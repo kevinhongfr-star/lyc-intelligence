@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowRight, Zap, Shield } from 'lucide-react';
+import { ArrowRight, Zap, Shield, Loader2 } from 'lucide-react';
 import { sendChatMessage } from '@/services/coze';
+import { insertB2CLead } from '@/services/supabaseApi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -62,11 +63,36 @@ export function NexusLanding() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [showEmailGate, setShowEmailGate] = useState(false);
+  const [email, setEmail] = useState('');
+  const [capturedEmail, setCapturedEmail] = useState<string | null>(null);
+  const [capturing, setCapturing] = useState(false);
 
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, showEmailGate]);
+
+  const handleEmailSubmit = async () => {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+    setCapturing(true);
+    try {
+      await insertB2CLead({ name: 'Anonymous', email, source: 'nexus_chat' });
+      setCapturedEmail(email);
+      setShowEmailGate(false);
+    } catch (e) {
+      console.error('Failed to capture lead:', e);
+    } finally {
+      setCapturing(false);
+    }
+  };
 
   const send = async () => {
     if (!input.trim() || loading) return;
+    
+    // Check if we need to show email gate (after 3 messages)
+    if (!capturedEmail && messages.length >= 3 && !showEmailGate) {
+      setShowEmailGate(true);
+      return;
+    }
+
     const userMsg = input.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
@@ -97,7 +123,65 @@ export function NexusLanding() {
           <p style={{ fontSize: '14px', color: DS.muted }}>Powered by LYC Partners — Building Leadership That Works Across Borders</p>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: 'calc(100vh - 260px)' }}>
+        <div style={{ flex: 1, overflowY: 'auto', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: 'calc(100vh - 260px)', paddingTop: showEmailGate ? '12px' : 0 }}>
+          {showEmailGate && !capturedEmail && (
+            <div style={{ alignSelf: 'center', width: '100%', maxWidth: '400px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '12px', padding: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+              <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '8px' }}>
+                Save our conversation
+              </h3>
+              <p style={{ fontSize: '13px', color: DS.muted, marginBottom: '16px' }}>
+                Enter your email to get your full leadership report and continue our chat.
+              </p>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="email"
+                  placeholder="Your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleEmailSubmit()}
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    background: DS.bg,
+                    border: `1px solid ${DS.border}`,
+                    borderRadius: '8px',
+                    color: DS.text,
+                    fontSize: '14px',
+                    outline: 'none',
+                    minHeight: '44px'
+                  }}
+                />
+                <button
+                  onClick={handleEmailSubmit}
+                  disabled={capturing || !email}
+                  style={{
+                    padding: '12px 20px',
+                    background: DS.accent,
+                    color: '#FFF',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: (capturing || !email) ? 'not-allowed' : 'pointer',
+                    opacity: (capturing || !email) ? 0.5 : 1,
+                    minHeight: '44px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  {capturing ? (
+                    <>
+                      <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
+                      ...
+                    </>
+                  ) : (
+                    'Continue'
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
           {messages.map((m, i) => (
             <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
               <div style={{
