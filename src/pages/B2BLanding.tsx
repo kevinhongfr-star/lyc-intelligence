@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart3, Shield, Briefcase, ArrowRight, Users, Zap, Star, CheckCircle2 } from 'lucide-react';
+import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 
 const DS = { headingFont: 'Georgia, serif', accent: '#C108AB', bg: '#0A0A0A', card: '#111111', muted: '#888888', text: '#FFFFFF', textSecondary: '#CCCCCC', border: '#222222', radius: '12px' };
 
@@ -64,14 +65,13 @@ export function B2BLanding() {
           <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 20px' }}>TRIDENT 3D Scoring Model</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
             {[
-              { dim: 'D1', weight: '40%', name: 'Experience & Achievements', desc: 'Career trajectory, role progression, quantifiable impact, leadership scope', color: '#3B82F6' },
-              { dim: 'D2', weight: '35%', name: 'Skills / Functional Match', desc: 'Technical competencies, functional expertise, cross-border capability, language fit', color: DS.accent },
-              { dim: 'D3', weight: '25%', name: 'Organizational Fit', desc: 'Culture alignment, stakeholder complexity, transformation readiness, board dynamics', color: '#8B5CF6' },
+              { dim: 'D1', name: 'Experience & Achievements', desc: 'Career trajectory, role progression, quantifiable impact, leadership scope', color: '#3B82F6' },
+              { dim: 'D2', name: 'Skills / Functional Match', desc: 'Technical competencies, functional expertise, cross-border capability, language fit', color: DS.accent },
+              { dim: 'D3', name: 'Organizational Fit', desc: 'Culture alignment, stakeholder complexity, transformation readiness, board dynamics', color: '#8B5CF6' },
             ].map(d => (
               <div key={d.dim} style={{ background: DS.bg, borderRadius: '8px', padding: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '28px', fontWeight: 700, color: d.color }}>{d.weight}</span>
-                  <span style={{ fontSize: '12px', color: DS.muted }}>{d.dim}</span>
+                  <span style={{ fontSize: '28px', fontWeight: 700, color: d.color }}>{d.dim}</span>
                 </div>
                 <h4 style={{ fontSize: '14px', fontWeight: 600, color: DS.text, margin: '0 0 6px' }}>{d.name}</h4>
                 <p style={{ fontSize: '12px', color: DS.muted, lineHeight: 1.4, margin: 0 }}>{d.desc}</p>
@@ -80,7 +80,7 @@ export function B2BLanding() {
           </div>
           <div style={{ marginTop: '20px', padding: '12px 16px', background: DS.bg, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <CheckCircle2 style={{ width: 14, height: 14, color: '#22C55E' }} />
-            <span style={{ fontSize: '12px', color: DS.muted }}>Verdict mapping: Strong Fit → T1 Strong Primary · Conditional → T2 Strong Secondary · Weak → T3 Reserve</span>
+            <span style={{ fontSize: '12px', color: DS.muted }}>Verdict mapping: Strong Fit → Strong Primary (T1) · Conditional → Strong Secondary (T2) · Weak → Reserve (T3)</span>
           </div>
         </div>
       </div>
@@ -103,13 +103,11 @@ export function B2BLanding() {
       </div>
 
       {/* CTA */}
-      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '60px 32px 80px', textAlign: 'center' }}>
+      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '60px 32px 80px', textAlign: 'center' }}>
         <Star style={{ width: 24, height: 24, color: DS.accent, marginBottom: '12px' }} />
         <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, margin: '0 0 12px' }}>Start matching today</h2>
         <p style={{ fontSize: '15px', color: DS.muted, marginBottom: '24px' }}>Free to try. No credit card required. Score your first candidates in under 2 minutes.</p>
-        <a href="/match" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '16px 32px', background: DS.accent, color: '#FFF', borderRadius: '8px', fontSize: '16px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}>
-          Launch TRIDENT Match <ArrowRight style={{ width: 18, height: 18 }} />
-        </a>
+        <LeadCaptureForm flow="b2b" />
       </div>
 
       {/* Footer */}

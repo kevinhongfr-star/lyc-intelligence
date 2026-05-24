@@ -1,28 +1,59 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowRight, Zap, Shield } from 'lucide-react';
 import { sendChatMessage } from '@/services/coze';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const DS = { headingFont: 'Georgia, serif', accent: '#C108AB', bg: '#0A0A0A', card: '#111111', muted: '#888888', text: '#FFFFFF', textSecondary: '#CCCCCC', border: '#222222', radius: '12px' };
 
-function renderMd(text: string): string {
-  return text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/```([\s\S]*?)```/g, '<pre style="background:#0A0A0A;padding:8px;border-radius:6px;overflow-x:auto;font-size:12px;margin:6px 0">$1</pre>')
-    .replace(/`([^`]+)`/g, '<code style="background:#0A0A0A;padding:2px 6px;border-radius:4px;font-size:12px;color:#C108AB">$1</code>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/^### (.+)$/gm, '<h4 style="font-size:14px;font-weight:600;color:#FFF;margin:8px 0 4px">$1</h4>')
-    .replace(/^## (.+)$/gm, '<h3 style="font-size:15px;font-weight:600;color:#FFF;margin:8px 0 4px">$1</h3>')
-    .replace(/^# (.+)$/gm, '<h2 style="font-size:16px;font-weight:600;color:#FFF;margin:8px 0 4px">$1</h2>')
-    .replace(/^- (.+)$/gm, '<div style="padding-left:12px;margin:2px 0;color:#CCC">• $1</div>')
-    .replace(/^\d+\. (.+)$/gm, '<div style="padding-left:12px;margin:2px 0;color:#CCC">$1</div>')
-    .replace(/\|(.+)\|/g, (match) => {
-      const cells = match.split('|').filter(c => c.trim());
-      if (cells.every(c => /^[\s-]+$/.test(c))) return '';
-      return '<div style="display:flex;gap:8px;padding:2px 0">' + cells.map(c => `<span style="flex:1;font-size:12px;color:#CCC">${c.trim()}</span>`).join('') + '</div>';
-    })
-    .replace(/\n/g, '<br/>');
-}
+const customComponents = {
+  table: ({ children }: any) => (
+    <div className="overflow-x-auto my-3">
+      <table className="min-w-full border-collapse border border-gray-700 rounded-lg overflow-hidden">
+        {children}
+      </table>
+    </div>
+  ),
+  th: ({ children }: any) => (
+    <th className="border border-gray-600 bg-gray-800 px-4 py-3 font-bold text-gray-200 text-left">
+      {children}
+    </th>
+  ),
+  td: ({ children }: any) => (
+    <td className="border border-gray-600 px-4 py-3 text-gray-300">
+      {children}
+    </td>
+  ),
+  tr: ({ children }: any) => (
+    <tr className="even:bg-gray-900 odd:bg-gray-800">
+      {children}
+    </tr>
+  ),
+  code: ({ inline, className, children, ...props }: any) => {
+    if (inline) return <code className="bg-gray-800 rounded px-1.5 py-0.5 text-sm text-accent" {...props}>{children}</code>;
+    return (
+      <pre className="bg-gray-900 rounded-lg p-4 overflow-x-auto my-3">
+        <code className={className} {...props}>{children}</code>
+      </pre>
+    );
+  },
+  ul: ({ children }: any) => <ul className="list-disc pl-6 space-y-1 text-gray-300 my-2">{children}</ul>,
+  ol: ({ children }: any) => <ol className="list-decimal pl-6 space-y-1 text-gray-300 my-2">{children}</ol>,
+  li: ({ children }: any) => <li className="text-gray-300">{children}</li>,
+  a: ({ href, children }: any) => <a href={href} className="text-accent underline hover:text-purple-400" target="_blank" rel="noopener noreferrer">{children}</a>,
+  p: ({ children }: any) => <p className="text-gray-300 mb-3 last:mb-0">{children}</p>,
+  h1: ({ children }: any) => <h1 className="text-xl font-bold text-white mb-3 mt-4">{children}</h1>,
+  h2: ({ children }: any) => <h2 className="text-lg font-bold text-white mb-2 mt-3">{children}</h2>,
+  h3: ({ children }: any) => <h3 className="text-base font-semibold text-white mb-2 mt-2">{children}</h3>,
+  h4: ({ children }: any) => <h4 className="text-sm font-semibold text-gray-200 mb-1 mt-2">{children}</h4>,
+  strong: ({ children }: any) => <strong className="font-semibold text-white">{children}</strong>,
+  em: ({ children }: any) => <em className="italic text-gray-300">{children}</em>,
+  blockquote: ({ children }: any) => (
+    <blockquote className="border-l-4 border-accent pl-4 my-3 italic text-gray-400">
+      {children}
+    </blockquote>
+  ),
+};
 
 export function NexusLanding() {
   const [messages, setMessages] = useState<Array<{role: string; content: string}>>([
@@ -77,7 +108,18 @@ export function NexusLanding() {
                 color: m.role === 'user' ? '#FFF' : DS.textSecondary,
                 fontSize: '14px',
                 lineHeight: 1.6
-              }} dangerouslySetInnerHTML={{ __html: m.role === 'user' ? m.content : renderMd(m.content) }} />
+              }}>
+                {m.role === 'user' ? (
+                  m.content
+                ) : (
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={customComponents}
+                  >
+                    {m.content}
+                  </ReactMarkdown>
+                )}
+              </div>
             </div>
           ))}
           {loading && (

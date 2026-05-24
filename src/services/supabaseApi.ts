@@ -237,6 +237,32 @@ export async function createEvent(event: { title: string; start_time: string; en
 }
 
 // ─── Lead Capture ───
+export async function insertB2CLead(lead: { name: string; email: string; source: string }): Promise<boolean> {
+  const { error } = await getSupabase().from('b2c_leads').insert({
+    email: lead.email,
+    source: lead.source,
+  });
+  if (error) {
+    console.error('[Supabase] insertB2CLead:', error);
+    return false;
+  }
+  return true;
+}
+
+export async function insertB2BLead(lead: { name: string; email: string; company: string; source: string }): Promise<boolean> {
+  const { error } = await getSupabase().from('b2b_leads').insert({
+    name: lead.name,
+    email: lead.email,
+    company: lead.company,
+    source: lead.source,
+  });
+  if (error) {
+    console.error('[Supabase] insertB2BLead:', error);
+    return false;
+  }
+  return true;
+}
+
 export async function upsertLead(lead: { name: string; email: string; current_title?: string; country?: string; source: string; }): Promise<boolean> {
   const { error } = await getSupabase().from('contacts').insert({ name: lead.name, email: lead.email, current_title: lead.current_title || null, country: lead.country || null, seniority: 'leadership', source: lead.source, activity_status: 'Lead', market_side: 'candidate', engagement_score: 10, is_expat: false, skills: [], languages: [] });
   return !error;

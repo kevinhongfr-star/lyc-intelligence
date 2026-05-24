@@ -7,6 +7,7 @@ const DS = { headingFont: 'Georgia, serif', bodyFont: 'Inter, sans-serif', accen
 const DEEPSEEK_API_KEY = (import.meta.env.VITE_DEEPSEEK_API_KEY as string) || '';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
+const TRIDENT_EDGE_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/trident-score` : '';
 
 interface CandidateInput { name: string; cv: string; }
 interface ScoreResult { name: string; d1: number; d2: number; d3: number; composite: number; verdict: string; tier: string; clientVerdict: string; keyMatchReasons: string; riskFactors: string; approachStrategy: string; }
@@ -23,6 +24,26 @@ async function saveLead(data: LeadData) {
 }
 
 async function scoreCandidate(jd: string, cv: string): Promise<{ d1: number; d2: number; d3: number; key_match_reasons: string; risk_factors: string; approach_strategy: string } | null> {
+  if (TRIDENT_EDGE_URL && SUPABASE_KEY) {
+    try {
+      const res = await fetch(TRIDENT_EDGE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY}` },
+        body: JSON.stringify({ jd, cv }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return {
+          d1: data.d1,
+          d2: data.d2,
+          d3: data.d3,
+          key_match_reasons: data.keyMatchReasons || '',
+          risk_factors: data.riskFactors || '',
+          approach_strategy: data.approachStrategy || '',
+        };
+      }
+    } catch (e) { console.warn('[TRIDENT Edge] Failed, falling back to direct:', e); }
+  }
   if (!DEEPSEEK_API_KEY) return null;
   try {
     const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -47,7 +68,7 @@ async function scoreCandidate(jd: string, cv: string): Promise<{ d1: number; d2:
   return null;
 }
 
-function verdictColor(v: string) { return v.includes('Strong') ? DS.green : v.includes('Conditional') ? DS.yellow : DS.red; }
+function verdictColor(v: string) { return v.includes('Strong Primary') ? DS.green : v.includes('Strong Secondary') ? DS.yellow : DS.red; }
 function tierBg(t: string) { return t === 'T1' ? 'rgba(34,197,94,0.15)' : t === 'T2' ? 'rgba(234,179,8,0.15)' : 'rgba(239,68,68,0.15)'; }
 
 export function MatchPage() {
@@ -198,7 +219,7 @@ export function MatchPage() {
               <BarChart3 style={{ color: DS.accent, width: 24, height: 24 }} />
               <span style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 700, color: DS.text }}>TRIDENT Results</span>
             </div>
-            <p style={{ fontSize: '13px', color: DS.muted, margin: 0 }}>{results.length} candidate{results.length !== 1 ? 's' : ''} scored • D1 40% · D2 35% · D3 25%</p>
+            <p style={{ fontSize: '13px', color: DS.muted, margin: 0 }}>{results.length} candidate{results.length !== 1 ? 's' : ''} scored</p>
           </div>
           <button onClick={() => { setStep('engine'); setResults([]); }} style={{ padding: '10px 20px', background: 'transparent', border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.textSecondary, fontSize: '13px', cursor: 'pointer' }}>
             Score More
@@ -208,9 +229,9 @@ export function MatchPage() {
         {/* Summary Bar */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
           {[
-            { label: 'Strong Fit', count: results.filter(r => r.composite >= 75).length, color: DS.green },
-            { label: 'Conditional', count: results.filter(r => r.composite >= 50 && r.composite < 75).length, color: DS.yellow },
-            { label: 'Weak Fit', count: results.filter(r => r.composite < 50).length, color: DS.red },
+            { label: 'Strong Primary (T1)', count: results.filter(r => r.tier === 'T1').length, color: DS.green },
+            { label: 'Strong Secondary (T2)', count: results.filter(r => r.tier === 'T2').length, color: DS.yellow },
+            { label: 'Reserve (T3)', count: results.filter(r => r.tier === 'T3').length, color: DS.red },
           ].map(s => (
             <div key={s.label} style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '8px', padding: '16px', textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 700, color: s.color }}>{s.count}</div>
@@ -263,7 +284,7 @@ export function MatchPage() {
                   </div>
                   {/* Score Bars */}
                   <div style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
-                    {[{ label: 'Experience & Achievements (D1)', val: r.d1 }, { label: 'Skills / Functional Match (D2)', val: r.d2 }, { label: 'Organizational Fit (D3)', val: r.d3 }].map(d => (
+                    {[{ label: 'Experience & Achievements', val: r.d1 }, { label: 'Skills / Functional Match', val: r.d2 }, { label: 'Organizational Fit', val: r.d3 }].map(d => (
                       <div key={d.label} style={{ flex: 1 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                           <span style={{ fontSize: '11px', color: DS.muted }}>{d.label}</span>

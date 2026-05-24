@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts';
 import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDashboard, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon } from 'lucide-react';
+import { CreditDisplay } from '@/components/ui/CreditDisplay';
 
 const NAV_ITEMS = [
   { path: '/platform', icon: LayoutDashboard, label: 'Dashboard', exact: true },
@@ -66,6 +67,7 @@ export function AppLayout() {
           })}
         </nav>
         <div className="p-4 border-t border-bg-tertiary space-y-2">
+          {sidebarOpen && <CreditDisplay showTier />}
           <button onClick={toggleTheme} className="flex items-center gap-2 text-sm text-text-muted hover:text-text-primary w-full min-h-[44px]">
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}{sidebarOpen && (theme === 'dark' ? 'Light Mode' : 'Dark Mode')}
           </button>

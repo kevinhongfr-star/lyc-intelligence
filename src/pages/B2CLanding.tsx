@@ -1,5 +1,6 @@
 import React from 'react';
 import { Brain, Globe, Award, ArrowRight, Shield, BarChart3, Star, MessageCircle } from 'lucide-react';
+import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 
 const DS = { headingFont: 'Georgia, serif', accent: '#C108AB', bg: '#0A0A0A', card: '#111111', muted: '#888888', text: '#FFFFFF', textSecondary: '#CCCCCC', border: '#222222', radius: '12px' };
 
@@ -88,13 +89,11 @@ export function B2CLanding() {
       </div>
 
       {/* CTA */}
-      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '40px 32px 80px', textAlign: 'center' }}>
+      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '40px 32px 80px', textAlign: 'center' }}>
         <Star style={{ width: 24, height: 24, color: DS.accent, marginBottom: '12px' }} />
         <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, margin: '0 0 12px' }}>Ready to find out?</h2>
         <p style={{ fontSize: '15px', color: DS.muted, marginBottom: '24px' }}>Free assessment. No credit card. Results in 10 minutes.</p>
-        <a href="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '16px 32px', background: DS.accent, color: '#FFF', borderRadius: '8px', fontSize: '16px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}>
-          Start Free Assessment <ArrowRight style={{ width: 18, height: 18 }} />
-        </a>
+        <LeadCaptureForm flow="b2c" />
       </div>
 
       {/* Footer */}

@@ -2,24 +2,53 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, MessageSquare, Trash2 } from 'lucide-react';
 import { sendChatMessage } from '@/services/coze';
 import { useAuth } from '@/contexts';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message { role: 'user' | 'assistant'; content: string; }
 
-function renderMarkdown(text: string): string {
-  let html = text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/```([\s\S]*?)```/g, '<pre class="bg-bg-primary rounded p-3 my-2 overflow-x-auto text-xs"><code>$1</code></pre>')
-    .replace(/`([^`]+)`/g, '<code class="bg-bg-primary px-1.5 py-0.5 rounded text-accent text-xs">$1</code>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/^### (.+)$/gm, '<h3 class="text-base font-semibold text-text-primary mt-3 mb-1">$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2 class="text-lg font-semibold text-text-primary mt-3 mb-1">$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1 class="text-xl font-bold text-text-primary mt-3 mb-1">$1</h1>')
-    .replace(/^- (.+)$/gm, '<li class="ml-4 text-text-secondary">• $1</li>')
-    .replace(/^\d+\. (.+)$/gm, '<li class="ml-4 text-text-secondary">$1</li>')
-    .replace(/\n/g, '<br/>');
-  return html;
-}
+const customComponents = {
+  table: ({ children }: any) => (
+    <div className="overflow-x-auto my-3">
+      <table className="min-w-full border-collapse border border-gray-700 rounded-lg overflow-hidden">
+        {children}
+      </table>
+    </div>
+  ),
+  th: ({ children }: any) => (
+    <th className="border border-gray-600 bg-gray-800 px-4 py-3 font-bold text-gray-200 text-left">
+      {children}
+    </th>
+  ),
+  td: ({ children }: any) => (
+    <td className="border border-gray-600 px-4 py-3 text-gray-300">
+      {children}
+    </td>
+  ),
+  tr: ({ children }: any) => (
+    <tr className="even:bg-gray-900 odd:bg-gray-800">
+      {children}
+    </tr>
+  ),
+  code: ({ inline, className, children, ...props }: any) => {
+    if (inline) return <code className="bg-gray-800 rounded px-1.5 py-0.5 text-xs text-accent" {...props}>{children}</code>;
+    return (
+      <pre className="bg-gray-900 rounded-lg p-3 overflow-x-auto my-2 text-xs">
+        <code className={className} {...props}>{children}</code>
+      </pre>
+    );
+  },
+  ul: ({ children }: any) => <ul className="list-disc pl-6 space-y-1 text-gray-300 my-2">{children}</ul>,
+  ol: ({ children }: any) => <ol className="list-decimal pl-6 space-y-1 text-gray-300 my-2">{children}</ol>,
+  li: ({ children }: any) => <li className="text-gray-300">{children}</li>,
+  a: ({ href, children }: any) => <a href={href} className="text-accent underline hover:text-purple-400" target="_blank" rel="noopener noreferrer">{children}</a>,
+  p: ({ children }: any) => <p className="text-gray-300 mb-2 last:mb-0">{children}</p>,
+  h1: ({ children }: any) => <h1 className="text-lg font-bold text-white mb-2 mt-3">{children}</h1>,
+  h2: ({ children }: any) => <h2 className="text-base font-bold text-white mb-2 mt-3">{children}</h2>,
+  h3: ({ children }: any) => <h3 className="text-sm font-semibold text-white mb-1 mt-2">{children}</h3>,
+  strong: ({ children }: any) => <strong className="font-semibold text-white">{children}</strong>,
+  em: ({ children }: any) => <em className="italic text-gray-300">{children}</em>,
+};
 
 export function NexusPage() {
   const { user } = useAuth();
@@ -73,7 +102,12 @@ export function NexusPage() {
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] rounded-lg px-4 py-2.5 text-sm ${m.role === 'user' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-primary'}`}>
               {m.role === 'assistant' ? (
-                <div dangerouslySetInnerHTML={{ __html: renderMarkdown(m.content) }} />
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={customComponents}
+                >
+                  {m.content}
+                </ReactMarkdown>
               ) : m.content}
             </div>
           </div>
