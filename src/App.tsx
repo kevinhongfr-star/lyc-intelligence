@@ -1,6 +1,6 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts';
+import { useAuthStore } from '@/stores/authStore';
 import { CreditProvider } from '@/contexts/CreditContext';
 import { Loader2 } from 'lucide-react';
 
@@ -10,15 +10,18 @@ const B2BLanding = lazy(() => import('@/pages/B2BLanding').then(m => ({ default:
 const B2CLanding = lazy(() => import('@/pages/B2CLanding').then(m => ({ default: m.B2CLanding })));
 const NexusLanding = lazy(() => import('@/pages/NexusLanding').then(m => ({ default: m.NexusLanding })));
 const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m.MatchPage })));
+const LoginPage = lazy(() => import('@/pages/LoginPage').then(m => ({ default: m.LoginPage })));
+const SignupPage = lazy(() => import('@/pages/SignupPage').then(m => ({ default: m.SignupPage })));
+const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
 function Loading() { return <div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>; }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading } = useAuthStore();
   if (isLoading) return <Loading />;
-  if (!user) return <Navigate to="/" replace />;
+  if (!user) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }
 
@@ -47,16 +50,25 @@ if (ENABLE_PLATFORM) {
 }
 
 export default function App() {
+  const { initialize } = useAuthStore();
+  
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
   return (
     <CreditProvider>
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="/assessment" element={<AssessmentPage />} />
           <Route path="/b2b" element={<B2BLanding />} />
           <Route path="/b2c" element={<B2CLanding />} />
           <Route path="/nexus" element={<NexusLanding />} />
           <Route path="/match" element={<MatchPage />} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           {ENABLE_PLATFORM && (
             <Route path="/platform" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<ConsultantDashboard />} />
