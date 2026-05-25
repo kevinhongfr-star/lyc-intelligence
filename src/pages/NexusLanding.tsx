@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowRight, Zap, Shield, Loader2 } from 'lucide-react';
-import { sendChatMessage } from '@/services/coze';
-import { insertB2CLead } from '@/services/supabaseApi';
+import { ArrowRight, Zap, Shield, Loader2, RefreshCw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -62,6 +60,8 @@ export function NexusLanding() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [aiState, setAiState] = useState<'idle'|'thinking'|'error'>('idle');
+  const [lastUserMessage, setLastUserMessage] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [showEmailGate, setShowEmailGate] = useState(false);
   const [email, setEmail] = useState('');
@@ -74,13 +74,47 @@ export function NexusLanding() {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
     setCapturing(true);
     try {
-      await insertB2CLead({ name: 'Anonymous', email, source: 'nexus_chat' });
+      // Use API endpoint for lead capture
+      await fetch('/api/lead-capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'nexus_chat' })
+      });
       setCapturedEmail(email);
       setShowEmailGate(false);
     } catch (e) {
       console.error('Failed to capture lead:', e);
     } finally {
       setCapturing(false);
+    }
+  };
+
+  const sendMessage = async (userMsg: string) => {
+    setAiState('thinking');
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          message: userMsg, 
+          userId: 'nexus-visitor', 
+          history: messages.slice(-10)
+        })
+      });
+      if (!res.ok) throw new Error('API failed');
+      const data = await res.json();
+      if (data.success) {
+        setMessages(prev => [...prev, { role: 'assistant', content: data.content }]);
+        setAiState('idle');
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (e) {
+      console.error('Chat failed:', e);
+      setAiState('error');
+      setLastUserMessage(userMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,9 +131,15 @@ export function NexusLanding() {
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setLoading(true);
-    const reply = await sendChatMessage(userMsg, 'nexus-visitor', messages.slice(-10));
-    setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
-    setLoading(false);
+    await sendMessage(userMsg);
+  };
+
+  const retry = async () => {
+    if (lastUserMessage) {
+      setAiState('thinking');
+      setLoading(true);
+      await sendMessage(lastUserMessage);
+    }
   };
 
   return (
@@ -206,8 +246,38 @@ export function NexusLanding() {
               </div>
             </div>
           ))}
-          {loading && (
-            <div style={{ alignSelf: 'flex-start', padding: '12px 16px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '12px 12px 12px 4px', color: DS.muted, fontSize: '14px' }}>Thinking...</div>
+          {aiState === 'thinking' && (
+            <div style={{ alignSelf: 'flex-start', padding: '12px 16px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '12px 12px 12px 4px', color: DS.muted, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
+              Thinking...
+            </div>
+          )}
+          {aiState === 'error' && (
+            <div style={{ alignSelf: 'flex-start', width: '100%', maxWidth: '400px', background: 'rgba(193, 8, 171, 0.1)', border: '1px solid rgba(193, 8, 171, 0.3)', borderRadius: '12px', padding: '16px' }}>
+              <p style={{ fontSize: '13px', color: DS.textSecondary, marginBottom: '12px' }}>
+                Oops, something went wrong. Want to try again?
+              </p>
+              <button
+                onClick={retry}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  background: DS.accent,
+                  color: '#FFF',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  minHeight: '36px'
+                }}
+              >
+                <RefreshCw style={{ width: 14, height: 14 }} />
+                Retry
+              </button>
+            </div>
           )}
           <div ref={chatEndRef} />
         </div>

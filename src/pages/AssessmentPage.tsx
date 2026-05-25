@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Download, Loader2, CheckCircle2, ChevronRight, ChevronLeft, AlertCircle, ArrowRight } from 'lucide-react';
 import { ASSESSMENT_CATALOG, AssessmentInfo, AssessmentDimension, AssessmentStyle, AssessmentArchetype } from '@/assessments/catalog';
-import { insertB2CLead, logAssessmentGeneration } from '@/services/supabaseApi';
+import { insertB2CLead, logAssessmentGeneration, saveAssessment } from '@/services/supabaseApi';
 import { generatePDF } from '@/services/reportGenerator';
 import type { AssessmentType, AssessmentReport } from '@/types';
 
@@ -111,6 +111,22 @@ export function AssessmentPage() {
     const archetype = catalog.archetypes[archetypeIndex];
     setState(prev => ({ ...prev, compositeScore, archetype, style: style.id, styleName: style.name }));
     setStep('results');
+    
+    // Save the assessment to the database
+    const scoresRecord: Record<string, number> = {};
+    catalog.dimensions.forEach(dim => {
+      scoresRecord[dim.name] = (state.ratings[dim.id] || 3) * 20;
+    });
+    await saveAssessment({
+      email: state.email,
+      assessmentType: state.type,
+      answers: state.ratings,
+      scores: scoresRecord,
+      archetype: archetype.name,
+      compositeScore,
+      writingStyle: style.id
+    });
+    
     await logAssessmentGeneration({
       email: state.email,
       toolType: state.type,

@@ -277,3 +277,49 @@ export async function logScoringRun(params: { mandateId?: string; contactId?: st
   const { error } = await getSupabase().from('scoring_runs').insert({ user_id: '3cf508f5-dd29-4d1c-846b-6633b616f9c6', mandate_id: params.mandateId || null, contact_id: params.contactId || null, run_type: params.runType, input_params: params.inputParams ? JSON.stringify(params.inputParams) : null, output_scores: params.outputScores ? JSON.stringify(params.outputScores) : null, composite_score: params.compositeScore ?? null, verdict: params.verdict || null, model: params.model || null });
   return !error;
 }
+
+// ─── Assessment Persistence ───
+export async function saveAssessment(params: {
+  email: string;
+  assessmentType: string;
+  answers: Record<string, number>;
+  scores: Record<string, number>;
+  archetype: string;
+  compositeScore: number;
+  writingStyle?: string;
+}): Promise<boolean> {
+  try {
+    const { error } = await getSupabase().from('assessments').insert({
+      email: params.email,
+      assessment_type: params.assessmentType,
+      answers: JSON.stringify(params.answers),
+      scores: JSON.stringify(params.scores),
+      archetype: params.archetype,
+      composite_score: params.compositeScore,
+      writing_style: params.writingStyle || null,
+      created_at: new Date().toISOString()
+    });
+    if (error) {
+      console.error('[Supabase] saveAssessment:', error);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('[Supabase] saveAssessment:', e);
+    return false;
+  }
+}
+
+export async function getAssessmentsByEmail(email: string): Promise<any[]> {
+  try {
+    const { data, error } = await getSupabase()
+      .from('assessments')
+      .select('*')
+      .eq('email', email)
+      .order('created_at', { ascending: false });
+    if (error) return [];
+    return data || [];
+  } catch {
+    return [];
+  }
+}

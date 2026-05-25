@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ArrowRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { insertB2BLead, insertB2CLead } from '@/services/supabaseApi';
 
 interface LeadCaptureFormProps {
   flow: 'b2b' | 'b2c';
@@ -59,14 +58,20 @@ export function LeadCaptureForm({ flow, onSuccess, redirectTo }: LeadCaptureForm
     setLoading(true);
 
     try {
-      if (flow === 'b2b') {
-        await insertB2BLead({
-          name: formData.name,
+      const res = await fetch('/api/lead-capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           email: formData.email,
-          company: formData.company || '',
-          source: 'b2b_landing',
-        });
+          name: formData.name,
+          company: formData.company,
+          source: flow === 'b2b' ? 'b2b_landing' : 'b2c_landing'
+        })
+      });
 
+      if (!res.ok) throw new Error('API failed');
+
+      if (flow === 'b2b') {
         if (onSuccess) {
           onSuccess(formData.email);
         } else if (redirectTo || flow === 'b2b') {
@@ -74,12 +79,6 @@ export function LeadCaptureForm({ flow, onSuccess, redirectTo }: LeadCaptureForm
           window.location.href = targetUrl;
         }
       } else {
-        await insertB2CLead({
-          name: formData.name,
-          email: formData.email,
-          source: 'b2c_landing',
-        });
-
         if (onSuccess) {
           onSuccess(formData.email);
         } else {

@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts';
+import { CreditProvider } from '@/contexts/CreditContext';
 import { Loader2 } from 'lucide-react';
 
 const Landing = lazy(() => import('@/pages/Landing').then(m => ({ default: m.Landing })));
@@ -47,33 +48,35 @@ if (ENABLE_PLATFORM) {
 
 export default function App() {
   return (
-    <Suspense fallback={<Loading />}>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/assessment" element={<AssessmentPage />} />
-        <Route path="/b2b" element={<B2BLanding />} />
-        <Route path="/b2c" element={<B2CLanding />} />
-        <Route path="/nexus" element={<NexusLanding />} />
-        <Route path="/match" element={<MatchPage />} />
-        {ENABLE_PLATFORM && (
-          <Route path="/platform" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-            <Route index element={<ConsultantDashboard />} />
-            <Route path="mandates" element={<MandatesPage />} />
-            <Route path="mandates/:id" element={<MandateDetailPage />} />
-            <Route path="mandates/:id/lens" element={<LensExportPage />} />
-            <Route path="candidates" element={<CandidatesPage />} />
-            <Route path="pipeline" element={<PipelinePage />} />
-            <Route path="batch-scoring" element={<BatchScoringPage />} />
-            <Route path="metrix" element={<MetrixPage />} />
-            <Route path="scoring-runs" element={<ScoringRunsPage />} />
-            <Route path="chat" element={<NexusPage />} />
-            <Route path="scheduler" element={<SchedulerPage />} />
-            <Route path="documents" element={<DocumentsPage />} />
-            <Route path="notifications" element={<NotificationsPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
-        )}
-      </Routes>
-    </Suspense>
+    <CreditProvider>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/assessment" element={<AssessmentPage />} />
+          <Route path="/b2b" element={<B2BLanding />} />
+          <Route path="/b2c" element={<B2CLanding />} />
+          <Route path="/nexus" element={<NexusLanding />} />
+          <Route path="/match" element={<MatchPage />} />
+          {ENABLE_PLATFORM && (
+            <Route path="/platform" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+              <Route index element={<ConsultantDashboard />} />
+              <Route path="mandates" element={<MandatesPage />} />
+              <Route path="mandates/:id" element={<MandateDetailPage />} />
+              <Route path="mandates/:id/lens" element={<LensExportPage />} />
+              <Route path="candidates" element={<CandidatesPage />} />
+              <Route path="pipeline" element={<PipelinePage />} />
+              <Route path="batch-scoring" element={<BatchScoringPage />} />
+              <Route path="metrix" element={<MetrixPage />} />
+              <Route path="scoring-runs" element={<ScoringRunsPage />} />
+              <Route path="chat" element={<NexusPage />} />
+              <Route path="scheduler" element={<SchedulerPage />} />
+              <Route path="documents" element={<DocumentsPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
+          )}
+        </Routes>
+      </Suspense>
+    </CreditProvider>
   );
 }
