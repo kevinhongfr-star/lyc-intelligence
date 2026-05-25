@@ -1,71 +1,182 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createClient } from '@supabase/supabase-js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
+
+const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
+  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+  : null;
+
+// Weights are hidden from client-side - only used internally
+const DIMENSION_WEIGHTS = {
+  experience: 0.40,
+  skills: 0.35,
+  fit: 0.25
+};
+
+interface CandidateInput {
+  name: string;
+  cv: string;
+}
+
+interface ScoreResult {
+  candidate_name: string;
+  composite_score: number;
+  dimension_scores: {
+    experience: number;
+    skills: number;
+    fit: number;
+  };
+  match_reasons: string[];
+  risk_factors: string[];
+  approach_strategy: string;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const { mandateId, contactIds, jdDescription, cvData } = req.body;
-  if (!mandateId) return res.status(400).json({ error: 'Missing mandateId' });
-  if (!DEEPSEEK_API_KEY) return res.status(500).json({ error: 'DEEPSEEK_API_KEY not configured' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { jd, candidates, userId } = req.body;
+
+  if (!jd || !candidates || candidates.length === 0) {
+    return res.status(400).json({ error: 'Missing JD or candidates' });
+  }
+
+  // Rate limiting check
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  if (ip) {
+    const rateLimitKey = `rate_limit:${ip}`;
+    // In production, check Redis or Supabase for rate limiting
+    // For now, skip rate limiting in this implementation
+  }
 
   try {
-    let jd = jdDescription || '';
-    if (!jd && SUPABASE_URL && SUPABASE_SERVICE_KEY) {
-      const mRes = await fetch(`${SUPABASE_URL}/rest/v1/mandates?select=jd_description,skills_requirements,search_definition&id=eq.${mandateId}`, { headers: { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` } });
-      const mandates = await mRes.json();
-      if (mandates.length) { const m = mandates[0]; jd = [m.jd_description, m.search_definition, Array.isArray(m.skills_requirements) ? m.skills_requirements.join(', ') : ''].filter(Boolean).join('\n'); }
+    const results: ScoreResult[] = [];
+
+    // Process each candidate
+    for (const candidate of candidates) {
+      const scoreResult = await scoreCandidate(jd, candidate.cv);
+      
+      if (scoreResult) {
+        results.push({
+          candidate_name: candidate.name,
+          composite_score: scoreResult.composite,
+          dimension_scores: scoreResult.dimensions,
+          match_reasons: scoreResult.reasons,
+          risk_factors: scoreResult.risks,
+          approach_strategy: scoreResult.strategy
+        });
+      }
     }
-    if (!jd) return res.status(400).json({ error: 'No JD description found' });
 
-    let candidates = cvData || [];
-    if (!candidates.length && contactIds?.length && SUPABASE_URL && SUPABASE_SERVICE_KEY) {
-      const cRes = await fetch(`${SUPABASE_URL}/rest/v1/contacts?select=id,name,current_title,headline,skills,career_history,summary&id=in.(${contactIds.join(',')})`, { headers: { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` } });
-      const contacts = await cRes.json();
-      candidates = contacts.map((c: any) => ({ id: c.id, name: c.name, title: c.current_title || '', headline: c.headline || '', skills: Array.isArray(c.skills) ? c.skills : [], experience: c.summary || (Array.isArray(c.career_history) ? c.career_history.map((h: any) => `${h.role} at ${h.company}`).join('; ') : '') }));
+    // Save match history for authenticated users
+    if (userId && supabase) {
+      await saveMatchHistory(userId, jd, results);
     }
-    if (!candidates.length) return res.status(400).json({ error: 'No candidates to score' });
 
-    const results = [];
-    for (const cv of candidates) {
-      const prompt = `You are an executive search analyst. Score this candidate against the job description using the TRIDENT 3D model.
+    return res.status(200).json({ results });
+  } catch (e) {
+    console.error('[Score API] Error:', e);
+    return res.status(500).json({ error: 'Scoring failed' });
+  }
+}
 
-JOB DESCRIPTION:
-${jd}
+async function scoreCandidate(jd: string, cv: string): Promise<ScoreResult | null> {
+  const scoringPrompt = `Score this candidate against the job description across three dimensions:
 
-CANDIDATE: ${cv.name}
-Title: ${cv.title}
-Headline: ${cv.headline}
-Skills: ${cv.skills.join(', ')}
-Experience: ${cv.experience}
+Experience (40%): Relevant years, role seniority, industry context, functional alignment
+Skills (35%): Technical capabilities, leadership competencies, language requirements  
+Organizational Fit (25%): Cultural alignment, team structure fit, reporting line suitability
 
-Score each dimension 0-100:
-- D1 (Experience): Career trajectory match
-- D2 (Skills): Skills match
-- D3 (Organizational Fit): Culture/org fit
+Return a composite score (0-100) and dimension scores. Provide specific match reasons,
+identify 2-3 risk factors, and suggest an approach strategy for recruiting this candidate.
 
-Also provide: verdict ("Strong Fit"/"Conditional Fit"/"Weak Fit"), key_match_reasons (2-3 sentences), risk_factors (1-2 sentences), approach_strategy.
+Job Description: ${jd}
+Candidate CV: ${cv}
 
-JSON only: {"d1": number, "d2": number, "d3": number, "verdict": string, "key_match_reasons": string, "risk_factors": string, "approach_strategy": string}`;
+Return ONLY valid JSON in this format:
+{
+  "experience_score": number (0-100),
+  "skills_score": number (0-100),
+  "fit_score": number (0-100),
+  "match_reasons": ["reason 1", "reason 2", "reason 3"],
+  "risk_factors": ["risk 1", "risk 2"],
+  "approach_strategy": "strategy text"
+}`;
 
-      try {
-        const dsRes = await fetch('https://api.deepseek.com/v1/chat/completions', { method: 'POST', headers: { 'Authorization': `Bearer ${DEEPSEEK_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'deepseek-chat', messages: [{ role: 'user', content: prompt }], temperature: 0.3, max_tokens: 500 }) });
-        const dsData = await dsRes.json();
-        const content = dsData.choices?.[0]?.message?.content || '';
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const scores = JSON.parse(jsonMatch[0]);
-          const composite = Math.round((scores.d1 || 0) * 0.40 + (scores.d2 || 0) * 0.35 + (scores.d3 || 0) * 0.25);
-          const tier = scores.verdict?.includes('Strong') ? 'T1' : scores.verdict?.includes('Conditional') ? 'T2' : 'T3';
-          results.push({ contactId: cv.id, name: cv.name, d1: scores.d1, d2: scores.d2, d3: scores.d3, composite, verdict: scores.verdict, tier, keyMatchReasons: scores.key_match_reasons, riskFactors: scores.risk_factors, approachStrategy: scores.approach_strategy });
-          if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
-            fetch(`${SUPABASE_URL}/rest/v1/candidates_pipeline?contact_id=eq.${cv.id}&mandate_id=eq.${mandateId}`, { method: 'PATCH', headers: { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ trident_d1: scores.d1, trident_d2: scores.d2, trident_d3: scores.d3, trident_composite: composite, sweep_tier: tier, verdict: scores.verdict, key_match_reasons: scores.key_match_reasons, risk_factors: scores.risk_factors, approach_strategy: scores.approach_strategy }) }).catch(() => {});
-            fetch(`${SUPABASE_URL}/rest/v1/scoring_runs`, { method: 'POST', headers: { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: '3cf508f5-dd29-4d1c-846b-6633b616f9c6', mandate_id: mandateId, contact_id: cv.id, run_type: 'trident', input_params: JSON.stringify({ jd_length: jd.length }), output_scores: JSON.stringify({ d1: scores.d1, d2: scores.d2, d3: scores.d3, composite }), composite_score: composite, verdict: scores.verdict, model: 'deepseek-chat' }) }).catch(() => {});
-          }
+  try {
+    if (DEEPSEEK_API_KEY) {
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'user', content: scoringPrompt }
+          ],
+          max_tokens: 800,
+          temperature: 0.3,
+          response_format: { type: 'json_object' }
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content;
+
+        if (content) {
+          const parsed = JSON.parse(content);
+          
+          // Calculate composite score using hidden weights
+          const composite = Math.round(
+            parsed.experience_score * DIMENSION_WEIGHTS.experience +
+            parsed.skills_score * DIMENSION_WEIGHTS.skills +
+            parsed.fit_score * DIMENSION_WEIGHTS.fit
+          );
+
+          return {
+            dimensions: {
+              experience: parsed.experience_score,
+              skills: parsed.skills_score,
+              fit: parsed.fit_score
+            },
+            composite,
+            reasons: parsed.match_reasons || [],
+            risks: parsed.risk_factors || [],
+            strategy: parsed.approach_strategy || ''
+          };
         }
-      } catch (scoreErr) { results.push({ contactId: cv.id, name: cv.name, error: 'Scoring failed' }); }
+      }
     }
-    return res.status(200).json({ success: true, results, scored: results.filter(r => !r.error).length, failed: results.filter(r => r.error).length });
-  } catch (err: any) { return res.status(500).json({ error: 'Internal server error', message: err.message }); }
+  } catch (e) {
+    console.error('[Score] DeepSeek error:', e);
+  }
+
+  return null;
+}
+
+async function saveMatchHistory(
+  userId: string,
+  jd: string,
+  results: ScoreResult[]
+) {
+  if (!supabase) return;
+
+  try {
+    await supabase.from('match_history').insert({
+      user_id: userId,
+      jd_text: jd.substring(0, 1000), // Store first 1000 chars
+      results: results,
+      candidate_count: results.length,
+      average_score: results.reduce((sum, r) => sum + r.composite_score, 0) / results.length
+    });
+  } catch (e) {
+    console.error('[Score] Failed to save history:', e);
+  }
 }

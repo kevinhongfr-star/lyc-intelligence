@@ -1,314 +1,520 @@
-import React, { useState, useRef } from 'react';
-import { ArrowRight, Plus, X, Play, Loader2, Download, Shield, BarChart3, ChevronDown, ChevronUp, Mail, Briefcase, Star } from 'lucide-react';
-import { computeTRIDENT } from '@/services/tridentScoring';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, BarChart3, Shield, Mail, Star, Loader2 } from 'lucide-react';
+import { JDInput } from '../components/trident/JDInput';
+import { CandidateList } from '../components/trident/CandidateList';
+import { ResultsTable } from '../components/trident/ResultsTable';
+import { runTRIDENTScoring, CandidateInput, TRIDENTResult, getCreditCost } from '../services/tridentScoring';
+import { useAuthStore } from '../stores/authStore';
 
-const DS = { headingFont: 'Georgia, serif', bodyFont: 'Inter, sans-serif', accent: '#C108AB', accentLight: '#D92FC4', bg: '#0A0A0A', card: '#111111', cardHover: '#1A1A1A', muted: '#888888', text: '#FFFFFF', textSecondary: '#CCCCCC', border: '#222222', borderHover: '#333333', radius: '12px', green: '#22C55E', yellow: '#EAB308', red: '#EF4444' };
+const DS = {
+  headingFont: 'Georgia, serif',
+  accent: '#C108AB',
+  accentLight: '#D92FC4',
+  bg: '#0A0A0A',
+  card: '#111111',
+  cardHover: '#1A1A1A',
+  muted: '#888888',
+  text: '#FFFFFF',
+  textSecondary: '#CCCCCC',
+  border: '#222222',
+  borderHover: '#333333',
+  radius: '12px',
+  green: '#22C55E',
+  yellow: '#EAB308',
+  red: '#EF4444',
+  warning: '#F59E0B',
+  success: '#10B981'
+};
 
-const DEEPSEEK_API_KEY = (import.meta.env.VITE_DEEPSEEK_API_KEY as string) || '';
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
-const TRIDENT_EDGE_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/trident-score` : '';
-
-interface CandidateInput { name: string; cv: string; }
-interface ScoreResult { name: string; d1: number; d2: number; d3: number; composite: number; verdict: string; tier: string; clientVerdict: string; keyMatchReasons: string; riskFactors: string; approachStrategy: string; }
-interface LeadData { name: string; email: string; company: string; title: string; }
-
-async function saveLead(data: LeadData) {
-  if (!SUPABASE_URL || !SUPABASE_KEY) return;
-  try {
-    await fetch(`${SUPABASE_URL}/rest/v1/b2b_leads`, {
-      method: 'POST', headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify({ name: data.name, email: data.email, company: data.company, title: data.title, source: 'trident-match' })
-    });
-  } catch (e) { console.warn('Lead save failed:', e); }
+interface LeadData {
+  name: string;
+  email: string;
+  company: string;
+  title: string;
 }
-
-async function scoreCandidate(jd: string, cv: string): Promise<{ d1: number; d2: number; d3: number; key_match_reasons: string; risk_factors: string; approach_strategy: string } | null> {
-  if (TRIDENT_EDGE_URL && SUPABASE_KEY) {
-    try {
-      const res = await fetch(TRIDENT_EDGE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY}` },
-        body: JSON.stringify({ jd, cv }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        return {
-          d1: data.d1,
-          d2: data.d2,
-          d3: data.d3,
-          key_match_reasons: data.keyMatchReasons || '',
-          risk_factors: data.riskFactors || '',
-          approach_strategy: data.approachStrategy || '',
-        };
-      }
-    } catch (e) { console.warn('[TRIDENT Edge] Failed, falling back to direct:', e); }
-  }
-  if (!DEEPSEEK_API_KEY) return null;
-  try {
-    const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${DEEPSEEK_API_KEY}` },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [
-          { role: 'system', content: 'You are an executive search analyst. Score this candidate against the JD using the TRIDENT 3D model. Score each dimension 0-100: D1=Experience & Achievements, D2=Skills/Functional Match, D3=Organizational Fit. Also provide key_match_reasons (2-3 sentences), risk_factors (1-2 sentences), approach_strategy (1-2 sentences). Return ONLY valid JSON: {"d1":number,"d2":number,"d3":number,"key_match_reasons":"string","risk_factors":"string","approach_strategy":"string"}' },
-          { role: 'user', content: `JOB DESCRIPTION:\n${jd}\n\nCANDIDATE CV:\n${cv}` }
-        ],
-        max_tokens: 600, temperature: 0.3
-      })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const content = data.choices?.[0]?.message?.content || '';
-      const match = content.match(/\{[\s\S]*\}/);
-      if (match) return JSON.parse(match[0]);
-    }
-  } catch (e) { console.warn('Scoring failed:', e); }
-  return null;
-}
-
-function verdictColor(v: string) { return v.includes('Strong Primary') ? DS.green : v.includes('Strong Secondary') ? DS.yellow : DS.red; }
-function tierBg(t: string) { return t === 'T1' ? 'rgba(34,197,94,0.15)' : t === 'T2' ? 'rgba(234,179,8,0.15)' : 'rgba(239,68,68,0.15)'; }
 
 export function MatchPage() {
+  const navigate = useNavigate();
+  const { user, profile } = useAuthStore();
+  
   const [step, setStep] = useState<'gate' | 'engine' | 'results'>('gate');
   const [lead, setLead] = useState<LeadData>({ name: '', email: '', company: '', title: '' });
   const [jd, setJd] = useState('');
   const [candidates, setCandidates] = useState<CandidateInput[]>([{ name: '', cv: '' }]);
-  const [results, setResults] = useState<ScoreResult[]>([]);
+  const [results, setResults] = useState<TRIDENTResult[]>([]);
   const [scoring, setScoring] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [expanded, setExpanded] = useState<number | null>(null);
-  const resultsRef = useRef<HTMLDivElement>(null);
+  const [showCreditModal, setShowCreditModal] = useState(false);
+  const [isFirstBatch, setIsFirstBatch] = useState(true);
+  const [userCredits, setUserCredits] = useState(0);
+
+  useEffect(() => {
+    if (profile?.credits?.balance !== undefined) {
+      setUserCredits(profile.credits.balance);
+    }
+  }, [profile]);
 
   const handleGate = async () => {
-    await saveLead(lead);
+    if (!lead.name || !lead.email) return;
+
+    // Save lead to database
+    try {
+      await fetch('/api/lead-capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: lead.name,
+          email: lead.email,
+          company: lead.company,
+          title: lead.title,
+          source: 'trident-match'
+        })
+      });
+    } catch (e) {
+      console.warn('Failed to save lead:', e);
+    }
+
     setStep('engine');
   };
 
   const addCandidate = () => setCandidates([...candidates, { name: '', cv: '' }]);
+  
   const removeCandidate = (i: number) => setCandidates(candidates.filter((_, idx) => idx !== i));
+  
   const updateCandidate = (i: number, field: keyof CandidateInput, val: string) => {
-    const c = [...candidates]; c[i] = { ...c[i], [field]: val }; setCandidates(c);
+    const updated = [...candidates];
+    updated[i] = { ...updated[i], [field]: val };
+    setCandidates(updated);
   };
 
-  const runScoring = async () => {
-    setScoring(true); setProgress(0); setResults([]);
-    const valid = candidates.filter(c => c.name && c.cv);
-    for (let i = 0; i < valid.length; i++) {
-      const score = await scoreCandidate(jd, valid[i].cv);
-      if (score) {
-        const result = computeTRIDENT({ d1: score.d1, d2: score.d2, d3: score.d3 });
-        setResults(prev => [...prev, {
-          name: valid[i].name, d1: score.d1, d2: score.d2, d3: score.d3,
-          composite: result.composite, verdict: result.verdict, tier: result.tier, clientVerdict: result.clientVerdict,
-          keyMatchReasons: score.key_match_reasons, riskFactors: score.risk_factors, approachStrategy: score.approach_strategy
-        }]);
-      }
-      setProgress(Math.round(((i + 1) / valid.length) * 100));
+  const validCandidates = candidates.filter(c => c.name && c.cv);
+  const creditCost = getCreditCost(validCandidates.length, isFirstBatch);
+
+  const handleRunScoring = async () => {
+    if (validCandidates.length === 0 || !jd) return;
+
+    // Check credits for non-free batches
+    if (!isFirstBatch && creditCost.credits > userCredits) {
+      setShowCreditModal(true);
+      return;
     }
-    setScoring(false);
-    setStep('results');
+
+    setScoring(true);
+    setProgress(0);
+
+    try {
+      const response = await runTRIDENTScoring(
+        jd,
+        validCandidates,
+        user?.id
+      );
+
+      setResults(response.results);
+      setStep('results');
+      setIsFirstBatch(false);
+
+      // Deduct credits if applicable
+      if (creditCost.credits > 0 && user) {
+        await fetch('/api/credits/spend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.id,
+            amount: creditCost.credits,
+            action: 'trident_match'
+          })
+        });
+      }
+    } catch (e) {
+      console.error('[MatchPage] Scoring error:', e);
+    } finally {
+      setScoring(false);
+      setProgress(100);
+    }
+  };
+
+  const handleDownloadPDF = (result: TRIDENTResult) => {
+    // TODO: Implement PDF download (3 credits)
+    alert(`Download PDF for ${result.candidate_name} (3 credits)`);
+  };
+
+  const handleShareCard = (result: TRIDENTResult) => {
+    // Generate shareable link (no auth required)
+    const shareId = Math.random().toString(36).substring(7);
+    const shareUrl = `${window.location.origin}/score-card/${shareId}`;
+    navigator.clipboard.writeText(shareUrl);
+    alert('Shareable link copied to clipboard!');
+  };
+
+  const handleSaveCandidate = (result: TRIDENTResult) => {
+    // TODO: Implement candidate saving
+    alert(`Save candidate: ${result.candidate_name}`);
   };
 
   // ─── GATE ───
-  if (step === 'gate') return (
-    <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-      <div style={{ maxWidth: '480px', width: '100%' }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <BarChart3 style={{ color: DS.accent, width: 28, height: 28 }} />
-            <span style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 700, color: DS.text }}>TRIDENT Match</span>
+  if (step === 'gate') {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        background: DS.bg, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        padding: '24px' 
+      }}>
+        <div style={{ maxWidth: '480px', width: '100%' }}>
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <BarChart3 style={{ color: DS.accent, width: 32, height: 32 }} />
+              <span style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, color: DS.text }}>TRIDENT Match</span>
+            </div>
+            <h1 style={{ fontFamily: DS.headingFont, fontSize: '36px', fontWeight: 700, color: DS.text, margin: '0 0 12px' }}>
+              AI-Powered Executive Matching
+            </h1>
+            <p style={{ fontSize: '16px', color: DS.muted, lineHeight: 1.6 }}>
+              Score candidates against job descriptions using the TRIDENT 3D model. 
+              Get instant insights on experience, skills, and organizational fit.
+            </p>
           </div>
-          <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 8px' }}>AI-Powered JD ↔ CV Matching</h1>
-          <p style={{ fontSize: '15px', color: DS.muted, lineHeight: 1.5 }}>Paste a job description, add candidate profiles, and get instant TRIDENT 3D scores with verdicts and strategy.</p>
-        </div>
-        <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '32px' }}>
-          <p style={{ fontSize: '13px', color: DS.muted, marginBottom: '20px', textAlign: 'center' }}>Enter your details to access the Match Engine</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <input placeholder="Full name" value={lead.name} onChange={e => setLead({ ...lead, name: e.target.value })} style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} />
-            <input placeholder="Work email" type="email" value={lead.email} onChange={e => setLead({ ...lead, email: e.target.value })} style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} />
-            <input placeholder="Company" value={lead.company} onChange={e => setLead({ ...lead, company: e.target.value })} style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} />
-            <input placeholder="Job title" value={lead.title} onChange={e => setLead({ ...lead, title: e.target.value })} style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} />
-            <button onClick={handleGate} disabled={!lead.name || !lead.email} style={{ padding: '14px', background: DS.accent, color: '#FFF', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', minHeight: '44px', opacity: (!lead.name || !lead.email) ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              Access Match Engine <ArrowRight style={{ width: 16, height: 16 }} />
-            </button>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '16px', justifyContent: 'center' }}>
-            <Shield style={{ width: 12, height: 12, color: DS.muted }} />
-            <span style={{ fontSize: '11px', color: DS.muted }}>Your data is confidential. We never share your JDs or candidate info.</span>
+
+          <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '32px' }}>
+            <p style={{ fontSize: '13px', color: DS.muted, marginBottom: '20px', textAlign: 'center' }}>
+              Enter your details to access the Match Engine
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <input 
+                placeholder="Full name" 
+                value={lead.name} 
+                onChange={e => setLead({ ...lead, name: e.target.value })} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+              />
+              <input 
+                placeholder="Work email" 
+                type="email" 
+                value={lead.email} 
+                onChange={e => setLead({ ...lead, email: e.target.value })} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+              />
+              <input 
+                placeholder="Company" 
+                value={lead.company} 
+                onChange={e => setLead({ ...lead, company: e.target.value })} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+              />
+              <input 
+                placeholder="Job title" 
+                value={lead.title} 
+                onChange={e => setLead({ ...lead, title: e.target.value })} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+              />
+              <button 
+                onClick={handleGate} 
+                disabled={!lead.name || !lead.email} 
+                style={{ 
+                  padding: '14px', 
+                  background: DS.accent, 
+                  color: '#FFF', 
+                  border: 'none', 
+                  borderRadius: '8px', 
+                  fontSize: '15px', 
+                  fontWeight: 600, 
+                  cursor: (lead.name && lead.email) ? 'pointer' : 'not-allowed',
+                  opacity: (lead.name && lead.email) ? 1 : 0.5, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  gap: '8px',
+                  minHeight: '44px'
+                }}
+              >
+                Access Match Engine <ArrowRight style={{ width: 16, height: 16 }} />
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '16px', justifyContent: 'center' }}>
+              <Shield style={{ width: 12, height: 12, color: DS.muted }} />
+              <span style={{ fontSize: '11px', color: DS.muted }}>Your data is confidential. We never share your JDs or candidate info.</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   // ─── ENGINE ───
-  if (step === 'engine') return (
-    <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
-      <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <BarChart3 style={{ color: DS.accent, width: 24, height: 24 }} />
-            <span style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 700, color: DS.text }}>TRIDENT Match Engine</span>
-          </div>
-          <span style={{ fontSize: '12px', color: DS.muted }}>Welcome, {lead.name}</span>
-        </div>
-
-        {/* JD Section */}
-        <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px', marginBottom: '20px' }}>
-          <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, margin: '0 0 12px' }}>
-            <Briefcase style={{ width: 16, height: 16, display: 'inline', marginRight: '6px', verticalAlign: -2 }} />
-            Job Description
-          </h3>
-          <textarea value={jd} onChange={e => setJd(e.target.value)} placeholder="Paste the full job description here — role, requirements, qualifications, company context..." style={{ width: '100%', minHeight: '160px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', padding: '14px', color: DS.text, fontSize: '13px', lineHeight: 1.6, resize: 'vertical', outline: 'none', fontFamily: DS.bodyFont }} />
-        </div>
-
-        {/* Candidates Section */}
-        <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px', marginBottom: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, margin: 0 }}>
-              Candidates ({candidates.length})
-            </h3>
-            <button onClick={addCandidate} style={{ padding: '8px 16px', background: 'transparent', border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.textSecondary, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Plus style={{ width: 14, height: 14 }} /> Add Candidate
-            </button>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {candidates.map((c, i) => (
-              <div key={i} style={{ background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', padding: '16px' }}>
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
-                  <input placeholder="Candidate name" value={c.name} onChange={e => updateCandidate(i, 'name', e.target.value)} style={{ flex: 1, padding: '10px 14px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '6px', color: DS.text, fontSize: '13px', outline: 'none' }} />
-                  {candidates.length > 1 && (
-                    <button onClick={() => removeCandidate(i)} style={{ background: 'none', border: 'none', color: DS.muted, cursor: 'pointer', padding: '4px' }}>
-                      <X style={{ width: 16, height: 16 }} />
-                    </button>
-                  )}
-                </div>
-                <textarea placeholder="Paste CV, LinkedIn profile, or resume text..." value={c.cv} onChange={e => updateCandidate(i, 'cv', e.target.value)} style={{ width: '100%', minHeight: '80px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '6px', padding: '10px', color: DS.text, fontSize: '12px', lineHeight: 1.5, resize: 'vertical', outline: 'none', fontFamily: DS.bodyFont }} />
+  if (step === 'engine') {
+    return (
+      <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
+        <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <BarChart3 style={{ color: DS.accent, width: 28, height: 28 }} />
+              <div>
+                <span style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 700, color: DS.text }}>TRIDENT Match Engine</span>
+                <p style={{ fontSize: '12px', color: DS.muted, margin: '4px 0 0' }}>Welcome, {lead.name}</p>
               </div>
-            ))}
+            </div>
+            
+            {isFirstBatch && (
+              <div style={{
+                padding: '8px 16px',
+                background: `${DS.success}15`,
+                border: `1px solid ${DS.success}30`,
+                borderRadius: '20px',
+                fontSize: '13px',
+                color: DS.success,
+                fontWeight: 600
+              }}>
+                First 3 matches free!
+              </div>
+            )}
+          </div>
+
+          {/* JD Input */}
+          <div style={{ marginBottom: '20px' }}>
+            <JDInput value={jd} onChange={setJd} />
+          </div>
+
+          {/* Candidates */}
+          <div style={{ marginBottom: '20px' }}>
+            <CandidateList
+              candidates={candidates}
+              onAdd={addCandidate}
+              onRemove={removeCandidate}
+              onUpdate={updateCandidate}
+            />
+          </div>
+
+          {/* Run Button */}
+          <div style={{ 
+            background: DS.card, 
+            border: `1px solid ${DS.border}`, 
+            borderRadius: DS.radius, 
+            padding: '20px' 
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '12px', flexWrap: 'wrap' }}>
+              <div>
+                <p style={{ fontSize: '14px', color: DS.text, margin: '0 0 4px' }}>
+                  {validCandidates.length > 0 ? (
+                    <>
+                      Ready to score <strong>{validCandidates.length}</strong> candidate{validCandidates.length !== 1 ? 's' : ''}
+                    </>
+                  ) : (
+                    'Add candidates to start scoring'
+                  )}
+                </p>
+                {validCandidates.length > 0 && (
+                  <p style={{ fontSize: '12px', color: DS.muted, margin: 0 }}>
+                    {isFirstBatch ? (
+                      <span style={{ color: DS.success }}>Free (first 3 matches)</span>
+                    ) : (
+                      <>
+                        Cost: <strong>{creditCost.credits} credits</strong>
+                        {userCredits < creditCost.credits && (
+                          <span style={{ color: DS.warning, marginLeft: '8px' }}>
+                            (You have {userCredits})
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </p>
+                )}
+              </div>
+              
+              <button 
+                onClick={handleRunScoring} 
+                disabled={scoring || validCandidates.length === 0 || !jd}
+                style={{ 
+                  padding: '12px 24px', 
+                  background: DS.accent, 
+                  color: '#FFF', 
+                  border: 'none', 
+                  borderRadius: '8px', 
+                  fontSize: '14px', 
+                  fontWeight: 600, 
+                  cursor: (scoring || validCandidates.length === 0 || !jd) ? 'not-allowed' : 'pointer',
+                  opacity: (scoring || validCandidates.length === 0 || !jd) ? 0.5 : 1, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px',
+                  minHeight: '44px'
+                }}
+              >
+                {scoring ? (
+                  <>
+                    <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
+                    Scoring... {progress}%
+                  </>
+                ) : (
+                  <>
+                    Run TRIDENT Sweep
+                  </>
+                )}
+              </button>
+            </div>
+            
+            {scoring && (
+              <div style={{ height: '6px', background: DS.bg, borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ 
+                  height: '100%', 
+                  width: `${progress}%`, 
+                  background: DS.accent, 
+                  borderRadius: '3px', 
+                  transition: 'width 0.3s' 
+                }} />
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Run Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button onClick={runScoring} disabled={scoring || !jd || candidates.every(c => !c.name || !c.cv)} style={{ padding: '14px 32px', background: DS.accent, color: '#FFF', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', minHeight: '44px', opacity: (scoring || !jd || candidates.every(c => !c.name || !c.cv)) ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {scoring ? <><Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} /> Scoring... {progress}%</> : <><Play style={{ width: 16, height: 16 }} /> Run TRIDENT Sweep</>}
-          </button>
-          {scoring && (
-            <div style={{ flex: 1, height: '6px', background: DS.card, borderRadius: '3px', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${progress}%`, background: DS.accent, borderRadius: '3px', transition: 'width 0.3s' }} />
+        {showCreditModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            zIndex: 1000
+          }}>
+            <div style={{
+              background: DS.card,
+              border: `1px solid ${DS.border}`,
+              borderRadius: '16px',
+              padding: '32px',
+              maxWidth: '400px',
+              textAlign: 'center'
+            }}>
+              <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', color: DS.text, marginBottom: '12px' }}>
+                Insufficient Credits
+              </h3>
+              <p style={{ fontSize: '14px', color: DS.muted, marginBottom: '20px' }}>
+                You need {creditCost.credits} credits but only have {userCredits}.
+              </p>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                <button
+                  onClick={() => setShowCreditModal(false)}
+                  style={{
+                    padding: '10px 20px',
+                    background: 'transparent',
+                    border: `1px solid ${DS.border}`,
+                    borderRadius: '8px',
+                    color: DS.text,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => navigate('/pricing')}
+                  style={{
+                    padding: '10px 20px',
+                    background: DS.accent,
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#FFF',
+                    cursor: 'pointer',
+                    fontWeight: 600
+                  }}
+                >
+                  Upgrade Plan
+                </button>
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        <style>{`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
+    );
+  }
 
   // ─── RESULTS ───
-  const sorted = [...results].sort((a, b) => b.composite - a.composite);
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }} ref={resultsRef}>
+    <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
       <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+        {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
               <BarChart3 style={{ color: DS.accent, width: 24, height: 24 }} />
               <span style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 700, color: DS.text }}>TRIDENT Results</span>
             </div>
-            <p style={{ fontSize: '13px', color: DS.muted, margin: 0 }}>{results.length} candidate{results.length !== 1 ? 's' : ''} scored</p>
+            <p style={{ fontSize: '13px', color: DS.muted, margin: 0 }}>
+              {results.length} candidate{results.length !== 1 ? 's' : ''} scored
+            </p>
           </div>
-          <button onClick={() => { setStep('engine'); setResults([]); }} style={{ padding: '10px 20px', background: 'transparent', border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.textSecondary, fontSize: '13px', cursor: 'pointer' }}>
+          <button 
+            onClick={() => { setStep('engine'); setResults([]); }} 
+            style={{ 
+              padding: '10px 20px', 
+              background: 'transparent', 
+              border: `1px solid ${DS.border}`, 
+              borderRadius: '8px', 
+              color: DS.textSecondary, 
+              fontSize: '13px', 
+              cursor: 'pointer' 
+            }}
+          >
             Score More
           </button>
         </div>
 
-        {/* Summary Bar */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
-          {[
-            { label: 'Strong Primary (T1)', count: results.filter(r => r.tier === 'T1').length, color: DS.green },
-            { label: 'Strong Secondary (T2)', count: results.filter(r => r.tier === 'T2').length, color: DS.yellow },
-            { label: 'Reserve (T3)', count: results.filter(r => r.tier === 'T3').length, color: DS.red },
-          ].map(s => (
-            <div key={s.label} style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '8px', padding: '16px', textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 700, color: s.color }}>{s.count}</div>
-              <div style={{ fontSize: '12px', color: DS.muted }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Results List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {sorted.map((r, i) => (
-            <div key={i} style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, overflow: 'hidden' }}>
-              <div onClick={() => setExpanded(expanded === i ? null : i)} style={{ padding: '16px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: tierBg(r.tier), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: verdictColor(r.verdict) }}>
-                  {i + 1}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '15px', fontWeight: 600, color: DS.text }}>{r.name}</div>
-                  <div style={{ fontSize: '12px', color: DS.muted, marginTop: '2px' }}>{r.clientVerdict} · Tier {r.tier}</div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '20px', fontWeight: 700, color: verdictColor(r.verdict) }}>{r.composite}</div>
-                  <div style={{ fontSize: '11px', color: DS.muted }}>composite</div>
-                </div>
-                <div style={{ display: 'flex', gap: '12px', marginLeft: '16px' }}>
-                  {[{ label: 'D1', val: r.d1 }, { label: 'D2', val: r.d2 }, { label: 'D3', val: r.d3 }].map(d => (
-                    <div key={d.label} style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: DS.textSecondary }}>{d.val}</div>
-                      <div style={{ fontSize: '10px', color: DS.muted }}>{d.label}</div>
-                    </div>
-                  ))}
-                </div>
-                {expanded === i ? <ChevronUp style={{ width: 16, height: 16, color: DS.muted }} /> : <ChevronDown style={{ width: 16, height: 16, color: DS.muted }} />}
-              </div>
-              {expanded === i && (
-                <div style={{ padding: '0 20px 20px', borderTop: `1px solid ${DS.border}`, marginTop: 0 }}>
-                  <div style={{ paddingTop: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                    <div>
-                      <h4 style={{ fontSize: '12px', fontWeight: 600, color: DS.green, margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Key Match Reasons</h4>
-                      <p style={{ fontSize: '13px', color: DS.textSecondary, lineHeight: 1.5, margin: 0 }}>{r.keyMatchReasons}</p>
-                    </div>
-                    <div>
-                      <h4 style={{ fontSize: '12px', fontWeight: 600, color: DS.yellow, margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Risk Factors</h4>
-                      <p style={{ fontSize: '13px', color: DS.textSecondary, lineHeight: 1.5, margin: 0 }}>{r.riskFactors}</p>
-                    </div>
-                  </div>
-                  <div style={{ marginTop: '12px' }}>
-                    <h4 style={{ fontSize: '12px', fontWeight: 600, color: DS.accent, margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Approach Strategy</h4>
-                    <p style={{ fontSize: '13px', color: DS.textSecondary, lineHeight: 1.5, margin: 0 }}>{r.approachStrategy}</p>
-                  </div>
-                  {/* Score Bars */}
-                  <div style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
-                    {[{ label: 'Experience & Achievements', val: r.d1 }, { label: 'Skills / Functional Match', val: r.d2 }, { label: 'Organizational Fit', val: r.d3 }].map(d => (
-                      <div key={d.label} style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                          <span style={{ fontSize: '11px', color: DS.muted }}>{d.label}</span>
-                          <span style={{ fontSize: '11px', fontWeight: 600, color: DS.text }}>{d.val}</span>
-                        </div>
-                        <div style={{ height: '4px', background: DS.border, borderRadius: '2px', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${d.val}%`, background: d.val >= 75 ? DS.green : d.val >= 50 ? DS.yellow : DS.red, borderRadius: '2px', transition: 'width 0.5s' }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* Results Table */}
+        <ResultsTable
+          results={results}
+          onDownloadPDF={handleDownloadPDF}
+          onShareCard={handleShareCard}
+          onSaveCandidate={handleSaveCandidate}
+        />
 
         {/* CTA */}
-        <div style={{ marginTop: '32px', background: DS.card, border: `1px solid ${DS.accent}33`, borderRadius: DS.radius, padding: '24px', textAlign: 'center' }}>
-          <Star style={{ width: 20, height: 20, color: DS.accent, marginBottom: '8px' }} />
-          <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>Want deeper analysis?</h3>
-          <p style={{ fontSize: '14px', color: DS.muted, margin: '0 0 16px' }}>Get full LENS reports with client-ready shortlists, Proximity scoring, and pipeline management.</p>
-          <a href="/b2b" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 24px', background: DS.accent, color: '#FFF', borderRadius: '8px', fontSize: '14px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}>
-            <Mail style={{ width: 16, height: 16 }} /> Contact LYC Partners
+        <div style={{ 
+          marginTop: '32px', 
+          background: DS.card, 
+          border: `1px solid ${DS.accent}33`, 
+          borderRadius: DS.radius, 
+          padding: '24px', 
+          textAlign: 'center' 
+        }}>
+          <Star style={{ width: 24, height: 24, color: DS.accent, margin: '0 auto 12px' }} />
+          <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
+            Want deeper analysis?
+          </h3>
+          <p style={{ fontSize: '14px', color: DS.muted, margin: '0 0 16px' }}>
+            Get full LENS reports with client-ready shortlists, Proximity scoring, and pipeline management.
+          </p>
+          <a 
+            href="/b2b" 
+            style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              padding: '12px 24px', 
+              background: DS.accent, 
+              color: '#FFF', 
+              borderRadius: '8px', 
+              fontSize: '14px', 
+              fontWeight: 600, 
+              textDecoration: 'none',
+              minHeight: '44px'
+            }}
+          >
+            <Mail style={{ width: 16, height: 16 }} /> 
+            Contact LYC Partners
           </a>
         </div>
       </div>
