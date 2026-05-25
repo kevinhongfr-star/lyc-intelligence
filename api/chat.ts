@@ -4,75 +4,167 @@ const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 const COZE_API_KEY = process.env.COZE_API_KEY || '';
 const COZE_BOT_ID = process.env.COZE_BOT_ID || '';
 const COZE_ENDPOINT = process.env.COZE_API_ENDPOINT || 'https://api.coze.cn/v3/chat';
+const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || ''; // For council tier
 
-const SYSTEM_PROMPT = `You are Nexus, the AI assistant for LYC Partners — a global leadership advisory and executive search firm headquartered in Shanghai with operations across Asia-Pacific and Europe.
+const ANONYMOUS_SYSTEM_PROMPT = `You are Nexus, the career intelligence advisor for LYC Intelligence — 
+powered by LYC Partners, a global leadership advisory and executive 
+search firm that has placed 500+ executives across 47 markets.
 
-ABOUT LYC PARTNERS (source: lyc-partners.ai):
-- Founded in 2015, specializing in cross-border executive search and leadership advisory
-- Tagline: "Building Leadership That Works Across Borders"
-- Methodology: The D3 Framework — Diagnose · Design · Deliver
-- 47 markets covered, 15+ years experience, 92% retention rate at 12 months
-- Services: Executive Search, Leadership Advisory, Career Strategy for Leaders, The Council (private network for Board Chairs and Regional Presidents)
-- Sectors: Financial Services, Industrial Manufacturing, Consumer & Retail, Cross-Border Leadership, Board & C-Suite
-- Proprietary IP: TRIDENT 3D scoring, PACE, CVFlow
-- Podcast: "Leaders in Motion" — hosted by Kevin Hong, Partner APAC
-- Key stat: "Up to 40% of executive leaders fail within the first 18 months when moving into a new cross-border role without proper support"
-- LYC's approach: "Standard search prioritizes resumes. We prioritize the reality of the role. If the setup is broken, the hire will fail. We fix the setup first."
-- LinkedIn: 1,600+ followers, 51-200 employees, Privately Held
+YOUR PURPOSE: Help senior professionals understand their career positioning, 
+navigate cross-border leadership transitions, and make smarter decisions.
 
-YOUR CAPABILITIES (for internal platform users):
-- TRIDENT scoring: 3-dimensional candidate evaluation (Experience & Achievements, Skills/Functional Match, Organizational Fit)
-- PHI Framework: Pipeline Health Index — tracking mandate urgency, strategic value, revenue potential, retainer status, and decision clarity
-- Pipeline management: 5 internal stages (SWEEP → CANVA → GRID → LENS → PLACED)
-- Proximity scoring: Company proximity and contact proximity levels
-- Verdict mapping for client-facing reports: Strong Primary / Strong Secondary / Reserve
+YOUR KNOWLEDGE BASE: What it takes to transition executives between European 
+and Asian markets, how boards evaluate C-suite candidates differently across 
+markets, what separates candidates who land roles, executive presence and 
+board readiness, LinkedIn positioning, interview preparation, and negotiation.
 
-YOUR CAPABILITIES (for external visitors on lyc-intelligence.app):
-- Help visitors understand LYC's services: Executive Search, Advisory, Career Strategy, The Council
-- Explain how TRIDENT matching works (at a high level — never reveal scoring weights or formulas)
-- Guide candidates to the Leadership Assessment at /assessment
-- Guide firms to the TRIDENT Match Engine at /match
-- Answer questions about cross-border leadership challenges
+YOUR TONE: Direct and honest, specific to real market dynamics, respectful, 
+never motivational-speaker language. Think trusted senior partner.
 
-FORMATTING RULES:
-- Use **bold** for key terms and emphasis
-- Use bullet lists (•) for multiple items
-- Use headers (##) for section breaks in longer responses
-- For tables: use markdown pipe format with proper alignment
-- Keep responses concise and action-oriented
-- Professional tone — no fluff, no corporate jargon
-- When discussing methodology with external visitors, use client-safe language only (never mention internal weights, pipeline stage codes, or technical implementation details)
+LEAD CAPTURE RULE: After your third response, naturally work in: "To save this 
+conversation and get your personalized career brief, what's your email address?"
 
-NEVER:
-- Mention Notion, Supabase, or any backend infrastructure
-- Reveal TRIDENT dimension weights (40/35/25)
-- Use internal stage names (SWEEP/CANVA/GRID/LENS/PLACED) with external visitors
-- Share internal scoring formulas or methodology details
-- Refer to the company as "Lyc Partners" — always "LYC Partners"`;
+NEVER: Mention Supabase, Notion, DeepSeek, Coze, internal weights, stage codes, 
+or position this as a marketing tool for LYC Partners.`;
+
+const AUTHENTICATED_SYSTEM_PROMPT_TEMPLATE = `You are Nexus, the career intelligence advisor for LYC Intelligence — 
+powered by LYC Partners, a global leadership advisory and executive 
+search firm that has placed 500+ executives across 47 markets.
+
+YOUR PURPOSE: Help senior professionals understand their career positioning, 
+navigate cross-border leadership transitions, and make smarter decisions.
+
+YOUR KNOWLEDGE BASE: What it takes to transition executives between European 
+and Asian markets, how boards evaluate C-suite candidates differently across 
+markets, what separates candidates who land roles, executive presence and 
+board readiness, LinkedIn positioning, interview preparation, and negotiation.
+
+YOUR TONE: Direct and honest, specific to real market dynamics, respectful, 
+never motivational-speaker language. Think trusted senior partner.
+
+USER CONTEXT:
+{memory_context}
+
+{document_context}
+
+NEVER: Mention Supabase, Notion, DeepSeek, Coze, internal weights, stage codes, 
+or position this as a marketing tool for LYC Partners.`;
+
+interface Message {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
+
+interface Memory {
+  id: string;
+  type: string;
+  content: string;
+  timestamp: string;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const { message, userId, history } = req.body;
+  const {
+    message,
+    history = [],
+    userId,
+    tier = 'free',
+    memoryContext = [],
+    documentContext = '',
+  } = req.body;
+
   if (!message) return res.status(400).json({ error: 'Missing message' });
 
-  const messages = [
-    { role: 'system', content: SYSTEM_PROMPT },
-    ...(history || []).map((m: any) => ({ role: m.role, content: m.content })),
-    { role: 'user', content: message }
+  // Choose system prompt based on authentication status
+  let systemPrompt = ANONYMOUS_SYSTEM_PROMPT;
+  if (userId) {
+    systemPrompt = AUTHENTICATED_SYSTEM_PROMPT_TEMPLATE
+      .replace('{memory_context}', memoryContext.length > 0 
+        ? `User Memory:\n${memoryContext.map((m: Memory) => `- ${m.type}: ${m.content}`).join('\n')}` 
+        : 'No prior user memory available.')
+      .replace('{document_context}', documentContext 
+        ? `\nUploaded Document Context:\n${documentContext}` 
+        : '');
+  }
+
+  const messages: Message[] = [
+    { role: 'system', content: systemPrompt },
+    ...(history as Message[]),
+    { role: 'user', content: message },
   ];
 
-  // Try DeepSeek first
+  // Add instruction to generate suggested prompts
+  messages.push({
+    role: 'system',
+    content: 'Please provide your response, and also include 3 context-aware follow-up suggestions that the user might want to ask next. Format your response as a JSON object with two keys: "response" (your answer as a string) and "suggested_prompts" (array of 3 strings).'
+  });
+
+  let responseText = 'Sorry, I am having trouble responding right now. Please try again later.';
+  let suggestedPrompts: string[] = [];
+  let tokensUsed = 0;
+
+  // Try Claude first if council tier
+  if (tier === 'council' && CLAUDE_API_KEY) {
+    try {
+      const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': CLAUDE_API_KEY,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-3-5-sonnet-20241022',
+          max_tokens: 2048,
+          messages: messages.filter(m => m.role !== 'system').map(m => ({
+            role: m.role === 'assistant' ? 'assistant' : 'user',
+            content: m.content
+          })),
+          system: messages.find(m => m.role === 'system')?.content,
+        })
+      });
+      if (claudeRes.ok) {
+        const data = await claudeRes.json();
+        const content = data.content?.[0]?.text || 'No response';
+        tokensUsed = data.usage?.total_tokens || 0;
+        
+        // Parse response and suggested prompts
+        const parsed = parseAIResponse(content);
+        responseText = parsed.response;
+        suggestedPrompts = parsed.suggested_prompts;
+        return res.status(200).json({ response: responseText, suggested_prompts: suggestedPrompts, usage: { tokens: tokensUsed } });
+      }
+    } catch (e) {
+      console.warn('[Claude] Failed:', e);
+    }
+  }
+
+  // Try DeepSeek next
   if (DEEPSEEK_API_KEY) {
     try {
       const dsRes = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${DEEPSEEK_API_KEY}` },
-        body: JSON.stringify({ model: 'deepseek-chat', messages, max_tokens: 1024, temperature: 0.3 })
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages,
+          max_tokens: 2048,
+          temperature: 0.3,
+          response_format: { type: 'json_object' },
+        })
       });
       if (dsRes.ok) {
         const data = await dsRes.json();
-        const content = data.choices?.[0]?.message?.content || 'No response';
-        return res.status(200).json({ success: true, content, model: 'deepseek' });
+        const content = data.choices?.[0]?.message?.content || '{"response":"No response","suggested_prompts":[]}';
+        tokensUsed = data.usage?.total_tokens || 0;
+
+        const parsed = parseAIResponse(content);
+        responseText = parsed.response;
+        suggestedPrompts = parsed.suggested_prompts;
+        return res.status(200).json({ response: responseText, suggested_prompts: suggestedPrompts, usage: { tokens: tokensUsed } });
       }
     } catch (e) {
       console.warn('[DeepSeek] Failed:', e);
@@ -84,18 +176,68 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       const cozeRes = await fetch(COZE_ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${COZE_API_KEY}` },
-        body: JSON.stringify({ bot_id: COZE_BOT_ID, user_id: userId || 'anonymous', stream: false, auto_save_history: true, additional_messages: [{ role: 'user', content: message, content_type: 'text' }] })
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${COZE_API_KEY}`
+        },
+        body: JSON.stringify({
+          bot_id: COZE_BOT_ID,
+          user_id: userId || 'anonymous',
+          stream: false,
+          auto_save_history: true,
+          additional_messages: [{
+            role: 'user',
+            content: JSON.stringify(messages),
+            content_type: 'text'
+          }]
+        })
       });
       if (cozeRes.ok) {
         const data = await cozeRes.json();
-        const content = data.messages?.filter((m: any) => m.role === 'assistant' && m.type === 'answer')?.[0]?.content || 'No response';
-        return res.status(200).json({ success: true, content, model: 'coze' });
+        const content = data.messages?.filter((m: any) => m.role === 'assistant' && m.type === 'answer')?.[0]?.content || '{"response":"No response","suggested_prompts":[]}';
+        
+        const parsed = parseAIResponse(content);
+        responseText = parsed.response;
+        suggestedPrompts = parsed.suggested_prompts;
+        return res.status(200).json({ response: responseText, suggested_prompts: suggestedPrompts, usage: { tokens: tokensUsed } });
       }
     } catch (e) {
       console.warn('[Coze] Failed:', e);
     }
   }
 
-  return res.status(503).json({ success: false, error: 'All AI services unavailable. Please try again later.' });
+  // Default fallback
+  return res.status(200).json({
+    response: responseText,
+    suggested_prompts: [
+      'How do I start the career assessment?',
+      'What is cross-border readiness?',
+      'Tell me about the TRIDENT score',
+    ],
+    usage: { tokens: 0 }
+  });
+}
+
+function parseAIResponse(content: string) {
+  try {
+    const parsed = JSON.parse(content);
+    return {
+      response: parsed.response || parsed.answer || content,
+      suggested_prompts: parsed.suggested_prompts || parsed.suggestions || [
+        'How does this apply to my situation?',
+        'What should I do next?',
+        'Can you give an example?',
+      ]
+    };
+  } catch (e) {
+    // If JSON parsing fails, assume the whole content is the response and use default suggestions
+    return {
+      response: content,
+      suggested_prompts: [
+        'How does this apply to my situation?',
+        'What should I do next?',
+        'Can you give an example?',
+      ]
+    };
+  }
 }
