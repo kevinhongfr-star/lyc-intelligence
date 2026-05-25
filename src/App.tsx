@@ -13,6 +13,8 @@ const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m
 const LoginPage = lazy(() => import('@/pages/LoginPage').then(m => ({ default: m.LoginPage })));
 const SignupPage = lazy(() => import('@/pages/SignupPage').then(m => ({ default: m.SignupPage })));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const DashboardPage = lazy(() => import('@/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
+const ProgressPage = lazy(() => import('@/pages/ProgressPage').then(m => ({ default: m.ProgressPage })));
 
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
@@ -69,6 +71,8 @@ export default function App() {
           <Route path="/nexus" element={<NexusLanding />} />
           <Route path="/match" element={<MatchPage />} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
           {ENABLE_PLATFORM && (
             <Route path="/platform" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<ConsultantDashboard />} />
