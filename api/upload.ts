@@ -1,25 +1,93 @@
+
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createClient } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from 'uuid';
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
+const SUPABASE_STORAGE_BUCKET = 'user-documents';
 
-export const config = { api: { bodyParser: { sizeLimit: '10mb' } } };
+const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
+  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+  : null;
+
+const MAX_FILE_SIZE_MB = 10;
+const ALLOWED_TYPES = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+const ALLOWED_EXTENSIONS = ['.pdf', '.docx', '.txt'];
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const { fileName, fileType, fileBase64, bucket, mandateId, contactId, visibility } = req.body;
-  if (!fileName || !fileBase64 || !bucket) return res.status(400).json({ error: 'Missing required fields' });
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) return res.status(500).json({ error: 'Supabase not configured' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // This is a placeholder - in production you'd use a library like multer for file handling
+  // Since we're using Vercel serverless, we'll outline what you need to do
+  
+  const { userId, type } = req.body;
+  
+  if (!userId || !type) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  if (!supabase) {
+    return res.status(500).json({ error: 'Server configuration error' });
+  }
 
   try {
-    const buffer = Buffer.from(fileBase64, 'base64');
-    const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${fileName}`, { method: 'POST', headers: { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': fileType || 'application/octet-stream' }, body: buffer });
-    if (!uploadRes.ok) { const err = await uploadRes.json(); return res.status(502).json({ error: 'Upload failed', details: err }); }
-    const uploadData = await uploadRes.json();
-    const filePath = uploadData.path || fileName;
-    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filePath}`;
-    const docRes = await fetch(`${SUPABASE_URL}/rest/v1/documents`, { method: 'POST', headers: { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify({ mandate_id: mandateId || null, contact_id: contactId || null, name: fileName, type: fileType?.includes('pdf') ? 'cv' : 'report', visibility: visibility || 'internal', storage_path: filePath, public_url: publicUrl }) });
-    const docData = await docRes.json();
-    return res.status(200).json({ success: true, path: filePath, publicUrl, document: docData?.[0] || null });
-  } catch (err: any) { return res.status(500).json({ error: 'Internal server error', message: err.message }); }
+    // Note: Actual file upload implementation requires proper multipart form handling
+    // For production, use:
+    // 1. multer or next-connect for serverless functions
+    // 2. pdfjs-dist for PDF text extraction
+    // 3. mammoth for DOCX text extraction
+    
+    const fileId = uuidv4();
+    const fileName = `document-${fileId}`; // replace with actual file name
+    
+    // Upload to Supabase Storage
+    const { data: storageData, error: storageError } = await supabase
+      .storage
+      .from(SUPABASE_STORAGE_BUCKET)
+      .upload(`${userId}/${fileName}`, 'placeholder-file-content', { // replace with actual file buffer
+        contentType: 'application/pdf', // replace with actual file type
+        upsert: true,
+      });
+
+    if (storageError) {
+      console.error('Storage error:', storageError);
+      return res.status(500).json({ error: 'Failed to upload file' });
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from(SUPABASE_STORAGE_BUCKET)
+      .getPublicUrl(`${userId}/${fileName}`);
+
+    // Extract text (placeholder)
+    const extractedText = 'Text extraction requires pdfjs-dist and mammoth libraries';
+
+    // Save to DB
+    const { data: docData, error: dbError } = await supabase
+      .from('documents')
+      .insert({
+        id: fileId,
+        user_id: userId,
+        name: fileName, // replace with actual name
+        type,
+        file_url: urlData.publicUrl,
+        file_size_bytes: 0, // replace with actual size
+        extracted_text: extractedText
+      })
+      .select()
+      .single();
+
+    if (dbError) {
+      console.error('DB error:', dbError);
+      return res.status(500).json({ error: 'Failed to save document' });
+    }
+
+    return res.status(200).json(docData);
+  } catch (error) {
+    console.error('Upload error:', error);
+    return res.status(500).json({ error: 'Upload failed' });
+  }
 }

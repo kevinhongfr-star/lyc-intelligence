@@ -16,6 +16,8 @@ const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ defaul
 const DashboardPage = lazy(() => import('@/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const ProgressPage = lazy(() => import('@/pages/ProgressPage').then(m => ({ default: m.ProgressPage })));
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
+const UserDocumentsPage = lazy(() => import('@/pages/UserDocumentsPage').then(m => ({ default: m.DocumentsPage })));
+const SharePage = lazy(() => import('@/pages/SharePage').then(m => ({ default: m.SharePage })));
 
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
@@ -28,7 +30,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-let AppLayout, ConsultantDashboard, MandatesPage, CandidatesPage, MandateDetailPage, BatchScoringPage, NexusPage, SchedulerPage, DocumentsPage, NotificationsPage, SettingsPage, PipelinePage, MetrixPage, ScoringRunsPage, LensExportPage;
+let AppLayout, ConsultantDashboard, MandatesPage, CandidatesPage, MandateDetailPage, BatchScoringPage, NexusPage, SchedulerPage, PlatformDocumentsPage, NotificationsPage, SettingsPage, PipelinePage, MetrixPage, ScoringRunsPage, LensExportPage;
 
 if (ENABLE_PLATFORM) {
   try {
@@ -40,7 +42,7 @@ if (ENABLE_PLATFORM) {
     BatchScoringPage = require('@/pages/BatchScoringPage').BatchScoringPage;
     NexusPage = require('@/pages/NexusPage').NexusPage;
     SchedulerPage = require('@/pages/SchedulerPage').SchedulerPage;
-    DocumentsPage = require('@/pages/DocumentsPage').DocumentsPage;
+    PlatformDocumentsPage = require('@/pages/DocumentsPage').DocumentsPage;
     NotificationsPage = require('@/pages/NotificationsPage').NotificationsPage;
     SettingsPage = require('@/pages/SettingsPage').SettingsPage;
     PipelinePage = require('@/pages/PipelinePage').PipelinePage;
@@ -75,6 +77,8 @@ export default function App() {
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
+          <Route path="/documents" element={<ProtectedRoute><UserDocumentsPage /></ProtectedRoute>} />
+          <Route path="/share/:id" element={<SharePage />} />
           {ENABLE_PLATFORM && (
             <Route path="/platform" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<ConsultantDashboard />} />
@@ -88,7 +92,7 @@ export default function App() {
               <Route path="scoring-runs" element={<ScoringRunsPage />} />
               <Route path="chat" element={<NexusPage />} />
               <Route path="scheduler" element={<SchedulerPage />} />
-              <Route path="documents" element={<DocumentsPage />} />
+              <Route path="documents" element={<PlatformDocumentsPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
