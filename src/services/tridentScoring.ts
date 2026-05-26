@@ -85,3 +85,24 @@ export function getCreditCost(candidateCount: number, isFirstBatch: boolean): {
 
   return { credits: candidateCount * 2, description: `${candidateCount} matches` };
 }
+
+export function computeTRIDENT(input: { d1: number; d2: number; d3: number }) {
+  const { d1, d2, d3 } = input;
+  const composite = Math.round((d1 * 0.35 + d2 * 0.4 + d3 * 0.25));
+  
+  let tier: string;
+  let verdict: string;
+  
+  if (composite >= 75) {
+    tier = 'T1';
+    verdict = 'Strong Primary';
+  } else if (composite >= 50) {
+    tier = 'T2';
+    verdict = 'Strong Secondary';
+  } else {
+    tier = 'T3';
+    verdict = 'Reserve';
+  }
+  
+  return { composite, verdict, tier };
+}
