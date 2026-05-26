@@ -27,7 +27,7 @@ export function B2CLanding() {
           Where do you stand<br />as a cross-border leader?
         </h1>
         <p style={{ fontSize: '17px', color: DS.muted, maxWidth: '560px', margin: '0 auto 32px', lineHeight: 1.6 }}>
-          Built on LYC Partners' 500+ executive placements. Our assessment benchmarks you against real cross-border C-suite candidates — giving you insights no generic AI can provide.
+          Take a 10-minute leadership assessment. Get your archetype, benchmark your profile against European and Asian executive markets, and discover opportunities that match.
         </p>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '8px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}>
@@ -80,27 +80,6 @@ export function B2CLanding() {
       </div>
 
       {/* Privacy */}
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 32px' }}>
-        <div style={{ background: `${DS.accent}08`, border: `1px solid ${DS.accent}20`, borderRadius: DS.radius, padding: '32px' }}>
-          <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 16px', textAlign: 'center' }}>Why not just use Claude or Gemini?</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-            {[
-              { title: 'Executive Market Data', desc: 'We analyze real executive placements, not just generic content. You get market-relevant insights.' },
-              { title: 'Cross-Border Expertise', desc: 'Trained specifically on European-Asian leadership transitions — the most complex executive moves.' },
-              { title: 'Actionable Intelligence', desc: 'Results that help you position yourself, not just generic advice.' },
-            ].map((item, i) => (
-              <div key={i} style={{ background: DS.card, borderRadius: '8px', padding: '16px', textAlign: 'center' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: '14px', fontWeight: 700, color: DS.accent }}>
-                  {i + 1}
-                </div>
-                <h4 style={{ fontSize: '14px', fontWeight: 600, color: DS.text, margin: '0 0 6px' }}>{item.title}</h4>
-                <p style={{ fontSize: '12px', color: DS.muted, lineHeight: 1.4, margin: 0 }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       <div style={{ maxWidth: '600px', margin: '0 auto', padding: '40px 32px', textAlign: 'center' }}>
         <Shield style={{ width: 24, height: 24, color: DS.accent, marginBottom: '12px' }} />
         <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>Your data is yours</h3>

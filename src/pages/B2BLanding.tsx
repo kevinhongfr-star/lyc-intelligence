@@ -37,7 +37,7 @@ export function B2BLanding() {
           Find your next<br />C-suite leader in hours,<br />not months
         </h1>
         <p style={{ fontSize: '17px', color: DS.muted, maxWidth: '560px', margin: '0 auto 32px', lineHeight: 1.6 }}>
-          Built on LYC Partners' 500+ executive placements across 47 markets. TRIDENT Match applies our proprietary D3 framework to score candidates with the precision of a seasoned search partner — at machine speed.
+          TRIDENT Match scores candidates against your job description across 3 dimensions — Experience, Skills, and Organizational Fit. No more gut feelings.
         </p>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/match" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: DS.white, borderRadius: '8px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}>
@@ -105,27 +105,6 @@ export function B2BLanding() {
               <p style={{ fontSize: '13px', color: DS.muted, lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
             </div>
           ))}
-        </div>
-      </div>
-
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 32px' }}>
-        <div style={{ background: `${DS.accent}08`, border: `1px solid ${DS.accent}20`, borderRadius: DS.radius, padding: '32px' }}>
-          <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 16px', textAlign: 'center' }}>Why TRIDENT Match beats generic AI</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-            {[
-              { title: 'Search Firm Expertise', desc: 'Trained on 500+ actual executive placements across European and Asian markets. Not generic knowledge.' },
-              { title: 'Proprietary Scoring', desc: 'Our D3 framework is battle-tested. It doesn\'t just match keywords — it evaluates fit.' },
-              { title: 'Context Matters', desc: 'Understands cross-border leadership dynamics, board expectations, and cultural nuances.' },
-            ].map((item, i) => (
-              <div key={i} style={{ background: DS.white, borderRadius: '8px', padding: '16px', textAlign: 'center' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: '14px', fontWeight: 700, color: DS.accent }}>
-                  {i + 1}
-                </div>
-                <h4 style={{ fontSize: '14px', fontWeight: 600, color: DS.text, margin: '0 0 6px' }}>{item.title}</h4>
-                <p style={{ fontSize: '12px', color: DS.muted, lineHeight: 1.4, margin: 0 }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
