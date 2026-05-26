@@ -5,16 +5,17 @@ import { TRIDENTResult, getTierFromScore, getScoreBarColor } from '../../service
 const DS = {
   headingFont: 'Georgia, serif',
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  bg: '#FFFFFF',
+  card: '#FAFAFA',
+  muted: '#666666',
+  text: '#0A0A0A',
+  textSecondary: '#333333',
+  border: '#E5E5E5',
   radius: '12px',
   success: '#10B981',
   warning: '#F59E0B',
-  error: '#EF4444'
+  error: '#EF4444',
+  white: '#FFFFFF'
 };
 
 interface ResultsTableProps {
@@ -37,7 +38,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
 
   return (
     <div>
-      {/* Summary Bar */}
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(3, 1fr)', 
@@ -50,7 +50,7 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
           { tier: 'T3', label: 'Reserve', count: tierCounts.T3, color: DS.error },
         ].map(item => (
           <div key={item.tier} style={{ 
-            background: DS.card, 
+            background: DS.white, 
             border: `1px solid ${DS.border}`, 
             borderRadius: '8px', 
             padding: '16px', 
@@ -66,7 +66,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
         ))}
       </div>
 
-      {/* Results List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {sorted.map((result, index) => {
           const tier = getTierFromScore(result.composite_score);
@@ -76,14 +75,13 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
             <div 
               key={index} 
               style={{ 
-                background: DS.card, 
+                background: DS.white, 
                 border: `1px solid ${DS.border}`, 
                 borderRadius: DS.radius, 
                 overflow: 'hidden',
                 transition: 'all 0.2s ease'
               }}
             >
-              {/* Header Row */}
               <div 
                 onClick={() => setExpandedIndex(isExpanded ? null : index)}
                 style={{ 
@@ -94,10 +92,9 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                   gap: '16px',
                   transition: 'background 0.2s ease'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.background = '#1a1a1a'}
+                onMouseOver={(e) => e.currentTarget.style.background = DS.card}
                 onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
               >
-                {/* Rank Badge */}
                 <div style={{ 
                   width: '36px', 
                   height: '36px', 
@@ -114,7 +111,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                   {index + 1}
                 </div>
 
-                {/* Candidate Info */}
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '15px', fontWeight: 600, color: DS.text }}>
                     {result.candidate_name}
@@ -124,7 +120,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                   </div>
                 </div>
 
-                {/* Composite Score */}
                 <div style={{ textAlign: 'right', marginRight: '16px' }}>
                   <div style={{ fontSize: '24px', fontWeight: 800, color: tier.color }}>
                     {result.composite_score}
@@ -132,7 +127,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                   <div style={{ fontSize: '11px', color: DS.muted }}>composite</div>
                 </div>
 
-                {/* Dimension Scores */}
                 <div style={{ display: 'flex', gap: '12px', marginRight: '8px' }}>
                   {[
                     { label: 'EXP', score: result.dimension_scores.experience },
@@ -148,7 +142,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                   ))}
                 </div>
 
-                {/* Expand Icon */}
                 {isExpanded ? (
                   <ChevronUp style={{ width: 18, height: 18, color: DS.muted }} />
                 ) : (
@@ -156,7 +149,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                 )}
               </div>
 
-              {/* Expanded Details */}
               {isExpanded && (
                 <div style={{ 
                   padding: '0 20px 20px', 
@@ -164,7 +156,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                   marginTop: '0'
                 }}>
                   <div style={{ paddingTop: '16px' }}>
-                    {/* Match Reasons */}
                     <div style={{ marginBottom: '16px' }}>
                       <h4 style={{ 
                         fontSize: '12px', 
@@ -193,7 +184,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                       </ul>
                     </div>
 
-                    {/* Risk Factors */}
                     {result.risk_factors.length > 0 && (
                       <div style={{ marginBottom: '16px' }}>
                         <h4 style={{ 
@@ -224,7 +214,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                       </div>
                     )}
 
-                    {/* Approach Strategy */}
                     <div style={{ marginBottom: '16px' }}>
                       <h4 style={{ 
                         fontSize: '12px', 
@@ -246,7 +235,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                       </p>
                     </div>
 
-                    {/* Score Bars */}
                     <div style={{ 
                       marginTop: '16px', 
                       display: 'flex', 
@@ -277,7 +265,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                       ))}
                     </div>
 
-                    {/* Action Buttons */}
                     <div style={{ 
                       marginTop: '16px',
                       display: 'flex',
@@ -291,15 +278,16 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             display: 'flex',
                             alignItems: 'center',
                             gap: '6px',
-                            padding: '8px 14px',
+                            padding: '10px 16px',
                             background: DS.accent,
-                            color: '#FFF',
+                            color: DS.white,
                             border: 'none',
                             borderRadius: '6px',
                             fontSize: '12px',
                             fontWeight: 600,
                             cursor: 'pointer',
-                            transition: 'opacity 0.2s ease'
+                            transition: 'opacity 0.2s ease',
+                            minHeight: '44px'
                           }}
                           onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
                           onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
@@ -316,15 +304,16 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             display: 'flex',
                             alignItems: 'center',
                             gap: '6px',
-                            padding: '8px 14px',
-                            background: 'transparent',
+                            padding: '10px 16px',
+                            background: DS.card,
                             color: DS.text,
                             border: `1px solid ${DS.border}`,
                             borderRadius: '6px',
                             fontSize: '12px',
                             fontWeight: 600,
                             cursor: 'pointer',
-                            transition: 'all 0.2s ease'
+                            transition: 'all 0.2s ease',
+                            minHeight: '44px'
                           }}
                           onMouseOver={(e) => {
                             e.currentTarget.style.borderColor = DS.accent;
@@ -347,15 +336,16 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             display: 'flex',
                             alignItems: 'center',
                             gap: '6px',
-                            padding: '8px 14px',
-                            background: 'transparent',
+                            padding: '10px 16px',
+                            background: DS.card,
                             color: DS.text,
                             border: `1px solid ${DS.border}`,
                             borderRadius: '6px',
                             fontSize: '12px',
                             fontWeight: 600,
                             cursor: 'pointer',
-                            transition: 'all 0.2s ease'
+                            transition: 'all 0.2s ease',
+                            minHeight: '44px'
                           }}
                           onMouseOver={(e) => {
                             e.currentTarget.style.borderColor = DS.success;

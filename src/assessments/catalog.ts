@@ -12,7 +12,6 @@ export interface AssessmentStyle {
   id: string;
   name: string;
   description: string;
-  icon: string;
 }
 
 export interface AssessmentArchetype {
@@ -43,10 +42,10 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = {
       { id: 'mastery', name: 'Mastery', description: 'Your pursuit of excellence and expertise', lowLabel: 'Generalist', highLabel: 'Expert' },
     ],
     styles: [
-      { id: 'analytical', name: 'Analytical', description: 'Data-driven, logical, and precise in communication', icon: '🔬' },
-      { id: 'visionary', name: 'Visionary', description: 'Inspiring, future-focused, and motivational', icon: '🔭' },
-      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical, results-oriented, and action-focused', icon: '⚙️' },
-      { id: 'empathetic', name: 'Empathetic', description: 'Warm, understanding, and people-centered', icon: '💡' },
+      { id: 'analytical', name: 'Analytical', description: 'Data-driven, logical, and precise in communication' },
+      { id: 'visionary', name: 'Visionary', description: 'Inspiring, future-focused, and motivational' },
+      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical, results-oriented, and action-focused' },
+      { id: 'empathetic', name: 'Empathetic', description: 'Warm, understanding, and people-centered' },
     ],
     archetypes: [
       { name: 'Strategic Architect', description: 'You excel at long-term planning and positioning organizations for future success.', traits: ['Long-term thinker', 'Systems-oriented', 'Change catalyst'] },
@@ -67,10 +66,10 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = {
       { id: 'adaptability', name: 'Adaptability', description: 'How you adjust to different buyer personalities and situations', lowLabel: 'Rigid', highLabel: 'Adaptive' },
     ],
     styles: [
-      { id: 'analytical', name: 'Analytical', description: 'Methodical, data-backed, consultative selling', icon: '🔬' },
-      { id: 'visionary', name: 'Visionary', description: 'Inspiring, big-picture, outcome-focused', icon: '🔭' },
-      { id: 'pragmatic', name: 'Pragmatic', description: 'Direct, efficient, results-driven', icon: '⚙️' },
-      { id: 'empathetic', name: 'Empathetic', description: 'Relationship-first, consultative, patient', icon: '💡' },
+      { id: 'analytical', name: 'Analytical', description: 'Methodical, data-backed, consultative selling' },
+      { id: 'visionary', name: 'Visionary', description: 'Inspiring, big-picture, outcome-focused' },
+      { id: 'pragmatic', name: 'Pragmatic', description: 'Direct, efficient, results-driven' },
+      { id: 'empathetic', name: 'Empathetic', description: 'Relationship-first, consultative, patient' },
     ],
     archetypes: [
       { name: 'Trusted Advisor', description: 'You build deep relationships and become a valued partner to clients.', traits: ['Consultative', 'Patient', 'Trusted'] },
@@ -91,10 +90,10 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = {
       { id: 'network', name: 'Network', description: 'Your professional connections and relationships in China', lowLabel: 'Isolated', highLabel: 'Well-connected' },
     ],
     styles: [
-      { id: 'analytical', name: 'Analytical', description: 'Systematic, research-based approach', icon: '🔬' },
-      { id: 'visionary', name: 'Visionary', description: 'Big-picture, opportunity-focused', icon: '🔭' },
-      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical, step-by-step implementation', icon: '⚙️' },
-      { id: 'empathetic', name: 'Empathetic', description: 'Relationship-first, culturally sensitive', icon: '💡' },
+      { id: 'analytical', name: 'Analytical', description: 'Systematic, research-based approach' },
+      { id: 'visionary', name: 'Visionary', description: 'Big-picture, opportunity-focused' },
+      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical, step-by-step implementation' },
+      { id: 'empathetic', name: 'Empathetic', description: 'Relationship-first, culturally sensitive' },
     ],
     archetypes: [
       { name: 'Cultural Bridge Builder', description: 'You excel at connecting Western and Chinese business practices.', traits: ['Bicultural', 'Adaptable', 'Connector'] },
@@ -115,10 +114,10 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = {
       { id: 'cq_adapt', name: 'CQ Adaptability', description: 'Your flexibility in adjusting to new cultural situations', lowLabel: 'Fixed', highLabel: 'Highly flexible' },
     ],
     styles: [
-      { id: 'analytical', name: 'Analytical', description: 'Cultural research, systematic approach', icon: '🔬' },
-      { id: 'visionary', name: 'Visionary', description: 'Inclusive, global perspective', icon: '🔭' },
-      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical, action-oriented', icon: '⚙️' },
-      { id: 'empathetic', name: 'Empathetic', description: 'Open-minded, curious, inclusive', icon: '💡' },
+      { id: 'analytical', name: 'Analytical', description: 'Cultural research, systematic approach' },
+      { id: 'visionary', name: 'Visionary', description: 'Inclusive, global perspective' },
+      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical, action-oriented' },
+      { id: 'empathetic', name: 'Empathetic', description: 'Open-minded, curious, inclusive' },
     ],
     archetypes: [
       { name: 'Global Bridge Leader', description: 'You naturally connect diverse teams and perspectives.', traits: ['Inclusive', 'Curious', 'Connector'] },
@@ -139,10 +138,10 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = {
       { id: 'innovation', name: 'Innovation', description: 'Your appetite for experimenting with new AI tools and approaches', lowLabel: 'Traditional', highLabel: 'Innovative' },
     ],
     styles: [
-      { id: 'analytical', name: 'Analytical', description: 'Data-driven, evidence-based approach', icon: '🔬' },
-      { id: 'visionary', name: 'Visionary', description: 'Future-focused, transformative', icon: '🔭' },
-      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical implementation, risk-aware', icon: '⚙️' },
-      { id: 'empathetic', name: 'Empathetic', description: 'People-focused, ethical', icon: '💡' },
+      { id: 'analytical', name: 'Analytical', description: 'Data-driven, evidence-based approach' },
+      { id: 'visionary', name: 'Visionary', description: 'Future-focused, transformative' },
+      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical implementation, risk-aware' },
+      { id: 'empathetic', name: 'Empathetic', description: 'People-focused, ethical' },
     ],
     archetypes: [
       { name: 'AI Strategist', description: 'You see the big picture of AI transformation and lead accordingly.', traits: ['Visionary', 'Strategic', 'Transformative'] },
@@ -163,10 +162,10 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = {
       { id: 'impact', name: 'Impact', description: 'Your ability to create meaningful competitive impact', lowLabel: 'Minimal', highLabel: 'Transformative' },
     ],
     styles: [
-      { id: 'analytical', name: 'Analytical', description: 'Competitive analysis, data-driven strategy', icon: '🔬' },
-      { id: 'visionary', name: 'Visionary', description: 'Opportunity spotting, disruptive thinking', icon: '🔭' },
-      { id: 'pragmatic', name: 'Pragmatic', description: 'Execution-focused, competitive tactics', icon: '⚙️' },
-      { id: 'empathetic', name: 'Empathetic', description: 'Customer-focused, market-driven', icon: '💡' },
+      { id: 'analytical', name: 'Analytical', description: 'Competitive analysis, data-driven strategy' },
+      { id: 'visionary', name: 'Visionary', description: 'Opportunity spotting, disruptive thinking' },
+      { id: 'pragmatic', name: 'Pragmatic', description: 'Execution-focused, competitive tactics' },
+      { id: 'empathetic', name: 'Empathetic', description: 'Customer-focused, market-driven' },
     ],
     archetypes: [
       { name: 'Market Disruptor', description: 'You identify and exploit competitive opportunities others miss.', traits: ['Opportunistic', 'Bold', 'Innovative'] },
@@ -187,10 +186,10 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = {
       { id: 'results', name: 'Results', description: 'Your track record of delivering outcomes', lowLabel: 'Unproven', highLabel: 'Results-proven' },
     ],
     styles: [
-      { id: 'analytical', name: 'Analytical', description: 'Process optimization, metric-driven', icon: '🔬' },
-      { id: 'visionary', name: 'Visionary', description: 'Goal-focused, inspirational', icon: '🔭' },
-      { id: 'pragmatic', name: 'Pragmatic', description: 'Hands-on, efficient, result-oriented', icon: '⚙️' },
-      { id: 'empathetic', name: 'Empathetic', description: 'Team-focused, collaborative', icon: '💡' },
+      { id: 'analytical', name: 'Analytical', description: 'Process optimization, metric-driven' },
+      { id: 'visionary', name: 'Visionary', description: 'Goal-focused, inspirational' },
+      { id: 'pragmatic', name: 'Pragmatic', description: 'Hands-on, efficient, result-oriented' },
+      { id: 'empathetic', name: 'Empathetic', description: 'Team-focused, collaborative' },
     ],
     archetypes: [
       { name: 'Execution Champion', description: 'You drive results through effective planning and delivery.', traits: ['Disciplined', 'Organized', 'Reliable'] },
@@ -211,10 +210,10 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = {
       { id: 'impact', name: 'Impact', description: 'Your ability to positively impact others\' development', lowLabel: 'Neutral', highLabel: 'Transformative' },
     ],
     styles: [
-      { id: 'analytical', name: 'Analytical', description: 'Diagnostic, developmental focus', icon: '🔬' },
-      { id: 'visionary', name: 'Visionary', description: 'Inspiring, growth-focused', icon: '🔭' },
-      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical, action-oriented coaching', icon: '⚙️' },
-      { id: 'empathetic', name: 'Empathetic', description: 'Supportive, patient, understanding', icon: '💡' },
+      { id: 'analytical', name: 'Analytical', description: 'Diagnostic, developmental focus' },
+      { id: 'visionary', name: 'Visionary', description: 'Inspiring, growth-focused' },
+      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical, action-oriented coaching' },
+      { id: 'empathetic', name: 'Empathetic', description: 'Supportive, patient, understanding' },
     ],
     archetypes: [
       { name: 'Empowering Coach', description: 'You unlock potential through thoughtful guidance and support.', traits: ['Patient', 'Supportive', 'Empowering'] },
@@ -235,10 +234,10 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = {
       { id: 'adapt', name: 'Adaptability', description: 'Your flexibility to adjust strategy as conditions change', lowLabel: 'Rigid', highLabel: 'Adaptive' },
     ],
     styles: [
-      { id: 'analytical', name: 'Analytical', description: 'Data-driven strategy, evidence-based', icon: '🔬' },
-      { id: 'visionary', name: 'Visionary', description: 'Future-focused, transformative', icon: '🔭' },
-      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical strategy, actionable', icon: '⚙️' },
-      { id: 'empathetic', name: 'Empathetic', description: 'Stakeholder-focused, inclusive', icon: '💡' },
+      { id: 'analytical', name: 'Analytical', description: 'Data-driven strategy, evidence-based' },
+      { id: 'visionary', name: 'Visionary', description: 'Future-focused, transformative' },
+      { id: 'pragmatic', name: 'Pragmatic', description: 'Practical strategy, actionable' },
+      { id: 'empathetic', name: 'Empathetic', description: 'Stakeholder-focused, inclusive' },
     ],
     archetypes: [
       { name: 'Strategic Visionary', description: 'You see the big picture and chart compelling direction.', traits: ['Forward-thinking', 'Inspiring', 'Clear communicator'] },
@@ -259,10 +258,10 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = {
       { id: 'legacy', name: 'Legacy', description: 'Your lasting impact on organizations and people', lowLabel: 'Temporary', highLabel: 'Legacy-builder' },
     ],
     styles: [
-      { id: 'analytical', name: 'Analytical', description: 'Metrics-driven, systematic impact', icon: '🔬' },
-      { id: 'visionary', name: 'Visionary', description: 'Transformational, legacy-focused', icon: '🔭' },
-      { id: 'pragmatic', name: 'Pragmatic', description: 'Results-oriented, efficient', icon: '⚙️' },
-      { id: 'empathetic', name: 'Empathetic', description: 'People-focused, sustainable', icon: '💡' },
+      { id: 'analytical', name: 'Analytical', description: 'Metrics-driven, systematic impact' },
+      { id: 'visionary', name: 'Visionary', description: 'Transformational, legacy-focused' },
+      { id: 'pragmatic', name: 'Pragmatic', description: 'Results-oriented, efficient' },
+      { id: 'empathetic', name: 'Empathetic', description: 'People-focused, sustainable' },
     ],
     archetypes: [
       { name: 'Transformational Leader', description: 'You create lasting, positive change in organizations.', traits: ['Visionary', 'Courageous', 'Transformative'] },

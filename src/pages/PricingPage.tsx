@@ -7,14 +7,15 @@ import { UpgradeModal, TIERS } from '../components/credits/UpgradeModal';
 const DS = {
   headingFont: 'Georgia, serif',
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  bg: '#FFFFFF',
+  card: '#FAFAFA',
+  muted: '#666666',
+  text: '#0A0A0A',
+  textSecondary: '#333333',
+  border: '#E5E5E5',
   success: '#10B981',
-  warning: '#F59E0B'
+  warning: '#F59E0B',
+  white: '#FFFFFF'
 };
 
 const FEATURE_COMPARISON = [
@@ -37,11 +38,11 @@ const FEATURE_COMPARISON = [
   {
     category: 'Premium Features',
     features: [
-      { name: 'Priority AI Model', free: '—', basic: '—', pro: '✓', council: '✓' },
-      { name: 'Quarterly Advisory Call', free: '—', basic: '—', pro: '—', council: '✓' },
-      { name: 'Custom Branding (PDF)', free: '—', basic: '—', pro: '✓', council: '✓' },
-      { name: 'White-Glove Onboarding', free: '—', basic: '—', pro: '—', council: '✓' },
-      { name: 'Direct Partner Access', free: '—', basic: '—', pro: '—', council: '✓' },
+      { name: 'Priority AI Model', free: '—', basic: '—', pro: true, council: true },
+      { name: 'Quarterly Advisory Call', free: '—', basic: '—', pro: '—', council: true },
+      { name: 'Custom Branding (PDF)', free: '—', basic: '—', pro: true, council: true },
+      { name: 'White-Glove Onboarding', free: '—', basic: '—', pro: '—', council: true },
+      { name: 'Direct Partner Access', free: '—', basic: '—', pro: '—', council: true },
     ]
   },
   {
@@ -101,14 +102,13 @@ export function PricingPage() {
   return (
     <div style={{ minHeight: '100vh', background: DS.bg }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 24px' }}>
-        {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
           <div style={{ 
             display: 'inline-flex', 
             alignItems: 'center', 
             gap: '8px',
             padding: '8px 16px',
-            background: `${DS.accent}20`,
+            background: `${DS.accent}15`,
             borderRadius: '20px',
             marginBottom: '16px'
           }}>
@@ -123,17 +123,15 @@ export function PricingPage() {
           </p>
         </div>
 
-        {/* Tier Cards */}
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           gap: '24px',
           marginBottom: '64px'
         }}>
-          {/* Free Tier */}
           <div style={{
             padding: '32px',
-            background: DS.card,
+            background: DS.white,
             border: `1px solid ${DS.border}`,
             borderRadius: '16px'
           }}>
@@ -174,7 +172,7 @@ export function PricingPage() {
                 background: currentTier === 'free' ? 'transparent' : DS.accent,
                 border: `1px solid ${DS.border}`,
                 borderRadius: '8px',
-                color: currentTier === 'free' ? DS.muted : '#FFF',
+                color: currentTier === 'free' ? DS.muted : DS.white,
                 fontSize: '15px',
                 fontWeight: 600,
                 cursor: currentTier === 'free' ? 'default' : 'pointer',
@@ -185,13 +183,12 @@ export function PricingPage() {
             </button>
           </div>
 
-          {/* Paid Tiers */}
           {TIERS.map((tier) => (
             <div
               key={tier.id}
               style={{
                 padding: '32px',
-                background: tier.popular ? `linear-gradient(135deg, ${DS.accent}20, ${DS.accent}05)` : DS.card,
+                background: tier.popular ? `${DS.accent}05` : DS.white,
                 border: `2px solid ${tier.popular ? DS.accent : DS.border}`,
                 borderRadius: '16px',
                 position: 'relative'
@@ -205,7 +202,7 @@ export function PricingPage() {
                   transform: 'translateX(-50%)',
                   padding: '6px 16px',
                   background: DS.accent,
-                  color: '#FFF',
+                  color: DS.white,
                   fontSize: '12px',
                   fontWeight: 700,
                   borderRadius: '14px',
@@ -241,10 +238,10 @@ export function PricingPage() {
                 style={{
                   width: '100%',
                   padding: '14px',
-                  background: tier.popular ? DS.accent : 'transparent',
+                  background: tier.popular ? DS.accent : DS.white,
                   border: `1px solid ${tier.popular ? DS.accent : DS.border}`,
                   borderRadius: '8px',
-                  color: '#FFF',
+                  color: tier.popular ? DS.white : DS.text,
                   fontSize: '15px',
                   fontWeight: 600,
                   cursor: (isLoading || currentTier === tier.id) ? 'not-allowed' : 'pointer',
@@ -270,7 +267,6 @@ export function PricingPage() {
           ))}
         </div>
 
-        {/* Feature Comparison Table */}
         <div style={{ marginBottom: '64px' }}>
           <h2 style={{ fontFamily: DS.headingFont, fontSize: '32px', color: DS.text, marginBottom: '32px', textAlign: 'center' }}>
             Compare Plans
@@ -331,7 +327,6 @@ export function PricingPage() {
           </div>
         </div>
 
-        {/* FAQ Section */}
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
           <h2 style={{ fontFamily: DS.headingFont, fontSize: '32px', color: DS.text, marginBottom: '16px' }}>
             Frequently Asked Questions

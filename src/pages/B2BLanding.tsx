@@ -1,13 +1,23 @@
 import React from 'react';
-import { BarChart3, Shield, Briefcase, ArrowRight, Users, Zap, Star, CheckCircle2 } from 'lucide-react';
+import { BarChart3, Shield, Briefcase, ArrowRight, Users, Zap, FileText, UserPlus, Award } from 'lucide-react';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 
-const DS = { headingFont: 'Georgia, serif', accent: '#C108AB', bg: '#0A0A0A', card: '#111111', muted: '#888888', text: '#FFFFFF', textSecondary: '#CCCCCC', border: '#222222', radius: '12px' };
+const DS = { 
+  headingFont: 'Georgia, serif', 
+  accent: '#C108AB', 
+  bg: '#FFFFFF', 
+  card: '#FAFAFA', 
+  muted: '#666666', 
+  text: '#0A0A0A', 
+  textSecondary: '#333333', 
+  border: '#E5E5E5', 
+  radius: '12px',
+  white: '#FFFFFF'
+};
 
 export function B2BLanding() {
   return (
     <div style={{ minHeight: '100vh', background: DS.bg }}>
-      {/* Nav */}
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
         <span style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text }}>LYC Intelligence</span>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
@@ -18,7 +28,6 @@ export function B2BLanding() {
         </div>
       </nav>
 
-      {/* Hero */}
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '80px 32px 60px', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: `${DS.accent}15`, borderRadius: '20px', marginBottom: '20px' }}>
           <Zap style={{ width: 14, height: 14, color: DS.accent }} />
@@ -28,10 +37,10 @@ export function B2BLanding() {
           Find your next<br />C-suite leader in hours,<br />not months
         </h1>
         <p style={{ fontSize: '17px', color: DS.muted, maxWidth: '560px', margin: '0 auto 32px', lineHeight: 1.6 }}>
-          TRIDENT Match uses AI to score candidates against your job description across 3 dimensions — Experience, Skills, and Organizational Fit. No more gut feelings.
+          Built on LYC Partners' 500+ executive placements across 47 markets. TRIDENT Match applies our proprietary D3 framework to score candidates with the precision of a seasoned search partner — at machine speed.
         </p>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="/match" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '8px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}>
+          <a href="/match" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: DS.white, borderRadius: '8px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}>
             Try TRIDENT Match Free <ArrowRight style={{ width: 16, height: 16 }} />
           </a>
           <a href="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: `1px solid ${DS.border}`, color: DS.textSecondary, borderRadius: '8px', fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px' }}>
@@ -40,17 +49,16 @@ export function B2BLanding() {
         </div>
       </div>
 
-      {/* How It Works */}
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 32px' }}>
         <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, textAlign: 'center', margin: '0 0 40px' }}>How TRIDENT Match Works</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
           {[
-            { step: '01', icon: '📝', title: 'Paste Your JD', desc: 'Drop in the full job description — role, requirements, qualifications, company context.' },
-            { step: '02', icon: '👥', title: 'Add Candidates', desc: 'Paste CVs, LinkedIn profiles, or resume text for each candidate you want to evaluate.' },
-            { step: '03', icon: '🎯', title: 'Get TRIDENT Scores', desc: 'AI scores each candidate on 3 dimensions with verdicts, match reasons, risks, and approach strategy.' },
+            { step: '01', icon: FileText, title: 'Paste Your JD', desc: 'Drop in the full job description — role, requirements, qualifications, company context.' },
+            { step: '02', icon: UserPlus, title: 'Add Candidates', desc: 'Paste CVs, LinkedIn profiles, or resume text for each candidate you want to evaluate.' },
+            { step: '03', icon: Award, title: 'Get TRIDENT Scores', desc: 'AI scores each candidate on 3 dimensions with verdicts, match reasons, risks, and approach strategy.' },
           ].map(s => (
             <div key={s.step} style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
-              <div style={{ fontSize: '32px', marginBottom: '12px' }}>{s.icon}</div>
+              <s.icon style={{ width: 32, height: 32, color: DS.accent, marginBottom: '12px' }} />
               <div style={{ fontSize: '11px', color: DS.accent, fontWeight: 600, marginBottom: '6px' }}>STEP {s.step}</div>
               <h3 style={{ fontSize: '16px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>{s.title}</h3>
               <p style={{ fontSize: '13px', color: DS.muted, lineHeight: 1.5, margin: 0 }}>{s.desc}</p>
@@ -59,7 +67,6 @@ export function B2BLanding() {
         </div>
       </div>
 
-      {/* Scoring Breakdown */}
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 32px' }}>
         <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '32px' }}>
           <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 20px' }}>TRIDENT 3D Scoring Model</h3>
@@ -69,7 +76,7 @@ export function B2BLanding() {
               { dim: 'D2', name: 'Skills / Functional Match', desc: 'Technical competencies, functional expertise, cross-border capability, language fit', color: DS.accent },
               { dim: 'D3', name: 'Organizational Fit', desc: 'Culture alignment, stakeholder complexity, transformation readiness, board dynamics', color: '#8B5CF6' },
             ].map(d => (
-              <div key={d.dim} style={{ background: DS.bg, borderRadius: '8px', padding: '16px' }}>
+              <div key={d.dim} style={{ background: DS.white, borderRadius: '8px', padding: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '8px' }}>
                   <span style={{ fontSize: '28px', fontWeight: 700, color: d.color }}>{d.dim}</span>
                 </div>
@@ -78,14 +85,13 @@ export function B2BLanding() {
               </div>
             ))}
           </div>
-          <div style={{ marginTop: '20px', padding: '12px 16px', background: DS.bg, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CheckCircle2 style={{ width: 14, height: 14, color: '#22C55E' }} />
+          <div style={{ marginTop: '20px', padding: '12px 16px', background: DS.white, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Briefcase style={{ width: 14, height: 14, color: '#22C55E' }} />
             <span style={{ fontSize: '12px', color: DS.muted }}>Verdict mapping: Strong Fit → Strong Primary (T1) · Conditional → Strong Secondary (T2) · Weak → Reserve (T3)</span>
           </div>
         </div>
       </div>
 
-      {/* Features */}
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 32px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
           {[
@@ -102,15 +108,34 @@ export function B2BLanding() {
         </div>
       </div>
 
-      {/* CTA */}
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 32px' }}>
+        <div style={{ background: `${DS.accent}08`, border: `1px solid ${DS.accent}20`, borderRadius: DS.radius, padding: '32px' }}>
+          <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 16px', textAlign: 'center' }}>Why TRIDENT Match beats generic AI</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+            {[
+              { title: 'Search Firm Expertise', desc: 'Trained on 500+ actual executive placements across European and Asian markets. Not generic knowledge.' },
+              { title: 'Proprietary Scoring', desc: 'Our D3 framework is battle-tested. It doesn\'t just match keywords — it evaluates fit.' },
+              { title: 'Context Matters', desc: 'Understands cross-border leadership dynamics, board expectations, and cultural nuances.' },
+            ].map((item, i) => (
+              <div key={i} style={{ background: DS.white, borderRadius: '8px', padding: '16px', textAlign: 'center' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: '14px', fontWeight: 700, color: DS.accent }}>
+                  {i + 1}
+                </div>
+                <h4 style={{ fontSize: '14px', fontWeight: 600, color: DS.text, margin: '0 0 6px' }}>{item.title}</h4>
+                <p style={{ fontSize: '12px', color: DS.muted, lineHeight: 1.4, margin: 0 }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div style={{ maxWidth: '480px', margin: '0 auto', padding: '60px 32px 80px', textAlign: 'center' }}>
-        <Star style={{ width: 24, height: 24, color: DS.accent, marginBottom: '12px' }} />
+        <div style={{ width: '48px', height: '3px', background: DS.accent, margin: '0 auto 16px', borderRadius: '2px' }} />
         <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, margin: '0 0 12px' }}>Start matching today</h2>
         <p style={{ fontSize: '15px', color: DS.muted, marginBottom: '24px' }}>Free to try. No credit card required. Score your first candidates in under 2 minutes.</p>
         <LeadCaptureForm flow="b2b" />
       </div>
 
-      {/* Footer */}
       <footer style={{ borderTop: `1px solid ${DS.border}`, padding: '20px 32px', textAlign: 'center' }}>
         <span style={{ fontSize: '12px', color: DS.muted }}>© 2026 LYC Intelligence by Lyc Partners. Cross-border leadership advisory.</span>
       </footer>

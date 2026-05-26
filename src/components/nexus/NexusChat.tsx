@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ArrowRight, Zap, Shield, Loader2, RefreshCw } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { ArrowRight, Zap, Shield, Loader2, RefreshCw, Paperclip } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { MessageBubble } from './MessageBubble';
 import { SuggestedPrompts } from './SuggestedPrompts';
@@ -48,6 +48,8 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [showEmailGate, setShowEmailGate] = useState(false);
   const [capturedEmail, setCapturedEmail] = useState<string | null>(null);
+  const [documentContext, setDocumentContext] = useState<string>('');
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -64,6 +66,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
           userId: user?.id,
           tier: profile?.tier || 'free',
           history: messages.slice(-10),
+          documentContext,
         })
       });
       if (!res.ok) throw new Error('API failed');
@@ -103,6 +106,48 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
       await sendMessage(lastUserMessage);
     }
   };
+
+  const handleDocumentUpload = useCallback(async () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.docx,.txt';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size exceeds 10MB limit');
+        return;
+      }
+
+      setUploading(true);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'document');
+      
+      try {
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await response.json();
+        if (data.text) {
+          setDocumentContext(data.text);
+          setMessages(prev => [...prev, {
+            role: 'user',
+            content: `I've uploaded a document: ${file.name}. Please analyze it and help me understand its content.`
+          }]);
+          await sendMessage(`Please analyze this document: ${file.name}`);
+        }
+      } catch (error) {
+        console.error('Upload failed:', error);
+        alert('Failed to upload document');
+      } finally {
+        setUploading(false);
+      }
+    };
+    input.click();
+  }, [sendMessage]);
 
   const handlePromptSelect = (prompt: string) => {
     setInput(prompt);
@@ -200,6 +245,28 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
               outline: 'none'
             }}
           />
+          <button
+            onClick={handleDocumentUpload}
+            disabled={uploading}
+            style={{
+              padding: '14px',
+              background: DS.card,
+              border: `1px solid ${DS.border}`,
+              borderRadius: '8px',
+              cursor: uploading ? 'not-allowed' : 'pointer',
+              opacity: uploading ? 0.5 : 1,
+              minHeight: '44px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            {uploading ? (
+              <Loader2 style={{ width: 18, height: 18, color: DS.accent, animation: 'spin 1s linear infinite' }} />
+            ) : (
+              <Paperclip style={{ width: 18, height: 18, color: DS.textSecondary }} />
+            )}
+          </button>
           <button
             onClick={send}
             disabled={loading || !input.trim()}

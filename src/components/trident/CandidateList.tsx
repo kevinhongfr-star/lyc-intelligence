@@ -1,19 +1,20 @@
 import React from 'react';
-import { Plus, X, User, FileText, Users } from 'lucide-react';
+import { Plus, X, User, FileText, Users, Upload } from 'lucide-react';
 import { CandidateInput } from '../../services/tridentScoring';
 
 const DS = {
   headingFont: 'Georgia, serif',
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  bg: '#FFFFFF',
+  card: '#FAFAFA',
+  muted: '#666666',
+  text: '#0A0A0A',
+  textSecondary: '#333333',
+  border: '#E5E5E5',
   radius: '12px',
   success: '#10B981',
-  warning: '#F59E0B'
+  warning: '#F59E0B',
+  white: '#FFFFFF'
 };
 
 interface CandidateListProps {
@@ -21,13 +22,14 @@ interface CandidateListProps {
   onAdd: () => void;
   onRemove: (index: number) => void;
   onUpdate: (index: number, field: keyof CandidateInput, value: string) => void;
+  onUploadCV?: (type: 'jd' | 'cv', index?: number) => void;
 }
 
-export function CandidateList({ candidates, onAdd, onRemove, onUpdate }: CandidateListProps) {
+export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadCV }: CandidateListProps) {
   const validCandidates = candidates.filter(c => c.name && c.cv);
   
   return (
-    <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
+    <div style={{ background: DS.white, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
         <h3 style={{ 
           fontFamily: DS.headingFont, 
@@ -47,7 +49,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate }: Candida
           onClick={onAdd}
           style={{
             padding: '8px 16px',
-            background: 'transparent',
+            background: DS.card,
             border: `1px solid ${DS.border}`,
             borderRadius: '8px',
             color: DS.textSecondary,
@@ -56,11 +58,12 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate }: Candida
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
+            minHeight: '44px'
           }}
           onMouseOver={(e) => {
             e.currentTarget.style.borderColor = DS.accent;
-            e.currentTarget.style.color = DS.text;
+            e.currentTarget.style.color = DS.accent;
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.borderColor = DS.border;
@@ -77,7 +80,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate }: Candida
           <div 
             key={index} 
             style={{ 
-              background: DS.bg, 
+              background: DS.card, 
               border: `1px solid ${DS.border}`, 
               borderRadius: '8px', 
               padding: '16px' 
@@ -92,12 +95,13 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate }: Candida
                 style={{ 
                   flex: 1, 
                   padding: '10px 14px', 
-                  background: DS.card, 
+                  background: DS.white, 
                   border: `1px solid ${DS.border}`, 
                   borderRadius: '6px', 
                   color: DS.text, 
                   fontSize: '13px', 
-                  outline: 'none' 
+                  outline: 'none',
+                  minHeight: '44px'
                 }}
               />
               {candidates.length > 1 && (
@@ -119,36 +123,70 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate }: Candida
               )}
             </div>
             
-            <div style={{ position: 'relative' }}>
-              <FileText style={{ 
-                position: 'absolute', 
-                left: '12px', 
-                top: '12px', 
-                width: 16, height: 16, 
-                color: DS.muted,
-                pointerEvents: 'none'
-              }} />
-              <textarea 
-                placeholder="Paste CV, LinkedIn profile, or resume text...
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ flex: 1, position: 'relative' }}>
+                <FileText style={{ 
+                  position: 'absolute', 
+                  left: '12px', 
+                  top: '12px', 
+                  width: 16, height: 16, 
+                  color: DS.muted,
+                  pointerEvents: 'none'
+                }} />
+                <textarea 
+                  placeholder="Paste CV, LinkedIn profile, or resume text...
 
 Include: work history, education, key achievements, skills"
-                value={candidate.cv}
-                onChange={(e) => onUpdate(index, 'cv', e.target.value)}
-                style={{ 
-                  width: '100%', 
-                  minHeight: '100px', 
-                  background: DS.card, 
-                  border: `1px solid ${DS.border}`, 
-                  borderRadius: '6px', 
-                  padding: '10px 10px 10px 38px', 
-                  color: DS.text, 
-                  fontSize: '12px', 
-                  lineHeight: 1.5, 
-                  resize: 'vertical', 
-                  outline: 'none',
-                  fontFamily: 'Inter, sans-serif'
-                }}
-              />
+                  value={candidate.cv}
+                  onChange={(e) => onUpdate(index, 'cv', e.target.value)}
+                  style={{ 
+                    width: '100%', 
+                    minHeight: '100px', 
+                    background: DS.white, 
+                    border: `1px solid ${DS.border}`, 
+                    borderRadius: '6px', 
+                    padding: '10px 10px 10px 38px', 
+                    color: DS.text, 
+                    fontSize: '12px', 
+                    lineHeight: 1.5, 
+                    resize: 'vertical', 
+                    outline: 'none',
+                    fontFamily: 'Inter, sans-serif'
+                  }}
+                />
+              </div>
+              
+              {onUploadCV && (
+                <button
+                  onClick={() => onUploadCV('cv', index)}
+                  style={{
+                    padding: '10px 16px',
+                    background: DS.white,
+                    border: `1px solid ${DS.border}`,
+                    borderRadius: '6px',
+                    color: DS.textSecondary,
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    transition: 'all 0.2s ease',
+                    height: '44px',
+                    marginTop: '2px'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = DS.accent;
+                    e.currentTarget.style.color = DS.accent;
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = DS.border;
+                    e.currentTarget.style.color = DS.textSecondary;
+                  }}
+                >
+                  <Upload style={{ width: 14, height: 14 }} />
+                  Upload
+                </button>
+              )}
             </div>
 
             {candidate.cv.length > 0 && (

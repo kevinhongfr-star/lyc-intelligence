@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, BarChart3, Shield, Mail, Star, Loader2 } from 'lucide-react';
+import { ArrowRight, BarChart3, Shield, Mail, Loader2, Upload, FileText } from 'lucide-react';
 import { JDInput } from '../components/trident/JDInput';
 import { CandidateList } from '../components/trident/CandidateList';
 import { ResultsTable } from '../components/trident/ResultsTable';
@@ -11,20 +11,21 @@ const DS = {
   headingFont: 'Georgia, serif',
   accent: '#C108AB',
   accentLight: '#D92FC4',
-  bg: '#0A0A0A',
-  card: '#111111',
-  cardHover: '#1A1A1A',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
-  borderHover: '#333333',
+  bg: '#FFFFFF',
+  card: '#FAFAFA',
+  cardHover: '#F0F0F0',
+  muted: '#666666',
+  text: '#0A0A0A',
+  textSecondary: '#333333',
+  border: '#E5E5E5',
+  borderHover: '#CCCCCC',
   radius: '12px',
   green: '#22C55E',
   yellow: '#EAB308',
   red: '#EF4444',
   warning: '#F59E0B',
-  success: '#10B981'
+  success: '#10B981',
+  white: '#FFFFFF'
 };
 
 interface LeadData {
@@ -58,7 +59,6 @@ export function MatchPage() {
   const handleGate = async () => {
     if (!lead.name || !lead.email) return;
 
-    // Save lead to database
     try {
       await fetch('/api/lead-capture', {
         method: 'POST',
@@ -88,13 +88,51 @@ export function MatchPage() {
     setCandidates(updated);
   };
 
+  const handleFileUpload = useCallback(async (type: 'jd' | 'cv', index?: number) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.docx,.txt';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size exceeds 10MB limit');
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('type', type);
+
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data.text) {
+          if (type === 'jd') {
+            setJd(data.text);
+          } else if (index !== undefined) {
+            updateCandidate(index, 'cv', data.text);
+          }
+        }
+      } catch (err) {
+        console.error('File upload error:', err);
+        alert('Failed to process file. Please try again.');
+      }
+    };
+    input.click();
+  }, [updateCandidate]);
+
   const validCandidates = candidates.filter(c => c.name && c.cv);
   const creditCost = getCreditCost(validCandidates.length, isFirstBatch);
 
   const handleRunScoring = async () => {
     if (validCandidates.length === 0 || !jd) return;
 
-    // Check credits for non-free batches
     if (!isFirstBatch && creditCost.credits > userCredits) {
       setShowCreditModal(true);
       return;
@@ -114,7 +152,6 @@ export function MatchPage() {
       setStep('results');
       setIsFirstBatch(false);
 
-      // Deduct credits if applicable
       if (creditCost.credits > 0 && user) {
         await fetch('/api/credits/spend', {
           method: 'POST',
@@ -135,12 +172,10 @@ export function MatchPage() {
   };
 
   const handleDownloadPDF = (result: TRIDENTResult) => {
-    // TODO: Implement PDF download (3 credits)
     alert(`Download PDF for ${result.candidate_name} (3 credits)`);
   };
 
   const handleShareCard = (result: TRIDENTResult) => {
-    // Generate shareable link (no auth required)
     const shareId = Math.random().toString(36).substring(7);
     const shareUrl = `${window.location.origin}/score-card/${shareId}`;
     navigator.clipboard.writeText(shareUrl);
@@ -148,11 +183,9 @@ export function MatchPage() {
   };
 
   const handleSaveCandidate = (result: TRIDENTResult) => {
-    // TODO: Implement candidate saving
     alert(`Save candidate: ${result.candidate_name}`);
   };
 
-  // ─── GATE ───
   if (step === 'gate') {
     return (
       <div style={{ 
@@ -179,7 +212,7 @@ export function MatchPage() {
             </p>
           </div>
 
-          <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '32px' }}>
+          <div style={{ background: DS.white, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '32px' }}>
             <p style={{ fontSize: '13px', color: DS.muted, marginBottom: '20px', textAlign: 'center' }}>
               Enter your details to access the Match Engine
             </p>
@@ -189,26 +222,26 @@ export function MatchPage() {
                 placeholder="Full name" 
                 value={lead.name} 
                 onChange={e => setLead({ ...lead, name: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <input 
                 placeholder="Work email" 
                 type="email" 
                 value={lead.email} 
                 onChange={e => setLead({ ...lead, email: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <input 
                 placeholder="Company" 
                 value={lead.company} 
                 onChange={e => setLead({ ...lead, company: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <input 
                 placeholder="Job title" 
                 value={lead.title} 
                 onChange={e => setLead({ ...lead, title: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <button 
                 onClick={handleGate} 
@@ -216,7 +249,7 @@ export function MatchPage() {
                 style={{ 
                   padding: '14px', 
                   background: DS.accent, 
-                  color: '#FFF', 
+                  color: DS.white, 
                   border: 'none', 
                   borderRadius: '8px', 
                   fontSize: '15px', 
@@ -244,12 +277,10 @@ export function MatchPage() {
     );
   }
 
-  // ─── ENGINE ───
   if (step === 'engine') {
     return (
       <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
         <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-          {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <BarChart3 style={{ color: DS.accent, width: 28, height: 28 }} />
@@ -274,24 +305,46 @@ export function MatchPage() {
             )}
           </div>
 
-          {/* JD Input */}
           <div style={{ marginBottom: '20px' }}>
-            <JDInput value={jd} onChange={setJd} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+              <JDInput value={jd} onChange={setJd} />
+              <button
+                onClick={() => handleFileUpload('jd')}
+                style={{
+                  padding: '10px 16px',
+                  background: DS.card,
+                  border: `1px solid ${DS.border}`,
+                  borderRadius: '8px',
+                  color: DS.textSecondary,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  minHeight: '44px'
+                }}
+              >
+                <Upload style={{ width: 14, height: 14 }} />
+                Upload JD
+              </button>
+            </div>
+            <p style={{ fontSize: '12px', color: DS.muted }}>
+              Supports PDF, DOCX, TXT (max 10MB)
+            </p>
           </div>
 
-          {/* Candidates */}
           <div style={{ marginBottom: '20px' }}>
             <CandidateList
               candidates={candidates}
               onAdd={addCandidate}
               onRemove={removeCandidate}
               onUpdate={updateCandidate}
+              onUploadCV={handleFileUpload}
             />
           </div>
 
-          {/* Run Button */}
           <div style={{ 
-            background: DS.card, 
+            background: DS.white, 
             border: `1px solid ${DS.border}`, 
             borderRadius: DS.radius, 
             padding: '20px' 
@@ -331,7 +384,7 @@ export function MatchPage() {
                 style={{ 
                   padding: '12px 24px', 
                   background: DS.accent, 
-                  color: '#FFF', 
+                  color: DS.white, 
                   border: 'none', 
                   borderRadius: '8px', 
                   fontSize: '14px', 
@@ -358,7 +411,7 @@ export function MatchPage() {
             </div>
             
             {scoring && (
-              <div style={{ height: '6px', background: DS.bg, borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ height: '6px', background: DS.card, borderRadius: '3px', overflow: 'hidden' }}>
                 <div style={{ 
                   height: '100%', 
                   width: `${progress}%`, 
@@ -378,7 +431,7 @@ export function MatchPage() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0,0,0,0.8)',
+            background: 'rgba(0,0,0,0.5)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -386,7 +439,7 @@ export function MatchPage() {
             zIndex: 1000
           }}>
             <div style={{
-              background: DS.card,
+              background: DS.white,
               border: `1px solid ${DS.border}`,
               borderRadius: '16px',
               padding: '32px',
@@ -404,11 +457,12 @@ export function MatchPage() {
                   onClick={() => setShowCreditModal(false)}
                   style={{
                     padding: '10px 20px',
-                    background: 'transparent',
+                    background: DS.card,
                     border: `1px solid ${DS.border}`,
                     borderRadius: '8px',
                     color: DS.text,
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    minHeight: '44px'
                   }}
                 >
                   Cancel
@@ -420,9 +474,10 @@ export function MatchPage() {
                     background: DS.accent,
                     border: 'none',
                     borderRadius: '8px',
-                    color: '#FFF',
+                    color: DS.white,
                     cursor: 'pointer',
-                    fontWeight: 600
+                    fontWeight: 600,
+                    minHeight: '44px'
                   }}
                 >
                   Upgrade Plan
@@ -442,11 +497,9 @@ export function MatchPage() {
     );
   }
 
-  // ─── RESULTS ───
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
       <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-        {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
@@ -461,19 +514,19 @@ export function MatchPage() {
             onClick={() => { setStep('engine'); setResults([]); }} 
             style={{ 
               padding: '10px 20px', 
-              background: 'transparent', 
+              background: DS.card, 
               border: `1px solid ${DS.border}`, 
               borderRadius: '8px', 
               color: DS.textSecondary, 
               fontSize: '13px', 
-              cursor: 'pointer' 
+              cursor: 'pointer',
+              minHeight: '44px'
             }}
           >
             Score More
           </button>
         </div>
 
-        {/* Results Table */}
         <ResultsTable
           results={results}
           onDownloadPDF={handleDownloadPDF}
@@ -481,16 +534,15 @@ export function MatchPage() {
           onSaveCandidate={handleSaveCandidate}
         />
 
-        {/* CTA */}
         <div style={{ 
           marginTop: '32px', 
-          background: DS.card, 
+          background: DS.white, 
           border: `1px solid ${DS.accent}33`, 
           borderRadius: DS.radius, 
           padding: '24px', 
           textAlign: 'center' 
         }}>
-          <Star style={{ width: 24, height: 24, color: DS.accent, margin: '0 auto 12px' }} />
+          <div style={{ width: '48px', height: '3px', background: DS.accent, margin: '0 auto 16px', borderRadius: '2px' }} />
           <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
             Want deeper analysis?
           </h3>
@@ -505,7 +557,7 @@ export function MatchPage() {
               gap: '8px', 
               padding: '12px 24px', 
               background: DS.accent, 
-              color: '#FFF', 
+              color: DS.white, 
               borderRadius: '8px', 
               fontSize: '14px', 
               fontWeight: 600, 

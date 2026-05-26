@@ -4,13 +4,14 @@ import { Briefcase, FileText, Lightbulb } from 'lucide-react';
 const DS = {
   headingFont: 'Georgia, serif',
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
-  radius: '12px'
+  bg: '#FFFFFF',
+  card: '#FAFAFA',
+  muted: '#666666',
+  text: '#0A0A0A',
+  textSecondary: '#333333',
+  border: '#E5E5E5',
+  radius: '12px',
+  white: '#FFFFFF'
 };
 
 interface JDInputProps {
@@ -20,7 +21,7 @@ interface JDInputProps {
 
 export function JDInput({ value, onChange }: JDInputProps) {
   return (
-    <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
+    <div style={{ flex: 1, background: DS.white, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
       <h3 style={{ 
         fontFamily: DS.headingFont, 
         fontSize: '16px', 
@@ -48,7 +49,7 @@ Example:
         style={{
           width: '100%',
           minHeight: '200px',
-          background: DS.bg,
+          background: DS.card,
           border: `1px solid ${DS.border}`,
           borderRadius: '8px',
           padding: '14px',
