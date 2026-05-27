@@ -5,16 +5,15 @@ import { CandidateInput } from '../../services/tridentScoring';
 const DS = {
   headingFont: 'Georgia, serif',
   accent: '#C108AB',
-  bg: '#FFFFFF',
-  card: '#FAFAFA',
-  muted: '#666666',
-  text: '#0A0A0A',
-  textSecondary: '#333333',
-  border: '#E5E5E5',
+  bg: '#0A0A0A',
+  card: '#111111',
+  muted: '#888888',
+  text: '#FFFFFF',
+  textSecondary: '#CCCCCC',
+  border: '#222222',
   radius: '12px',
   success: '#10B981',
   warning: '#F59E0B',
-  white: '#FFFFFF'
 };
 
 interface CandidateListProps {
@@ -29,8 +28,8 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
   const validCandidates = candidates.filter(c => c.name && c.cv);
   
   return (
-    <div style={{ background: DS.white, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+    <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
         <h3 style={{ 
           fontFamily: DS.headingFont, 
           fontSize: '16px', 
@@ -42,14 +41,14 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
           gap: '8px'
         }}>
           <Users style={{ width: 18, height: 18, color: DS.accent }} />
-          Candidates ({validCandidates.length} ready to score)
+          Candidates ({validCandidates.length} ready)
         </h3>
         
         <button
           onClick={onAdd}
           style={{
             padding: '8px 16px',
-            background: DS.card,
+            background: DS.bg,
             border: `1px solid ${DS.border}`,
             borderRadius: '8px',
             color: DS.textSecondary,
@@ -58,16 +57,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            transition: 'all 0.2s ease',
             minHeight: '44px'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.borderColor = DS.accent;
-            e.currentTarget.style.color = DS.accent;
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.borderColor = DS.border;
-            e.currentTarget.style.color = DS.textSecondary;
           }}
         >
           <Plus style={{ width: 14, height: 14 }} /> 
@@ -80,7 +70,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
           <div 
             key={index} 
             style={{ 
-              background: DS.card, 
+              background: DS.bg, 
               border: `1px solid ${DS.border}`, 
               borderRadius: '8px', 
               padding: '16px' 
@@ -95,7 +85,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
                 style={{ 
                   flex: 1, 
                   padding: '10px 14px', 
-                  background: DS.white, 
+                  background: DS.card, 
                   border: `1px solid ${DS.border}`, 
                   borderRadius: '6px', 
                   color: DS.text, 
@@ -112,11 +102,8 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
                     border: 'none', 
                     color: DS.muted, 
                     cursor: 'pointer', 
-                    padding: '4px',
-                    transition: 'color 0.2s ease'
+                    padding: '4px'
                   }}
-                  onMouseOver={(e) => e.currentTarget.style.color = DS.text}
-                  onMouseOut={(e) => e.currentTarget.style.color = DS.muted}
                 >
                   <X style={{ width: 16, height: 16 }} />
                 </button>
@@ -142,7 +129,7 @@ Include: work history, education, key achievements, skills"
                   style={{ 
                     width: '100%', 
                     minHeight: '100px', 
-                    background: DS.white, 
+                    background: DS.card, 
                     border: `1px solid ${DS.border}`, 
                     borderRadius: '6px', 
                     padding: '10px 10px 10px 38px', 
@@ -161,7 +148,7 @@ Include: work history, education, key achievements, skills"
                   onClick={() => onUploadCV('cv', index)}
                   style={{
                     padding: '10px 16px',
-                    background: DS.white,
+                    background: DS.card,
                     border: `1px solid ${DS.border}`,
                     borderRadius: '6px',
                     color: DS.textSecondary,
@@ -170,17 +157,8 @@ Include: work history, education, key achievements, skills"
                     display: 'flex',
                     alignItems: 'center',
                     gap: '4px',
-                    transition: 'all 0.2s ease',
                     height: '44px',
                     marginTop: '2px'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.borderColor = DS.accent;
-                    e.currentTarget.style.color = DS.accent;
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.borderColor = DS.border;
-                    e.currentTarget.style.color = DS.textSecondary;
                   }}
                 >
                   <Upload style={{ width: 14, height: 14 }} />
@@ -190,11 +168,7 @@ Include: work history, education, key achievements, skills"
             </div>
 
             {candidate.cv.length > 0 && (
-              <div style={{ 
-                marginTop: '8px',
-                fontSize: '11px',
-                color: DS.muted
-              }}>
+              <div style={{ marginTop: '8px', fontSize: '11px', color: DS.muted }}>
                 {candidate.cv.length.toLocaleString()} characters
               </div>
             )}
@@ -211,7 +185,7 @@ Include: work history, education, key achievements, skills"
           borderRadius: '8px',
           textAlign: 'center'
         }}>
-          <p style={{ fontSize: '13px', color: DS.textSecondary, margin: '0 0 4px 0' }}>
+          <p style={{ fontSize: '13px', color: DS.textSecondary, margin: 0 }}>
             Add at least one candidate with name and CV to run scoring
           </p>
         </div>
@@ -228,12 +202,7 @@ Include: work history, education, key achievements, skills"
           alignItems: 'center',
           gap: '8px'
         }}>
-          <div style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: DS.success
-          }} />
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: DS.success }} />
           <span style={{ fontSize: '12px', color: DS.textSecondary }}>
             {validCandidates.length} candidate{validCandidates.length !== 1 ? 's' : ''} ready to score
           </span>

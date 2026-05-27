@@ -212,7 +212,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     suggested_prompts: [
       'How do I start the career assessment?',
       'What is cross-border readiness?',
-      'Tell me about the TRIDENT score',
+      'How does Score Match work?',
     ],
     usage: { tokens: 0 }
   });
