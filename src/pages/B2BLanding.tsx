@@ -2,26 +2,25 @@ import React from 'react';
 import { BarChart3, Shield, Briefcase, ArrowRight, Users, Zap, FileText, UserPlus, Award } from 'lucide-react';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 
-const DS = { 
-  headingFont: 'Georgia, serif', 
-  accent: '#C108AB', 
-  bg: '#FFFFFF', 
-  card: '#FAFAFA', 
-  muted: '#666666', 
-  text: '#0A0A0A', 
-  textSecondary: '#333333', 
-  border: '#E5E5E5', 
+const DS = {
+  headingFont: 'Georgia, serif',
+  accent: '#C108AB',
+  bg: '#0A0A0A',
+  card: '#111111',
+  muted: '#888888',
+  text: '#FFFFFF',
+  textSecondary: '#CCCCCC',
+  border: '#222222',
   radius: '12px',
-  white: '#FFFFFF'
 };
 
 export function B2BLanding() {
   return (
     <div style={{ minHeight: '100vh', background: DS.bg }}>
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <span style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text }}>LYC Intelligence</span>
+        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>LYC Intelligence</a>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <a href="/match" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>TRIDENT Match</a>
+          <a href="/match" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Score Match</a>
           <a href="/b2c" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Leaders</a>
           <a href="/nexus" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Nexus AI</a>
           <a href="/" style={{ fontSize: '13px', color: DS.text, textDecoration: 'none', padding: '8px 16px', border: `1px solid ${DS.border}`, borderRadius: '6px' }}>Sign In</a>
@@ -34,14 +33,14 @@ export function B2BLanding() {
           <span style={{ fontSize: '12px', color: DS.accent, fontWeight: 600 }}>AI-Powered Executive Search</span>
         </div>
         <h1 style={{ fontFamily: DS.headingFont, fontSize: '48px', fontWeight: 700, color: DS.text, margin: '0 0 16px', lineHeight: 1.1 }}>
-          Find your next<br />C-suite leader in hours,<br />not months
+          Find Your Next<br />C-Suite Leader in Hours,<br />Not Months
         </h1>
         <p style={{ fontSize: '17px', color: DS.muted, maxWidth: '560px', margin: '0 auto 32px', lineHeight: 1.6 }}>
-          TRIDENT Match scores candidates against your job description across 3 dimensions — Experience, Skills, and Organizational Fit. No more gut feelings.
+          Paste a job description, add candidate profiles, and get instant 3-dimensional match scores. See who fits before you schedule the first call.
         </p>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="/match" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: DS.white, borderRadius: '8px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}>
-            Try TRIDENT Match Free <ArrowRight style={{ width: 16, height: 16 }} />
+          <a href="/match" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '8px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}>
+            Try Score Match Free <ArrowRight style={{ width: 16, height: 16 }} />
           </a>
           <a href="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: `1px solid ${DS.border}`, color: DS.textSecondary, borderRadius: '8px', fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px' }}>
             Leadership Assessment
@@ -50,12 +49,12 @@ export function B2BLanding() {
       </div>
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 32px' }}>
-        <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, textAlign: 'center', margin: '0 0 40px' }}>How TRIDENT Match Works</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+        <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, textAlign: 'center', margin: '0 0 40px' }}>How Score Match Works</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
           {[
             { step: '01', icon: FileText, title: 'Paste Your JD', desc: 'Drop in the full job description — role, requirements, qualifications, company context.' },
             { step: '02', icon: UserPlus, title: 'Add Candidates', desc: 'Paste CVs, LinkedIn profiles, or resume text for each candidate you want to evaluate.' },
-            { step: '03', icon: Award, title: 'Get TRIDENT Scores', desc: 'AI scores each candidate on 3 dimensions with verdicts, match reasons, risks, and approach strategy.' },
+            { step: '03', icon: Award, title: 'Get Match Scores', desc: 'AI scores each candidate on 3 dimensions with verdicts, match reasons, risks, and approach strategy.' },
           ].map(s => (
             <div key={s.step} style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
               <s.icon style={{ width: 32, height: 32, color: DS.accent, marginBottom: '12px' }} />
@@ -69,31 +68,31 @@ export function B2BLanding() {
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 32px' }}>
         <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '32px' }}>
-          <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 20px' }}>TRIDENT 3D Scoring Model</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+          <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 20px' }}>How Scoring Works</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
             {[
-              { dim: 'D1', name: 'Experience & Achievements', desc: 'Career trajectory, role progression, quantifiable impact, leadership scope', color: '#3B82F6' },
-              { dim: 'D2', name: 'Skills / Functional Match', desc: 'Technical competencies, functional expertise, cross-border capability, language fit', color: DS.accent },
-              { dim: 'D3', name: 'Organizational Fit', desc: 'Culture alignment, stakeholder complexity, transformation readiness, board dynamics', color: '#8B5CF6' },
+              { name: 'Experience & Achievements', desc: 'Career trajectory, role progression, quantifiable impact, leadership scope', color: '#3B82F6' },
+              { name: 'Skills & Expertise', desc: 'Technical competencies, functional expertise, cross-border capability, language fit', color: DS.accent },
+              { name: 'Organizational Fit', desc: 'Culture alignment, stakeholder complexity, transformation readiness, board dynamics', color: '#8B5CF6' },
             ].map(d => (
-              <div key={d.dim} style={{ background: DS.white, borderRadius: '8px', padding: '16px' }}>
+              <div key={d.name} style={{ background: '#0A0A0A', borderRadius: '8px', padding: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '28px', fontWeight: 700, color: d.color }}>{d.dim}</span>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: d.color, flexShrink: 0 }} />
+                  <h4 style={{ fontSize: '14px', fontWeight: 600, color: DS.text, margin: 0 }}>{d.name}</h4>
                 </div>
-                <h4 style={{ fontSize: '14px', fontWeight: 600, color: DS.text, margin: '0 0 6px' }}>{d.name}</h4>
                 <p style={{ fontSize: '12px', color: DS.muted, lineHeight: 1.4, margin: 0 }}>{d.desc}</p>
               </div>
             ))}
           </div>
-          <div style={{ marginTop: '20px', padding: '12px 16px', background: DS.white, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ marginTop: '20px', padding: '12px 16px', background: '#0A0A0A', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Briefcase style={{ width: 14, height: 14, color: '#22C55E' }} />
-            <span style={{ fontSize: '12px', color: DS.muted }}>Verdict mapping: Strong Fit → Strong Primary (T1) · Conditional → Strong Secondary (T2) · Weak → Reserve (T3)</span>
+            <span style={{ fontSize: '12px', color: DS.muted }}>Each candidate receives a match verdict: Strong Fit, Good Fit, or Potential Fit — with detailed reasoning and approach strategy.</span>
           </div>
         </div>
       </div>
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 32px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
           {[
             { icon: BarChart3, title: 'Instant Scoring', desc: 'Each candidate scored in seconds. No waiting for analyst reports.' },
             { icon: Shield, title: 'Confidential', desc: 'Your JDs and candidate data stay private. Never shared with third parties.' },
@@ -112,7 +111,7 @@ export function B2BLanding() {
         <div style={{ width: '48px', height: '3px', background: DS.accent, margin: '0 auto 16px', borderRadius: '2px' }} />
         <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, margin: '0 0 12px' }}>Start matching today</h2>
         <p style={{ fontSize: '15px', color: DS.muted, marginBottom: '24px' }}>Free to try. No credit card required. Score your first candidates in under 2 minutes.</p>
-        <LeadCaptureForm flow="b2b" />
+        <LeadCaptureForm type="b2b" source="b2b_landing" />
       </div>
 
       <footer style={{ borderTop: `1px solid ${DS.border}`, padding: '20px 32px', textAlign: 'center' }}>

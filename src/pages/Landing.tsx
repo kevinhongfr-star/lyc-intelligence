@@ -10,7 +10,7 @@ export function Landing() {
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
         <span style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text }}>LYC Intelligence</span>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <a href="/match" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>TRIDENT Match</a>
+          <a href="/match" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Score Match</a>
           <a href="/b2b" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Firms</a>
           <a href="/b2c" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Leaders</a>
           <a href="/nexus" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Nexus AI</a>
@@ -24,7 +24,7 @@ export function Landing() {
           Cross-border<br />leadership intelligence
         </h1>
         <p style={{ fontSize: '17px', color: DS.muted, maxWidth: '520px', margin: '0 auto 48px', lineHeight: 1.6 }}>
-          AI-powered executive search. TRIDENT scoring. Pipeline management. From Europe to Asia.
+          AI-powered executive search. Score candidates instantly. From Europe to Asia.
         </p>
 
         {/* Dual CTA Section */}
@@ -78,7 +78,7 @@ export function Landing() {
         {/* Product Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginTop: '60px' }}>
           {[
-            { icon: BarChart3, title: 'TRIDENT Match', desc: 'AI-powered JD ↔ CV matching engine. Score candidates instantly.', href: '/match', cta: 'Try Free' },
+            { icon: BarChart3, title: 'Score Match', desc: 'AI-powered JD-CV matching engine. Score candidates instantly.', href: '/match', cta: 'Try Free' },
             { icon: Brain, title: 'Leadership Assessment', desc: 'Discover your archetype. Benchmark against global executives.', href: '/assessment', cta: 'Take Assessment' },
             { icon: MessageCircle, title: 'Nexus AI', desc: 'Talk to our AI about career positioning, scoring, and opportunities.', href: '/nexus', cta: 'Start Chat' },
           ].map(p => (

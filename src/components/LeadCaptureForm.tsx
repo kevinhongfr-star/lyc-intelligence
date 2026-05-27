@@ -162,7 +162,7 @@ export function LeadCaptureForm({
         textAlign: 'center',
       }}>
         {subheading || (type === 'b2b'
-          ? 'Get 3 free TRIDENT matches when you book a demo'
+          ? 'Get 3 free Score Match results when you book a demo'
           : 'Get your personalized leadership archetype in 10 minutes')}
       </p>
 

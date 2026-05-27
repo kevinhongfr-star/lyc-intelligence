@@ -77,7 +77,7 @@ export function NexusPage() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-serif font-bold text-text-primary">Nexus</h1>
-          <p className="text-text-muted text-sm">Your LYC Intelligence assistant — ask about mandates, candidates, TRIDENT scores, pipeline health</p>
+          <p className="text-text-muted text-sm">Your LYC Intelligence assistant — ask about cross-border leadership, career strategy, and executive positioning</p>
         </div>
         {messages.length > 0 && (
           <button onClick={clearChat} className="flex items-center gap-1.5 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary rounded-lg min-h-[44px]">
@@ -92,7 +92,7 @@ export function NexusPage() {
             <MessageSquare className="w-8 h-8 mx-auto mb-3 opacity-50" />
             <p className="font-medium mb-2">Nexus is ready</p>
             <div className="grid grid-cols-2 gap-2 max-w-md mx-auto text-sm">
-              {['What is TRIDENT scoring?', 'Show PHI health overview', 'Explain pipeline stages', 'How does Proximity work?'].map(q => (
+              {['How do I position for a cross-border role?', 'What makes a strong leadership profile?', 'What do boards look for in C-suite candidates?', 'How should I prepare for a board interview?'].map(q => (
                 <button key={q} onClick={() => { setInput(q); }} className="p-2 bg-bg-tertiary rounded-lg hover:bg-bg-hover text-text-secondary text-left transition-colors">{q}</button>
               ))}
             </div>
@@ -128,7 +128,7 @@ export function NexusPage() {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
-          placeholder="Ask Nexus anything about your pipeline..."
+          placeholder="Ask Nexus about career positioning, cross-border leadership..."
           className="flex-1 px-4 py-3 bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent min-h-[44px]"
         />
         <button

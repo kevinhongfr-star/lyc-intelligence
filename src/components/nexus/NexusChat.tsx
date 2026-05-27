@@ -32,7 +32,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hi! I'm **Nexus**, LYC Partners' AI assistant. I can help you with:\n\n- **Executive Search** — How we find cross-border leaders\n- **TRIDENT Matching** — How our AI-powered JD↔CV matching works\n- **Career Strategy** — Guidance for senior leaders navigating international careers\n- **Leadership Advisory** — Our D3 Framework: Diagnose · Design · Deliver\n\nWhat would you like to know?"
+      content: "Hi! I'm **Nexus**, your career intelligence advisor. I can help you with:\n\n- **Career Strategy** — Guidance for senior leaders navigating cross-border transitions\n- **Score Match** — AI-powered JD-CV matching to evaluate candidate fit\n- **Leadership Assessment** — Benchmark your profile against executive markets\n- **Market Insights** — What boards and search firms look for in C-suite candidates\n\nWhat would you like to know?"
     }
   ]);
   const [input, setInput] = useState('');
@@ -40,9 +40,9 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const [aiState, setAiState] = useState<'idle' | 'thinking' | 'error'>('idle');
   const [lastUserMessage, setLastUserMessage] = useState<string | null>(null);
   const [suggestedPrompts, setSuggestedPrompts] = useState<string[]>(initialPrompts || [
-    'What does LYC do?',
-    'How does TRIDENT matching work?',
-    'Tell me about the D3 Framework',
+    'How do I position myself for a cross-border role?',
+    'What makes a strong leadership profile?',
+    'How should I prepare for a board interview?',
     'What is The Council?'
   ]);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -166,7 +166,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
           <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
             <a href="/b2b" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Firms</a>
             <a href="/b2c" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Leaders</a>
-            <a href="/match" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>TRIDENT Match</a>
+            <a href="/match" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Score Match</a>
           </div>
         </nav>
       )}

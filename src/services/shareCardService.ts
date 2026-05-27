@@ -64,7 +64,7 @@ export function getLinkedInShareUrl(shareCard: ShareCard): string {
       text = `Just got my cross-border leadership profile from LYC Intelligence. Archetype: ${shareCard.data?.archetype || 'Executive'}.`;
       break;
     case 'trident':
-      text = `TRIDENT scorecard for ${shareCard.data?.candidate_name || 'Candidate'}: ${shareCard.data?.composite_score || 0}/100.`;
+      text = `Score Match card for ${shareCard.data?.candidate_name || 'Candidate'}: ${shareCard.data?.composite_score || 0}/100.`;
       break;
     case 'progress':
       text = 'Check out my leadership progress over the last quarter with LYC Intelligence.';

@@ -46,7 +46,7 @@ export function B2CLanding() {
           {[
             { icon: Brain, title: 'Leadership Archetype', desc: 'Discover whether you\'re a Strategist, Operator, Catalyst, or Builder — with personalized insights for your career trajectory.' },
             { icon: Globe, title: 'Cross-Border Benchmark', desc: 'See how you compare across European and Asian executive markets. Understand your positioning and unlock hidden opportunities.' },
-            { icon: BarChart3, title: 'TRIDENT Score', desc: 'Get scored on Experience, Skills, and Organizational Fit — the same framework top search firms use to evaluate C-suite candidates.' },
+            { icon: BarChart3, title: 'Career Benchmark', desc: 'Get benchmarked across Experience, Skills, and Organizational Fit — see exactly how you compare to what top firms look for in C-suite candidates.' },
           ].map(f => (
             <div key={f.title} style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
               <f.icon style={{ width: 24, height: 24, color: DS.accent, marginBottom: '12px' }} />
@@ -93,7 +93,7 @@ export function B2CLanding() {
         <Star style={{ width: 24, height: 24, color: DS.accent, marginBottom: '12px' }} />
         <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, margin: '0 0 12px' }}>Ready to find out?</h2>
         <p style={{ fontSize: '15px', color: DS.muted, marginBottom: '24px' }}>Free assessment. No credit card. Results in 10 minutes.</p>
-        <LeadCaptureForm flow="b2c" />
+        <LeadCaptureForm type="b2c" source="b2c_landing" />
       </div>
 
       {/* Footer */}

@@ -1,31 +1,25 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, BarChart3, Shield, Mail, Loader2, Upload, FileText } from 'lucide-react';
-import { JDInput } from '../components/trident/JDInput';
-import { CandidateList } from '../components/trident/CandidateList';
-import { ResultsTable } from '../components/trident/ResultsTable';
+import { ArrowRight, BarChart3, Shield, Loader2, Upload } from 'lucide-react';
+import { JDInput } from '../components/match/JDInput';
+import { CandidateList } from '../components/match/CandidateList';
+import { ResultsTable } from '../components/match/ResultsTable';
 import { runTRIDENTScoring, CandidateInput, TRIDENTResult, getCreditCost } from '../services/tridentScoring';
 import { useAuthStore } from '../stores/authStore';
 
 const DS = {
   headingFont: 'Georgia, serif',
   accent: '#C108AB',
-  accentLight: '#D92FC4',
-  bg: '#FFFFFF',
-  card: '#FAFAFA',
-  cardHover: '#F0F0F0',
-  muted: '#666666',
-  text: '#0A0A0A',
-  textSecondary: '#333333',
-  border: '#E5E5E5',
-  borderHover: '#CCCCCC',
+  bg: '#0A0A0A',
+  card: '#111111',
+  muted: '#888888',
+  text: '#FFFFFF',
+  textSecondary: '#CCCCCC',
+  border: '#222222',
   radius: '12px',
-  green: '#22C55E',
-  yellow: '#EAB308',
-  red: '#EF4444',
-  warning: '#F59E0B',
   success: '#10B981',
-  white: '#FFFFFF'
+  warning: '#F59E0B',
+  error: '#EF4444',
 };
 
 interface LeadData {
@@ -68,7 +62,7 @@ export function MatchPage() {
           email: lead.email,
           company: lead.company,
           title: lead.title,
-          source: 'trident-match'
+          source: 'score-match'
         })
       });
     } catch (e) {
@@ -159,7 +153,7 @@ export function MatchPage() {
           body: JSON.stringify({
             userId: user.id,
             amount: creditCost.credits,
-            action: 'trident_match'
+            action: 'score_match'
           })
         });
       }
@@ -172,7 +166,7 @@ export function MatchPage() {
   };
 
   const handleDownloadPDF = (result: TRIDENTResult) => {
-    alert(`Download PDF for ${result.candidate_name} (3 credits)`);
+    alert(`Download PDF for ${result.candidate_name}`);
   };
 
   const handleShareCard = (result: TRIDENTResult) => {
@@ -201,18 +195,18 @@ export function MatchPage() {
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
               <BarChart3 style={{ color: DS.accent, width: 32, height: 32 }} />
-              <span style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, color: DS.text }}>TRIDENT Match</span>
+              <span style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, color: DS.text }}>Score Match</span>
             </div>
             <h1 style={{ fontFamily: DS.headingFont, fontSize: '36px', fontWeight: 700, color: DS.text, margin: '0 0 12px' }}>
               AI-Powered Executive Matching
             </h1>
             <p style={{ fontSize: '16px', color: DS.muted, lineHeight: 1.6 }}>
-              Score candidates against job descriptions using the TRIDENT 3D model. 
+              Score candidates against job descriptions across 3 dimensions. 
               Get instant insights on experience, skills, and organizational fit.
             </p>
           </div>
 
-          <div style={{ background: DS.white, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '32px' }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '32px' }}>
             <p style={{ fontSize: '13px', color: DS.muted, marginBottom: '20px', textAlign: 'center' }}>
               Enter your details to access the Match Engine
             </p>
@@ -222,26 +216,26 @@ export function MatchPage() {
                 placeholder="Full name" 
                 value={lead.name} 
                 onChange={e => setLead({ ...lead, name: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <input 
                 placeholder="Work email" 
                 type="email" 
                 value={lead.email} 
                 onChange={e => setLead({ ...lead, email: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <input 
                 placeholder="Company" 
                 value={lead.company} 
                 onChange={e => setLead({ ...lead, company: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <input 
                 placeholder="Job title" 
                 value={lead.title} 
                 onChange={e => setLead({ ...lead, title: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <button 
                 onClick={handleGate} 
@@ -249,7 +243,7 @@ export function MatchPage() {
                 style={{ 
                   padding: '14px', 
                   background: DS.accent, 
-                  color: DS.white, 
+                  color: '#FFF', 
                   border: 'none', 
                   borderRadius: '8px', 
                   fontSize: '15px', 
@@ -285,7 +279,7 @@ export function MatchPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <BarChart3 style={{ color: DS.accent, width: 28, height: 28 }} />
               <div>
-                <span style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 700, color: DS.text }}>TRIDENT Match Engine</span>
+                <span style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 700, color: DS.text }}>Score Match Engine</span>
                 <p style={{ fontSize: '12px', color: DS.muted, margin: '4px 0 0' }}>Welcome, {lead.name}</p>
               </div>
             </div>
@@ -306,7 +300,7 @@ export function MatchPage() {
           </div>
 
           <div style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
               <JDInput value={jd} onChange={setJd} />
               <button
                 onClick={() => handleFileUpload('jd')}
@@ -321,7 +315,8 @@ export function MatchPage() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  minHeight: '44px'
+                  minHeight: '44px',
+                  whiteSpace: 'nowrap'
                 }}
               >
                 <Upload style={{ width: 14, height: 14 }} />
@@ -344,7 +339,7 @@ export function MatchPage() {
           </div>
 
           <div style={{ 
-            background: DS.white, 
+            background: DS.card, 
             border: `1px solid ${DS.border}`, 
             borderRadius: DS.radius, 
             padding: '20px' 
@@ -384,7 +379,7 @@ export function MatchPage() {
                 style={{ 
                   padding: '12px 24px', 
                   background: DS.accent, 
-                  color: DS.white, 
+                  color: '#FFF', 
                   border: 'none', 
                   borderRadius: '8px', 
                   fontSize: '14px', 
@@ -403,15 +398,13 @@ export function MatchPage() {
                     Scoring... {progress}%
                   </>
                 ) : (
-                  <>
-                    Run TRIDENT Sweep
-                  </>
+                  'Run Match'
                 )}
               </button>
             </div>
             
             {scoring && (
-              <div style={{ height: '6px', background: DS.card, borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ height: '6px', background: DS.bg, borderRadius: '3px', overflow: 'hidden' }}>
                 <div style={{ 
                   height: '100%', 
                   width: `${progress}%`, 
@@ -439,7 +432,7 @@ export function MatchPage() {
             zIndex: 1000
           }}>
             <div style={{
-              background: DS.white,
+              background: DS.card,
               border: `1px solid ${DS.border}`,
               borderRadius: '16px',
               padding: '32px',
@@ -450,39 +443,23 @@ export function MatchPage() {
                 Insufficient Credits
               </h3>
               <p style={{ fontSize: '14px', color: DS.muted, marginBottom: '20px' }}>
-                You need {creditCost.credits} credits but only have {userCredits}.
+                You need {creditCost.credits} credits but only have {userCredits}. Contact support for assistance.
               </p>
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-                <button
-                  onClick={() => setShowCreditModal(false)}
-                  style={{
-                    padding: '10px 20px',
-                    background: DS.card,
-                    border: `1px solid ${DS.border}`,
-                    borderRadius: '8px',
-                    color: DS.text,
-                    cursor: 'pointer',
-                    minHeight: '44px'
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => navigate('/pricing')}
-                  style={{
-                    padding: '10px 20px',
-                    background: DS.accent,
-                    border: 'none',
-                    borderRadius: '8px',
-                    color: DS.white,
-                    cursor: 'pointer',
-                    fontWeight: 600,
-                    minHeight: '44px'
-                  }}
-                >
-                  Upgrade Plan
-                </button>
-              </div>
+              <button
+                onClick={() => setShowCreditModal(false)}
+                style={{
+                  padding: '10px 20px',
+                  background: DS.accent,
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: '#FFF',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  minHeight: '44px'
+                }}
+              >
+                Understood
+              </button>
             </div>
           </div>
         )}
@@ -500,11 +477,11 @@ export function MatchPage() {
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
       <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
               <BarChart3 style={{ color: DS.accent, width: 24, height: 24 }} />
-              <span style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 700, color: DS.text }}>TRIDENT Results</span>
+              <span style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 700, color: DS.text }}>Match Results</span>
             </div>
             <p style={{ fontSize: '13px', color: DS.muted, margin: 0 }}>
               {results.length} candidate{results.length !== 1 ? 's' : ''} scored
@@ -533,42 +510,6 @@ export function MatchPage() {
           onShareCard={handleShareCard}
           onSaveCandidate={handleSaveCandidate}
         />
-
-        <div style={{ 
-          marginTop: '32px', 
-          background: DS.white, 
-          border: `1px solid ${DS.accent}33`, 
-          borderRadius: DS.radius, 
-          padding: '24px', 
-          textAlign: 'center' 
-        }}>
-          <div style={{ width: '48px', height: '3px', background: DS.accent, margin: '0 auto 16px', borderRadius: '2px' }} />
-          <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
-            Want deeper analysis?
-          </h3>
-          <p style={{ fontSize: '14px', color: DS.muted, margin: '0 0 16px' }}>
-            Get full LENS reports with client-ready shortlists, Proximity scoring, and pipeline management.
-          </p>
-          <a 
-            href="/b2b" 
-            style={{ 
-              display: 'inline-flex', 
-              alignItems: 'center', 
-              gap: '8px', 
-              padding: '12px 24px', 
-              background: DS.accent, 
-              color: DS.white, 
-              borderRadius: '8px', 
-              fontSize: '14px', 
-              fontWeight: 600, 
-              textDecoration: 'none',
-              minHeight: '44px'
-            }}
-          >
-            <Mail style={{ width: 16, height: 16 }} /> 
-            Contact LYC Partners
-          </a>
-        </div>
       </div>
     </div>
   );

@@ -1,22 +1,27 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Download, Share2, Save, AlertTriangle, CheckCircle } from 'lucide-react';
-import { TRIDENTResult, getTierFromScore, getScoreBarColor } from '../../services/tridentScoring';
+import { TRIDENTResult, getScoreBarColor } from '../../services/tridentScoring';
 
 const DS = {
   headingFont: 'Georgia, serif',
   accent: '#C108AB',
-  bg: '#FFFFFF',
-  card: '#FAFAFA',
-  muted: '#666666',
-  text: '#0A0A0A',
-  textSecondary: '#333333',
-  border: '#E5E5E5',
+  bg: '#0A0A0A',
+  card: '#111111',
+  muted: '#888888',
+  text: '#FFFFFF',
+  textSecondary: '#CCCCCC',
+  border: '#222222',
   radius: '12px',
   success: '#10B981',
   warning: '#F59E0B',
   error: '#EF4444',
-  white: '#FFFFFF'
 };
+
+function getFitLabel(score: number): { label: string; color: string } {
+  if (score >= 75) return { label: 'Strong Fit', color: DS.success };
+  if (score >= 50) return { label: 'Good Fit', color: DS.warning };
+  return { label: 'Potential Fit', color: DS.error };
+}
 
 interface ResultsTableProps {
   results: TRIDENTResult[];
@@ -31,26 +36,26 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
   const sorted = [...results].sort((a, b) => b.composite_score - a.composite_score);
   
   const tierCounts = {
-    T1: results.filter(r => getTierFromScore(r.composite_score).tier === 'T1').length,
-    T2: results.filter(r => getTierFromScore(r.composite_score).tier === 'T2').length,
-    T3: results.filter(r => getTierFromScore(r.composite_score).tier === 'T3').length
+    strong: results.filter(r => r.composite_score >= 75).length,
+    good: results.filter(r => r.composite_score >= 50 && r.composite_score < 75).length,
+    potential: results.filter(r => r.composite_score < 50).length,
   };
 
   return (
     <div>
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(3, 1fr)', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', 
         gap: '12px', 
         marginBottom: '24px' 
       }}>
         {[
-          { tier: 'T1', label: 'Strong Primary', count: tierCounts.T1, color: DS.success },
-          { tier: 'T2', label: 'Strong Secondary', count: tierCounts.T2, color: DS.warning },
-          { tier: 'T3', label: 'Reserve', count: tierCounts.T3, color: DS.error },
+          { label: 'Strong Fit', count: tierCounts.strong, color: DS.success },
+          { label: 'Good Fit', count: tierCounts.good, color: DS.warning },
+          { label: 'Potential Fit', count: tierCounts.potential, color: DS.error },
         ].map(item => (
-          <div key={item.tier} style={{ 
-            background: DS.white, 
+          <div key={item.label} style={{ 
+            background: DS.card, 
             border: `1px solid ${DS.border}`, 
             borderRadius: '8px', 
             padding: '16px', 
@@ -68,18 +73,17 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {sorted.map((result, index) => {
-          const tier = getTierFromScore(result.composite_score);
+          const fit = getFitLabel(result.composite_score);
           const isExpanded = expandedIndex === index;
           
           return (
             <div 
               key={index} 
               style={{ 
-                background: DS.white, 
+                background: DS.card, 
                 border: `1px solid ${DS.border}`, 
                 borderRadius: DS.radius, 
-                overflow: 'hidden',
-                transition: 'all 0.2s ease'
+                overflow: 'hidden'
               }}
             >
               <div 
@@ -89,23 +93,20 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                   cursor: 'pointer', 
                   display: 'flex', 
                   alignItems: 'center', 
-                  gap: '16px',
-                  transition: 'background 0.2s ease'
+                  gap: '16px'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.background = DS.card}
-                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 <div style={{ 
                   width: '36px', 
                   height: '36px', 
                   borderRadius: '50%', 
-                  background: `${tier.color}20`,
+                  background: `${fit.color}20`,
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center', 
                   fontSize: '14px', 
                   fontWeight: 700, 
-                  color: tier.color,
+                  color: fit.color,
                   flexShrink: 0
                 }}>
                   {index + 1}
@@ -116,15 +117,15 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                     {result.candidate_name}
                   </div>
                   <div style={{ fontSize: '12px', color: DS.muted, marginTop: '2px' }}>
-                    {tier.label} · Tier {tier.tier}
+                    {fit.label}
                   </div>
                 </div>
 
                 <div style={{ textAlign: 'right', marginRight: '16px' }}>
-                  <div style={{ fontSize: '24px', fontWeight: 800, color: tier.color }}>
+                  <div style={{ fontSize: '24px', fontWeight: 800, color: fit.color }}>
                     {result.composite_score}
                   </div>
-                  <div style={{ fontSize: '11px', color: DS.muted }}>composite</div>
+                  <div style={{ fontSize: '11px', color: DS.muted }}>score</div>
                 </div>
 
                 <div style={{ display: 'flex', gap: '12px', marginRight: '8px' }}>
@@ -152,8 +153,7 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
               {isExpanded && (
                 <div style={{ 
                   padding: '0 20px 20px', 
-                  borderTop: `1px solid ${DS.border}`,
-                  marginTop: '0'
+                  borderTop: `1px solid ${DS.border}`
                 }}>
                   <div style={{ paddingTop: '16px' }}>
                     <div style={{ marginBottom: '16px' }}>
@@ -257,8 +257,7 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                               height: '100%', 
                               width: `${dim.score}%`, 
                               background: getScoreBarColor(dim.score), 
-                              borderRadius: '3px',
-                              transition: 'width 0.5s ease'
+                              borderRadius: '3px'
                             }} />
                           </div>
                         </div>
@@ -280,20 +279,17 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             gap: '6px',
                             padding: '10px 16px',
                             background: DS.accent,
-                            color: DS.white,
+                            color: '#FFF',
                             border: 'none',
                             borderRadius: '6px',
                             fontSize: '12px',
                             fontWeight: 600,
                             cursor: 'pointer',
-                            transition: 'opacity 0.2s ease',
                             minHeight: '44px'
                           }}
-                          onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
-                          onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
                         >
                           <Download style={{ width: 14, height: 14 }} />
-                          Download PDF (3 credits)
+                          Download PDF
                         </button>
                       )}
                       
@@ -305,23 +301,14 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             alignItems: 'center',
                             gap: '6px',
                             padding: '10px 16px',
-                            background: DS.card,
-                            color: DS.text,
+                            background: DS.bg,
+                            color: DS.textSecondary,
                             border: `1px solid ${DS.border}`,
                             borderRadius: '6px',
                             fontSize: '12px',
                             fontWeight: 600,
                             cursor: 'pointer',
-                            transition: 'all 0.2s ease',
                             minHeight: '44px'
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.borderColor = DS.accent;
-                            e.currentTarget.style.color = DS.accent;
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.borderColor = DS.border;
-                            e.currentTarget.style.color = DS.text;
                           }}
                         >
                           <Share2 style={{ width: 14, height: 14 }} />
@@ -337,23 +324,14 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             alignItems: 'center',
                             gap: '6px',
                             padding: '10px 16px',
-                            background: DS.card,
-                            color: DS.text,
+                            background: DS.bg,
+                            color: DS.textSecondary,
                             border: `1px solid ${DS.border}`,
                             borderRadius: '6px',
                             fontSize: '12px',
                             fontWeight: 600,
                             cursor: 'pointer',
-                            transition: 'all 0.2s ease',
                             minHeight: '44px'
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.borderColor = DS.success;
-                            e.currentTarget.style.color = DS.success;
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.borderColor = DS.border;
-                            e.currentTarget.style.color = DS.text;
                           }}
                         >
                           <Save style={{ width: 14, height: 14 }} />
