@@ -54,7 +54,7 @@ export function ScoringRunsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-serif font-bold text-text-primary">Scoring Runs</h1>
-          <p className="text-text-secondary">Audit trail of every TRIDENT and PHI evaluation</p>
+          <p className="text-text-secondary">Audit trail of every match analysis and priority score evaluation</p>
         </div>
         <div className="flex gap-2">
           {runTypes.map(t => (
