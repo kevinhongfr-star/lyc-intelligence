@@ -135,7 +135,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
                 <div style={{ fontSize: '14px', color: DS.textSecondary, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  TRIDENT Scorecard
+                  Match Scorecard
                 </div>
                 <div style={{ fontSize: '48px', fontWeight: 800, color: DS.text, marginBottom: '8px' }}>
                   {data?.candidate_name || 'Candidate'}
