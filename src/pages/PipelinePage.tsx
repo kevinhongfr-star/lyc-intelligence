@@ -11,7 +11,7 @@ const STAGE_COLORS: Record<string, string> = {
   SWEEP: 'border-t-secondary-400',
   CANVA: 'border-t-tier-2',
   GRID: 'border-t-tier-1',
-  LENS: 'border-t-accent',
+  Candidate Report: 'border-t-accent',
   PLACED: 'border-t-purple-400',
 };
 
@@ -19,12 +19,12 @@ const STAGE_BG: Record<string, string> = {
   SWEEP: 'bg-secondary-500/5',
   CANVA: 'bg-tier-2Bg',
   GRID: 'bg-tier-1Bg',
-  LENS: 'bg-accent/5',
+  Candidate Report: 'bg-accent/5',
   PLACED: 'bg-purple-500/5',
 };
 
 const NEXT_STAGE: Record<string, string> = {
-  SWEEP: 'CANVA', CANVA: 'GRID', GRID: 'LENS', LENS: 'PLACED',
+  SWEEP: 'CANVA', CANVA: 'GRID', GRID: 'Candidate Report', Candidate Report: 'PLACED',
 };
 
 const VERDICT_OPTIONS = ['Strong Fit', 'Conditional Fit', 'Weak Fit', 'Hold', 'Reject'];
@@ -94,10 +94,10 @@ export function PipelinePage() {
             <button className="flex items-center gap-1 text-sm text-accent hover:underline"><Eye className="w-3.5 h-3.5" />Detail</button>
           </Link>
           <Link to={`/platform/mandates/${selectedMandate.id}/lens`}>
-            <button className="flex items-center gap-1 text-sm text-accent hover:underline"><FileDown className="w-3.5 h-3.5" />LENS</button>
+            <button className="flex items-center gap-1 text-sm text-accent hover:underline"><FileDown className="w-3.5 h-3.5" />Candidate Report</button>
           </Link>
           <Link to="/platform/batch-scoring">
-            <button className="flex items-center gap-1 text-sm text-accent hover:underline"><BarChart3 className="w-3.5 h-3.5" />TRIDENT</button>
+            <button className="flex items-center gap-1 text-sm text-accent hover:underline"><BarChart3 className="w-3.5 h-3.5" />Match Analysis</button>
           </Link>
           <span className="text-sm text-text-muted">{totalCandidates} candidates</span>
         </div>
@@ -134,7 +134,7 @@ export function PipelinePage() {
                       </div>
                       {cp.trident_composite != null && (
                         <div className="flex items-center gap-1 mt-1">
-                          <span className="text-[10px] text-text-muted">TRIDENT:</span>
+                          <span className="text-[10px] text-text-muted">Match Analysis:</span>
                           <span className="text-[10px] font-bold" style={{ color: cp.trident_composite >= 75 ? '#10B981' : cp.trident_composite >= 50 ? '#F59E0B' : '#6B7280' }}>
                             {cp.trident_composite}
                           </span>

@@ -100,7 +100,7 @@ export function LensExportPage() {
     const t2 = sortedPipeline.filter(p => p.sweep_tier === 'T2');
     const clientName = mandate.company?.name || 'the client';
     const lines = [
-      `Subject: LENS Shortlist Report — ${mandate.title}`,
+      `Subject: Candidate Shortlist Report — ${mandate.title}`,
       '',
       `Dear ${clientName},`,
       '',
@@ -132,7 +132,7 @@ export function LensExportPage() {
 
       doc.setFillColor(10, 10, 10); doc.rect(0, 0, pw, doc.internal.pageSize.getHeight(), 'F');
       doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(22);
-      doc.text('LENS Shortlist Report', margin, y += 15);
+      doc.text('Candidate Shortlist Report', margin, y += 15);
       doc.setFontSize(11); doc.setTextColor(160, 160, 178);
       doc.text(mandate?.title || 'Mandate', margin, y += 8);
       doc.text(mandate?.company?.name || '', margin, y += 6);
@@ -172,7 +172,7 @@ export function LensExportPage() {
 
   function handleEmailDraft() {
     // Open mailto: with pre-filled subject and body
-    const subject = encodeURIComponent(`LENS Shortlist Report — ${mandate?.title || 'Mandate'}`);
+    const subject = encodeURIComponent(`Candidate Shortlist Report — ${mandate?.title || 'Mandate'}`);
     const body = encodeURIComponent(emailDraft);
     window.open(`mailto:${emailTo}?subject=${subject}&body=${body}`, '_blank');
   }
@@ -189,7 +189,7 @@ export function LensExportPage() {
     setSending(true);
     const result = await sendEmail({
       to: emailTo,
-      subject: `LENS Shortlist Report — ${mandate?.title || 'Mandate'}`,
+      subject: `Candidate Shortlist Report — ${mandate?.title || 'Mandate'}`,
       text: emailDraft,
       html: emailDraft.replace(/\n/g, '<br>'),
       mandateId: mandate?.id,
@@ -206,7 +206,7 @@ export function LensExportPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-text-primary">LENS Shortlist</h1>
+          <h1 className="text-2xl font-serif font-bold text-text-primary">Candidate Shortlist</h1>
           <p className="text-text-secondary">Client-safe candidate report</p>
         </div>
         <div className="flex gap-2">

@@ -57,10 +57,10 @@ export function MandateDetailPage() {
         </Link>
         <div className="flex gap-2">
           <Link to={`/platform/mandates/${id}/lens`}>
-            <Button variant="outline" size="sm"><FileDown className="w-4 h-4" />LENS Report</Button>
+            <Button variant="outline" size="sm"><FileDown className="w-4 h-4" />Candidate Report</Button>
           </Link>
           <Link to="/platform/batch-scoring">
-            <Button variant="outline" size="sm"><BarChart3 className="w-4 h-4" />TRIDENT Score</Button>
+            <Button variant="outline" size="sm"><BarChart3 className="w-4 h-4" />Match Score</Button>
           </Link>
           <Link to="/platform/pipeline">
             <Button variant="outline" size="sm"><Eye className="w-4 h-4" />GRID View</Button>
