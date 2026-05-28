@@ -38,7 +38,7 @@ export function B2CLanding() {
 
   const navLinks = [
     { href: '/b2b', label: 'For Firms' },
-    { href: '/nexus', label: 'Nexus AI' },
+    { href: '/nexus', label: 'Nexus' },
   ];
 
   return (
@@ -83,7 +83,7 @@ export function B2CLanding() {
               Free Assessment <ArrowRight style={{ width: 16, height: 16 }} />
             </a>
             <a href="/nexus" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', borderRadius: '8px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
-              <IconQuest size={16} color="#000" /> Talk to Nexus AI
+              Consult Nexus
             </a>
           </div>
         </div>
@@ -173,7 +173,7 @@ export function B2CLanding() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <a href="/match">Match Analysis</a>
               <a href="/assessment">Assessment</a>
-              <a href="/nexus">Nexus AI</a>
+              <a href="/nexus">Nexus</a>
             </div>
           </div>
           <div>
