@@ -172,7 +172,7 @@ export function MetrixPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader><CardTitle>Pipeline Funnel</CardTitle></CardHeader>
-          <CardContent><BarChart data={analytics.funnelData} color="#6366F1" /></CardContent>
+          <CardContent><BarChart data={analytics.funnelData} color="#00897B" /></CardContent>
         </Card>
         <Card>
           <CardHeader><CardTitle>PHI Health Distribution</CardTitle></CardHeader>

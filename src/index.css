@@ -43,7 +43,43 @@
 * { box-sizing: border-box; }
 
 :root {
-  /* Custom design system variables */
+  /* ── LYC Brand Design System ── */
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Libre Baskerville', Georgia, serif;
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --nav-height: 60px;
+
+  /* ── Brand Colors ── */
+  --accent: #C108AB;
+  --accent-light: #E040C8;
+  --accent-hover: #A00790;
+  --teal: #00897B;              /* Secondary brand — success, subtle accents */
+  --teal-light: #4DB6AC;
+  --ocean: #4FC3F7;             /* Data viz, info states */
+  --ocean-deep: #0288D1;
+  --slate: #607D8B;             /* Muted text, borders */
+  --blue-grey: #B0BEC5;
+
+  /* ── Fuchsia Opacity Scale ── */
+  --accent-5: #c108ab08;
+  --accent-10: #c108ab1a;
+  --accent-15: #c108ab26;
+  --accent-20: #c108ab33;
+  --accent-40: #c108ab66;
+  --accent-60: #c108ab99;
+  --accent-80: #c108abcc;
+  --accent-90: #c108abe6;
+
+  /* ── Light Theme (public pages default) ── */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F5;
+  --bg-tertiary: #EDEDED;
+  --bg-hover: #E5E5E5;
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --text-muted: #666666;
   --color-primary: #000000;
   --color-secondary: #333333;
   --color-accent: #C108AB;
@@ -54,41 +90,33 @@
   --color-text-primary: #000000;
   --color-text-secondary: #333333;
   --color-text-muted: #666666;
-  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
-  --font-serif: 'Libre Baskerville', Georgia, serif;
-  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --nav-height: 60px;
-
-  /* Tailwind CSS variable overrides — LIGHT THEME */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F5F5F5;
-  --bg-tertiary: #EDEDED;
-  --bg-hover: #E5E5E5;
-  --text-primary: #000000;
-  --text-secondary: #333333;
-  --text-muted: #666666;
-  --accent: #C108AB;
-  --accent-light: #E040C8;
+  --sky: #E8F4FD;
+  --mist: #F0F7FF;
+  --lavender: #EDE7F6;
+  --cream: #FAFAFA;
 }
 
-/* Dark theme override — only when explicitly toggled */
+/* ── Dark Theme — warm purple-black gradients matching corporate site ── */
 [data-theme="dark"] {
-  --bg-primary: #0A0A0A;
-  --bg-secondary: #1A1A1A;
-  --bg-tertiary: #2A2A2A;
-  --bg-hover: #333333;
+  --bg-primary: #0d0a14;        /* Warm purple-black */
+  --bg-secondary: #1a0f1e;      /* Step 2 */
+  --bg-tertiary: #281530;       /* Step 3 */
+  --bg-hover: #3a2040;          /* Step 4 */
   --text-primary: #FFFFFF;
   --text-secondary: #CCCCCC;
   --text-muted: #888888;
   --accent: #C108AB;
   --accent-light: #E040C8;
-  --color-background: #0A0A0A;
-  --color-surface: #1A1A1A;
-  --color-border: #2A2A2A;
+  --color-background: #0d0a14;
+  --color-surface: #1a0f1e;
+  --color-border: #281530;
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #CCCCCC;
   --color-text-muted: #888888;
+  --sky: #0d1a2e;
+  --mist: #1a0f1e;
+  --lavender: #1e1030;
+  --cream: #1a0f1e;
 }
 
 body {
@@ -406,26 +434,187 @@ html {
   input, textarea { font-size: 16px !important; }
 }
 
+
+/* ── LYC Brand Keyframe Animations ── */
+
+/* CTA Glow — signature fuchsia pulse on primary buttons */
+@keyframes ctaGlow {
+  0% { box-shadow: 0 0 #c108ab00; }
+  50% { box-shadow: 0 0 20px 2px #c108ab26; }
+  100% { box-shadow: 0 0 #c108ab00; }
+}
+
+/* Base icon animations */
+@keyframes iconPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+@keyframes iconRotate {
+  0% { transform: rotate(0); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes iconDraw {
+  0% { stroke-dashoffset: 40; opacity: .4; }
+  50% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: -40; opacity: .4; }
+}
+
+/* Service-specific icon animations */
+@keyframes iconBridgeConnect {
+  0%, 100% { stroke-dashoffset: 30; opacity: .4; }
+  50% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes iconCoachBlow {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.15); }
+  30% { transform: scale(1); }
+}
+
+@keyframes iconDriveThrust {
+  0%, 100% { transform: translate(0); opacity: .7; }
+  50% { transform: translate(2px); opacity: 1; }
+}
+
+@keyframes iconForgeStrike {
+  0%, 80%, 100% { transform: translateY(0); }
+  90% { transform: translateY(-4px); }
+}
+
+@keyframes iconImpactRipple {
+  0% { transform: scale(.8); opacity: .9; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes iconLeapRise {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes iconMosaicShift {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(2deg); }
+  75% { transform: rotate(-2deg); }
+}
+
+@keyframes iconPrismShimmer {
+  0%, 100% { opacity: .5; transform: rotate(0); }
+  50% { opacity: 1; transform: rotate(8deg); }
+}
+
+@keyframes iconQuestSpin {
+  0% { transform: rotate(0); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes iconSparkFlash {
+  0%, 100% { opacity: .5; }
+  10% { opacity: 1; }
+  20% { opacity: .4; }
+  30% { opacity: 1; }
+  40% { opacity: .6; }
+}
+
+@keyframes iconTridentPulse {
+  0%, 100% { opacity: .6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+/* Hero & atmospheric animations */
+@keyframes heroFuchsiaGlow {
+  0% { opacity: .4; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: .8; transform: translate(-50%, -50%) scale(1.15); }
+  100% { opacity: .4; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes pageEnter {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dreamyFloat {
+  0% { transform: translate(0) scale(1); }
+  33% { transform: translate(20px, -15px) scale(1.05); }
+  66% { transform: translate(-15px, 10px) scale(.97); }
+  100% { transform: translate(0) scale(1); }
+}
+
+@keyframes dotGridPulse {
+  0%, 100% { background-image: radial-gradient(circle, rgba(193,8,171,.1) 1px, transparent 1px); }
+  50% { background-image: radial-gradient(circle, rgba(193,8,171,.2) 1px, transparent 1px); }
+}
+
+/* ── Animation utility classes ── */
+.anim-pulse { animation: iconPulse 2s ease-in-out infinite; }
+.anim-rotate { animation: iconRotate 8s linear infinite; }
+.anim-draw { animation: iconDraw 3s ease-in-out infinite; }
+.anim-glow { animation: ctaGlow 2.5s ease-in-out infinite; }
+.anim-float { animation: dreamyFloat 8s ease-in-out infinite; }
+.anim-enter { animation: pageEnter 0.4s var(--ease-out-expo) forwards; }
+
+/* Icon-specific animation classes */
+.anim-bridge { animation: iconBridgeConnect 3s ease-in-out infinite; }
+.anim-coach { animation: iconCoachBlow 2.5s ease-in-out infinite; }
+.anim-drive { animation: iconDriveThrust 2s ease-in-out infinite; }
+.anim-forge { animation: iconForgeStrike 2s ease-in-out infinite; }
+.anim-impact { animation: iconImpactRipple 1.8s ease-out infinite; }
+.anim-leap { animation: iconLeapRise 2s ease-in-out infinite; }
+.anim-mosaic { animation: iconMosaicShift 4s ease-in-out infinite; }
+.anim-prism { animation: iconPrismShimmer 3s ease-in-out infinite; }
+.anim-quest { animation: iconQuestSpin 6s linear infinite; }
+.anim-spark { animation: iconSparkFlash 2s ease-in-out infinite; }
+.anim-trident { animation: iconTridentPulse 2s ease-in-out infinite; }
+
+/* CTA glow — apply to primary action buttons */
+.cta-glow {
+  animation: ctaGlow 2.5s ease-in-out infinite;
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+.cta-glow:hover {
+  transform: translateY(-1px);
+}
+
+/* Scroll reveal — ease-out-expo for intentional content appearance */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fuchsia accent backgrounds at multiple opacities */
+.bg-accent-5 { background-color: var(--accent-5); }
+.bg-accent-10 { background-color: var(--accent-10); }
+.bg-accent-15 { background-color: var(--accent-15); }
+.bg-accent-20 { background-color: var(--accent-20); }
+
+/* Atmospheric backgrounds (light theme) */
+.bg-sky { background-color: var(--sky); }
+.bg-mist { background-color: var(--mist); }
+.bg-lavender { background-color: var(--lavender); }
+.bg-cream { background-color: var(--cream); }
+
+/* Teal utility — secondary brand color */
+.text-teal { color: var(--teal); }
+.bg-teal { background-color: var(--teal); }
+.border-teal { border-color: var(--teal); }
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-  html {
-    scroll-behavior: auto;
-  }
-  .card-hover:hover {
-    transform: none;
-  }
-  .nav-mobile {
-    transition: none;
-  }
-  .nav-mobile-overlay {
-    transition: none;
-  }
-  .skeleton {
-    animation: none;
-  }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+  .card-hover:hover { transform: none; }
+  .nav-mobile { transition: none; }
+  .nav-mobile-overlay { transition: none; }
+  .skeleton { animation: none; }
+  .anim-pulse, .anim-rotate, .anim-draw, .anim-glow, .anim-float,
+  .anim-bridge, .anim-coach, .anim-drive, .anim-forge, .anim-impact,
+  .anim-leap, .anim-mosaic, .anim-prism, .anim-quest, .anim-spark,
+  .anim-trident, .anim-enter { animation: none; }
+  .cta-glow { animation: none; }
 }

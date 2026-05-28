@@ -141,6 +141,7 @@ export function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
+                className="cta-glow"
                 style={{
                   width: '100%', padding: '14px',
                   background: DS.accent, color: '#FFFFFF',

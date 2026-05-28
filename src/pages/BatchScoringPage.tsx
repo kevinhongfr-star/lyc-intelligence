@@ -18,7 +18,7 @@ function getVerdictLabel(score: number): string {
 
 function getVerdictColor(score: number): string {
   if (score >= 8) return '#16A34A';
-  if (score >= 6.5) return '#6366F1';
+  if (score >= 6.5) return '#00897B';
   if (score >= 5) return '#CA8A04';
   return '#DC2626';
 }

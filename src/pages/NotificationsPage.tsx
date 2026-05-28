@@ -5,7 +5,7 @@ import { useNotifications } from '@/hooks/useSupabaseData';
 
 const ACTION_ICONS: Record<string, React.ReactNode> = {
   alert: <AlertTriangle className="w-4 h-4 text-amber-400" />,
-  reminder: <Clock className="w-4 h-4 text-indigo-400" />,
+  reminder: <Clock className="w-4 h-4 text-teal" />,
   update: <CheckCircle2 className="w-4 h-4 text-green-400" />,
   action: <Zap className="w-4 h-4 text-accent" />,
 };

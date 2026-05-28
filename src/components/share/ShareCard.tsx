@@ -39,7 +39,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
     left: 0,
     right: 0,
     bottom: 0,
-    background: `radial-gradient(circle at 10% 20%, ${DS.accent}20 0%, transparent 50%), radial-gradient(circle at 90% 80%, #6366F120 0%, transparent 50%)`
+    background: `radial-gradient(circle at 10% 20%, ${DS.accent}20 0%, transparent 50%), radial-gradient(circle at 90% 80%, #00897B20 0%, transparent 50%)`
   };
 
   switch (type) {

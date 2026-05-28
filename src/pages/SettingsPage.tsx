@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts';
 
 const ACCENT_COLORS = [
   { name: 'Magenta', value: '#C108AB' },
-  { name: 'Indigo', value: '#6366F1' },
+  { name: 'Indigo', value: '#00897B' },
   { name: 'Emerald', value: '#10B981' },
   { name: 'Amber', value: '#F59E0B' },
 ];

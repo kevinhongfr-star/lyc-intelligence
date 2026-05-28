@@ -19,7 +19,7 @@ interface ScoringRun {
 }
 
 const RUN_TYPE_COLORS: Record<string, string> = {
-  trident: '#6366F1',
+  trident: '#00897B',
   phi: '#EC4899',
   batch: '#F59E0B',
   assessment: '#10B981',

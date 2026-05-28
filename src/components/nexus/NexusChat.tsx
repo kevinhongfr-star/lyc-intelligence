@@ -320,7 +320,8 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
               borderRadius: '8px',
               cursor: (loading || !input.trim()) ? 'not-allowed' : 'pointer',
               opacity: (loading || !input.trim()) ? 0.5 : 1,
-              minHeight: '44px'
+              minHeight: '44px',
+              className: 'cta-glow'
             }}
           >
             <ArrowRight style={{ width: 18, height: 18 }} />

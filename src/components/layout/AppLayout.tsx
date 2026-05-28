@@ -3,23 +3,24 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts';
 import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDashboard, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon } from 'lucide-react';
 import { CreditDisplay } from '@/components/ui/CreditDisplay';
+import { IconBridge, IconTrident, IconDrive, IconLeap, IconImpact, IconSpark, IconQuest, IconForge, IconPrism } from '@/components/icons/LycIcons';
 
 const NAV_ITEMS = [
-  { path: '/platform', icon: LayoutDashboard, label: 'Dashboard', exact: true },
-  { path: '/platform/pipeline', icon: Eye, label: 'Pipeline' },
+  { path: '/platform', icon: IconImpact, label: 'Dashboard', exact: true },
+  { path: '/platform/pipeline', icon: IconBridge, label: 'Pipeline' },
   { path: '/platform/mandates', icon: Briefcase, label: 'Mandates' },
   { path: '/platform/candidates', icon: Users, label: 'Candidates' },
   { type: 'divider' as const, label: 'Scoring' },
-  { path: '/platform/batch-scoring', icon: BarChart3, label: 'Match Analysis' },
+  { path: '/platform/batch-scoring', icon: IconTrident, label: 'Match Analysis' },
   { path: '/platform/mandates', icon: FileDown, label: 'Candidate Report', suffix: '/lens' },
-  { path: '/platform/metrix', icon: Activity, label: 'Performance Metrics' },
+  { path: '/platform/metrix', icon: IconSpark, label: 'Performance Metrics' },
   { path: '/platform/scoring-runs', icon: ClipboardList, label: 'Scoring Runs' },
   { type: 'divider' as const, label: 'Tools' },
-  { path: '/platform/chat', icon: MessageSquare, label: 'Nexus AI' },
+  { path: '/platform/chat', icon: IconQuest, label: 'Nexus AI' },
   { path: '/platform/scheduler', icon: Calendar, label: 'Scheduler' },
-  { path: '/platform/documents', icon: ClipboardList, label: 'Documents' },
+  { path: '/platform/documents', icon: IconPrism, label: 'Documents' },
   { path: '/platform/notifications', icon: Bell, label: 'Alerts' },
-  { path: '/platform/settings', icon: Settings, label: 'Settings' },
+  { path: '/platform/settings', icon: IconForge, label: 'Settings' },
 ];
 
 type NavItem = { path?: string; icon?: any; label: string; exact?: boolean; type?: 'divider'; suffix?: string };
@@ -65,7 +66,7 @@ export function AppLayout() {
             }
             return (
               <Link key={item.path} to={item.suffix ? item.path : item.path!} className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${isActive(item) ? 'bg-accent/10 text-accent' : 'text-text-muted hover:text-text-primary hover:bg-bg-tertiary'}`}>
-                {item.icon && <item.icon className="w-4 h-4 flex-shrink-0" />}
+                {item.icon && <item.icon size={16} className="flex-shrink-0" />}
                 {sidebarOpen && <span>{item.label}</span>}
               </Link>
             );

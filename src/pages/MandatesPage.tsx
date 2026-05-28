@@ -7,7 +7,7 @@ import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
 import { updateMandateStatus } from '@/services/supabaseApi';
 
 const STATUS_OPTIONS = [
-  { value: '1_search', label: 'SWEEP', color: '#6366F1' },
+  { value: '1_search', label: 'SWEEP', color: '#00897B' },
   { value: '2_call', label: 'CANVA', color: '#F59E0B' },
   { value: '3_deliver', label: 'GRID/LENS', color: '#10B981' },
   { value: 'won', label: 'Won', color: '#10B981' },

@@ -8,7 +8,7 @@ import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
 import type { CandidatePipeline, Mandate } from '@/services/supabaseApi';
 
 const STAGE_COLORS: Record<string, string> = {
-  SWEEP: 'border-t-secondary-400',
+  SWEEP: 'border-t-sweep-light',
   CANVA: 'border-t-tier-2',
   GRID: 'border-t-tier-1',
   Candidate Report: 'border-t-accent',
@@ -16,7 +16,7 @@ const STAGE_COLORS: Record<string, string> = {
 };
 
 const STAGE_BG: Record<string, string> = {
-  SWEEP: 'bg-secondary-500/5',
+  SWEEP: 'bg-sweep/5',
   CANVA: 'bg-tier-2Bg',
   GRID: 'bg-tier-1Bg',
   Candidate Report: 'bg-accent/5',

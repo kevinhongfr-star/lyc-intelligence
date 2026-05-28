@@ -44,7 +44,7 @@ const DIMENSION_LABELS: Record<string, string> = {
 };
 
 const DIMENSION_COLORS: Record<string, string> = {
-  strategic_orientation: '#6366F1',
+  strategic_orientation: '#00897B',
   cross_border_adaptability: '#10B981',
   stakeholder_influence: '#F59E0B',
   execution_discipline: '#EC4899',

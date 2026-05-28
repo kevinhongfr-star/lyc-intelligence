@@ -165,7 +165,7 @@ export function getMemoryTypeColor(type: MemoryType): string {
   const colors: Record<MemoryType, string> = {
     goal: '#10B981',        // green
     pain_point: '#F59E0B',  // amber
-    strength: '#6366F1',    // indigo
+    strength: '#00897B',    // teal (replaced indigo)
     experience: '#06B6D4',  // cyan
     preference: '#EC4899',  // pink
     insight: '#8B5CF6',    // violet
