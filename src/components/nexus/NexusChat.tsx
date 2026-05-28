@@ -4,6 +4,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { MessageBubble } from './MessageBubble';
 import { SuggestedPrompts } from './SuggestedPrompts';
 import { EmailCapture } from './EmailCapture';
+import { useSearchParams } from 'react-router-dom';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -36,6 +37,8 @@ interface NexusChatProps {
 
 export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps) {
   const { user, profile } = useAuthStore();
+  const [searchParams] = useSearchParams();
+  const [autoSend, setAutoSend] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -46,6 +49,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { MessageBubble } from './MessageBubble';
 import { SuggestedPrompts } from './SuggestedPrompts';
 import { EmailCapture } from './EmailCapture';
+import { useSearchParams } from 'react-router-dom';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -78,6 +82,8 @@ interface NexusChatProps {
 
 export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps) {
   const { user, profile } = useAuthStore();
+  const [searchParams] = useSearchParams();
+  const [autoSend, setAutoSend] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -103,6 +109,30 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, showEmailGate]);
+
+  // Phase 6.2 — Read assessment context from URL params
+  useEffect(() => {
+    const context = searchParams.get('context');
+    const gap = searchParams.get('gap');
+    const score = searchParams.get('score');
+    const archetypeParam = searchParams.get('archetype');
+
+    if (context === 'assessment' && archetypeParam) {
+      const contextMessage = gap
+        ? `I just completed the Career Positioning Diagnostic. My archetype is **${archetypeParam}**. My lowest dimension is **${gap}** at ${score}/100. I'd like help building a 90-day development plan focused on this.`
+        : `I just completed the Career Positioning Diagnostic. My archetype is **${archetypeParam}** with a composite score of ${score}/100. Help me understand my results and plan next steps.`;
+      setMessages(prev => [...prev, { role: 'user' as const, content: contextMessage }]);
+      setAutoSend(contextMessage);
+    }
+  }, []);
+
+  // Auto-send when context is loaded
+  useEffect(() => {
+    if (autoSend) {
+      sendMessage(autoSend);
+      setAutoSend(null);
+    }
+  }, [autoSend]);
 
   const sendMessage = async (userMsg: string) => {
     setAiState('thinking');
