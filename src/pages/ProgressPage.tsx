@@ -48,7 +48,7 @@ const DIMENSION_COLORS: Record<string, string> = {
   cross_border_adaptability: '#10B981',
   stakeholder_influence: '#F59E0B',
   execution_discipline: '#EC4899',
-  leadership_presence: '#06B6D4'
+  leadership_presence: '#C108AB'
 };
 
 export function ProgressPage() {
