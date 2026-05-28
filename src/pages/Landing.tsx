@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { initScrollReveal } from '@/lib/scrollReveal';
+import { initScrollReveal } from '@/lib/utils';
 import { ArrowRight, BarChart3, Brain, MessageCircle, Users, Briefcase } from 'lucide-react';
 
 const DS = {
