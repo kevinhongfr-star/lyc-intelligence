@@ -130,6 +130,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         });
         if (profileError) console.warn('[AuthStore] Profile creation error:', profileError);
         
+        // Phase 11.1 — Fire welcome email
+        fetch('/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'welcome', data: { email, name } })
+        }).catch(() => {}); // fire and forget
+        
         set({ user: data.user });
         await get().loadProfile();
       }
