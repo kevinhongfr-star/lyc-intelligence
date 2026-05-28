@@ -12,16 +12,22 @@ import { StyleSelector } from './StyleSelector';
 import { ResultsPanel } from './ResultsPanel';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#1A1A1A',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#333333',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
-  error: '#EF4444',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 type Step = 'gate' | 'context' | 'dimensions' | 'cross_border' | 'style' | 'goals' | 'results';
@@ -203,7 +209,7 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
               marginTop: '24px',
               width: '100%',
               background: DS.accent,
-              color: '#FFF',
+              color: '#FFFFFF',
               padding: '16px',
               fontSize: '16px',
               fontWeight: 600,
@@ -265,7 +271,7 @@ function GateStep({ state, setState, onSubmit, error }: any) {
             value={state.gate.name}
             onChange={(e) => setState(prev => ({ ...prev, gate: { ...prev.gate, name: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.border}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
             }}
             placeholder="Your full name"
           />
@@ -279,7 +285,7 @@ function GateStep({ state, setState, onSubmit, error }: any) {
             value={state.gate.email}
             onChange={(e) => setState(prev => ({ ...prev, gate: { ...prev.gate, email: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.border}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
             }}
             placeholder="you@company.com"
           />
@@ -416,7 +422,7 @@ function ContextStep({ state, setState, onNext }: any) {
           style={{
             width: '100%',
             background: DS.accent,
-            color: '#FFF',
+            color: '#FFFFFF',
             padding: '16px',
             fontSize: '16px',
             fontWeight: 'bold',
@@ -528,7 +534,7 @@ function CareerGoalsStep({ state, setState, onComplete }: any) {
           width: '100%',
           marginTop: '24px',
           background: DS.accent,
-          color: '#FFF',
+          color: '#FFFFFF',
           padding: '16px',
           fontSize: '16px',
           fontWeight: 600,
