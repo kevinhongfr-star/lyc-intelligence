@@ -14,53 +14,26 @@ export function SettingsPage() {
   const { user } = useAuth();
   const [activeSection, setActiveSection] = useState<'profile' | 'notifications' | 'security' | 'appearance'>('appearance');
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    return (localStorage.getItem('lyc-theme') as 'dark' | 'light') || 'dark';
+    return (localStorage.getItem('lyc-theme') as 'dark' | 'light') || 'light';
   });
   const [accent, setAccent] = useState(() => localStorage.getItem('lyc-accent') || '#C108AB');
   const [notifications, setNotifications] = useState({
     mandateStatus: true, candidateMatches: true, phiAlerts: true, scoringComplete: true,
   });
 
-  // Apply theme to document
+  // Apply theme via data-theme attribute — CSS variables handle the rest
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'light') {
-      root.style.setProperty('--bg-primary', '#FFFFFF');
-      root.style.setProperty('--bg-secondary', '#F5F5F5');
-      root.style.setProperty('--bg-tertiary', '#E5E5E5');
-      root.style.setProperty('--bg-hover', '#D4D4D4');
-      root.style.setProperty('--text-primary', '#0A0A0A');
-      root.style.setProperty('--text-secondary', '#333333');
-      root.style.setProperty('--text-muted', '#666666');
-      document.body.style.backgroundColor = '#FFFFFF';
-      document.body.style.color = '#0A0A0A';
-    } else {
-      root.style.setProperty('--bg-primary', '#0A0A0A');
-      root.style.setProperty('--bg-secondary', '#1A1A1A');
-      root.style.setProperty('--bg-tertiary', '#2A2A2A');
-      root.style.setProperty('--bg-hover', '#333333');
-      root.style.setProperty('--text-primary', '#FFFFFF');
-      root.style.setProperty('--text-secondary', '#CCCCCC');
-      root.style.setProperty('--text-muted', '#888888');
-      document.body.style.backgroundColor = '#0A0A0A';
-      document.body.style.color = '#FFFFFF';
-    }
+    document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('lyc-theme', theme);
+    window.dispatchEvent(new CustomEvent('theme-change', { detail: theme }));
   }, [theme]);
 
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty('--accent', accent);
+    root.style.setProperty('--accent-light', accent);
     localStorage.setItem('lyc-accent', accent);
   }, [accent]);
-
-  // Apply theme on first load
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('lyc-theme') as 'dark' | 'light' | null;
-    if (savedTheme) setTheme(savedTheme);
-    const savedAccent = localStorage.getItem('lyc-accent');
-    if (savedAccent) setAccent(savedAccent);
-  }, []);
 
   const sections = [
     { key: 'appearance' as const, icon: Palette, label: 'Appearance' },
@@ -107,7 +80,7 @@ export function SettingsPage() {
                   <div className="flex gap-3">
                     {ACCENT_COLORS.map(c => (
                       <button key={c.value} onClick={() => setAccent(c.value)}
-                        className={`w-10 h-10 rounded-full border-2 transition-colors ${accent === c.value ? 'border-white scale-110' : 'border-bg-tertiary opacity-60 hover:opacity-100'}`}
+                        className={`w-10 h-10 rounded-full border-2 transition-colors ${accent === c.value ? 'border-accent scale-110' : 'border-bg-tertiary opacity-60 hover:opacity-100'}`}
                         style={{ backgroundColor: c.value }}
                         title={c.name}
                       />
