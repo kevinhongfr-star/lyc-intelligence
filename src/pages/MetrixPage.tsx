@@ -218,7 +218,7 @@ export function MetrixPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader><CardTitle>Mandate Status Breakdown</CardTitle></CardHeader>
-          <CardContent><BarChart data={analytics.statusData} color="#8B5CF6" /></CardContent>
+          <CardContent><BarChart data={analytics.statusData} color="#C108AB" /></CardContent>
         </Card>
         <Card>
           <CardHeader><CardTitle>Candidate Tier Distribution</CardTitle></CardHeader>
