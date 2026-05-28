@@ -243,6 +243,21 @@ export function DashboardPage() {
                 {getNextAction()}
               </p>
             </div>
+            {/* Phase 11.2 — Nexus CTA after assessment */}
+            {assessment && (
+              <div style={{ background: `${DS.accent}08`, border: `1px solid ${DS.accent}25`, borderRadius: '12px', padding: '20px', marginTop: '16px' }}>
+                <p style={{ color: DS.textSecondary, fontSize: '14px', margin: '0 0 12px', fontFamily: DS.headingFont }}>
+                  Nexus has context from your assessment. Ask it anything about your results or next steps.
+                </p>
+                <a
+                  href={`/nexus?context=dashboard&archetype=${encodeURIComponent(assessment.archetype || '')}`}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', background: DS.accent, color: '#fff', borderRadius: '8px', textDecoration: 'none', fontWeight: 600, fontSize: '13px' }}
+                >
+                  Continue with Nexus →
+                </a>
+              </div>
+            )}
+
           </div>
         </div>
 
