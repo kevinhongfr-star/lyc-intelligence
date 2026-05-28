@@ -1,5 +1,6 @@
 import React from 'react';
-import { Check, ArrowRight, Shield, Zap } from 'lucide-react';
+import { IconSpark, IconForge, IconQuest, Shield } from '@/components/icons/LycIcons';
+import { Check, ArrowRight, Shield } from 'lucide-react';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -29,6 +30,7 @@ const TIERS = [
     period: 'forever',
     credits: 5,
     description: 'Start here',
+    icon: IconSpark,
     features: [
       '5 credits per day',
       'Career Positioning Diagnostic',
@@ -44,6 +46,7 @@ const TIERS = [
     period: '/month',
     credits: 200,
     description: 'For serious career development',
+    icon: IconQuest,
     highlight: true,
     features: [
       '200 credits per month',
@@ -62,6 +65,7 @@ const TIERS = [
     period: '/month',
     credits: -1,
     description: 'Includes quarterly advisory call with LYC partner',
+    icon: IconForge,
     features: [
       'Quarterly 1:1 call with a LYC partner who has placed executives in your target market',
       'Unlimited credits',
@@ -88,7 +92,7 @@ export function PricingPage() {
       {/* Hero */}
       <div style={{ textAlign: 'center', padding: '64px 24px 48px', maxWidth: '640px', margin: '0 auto' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: `${DS.accent}15`, borderRadius: '20px', marginBottom: '20px' }}>
-          <Zap style={{ width: 14, height: 14, color: DS.accent }} />
+          <IconSpark size={14} color={DS.accent} />
           <span style={{ fontSize: '11px', color: DS.accent, fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Pricing</span>
         </div>
         <h1 style={{ fontFamily: DS.headingFont, fontSize: '40px', fontWeight: 700, color: DS.text, margin: '0 0 16px' }}>
@@ -117,6 +121,9 @@ export function PricingPage() {
                 MOST POPULAR
               </div>
             )}
+            <div style={{ color: DS.accent, marginBottom: '12px' }}>
+              <tier.icon size={28} color={DS.accent} />
+            </div>
             <h3 style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>{tier.name}</h3>
             <p style={{ fontSize: '13px', color: DS.muted, margin: '0 0 20px' }}>{tier.description}</p>
             <div style={{ marginBottom: '24px' }}>
@@ -126,7 +133,7 @@ export function PricingPage() {
             <div style={{ flex: 1 }}>
               {tier.features.map((feature, i) => (
                 <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '12px' }}>
-                  <Check style={{ width: 16, height: 16, color: i === 0 && tier.id === 'council' ? DS.accent : '#16A34A', flexShrink: 0, marginTop: '2px' }} />
+                  <Check style={{ width: 16, height: 16, color: i === 0 && tier.id === 'council' ? DS.accent : '#00897B', flexShrink: 0, marginTop: '2px' }} />
                   <span style={{ fontSize: '13px', color: i === 0 && tier.id === 'council' ? DS.accent : DS.textSecondary, fontWeight: i === 0 && tier.id === 'council' ? 600 : 400, lineHeight: 1.5 }}>
                     {feature}
                   </span>
@@ -135,6 +142,7 @@ export function PricingPage() {
             </div>
             <a
               href={tier.id === 'free' ? '/assessment' : '/login'}
+              className={tier.highlight ? 'cta-glow' : ''}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                 padding: '14px', marginTop: '24px',
@@ -155,7 +163,7 @@ export function PricingPage() {
 
       {/* Footer trust */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', paddingBottom: '48px' }}>
-        <Shield style={{ width: 14, height: 14, color: DS.muted }} />
+        <Shield size={14} color={DS.muted} />
         <span style={{ fontSize: '12px', color: DS.muted }}>Secure payment · Cancel anytime · 14-day money-back guarantee</span>
       </div>
     </div>
