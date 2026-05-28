@@ -219,7 +219,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
               <span style={{ fontSize: '12px', color: DS.accent, fontWeight: 600 }}>AI Assistant</span>
             </div>
             <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>Nexus</h1>
-            <p style={{ fontSize: '14px', color: DS.muted }}>Powered by LYC Partners — Building Leadership That Works Across Borders</p>
+            <p style={{ fontSize: '14px', color: DS.muted }}>Know where you stand. Know where to go.</p>
           </div>
         )}
 
