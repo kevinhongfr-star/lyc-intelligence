@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { initScrollReveal } from '@/lib/utils';
 import { IconTrident, IconQuest, IconSpark, IconBridge, IconLeap, IconImpact, IconPrism } from '@/components/icons/LycIcons';
 import { Menu, X, Lock, ArrowRight } from 'lucide-react';
@@ -23,12 +23,22 @@ const DS = {
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
+const HERO_VIDEO = 'https://assets.mixkit.co/videos/46497/46497-720.mp4';
+const HERO_POSTER = 'https://www.lyc-partners.ai/images/heroes/hero-boardroom.webp';
+
 export function Landing() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const observer = initScrollReveal();
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {/* autoplay blocked */});
+    }
   }, []);
 
   useEffect(() => {
@@ -92,37 +102,70 @@ export function Landing() {
         <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</a>
       </div>
 
-      {/* Hero — fuchsia glow + atmospheric background */}
-      <div className="reveal hero-padding" style={{ maxWidth: '900px', margin: '0 auto', padding: '96px 32px 48px', textAlign: 'center', position: 'relative' }}>
-        {/* Fuchsia glow backdrop */}
-        <div style={{ position: 'absolute', top: '-80px', left: '50%', transform: 'translateX(-50%)', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(193,8,171,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+      {/* Hero — VIDEO BACKGROUND with dark overlay */}
+      <div style={{ position: 'relative', overflow: 'hidden', minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Video layer */}
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster={HERO_POSTER}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            minWidth: '100%',
+            minHeight: '100%',
+            width: 'auto',
+            height: 'auto',
+            transform: 'translate(-50%, -50%)',
+            objectFit: 'cover',
+            zIndex: 0,
+          }}
+        >
+          <source src={HERO_VIDEO} type="video/mp4" />
+        </video>
 
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '16px' }}>
+        {/* Dark overlay gradient — warm purple-black matching brand */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, rgba(13,10,20,0.75) 0%, rgba(26,15,30,0.65) 40%, rgba(40,21,48,0.7) 70%, rgba(13,10,20,0.85) 100%)',
+          zIndex: 1,
+        }} />
+
+        {/* Fuchsia glow orb */}
+        <div style={{ position: 'absolute', top: '10%', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '400px', background: 'radial-gradient(circle, rgba(193,8,171,0.12) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 2 }} />
+
+        {/* Hero content */}
+        <div style={{ position: 'relative', zIndex: 3, maxWidth: '900px', margin: '0 auto', padding: '96px 32px 48px', textAlign: 'center' }}>
+          <div className="section-label-dark" style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px' }}>
             Platform
           </div>
-          <h1 className="hero-heading" style={{ fontFamily: DS.headingFont, fontSize: '52px', fontWeight: 700, color: DS.text, margin: '0 0 16px', lineHeight: 1.1 }}>
+          <h1 className="hero-heading" style={{ fontFamily: DS.headingFont, fontSize: '56px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 16px', lineHeight: 1.1 }}>
             Cross-border<br />leadership intelligence
           </h1>
-          <p className="hero-sub" style={{ fontFamily: DS.bodyFont, fontSize: '17px', color: DS.textSecondary, maxWidth: '520px', margin: '0 auto 48px', lineHeight: 1.6 }}>
+          <p className="hero-sub" style={{ fontFamily: DS.bodyFont, fontSize: '17px', color: 'rgba(255,255,255,0.7)', maxWidth: '520px', margin: '0 auto 48px', lineHeight: 1.6 }}>
             AI-powered executive search. Score candidates instantly. From Europe to Asia.
           </p>
 
-          {/* Dual CTA Section — branded icons */}
+          {/* Dual CTA — white text on dark */}
           <div className="grid-responsive-2 reveal reveal-delay-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', maxWidth: '600px', margin: '0 auto' }}>
             <a
               className="card-hover"
               href="/b2c"
               style={{
-                background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius,
+                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: DS.radius,
                 padding: '32px 24px', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center',
-                boxShadow: DS.shadow, cursor: 'pointer'
+                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', cursor: 'pointer'
               }}
             >
-              <div style={{ color: DS.accent, marginBottom: '16px' }}><IconLeap size={32} color={DS.accent} /></div>
-              <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>I'm a leader</h3>
-              <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: DS.muted, margin: '0 0 20px', lineHeight: 1.5 }}>Get your leadership archetype, benchmark your profile, and explore opportunities.</p>
-              <span style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: DS.accent, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ color: '#C108AB', marginBottom: '16px' }}><IconLeap size={32} color="#C108AB" /></div>
+              <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: '#FFFFFF', margin: '0 0 8px' }}>I'm a leader</h3>
+              <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: 'rgba(255,255,255,0.6)', margin: '0 0 20px', lineHeight: 1.5 }}>Get your leadership archetype, benchmark your profile, and explore opportunities.</p>
+              <span style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: '#C108AB', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 Get Started <ArrowRight style={{ width: 16, height: 16 }} />
               </span>
             </a>
@@ -130,24 +173,21 @@ export function Landing() {
               href="/b2b"
               className="card-hover"
               style={{
-                background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius,
+                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: DS.radius,
                 padding: '32px 24px', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center',
-                boxShadow: DS.shadow, transition: 'box-shadow 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1)', cursor: 'pointer'
+                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', cursor: 'pointer'
               }}
             >
-              <div style={{ color: DS.accent, marginBottom: '16px' }}><IconBridge size={32} color={DS.accent} /></div>
-              <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>I'm hiring</h3>
-              <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: DS.muted, margin: '0 0 20px', lineHeight: 1.5 }}>Meet exceptional cross-border leaders, score candidates, and build your team.</p>
-              <span style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: DS.accent, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ color: '#C108AB', marginBottom: '16px' }}><IconBridge size={32} color="#C108AB" /></div>
+              <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: '#FFFFFF', margin: '0 0 8px' }}>I'm hiring</h3>
+              <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: 'rgba(255,255,255,0.6)', margin: '0 0 20px', lineHeight: 1.5 }}>Meet exceptional cross-border leaders, score candidates, and build your team.</p>
+              <span style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: '#C108AB', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 Get Started <ArrowRight style={{ width: 16, height: 16 }} />
               </span>
             </a>
           </div>
         </div>
       </div>
-
-      {/* Divider */}
-      <div className="section-divider" />
 
       {/* Trust Bar — stats on cream background */}
       <div className="reveal" style={{ background: '#FAFAFA', padding: '48px 32px' }}>
@@ -187,9 +227,7 @@ export function Landing() {
 
       {/* CTA Section — fuchsia glow on dark bg */}
       <div className="reveal" style={{ position: 'relative', overflow: 'hidden', padding: '80px 32px', textAlign: 'center' }}>
-        {/* Warm dark gradient */}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0d0a14 0%, #1a0f1e 40%, #281530 70%, #3a2040 100%)' }} />
-        {/* Fuchsia glow orb */}
         <div style={{ position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '400px', background: 'radial-gradient(circle, rgba(193,8,171,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '600px', margin: '0 auto' }}>
           <div className="section-label-dark" style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px' }}>
@@ -212,7 +250,7 @@ export function Landing() {
         </div>
       </div>
 
-      {/* Dark Footer — matching corporate site */}
+      {/* Dark Footer */}
       <footer className="footer-dark">
         <div className="footer-grid" style={{ maxWidth: '900px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
           <div>
