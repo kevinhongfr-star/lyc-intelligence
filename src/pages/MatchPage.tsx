@@ -8,18 +8,22 @@ import { runTRIDENTScoring, CandidateInput, TRIDENTResult, getCreditCost } from 
 import { useAuthStore } from '../stores/authStore';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
-  success: '#10B981',
-  warning: '#F59E0B',
-  error: '#EF4444',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 interface LeadData {
@@ -206,7 +210,7 @@ export function MatchPage() {
             </p>
           </div>
 
-          <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '32px' }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px' }}>
             <p style={{ fontSize: '13px', color: DS.muted, marginBottom: '20px', textAlign: 'center' }}>
               Enter your details to access the Match Engine
             </p>
@@ -216,26 +220,26 @@ export function MatchPage() {
                 placeholder="Full name" 
                 value={lead.name} 
                 onChange={e => setLead({ ...lead, name: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <input 
                 placeholder="Work email" 
                 type="email" 
                 value={lead.email} 
                 onChange={e => setLead({ ...lead, email: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <input 
                 placeholder="Company" 
                 value={lead.company} 
                 onChange={e => setLead({ ...lead, company: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <input 
                 placeholder="Job title" 
                 value={lead.title} 
                 onChange={e => setLead({ ...lead, title: e.target.value })} 
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} 
               />
               <button 
                 onClick={handleGate} 
@@ -243,7 +247,7 @@ export function MatchPage() {
                 style={{ 
                   padding: '14px', 
                   background: DS.accent, 
-                  color: '#FFF', 
+                  color: '#FFFFFF', 
                   border: 'none', 
                   borderRadius: '8px', 
                   fontSize: '15px', 
@@ -307,7 +311,7 @@ export function MatchPage() {
                 style={{
                   padding: '10px 16px',
                   background: DS.card,
-                  border: `1px solid ${DS.border}`,
+                  border: `1px solid ${DS.cardBorder}`,
                   borderRadius: '8px',
                   color: DS.textSecondary,
                   fontSize: '13px',
@@ -340,7 +344,7 @@ export function MatchPage() {
 
           <div style={{ 
             background: DS.card, 
-            border: `1px solid ${DS.border}`, 
+            border: `1px solid ${DS.cardBorder}`, 
             borderRadius: DS.radius, 
             padding: '20px' 
           }}>
@@ -379,7 +383,7 @@ export function MatchPage() {
                 style={{ 
                   padding: '12px 24px', 
                   background: DS.accent, 
-                  color: '#FFF', 
+                  color: '#FFFFFF', 
                   border: 'none', 
                   borderRadius: '8px', 
                   fontSize: '14px', 
@@ -433,7 +437,7 @@ export function MatchPage() {
           }}>
             <div style={{
               background: DS.card,
-              border: `1px solid ${DS.border}`,
+              border: `1px solid ${DS.cardBorder}`,
               borderRadius: '16px',
               padding: '32px',
               maxWidth: '400px',
@@ -452,7 +456,7 @@ export function MatchPage() {
                   background: DS.accent,
                   border: 'none',
                   borderRadius: '8px',
-                  color: '#FFF',
+                  color: '#FFFFFF',
                   cursor: 'pointer',
                   fontWeight: 600,
                   minHeight: '44px'
@@ -492,7 +496,7 @@ export function MatchPage() {
             style={{ 
               padding: '10px 20px', 
               background: DS.card, 
-              border: `1px solid ${DS.border}`, 
+              border: `1px solid ${DS.cardBorder}`, 
               borderRadius: '8px', 
               color: DS.textSecondary, 
               fontSize: '13px', 

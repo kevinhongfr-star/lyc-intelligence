@@ -4,17 +4,22 @@ import { Mail, Lock, ArrowRight, Loader2, CheckCircle2, AlertCircle } from 'luci
 import { useAuthStore } from '@/stores/authStore';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
-  success: '#22C55E',
-  error: '#EF4444',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 type LoginMode = 'magic_link' | 'password';
@@ -77,7 +82,7 @@ export function LoginPage() {
   if (magicLinkSent) {
     return (
       <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-        <div style={{ maxWidth: '420px', width: '100%', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '48px 40px', textAlign: 'center' }}>
+        <div style={{ maxWidth: '420px', width: '100%', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '48px 40px', textAlign: 'center' }}>
           <CheckCircle2 style={{ width: 56, height: 56, color: DS.success, margin: '0 auto 24px' }} />
           <h1 style={{ fontFamily: DS.headingFont, fontSize: '24px', fontWeight: 600, color: DS.text, margin: '0 0 12px' }}>
             Check your email
@@ -161,7 +166,7 @@ export function LoginPage() {
           </div>
 
           {/* Form */}
-          <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '32px' }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px' }}>
             <form onSubmit={mode === 'magic_link' ? handleMagicLink : handlePassword}>
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
@@ -178,7 +183,7 @@ export function LoginPage() {
                       width: '100%',
                       padding: '12px 16px 12px 44px',
                       background: DS.bg,
-                      border: `1px solid ${DS.border}`,
+                      border: `1px solid ${DS.cardBorder}`,
                       borderRadius: '8px',
                       color: DS.text,
                       fontSize: '15px',
@@ -205,7 +210,7 @@ export function LoginPage() {
                         width: '100%',
                         padding: '12px 16px 12px 44px',
                         background: DS.bg,
-                        border: `1px solid ${DS.border}`,
+                        border: `1px solid ${DS.cardBorder}`,
                         borderRadius: '8px',
                         color: DS.text,
                         fontSize: '15px',
@@ -231,7 +236,7 @@ export function LoginPage() {
                   width: '100%',
                   padding: '14px',
                   background: DS.accent,
-                  color: '#FFF',
+                  color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '8px',
                   fontSize: '15px',

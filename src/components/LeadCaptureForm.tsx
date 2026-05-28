@@ -12,17 +12,22 @@ interface LeadCaptureFormProps {
 }
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0a0a0a',
-  card: '#1a1a1a',
-  cardHover: '#222222',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#333333',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
-  success: '#22C55E',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  success: '#1A7A4A',
   error: '#EF4444',
 };
 
@@ -120,16 +125,17 @@ export function LeadCaptureForm({
     return (
       <div style={{
         background: DS.card,
-        border: `1px solid ${DS.border}`,
+        border: `1px solid ${DS.cardBorder}`,
         borderRadius: DS.radius,
         padding: '32px',
         textAlign: 'center',
+        boxShadow: DS.shadow,
       }}>
         <CheckCircle2 style={{ width: 48, height: 48, color: DS.success, margin: '0 auto 16px' }} />
         <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
           {successMessage || (type === 'b2b' ? 'Demo Scheduled!' : 'Assessment Started!')}
         </h3>
-        <p style={{ fontSize: '14px', color: DS.muted, margin: 0 }}>
+        <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: DS.muted, margin: 0 }}>
           {type === 'b2b'
             ? 'Our team will reach out within 24 hours.'
             : 'Check your email for next steps.'}
@@ -141,9 +147,10 @@ export function LeadCaptureForm({
   return (
     <div style={{
       background: DS.card,
-      border: `1px solid ${DS.border}`,
+      border: `1px solid ${DS.cardBorder}`,
       borderRadius: DS.radius,
       padding: '32px',
+      boxShadow: DS.shadow,
     }}>
       <h3 style={{
         fontFamily: DS.headingFont,
@@ -156,13 +163,14 @@ export function LeadCaptureForm({
         {heading || (type === 'b2b' ? 'Schedule Your Demo' : 'Start Your Free Assessment')}
       </h3>
       <p style={{
+        fontFamily: DS.bodyFont,
         fontSize: '14px',
         color: DS.muted,
         margin: '0 0 24px',
         textAlign: 'center',
       }}>
         {subheading || (type === 'b2b'
-          ? 'Get 3 free Score Match results when you book a demo'
+          ? 'Get 3 free Match Analysis results when you book a demo'
           : 'Get your personalized leadership archetype in 10 minutes')}
       </p>
 
@@ -176,10 +184,11 @@ export function LeadCaptureForm({
             style={{
               width: '100%',
               padding: '14px 16px',
-              background: DS.bg,
-              border: `1px solid ${DS.border}`,
+              background: '#FFFFFF',
+              border: '1px solid #E5E5E5',
               borderRadius: '8px',
-              color: DS.text,
+              color: '#000000',
+              fontFamily: DS.bodyFont,
               fontSize: '14px',
               outline: 'none',
               minHeight: '44px',
@@ -199,10 +208,11 @@ export function LeadCaptureForm({
             style={{
               width: '100%',
               padding: '14px 16px',
-              background: DS.bg,
-              border: `1px solid ${DS.border}`,
+              background: '#FFFFFF',
+              border: '1px solid #E5E5E5',
               borderRadius: '8px',
-              color: DS.text,
+              color: '#000000',
+              fontFamily: DS.bodyFont,
               fontSize: '14px',
               outline: 'none',
               minHeight: '44px',
@@ -221,10 +231,11 @@ export function LeadCaptureForm({
                 style={{
                   width: '100%',
                   padding: '14px 16px',
-                  background: DS.bg,
-                  border: `1px solid ${DS.border}`,
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E5E5',
                   borderRadius: '8px',
-                  color: DS.text,
+                  color: '#000000',
+                  fontFamily: DS.bodyFont,
                   fontSize: '14px',
                   outline: 'none',
                   minHeight: '44px',
@@ -240,10 +251,11 @@ export function LeadCaptureForm({
                 style={{
                   width: '100%',
                   padding: '14px 16px',
-                  background: DS.bg,
-                  border: `1px solid ${DS.border}`,
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E5E5',
                   borderRadius: '8px',
-                  color: DS.text,
+                  color: '#000000',
+                  fontFamily: DS.bodyFont,
                   fontSize: '14px',
                   outline: 'none',
                   minHeight: '44px',
@@ -264,10 +276,11 @@ export function LeadCaptureForm({
                 style={{
                   width: '100%',
                   padding: '14px 16px',
-                  background: DS.bg,
-                  border: `1px solid ${DS.border}`,
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E5E5',
                   borderRadius: '8px',
-                  color: DS.text,
+                  color: '#000000',
+                  fontFamily: DS.bodyFont,
                   fontSize: '14px',
                   outline: 'none',
                   minHeight: '44px',
@@ -283,10 +296,11 @@ export function LeadCaptureForm({
                 style={{
                   width: '100%',
                   padding: '14px 16px',
-                  background: DS.bg,
-                  border: `1px solid ${DS.border}`,
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E5E5',
                   borderRadius: '8px',
-                  color: DS.text,
+                  color: '#000000',
+                  fontFamily: DS.bodyFont,
                   fontSize: '14px',
                   outline: 'none',
                   minHeight: '44px',
@@ -305,6 +319,7 @@ export function LeadCaptureForm({
             background: `${DS.error}15`,
             borderRadius: '8px',
             color: DS.error,
+            fontFamily: DS.bodyFont,
             fontSize: '13px',
           }}>
             <AlertCircle style={{ width: 16, height: 16, flexShrink: 0 }} />
@@ -322,6 +337,7 @@ export function LeadCaptureForm({
             color: '#FFFFFF',
             border: 'none',
             borderRadius: '8px',
+            fontFamily: DS.bodyFont,
             fontSize: '15px',
             fontWeight: 600,
             cursor: loading ? 'not-allowed' : 'pointer',
@@ -331,7 +347,7 @@ export function LeadCaptureForm({
             justifyContent: 'center',
             gap: '8px',
             minHeight: '44px',
-            transition: 'opacity 0.2s',
+            transition: 'background-color 0.2s ease, transform 0.15s ease',
           }}
         >
           {loading ? (
@@ -348,6 +364,7 @@ export function LeadCaptureForm({
         </button>
 
         <p style={{
+          fontFamily: DS.bodyFont,
           fontSize: '11px',
           color: DS.muted,
           textAlign: 'center',
@@ -365,10 +382,10 @@ export function LeadCaptureForm({
           to { transform: rotate(360deg); }
         }
         input:focus {
-          border-color: ${DS.accent} !important;
+          border-color: #C108AB !important;
         }
         input::placeholder {
-          color: ${DS.muted};
+          color: #666666;
         }
       `}</style>
     </div>

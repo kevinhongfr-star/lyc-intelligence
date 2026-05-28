@@ -2,15 +2,22 @@ import React from 'react';
 import { Mail, ArrowRight, Shield } from 'lucide-react';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 export function PricingPage() {
@@ -34,15 +41,16 @@ export function PricingPage() {
           Let's Talk
         </h1>
         
-        <p style={{ fontSize: '16px', color: DS.muted, lineHeight: 1.6, marginBottom: '32px' }}>
+        <p style={{ fontFamily: DS.bodyFont, fontSize: '16px', color: DS.textSecondary, lineHeight: 1.6, marginBottom: '32px' }}>
           Every leadership search is unique. Tell us about your needs and we'll design the right solution for you.
         </p>
 
         <div style={{
-          background: DS.card,
-          border: `1px solid ${DS.border}`,
+          background: DS.bgAlt,
+          border: `1px solid ${DS.cardBorder}`,
           borderRadius: DS.radius,
-          padding: '32px'
+          padding: '32px',
+          boxShadow: DS.shadow,
         }}>
           <a 
             href="mailto:contact@lycpartners.com" 
@@ -55,11 +63,13 @@ export function PricingPage() {
               background: DS.accent,
               color: '#FFF',
               borderRadius: '8px',
+              fontFamily: DS.bodyFont,
               fontSize: '16px',
               fontWeight: 600,
               textDecoration: 'none',
               minHeight: '44px',
-              marginBottom: '20px'
+              marginBottom: '20px',
+              transition: 'background-color 0.2s ease, transform 0.15s ease',
             }}
           >
             contact@lycpartners.com
@@ -68,13 +78,13 @@ export function PricingPage() {
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
             <Shield style={{ width: 14, height: 14, color: DS.muted }} />
-            <span style={{ fontSize: '12px', color: DS.muted }}>
+            <span style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted }}>
               All inquiries are confidential
             </span>
           </div>
         </div>
 
-        <p style={{ fontSize: '13px', color: DS.muted, marginTop: '32px' }}>
+        <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, marginTop: '32px' }}>
           Already a partner? <a href="/" style={{ color: DS.accent, textDecoration: 'none' }}>Sign in</a>
         </p>
       </div>

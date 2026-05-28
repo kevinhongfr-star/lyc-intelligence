@@ -5,15 +5,22 @@ import { ShareCard } from '../components/share/ShareCard';
 import { getShareCard } from '../services/shareCardService';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
-  radius: '12px'
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
+  radius: '12px',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 export function SharePage() {
@@ -108,7 +115,7 @@ export function SharePage() {
           style={{
             padding: '10px 20px',
             background: DS.accent,
-            color: '#FFF',
+            color: '#FFFFFF',
             border: 'none',
             borderRadius: '8px',
             fontSize: '14px',
@@ -146,7 +153,7 @@ export function SharePage() {
             style={{
               padding: '8px 16px',
               background: 'transparent',
-              border: `1px solid ${DS.border}`,
+              border: `1px solid ${DS.cardBorder}`,
               borderRadius: '8px',
               color: DS.textSecondary,
               fontSize: '13px',
@@ -169,7 +176,7 @@ export function SharePage() {
         {/* Share Card Container */}
         <div style={{ 
           background: DS.card, 
-          border: `1px solid ${DS.border}`, 
+          border: `1px solid ${DS.cardBorder}`, 
           borderRadius: '16px', 
           overflow: 'hidden' 
         }}>
@@ -198,7 +205,7 @@ export function SharePage() {
               gap: '8px',
               padding: '12px 28px',
               background: DS.accent,
-              color: '#FFF',
+              color: '#FFFFFF',
               border: 'none',
               borderRadius: '10px',
               fontSize: '15px',

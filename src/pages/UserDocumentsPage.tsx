@@ -14,16 +14,22 @@ import { useAuthStore } from '../stores/authStore';
 import { FileText, Trash2, Calendar, ExternalLink } from 'lucide-react';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
-  success: '#10B981'
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 export function DocumentsPage() {
@@ -103,7 +109,7 @@ export function DocumentsPage() {
               gap: '8px', 
               padding: '12px 28px', 
               background: DS.accent, 
-              color: '#FFF', 
+              color: '#FFFFFF', 
               border: 'none', 
               borderRadius: '10px', 
               fontSize: '15px', 
@@ -144,7 +150,7 @@ export function DocumentsPage() {
             <div style={{ fontSize: '14px', color: DS.muted }}>Loading...</div>
           </div>
         ) : documents.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '48px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius }}>
+          <div style={{ textAlign: 'center', padding: '48px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius }}>
             <FileText style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
             <p style={{ fontSize: '14px', color: DS.textSecondary }}>No documents uploaded yet</p>
           </div>
@@ -154,7 +160,7 @@ export function DocumentsPage() {
               <div key={doc.id} style={{
                 padding: '16px 20px',
                 background: DS.card,
-                border: `1px solid ${DS.border}`,
+                border: `1px solid ${DS.cardBorder}`,
                 borderRadius: '10px',
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -205,7 +211,7 @@ export function DocumentsPage() {
                       gap: '6px',
                       padding: '8px 14px',
                       background: 'transparent',
-                      border: `1px solid ${DS.border}`,
+                      border: `1px solid ${DS.cardBorder}`,
                       borderRadius: '6px',
                       color: DS.textSecondary,
                       fontSize: '13px',

@@ -3,18 +3,22 @@ import { ChevronDown, ChevronUp, Download, Share2, Save, AlertTriangle, CheckCir
 import { TRIDENTResult, getScoreBarColor } from '../../services/tridentScoring';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
-  success: '#10B981',
-  warning: '#F59E0B',
-  error: '#EF4444',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 function getFitLabel(score: number): { label: string; color: string } {
@@ -56,7 +60,7 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
         ].map(item => (
           <div key={item.label} style={{ 
             background: DS.card, 
-            border: `1px solid ${DS.border}`, 
+            border: `1px solid ${DS.cardBorder}`, 
             borderRadius: '8px', 
             padding: '16px', 
             textAlign: 'center' 
@@ -81,7 +85,7 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
               key={index} 
               style={{ 
                 background: DS.card, 
-                border: `1px solid ${DS.border}`, 
+                border: `1px solid ${DS.cardBorder}`, 
                 borderRadius: DS.radius, 
                 overflow: 'hidden'
               }}
@@ -279,7 +283,7 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             gap: '6px',
                             padding: '10px 16px',
                             background: DS.accent,
-                            color: '#FFF',
+                            color: '#FFFFFF',
                             border: 'none',
                             borderRadius: '6px',
                             fontSize: '12px',
@@ -303,7 +307,7 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             padding: '10px 16px',
                             background: DS.bg,
                             color: DS.textSecondary,
-                            border: `1px solid ${DS.border}`,
+                            border: `1px solid ${DS.cardBorder}`,
                             borderRadius: '6px',
                             fontSize: '12px',
                             fontWeight: 600,
@@ -326,7 +330,7 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             padding: '10px 16px',
                             background: DS.bg,
                             color: DS.textSecondary,
-                            border: `1px solid ${DS.border}`,
+                            border: `1px solid ${DS.cardBorder}`,
                             borderRadius: '6px',
                             fontSize: '12px',
                             fontWeight: 600,

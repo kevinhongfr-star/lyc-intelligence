@@ -4,17 +4,22 @@ import { useAuthStore, UserProfile } from '@/stores/authStore';
 import { getAssessmentsByEmail } from '@/services/supabaseApi';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
-  success: '#22C55E',
-  error: '#EF4444',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 type Section = 'identity' | 'goals' | 'assessments' | 'memory' | 'subscription' | 'documents';
@@ -105,7 +110,7 @@ export function ProfilePage() {
               width: '100%',
               padding: '12px 16px',
               background: DS.bg,
-              border: `1px solid ${DS.border}`,
+              border: `1px solid ${DS.cardBorder}`,
               borderRadius: '8px',
               color: DS.text,
               fontSize: '15px',
@@ -128,7 +133,7 @@ export function ProfilePage() {
                 width: '100%',
                 padding: '12px 16px',
                 background: DS.bg,
-                border: `1px solid ${DS.border}`,
+                border: `1px solid ${DS.cardBorder}`,
                 borderRadius: '8px',
                 color: DS.text,
                 fontSize: '15px',
@@ -150,7 +155,7 @@ export function ProfilePage() {
                 width: '100%',
                 padding: '12px 16px',
                 background: DS.bg,
-                border: `1px solid ${DS.border}`,
+                border: `1px solid ${DS.cardBorder}`,
                 borderRadius: '8px',
                 color: DS.text,
                 fontSize: '15px',
@@ -173,7 +178,7 @@ export function ProfilePage() {
               width: '100%',
               padding: '12px 16px',
               background: DS.bg,
-              border: `1px solid ${DS.border}`,
+              border: `1px solid ${DS.cardBorder}`,
               borderRadius: '8px',
               color: DS.text,
               fontSize: '15px',
@@ -205,7 +210,7 @@ export function ProfilePage() {
               width: '100%',
               padding: '12px 16px',
               background: DS.bg,
-              border: `1px solid ${DS.border}`,
+              border: `1px solid ${DS.cardBorder}`,
               borderRadius: '8px',
               color: DS.text,
               fontSize: '15px',
@@ -228,7 +233,7 @@ export function ProfilePage() {
               width: '100%',
               padding: '12px 16px',
               background: DS.bg,
-              border: `1px solid ${DS.border}`,
+              border: `1px solid ${DS.cardBorder}`,
               borderRadius: '8px',
               color: DS.text,
               fontSize: '15px',
@@ -251,7 +256,7 @@ export function ProfilePage() {
               width: '100%',
               padding: '12px 16px',
               background: DS.bg,
-              border: `1px solid ${DS.border}`,
+              border: `1px solid ${DS.cardBorder}`,
               borderRadius: '8px',
               color: DS.text,
               fontSize: '15px',
@@ -282,7 +287,7 @@ export function ProfilePage() {
       ) : (
         <div style={{ display: 'grid', gap: '12px' }}>
           {assessments.map((assessment) => (
-            <div key={assessment.id} style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '20px' }}>
+            <div key={assessment.id} style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                 <div>
                   <h3 style={{ fontSize: '15px', fontWeight: 600, color: DS.text, margin: '0 0 4px' }}>{assessment.assessment_type}</h3>
@@ -309,7 +314,7 @@ export function ProfilePage() {
       <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 24px' }}>
         Memory Summary
       </h2>
-      <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px', textAlign: 'center' }}>
+      <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', textAlign: 'center' }}>
         <Lightbulb style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
         <p style={{ fontSize: '15px', color: DS.muted, margin: '0 0 8px' }}>
           Nexus learns about you through your conversations
@@ -326,7 +331,7 @@ export function ProfilePage() {
       <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 24px' }}>
         Subscription & Credits
       </h2>
-      <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px', marginBottom: '16px' }}>
+      <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
             <p style={{ fontSize: '13px', color: DS.muted, margin: '0 0 4px' }}>Current Plan</p>
@@ -335,7 +340,7 @@ export function ProfilePage() {
           <button style={{
             padding: '10px 20px',
             background: DS.accent,
-            color: '#FFF',
+            color: '#FFFFFF',
             border: 'none',
             borderRadius: '8px',
             fontSize: '14px',
@@ -357,7 +362,7 @@ export function ProfilePage() {
           { label: 'Pro', price: '$29.99/mo', features: '50 credits/month' },
           { label: 'Enterprise', price: 'Custom', features: 'Unlimited' },
         ].map((plan) => (
-          <div key={plan.label} style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '16px', textAlign: 'center' }}>
+          <div key={plan.label} style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '16px', textAlign: 'center' }}>
             <h4 style={{ fontSize: '14px', fontWeight: 600, color: DS.text, margin: '0 0 4px' }}>{plan.label}</h4>
             <p style={{ fontSize: '12px', color: DS.accent, fontWeight: 600, margin: '0 0 8px' }}>{plan.price}</p>
             <p style={{ fontSize: '11px', color: DS.muted, margin: 0 }}>{plan.features}</p>
@@ -372,7 +377,7 @@ export function ProfilePage() {
       <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 24px' }}>
         Document Library
       </h2>
-      <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px', marginBottom: '16px' }}>
+      <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
           <div style={{ width: '48px', height: '48px', background: `${DS.accent}20`, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <FileText style={{ width: 24, height: 24, color: DS.accent }} />
@@ -387,7 +392,7 @@ export function ProfilePage() {
           padding: '12px',
           background: DS.bg,
           color: DS.text,
-          border: `1px solid ${DS.border}`,
+          border: `1px solid ${DS.cardBorder}`,
           borderRadius: '8px',
           fontSize: '14px',
           fontWeight: 500,
@@ -397,7 +402,7 @@ export function ProfilePage() {
           Upload CV
         </button>
       </div>
-      <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
+      <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
           <div style={{ width: '48px', height: '48px', background: `${DS.accent}20`, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <ExternalLink style={{ width: 24, height: 24, color: DS.accent }} />
@@ -417,7 +422,7 @@ export function ProfilePage() {
               flex: 1,
               padding: '12px 16px',
               background: DS.bg,
-              border: `1px solid ${DS.border}`,
+              border: `1px solid ${DS.cardBorder}`,
               borderRadius: '8px',
               color: DS.text,
               fontSize: '14px',
@@ -428,7 +433,7 @@ export function ProfilePage() {
           <button style={{
             padding: '12px 20px',
             background: DS.accent,
-            color: '#FFF',
+            color: '#FFFFFF',
             border: 'none',
             borderRadius: '8px',
             fontSize: '14px',
@@ -464,7 +469,7 @@ export function ProfilePage() {
               gap: '6px',
               padding: '10px 20px',
               background: DS.accent,
-              color: '#FFF',
+              color: '#FFFFFF',
               border: 'none',
               borderRadius: '8px',
               fontSize: '14px',
@@ -511,7 +516,7 @@ export function ProfilePage() {
         </div>
 
         {/* Content */}
-        <div style={{ flex: 1, background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '32px' }}>
+        <div style={{ flex: 1, background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px' }}>
           {activeSection === 'identity' && renderIdentitySection()}
           {activeSection === 'goals' && renderGoalsSection()}
           {activeSection === 'assessments' && renderAssessmentsSection()}

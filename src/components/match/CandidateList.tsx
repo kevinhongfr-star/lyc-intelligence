@@ -3,17 +3,22 @@ import { Plus, X, User, FileText, Users, Upload } from 'lucide-react';
 import { CandidateInput } from '../../services/tridentScoring';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
-  success: '#10B981',
-  warning: '#F59E0B',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 interface CandidateListProps {
@@ -28,7 +33,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
   const validCandidates = candidates.filter(c => c.name && c.cv);
   
   return (
-    <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
+    <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
         <h3 style={{ 
           fontFamily: DS.headingFont, 
@@ -49,7 +54,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
           style={{
             padding: '8px 16px',
             background: DS.bg,
-            border: `1px solid ${DS.border}`,
+            border: `1px solid ${DS.cardBorder}`,
             borderRadius: '8px',
             color: DS.textSecondary,
             fontSize: '13px',
@@ -71,7 +76,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
             key={index} 
             style={{ 
               background: DS.bg, 
-              border: `1px solid ${DS.border}`, 
+              border: `1px solid ${DS.cardBorder}`, 
               borderRadius: '8px', 
               padding: '16px' 
             }}
@@ -86,7 +91,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
                   flex: 1, 
                   padding: '10px 14px', 
                   background: DS.card, 
-                  border: `1px solid ${DS.border}`, 
+                  border: `1px solid ${DS.cardBorder}`, 
                   borderRadius: '6px', 
                   color: DS.text, 
                   fontSize: '13px', 
@@ -130,7 +135,7 @@ Include: work history, education, key achievements, skills"
                     width: '100%', 
                     minHeight: '100px', 
                     background: DS.card, 
-                    border: `1px solid ${DS.border}`, 
+                    border: `1px solid ${DS.cardBorder}`, 
                     borderRadius: '6px', 
                     padding: '10px 10px 10px 38px', 
                     color: DS.text, 
@@ -149,7 +154,7 @@ Include: work history, education, key achievements, skills"
                   style={{
                     padding: '10px 16px',
                     background: DS.card,
-                    border: `1px solid ${DS.border}`,
+                    border: `1px solid ${DS.cardBorder}`,
                     borderRadius: '6px',
                     color: DS.textSecondary,
                     fontSize: '12px',

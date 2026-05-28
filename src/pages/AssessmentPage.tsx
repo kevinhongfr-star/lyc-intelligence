@@ -11,7 +11,7 @@ export function AssessmentPage() {
   const prefillName = searchParams.get('name') || profile?.full_name || '';
 
   return (
-    <div style={{ background: '#0A0A0A', minHeight: '100vh' }}>
+    <div style={{ background: '#FFFFFF', minHeight: '100vh' }}>
       <AssessmentWizard 
         prefillEmail={prefillEmail} 
         prefillName={prefillName} 

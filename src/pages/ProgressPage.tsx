@@ -8,20 +8,22 @@ import { useAuthStore } from '../stores/authStore';
 import { getSupabase } from '../services/supabaseApi';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  accentLight: '#E040C8',
-  bg: '#0A0A0A',
-  card: '#111111',
-  cardHover: '#1a1a1a',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
-  success: '#10B981',
-  warning: '#F59E0B',
-  error: '#EF4444'
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 interface AssessmentRecord {
@@ -188,7 +190,7 @@ export function ProgressPage() {
                 gap: '8px',
                 padding: '12px 24px',
                 background: DS.accent,
-                color: '#FFF',
+                color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '14px',
@@ -203,7 +205,7 @@ export function ProgressPage() {
         </div>
 
         {assessments.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 0', background: DS.card, borderRadius: '16px', border: `1px solid ${DS.border}` }}>
+          <div style={{ textAlign: 'center', padding: '80px 0', background: DS.card, borderRadius: '16px', border: `1px solid ${DS.cardBorder}` }}>
             <Target style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
             <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', color: DS.text, marginBottom: '8px' }}>
               No assessments yet
@@ -219,7 +221,7 @@ export function ProgressPage() {
                 gap: '8px',
                 padding: '14px 28px',
                 background: DS.accent,
-                color: '#FFF',
+                color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '15px',
@@ -333,7 +335,7 @@ export function ProgressPage() {
                 </div>
 
                 {/* Dimension Breakdown */}
-                <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
+                <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
                   <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 600, color: DS.text, marginBottom: '24px' }}>
                     Dimension Breakdown
                   </h3>
@@ -380,7 +382,7 @@ export function ProgressPage() {
 
                 {/* Comparison with Previous */}
                 {previousAssessment && (
-                  <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '16px', padding: '24px' }}>
+                  <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '16px', padding: '24px' }}>
                     <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 600, color: DS.text, marginBottom: '24px' }}>
                       Progress Since {new Date(previousAssessment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </h3>
