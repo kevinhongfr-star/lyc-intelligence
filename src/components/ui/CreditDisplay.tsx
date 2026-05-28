@@ -8,15 +8,15 @@ interface CreditDisplayProps {
 
 const DS = {
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#1A1A1A',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#333333',
+  bg: '#F5F5F5',
+  card: '#FFFFFF',
+  muted: '#666666',
+  text: '#000000',
+  textSecondary: '#333333',
+  border: '#E5E5E5',
   radius: '8px',
-  success: '#22C55E',
-  warning: '#EAB308',
+  success: '#16A34A',
+  warning: '#CA8A04',
 };
 
 export function CreditDisplay({ showTier = false }: CreditDisplayProps) {
@@ -38,7 +38,7 @@ export function CreditDisplay({ showTier = false }: CreditDisplayProps) {
   const getBalanceColor = () => {
     if (credit.tier === 'enterprise') return DS.accent;
     if (credit.tier === 'pro' || credit.tier === 'basic') return DS.success;
-    if (credit.balance <= 0) return '#EF4444';
+    if (credit.balance <= 0) return '#DC2626';
     if (credit.balance <= 2) return DS.warning;
     return DS.text;
   };
@@ -62,7 +62,7 @@ export function CreditDisplay({ showTier = false }: CreditDisplayProps) {
             {credit.tier === 'enterprise' ? '∞' : credit.balance}
           </span>
           <span style={{ fontSize: '11px', color: DS.muted }}>
-            {credit.tier === 'enterprise' ? 'credits' : 'credits'}
+            credits
           </span>
           {showTier && (
             <span style={{
