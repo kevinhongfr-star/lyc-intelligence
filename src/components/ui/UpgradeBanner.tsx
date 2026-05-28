@@ -9,13 +9,22 @@ interface UpgradeBannerProps {
 }
 
 const DS = {
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#1A1A1A',
-  muted: '#888888',
-  text: '#FFFFFF',
-  border: '#333333',
-  radius: '8px',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
+  radius: '12px',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 export function UpgradeBanner({ type = 'empty', message, onDismiss }: UpgradeBannerProps) {
