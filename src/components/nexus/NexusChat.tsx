@@ -6,15 +6,22 @@ import { SuggestedPrompts } from './SuggestedPrompts';
 import { EmailCapture } from './EmailCapture';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
-  radius: '12px'
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
+  radius: '12px',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 interface Message {
@@ -191,7 +198,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
             <MessageBubble key={i} role={m.role} content={m.content} />
           ))}
           {aiState === 'thinking' && (
-            <div style={{ alignSelf: 'flex-start', padding: '12px 16px', background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '12px 12px 12px 4px', color: DS.muted, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ alignSelf: 'flex-start', padding: '12px 16px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '12px 12px 12px 4px', color: DS.muted, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
               Thinking...
             </div>
@@ -209,7 +216,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
                   gap: '6px',
                   padding: '8px 16px',
                   background: DS.accent,
-                  color: '#FFF',
+                  color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '8px',
                   fontSize: '13px',
@@ -238,7 +245,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
               flex: 1,
               padding: '14px 16px',
               background: DS.card,
-              border: `1px solid ${DS.border}`,
+              border: `1px solid ${DS.cardBorder}`,
               borderRadius: '8px',
               color: DS.text,
               fontSize: '14px',
@@ -251,7 +258,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
             style={{
               padding: '14px',
               background: DS.card,
-              border: `1px solid ${DS.border}`,
+              border: `1px solid ${DS.cardBorder}`,
               borderRadius: '8px',
               cursor: uploading ? 'not-allowed' : 'pointer',
               opacity: uploading ? 0.5 : 1,
@@ -273,7 +280,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
             style={{
               padding: '14px 20px',
               background: DS.accent,
-              color: '#FFF',
+              color: '#FFFFFF',
               border: 'none',
               borderRadius: '8px',
               cursor: (loading || !input.trim()) ? 'not-allowed' : 'pointer',
