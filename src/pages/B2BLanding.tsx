@@ -170,7 +170,7 @@ export function B2BLanding() {
         <div style={{ width: '48px', height: '3px', background: DS.accent, margin: '0 auto 16px', borderRadius: '2px' }} />
         <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, margin: '0 0 12px' }}>Start matching today</h2>
         <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: DS.muted, marginBottom: '24px' }}>Free to try. No credit card required. Score your first candidates in under 2 minutes.</p>
-        <LeadCaptureForm type="b2b" source="b2b_landing" />
+        <LeadCaptureForm type="b2b" source="b2b_landing" heading="Get 3 free candidate matches" subheading="Paste a job description, add CVs, get ranked results. No credit card." />
       </div>
 
       {/* Dark Footer */}
