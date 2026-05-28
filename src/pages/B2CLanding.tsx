@@ -155,7 +155,7 @@ export function B2CLanding() {
         <Star style={{ width: 24, height: 24, color: DS.accent, marginBottom: '12px' }} />
         <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, margin: '0 0 12px' }}>Ready to find out?</h2>
         <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: DS.muted, marginBottom: '24px' }}>Free assessment. No credit card. Results in 10 minutes.</p>
-        <LeadCaptureForm type="b2c" source="b2c_landing" />
+        <LeadCaptureForm type="b2c" source="b2c_landing" heading="Get your free leadership profile" subheading="8 minutes. Archetype, benchmarks, and your 90-day priorities." />
       </div>
 
       {/* Dark Footer */}
