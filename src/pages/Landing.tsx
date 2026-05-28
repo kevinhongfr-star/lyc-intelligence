@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { initScrollReveal } from '@/lib/utils';
-import { ArrowRight, BarChart3, Brain, MessageCircle, Users, Briefcase, Menu, X } from 'lucide-react';
+import { ArrowRight, BarChart3, Brain, MessageCircle, Users, Briefcase, Menu, X, Lock } from 'lucide-react';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -54,7 +54,7 @@ export function Landing() {
           {navLinks.map(l => (
             <a key={l.href} href={l.href} style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</a>
           ))}
-          <a href="/platform" style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.text, textDecoration: 'none', padding: '10px 20px', border: `1px solid ${DS.border}`, borderRadius: '6px', transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>Sign In</a>
+          <a href="/login" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '6px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}><Lock style={{ width: 14, height: 14 }} />Platform</a>
         </div>
         <button className="nav-toggle" onClick={() => setMobileOpen(true)} aria-label="Open menu">
           <Menu />
@@ -72,7 +72,7 @@ export function Landing() {
         {navLinks.map(l => (
           <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)}>{l.label}</a>
         ))}
-        <a href="/platform" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Sign In</a>
+        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</a>
       </div>
 
       {/* Hero */}
