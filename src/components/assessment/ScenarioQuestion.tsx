@@ -2,16 +2,22 @@ import React from 'react';
 import { CPDScenario } from '../../services/assessmentEngine';
 
 const DS = {
-  headingFont: 'Georgia, serif',
-  bodyFont: 'Inter, sans-serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#1A1A1A',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#333333',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 export interface ScenarioQuestionProps {
@@ -68,7 +74,7 @@ export function ScenarioQuestion({ question, currentAnswer, onAnswer, questionNu
               minWidth: '32px',
               height: '32px',
               background: currentAnswer === option.score ? DS.accent : DS.bg,
-              color: '#FFFFFF',
+              color: '#000000',
               borderRadius: '50%',
               marginRight: '16px',
               fontWeight: 'bold',
