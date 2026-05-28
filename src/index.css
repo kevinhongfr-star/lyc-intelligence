@@ -1,4 +1,4 @@
-/* Build v2026.05.28.3 */
+/* Build v2026.05.28.4 — Light theme platform fix */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -43,6 +43,7 @@
 * { box-sizing: border-box; }
 
 :root {
+  /* Custom design system variables */
   --color-primary: #000000;
   --color-secondary: #333333;
   --color-accent: #C108AB;
@@ -58,6 +59,36 @@
   --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --nav-height: 60px;
+
+  /* Tailwind CSS variable overrides — LIGHT THEME */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F5;
+  --bg-tertiary: #EDEDED;
+  --bg-hover: #E5E5E5;
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --text-muted: #666666;
+  --accent: #C108AB;
+  --accent-light: #E040C8;
+}
+
+/* Dark theme override — only when explicitly toggled */
+[data-theme="dark"] {
+  --bg-primary: #0A0A0A;
+  --bg-secondary: #1A1A1A;
+  --bg-tertiary: #2A2A2A;
+  --bg-hover: #333333;
+  --text-primary: #FFFFFF;
+  --text-secondary: #CCCCCC;
+  --text-muted: #888888;
+  --accent: #C108AB;
+  --accent-light: #E040C8;
+  --color-background: #0A0A0A;
+  --color-surface: #1A1A1A;
+  --color-border: #2A2A2A;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #CCCCCC;
+  --color-text-muted: #888888;
 }
 
 body {
@@ -286,7 +317,7 @@ html {
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .grid-responsive {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(2, fr) !important;
   }
 }
 
