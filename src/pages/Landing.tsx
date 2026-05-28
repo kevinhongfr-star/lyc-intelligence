@@ -54,13 +54,13 @@ export function Landing() {
     { href: '/match', label: 'Match Analysis' },
     { href: '/b2b', label: 'For Firms' },
     { href: '/b2c', label: 'For Leaders' },
-    { href: '/nexus', label: 'Nexus AI' },
+    { href: '/nexus', label: 'Nexus' },
   ];
 
   const services = [
     { icon: IconTrident, animClass: 'anim-trident', title: 'Match Analysis', desc: 'AI-powered JD-CV matching engine. Score candidates instantly against role requirements.', href: '/match', cta: 'Try Free' },
     { icon: IconImpact, animClass: 'anim-impact', title: 'Leadership Assessment', desc: 'Discover your archetype. Benchmark against global executives across 47 markets.', href: '/assessment', cta: 'Take Assessment' },
-    { icon: IconQuest, animClass: 'anim-quest', title: 'Nexus AI', desc: 'Talk to our AI about career positioning, scoring, and cross-border opportunities.', href: '/nexus', cta: 'Start Chat' },
+    { icon: null, animClass: '', title: 'Nexus', desc: 'Executive advisory on career positioning, leadership scoring, and cross-border opportunities.', href: '/nexus', cta: 'Consult' },
   ];
 
   const stats = [
@@ -212,9 +212,13 @@ export function Landing() {
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           {services.map(p => (
             <a key={p.title} href={p.href} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '28px 24px', textDecoration: 'none', display: 'block', boxShadow: DS.shadow }}>
-              <div style={{ color: DS.accent, marginBottom: '16px' }}>
-                <p.icon size={28} color={DS.accent} />
-              </div>
+              {p.icon ? (
+                <div style={{ color: DS.accent, marginBottom: '16px' }}>
+                  <p.icon size={28} color={DS.accent} />
+                </div>
+              ) : (
+                <div style={{ width: '40px', height: '3px', background: DS.accent, marginBottom: '16px', borderRadius: '1px' }} />
+              )}
               <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>{p.title}</h3>
               <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, lineHeight: 1.5, margin: '0 0 16px' }}>{p.desc}</p>
               <span style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.accent, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
@@ -262,7 +266,7 @@ export function Landing() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <a href="/match">Match Analysis</a>
               <a href="/assessment">Assessment</a>
-              <a href="/nexus">Nexus AI</a>
+              <a href="/nexus">Nexus</a>
             </div>
           </div>
           <div>
