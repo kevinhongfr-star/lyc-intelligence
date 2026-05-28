@@ -53,7 +53,7 @@ export function LoginPage() {
     if (result.success) {
       navigate('/platform');
     } else {
-      setError('Invalid credentials. Please try again.');
+      setError(result.error || 'Invalid credentials. Please try again.');
     }
   };
 
