@@ -34,7 +34,7 @@ const TIERS = [
     features: [
       '5 credits per day',
       'Career Positioning Diagnostic',
-      'Basic Nexus AI chat',
+      'Basic Nexus chat',
       'Leadership archetype report',
     ],
   },
@@ -50,7 +50,7 @@ const TIERS = [
     highlight: true,
     features: [
       '200 credits per month',
-      'Unlimited Nexus AI conversations',
+      'Unlimited Nexus conversations',
       'Match Analysis for job comparisons',
       'Full assessment history',
       'Priority scoring & insights',
