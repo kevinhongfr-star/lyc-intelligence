@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { CreditProvider } from '@/contexts/CreditContext';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Loader2 } from 'lucide-react';
 
 const Landing = lazy(() => import('@/pages/Landing').then(m => ({ default: m.Landing })));
@@ -62,6 +63,7 @@ export default function App() {
   }, [initialize]);
 
   return (
+    <ErrorBoundary>
     <CreditProvider>
       <Suspense fallback={<Loading />}>
         <Routes>

@@ -8,18 +8,13 @@ export interface UserProfile {
   id: string;
   email: string;
   name: string;
-  current_title: string | null;
-  company: string | null;
-  country: string | null;
-  goal_short: string | null;
-  goal_long: string | null;
-  target_geography: string | null;
-  icp_selector: 'leader' | 'job_seeker' | 'hiring' | 'search_professional' | null;
+  role: string | null;
   tier: 'free' | 'pro' | 'council' | 'enterprise';
-  referral_code: string | null;
-  referred_by: string | null;
-  streak_days: number;
-  last_active_date: string | null;
+  icp: string | null;
+  active_surface: string | null;
+  organization_id: string | null;
+  subtype: string | null;
+  notion_profile_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -119,14 +114,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       if (data.user) {
         const referralCode = generateReferralCode();
-        const { error: profileError } = await supabase.from('user_profiles').insert({
+        const { error: profileError } = await supabase.from('profiles').insert({
           id: data.user.id,
           email,
           name,
-          icp_selector: icp,
+          icp: icp,
           tier: 'free',
-          referral_code: referralCode,
-          streak_days: 0,
+          role: 'user',
         });
         if (profileError) console.warn('[AuthStore] Profile creation error:', profileError);
         
@@ -159,7 +153,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     try {
       const { data, error } = await supabase
-        .from('user_profiles')
+        .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
@@ -181,7 +175,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     try {
       const { error } = await supabase
-        .from('user_profiles')
+        .from('profiles')
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('id', user.id);
       
