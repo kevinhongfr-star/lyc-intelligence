@@ -8,6 +8,21 @@ import { getSupabase } from '@/services/supabaseApi';
 interface CandidateInput { name: string; cv: string; }
 interface ScoreResult { name: string; d1: number; d2: number; d3: number; composite: number; verdict: string; tier: string; reasoning: string; }
 
+
+function getVerdictLabel(score: number): string {
+  if (score >= 8) return 'Strong Primary';
+  if (score >= 6.5) return 'Strong Secondary';
+  if (score >= 5) return 'Reserve';
+  return 'Not Recommended';
+}
+
+function getVerdictColor(score: number): string {
+  if (score >= 8) return '#16A34A';
+  if (score >= 6.5) return '#6366F1';
+  if (score >= 5) return '#CA8A04';
+  return '#DC2626';
+}
+
 export function BatchScoringPage() {
   const [jd, setJd] = useState('');
   const [candidates, setCandidates] = useState<CandidateInput[]>([{ name: '', cv: '' }]);
@@ -41,8 +56,8 @@ export function BatchScoringPage() {
         <div key={i} className="bg-bg-tertiary rounded-lg p-3"><div className="flex gap-2 mb-2"><Input placeholder="Candidate name" value={c.name} onChange={e => updateCandidate(i, 'name', e.target.value)} className="max-w-xs" /><button onClick={() => removeCandidate(i)} className="text-text-muted hover:text-red-400"><X className="w-4 h-4" /></button></div><textarea placeholder="Paste CV or profile..." value={c.cv} onChange={e => updateCandidate(i, 'cv', e.target.value)} className="w-full h-24 bg-bg-secondary border border-bg-hover rounded-lg p-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" /></div>
       ))}</CardContent></Card>
       <div className="flex items-center gap-4"><Button onClick={runScoring} disabled={scoring || !jd || candidates.every(c => !c.name)}>{scoring ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Scoring... ({progress}%)</> : <><Play className="w-4 h-4 mr-2" />Run Match Sweep</>}</Button>{scoring && <Progress value={progress} className="max-w-xs" />}</div>
-      {results.length > 0 && <Card><CardHeader><CardTitle>Results ({results.length} scored)</CardTitle></CardHeader><CardContent><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b border-bg-tertiary"><th className="text-left py-2 text-text-muted font-medium">Name</th><th className="text-center py-2 text-text-muted font-medium">D1</th><th className="text-center py-2 text-text-muted font-medium">D2</th><th className="text-center py-2 text-text-muted font-medium">D3</th><th className="text-center py-2 text-text-muted font-medium">Composite</th><th className="text-center py-2 text-text-muted font-medium">Verdict</th><th className="text-center py-2 text-text-muted font-medium">Tier</th></tr></thead><tbody>{results.sort((a, b) => b.composite - a.composite).map((r, i) => (
-        <tr key={i} className="border-b border-bg-tertiary"><td className="py-2 text-text-primary">{r.name}</td><td className="text-center py-2">{r.d1}</td><td className="text-center py-2">{r.d2}</td><td className="text-center py-2">{r.d3}</td><td className="text-center py-2 font-bold">{r.composite}</td><td className="text-center py-2"><Badge variant={r.composite >= 75 ? 'success' : r.composite >= 50 ? 'warning' : 'default'}>{r.verdict}</Badge></td><td className="text-center py-2">{r.tier}</td></tr>
+      {results.length > 0 && <Card><CardHeader><CardTitle>Results ({results.length} scored)</CardTitle></CardHeader><CardContent><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b border-bg-tertiary"><th className="text-left py-2 text-text-muted font-medium">Name</th><th className="text-center py-2 text-text-muted font-medium">Experience</th><th className="text-center py-2 text-text-muted font-medium">Skills</th><th className="text-center py-2 text-text-muted font-medium">Fit</th><th className="text-center py-2 text-text-muted font-medium">Composite</th><th className="text-center py-2 text-text-muted font-medium">Verdict</th><th className="text-center py-2 text-text-muted font-medium">Tier</th></tr></thead><tbody>{results.sort((a, b) => b.composite - a.composite).map((r, i) => (
+        <tr key={i} className="border-b border-bg-tertiary"><td className="py-2 text-text-primary">{r.name}</td><td className="text-center py-2"><span style={{ color: getVerdictColor(r.d1), fontSize: '12px', fontWeight: 600 }}>{getVerdictLabel(r.d1)}</span></td><td className="text-center py-2"><span style={{ color: getVerdictColor(r.d2), fontSize: '12px', fontWeight: 600 }}>{getVerdictLabel(r.d2)}</span></td><td className="text-center py-2"><span style={{ color: getVerdictColor(r.d3), fontSize: '12px', fontWeight: 600 }}>{getVerdictLabel(r.d3)}</span></td><td className="text-center py-2 font-bold">{r.composite}</td><td className="text-center py-2"><Badge variant={r.composite >= 75 ? 'success' : r.composite >= 50 ? 'warning' : 'default'}>{r.verdict}</Badge></td><td className="text-center py-2">{r.tier}</td></tr>
       ))}</tbody></table></div></CardContent></Card>}
     </div>
   );
