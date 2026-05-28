@@ -330,7 +330,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center', marginBottom: '20px' }}>
           <Shield style={{ width: 12, height: 12, color: DS.muted }} />
-          <span style={{ fontSize: '11px', color: DS.muted }}>Your conversation is confidential. Powered by LYC Intelligence.</span>
+          <span style={{ fontSize: '11px', color: DS.muted }}>Leadership isn't a title — it's a trajectory. Powered by LYC Intelligence.</span>
         </div>
       </div>
     </div>
