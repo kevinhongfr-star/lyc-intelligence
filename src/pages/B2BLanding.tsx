@@ -39,7 +39,7 @@ export function B2BLanding() {
   const navLinks = [
     { href: '/match', label: 'Match Analysis' },
     { href: '/b2c', label: 'For Leaders' },
-    { href: '/nexus', label: 'Nexus AI' },
+    { href: '/nexus', label: 'Nexus' },
   ];
 
   return (
@@ -188,7 +188,7 @@ export function B2BLanding() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <a href="/match">Match Analysis</a>
               <a href="/assessment">Assessment</a>
-              <a href="/nexus">Nexus AI</a>
+              <a href="/nexus">Nexus</a>
             </div>
           </div>
           <div>
