@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { initScrollReveal } from '@/lib/scrollReveal';
+import { initScrollReveal } from '@/lib/utils';
 import { Brain, Globe, Award, ArrowRight, Shield, BarChart3, Star, MessageCircle } from 'lucide-react';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 
