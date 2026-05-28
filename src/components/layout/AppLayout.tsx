@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts';
 import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDashboard, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon } from 'lucide-react';
@@ -28,13 +28,17 @@ export function AppLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => (localStorage.getItem('lyc-theme') as 'dark' | 'light') || 'dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => (localStorage.getItem('lyc-theme') as 'dark' | 'light') || 'light');
+
+  // Apply theme to document for CSS variable switching
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
     localStorage.setItem('lyc-theme', newTheme);
-    // Trigger the SettingsPage theme logic
     window.dispatchEvent(new CustomEvent('theme-change', { detail: newTheme }));
   };
 
@@ -49,11 +53,12 @@ export function AppLayout() {
         <div className="p-4 border-b border-bg-tertiary">
           <h1 className="font-serif font-bold text-lg text-text-primary">{sidebarOpen ? 'LYC Intelligence' : 'LYC'}</h1>
         </div>
+        
         <nav className="flex-1 py-2 overflow-y-auto">
           {NAV_ITEMS.map((item, i) => {
             if (item.type === 'divider') {
               return sidebarOpen ? (
-                <div key={i} className="px-4 pt-4 pb-1"><span className="text-[10px] uppercase tracking-wider text-text-muted font-medium">{item.label}</span></div>
+                <div key={i} className="px-4 pt-4 pb-1"><span className="text-[9px] uppercase tracking-[2.5px] text-accent font-semibold">{item.label}</span></div>
               ) : (
                 <div key={i} className="mx-2 my-2 border-t border-bg-tertiary" />
               );
@@ -66,6 +71,7 @@ export function AppLayout() {
             );
           })}
         </nav>
+        
         <div className="p-4 border-t border-bg-tertiary space-y-2">
           {sidebarOpen && <CreditDisplay showTier />}
           <button onClick={toggleTheme} className="flex items-center gap-2 text-sm text-text-muted hover:text-text-primary w-full min-h-[44px]">
