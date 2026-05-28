@@ -3,32 +3,39 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
-  radius: '12px'
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
+  radius: '12px',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 const customComponents = {
   table: ({ children }: any) => (
     <div style={{ overflowX: 'auto', margin: '8px 0' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', border: `1px solid ${DS.border}`, borderRadius: '8px', overflow: 'hidden' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', overflow: 'hidden' }}>
         {children}
       </table>
     </div>
   ),
   th: ({ children }: any) => (
-    <th style={{ border: `1px solid ${DS.border}`, padding: '10px 14px', fontWeight: 700, color: '#E5E5E5', background: '#1A1A1A', fontSize: '12px', textAlign: 'left' }}>
+    <th style={{ border: `1px solid ${DS.cardBorder}`, padding: '10px 14px', fontWeight: 700, color: '#E5E5E5', background: '#FFFFFF', fontSize: '12px', textAlign: 'left' }}>
       {children}
     </th>
   ),
   td: ({ children }: any) => (
-    <td style={{ border: `1px solid ${DS.border}`, padding: '10px 14px', color: DS.textSecondary, fontSize: '13px' }}>
+    <td style={{ border: `1px solid ${DS.cardBorder}`, padding: '10px 14px', color: DS.textSecondary, fontSize: '13px' }}>
       {children}
     </td>
   ),
@@ -38,9 +45,9 @@ const customComponents = {
     </tr>
   ),
   code: ({ inline, children, ...props }: any) => {
-    if (inline) return <code style={{ background: '#1A1A1A', padding: '2px 6px', borderRadius: '4px', fontSize: '12px', color: DS.accent, fontFamily: 'monospace' }} {...props}>{children}</code>;
+    if (inline) return <code style={{ background: '#FFFFFF', padding: '2px 6px', borderRadius: '4px', fontSize: '12px', color: DS.accent, fontFamily: 'monospace' }} {...props}>{children}</code>;
     return (
-      <pre style={{ background: '#111111', padding: '14px', borderRadius: '8px', overflowX: 'auto', margin: '8px 0', fontSize: '12px', color: DS.textSecondary, fontFamily: 'monospace', lineHeight: 1.5 }}>
+      <pre style={{ background: '#FFFFFF', padding: '14px', borderRadius: '8px', overflowX: 'auto', margin: '8px 0', fontSize: '12px', color: DS.textSecondary, fontFamily: 'monospace', lineHeight: 1.5 }}>
         <code {...props}>{children}</code>
       </pre>
     );
