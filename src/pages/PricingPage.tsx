@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, ArrowRight, Shield } from 'lucide-react';
+import { Check, ArrowRight, Shield, Zap } from 'lucide-react';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -20,73 +20,143 @@ const DS = {
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
+const TIERS = [
+  {
+    id: 'free',
+    name: 'Free',
+    price: 0,
+    priceDisplay: '$0',
+    period: 'forever',
+    credits: 5,
+    description: 'Start here',
+    features: [
+      '5 credits per day',
+      'Career Positioning Diagnostic',
+      'Basic Nexus AI chat',
+      'Leadership archetype report',
+    ],
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: 49,
+    priceDisplay: '$49',
+    period: '/month',
+    credits: 200,
+    description: 'For serious career development',
+    highlight: true,
+    features: [
+      '200 credits per month',
+      'Unlimited Nexus AI conversations',
+      'Match Analysis for job comparisons',
+      'Full assessment history',
+      'Priority scoring & insights',
+      'PDF export of all reports',
+    ],
+  },
+  {
+    id: 'council',
+    name: 'Council',
+    price: 199,
+    priceDisplay: '$199',
+    period: '/month',
+    credits: -1,
+    description: 'Includes quarterly advisory call with LYC partner',
+    features: [
+      'Quarterly 1:1 call with a LYC partner who has placed executives in your target market',
+      'Unlimited credits',
+      'Everything in Pro',
+      'Executive CV review & optimization',
+      'Interview preparation sessions',
+      'Board readiness assessment',
+      'Private Council network access',
+    ],
+  },
+];
+
 export function PricingPage() {
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-      <div style={{ maxWidth: '480px', width: '100%', textAlign: 'center' }}>
-        <div style={{ 
-          width: '64px', 
-          height: '64px', 
-          borderRadius: '50%', 
-          background: `${DS.accent}15`, 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          margin: '0 auto 24px' 
-        }}>
-          <Mail style={{ width: 28, height: 28, color: DS.accent }} />
+    <div style={{ minHeight: '100vh', background: DS.bg }}>
+      {/* Header */}
+      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
+        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>LYC Intelligence</a>
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+          <a href="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Back to site</a>
         </div>
+      </nav>
 
-        <h1 style={{ fontFamily: DS.headingFont, fontSize: '36px', fontWeight: 700, color: DS.text, margin: '0 0 12px' }}>
-          Let's Talk
+      {/* Hero */}
+      <div style={{ textAlign: 'center', padding: '64px 24px 48px', maxWidth: '640px', margin: '0 auto' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: `${DS.accent}15`, borderRadius: '20px', marginBottom: '20px' }}>
+          <Zap style={{ width: 14, height: 14, color: DS.accent }} />
+          <span style={{ fontSize: '11px', color: DS.accent, fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Pricing</span>
+        </div>
+        <h1 style={{ fontFamily: DS.headingFont, fontSize: '40px', fontWeight: 700, color: DS.text, margin: '0 0 16px' }}>
+          Invest in your career trajectory
         </h1>
-        
-        <p style={{ fontFamily: DS.bodyFont, fontSize: '16px', color: DS.textSecondary, lineHeight: 1.6, marginBottom: '32px' }}>
-          Every leadership search is unique. Tell us about your needs and we'll design the right solution for you.
+        <p style={{ fontFamily: DS.bodyFont, fontSize: '16px', color: DS.textSecondary, lineHeight: 1.6, margin: 0 }}>
+          One in three cross-border executive moves fails. The right intelligence changes the odds.
         </p>
+      </div>
 
-        <div style={{
-          background: DS.bgAlt,
-          border: `1px solid ${DS.cardBorder}`,
-          borderRadius: DS.radius,
-          padding: '32px',
-          boxShadow: DS.shadow,
-        }}>
-          <a 
-            href="mailto:contact@lycpartners.com" 
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '16px 24px',
-              background: DS.accent,
-              color: '#FFF',
-              borderRadius: '8px',
-              fontFamily: DS.bodyFont,
-              fontSize: '16px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              minHeight: '44px',
-              marginBottom: '20px',
-              transition: 'background-color 0.2s ease, transform 0.15s ease',
-            }}
-          >
-            contact@lycpartners.com
-            <ArrowRight style={{ width: 18, height: 18 }} />
-          </a>
-
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-            <Shield style={{ width: 14, height: 14, color: DS.muted }} />
-            <span style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted }}>
-              All inquiries are confidential
-            </span>
+      {/* Tier Cards */}
+      <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '960px', margin: '0 auto', padding: '0 24px 80px' }}>
+        {TIERS.map(tier => (
+          <div key={tier.id} style={{
+            background: DS.card,
+            border: tier.highlight ? `2px solid ${DS.accent}` : `1px solid ${DS.cardBorder}`,
+            borderRadius: DS.radius,
+            padding: '32px 28px',
+            boxShadow: tier.highlight ? `0 4px 20px rgba(193,8,171,0.15)` : DS.shadow,
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+          }}>
+            {tier.highlight && (
+              <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: DS.accent, color: '#FFF', fontSize: '11px', fontWeight: 600, padding: '4px 16px', borderRadius: '12px', letterSpacing: '0.5px' }}>
+                MOST POPULAR
+              </div>
+            )}
+            <h3 style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>{tier.name}</h3>
+            <p style={{ fontSize: '13px', color: DS.muted, margin: '0 0 20px' }}>{tier.description}</p>
+            <div style={{ marginBottom: '24px' }}>
+              <span style={{ fontFamily: DS.headingFont, fontSize: '42px', fontWeight: 700, color: DS.text }}>{tier.priceDisplay}</span>
+              <span style={{ fontSize: '14px', color: DS.muted, marginLeft: '4px' }}>{tier.period}</span>
+            </div>
+            <div style={{ flex: 1 }}>
+              {tier.features.map((feature, i) => (
+                <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '12px' }}>
+                  <Check style={{ width: 16, height: 16, color: i === 0 && tier.id === 'council' ? DS.accent : '#16A34A', flexShrink: 0, marginTop: '2px' }} />
+                  <span style={{ fontSize: '13px', color: i === 0 && tier.id === 'council' ? DS.accent : DS.textSecondary, fontWeight: i === 0 && tier.id === 'council' ? 600 : 400, lineHeight: 1.5 }}>
+                    {feature}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <a
+              href={tier.id === 'free' ? '/assessment' : '/login'}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                padding: '14px', marginTop: '24px',
+                background: tier.highlight ? DS.accent : 'transparent',
+                color: tier.highlight ? '#FFF' : DS.text,
+                border: tier.highlight ? 'none' : `1px solid ${DS.cardBorder}`,
+                borderRadius: '8px', fontSize: '14px', fontWeight: 600,
+                textDecoration: 'none', minHeight: '48px',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {tier.id === 'free' ? 'Start Free Assessment' : `Get ${tier.name}`}
+              <ArrowRight style={{ width: 16, height: 16 }} />
+            </a>
           </div>
-        </div>
+        ))}
+      </div>
 
-        <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, marginTop: '32px' }}>
-          Already a partner? <a href="/" style={{ color: DS.accent, textDecoration: 'none' }}>Sign in</a>
-        </p>
+      {/* Footer trust */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', paddingBottom: '48px' }}>
+        <Shield style={{ width: 14, height: 14, color: DS.muted }} />
+        <span style={{ fontSize: '12px', color: DS.muted }}>Secure payment · Cancel anytime · 14-day money-back guarantee</span>
       </div>
     </div>
   );
