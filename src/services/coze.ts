@@ -1,93 +1,82 @@
-const DEEPSEEK_API_KEY = (import.meta.env.VITE_DEEPSEEK_API_KEY as string) || '';
-const DEEPSEEK_ENDPOINT = 'https://api.deepseek.com/v1/chat/completions';
-const COZE_API_KEY = (import.meta.env.VITE_COZE_API_KEY as string) || '';
-const COZE_BOT_ID = (import.meta.env.VITE_COZE_BOT_ID as string) || '';
-const COZE_ENDPOINT = (import.meta.env.VITE_COZE_API_ENDPOINT as string) || 'https://api.coze.cn/v3/chat';
+// coze.ts — Legacy service file. All AI calls now go through /api/chat proxy.
+// This file is kept only for type compatibility. Do not add API keys here.
 
-const SYSTEM_PROMPT = `You are Nexus, the AI assistant for LYC Partners — a global leadership advisory and executive search firm headquartered in Shanghai with operations across Asia-Pacific and Europe.
-
-ABOUT LYC PARTNERS (source: lyc-partners.ai):
-- Founded in 2015, specializing in cross-border executive search and leadership advisory
-- Tagline: "Building Leadership That Works Across Borders"
-- Methodology: Diagnose · Design · Deliver
-- 47 markets covered, 15+ years experience, 92% retention rate at 12 months
-- Services: Executive Search, Leadership Advisory, Career Strategy for Leaders, The Council (private network for Board Chairs and Regional Presidents)
-- Sectors: Financial Services, Industrial Manufacturing, Consumer & Retail, Cross-Border Leadership, Board & C-Suite
-- Proprietary IP: 3D scoring engine, PACE, CVFlow
-- Podcast: "Leaders in Motion" — hosted by Kevin Hong, Partner APAC
-- Key stat: "Up to 40% of executive leaders fail within the first 18 months when moving into a new cross-border role without proper support"
-- LYC's approach: "Standard search prioritizes resumes. We prioritize the reality of the role. If the setup is broken, the hire will fail. We fix the setup first."
-- LinkedIn: 1,600+ followers, 51-200 employees, Privately Held
-
-YOUR CAPABILITIES (for internal platform users):
-- 3-dimensional candidate evaluation (Experience & Achievements, Skills/Functional Match, Organizational Fit)
-- Pipeline health tracking — mandate urgency, strategic value, revenue potential, retainer status, and decision clarity
-- Pipeline management: 5 internal stages
-- Proximity scoring: Company proximity and contact proximity levels
-- Verdict mapping for client-facing reports: Strong Fit, Good Fit, Potential Fit
-
-YOUR CAPABILITIES (for external visitors on lyc-intelligence.app):
-- Help visitors understand LYC's services: Executive Search, Advisory, Career Strategy, The Council
-- Explain how Score Match works (at a high level — never reveal scoring weights or formulas)
-- Guide candidates to the Leadership Assessment at /assessment
-- Guide firms to the Score Match Engine at /match
-- Answer questions about cross-border leadership challenges
-
-FORMATTING RULES:
-- Use **bold** for key terms and emphasis
-- Use bullet lists (•) for multiple items
-- Use headers (##) for section breaks in longer responses
-- For tables: use markdown pipe format with proper alignment
-- Keep responses concise and action-oriented
-- Professional tone — no fluff, no corporate jargon
-- When discussing methodology with external visitors, use client-safe language only (never mention internal weights, pipeline stage codes, or technical implementation details)
-
-NEVER:
-- Mention Notion, Supabase, or any backend infrastructure
-- Reveal scoring dimension weights
-- Use internal pipeline stage names with external visitors
-- Share internal scoring formulas or methodology details
-- Refer to the company as "Lyc Partners" — always "LYC Partners"`;
-
-export async function sendChatMessage(message: string, userId: string, history: Array<{role: string; content: string}> = []): Promise<string> {
-  const messages = [
-    { role: 'system', content: SYSTEM_PROMPT },
-    ...history.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
-    { role: 'user', content: message }
-  ];
-
-  if (DEEPSEEK_API_KEY) {
-    try {
-      const res = await fetch(DEEPSEEK_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${DEEPSEEK_API_KEY}` },
-        body: JSON.stringify({ model: 'deepseek-chat', messages, max_tokens: 1024 }),
-      });
-      if (res.ok) { const data = await res.json(); return data.choices?.[0]?.message?.content || 'No response'; }
-    } catch (e) { console.warn('[DeepSeek] Failed:', e); }
+export async function sendChatMessage(
+  message: string,
+  userId: string,
+  history: Array<{ role: string; content: string }> = [],
+  options?: { systemPrompt?: string; memoryContext?: any[]; documentContext?: string; tier?: string }
+): Promise<string> {
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message,
+        history: history.slice(-10),
+        userId,
+        tier: options?.tier || 'free',
+        memoryContext: options?.memoryContext || [],
+        documentContext: options?.documentContext || '',
+        systemPrompt: options?.systemPrompt,
+      }),
+    });
+    if (!res.ok) throw new Error(`API error ${res.status}`);
+    const data = await res.json();
+    return data.response || 'No response received.';
+  } catch (e) {
+    console.error('[sendChatMessage] Failed:', e);
+    return 'I\'m having trouble connecting right now. Please try again in a moment.';
   }
-  if (COZE_API_KEY && COZE_BOT_ID) {
-    try {
-      const res = await fetch(COZE_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${COZE_API_KEY}` },
-        body: JSON.stringify({ bot_id: COZE_BOT_ID, user_id: userId, stream: false, auto_save_history: true, additional_messages: [{ role: 'user', content: message, content_type: 'text' }] }),
-      });
-      if (res.ok) { const data = await res.json(); return data.messages?.filter((m: any) => m.role === 'assistant' && m.type === 'answer')?.[0]?.content || 'No response'; }
-    } catch (e) { console.warn('[Coze] Failed:', e); }
+}
+
+export async function sendChatMessageWithSuggestions(
+  message: string,
+  userId: string,
+  history: Array<{ role: string; content: string }> = [],
+  options?: { systemPrompt?: string; memoryContext?: any[]; documentContext?: string; tier?: string }
+): Promise<{ response: string; suggested_prompts: string[] }> {
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message,
+        history: history.slice(-10),
+        userId,
+        tier: options?.tier || 'free',
+        memoryContext: options?.memoryContext || [],
+        documentContext: options?.documentContext || '',
+        systemPrompt: options?.systemPrompt,
+      }),
+    });
+    if (!res.ok) throw new Error(`API error ${res.status}`);
+    const data = await res.json();
+    return {
+      response: data.response || 'No response received.',
+      suggested_prompts: data.suggested_prompts || [],
+    };
+  } catch (e) {
+    console.error('[sendChatMessageWithSuggestions] Failed:', e);
+    return {
+      response: 'I\'m having trouble connecting right now. Please try again in a moment.',
+      suggested_prompts: [],
+    };
   }
-  return 'AI service is currently unavailable. Please try again later.';
 }
 
 export async function scoreCandidateWithAI(jd: string, cv: string): Promise<{ d1: number; d2: number; d3: number; reasoning: string } | null> {
-  if (!DEEPSEEK_API_KEY) return null;
   try {
-    const res = await fetch(DEEPSEEK_ENDPOINT, {
+    const res = await fetch('/api/score', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${DEEPSEEK_API_KEY}` },
-      body: JSON.stringify({ model: 'deepseek-chat', messages: [{ role: 'system', content: 'You are a TRIDENT scoring engine. Score this candidate against the JD on 3 dimensions (1-10 each): D1=Experience & Achievements, D2=Skills/Functional Match, D3=Organizational Fit. Return ONLY valid JSON: {"d1":number,"d2":number,"d3":number,"reasoning":"brief explanation"}' }, { role: 'user', content: `JD:\n${jd}\n\nCandidate CV:\n${cv}` }], max_tokens: 500, temperature: 0.3 }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jd, cv }),
     });
-    if (res.ok) { const data = await res.json(); const content = data.choices?.[0]?.message?.content || ''; const match = content.match(/\{[\s\S]*\}/); if (match) return JSON.parse(match[0]); }
-  } catch (e) { console.warn('[DeepSeek] Score failed:', e); }
-  return null;
+    if (!res.ok) throw new Error(`API error ${res.status}`);
+    const data = await res.json();
+    return data.result || null;
+  } catch (e) {
+    console.error('[scoreCandidateWithAI] Failed:', e);
+    return null;
+  }
 }
