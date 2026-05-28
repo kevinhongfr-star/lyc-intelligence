@@ -71,13 +71,13 @@ export function B2BLanding() {
         <div style={{ position: 'absolute', top: '-80px', left: '50%', transform: 'translateX(-50%)', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(193,8,171,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '16px' }}>
-            AI-Powered Executive Search
+            Leadership Intelligence
           </div>
           <h1 className="hero-heading" style={{ fontFamily: DS.headingFont, fontSize: '48px', fontWeight: 700, color: DS.text, margin: '0 0 16px', lineHeight: 1.1 }}>
             Find Your Next<br />C-Suite Leader in Hours,<br />Not Months
           </h1>
           <p className="hero-sub" style={{ fontFamily: DS.bodyFont, fontSize: '17px', color: DS.textSecondary, maxWidth: '560px', margin: '0 auto 32px', lineHeight: 1.6 }}>
-            Paste a job description, add candidate profiles, and get instant 3-dimensional match scores. See who fits before you schedule the first call.
+            Identify the right talent, score candidates with precision, and align your leadership team to accelerate results.
           </p>
           <div className="cta-row" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="/match" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '8px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
@@ -171,7 +171,7 @@ export function B2BLanding() {
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '500px', margin: '0 auto' }}>
           <div style={{ width: '48px', height: '3px', background: '#C108AB', margin: '0 auto 16px', borderRadius: '2px' }} />
           <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 12px' }}>Start matching today</h2>
-          <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px' }}>Free to try. No credit card required. Score your first candidates in under 2 minutes.</p>
+          <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px' }}>Leadership isn't a title — it's a trajectory. Find the right one.</p>
           <LeadCaptureForm type="b2b" source="b2b_landing" heading="Get 3 free candidate matches" subheading="Paste a job description, add CVs, get ranked results. No credit card." />
         </div>
       </div>
@@ -181,7 +181,7 @@ export function B2BLanding() {
         <div className="footer-grid" style={{ maxWidth: '900px', margin: '0 auto', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '32px' }}>
           <div>
             <span style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 700, color: '#FFF' }}>LYC Intelligence</span>
-            <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '12px', lineHeight: 1.5 }}>AI-powered executive search and leadership intelligence. Cross-border, data-driven, confidential.</p>
+            <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '12px', lineHeight: 1.5 }}>Career advisory, candidate scoring, and leadership alignment. For leaders at every stage.</p>
           </div>
           <div>
             <div className="footer-label">Platform</div>
@@ -199,7 +199,7 @@ export function B2BLanding() {
             </div>
           </div>
         </div>
-        <div className="footer-copy">© 2026 LYC Intelligence by LYC Partners</div>
+        <div className="footer-copy">© 2026 LYC Intelligence by LYC Partners. Know where you stand. Know where to go.</div>
       </footer>
     </div>
   );
