@@ -4,15 +4,22 @@ import { Menu, X, User, FileText, Settings, LogOut, ChevronDown, CreditCard } fr
 import { useAuthStore } from '@/stores/authStore';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 export function NavBar() {
@@ -74,7 +81,7 @@ export function NavBar() {
           gap: '6px',
           padding: '6px 12px',
           background: DS.card,
-          border: `1px solid ${DS.border}`,
+          border: `1px solid ${DS.cardBorder}`,
           borderRadius: '20px',
         }}>
           <CreditCard style={{ width: 14, height: 14, color: DS.accent }} />
@@ -91,7 +98,7 @@ export function NavBar() {
               gap: '8px',
               padding: '8px 12px',
               background: DS.card,
-              border: `1px solid ${DS.border}`,
+              border: `1px solid ${DS.cardBorder}`,
               borderRadius: '8px',
               cursor: 'pointer',
               minHeight: '40px',
@@ -107,7 +114,7 @@ export function NavBar() {
               justifyContent: 'center',
               fontSize: '14px',
               fontWeight: 600,
-              color: '#FFF',
+              color: '#FFFFFF',
             }}>
               {profile?.name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
             </div>
@@ -130,7 +137,7 @@ export function NavBar() {
                 top: 'calc(100% + 8px)',
                 width: '220px',
                 background: DS.card,
-                border: `1px solid ${DS.border}`,
+                border: `1px solid ${DS.cardBorder}`,
                 borderRadius: '12px',
                 padding: '8px',
                 zIndex: 100,
