@@ -15,7 +15,7 @@ export interface UserProfile {
   goal_long: string | null;
   target_geography: string | null;
   icp_selector: 'leader' | 'job_seeker' | 'hiring' | 'search_professional' | null;
-  tier: 'free' | 'basic' | 'pro' | 'enterprise';
+  tier: 'free' | 'pro' | 'council' | 'enterprise';
   referral_code: string | null;
   referred_by: string | null;
   streak_days: number;
