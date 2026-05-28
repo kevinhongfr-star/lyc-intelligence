@@ -9,17 +9,22 @@ import {
 } from '../../services/assessmentEngine';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#1A1A1A',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#333333',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
-  success: '#22C55E',
-  warning: '#EAB308',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 interface ResultsPanelProps {
@@ -103,7 +108,7 @@ export function ResultsPanel({
       {/* Composite Score */}
       <div style={{
         background: DS.card,
-        border: `1px solid ${DS.border}`,
+        border: `1px solid ${DS.cardBorder}`,
         borderRadius: DS.radius,
         padding: '24px',
         marginBottom: '24px',
@@ -128,7 +133,7 @@ export function ResultsPanel({
       {/* Dimensions */}
       <div style={{
         background: DS.card,
-        border: `1px solid ${DS.border}`,
+        border: `1px solid ${DS.cardBorder}`,
         borderRadius: DS.radius,
         padding: '24px',
         marginBottom: '24px'
@@ -187,7 +192,7 @@ export function ResultsPanel({
       {/* Cross-Border Tier */}
       <div style={{
         background: DS.card,
-        border: `1px solid ${DS.border}`,
+        border: `1px solid ${DS.cardBorder}`,
         borderRadius: DS.radius,
         padding: '24px',
         marginBottom: '24px'
@@ -213,7 +218,7 @@ export function ResultsPanel({
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '24px' }}>
         <div style={{
           background: DS.card,
-          border: `1px solid ${DS.border}`,
+          border: `1px solid ${DS.cardBorder}`,
           borderRadius: DS.radius,
           padding: '20px'
         }}>
@@ -233,7 +238,7 @@ export function ResultsPanel({
         </div>
         <div style={{
           background: DS.card,
-          border: `1px solid ${DS.border}`,
+          border: `1px solid ${DS.cardBorder}`,
           borderRadius: DS.radius,
           padding: '20px'
         }}>
