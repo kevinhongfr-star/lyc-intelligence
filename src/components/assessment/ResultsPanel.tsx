@@ -64,9 +64,9 @@ export function ResultsPanel({
         textAlign: 'center',
         marginBottom: '32px'
       }}>
-        <CheckCircle2 style={{ width: 64, height: 64, color: DS.success, margin: '0 auto 16px' }} />
+        
         <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', color: DS.text, marginBottom: '8px' }}>
-          Assessment Complete!
+          {archetype}
         </h2>
       </div>
 
@@ -85,7 +85,7 @@ export function ResultsPanel({
           color: DS.text,
           margin: '0 0 8px'
         }}>
-          Your Archetype: {archetype}
+          Your Cross-Border Leadership Profile
         </h3>
         <p style={{
           color: DS.textSecondary,
@@ -279,7 +279,33 @@ export function ResultsPanel({
           minHeight: '56px'
         }}
       >
-        <Download style={{ width: 20, height: 20 }} />
+        
+        {/* Phase 6.1 — Insight bridge to Nexus */}
+        <div style={{
+          background: 'rgba(193,8,171,0.08)',
+          border: '1px solid rgba(193,8,171,0.25)',
+          borderRadius: '12px',
+          padding: '20px 24px',
+          marginTop: '24px',
+        }}>
+          <p style={{ color: DS.text, fontSize: '15px', lineHeight: 1.6, margin: '0 0 16px', fontFamily: DS.headingFont }}>
+            Your biggest development area is <strong style={{ color: DS.accent }}>shown in your dimension scores</strong>.
+            {compositeScore >= 70
+              ? ' Given your strong overall positioning, this is the gap worth closing first.'
+              : ' Combined with developing scores, this is where to focus your next 90 days.'}
+          </p>
+          <a
+            href={`/nexus?context=assessment&archetype=${encodeURIComponent(archetype)}&score=${compositeScore}`}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              padding: '10px 20px', background: DS.accent, color: '#fff',
+              borderRadius: '8px', textDecoration: 'none', fontWeight: 600, fontSize: '14px'
+            }}
+          >
+            Build your 90-day plan with Nexus →
+          </a>
+        </div>
+<Download style={{ width: 20, height: 20 }} />
         {isGeneratingPDF ? 'Generating PDF...' : 'Download Your Report'}
       </button>
     </div>
