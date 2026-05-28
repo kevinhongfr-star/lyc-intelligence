@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { initScrollReveal } from '@/lib/utils';
-import { IconTrident, IconQuest, IconSpark, IconBridge, IconLeap, IconImpact, IconPrism } from '@/components/icons/LycIcons';
+import { IconTrident, IconQuest, IconSpark, IconBridge, IconLeap, IconImpact, IconPrism, IconCompass } from '@/components/icons/LycIcons';
 import { Menu, X, Lock, ArrowRight } from 'lucide-react';
 
 const DS = {
@@ -212,13 +212,9 @@ export function Landing() {
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           {services.map(p => (
             <a key={p.title} href={p.href} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '28px 24px', textDecoration: 'none', display: 'block', boxShadow: DS.shadow }}>
-              {p.icon ? (
-                <div style={{ color: DS.accent, marginBottom: '16px' }}>
-                  <p.icon size={28} color={DS.accent} />
-                </div>
-              ) : (
-                <div style={{ width: '40px', height: '3px', background: DS.accent, marginBottom: '16px', borderRadius: '1px' }} />
-              )}
+              <div style={{ color: DS.accent, marginBottom: '16px' }} className={p.animClass}>
+                <p.icon size={28} color={DS.accent} />
+              </div>
               <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>{p.title}</h3>
               <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, lineHeight: 1.5, margin: '0 0 16px' }}>{p.desc}</p>
               <span style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.accent, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
