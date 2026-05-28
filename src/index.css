@@ -2,21 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Font declarations — bundled locally, NO Google CDN */
+@font-face {
+  font-family: 'Libre Baskerville';
+  src: url('/fonts/LibreBaskerville-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Libre Baskerville';
+  src: url('/fonts/LibreBaskerville-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/DMSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/DMSans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/DMSans-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 * { box-sizing: border-box; }
 
 :root {
-  --color-primary: #1a1a1a;
+  --color-primary: #000000;
   --color-secondary: #333333;
   --color-accent: #C108AB;
-  --color-accent-hover: #a0078c;
+  --color-accent-hover: #A00790;
   --color-background: #FFFFFF;
-  --color-surface: #FAFAFA;
+  --color-surface: #F5F5F5;
   --color-border: #E5E5E5;
-  --color-text-primary: #0A0A0A;
-  --color-text-secondary: #666666;
-  --color-text-muted: #999999;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+  --color-text-primary: #000000;
+  --color-text-secondary: #333333;
+  --color-text-muted: #666666;
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Libre Baskerville', Georgia, serif;
 }
 
 body {
