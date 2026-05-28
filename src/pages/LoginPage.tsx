@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Shield } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 
 const DS = {
@@ -22,85 +22,40 @@ const DS = {
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
-type LoginMode = 'magic_link' | 'password';
+const ALLOWED_EMAIL = 'kevin.hong@lyc-partners.ai';
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { signInWithMagicLink, signInWithPassword } = useAuthStore();
-  
-  const [mode, setMode] = useState<LoginMode>('magic_link');
+  const { signInWithPassword } = useAuthStore();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [magicLinkSent, setMagicLinkSent] = useState(false);
 
-  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-  const handleMagicLink = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
+
+    if (email.trim().toLowerCase() !== ALLOWED_EMAIL) {
+      setError('Access restricted. This platform is invite-only.');
+      return;
+    }
+    if (!password) {
+      setError('Password is required');
       return;
     }
 
     setLoading(true);
-    const result = await signInWithMagicLink(email);
+    const result = await signInWithPassword(email.trim(), password);
     setLoading(false);
 
     if (result.success) {
-      setMagicLinkSent(true);
+      navigate('/platform');
     } else {
-      setError(result.error || 'Failed to send magic link');
+      setError('Invalid credentials. Please try again.');
     }
   };
-
-  const handlePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-    if (!password || password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
-    setLoading(true);
-    const result = await signInWithPassword(email, password);
-    setLoading(false);
-
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
-      setError(result.error || 'Failed to sign in');
-    }
-  };
-
-  if (magicLinkSent) {
-    return (
-      <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-        <div style={{ maxWidth: '420px', width: '100%', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '48px 40px', textAlign: 'center' }}>
-          <CheckCircle2 style={{ width: 56, height: 56, color: DS.success, margin: '0 auto 24px' }} />
-          <h1 style={{ fontFamily: DS.headingFont, fontSize: '24px', fontWeight: 600, color: DS.text, margin: '0 0 12px' }}>
-            Check your email
-          </h1>
-          <p style={{ fontSize: '15px', color: DS.muted, margin: '0 0 24px', lineHeight: 1.6 }}>
-            We sent a magic link to <strong style={{ color: DS.text }}>{email}</strong>.
-            Click the link in the email to sign in.
-          </p>
-          <p style={{ fontSize: '13px', color: DS.muted }}>
-            Didn't receive it? Check your spam folder or{' '}
-            <button onClick={() => setMagicLinkSent(false)} style={{ background: 'none', border: 'none', color: DS.accent, cursor: 'pointer', fontSize: '13px' }}>
-              try again
-            </button>.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg }}>
@@ -110,67 +65,31 @@ export function LoginPage() {
           LYC Intelligence
         </Link>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <Link to="/signup" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Sign up</Link>
-          <Link to="/nexus" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Talk to Nexus AI</Link>
+          <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Back to site</Link>
         </div>
       </nav>
 
       {/* Login Form */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 24px' }}>
-        <div style={{ maxWidth: '420px', width: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 24px' }}>
+        <div style={{ maxWidth: '400px', width: '100%' }}>
+
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+              <Shield style={{ width: 24, height: 24, color: DS.accent }} />
+            </div>
             <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
-              Welcome back
+              Platform Access
             </h1>
-            <p style={{ fontSize: '15px', color: DS.muted }}>
-              Sign in to access your profile and assessments
+            <p style={{ fontSize: '14px', color: DS.muted, lineHeight: 1.6 }}>
+              Executive Search Platform
             </p>
           </div>
 
-          {/* Mode Toggle */}
-          <div style={{ display: 'flex', background: DS.card, borderRadius: '8px', padding: '4px', marginBottom: '24px' }}>
-            <button
-              onClick={() => { setMode('magic_link'); setError(''); setPassword(''); }}
-              style={{
-                flex: 1,
-                padding: '10px 16px',
-                background: mode === 'magic_link' ? DS.accent : 'transparent',
-                color: mode === 'magic_link' ? '#FFF' : DS.muted,
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '14px',
-                fontWeight: 500,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-            >
-              Magic Link
-            </button>
-            <button
-              onClick={() => { setMode('password'); setError(''); setMagicLinkSent(false); }}
-              style={{
-                flex: 1,
-                padding: '10px 16px',
-                background: mode === 'password' ? DS.accent : 'transparent',
-                color: mode === 'password' ? '#FFF' : DS.muted,
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '14px',
-                fontWeight: 500,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-            >
-              Password
-            </button>
-          </div>
-
-          {/* Form */}
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px' }}>
-            <form onSubmit={mode === 'magic_link' ? handleMagicLink : handlePassword}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px', boxShadow: DS.shadow }}>
+            <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
-                  Email address
+                  Email
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Mail style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: 18, height: 18, color: DS.muted }} />
@@ -179,51 +98,41 @@ export function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@company.com"
+                    autoComplete="email"
                     style={{
-                      width: '100%',
-                      padding: '12px 16px 12px 44px',
-                      background: DS.bg,
-                      border: `1px solid ${DS.cardBorder}`,
-                      borderRadius: '8px',
-                      color: DS.text,
-                      fontSize: '15px',
-                      outline: 'none',
-                      minHeight: '44px',
+                      width: '100%', padding: '12px 16px 12px 44px',
+                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px',
+                      color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
+                      fontFamily: DS.bodyFont,
                     }}
                   />
                 </div>
               </div>
 
-              {mode === 'password' && (
-                <div style={{ marginBottom: '24px' }}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
-                    Password
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <Lock style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: 18, height: 18, color: DS.muted }} />
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Your password"
-                      style={{
-                        width: '100%',
-                        padding: '12px 16px 12px 44px',
-                        background: DS.bg,
-                        border: `1px solid ${DS.cardBorder}`,
-                        borderRadius: '8px',
-                        color: DS.text,
-                        fontSize: '15px',
-                        outline: 'none',
-                        minHeight: '44px',
-                      }}
-                    />
-                  </div>
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+                  Password
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <Lock style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: 18, height: 18, color: DS.muted }} />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                    style={{
+                      width: '100%', padding: '12px 16px 12px 44px',
+                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px',
+                      color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
+                      fontFamily: DS.bodyFont,
+                    }}
+                  />
                 </div>
-              )}
+              </div>
 
               {error && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: `${DS.error}15`, borderRadius: '8px', color: DS.error, fontSize: '14px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: '#FEF2F2', borderRadius: '8px', color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
                   <AlertCircle style={{ width: 18, height: 18, flexShrink: 0 }} />
                   {error}
                 </div>
@@ -233,59 +142,36 @@ export function LoginPage() {
                 type="submit"
                 disabled={loading}
                 style={{
-                  width: '100%',
-                  padding: '14px',
-                  background: DS.accent,
-                  color: '#FFFFFF',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '15px',
-                  fontWeight: 600,
+                  width: '100%', padding: '14px',
+                  background: DS.accent, color: '#FFFFFF',
+                  border: 'none', borderRadius: '8px',
+                  fontSize: '15px', fontWeight: 600,
                   cursor: loading ? 'not-allowed' : 'pointer',
                   opacity: loading ? 0.7 : 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  minHeight: '48px',
-                  transition: 'opacity 0.2s',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  minHeight: '48px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+                  fontFamily: DS.bodyFont,
                 }}
               >
                 {loading ? (
-                  <>
-                    <Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} />
-                    {mode === 'magic_link' ? 'Sending link...' : 'Signing in...'}
-                  </>
+                  <><Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} />Signing in...</>
                 ) : (
-                  <>
-                    {mode === 'magic_link' ? 'Send Magic Link' : 'Sign In'}
-                    <ArrowRight style={{ width: 18, height: 18 }} />
-                  </>
+                  <>Sign In <ArrowRight style={{ width: 18, height: 18 }} /></>
                 )}
               </button>
             </form>
-
-            <p style={{ fontSize: '13px', color: DS.muted, textAlign: 'center', marginTop: '20px' }}>
-              Don't have an account?{' '}
-              <Link to="/signup" style={{ color: DS.accent, textDecoration: 'none', fontWeight: 500 }}>
-                Sign up
-              </Link>
-            </p>
           </div>
+
+          <p style={{ fontSize: '12px', color: DS.muted, textAlign: 'center', marginTop: '20px', lineHeight: 1.5 }}>
+            This platform is invite-only. Unauthorized access attempts are logged.
+          </p>
         </div>
       </div>
 
       <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        input:focus {
-          border-color: ${DS.accent} !important;
-        }
-        input::placeholder {
-          color: ${DS.muted};
-        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; }
+        input::placeholder { color: ${DS.muted}; }
       `}</style>
     </div>
   );

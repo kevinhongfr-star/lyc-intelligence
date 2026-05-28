@@ -6,13 +6,13 @@ import { CreditDisplay } from '@/components/ui/CreditDisplay';
 
 const NAV_ITEMS = [
   { path: '/platform', icon: LayoutDashboard, label: 'Dashboard', exact: true },
-  { path: '/platform/pipeline', icon: Eye, label: 'GRID / Pipeline' },
+  { path: '/platform/pipeline', icon: Eye, label: 'Pipeline' },
   { path: '/platform/mandates', icon: Briefcase, label: 'Mandates' },
   { path: '/platform/candidates', icon: Users, label: 'Candidates' },
   { type: 'divider' as const, label: 'Scoring' },
-  { path: '/platform/batch-scoring', icon: BarChart3, label: 'TRIDENT Match' },
-  { path: '/platform/mandates', icon: FileDown, label: 'LENS Report', suffix: '/lens' },
-  { path: '/platform/metrix', icon: Activity, label: 'METRIX' },
+  { path: '/platform/batch-scoring', icon: BarChart3, label: 'Match Analysis' },
+  { path: '/platform/mandates', icon: FileDown, label: 'Candidate Report', suffix: '/lens' },
+  { path: '/platform/metrix', icon: Activity, label: 'Performance Metrics' },
   { path: '/platform/scoring-runs', icon: ClipboardList, label: 'Scoring Runs' },
   { type: 'divider' as const, label: 'Tools' },
   { path: '/platform/chat', icon: MessageSquare, label: 'Nexus AI' },
