@@ -101,7 +101,7 @@ export function B2CLanding() {
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
           {[
             { icon: IconImpact, title: 'Leadership Archetype', desc: "Discover whether you're a Strategist, Operator, Catalyst, or Builder — with personalized insights for your career trajectory." },
-            { icon: IconLeap, title: 'Cross-Border Benchmark', desc: 'See how you compare across European and Asian executive markets. Understand your positioning and unlock hidden opportunities.' },
+            { icon: IconLeap, title: 'Market Benchmark', desc: 'See how you compare across executive markets. Understand your positioning and unlock opportunities that match your trajectory.' },
             { icon: IconTrident, title: 'Career Benchmark', desc: 'Get benchmarked across Experience, Skills, and Organizational Fit — see exactly how you compare to what top firms look for in C-suite candidates.' },
           ].map(f => (
             <div key={f.title} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', boxShadow: DS.shadow }}>
