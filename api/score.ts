@@ -34,7 +34,28 @@ interface ScoreResult {
   approach_strategy: string;
 }
 
+
+// Simple in-memory rate limiting (resets on cold start — good enough for launch)
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+  if (entry.count >= limit) return true;
+  entry.count++;
+  return false;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
+  if (isRateLimited(ip, 10, 60 * 1000)) {
+    return res.status(429).json({ error: 'Rate limit exceeded' });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
