@@ -99,7 +99,7 @@ export function PricingPage() {
           Invest in your career trajectory
         </h1>
         <p style={{ fontFamily: DS.bodyFont, fontSize: '16px', color: DS.textSecondary, lineHeight: 1.6, margin: 0 }}>
-          One in three cross-border executive moves fails. The right intelligence changes the odds.
+          One in three leadership moves fails. The right intelligence changes the odds.
         </p>
       </div>
 
