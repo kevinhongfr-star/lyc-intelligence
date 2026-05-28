@@ -43,51 +43,6 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
     {
       role: 'assistant',
       content: "I'm Nexus. LYC Partners has placed 500+ executives across 47 markets — I carry that knowledge into every conversation.\n\nOne in three cross-border executive moves fails within 18 months. Usually for the same reasons.\n\nWhat are you navigating right now?"
-    }port React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ArrowRight, Zap, Shield, Loader2, RefreshCw, Paperclip } from 'lucide-react';
-import { useAuthStore } from '../../stores/authStore';
-import { MessageBubble } from './MessageBubble';
-import { SuggestedPrompts } from './SuggestedPrompts';
-import { EmailCapture } from './EmailCapture';
-import { useSearchParams } from 'react-router-dom';
-
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-};
-
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
-interface NexusChatProps {
-  showHeader?: boolean;
-  initialPrompts?: string[];
-}
-
-export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps) {
-  const { user, profile } = useAuthStore();
-  const [searchParams] = useSearchParams();
-  const [autoSend, setAutoSend] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: "Hi! I'm **Nexus**, your career intelligence advisor. I can help you with:\n\n- **Career Strategy** — Guidance for senior leaders navigating cross-border transitions\n- **Score Match** — AI-powered JD-CV matching to evaluate candidate fit\n- **Leadership Assessment** — Benchmark your profile against executive markets\n- **Market Insights** — What boards and search firms look for in C-suite candidates\n\nWhat would you like to know?"
     }
   ]);
   const [input, setInput] = useState('');
