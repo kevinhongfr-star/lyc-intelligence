@@ -142,13 +142,13 @@ export function Landing() {
         {/* Hero content */}
         <div style={{ position: 'relative', zIndex: 3, maxWidth: '900px', margin: '0 auto', padding: '96px 32px 48px', textAlign: 'center' }}>
           <div className="section-label-dark" style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px' }}>
-            Platform
+            Leadership Intelligence
           </div>
           <h1 className="hero-heading" style={{ fontFamily: DS.headingFont, fontSize: '56px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 16px', lineHeight: 1.1 }}>
-            Cross-border<br />leadership intelligence
+            Know where you stand.<br />Know where to go.
           </h1>
           <p className="hero-sub" style={{ fontFamily: DS.bodyFont, fontSize: '17px', color: 'rgba(255,255,255,0.7)', maxWidth: '520px', margin: '0 auto 48px', lineHeight: 1.6 }}>
-            AI-powered executive search. Score candidates instantly. From Europe to Asia.
+            We help leaders understand their trajectory, organizations identify the right talent, and teams align to accelerate results.
           </p>
 
           {/* Dual CTA — white text on dark */}
@@ -207,7 +207,7 @@ export function Landing() {
           Our Platform
         </div>
         <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, textAlign: 'center', margin: '0 auto 40px', maxWidth: '500px' }}>
-          Intelligence tools for cross-border leadership
+          Leadership intelligence, for every stage
         </h2>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           {services.map(p => (
@@ -238,10 +238,10 @@ export function Landing() {
             Get Started
           </div>
           <h2 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 16px', lineHeight: 1.2 }}>
-            Ready to find your next<br />cross-border leader?
+            Leadership isn't a title —<br />it's a trajectory.
           </h2>
           <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', maxWidth: '420px', margin: '0 auto 32px', lineHeight: 1.6 }}>
-            Join 500+ executives who trust LYC Intelligence for cross-border leadership advisory.
+            See it, shape it, accelerate it. Leadership intelligence starts here.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="/b2c" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: '#C108AB', color: '#FFFFFF', borderRadius: '6px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
@@ -259,7 +259,7 @@ export function Landing() {
         <div className="footer-grid" style={{ maxWidth: '900px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
           <div>
             <span style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 700, color: '#FFF' }}>LYC Intelligence</span>
-            <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '12px', lineHeight: 1.5 }}>AI-powered executive search and leadership intelligence. Cross-border, data-driven, confidential.</p>
+            <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '12px', lineHeight: 1.5 }}>Career advisory, candidate scoring, and leadership alignment. For leaders at every stage.</p>
           </div>
           <div>
             <div className="footer-label">Platform</div>
@@ -277,7 +277,7 @@ export function Landing() {
             </div>
           </div>
         </div>
-        <div className="footer-copy">© 2026 LYC Intelligence by LYC Partners. Cross-border leadership advisory.</div>
+        <div className="footer-copy">© 2026 LYC Intelligence by LYC Partners. Know where you stand. Know where to go.</div>
       </footer>
     </div>
   );
