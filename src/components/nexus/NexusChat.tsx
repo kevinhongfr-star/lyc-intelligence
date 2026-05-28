@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ArrowRight, Zap, Shield, Loader2, RefreshCw, Paperclip } from 'lucide-react';
+import { ArrowRight, Shield, Loader2, RefreshCw, Paperclip } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { MessageBubble } from './MessageBubble';
 import { SuggestedPrompts } from './SuggestedPrompts';
@@ -216,7 +216,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
           <div style={{ textAlign: 'center', padding: '32px 0 20px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: `${DS.accent}15`, borderRadius: '20px', marginBottom: '12px' }}>
               <Zap style={{ width: 14, height: 14, color: DS.accent }} />
-              <span style={{ fontSize: '12px', color: DS.accent, fontWeight: 600 }}>AI Assistant</span>
+              <span style={{ fontSize: '12px', color: DS.accent, fontWeight: 600 }}/>Nexus</span>
             </div>
             <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>Nexus</h1>
             <p style={{ fontSize: '14px', color: DS.muted }}>Know where you stand. Know where to go.</p>
