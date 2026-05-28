@@ -16,7 +16,7 @@ const NAV_ITEMS = [
   { path: '/platform/metrix', icon: IconSpark, label: 'Performance Metrics' },
   { path: '/platform/scoring-runs', icon: ClipboardList, label: 'Scoring Runs' },
   { type: 'divider' as const, label: 'Tools' },
-  { path: '/platform/chat', icon: IconQuest, label: 'Nexus AI' },
+  { path: '/platform/chat', icon: IconQuest, label: 'Nexus' },
   { path: '/platform/scheduler', icon: Calendar, label: 'Scheduler' },
   { path: '/platform/documents', icon: IconPrism, label: 'Documents' },
   { path: '/platform/notifications', icon: Bell, label: 'Alerts' },
@@ -52,7 +52,9 @@ export function AppLayout() {
     <div className="flex h-screen bg-bg-primary">
       <aside className={`${sidebarOpen ? 'w-56' : 'w-16'} bg-bg-secondary border-r border-bg-tertiary flex flex-col transition-all`}>
         <div className="p-4 border-b border-bg-tertiary">
-          <h1 className="font-serif font-bold text-lg text-text-primary">{sidebarOpen ? 'LYC Intelligence' : 'LYC'}</h1>
+          <Link to="/" className="font-serif font-bold text-lg text-text-primary hover:text-accent transition-colors no-underline block">
+            {sidebarOpen ? 'LYC Intelligence' : 'LYC'}
+          </Link>
         </div>
         
         <nav className="flex-1 py-2 overflow-y-auto">
