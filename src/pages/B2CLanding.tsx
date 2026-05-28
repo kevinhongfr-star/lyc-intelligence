@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { initScrollReveal } from '@/lib/scrollReveal';
 import { Brain, Globe, Award, ArrowRight, Shield, BarChart3, Star, MessageCircle } from 'lucide-react';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 
@@ -22,6 +23,11 @@ const DS = {
 };
 
 export function B2CLanding() {
+  useEffect(() => {
+    const observer = initScrollReveal();
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div style={{ minHeight: '100vh', background: DS.bg }}>
       {/* Nav */}
@@ -121,8 +127,15 @@ export function B2CLanding() {
       </div>
 
       {/* Footer */}
-      <footer style={{ borderTop: `1px solid ${DS.border}`, padding: '20px 32px', textAlign: 'center' }}>
-        <span style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted }}>© 2026 LYC Intelligence by Lyc Partners. Cross-border leadership advisory.</span>
+      <footer style={{ borderTop: `1px solid ${DS.border}`, marginTop: '48px' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted }}>© 2026 LYC Intelligence by LYC Partners</span>
+          <div style={{ display: 'flex', gap: '24px' }}>
+            <a href="/b2b" style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none' }}>For Firms</a>
+            <a href="/nexus" style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none' }}>Nexus AI</a>
+            <a href="https://lyc-partners.ai" target="_blank" rel="noopener" style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none' }}>LYC Partners</a>
+          </div>
+        </div>
       </footer>
     </div>
   );
