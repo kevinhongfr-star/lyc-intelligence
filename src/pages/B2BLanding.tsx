@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { initScrollReveal } from '@/lib/utils';
 import { BarChart3, Shield, Briefcase, ArrowRight, Users, Zap, FileText, UserPlus, Award } from 'lucide-react';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 
@@ -22,6 +23,11 @@ const DS = {
 };
 
 export function B2BLanding() {
+  useEffect(() => {
+    const observer = initScrollReveal();
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div style={{ minHeight: '100vh', background: DS.bg }}>
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}`, background: DS.bg }}>
@@ -87,9 +93,9 @@ export function B2BLanding() {
           <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 20px' }}>How Scoring Works</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
             {[
-              { name: 'Experience & Achievements', desc: 'Career trajectory, role progression, quantifiable impact, leadership scope', color: '#3B82F6' },
+              { name: 'Experience & Achievements', desc: 'Career trajectory, role progression, quantifiable impact, leadership scope', color: '#000000' },
               { name: 'Skills & Expertise', desc: 'Technical competencies, functional expertise, cross-border capability, language fit', color: DS.accent },
-              { name: 'Organizational Fit', desc: 'Culture alignment, stakeholder complexity, transformation readiness, board dynamics', color: '#8B5CF6' },
+              { name: 'Organizational Fit', desc: 'Culture alignment, stakeholder complexity, transformation readiness, board dynamics', color: '#333333' },
             ].map(d => (
               <div key={d.name} style={{ background: DS.bgAlt, borderRadius: '8px', padding: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '8px' }}>
@@ -133,8 +139,15 @@ export function B2BLanding() {
         <LeadCaptureForm type="b2b" source="b2b_landing" />
       </div>
 
-      <footer style={{ borderTop: `1px solid ${DS.border}`, padding: '20px 32px', textAlign: 'center' }}>
-        <span style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted }}>© 2026 LYC Intelligence by Lyc Partners. Cross-border leadership advisory.</span>
+      <footer style={{ borderTop: `1px solid ${DS.border}`, marginTop: '48px' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted }}>© 2026 LYC Intelligence by LYC Partners</span>
+          <div style={{ display: 'flex', gap: '24px' }}>
+            <a href="/b2c" style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none' }}>For Leaders</a>
+            <a href="/nexus" style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none' }}>Nexus AI</a>
+            <a href="https://lyc-partners.ai" target="_blank" rel="noopener" style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none' }}>LYC Partners</a>
+          </div>
+        </div>
       </footer>
     </div>
   );

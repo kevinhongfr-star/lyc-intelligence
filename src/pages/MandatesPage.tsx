@@ -13,7 +13,7 @@ const STATUS_OPTIONS = [
   { value: 'won', label: 'Won', color: '#10B981' },
   { value: 'on_hold', label: 'On Hold', color: '#F59E0B' },
   { value: 'lost', label: 'Lost', color: '#EF4444' },
-  { value: 'completed', label: 'Completed', color: '#8B5CF6' },
+  { value: 'completed', label: 'Completed', color: '#333333' },
 ];
 
 export function MandatesPage() {
