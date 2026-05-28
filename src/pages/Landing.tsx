@@ -97,6 +97,22 @@ export function Landing() {
           </a>
         </div>
 
+
+        {/* Stats Bar */}
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 32px 48px', textAlign: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '64px', flexWrap: 'wrap' }}>
+            {[
+              { value: '47', label: 'Markets' },
+              { value: '500+', label: 'Placements' },
+              { value: '92%', label: 'Retention' },
+            ].map(stat => (
+              <div key={stat.label} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: DS.headingFont, fontSize: '36px', fontWeight: 700, color: DS.text, lineHeight: 1 }}>{stat.value}</div>
+                <div style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.muted, marginTop: '8px' }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
         {/* Product Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginTop: '60px' }}>
           {[
