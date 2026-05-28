@@ -11,20 +11,22 @@ import { getMemoryContextForUser, formatAssessmentForInjection } from '../servic
 import { getSupabase } from '../services/supabaseApi';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
-  accentLight: '#E040C8',
-  bg: '#0A0A0A',
-  card: '#111111',
-  cardHover: '#1a1a1a',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
   radius: '12px',
-  success: '#10B981',
-  warning: '#F59E0B',
-  error: '#EF4444'
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 interface AssessmentSummary {
@@ -187,11 +189,11 @@ export function DashboardPage() {
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: DS.card, borderRadius: '20px', border: `1px solid ${DS.border}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: DS.card, borderRadius: '20px', border: `1px solid ${DS.cardBorder}` }}>
               <Calendar style={{ width: 16, height: 16, color: DS.accent }} />
               <span style={{ fontSize: '14px', color: DS.text }}>{streak} day streak</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: DS.card, borderRadius: '20px', border: `1px solid ${DS.border}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: DS.card, borderRadius: '20px', border: `1px solid ${DS.cardBorder}` }}>
               <CreditCard style={{ width: 16, height: 16, color: DS.accent }} />
               <span style={{ fontSize: '14px', color: DS.text }}>{credits} credits</span>
             </div>
@@ -272,7 +274,7 @@ export function DashboardPage() {
         {/* Row 3: Recent Activity */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', marginBottom: '24px' }}>
           {/* Recent Conversations */}
-          <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '12px', padding: '20px' }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '12px', padding: '20px' }}>
             <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '16px' }}>
               Recent Conversations
             </h3>
@@ -308,7 +310,7 @@ export function DashboardPage() {
           </div>
 
           {/* Assessment Summary */}
-          <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '12px', padding: '20px' }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '12px', padding: '20px' }}>
             <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '16px' }}>
               Assessment Results
             </h3>
@@ -357,7 +359,7 @@ export function DashboardPage() {
                   style={{
                     padding: '10px 20px',
                     background: DS.accent,
-                    color: '#FFF',
+                    color: '#FFFFFF',
                     border: 'none',
                     borderRadius: '8px',
                     fontSize: '14px',
@@ -373,7 +375,7 @@ export function DashboardPage() {
 
         {/* Row 4: Nexus Suggestions */}
         {suggestions.length > 0 && (
-          <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
             <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Sparkles style={{ width: 18, height: 18, color: DS.accent }} />
               Suggested by Nexus
@@ -410,7 +412,7 @@ export function DashboardPage() {
         )}
 
         {/* Row 5: Referral Module */}
-        <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: '12px', padding: '20px' }}>
+        <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '12px', padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
             <Gift style={{ width: 24, height: 24, color: DS.success }} />
             <div>
@@ -427,7 +429,7 @@ export function DashboardPage() {
               <div style={{ 
                 padding: '12px 16px', 
                 background: DS.bg, 
-                border: `1px solid ${DS.border}`, 
+                border: `1px solid ${DS.cardBorder}`, 
                 borderRadius: '8px',
                 fontSize: '14px',
                 color: DS.text,
@@ -444,7 +446,7 @@ export function DashboardPage() {
                 gap: '6px',
                 padding: '12px 20px',
                 background: DS.success,
-                color: '#FFF',
+                color: '#000000',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '14px',
@@ -487,7 +489,7 @@ function ActionCard({ icon: Icon, title, description, color, onClick }: ActionCa
         gap: '16px',
         padding: '20px',
         background: DS.card,
-        border: `1px solid ${DS.border}`,
+        border: `1px solid ${DS.cardBorder}`,
         borderRadius: '12px',
         cursor: 'pointer',
         textAlign: 'left',
