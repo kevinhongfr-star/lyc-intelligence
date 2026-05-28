@@ -115,6 +115,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   let sent = false;
 
+  if (!RESEND_API_KEY) {
+    // Log to console as fallback — operator must configure RESEND_API_KEY
+    console.log('[LEAD]', JSON.stringify({ type, data, timestamp: new Date().toISOString() }));
+    return res.status(200).json({ sent: false, fallback: 'logged_to_console' });
+  }
+
   if (RESEND_API_KEY) {
     try {
       const email = renderEmailTemplate(type, data);
