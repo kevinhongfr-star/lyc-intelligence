@@ -125,7 +125,19 @@ export function IconSpark({ size = 24, className = '', color = defaultColor }: I
 }
 
 /* ── Mosaic — tiles shifting ── */
-export function IconMosaic({ size = 24, className = '', color = defaultColor }: IconProps) {
+export function IconMosaic({ size = 24, className = '', color = defaultColor }
+
+export function IconCompass({ size = 24, color = 'currentColor', className = '' }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="1.5" opacity="0.3" />
+      <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="1.5" />
+      <polygon points="12,5 14,10 12,12 10,10" fill={color} opacity="0.6" />
+      <polygon points="12,19 10,14 12,12 14,14" fill={color} />
+      <circle cx="12" cy="12" r="1.5" fill={color} />
+    </svg>
+  );
+}: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" className={`anim-mosaic ${className}`}>
       <rect x="3" y="3" width="7" height="7" rx="1" />
