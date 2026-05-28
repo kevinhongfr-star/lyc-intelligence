@@ -39,6 +39,48 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
+      content: "I'm Nexus. LYC Partners has placed 500+ executives across 47 markets — I carry that knowledge into every conversation.\n\nOne in three cross-border executive moves fails within 18 months. Usually for the same reasons.\n\nWhat are you navigating right now?"
+    }port React, { useState, useRef, useEffect, useCallback } from 'react';
+import { ArrowRight, Zap, Shield, Loader2, RefreshCw, Paperclip } from 'lucide-react';
+import { useAuthStore } from '../../stores/authStore';
+import { MessageBubble } from './MessageBubble';
+import { SuggestedPrompts } from './SuggestedPrompts';
+import { EmailCapture } from './EmailCapture';
+
+const DS = {
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
+  accent: '#C108AB',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
+  radius: '12px',
+  radiusSm: '8px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
+};
+
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+interface NexusChatProps {
+  showHeader?: boolean;
+  initialPrompts?: string[];
+}
+
+export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps) {
+  const { user, profile } = useAuthStore();
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: 'assistant',
       content: "Hi! I'm **Nexus**, your career intelligence advisor. I can help you with:\n\n- **Career Strategy** — Guidance for senior leaders navigating cross-border transitions\n- **Score Match** — AI-powered JD-CV matching to evaluate candidate fit\n- **Leadership Assessment** — Benchmark your profile against executive markets\n- **Market Insights** — What boards and search firms look for in C-suite candidates\n\nWhat would you like to know?"
     }
   ]);
@@ -47,10 +89,10 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const [aiState, setAiState] = useState<'idle' | 'thinking' | 'error'>('idle');
   const [lastUserMessage, setLastUserMessage] = useState<string | null>(null);
   const [suggestedPrompts, setSuggestedPrompts] = useState<string[]>(initialPrompts || [
-    'How do I position myself for a cross-border role?',
-    'What makes a strong leadership profile?',
-    'How should I prepare for a board interview?',
-    'What is The Council?'
+    "I'm considering a move from Europe to APAC — what do I need to know?",
+    'What makes a strong cross-border C-suite profile in 2026?',
+    'I have a senior interview next week — help me prepare',
+    'How does my profile benchmark against regional executives?'
   ]);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [showEmailGate, setShowEmailGate] = useState(false);
@@ -74,6 +116,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
           tier: profile?.tier || 'free',
           history: messages.slice(-10),
           documentContext,
+          memoryContext: [],
         })
       });
       if (!res.ok) throw new Error('API failed');
@@ -163,6 +206,11 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const handleEmailCapture = (email: string) => {
     setCapturedEmail(email);
     setShowEmailGate(false);
+    setMessages(prev => [...prev, {
+      id: Date.now().toString(),
+      role: 'assistant' as const,
+      content: "Got it — I've saved your details. I'll send you a summary of what we've discussed.\n\nNow, where were we?"
+    }]);
   };
 
   return (
@@ -191,12 +239,14 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
         )}
 
         <div style={{ flex: 1, overflowY: 'auto', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: 'calc(100vh - 260px)', paddingTop: showEmailGate ? '12px' : 0 }}>
-          {showEmailGate && !capturedEmail && (
-            <EmailCapture onCapture={handleEmailCapture} />
-          )}
           {messages.map((m, i) => (
             <MessageBubble key={i} role={m.role} content={m.content} />
           ))}
+          {showEmailGate && !capturedEmail && (
+            <div style={{ alignSelf: 'flex-start', maxWidth: '80%' }}>
+              <EmailCapture onCapture={handleEmailCapture} />
+            </div>
+          )}
           {aiState === 'thinking' && (
             <div style={{ alignSelf: 'flex-start', padding: '12px 16px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '12px 12px 12px 4px', color: DS.muted, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
