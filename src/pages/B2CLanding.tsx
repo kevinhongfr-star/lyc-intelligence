@@ -73,10 +73,10 @@ export function B2CLanding() {
             For Senior Leaders
           </div>
           <h1 className="hero-heading" style={{ fontFamily: DS.headingFont, fontSize: '48px', fontWeight: 700, color: DS.text, margin: '0 0 16px', lineHeight: 1.1 }}>
-            Where do you stand<br />as a cross-border leader?
+            Know where you stand.<br />Know where to go.
           </h1>
           <p className="hero-sub" style={{ fontFamily: DS.bodyFont, fontSize: '17px', color: DS.textSecondary, maxWidth: '560px', margin: '0 auto 32px', lineHeight: 1.6 }}>
-            Take a 10-minute leadership assessment. Get your archetype, benchmark your profile against European and Asian executive markets, and discover opportunities that match.
+            Understand your trajectory. Benchmark your leadership. Discover opportunities that match where you're headed.
           </p>
           <div className="cta-row" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="/assessment" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '8px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
@@ -156,7 +156,7 @@ export function B2CLanding() {
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '500px', margin: '0 auto' }}>
           <div style={{ color: '#C108AB', marginBottom: '12px' }}><IconSpark size={24} color="#C108AB" /></div>
           <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 12px' }}>Ready to find out?</h2>
-          <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px' }}>Free assessment. No credit card. Results in 10 minutes.</p>
+          <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px' }}>Leadership isn't a title — it's a trajectory. See it, shape it, accelerate it.</p>
           <LeadCaptureForm type="b2c" source="b2c_landing" heading="Get your free leadership profile" subheading="8 minutes. Archetype, benchmarks, and your 90-day priorities." />
         </div>
       </div>
@@ -166,7 +166,7 @@ export function B2CLanding() {
         <div className="footer-grid" style={{ maxWidth: '900px', margin: '0 auto', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '32px' }}>
           <div>
             <span style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 700, color: '#FFF' }}>LYC Intelligence</span>
-            <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '12px', lineHeight: 1.5 }}>AI-powered executive search and leadership intelligence. Cross-border, data-driven, confidential.</p>
+            <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '12px', lineHeight: 1.5 }}>Career advisory, candidate scoring, and leadership alignment. For leaders at every stage.</p>
           </div>
           <div>
             <div className="footer-label">Platform</div>
@@ -184,7 +184,7 @@ export function B2CLanding() {
             </div>
           </div>
         </div>
-        <div className="footer-copy">© 2026 LYC Intelligence by LYC Partners</div>
+        <div className="footer-copy">© 2026 LYC Intelligence by LYC Partners. Know where you stand. Know where to go.</div>
       </footer>
     </div>
   );
