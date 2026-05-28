@@ -102,5 +102,6 @@ export default function App() {
         </Routes>
       </Suspense>
     </CreditProvider>
+    </ErrorBoundary>
   );
 }
