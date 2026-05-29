@@ -1,7 +1,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import { v4 as uuidv4 } from 'uuid';
+
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
@@ -26,7 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const publicUuid = uuidv4();
+    const publicUuid = crypto.randomUUID();
     
     // Note: Share card image generation requires html2canvas or similar
     // For this implementation, we'll store the card data and provide a placeholder image URL
@@ -39,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: shareCard, error: dbError } = await supabase
       .from('share_cards')
       .insert({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         user_id: userId,
         type,
         data,

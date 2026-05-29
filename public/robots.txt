@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /platform/
+Disallow: /api/
+
+Sitemap: https://lyc-intelligence.app/sitemap.xml

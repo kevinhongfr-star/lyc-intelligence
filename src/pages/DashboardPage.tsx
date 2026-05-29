@@ -27,6 +27,8 @@ const DS = {
   radiusSm: '8px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
+  success: '#00897B',
+  warning: '#F59E0B',
 };
 
 interface AssessmentSummary {
@@ -304,7 +306,7 @@ export function DashboardPage() {
                       padding: '12px', background: DS.bg, borderRadius: '8px', cursor: 'pointer',
                       transition: 'background 0.2s'
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.background = '#1a1a1a'}
+                    onMouseOver={(e) => e.currentTarget.style.background = DS.bgAlt}
                     onMouseOut={(e) => e.currentTarget.style.background = DS.bg}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -512,7 +514,7 @@ function ActionCard({ icon: Icon, title, description, color, onClick }: ActionCa
       }}
       onMouseOver={(e) => {
         e.currentTarget.style.borderColor = color;
-        e.currentTarget.style.background = '#1a1a1a';
+        e.currentTarget.style.background = DS.bgAlt;
       }}
       onMouseOut={(e) => {
         e.currentTarget.style.borderColor = DS.border;

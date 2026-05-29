@@ -10,8 +10,8 @@ const renderEmailTemplate = (type: string, data: any) => {
       return {
         subject: 'Welcome to LYC Intelligence',
         html: `
-          <div style="font-family: Georgia, serif; background: #0a0a0a; color: #e5e5e5; padding: 40px; max-width: 600px; margin: auto;">
-            <h1 style="color: #e5e5e5; border-bottom: 2px solid #c108ab; padding-bottom: 20px;">LYC Intelligence</h1>
+          <div style="font-family: Georgia, serif; background: #FFFFFF; color: #333333; padding: 40px; max-width: 600px; margin: auto;">
+            <h1 style="color: #333333; border-bottom: 2px solid #00897B; padding-bottom: 20px;">LYC Intelligence</h1>
             <p>Hi ${data.name || 'there'},</p>
             <p>Thanks for trying LYC Intelligence! We're glad you're here.</p>
             <p style="margin-top:20px;">Ready to get started? Take our leadership assessment here:</p>
@@ -28,8 +28,8 @@ const renderEmailTemplate = (type: string, data: any) => {
       return {
         subject: `[LYC Lead] New ${data.leadType} Lead: ${data.name}`,
         html: `
-          <div style="font-family: Georgia, serif; background: #0a0a0a; color: #e5e5e5; padding: 40px; max-width: 600px; margin: auto;">
-            <h1 style="color: #e5e5e5; border-bottom: 2px solid #c108ab; padding-bottom: 20px;">New Lead</h1>
+          <div style="font-family: Georgia, serif; background: #FFFFFF; color: #333333; padding: 40px; max-width: 600px; margin: auto;">
+            <h1 style="color: #333333; border-bottom: 2px solid #00897B; padding-bottom: 20px;">New Lead</h1>
             <p><strong>Name:</strong> ${data.name}</p>
             <p><strong>Email:</strong> ${data.email}</p>
             ${data.company ? `<p><strong>Company:</strong> ${data.company}</p>` : ''}
@@ -47,8 +47,8 @@ const renderEmailTemplate = (type: string, data: any) => {
       return {
         subject: 'Thanks for submitting your info — LYC Intelligence',
         html: `
-          <div style="font-family: Georgia, serif; background: #0a0a0a; color: #e5e5e5; padding: 40px; max-width: 600px; margin: auto;">
-            <h1 style="color: #e5e5e5; border-bottom: 2px solid #c108ab; padding-bottom: 20px;">LYC Intelligence</h1>
+          <div style="font-family: Georgia, serif; background: #FFFFFF; color: #333333; padding: 40px; max-width: 600px; margin: auto;">
+            <h1 style="color: #333333; border-bottom: 2px solid #00897B; padding-bottom: 20px;">LYC Intelligence</h1>
             <p>Hi ${data.name || 'there'},</p>
             <p>Thanks for your interest! Your assessment is now ready.</p>
             <div style="margin:20px 0;">
@@ -64,10 +64,10 @@ const renderEmailTemplate = (type: string, data: any) => {
       return {
         subject: '🚨 HOT LEAD ALERT: Priority Follow-Up Required',
         html: `
-          <div style="font-family: Georgia, serif; background: #0a0a0a; color: #e5e5e5; padding: 40px; max-width: 600px; margin: auto;">
-            <h1 style="color: #EF4444; border-bottom: 2px solid #c108ab; padding-bottom: 20px;">HOT LEAD</h1>
+          <div style="font-family: Georgia, serif; background: #FFFFFF; color: #333333; padding: 40px; max-width: 600px; margin: auto;">
+            <h1 style="color: #EF4444; border-bottom: 2px solid #00897B; padding-bottom: 20px;">HOT LEAD</h1>
             <p style="font-size:16px; color:#EF4444; font-weight:bold;">URGENT: Follow up within 15 MINUTES!</p>
-            <div style="margin-top:24px; padding:20px; background:#1a1a1a; border:1px solid #333; border-radius:12px;">
+            <div style="margin-top:24px; padding:20px; background:#F5F5F5; border:1px solid #E5E5E5; border-radius:12px;">
               <p><strong>Name:</strong> ${data.name}</p>
               <p><strong>Email:</strong> ${data.email}</p>
               <p><strong>Company:</strong> ${data.company}</p>
@@ -81,8 +81,8 @@ const renderEmailTemplate = (type: string, data: any) => {
       return {
         subject: 'Your credits are running low — LYC Intelligence',
         html: `
-          <div style="font-family: Georgia, serif; background: #0a0a0a; color: #e5e5e5; padding: 40px; max-width: 600px; margin: auto;">
-            <h1 style="color: #e5e5e5; border-bottom: 2px solid #c108ab; padding-bottom: 20px;">LYC Intelligence</h1>
+          <div style="font-family: Georgia, serif; background: #FFFFFF; color: #333333; padding: 40px; max-width: 600px; margin: auto;">
+            <h1 style="color: #333333; border-bottom: 2px solid #00897B; padding-bottom: 20px;">LYC Intelligence</h1>
             <p>Hi there,</p>
             <p>Your credits are running low. Consider upgrading to keep using premium features.</p>
             <div style="margin:20px 0;">

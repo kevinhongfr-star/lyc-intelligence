@@ -204,9 +204,9 @@ async function handleDailyReset(req: VercelRequest, res: VercelResponse) {
     await supabase!
       .from('credits')
       .update({
-        balance: creditData.daily_balance + dailyCredits,
+        balance: creditData.balance + dailyCredits,
         daily_balance: dailyCredits,
-        total_earned: creditData.daily_balance + dailyCredits,
+        total_earned: creditData.balance + dailyCredits,
         updated_at: new Date().toISOString()
       })
       .eq('user_id', userId);
@@ -224,7 +224,7 @@ async function handleDailyReset(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ 
       success: true, 
       creditsGranted: dailyCredits,
-      newBalance: creditData.daily_balance + dailyCredits
+      newBalance: creditData.balance + dailyCredits
     });
   } catch (e) {
     console.error('[Credits] Daily reset error:', e);

@@ -240,6 +240,7 @@ export async function createEvent(event: { title: string; start_time: string; en
 export async function insertB2CLead(lead: { name: string; email: string; source: string }): Promise<boolean> {
   const { error } = await getSupabase().from('b2c_leads').insert({
     email: lead.email,
+    name: lead.name,
     source: lead.source,
   });
   if (error) {
@@ -253,6 +254,7 @@ export async function insertB2BLead(lead: { name: string; email: string; company
   const { error } = await getSupabase().from('b2b_leads').insert({
     name: lead.name,
     email: lead.email,
+    name: lead.name,
     company: lead.company,
     source: lead.source,
   });
@@ -264,17 +266,18 @@ export async function insertB2BLead(lead: { name: string; email: string; company
 }
 
 export async function upsertLead(lead: { name: string; email: string; current_title?: string; country?: string; source: string; }): Promise<boolean> {
-  const { error } = await getSupabase().from('contacts').insert({ name: lead.name, email: lead.email, current_title: lead.current_title || null, country: lead.country || null, seniority: 'leadership', source: lead.source, activity_status: 'Lead', market_side: 'candidate', engagement_score: 10, is_expat: false, skills: [], languages: [] });
+  const { error } = await getSupabase().from('contacts').insert({ name: lead.name, email: lead.email,
+    name: lead.name, current_title: lead.current_title || null, country: lead.country || null, seniority: 'leadership', source: lead.source, activity_status: 'Lead', market_side: 'candidate', engagement_score: 10, is_expat: false, skills: [], languages: [] });
   return !error;
 }
 
-export async function logAssessmentGeneration(params: { email: string; toolType: string; assessmentName: string; archetype: string; compositeScore: number | null; gateData?: Record<string, unknown>; }): Promise<boolean> {
-  const { error } = await getSupabase().from('ai_generations').insert({ user_id: '3cf508f5-dd29-4d1c-846b-6633b616f9c6', tool_type: params.toolType, contact_id: null, mandate_id: null, input_params: JSON.stringify(params.gateData ?? {}), output_text: `${params.assessmentName} — Archetype: ${params.archetype}, Composite: ${params.compositeScore ?? 'N/A'}`, confidence: params.compositeScore != null ? Math.round(params.compositeScore) : null, model: params.assessmentName, tokens_used: null });
+export async function logAssessmentGeneration(params: { userId?: string; email: string; toolType: string; assessmentName: string; archetype: string; compositeScore: number | null; gateData?: Record<string, unknown>; }): Promise<boolean> {
+  const { error } = await getSupabase().from('ai_generations').insert({ user_id: params.userId || null, tool_type: params.toolType, contact_id: null, mandate_id: null, input_params: JSON.stringify(params.gateData ?? {}), output_text: `${params.assessmentName} — Archetype: ${params.archetype}, Composite: ${params.compositeScore ?? 'N/A'}`, confidence: params.compositeScore != null ? Math.round(params.compositeScore) : null, model: params.assessmentName, tokens_used: null });
   return !error;
 }
 
-export async function logScoringRun(params: { mandateId?: string; contactId?: string; runType: string; inputParams?: any; outputScores?: any; compositeScore?: number; verdict?: string; model?: string; }): Promise<boolean> {
-  const { error } = await getSupabase().from('scoring_runs').insert({ user_id: '3cf508f5-dd29-4d1c-846b-6633b616f9c6', mandate_id: params.mandateId || null, contact_id: params.contactId || null, run_type: params.runType, input_params: params.inputParams ? JSON.stringify(params.inputParams) : null, output_scores: params.outputScores ? JSON.stringify(params.outputScores) : null, composite_score: params.compositeScore ?? null, verdict: params.verdict || null, model: params.model || null });
+export async function logScoringRun(params: { userId?: string; mandateId?: string; contactId?: string; runType: string; inputParams?: any; outputScores?: any; compositeScore?: number; verdict?: string; model?: string; }): Promise<boolean> {
+  const { error } = await getSupabase().from('scoring_runs').insert({ user_id: params.userId || null, mandate_id: params.mandateId || null, contact_id: params.contactId || null, run_type: params.runType, input_params: params.inputParams ? JSON.stringify(params.inputParams) : null, output_scores: params.outputScores ? JSON.stringify(params.outputScores) : null, composite_score: params.compositeScore ?? null, verdict: params.verdict || null, model: params.model || null });
   return !error;
 }
 

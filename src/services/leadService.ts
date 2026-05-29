@@ -48,13 +48,13 @@ export async function captureB2BLead(lead: B2BLeadInput): Promise<boolean> {
 
 export async function sendEmailNotification(data: {
   type: 'welcome' | 'lead_notify' | 'lead_capture' | 'upgrade_reminder' | 'hot_lead';
-  payload: any;
+  data: any;
 }): Promise<boolean> {
   try {
     const res = await fetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify({ type: data.type, data: data.data }),
     });
     return res.ok;
   } catch (e) {

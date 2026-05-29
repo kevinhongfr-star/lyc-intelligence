@@ -66,6 +66,7 @@ export function MatchPage() {
           email: lead.email,
           company: lead.company,
           title: lead.title,
+          type: 'b2b',
           source: 'score-match'
         })
       });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconSpark, IconForge, IconQuest, Shield } from '@/components/icons/LycIcons';
+import { IconSpark, IconForge, IconQuest } from '@/components/icons/LycIcons';
 import { Check, ArrowRight, Shield } from 'lucide-react';
 
 const DS = {

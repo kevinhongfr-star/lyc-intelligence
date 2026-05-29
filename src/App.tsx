@@ -76,6 +76,7 @@ export default function App() {
           <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
           <Route path="/documents" element={<ProtectedRoute><UserDocumentsPage /></ProtectedRoute>} />
           <Route path="/share/:id" element={<SharePage />} />
+          <Route path="*" element={<div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',fontFamily:'Georgia,serif'}}><h1 style={{fontSize:'48px',color:'#C108AB',marginBottom:'8px'}}>404</h1><p style={{color:'#666'}}>Page not found</p><a href="/" style={{marginTop:'20px',color:'#C108AB',textDecoration:'underline'}}>Go home</a></div>} />
           {ENABLE_PLATFORM && (
             <Route path="/platform" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<ConsultantDashboard />} />
