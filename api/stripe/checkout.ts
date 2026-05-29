@@ -31,6 +31,9 @@ async function handleCheckout(req: VercelRequest, res: VercelResponse) {
   }
 
   const userId = req.headers['x-user-id'] as string;
+  if (!userId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+    return res.status(401).json({ error: 'Invalid user ID format' });
+  }
   if (!userId) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -81,6 +84,9 @@ async function handleCheckout(req: VercelRequest, res: VercelResponse) {
 
 async function handlePortal(req: VercelRequest, res: VercelResponse) {
   const userId = req.headers['x-user-id'] as string;
+  if (!userId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+    return res.status(401).json({ error: 'Invalid user ID format' });
+  }
 
   if (!userId) {
     return res.status(401).json({ error: 'Unauthorized' });

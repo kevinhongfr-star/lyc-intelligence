@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { X, Check, Loader2, Zap, ArrowRight } from 'lucide-react';
 
 const DS = {
-  headingFont: 'Georgia, serif',
+  headingFont: "'Libre Baskerville', Georgia, serif",
   accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
-  success: '#10B981',
+  bg: '#FFFFFF',
+  card: '#FFFFFF',
+  muted: '#666666',
+  text: '#000000',
+  textSecondary: '#333333',
+  border: '#E5E5E5',
+  success: '#00897B',
   warning: '#F59E0B',
   error: '#EF4444'
 };

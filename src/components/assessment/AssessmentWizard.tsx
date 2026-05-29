@@ -1,3 +1,4 @@
+import { saveAssessment } from '@/services/supabaseApi';
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import {

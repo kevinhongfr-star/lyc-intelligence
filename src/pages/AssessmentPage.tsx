@@ -8,7 +8,7 @@ export function AssessmentPage() {
   const { profile } = useAuthStore();
   
   const prefillEmail = searchParams.get('email') || profile?.email || '';
-  const prefillName = searchParams.get('name') || profile?.full_name || '';
+  const prefillName = searchParams.get('name') || profile?.name || '';
 
   return (
     <div style={{ background: '#FFFFFF', minHeight: '100vh' }}>

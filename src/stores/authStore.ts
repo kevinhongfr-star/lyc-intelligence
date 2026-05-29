@@ -133,6 +133,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         });
         if (profileError) console.warn('[AuthStore] Profile creation error:', profileError);
         
+        // Create initial credits row
+        const { error: creditsError } = await supabase.from('credits').insert({
+          user_id: data.user.id,
+          balance: 5,
+          daily_balance: 5,
+          total_earned: 5,
+          total_spent: 0,
+          tier: 'free'
+        });
+        if (creditsError) console.warn('[AuthStore] Credits creation error:', creditsError);
+        
         // Phase 11.1 — Fire welcome email
         fetch('/api/email', {
           method: 'POST',

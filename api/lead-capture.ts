@@ -62,7 +62,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     try {
       // Notify consultant
-      await fetch('/api/email', {
+      await fetch('https://www.lyc-intelligence.app/api/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -87,7 +87,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     try {
       // Confirmation to lead
-      await fetch('/api/email', {
+      await fetch('https://www.lyc-intelligence.app/api/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

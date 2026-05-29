@@ -88,13 +88,28 @@ export function DashboardPage() {
       ]);
 
       // Load latest assessment
-      const { data: assessmentData } = await sb
+      // Try user_id first, fall back to email
+      let assessmentData: any = null;
+      const { data: byUserId } = await sb
         .from('assessments')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
+      
+      if (byUserId) {
+        assessmentData = byUserId;
+      } else if (user.email) {
+        const { data: byEmail } = await sb
+          .from('assessments')
+          .select('*')
+          .eq('email', user.email)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        assessmentData = byEmail;
+      }
 
       if (assessmentData) {
         setAssessment({
