@@ -60,7 +60,7 @@ export function Landing() {
   const services = [
     { icon: IconTrident, animClass: 'anim-trident', title: 'Match Analysis', desc: 'AI-powered JD-CV matching engine. Score candidates instantly against role requirements.', href: '/match', cta: 'Try Free' },
     { icon: IconImpact, animClass: 'anim-impact', title: 'Leadership Assessment', desc: 'Discover your archetype. Benchmark against global executives across 47 markets.', href: '/assessment', cta: 'Take Assessment' },
-    { icon: null, animClass: '', title: 'Nexus', desc: 'Executive advisory on career positioning, talent scoring, and leadership alignment.', href: '/nexus', cta: 'Consult' },
+    { icon: IconCompass, animClass: 'anim-compass', title: 'Nexus', desc: 'Executive advisory on career positioning, talent scoring, and leadership alignment.', href: '/nexus', cta: 'Consult' },
   ];
 
   const stats = [
@@ -213,7 +213,7 @@ export function Landing() {
           {services.map(p => (
             <a key={p.title} href={p.href} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '28px 24px', textDecoration: 'none', display: 'block', boxShadow: DS.shadow }}>
               <div style={{ color: DS.accent, marginBottom: '16px' }} className={p.animClass}>
-                <p.icon size={28} color={DS.accent} />
+                {p.icon ? <p.icon size={28} color={DS.accent} /> : <div style={{ width: '40px', height: '3px', background: DS.accent, borderRadius: '1px' }} />}
               </div>
               <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>{p.title}</h3>
               <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, lineHeight: 1.5, margin: '0 0 16px' }}>{p.desc}</p>
