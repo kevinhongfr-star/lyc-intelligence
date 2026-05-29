@@ -326,7 +326,7 @@ function ContextStep({ state, setState, onNext }: any) {
   const careerGeographies = [
     { id: 'europe_to_apac', label: 'Europe → APAC' },
     { id: 'apac_to_europe', label: 'APAC → Europe' },
-    { id: 'already_cross_border', label: 'Already cross-border' },
+    { id: 'already_cross_border', label: 'Multi-market' },
     { id: 'single_market', label: 'Single market focus' },
   ];
   const functions = ['CEO', 'CFO', 'CTO', 'CHRO', 'CMO', 'COO', 'General Counsel', 'Board', 'Other'];
@@ -450,7 +450,7 @@ function CrossBorderStep({ state, setState, index, onAnswer }: any) {
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto', padding: '24px' }}>
       <p style={{ color: DS.muted, marginBottom: '8px' }}>
-        Cross-Border Readiness: {index + 1}/{CROSS_BORDER_QUESTIONS.length}
+        Readiness: {index + 1}/{CROSS_BORDER_QUESTIONS.length}
       </p>
       <h2 style={{ fontFamily: DS.headingFont, color: DS.text, fontSize: '20px', marginBottom: '24px' }}>
         {question.question}
@@ -483,7 +483,7 @@ function CrossBorderStep({ state, setState, index, onAnswer }: any) {
 function CareerGoalsStep({ state, setState, onComplete }: any) {
   const allGoals = [
     'Land target role', 'Build thought leadership', 'Board presence',
-    'Cross-border credentials', 'Negotiate offer', 'Internal transition',
+    'International credentials', 'Negotiate offer', 'Internal transition',
     'Geography move', 'Build team capability'
   ];
   const [selected, setSelected] = useState<string[]>(state.careerGoals || []);

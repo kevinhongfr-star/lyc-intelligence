@@ -37,7 +37,7 @@ export function EmailCapture({ onCapture }: EmailCaptureProps) {
       await fetch('/api/lead-capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'nexus_chat' })
+        body: JSON.stringify({ email, name: email.split('@')[0], type: 'b2c', source: 'nexus_chat' })
       });
       onCapture(email);
     } catch (e) {

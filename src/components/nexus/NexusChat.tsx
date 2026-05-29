@@ -42,7 +42,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "I'm Nexus. LYC Partners has placed 500+ executives across 47 markets — I carry that knowledge into every conversation.\n\nOne in three cross-border executive moves fails within 18 months. Usually for the same reasons.\n\nWhat are you navigating right now?"
+      content: "I'm Nexus. LYC Partners has placed 500+ executives across 47 markets — I carry that knowledge into every conversation.\n\nOne in three leadership transitions fails within 18 months. Usually for the same reasons.\n\nWhat are you navigating right now?"
     }
   ]);
   const [input, setInput] = useState('');
@@ -51,7 +51,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const [lastUserMessage, setLastUserMessage] = useState<string | null>(null);
   const [suggestedPrompts, setSuggestedPrompts] = useState<string[]>(initialPrompts || [
     "I'm considering a move from Europe to APAC — what do I need to know?",
-    'What makes a strong cross-border C-suite profile in 2026?',
+    'What makes a strong C-suite profile in 2026?',
     'I have a senior interview next week — help me prepare',
     'How does my profile benchmark against regional executives?'
   ]);

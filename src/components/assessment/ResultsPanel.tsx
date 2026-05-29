@@ -85,7 +85,7 @@ export function ResultsPanel({
           color: DS.text,
           margin: '0 0 8px'
         }}>
-          Your Cross-Border Leadership Profile
+          Your Leadership Profile
         </h3>
         <p style={{
           color: DS.textSecondary,
@@ -189,7 +189,7 @@ export function ResultsPanel({
         </div>
       </div>
 
-      {/* Cross-Border Tier */}
+      {/* Readiness Tier */}
       <div style={{
         background: DS.card,
         border: `1px solid ${DS.cardBorder}`,
@@ -203,14 +203,14 @@ export function ResultsPanel({
           color: DS.text,
           marginBottom: '12px'
         }}>
-          Cross-Border Readiness: {crossBorderTier.label}
+          Readiness: {crossBorderTier.label}
         </h4>
         <p style={{
           fontSize: '14px',
           color: DS.textSecondary,
           marginBottom: '12px'
         }}>
-          You scored {crossBorderScore} out of 100 for cross-border leadership readiness.
+          You scored {crossBorderScore} out of 100 for leadership readiness.
         </p>
       </div>
 

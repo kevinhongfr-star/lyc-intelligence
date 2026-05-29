@@ -14,7 +14,7 @@ export type ScenarioQuestion = { id: string; dimension: DimensionId; scenario: s
 
 export type CPDArchetype =
   | 'Strategic Architect'
-  | 'Cross-Border Catalyst'
+  | 'Global Catalyst'
   | 'Precision Operator'
   | 'Influential Builder'
   | 'Adaptive Visionary'
@@ -87,7 +87,7 @@ export const CPD_SCENARIOS: ScenarioQuestion[] = [
       { score: 5, text: 'shape a bold vision', label: 'D' },
     ],
   },
-  // Cross-Border Adaptability (4)
+  // Adaptability (4)
   {
     id: 'cb_q1',
     dimension: 'cross_border_adaptability',
@@ -269,7 +269,7 @@ export const CPD_SCENARIOS: ScenarioQuestion[] = [
   },
 ];
 
-// Cross-Border Readiness questions
+// Readiness questions
 export const CROSS_BORDER_QUESTIONS: { id: string; question: string; options: { score: number; label: string }[] }[] = [
   { id: 'cb_read_1', question: 'Language and communication adaptability', options: [ {score: 1, label: 'Limited'}, { score:2, label: 'Developing' }, { score:3, label: 'Comfortable' }, { score:4, label:'Strong' }, {score:5, label:'Advanced' } ] },
   { id: 'cb_read_2', question: 'Experience in matrix reporting', options: [ {score:1, label: 'None' }, { score:2, label: 'Limited' }, { score:3, label: 'Moderate' }, { score:4, label:'Extensive' }, { score:5, label: 'Expert' } ] },
@@ -341,7 +341,7 @@ function getArchetype(dimensionScores: Record<DimensionId, number>, crossBorderS
     return 'Strategic Architect';
   }
   if (top1 === 'cross_border_adaptability' && top2 === 'leadership_presence' && crossBorderScore >= 75) {
-    return 'Cross-Border Catalyst';
+    return 'Global Catalyst';
   }
   if (top1 === 'execution_discipline' && top2 === 'strategic_orientation') {
     return 'Precision Operator';
@@ -365,7 +365,7 @@ export const ARCHETYPE_INFO: Record<CPDArchetype, { description: string; strengt
     development: ['Execution', 'Adaptability'],
     tagline: 'Building leadership that works across borders'
   },
-  'Cross-Border Catalyst': {
+  'Global Catalyst': {
     description: 'You thrive in diverse, multi-cultural environments.',
     strengths: ['Cultural adaptability', 'Leadership presence', 'Relationship-building', 'Global mindset'],
     development: ['Strategic rigor', 'Execution discipline'],
@@ -374,7 +374,7 @@ export const ARCHETYPE_INFO: Record<CPDArchetype, { description: string; strengt
   'Precision Operator': {
     description: 'You excel at execution and delivering results consistently.',
     strengths: ['Execution discipline', 'Strategic orientation', 'Attention to detail', 'Consistency'],
-    development: ['Cross-border adaptability', 'Leadership presence'],
+    development: ['Adaptability', 'Leadership presence'],
     tagline: 'Delivering results that matter'
   },
   'Influential Builder': {
@@ -385,13 +385,13 @@ export const ARCHETYPE_INFO: Record<CPDArchetype, { description: string; strengt
   },
   'Adaptive Visionary': {
     description: 'You can adapt to any culture while setting inspiring vision.',
-    strengths: ['Cross-border adaptability', 'Strategic orientation', 'Vision', 'Cultural intelligence'],
+    strengths: ['Adaptability', 'Strategic orientation', 'Vision', 'Cultural intelligence'],
     development: ['Execution', 'Influence'],
     tagline: 'Adapting, innovating, leading'
   },
   'Grounded Executor': {
     description: 'You get things done while adapting to circumstances.',
-    strengths: ['Execution discipline', 'Cross-border adaptability', 'Resilience', 'Delivery'],
+    strengths: ['Execution discipline', 'Adaptability', 'Resilience', 'Delivery'],
     development: ['Strategic vision', 'Influence'],
     tagline: 'Getting it done, anywhere'
   },

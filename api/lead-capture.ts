@@ -62,7 +62,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     try {
       // Notify consultant
-      await fetch('http://localhost:3000/api/email', {
+      await fetch('/api/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -87,7 +87,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     try {
       // Confirmation to lead
-      await fetch('http://localhost:3000/api/email', {
+      await fetch('/api/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

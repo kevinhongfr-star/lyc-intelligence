@@ -37,7 +37,7 @@ interface AssessmentRecord {
 
 const DIMENSION_LABELS: Record<string, string> = {
   strategic_orientation: 'Strategic Orientation',
-  cross_border_adaptability: 'Cross-Border Adaptability',
+  cross_border_adaptability: 'Adaptability',
   stakeholder_influence: 'Stakeholder Influence',
   execution_discipline: 'Execution Discipline',
   leadership_presence: 'Leadership Presence'

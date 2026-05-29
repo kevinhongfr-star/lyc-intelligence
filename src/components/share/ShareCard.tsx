@@ -74,14 +74,14 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 {data?.archetype || 'Strategic Architect'}
               </div>
               <div style={{ fontSize: '16px', color: DS.textSecondary, maxWidth: '600px' }}>
-                {data?.tagline || 'Cross-border leadership with board-level influence'}
+                {data?.tagline || 'Leadership with board-level influence'}
               </div>
             </div>
 
             <div style={{ marginTop: '40px' }}>
               {[
                 { label: 'Strategic Orientation', score: data?.dimension_scores?.strategic_orientation || 0 },
-                { label: 'Cross-border Adaptability', score: data?.dimension_scores?.cross_border_adaptability || 0 },
+                { label: 'Adaptability', score: data?.dimension_scores?.cross_border_adaptability || 0 },
                 { label: 'Stakeholder Influence', score: data?.dimension_scores?.stakeholder_influence || 0 }
               ].map((item, i) => (
                 <div key={i} style={{ marginBottom: i < 2 ? '16px' : 0 }}>
@@ -102,7 +102,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
             </div>
 
             <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ fontSize: '14px', color: DS.textSecondary }}>Cross-border Readiness:</div>
+              <div style={{ fontSize: '14px', color: DS.textSecondary }}>Readiness:</div>
               <div style={{ 
                 padding: '8px 16px', 
                 background: `${DS.success}20`, 
@@ -228,7 +228,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 <div style={{ fontSize: '18px', color: DS.textSecondary, marginBottom: '24px' }}>3 months ago vs today</div>
                 {[
                   { label: 'Strategic Orientation', old: data?.strategic_old || 0, new: data?.strategic_new || 0 },
-                  { label: 'Cross-border Adaptability', old: data?.adaptability_old || 0, new: data?.adaptability_new || 0 },
+                  { label: 'Adaptability', old: data?.adaptability_old || 0, new: data?.adaptability_new || 0 },
                   { label: 'Stakeholder Influence', old: data?.influence_old || 0, new: data?.influence_new || 0 }
                 ].map((item, i) => {
                   const delta = item.new - item.old;
@@ -262,7 +262,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
                   border: `1px solid ${DS.success}30`, 
                   borderRadius: '12px' 
                 }}>
-                  <div style={{ fontSize: '14px', color: DS.textSecondary, marginBottom: '4px' }}>Cross-border Readiness</div>
+                  <div style={{ fontSize: '14px', color: DS.textSecondary, marginBottom: '4px' }}>Readiness</div>
                   <div style={{ fontSize: '16px', fontWeight: 700, color: DS.success }}>
                     {data?.readiness_old || 'Developing'} → {data?.readiness_new || 'Advanced'}
                   </div>

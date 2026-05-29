@@ -73,7 +73,7 @@ export function SharePage() {
       
       const ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) {
-        ogDesc.setAttribute('content', 'Cross-border leadership profile. Powered by LYC Intelligence.');
+        ogDesc.setAttribute('content', 'Leadership profile. Powered by LYC Intelligence.');
       }
     }
   }, [shareCard]);

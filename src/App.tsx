@@ -59,7 +59,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-    <CreditProvider>
+    <CreditProvider userId={user?.id}>
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<Landing />} />

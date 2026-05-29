@@ -78,7 +78,7 @@ Example:
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
           <Lightbulb style={{ width: 16, height: 16, color: DS.accent, flexShrink: 0, marginTop: '2px' }} />
           <div style={{ fontSize: '12px', color: DS.textSecondary }}>
-            <strong style={{ color: DS.text }}>Pro tip:</strong> The more detailed the JD, the more accurate the matching. Include responsibilities, required skills, reporting structure, and any cross-border requirements.
+            <strong style={{ color: DS.text }}>Pro tip:</strong> The more detailed the JD, the more accurate the matching. Include responsibilities, required skills, reporting structure, and any geographic requirements.
           </div>
         </div>
       </div>

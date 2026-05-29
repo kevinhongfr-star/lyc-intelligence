@@ -125,7 +125,7 @@ export function B2BLanding() {
           <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
             {[
               { name: 'Experience & Achievements', desc: 'Career trajectory, role progression, quantifiable impact, leadership scope', color: '#000000' },
-              { name: 'Skills & Expertise', desc: 'Technical competencies, functional expertise, cross-border capability, language fit', color: DS.accent },
+              { name: 'Skills & Expertise', desc: 'Technical competencies, functional expertise, cultural adaptability, language fit', color: DS.accent },
               { name: 'Organizational Fit', desc: 'Culture alignment, stakeholder complexity, transformation readiness, board dynamics', color: '#333333' },
             ].map(d => (
               <div key={d.name} style={{ background: DS.bgAlt, borderRadius: '8px', padding: '16px' }}>

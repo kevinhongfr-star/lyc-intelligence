@@ -125,7 +125,7 @@ export function formatAssessmentForInjection(assessment: AssessmentScore | null)
   return `**Current Assessment Profile (as of ${date}):**
 - Archetype: ${assessment.archetype}
 - Overall Score: ${assessment.composite_score}/100
-- Cross-Border Readiness: ${assessment.cross_border_score}/100
+- Readiness: ${assessment.cross_border_score}/100
 - Dimension Scores: ${dimensions || 'N/A'}`;
 }
 

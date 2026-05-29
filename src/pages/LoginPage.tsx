@@ -22,7 +22,7 @@ const DS = {
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
-const ALLOWED_EMAIL = 'kevin.hong@lyc-partners.ai';
+// Email restriction removed — login is now available to all registered users
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -37,10 +37,7 @@ export function LoginPage() {
     e.preventDefault();
     setError('');
 
-    if (email.trim().toLowerCase() !== ALLOWED_EMAIL) {
-      setError('Access restricted. This platform is invite-only.');
-      return;
-    }
+    // No email restriction — any registered user can log in
     if (!password) {
       setError('Password is required');
       return;
@@ -164,7 +161,7 @@ export function LoginPage() {
           </div>
 
           <p style={{ fontSize: '12px', color: DS.muted, textAlign: 'center', marginTop: '20px', lineHeight: 1.5 }}>
-            This platform is invite-only. Unauthorized access attempts are logged.
+            Sign in to your account
           </p>
         </div>
       </div>

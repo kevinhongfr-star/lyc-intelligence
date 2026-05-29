@@ -126,7 +126,7 @@ export function DashboardPage() {
     const painPoints = memoryList.filter(m => m.memory_type === 'pain_point');
     
     const baseSuggestions = [
-      'How do I position my cross-border experience?',
+      'How do I position my leadership experience?',
       'What should I focus on for the next 90 days?',
       'Help me strengthen my LinkedIn profile'
     ];
@@ -542,7 +542,7 @@ function ActionCard({ icon: Icon, title, description, color, onClick }: ActionCa
 function formatDimensionName(key: string): string {
   const names: Record<string, string> = {
     strategic_orientation: 'Strategic',
-    cross_border_adaptability: 'Cross-Border',
+    cross_border_adaptability: 'Adaptability',
     stakeholder_influence: 'Stakeholder',
     execution_discipline: 'Execution',
     leadership_presence: 'Leadership'

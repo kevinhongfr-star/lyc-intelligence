@@ -98,9 +98,9 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          userId: user?.id, 
+          userId: user?.id,
           action,
-          cost 
+          amount: cost 
         })
       });
 

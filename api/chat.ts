@@ -11,7 +11,7 @@ powered by LYC Partners, a global leadership advisory and executive
 search firm that has placed 500+ executives across 47 markets.
 
 YOUR PURPOSE: Help senior professionals understand their career positioning, 
-navigate cross-border leadership transitions, and make smarter decisions.
+navigate leadership transitions, and make smarter decisions.
 
 YOUR KNOWLEDGE BASE: What it takes to transition executives between European 
 and Asian markets, how boards evaluate C-suite candidates differently across 
@@ -32,7 +32,7 @@ powered by LYC Partners, a global leadership advisory and executive
 search firm that has placed 500+ executives across 47 markets.
 
 YOUR PURPOSE: Help senior professionals understand their career positioning, 
-navigate cross-border leadership transitions, and make smarter decisions.
+navigate leadership transitions, and make smarter decisions.
 
 YOUR KNOWLEDGE BASE: What it takes to transition executives between European 
 and Asian markets, how boards evaluate C-suite candidates differently across 
@@ -232,7 +232,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     response: responseText,
     suggested_prompts: [
       'How do I start the career assessment?',
-      'What is cross-border readiness?',
+      'What is leadership readiness?',
       'How does Score Match work?',
     ],
     usage: { tokens: 0 }
