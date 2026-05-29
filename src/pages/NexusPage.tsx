@@ -92,7 +92,7 @@ export function NexusPage() {
             <MessageSquare className="w-8 h-8 mx-auto mb-3 opacity-50" />
             <p className="font-medium mb-2">Nexus is ready</p>
             <div className="grid grid-cols-2 gap-2 max-w-md mx-auto text-sm">
-              {['How do I position for a leadership role?', 'What makes a strong leadership profile?', 'What do boards look for in C-suite candidates?', 'How should I prepare for a board interview?'].map(q => (
+              {['How do I position for a board-level role?', 'What makes a strong leadership profile?', 'What do boards look for in a non-executive director?', 'How should I prepare for a board interview?'].map(q => (
                 <button key={q} onClick={() => { setInput(q); }} className="p-2 bg-bg-tertiary rounded-lg hover:bg-bg-hover text-text-secondary text-left transition-colors">{q}</button>
               ))}
             </div>

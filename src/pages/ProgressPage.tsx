@@ -31,7 +31,7 @@ interface AssessmentRecord {
   archetype: string;
   composite_score: number;
   scores: Record<string, number>;
-  cross_border_score: number;
+  adaptability_score: number;
   created_at: string;
 }
 
@@ -87,7 +87,7 @@ export function ProgressPage() {
           archetype: a.archetype,
           composite_score: a.composite_score,
           scores: JSON.parse(a.scores || '{}'),
-          cross_border_score: a.cross_border_score || 0,
+          adaptability_score: a.adaptability_score || 0,
           created_at: a.created_at
         }));
         
@@ -326,9 +326,9 @@ export function ProgressPage() {
                       </p>
                     </div>
                     <div style={{ textAlign: 'center', padding: '20px', background: DS.bg, borderRadius: '12px' }}>
-                      <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>CROSS-BORDER READINESS</p>
+                      <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>ADAPTABILITY</p>
                       <p style={{ fontSize: '48px', fontWeight: 800, color: DS.accent, lineHeight: 1 }}>
-                        {selectedAssessment.cross_border_score}
+                        {selectedAssessment.adaptability_score}
                       </p>
                     </div>
                   </div>
@@ -398,11 +398,11 @@ export function ProgressPage() {
                         </div>
                       </div>
                       <div style={{ textAlign: 'center', padding: '16px', background: DS.bg, borderRadius: '12px' }}>
-                        <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>CROSS-BORDER</p>
+                        <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>ADAPTABILITY</p>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                          {getDeltaIcon(selectedAssessment.cross_border_score - previousAssessment.cross_border_score)}
-                          <span style={{ fontSize: '24px', fontWeight: 700, color: getDeltaColor(selectedAssessment.cross_border_score - previousAssessment.cross_border_score) }}>
-                            {formatDelta(selectedAssessment.cross_border_score - previousAssessment.cross_border_score)}
+                          {getDeltaIcon(selectedAssessment.adaptability_score - previousAssessment.adaptability_score)}
+                          <span style={{ fontSize: '24px', fontWeight: 700, color: getDeltaColor(selectedAssessment.adaptability_score - previousAssessment.adaptability_score) }}>
+                            {formatDelta(selectedAssessment.adaptability_score - previousAssessment.adaptability_score)}
                           </span>
                         </div>
                       </div>

@@ -13,7 +13,7 @@ export interface AssessmentScore {
   archetype: string;
   composite_score: number;
   dimension_scores: Record<string, number>;
-  cross_border_score: number;
+  adaptability_score: number;
   created_at: string;
 }
 
@@ -43,7 +43,7 @@ export async function getMemoryContextForUser(userId: string): Promise<MemoryCon
     archetype: assessmentResult.data.archetype,
     composite_score: assessmentResult.data.composite_score,
     dimension_scores: JSON.parse(assessmentResult.data.scores || '{}'),
-    cross_border_score: assessmentResult.data.cross_border_score || 0,
+    adaptability_score: assessmentResult.data.adaptability_score || 0,
     created_at: assessmentResult.data.created_at
   } : null;
 
@@ -125,7 +125,7 @@ export function formatAssessmentForInjection(assessment: AssessmentScore | null)
   return `**Current Assessment Profile (as of ${date}):**
 - Archetype: ${assessment.archetype}
 - Overall Score: ${assessment.composite_score}/100
-- Readiness: ${assessment.cross_border_score}/100
+- Readiness: ${assessment.adaptability_score}/100
 - Dimension Scores: ${dimensions || 'N/A'}`;
 }
 

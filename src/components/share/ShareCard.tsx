@@ -111,7 +111,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 borderRadius: '8px',
                 fontSize: '14px'
               }}>
-                {data?.cross_border_readiness?.label || 'Advanced'} — {data?.cross_border_readiness?.score || 80}/100
+                {data?.adaptability_readiness?.label || 'Advanced'} — {data?.adaptability_readiness?.score || 80}/100
               </div>
             </div>
           </div>

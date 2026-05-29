@@ -36,7 +36,7 @@ interface AssessmentSummary {
   archetype: string;
   composite_score: number;
   dimension_scores: Record<string, number>;
-  cross_border_score: number;
+  adaptability_score: number;
   created_at: string;
 }
 
@@ -117,7 +117,7 @@ export function DashboardPage() {
           archetype: assessmentData.archetype,
           composite_score: assessmentData.composite_score,
           dimension_scores: JSON.parse(assessmentData.scores || '{}'),
-          cross_border_score: assessmentData.cross_border_score || 0,
+          adaptability_score: assessmentData.adaptability_score || 0,
           created_at: assessmentData.created_at
         });
       }
@@ -162,13 +162,16 @@ export function DashboardPage() {
     return `${window.location.origin}/signup?ref=${referralCode}`;
   };
 
+  const [referralCopied, setReferralCopied] = useState(false);
   const copyReferralLink = async () => {
     const link = getReferralLink();
     try {
       await navigator.clipboard.writeText(link);
-      alert('Referral link copied!');
+      setReferralCopied(true);
+      setTimeout(() => setReferralCopied(false), 2000);
     } catch {
-      alert('Could not copy. Please copy manually: ' + link);
+      // Fallback: select text for manual copy
+      console.log('Referral link:', link);
     }
   };
 

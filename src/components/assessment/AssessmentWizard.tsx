@@ -140,9 +140,54 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
   const handleDownloadPDF = async () => {
     setIsGeneratingPDF(true);
     try {
-      // Simulate PDF generation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      alert('PDF downloaded! (demo version)');
+      // Generate text report for download
+      const lines: string[] = [
+        '═══════════════════════════════════════════',
+        '  CAREER POSITIONING DIAGNOSTIC REPORT',
+        '  LYC Intelligence — Powered by LYC Partners',
+        '═══════════════════════════════════════════',
+        '',
+        `Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+        '',
+        '── ARCHETYPE ─────────────────────────────',
+        `${archetype}`,
+        '',
+        '── COMPOSITE SCORE ───────────────────────',
+        `${compositeScore}/100`,
+        '',
+        '── DIMENSION SCORES ──────────────────────',
+        ...Object.entries(dimensionScores).map(([dim, score]) => {
+          const label = dim.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          return `  ${label}: ${score}/100`;
+        }),
+        '',
+        '── CAREER STAGE ──────────────────────────',
+        `${contextData.career_stage || 'Not specified'}`,
+        '',
+        '── GEOGRAPHY ─────────────────────────────',
+        `${contextData.geography || 'Not specified'}`,
+        '',
+        '── WRITING STYLE ─────────────────────────',
+        `${contextData.writing_style || 'Not specified'}`,
+        '',
+        '── GOALS ─────────────────────────────────',
+        ...(contextData.goals || []).map((g: string) => `  • ${g}`),
+        '',
+        '═══════════════════════════════════════════',
+        '  Know where you stand. Know where to go.',
+        '  lyc-intelligence.app',
+        '═══════════════════════════════════════════',
+      ];
+      const reportText = lines.join('\n');
+      const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `LYC-CPD-Report-${archetype.replace(/\s+/g, '-')}-${new Date().toISOString().slice(0,10)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch (e) {
       console.error('PDF error', e);
     } finally {

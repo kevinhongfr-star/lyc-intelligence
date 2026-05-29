@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { initScrollReveal } from '@/lib/utils';
 import { IconTrident, IconQuest, IconSpark, IconBridge, IconLeap, IconImpact, IconPrism, IconCompass } from '@/components/icons/LycIcons';
 import { Menu, X, Lock, ArrowRight } from 'lucide-react';
+import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -240,13 +241,13 @@ export function Landing() {
           <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', maxWidth: '420px', margin: '0 auto 32px', lineHeight: 1.6 }}>
             See it, shape it, accelerate it. Leadership intelligence starts here.
           </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/b2c" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: '#C108AB', color: '#FFFFFF', borderRadius: '6px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
-              For Leaders <ArrowRight style={{ width: 14, height: 14 }} />
-            </a>
-            <a href="/b2b" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid rgba(193,8,171,0.5)', color: '#C108AB', borderRadius: '6px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
-              For Firms
-            </a>
+          <div style={{ maxWidth: '400px', margin: '0 auto' }}>
+            <LeadCaptureForm type="b2c" source="landing_cta" heading="Start Your Free Assessment" subheading="Get your leadership archetype in 10 minutes. No credit card." />
+          </div>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '16px' }}>
+            <a href="/b2c" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', transition: 'color 0.2s' }}>For Leaders</a>
+            <span style={{ color: 'rgba(255,255,255,0.3)' }}>·</span>
+            <a href="/b2b" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', transition: 'color 0.2s' }}>For Firms</a>
           </div>
         </div>
       </div>

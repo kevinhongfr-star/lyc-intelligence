@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ArrowRight, Shield, Loader2, RefreshCw, Paperclip } from 'lucide-react';
+import { ArrowRight, Shield, Loader2, RefreshCw, Paperclip, Trash2 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { MessageBubble } from './MessageBubble';
 import { SuggestedPrompts } from './SuggestedPrompts';
@@ -40,18 +40,27 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const { user, profile } = useAuthStore();
   const [searchParams] = useSearchParams();
   const [autoSend, setAutoSend] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: "I'm Nexus. LYC Partners has placed 500+ executives across 47 markets — I carry that knowledge into every conversation.\n\nOne in three leadership transitions fails within 18 months. Usually for the same reasons.\n\nWhat are you navigating right now?"
-    }
-  ]);
+  const STORAGE_KEY = 'nexus_chat_messages';
+  const INITIAL_MESSAGE: Message = {
+    role: 'assistant',
+    content: "I'm Nexus. LYC Partners has placed 500+ executives across 47 markets — I carry that knowledge into every conversation.\n\nOne in three leadership transitions fails within 18 months. Usually for the same reasons.\n\nWhat are you navigating right now?"
+  };
+  const [messages, setMessages] = useState<Message[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return [INITIAL_MESSAGE];
+  });
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [aiState, setAiState] = useState<'idle' | 'thinking' | 'error'>('idle');
   const [lastUserMessage, setLastUserMessage] = useState<string | null>(null);
   const [suggestedPrompts, setSuggestedPrompts] = useState<string[]>(initialPrompts || [
-    "I'm considering a move from Europe to APAC — what do I need to know?",
+    "How do I position myself for a C-suite transition?",
     'What makes a strong C-suite profile in 2026?',
     'I have a senior interview next week — help me prepare',
     'How does my profile benchmark against regional executives?'
@@ -61,6 +70,13 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const [capturedEmail, setCapturedEmail] = useState<string | null>(null);
   const [documentContext, setDocumentContext] = useState<string>('');
   const [uploading, setUploading] = useState(false);
+
+  // Persist messages to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-50))); // Keep last 50 messages
+    } catch {}
+  }, [messages]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -122,9 +138,9 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const send = async () => {
     if (!input.trim() || loading) return;
 
-    // Check if we need to show email gate (after 3 messages if not authenticated and no email captured)
-    if (!user && !capturedEmail && messages.length >= 3 && !showEmailGate) {
-      setShowEmailGate(true);
+    // Hard email gate: block sending after 3 messages until email is captured
+    if (!user && !capturedEmail && messages.length >= 3) {
+      if (!showEmailGate) setShowEmailGate(true);
       return;
     }
 
@@ -185,6 +201,12 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
     setInput(prompt);
   };
 
+  const clearChat = () => {
+    setMessages([INITIAL_MESSAGE]);
+    setDocumentContext('');
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+  };
+
   const handleEmailCapture = (email: string) => {
     setCapturedEmail(email);
     setShowEmailGate(false);
@@ -217,6 +239,11 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
             </div>
             <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>Nexus</h1>
             <p style={{ fontSize: '14px', color: DS.muted }}>Know where you stand. Know where to go.</p>
+            {messages.length > 1 && (
+              <button onClick={clearChat} style={{ marginTop: '8px', padding: '4px 12px', background: 'none', border: `1px solid ${DS.border}`, borderRadius: '6px', color: DS.muted, fontSize: '12px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <Trash2 style={{ width: 12, height: 12 }} /> Clear
+              </button>
+            )}
           </div>
         )}
 

@@ -96,7 +96,7 @@ export function MatchPage() {
       if (!file) return;
 
       if (file.size > 10 * 1024 * 1024) {
-        alert('File size exceeds 10MB limit');
+      console.warn('[Match] File size exceeds 10MB limit');
         return;
       }
 
@@ -120,7 +120,7 @@ export function MatchPage() {
         }
       } catch (err) {
         console.error('File upload error:', err);
-        alert('Failed to process file. Please try again.');
+        console.error('[Match] Failed to process file');
       }
     };
     input.click();
@@ -171,18 +171,59 @@ export function MatchPage() {
   };
 
   const handleDownloadPDF = (result: TRIDENTResult) => {
-    alert(`Download PDF for ${result.candidate_name}`);
+    const lines: string[] = [
+      '═══════════════════════════════════════════',
+      '  TRIDENT MATCH ANALYSIS REPORT',
+      '  LYC Intelligence — Powered by LYC Partners',
+      '═══════════════════════════════════════════',
+      '',
+      `Candidate: ${result.candidate_name}`,
+      `Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+      '',
+      '── MATCH SCORE ───────────────────────────',
+      `Overall: ${result.overall_score}%`,
+      '',
+      '── DIMENSION SCORES ──────────────────────',
+      `  Experience & Achievements: ${result.experience_score}%`,
+      `  Skills & Expertise: ${result.skills_score}%`,
+      `  Organizational Fit: ${result.fit_score}%`,
+      '',
+      '── VERDICT ───────────────────────────────',
+      `${result.verdict}`,
+      '',
+      result.match_reasons ? '── MATCH REASONS ─────────────────────────\n' + result.match_reasons.map((r: string) => `  • ${r}`).join('\n') : '',
+      result.risk_factors ? '── RISK FACTORS ──────────────────────────\n' + result.risk_factors.map((r: string) => `  • ${r}`).join('\n') : '',
+      '',
+      '═══════════════════════════════════════════',
+      '  Know where you stand. Know where to go.',
+      '  lyc-intelligence.app',
+      '═══════════════════════════════════════════',
+    ].filter(Boolean);
+    const reportText = lines.join('\n');
+    const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `LYC-TRIDENT-${result.candidate_name.replace(/\s+/g, '-')}-${new Date().toISOString().slice(0,10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
-  const handleShareCard = (result: TRIDENTResult) => {
-    const shareId = Math.random().toString(36).substring(7);
-    const shareUrl = `${window.location.origin}/score-card/${shareId}`;
-    navigator.clipboard.writeText(shareUrl);
-    alert('Shareable link copied to clipboard!');
+  const handleShareCard = async (result: TRIDENTResult) => {
+    try {
+      const shareId = Math.random().toString(36).substring(7);
+      const shareUrl = `${window.location.origin}/score-card/${shareId}`;
+      await navigator.clipboard.writeText(shareUrl);
+    } catch {
+      // Clipboard API may fail in some contexts
+    }
   };
 
   const handleSaveCandidate = (result: TRIDENTResult) => {
-    alert(`Save candidate: ${result.candidate_name}`);
+    // TODO: Implement save to Supabase when API auth is in place
+    console.log('[Match] Save candidate:', result.candidate_name);
   };
 
   if (step === 'gate') {

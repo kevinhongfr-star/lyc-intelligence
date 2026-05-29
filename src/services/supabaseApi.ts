@@ -115,7 +115,7 @@ export interface CandidatePipeline {
 
 
 function escapeLikePattern(str: string): string {
-  return str.replace(/[%_\]/g, '\\$&');
+  return str.replace(/[%_\\]/g, '\\\\$&');
 }
 
 export async function searchContacts(params: { query?: string; seniority?: string[]; skills?: string[]; country?: string; limit?: number; offset?: number; }): Promise<{ data: Contact[]; count: number }> {
