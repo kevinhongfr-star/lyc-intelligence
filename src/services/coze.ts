@@ -1,3 +1,4 @@
+/** @deprecated Use serverApi or /api/chat directly. This file will be removed. */
 // coze.ts — Legacy service file. All AI calls now go through /api/chat proxy.
 // This file is kept only for type compatibility. Do not add API keys here.
 

@@ -21,28 +21,67 @@ interface ChatMessage {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method === 'GET') {
+    return handleGet(req, res);
+  } else if (req.method === 'DELETE') {
+    return handleDelete(req, res);
+  } else if (req.method === 'POST') {
+    return handlePost(req, res);
   }
+  return res.status(405).json({ error: 'Method not allowed' });
+}
 
+async function handleGet(req: VercelRequest, res: VercelResponse) {
+  const userId = req.query.userId as string;
+  if (!userId) return res.status(400).json({ error: 'User ID required' });
+  if (!supabase) return res.status(200).json({ memories: [] });
+
+  const { data, error } = await supabase
+    .from('memories')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error) {
+    console.error('[Memory GET] Error:', error);
+    return res.status(500).json({ error: 'Failed to fetch memories' });
+  }
+  return res.status(200).json({ memories: data || [] });
+}
+
+async function handleDelete(req: VercelRequest, res: VercelResponse) {
+  const memoryId = req.query.memoryId as string;
+  if (!memoryId) return res.status(400).json({ error: 'Memory ID required' });
+  if (!supabase) return res.status(200).json({ success: true });
+
+  const { error } = await supabase
+    .from('memories')
+    .update({ is_active: false })
+    .eq('id', memoryId);
+
+  if (error) {
+    console.error('[Memory DELETE] Error:', error);
+    return res.status(500).json({ error: 'Failed to delete memory' });
+  }
+  return res.status(200).json({ success: true });
+}
+
+async function handlePost(req: VercelRequest, res: VercelResponse) {
   const { userId, messages, sessionId, explicitGoal } = req.body;
 
-  if (!userId) {
-    return res.status(400).json({ error: 'User ID required' });
-  }
+  if (!userId) return res.status(400).json({ error: 'User ID required' });
 
-  // Handle explicit goal storage
   if (explicitGoal) {
     await storeExplicitMemory(userId, explicitGoal, sessionId);
     return res.status(200).json({ success: true, message: 'Goal stored' });
   }
 
-  // Handle memory extraction from conversation
   if (!messages || messages.length === 0) {
     return res.status(400).json({ error: 'Messages required for extraction' });
   }
 
-  // Run memory extraction asynchronously
   if (DEEPSEEK_API_KEY && supabase) {
     try {
       const conversationText = messages.map((m: ChatMessage) => 
@@ -50,16 +89,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ).join('\n\n');
 
       const memories = await extractMemories(conversationText);
-      
-      // Store extracted memories
       for (const memory of memories) {
         await storeExtractedMemory(userId, memory, sessionId);
       }
-
-      return res.status(200).json({ 
-        success: true, 
-        memories_extracted: memories.length 
-      });
+      return res.status(200).json({ success: true, memories_extracted: memories.length });
     } catch (e) {
       console.error('[Memory API] Extraction failed:', e);
       return res.status(500).json({ error: 'Extraction failed' });
@@ -98,14 +131,10 @@ ${conversationText}`;
       })
     });
 
-    if (!response.ok) {
-      throw new Error('DeepSeek API failed');
-    }
+    if (!response.ok) throw new Error('DeepSeek API failed');
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '[]';
-    
-    // Parse and validate memories
     const memories = JSON.parse(content);
     if (!Array.isArray(memories)) return [];
     
@@ -125,7 +154,6 @@ ${conversationText}`;
 
 async function storeExplicitMemory(userId: string, content: string, sessionId?: string) {
   if (!supabase) return;
-  
   await supabase.from('memories').insert({
     user_id: userId,
     memory_type: 'goal',
@@ -139,7 +167,6 @@ async function storeExplicitMemory(userId: string, content: string, sessionId?: 
 
 async function storeExtractedMemory(userId: string, memory: Memory, sessionId?: string) {
   if (!supabase) return;
-  
   await supabase.from('memories').insert({
     user_id: userId,
     memory_type: memory.memory_type,
@@ -149,65 +176,4 @@ async function storeExtractedMemory(userId: string, memory: Memory, sessionId?: 
     confidence: memory.confidence,
     is_active: true
   });
-}
-
-// GET handler for retrieving memories
-export async function getMemories(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const userId = req.query.userId as string;
-  
-  if (!userId) {
-    return res.status(400).json({ error: 'User ID required' });
-  }
-
-  if (!supabase) {
-    return res.status(200).json({ memories: [] });
-  }
-
-  const { data, error } = await supabase
-    .from('memories')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
-    .limit(50);
-
-  if (error) {
-    console.error('[Memory GET] Error:', error);
-    return res.status(500).json({ error: 'Failed to fetch memories' });
-  }
-
-  return res.status(200).json({ memories: data || [] });
-}
-
-// DELETE handler for deactivating memories
-export async function deleteMemory(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'DELETE') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const memoryId = req.query.memoryId as string;
-  
-  if (!memoryId) {
-    return res.status(400).json({ error: 'Memory ID required' });
-  }
-
-  if (!supabase) {
-    return res.status(200).json({ success: true });
-  }
-
-  const { error } = await supabase
-    .from('memories')
-    .update({ is_active: false })
-    .eq('id', memoryId);
-
-  if (error) {
-    console.error('[Memory DELETE] Error:', error);
-    return res.status(500).json({ error: 'Failed to delete memory' });
-  }
-
-  return res.status(200).json({ success: true });
 }

@@ -23,7 +23,7 @@ interface UpgradeModalProps {
 
 export const TIERS = [
   {
-    id: 'basic',
+    id: 'free',
     name: 'Basic',
     price: 19,
     credits: 50,

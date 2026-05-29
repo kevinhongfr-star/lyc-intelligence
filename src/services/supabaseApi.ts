@@ -5,7 +5,7 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
+const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
 
 let supabase: SupabaseClient;
 export function getSupabase(): SupabaseClient {
@@ -113,10 +113,15 @@ export interface CandidatePipeline {
 
 // ─── Query Functions ───
 
+
+function escapeLikePattern(str: string): string {
+  return str.replace(/[%_\]/g, '\\$&');
+}
+
 export async function searchContacts(params: { query?: string; seniority?: string[]; skills?: string[]; country?: string; limit?: number; offset?: number; }): Promise<{ data: Contact[]; count: number }> {
   const sb = getSupabase();
   let q = sb.from('contacts').select('*, company:companies(*)', { count: 'exact' });
-  if (params.query) q = q.or(`name.ilike.%${params.query}%,email.ilike.%${params.query}%,headline.ilike.%${params.query}%,current_title.ilike.%${params.query}%`);
+  if (params.query) q = q.or(`name.ilike.%${escapeLikePattern(params.query)}%,email.ilike.%${escapeLikePattern(params.query)}%,headline.ilike.%${escapeLikePattern(params.query)}%,current_title.ilike.%${escapeLikePattern(params.query)}%`);
   if (params.seniority?.length) q = q.in('seniority', params.seniority);
   if (params.country) q = q.eq('country', params.country);
   q = q.range(params.offset ?? 0, (params.offset ?? 0) + (params.limit ?? 50) - 1).order('updated_at', { ascending: false });

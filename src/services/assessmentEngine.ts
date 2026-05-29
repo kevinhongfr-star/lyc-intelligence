@@ -288,7 +288,7 @@ export const DIMENSION_WEIGHTS: Record<DimensionId, number> = {
 
 export const DIMENSION_INFO: Record<DimensionId, { name: string; description: string }> = {
   strategic_orientation: { name: 'Strategic Orientation', description: 'Ability to think long-term and set direction' },
-  cross_border_adaptability: { name: 'Cross-Border Adaptability', description: 'Ability to adapt across cultures' },
+  cross_border_adaptability: { name: 'Adaptability', description: 'Ability to adapt across cultures' },
   stakeholder_influence: { name: 'Stakeholder Influence', description: 'Ability to influence and align' },
   execution_discipline: { name: 'Execution Discipline', description: 'Delivering results consistently' },
   leadership_presence: { name: 'Leadership Presence', description: 'Executive presence and trust' },
@@ -363,7 +363,7 @@ export const ARCHETYPE_INFO: Record<CPDArchetype, { description: string; strengt
     description: 'You see the big picture and inspire others to follow. Great at setting direction and building buy-in.',
     strengths: ['Strategic thinking', 'Stakeholder influence', 'Visionary leadership', 'Long-term perspective'],
     development: ['Execution', 'Adaptability'],
-    tagline: 'Building leadership that works across borders'
+    tagline: 'Know where you stand. Know where to go.'
   },
   'Global Catalyst': {
     description: 'You thrive in diverse, multi-cultural environments.',

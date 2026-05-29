@@ -61,7 +61,8 @@ async function handleCheckout(req: VercelRequest, res: VercelResponse) {
         'cancel_url': `${process.env.SITE_URL}/pricing?canceled=true`,
         'customer_email': userData.email,
         'metadata[user_id]': userId,
-        'metadata[tier]': tier
+        'metadata[tier]': tier,
+        'idempotency_key': \`checkout_${userId}_${tier}_${Date.now()}\`
       })
     });
 

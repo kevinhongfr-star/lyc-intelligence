@@ -3,7 +3,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { User, ICP } from '@/types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
+const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
 
 const sb = SUPABASE_URL && SUPABASE_KEY ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 

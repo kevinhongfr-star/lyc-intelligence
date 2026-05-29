@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
+const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
 
 export interface UserProfile {
   id: string;
@@ -15,6 +15,15 @@ export interface UserProfile {
   organization_id: string | null;
   subtype: string | null;
   notion_profile_id: string | null;
+  current_title: string | null;
+  company: string | null;
+  country: string | null;
+  goal_short: string | null;
+  goal_long: string | null;
+  target_geography: string | null;
+  credits: { balance: number; tier: string; daily_balance: number } | null;
+  streak_days: number | null;
+  referral_code: string | null;
   created_at: string;
   updated_at: string;
 }

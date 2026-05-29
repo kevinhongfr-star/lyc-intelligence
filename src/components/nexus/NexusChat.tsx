@@ -26,6 +26,7 @@ const DS = {
 };
 
 interface Message {
+  id?: string;
   role: 'user' | 'assistant';
   content: string;
 }
@@ -168,11 +169,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
         const data = await response.json();
         if (data.text) {
           setDocumentContext(data.text);
-          setMessages(prev => [...prev, {
-            role: 'user',
-            content: `I've uploaded a document: ${file.name}. Please analyze it and help me understand its content.`
-          }]);
-          await sendMessage(`Please analyze this document: ${file.name}`);
+          await sendMessage(`I've uploaded a document: ${file.name}. Please analyze it and help me understand its content.`);
         }
       } catch (error) {
         console.error('Upload failed:', error);
@@ -312,6 +309,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
           <button
             onClick={send}
             disabled={loading || !input.trim()}
+            className="cta-glow"
             style={{
               padding: '14px 20px',
               background: DS.accent,
@@ -321,7 +319,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
               cursor: (loading || !input.trim()) ? 'not-allowed' : 'pointer',
               opacity: (loading || !input.trim()) ? 0.5 : 1,
               minHeight: '44px',
-              className: 'cta-glow'
+              
             }}
           >
             <ArrowRight style={{ width: 18, height: 18 }} />
