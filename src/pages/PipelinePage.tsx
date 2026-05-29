@@ -11,7 +11,7 @@ const STAGE_COLORS: Record<string, string> = {
   SWEEP: 'border-t-sweep-light',
   CANVA: 'border-t-tier-2',
   GRID: 'border-t-tier-1',
-  Candidate Report: 'border-t-accent',
+  'Candidate Report': 'border-t-accent',
   PLACED: 'border-t-purple-400',
 };
 
@@ -19,12 +19,12 @@ const STAGE_BG: Record<string, string> = {
   SWEEP: 'bg-sweep/5',
   CANVA: 'bg-tier-2Bg',
   GRID: 'bg-tier-1Bg',
-  Candidate Report: 'bg-accent/5',
+  'Candidate Report': 'bg-accent/5',
   PLACED: 'bg-purple-500/5',
 };
 
 const NEXT_STAGE: Record<string, string> = {
-  SWEEP: 'CANVA', CANVA: 'GRID', GRID: 'Candidate Report', Candidate Report: 'PLACED',
+  SWEEP: 'CANVA', CANVA: 'GRID', GRID: 'Candidate Report', 'Candidate Report': 'PLACED',
 };
 
 const VERDICT_OPTIONS = ['Strong Fit', 'Conditional Fit', 'Weak Fit', 'Hold', 'Reject'];
