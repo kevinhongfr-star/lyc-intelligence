@@ -23,7 +23,7 @@ const DS = {
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
-const HERO_VIDEO = 'https://assets.mixkit.co/videos/46497/46497-720.mp4';
+const HERO_VIDEO = '/hero-bg.mp4';
 const HERO_POSTER = 'https://www.lyc-partners.ai/images/heroes/hero-boardroom.webp';
 
 export function Landing() {
@@ -123,6 +123,7 @@ export function Landing() {
             transform: 'translate(-50%, -50%)',
             objectFit: 'cover',
             zIndex: 0,
+            filter: 'blur(3px)',
           }}
         >
           <source src={HERO_VIDEO} type="video/mp4" />
@@ -132,7 +133,7 @@ export function Landing() {
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(180deg, rgba(13,10,20,0.75) 0%, rgba(26,15,30,0.65) 40%, rgba(40,21,48,0.7) 70%, rgba(13,10,20,0.85) 100%)',
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.82) 0%, rgba(10,6,14,0.78) 30%, rgba(20,10,24,0.75) 60%, rgba(0,0,0,0.9) 100%)',
           zIndex: 1,
         }} />
 
