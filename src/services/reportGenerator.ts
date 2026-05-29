@@ -21,7 +21,7 @@ export async function generatePDF(assessmentType: AssessmentType, result: { scor
   
   doc.setFontSize(10); 
   doc.setTextColor(136, 136, 136);
-  doc.text('Building Leadership That Works Across Borders', margin, y + 17);
+  doc.text('Know where you stand. Know where to go.', margin, y + 17);
   y += 25;
   
   // Accent line

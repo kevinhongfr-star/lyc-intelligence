@@ -37,7 +37,7 @@ export function NavBar() {
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/assessment', label: 'Assessment' },
     { href: '/match', label: 'Match' },
-    { href: '/nexus', label: 'Nexus AI' },
+    { href: '/nexus', label: 'Nexus' },
   ];
 
   return (
@@ -85,7 +85,7 @@ export function NavBar() {
           borderRadius: '20px',
         }}>
           <CreditCard style={{ width: 14, height: 14, color: DS.accent }} />
-          <span style={{ fontSize: '13px', fontWeight: 600, color: DS.text }}>—</span>
+          <span style={{ fontSize: '13px', fontWeight: 600, color: DS.text }}>{profile?.credits?.balance ?? 0}</span>
         </div>
 
         {/* User Menu */}

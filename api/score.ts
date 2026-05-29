@@ -66,14 +66,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Missing JD or candidates' });
   }
 
-  // Rate limiting check
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  if (ip) {
-    const rateLimitKey = `rate_limit:${ip}`;
-    // In production, check Redis or Supabase for rate limiting
-    // For now, skip rate limiting in this implementation
-  }
-
   try {
     const results: ScoreResult[] = [];
 

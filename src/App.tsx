@@ -51,7 +51,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const { initialize } = useAuthStore();
+  const { user, initialize } = useAuthStore();
   
   useEffect(() => {
     initialize();
