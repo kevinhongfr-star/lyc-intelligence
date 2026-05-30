@@ -1,5 +1,6 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { requireAuth, AuthedRequest } from '../_lib/auth';
 import { createClient } from '@supabase/supabase-js';
 
 
@@ -11,7 +12,9 @@ const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
   : null;
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: AuthedRequest, res: VercelResponse) {
+  if (!(await requireAuth(req, res))) return;
+  const userId = req.userId!;
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -33,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     // Upload placeholder image or generate real one here
     
-    const placeholderImageUrl = 'https://placehold.co/1200x630/0A0A0A/C108AB?text=LYC+Intelligence+Share+Card';
+    const placeholderImageUrl = 'https://SITE_URL/og-image.svg/0A0A0A/C108AB?text=LYC+Intelligence+Share+Card';
     
     // Save to share_cards table
     const { data: shareCard, error: dbError } = await supabase

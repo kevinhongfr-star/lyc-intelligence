@@ -1,7 +1,7 @@
+import { apiFetch } from '@/lib/apiClient';
 import React, { useState } from 'react';
 import { Upload, Play, Loader2, Plus, X } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Badge, Input, Progress } from '@/components/ui';
-import { scoreCandidateWithAI } from '@/services/coze';
 import { computeTRIDENT } from '@/services/tridentScoring';
 import { getSupabase } from '@/services/supabaseApi';
 
@@ -38,7 +38,13 @@ export function BatchScoringPage() {
     setScoring(true); setProgress(0); setResults([]);
     const valid = candidates.filter(c => c.name && c.cv);
     for (let i = 0; i < valid.length; i++) {
-      const score = await scoreCandidateWithAI(jd, valid[i].cv);
+      const scoreRes = await apiFetch('/api/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jd, cv: valid[i].cv }),
+      });
+      const scoreData = await scoreRes.json();
+      const score = scoreData.result || scoreData;
       if (score) {
         const result = computeTRIDENT({ d1: score.d1, d2: score.d2, d3: score.d3 });
         setResults(prev => [...prev, { name: valid[i].name, d1: score.d1, d2: score.d2, d3: score.d3, composite: result.composite, verdict: result.verdict, tier: result.tier, reasoning: score.reasoning }]);

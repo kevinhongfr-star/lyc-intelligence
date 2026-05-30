@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import { requireAuth, AuthedRequest } from '../_lib/auth';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
@@ -8,16 +9,19 @@ const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
   : null;
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: AuthedRequest, res: VercelResponse) {
   if (req.method === 'POST') {
+    if (!(await requireAuth(req, res))) return;
+    const userId = req.userId!;
+
     const { action } = req.query;
 
     if (action === 'spend') {
-      return handleSpend(req, res);
+      return handleSpend(req, res, userId);
     } else if (action === 'earn') {
-      return handleEarn(req, res);
+      return handleEarn(req, res, userId);
     } else if (action === 'daily-reset') {
-      return handleDailyReset(req, res);
+      return handleDailyReset(req, res, userId);
     }
 
     return res.status(400).json({ error: 'Invalid action' });
@@ -26,18 +30,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   return res.status(405).json({ error: 'Method not allowed' });
 }
 
-async function handleSpend(req: VercelRequest, res: VercelResponse) {
-  const { userId, amount, action, referenceId } = req.body;
+async function handleSpend(req: AuthedRequest, res: VercelResponse, userId: string) {
+  const { amount, action, referenceId } = req.body;
 
-  if (!userId || !amount || !action) {
+  if (!amount || !action) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
-    // Get current balance
     const { data: creditData, error: creditError } = await supabase!
       .from('credits')
-      .select('balance, tier')
+      .select('balance, tier, total_spent')
       .eq('user_id', userId)
       .single();
 
@@ -45,7 +48,6 @@ async function handleSpend(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Credits record not found', success: false });
     }
 
-    // Check if user has enough credits
     if (creditData.balance < amount) {
       return res.status(400).json({ 
         error: 'Insufficient credits',
@@ -55,21 +57,21 @@ async function handleSpend(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Deduct credits
+    // Optimistic lock
     const { error: updateError } = await supabase!
       .from('credits')
       .update({
         balance: creditData.balance - amount,
-        total_spent: creditData.total_spent + amount,
+        total_spent: (creditData.total_spent || 0) + amount,
         updated_at: new Date().toISOString()
       })
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .eq('balance', creditData.balance);
 
     if (updateError) {
-      throw updateError;
+      return res.status(409).json({ error: 'Concurrent modification — please retry', success: false, retry: true });
     }
 
-    // Record transaction
     const { error: transactionError } = await supabase!
       .from('credit_transactions')
       .insert({
@@ -95,23 +97,21 @@ async function handleSpend(req: VercelRequest, res: VercelResponse) {
   }
 }
 
-async function handleEarn(req: VercelRequest, res: VercelResponse) {
-  const { userId, amount, action, referenceId } = req.body;
+async function handleEarn(req: AuthedRequest, res: VercelResponse, userId: string) {
+  const { amount, action, referenceId } = req.body;
 
-  if (!userId || !amount || !action) {
+  if (!amount || !action) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
-    // Get current balance
     const { data: creditData, error: creditError } = await supabase!
       .from('credits')
-      .select('balance')
+      .select('balance, total_earned')
       .eq('user_id', userId)
       .single();
 
     if (creditError || !creditData) {
-      // Create credits record if it doesn't exist
       await supabase!
         .from('credits')
         .insert({
@@ -123,7 +123,6 @@ async function handleEarn(req: VercelRequest, res: VercelResponse) {
           tier: 'free'
         });
 
-      // Record transaction
       await supabase!
         .from('credit_transactions')
         .insert({
@@ -137,21 +136,18 @@ async function handleEarn(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ success: true, newBalance: amount });
     }
 
-    // Update balance
+    const newTotalEarned = (creditData.total_earned || 0) + amount;
     const { error: updateError } = await supabase!
       .from('credits')
       .update({
         balance: creditData.balance + amount,
-        total_earned: creditData.balance + amount,
+        total_earned: newTotalEarned,
         updated_at: new Date().toISOString()
       })
       .eq('user_id', userId);
 
-    if (updateError) {
-      throw updateError;
-    }
+    if (updateError) throw updateError;
 
-    // Record transaction
     await supabase!
       .from('credit_transactions')
       .insert({
@@ -173,18 +169,11 @@ async function handleEarn(req: VercelRequest, res: VercelResponse) {
   }
 }
 
-async function handleDailyReset(req: VercelRequest, res: VercelResponse) {
-  const { userId } = req.body;
-
-  if (!userId) {
-    return res.status(400).json({ error: 'User ID required' });
-  }
-
+async function handleDailyReset(req: AuthedRequest, res: VercelResponse, userId: string) {
   try {
-    // Get user's credits record
     const { data: creditData, error: creditError } = await supabase!
       .from('credits')
-      .select('tier, daily_balance')
+      .select('tier, daily_balance, total_earned')
       .eq('user_id', userId)
       .single();
 
@@ -192,26 +181,22 @@ async function handleDailyReset(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Credits record not found' });
     }
 
-    // Only reset for free tier users
     if (creditData.tier !== 'free') {
       return res.status(200).json({ success: true, creditsGranted: 0, message: 'No reset needed for paid tier' });
     }
 
-    // Grant daily credits (5 for free tier)
     const dailyCredits = 5;
 
-    // Update balance
     await supabase!
       .from('credits')
       .update({
-        balance: creditData.balance + dailyCredits,
+        balance: creditData.daily_balance + dailyCredits,
         daily_balance: dailyCredits,
-        total_earned: creditData.balance + dailyCredits,
+        total_earned: (creditData.total_earned || 0) + dailyCredits,
         updated_at: new Date().toISOString()
       })
       .eq('user_id', userId);
 
-    // Record transaction
     await supabase!
       .from('credit_transactions')
       .insert({
@@ -224,7 +209,7 @@ async function handleDailyReset(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ 
       success: true, 
       creditsGranted: dailyCredits,
-      newBalance: creditData.balance + dailyCredits
+      newBalance: creditData.daily_balance + dailyCredits
     });
   } catch (e) {
     console.error('[Credits] Daily reset error:', e);

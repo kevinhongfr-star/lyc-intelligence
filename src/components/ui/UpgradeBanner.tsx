@@ -63,7 +63,7 @@ export function UpgradeBanner({ type = 'empty', message, onDismiss }: UpgradeBan
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <a
-          href="/upgrade"
+          href="/pricing"
           style={{
             display: 'inline-flex',
             alignItems: 'center',

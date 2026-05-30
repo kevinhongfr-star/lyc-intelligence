@@ -1,3 +1,4 @@
+import { apiFetch } from '@/lib/apiClient';
 
 import { getSupabase } from './supabaseApi';
 
@@ -19,7 +20,7 @@ export async function generateShareCard(
   userId: string
 ): Promise<ShareCard | null> {
   try {
-    const res = await fetch('/api/share', {
+    const res = await apiFetch('/api/share', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type, data, userId })

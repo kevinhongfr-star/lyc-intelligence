@@ -18,18 +18,14 @@ const DS = {
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
+  bg: '#FFFFFF', bgAlt: '#F5F5F5',
+  card: '#FFFFFF', cardBorder: '#E5E5E5',
+  text: '#000000', textSecondary: '#333333', muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
+  radius: '12px', radiusSm: '8px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
+  success: '#00897B', warning: '#F59E0B', error: '#EF4444',
 };
 
 type Step = 'gate' | 'context' | 'dimensions' | 'cross_border' | 'style' | 'goals' | 'results';
@@ -79,7 +75,7 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
       const saved = localStorage.getItem('assessmentState');
       if (saved) {
         const parsed = JSON.parse(saved);
-        setState(prev => ({ ...prev, ...parsed }));
+        setState((prev: any) => ({ ...prev, ...parsed }));
       }
     } catch (e) {
       console.warn('Failed to load from localStorage', e);
@@ -99,7 +95,7 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
 
   const answerDimensionQuestion = (score: number) => {
     const questionId = CPD_SCENARIOS[currentQuestionIndex].id;
-    setState(prev => ({
+    setState((prev: any) => ({
       ...prev,
       dimensions: { ...prev.dimensions, [questionId]: score }
     }));
@@ -112,7 +108,7 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
 
   const answerCrossBorderQuestion = (score: number) => {
     const questionId = CROSS_BORDER_QUESTIONS[currentCrossBorderIndex].id;
-    setState(prev => ({
+    setState((prev: any) => ({
       ...prev,
       crossBorderQuestions: { ...prev.crossBorderQuestions, [questionId]: score }
     }));
@@ -166,16 +162,16 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
         }),
         '',
         '── CAREER STAGE ──────────────────────────',
-        `${contextData.career_stage || 'Not specified'}`,
+        `${state.professionalContext?.situation || 'Not specified'}`,
         '',
         '── GEOGRAPHY ─────────────────────────────',
-        `${contextData.geography || 'Not specified'}`,
+        `${state.professionalContext?.geography || 'Not specified'}`,
         '',
         '── WRITING STYLE ─────────────────────────',
-        `${contextData.writing_style || 'Not specified'}`,
+        `${state.writingStyle || 'Not specified'}`,
         '',
         '── GOALS ─────────────────────────────────',
-        ...(contextData.goals || []).map((g: string) => `  • ${g}`),
+        ...(state.careerGoals || []).map((g: string) => `  • ${g}`),
         '',
         '═══════════════════════════════════════════',
         '  Know where you stand. Know where to go.',
@@ -249,7 +245,7 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
           <StyleSelector
             selectedStyle={state.writingStyle}
             onSelect={(style) => {
-              setState(prev => ({ ...prev, writingStyle: style }));
+              setState((prev: any) => ({ ...prev, writingStyle: style }));
               goNext('goals');
             }}
           />
@@ -319,7 +315,7 @@ function GateStep({ state, setState, onSubmit, error }: any) {
           <input
             type="text"
             value={state.gate.name}
-            onChange={(e) => setState(prev => ({ ...prev, gate: { ...prev.gate, name: e.target.value } }))}
+            onChange={(e) => setState((prev: any) => ({ ...prev, gate: { ...prev.gate, name: e.target.value } }))}
             style={{
               width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
             }}
@@ -333,7 +329,7 @@ function GateStep({ state, setState, onSubmit, error }: any) {
           <input
             type="email"
             value={state.gate.email}
-            onChange={(e) => setState(prev => ({ ...prev, gate: { ...prev.gate, email: e.target.value } }))}
+            onChange={(e) => setState((prev: any) => ({ ...prev, gate: { ...prev.gate, email: e.target.value } }))}
             style={{
               width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
             }}
@@ -398,7 +394,7 @@ function ContextStep({ state, setState, onNext }: any) {
             {careerSituations.map((s) => (
               <button
                 key={s.id}
-                onClick={() => setState(prev => ({ ...prev, professionalContext: { ...prev.professionalContext, situation: s.id } }))}
+                onClick={() => setState((prev: any) => ({ ...prev, professionalContext: { ...prev.professionalContext, situation: s.id } }))}
                 style={{
                   padding: '12px',
                   background: state.professionalContext.situation === s.id ? `${DS.accent}20` : DS.card,
@@ -424,7 +420,7 @@ function ContextStep({ state, setState, onNext }: any) {
             {careerGeographies.map((g) => (
               <button
                 key={g.id}
-                onClick={() => setState(prev => ({ ...prev, professionalContext: { ...prev.professionalContext, geography: g.id } }))}
+                onClick={() => setState((prev: any) => ({ ...prev, professionalContext: { ...prev.professionalContext, geography: g.id } }))}
                 style={{
                   padding: '12px',
                   background: state.professionalContext.geography === g.id ? `${DS.accent}20` : DS.card,
@@ -450,7 +446,7 @@ function ContextStep({ state, setState, onNext }: any) {
             {functions.map((f) => (
               <button
                 key={f}
-                onClick={() => setState(prev => ({ ...prev, professionalContext: { ...prev.professionalContext, function: f } }))}
+                onClick={() => setState((prev: any) => ({ ...prev, professionalContext: { ...prev.professionalContext, function: f } }))}
                 style={{
                   padding: '10px 14px',
                   background: state.professionalContext.function === f ? `${DS.accent}20` : DS.card,
@@ -547,7 +543,7 @@ function CareerGoalsStep({ state, setState, onComplete }: any) {
   };
 
   const handleContinue = () => {
-    setState(prev => ({ ...prev, careerGoals: selected }));
+    setState((prev: any) => ({ ...prev, careerGoals: selected }));
     onComplete();
   };
 

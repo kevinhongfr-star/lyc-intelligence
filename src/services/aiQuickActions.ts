@@ -1,4 +1,4 @@
-import { sendChatMessage } from './coze';
+
 export type AIAction = 'email' | 'cv' | 'shortlist' | 'overview' | 'feedback';
 const PROMPTS: Record<AIAction, string> = {
   email: 'Write a professional outreach email from LYC Partners to {name} about a {mandate} opportunity. Warm but professional, under 150 words.',
@@ -9,5 +9,12 @@ const PROMPTS: Record<AIAction, string> = {
 };
 export async function executeAIAction(action: AIAction, context: { name: string; title?: string; company?: string; mandate: string; viewMode: 'internal' | 'external' }): Promise<string> {
   const prompt = PROMPTS[action].replace('{name}', context.name).replace('{title}', context.title || '').replace('{company}', context.company || '').replace('{mandate}', context.mandate);
-  return sendChatMessage(prompt, 'quick-action');
+  const { apiFetch } = await import('@/lib/apiClient');
+  const res = await apiFetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: prompt, action: 'quick-action' }),
+  });
+  const data = await res.json();
+  return data.response || data.message || '';
 }

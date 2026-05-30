@@ -196,7 +196,7 @@ export function LensExportPage() {
     });
     setSending(false);
     if (result.success) { setSent(true); setTimeout(() => setSent(false), 3000); }
-    else { alert('Failed to send: ' + (result.error || 'Unknown error')); }
+    else { console.warn('Failed to send: ' + (result.error || 'Unknown error')); }
   }
 
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>;

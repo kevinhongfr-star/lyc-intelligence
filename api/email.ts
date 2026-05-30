@@ -1,5 +1,6 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { requireAuth, AuthedRequest } from '../_lib/auth';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const CONSULTANT_EMAIL = process.env.CONSULTANT_EMAIL || 'contact@lyc-partners.ai';
@@ -102,7 +103,9 @@ const renderEmailTemplate = (type: string, data: any) => {
   }
 };
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: AuthedRequest, res: VercelResponse) {
+  if (!(await requireAuth(req, res))) return;
+  const userId = req.userId!;
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart3, Users, Briefcase, TrendingUp, CheckCircle2, Zap, Plus, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
-import { useAuth } from '@/contexts';
+import { useAuthStore } from '@/stores/authStore';
 import { STAGE_CONFIG, STAGE_ORDER } from '@/types/mandate';
 import { useDashboardStats, useMandates } from '@/hooks/useSupabaseData';
 import { CommandCenter } from './CommandCenter';
@@ -9,7 +9,7 @@ import { CommandCenter } from './CommandCenter';
 const STATUS_LABELS: Record<string, string> = { '1_search': 'SWEEP', '2_call': 'CANVA', '3_deliver': 'GRID/LENS', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
 
 export function ConsultantDashboard() {
-  const { user } = useAuth();
+  const { user, profile } = useAuthStore();
   const { stats, loading: statsLoading } = useDashboardStats();
   const { data: mandates, count, loading: mandatesLoading } = useMandates({ limit: 10 });
   const [activeTab, setActiveTab] = useState<'overview' | 'command'>('overview');
@@ -18,7 +18,7 @@ export function ConsultantDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-text-primary">Good morning, {user?.name?.split(' ')[0]}</h1>
+          <h1 className="text-2xl font-serif font-bold text-text-primary">Good morning, {(profile?.name || user?.email?.split('@')[0] || 'there')?.split(' ')[0]}</h1>
           <p className="text-text-secondary">Here's your pipeline overview for today</p>
         </div>
         <div className="flex gap-2">

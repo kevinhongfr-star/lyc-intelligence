@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts';
+import { useAuthStore } from '@/stores/authStore';
 import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDashboard, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon } from 'lucide-react';
 import { CreditDisplay } from '@/components/ui/CreditDisplay';
 import { IconBridge, IconTrident, IconDrive, IconLeap, IconImpact, IconSpark, IconQuest, IconForge, IconPrism } from '@/components/icons/LycIcons';
@@ -26,7 +26,7 @@ const NAV_ITEMS = [
 type NavItem = { path?: string; icon?: any; label: string; exact?: boolean; type?: 'divider'; suffix?: string };
 
 export function AppLayout() {
-  const { user, logout } = useAuth();
+  const { user, profile, signOut } = useAuthStore();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => (localStorage.getItem('lyc-theme') as 'dark' | 'light') || 'light');
@@ -83,7 +83,7 @@ export function AppLayout() {
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="flex items-center gap-2 text-sm text-text-muted hover:text-text-primary w-full min-h-[44px]">
             {sidebarOpen ? '← Collapse' : '→'}
           </button>
-          <button onClick={logout} className="flex items-center gap-2 text-sm text-text-muted hover:text-text-primary w-full min-h-[44px]">
+          <button onClick={() => signOut()} className="flex items-center gap-2 text-sm text-text-muted hover:text-text-primary w-full min-h-[44px]">
             <LogOut className="w-4 h-4" />{sidebarOpen && 'Sign Out'}
           </button>
         </div>

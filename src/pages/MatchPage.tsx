@@ -12,18 +12,14 @@ const DS = {
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
+  bg: '#FFFFFF', bgAlt: '#F5F5F5',
+  card: '#FFFFFF', cardBorder: '#E5E5E5',
+  text: '#000000', textSecondary: '#333333', muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
+  radius: '12px', radiusSm: '8px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
+  success: '#00897B', warning: '#F59E0B', error: '#EF4444',
 };
 
 interface LeadData {
@@ -181,15 +177,15 @@ export function MatchPage() {
       `Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
       '',
       '── MATCH SCORE ───────────────────────────',
-      `Overall: ${result.overall_score}%`,
+      `Overall: ${result.composite_score}%`,
       '',
       '── DIMENSION SCORES ──────────────────────',
-      `  Experience & Achievements: ${result.experience_score}%`,
-      `  Skills & Expertise: ${result.skills_score}%`,
-      `  Organizational Fit: ${result.fit_score}%`,
+      `  Experience & Achievements: ${result.dimension_scores?.experience}%`,
+      `  Skills & Expertise: ${result.dimension_scores?.skills}%`,
+      `  Organizational Fit: ${result.dimension_scores?.fit}%`,
       '',
       '── VERDICT ───────────────────────────────',
-      `${result.verdict}`,
+      `${result.approach_strategy}`,
       '',
       result.match_reasons ? '── MATCH REASONS ─────────────────────────\n' + result.match_reasons.map((r: string) => `  • ${r}`).join('\n') : '',
       result.risk_factors ? '── RISK FACTORS ──────────────────────────\n' + result.risk_factors.map((r: string) => `  • ${r}`).join('\n') : '',
@@ -223,7 +219,7 @@ export function MatchPage() {
 
   const handleSaveCandidate = (result: TRIDENTResult) => {
     // TODO: Implement save to Supabase when API auth is in place
-    console.log('[Match] Save candidate:', result.candidate_name);
+    // TODO: #110 — console.log('[Match] Save candidate:', result.candidate_name);
   };
 
   if (step === 'gate') {

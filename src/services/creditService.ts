@@ -1,3 +1,4 @@
+import { apiFetch } from '@/lib/apiClient';
 import { getSupabase } from './supabaseApi';
 import { useAuthStore } from '../stores/authStore';
 
@@ -38,6 +39,7 @@ export const TIER_CREDITS = {
   council: 999999
 } as const;
 
+// NOTE: getCreditBalance reads from client-side Supabase — consider using CreditContext.refreshCredits instead
 export async function getCreditBalance(userId: string): Promise<CreditInfo | null> {
   try {
     const sb = getSupabase();
@@ -73,7 +75,7 @@ export async function spendCredits(
   referenceId?: string
 ): Promise<{ success: boolean; newBalance: number }> {
   try {
-    const response = await fetch('/api/credits/spend', {
+    const response = await apiFetch('/api/credits?action=spend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, amount, action, referenceId })
@@ -94,7 +96,7 @@ export async function earnCredits(
   referenceId?: string
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/credits/earn', {
+    const response = await apiFetch('/api/credits?action=earn', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, amount, action, referenceId })
@@ -155,7 +157,7 @@ export async function updateUserTier(
   tier: string
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/stripe/update-tier', {
+    const response = await apiFetch('/api/stripe/update-tier', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, tier })
@@ -171,7 +173,7 @@ export async function updateUserTier(
 
 export async function checkAndGrantDailyCredits(userId: string): Promise<number> {
   try {
-    const response = await fetch('/api/credits/daily-reset', {
+    const response = await apiFetch('/api/credits?action=daily-reset', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId })

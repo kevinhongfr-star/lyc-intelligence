@@ -100,34 +100,29 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
     if (!userId || credit.balance < amount) return false;
 
     try {
-      const supabase = getSupabase();
-      const newBalance = credit.balance - amount;
-
-      await supabase
-        .from('credits')
-        .update({
-          balance: newBalance,
-          total_spent: credit.totalSpent + amount,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('user_id', userId);
-
-      await supabase.from('credit_transactions').insert({
-        user_id: userId,
-        amount: -amount,
-        type: 'spend',
-        description,
+      const { apiFetch } = await import('@/lib/apiClient');
+      const response = await apiFetch('/api/credits?action=spend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, action: description }),
       });
+      const data = await response.json();
+
+      if (!data.success) {
+        await refreshCredits();
+        return false;
+      }
 
       setCredit(prev => ({
         ...prev,
-        balance: newBalance,
+        balance: data.newBalance,
         totalSpent: prev.totalSpent + amount,
       }));
 
       return true;
     } catch (error) {
       console.error('[CreditContext] Deduct error:', error);
+      await refreshCredits();
       return false;
     }
   };

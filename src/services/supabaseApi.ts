@@ -5,7 +5,7 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 let supabase: SupabaseClient;
 export function getSupabase(): SupabaseClient {
@@ -259,7 +259,6 @@ export async function insertB2BLead(lead: { name: string; email: string; company
   const { error } = await getSupabase().from('b2b_leads').insert({
     name: lead.name,
     email: lead.email,
-    name: lead.name,
     company: lead.company,
     source: lead.source,
   });
@@ -271,8 +270,7 @@ export async function insertB2BLead(lead: { name: string; email: string; company
 }
 
 export async function upsertLead(lead: { name: string; email: string; current_title?: string; country?: string; source: string; }): Promise<boolean> {
-  const { error } = await getSupabase().from('contacts').insert({ name: lead.name, email: lead.email,
-    name: lead.name, current_title: lead.current_title || null, country: lead.country || null, seniority: 'leadership', source: lead.source, activity_status: 'Lead', market_side: 'candidate', engagement_score: 10, is_expat: false, skills: [], languages: [] });
+  const { error } = await getSupabase().from('contacts').insert({ name: lead.name, email: lead.email, current_title: lead.current_title || null, country: lead.country || null, seniority: 'leadership', source: lead.source, activity_status: 'Lead', market_side: 'candidate', engagement_score: 10, is_expat: false, skills: [], languages: [] });
   return !error;
 }
 

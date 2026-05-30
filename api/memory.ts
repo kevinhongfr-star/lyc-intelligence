@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { requireAuth, AuthedRequest } from '../_lib/auth';
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
@@ -20,7 +21,9 @@ interface ChatMessage {
   content: string;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: AuthedRequest, res: VercelResponse) {
+  if (!(await requireAuth(req, res))) return;
+  const userId = req.userId!;
   if (req.method === 'GET') {
     return handleGet(req, res);
   } else if (req.method === 'DELETE') {
@@ -31,7 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   return res.status(405).json({ error: 'Method not allowed' });
 }
 
-async function handleGet(req: VercelRequest, res: VercelResponse) {
+async function handleGet(req: AuthedRequest, res: VercelResponse) {
   const userId = req.query.userId as string;
   if (!userId) return res.status(400).json({ error: 'User ID required' });
   if (!supabase) return res.status(200).json({ memories: [] });
@@ -51,7 +54,7 @@ async function handleGet(req: VercelRequest, res: VercelResponse) {
   return res.status(200).json({ memories: data || [] });
 }
 
-async function handleDelete(req: VercelRequest, res: VercelResponse) {
+async function handleDelete(req: AuthedRequest, res: VercelResponse) {
   const memoryId = req.query.memoryId as string;
   if (!memoryId) return res.status(400).json({ error: 'Memory ID required' });
   if (!supabase) return res.status(200).json({ success: true });
@@ -68,7 +71,7 @@ async function handleDelete(req: VercelRequest, res: VercelResponse) {
   return res.status(200).json({ success: true });
 }
 
-async function handlePost(req: VercelRequest, res: VercelResponse) {
+async function handlePost(req: AuthedRequest, res: VercelResponse) {
   const { userId, messages, sessionId, explicitGoal } = req.body;
 
   if (!userId) return res.status(400).json({ error: 'User ID required' });

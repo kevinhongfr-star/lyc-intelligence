@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { requireAuth, AuthedRequest } from '../../api/_lib/auth';
 import { createClient } from '@supabase/supabase-js';
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
@@ -14,7 +15,9 @@ const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
   : null;
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: AuthedRequest, res: VercelResponse) {
+  if (!(await requireAuth(req, res))) return;
+  const userId = req.userId!;
   if (req.method === 'POST') {
     return handleCheckout(req, res);
   } else if (req.method === 'GET') {
@@ -23,7 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   return res.status(405).json({ error: 'Method not allowed' });
 }
 
-async function handleCheckout(req: VercelRequest, res: VercelResponse) {
+async function handleCheckout(req: AuthedRequest, res: VercelResponse) {
   const { tier } = req.body;
 
   if (!tier || !STRIPE_PRICES[tier as keyof typeof STRIPE_PRICES]) {
@@ -40,7 +43,7 @@ async function handleCheckout(req: VercelRequest, res: VercelResponse) {
 
   try {
     const { data: userData } = await supabase!
-      .from('user_profiles')
+      .from('profiles')
       .select('email')
       .eq('id', userId)
       .single();
@@ -82,7 +85,7 @@ async function handleCheckout(req: VercelRequest, res: VercelResponse) {
   }
 }
 
-async function handlePortal(req: VercelRequest, res: VercelResponse) {
+async function handlePortal(req: AuthedRequest, res: VercelResponse) {
   const userId = req.headers['x-user-id'] as string;
   if (!userId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
     return res.status(401).json({ error: 'Invalid user ID format' });
@@ -94,7 +97,7 @@ async function handlePortal(req: VercelRequest, res: VercelResponse) {
 
   try {
     const { data: userData } = await supabase!
-      .from('user_profiles')
+      .from('profiles')
       .select('stripe_customer_id')
       .eq('id', userId)
       .single();

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Bell, Shield, Palette, Sun, Moon } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Input } from '@/components/ui';
-import { useAuth } from '@/contexts';
+import { useAuthStore } from '@/stores/authStore';
 
 const ACCENT_COLORS = [
   { name: 'Magenta', value: '#C108AB' },
@@ -11,7 +11,7 @@ const ACCENT_COLORS = [
 ];
 
 export function SettingsPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuthStore();
   const [activeSection, setActiveSection] = useState<'profile' | 'notifications' | 'security' | 'appearance'>('appearance');
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('lyc-theme') as 'dark' | 'light') || 'light';
@@ -95,9 +95,9 @@ export function SettingsPage() {
             <Card>
               <CardHeader><CardTitle>Profile</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <div><label className="text-xs text-text-muted mb-1 block">Name</label><Input value={user?.name ?? ''} readOnly /></div>
+                <div><label className="text-xs text-text-muted mb-1 block">Name</label><Input value={profile?.name ?? ''} readOnly /></div>
                 <div><label className="text-xs text-text-muted mb-1 block">Email</label><Input value={user?.email ?? ''} readOnly /></div>
-                <div><label className="text-xs text-text-muted mb-1 block">Role</label><Input value={user?.role ?? ''} readOnly /></div>
+                <div><label className="text-xs text-text-muted mb-1 block">Role</label><Input value={profile?.role ?? ''} readOnly /></div>
               </CardContent>
             </Card>
           )}

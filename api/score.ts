@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { requireAuth, AuthedRequest } from '../_lib/auth';
 import { createClient } from '@supabase/supabase-js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
@@ -50,7 +51,9 @@ function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
   return false;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: AuthedRequest, res: VercelResponse) {
+  if (!(await requireAuth(req, res))) return;
+  const userId = req.userId!;
   const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
   if (isRateLimited(ip, 10, 60 * 1000)) {
     return res.status(429).json({ error: 'Rate limit exceeded' });

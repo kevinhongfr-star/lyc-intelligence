@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { requireAuth, AuthedRequest } from '../_lib/auth';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 const COZE_API_KEY = process.env.COZE_API_KEY || '';
@@ -78,7 +79,12 @@ function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
   return false;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: AuthedRequest, res: VercelResponse) {
+  const isAnonymous = req.body?.anonymous === true;
+  if (!isAnonymous) {
+    if (!(await requireAuth(req, res))) return;
+  }
+  const userId = req.userId || req.body?.userId || 'anonymous';
   const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
   if (isRateLimited(ip, 30, 60 * 1000)) {
     return res.status(429).json({ error: 'Rate limit exceeded', response: 'Too many requests. Please wait a moment and try again.' });

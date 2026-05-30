@@ -1,3 +1,4 @@
+import { apiFetch } from '@/lib/apiClient';
 import { getSupabase } from './supabaseApi';
 import type { Memory, MemoryType } from '../stores/memoryStore';
 

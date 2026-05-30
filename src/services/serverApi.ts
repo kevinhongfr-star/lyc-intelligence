@@ -1,3 +1,4 @@
+import { apiFetch } from '@/lib/apiClient';
 const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 export async function sendEmail(params: { to: string | string[]; subject: string; html?: string; text?: string; mandateId?: string; contactId?: string }): Promise<{ success: boolean; emailId?: string; error?: string }> {

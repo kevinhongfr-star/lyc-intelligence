@@ -61,7 +61,7 @@ async function handleSubscriptionUpdate(subscription: any) {
 
   if (!finalUserId) {
     const { data: userData } = await supabase!
-      .from('user_profiles')
+      .from('profiles')
       .select('id')
       .eq('stripe_customer_id', customerId)
       .single();
@@ -75,7 +75,7 @@ async function handleSubscriptionUpdate(subscription: any) {
 
   // Update user tier
   await supabase!
-    .from('user_profiles')
+    .from('profiles')
     .update({ tier, updated_at: new Date().toISOString() })
     .eq('id', finalUserId);
 
@@ -127,7 +127,7 @@ async function handleSubscriptionDeleted(subscription: any) {
   const customerId = subscription.customer;
 
   const { data: userData } = await supabase!
-    .from('user_profiles')
+    .from('profiles')
     .select('id')
     .eq('stripe_customer_id', customerId)
     .single();
@@ -135,7 +135,7 @@ async function handleSubscriptionDeleted(subscription: any) {
   if (!userData) return;
 
   await supabase!
-    .from('user_profiles')
+    .from('profiles')
     .update({ tier: 'free', updated_at: new Date().toISOString() })
     .eq('id', userData.id);
 
@@ -154,7 +154,7 @@ async function handlePaymentFailed(invoice: any) {
   const customerId = invoice.customer;
 
   const { data: userData } = await supabase!
-    .from('user_profiles')
+    .from('profiles')
     .select('id, email')
     .eq('stripe_customer_id', customerId)
     .single();
@@ -164,7 +164,7 @@ async function handlePaymentFailed(invoice: any) {
   console.log('[Stripe] Payment failed for user:', userData.email);
 
   await supabase!
-    .from('user_profiles')
+    .from('profiles')
     .update({
       payment_grace_period: true,
       grace_period_expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
@@ -176,7 +176,7 @@ async function handlePaymentSucceeded(invoice: any) {
   const customerId = invoice.customer;
 
   await supabase!
-    .from('user_profiles')
+    .from('profiles')
     .update({
       payment_grace_period: false,
       grace_period_expires: null

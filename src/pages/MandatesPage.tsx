@@ -27,8 +27,8 @@ export function MandatesPage() {
     .filter(m => !statusFilter || m.status === statusFilter)
     .filter(m => !search || m.title.toLowerCase().includes(search.toLowerCase()) || m.company?.name?.toLowerCase().includes(search.toLowerCase()));
 
-  const handleStatusChange = async (mandateId: string, newStatus: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleStatusChange = async (mandateId: string, newStatus: string, e?: React.MouseEvent) => {
+    ;
     setUpdating(mandateId);
     await updateMandateStatus(mandateId, newStatus);
     setUpdating(null);
@@ -63,7 +63,7 @@ export function MandatesPage() {
                   <h3 className="font-medium text-text-primary">{m.title}</h3>
                   <p className="text-sm text-text-muted">{m.company?.name ?? 'No client'}</p>
                 </div>
-                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center gap-2" onClick={() => {}}>
                   <select value={m.status} onChange={async e => { setUpdating(m.id); await updateMandateStatus(m.id, e.target.value); setUpdating(null); window.location.reload(); }}
                     className="text-xs bg-bg-tertiary text-text-primary rounded px-2 py-1 border-0 min-h-[32px]">
                     {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
@@ -77,10 +77,10 @@ export function MandatesPage() {
                   return <div key={s} className="flex-1 h-6 rounded flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{c}</div>;
                 })}
               </div>
-              <div className="flex gap-2 mt-2" onClick={e => e.stopPropagation()}>
-                <button onClick={() => handleStatusChange(m.id, 'won', e)} className="text-xs px-2 py-1 bg-tier-1/20 text-tier-1 rounded hover:bg-tier-1/30 flex items-center gap-1"><CheckCircle className="w-3 h-3" />Won</button>
-                <button onClick={() => handleStatusChange(m.id, 'on_hold', e)} className="text-xs px-2 py-1 bg-tier-2/20 text-tier-2 rounded hover:bg-tier-2/30 flex items-center gap-1"><PauseCircle className="w-3 h-3" />Hold</button>
-                <button onClick={() => handleStatusChange(m.id, 'lost', e)} className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 flex items-center gap-1"><XCircle className="w-3 h-3" />Lost</button>
+              <div className="flex gap-2 mt-2" onClick={() => {}}>
+                <button onClick={() => handleStatusChange(m.id, 'won')} className="text-xs px-2 py-1 bg-tier-1/20 text-tier-1 rounded hover:bg-tier-1/30 flex items-center gap-1"><CheckCircle className="w-3 h-3" />Won</button>
+                <button onClick={() => handleStatusChange(m.id, 'on_hold')} className="text-xs px-2 py-1 bg-tier-2/20 text-tier-2 rounded hover:bg-tier-2/30 flex items-center gap-1"><PauseCircle className="w-3 h-3" />Hold</button>
+                <button onClick={() => handleStatusChange(m.id, 'lost')} className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 flex items-center gap-1"><XCircle className="w-3 h-3" />Lost</button>
               </div>
             </div>
           ))}

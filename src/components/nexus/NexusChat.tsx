@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ArrowRight, Shield, Loader2, RefreshCw, Paperclip, Trash2 } from 'lucide-react';
 import { trackNexusMessageSent, trackEmailCaptured } from '@/lib/analytics';
 import { useAuthStore } from '../../stores/authStore';
+import { apiFetch } from '@/lib/apiClient';
 import { MessageBubble } from './MessageBubble';
 import { SuggestedPrompts } from './SuggestedPrompts';
 import { EmailCapture } from './EmailCapture';
@@ -122,7 +123,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
         } catch {}
       }
 
-      const res = await fetch('/api/chat', {
+      const res = await apiFetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

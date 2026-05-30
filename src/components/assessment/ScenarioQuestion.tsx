@@ -1,5 +1,5 @@
 import React from 'react';
-import { CPDScenario } from '../../services/assessmentEngine';
+type CPDScenario = any;
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -46,7 +46,7 @@ export function ScenarioQuestion({ question, currentAnswer, onAnswer, questionNu
       </h3>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {question.answers.map((option, idx) => (
+        {question.answers.map((option: any, idx: number) => (
           <button
             key={idx}
             onClick={() => onAnswer(option.score)}
