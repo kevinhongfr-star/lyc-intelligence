@@ -2,18 +2,7 @@ import React from 'react';
 import { CreditCard, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 
-const DS = {
-  accent: '#C108AB',
-  bg: '#FFFFFF',
-  card: '#FFFFFF',
-  muted: '#666666',
-  text: '#000000',
-  textSecondary: '#333333',
-  border: '#E5E5E5',
-  success: '#00897B',
-  warning: '#F59E0B',
-  error: '#EF4444'
-};
+import { DS } from '@/lib/designSystem';
 
 interface CreditBadgeProps {
   showBalance?: boolean;

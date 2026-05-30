@@ -3,19 +3,7 @@ import { Lock, Unlock, Loader2, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { UpgradeModal } from './UpgradeModal';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  accent: '#C108AB',
-  bg: '#FFFFFF',
-  card: '#FFFFFF',
-  muted: '#666666',
-  text: '#000000',
-  textSecondary: '#333333',
-  border: '#E5E5E5',
-  success: '#00897B',
-  warning: '#F59E0B',
-  error: '#EF4444'
-};
+import { DS } from '@/lib/designSystem';
 
 export type ActionType = 
   | 'assessment'

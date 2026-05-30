@@ -3,18 +3,7 @@ import React, { useState } from 'react';
 import { Upload, X, FileText, AlertCircle, Loader2 } from 'lucide-react';
 import { DocumentType, DOCUMENT_TYPE_LABELS } from '../../services/documentService';
 
-const DS = {
-  accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
-  error: '#EF4444',
-  success: '#10B981',
-  radius: '12px'
-};
+import { DS_DARK as DS } from '@/lib/designSystem';
 
 interface Props {
   onUpload: (file: File, type: DocumentType) => void;

@@ -4,25 +4,7 @@ import { IconTrident, IconQuest, IconSpark, IconBridge, IconLeap, IconImpact, Ic
 import { Menu, X, Lock, ArrowRight } from 'lucide-react';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  teal: '#00897B',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-};
+import { DS } from '@/lib/designSystem';
 
 const HERO_VIDEO = '/hero-bg.mp4';
 const HERO_POSTER = 'https://www.lyc-partners.ai/images/heroes/hero-boardroom.webp';

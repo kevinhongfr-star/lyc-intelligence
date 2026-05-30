@@ -2,22 +2,11 @@ import React from 'react';
 import { Zap, Loader2 } from 'lucide-react';
 import { useCredits } from '@/contexts/CreditContext';
 
+import { DS } from '@/lib/designSystem';
 interface CreditDisplayProps {
   showTier?: boolean;
 }
 
-const DS = {
-  accent: '#C108AB',
-  bg: '#F5F5F5',
-  card: '#FFFFFF',
-  muted: '#666666',
-  text: '#000000',
-  textSecondary: '#333333',
-  border: '#E5E5E5',
-  radius: '8px',
-  success: '#16A34A',
-  warning: '#CA8A04',
-};
 
 export function CreditDisplay({ showTier = false }: CreditDisplayProps) {
   const { credit } = useCredits();

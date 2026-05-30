@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { trackLeadFormSubmitted } from '@/lib/analytics';
 
+import { DS } from '@/lib/designSystem';
 interface LeadCaptureFormProps {
   type: 'b2b' | 'b2c';
   source: string;
@@ -12,25 +13,6 @@ interface LeadCaptureFormProps {
   successMessage?: string;
 }
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  success: '#1A7A4A',
-  error: '#EF4444',
-};
 
 export function LeadCaptureForm({ 
   type,

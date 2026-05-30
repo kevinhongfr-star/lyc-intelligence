@@ -42,7 +42,18 @@ const LensExportPage = lazy(() => import('@/pages/LensExportPage').then(m => ({ 
 
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
-function Loading() { return <div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>; }
+function Loading() {
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#FFFFFF', padding: '40px' }}>
+      <div style={{ width: '100%', maxWidth: '600px' }}>
+        <div style={{ width: '40%', height: '24px', borderRadius: '4px', background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'skeleton-shimmer 1.5s infinite', marginBottom: '24px' }} />
+        <div style={{ width: '100%', height: '16px', borderRadius: '4px', background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'skeleton-shimmer 1.5s infinite', marginBottom: '12px' }} />
+        <div style={{ width: '80%', height: '16px', borderRadius: '4px', background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'skeleton-shimmer 1.5s infinite', marginBottom: '32px' }} />
+        <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#C108AB', margin: '0 auto' }} />
+      </div>
+    </div>
+  );
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuthStore();

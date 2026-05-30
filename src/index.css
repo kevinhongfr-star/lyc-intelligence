@@ -654,3 +654,9 @@ html {
   .anim-trident, .anim-enter { animation: none; }
   .cta-glow { animation: none; }
 }
+
+/* Skeleton loading animation */
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

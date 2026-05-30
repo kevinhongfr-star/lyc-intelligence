@@ -3,25 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Shield, CheckCircle2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-  success: '#00897B',
-};
+import { DS } from '@/lib/designSystem';
 
 export function LoginPage() {
   const navigate = useNavigate();

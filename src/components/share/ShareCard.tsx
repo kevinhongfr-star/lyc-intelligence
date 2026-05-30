@@ -2,15 +2,7 @@
 import React from 'react';
 import { ShareCardType } from '../../services/shareCardService';
 
-const DS = {
-  accent: '#C108AB',
-  bg: '#0A0A0A',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  success: '#10B981',
-  warning: '#F59E0B',
-  radius: '12px'
-};
+import { DS_DARK as DS } from '@/lib/designSystem';
 
 interface Props {
   type: ShareCardType;
