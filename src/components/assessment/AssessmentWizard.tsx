@@ -1,4 +1,5 @@
 import { saveAssessment } from '@/services/supabaseApi';
+import { trackAssessmentStarted, trackAssessmentCompleted } from '@/lib/analytics';
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import {
@@ -56,6 +57,7 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [startTime] = useState(Date.now());
 
   const [dimensionScores, setDimensionScores] = useState<any>(null);
   const [compositeScore, setCompositeScore] = useState<number>(0);
@@ -92,6 +94,7 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
     }
     setError(null);
     setStep('context');
+    trackAssessmentStarted('wizard');
   };
 
   const answerDimensionQuestion = (score: number) => {
@@ -135,6 +138,7 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
     setCompositeScore(compScore);
     setArchetype(arch);
     setStep('results');
+    trackAssessmentCompleted(arch, Math.round((Date.now() - startTime) / 1000));
   };
 
   const handleDownloadPDF = async () => {

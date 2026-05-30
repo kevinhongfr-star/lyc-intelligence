@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, MessageSquare, Trash2 } from 'lucide-react';
-import { sendChatMessage } from '@/services/coze';
-import { useAuth } from '@/contexts';
+import { useAuthStore } from '@/stores/authStore';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -51,7 +50,7 @@ const customComponents = {
 };
 
 export function NexusPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuthStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -63,9 +62,27 @@ export function NexusPage() {
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setLoading(true);
-    const response = await sendChatMessage(userMsg, user?.id || 'anonymous', messages.slice(-10));
-    setMessages(prev => [...prev, { role: 'assistant', content: response }]);
-    setLoading(false);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMsg,
+          userId: user?.id || 'anonymous',
+          tier: profile?.tier || 'free',
+          history: messages.slice(-10),
+          documentContext: '',
+          memoryContext: [],
+        })
+      });
+      if (!res.ok) throw new Error('API failed');
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: 'assistant', content: data.response || 'Sorry, I couldn\'t process that.' }]);
+    } catch (e) {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const clearChat = () => setMessages([]);

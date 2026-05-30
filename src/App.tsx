@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { CreditProvider } from '@/contexts/CreditContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Loader2 } from 'lucide-react';
+import { trackPageView } from '@/lib/analytics';
 
 // ── Lazy-loaded page components (ESM dynamic import — works in browser) ──
 
@@ -56,6 +57,12 @@ export default function App() {
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  // Track page views
+  useEffect(() => {
+    const path = window.location.pathname;
+    trackPageView(path, user ? undefined : undefined);
+  }, [window.location.pathname]);
 
   return (
     <ErrorBoundary>

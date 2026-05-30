@@ -38,6 +38,7 @@ interface AuthStore {
   signInWithPassword: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signUp: (email: string, password: string, icp: string, name: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   loadProfile: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ success: boolean; error?: string }>;
   generateReferralCode: () => string;
@@ -158,6 +159,21 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       return { success: true };
     } catch (e: any) {
       return { success: false, error: e.message || 'Failed to create account' };
+    }
+  },
+
+  resetPassword: async (email: string) => {
+    const { supabase } = get();
+    if (!supabase) return { success: false, error: 'Supabase not configured' };
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login?reset=1`
+      });
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: e.message || 'Failed to send reset email' };
     }
   },
 

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ArrowRight, Shield, Loader2, RefreshCw, Paperclip, Trash2 } from 'lucide-react';
+import { trackNexusMessageSent, trackEmailCaptured } from '@/lib/analytics';
 import { useAuthStore } from '../../stores/authStore';
 import { MessageBubble } from './MessageBubble';
 import { SuggestedPrompts } from './SuggestedPrompts';
@@ -109,6 +110,18 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const sendMessage = async (userMsg: string) => {
     setAiState('thinking');
     try {
+      // Fetch memory context for authenticated users
+      let memoryContext: any[] = [];
+      if (user?.id) {
+        try {
+          const memRes = await fetch(`/api/memory?userId=${user.id}`);
+          if (memRes.ok) {
+            const memData = await memRes.json();
+            memoryContext = memData.memories || [];
+          }
+        } catch {}
+      }
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -118,14 +131,61 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
           tier: profile?.tier || 'free',
           history: messages.slice(-10),
           documentContext,
-          memoryContext: [],
+          memoryContext,
+          stream: true,
         })
       });
+
       if (!res.ok) throw new Error('API failed');
-      const data = await res.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
-      setSuggestedPrompts(data.suggested_prompts || suggestedPrompts);
-      setAiState('idle');
+
+      // Check if response is SSE stream
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('text/event-stream') && res.body) {
+        // Streaming response — progressively render tokens
+        const assistantMsgId = Date.now().toString();
+        setMessages(prev => [...prev, { id: assistantMsgId, role: 'assistant', content: '' }]);
+        setAiState('idle');
+        
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let fullContent = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6).trim();
+              if (data === '[DONE]') break;
+              try {
+                const parsed = JSON.parse(data);
+                const token = parsed.choices?.[0]?.delta?.content || '';
+                if (token) {
+                  fullContent += token;
+                  setMessages(prev => prev.map(m => 
+                    m.id === assistantMsgId ? { ...m, content: fullContent } : m
+                  ));
+                }
+                // Extract suggested prompts from final chunk
+                if (parsed.suggested_prompts) {
+                  setSuggestedPrompts(parsed.suggested_prompts);
+                }
+              } catch {}
+            }
+          }
+        }
+        trackNexusMessageSent(!!user, messages.length);
+      } else {
+        // Non-streaming fallback (same as before)
+        const data = await res.json();
+        setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+        setSuggestedPrompts(data.suggested_prompts || suggestedPrompts);
+        setAiState('idle');
+        trackNexusMessageSent(!!user, messages.length);
+      }
     } catch (e) {
       console.error('Chat failed:', e);
       setAiState('error');
@@ -210,6 +270,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
   const handleEmailCapture = (email: string) => {
     setCapturedEmail(email);
     setShowEmailGate(false);
+    trackEmailCaptured('nexus_chat', messages.length);
     setMessages(prev => [...prev, {
       id: Date.now().toString(),
       role: 'assistant' as const,

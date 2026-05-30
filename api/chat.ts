@@ -163,6 +163,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Try DeepSeek next
   if (DEEPSEEK_API_KEY) {
     try {
+      const shouldStream = req.body.stream === true;
       const dsRes = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -174,10 +175,52 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           messages,
           max_tokens: 2048,
           temperature: 0.3,
-          response_format: { type: 'json_object' },
+          ...(shouldStream ? { stream: true } : { response_format: { type: 'json_object' } }),
         })
       });
       if (dsRes.ok) {
+        if (shouldStream) {
+          // Stream SSE response
+          res.setHeader('Content-Type', 'text/event-stream');
+          res.setHeader('Cache-Control', 'no-cache');
+          res.setHeader('Connection', 'keep-alive');
+          
+          const reader = dsRes.body?.getReader();
+          if (!reader) return res.status(500).json({ error: 'Stream failed' });
+          
+          const decoder = new TextDecoder();
+          let fullContent = '';
+          
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6).trim();
+                if (data === '[DONE]') {
+                  // Send suggested prompts as final event
+                  res.write(`data: ${JSON.stringify({ suggested_prompts: ['How does this apply to my situation?', 'What should I do next?', 'Can you give an example?'], type: 'done' })}\n\n`);
+                  res.end();
+                  return;
+                }
+                try {
+                  const parsed = JSON.parse(data);
+                  const token = parsed.choices?.[0]?.delta?.content || '';
+                  if (token) fullContent += token;
+                  // Forward the SSE chunk to client
+                  res.write(`data: ${data}\n\n`);
+                } catch {}
+              }
+            }
+          }
+          res.end();
+          return;
+        }
+        
+        // Non-streaming response
         const data = await dsRes.json();
         const content = data.choices?.[0]?.message?.content || '{"response":"No response","suggested_prompts":[]}';
         tokensUsed = data.usage?.total_tokens || 0;

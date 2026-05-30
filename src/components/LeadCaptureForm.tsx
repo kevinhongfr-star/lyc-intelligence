@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { trackLeadFormSubmitted } from '@/lib/analytics';
 
 interface LeadCaptureFormProps {
   type: 'b2b' | 'b2c';
@@ -99,6 +100,7 @@ export function LeadCaptureForm({
       if (!res.ok) throw new Error('API failed');
 
       const submittedEmail = type === 'b2b' ? (formData.work_email || '') : (formData.email || '');
+      trackLeadFormSubmitted(type, source);
       
       if (onSuccess) {
         onSuccess(submittedEmail);
