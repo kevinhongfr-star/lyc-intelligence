@@ -1,19 +1,27 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
+import { insert, isSupabaseConfigured, handleError } from './_lib/supabaseRest';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
-const SUPABASE_URL = process.env.SUPABASE_URL || '';
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
 
-const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
-  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-  : null;
+// Vercel Hobby default is 10s; multi-candidate scoring can run 5-20s.
+export const maxDuration = 60;
 
-// Weights are hidden from client-side - only used internally
+const PROVIDER_TIMEOUT_MS = 7000;
+
+async function fetchWithTimeout(url: string, options: any, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 const DIMENSION_WEIGHTS = {
   experience: 0.40,
   skills: 0.35,
-  fit: 0.25
+  fit: 0.25,
 };
 
 interface CandidateInput {
@@ -34,8 +42,6 @@ interface ScoreResult {
   approach_strategy: string;
 }
 
-
-// Simple in-memory rate limiting (resets on cold start — good enough for launch)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
@@ -51,36 +57,25 @@ function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
-  if (isRateLimited(ip, 10, 60 * 1000)) {
-    return res.status(429).json({ error: 'Rate limit exceeded' });
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const { jd, candidates, userId } = req.body;
-
-  if (!jd || !candidates || candidates.length === 0) {
-    return res.status(400).json({ error: 'Missing JD or candidates' });
-  }
-
-  // Rate limiting check
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  if (ip) {
-    const rateLimitKey = `rate_limit:${ip}`;
-    // In production, check Redis or Supabase for rate limiting
-    // For now, skip rate limiting in this implementation
-  }
-
   try {
-    const results: ScoreResult[] = [];
+    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
+    if (isRateLimited(ip, 10, 60 * 1000)) {
+      return res.status(429).json({ error: 'Rate limit exceeded' });
+    }
 
-    // Process each candidate
-    for (const candidate of candidates) {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const { jd, candidates, userId } = req.body;
+
+    if (!jd || !candidates || candidates.length === 0) {
+      return res.status(400).json({ error: 'Missing JD or candidates' });
+    }
+
+    const results: ScoreResult[] = [];
+    for (const candidate of candidates as CandidateInput[]) {
       const scoreResult = await scoreCandidate(jd, candidate.cv);
-      
       if (scoreResult) {
         results.push({
           candidate_name: candidate.name,
@@ -88,28 +83,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           dimension_scores: scoreResult.dimensions,
           match_reasons: scoreResult.reasons,
           risk_factors: scoreResult.risks,
-          approach_strategy: scoreResult.strategy
+          approach_strategy: scoreResult.strategy,
         });
       }
     }
 
-    // Save match history for authenticated users
-    if (userId && supabase) {
-      await saveMatchHistory(userId, jd, results);
+    // Save match history for authenticated users (best-effort)
+    if (userId && isSupabaseConfigured()) {
+      try {
+        await insert('match_history', {
+          user_id: userId,
+          jd_text: jd.substring(0, 1000),
+          results,
+          candidate_count: results.length,
+          average_score: results.length > 0
+            ? results.reduce((sum, r) => sum + r.composite_score, 0) / results.length
+            : 0,
+        });
+      } catch (e) {
+        console.error('[Score] Failed to save history:', e);
+      }
     }
 
     return res.status(200).json({ results });
-  } catch (e) {
-    console.error('[Score API] Error:', e);
-    return res.status(500).json({ error: 'Scoring failed' });
+  } catch (err) {
+    return handleError(res, 'score', err);
   }
 }
 
-async function scoreCandidate(jd: string, cv: string): Promise<ScoreResult | null> {
+interface InternalScore {
+  dimensions: { experience: number; skills: number; fit: number };
+  composite: number;
+  reasons: string[];
+  risks: string[];
+  strategy: string;
+}
+
+async function scoreCandidate(jd: string, cv: string): Promise<InternalScore | null> {
   const scoringPrompt = `Score this candidate against the job description across three dimensions:
 
 Experience (40%): Relevant years, role seniority, industry context, functional alignment
-Skills (35%): Technical capabilities, leadership competencies, language requirements  
+Skills (35%): Technical capabilities, leadership competencies, language requirements
 Organizational Fit (25%): Cultural alignment, team structure fit, reporting line suitability
 
 Return a composite score (0-100) and dimension scores. Provide specific match reasons,
@@ -128,76 +142,56 @@ Return ONLY valid JSON in this format:
   "approach_strategy": "strategy text"
 }`;
 
-  try {
-    if (DEEPSEEK_API_KEY) {
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            { role: 'user', content: scoringPrompt }
-          ],
-          max_tokens: 800,
-          temperature: 0.3,
-          response_format: { type: 'json_object' }
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const content = data.choices?.[0]?.message?.content;
-
-        if (content) {
-          const parsed = JSON.parse(content);
-          
-          // Calculate composite score using hidden weights
-          const composite = Math.round(
-            parsed.experience_score * DIMENSION_WEIGHTS.experience +
-            parsed.skills_score * DIMENSION_WEIGHTS.skills +
-            parsed.fit_score * DIMENSION_WEIGHTS.fit
-          );
-
-          return {
-            dimensions: {
-              experience: parsed.experience_score,
-              skills: parsed.skills_score,
-              fit: parsed.fit_score
-            },
-            composite,
-            reasons: parsed.match_reasons || [],
-            risks: parsed.risk_factors || [],
-            strategy: parsed.approach_strategy || ''
-          };
-        }
-      }
-    }
-  } catch (e) {
-    console.error('[Score] DeepSeek error:', e);
+  if (!DEEPSEEK_API_KEY) {
+    console.warn('[Score] DEEPSEEK_API_KEY missing — cannot score');
+    return null;
   }
 
-  return null;
-}
-
-async function saveMatchHistory(
-  userId: string,
-  jd: string,
-  results: ScoreResult[]
-) {
-  if (!supabase) return;
-
   try {
-    await supabase.from('match_history').insert({
-      user_id: userId,
-      jd_text: jd.substring(0, 1000), // Store first 1000 chars
-      results: results,
-      candidate_count: results.length,
-      average_score: results.reduce((sum, r) => sum + r.composite_score, 0) / results.length
-    });
+    const response = await fetchWithTimeout('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: scoringPrompt }],
+        max_tokens: 800,
+        temperature: 0.3,
+        response_format: { type: 'json_object' },
+      }),
+    }, PROVIDER_TIMEOUT_MS);
+
+    if (!response.ok) {
+      console.warn('[Score] DeepSeek non-OK:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+    if (!content) return null;
+
+    const parsed = JSON.parse(content);
+    const composite = Math.round(
+      (Number(parsed.experience_score) || 0) * DIMENSION_WEIGHTS.experience +
+      (Number(parsed.skills_score) || 0) * DIMENSION_WEIGHTS.skills +
+      (Number(parsed.fit_score) || 0) * DIMENSION_WEIGHTS.fit
+    );
+
+    return {
+      dimensions: {
+        experience: Number(parsed.experience_score) || 0,
+        skills: Number(parsed.skills_score) || 0,
+        fit: Number(parsed.fit_score) || 0,
+      },
+      composite,
+      reasons: Array.isArray(parsed.match_reasons) ? parsed.match_reasons : [],
+      risks: Array.isArray(parsed.risk_factors) ? parsed.risk_factors : [],
+      strategy: String(parsed.approach_strategy || ''),
+    };
   } catch (e) {
-    console.error('[Score] Failed to save history:', e);
+    console.error('[Score] DeepSeek error:', e);
+    return null;
   }
 }

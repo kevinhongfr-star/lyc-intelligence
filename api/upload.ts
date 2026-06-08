@@ -1,14 +1,16 @@
-
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const MAX_FILE_SIZE_MB = 10;
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+// File parsing can take a few seconds for large files — extend Vercel timeout.
+export const maxDuration = 60;
 
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     const contentType = req.headers['content-type'];
     if (!contentType || !contentType.includes('multipart/form-data')) {
       return res.status(400).json({ error: 'Content-Type must be multipart/form-data' });
@@ -70,11 +72,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({
       text: extractedText,
       filename: fileName,
-      size: rawBody.length
+      size: rawBody.length,
     });
-  } catch (error) {
-    console.error('Upload error:', error);
-    return res.status(500).json({ error: 'Upload failed' });
+  } catch (err: any) {
+    console.error('[upload] Unhandled error:', err);
+    return res.status(500).json({
+      error: 'Upload failed',
+      details: process.env.NODE_ENV === 'development' ? String(err?.message || err) : undefined,
+    });
   }
 }
 
