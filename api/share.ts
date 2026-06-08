@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { insert, isSupabaseConfigured, handleError } from './_lib/supabaseRest';
+import { insert, isSupabaseConfigured, handleError } from './_lib/supabaseRest.js';
 
 export const maxDuration = 60;
 

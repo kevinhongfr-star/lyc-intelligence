@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { selectOne, insert, update, isSupabaseConfigured, handleError } from './_lib/supabaseRest';
+import { selectOne, insert, update, isSupabaseConfigured, handleError } from './_lib/supabaseRest.js';
 
 // Vercel Hobby default is 10s — credit operations should be well under that,
 // but we extend for safety in case the DB is slow.

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { insert, isSupabaseConfigured, handleError } from './_lib/supabaseRest';
-import { sendEmail } from './_lib/email';
+import { insert, isSupabaseConfigured, handleError } from './_lib/supabaseRest.js';
+import { sendEmail } from './_lib/email.js';
 
 export const maxDuration = 60;
 
