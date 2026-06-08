@@ -154,7 +154,7 @@ async function handleDailyReset(req: VercelRequest, res: VercelResponse) {
   }
 
   // Get user's credits record
-  const creditData = await selectOne('credits', { column: 'user_id', value: userId, select: 'tier,daily_balance,balance,total_earned' });
+  const creditData = await selectOne('credits', { column: 'user_id', value: userId, select: 'tier,balance,total_earned' });
   if (!creditData) {
     return res.status(404).json({ error: 'Credits record not found' });
   }
@@ -166,12 +166,11 @@ async function handleDailyReset(req: VercelRequest, res: VercelResponse) {
 
   // Grant daily credits (5 for free tier)
   const dailyCredits = 5;
-  const newBalance = (creditData.daily_balance || 0) + dailyCredits;
+  const newBalance = (creditData.balance || 0) + dailyCredits;
   const newTotalEarned = (creditData.total_earned || 0) + dailyCredits;
 
   await update('credits', { column: 'user_id', value: userId }, {
     balance: newBalance,
-    daily_balance: dailyCredits,
     total_earned: newTotalEarned,
     updated_at: new Date().toISOString(),
   });
