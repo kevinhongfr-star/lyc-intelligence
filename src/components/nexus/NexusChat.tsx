@@ -91,6 +91,11 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
 
   const sendMessage = async (userMsg: string) => {
     setAiState('thinking');
+
+    // Client-side timeout: don't let the UI hang forever if the server is slow
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -102,16 +107,34 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
           history: messages.slice(-10),
           documentContext,
           memoryContext: [],
-        })
+        }),
+        signal: controller.signal,
       });
-      if (!res.ok) throw new Error('API failed');
+      clearTimeout(timeout);
+      if (!res.ok) {
+        // Try to surface the server's actual error message
+        let serverMsg = 'API failed';
+        try {
+          const errBody = await res.json();
+          serverMsg = errBody.response || errBody.error || serverMsg;
+        } catch {}
+        throw new Error(serverMsg);
+      }
       const data = await res.json();
       setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
       setSuggestedPrompts(data.suggested_prompts || suggestedPrompts);
       setAiState('idle');
-    } catch (e) {
+    } catch (e: any) {
+      clearTimeout(timeout);
       console.error('Chat failed:', e);
-      setAiState('error');
+      const isAbort = e?.name === 'AbortError';
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: isAbort
+          ? 'The request took too long. Please try a shorter question or try again.'
+          : `Sorry, something went wrong: ${e?.message || 'Unknown error'}`
+      }]);
+      setAiState('idle');
       setLastUserMessage(userMsg);
     } finally {
       setLoading(false);

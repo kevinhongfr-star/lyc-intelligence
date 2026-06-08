@@ -78,7 +78,24 @@ function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
   return false;
 }
 
+// Per-provider fetch timeout (Vercel Hobby plan default is 10s, we need headroom)
+const PROVIDER_TIMEOUT_MS = 7000;
+
+async function fetchWithTimeout(url: string, options: any, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+// Allow function to run up to 60s on Vercel (Hobby default is 10s — too short for AI calls)
+export const maxDuration = 60;
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  try {
   const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
   if (isRateLimited(ip, 30, 60 * 1000)) {
     return res.status(429).json({ error: 'Rate limit exceeded', response: 'Too many requests. Please wait a moment and try again.' });
@@ -127,7 +144,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Try Claude first if council tier
   if (tier === 'council' && CLAUDE_API_KEY) {
     try {
-      const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+      const claudeRes = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -143,7 +160,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           })),
           system: messages.find(m => m.role === 'system')?.content,
         })
-      });
+      }, PROVIDER_TIMEOUT_MS);
       if (claudeRes.ok) {
         const data = await claudeRes.json();
         const content = data.content?.[0]?.text || 'No response';
@@ -163,7 +180,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Try DeepSeek next
   if (DEEPSEEK_API_KEY) {
     try {
-      const dsRes = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      const dsRes = await fetchWithTimeout('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -176,7 +193,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           temperature: 0.3,
           response_format: { type: 'json_object' },
         })
-      });
+      }, PROVIDER_TIMEOUT_MS);
       if (dsRes.ok) {
         const data = await dsRes.json();
         const content = data.choices?.[0]?.message?.content || '{"response":"No response","suggested_prompts":[]}';
@@ -195,7 +212,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Fall back to Coze
   if (COZE_API_KEY && COZE_BOT_ID) {
     try {
-      const cozeRes = await fetch(COZE_ENDPOINT, {
+      const cozeRes = await fetchWithTimeout(COZE_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -212,7 +229,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             content_type: 'text'
           }]
         })
-      });
+      }, PROVIDER_TIMEOUT_MS);
       if (cozeRes.ok) {
         const data = await cozeRes.json();
         const content = data.messages?.filter((m: any) => m.role === 'assistant' && m.type === 'answer')?.[0]?.content || '{"response":"No response","suggested_prompts":[]}';
@@ -237,6 +254,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ],
     usage: { tokens: 0 }
   });
+  } catch (err: any) {
+    console.error('[chat] Unhandled error:', err);
+    return res.status(500).json({
+      error: 'Internal server error',
+      response: 'Sorry, something went wrong on our end. Please try again in a moment.',
+      details: process.env.NODE_ENV === 'development' ? String(err?.message || err) : undefined
+    });
+  }
 }
 
 function parseAIResponse(content: string) {
