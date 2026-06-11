@@ -13,7 +13,7 @@ The Org Intelligence module evaluates individuals (typically senior executives a
 The original v1.1 spec (973 lines, internal OpenClaw) was lost in context compression on 2026-06-11. This v1.2 is a re-derivation based on:
 - (a) the Org Intelligence module's "5-criteria" design principle (per Kevin's 2026-06-11 15:00 brief)
 - (b) standard executive evaluation frameworks (Heidrick & Struggles, Egon Zehnder, Spencer Stuart)
-- (c) the existing LYC codebase scoring patterns (TRIDENT 3D, PHI 3D)
+- (c) the existing LYC codebase scoring patterns (3D dimension-weighted)
 - (d) the Codelco China mandate context (state-owned commodity, China market entry)
 
 **Kevin should confirm or adjust the 5 criteria before T4 implementation begins.**
@@ -49,7 +49,6 @@ Range: **0-100.** Tier mapping:
 | 40-59 | T3 | Reserve | Development track |
 | 0-39 | T4 | Not Recommended | Explicit dealbreaker |
 
-(Aligned with existing TRIDENT tier convention in `src/services/tridentScoring.ts`.)
 
 ---
 
@@ -208,7 +207,7 @@ Phase 1 priority pool = **<$2.** Trivial cost.
 
 1. **Are the 5 criteria the right 5?** (Tenure / Network / Performance / Mobility / Cultural Fit)
 2. **Are the default weights right?** (0.25 / 0.20 / 0.25 / 0.15 / 0.15 - performance + tenure dominant)
-3. **Tier boundaries?** (80/60/40 thresholds - same as TRIDENT, kept for consistency)
+3. **Tier boundaries?** (80/60/40 thresholds - kept simple and consistent across the platform)
 4. **Override reason min length?** (30 chars proposed)
 5. **Per-call temperature?** (0.1 proposed - low variance for rubric application)
 
@@ -219,5 +218,5 @@ Phase 1 priority pool = **<$2.** Trivial cost.
 - T1 SQL: `supabase/migrations/20260611_create_org_intelligence_tables.sql` (10 tables, `org_evaluation_scores` + `org_audit_log` already in place)
 - T2 helper: `api/_lib/adminAuth.ts`
 - T3 upload: `api/admin/org-intelligence/companies/upload.ts` (predecessor pattern)
-- Existing scoring: `api/score.ts` + `src/services/tridentScoring.ts` (TRIDENT 3D, similar LLM-call pattern)
+- Existing scoring: `api/score.ts` (3D dimension-weighted, similar LLM-call pattern)
 - Hard rule: `python3 ./LYC_BOTS/deepseek_call.py --model flash` (Coze LLM FORBIDDEN)
