@@ -1,5 +1,7 @@
-// coze.ts — Legacy service file. All AI calls now go through /api/chat proxy.
-// This file is kept only for type compatibility. Do not add API keys here.
+// coze.ts — Chat proxy + legacy single-candidate scoring wrapper.
+// All LLM calls go through /api/chat (chat proxy) or
+// /api/admin/org-intelligence/scoring/compute (public mode, see scoringClient.ts).
+// Do not add API keys here.
 
 export async function sendChatMessage(
   message: string,
@@ -65,18 +67,16 @@ export async function sendChatMessageWithSuggestions(
   }
 }
 
-export async function scoreCandidateWithAI(jd: string, cv: string): Promise<{ d1: number; d2: number; d3: number; reasoning: string } | null> {
-  try {
-    const res = await fetch('/api/score', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jd, cv }),
-    });
-    if (!res.ok) throw new Error(`API error ${res.status}`);
-    const data = await res.json();
-    return data.result || null;
-  } catch (e) {
-    console.error('[scoreCandidateWithAI] Failed:', e);
-    return null;
-  }
+/**
+ * Score a single candidate against a job description.
+ * Delegates to scoringClient.scoreSingleCandidate (uses T4 endpoint public mode).
+ * Kept here for backward compat — BatchScoringPage imports scoreCandidateWithAI from this file.
+ */
+export async function scoreCandidateWithAI(
+  jd: string,
+  cv: string,
+  candidateName: string = 'Candidate'
+): Promise<{ d1: number; d2: number; d3: number; reasoning: string } | null> {
+  const { scoreSingleCandidate } = await import('./scoringClient');
+  return scoreSingleCandidate(jd, cv, candidateName);
 }

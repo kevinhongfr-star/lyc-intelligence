@@ -1,29 +1,24 @@
 /**
  * POST /api/admin/org-intelligence/scoring/compute
  *
- * Body: { talent_id: string, mandate_id: string, force?: boolean, override_summary?: string }
- *   - talent_id: UUID of the individual to score (org_talent_pools.id)
- *   - mandate_id: UUID of the target mandate (mandates.id)
- *   - force: re-score even if an evaluation already exists for this talent
- *   - override_summary: admin override of the summary (≥30 chars per OVERRIDE_MIN_REASON_LENGTH)
+ * ─────────────────────────────────────────────────────────────────
+ * ADMIN MODE (default):
+ *   Body: { talent_id: string, mandate_id: string, force?: boolean, override_summary?: string }
+ *   Auth: verifyAdmin required
+ *   DB:   persists to org_evaluations + org_evaluation_scores + org_audit_log
  *
- * Pipeline:
- *   1. verifyAdmin (T2) — reject if not admin
- *   2. Validate body — UUIDs, override length
- *   3. Fetch talent from org_talent_pools
- *   4. Fetch mandate from mandates (existing LYC table, not the new T1 tables)
- *   5. Build sources corpus from talent data + admin attributes
- *   6. Run 5 LLM calls in parallel (one per criterion)
- *   7. Parse sub-scores from LLM responses
- *   8. Compute composite + determine tier
- *   9. Upsert org_evaluation (header) — re-use existing row if (talent_id, eval_type) match
- *  10. Replace 5 org_evaluation_scores rows (delete existing + insert new)
- *  11. Append org_audit_log entry
- *  12. Return 200 with full scoring result
+ * PUBLIC MODE (legacy candidate matching, opt-in):
+ *   Body: { public: true, jd: string, candidates: [{name: string, cv: string}] }
+ *   Auth: NONE (open endpoint, used by legacy MatchPage / BatchScoringPage /
+ *         Shortlist1Pager / CandidateList / ResultsTable)
+ *   DB:   none (pure compute, ephemeral)
+ *   Output: legacy 3-dim shape (composite_score, dimension_scores, match_reasons,
+ *           risk_factors, approach_strategy) PLUS v1.2 sub_scores (C1-C5) on the side.
  *
- * Idempotency: re-running with the same (talent_id, mandate_id) overwrites
- * the previous evaluation. Pass `force: true` if you want to bypass
- * "is_final" guards (Phase 2 — currently no guard, force is reserved).
+ * Public mode exists because Vercel Hobby plan caps serverless functions at 12
+ * and legacy /api/score.ts was deleted (commit 91acfb623e) to fit the T3/T4/T6
+ * org-intel endpoints. By accepting legacy requests with public:true, we ship one
+ * function that serves both the admin org-intel flow AND the public candidate-match flow.
  *
  * Source: docs/org_intelligence_scoring_spec_v1.2.md
  */
@@ -33,7 +28,6 @@ import { verifyAdmin } from '../../../_lib/adminAuth.js';
 import {
   isSupabaseConfigured,
   selectOne,
-  selectMany,
   insert,
   update,
   deleteRows,
@@ -45,6 +39,7 @@ import {
   tierFor,
   tierLabel,
   OVERRIDE_MIN_REASON_LENGTH,
+  LLM_MODEL,
   type CriterionId,
   type SubScores,
   type TierId,
@@ -65,6 +60,9 @@ interface ComputeRequestBody {
   mandate_id?: string;
   force?: boolean;
   override_summary?: string;
+  public?: boolean;
+  jd?: string;
+  candidates?: Array<{ name?: string; cv?: string }>;
 }
 
 interface ComputeSuccessResponse {
@@ -85,7 +83,25 @@ interface ComputeSuccessResponse {
   model: string;
 }
 
-interface ComputeErrorResponse {
+interface PublicCandidateResult {
+  candidate_name: string;
+  composite_score: number;
+  dimension_scores: { experience: number; skills: number; fit: number };
+  match_reasons: string[];
+  risk_factors: string[];
+  approach_strategy: string;
+  sub_scores: SubScores;
+}
+
+interface PublicSuccessResponse {
+  success: true;
+  results: PublicCandidateResult[];
+  total_tokens: number;
+  duration_ms: number;
+  model: string;
+}
+
+type ComputeErrorResponse = {
   success: false;
   error: string;
   step:
@@ -101,7 +117,7 @@ interface ComputeErrorResponse {
     | 'persist_scores'
     | 'audit';
   details?: string;
-}
+};
 
 function err(
   res: VercelResponse,
@@ -133,165 +149,381 @@ export default async function handler(
       });
     }
 
-    // 1. Auth
-    const { user, error: authErr } = await verifyAdmin(req);
-    if (authErr || !user) {
-      return err(res, 401, {
-        success: false,
-        error: authErr || 'Unauthorized',
-        step: 'auth',
-      });
-    }
-
-    // 2. Validate body
     const body = (req.body ?? {}) as ComputeRequestBody;
-    if (!body.talent_id || !UUID_RE.test(body.talent_id)) {
-      return err(res, 400, {
-        success: false,
-        error: 'talent_id is required and must be a UUID',
-        step: 'validate',
-      });
-    }
-    if (!body.mandate_id || !UUID_RE.test(body.mandate_id)) {
-      return err(res, 400, {
-        success: false,
-        error: 'mandate_id is required and must be a UUID',
-        step: 'validate',
-      });
-    }
-    if (
-      body.override_summary !== undefined &&
-      body.override_summary.length < OVERRIDE_MIN_REASON_LENGTH
-    ) {
-      return err(res, 400, {
-        success: false,
-        error: `override_summary must be at least ${OVERRIDE_MIN_REASON_LENGTH} characters when provided`,
-        step: 'validate',
-      });
+
+    // ─── PUBLIC MODE BRANCH (legacy candidate matching) ─────────────
+    if (body.public === true) {
+      return await handlePublicMode(res, body, start);
     }
 
-    const talentId = body.talent_id;
-    const mandateId = body.mandate_id;
+    // ─── ADMIN MODE BRANCH (org-intel talent scoring) ───────────────
+    return await handleAdminMode(req, res, body, start);
+  } catch (e) {
+    return handleError(res, 'scoring.compute', e) as VercelResponse;
+  }
+}
 
-    // 3. Fetch talent
-    const talent = await selectOne('org_talent_pools', {
-      column: 'id',
-      value: talentId,
+// ─────────────────────────────────────────────────────────────────
+// Public mode — legacy candidate matching (no auth, no DB)
+// ─────────────────────────────────────────────────────────────────
+async function handlePublicMode(
+  res: VercelResponse,
+  body: ComputeRequestBody,
+  start: number
+): Promise<VercelResponse> {
+  if (!body.jd || typeof body.jd !== 'string' || body.jd.trim().length < 20) {
+    return res.status(400).json({
+      success: false,
+      error: 'public mode requires jd (job description) of at least 20 characters',
     });
-    if (!talent) {
-      return err(res, 404, {
-        success: false,
-        error: `Talent ${talentId} not found in org_talent_pools`,
-        step: 'fetch_talent',
-      });
-    }
-
-    // 4. Fetch mandate (from existing LYC `mandates` table, not the new T1 tables)
-    const mandate = await selectOne('mandates', {
-      column: 'id',
-      value: mandateId,
+  }
+  if (!Array.isArray(body.candidates) || body.candidates.length === 0) {
+    return res.status(400).json({
+      success: false,
+      error: 'public mode requires non-empty candidates[] array',
     });
-    if (!mandate) {
-      return err(res, 404, {
+  }
+  if (body.candidates.length > 20) {
+    return res.status(400).json({
+      success: false,
+      error: 'public mode supports up to 20 candidates per request (rate-limit guard)',
+    });
+  }
+  for (const [i, c] of body.candidates.entries()) {
+    if (!c || typeof c.name !== 'string' || !c.name.trim()) {
+      return res.status(400).json({
         success: false,
-        error: `Mandate ${mandateId} not found in mandates`,
-        step: 'fetch_mandate',
+        error: `candidates[${i}].name is required`,
       });
     }
+    if (typeof c.cv !== 'string' || c.cv.trim().length < 10) {
+      return res.status(400).json({
+        success: false,
+        error: `candidates[${i}].cv is required (min 10 chars)`,
+      });
+    }
+  }
 
-    // 5. Build sources corpus
-    const sources = buildSourcesFromTalent(talent);
-    const corpus = buildCorpus(sources);
+  let totalTokens = 0;
+  let modelUsed = LLM_MODEL;
 
-    // 6. Build prompt contexts
-    const individualContext = buildIndividualContext(talent, corpus);
-    const mandateContext = buildMandateContext(mandate);
+  try {
+    const results = await Promise.all(
+      body.candidates!.map(async (cand) => {
+        const prompt = buildPublicPrompt(body.jd!, cand.name!, cand.cv!);
+        const llm = await callLLM({ prompt });
+        const parsed = parsePublicResponse(llm.content);
+        totalTokens += llm.totalTokens;
+        modelUsed = llm.model;
+        return projectToLegacy(parsed, cand.name!);
+      })
+    );
 
-    // 7. Run 5 LLM calls in parallel
-    const subScores: SubScores = { C1: 0, C2: 0, C3: 0, C4: 0, C5: 0 };
-    const rationales: Record<CriterionId, string> = {
-      C1: '', C2: '', C3: '', C4: '', C5: '',
+    const response: PublicSuccessResponse = {
+      success: true,
+      results,
+      total_tokens: totalTokens,
+      duration_ms: Date.now() - start,
+      model: modelUsed,
     };
-    let totalTokens = 0;
-    let modelUsed = 'deepseek-chat';
-
-    try {
-      const results = await Promise.all(
-        (Object.keys(CRITERIA) as CriterionId[]).map(async (cId) => {
-          const c = CRITERIA[cId];
-          const prompt = buildCriterionPrompt(c, individualContext, mandateContext);
-          const llm = await callLLM({ prompt });
-          const parsed = parseScoreResponse(llm.content);
-          return {
-            cId,
-            score: parsed.score,
-            rationale: parsed.rationale,
-            tokens: llm.totalTokens,
-            model: llm.model,
-          };
-        })
-      );
-      for (const r of results) {
-        subScores[r.cId] = r.score;
-        rationales[r.cId] = r.rationale;
-        totalTokens += r.tokens;
-        modelUsed = r.model;
-      }
-    } catch (e) {
-      if (e instanceof LLMError || e instanceof ParseScoreError) {
-        return err(res, 502, {
-          success: false,
-          error: e.message,
-          step: 'llm',
-        });
-      }
-      throw e;
+    return res.status(200).json(response);
+  } catch (e) {
+    if (e instanceof LLMError) {
+      return res.status(502).json({ success: false, error: e.message });
     }
+    if (e instanceof Error && /public response parse/i.test(e.message)) {
+      return res.status(502).json({ success: false, error: e.message });
+    }
+    throw e;
+  }
+}
 
-    // 8. Composite + tier
-    const composite = computeComposite(subScores);
-    const tier = tierFor(composite);
-    const tierL = tierLabel(tier);
+interface PublicParsed {
+  C1: number;
+  C2: number;
+  C3: number;
+  C4: number;
+  C5: number;
+  match_reasons: string[];
+  risk_factors: string[];
+  approach_strategy: string;
+}
 
-    // 9. Upsert org_evaluation (header)
-    let evaluationId: string;
+function buildPublicPrompt(jd: string, name: string, cv: string): string {
+  return `You are an executive search consultant evaluating a candidate for a client mandate.
+
+ROLE (job description):
+${jd}
+
+CANDIDATE:
+Name: ${name}
+Background:
+${cv}
+
+Apply the 5-criteria executive assessment framework. Each criterion is scored 0-20.
+
+C1 — Tenure & Track Record
+  0-7:  Frequent short tenures, employment gaps, limited scope growth
+  8-13: Stable progression with some scope growth
+  14-20: Long stable tenure with progressive responsibility, leadership roles
+
+C2 — Network & Influence
+  0-7:  Limited visibility, narrow industry footprint
+  8-13: Known within immediate company or function
+  14-20: Recognized authority, speaking/publishing/advisory, well-connected
+
+C3 — Performance & Impact
+  0-7:  Vague achievements, limited quantifiable outcomes
+  8-13: Some attributable wins, clear business impact
+  14-20: Specific, attributable, compounding business outcomes
+
+C4 — Mobility & Adaptability
+  0-7:  Deep specialization, geographic or functional constraints
+  8-13: Some cross-functional exposure, willing to move within scope
+  14-20: Demonstrated pivots, international experience, flexible scope
+
+C5 — Cultural & Mandate Fit
+  0-7:  Past roles in very different cultural or governance contexts
+  8-13: Some alignment with mandate context
+  14-20: Strong alignment with mandate stakeholders, pace, governance
+
+Also provide 3-5 concise match reasons (why this candidate fits), 1-3 risk factors (gaps or
+concerns), and a one-sentence approach strategy for engaging this candidate.
+
+Respond with ONLY this JSON (no markdown, no code fences, no prose):
+{
+  "C1": <integer 0-20>,
+  "C2": <integer 0-20>,
+  "C3": <integer 0-20>,
+  "C4": <integer 0-20>,
+  "C5": <integer 0-20>,
+  "match_reasons": ["<short reason 1>", "<short reason 2>", "<short reason 3>"],
+  "risk_factors": ["<short risk 1>"],
+  "approach_strategy": "<1-sentence approach for engaging this candidate>"
+}`;
+}
+
+function parsePublicResponse(raw: string): PublicParsed {
+  let text = raw.trim();
+  text = text
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/```\s*$/i, '')
+    .trim();
+  let obj: any;
+  try {
+    obj = JSON.parse(text);
+  } catch {
+    const m = text.match(/\{[\s\S]*\}/);
+    if (!m) {
+      throw new Error(`public response parse: no JSON object found: ${raw.slice(0, 200)}`);
+    }
     try {
-      const existing = await selectOne('org_evaluations', {
-        column: 'talent_id',
-        value: talentId,
-        select: 'id,eval_type,is_final',
-      });
-      // Filter by eval_type in JS (selectOne only does single-column eq)
-      const existingMatch =
-        existing && existing.eval_type === EVAL_TYPE ? existing : null;
+      obj = JSON.parse(m[0]);
+    } catch {
+      throw new Error(`public response parse: invalid JSON: ${m[0].slice(0, 200)}`);
+    }
+  }
 
-      if (existingMatch) {
-        evaluationId = existingMatch.id;
-        await update(
-          'org_evaluations',
-          { column: 'id', value: evaluationId },
-          {
-            eval_date: new Date().toISOString().slice(0, 10),
-            evaluator_id: user.id,
-            overall_score: composite,
-            scorecard: {
-              sub_scores: subScores,
-              tier,
-              tier_label: tierL,
-              source_count: corpus.sourcesUsed,
-              sources_truncated: corpus.truncated,
-              total_tokens: totalTokens,
-              model: modelUsed,
-            },
-            notes: body.override_summary ?? null,
-            is_final: true,
-            updated_at: new Date().toISOString(),
-          }
-        );
-      } else {
-        const inserted = await insert('org_evaluations', {
-          talent_id: talentId,
-          eval_type: EVAL_TYPE,
+  const clamp20 = (v: any) => {
+    const n = Math.round(Number(v));
+    if (!Number.isFinite(n)) {
+      throw new Error('public response parse: non-numeric sub-score');
+    }
+    return Math.max(0, Math.min(20, n));
+  };
+
+  const reasons = Array.isArray(obj.match_reasons)
+    ? obj.match_reasons.slice(0, 5).map((s: any) => String(s).slice(0, 200))
+    : [];
+  const risks = Array.isArray(obj.risk_factors)
+    ? obj.risk_factors.slice(0, 5).map((s: any) => String(s).slice(0, 200))
+    : [];
+  const approach =
+    typeof obj.approach_strategy === 'string'
+      ? obj.approach_strategy.slice(0, 500)
+      : '';
+
+  return {
+    C1: clamp20(obj.C1),
+    C2: clamp20(obj.C2),
+    C3: clamp20(obj.C3),
+    C4: clamp20(obj.C4),
+    C5: clamp20(obj.C5),
+    match_reasons: reasons,
+    risk_factors: risks,
+    approach_strategy: approach,
+  };
+}
+
+/**
+ * Project 5-criteria sub-scores (each 0-20) to legacy 3-dim shape (each 0-100).
+ *   experience = (C1*0.6 + C3*0.4) * 5    [Tenure-heavy + Performance]
+ *   skills     = (C3*0.7 + C2*0.3) * 5    [Performance-heavy + Network]
+ *   fit        = (C5*0.7 + C2*0.3) * 5    [Cultural-heavy + Network]
+ *   composite  = 0.40*experience + 0.35*skills + 0.25*fit  (legacy weights)
+ */
+function projectToLegacy(parsed: PublicParsed, name: string): PublicCandidateResult {
+  const sub_scores: SubScores = {
+    C1: parsed.C1,
+    C2: parsed.C2,
+    C3: parsed.C3,
+    C4: parsed.C4,
+    C5: parsed.C5,
+  };
+  const experience = Math.round((parsed.C1 * 0.6 + parsed.C3 * 0.4) * 5);
+  const skills = Math.round((parsed.C3 * 0.7 + parsed.C2 * 0.3) * 5);
+  const fit = Math.round((parsed.C5 * 0.7 + parsed.C2 * 0.3) * 5);
+  const composite = Math.round(0.40 * experience + 0.35 * skills + 0.25 * fit);
+  return {
+    candidate_name: name,
+    composite_score: composite,
+    dimension_scores: { experience, skills, fit },
+    match_reasons: parsed.match_reasons,
+    risk_factors: parsed.risk_factors,
+    approach_strategy: parsed.approach_strategy,
+    sub_scores,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Admin mode — org-intel talent scoring (original flow)
+// ─────────────────────────────────────────────────────────────────
+async function handleAdminMode(
+  req: VercelRequest,
+  res: VercelResponse,
+  body: ComputeRequestBody,
+  start: number
+): Promise<VercelResponse> {
+  const { user, error: authErr } = await verifyAdmin(req);
+  if (authErr || !user) {
+    return err(res, 401, {
+      success: false,
+      error: authErr || 'Unauthorized',
+      step: 'auth',
+    });
+  }
+
+  if (!body.talent_id || !UUID_RE.test(body.talent_id)) {
+    return err(res, 400, {
+      success: false,
+      error: 'talent_id is required and must be a UUID',
+      step: 'validate',
+    });
+  }
+  if (!body.mandate_id || !UUID_RE.test(body.mandate_id)) {
+    return err(res, 400, {
+      success: false,
+      error: 'mandate_id is required and must be a UUID',
+      step: 'validate',
+    });
+  }
+  if (
+    body.override_summary !== undefined &&
+    body.override_summary.length < OVERRIDE_MIN_REASON_LENGTH
+  ) {
+    return err(res, 400, {
+      success: false,
+      error: `override_summary must be at least ${OVERRIDE_MIN_REASON_LENGTH} characters when provided`,
+      step: 'validate',
+    });
+  }
+
+  const talentId = body.talent_id;
+  const mandateId = body.mandate_id;
+
+  const talent = await selectOne('org_talent_pools', {
+    column: 'id',
+    value: talentId,
+  });
+  if (!talent) {
+    return err(res, 404, {
+      success: false,
+      error: `Talent ${talentId} not found in org_talent_pools`,
+      step: 'fetch_talent',
+    });
+  }
+
+  const mandate = await selectOne('mandates', {
+    column: 'id',
+    value: mandateId,
+  });
+  if (!mandate) {
+    return err(res, 404, {
+      success: false,
+      error: `Mandate ${mandateId} not found in mandates`,
+      step: 'fetch_mandate',
+    });
+  }
+
+  const sources = buildSourcesFromTalent(talent);
+  const corpus = buildCorpus(sources);
+  const individualContext = buildIndividualContext(talent, corpus);
+  const mandateContext = buildMandateContext(mandate);
+
+  const subScores: SubScores = { C1: 0, C2: 0, C3: 0, C4: 0, C5: 0 };
+  const rationales: Record<CriterionId, string> = {
+    C1: '',
+    C2: '',
+    C3: '',
+    C4: '',
+    C5: '',
+  };
+  let totalTokens = 0;
+  let modelUsed = LLM_MODEL;
+
+  try {
+    const results = await Promise.all(
+      (Object.keys(CRITERIA) as CriterionId[]).map(async (cId) => {
+        const c = CRITERIA[cId];
+        const prompt = buildCriterionPrompt(c, individualContext, mandateContext);
+        const llm = await callLLM({ prompt });
+        const parsed = parseScoreResponse(llm.content);
+        return {
+          cId,
+          score: parsed.score,
+          rationale: parsed.rationale,
+          tokens: llm.totalTokens,
+          model: llm.model,
+        };
+      })
+    );
+    for (const r of results) {
+      subScores[r.cId] = r.score;
+      rationales[r.cId] = r.rationale;
+      totalTokens += r.tokens;
+      modelUsed = r.model;
+    }
+  } catch (e) {
+    if (e instanceof LLMError || e instanceof ParseScoreError) {
+      return err(res, 502, {
+        success: false,
+        error: e.message,
+        step: 'llm',
+      });
+    }
+    throw e;
+  }
+
+  const composite = computeComposite(subScores);
+  const tier = tierFor(composite);
+  const tierL = tierLabel(tier);
+
+  let evaluationId: string;
+  try {
+    const existing = await selectOne('org_evaluations', {
+      column: 'talent_id',
+      value: talentId,
+      select: 'id,eval_type,is_final',
+    });
+    const existingMatch =
+      existing && existing.eval_type === EVAL_TYPE ? existing : null;
+
+    if (existingMatch) {
+      evaluationId = existingMatch.id;
+      await update(
+        'org_evaluations',
+        { column: 'id', value: evaluationId },
+        {
           eval_date: new Date().toISOString().slice(0, 10),
           evaluator_id: user.id,
           overall_score: composite,
@@ -306,110 +538,117 @@ export default async function handler(
           },
           notes: body.override_summary ?? null,
           is_final: true,
-        });
-        if (!inserted?.id) {
-          throw new Error('org_evaluations insert returned no id');
+          updated_at: new Date().toISOString(),
         }
-        evaluationId = inserted.id;
-      }
-    } catch (e) {
-      return err(res, 500, {
-        success: false,
-        error: `Persist org_evaluations failed: ${(e as Error).message}`,
-        step: 'persist_evaluation',
-      });
-    }
-
-    // 10. Replace 5 org_evaluation_scores rows (delete existing + insert new)
-    try {
-      await deleteRows('org_evaluation_scores', {
-        column: 'evaluation_id',
-        value: evaluationId,
-      });
-      const scoreRows = (Object.keys(CRITERIA) as CriterionId[]).map((cId) => ({
-        evaluation_id: evaluationId,
-        criterion_key: cId,
-        criterion_label: CRITERIA[cId].name,
-        score: subScores[cId],
-        source: modelUsed,
-        rationale: rationales[cId],
-        confidence: 0.85, // placeholder; future iteration can derive from LLM metadata
-      }));
-      await insert('org_evaluation_scores', scoreRows);
-    } catch (e) {
-      return err(res, 500, {
-        success: false,
-        error: `Persist org_evaluation_scores failed: ${(e as Error).message}`,
-        step: 'persist_scores',
-      });
-    }
-
-    // 11. Audit log (failures here don't fail the call)
-    try {
-      await insert('org_audit_log', {
-        actor_id: user.id,
-        action: 'scoring.compute',
-        resource_type: 'org_evaluation',
-        resource_id: evaluationId,
-        after_state: {
-          talent_id: talentId,
-          mandate_id: mandateId,
-          sub_scores: subScores,
-          composite,
-          tier,
-          total_tokens: totalTokens,
-          source_count: corpus.sourcesUsed,
-        },
-        ip_address:
-          (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
-          req.socket?.remoteAddress ||
-          null,
-        user_agent: (req.headers['user-agent'] as string) || null,
-      });
-    } catch (auditErr) {
-      // Audit failure is non-fatal — log it and continue
-      console.error(
-        `[scoring.compute] audit log failed for evaluation ${evaluationId}:`,
-        auditErr
       );
+    } else {
+      const inserted = await insert('org_evaluations', {
+        talent_id: talentId,
+        eval_type: EVAL_TYPE,
+        eval_date: new Date().toISOString().slice(0, 10),
+        evaluator_id: user.id,
+        overall_score: composite,
+        scorecard: {
+          sub_scores: subScores,
+          tier,
+          tier_label: tierL,
+          source_count: corpus.sourcesUsed,
+          sources_truncated: corpus.truncated,
+          total_tokens: totalTokens,
+          model: modelUsed,
+        },
+        notes: body.override_summary ?? null,
+        is_final: true,
+      });
+      if (!inserted?.id) {
+        throw new Error('org_evaluations insert returned no id');
+      }
+      evaluationId = inserted.id;
     }
-
-    // 12. Success response
-    const response: ComputeSuccessResponse = {
-      success: true,
-      evaluation_id: evaluationId,
-      talent_id: talentId,
-      mandate_id: mandateId,
-      sub_scores: subScores,
-      composite,
-      tier,
-      tier_label: tierL,
-      rationale: rationales,
-      source_count: corpus.sourcesUsed,
-      sources_truncated: corpus.truncated,
-      total_tokens: totalTokens,
-      duration_ms: Date.now() - start,
-      overridden: Boolean(body.override_summary),
-      model: modelUsed,
-    };
-    return res.status(200).json(response);
   } catch (e) {
-    return handleError(res, 'scoring.compute', e) as VercelResponse;
+    return err(res, 500, {
+      success: false,
+      error: `Persist org_evaluations failed: ${(e as Error).message}`,
+      step: 'persist_evaluation',
+    });
   }
+
+  try {
+    await deleteRows('org_evaluation_scores', {
+      column: 'evaluation_id',
+      value: evaluationId,
+    });
+    const scoreRows = (Object.keys(CRITERIA) as CriterionId[]).map((cId) => ({
+      evaluation_id: evaluationId,
+      criterion_key: cId,
+      criterion_label: CRITERIA[cId].name,
+      score: subScores[cId],
+      source: modelUsed,
+      rationale: rationales[cId],
+      confidence: 0.85,
+    }));
+    await insert('org_evaluation_scores', scoreRows);
+  } catch (e) {
+    return err(res, 500, {
+      success: false,
+      error: `Persist org_evaluation_scores failed: ${(e as Error).message}`,
+      step: 'persist_scores',
+    });
+  }
+
+  try {
+    await insert('org_audit_log', {
+      actor_id: user.id,
+      action: 'scoring.compute',
+      resource_type: 'org_evaluation',
+      resource_id: evaluationId,
+      after_state: {
+        talent_id: talentId,
+        mandate_id: mandateId,
+        sub_scores: subScores,
+        composite,
+        tier,
+        total_tokens: totalTokens,
+        source_count: corpus.sourcesUsed,
+      },
+      ip_address:
+        (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+        req.socket?.remoteAddress ||
+        null,
+      user_agent: (req.headers['user-agent'] as string) || null,
+    });
+  } catch (auditErr) {
+    console.error(
+      `[scoring.compute] audit log failed for evaluation ${evaluationId}:`,
+      auditErr
+    );
+  }
+
+  const response: ComputeSuccessResponse = {
+    success: true,
+    evaluation_id: evaluationId,
+    talent_id: talentId,
+    mandate_id: mandateId,
+    sub_scores: subScores,
+    composite,
+    tier,
+    tier_label: tierL,
+    rationale: rationales,
+    source_count: corpus.sourcesUsed,
+    sources_truncated: corpus.truncated,
+    total_tokens: totalTokens,
+    duration_ms: Date.now() - start,
+    overridden: Boolean(body.override_summary),
+    model: modelUsed,
+  };
+  return res.status(200).json(response);
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────
-
-/**
- * Build a Source list from the talent row.
- * Phase 1: use LinkedIn URL + admin-supplied attributes.sources array.
- * Future: integrate sourcing_channels (web scraper) + org_talent_attachments.
- */
+// ─────────────────────────────────────────────────────────────────
+// Admin-mode helpers
+// ─────────────────────────────────────────────────────────────────
 function buildSourcesFromTalent(talent: any): Source[] {
   const sources: Source[] = [];
-
   if (talent.linkedin_url) {
     sources.push({
       url: talent.linkedin_url,
@@ -427,7 +666,6 @@ function buildSourcesFromTalent(talent: any): Source[] {
       sourceType: 'professional_network',
     });
   }
-
   if (
     talent.attributes &&
     Array.isArray(talent.attributes.sources) &&
@@ -445,7 +683,6 @@ function buildSourcesFromTalent(talent: any): Source[] {
       }
     }
   }
-
   if (talent.email) {
     sources.push({
       url: `mailto:${talent.email}`,
@@ -454,7 +691,6 @@ function buildSourcesFromTalent(talent: any): Source[] {
       sourceType: 'admin_supplied',
     });
   }
-
   return sources;
 }
 

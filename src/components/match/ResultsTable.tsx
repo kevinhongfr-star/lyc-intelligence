@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Download, Share2, Save, AlertTriangle, CheckCircle } from 'lucide-react';
-import { TRIDENTResult, getScoreBarColor } from '../../services/tridentScoring';
+import { MatchResult, getScoreBarColor } from '../../services/scoringClient';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -28,10 +28,10 @@ function getFitLabel(score: number): { label: string; color: string } {
 }
 
 interface ResultsTableProps {
-  results: TRIDENTResult[];
-  onDownloadPDF?: (result: TRIDENTResult) => void;
-  onShareCard?: (result: TRIDENTResult) => void;
-  onSaveCandidate?: (result: TRIDENTResult) => void;
+  results: MatchResult[];
+  onDownloadPDF?: (result: MatchResult) => void;
+  onShareCard?: (result: MatchResult) => void;
+  onSaveCandidate?: (result: MatchResult) => void;
 }
 
 export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandidate }: ResultsTableProps) {

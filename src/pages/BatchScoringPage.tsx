@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Upload, Play, Loader2, Plus, X } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Badge, Input, Progress } from '@/components/ui';
 import { scoreCandidateWithAI } from '@/services/coze';
-import { computeTRIDENT } from '@/services/tridentScoring';
+import { computeMatchScore } from '@/services/scoringClient';
 import { getSupabase } from '@/services/supabaseApi';
 
 interface CandidateInput { name: string; cv: string; }
@@ -40,7 +40,7 @@ export function BatchScoringPage() {
     for (let i = 0; i < valid.length; i++) {
       const score = await scoreCandidateWithAI(jd, valid[i].cv);
       if (score) {
-        const result = computeTRIDENT({ d1: score.d1, d2: score.d2, d3: score.d3 });
+        const result = computeMatchScore({ d1: score.d1, d2: score.d2, d3: score.d3 });
         setResults(prev => [...prev, { name: valid[i].name, d1: score.d1, d2: score.d2, d3: score.d3, composite: result.composite, verdict: result.verdict, tier: result.tier, reasoning: score.reasoning }]);
       }
       setProgress(Math.round(((i + 1) / valid.length) * 100));

@@ -4,7 +4,7 @@ import { ArrowRight, BarChart3, Shield, Loader2, Upload } from 'lucide-react';
 import { JDInput } from '../components/match/JDInput';
 import { CandidateList } from '../components/match/CandidateList';
 import { ResultsTable } from '../components/match/ResultsTable';
-import { runTRIDENTScoring, CandidateInput, TRIDENTResult, getCreditCost } from '../services/tridentScoring';
+import { runMatchScoring, CandidateInput, MatchResult, getCreditCost } from '../services/scoringClient';
 import { useAuthStore } from '../stores/authStore';
 
 const DS = {
@@ -41,7 +41,7 @@ export function MatchPage() {
   const [lead, setLead] = useState<LeadData>({ name: '', email: '', company: '', title: '' });
   const [jd, setJd] = useState('');
   const [candidates, setCandidates] = useState<CandidateInput[]>([{ name: '', cv: '' }]);
-  const [results, setResults] = useState<TRIDENTResult[]>([]);
+  const [results, setResults] = useState<MatchResult[]>([]);
   const [scoring, setScoring] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showCreditModal, setShowCreditModal] = useState(false);
@@ -140,7 +140,7 @@ export function MatchPage() {
     setProgress(0);
 
     try {
-      const response = await runTRIDENTScoring(
+      const response = await runMatchScoring(
         jd,
         validCandidates,
         user?.id
@@ -169,18 +169,18 @@ export function MatchPage() {
     }
   };
 
-  const handleDownloadPDF = (result: TRIDENTResult) => {
+  const handleDownloadPDF = (result: MatchResult) => {
     alert(`Download PDF for ${result.candidate_name}`);
   };
 
-  const handleShareCard = (result: TRIDENTResult) => {
+  const handleShareCard = (result: MatchResult) => {
     const shareId = Math.random().toString(36).substring(7);
     const shareUrl = `${window.location.origin}/score-card/${shareId}`;
     navigator.clipboard.writeText(shareUrl);
     alert('Shareable link copied to clipboard!');
   };
 
-  const handleSaveCandidate = (result: TRIDENTResult) => {
+  const handleSaveCandidate = (result: MatchResult) => {
     alert(`Save candidate: ${result.candidate_name}`);
   };
 

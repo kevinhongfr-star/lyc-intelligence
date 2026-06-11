@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, X, User, FileText, Users, Upload } from 'lucide-react';
-import { CandidateInput } from '../../services/tridentScoring';
+import { CandidateInput } from '../../services/scoringClient';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
