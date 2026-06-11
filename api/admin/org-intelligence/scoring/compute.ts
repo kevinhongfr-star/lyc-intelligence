@@ -303,25 +303,58 @@ Respond with ONLY this JSON (no markdown, no code fences, no prose):
 }`;
 }
 
+/**
+ * Extract the first top-level JSON object from a string by tracking
+ * brace depth and respecting JSON string boundaries. Tolerant to LLM
+ * responses that include prose or commentary before/after the JSON.
+ */
+function extractFirstJsonObject(text: string): string | null {
+  let depth = 0;
+  let start = -1;
+  let inString = false;
+  let escape = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inString) {
+      if (escape) { escape = false; continue; }
+      if (ch === '\\') { escape = true; continue; }
+      if (ch === '"') { inString = false; }
+      continue;
+    }
+    if (ch === '"') { inString = true; continue; }
+    if (ch === '{') {
+      if (start === -1) start = i;
+      depth++;
+    } else if (ch === '}') {
+      if (depth === 0) continue;
+      depth--;
+      if (depth === 0 && start !== -1) {
+        return text.slice(start, i + 1);
+      }
+    }
+  }
+  return null;
+}
+
 function parsePublicResponse(raw: string): PublicParsed {
   let text = raw.trim();
   text = text
     .replace(/^```(?:json)?\s*/i, '')
     .replace(/```\s*$/i, '')
     .trim();
-  let obj: any;
-  try {
-    obj = JSON.parse(text);
-  } catch {
-    const m = text.match(/\{[\s\S]*\}/);
-    if (!m) {
-      throw new Error(`public response parse: no JSON object found: ${raw.slice(0, 200)}`);
+
+  let obj: any = null;
+  // 1. Try as-is
+  try { obj = JSON.parse(text); } catch {}
+  // 2. Try extracting first balanced JSON object (handles trailing prose)
+  if (!obj) {
+    const extracted = extractFirstJsonObject(text);
+    if (extracted) {
+      try { obj = JSON.parse(extracted); } catch {}
     }
-    try {
-      obj = JSON.parse(m[0]);
-    } catch {
-      throw new Error(`public response parse: invalid JSON: ${m[0].slice(0, 200)}`);
-    }
+  }
+  if (!obj) {
+    throw new Error(`public response parse: no JSON object found: ${raw.slice(0, 200)}`);
   }
 
   const clamp20 = (v: any) => {
