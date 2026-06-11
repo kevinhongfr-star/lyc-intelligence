@@ -211,7 +211,7 @@ async function handlePublicMode(
     const results = await Promise.all(
       body.candidates!.map(async (cand) => {
         const prompt = buildPublicPrompt(body.jd!, cand.name!, cand.cv!);
-        const llm = await callLLM({ prompt });
+        const llm = await callLLM({ prompt, maxTokens: 600 });
         const parsed = parsePublicResponse(llm.content);
         totalTokens += llm.totalTokens;
         modelUsed = llm.model;
