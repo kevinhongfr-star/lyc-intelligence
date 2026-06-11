@@ -38,6 +38,7 @@ const PipelinePage = lazy(() => import('@/pages/PipelinePage').then(m => ({ defa
 const MetrixPage = lazy(() => import('@/pages/MetrixPage').then(m => ({ default: m.MetrixPage })));
 const ScoringRunsPage = lazy(() => import('@/pages/ScoringRunsPage').then(m => ({ default: m.ScoringRunsPage })));
 const LensExportPage = lazy(() => import('@/pages/LensExportPage').then(m => ({ default: m.LensExportPage })));
+const OrgIntelligencePage = lazy(() => import('@/pages/OrgIntelligencePage').then(m => ({ default: m.OrgIntelligencePage })));
 
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
@@ -47,6 +48,28 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuthStore();
   if (isLoading) return <Loading />;
   if (!user) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, profile, isLoading } = useAuthStore();
+  if (isLoading) return <Loading />;
+  if (!user) return <Navigate to="/login" replace />;
+  const role = profile?.role ?? (user as any)?.app_metadata?.role ?? null;
+  if (role !== 'admin') {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-3 text-center px-6">
+        <h1 className="text-2xl font-serif">Admin access required</h1>
+        <p className="text-text-muted max-w-md">
+          This page is restricted to LYC platform administrators. You are signed in as
+          <span className="font-mono text-text-primary ml-1">{user.email}</span>.
+        </p>
+        <a href="/platform" className="mt-2 text-accent hover:underline">
+          Return to dashboard
+        </a>
+      </div>
+    );
+  }
   return <>{children}</>;
 }
 
@@ -90,6 +113,7 @@ export default function App() {
               <Route path="chat" element={<NexusPage />} />
               <Route path="scheduler" element={<SchedulerPage />} />
               <Route path="documents" element={<PlatformDocumentsPage />} />
+              <Route path="org-intel" element={<AdminRoute><OrgIntelligencePage /></AdminRoute>} />
               <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
