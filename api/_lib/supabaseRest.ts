@@ -183,3 +183,29 @@ export function handleError(res: VercelResponse, endpoint: string, err: any) {
     details: process.env.NODE_ENV === 'development' ? String(err?.message || err) : undefined,
   });
 }
+
+/** DELETE rows matching the filter. Returns the count of deleted rows. */
+export async function deleteRows(
+  table: string,
+  filter: { column: string; value: string | number | boolean },
+  timeoutMs?: number
+): Promise<number> {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
+  }
+  const query = `${filter.column}=eq.${encodeURIComponent(String(filter.value))}`;
+  const res = await fetchWithTimeout(
+    buildUrl(table, query),
+    {
+      method: 'DELETE',
+      headers: getHeaders({ Prefer: 'return=representation' }),
+    },
+    timeoutMs
+  );
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Supabase DELETE ${table} failed: ${res.status} ${text}`);
+  }
+  const out = await res.json().catch(() => []);
+  return Array.isArray(out) ? out.length : 0;
+}
