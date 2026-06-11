@@ -40,8 +40,8 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { insert, isSupabaseConfigured, handleError } from '../../../../_lib/supabaseRest.js';
-import { verifyAdmin } from '../../../../_lib/adminAuth.js';
+import { insert, isSupabaseConfigured, handleError } from '../../../_lib/supabaseRest.js';
+import { verifyAdmin } from '../../../_lib/adminAuth.js';
 
 // 5 MB cap is more than enough for a 50-company list (typical ~10 KB).
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -67,9 +67,6 @@ interface ParsedRow {
  *   - escaped quotes ("" inside a quoted field)
  *   - \r\n, \n, and \r line endings
  *   - trailing newline (no spurious empty row)
- *
- * Returns a 2D array of raw strings. Header parsing + type coercion is the
- * caller's job — keeps this function single-purpose and testable.
  */
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
@@ -102,9 +99,7 @@ function parseCsv(text: string): string[][] {
     } else if (c === '\r' || c === '\n') {
       row.push(field);
       field = '';
-      // Skip \r\n pair
       if (c === '\r' && text[i + 1] === '\n') i++;
-      // Skip blank lines (single empty field)
       if (!(row.length === 1 && row[0] === '')) {
         rows.push(row);
       }
@@ -114,7 +109,6 @@ function parseCsv(text: string): string[][] {
     }
   }
 
-  // Trailing field / row (no final newline)
   if (field !== '' || row.length > 0) {
     row.push(field);
     if (!(row.length === 1 && row[0] === '')) {
@@ -131,7 +125,6 @@ function validateRow(headers: string[], values: string[]):
   | { ok: true; row: ParsedRow }
   | { ok: false; reason: string } {
 
-  // Build header → value map (case-insensitive, trimmed)
   const map: Record<string, string> = {};
   for (let i = 0; i < headers.length; i++) {
     map[headers[i].trim().toLowerCase()] = (values[i] ?? '').trim();
@@ -149,7 +142,6 @@ function validateRow(headers: string[], values: string[]):
   const website = map['website'] || null;
   if (website) {
     try {
-      // URL constructor accepts both http:// and https://
       new URL(website);
     } catch {
       return { ok: false, reason: `website is not a valid URL: "${website}"` };
@@ -175,11 +167,6 @@ function validateRow(headers: string[], values: string[]):
   };
 }
 
-/**
- * Extracts the first file part from a multipart/form-data body.
- * Mirrors the pattern in `api/upload.ts` but returns the raw CSV string
- * (no PDF/DOCX extraction — the caller wants the bytes verbatim).
- */
 async function extractFileFromMultipart(req: VercelRequest): Promise<
   { csv: string; filename: string } | { error: string }
 > {
@@ -208,7 +195,6 @@ async function extractFileFromMultipart(req: VercelRequest): Promise<
       const filename = filenameMatch ? filenameMatch[1] : 'upload.csv';
       const contentStart = part.indexOf('\r\n\r\n');
       if (contentStart === -1) continue;
-      // Strip the trailing \r\n before the next boundary marker
       let content = part.substring(contentStart + 4);
       if (content.endsWith('\r\n')) content = content.slice(0, -2);
       return { csv: content, filename };
@@ -262,16 +248,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     for (let i = 0; i < dataRows.length; i++) {
       const result = validateRow(headers, dataRows[i]);
       if (result.ok) {
-        // +2 = +1 for header, +1 for 1-indexing in user-facing row numbers
         valid.push({ rowNumber: i + 2, row: result.row });
       } else {
         validationErrors.push({ row: i + 2, reason: result.reason });
       }
     }
 
-    // 5. Insert valid rows one at a time so a single FK violation doesn't
-    //    poison the whole batch. For 50 companies this is fine; a future
-    //    optimization can batch via a single INSERT ... VALUES (...), (...).
+    // 5. Insert valid rows one at a time
     const inserted: any[] = [];
     const insertErrors: { row: number; reason: string }[] = [...validationErrors];
 
