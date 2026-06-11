@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Desktop Research, AI-Assisted — LYC Intelligence (DEX AI)</title>
+<style>
+  :root {
+    --bg: #0a1628;
+    --card: #142540;
+    --card-2: #1a2c4a;
+    --border: #1e3556;
+    --text: #f0f4f8;
+    --muted: #9baec8;
+    --dim: #6b829f;
+    --gold: #d4af37;
+    --teal: #4ec9b0;
+    --coral: #e07a6b;
+    --indigo: #6b8ce8;
+    --plum: #c878e0;
+    --green: #6ec47a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .deck {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .frame {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 100%;
+    aspect-ratio: 16/9;
+    padding: 64px 80px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .frame-caption {
+    position: absolute;
+    top: 20px;
+    left: 28px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-family: 'Courier New', monospace;
+  }
+  .frame-watermark {
+    position: absolute;
+    bottom: 20px;
+    right: 28px;
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.5px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 56px;
+    line-height: 1.1;
+    font-weight: 400;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+  h2 {
+    font-family: Georgia, serif;
+    font-size: 38px;
+    line-height: 1.15;
+    font-weight: 400;
+    margin-bottom: 14px;
+    letter-spacing: -0.3px;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 760px;
+    font-weight: 300;
+  }
+  .meta-row {
+    display: flex;
+    gap: 48px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .meta-item .label {
+    color: var(--gold);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .meta-item .value {
+    font-size: 14px;
+    color: var(--text);
+  }
+  /* Frame 1: Cover */
+  .frame-cover { justify-content: center; align-items: flex-start; }
+  .frame-cover h1 { font-size: 72px; }
+  .frame-cover .subtitle { font-size: 22px; max-width: 880px; }
+  .cover-stack {
+    margin-top: 40px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .cover-badge {
+    background: rgba(212,175,55,0.12);
+    border: 1px solid rgba(212,175,55,0.4);
+    color: var(--gold);
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .cover-arrow { color: var(--dim); font-size: 14px; }
+  /* Frame 2: Source cards */
+  .source-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-top: 32px;
+    flex: 1;
+  }
+  .source-card {
+    background: var(--card-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  .source-card .head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .source-card .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .dot-liepin  { background: var(--teal); }
+  .dot-zhilian { background: var(--gold); }
+  .dot-zhipin  { background: var(--coral); }
+  .dot-linkedin{ background: var(--indigo); }
+  .dot-web     { background: var(--plum); }
+  .source-card .name { font-weight: 600; font-size: 16px; }
+  .source-card .name-cn { font-size: 12px; color: var(--dim); margin-bottom: 18px; }
+  .source-card .coverage {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text);
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .frame-2-foot {
+    margin-top: 24px;
+    padding: 16px 20px;
+    background: rgba(212,175,55,0.08);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .frame-2-foot strong { color: var(--gold); }
+  /* Frame 3: Pipeline */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+  }
+  .step {
+    background: var(--card-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px 20px;
+    position: relative;
+  }
+  .step .num {
+    font-family: Georgia, serif;
+    font-size: 36px;
+    color: var(--gold);
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .step .step-title {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  .step .step-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .step .step-tokens {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--gold);
+    font-family: 'Courier New', monospace;
+  }
+  .step-arrow {
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 18px;
+    z-index: 2;
+  }
+  .frame-3-callout {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .metric {
+    background: var(--card-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .metric .num {
+    font-family: Georgia, serif;
+    font-size: 28px;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .metric .label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  /* Frame 4: HITL */
+  .hitl-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+  }
+  .hitl-col {
+    background: var(--card-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 22px;
+    display: flex;
+    flex-direction: column;
+  }
+  .hitl-col .col-num {
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .hitl-col .col-title {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 12px;
+  }
+  .hitl-col .col-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 16px;
+  }
+  .hitl-col .stat-row {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .stat-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .stat-line .stat-val {
+    color: var(--coral);
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+  }
+  .hitl-col.after .col-title { color: var(--green); }
+  .frame-4-quote {
+    margin-top: 24px;
+    padding: 18px 24px;
+    border-left: 3px solid var(--gold);
+    background: rgba(212,175,55,0.06);
+    border-radius: 4px;
+    font-family: Georgia, serif;
+    font-size: 20px;
+    font-style: italic;
+    color: var(--text);
+  }
+  /* Frame 5: Output */
+  .output-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 28px;
+  }
+  .output-card {
+    background: var(--card-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+  }
+  .output-card .oc-num {
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .output-card .oc-title {
+    font-family: Georgia, serif;
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 14px;
+  }
+  .output-card .oc-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 18px;
+  }
+  .output-card .oc-spec {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--gold);
+    font-family: 'Courier New', monospace;
+  }
+  .frame-5-handoff {
+    margin-top: 24px;
+    padding: 22px 28px;
+    background: var(--card-2);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    text-align: center;
+  }
+  .frame-5-handoff .label {
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .frame-5-handoff .body {
+    font-family: Georgia, serif;
+    font-size: 20px;
+    color: var(--text);
+  }
+  .frame-5-handoff .body strong { color: var(--gold); }
+  .frame-5-example {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- ==================== SLIDE 1: COVER ==================== -->
+  <section class="frame frame-cover">
+    <div class="frame-caption">Slide 1 · Cover</div>
+    <div class="eyebrow">Talent Research Methodology</div>
+    <h1>Desktop Research,<br>AI-Assisted</h1>
+    <p class="subtitle">How LYC Intelligence (DEX AI) builds a complete picture of any China talent market — before assessments begin.</p>
+    <div class="cover-stack">
+      <span class="cover-badge">LYC Intelligence</span>
+      <span class="cover-arrow">→</span>
+      <span class="cover-badge">DEX AI</span>
+      <span class="cover-arrow">→</span>
+      <span class="cover-badge">Desktop Validation</span>
+    </div>
+    <div class="meta-row">
+      <div class="meta-item">
+        <div class="label">Stack</div>
+        <div class="value">Multi-source AI extraction</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Coverage</div>
+        <div class="value">4 platforms + open web</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Validation</div>
+        <div class="value">LYC analyst + phone/email</div>
+      </div>
+    </div>
+    <div class="frame-watermark">LYC Intelligence · DEX AI · Desktop Research Methodology · Confidential</div>
+  </section>
+
+  <!-- ==================== SLIDE 2: SOURCE LANDSCAPE ==================== -->
+  <section class="frame">
+    <div class="frame-caption">Slide 2 · Source Landscape</div>
+    <div class="eyebrow">Step 1 · Where the data lives</div>
+    <h2>China's talent data is fragmented</h2>
+    <p class="subtitle">Five complementary sources. No single platform is complete — cross-source is the only path to a real picture.</p>
+    <div class="source-grid">
+      <div class="source-card">
+        <div class="head"><span class="dot dot-liepin"></span><span class="name">Liepin</span></div>
+        <div class="name-cn">猎聘 · Senior focus</div>
+        <div class="coverage">Strong on senior management and mid-career professionals. Most MNC-friendly of the Chinese platforms.</div>
+      </div>
+      <div class="source-card">
+        <div class="head"><span class="dot dot-zhilian"></span><span class="name">Zhilian</span></div>
+        <div class="name-cn">智联招聘 · Volume</div>
+        <div class="coverage">Largest resume database. High volume, mid-tier focus. Weaker on leadership and confidential searches.</div>
+      </div>
+      <div class="source-card">
+        <div class="head"><span class="dot dot-zhipin"></span><span class="name">Zhipin</span></div>
+        <div class="name-cn">BOSS 直聘 · Active</div>
+        <div class="coverage">Active job-seeker platform. Best for current titles, recent transitions, real-time salary bands.</div>
+      </div>
+      <div class="source-card">
+        <div class="head"><span class="dot dot-linkedin"></span><span class="name">LinkedIn</span></div>
+        <div class="name-cn">领英 · Global</div>
+        <div class="coverage">Cross-border roles, MNC presence, expat profiles. Weaker on local Chinese firms and confidential roles.</div>
+      </div>
+      <div class="source-card">
+        <div class="head"><span class="dot dot-web"></span><span class="name">+ Open Web</span></div>
+        <div class="name-cn">IR · News · WeChat</div>
+        <div class="coverage">Company IR pages, regulatory filings, industry news, WeChat articles. Captures org changes and context.</div>
+      </div>
+    </div>
+    <div class="frame-2-foot">
+      <strong>Why 5 sources?</strong> Each platform indexes a different slice of the market. Liepin captures senior MNC, Zhipin captures active job-seekers, Open Web captures org changes. Combined, they triangulate a complete view.
+    </div>
+    <div class="frame-watermark">LYC Intelligence · DEX AI · Desktop Research Methodology · Confidential</div>
+  </section>
+
+  <!-- ==================== SLIDE 3: PIPELINE ==================== -->
+  <section class="frame">
+    <div class="frame-caption">Slide 3 · The Pipeline</div>
+    <div class="eyebrow">Step 2 · Search → Extract → Structure → Cross-reference</div>
+    <h2>A 4-step pipeline per target company</h2>
+    <p class="subtitle">Each company passes through the same pipeline. Output is a structured talent profile set with confidence scores attached to every data point.</p>
+    <div class="pipeline">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="step-title">Multi-source query</div>
+        <div class="step-desc">~20 targeted searches per company across 4 platforms + open web. In Chinese and English. 4–6 hours of analyst time at manual speed.</div>
+        <div class="step-tokens">~12K tokens</div>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div class="step-title">AI extract</div>
+        <div class="step-desc">Named-entity recognition, role normalization, deduplication, language-aware parsing. Catches names, titles, dates, org structures.</div>
+        <div class="step-tokens">~18K tokens</div>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div class="step-title">Structure</div>
+        <div class="step-desc">Map extracted data into org tree (BUs × levels), talent profile cards, scoring matrix. Each claim is source-linked.</div>
+        <div class="step-tokens">~14K tokens</div>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <div class="step-title">Cross-reference</div>
+        <div class="step-desc">Compare across sources. Flag conflicts. Assign confidence score. Anything &lt; 0.7 confidence is sent to analyst review.</div>
+        <div class="step-tokens">~6K tokens</div>
+      </div>
+    </div>
+    <div class="frame-3-callout">
+      <div class="metric">
+        <div class="num">~50K</div>
+        <div class="label">Tokens per company</div>
+      </div>
+      <div class="metric">
+        <div class="num">~2.5M</div>
+        <div class="label">Tokens for 50 companies</div>
+      </div>
+      <div class="metric">
+        <div class="num">~150h</div>
+        <div class="label">Manual time saved per engagement</div>
+      </div>
+    </div>
+    <div class="frame-watermark">LYC Intelligence · DEX AI · Desktop Research Methodology · Confidential</div>
+  </section>
+
+  <!-- ==================== SLIDE 4: HUMAN-IN-THE-LOOP ==================== -->
+  <section class="frame">
+    <div class="frame-caption">Slide 4 · Human-in-the-Loop</div>
+    <div class="eyebrow">Step 3 · Why LYC analysts validate every data point</div>
+    <h2>AI builds the draft. Our analysts make it real.</h2>
+    <p class="subtitle">Pure LLM extraction has known failure modes. LYC validation is the QA gate that turns raw AI output into decision-ready intelligence.</p>
+    <div class="hitl-grid">
+      <div class="hitl-col">
+        <div class="col-num">Layer 1</div>
+        <div class="col-title">AI extracts</div>
+        <div class="col-desc">Fast, broad, multilingual. Surfaces candidates the analyst would not have found at manual speed. Reads 5 sources in parallel.</div>
+        <div class="stat-row">
+          <div class="stat-line"><span>Hallucinated entities</span><span class="stat-val">8–12%</span></div>
+          <div class="stat-line"><span>Missed data points</span><span class="stat-val">15–20%</span></div>
+          <div class="stat-line"><span>Role/level mismatch</span><span class="stat-val">5–8%</span></div>
+        </div>
+      </div>
+      <div class="hitl-col">
+        <div class="col-num">Layer 2</div>
+        <div class="col-title">LYC desktop verification</div>
+        <div class="col-desc">Analyst re-searches, fact-checks dates, verifies tenure claims, traces every profile back to its original source. Reads the org chart and the people.</div>
+        <div class="stat-row">
+          <div class="stat-line"><span>Tenure verified</span><span class="stat-val">100%</span></div>
+          <div class="stat-line"><span>Source-linked</span><span class="stat-val">100%</span></div>
+          <div class="stat-line"><span>Org-tree audited</span><span class="stat-val">100%</span></div>
+        </div>
+      </div>
+      <div class="hitl-col">
+        <div class="col-num">Layer 3</div>
+        <div class="col-title">Phone &amp; email validation</div>
+        <div class="col-desc">LYC analyst calls or emails the candidate (or current employer) to verify role scope, team size, key projects, and any red flags AI cannot see.</div>
+        <div class="stat-row">
+          <div class="stat-line"><span>Scope confirmed</span><span class="stat-val">100%</span></div>
+          <div class="stat-line"><span>Red flags caught</span><span class="stat-val">~12%</span></div>
+          <div class="stat-line"><span>Title inflation flagged</span><span class="stat-val">~7%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-4-quote">
+      "AI builds the first draft in 4 hours. Our analysts spend the next 12 hours making sure it is real."
+    </div>
+    <div class="frame-watermark">LYC Intelligence · DEX AI · Desktop Research Methodology · Confidential</div>
+  </section>
+
+  <!-- ==================== SLIDE 5: OUTPUT & HANDOFF ==================== -->
+  <section class="frame">
+    <div class="frame-caption">Slide 5 · Output &amp; Handoff</div>
+    <div class="eyebrow">Step 4 · What the engagement receives</div>
+    <h2>A complete picture, ready for assessment</h2>
+    <p class="subtitle">Three structured artifacts, each source-linked and confidence-scored. They become the input layer for the LYC evaluation engine.</p>
+    <div class="output-grid">
+      <div class="output-card">
+        <div class="oc-num">Artifact 1</div>
+        <div class="oc-title">Org chart</div>
+        <div class="oc-desc">Nested tree of business units, levels, and headcount per target company. For 8 comparator companies, fully resolved to named individuals.</div>
+        <div class="oc-spec">8 comparators · 5 BUs · 5 levels · ~200 nodes per company</div>
+      </div>
+      <div class="output-card">
+        <div class="oc-num">Artifact 2</div>
+        <div class="oc-title">Talent profiles</div>
+        <div class="oc-desc">Per-individual profile cards with title, tenure, scope, education, key projects, source confidence. Pre-scored on the 5-criteria matrix.</div>
+        <div class="oc-spec">50–200 per company · 5-criteria scored · source-linked</div>
+      </div>
+      <div class="output-card">
+        <div class="oc-num">Artifact 3</div>
+        <div class="oc-title">Cross-company pool</div>
+        <div class="oc-desc">Aggregated view of comparable talent across all 50 target companies. Filterable by BU, level, geography, and seniority band. Exports to CSV.</div>
+        <div class="oc-spec">~5,000 profiles aggregated · filterable · CSV export (Phase 1.5)</div>
+      </div>
+    </div>
+    <div class="frame-5-handoff">
+      <div class="label">Handoff to assessment</div>
+      <div class="body">Desktop research is the <strong>input layer</strong>. The LYC evaluation engine consumes it for full assessments, interviews, and shortlisting.</div>
+      <div class="frame-5-example">Example: Codelco China CPO Search — desktop research surfaces the long-list. Assessments then rank, validate, and present the final 3–5.</div>
+    </div>
+    <div class="frame-watermark">LYC Intelligence · DEX AI · Desktop Research Methodology · Confidential</div>
+  </section>
+
+</div>
+</body>
+</html>
