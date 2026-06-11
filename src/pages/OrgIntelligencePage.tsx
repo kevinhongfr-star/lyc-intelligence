@@ -1,10 +1,12 @@
 /**
  * OrgIntelligencePage — main entry for the Org Intelligence module.
  *
- * Phase 1 (T5 scaffold):
- *   - Top-level tabs: Companies / Talent Pool / Evaluations / Scoring / One-Pager
- *   - Only the "Companies" tab is wired up (CSVUploader)
- *   - Other tabs are placeholders for the next ticket batch
+ * Tabs:
+ *   - Companies: CSV upload + format reference (T5.1)
+ *   - Talent Pool: individuals per company + manual entry (T5.2)
+ *   - Evaluations: list of evaluation runs + re-score + override (T5.3)
+ *   - Scoring: platform-wide 5-criteria stats + bar chart (T5.4)
+ *   - One-Pager: company summary + GRID PDF generator (T5.5 + T6)
  *
  * Access: gated by AdminRoute (admin role required). Renders inside the
  * platform AppLayout, so it inherits the platform sidebar.
@@ -12,6 +14,10 @@
 import React, { useState } from 'react';
 import { Building2, Users, ClipboardCheck, BarChart3, FileText } from 'lucide-react';
 import { CSVUploader } from '@/components/org-intel/CSVUploader';
+import { TalentPoolTab } from '@/components/org-intel/TalentPoolTab';
+import { EvaluationsTab } from '@/components/org-intel/EvaluationsTab';
+import { ScoringTab } from '@/components/org-intel/ScoringTab';
+import { OnePagerTab } from '@/components/org-intel/OnePagerTab';
 
 type Tab = 'companies' | 'talent-pool' | 'evaluations' | 'scoring' | 'one-pager';
 
@@ -26,8 +32,8 @@ const TABS: TabDef[] = [
   { id: 'companies',    label: 'Companies',    icon: <Building2 className="w-4 h-4" />,      description: 'Target company list — CSV upload + manual entry' },
   { id: 'talent-pool',  label: 'Talent Pool',  icon: <Users className="w-4 h-4" />,          description: 'Individuals in the org tree per company' },
   { id: 'evaluations',  label: 'Evaluations',  icon: <ClipboardCheck className="w-4 h-4" />, description: 'Active evaluation runs and outcomes' },
-  { id: 'scoring',      label: 'Scoring',      icon: <BarChart3 className="w-4 h-4" />,      description: '5-criteria scoring engine (T4 — pending spec sign-off)' },
-  { id: 'one-pager',    label: 'One-Pager',    icon: <FileText className="w-4 h-4" />,       description: 'Per-company org summary output' },
+  { id: 'scoring',      label: 'Scoring',      icon: <BarChart3 className="w-4 h-4" />,      description: 'Platform-wide 5-criteria scoring overview' },
+  { id: 'one-pager',    label: 'One-Pager',    icon: <FileText className="w-4 h-4" />,       description: 'Per-company summary + GRID PDF generator' },
 ];
 
 export function OrgIntelligencePage() {
@@ -105,40 +111,11 @@ export function OrgIntelligencePage() {
           </div>
         )}
 
-        {active === 'talent-pool' && (
-          <EmptyState
-            title="Talent pool is empty"
-            note="Upload a company list, then add individuals to the org tree."
-          />
-        )}
-        {active === 'evaluations' && (
-          <EmptyState
-            title="No evaluations yet"
-            note="Trigger an evaluation from a talent profile."
-          />
-        )}
-        {active === 'scoring' && (
-          <EmptyState
-            title="Scoring engine pending spec sign-off"
-            note="See docs/org_intelligence_scoring_spec_v1.2.md (DRAFT) for the proposed algorithm."
-          />
-        )}
-        {active === 'one-pager' && (
-          <EmptyState
-            title="One-pager generator pending"
-            note="Output: per-company org summary + scoring breakdown + sources."
-          />
-        )}
+        {active === 'talent-pool' && <TalentPoolTab />}
+        {active === 'evaluations' && <EvaluationsTab />}
+        {active === 'scoring' && <ScoringTab />}
+        {active === 'one-pager' && <OnePagerTab />}
       </section>
-    </div>
-  );
-}
-
-function EmptyState({ title, note }: { title: string; note: string }) {
-  return (
-    <div className="border-2 border-dashed border-bg-hover rounded-lg p-8 text-center">
-      <p className="text-text-primary font-medium">{title}</p>
-      <p className="text-text-muted text-sm mt-1">{note}</p>
     </div>
   );
 }
