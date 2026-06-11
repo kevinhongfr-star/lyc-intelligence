@@ -17,7 +17,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import { verifyAdmin } from '../../../../_lib/adminAuth.js';
 import {
   isSupabaseConfigured,
