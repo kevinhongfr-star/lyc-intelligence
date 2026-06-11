@@ -87,8 +87,8 @@ export function EvaluationsTab() {
         org_talent_pools: undefined,
       })) as Evaluation[];
       setEvaluations(rows);
-    } catch (e) {
-      setError((e as Error).message);
+    } catch (caughtErr) {
+      setError((caughtErr as Error).message);
     } finally {
       setLoading(false);
     }
@@ -99,13 +99,13 @@ export function EvaluationsTab() {
   const fetchScores = async (evaluationId: string) => {
     const sb = useAuthStore.getState().supabase;
     if (!sb) return;
-    const { data, error: e } = await sb
+    const { data, error: fetchErr } = await sb
       .from('org_evaluation_scores')
       .select('*')
       .eq('evaluation_id', evaluationId)
       .order('criterion_key', { ascending: true });
-    if (e) {
-      setError(e.message);
+    if (fetchErr) {
+      setError(fetchErr.message);
       return;
     }
     setScores((prev) => ({ ...prev, [evaluationId]: (data ?? []) as EvaluationScore[] }));
@@ -164,8 +164,8 @@ export function EvaluationsTab() {
           await fetchScores(ev.id);
         }
       }
-    } catch (e) {
-      setError((e as Error).message);
+    } catch (caughtErr) {
+      setError((caughtErr as Error).message);
     } finally {
       setRescoring(null);
     }
@@ -328,7 +328,7 @@ function OverrideModal({ evaluationId, scores, onClose, onSaved }: {
       for (const key of changed) {
         const orig = scores.find((s) => s.criterion_key === key);
         if (!orig) continue;
-        const { error: e } = await sb
+        const { error: updateErr } = await sb
           .from('org_evaluation_scores')
           .update({
             score: overrides[key],
@@ -336,7 +336,7 @@ function OverrideModal({ evaluationId, scores, onClose, onSaved }: {
             overridden_at: new Date().toISOString(),
           })
           .eq('id', orig.id);
-        if (e) throw e;
+        if (updateErr) throw updateErr;
       }
       // Audit log
       const { data: userData } = await sb.auth.getUser();
@@ -348,8 +348,8 @@ function OverrideModal({ evaluationId, scores, onClose, onSaved }: {
         after_state: { overrides, reason, changed_keys: changed },
       });
       onSaved();
-    } catch (e) {
-      setError((e as Error).message);
+    } catch (caughtErr) {
+      setError((caughtErr as Error).message);
     } finally {
       setSubmitting(false);
     }

@@ -85,8 +85,8 @@ export function ScoringTab() {
         } else {
           setScores([]);
         }
-      } catch (e) {
-        setError((e as Error).message);
+      } catch (caughtErr) {
+        setError((caughtErr as Error).message);
       } finally {
         setLoading(false);
       }

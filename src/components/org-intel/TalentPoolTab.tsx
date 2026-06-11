@@ -57,7 +57,7 @@ export function TalentPoolTab() {
     setError(null);
     (async () => {
       try {
-        const { data, error: e } = await sb
+        const { data, error: fetchErr } = await sb
           .from('org_talent_pools')
           .select('*')
           .eq('target_company_id', companyId)
@@ -65,14 +65,14 @@ export function TalentPoolTab() {
           .order('level', { ascending: false })
           .order('name', { ascending: true })
           .limit(500);
-        if (e) {
-          setError(e.message);
+        if (fetchErr) {
+          setError(fetchErr.message);
           setTalent([]);
         } else {
           setTalent((data ?? []) as Talent[]);
         }
-      } catch (e) {
-        setError((e as Error).message);
+      } catch (caughtErr) {
+        setError((caughtErr as Error).message);
       } finally {
         setLoading(false);
       }
@@ -264,9 +264,9 @@ function AddIndividualForm({ companyId, onAdded }: { companyId: string; onAdded:
     if (tenureYears) row.tenure_years = parseFloat(tenureYears);
     row.is_leadership = isLeadership;
 
-    const { error: e } = await sb.from('org_talent_pools').insert(row);
-    if (e) {
-      setResult({ ok: false, msg: e.message });
+    const { error: insertErr } = await sb.from('org_talent_pools').insert(row);
+    if (insertErr) {
+      setResult({ ok: false, msg: insertErr.message });
     } else {
       setResult({ ok: true, msg: 'Individual added' });
       // reset

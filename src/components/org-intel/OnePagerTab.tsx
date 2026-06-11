@@ -94,8 +94,8 @@ export function OnePagerTab() {
       const scores = (evs ?? []).map((e: any) => Number(e.overall_score)).filter((n: number) => Number.isFinite(n));
       setAvgComposite(scores.length > 0 ? Math.round((scores.reduce((a: number, b: number) => a + b, 0) / scores.length) * 10) / 10 : null);
       setReports((rps ?? []) as GridReport[]);
-    } catch (e) {
-      setError((e as Error).message);
+    } catch (caughtErr) {
+      setError((caughtErr as Error).message);
     } finally {
       setLoading(false);
     }
@@ -138,8 +138,8 @@ export function OnePagerTab() {
       URL.revokeObjectURL(url);
       setGenMsg(`GRID PDF generated (${slideCount} slides) — report ${reportId.slice(0, 8)}`);
       await fetchAll();
-    } catch (e) {
-      setError((e as Error).message);
+    } catch (caughtErr) {
+      setError((caughtErr as Error).message);
     } finally {
       setGenerating(false);
     }
