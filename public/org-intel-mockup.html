@@ -4,740 +4,418 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LYC Intelligence — Organizational Intelligence</title>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --accent: #C108AB;
-  --accent-hover: #A00790;
-  --accent-light: rgba(193,8,171,0.08);
-  --accent-lighter: rgba(193,8,171,0.04);
-  --bg: #FFFFFF;
-  --bg-alt: #F8F8FA;
-  --card: #FFFFFF;
-  --card-border: #E8E8EC;
-  --text: #1A1A1A;
-  --text-secondary: #4A4A4A;
-  --muted: #888888;
-  --border: #E8E8EC;
-  --success: #059669;
-  --warning: #D97706;
-  --danger: #DC2626;
-  --info: #2563EB;
-  --tier1: #059669;
-  --tier2: #2563EB;
-  --tier3: #D97706;
-  --tier4: #6B7280;
-  --radius: 10px;
-  --radius-sm: 6px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
-  --heading-font: 'Libre Baskerville', Georgia, serif;
-  --body-font: 'DM Sans', system-ui, -apple-system, sans-serif;
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: var(--body-font); background: var(--bg-alt); color: var(--text); min-height: 100vh; }
-
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f8f9fb;color:#1a1a2e;line-height:1.5}
 /* Layout */
-.app-layout { display: flex; min-height: 100vh; }
-.sidebar { width: 240px; background: var(--bg); border-right: 1px solid var(--border); padding: 24px 0; position: fixed; height: 100vh; overflow-y: auto; }
-.main { margin-left: 240px; flex: 1; padding: 32px; max-width: calc(100vw - 240px); }
-
-/* Sidebar */
-.sidebar-brand { padding: 0 24px 24px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-.sidebar-brand h1 { font-family: var(--heading-font); font-size: 16px; font-weight: 700; color: var(--text); }
-.sidebar-brand span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.sidebar-nav { padding: 0 12px; }
-.nav-section { margin-bottom: 24px; }
-.nav-section-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; padding: 0 12px; margin-bottom: 8px; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-sm); font-size: 13px; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
-.nav-item:hover { background: var(--accent-lighter); color: var(--text); }
-.nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
-.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
-.sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px 24px; border-top: 1px solid var(--border); }
-.sidebar-footer .user-badge { display: flex; align-items: center; gap: 10px; }
-.sidebar-footer .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
-.sidebar-footer .user-info { font-size: 12px; }
-.sidebar-footer .user-info .name { font-weight: 600; color: var(--text); }
-.sidebar-footer .user-info .role { color: var(--muted); }
-
-/* Page header */
-.page-header { margin-bottom: 28px; }
-.page-header h2 { font-family: var(--heading-font); font-size: 24px; font-weight: 700; margin-bottom: 4px; }
-.page-header p { font-size: 13px; color: var(--muted); }
-
-/* Company selector */
-.company-bar { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; padding: 16px 20px; background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); box-shadow: var(--shadow); }
-.company-bar label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-.company-select { flex: 1; padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: var(--body-font); background: var(--bg-alt); cursor: pointer; }
-.company-meta { display: flex; gap: 16px; font-size: 12px; color: var(--muted); }
-.company-meta .pill { padding: 3px 10px; background: var(--accent-light); color: var(--accent); border-radius: 20px; font-weight: 600; font-size: 11px; }
-
-/* Tabs */
-.tab-bar { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
-.tab { padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
-.tab:hover { color: var(--text); }
-.tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;background:#fff;border-right:1px solid #e8eaed;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-header{padding:20px 16px 12px;border-bottom:1px solid #e8eaed}
+.sidebar-header h1{font-size:14px;font-weight:700;color:#0f172a;letter-spacing:-0.2px}
+.sidebar-header p{font-size:11px;color:#64748b;margin-top:2px}
+.nav{padding:8px;flex:1;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:#475569;transition:all .15s}
+.nav-item:hover{background:#f1f5f9;color:#0f172a}
+.nav-item.active{background:#eef2ff;color:#4f46e5;font-weight:600}
+.nav-icon{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px}
+.nav-item.active .nav-icon{background:#4f46e5;color:#fff}
+.nav-item:not(.active) .nav-icon{background:#e2e8f0;color:#64748b}
+/* Main */
+.main{flex:1;overflow-y:auto;padding:32px 40px}
+.page{display:none}
+.page.active{display:block}
+/* Typography */
+h2{font-size:22px;font-weight:700;color:#0f172a;margin-bottom:4px}
+.subtitle{font-size:13px;color:#64748b;margin-bottom:28px}
 /* Cards */
-.card { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-.card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.card-header h3 { font-family: var(--heading-font); font-size: 15px; font-weight: 700; }
-.card-body { padding: 20px; }
-
-/* Stats row */
-.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-.stat-card { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); }
-.stat-card .stat-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-.stat-card .stat-value { font-family: var(--heading-font); font-size: 28px; font-weight: 700; color: var(--text); }
-.stat-card .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
-.stat-card.accent .stat-value { color: var(--accent); }
-
-/* Tables */
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); background: var(--bg-alt); }
-tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-tbody tr:hover { background: var(--accent-lighter); }
-tbody tr:last-child td { border-bottom: none; }
-
+.card{background:#fff;border:1px solid #e8eaed;border-radius:12px;padding:24px;margin-bottom:20px}
+.card-title{font-size:14px;font-weight:600;color:#0f172a;margin-bottom:16px}
+/* Stats grid */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:#fff;border:1px solid #e8eaed;border-radius:12px;padding:20px}
+.stat-value{font-size:28px;font-weight:700;color:#0f172a}
+.stat-label{font-size:12px;color:#64748b;margin-top:2px}
+.stat-change{font-size:11px;color:#10b981;margin-top:6px;font-weight:500}
+/* Table */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 12px;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #e8eaed}
+td{padding:12px;font-size:13px;border-bottom:1px solid #f1f5f9;color:#334155}
+tr:hover td{background:#f8fafc}
 /* Badges */
-.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-.badge-t1 { background: rgba(5,150,105,0.1); color: var(--tier1); }
-.badge-t2 { background: rgba(37,99,235,0.1); color: var(--tier2); }
-.badge-t3 { background: rgba(217,119,6,0.1); color: var(--tier3); }
-.badge-t4 { background: rgba(107,114,128,0.1); color: var(--tier4); }
-.badge-leadership { background: rgba(193,8,171,0.1); color: var(--accent); }
-.badge-bu { background: var(--bg-alt); color: var(--text-secondary); border: 1px solid var(--border); }
-
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-s{background:#dcfce7;color:#15803d}
+.badge-a{background:#dbeafe;color:#1d4ed8}
+.badge-b{background:#fef3c7;color:#b45309}
+.badge-c{background:#f1f5f9;color:#64748b}
 /* Score bar */
-.score-bar-container { display: flex; align-items: center; gap: 8px; }
-.score-bar { flex: 1; height: 6px; background: var(--bg-alt); border-radius: 3px; overflow: hidden; }
-.score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
-.score-value { font-size: 13px; font-weight: 700; min-width: 28px; text-align: right; }
-
-/* Buttons */
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; font-family: var(--body-font); cursor: pointer; border: none; transition: all 0.15s; }
-.btn-primary { background: var(--accent); color: white; }
-.btn-primary:hover { background: var(--accent-hover); }
-.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
-.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-.btn-sm { padding: 5px 12px; font-size: 12px; }
-
-/* Tier distribution */
-.tier-dist { display: flex; gap: 12px; margin-bottom: 24px; }
-.tier-card { flex: 1; padding: 16px; border-radius: var(--radius); text-align: center; border: 1px solid; }
-.tier-card.t1 { border-color: rgba(5,150,105,0.3); background: rgba(5,150,105,0.04); }
-.tier-card.t2 { border-color: rgba(37,99,235,0.3); background: rgba(37,99,235,0.04); }
-.tier-card.t3 { border-color: rgba(217,119,6,0.3); background: rgba(217,119,6,0.04); }
-.tier-card.t4 { border-color: rgba(107,114,128,0.3); background: rgba(107,114,128,0.04); }
-.tier-card .tier-count { font-family: var(--heading-font); font-size: 32px; font-weight: 700; }
-.tier-card.t1 .tier-count { color: var(--tier1); }
-.tier-card.t2 .tier-count { color: var(--tier2); }
-.tier-card.t3 .tier-count { color: var(--tier3); }
-.tier-card.t4 .tier-count { color: var(--tier4); }
-.tier-card .tier-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
-.tier-card.t1 .tier-label { color: var(--tier1); }
-.tier-card.t2 .tier-label { color: var(--tier2); }
-.tier-card.t3 .tier-label { color: var(--tier3); }
-.tier-card.t4 .tier-label { color: var(--tier4); }
-
-/* Criteria chart */
-.criteria-chart { display: flex; align-items: flex-end; gap: 24px; padding: 20px 0; justify-content: center; }
-.criteria-bar-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.criteria-bar { width: 48px; border-radius: 6px 6px 0 0; transition: height 0.3s; }
-.criteria-label { font-size: 11px; color: var(--muted); text-align: center; max-width: 80px; }
-.criteria-score { font-size: 14px; font-weight: 700; color: var(--text); }
-
+.score-bar{width:100%;height:6px;background:#e8eaed;border-radius:3px;overflow:hidden}
+.score-fill{height:100%;border-radius:3px}
+.score-fill.high{background:#10b981}
+.score-fill.mid{background:#f59e0b}
+.score-fill.low{background:#ef4444}
+/* Org chart */
+.org-tree{display:flex;flex-direction:column;align-items:center;gap:0}
+.org-level{display:flex;gap:16px;justify-content:center;margin-bottom:0;position:relative}
+.org-node{background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:14px 18px;text-align:center;min-width:160px;position:relative;transition:all .15s}
+.org-node:hover{border-color:#4f46e5;box-shadow:0 2px 8px rgba(79,70,229,.12)}
+.org-node.ceo{border-color:#4f46e5;background:#eef2ff}
+.org-node .name{font-size:13px;font-weight:600;color:#0f172a}
+.org-node .role{font-size:11px;color:#64748b;margin-top:2px}
+.org-node .bu-tag{display:inline-block;margin-top:6px;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:500;background:#f1f5f9;color:#475569}
+/* Connector lines */
+.connector{display:flex;justify-content:center;position:relative;height:32px}
+.connector::after{content:"";position:absolute;top:0;left:50%;width:2px;height:16px;background:#cbd5e1}
+.connector-branch{display:flex;justify-content:center;position:relative;height:16px}
+.connector-branch::before{content:"";position:absolute;top:0;height:2px;background:#cbd5e1}
+/* Profile */
+.profile-header{display:flex;gap:24px;align-items:flex-start;margin-bottom:28px}
+.profile-avatar{width:72px;height:72px;border-radius:16px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#4f46e5;flex-shrink:0}
+.profile-info h3{font-size:20px;font-weight:700;color:#0f172a}
+.profile-info .current-role{font-size:14px;color:#475569;margin-top:2px}
+.profile-info .meta{display:flex;gap:16px;margin-top:8px;font-size:12px;color:#64748b}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.detail-section{margin-bottom:20px}
+.detail-section h4{font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.detail-item{font-size:13px;color:#334155;padding:4px 0}
+/* Score breakdown */
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.score-item{display:flex;align-items:center;gap:10px}
+.score-item .label{font-size:12px;color:#475569;width:120px;flex-shrink:0}
+.score-item .bar-wrap{flex:1}
+.score-item .value{font-size:12px;font-weight:600;color:#0f172a;width:32px;text-align:right}
+/* One-pager */
+.onepager{background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:48px;max-width:800px;margin:0 auto;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.onepager-header{text-align:center;border-bottom:2px solid #0f172a;padding-bottom:20px;margin-bottom:28px}
+.onepager-header h2{font-size:18px;letter-spacing:1px;text-transform:uppercase;color:#0f172a}
+.onepager-header p{font-size:12px;color:#64748b;margin-top:4px}
+.onepager-section{margin-bottom:24px}
+.onepager-section h3{font-size:13px;font-weight:700;color:#0f172a;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e8eaed;padding-bottom:6px;margin-bottom:12px}
+.onepager-section p,.onepager-section li{font-size:12px;color:#334155;line-height:1.6}
+.onepager-section ul{padding-left:16px}
+.onepager-section li{margin-bottom:4px}
+/* Approach table */
+.approach-table{width:100%;margin-top:8px}
+.approach-table th{font-size:10px;padding:6px 8px;background:#f8f9fb}
+.approach-table td{font-size:11px;padding:8px}
 /* Filters */
-.filter-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-.filter-chip { padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 12px; cursor: pointer; background: var(--bg); transition: all 0.15s; }
-.filter-chip:hover, .filter-chip.active { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-
-/* PDF Preview */
-.pdf-preview { background: #1A1A1A; border-radius: var(--radius); padding: 32px; display: flex; align-items: center; justify-content: center; min-height: 400px; }
-.pdf-slide { width: 720px; height: 405px; background: white; border-radius: 4px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
-.pdf-slide-header { padding: 24px 32px 12px; border-bottom: 2px solid var(--accent); }
-.pdf-slide-header .eyebrow { font-size: 10px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-.pdf-slide-header h4 { font-family: var(--heading-font); font-size: 18px; font-weight: 700; }
-.pdf-slide-body { flex: 1; padding: 16px 32px; display: flex; gap: 24px; }
-.pdf-slide-col { flex: 1; }
-.pdf-slide-col h5 { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-.pdf-slide-col p { font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
-.pdf-slide-footer { padding: 8px 32px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); }
-
-/* Score detail */
-.score-detail-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 16px; }
-.score-detail-item { text-align: center; padding: 12px; background: var(--bg-alt); border-radius: var(--radius-sm); }
-.score-detail-item .criterion-name { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
-.score-detail-item .criterion-score { font-family: var(--heading-font); font-size: 22px; font-weight: 700; }
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-  .score-detail-grid { grid-template-columns: repeat(3, 1fr); }
-}
+.filters{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;border:1px solid #e2e8f0;background:#fff;color:#475569;cursor:pointer;transition:all .15s}
+.filter-btn:hover{border-color:#4f46e5;color:#4f46e5}
+.filter-btn.active{background:#4f46e5;color:#fff;border-color:#4f46e5}
 </style>
 </head>
 <body>
+<div class="app">
+<div class="sidebar">
+<div class="sidebar-header">
+<h1>LYC Intelligence</h1>
+<p>Organizational Intelligence</p>
+</div>
+<div class="nav">
+<div class="nav-item active" onclick="showPage(0)"><div class="nav-icon">1</div>Overview</div>
+<div class="nav-item" onclick="showPage(1)"><div class="nav-icon">2</div>Org Chart</div>
+<div class="nav-item" onclick="showPage(2)"><div class="nav-icon">3</div>Talent Pipeline</div>
+<div class="nav-item" onclick="showPage(3)"><div class="nav-icon">4</div>Executive Profile</div>
+<div class="nav-item" onclick="showPage(4)"><div class="nav-icon">5</div>Client Deliverable</div>
+</div>
+</div>
+<div class="main">
 
-<div class="app-layout">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <h1>LYC Intelligence</h1>
-      <span>Platform Admin</span>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">
-        <div class="nav-section-label">Platform</div>
-        <div class="nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-          Dashboard
-        </div>
-        <div class="nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Candidates
-        </div>
-        <div class="nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Mandates
-        </div>
-        <div class="nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Pipeline
-        </div>
-      </div>
-      <div class="nav-section">
-        <div class="nav-section-label">Intelligence</div>
-        <div class="nav-item active">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          Org Intelligence
-        </div>
-        <div class="nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          AI Chat
-        </div>
-      </div>
-      <div class="nav-section">
-        <div class="nav-section-label">Reports</div>
-        <div class="nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="16" y1="18" x2="8" y2="18"/><line x1="16" y1="12" x2="8" y2="12"/></svg>
-          Report Generator
-        </div>
-      </div>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="user-badge">
-        <div class="avatar">KH</div>
-        <div class="user-info">
-          <div class="name">Kevin Hong</div>
-          <div class="role">Administrator</div>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="main">
-    <div class="page-header">
-      <h2>Organizational Intelligence</h2>
-      <p>Talent mapping, evaluation, and reporting for active engagements</p>
-    </div>
-
-    <!-- Company Selector -->
-    <div class="company-bar">
-      <label>Target Company</label>
-      <select class="company-select">
-        <option selected>Codelco China — Copper & Mining (Engagement Active)</option>
-        <option>BHP Group — Global Operations</option>
-        <option>Rio Tinto — APAC Division</option>
-      </select>
-      <div class="company-meta">
-        <span class="pill">Active</span>
-        <span>5 Business Units</span>
-        <span>24 Individuals</span>
-        <span>8 Comparators</span>
-      </div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tab-bar">
-      <div class="tab active" onclick="switchTab('talent')">Talent Pool</div>
-      <div class="tab" onclick="switchTab('evaluations')">Evaluations</div>
-      <div class="tab" onclick="switchTab('scoring')">Scoring Overview</div>
-      <div class="tab" onclick="switchTab('onepager')">One-Pager Report</div>
-    </div>
-
-    <!-- TAB 1: Talent Pool -->
-    <div class="tab-content active" id="tab-talent">
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Total Individuals</div>
-          <div class="stat-value">24</div>
-          <div class="stat-sub">Across 5 business units</div>
-        </div>
-        <div class="stat-card accent">
-          <div class="stat-label">Leadership</div>
-          <div class="stat-value">8</div>
-          <div class="stat-sub">VP+ level</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Avg Tenure</div>
-          <div class="stat-value">4.2y</div>
-          <div class="stat-sub">At current company</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Evaluations</div>
-          <div class="stat-value">19</div>
-          <div class="stat-sub">Completed assessments</div>
-        </div>
-      </div>
-
-      <div class="filter-bar">
-        <div class="filter-chip active">All BUs</div>
-        <div class="filter-chip">Operations</div>
-        <div class="filter-chip">Commercial</div>
-        <div class="filter-chip">Technology</div>
-        <div class="filter-chip">Finance</div>
-        <div class="filter-chip">Human Resources</div>
-        <div class="filter-chip">Leadership Only</div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3>Talent Pool — Codelco China</h3>
-          <button class="btn btn-primary btn-sm">+ Add Individual</button>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Title</th>
-              <th>Business Unit</th>
-              <th>Level</th>
-              <th>Location</th>
-              <th>Tenure</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Wei Zhang</strong></td>
-              <td>SVP, Operations</td>
-              <td><span class="badge badge-bu">Operations</span></td>
-              <td>8</td>
-              <td>Shanghai</td>
-              <td>6.5 years</td>
-              <td><span class="badge badge-leadership">Leadership</span></td>
-            </tr>
-            <tr>
-              <td><strong>Li Chen</strong></td>
-              <td>VP, Commercial Strategy</td>
-              <td><span class="badge badge-bu">Commercial</span></td>
-              <td>7</td>
-              <td>Beijing</td>
-              <td>4.2 years</td>
-              <td><span class="badge badge-leadership">Leadership</span></td>
-            </tr>
-            <tr>
-              <td><strong>Mei Wang</strong></td>
-              <td>Director, Technology</td>
-              <td><span class="badge badge-bu">Technology</span></td>
-              <td>6</td>
-              <td>Shenzhen</td>
-              <td>3.8 years</td>
-              <td><span class="badge badge-leadership">Leadership</span></td>
-            </tr>
-            <tr>
-              <td><strong>Jun Liu</strong></td>
-              <td>VP, Finance & Planning</td>
-              <td><span class="badge badge-bu">Finance</span></td>
-              <td>7</td>
-              <td>Shanghai</td>
-              <td>5.1 years</td>
-              <td><span class="badge badge-leadership">Leadership</span></td>
-            </tr>
-            <tr>
-              <td><strong>Xiaoming Zhao</strong></td>
-              <td>GM, Western Region</td>
-              <td><span class="badge badge-bu">Operations</span></td>
-              <td>6</td>
-              <td>Chengdu</td>
-              <td>7.2 years</td>
-              <td><span class="badge badge-leadership">Leadership</span></td>
-            </tr>
-            <tr>
-              <td><strong>Ying Sun</strong></td>
-              <td>Senior Manager, HR</td>
-              <td><span class="badge badge-bu">Human Resources</span></td>
-              <td>5</td>
-              <td>Shanghai</td>
-              <td>3.5 years</td>
-              <td>—</td>
-            </tr>
-            <tr>
-              <td><strong>Hao Wu</strong></td>
-              <td>Director, Supply Chain</td>
-              <td><span class="badge badge-bu">Operations</span></td>
-              <td>5</td>
-              <td>Tianjin</td>
-              <td>4.0 years</td>
-              <td>—</td>
-            </tr>
-            <tr>
-              <td><strong>Lin Xu</strong></td>
-              <td>Head of APAC Sales</td>
-              <td><span class="badge badge-bu">Commercial</span></td>
-              <td>6</td>
-              <td>Singapore</td>
-              <td>2.8 years</td>
-              <td><span class="badge badge-leadership">Leadership</span></td>
-            </tr>
-            <tr>
-              <td><strong>Qian Li</strong></td>
-              <td>Manager, Data Analytics</td>
-              <td><span class="badge badge-bu">Technology</span></td>
-              <td>4</td>
-              <td>Shanghai</td>
-              <td>2.1 years</td>
-              <td>—</td>
-            </tr>
-            <tr>
-              <td><strong>Tao Huang</strong></td>
-              <td>Controller, APAC</td>
-              <td><span class="badge badge-bu">Finance</span></td>
-              <td>5</td>
-              <td>Hong Kong</td>
-              <td>3.3 years</td>
-              <td>—</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TAB 2: Evaluations -->
-    <div class="tab-content" id="tab-evaluations">
-      <div class="stats-row">
-        <div class="stat-card accent">
-          <div class="stat-label">Total Evaluations</div>
-          <div class="stat-value">19</div>
-          <div class="stat-sub">12 finalized</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Avg Score</div>
-          <div class="stat-value">68</div>
-          <div class="stat-sub">Across all criteria</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Top Performer</div>
-          <div class="stat-value">Wei Zhang</div>
-          <div class="stat-sub">Score: 87</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Pending Review</div>
-          <div class="stat-value">7</div>
-          <div class="stat-sub">Awaiting finalization</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3>Recent Evaluations</h3>
-          <button class="btn btn-outline btn-sm">Run New Evaluation</button>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Individual</th>
-              <th>Title</th>
-              <th>Overall Score</th>
-              <th>Tier</th>
-              <th>Evaluated</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Wei Zhang</strong></td>
-              <td>SVP, Operations</td>
-              <td>
-                <div class="score-bar-container">
-                  <div class="score-bar"><div class="score-bar-fill" style="width:87%;background:var(--tier1)"></div></div>
-                  <span class="score-value" style="color:var(--tier1)">87</span>
-                </div>
-              </td>
-              <td><span class="badge badge-t1">Strong Fit</span></td>
-              <td>2026-06-11</td>
-              <td><span class="badge" style="background:rgba(5,150,105,0.1);color:var(--tier1)">Finalized</span></td>
-            </tr>
-            <tr>
-              <td><strong>Li Chen</strong></td>
-              <td>VP, Commercial Strategy</td>
-              <td>
-                <div class="score-bar-container">
-                  <div class="score-bar"><div class="score-bar-fill" style="width:74%;background:var(--tier2)"></div></div>
-                  <span class="score-value" style="color:var(--tier2)">74</span>
-                </div>
-              </td>
-              <td><span class="badge badge-t2">Good Fit</span></td>
-              <td>2026-06-11</td>
-              <td><span class="badge" style="background:rgba(5,150,105,0.1);color:var(--tier1)">Finalized</span></td>
-            </tr>
-            <tr>
-              <td><strong>Jun Liu</strong></td>
-              <td>VP, Finance & Planning</td>
-              <td>
-                <div class="score-bar-container">
-                  <div class="score-bar"><div class="score-bar-fill" style="width:71%;background:var(--tier2)"></div></div>
-                  <span class="score-value" style="color:var(--tier2)">71</span>
-                </div>
-              </td>
-              <td><span class="badge badge-t2">Good Fit</span></td>
-              <td>2026-06-10</td>
-              <td><span class="badge" style="background:rgba(5,150,105,0.1);color:var(--tier1)">Finalized</span></td>
-            </tr>
-            <tr>
-              <td><strong>Mei Wang</strong></td>
-              <td>Director, Technology</td>
-              <td>
-                <div class="score-bar-container">
-                  <div class="score-bar"><div class="score-bar-fill" style="width:66%;background:var(--tier2)"></div></div>
-                  <span class="score-value" style="color:var(--tier2)">66</span>
-                </div>
-              </td>
-              <td><span class="badge badge-t2">Good Fit</span></td>
-              <td>2026-06-10</td>
-              <td><span class="badge" style="background:rgba(217,119,6,0.1);color:var(--tier3)">Pending</span></td>
-            </tr>
-            <tr>
-              <td><strong>Lin Xu</strong></td>
-              <td>Head of APAC Sales</td>
-              <td>
-                <div class="score-bar-container">
-                  <div class="score-bar"><div class="score-bar-fill" style="width:63%;background:var(--tier2)"></div></div>
-                  <span class="score-value" style="color:var(--tier2)">63</span>
-                </div>
-              </td>
-              <td><span class="badge badge-t2">Good Fit</span></td>
-              <td>2026-06-09</td>
-              <td><span class="badge" style="background:rgba(5,150,105,0.1);color:var(--tier1)">Finalized</span></td>
-            </tr>
-            <tr>
-              <td><strong>Xiaoming Zhao</strong></td>
-              <td>GM, Western Region</td>
-              <td>
-                <div class="score-bar-container">
-                  <div class="score-bar"><div class="score-bar-fill" style="width:58%;background:var(--tier3)"></div></div>
-                  <span class="score-value" style="color:var(--tier3)">58</span>
-                </div>
-              </td>
-              <td><span class="badge badge-t3">Potential</span></td>
-              <td>2026-06-09</td>
-              <td><span class="badge" style="background:rgba(5,150,105,0.1);color:var(--tier1)">Finalized</span></td>
-            </tr>
-            <tr>
-              <td><strong>Hao Wu</strong></td>
-              <td>Director, Supply Chain</td>
-              <td>
-                <div class="score-bar-container">
-                  <div class="score-bar"><div class="score-bar-fill" style="width:52%;background:var(--tier3)"></div></div>
-                  <span class="score-value" style="color:var(--tier3)">52</span>
-                </div>
-              </td>
-              <td><span class="badge badge-t3">Potential</span></td>
-              <td>2026-06-08</td>
-              <td><span class="badge" style="background:rgba(217,119,6,0.1);color:var(--tier3)">Pending</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TAB 3: Scoring Overview -->
-    <div class="tab-content" id="tab-scoring">
-      <div class="tier-dist">
-        <div class="tier-card t1">
-          <div class="tier-count">4</div>
-          <div class="tier-label">Strong Fit (80+)</div>
-        </div>
-        <div class="tier-card t2">
-          <div class="tier-count">9</div>
-          <div class="tier-label">Good Fit (60–79)</div>
-        </div>
-        <div class="tier-card t3">
-          <div class="tier-count">4</div>
-          <div class="tier-label">Potential (40–59)</div>
-        </div>
-        <div class="tier-card t4">
-          <div class="tier-count">2</div>
-          <div class="tier-label">Not Yet (0–39)</div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-        <div class="card">
-          <div class="card-header">
-            <h3>Average Score by Criterion</h3>
-          </div>
-          <div class="card-body">
-            <div class="criteria-chart">
-              <div class="criteria-bar-group">
-                <div class="criteria-score">14.2</div>
-                <div class="criteria-bar" style="height:142px;background:var(--accent);opacity:0.9"></div>
-                <div class="criteria-label">Tenure & Track Record</div>
-              </div>
-              <div class="criteria-bar-group">
-                <div class="criteria-score">12.8</div>
-                <div class="criteria-bar" style="height:128px;background:var(--accent);opacity:0.8"></div>
-                <div class="criteria-label">Network & Influence</div>
-              </div>
-              <div class="criteria-bar-group">
-                <div class="criteria-score">15.1</div>
-                <div class="criteria-bar" style="height:151px;background:var(--accent)"></div>
-                <div class="criteria-label">Performance & Impact</div>
-              </div>
-              <div class="criteria-bar-group">
-                <div class="criteria-score">11.4</div>
-                <div class="criteria-bar" style="height:114px;background:var(--accent);opacity:0.7"></div>
-                <div class="criteria-label">Mobility & Adaptability</div>
-              </div>
-              <div class="criteria-bar-group">
-                <div class="criteria-score">14.7</div>
-                <div class="criteria-bar" style="height:147px;background:var(--accent);opacity:0.85"></div>
-                <div class="criteria-label">Cultural Fit</div>
-              </div>
-            </div>
-            <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;">Each criterion scored 0–20. Average across 19 evaluations.</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <h3>Top Candidate Detail — Wei Zhang</h3>
-            <span class="badge badge-t1">Strong Fit · Score 87</span>
-          </div>
-          <div class="card-body">
-            <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6">
-              <strong>SVP, Operations</strong> · 6.5 years tenure · Shanghai<br>
-              Demonstrated progressive leadership across Codelco's largest operational units. 
-              P&L ownership of $2.1B revenue segment. Recognized industry voice at mining conferences.
-            </div>
-            <div class="score-detail-grid">
-              <div class="score-detail-item">
-                <div class="criterion-name">Tenure</div>
-                <div class="criterion-score" style="color:var(--tier1)">18</div>
-              </div>
-              <div class="score-detail-item">
-                <div class="criterion-name">Network</div>
-                <div class="criterion-score" style="color:var(--tier1)">17</div>
-              </div>
-              <div class="score-detail-item">
-                <div class="criterion-name">Performance</div>
-                <div class="criterion-score" style="color:var(--tier1)">19</div>
-              </div>
-              <div class="score-detail-item">
-                <div class="criterion-name">Mobility</div>
-                <div class="criterion-score" style="color:var(--tier2)">15</div>
-              </div>
-              <div class="score-detail-item">
-                <div class="criterion-name">Cultural Fit</div>
-                <div class="criterion-score" style="color:var(--tier1)">18</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 4: One-Pager Report -->
-    <div class="tab-content" id="tab-onepager">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <div>
-          <h3 style="font-family:var(--heading-font);font-size:18px;margin-bottom:4px;">Talent Map Report</h3>
-          <p style="font-size:13px;color:var(--muted);">Codelco China — Executive Talent Mapping · Confidential</p>
-        </div>
-        <div style="display:flex;gap:12px;">
-          <button class="btn btn-outline">Preview PDF</button>
-          <button class="btn btn-primary">Generate Report</button>
-        </div>
-      </div>
-
-      <div class="pdf-preview">
-        <div class="pdf-slide">
-          <div class="pdf-slide-header">
-            <div class="eyebrow">Talent Map Report · Confidential</div>
-            <h4>Codelco China — Executive Assessment Summary</h4>
-          </div>
-          <div class="pdf-slide-body">
-            <div class="pdf-slide-col">
-              <h5>Engagement Scope</h5>
-              <p>
-                <strong>Target:</strong> Codelco China<br>
-                <strong>Sector:</strong> Copper & Mining<br>
-                <strong>Focus:</strong> 5 Business Units, 8 comparator companies<br>
-                <strong>Status:</strong> Active · 19 of 24 evaluated
-              </p>
-              <h5 style="margin-top:16px;">Key Findings</h5>
-              <p>
-                4 candidates identified as Strong Fit (score 80+). 
-                Operations BU shows strongest leadership depth. 
-                Technology and HR units present succession risk.
-              </p>
-            </div>
-            <div class="pdf-slide-col">
-              <h5>Top Candidates</h5>
-              <p>
-                <strong>1. Wei Zhang</strong> — SVP Ops · Score 87<br>
-                <strong>2. Li Chen</strong> — VP Commercial · Score 74<br>
-                <strong>3. Jun Liu</strong> — VP Finance · Score 71<br>
-                <strong>4. Mei Wang</strong> — Dir Technology · Score 66
-              </p>
-              <h5 style="margin-top:16px;">Approach Strategy</h5>
-              <p>
-                Lead with operational autonomy and regional P&L ownership. 
-                Emphasize cross-border exposure and board-level visibility.
-              </p>
-            </div>
-          </div>
-          <div class="pdf-slide-footer">
-            <span>LYC Partners · Confidential</span>
-            <span>12 slides · 720×405 pts</span>
-            <span>Generated 2026-06-12</span>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
-        <div class="stat-card">
-          <div class="stat-label">Report Pages</div>
-          <div class="stat-value">12</div>
-          <div class="stat-sub">Full talent map deck</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Format</div>
-          <div class="stat-value">PDF</div>
-          <div class="stat-sub">Premium · 720×405 pts</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Last Generated</div>
-          <div class="stat-value">—</div>
-          <div class="stat-sub">Click Generate to create</div>
-        </div>
-      </div>
-    </div>
-  </main>
+<!-- PAGE 1: OVERVIEW DASHBOARD -->
+<div class="page active" id="p0">
+<h2>Codelco China — Overview</h2>
+<p class="subtitle">Mapped from 12 Chinese recruiting platforms and 40+ web sources · Last updated Jun 2026</p>
+<div class="stats">
+<div class="stat-card">
+<div class="stat-value">47</div>
+<div class="stat-label">Executives Mapped</div>
+<div class="stat-change">▲ 8 new this month</div>
+</div>
+<div class="stat-card">
+<div class="stat-value">5</div>
+<div class="stat-label">Business Units</div>
+<div class="stat-change">Full coverage</div>
+</div>
+<div class="stat-card">
+<div class="stat-value">4</div>
+<div class="stat-label">Hierarchy Levels</div>
+<div class="stat-change">C-Suite to Director</div>
+</div>
+<div class="stat-card">
+<div class="stat-value">92%</div>
+<div class="stat-label">Profile Completeness</div>
+<div class="stat-change">▲ 5% vs last quarter</div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div class="card">
+<div class="card-title">Business Unit Breakdown</div>
+<table>
+<tr><th>BU</th><th>Executives</th><th>Coverage</th></tr>
+<tr><td>Operations & Mining</td><td style="font-weight:600">14</td><td><div class="score-bar" style="width:120px"><div class="score-fill high" style="width:93%"></div></div></td></tr>
+<tr><td>Commercial & Trading</td><td style="font-weight:600">11</td><td><div class="score-bar" style="width:120px"><div class="score-fill high" style="width:85%"></div></div></td></tr>
+<tr><td>Corporate Affairs</td><td style="font-weight:600">9</td><td><div class="score-bar" style="width:120px"><div class="score-fill mid" style="width:72%"></div></div></td></tr>
+<tr><td>Technology & Digital</td><td style="font-weight:600">8</td><td><div class="score-bar" style="width:120px"><div class="score-fill mid" style="width:68%"></div></div></td></tr>
+<tr><td>Finance & Strategy</td><td style="font-weight:600">5</td><td><div class="score-bar" style="width:120px"><div class="score-fill high" style="width:88%"></div></div></td></tr>
+</table>
+</div>
+<div class="card">
+<div class="card-title">Data Sources</div>
+<table>
+<tr><th>Source</th><th>Profiles</th><th>Records</th></tr>
+<tr><td>Liepin (猎聘)</td><td style="font-weight:600">38</td><td>Career history, education</td></tr>
+<tr><td>Zhaopin (智联)</td><td style="font-weight:600">31</td><td>Job transitions, skills</td></tr>
+<tr><td>Maimai (脉脉)</td><td style="font-weight:600">29</td><td>Connections, endorsements</td></tr>
+<tr><td>LinkedIn CN Mirror</td><td style="font-weight:600">27</td><td>Cross-border roles</td></tr>
+<tr><td>Qichacha / Tianyancha</td><td style="font-weight:600">22</td><td>Board seats, legal entities</td></tr>
+<tr><td>Baidu Baike / News</td><td style="font-weight:600">18</td><td>Public appearances, awards</td></tr>
+</table>
+</div>
+</div>
 </div>
 
+<!-- PAGE 2: ORG CHART -->
+<div class="page" id="p1">
+<h2>Codelco China — Organization Chart</h2>
+<p class="subtitle">Reporting structure mapped from executive profiles · Click any node for details</p>
+<div class="card" style="padding:40px 20px">
+<div class="org-tree">
+<!-- CEO -->
+<div class="org-level">
+<div class="org-node ceo" onclick="showPage(3)">
+<div class="name">Wei Zhang 张伟</div>
+<div class="role">President, China</div>
+<div class="bu-tag">Executive Office</div>
+</div>
+</div>
+<div class="connector"></div>
+<!-- VP Level -->
+<div class="org-level">
+<div class="org-node">
+<div class="name">Li Chen 陈力</div>
+<div class="role">VP Operations</div>
+<div class="bu-tag">Operations & Mining</div>
+</div>
+<div class="org-node">
+<div class="name">Jun Wang 王军</div>
+<div class="role">VP Commercial</div>
+<div class="bu-tag">Commercial & Trading</div>
+</div>
+<div class="org-node">
+<div class="name">Fang Liu 刘芳</div>
+<div class="role">VP Corporate Affairs</div>
+<div class="bu-tag">Corporate Affairs</div>
+</div>
+<div class="org-node">
+<div class="name">Ming Yang 杨明</div>
+<div class="role">CTO China</div>
+<div class="bu-tag">Technology & Digital</div>
+</div>
+</div>
+<div class="connector"></div>
+<!-- Director Level -->
+<div class="org-level" style="flex-wrap:wrap">
+<div class="org-node">
+<div class="name">Hao Xu 徐浩</div>
+<div class="role">Dir. Mining Operations</div>
+<div class="bu-tag">Operations</div>
+</div>
+<div class="org-node">
+<div class="name">Yan Zhao 赵岩</div>
+<div class="role">Dir. Sales — Greater China</div>
+<div class="bu-tag">Commercial</div>
+</div>
+<div class="org-node">
+<div class="name">Xin Zhou 周欣</div>
+<div class="role">Dir. Government Relations</div>
+<div class="bu-tag">Corp Affairs</div>
+</div>
+<div class="org-node">
+<div class="name">Tao Sun 孙涛</div>
+<div class="role">Dir. Digital Transformation</div>
+<div class="bu-tag">Technology</div>
+</div>
+</div>
+<div class="connector"></div>
+<!-- GM Level -->
+<div class="org-level" style="flex-wrap:wrap;gap:12px">
+<div class="org-node" style="min-width:140px;padding:10px 14px">
+<div class="name" style="font-size:12px">Jing Ma 马静</div>
+<div class="role" style="font-size:10px">GM — Atacama Office</div>
+</div>
+<div class="org-node" style="min-width:140px;padding:10px 14px">
+<div class="name" style="font-size:12px">Peng Gao 高鹏</div>
+<div class="role" style="font-size:10px">GM — Trading Desk</div>
+</div>
+<div class="org-node" style="min-width:140px;padding:10px 14px">
+<div class="name" style="font-size:12px">Lei Wu 吴磊</div>
+<div class="role" style="font-size:10px">GM — ESG & Compliance</div>
+</div>
+<div class="org-node" style="min-width:140px;padding:10px 14px">
+<div class="name" style="font-size:12px">Qian Li 李倩</div>
+<div class="role" style="font-size:10px">GM — Data Platform</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- PAGE 3: TALENT PIPELINE -->
+<div class="page" id="p2">
+<h2>Talent Pipeline — Codelco China</h2>
+<p class="subtitle">47 executives scored and ranked · Filter by BU, tier, or seniority</p>
+<div class="filters">
+<div class="filter-btn active">All (47)</div>
+<div class="filter-btn">S-Tier (4)</div>
+<div class="filter-btn">A-Tier (12)</div>
+<div class="filter-btn">Operations (14)</div>
+<div class="filter-btn">Commercial (11)</div>
+<div class="filter-btn">Corp Affairs (9)</div>
+<div class="filter-btn">Technology (8)</div>
+</div>
+<div class="card" style="padding:0;overflow:hidden">
+<table>
+<thead>
+<tr><th>#</th><th>Name</th><th>Current Role</th><th>BU</th><th>Level</th><th>Score</th><th>Tier</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td style="font-weight:600">Wei Zhang 张伟</td><td>President, China</td><td>Executive Office</td><td>C-Suite</td><td><div style="display:flex;align-items:center;gap:8px"><div class="score-bar" style="width:80px"><div class="score-fill high" style="width:92%"></div></div><span style="font-weight:600;font-size:12px">92</span></div></td><td><span class="badge badge-s">S</span></td></tr>
+<tr><td>2</td><td style="font-weight:600">Li Chen 陈力</td><td>VP Operations</td><td>Operations & Mining</td><td>VP</td><td><div style="display:flex;align-items:center;gap:8px"><div class="score-bar" style="width:80px"><div class="score-fill high" style="width:88%"></div></div><span style="font-weight:600;font-size:12px">88</span></div></td><td><span class="badge badge-s">S</span></td></tr>
+<tr><td>3</td><td style="font-weight:600">Jun Wang 王军</td><td>VP Commercial</td><td>Commercial & Trading</td><td>VP</td><td><div style="display:flex;align-items:center;gap:8px"><div class="score-bar" style="width:80px"><div class="score-fill high" style="width:85%"></div></div><span style="font-weight:600;font-size:12px">85</span></div></td><td><span class="badge badge-s">S</span></td></tr>
+<tr><td>4</td><td style="font-weight:600">Fang Liu 刘芳</td><td>VP Corporate Affairs</td><td>Corporate Affairs</td><td>VP</td><td><div style="display:flex;align-items:center;gap:8px"><div class="score-bar" style="width:80px"><div class="score-fill high" style="width:83%"></div></div><span style="font-weight:600;font-size:12px">83</span></div></td><td><span class="badge badge-s">S</span></td></tr>
+<tr><td>5</td><td>Ming Yang 杨明</td><td>CTO China</td><td>Technology & Digital</td><td>VP</td><td><div style="display:flex;align-items:center;gap:8px"><div class="score-bar" style="width:80px"><div class="score-fill mid" style="width:78%"></div></div><span style="font-weight:600;font-size:12px">78</span></div></td><td><span class="badge badge-a">A</span></td></tr>
+<tr><td>6</td><td>Hao Xu 徐浩</td><td>Dir. Mining Operations</td><td>Operations & Mining</td><td>Director</td><td><div style="display:flex;align-items:center;gap:8px"><div class="score-bar" style="width:80px"><div class="score-fill mid" style="width:76%"></div></div><span style="font-weight:600;font-size:12px">76</span></div></td><td><span class="badge badge-a">A</span></td></tr>
+<tr><td>7</td><td>Yan Zhao 赵岩</td><td>Dir. Sales — Greater China</td><td>Commercial & Trading</td><td>Director</td><td><div style="display:flex;align-items:center;gap:8px"><div class="score-bar" style="width:80px"><div class="score-fill mid" style="width:74%"></div></div><span style="font-weight:600;font-size:12px">74</span></div></td><td><span class="badge badge-a">A</span></td></tr>
+<tr><td>8</td><td>Xin Zhou 周欣</td><td>Dir. Government Relations</td><td>Corporate Affairs</td><td>Director</td><td><div style="display:flex;align-items:center;gap:8px"><div class="score-bar" style="width:80px"><div class="score-fill mid" style="width:72%"></div></div><span style="font-weight:600;font-size:12px">72</span></div></td><td><span class="badge badge-a">A</span></td></tr>
+<tr><td>9</td><td>Tao Sun 孙涛</td><td>Dir. Digital Transformation</td><td>Technology & Digital</td><td>Director</td><td><div style="display:flex;align-items:center;gap:8px"><div class="score-bar" style="width:80px"><div class="score-fill mid" style="width:69%"></div></div><span style="font-weight:600;font-size:12px">69</span></div></td><td><span class="badge badge-b">B</span></td></tr>
+<tr><td>10</td><td>Jing Ma 马静</td><td>GM — Atacama Office</td><td>Operations & Mining</td><td>GM</td><td><div style="display:flex;align-items:center;gap:8px"><div class="score-bar" style="width:80px"><div class="score-fill mid" style="width:65%"></div></div><span style="font-weight:600;font-size:12px">65</span></div></td><td><span class="badge badge-b">B</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- PAGE 4: EXECUTIVE PROFILE -->
+<div class="page" id="p3">
+<h2>Executive Profile</h2>
+<p class="subtitle">Deep-dive intelligence on a single executive</p>
+<div class="profile-header">
+<div class="profile-avatar">WZ</div>
+<div class="profile-info">
+<h3>Wei Zhang 张伟</h3>
+<div class="current-role">President, China · Codelco China</div>
+<div class="meta">
+<span>📍 Beijing, China</span>
+<span>🏢 22 years in mining & resources</span>
+<span>🎓 PhD Metallurgical Engineering</span>
+</div>
+</div>
+</div>
+<div class="profile-grid">
+<div>
+<div class="card">
+<div class="card-title">Career Trajectory</div>
+<div class="detail-section">
+<div class="detail-item" style="border-left:3px solid #4f46e5;padding-left:12px;margin-bottom:12px">
+<div style="font-weight:600">President, China — Codelco China</div>
+<div style="font-size:11px;color:#64748b">2019 – Present · 7 years</div>
+</div>
+<div class="detail-item" style="border-left:3px solid #cbd5e1;padding-left:12px;margin-bottom:12px">
+<div style="font-weight:600">SVP Operations — Minmetals Group</div>
+<div style="font-size:11px;color:#64748b">2014 – 2019 · 5 years</div>
+</div>
+<div class="detail-item" style="border-left:3px solid #cbd5e1;padding-left:12px;margin-bottom:12px">
+<div style="font-weight:600">VP Mining — Chinalco</div>
+<div style="font-size:11px;color:#64748b">2008 – 2014 · 6 years</div>
+</div>
+<div class="detail-item" style="border-left:3px solid #cbd5e1;padding-left:12px">
+<div style="font-weight:600">Senior Engineer — Rio Tinto China</div>
+<div style="font-size:11px;color:#64748b">2004 – 2008 · 4 years</div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-title">Board Seats & Affiliations</div>
+<div class="detail-item">🏛 China Mining Association — Vice Chairman</div>
+<div class="detail-item">🏛 CCCME — Copper Committee Chair</div>
+<div class="detail-item">🏛 Zijin Mining (601899.SH) — Independent Director</div>
+</div>
+</div>
+<div>
+<div class="card">
+<div class="card-title">Composite Score Breakdown</div>
+<div class="score-grid">
+<div class="score-item"><span class="label">Industry Relevance</span><div class="bar-wrap"><div class="score-bar"><div class="score-fill high" style="width:96%"></div></div></div><span class="value">96</span></div>
+<div class="score-item"><span class="label">Functional Depth</span><div class="bar-wrap"><div class="score-bar"><div class="score-fill high" style="width:92%"></div></div></div><span class="value">92</span></div>
+<div class="score-item"><span class="label">Leadership Scale</span><div class="bar-wrap"><div class="score-bar"><div class="score-fill high" style="width:90%"></div></div></div><span class="value">90</span></div>
+<div class="score-item"><span class="label">Track Record</span><div class="bar-wrap"><div class="score-bar"><div class="score-fill high" style="width:88%"></div></div></div><span class="value">88</span></div>
+<div class="score-item"><span class="label">Strategic Fit</span><div class="bar-wrap"><div class="score-bar"><div class="score-fill mid" style="width:78%"></div></div></div><span class="value">78</span></div>
+</div>
+<div style="margin-top:16px;padding:12px;background:#f8f9fb;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+<span style="font-size:13px;font-weight:600;color:#0f172a">Composite Score</span>
+<span style="font-size:24px;font-weight:700;color:#4f46e5">92</span>
+</div>
+</div>
+<div class="card">
+<div class="card-title">Approach Strategy</div>
+<div class="detail-item" style="font-size:12px;line-height:1.7">
+<p style="margin-bottom:8px"><strong>Warm intro path:</strong> Mutual connection via CCCME Copper Committee — current chair has direct relationship.</p>
+<p style="margin-bottom:8px"><strong>Key motivator:</strong> Reported frustration with state-owned enterprise bureaucracy (Maimai, 2025 Q4). Open to advisory/board roles in private sector.</p>
+<p><strong>Risk flag:</strong> Non-compete clause with Codelco expires Q3 2026. Engage before July for Q4 start.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- PAGE 5: CLIENT DELIVERABLE -->
+<div class="page" id="p4">
+<h2>Client Deliverable Preview</h2>
+<p class="subtitle">The polished one-pager your client receives</p>
+<div class="onepager">
+<div class="onepager-header">
+<h2>Organizational Intelligence Report</h2>
+<p>Codelco China · Confidential · Prepared by LYC Partners · June 2026</p>
+</div>
+<div class="onepager-section">
+<h3>Engagement Scope</h3>
+<p>Full organizational mapping of Codelco China operations, covering 47 executives across 5 business units. Intelligence sourced from 12 Chinese recruiting platforms, corporate registries, and verified web sources. All profiles cross-referenced and scored using LYC's proprietary 5-dimension framework.</p>
+</div>
+<div class="onepager-section">
+<h3>Key Findings</h3>
+<ul>
+<li><strong>4 S-Tier candidates</strong> identified at VP and above with direct decision-making authority</li>
+<li><strong>12 A-Tier candidates</strong> at Director level with deep operational expertise and industry networks</li>
+<li><strong>Strongest cluster:</strong> Operations & Mining BU (14 executives, 93% coverage)</li>
+<li><strong>Gap identified:</strong> Finance & Strategy BU under-mapped (5 executives) — recommend secondary sourcing via Liepin and Maimai</li>
+<li><strong>Non-compete window:</strong> 3 key candidates have clauses expiring Q3 2026 — optimal engagement window is July–August</li>
+</ul>
+</div>
+<div class="onepager-section">
+<h3>Top 3 Candidates — Recommended Approach</h3>
+<table class="approach-table">
+<thead><tr><th>Candidate</th><th>Current Role</th><th>Score</th><th>Approach</th><th>Timeline</th></tr></thead>
+<tbody>
+<tr><td style="font-weight:600">Li Chen 陈力</td><td>VP Operations</td><td>88</td><td>Warm intro via Minmetals alumni network</td><td>Q3 2026</td></tr>
+<tr><td style="font-weight:600">Jun Wang 王军</td><td>VP Commercial</td><td>85</td><td>Direct outreach — active on Maimai, signaling openness</td><td>Q3 2026</td></tr>
+<tr><td style="font-weight:600">Hao Xu 徐浩</td><td>Dir. Mining Ops</td><td>76</td><td>Board seat offer — lower cost, high influence</td><td>Q4 2026</td></tr>
+</tbody>
+</table>
+</div>
+<div style="text-align:center;padding:20px 0 0;border-top:1px solid #e8eaed;margin-top:24px">
+<p style="font-size:10px;color:#94a3b8">LYC Partners · Confidential · For authorized recipients only</p>
+</div>
+</div>
+</div>
+
+</div>
+</div>
 <script>
-function switchTab(tabId) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('tab-' + tabId).classList.add('active');
+function showPage(i){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  document.getElementById("p"+i).classList.add("active");
+  document.querySelectorAll(".nav-item")[i].classList.add("active");
 }
 </script>
-
 </body>
 </html>
