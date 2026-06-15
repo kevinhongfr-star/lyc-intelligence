@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts';
-import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDashboard, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon } from 'lucide-react';
+import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDashboard, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon, Building2 } from 'lucide-react';
 import { CreditDisplay } from '@/components/ui/CreditDisplay';
 import { IconBridge, IconTrident, IconDrive, IconLeap, IconImpact, IconSpark, IconQuest, IconForge, IconPrism } from '@/components/icons/LycIcons';
 
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { path: '/platform/pipeline', icon: IconBridge, label: 'Pipeline' },
   { path: '/platform/mandates', icon: Briefcase, label: 'Mandates' },
   { path: '/platform/candidates', icon: Users, label: 'Candidates' },
+  { path: '/platform/companies', icon: Building2, label: 'Companies' },
   { type: 'divider' as const, label: 'Scoring' },
   { path: '/platform/batch-scoring', icon: IconTrident, label: 'Match Analysis' },
   { path: '/platform/mandates', icon: FileDown, label: 'Candidate Report', suffix: '/lens' },

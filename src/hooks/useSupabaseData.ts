@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getDashboardStats, getMandates, searchContacts, getPipelineByMandate, getMandateWithPipeline, getEvents, getDocuments, getNotifications } from '@/services/supabaseApi';
-import type { Mandate, Contact, CandidatePipeline, CalendarEvent, Document } from '@/services/supabaseApi';
+import { getDashboardStats, getMandates, searchContacts, getPipelineByMandate, getMandateWithPipeline, getEvents, getDocuments, getNotifications, getCompanies, getTierDistribution, getRecentActivity } from '@/services/supabaseApi';
+import type { Mandate, Contact, Company, CandidatePipeline, CalendarEvent, Document } from '@/services/supabaseApi';
 
 export function useDashboardStats() {
   const [stats, setStats] = useState<any>(null); const [loading, setLoading] = useState(true);
@@ -51,5 +51,22 @@ export function useDocuments() {
 export function useNotifications() {
   const [data, setData] = useState<any[]>([]); const [loading, setLoading] = useState(true);
   useEffect(() => { getNotifications().then(d => { setData(d); setLoading(false); }); }, []);
+  return { data, loading };
+}
+export function useCompanies(params?: { industry?: string; country?: string; stainGroup?: string; query?: string; limit?: number; offset?: number }) {
+  const [data, setData] = useState<Company[]>([]); const [count, setCount] = useState(0); const [loading, setLoading] = useState(true);
+  useEffect(() => { getCompanies(params).then(r => { setData(r.data); setCount(r.count); setLoading(false); }); }, [params?.query, params?.industry, params?.country, params?.stainGroup]);
+  return { data, count, loading };
+}
+
+export function useTierDistribution() {
+  const [data, setData] = useState<Record<string, number>>({ S: 0, A: 0, B: 0, C: 0 }); const [loading, setLoading] = useState(true);
+  useEffect(() => { getTierDistribution().then(d => { setData(d); setLoading(false); }); }, []);
+  return { data, loading };
+}
+
+export function useRecentActivity(limit?: number) {
+  const [data, setData] = useState<any[]>([]); const [loading, setLoading] = useState(true);
+  useEffect(() => { getRecentActivity(limit).then(d => { setData(d); setLoading(false); }); }, []);
   return { data, loading };
 }

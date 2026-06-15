@@ -164,14 +164,7 @@ export async function getMandateWithPipeline(mandateId: string): Promise<{ manda
   return { mandate, pipeline: (pRes.data as CandidatePipeline[]) ?? [] };
 }
 
-export async function getCompanies(params?: { industry?: string; limit?: number; }): Promise<Company[]> {
-  const sb = getSupabase();
-  let q = sb.from('companies').select('*');
-  if (params?.industry) q = q.eq('industry', params.industry);
-  q = q.order('total_contacts', { ascending: false }).limit(params?.limit ?? 100);
-  const { data, error } = await q;
-  return error ? [] : (data as Company[]) ?? [];
-}
+// getCompanies — enhanced version with search, country, pagination (defined below in Companies section)
 
 export async function getDashboardStats(): Promise<{
   totalContacts: number; totalMandates: number; totalCompanies: number; totalProposals: number;
@@ -322,4 +315,99 @@ export async function getAssessmentsByEmail(email: string): Promise<any[]> {
   } catch {
     return [];
   }
+}
+
+// ─── Companies / Target Companies ───
+export async function getCompanies(params?: {
+  industry?: string; country?: string; stainGroup?: string;
+  query?: string; limit?: number; offset?: number;
+}): Promise<{ data: Company[]; count: number }> {
+  const sb = getSupabase();
+  let q = sb.from('companies').select('*', { count: 'exact' });
+  if (params?.query) q = q.or(`name.ilike.%${params.query}%,industry.ilike.%${params.query}%`);
+  if (params?.industry) q = q.eq('industry', params.industry);
+  if (params?.country) q = q.eq('country', params.country);
+  if (params?.stainGroup) q = q.eq('stain_group', params.stainGroup);
+  q = q.range(params?.offset ?? 0, (params?.offset ?? 0) + (params?.limit ?? 50) - 1)
+       .order('engagement_score', { ascending: false });
+  const { data, count, error } = await q;
+  if (error) { console.error('[Supabase] getCompanies:', error); return { data: [], count: 0 }; }
+  return { data: (data as Company[]) ?? [], count: count ?? 0 };
+}
+
+export async function getCompany(id: string): Promise<Company | null> {
+  const { data, error } = await getSupabase().from('companies').select('*').eq('id', id).single();
+  if (error) return null;
+  return data as Company;
+}
+
+// ─── Tier Distribution (S/A/B/C based on trident_composite) ───
+export async function getTierDistribution(): Promise<Record<string, number>> {
+  const sb = getSupabase();
+  const { data, error } = await sb.from('contacts')
+    .select('trident_composite, council_tier, advisory_tier, cxo_stamp')
+    .limit(15000);
+  if (error || !data) return { S: 0, A: 0, B: 0, C: 0 };
+
+  const tiers: Record<string, number> = { S: 0, A: 0, B: 0, C: 0 };
+  for (const c of data) {
+    const score = c.trident_composite ?? 0;
+    if (c.cxo_stamp || score >= 85) tiers.S++;
+    else if (score >= 65) tiers.A++;
+    else if (score >= 45) tiers.B++;
+    else tiers.C++;
+  }
+  return tiers;
+}
+
+// ─── Recent Activity Feed ───
+export async function getRecentActivity(limit: number = 20): Promise<any[]> {
+  const sb = getSupabase();
+  // Get recent scoring runs + recently updated contacts
+  const [scoreRes, contactRes] = await Promise.all([
+    sb.from('scoring_runs').select('id, run_type, composite_score, verdict, created_at, contact_id, mandate_id')
+      .order('created_at', { ascending: false }).limit(limit),
+    sb.from('contacts').select('id, name, current_title, updated_at, source')
+      .order('updated_at', { ascending: false }).limit(limit),
+  ]);
+
+  const activities: any[] = [];
+  for (const sr of (scoreRes.data ?? [])) {
+    activities.push({
+      type: 'scoring',
+      id: sr.id,
+      title: `Scored: ${sr.run_type}`,
+      detail: sr.verdict ? `Verdict: ${sr.verdict}` : `Score: ${sr.composite_score ?? '—'}`,
+      timestamp: sr.created_at,
+      contact_id: sr.contact_id,
+      mandate_id: sr.mandate_id,
+    });
+  }
+  for (const c of (contactRes.data ?? [])) {
+    activities.push({
+      type: 'contact_update',
+      id: c.id,
+      title: c.name,
+      detail: c.current_title ?? 'Profile updated',
+      timestamp: c.updated_at,
+    });
+  }
+
+  activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  return activities.slice(0, limit);
+}
+
+// ─── Company CRUD ───
+export async function createCompany(company: Partial<Company>): Promise<Company | null> {
+  const { data, error } = await getSupabase().from('companies')
+    .insert(company).select().single();
+  if (error) { console.error('[Supabase] createCompany:', error); return null; }
+  return data as Company;
+}
+
+export async function updateCompany(id: string, updates: Partial<Company>): Promise<Company | null> {
+  const { data, error } = await getSupabase().from('companies')
+    .update(updates).eq('id', id).select().single();
+  if (error) { console.error('[Supabase] updateCompany:', error); return null; }
+  return data as Company;
 }

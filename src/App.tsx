@@ -27,6 +27,7 @@ const AppLayout = lazy(() => import('@/components/layout/AppLayout').then(m => (
 const ConsultantDashboard = lazy(() => import('@/components/dashboard/ConsultantDashboard').then(m => ({ default: m.ConsultantDashboard })));
 const MandatesPage = lazy(() => import('@/pages/MandatesPage').then(m => ({ default: m.MandatesPage })));
 const CandidatesPage = lazy(() => import('@/pages/CandidatesPage').then(m => ({ default: m.CandidatesPage })));
+const CompaniesPage = lazy(() => import('@/pages/CompaniesPage').then(m => ({ default: m.CompaniesPage })));
 const MandateDetailPage = lazy(() => import('@/pages/MandateDetailPage').then(m => ({ default: m.MandateDetailPage })));
 const BatchScoringPage = lazy(() => import('@/pages/BatchScoringPage').then(m => ({ default: m.BatchScoringPage })));
 const NexusPage = lazy(() => import('@/pages/NexusPage').then(m => ({ default: m.NexusPage })));
@@ -106,6 +107,7 @@ export default function App() {
               <Route path="mandates/:id" element={<MandateDetailPage />} />
               <Route path="mandates/:id/lens" element={<LensExportPage />} />
               <Route path="candidates" element={<CandidatesPage />} />
+              <Route path="companies" element={<CompaniesPage />} />
               <Route path="pipeline" element={<PipelinePage />} />
               <Route path="batch-scoring" element={<BatchScoringPage />} />
               <Route path="metrix" element={<MetrixPage />} />
