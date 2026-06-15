@@ -14,9 +14,9 @@ export function useMandates(params?: { status?: string; limit?: number }) {
   return { data, count, loading, error };
 }
 
-export function useContacts(params: { query?: string; limit?: number }) {
+export function useContacts(params: { query?: string; seniority?: string[]; country?: string; limit?: number }) {
   const [data, setData] = useState<Contact[]>([]); const [count, setCount] = useState(0); const [loading, setLoading] = useState(true);
-  useEffect(() => { searchContacts(params).then(r => { setData(r.data); setCount(r.count); setLoading(false); }); }, [params.query]);
+  useEffect(() => { searchContacts(params).then(r => { setData(r.data); setCount(r.count); setLoading(false); }); }, [params.query, params.country, (params.seniority || []).join(',')]);
   return { data, count, loading };
 }
 
