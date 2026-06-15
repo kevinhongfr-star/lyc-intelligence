@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Users, Loader2, Filter, ChevronLeft, ChevronRight, ArrowUpDown, Linkedin, Globe, Briefcase, Award, Target } from 'lucide-react';
 import { useContacts } from '@/hooks/useSupabaseData';
 import { Badge, Card, CardContent } from '@/components/ui';
@@ -32,6 +33,7 @@ const TIER_STYLES: Record<string, string> = {
 type SortField = 'name' | 'score' | 'seniority' | 'country';
 
 export function CandidatesPage() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [seniorityFilter, setSeniorityFilter] = useState<string[]>([]);
   const [countryFilter, setCountryFilter] = useState('');
@@ -198,10 +200,10 @@ export function CandidatesPage() {
                 {paginated.map(c => {
                   const tier = getTier(c.trident_composite, !!c.cxo_stamp);
                   return (
-                    <tr key={c.id} className="border-b border-bg-tertiary/50 hover:bg-bg-tertiary/30 transition-colors">
+                    <tr key={c.id} className="border-b border-bg-tertiary/50 hover:bg-bg-tertiary/30 transition-colors cursor-pointer" onClick={() => navigate(`/platform/candidates/${c.id}`)}>
                       <td className="px-4 py-3">
                         <div>
-                          <p className="font-medium text-text-primary">{c.name}</p>
+                          <p className="font-medium text-accent hover:underline">{c.name}</p>
                           {c.headline && <p className="text-[11px] text-text-muted truncate max-w-[200px]">{c.headline}</p>}
                         </div>
                       </td>
@@ -236,7 +238,8 @@ export function CandidatesPage() {
                         <div className="flex items-center justify-center gap-2">
                           {c.linkedin_url && (
                             <a href={c.linkedin_url} target="_blank" rel="noopener noreferrer"
-                              className="text-blue-500 hover:text-blue-400" title="LinkedIn">
+                              className="text-blue-500 hover:text-blue-400" title="LinkedIn"
+                              onClick={(e) => e.stopPropagation()}>
                               <Linkedin className="w-4 h-4" />
                             </a>
                           )}

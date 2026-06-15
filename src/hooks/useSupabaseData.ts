@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getDashboardStats, getMandates, searchContacts, getPipelineByMandate, getMandateWithPipeline, getEvents, getDocuments, getNotifications, getCompanies, getTierDistribution, getRecentActivity } from '@/services/supabaseApi';
+import { getDashboardStats, getMandates, searchContacts, getPipelineByMandate, getMandateWithPipeline, getEvents, getDocuments, getNotifications, getCompanies, getTierDistribution, getRecentActivity, getContact } from '@/services/supabaseApi';
 import type { Mandate, Contact, Company, CandidatePipeline, CalendarEvent, Document } from '@/services/supabaseApi';
 
 export function useDashboardStats() {
@@ -69,4 +69,14 @@ export function useRecentActivity(limit?: number) {
   const [data, setData] = useState<any[]>([]); const [loading, setLoading] = useState(true);
   useEffect(() => { getRecentActivity(limit).then(d => { setData(d); setLoading(false); }); }, []);
   return { data, loading };
+}
+export function useContact(id: string | undefined) {
+  const [data, setData] = useState<Contact | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (!id) { setLoading(false); return; }
+    getContact(id).then(c => { setData(c); setLoading(false); }).catch(e => { setError(e.message); setLoading(false); });
+  }, [id]);
+  return { data, loading, error };
 }

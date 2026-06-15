@@ -40,6 +40,8 @@ const MetrixPage = lazy(() => import('@/pages/MetrixPage').then(m => ({ default:
 const ScoringRunsPage = lazy(() => import('@/pages/ScoringRunsPage').then(m => ({ default: m.ScoringRunsPage })));
 const LensExportPage = lazy(() => import('@/pages/LensExportPage').then(m => ({ default: m.LensExportPage })));
 const OrgIntelligencePage = lazy(() => import('@/pages/OrgIntelligencePage').then(m => ({ default: m.OrgIntelligencePage })));
+const ExecutiveProfilePage = lazy(() => import('@/pages/ExecutiveProfilePage').then(m => ({ default: m.ExecutiveProfilePage })));
+const CandidateReportPage = lazy(() => import('@/pages/CandidateReportPage').then(m => ({ default: m.CandidateReportPage })));
 
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
@@ -107,6 +109,8 @@ export default function App() {
               <Route path="mandates/:id" element={<MandateDetailPage />} />
               <Route path="mandates/:id/lens" element={<LensExportPage />} />
               <Route path="candidates" element={<CandidatesPage />} />
+              <Route path="candidates/:id" element={<ExecutiveProfilePage />} />
+              <Route path="candidates/:id/report" element={<CandidateReportPage />} />
               <Route path="companies" element={<CompaniesPage />} />
               <Route path="pipeline" element={<PipelinePage />} />
               <Route path="batch-scoring" element={<BatchScoringPage />} />
