@@ -96,6 +96,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return { success: false, error: error.message };
+      
+      // Check if user has admin role in profiles table
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+      
+      if (profileError || !profile || profile.role !== 'admin') {
+        await supabase.auth.signOut();
+        return { success: false, error: 'Access restricted. This platform is invite-only.' };
+      }
+      
       set({ user: data.user });
       await get().loadProfile();
       return { success: true };

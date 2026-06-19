@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Shield } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -22,8 +22,6 @@ const DS = {
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
-const ALLOWED_EMAIL = 'kevin.hong@lyc-partners.ai';
-
 export function LoginPage() {
   const navigate = useNavigate();
   const { signInWithPassword } = useAuthStore();
@@ -33,12 +31,18 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Preload platform route on hover for instant navigation
+  const handleMouseEnter = useCallback(() => {
+    import('../pages/ConsultantDashboard');
+    import('../components/layout/AppLayout');
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (email.trim().toLowerCase() !== ALLOWED_EMAIL) {
-      setError('Access restricted. This platform is invite-only.');
+    if (!email.trim()) {
+      setError('Email is required');
       return;
     }
     if (!password) {
@@ -86,7 +90,9 @@ export function LoginPage() {
           </div>
 
           <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px', boxShadow: DS.shadow }}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}
+              onMouseEnter={handleMouseEnter}
+            >
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
                   Email
@@ -160,11 +166,16 @@ export function LoginPage() {
                   <>Sign In <ArrowRight style={{ width: 18, height: 18 }} /></>
                 )}
               </button>
+              <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                <Link to="/reset-password" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', fontFamily: DS.bodyFont }}>
+                  Forgot password?
+                </Link>
+              </div>
             </form>
           </div>
 
           <p style={{ fontSize: '12px', color: DS.muted, textAlign: 'center', marginTop: '20px', lineHeight: 1.5 }}>
-            This platform is invite-only. Unauthorized access attempts are logged.
+            This platform is invite-only. Access controlled by admin role.
           </p>
         </div>
       </div>
