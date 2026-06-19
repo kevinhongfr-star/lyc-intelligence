@@ -80,3 +80,45 @@ export function useContact(id: string | undefined) {
   }, [id]);
   return { data, loading, error };
 }
+
+// ─── Consolidated Dashboard Hook ───
+export interface DashboardData {
+  stats: {
+    totalContacts: number;
+    totalMandates: number;
+    totalCompanies: number;
+    totalProposals: number;
+    mandatesByStatus: Record<string, number>;
+    contactsBySeniority: Record<string, number>;
+  };
+  mandates: any[];
+  tierDistribution: { S: number; A: number; B: number; C: number };
+  recentActivity: any[];
+}
+
+export function useDashboard() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const sb = getSupabase();
+    // Single consolidated API call
+    fetch('/api/dashboard')
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((d: DashboardData) => {
+        setData(d);
+        setLoading(false);
+      })
+      .catch((e) => {
+        console.error('[useDashboard] Error:', e);
+        setError(e.message);
+        setLoading(false);
+      });
+  }, []);
+  
+  return { data, loading, error };
+}
