@@ -494,7 +494,7 @@ export function MatchPage() {
         )}
 
         {/* Selectors */}
-        <ContactSelector open={showContactSelector} onClose={() => setShowContactSelector(false)} onSelect={handleContactsSelect} />
+        <ContactSelector open={showContactSelector} onClose={() => setShowContactSelector(false)} onSelect={handleContactsSelect} userId={profile?.id} />
         <MandateSelector open={showMandateSelector} onClose={() => setShowMandateSelector(false)} onSelect={handleMandateSelect} />
 
         <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>

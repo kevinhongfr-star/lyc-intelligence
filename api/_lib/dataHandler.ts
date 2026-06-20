@@ -246,13 +246,46 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         const limit = parseInt(req.query.limit as string) || 50;
         const offset = parseInt(req.query.offset as string) || 0;
         const search = req.query.q as string;
+        const userId = req.query.user_id as string;
 
-        const rows = await db.selectMany('contacts', {
+        let rows = await db.selectMany('contacts', {
           select: 'id, name, email, current_title, company_id, location, country, seniority, skills, headline, summary, career_history, trident_composite, trident_d1, trident_d2, trident_d3, company:companies(id, name)',
           orderBy: { column: 'updated_at', ascending: false },
-          limit,
-          offset,
+          limit: 10000, // fetch all to filter by user membership, then paginate
+          offset: 0,
         }, 15000);
+
+        // Filter by user's mandate membership (non-admin only sees contacts in their mandates)
+        if (userId) {
+          try {
+            const { user } = await getUserFromRequest(req);
+            if (user && user.role !== 'admin') {
+              // Get mandates this user is assigned to
+              const assignments = await db.selectMany('mandate_members', {
+                select: 'mandate_id',
+                where: [{ column: 'user_id', value: userId }],
+              }, 15000);
+              const assignedMandateIds = new Set(assignments.map((a: any) => a.mandate_id));
+              
+              if (assignedMandateIds.size === 0) {
+                return res.status(200).json({ success: true, data: [], total: 0 });
+              }
+
+              // Get pipeline entries for user's mandates to find allowed contact IDs
+              const allPipeline = await db.selectMany('candidates_pipeline', {
+                select: 'contact_id, mandate_id',
+              }, 15000);
+              const allowedContactIds = new Set(
+                allPipeline
+                  .filter((p: any) => assignedMandateIds.has(p.mandate_id))
+                  .map((p: any) => p.contact_id)
+              );
+              rows = rows.filter((r: any) => allowedContactIds.has(r.id));
+            }
+          } catch (e) {
+            console.warn('[contact] Auth check failed, returning all:', (e as any).message);
+          }
+        }
 
         let filtered = rows;
         if (search) {
@@ -265,7 +298,11 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           );
         }
 
-        return res.status(200).json({ success: true, data: filtered });
+        // Manual pagination after filtering
+        const total = filtered.length;
+        const paginated = filtered.slice(offset, offset + limit);
+
+        return res.status(200).json({ success: true, data: paginated, total });
       }
     }
 

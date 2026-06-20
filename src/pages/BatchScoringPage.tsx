@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/authStore';
 import React, { useState, useCallback } from 'react';
 import { Target, Loader2, AlertTriangle, CheckCircle2, ArrowRight, Zap, BarChart3, Database, FileText, Save } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui';
@@ -157,6 +158,7 @@ export function BatchScoringPage() {
   const [jdMode, setJdMode] = useState<'paste' | 'db'>('paste');
   const [showMandateSelector, setShowMandateSelector] = useState(false);
   const [showContactSelector, setShowContactSelector] = useState(false);
+  const { profile } = useAuthStore();
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedFromDb, setSelectedFromDb] = useState<Map<string, { contact_id: string; name: string; cv: string }>>(new Map());
@@ -443,6 +445,7 @@ export function BatchScoringPage() {
         onClose={() => setShowContactSelector(false)}
         onSelect={handleContactSelect}
         multi={true}
+        userId={profile?.id}
       />
       {saveTarget && (
         <PipelineSaveModal

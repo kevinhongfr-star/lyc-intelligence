@@ -113,8 +113,32 @@ export interface CandidatePipeline {
 
 // ─── Query Functions ───
 
-export async function searchContacts(params: { query?: string; seniority?: string[]; skills?: string[]; country?: string; limit?: number; offset?: number; }): Promise<{ data: Contact[]; count: number }> {
+export async function searchContacts(params: { query?: string; seniority?: string[]; skills?: string[]; country?: string; limit?: number; offset?: number; userId?: string; }): Promise<{ data: Contact[]; count: number }> {
   const sb = getSupabase();
+
+  // If userId provided, route through API for server-side mandate-based filtering
+  if (params.userId) {
+    const qp = new URLSearchParams();
+    if (params.query) qp.set('search', params.query);
+    if (params.seniority?.length) qp.set('seniority', params.seniority.join(','));
+    if (params.country) qp.set('country', params.country);
+    qp.set('limit', String(params.limit ?? 50));
+    qp.set('offset', String(params.offset ?? 0));
+    qp.set('user_id', params.userId);
+    const res = await fetch(`/api/data/contact?${qp}`);
+    const json = await res.json();
+    const contacts = (json.data || []) as Contact[];
+    // Apply heuristic trident enrichment
+    const enriched = contacts.map(c => {
+      if (c.trident_composite == null) {
+        const h = heuristicTrident(c);
+        return { ...c, trident_d1: h.d1, trident_d2: h.d2, trident_d3: h.d3, trident_composite: h.composite, match_score_best: h.composite };
+      }
+      return c;
+    });
+    return { data: enriched, count: json.total ?? enriched.length };
+  }
+
   let q = sb.from('contacts').select('*, company:companies(*)', { count: 'exact' });
   if (params.query) q = q.or(`name.ilike.%${params.query}%,email.ilike.%${params.query}%,headline.ilike.%${params.query}%,current_title.ilike.%${params.query}%`);
   if (params.seniority?.length) q = q.in('seniority', params.seniority);

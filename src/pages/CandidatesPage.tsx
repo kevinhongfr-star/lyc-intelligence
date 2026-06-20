@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/authStore';
 import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Users, Loader2, Filter, ChevronLeft, ChevronRight, ArrowUpDown, Linkedin, Globe, Briefcase, Award, Target } from 'lucide-react';
@@ -43,7 +44,7 @@ export function CandidatesPage() {
   const [sortAsc, setSortAsc] = useState(false);
   const limit = 30;
 
-  const { data: contacts, count, loading } = useContacts({
+  const { data: contacts, count, loading } = useContacts({ userId: profile?.id || undefined,
     query: search || undefined,
     seniority: seniorityFilter.length ? seniorityFilter : undefined,
     country: countryFilter || undefined,
