@@ -228,12 +228,18 @@ async function handleSubscriptionUpdate(subscription: any) {
         description: `${tierCredits} credits from ${tier} subscription`
       });
 
-    // Add to balance
+    // Add to balance (read-then-update since Supabase JS SDK has no raw SQL)
+    const { data: currentCredits } = await supabase!
+      .from('credits')
+      .select('balance, total_earned')
+      .eq('user_id', finalUserId)
+      .single();
+
     await supabase!
       .from('credits')
       .update({
-        balance: supabase!.sql`balance + ${tierCredits}`,
-        total_earned: supabase!.sql`total_earned + ${tierCredits}`
+        balance: (currentCredits?.balance || 0) + tierCredits,
+        total_earned: (currentCredits?.total_earned || 0) + tierCredits
       })
       .eq('user_id', finalUserId);
   }
