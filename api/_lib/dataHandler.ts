@@ -16,10 +16,16 @@
  *   GET    /api/data/scoring-run        → list scoring runs
  *   POST   /api/data/share              → persist share record
  *   GET    /api/data/share/:id          → get share record
+ *   POST   /api/data/mandate-members   → assign user to mandate
+ *   GET    /api/data/mandate-members/:mid → get members for mandate
+ *   GET    /api/data/mandate-members?user_id=X → get mandates for user
+ *   DELETE /api/data/mandate-members/:id → remove assignment
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as db from './supabaseRest.js';
+import { getUserFromRequest } from './adminAuth.js';
+import { sendEmail } from './email.js';
 
 export async function handler(req: VercelRequest, res: VercelResponse) {
   const pathArr = (req.query.path as string[]) || [];
@@ -147,13 +153,33 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         const limit = parseInt(req.query.limit as string) || 50;
         const offset = parseInt(req.query.offset as string) || 0;
         const search = req.query.q as string;
+        const userId = req.query.user_id as string;  // Frontend passes current user ID
         
-        const rows = await db.selectMany('mandates', {
+        let rows = await db.selectMany('mandates', {
           select: 'id, title, status, priority, client_id, jd_description, search_definition, skills_requirements, company:companies(id, name)',
           orderBy: { column: 'updated_at', ascending: false },
           limit,
           offset,
         }, 15000);
+        
+        // Filter by user assignment (unless admin or no user_id provided)
+        if (userId) {
+          try {
+            const { user } = await getUserFromRequest(req);
+            if (user && user.role !== 'admin') {
+              // Get mandates this user is assigned to
+              const assignments = await db.selectMany('mandate_members', {
+                select: 'mandate_id',
+                where: [{ column: 'user_id', value: userId }],
+              }, 15000);
+              const assignedIds = new Set(assignments.map((a: any) => a.mandate_id));
+              rows = rows.filter((r: any) => assignedIds.has(r.id));
+            }
+          } catch (e) {
+            // If auth check fails, return all (graceful degradation)
+            console.warn('[mandate] Auth check failed, returning all:', (e as any).message);
+          }
+        }
         
         let filtered = rows;
         if (search) {
@@ -347,11 +373,25 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           icp: icp || 'professional',
         }, 15000);
 
+        // Send invite email with temp password (non-blocking — don't fail if email fails)
+        try {
+          await sendEmail('team_invite', {
+            name,
+            email: email.toLowerCase(),
+            tempPassword,
+            role: role || 'user',
+            inviterName: 'Your admin',
+          });
+        } catch (emailErr) {
+          console.warn('[profile] Failed to send invite email:', (emailErr as any).message);
+        }
+
         return res.status(201).json({ 
           success: true, 
           data: row,
           temp_password: tempPassword,  // Admin can share this with the invited user
           auth_created: true,
+          email_sent: true,
         });
       }
 
@@ -366,6 +406,67 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
 
+
+    // ── Mandate Members (Assignment) ──
+    if (resource === 'mandate-members') {
+      if (method === 'POST' && !id) {
+        const { mandate_id, user_id, role, assigned_by } = req.body || {};
+        
+        if (!mandate_id || !user_id) {
+          return res.status(400).json({ error: 'mandate_id and user_id are required' });
+        }
+
+        // Check if already assigned
+        const existing = await db.selectOne('mandate_members', {
+          select: 'id',
+          where: [
+            { column: 'mandate_id', value: mandate_id },
+            { column: 'user_id', value: user_id },
+          ],
+        }, 15000);
+        
+        if (existing) {
+          return res.status(409).json({ error: 'User already assigned to this mandate' });
+        }
+
+        const row = await db.insert('mandate_members', {
+          mandate_id,
+          user_id,
+          role: role || 'member',
+          assigned_by: assigned_by || null,
+        }, 15000);
+        return res.status(201).json({ success: true, data: row });
+      }
+
+      if (method === 'GET' && id) {
+        // Get members for a specific mandate
+        const rows = await db.selectMany('mandate_members', {
+          select: 'id, user_id, role, assigned_at, assigned_by, profiles:profiles(id, name, email)',
+          where: [{ column: 'mandate_id', value: id }],
+          orderBy: { column: 'assigned_at', ascending: true },
+        }, 15000);
+        return res.status(200).json({ success: true, data: rows });
+      }
+
+      if (method === 'GET' && !id) {
+        // Get assignments for a user
+        const userId = req.query.user_id as string;
+        if (!userId) {
+          return res.status(400).json({ error: 'user_id query param required' });
+        }
+        const rows = await db.selectMany('mandate_members', {
+          select: 'id, mandate_id, role, assigned_at, mandates:mandates(id, title, status)',
+          where: [{ column: 'user_id', value: userId }],
+          orderBy: { column: 'assigned_at', ascending: false },
+        }, 15000);
+        return res.status(200).json({ success: true, data: rows });
+      }
+
+      if (method === 'DELETE' && id) {
+        const count = await db.deleteRows('mandate_members', { column: 'id', value: id }, 15000);
+        return res.status(200).json({ success: true, deleted: count });
+      }
+    }
 
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}` });
   } catch (err: any) {

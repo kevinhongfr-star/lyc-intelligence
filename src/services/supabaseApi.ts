@@ -143,15 +143,26 @@ export async function getContact(id: string): Promise<Contact | null> {
   return c;
 }
 
-export async function getMandates(params?: { status?: string; limit?: number; offset?: number; }): Promise<{ data: Mandate[]; count: number }> {
-  const sb = getSupabase();
-  let q = sb.from('mandates').select('*, company:companies(*)', { count: 'exact' });
-  if (params?.status) q = q.eq('status', params.status);
-  q = q.range(params?.offset ?? 0, (params?.offset ?? 0) + (params?.limit ?? 50) - 1).order('updated_at', { ascending: false });
-  const { data, count, error } = await q;
-  if (error) { console.error('[Supabase] getMandates:', error); return { data: [], count: 0 }; }
-  const mandates = ((data as Mandate[]) ?? []).map(m => ({ ...m, title: cleanMandateTitle(m.title, m.company?.name) }));
-  return { data: mandates, count: count ?? 0 };
+export async function getMandates(params?: { status?: string; limit?: number; offset?: number; userId?: string; }): Promise<{ data: Mandate[]; count: number }> {
+  // Use the API endpoint for authorization filtering
+  const queryParams = new URLSearchParams();
+  if (params?.limit) queryParams.set('limit', params.limit.toString());
+  if (params?.offset) queryParams.set('offset', params.offset.toString());
+  if (params?.userId) queryParams.set('user_id', params.userId);
+  
+  try {
+    const res = await fetch(`/api/data/mandate?${queryParams.toString()}`);
+    const result = await res.json();
+    if (result.success) {
+      const mandates = (result.data || []).map((m: any) => ({ ...m, title: cleanMandateTitle(m.title, m.company?.name) }));
+      return { data: mandates, count: mandates.length };
+    }
+    console.error('[API] getMandates failed:', result.error);
+    return { data: [], count: 0 };
+  } catch (err) {
+    console.error('[API] getMandates error:', err);
+    return { data: [], count: 0 };
+  }
 }
 
 export async function getMandateWithPipeline(mandateId: string): Promise<{ mandate: Mandate | null; pipeline: CandidatePipeline[] }> {

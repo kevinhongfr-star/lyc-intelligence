@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useAuthStore } from '@/stores/authStore';
 import { getDashboardStats, getMandates, searchContacts, getPipelineByMandate, getMandateWithPipeline, getEvents, getDocuments, getNotifications, getCompanies, getTierDistribution, getRecentActivity, getContact } from '@/services/supabaseApi';
 import type { Mandate, Contact, Company, CandidatePipeline, CalendarEvent, Document } from '@/services/supabaseApi';
 
@@ -9,8 +10,12 @@ export function useDashboardStats() {
 }
 
 export function useMandates(params?: { status?: string; limit?: number }) {
+  const { profile } = useAuthStore();
   const [data, setData] = useState<Mandate[]>([]); const [count, setCount] = useState(0); const [loading, setLoading] = useState(true); const [error, setError] = useState<string | null>(null);
-  useEffect(() => { getMandates(params).then(r => { setData(r.data); setCount(r.count); setLoading(false); }).catch(e => { setError(e.message); setLoading(false); }); }, []);
+  useEffect(() => { 
+    const queryParams = { ...params, userId: profile?.id };
+    getMandates(queryParams).then(r => { setData(r.data); setCount(r.count); setLoading(false); }).catch(e => { setError(e.message); setLoading(false); }); 
+  }, [profile?.id]);
   return { data, count, loading, error };
 }
 

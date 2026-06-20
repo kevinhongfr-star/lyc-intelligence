@@ -85,3 +85,38 @@ export async function verifyAdmin(req: VercelRequest): Promise<AuthResult> {
     return { user: null, error: `Auth lookup failed: ${err?.message || 'unknown'}` };
   }
 }
+
+/**
+ * Extract user from JWT — any authenticated user, no admin check.
+ * Returns the user's id, email, and role from the profiles table.
+ */
+export async function getUserFromRequest(req: VercelRequest): Promise<AuthResult> {
+  if (!isSupabaseConfigured()) {
+    return { user: null, error: 'Supabase not configured on server' };
+  }
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Bearer ')) {
+    return { user: null, error: 'Missing or invalid Authorization header' };
+  }
+  const token = auth.slice(7).trim();
+  if (!token) return { user: null, error: 'Empty bearer token' };
+
+  const userId = decodeJwtSub(token);
+  if (!userId) {
+    return { user: null, error: 'Invalid JWT format (no sub claim)' };
+  }
+
+  try {
+    const profile = await selectOne('profiles', {
+      column: 'id',
+      value: userId,
+      select: 'id,email,role',
+    });
+    if (!profile) {
+      return { user: null, error: 'Profile not found for this user' };
+    }
+    return { user: profile as AdminUser, error: null };
+  } catch (err: any) {
+    return { user: null, error: `Auth lookup failed: ${err?.message || 'unknown'}` };
+  }
+}

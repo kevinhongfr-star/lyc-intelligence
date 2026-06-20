@@ -6,6 +6,8 @@ import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/compo
 import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
 import { executeAIAction, type AIAction } from '@/services/aiQuickActions';
 import { updateMandateStatus, updatePipelineStage, updatePipelineVerdict } from '@/services/supabaseApi';
+import { MandateTeam } from '@/components/mandate/MandateTeam';
+import { useAuthStore } from '@/stores/authStore';
 
 const STATUS_OPTIONS = [
   { value: '1_search', label: 'SWEEP', color: '#00897B' },
@@ -28,6 +30,7 @@ const AI_ACTIONS: { key: AIAction; icon: any; label: string }[] = [
 
 export function MandateDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const { profile } = useAuthStore();
   const { mandate, pipeline, loading, refresh } = useMandateDetail(id || '');
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState<string | null>(null);
@@ -125,6 +128,14 @@ export function MandateDetailPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Mandate Team */}
+      <Card>
+        <CardHeader className="py-2"><CardTitle className="text-sm">Team</CardTitle></CardHeader>
+        <CardContent className="py-0">
+          <MandateTeam mandateId={mandate.id} isAdmin={profile?.role === 'admin'} />
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-3">

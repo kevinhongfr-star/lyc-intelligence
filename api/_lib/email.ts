@@ -111,6 +111,29 @@ function renderEmail(type: string, data: any): { subject: string; html: string }
           </div>
         `,
       };
+    case 'team_invite':
+      return {
+        subject: \`You've been invited to LYC Intelligence — \${data.inviterName || 'a colleague'}\`,
+        html: \`
+          <div style="font-family: Georgia, serif; background: #0a0a0a; color: #e5e5e5; padding: 40px; max-width: 600px; margin: auto;">
+            <h1 style="color: #e5e5e5; border-bottom: 2px solid #c108ab; padding-bottom: 20px;">LYC Intelligence</h1>
+            <p>Hi \${data.name || 'there'},</p>
+            <p>\${data.inviterName || 'A colleague'} has invited you to join LYC Intelligence as a \${data.role || 'team member'}.</p>
+            <div style="margin:20px 0; padding:20px; background:#1a1a1a; border:1px solid #333; border-radius:12px;">
+              <p style="margin:0;"><strong>Your login credentials:</strong></p>
+              <p style="margin:8px 0 0;"><strong>Email:</strong> \${data.email}</p>
+              <p style="margin:8px 0 0;"><strong>Temporary Password:</strong> \${data.tempPassword || 'Check with your admin'}</p>
+            </div>
+            <div style="margin:20px 0;">
+              <a href="https://lyc-intelligence.vercel.app/login" style="display:inline-block;padding:12px 24px;background:#c108ab;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">
+                Log In Now
+              </a>
+            </div>
+            <p style="color:#999; font-size:13px;">Please change your password after first login.</p>
+            <p>Best,<br/>The LYC Partners Team</p>
+          </div>
+        \`,
+      };
     default:
       return null;
   }
