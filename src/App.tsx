@@ -44,6 +44,7 @@ const LensExportPage = lazy(() => import('@/pages/LensExportPage').then(m => ({ 
 const OrgIntelligencePage = lazy(() => import('@/pages/OrgIntelligencePage').then(m => ({ default: m.OrgIntelligencePage })));
 const ExecutiveProfilePage = lazy(() => import('@/pages/ExecutiveProfilePage').then(m => ({ default: m.ExecutiveProfilePage })));
 const CandidateReportPage = lazy(() => import('@/pages/CandidateReportPage').then(m => ({ default: m.CandidateReportPage })));
+const ProposalBuilderPage = lazy(() => import('@/pages/ProposalBuilderPage').then(m => ({ default: m.ProposalBuilderPage })));
 
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
@@ -110,6 +111,8 @@ export default function App() {
             <Route path="/platform" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<ConsultantDashboard />} />
               <Route path="mandates" element={<MandatesPage />} />
+              <Route path="mandates/new" element={<ProposalBuilderPage />} />
+              <Route path="mandates/:id/edit" element={<ProposalBuilderPage />} />
               <Route path="mandates/:id" element={<MandateDetailPage />} />
               <Route path="mandates/:id/lens" element={<LensExportPage />} />
               <Route path="candidates" element={<CandidatesPage />} />

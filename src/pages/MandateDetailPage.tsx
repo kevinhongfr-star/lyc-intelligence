@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Loader2, Mail, FileText, ClipboardList, Eye, MessageSquare, FileDown, BarChart3, CheckCircle, PauseCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, FileText, ClipboardList, Eye, MessageSquare, FileDown, BarChart3, CheckCircle, PauseCircle, XCircle, Edit } from 'lucide-react';
 import { useMandateDetail } from '@/hooks/useSupabaseData';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
 import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';

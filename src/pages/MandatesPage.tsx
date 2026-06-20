@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Briefcase, ChevronRight, Loader2, CheckCircle, PauseCircle, XCircle } from 'lucide-react';
+import { Search, Briefcase, ChevronRight, Loader2, CheckCircle, PauseCircle, XCircle, Plus } from 'lucide-react';
 import { useMandates } from '@/hooks/useSupabaseData';
 import { Badge, Card, CardContent } from '@/components/ui';
 import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
@@ -37,9 +37,18 @@ export function MandatesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-serif font-bold text-text-primary">Mandates</h1>
-        <p className="text-text-muted">{count ?? mandates.length} mandates</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-serif font-bold text-text-primary">Mandates</h1>
+          <p className="text-text-muted">{count ?? mandates.length} mandates</p>
+        </div>
+        <button
+          onClick={() => navigate('/platform/mandates/new')}
+          className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          Create Mandate
+        </button>
       </div>
       <div className="flex gap-3 flex-wrap">
         <div className="relative flex-1 max-w-md">
