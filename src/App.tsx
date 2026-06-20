@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { CreditProvider } from '@/contexts/CreditContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Loader2 } from 'lucide-react';
+import { ToastContainer } from '@/components/ui/ToastContainer';
 
 // ── Lazy-loaded page components (ESM dynamic import — works in browser) ──
 
@@ -87,6 +88,7 @@ export default function App() {
   return (
     <ErrorBoundary>
     <CreditProvider>
+      <ToastContainer />
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<Landing />} />

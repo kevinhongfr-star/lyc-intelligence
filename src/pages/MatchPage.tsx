@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { toast } from '@/stores/toastStore';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, BarChart3, Shield, Loader2, Upload, Database, FileText, Plus } from 'lucide-react';
 import { JDInput } from '../components/match/JDInput';
@@ -101,7 +102,7 @@ export function MatchPage() {
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { alert('File size exceeds 10MB limit'); return; }
+      if (file.size > 10 * 1024 * 1024) { toast.warning('File size exceeds 10MB limit'); return; }
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -114,7 +115,7 @@ export function MatchPage() {
         }
       } catch (err) {
         console.error('File upload error:', err);
-        alert('Failed to process file. Please try again.');
+        toast.error('Failed to process file. Please try again.');
       }
     };
     input.click();
@@ -197,7 +198,7 @@ export function MatchPage() {
   const handleDownloadPDF = (result: MatchResult) => {
     // Generate a printable HTML page and trigger print
     const printWindow = window.open('', '_blank');
-    if (!printWindow) { alert('Please allow popups to download PDF'); return; }
+    if (!printWindow) { toast.warning('Please allow popups to download PDF'); return; }
     
     const html = `<!DOCTYPE html><html><head><title>${result.candidate_name} — Match Report</title>
     <style>
@@ -249,14 +250,14 @@ export function MatchPage() {
       const data = await res.json();
       const shareUrl = `${window.location.origin}/share/${data.data?.id || ''}`;
       await navigator.clipboard.writeText(shareUrl);
-      alert(`Share link copied to clipboard!\n\n${shareUrl}`);
+      toast.success('Share link copied to clipboard!');
     } catch (e) {
       console.error('[MatchPage] share error:', e);
       // Fallback: generate a local share URL
       const shareId = Math.random().toString(36).substring(7);
       const shareUrl = `${window.location.origin}/score-card/${shareId}`;
       navigator.clipboard.writeText(shareUrl);
-      alert('Shareable link copied to clipboard!');
+      toast.success('Shareable link copied to clipboard!');
     }
   };
 

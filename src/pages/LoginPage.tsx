@@ -175,7 +175,7 @@ export function LoginPage() {
           </div>
 
           <p style={{ fontSize: '12px', color: DS.muted, textAlign: 'center', marginTop: '20px', lineHeight: 1.5 }}>
-            This platform is invite-only. Access controlled by admin role.
+            Sign in to access the LYC Intelligence platform.
           </p>
         </div>
       </div>

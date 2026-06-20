@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { toast } from '@/stores/toastStore';
 import { FileDown, Loader2, Users, Eye, Shield, Mail, Copy, CheckCircle2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
 import { useMandateDetail } from '@/hooks/useSupabaseData';
@@ -196,7 +197,7 @@ export function LensExportPage() {
     });
     setSending(false);
     if (result.success) { setSent(true); setTimeout(() => setSent(false), 3000); }
-    else { alert('Failed to send: ' + (result.error || 'Unknown error')); }
+    else { toast.error('Failed to send: ' + (result.error || 'Unknown error')); }
   }
 
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>;

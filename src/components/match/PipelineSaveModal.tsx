@@ -3,6 +3,7 @@
  * Used by MatchPage results "Save to Pipeline" action.
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { toast } from '@/stores/toastStore';
 import { Search, X, Briefcase, Loader2, CheckCircle2 } from 'lucide-react';
 import { MatchResult } from '../../services/scoringClient';
 
@@ -134,7 +135,7 @@ export function PipelineSaveModal({ open, onClose, result, contactId, candidateN
       }, 1500);
     } catch (e: any) {
       console.error('[PipelineSaveModal] save error:', e);
-      alert(`Failed to save to pipeline: ${e.message}`);
+      toast.error(`Failed to save to pipeline: ${e.message}`);
     } finally {
       setSaving(false);
     }

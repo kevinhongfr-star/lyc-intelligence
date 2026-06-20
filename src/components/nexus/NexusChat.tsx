@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { toast } from '@/stores/toastStore';
 import { ArrowRight, Shield, Loader2, RefreshCw, Paperclip } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { MessageBubble } from './MessageBubble';
@@ -174,7 +175,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
       if (!file) return;
       
       if (file.size > 10 * 1024 * 1024) {
-        alert('File size exceeds 10MB limit');
+        toast.warning('File size exceeds 10MB limit');
         return;
       }
 
@@ -199,7 +200,7 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
         }
       } catch (error) {
         console.error('Upload failed:', error);
-        alert('Failed to upload document');
+        toast.error('Failed to upload document');
       } finally {
         setUploading(false);
       }

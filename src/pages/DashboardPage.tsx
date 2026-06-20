@@ -5,6 +5,7 @@ import {
   ChevronRight, Target, Award, Globe, Sparkles,
   CreditCard, Gift, Share2, Loader2
 } from 'lucide-react';
+import { toast } from '@/stores/toastStore';
 import { useAuthStore } from '../stores/authStore';
 import { useMemoryStore } from '../stores/memoryStore';
 import { getMemoryContextForUser, formatAssessmentForInjection } from '../services/memoryService';
@@ -149,9 +150,9 @@ export function DashboardPage() {
     const link = getReferralLink();
     try {
       await navigator.clipboard.writeText(link);
-      alert('Referral link copied!');
+      toast.success('Referral link copied!');
     } catch {
-      alert('Could not copy. Please copy manually: ' + link);
+      toast.warning('Could not copy. Please copy manually: ' + link);
     }
   };
 
