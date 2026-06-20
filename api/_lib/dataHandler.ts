@@ -100,8 +100,9 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
     // ── Mandate CRUD ──
     if (resource === 'mandate') {
       if (method === 'POST' && !id) {
-        const { title, client_id, status, priority, jd_description, search_definition,
-                skills_requirements, keywords } = req.body || {};
+        const { title, client_id, company_id, status, priority, description, jd_description, 
+                search_definition, skills_requirements, keywords, location, 
+                compensation_range, timeline, team_size } = req.body || {};
         
         if (!title) {
           return res.status(400).json({ error: 'title is required' });
@@ -109,13 +110,18 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
 
         const row = await db.insert('mandates', {
           title,
-          client_id: client_id || null,
+          client_id: client_id || company_id || null,
           status: status || '1_search',
           priority: priority || null,
+          description: description || null,
           jd_description: jd_description || null,
           search_definition: search_definition || null,
           skills_requirements: skills_requirements || null,
           keywords: keywords || null,
+          location: location || null,
+          compensation_range: compensation_range || null,
+          timeline: timeline || null,
+          team_size: team_size || null,
           source: 'platform',
         }, 15000);
         return res.status(201).json({ success: true, data: row });
@@ -127,6 +133,14 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         delete updates.created_at;
         const rows = await db.update('mandates', { column: 'id', value: id }, updates, 15000);
         return res.status(200).json({ success: true, data: rows[0] || null });
+      }
+
+      if (method === 'GET' && id) {
+        const row = await db.selectOne('mandates', {
+          select: '*, company:companies(id, name)',
+          where: [{ column: 'id', value: id }],
+        }, 15000);
+        return res.status(200).json({ success: true, data: row });
       }
 
       if (method === 'GET' && !id) {
@@ -192,6 +206,14 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         delete updates.created_at;
         const rows = await db.update('contacts', { column: 'id', value: id }, updates, 15000);
         return res.status(200).json({ success: true, data: rows[0] || null });
+      }
+
+      if (method === 'GET' && id) {
+        const row = await db.selectOne('mandates', {
+          select: '*, company:companies(id, name)',
+          where: [{ column: 'id', value: id }],
+        }, 15000);
+        return res.status(200).json({ success: true, data: row });
       }
 
       if (method === 'GET' && !id) {
@@ -275,6 +297,84 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           where: [{ column: 'id', value: id }],
         }, 15000);
         return res.status(200).json({ success: true, data: rows[0] || null });
+      }
+    }
+
+    // ── Profile CRUD (Admin) ──
+    if (resource === 'profile') {
+      if (method === 'POST' && !id) {
+        const { email, name, role, tier, icp } = req.body || {};
+        
+        if (!email || !name) {
+          return res.status(400).json({ error: 'email and name are required' });
+        }
+
+        // Check if profile already exists
+        const existing = await db.selectOne('profiles', {
+          select: 'id',
+          where: [{ column: 'email', value: email.toLowerCase() }],
+        }, 15000);
+        
+        if (existing) {
+          return res.status(409).json({ error: 'User with this email already exists' });
+        }
+
+        const row = await db.insert('profiles', {
+          email: email.toLowerCase(),
+          name,
+          role: role || 'user',
+          tier: tier || 'pro',
+          icp: icp || 'professional',
+        }, 15000);
+        return res.status(201).json({ success: true, data: row });
+      }
+
+      if (method === 'GET' && !id) {
+        const rows = await db.selectMany('profiles', {
+          select: 'id, email, name, role, tier, created_at',
+          orderBy: { column: 'created_at', ascending: false },
+          limit: 100,
+        }, 15000);
+        return res.status(200).json({ success: true, data: rows });
+      }
+    }
+
+    // ── Profile CRUD (Admin) ──
+    if (resource === 'profile') {
+      if (method === 'POST' && !id) {
+        const { email, name, role, tier, icp } = req.body || {};
+        
+        if (!email || !name) {
+          return res.status(400).json({ error: 'email and name are required' });
+        }
+
+        // Check if profile already exists
+        const existing = await db.selectOne('profiles', {
+          select: 'id',
+          where: [{ column: 'email', value: email.toLowerCase() }],
+        }, 15000);
+        
+        if (existing) {
+          return res.status(409).json({ error: 'User with this email already exists' });
+        }
+
+        const row = await db.insert('profiles', {
+          email: email.toLowerCase(),
+          name,
+          role: role || 'user',
+          tier: tier || 'pro',
+          icp: icp || 'professional',
+        }, 15000);
+        return res.status(201).json({ success: true, data: row });
+      }
+
+      if (method === 'GET' && !id) {
+        const rows = await db.selectMany('profiles', {
+          select: 'id, email, name, role, tier, created_at',
+          orderBy: { column: 'created_at', ascending: false },
+          limit: 100,
+        }, 15000);
+        return res.status(200).json({ success: true, data: rows });
       }
     }
 

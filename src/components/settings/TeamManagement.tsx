@@ -3,8 +3,7 @@ import { Users, Plus, Shield, User, Loader2, X } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from '@/stores/toastStore';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
+
 
 interface TeamMember {
   id: string;
@@ -34,11 +33,12 @@ export function TeamManagement() {
 
   const loadTeam = async () => {
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id,email,name,role,tier,created_at&order=created_at.desc`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
-      });
+      const res = await fetch('/api/data/profile');
       if (res.ok) {
-        setMembers(await res.json());
+        const result = await res.json();
+        if (result.success) {
+          setMembers(result.data || []);
+        }
       }
     } catch (e) {
       console.error('Failed to load team:', e);
@@ -53,14 +53,9 @@ export function TeamManagement() {
 
     setInviting(true);
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+      const res = await fetch('/api/data/profile', {
         method: 'POST',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=representation',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: inviteEmail.trim().toLowerCase(),
           name: inviteName.trim(),
@@ -77,8 +72,8 @@ export function TeamManagement() {
         setShowInvite(false);
         await loadTeam();
       } else {
-        const err = await res.json();
-        toast.error(err.code === '23505' ? 'User with this email already exists' : 'Failed to create invitation');
+        const result = await res.json();
+        toast.error(result.error || 'Failed to create invitation');
       }
     } catch {
       toast.error('Network error while creating invitation');

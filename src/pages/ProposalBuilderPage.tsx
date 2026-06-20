@@ -87,13 +87,11 @@ export function ProposalBuilderPage() {
   const loadMandate = async (mandateId: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/mandates?id=eq.${mandateId}&select=*`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
-      });
+      const res = await fetch(`/api/data/mandate/${mandateId}`);
       if (res.ok) {
-        const data = await res.json();
-        if (data.length > 0) {
-          const m = data[0];
+        const result = await res.json();
+        if (result.success && result.data) {
+          const m = result.data;
           setMandate({
             title: m.title || '',
             description: m.description || '',
@@ -106,7 +104,7 @@ export function ProposalBuilderPage() {
             timeline: m.timeline || '',
             team_size: m.team_size || '',
           });
-          setSelectedCompanyId(m.company_id || '');
+          setSelectedCompanyId(m.client_id || m.company_id || '');
         }
       }
     } catch (e) {
@@ -136,33 +134,27 @@ export function ProposalBuilderPage() {
 
       let res;
       if (isEditing) {
-        res = await fetch(`${SUPABASE_URL}/rest/v1/mandates?id=eq.${id}`, {
+        res = await fetch(`/api/data/mandate/${id}`, {
           method: 'PATCH',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
       } else {
-        res = await fetch(`${SUPABASE_URL}/rest/v1/mandates`, {
+        res = await fetch(`/api/data/mandate`, {
           method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
       }
 
       if (res.ok) {
-        const data = await res.json();
-        toast.success(isEditing ? 'Mandate updated' : 'Mandate created');
-        navigate(`/platform/mandates/${data[0].id}`);
+        const result = await res.json();
+        if (result.success && result.data) {
+          toast.success(isEditing ? 'Mandate updated' : 'Mandate created');
+          navigate(`/platform/mandates/${result.data.id}`);
+        } else {
+          throw new Error(result.error || 'Save failed');
+        }
       } else {
         throw new Error('Save failed');
       }
