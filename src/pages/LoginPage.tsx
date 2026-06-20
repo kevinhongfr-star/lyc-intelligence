@@ -167,9 +167,15 @@ export function LoginPage() {
                 )}
               </button>
               <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                <Link to="/reset-password" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', fontFamily: DS.bodyFont }}>
-                  Forgot password?
-                </Link>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
+                  <Link to="/reset-password" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', fontFamily: DS.bodyFont }}>
+                    Forgot password?
+                  </Link>
+                  <span style={{ fontSize: '13px', color: DS.border }}>·</span>
+                  <Link to="/signup" style={{ fontSize: '13px', color: DS.accent, textDecoration: 'none', fontFamily: DS.bodyFont, fontWeight: 500 }}>
+                    Create account
+                  </Link>
+                </div>
               </div>
             </form>
           </div>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { User, Bell, Shield, Palette, Sun, Moon } from 'lucide-react';
+import { User, Bell, Shield, Palette, Sun, Moon, Users } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Input } from '@/components/ui';
 import { useAuth } from '@/contexts';
+import { TeamManagement } from '@/components/settings/TeamManagement';
 
 const ACCENT_COLORS = [
   { name: 'Magenta', value: '#C108AB' },
@@ -12,7 +13,7 @@ const ACCENT_COLORS = [
 
 export function SettingsPage() {
   const { user } = useAuth();
-  const [activeSection, setActiveSection] = useState<'profile' | 'notifications' | 'security' | 'appearance'>('appearance');
+  const [activeSection, setActiveSection] = useState<'profile' | 'notifications' | 'security' | 'appearance' | 'team'>('appearance');
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('lyc-theme') as 'dark' | 'light') || 'light';
   });
@@ -40,6 +41,7 @@ export function SettingsPage() {
     { key: 'profile' as const, icon: User, label: 'Profile' },
     { key: 'notifications' as const, icon: Bell, label: 'Notifications' },
     { key: 'security' as const, icon: Shield, label: 'Security' },
+    { key: 'team' as const, icon: Users, label: 'Team' },
   ];
 
   return (
@@ -137,6 +139,15 @@ export function SettingsPage() {
                   <p className="text-sm font-medium text-text-primary">Active Sessions</p>
                   <p className="text-xs text-text-muted mt-1">Current session: {user?.email ?? 'Unknown'}</p>
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {activeSection === 'team' && (
+            <Card>
+              <CardHeader><CardTitle>Team Management</CardTitle></CardHeader>
+              <CardContent>
+                <TeamManagement />
               </CardContent>
             </Card>
           )}

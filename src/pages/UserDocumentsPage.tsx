@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DocumentUploader } from '../components/documents/DocumentUploader';
@@ -11,7 +10,8 @@ import {
   DOCUMENT_TYPE_LABELS 
 } from '../services/documentService';
 import { useAuthStore } from '../stores/authStore';
-import { FileText, Trash2, Calendar, ExternalLink } from 'lucide-react';
+import { toast } from '@/stores/toastStore';
+import { FileText, Trash2, Calendar, ExternalLink, X, Check } from 'lucide-react';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -38,6 +38,7 @@ export function DocumentsPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const tier = profile?.tier || 'free';
   const maxDocs = getMaxDocumentsForTier(tier);
@@ -72,22 +73,35 @@ export function DocumentsPage() {
     try {
       const doc = await uploadDocument(file, type as any, user.id);
       if (doc) {
+        toast.success('Document uploaded successfully');
         await loadDocuments();
       }
-    } catch (e) {
-      console.error('Failed to upload document:', e);
+    } catch (e: any) {
+      toast.error('Failed to upload document: ' + (e.message || 'Unknown error'));
     } finally {
       setIsUploading(false);
     }
   };
 
   const handleDelete = async (docId: string) => {
-    if (!confirm('Are you sure you want to delete this document?')) return;
-
-    const success = await deleteDocument(docId);
-    if (success) {
-      await loadDocuments();
+    if (deletingId !== docId) {
+      setDeletingId(docId);
+      return;
     }
+    
+    // Second click = confirm delete
+    const success = await deleteDocument(docId);
+    setDeletingId(null);
+    if (success) {
+      toast.success('Document deleted');
+      await loadDocuments();
+    } else {
+      toast.error('Failed to delete document');
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeletingId(null);
   };
 
   if (tier === 'free') {
@@ -200,7 +214,7 @@ export function DocumentsPage() {
                     </div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <a 
                     href={doc.file_url} 
                     target="_blank" 
@@ -231,31 +245,74 @@ export function DocumentsPage() {
                     <ExternalLink style={{ width: 14, height: 14 }} />
                     View
                   </a>
-                  <button 
-                    onClick={() => handleDelete(doc.id)} 
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      padding: '8px 14px',
-                      background: 'transparent',
-                      border: '1px solid #333333',
-                      borderRadius: '6px',
-                      color: '#EF4444',
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.borderColor = '#EF4444';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.borderColor = '#333333';
-                    }}
-                  >
-                    <Trash2 style={{ width: 14, height: 14 }} />
-                    Delete
-                  </button>
+                  
+                  {deletingId === doc.id ? (
+                    <>
+                      <button
+                        onClick={() => handleDelete(doc.id)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '8px 14px',
+                          background: '#DC2626',
+                          border: 'none',
+                          borderRadius: '6px',
+                          color: '#FFFFFF',
+                          fontSize: '13px',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Check style={{ width: 14, height: 14 }} />
+                        Confirm Delete
+                      </button>
+                      <button
+                        onClick={cancelDelete}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '8px 14px',
+                          background: 'transparent',
+                          border: `1px solid ${DS.cardBorder}`,
+                          borderRadius: '6px',
+                          color: DS.textSecondary,
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <X style={{ width: 14, height: 14 }} />
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button 
+                      onClick={() => handleDelete(doc.id)} 
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 14px',
+                        background: 'transparent',
+                        border: '1px solid #333333',
+                        borderRadius: '6px',
+                        color: '#EF4444',
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.borderColor = '#EF4444';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.borderColor = '#333333';
+                      }}
+                    >
+                      <Trash2 style={{ width: 14, height: 14 }} />
+                      Delete
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
