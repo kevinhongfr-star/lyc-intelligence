@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts';
 import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDashboard, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon, Building2 } from 'lucide-react';
 import { CreditDisplay } from '@/components/ui/CreditDisplay';
 import { IconBridge, IconTrident, IconDrive, IconLeap, IconImpact, IconSpark, IconQuest, IconForge, IconPrism } from '@/components/icons/LycIcons';
+import { getNotifications } from '@/services/supabaseApi';
 
 const NAV_ITEMS = [
   { path: '/platform', icon: IconImpact, label: 'Dashboard', exact: true },
@@ -21,16 +22,24 @@ const NAV_ITEMS = [
   { path: '/platform/scheduler', icon: Calendar, label: 'Scheduler' },
   { path: '/platform/documents', icon: IconPrism, label: 'Documents' },
   { path: '/platform/notifications', icon: Bell, label: 'Alerts' },
-  { path: '/platform/settings', icon: IconForge, label: 'Settings' },
+  { path: '/platform/settings', icon: IconForge, label: 'Settings', roles: ['admin', 'recruiter'] },
 ];
 
-type NavItem = { path?: string; icon?: any; label: string; exact?: boolean; type?: 'divider'; suffix?: string };
+type NavItem = { path?: string; icon?: any; label: string; exact?: boolean; type?: 'divider'; suffix?: string; roles?: string[] };
 
 export function AppLayout() {
   const { user, logout } = useAuth();
+  const userRole = (user as any)?.role || 'user';
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => (localStorage.getItem('lyc-theme') as 'dark' | 'light') || 'light');
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    getNotifications().then(items => {
+      setPendingCount(items.filter(n => n.status === 'Pending').length);
+    });
+  }, []);
 
   // Apply theme to document for CSS variable switching
   useEffect(() => {
@@ -59,7 +68,7 @@ export function AppLayout() {
         </div>
         
         <nav className="flex-1 py-2 overflow-y-auto">
-          {NAV_ITEMS.map((item, i) => {
+          {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(userRole)).map((item, i) => {
             if (item.type === 'divider') {
               return sidebarOpen ? (
                 <div key={i} className="px-4 pt-4 pb-1"><span className="text-[9px] uppercase tracking-[2.5px] text-accent font-semibold">{item.label}</span></div>
@@ -67,10 +76,21 @@ export function AppLayout() {
                 <div key={i} className="mx-2 my-2 border-t border-bg-tertiary" />
               );
             }
+            const isAlerts = item.path === '/platform/notifications';
             return (
-              <Link key={item.path} to={item.suffix ? item.path : item.path!} className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${isActive(item) ? 'bg-accent/10 text-accent' : 'text-text-muted hover:text-text-primary hover:bg-bg-tertiary'}`}>
+              <Link key={item.path} to={item.suffix ? `${item.path}${item.suffix}` : item.path!} className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors relative ${isActive(item) ? 'bg-accent/10 text-accent' : 'text-text-muted hover:text-text-primary hover:bg-bg-tertiary'}`}>
                 {item.icon && <item.icon size={16} className="flex-shrink-0" />}
-                {sidebarOpen && <span>{item.label}</span>}
+                {sidebarOpen && <span className="flex-1">{item.label}</span>}
+                {sidebarOpen && isAlerts && pendingCount > 0 && (
+                  <span className="ml-auto flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold">
+                    {pendingCount}
+                  </span>
+                )}
+                {!sidebarOpen && isAlerts && pendingCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center">
+                    {pendingCount}
+                  </span>
+                )}
               </Link>
             );
           })}

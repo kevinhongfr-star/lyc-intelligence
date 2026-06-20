@@ -3,11 +3,13 @@ import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft, MapPin, Mail, Linkedin, Briefcase, GraduationCap,
   Award, Shield, Brain, Target, AlertTriangle, CheckCircle2, Zap,
-  ExternalLink, Clock, Languages, Building2, FileDown
+  ExternalLink, Clock, Languages, Building2, FileDown,
+  FileText, MessageSquare, Sparkles, Eye, Copy, X
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button } from '@/components/ui';
 import { useContact } from '@/hooks/useSupabaseData';
 import type { Contact } from '@/services/supabaseApi';
+import { executeAIAction, type AIAction } from '@/services/aiQuickActions';
 
 // ─── Tier helpers ───
 function getTier(score: number | null): { tier: string; color: string } {
@@ -133,6 +135,121 @@ function ScoringPanel({ contact }: { contact: Contact }) {
       </Button>
       {error && <p className="text-[10px] text-red-400">{error}</p>}
     </div>
+  );
+}
+
+// ─── AI Quick Actions Panel ───
+const AI_ACTIONS_LIST: { key: AIAction; label: string; icon: any; color: string; desc: string }[] = [
+  { key: 'email', label: 'Outreach Email', icon: Mail, color: '#3B82F6', desc: 'Professional outreach email' },
+  { key: 'cv', label: 'CV Summary', icon: FileText, color: '#00C853', desc: '3-4 bullet point summary' },
+  { key: 'shortlist', label: 'Shortlist Blurb', icon: Sparkles, color: '#C108AB', desc: 'Client-ready summary' },
+  { key: 'overview', label: 'Internal Overview', icon: Eye, color: '#6366F1', desc: '5-criteria assessment notes' },
+  { key: 'feedback', label: 'Interview Feedback', icon: MessageSquare, color: '#FFB300', desc: 'Post-interview feedback draft' },
+];
+
+function AIQuickActionsPanel({ contact }: { contact: Contact }) {
+  const [activeAction, setActiveAction] = useState<AIAction | null>(null);
+  const [output, setOutput] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleAction = async (action: AIAction) => {
+    if (activeAction === action) { setActiveAction(null); setOutput(''); return; }
+    setActiveAction(action);
+    setOutput('');
+    setError(null);
+    setLoading(true);
+    try {
+      const result = await executeAIAction(action, {
+        name: contact.name || 'Candidate',
+        title: contact.current_title || undefined,
+        company: (contact as any)?.company?.name || contact.company || undefined,
+        mandate: 'LYC Partners search',
+        viewMode: 'internal',
+      });
+      setOutput(result);
+    } catch (e: any) {
+      setError(e.message || 'Generation failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(output);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-xs">
+          <Sparkles size={14} className="text-accent" />
+          AI Content Tools
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-2 gap-2">
+          {AI_ACTIONS_LIST.map((action) => {
+            const Icon = action.icon;
+            const isActive = activeAction === action.key;
+            return (
+              <button
+                key={action.key}
+                onClick={() => handleAction(action.key)}
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium border transition-all min-h-[44px] ${
+                  isActive
+                    ? 'border-accent bg-accent/10 text-accent'
+                    : 'border-bg-tertiary bg-bg-primary text-text-secondary hover:border-accent/30 hover:bg-accent/5'
+                }`}
+              >
+                <Icon size={13} style={{ color: isActive ? undefined : action.color }} />
+                <div className="text-left min-w-0">
+                  <div className="truncate">{action.label}</div>
+                  <div className="text-[9px] text-text-muted font-normal truncate">{action.desc}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Output area */}
+        {activeAction && (
+          <div className="border border-bg-tertiary rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 bg-bg-tertiary/50 border-b border-bg-tertiary">
+              <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                {AI_ACTIONS_LIST.find(a => a.key === activeAction)?.label}
+              </span>
+              <div className="flex items-center gap-1">
+                {output && (
+                  <button onClick={handleCopy} className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-text-muted hover:text-accent hover:bg-accent/10 transition-colors">
+                    <Copy size={10} />
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
+                )}
+                <button onClick={() => { setActiveAction(null); setOutput(''); }} className="p-1 rounded hover:bg-bg-tertiary transition-colors">
+                  <X size={12} className="text-text-muted" />
+                </button>
+              </div>
+            </div>
+            <div className="p-3 min-h-[80px] max-h-[300px] overflow-y-auto">
+              {loading ? (
+                <div className="flex items-center gap-2 text-text-muted">
+                  <Clock size={12} className="animate-spin" />
+                  <span className="text-xs">Generating...</span>
+                </div>
+              ) : error ? (
+                <p className="text-xs text-red-400">{error}</p>
+              ) : output ? (
+                <div className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap">{output}</div>
+              ) : null}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -380,6 +497,9 @@ export function ExecutiveProfilePage() {
               <ScoringPanel contact={contact} />
             </CardContent>
           </Card>
+
+          {/* AI Quick Actions */}
+          <AIQuickActionsPanel contact={contact} />
 
           {/* Advisory & Governance */}
           <Card>

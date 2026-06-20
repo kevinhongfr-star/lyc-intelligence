@@ -45,7 +45,7 @@ export function useEvents() {
 export function useDocuments() {
   const [data, setData] = useState<Document[]>([]); const [loading, setLoading] = useState(true);
   useEffect(() => { getDocuments().then(d => { setData(d); setLoading(false); }); }, []);
-  return { data, loading };
+  return { data, setData, loading };
 }
 
 export function useNotifications() {
