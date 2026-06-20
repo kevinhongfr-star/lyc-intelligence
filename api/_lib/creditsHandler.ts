@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { selectOne, insert, update, isSupabaseConfigured, handleError } from './_lib/supabaseRest.js';
+import { selectOne, insert, update, isSupabaseConfigured, handleError } from './supabaseRest.js';
 
 // Vercel Hobby default is 10s — credit operations should be well under that,
 // but we extend for safety in case the DB is slow.
 export const maxDuration = 60;
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export async function handleCredits(req: VercelRequest, res: VercelResponse) {
   try {
     if (!isSupabaseConfigured()) {
       return res.status(500).json({ error: 'Server configuration error: Supabase not configured', success: false });
@@ -15,7 +15,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { action } = req.query;
+    const pathArr = (req.query.path as string[]) || [];
+    const action = pathArr[0] || (req.query.action as string);
 
     if (action === 'spend') {
       return await handleSpend(req, res);

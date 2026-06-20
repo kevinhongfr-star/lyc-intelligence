@@ -18,7 +18,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { jsPDF } from 'jspdf';
-import { verifyAdmin } from '../../../_lib/adminAuth.js';
+import { verifyAdmin } from './adminAuth.js';
 import {
   isSupabaseConfigured,
   selectOne,
@@ -26,8 +26,8 @@ import {
   insert,
   update,
   handleError,
-} from '../../../_lib/supabaseRest.js';
-import { TIER_BOUNDARIES, type TierId } from '../../../_lib/scoringCriteria.js';
+} from './supabaseRest.js';
+import { TIER_BOUNDARIES, type TierId } from './scoringCriteria.js';
 
 // Vercel Hobby default is 10s; PDF gen + DB queries can take 15-20s
 export const maxDuration = 60;
@@ -76,7 +76,7 @@ interface Evaluation {
   updated_at: string;
 }
 
-export default async function handler(
+export async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<VercelResponse | void> {

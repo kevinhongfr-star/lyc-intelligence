@@ -22,7 +22,7 @@ const TIER_CREDITS = {
 };
 
 // POST /api/stripe/checkout - Create checkout session
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export async function handleStripe(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'POST') {
     return handleCheckout(req, res);
   } else if (req.method === 'GET') {

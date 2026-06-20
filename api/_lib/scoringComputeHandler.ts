@@ -24,7 +24,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { verifyAdmin } from '../../../_lib/adminAuth.js';
+import { verifyAdmin } from './adminAuth.js';
 import {
   isSupabaseConfigured,
   selectOne,
@@ -32,7 +32,7 @@ import {
   update,
   deleteRows,
   handleError,
-} from '../../../_lib/supabaseRest.js';
+} from './supabaseRest.js';
 import {
   CRITERIA,
   computeComposite,
@@ -43,11 +43,11 @@ import {
   type CriterionId,
   type SubScores,
   type TierId,
-} from '../../../_lib/scoringCriteria.js';
-import { callLLM, LLMError } from '../../../_lib/llmCall.js';
-import { buildCriterionPrompt } from '../../../_lib/promptTemplates.js';
-import { parseScoreResponse, ParseScoreError } from '../../../_lib/parseScoreResponse.js';
-import { buildCorpus, type Source, type BuildCorpusResult } from '../../../_lib/buildCorpus.js';
+} from './scoringCriteria.js';
+import { callLLM, LLMError } from './llmCall.js';
+import { buildCriterionPrompt } from './promptTemplates.js';
+import { parseScoreResponse, ParseScoreError } from './parseScoreResponse.js';
+import { buildCorpus, type Source, type BuildCorpusResult } from './buildCorpus.js';
 
 // Vercel Hobby default is 10s; need 60s for 5 parallel LLM calls
 export const maxDuration = 60;
@@ -127,7 +127,7 @@ function err(
   return res.status(status).json(body);
 }
 
-export default async function handler(
+export async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<VercelResponse> {

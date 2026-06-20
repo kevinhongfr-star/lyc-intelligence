@@ -26,7 +26,7 @@ export async function runTRIDENTScoring(
   userId?: string
 ): Promise<ScoringResponse> {
   try {
-    const response = await fetch('/api/score', {
+    const response = await fetch('/api/scoring', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

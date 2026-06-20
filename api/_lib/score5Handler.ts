@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { insert, isSupabaseConfigured, handleError } from './_lib/supabaseRest.js';
+import { insert, isSupabaseConfigured, handleError } from './supabaseRest.js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 export const maxDuration = 60;
@@ -47,7 +47,7 @@ interface FiveCriteriaResult {
   };
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export async function handleScore5(req: VercelRequest, res: VercelResponse) {
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });

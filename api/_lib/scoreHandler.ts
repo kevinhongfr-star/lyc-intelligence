@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { insert, isSupabaseConfigured, handleError } from './_lib/supabaseRest.js';
+import { insert, isSupabaseConfigured, handleError } from './supabaseRest.js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 
@@ -56,7 +56,7 @@ function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
   return false;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export async function handleScore(req: VercelRequest, res: VercelResponse) {
   try {
     const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
     if (isRateLimited(ip, 10, 60 * 1000)) {

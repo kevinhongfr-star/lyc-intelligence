@@ -174,7 +174,7 @@ export function BatchScoringPage() {
     });
 
     try {
-      const res = await fetch('/api/score5', {
+      const res = await fetch('/api/scoring/5', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jd, candidates }),

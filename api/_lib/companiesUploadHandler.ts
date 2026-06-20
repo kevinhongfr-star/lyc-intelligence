@@ -40,8 +40,8 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { insert, isSupabaseConfigured, handleError } from '../../../_lib/supabaseRest.js';
-import { verifyAdmin } from '../../../_lib/adminAuth.js';
+import { insert, isSupabaseConfigured, handleError } from './supabaseRest.js';
+import { verifyAdmin } from './adminAuth.js';
 
 // 5 MB cap is more than enough for a 50-company list (typical ~10 KB).
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -203,7 +203,7 @@ async function extractFileFromMultipart(req: VercelRequest): Promise<
   return { error: 'No file part found in multipart body' };
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ success: false, error: 'Method not allowed' });
