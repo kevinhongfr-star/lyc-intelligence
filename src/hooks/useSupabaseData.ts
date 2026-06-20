@@ -102,7 +102,6 @@ export function useDashboard() {
   const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    const sb = getSupabase();
     // Single consolidated API call
     fetch('/api/dashboard')
       .then(async (r) => {

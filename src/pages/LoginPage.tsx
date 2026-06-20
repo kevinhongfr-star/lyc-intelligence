@@ -33,7 +33,7 @@ export function LoginPage() {
 
   // Preload platform route on hover for instant navigation
   const handleMouseEnter = useCallback(() => {
-    import('../pages/ConsultantDashboard');
+    import('../components/dashboard/ConsultantDashboard');
     import('../components/layout/AppLayout');
   }, []);
 
