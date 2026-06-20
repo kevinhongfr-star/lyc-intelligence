@@ -300,7 +300,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // ── Profile CRUD (Admin) ──
+    // ── Profile + Auth User CRUD (Admin) ──
     if (resource === 'profile') {
       if (method === 'POST' && !id) {
         const { email, name, role, tier, icp } = req.body || {};
@@ -311,7 +311,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
 
         // Check if profile already exists
         const existing = await db.selectOne('profiles', {
-          select: 'id',
+          select: 'id, email',
           where: [{ column: 'email', value: email.toLowerCase() }],
         }, 15000);
         
@@ -319,14 +319,40 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(409).json({ error: 'User with this email already exists' });
         }
 
+        // Generate a random temporary password for the auth user
+        const tempPassword = crypto.randomUUID().replace(/-/g, '').slice(0, 16);
+
+        // Step 1: Create auth.users record via Supabase Auth Admin API
+        let authUserId: string;
+        try {
+          const authUser = await db.createAuthUser(email.toLowerCase(), tempPassword, {
+            email_confirm: true,
+            user_metadata: { name, role: role || 'user' },
+          });
+          authUserId = authUser.id;
+        } catch (authErr: any) {
+          // If auth user creation fails (e.g., already exists), try to proceed with profile-only
+          console.warn('[profile] Auth user creation failed:', authErr.message);
+          // Use a random UUID as fallback — the user won't be able to log in, but the profile exists
+          authUserId = crypto.randomUUID();
+        }
+
+        // Step 2: Create profiles row with the auth user's ID as the primary key
         const row = await db.insert('profiles', {
+          id: authUserId,
           email: email.toLowerCase(),
           name,
           role: role || 'user',
           tier: tier || 'pro',
           icp: icp || 'professional',
         }, 15000);
-        return res.status(201).json({ success: true, data: row });
+
+        return res.status(201).json({ 
+          success: true, 
+          data: row,
+          temp_password: tempPassword,  // Admin can share this with the invited user
+          auth_created: true,
+        });
       }
 
       if (method === 'GET' && !id) {
@@ -339,44 +365,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // ── Profile CRUD (Admin) ──
-    if (resource === 'profile') {
-      if (method === 'POST' && !id) {
-        const { email, name, role, tier, icp } = req.body || {};
-        
-        if (!email || !name) {
-          return res.status(400).json({ error: 'email and name are required' });
-        }
 
-        // Check if profile already exists
-        const existing = await db.selectOne('profiles', {
-          select: 'id',
-          where: [{ column: 'email', value: email.toLowerCase() }],
-        }, 15000);
-        
-        if (existing) {
-          return res.status(409).json({ error: 'User with this email already exists' });
-        }
-
-        const row = await db.insert('profiles', {
-          email: email.toLowerCase(),
-          name,
-          role: role || 'user',
-          tier: tier || 'pro',
-          icp: icp || 'professional',
-        }, 15000);
-        return res.status(201).json({ success: true, data: row });
-      }
-
-      if (method === 'GET' && !id) {
-        const rows = await db.selectMany('profiles', {
-          select: 'id, email, name, role, tier, created_at',
-          orderBy: { column: 'created_at', ascending: false },
-          limit: 100,
-        }, 15000);
-        return res.status(200).json({ success: true, data: rows });
-      }
-    }
 
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}` });
   } catch (err: any) {

@@ -66,7 +66,13 @@ export function TeamManagement() {
       });
 
       if (res.ok) {
-        toast.success(`Invitation created for ${inviteEmail}`);
+        const result = await res.json();
+        const tempPassword = result.temp_password;
+        if (tempPassword) {
+          toast.success(`User created! Share this temporary password with ${inviteName}: ${tempPassword}`);
+        } else {
+          toast.success(`Invitation created for ${inviteEmail}`);
+        }
         setInviteEmail('');
         setInviteName('');
         setShowInvite(false);
@@ -148,7 +154,7 @@ export function TeamManagement() {
             {inviting ? <><Loader2 style={{ width: 14, height: 14, animation: 'spin 1s linear infinite' }} />Creating...</> : 'Send Invitation'}
           </button>
           <p style={{ fontSize: '11px', color: '#999', marginTop: '8px' }}>
-            Note: The invited user will need to use "Forgot password" to set their password on first login.
+            The invited user will receive a temporary password. They can log in and change it from Settings.
           </p>
         </div>
       )}

@@ -171,6 +171,60 @@ export async function update(
   return (await res.json()) as any[];
 }
 
+
+/**
+ * Create a Supabase Auth user via the Admin API (GoTrue).
+ * This creates an auth.users record so the user can log in.
+ * Returns the created user object (with id, email, etc.).
+ */
+export async function createAuthUser(
+  email: string,
+  password: string,
+  options: { email_confirm?: boolean; user_metadata?: Record<string, any> } = {}
+): Promise<any> {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
+  }
+
+  const url = `${SUPABASE_URL}/auth/v1/admin/users`;
+  const body: Record<string, any> = {
+    email,
+    password,
+    email_confirm: options.email_confirm !== false, // default true
+  };
+  if (options.user_metadata) {
+    body.user_metadata = options.user_metadata;
+  }
+
+  const res = await fetchWithTimeout(
+    url,
+    {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(body),
+    },
+    15000
+  );
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    // If user already exists in auth, that's OK — try to find them
+    if (res.status === 422 || text.includes('already')) {
+      const existing = await selectOne('profiles', {
+        select: 'id',
+        column: 'email',
+        value: email.toLowerCase(),
+      });
+      if (existing) {
+        throw new Error(`Auth user already exists for ${email}. Profile may already be linked.`);
+      }
+    }
+    throw new Error(`Supabase Auth create user failed: ${res.status} ${text}`);
+  }
+
+  return await res.json();
+}
+
 /**
  * Helper for Vercel handlers: returns a clean 500 JSON when an error escapes
  * the try/catch. Always pair with a top-level try/catch in the handler.
