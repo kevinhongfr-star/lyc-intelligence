@@ -26,6 +26,16 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as db from './supabaseRest.js';
 import { getUserFromRequest } from './adminAuth.js';
 import { sendEmail } from './email.js';
+import {
+  getOrgId,
+  getUserRole,
+  getOrgScopedMandates,
+  getOrgScopedPipeline,
+  getOrgScopedContacts,
+  getOrgScopedCompanies,
+  isReadOnly,
+  hasOrgAccess,
+} from './orgScopedQueries.js';
 
 export async function handler(req: VercelRequest, res: VercelResponse) {
   const pathArr = (req.query.path as string[]) || [];
@@ -34,6 +44,27 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
   const method = req.method || 'GET';
 
   try {
+    let authUserId: string | null = null;
+    let userRole: string = 'member';
+    let orgId: string | null = null;
+
+    try {
+      const { user } = await getUserFromRequest(req);
+      if (user) {
+        authUserId = user.id;
+        userRole = await getUserRole(user.id);
+        orgId = await getOrgId(user.id);
+      }
+    } catch (e) {
+      console.warn('[dataHandler] Auth check failed:', (e as any).message);
+    }
+
+    if (method !== 'GET') {
+      if (isReadOnly(userRole)) {
+        return res.status(403).json({ error: 'Read-only access' });
+      }
+    }
+
     // ── Pipeline CRUD ──
     if (resource === 'pipeline') {
       if (method === 'POST' && !id) {
@@ -44,6 +75,20 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         
         if (!contact_id || !mandate_id) {
           return res.status(400).json({ error: 'contact_id and mandate_id are required' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: mandate_id,
+          select: 'id, organization_id',
+        });
+        
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
         }
 
         const row = await db.insert('candidates_pipeline', {
@@ -71,19 +116,38 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (method === 'GET' && id) {
-        const rows = await db.selectMany('candidates_pipeline', {
-          select: '*, contact:contacts(id, name, current_title, email, company:companies(id, name)), mandate:mandates(id, title)',
-          where: [{ column: 'mandate_id', value: id }],
-          orderBy: { column: 'match_score', ascending: false },
-        }, 15000);
-        return res.status(200).json({ success: true, data: rows });
+        const pipeline = await getOrgScopedPipeline(authUserId || '', userRole, orgId || '', id);
+        return res.status(200).json({ success: true, data: pipeline });
       }
 
       if (method === 'PATCH' && id) {
+        const pipelineEntry = await db.selectOne('candidates_pipeline', {
+          column: 'id',
+          value: id,
+          select: 'id, mandate_id',
+        });
+        
+        if (!pipelineEntry) {
+          return res.status(404).json({ error: 'Pipeline entry not found' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: pipelineEntry.mandate_id,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
         const updates = req.body || {};
         delete updates.id;
         delete updates.created_at;
-        // Stringify JSON fields
         if (updates.fit_analysis && typeof updates.fit_analysis !== 'string') {
           updates.fit_analysis = JSON.stringify(updates.fit_analysis);
         }
@@ -98,6 +162,30 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (method === 'DELETE' && id) {
+        const pipelineEntry = await db.selectOne('candidates_pipeline', {
+          column: 'id',
+          value: id,
+          select: 'id, mandate_id',
+        });
+        
+        if (!pipelineEntry) {
+          return res.status(404).json({ error: 'Pipeline entry not found' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: pipelineEntry.mandate_id,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
         const count = await db.deleteRows('candidates_pipeline', { column: 'id', value: id }, 15000);
         return res.status(200).json({ success: true, deleted: count });
       }
@@ -114,9 +202,14 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(400).json({ error: 'title is required' });
         }
 
+        if (!hasOrgAccess(userRole)) {
+          return res.status(403).json({ error: 'Organization access required' });
+        }
+
         const row = await db.insert('mandates', {
           title,
           client_id: client_id || company_id || null,
+          organization_id: orgId,
           status: status || '1_search',
           priority: priority || null,
           description: description || null,
@@ -134,6 +227,20 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (method === 'PATCH' && id) {
+        const existing = await db.selectOne('mandates', {
+          column: 'id',
+          value: id,
+          select: 'id, organization_id',
+        });
+        
+        if (!existing) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && existing.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
         const updates = req.body || {};
         delete updates.id;
         delete updates.created_at;
@@ -142,55 +249,41 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (method === 'GET' && id) {
-        const row = await db.selectOne('mandates', {
+        const mandate = await db.selectOne('mandates', {
           select: '*, company:companies(id, name)',
           where: [{ column: 'id', value: id }],
         }, 15000);
-        return res.status(200).json({ success: true, data: row });
+        
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        return res.status(200).json({ success: true, data: mandate });
       }
 
       if (method === 'GET' && !id) {
         const limit = parseInt(req.query.limit as string) || 50;
         const offset = parseInt(req.query.offset as string) || 0;
         const search = req.query.q as string;
-        const userId = req.query.user_id as string;  // Frontend passes current user ID
         
-        let rows = await db.selectMany('mandates', {
-          select: 'id, title, status, priority, client_id, jd_description, search_definition, skills_requirements, company:companies(id, name)',
-          orderBy: { column: 'updated_at', ascending: false },
-          limit,
-          offset,
-        }, 15000);
+        const mandates = await getOrgScopedMandates(authUserId || '', userRole, orgId || '');
         
-        // Filter by user assignment (unless admin or no user_id provided)
-        if (userId) {
-          try {
-            const { user } = await getUserFromRequest(req);
-            if (user && user.role !== 'admin') {
-              // Get mandates this user is assigned to
-              const assignments = await db.selectMany('mandate_members', {
-                select: 'mandate_id',
-                where: [{ column: 'user_id', value: userId }],
-              }, 15000);
-              const assignedIds = new Set(assignments.map((a: any) => a.mandate_id));
-              rows = rows.filter((r: any) => assignedIds.has(r.id));
-            }
-          } catch (e) {
-            // If auth check fails, return all (graceful degradation)
-            console.warn('[mandate] Auth check failed, returning all:', (e as any).message);
-          }
-        }
-        
-        let filtered = rows;
+        let filtered = mandates;
         if (search) {
           const q = search.toLowerCase();
-          filtered = rows.filter((r: any) =>
+          filtered = mandates.filter((r: any) =>
             (r.title || '').toLowerCase().includes(q) ||
             (r.company?.name || '').toLowerCase().includes(q)
           );
         }
         
-        return res.status(200).json({ success: true, data: filtered });
+        const paginated = filtered.slice(offset, offset + limit);
+        
+        return res.status(200).json({ success: true, data: paginated, total: filtered.length });
       }
     }
 
@@ -203,6 +296,10 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         
         if (!name) {
           return res.status(400).json({ error: 'name is required' });
+        }
+
+        if (!hasOrgAccess(userRole)) {
+          return res.status(403).json({ error: 'Organization access required' });
         }
 
         const row = await db.insert('contacts', {
@@ -227,6 +324,16 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (method === 'PATCH' && id) {
+        const contact = await db.selectOne('contacts', {
+          column: 'id',
+          value: id,
+          select: 'id',
+        });
+        
+        if (!contact) {
+          return res.status(404).json({ error: 'Contact not found' });
+        }
+
         const updates = req.body || {};
         delete updates.id;
         delete updates.created_at;
@@ -235,62 +342,44 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (method === 'GET' && id) {
-        const row = await db.selectOne('mandates', {
+        const contact = await db.selectOne('contacts', {
           select: '*, company:companies(id, name)',
           where: [{ column: 'id', value: id }],
         }, 15000);
-        return res.status(200).json({ success: true, data: row });
+        
+        if (!contact) {
+          return res.status(404).json({ error: 'Contact not found' });
+        }
+
+        if (userRole !== 'super_admin') {
+          const mandates = await getOrgScopedMandates(authUserId || '', userRole, orgId || '');
+          const mandateIds = new Set(mandates.map((m: any) => m.id));
+          
+          const pipelineEntries = await db.selectMany('candidates_pipeline', {
+            select: 'contact_id, mandate_id',
+            where: [{ column: 'contact_id', value: id }],
+          }, 15000);
+          
+          const hasAccess = pipelineEntries.some((p: any) => mandateIds.has(p.mandate_id));
+          if (!hasAccess) {
+            return res.status(403).json({ error: 'Access denied' });
+          }
+        }
+
+        return res.status(200).json({ success: true, data: contact });
       }
 
       if (method === 'GET' && !id) {
         const limit = parseInt(req.query.limit as string) || 50;
         const offset = parseInt(req.query.offset as string) || 0;
         const search = req.query.q as string;
-        const userId = req.query.user_id as string;
 
-        let rows = await db.selectMany('contacts', {
-          select: 'id, name, email, current_title, company_id, location, country, seniority, skills, headline, summary, career_history, trident_composite, trident_d1, trident_d2, trident_d3, company:companies(id, name)',
-          orderBy: { column: 'updated_at', ascending: false },
-          limit: 10000, // fetch all to filter by user membership, then paginate
-          offset: 0,
-        }, 15000);
+        const contacts = await getOrgScopedContacts(authUserId || '', userRole, orgId || '');
 
-        // Filter by user's mandate membership (non-admin only sees contacts in their mandates)
-        if (userId) {
-          try {
-            const { user } = await getUserFromRequest(req);
-            if (user && user.role !== 'admin') {
-              // Get mandates this user is assigned to
-              const assignments = await db.selectMany('mandate_members', {
-                select: 'mandate_id',
-                where: [{ column: 'user_id', value: userId }],
-              }, 15000);
-              const assignedMandateIds = new Set(assignments.map((a: any) => a.mandate_id));
-              
-              if (assignedMandateIds.size === 0) {
-                return res.status(200).json({ success: true, data: [], total: 0 });
-              }
-
-              // Get pipeline entries for user's mandates to find allowed contact IDs
-              const allPipeline = await db.selectMany('candidates_pipeline', {
-                select: 'contact_id, mandate_id',
-              }, 15000);
-              const allowedContactIds = new Set(
-                allPipeline
-                  .filter((p: any) => assignedMandateIds.has(p.mandate_id))
-                  .map((p: any) => p.contact_id)
-              );
-              rows = rows.filter((r: any) => allowedContactIds.has(r.id));
-            }
-          } catch (e) {
-            console.warn('[contact] Auth check failed, returning all:', (e as any).message);
-          }
-        }
-
-        let filtered = rows;
+        let filtered = contacts;
         if (search) {
           const q = search.toLowerCase();
-          filtered = rows.filter((r: any) =>
+          filtered = contacts.filter((r: any) =>
             (r.name || '').toLowerCase().includes(q) ||
             (r.current_title || '').toLowerCase().includes(q) ||
             (r.headline || '').toLowerCase().includes(q) ||
@@ -298,7 +387,6 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           );
         }
 
-        // Manual pagination after filtering
         const total = filtered.length;
         const paginated = filtered.slice(offset, offset + limit);
 
@@ -306,14 +394,60 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    // ── Company CRUD ──
+    if (resource === 'company') {
+      if (method === 'GET' && !id) {
+        const limit = parseInt(req.query.limit as string) || 50;
+        const offset = parseInt(req.query.offset as string) || 0;
+        const search = req.query.q as string;
+
+        const companies = await getOrgScopedCompanies(authUserId || '', userRole, orgId || '');
+
+        let filtered = companies;
+        if (search) {
+          const q = search.toLowerCase();
+          filtered = companies.filter((c: any) =>
+            (c.name || '').toLowerCase().includes(q) ||
+            (c.industry || '').toLowerCase().includes(q)
+          );
+        }
+
+        const total = filtered.length;
+        const paginated = filtered.slice(offset, offset + limit);
+
+        return res.status(200).json({ success: true, data: paginated, total });
+      }
+
+      if (method === 'GET' && id) {
+        const companies = await getOrgScopedCompanies(authUserId || '', userRole, orgId || '');
+        const company = companies.find((c: any) => c.id === id);
+        
+        if (!company) {
+          return res.status(404).json({ error: 'Company not found' });
+        }
+
+        return res.status(200).json({ success: true, data: company });
+      }
+    }
+
     // ── Scoring Run Persistence ──
-    // Schema: id, user_id, mandate_id, contact_id, run_type, input_params, 
-    //         output_scores, composite_score, verdict, model, tokens_used, duration_ms, created_at
     if (resource === 'scoring-run') {
       if (method === 'POST') {
         const { mandate_id, contact_id, run_type, input_params, output_scores,
                 composite_score, verdict, model, tokens_used, duration_ms, user_id } = req.body || {};
         
+        if (mandate_id) {
+          const mandate = await db.selectOne('mandates', {
+            column: 'id',
+            value: mandate_id,
+            select: 'id, organization_id',
+          });
+          
+          if (mandate && userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+            return res.status(403).json({ error: 'Access denied' });
+          }
+        }
+
         const row = await db.insert('scoring_runs', {
           mandate_id: mandate_id || null,
           contact_id: contact_id || null,
@@ -366,13 +500,12 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
     // ── Profile + Auth User CRUD (Admin) ──
     if (resource === 'profile') {
       if (method === 'POST' && !id) {
-        const { email, name, role, tier, icp } = req.body || {};
+        const { email, name, role, tier, icp, organization_id } = req.body || {};
         
         if (!email || !name) {
           return res.status(400).json({ error: 'email and name are required' });
         }
 
-        // Check if profile already exists
         const existing = await db.selectOne('profiles', {
           select: 'id, email',
           where: [{ column: 'email', value: email.toLowerCase() }],
@@ -382,41 +515,36 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(409).json({ error: 'User with this email already exists' });
         }
 
-        // Generate a random temporary password for the auth user
         const tempPassword = crypto.randomUUID().replace(/-/g, '').slice(0, 16);
 
-        // Step 1: Create auth.users record via Supabase Auth Admin API
         let authUserId: string;
         try {
           const authUser = await db.createAuthUser(email.toLowerCase(), tempPassword, {
             email_confirm: true,
-            user_metadata: { name, role: role || 'user' },
+            user_metadata: { name, role: role || 'member' },
           });
           authUserId = authUser.id;
         } catch (authErr: any) {
-          // If auth user creation fails (e.g., already exists), try to proceed with profile-only
           console.warn('[profile] Auth user creation failed:', authErr.message);
-          // Use a random UUID as fallback — the user won't be able to log in, but the profile exists
           authUserId = crypto.randomUUID();
         }
 
-        // Step 2: Create profiles row with the auth user's ID as the primary key
         const row = await db.insert('profiles', {
           id: authUserId,
           email: email.toLowerCase(),
           name,
-          role: role || 'user',
+          role: role || 'member',
           tier: tier || 'pro',
           icp: icp || 'professional',
+          organization_id: organization_id || null,
         }, 15000);
 
-        // Send invite email with temp password (non-blocking — don't fail if email fails)
         try {
           await sendEmail('team_invite', {
             name,
             email: email.toLowerCase(),
             tempPassword,
-            role: role || 'user',
+            role: role || 'member',
             inviterName: 'Your admin',
           });
         } catch (emailErr) {
@@ -426,23 +554,24 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(201).json({ 
           success: true, 
           data: row,
-          temp_password: tempPassword,  // Admin can share this with the invited user
+          temp_password: tempPassword,
           auth_created: true,
           email_sent: true,
         });
       }
 
       if (method === 'GET' && !id) {
+        if (userRole !== 'super_admin') {
+          return res.status(403).json({ error: 'Admin access required' });
+        }
         const rows = await db.selectMany('profiles', {
-          select: 'id, email, name, role, tier, created_at',
+          select: 'id, email, name, role, tier, organization_id, created_at',
           orderBy: { column: 'created_at', ascending: false },
           limit: 100,
         }, 15000);
         return res.status(200).json({ success: true, data: rows });
       }
     }
-
-
 
     // ── Mandate Members (Assignment) ──
     if (resource === 'mandate-members') {
@@ -453,7 +582,20 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(400).json({ error: 'mandate_id and user_id are required' });
         }
 
-        // Check if already assigned
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: mandate_id,
+          select: 'id, organization_id',
+        });
+        
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
         const existing = await db.selectOne('mandate_members', {
           select: 'id',
           where: [
@@ -476,7 +618,20 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (method === 'GET' && id) {
-        // Get members for a specific mandate
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: id,
+          select: 'id, organization_id',
+        });
+        
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
         const rows = await db.selectMany('mandate_members', {
           select: 'id, user_id, role, assigned_at, assigned_by, profiles:profiles(id, name, email)',
           where: [{ column: 'mandate_id', value: id }],
@@ -486,11 +641,16 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (method === 'GET' && !id) {
-        // Get assignments for a user
         const userId = req.query.user_id as string;
         if (!userId) {
           return res.status(400).json({ error: 'user_id query param required' });
         }
+
+        const userOrgId = await getOrgId(userId);
+        if (userRole !== 'super_admin' && userOrgId !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
         const rows = await db.selectMany('mandate_members', {
           select: 'id, mandate_id, role, assigned_at, mandates:mandates(id, title, status)',
           where: [{ column: 'user_id', value: userId }],
@@ -500,6 +660,30 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (method === 'DELETE' && id) {
+        const assignment = await db.selectOne('mandate_members', {
+          column: 'id',
+          value: id,
+          select: 'id, mandate_id',
+        });
+        
+        if (!assignment) {
+          return res.status(404).json({ error: 'Assignment not found' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: assignment.mandate_id,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
         const count = await db.deleteRows('mandate_members', { column: 'id', value: id }, 15000);
         return res.status(200).json({ success: true, deleted: count });
       }

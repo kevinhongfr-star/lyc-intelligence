@@ -17,7 +17,7 @@
  *      No signature verification here — Supabase REST will reject forged tokens
  *      on every subsequent query.
  *   3. Look up the matching row in `profiles` via the service role key.
- *   4. Reject unless `role === 'admin'`.
+ *   4. Reject unless `role === 'super_admin'`.
  *
  * Note: This is a *read* of the profiles table. The service role key bypasses
  * RLS so this works even when the caller's JWT has anon-level perms.
@@ -25,11 +25,12 @@
 
 import type { VercelRequest } from '@vercel/node';
 import { isSupabaseConfigured, selectOne } from './supabaseRest.js';
+import type { UserRole } from '@/types';
 
 export interface AdminUser {
   id: string;
   email: string;
-  role: string;
+  role: UserRole;
 }
 
 export interface AuthResult {
@@ -41,7 +42,6 @@ function decodeJwtSub(token: string): string | null {
   const parts = token.split('.');
   if (parts.length !== 3) return null;
   try {
-    // base64url → base64 padding
     let b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
     while (b64.length % 4 !== 0) b64 += '=';
     const json = Buffer.from(b64, 'base64').toString('utf-8');
@@ -77,7 +77,7 @@ export async function verifyAdmin(req: VercelRequest): Promise<AuthResult> {
     if (!profile) {
       return { user: null, error: 'Profile not found for this user' };
     }
-    if (profile.role !== 'admin') {
+    if (profile.role !== 'super_admin') {
       return { user: null, error: 'Admin access required' };
     }
     return { user: profile as AdminUser, error: null };
@@ -119,4 +119,18 @@ export async function getUserFromRequest(req: VercelRequest): Promise<AuthResult
   } catch (err: any) {
     return { user: null, error: `Auth lookup failed: ${err?.message || 'unknown'}` };
   }
+}
+
+/**
+ * Check if user has org-level access permissions.
+ */
+export function hasOrgAccess(role: UserRole): boolean {
+  return ['client_admin', 'client_viewer', 'lyc_consultant', 'lyc_admin', 'super_admin'].includes(role);
+}
+
+/**
+ * Check if user is an org admin.
+ */
+export function isOrgAdmin(role: UserRole): boolean {
+  return ['client_admin', 'lyc_admin', 'super_admin'].includes(role);
 }
