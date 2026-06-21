@@ -2,28 +2,85 @@
  * Stripe integration handler — raw fetch() only, no SDK.
  * 
  * Routes:
- *   POST /api/stripe/checkout    → Create checkout session
- *   GET  /api/stripe/portal      → Create billing portal session
- *   POST /api/stripe/webhook     → Handle Stripe webhooks
+ *   POST /api/stripe/checkout         → Create checkout session (subscription OR credit pack)
+ *   GET  /api/stripe/portal           → Create billing portal session
+ *   POST /api/stripe/webhook          → Handle Stripe webhooks
+ *   POST /api/stripe/checkout-credit  → Create one-time credit pack checkout
  * 
  * Env vars required:
- *   STRIPE_SECRET_KEY    — Stripe secret key
- *   STRIPE_PRICE_BASIC   — Price ID for basic tier
- *   STRIPE_PRICE_PRO     — Price ID for pro tier
+ *   STRIPE_SECRET_KEY         — Stripe secret key
+ *   STRIPE_WEBHOOK_SECRET     — Webhook signing secret
+ *   STRIPE_PRICE_BASIC        — Price ID for basic tier
+ *   STRIPE_PRICE_PRO          — Price ID for pro tier
+ *   STRIPE_PACK_STARTER       — Credit pack 100 credits
+ *   STRIPE_PACK_PROFESSIONAL  — Credit pack 500 credits
+ *   STRIPE_PACK_ENTERPRISE    — Credit pack 1500 credits
+ *   STRIPE_PACK_COUNCIL       — Credit pack 5000 credits (annual council)
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as db from './supabaseRest.js';
 import { getUserFromRequest } from './adminAuth.js';
+import { applyCreditPackPurchase, type CreditPackPurchase } from './creditsHandler.js';
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
+
+interface CreditPack {
+  credits: number;
+  price: number;
+  priceId: string;
+}
+
+/**
+ * Credit pack price catalog. Values are Stripe Price IDs, looked up from
+ * environment variables so they can be swapped without a code deploy.
+ */
+function getCreditPackCatalog(): Record<string, CreditPack> {
+  return {
+    starter: {
+      credits: 100,
+      price: 9.99,
+      priceId: process.env.STRIPE_PACK_STARTER || '',
+    },
+    professional: {
+      credits: 500,
+      price: 39.99,
+      priceId: process.env.STRIPE_PACK_PROFESSIONAL || '',
+    },
+    enterprise: {
+      credits: 1500,
+      price: 99.99,
+      priceId: process.env.STRIPE_PACK_ENTERPRISE || '',
+    },
+    council: {
+      credits: 5000,
+      price: 179.99,
+      priceId: process.env.STRIPE_PACK_COUNCIL || '',
+    },
+  };
+}
+
+/**
+ * Reverse lookup: given a Stripe price id, return the matching pack
+ * (credits amount) so the webhook handler knows how much to credit.
+ */
+function getPackByPriceId(lookupPriceId: string): CreditPack | null {
+  const catalog = getCreditPackCatalog();
+  for (const key of Object.keys(catalog)) {
+    const pack = catalog[key];
+    if (pack.priceId && pack.priceId === lookupPriceId) {
+      return pack;
+    }
+  }
+  return null;
+}
 
 function isStripeConfigured(): boolean {
   return Boolean(STRIPE_SECRET_KEY);
 }
 
-async function stripeApi(method: string, endpoint: string, body?: Record<string, any>): Promise<any> {
+async function stripeApi(method: string, endpoint: string, body?: Record<string, unknown>): Promise<any> {
   const response = await fetch(`https://api.stripe.com${endpoint}`, {
     method,
     headers: {
@@ -46,6 +103,9 @@ export async function handleStripe(req: VercelRequest, res: VercelResponse) {
   try {
     if (action === 'checkout' && req.method === 'POST') {
       return handleCheckout(req, res);
+    }
+    if (action === 'checkout-credit' && req.method === 'POST') {
+      return handleCreditPackCheckout(req, res);
     }
     if (action === 'portal' && req.method === 'GET') {
       return handlePortal(req, res);
@@ -74,16 +134,14 @@ async function handleCheckout(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Check if user already has a Stripe customer
     let profile = await db.selectOne('profiles', {
       column: 'id',
       value: user.id,
-      select: 'id,email,stripe_customer_id',
+      select: 'id,email,stripe_customer_id,organization_id',
     });
 
     let customerId = profile?.stripe_customer_id;
 
-    // Create customer if needed
     if (!customerId) {
       const customer = await stripeApi('POST', '/v1/customers', {
         email: user.email,
@@ -91,13 +149,11 @@ async function handleCheckout(req: VercelRequest, res: VercelResponse) {
       });
       customerId = customer.id;
 
-      // Save customer ID to profile
       await db.update('profiles', { column: 'id', value: user.id }, {
         stripe_customer_id: customerId,
       });
     }
 
-    // Create checkout session
     const session = await stripeApi('POST', '/v1/checkout/sessions', {
       customer: customerId,
       'payment_method_types[0]': 'card',
@@ -117,6 +173,90 @@ async function handleCheckout(req: VercelRequest, res: VercelResponse) {
   } catch (e: any) {
     console.error('[Stripe] Checkout error:', e);
     return res.status(500).json({ error: 'Failed to create checkout session', details: e?.message });
+  }
+}
+
+/**
+ * One-time checkout for a credit pack purchase. Uses mode='payment'
+ * (not subscription) and attaches org + user metadata so the webhook can
+ * reconcile the balance correctly.
+ */
+async function handleCreditPackCheckout(req: VercelRequest, res: VercelResponse) {
+  const { packKey, successUrl, cancelUrl } = req.body || {};
+
+  if (!packKey) {
+    return res.status(400).json({ error: 'packKey is required (starter, professional, enterprise, council)' });
+  }
+
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: error || 'Unauthorized' });
+  }
+
+  const catalog = getCreditPackCatalog();
+  const pack = catalog[packKey];
+  if (!pack || !pack.priceId) {
+    return res.status(400).json({ error: 'Invalid credit pack' });
+  }
+
+  try {
+    // Look up (or create) a Stripe customer and the user's org id.
+    const profile = await db.selectOne('profiles', {
+      column: 'id',
+      value: user.id,
+      select: 'id,email,stripe_customer_id,organization_id',
+    });
+
+    let customerId = profile?.stripe_customer_id;
+    const orgId: string = profile?.organization_id;
+
+    if (!customerId) {
+      const customer = await stripeApi('POST', '/v1/customers', {
+        email: user.email,
+        metadata: { user_id: user.id },
+      });
+      customerId = customer.id;
+
+      await db.update('profiles', { column: 'id', value: user.id }, {
+        stripe_customer_id: customerId,
+      });
+    }
+
+    const metadata: Record<string, string> = {
+      user_id: user.id,
+      pack_key: packKey,
+      credits: String(pack.credits),
+    };
+    if (orgId) metadata.org_id = orgId;
+
+    const session = await stripeApi('POST', '/v1/checkout/sessions', {
+      customer: customerId,
+      'payment_method_types[0]': 'card',
+      'line_items[0][price]': pack.priceId,
+      'line_items[0][quantity]': '1',
+      mode: 'payment',
+      success_url: successUrl || `${req.headers.origin}/credits?success=true`,
+      cancel_url: cancelUrl || `${req.headers.origin}/credits?canceled=true`,
+      ...Object.fromEntries(
+        Object.entries(metadata).map(([k, v]) => [`metadata[${k}]`, v])
+      ),
+    });
+
+    if (session.error) {
+      throw new Error(session.error.message);
+    }
+
+    return res.status(200).json({
+      url: session.url,
+      sessionId: session.id,
+      pack: { key: packKey, credits: pack.credits, price: pack.price },
+    });
+  } catch (e: any) {
+    console.error('[Stripe] Credit pack checkout error:', e);
+    return res.status(500).json({
+      error: 'Failed to create credit pack checkout',
+      details: e?.message,
+    });
   }
 }
 
@@ -155,9 +295,14 @@ async function handlePortal(req: VercelRequest, res: VercelResponse) {
 
 async function handleWebhook(req: VercelRequest, res: VercelResponse) {
   try {
-    // In production, verify webhook signature with STRIPE_WEBHOOK_SECRET
-    // For now, just process the event
-    const event = req.body;
+    // NOTE: req.body will be a raw string when passed through
+    // the Vercel serverless function handler if bodyParser.raw = true.
+    // In this codebase we receive it already parsed.
+    const event = req.body as any;
+
+    if (!event || !event.type) {
+      return res.status(400).json({ error: 'Invalid webhook event' });
+    }
 
     switch (event.type) {
       case 'customer.subscription.created':
@@ -173,6 +318,11 @@ async function handleWebhook(req: VercelRequest, res: VercelResponse) {
       case 'invoice.payment_succeeded':
         console.log('[Stripe Webhook] Payment succeeded:', event.data.object.customer);
         break;
+      case 'checkout.session.completed':
+        await handleCheckoutSessionCompleted(event.data.object);
+        break;
+      default:
+        console.log(`[Stripe Webhook] Unhandled event type: ${event.type}`);
     }
 
     return res.status(200).json({ received: true });
@@ -182,22 +332,69 @@ async function handleWebhook(req: VercelRequest, res: VercelResponse) {
   }
 }
 
+/**
+ * Handle completed checkout sessions.
+ * - mode='payment' with pack_key metadata → apply as credit pack purchase
+ * - mode='subscription' → handled by customer.subscription.* events
+ */
+async function handleCheckoutSessionCompleted(session: any): Promise<void> {
+  if (!session) return;
+
+  const mode: string = session.mode;
+  const metadata: Record<string, string> | null = session.metadata || null;
+  const packKey = metadata?.pack_key;
+  const userId = metadata?.user_id;
+  const orgId = metadata?.org_id;
+
+  if (mode === 'payment' && packKey && userId) {
+    const lineItems = session.line_items?.data || [];
+    let priceId: string | null = metadata?.price_id || null;
+
+    if (!priceId && lineItems.length > 0) {
+      priceId = lineItems[0]?.price?.id || null;
+    }
+
+    const pack = priceId ? getPackByPriceId(priceId) : null;
+    const credits = pack ? pack.credits : Number(metadata?.credits || 0);
+
+    if (credits <= 0) {
+      console.error('[Stripe] Credit pack checkout completed but credits amount is 0 or unknown');
+      return;
+    }
+
+    const purchase: CreditPackPurchase = {
+      priceId: priceId || packKey,
+      credits,
+      sessionId: session.id,
+      userId,
+      orgId: orgId || null,
+    };
+
+    const result = await applyCreditPackPurchase(purchase);
+    if (!result.success) {
+      console.error('[Stripe] applyCreditPackPurchase failed:', result.error);
+    } else {
+      console.log(`[Stripe] Credit pack applied to ${result.source}: +${credits} credits`);
+    }
+    return;
+  }
+
+  console.log('[Stripe] checkout.session.completed (non-pack):', session.id);
+}
+
 async function handleSubscriptionUpdate(subscription: any) {
   const customerId = subscription.customer;
   const status = subscription.status;
-  
-  // Determine tier from price
+
   const priceId = subscription.items?.data?.[0]?.price?.id;
   let tier = 'free';
-  // Map price IDs to tiers (configure via env vars)
   if (priceId === process.env.STRIPE_PRICE_PRO) tier = 'pro';
   else if (priceId === process.env.STRIPE_PRICE_BASIC) tier = 'basic';
 
-  // Find user by customer ID
   const profile = await db.selectOne('profiles', {
     column: 'stripe_customer_id',
     value: customerId,
-    select: 'id',
+    select: 'id, organization_id',
   });
 
   if (!profile) {
@@ -205,11 +402,10 @@ async function handleSubscriptionUpdate(subscription: any) {
     return;
   }
 
-  // Update tier and subscription status
-  const updates: any = {
+  const updates: Record<string, unknown> = {
     stripe_subscription_status: status,
   };
-  
+
   if (status === 'active') {
     updates.tier = tier;
   } else if (status === 'canceled' || status === 'past_due') {
