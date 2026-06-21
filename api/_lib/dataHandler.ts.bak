@@ -26,32 +26,6 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as db from './supabaseRest.js';
 import { getUserFromRequest } from './adminAuth.js';
 import { sendEmail } from './email.js';
-import { getOrgId, getUserRole, hasOrgAccess, isOrgAdmin, isReadOnly } from '@/services/auth/orgScopedQueries';
-import type { UserRole, PermissionCheck } from '@/types';
-
-// Phase 0.2: Organization-scoping middleware
-async function orgScopingMiddleware(
-  userId: string,
-  res: VercelResponse
-): Promise<{ user: any; permission: PermissionCheck | null }> {
-  const userRole = await getUserRole(userId);
-  if (!userRole) {
-    res.status(401).json({ error: 'User role not found' });
-    return { user: null, permission: null };
-  }
-  const orgId = await getOrgId(userId);
-  if (!orgId && userRole !== 'super_admin') {
-    res.status(403).json({ error: 'No organization assigned to user' });
-    return { user: null, permission: null };
-  }
-  const permission: PermissionCheck = {
-    allowed: true,
-    scope: userRole === 'super_admin' ? 'global' :
-           ['lyc_admin', 'lyc_consultant'].includes(userRole) ? 'cross-org' :
-           ['client_admin', 'client_viewer'].includes(userRole) ? 'org' : 'self',
-  };
-  return { user: { id: userId, role: userRole, organization_id: orgId || '' }, permission };
-}
 
 export async function handler(req: VercelRequest, res: VercelResponse) {
   const pathArr = (req.query.path as string[]) || [];
@@ -61,18 +35,6 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // ── Pipeline CRUD ──
-
-    // Phase 0.2: Get authenticated user and apply org-scoping
-    const { user: authUser } = await getUserFromRequest(req);
-    if (!authUser) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const { user: scopedUser, permission } = await orgScopingMiddleware(authUser.id, res);
-    if (!scopedUser || !permission) {
-      return; // Response already sent by middleware
-    }
-    // Attach scoped user to request for use in handlers
-    (req as any).scopedUser = scopedUser;
     if (resource === 'pipeline') {
       if (method === 'POST' && !id) {
         const { contact_id, mandate_id, stage, match_score, match_reasons, 
