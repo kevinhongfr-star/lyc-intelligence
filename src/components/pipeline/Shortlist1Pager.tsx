@@ -88,7 +88,7 @@ function PreFlightChecks({ candidate }: { candidate: ShortlistCandidate }) {
     { label: 'CV Present', pass: !!candidate.cvUrl },
     { label: 'Score Computed', pass: !!candidate.trident },
     { label: 'No Reject Flag', pass: candidate.verdict !== 'Reject' },
-    { label: 'Active Stage', pass: candidate.stage !== 'SWEEP' },
+    { label: 'Active Stage', pass: candidate.stage !== 'screened' },
   ];
 
   return (

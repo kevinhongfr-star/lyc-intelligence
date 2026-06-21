@@ -5,9 +5,9 @@ import { useMandates } from '@/hooks/useSupabaseData';
 import { autoComputePHI, computePHI } from '@/services/phiScoring';
 import type { PHIResult } from '@/services/phiScoring';
 import type { Mandate } from '@/services/supabaseApi';
-import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
+import { STAGE_LABEL, STAGE_COLOR, STAGE_BY_VALUE, PIPELINE_STAGES, ALL_STAGES, getNextStage } from '@/constants/pipelineStages';
 
-const STATUS_LABELS: Record<string, string> = { '1_search': 'SWEEP', '2_call': 'CANVA', '3_deliver': 'GRID/LENS', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
+const STATUS_LABELS: Record<string, string> = { '1_search': 'Screened', '2_call': 'Client Submitted', '3_deliver': 'Interview', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
 const FILTER_OPTIONS = [
   { key: 'all' as const, label: 'All' },
   { key: 'RED' as const, label: 'Red' },
@@ -78,7 +78,7 @@ export function CommandCenter() {
                 <span>Priority: {m.phi.actionPriority}</span>
               </div>
               <div className="flex gap-1 mt-2">
-                {STAGE_ORDER.map(s => { const c = s === 'SWEEP' ? m.tier1_count : s === 'CANVA' ? m.tier2_count : s === 'GRID' ? m.shortlisted_count : s === 'LENS' ? m.interview_count : m.placed_count; return <div key={s} className="flex-1 h-6 rounded flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{c}</div>; })}
+                {PIPELINE_STAGES.map(s => { const c = s === 'screened' ? m.tier1_count : s === 'client_submitted' ? m.tier2_count : s === 'client_approved' ? m.shortlisted_count : s === 'interview_1' ? m.interview_count : m.placed_count; return <div key={s} className="flex-1 h-6 rounded flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: `${STAGE_COLOR[s].color}20`, color: STAGE_CONFIG[s] }}>{c}</div>; })}
               </div>
             </div>
           ))}

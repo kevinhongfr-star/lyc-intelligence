@@ -3,15 +3,15 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Loader2, Mail, FileText, ClipboardList, Eye, MessageSquare, FileDown, BarChart3, CheckCircle, PauseCircle, XCircle, Edit } from 'lucide-react';
 import { useMandateDetail } from '@/hooks/useSupabaseData';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
-import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
+import { STAGE_LABEL, STAGE_COLOR, STAGE_BY_VALUE, PIPELINE_STAGES, ALL_STAGES, getNextStage } from '@/constants/pipelineStages';
 import { executeAIAction, type AIAction } from '@/services/aiQuickActions';
 import { updateMandateStatus, updatePipelineStage, updatePipelineVerdict } from '@/services/supabaseApi';
 import { MandateTeam } from '@/components/mandate/MandateTeam';
 import { useAuthStore } from '@/stores/authStore';
 
 const STATUS_OPTIONS = [
-  { value: '1_search', label: 'SWEEP', color: '#00897B' },
-  { value: '2_call', label: 'CANVA', color: '#F59E0B' },
+  { value: '1_search', label: 'Screened', color: '#00897B' },
+  { value: '2_call', label: 'Client Submitted', color: '#F59E0B' },
   { value: '3_deliver', label: 'GRID/LENS', color: '#10B981' },
   { value: 'won', label: 'Won', color: '#10B981' },
   { value: 'on_hold', label: 'On Hold', color: '#F59E0B' },
@@ -19,7 +19,7 @@ const STATUS_OPTIONS = [
   { value: 'completed', label: 'Completed', color: '#333333' },
 ];
 
-const NEXT_STAGE: Record<string, string> = { SWEEP: 'CANVA', CANVA: 'GRID', GRID: 'LENS', LENS: 'PLACED' };
+const NEXT_STAGE: Record<string, string> = { screened: 'client_submitted', client_submitted: 'client_approved', client_approved: 'interview_1', interview_1: 'offer_accepted' };
 const VERDICT_OPTIONS = ['Strong Fit', 'Conditional Fit', 'Weak Fit', 'Hold', 'Reject'];
 
 const AI_ACTIONS: { key: AIAction; icon: any; label: string }[] = [
@@ -100,9 +100,9 @@ export function MandateDetailPage() {
 
       {/* Stage pipeline bar */}
       <div className="flex gap-1">
-        {STAGE_ORDER.map(s => {
-          const c = s === 'SWEEP' ? mandate.tier1_count : s === 'CANVA' ? mandate.tier2_count : s === 'GRID' ? mandate.shortlisted_count : s === 'LENS' ? mandate.interview_count : mandate.placed_count;
-          return <div key={s} className="flex-1 h-10 rounded flex items-center justify-center text-sm font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{s}: {c}</div>;
+        {PIPELINE_STAGES.map(s => {
+          const c = s === 'screened' ? mandate.tier1_count : s === 'client_submitted' ? mandate.tier2_count : s === 'client_approved' ? mandate.shortlisted_count : s === 'interview_1' ? mandate.interview_count : mandate.placed_count;
+          return <div key={s} className="flex-1 h-10 rounded flex items-center justify-center text-sm font-medium" style={{ backgroundColor: `${STAGE_COLOR[s].color}20`, color: STAGE_CONFIG[s] }}>{s}: {c}</div>;
         })}
       </div>
 

@@ -72,7 +72,7 @@ function Sparkline({ data, color = '#C108AB', width = 200, height = 40 }: { data
   );
 }
 
-const STATUS_LABELS: Record<string, string> = { '1_search': 'SWEEP', '2_call': 'CANVA', '3_deliver': 'GRID/LENS', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
+const STATUS_LABELS: Record<string, string> = { '1_search': 'Screened', '2_call': 'Client Submitted', '3_deliver': 'Interview', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
 
 export function MetrixPage() {
   const { data: mandates, count, loading } = useMandates({ limit: 500 });
@@ -96,13 +96,13 @@ export function MetrixPage() {
       phiBuckets[phi.status]++;
     }
 
-    const funnel = { SWEEP: 0, CANVA: 0, GRID: 0, LENS: 0, PLACED: 0 };
+    const funnel = { screened: 0, client_submitted: 0, client_approved: 0, interview_1: 0, offer_accepted: 0 };
     for (const m of filtered) {
-      funnel.SWEEP += m.tier1_count;
-      funnel.CANVA += m.tier2_count;
-      funnel.GRID += m.shortlisted_count;
-      funnel.LENS += m.interview_count;
-      funnel.PLACED += m.placed_count;
+      funnel.screened += m.tier1_count;
+      funnel.client_submitted += m.tier2_count;
+      funnel.client_approved += m.shortlisted_count;
+      funnel.interview_1 += m.interview_count;
+      funnel.offer_accepted += m.placed_count;
     }
     const funnelData = Object.entries(funnel).map(([label, value]) => ({ label, value }));
 
@@ -115,12 +115,12 @@ export function MetrixPage() {
     }
     const trendData = Object.entries(weekBuckets).sort(([a], [b]) => a.localeCompare(b)).map(([, v]) => v);
 
-    const totalPipeline = funnel.SWEEP || 1;
+    const totalPipeline = funnel.screened || 1;
     const conversions = {
-      'Sweep→Canvas': funnel.CANVA ? Math.round((funnel.CANVA / totalPipeline) * 100) : 0,
-      'Canvas→Grid': funnel.CANVA && funnel.GRID ? Math.round((funnel.GRID / (funnel.CANVA || 1)) * 100) : 0,
-      'Grid→Lens': funnel.GRID && funnel.LENS ? Math.round((funnel.LENS / (funnel.GRID || 1)) * 100) : 0,
-      'Lens→Placed': funnel.LENS && funnel.PLACED ? Math.round((funnel.PLACED / (funnel.LENS || 1)) * 100) : 0,
+      'Screened→Submitted': funnel.client_submitted ? Math.round((funnel.client_submitted / totalPipeline) * 100) : 0,
+      'Submitted→Approved': funnel.client_submitted && funnel.client_approved ? Math.round((funnel.client_approved / (funnel.client_submitted || 1)) * 100) : 0,
+      'Grid→Lens': funnel.client_approved && funnel.interview_1 ? Math.round((funnel.interview_1 / (funnel.client_approved || 1)) * 100) : 0,
+      'Lens→Placed': funnel.interview_1 && funnel.offer_accepted ? Math.round((funnel.offer_accepted / (funnel.interview_1 || 1)) * 100) : 0,
     };
 
     const ages = filtered.map(m => Math.floor((now - new Date(m.created_at).getTime()) / 86400000));
@@ -165,7 +165,7 @@ export function MetrixPage() {
         </CardContent></Card>
         <Card><CardContent className="p-4">
           <p className="text-xs text-text-muted mb-1">Placed</p>
-          <p className="text-2xl font-bold text-green-400">{analytics.funnelData.find(d => d.label === 'PLACED')?.value ?? 0}</p>
+          <p className="text-2xl font-bold text-green-400">{analytics.funnelData.find(d => d.label === 'offer_accepted')?.value ?? 0}</p>
         </CardContent></Card>
       </div>
 

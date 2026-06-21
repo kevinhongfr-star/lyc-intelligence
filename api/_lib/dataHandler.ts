@@ -49,7 +49,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         const row = await db.insert('candidates_pipeline', {
           contact_id,
           mandate_id,
-          stage: stage || 'SWEEP',
+          stage: stage || 'screened',
           sweep_tier: sweep_tier || null,
           match_score: match_score || null,
           match_reasons: match_reasons ? JSON.stringify(match_reasons) : null,

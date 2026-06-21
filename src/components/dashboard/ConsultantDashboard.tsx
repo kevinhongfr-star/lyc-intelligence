@@ -6,7 +6,7 @@ import { STAGE_CONFIG, STAGE_ORDER } from '@/types/mandate';
 import { useDashboard } from '@/hooks/useSupabaseData';
 import { CommandCenter } from './CommandCenter';
 
-const STATUS_LABELS: Record<string, string> = { '1_search': 'SWEEP', '2_call': 'CANVA', '3_deliver': 'GRID/LENS', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
+const STATUS_LABELS: Record<string, string> = { '1_search': 'Screened', '2_call': 'Client Submitted', '3_deliver': 'Interview', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
 
 const TIER_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
   S: { color: '#D4AF37', bg: 'rgba(212,175,55,0.12)', label: 'S — C-Suite Elite' },
@@ -98,7 +98,7 @@ export function ConsultantDashboard() {
                     mandates.slice(0, 5).map((m: any) => (
                       <div key={m.id} className="p-4 bg-bg-tertiary rounded-lg">
                         <div className="flex items-center justify-between mb-3"><div><h3 className="font-medium text-text-primary">{m.title}</h3><p className="text-sm text-text-muted">{STATUS_LABELS[m.status] ?? m.status}</p></div><Badge variant={m.status === 'won' ? 'success' : 'default'}>{STATUS_LABELS[m.status] ?? m.status}</Badge></div>
-                        <div className="flex gap-1">{STAGE_ORDER.map(s => { const c = s === 'SWEEP' ? m.tier1_count : s === 'CANVA' ? m.tier2_count : s === 'GRID' ? m.shortlisted_count : s === 'LENS' ? m.interview_count : m.placed_count; return <div key={s} className="flex-1 h-8 rounded flex items-center justify-center text-xs font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{c}</div>; })}</div>
+                        <div className="flex gap-1">{PIPELINE_STAGES.map(s => { const c = s === 'screened' ? m.tier1_count : s === 'client_submitted' ? m.tier2_count : s === 'client_approved' ? m.shortlisted_count : s === 'interview_1' ? m.interview_count : m.placed_count; return <div key={s} className="flex-1 h-8 rounded flex items-center justify-center text-xs font-medium" style={{ backgroundColor: `${STAGE_COLOR[s].color}20`, color: STAGE_CONFIG[s] }}>{c}</div>; })}</div>
                       </div>
                     ))}
                 </CardContent>

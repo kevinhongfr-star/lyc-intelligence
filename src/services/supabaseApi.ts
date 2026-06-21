@@ -225,7 +225,7 @@ export async function getPipelineByMandate(mandateId: string): Promise<Record<st
   const { data, error } = await getSupabase().from('candidates_pipeline').select('*, contact:contacts(*, company:companies(*))').eq('mandate_id', mandateId);
   if (error || !data) return {};
   const grouped: Record<string, CandidatePipeline[]> = {};
-  for (const item of data as CandidatePipeline[]) { const stage = item.stage || 'SWEEP'; if (!grouped[stage]) grouped[stage] = []; grouped[stage].push(item); }
+  for (const item of data as CandidatePipeline[]) { const stage = item.stage || 'screened'; if (!grouped[stage]) grouped[stage] = []; grouped[stage].push(item); }
   return grouped;
 }
 

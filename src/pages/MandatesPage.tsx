@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Briefcase, ChevronRight, Loader2, CheckCircle, PauseCircle, XCircle, Plus } from 'lucide-react';
 import { useMandates } from '@/hooks/useSupabaseData';
 import { Badge, Card, CardContent } from '@/components/ui';
-import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
+import { STAGE_LABEL, STAGE_COLOR, STAGE_BY_VALUE, PIPELINE_STAGES, ALL_STAGES, getNextStage } from '@/constants/pipelineStages';
 import { updateMandateStatus } from '@/services/supabaseApi';
 
 const STATUS_OPTIONS = [
-  { value: '1_search', label: 'SWEEP', color: '#00897B' },
-  { value: '2_call', label: 'CANVA', color: '#F59E0B' },
+  { value: '1_search', label: 'Screened', color: '#00897B' },
+  { value: '2_call', label: 'Client Submitted', color: '#F59E0B' },
   { value: '3_deliver', label: 'GRID/LENS', color: '#10B981' },
   { value: 'won', label: 'Won', color: '#10B981' },
   { value: 'on_hold', label: 'On Hold', color: '#F59E0B' },
@@ -81,9 +81,9 @@ export function MandatesPage() {
                 </div>
               </div>
               <div className="flex gap-1">
-                {STAGE_ORDER.map(s => {
-                  const c = s === 'SWEEP' ? m.tier1_count : s === 'CANVA' ? m.tier2_count : s === 'GRID' ? m.shortlisted_count : s === 'LENS' ? m.interview_count : m.placed_count;
-                  return <div key={s} className="flex-1 h-6 rounded flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{c}</div>;
+                {PIPELINE_STAGES.map(s => {
+                  const c = s === 'screened' ? m.tier1_count : s === 'client_submitted' ? m.tier2_count : s === 'client_approved' ? m.shortlisted_count : s === 'interview_1' ? m.interview_count : m.placed_count;
+                  return <div key={s} className="flex-1 h-6 rounded flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: `${STAGE_COLOR[s].color}20`, color: STAGE_CONFIG[s] }}>{c}</div>;
                 })}
               </div>
               <div className="flex gap-2 mt-2" onClick={e => e.stopPropagation()}>

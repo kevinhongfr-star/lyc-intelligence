@@ -109,7 +109,7 @@ export function PipelineSaveModal({ open, onClose, result, contactId, candidateN
         body: JSON.stringify({
           contact_id: finalContactId,
           mandate_id: selectedMandate.id,
-          stage: 'SWEEP',
+          stage: 'screened',
           sweep_tier: tier,
           match_score: result.composite_score,
           match_reasons: result.match_reasons,
