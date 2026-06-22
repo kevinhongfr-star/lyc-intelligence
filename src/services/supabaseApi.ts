@@ -2616,3 +2616,186 @@ export async function getMandateCandidates(mandateId: string): Promise<MandateCa
     return [];
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// TIMELINE/MILESTONES API (Phase 4.4)
+// ═══════════════════════════════════════════════════════════════
+
+export type MilestoneStatus = 'pending' | 'on_track' | 'at_risk' | 'overdue' | 'completed' | 'completed_late';
+
+export interface Milestone {
+  target_date: string | null;
+  actual_date: string | null;
+  status: MilestoneStatus;
+  notes?: string;
+}
+
+export interface MandateMilestones {
+  [key: string]: Milestone | undefined;
+  intake_complete?: Milestone;
+  solution_defined?: Milestone;
+  jd_approved?: Milestone;
+  market_defined?: Milestone;
+  longlist_ready?: Milestone;
+  shortlist_ready?: Milestone;
+  client_presentation?: Milestone;
+  first_interview?: Milestone;
+  offer_extended?: Milestone;
+  placement?: Milestone;
+}
+
+export interface MandateMilestoneData {
+  mandate_id: string;
+  mandate_title: string;
+  created_at: string;
+  milestones: MandateMilestones;
+}
+
+export interface AtRiskMandate {
+  mandateId: string;
+  mandateTitle: string;
+  clientName: string;
+  mostUrgentMilestone: string;
+  mostUrgentDays: number;
+  mostUrgentStatus: MilestoneStatus;
+}
+
+export interface StageAnalytics {
+  stage: string;
+  label: string;
+  avgDays: number;
+  minDays: number;
+  maxDays: number;
+  count: number;
+}
+
+export interface ConsultantAnalytics {
+  consultantId: string;
+  consultantName: string;
+  avgDaysToShortlist: number;
+  avgDaysToPlacement: number;
+  placementsCount: number;
+}
+
+// Get mandate milestones
+export async function getMandateMilestones(mandateId: string): Promise<MandateMilestoneData | null> {
+  try {
+    const res = await fetch(`/api/data/milestones/${mandateId}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Timeline] getMandateMilestones error:', e);
+    return null;
+  }
+}
+
+// Update a specific milestone
+export async function updateMilestone(
+  mandateId: string,
+  milestoneKey: string,
+  milestone: Milestone
+): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/milestones/${mandateId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ milestone_key: milestoneKey, milestone }),
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Timeline] updateMilestone error:', e);
+    return false;
+  }
+}
+
+// Initialize milestones for a mandate
+export async function initializeMilestones(mandateId: string): Promise<MandateMilestones | null> {
+  try {
+    const res = await fetch('/api/data/milestones/init', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mandate_id: mandateId }),
+    });
+
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Timeline] initializeMilestones error:', e);
+    return null;
+  }
+}
+
+// Get mandates with at-risk milestones
+export async function getMandatesAtRisk(): Promise<AtRiskMandate[]> {
+  try {
+    const res = await fetch('/api/data/milestones/at-risk');
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return [];
+  } catch (e) {
+    console.error('[Timeline] getMandatesAtRisk error:', e);
+    return [];
+  }
+}
+
+// Get timeline analytics
+export async function getTimelineAnalytics(): Promise<{
+  stage_analytics: StageAnalytics[];
+  consultant_analytics: ConsultantAnalytics[];
+  total_mandates: number;
+  completed_mandates: number;
+} | null> {
+  try {
+    const res = await fetch('/api/data/milestones/analytics');
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Timeline] getTimelineAnalytics error:', e);
+    return null;
+  }
+}
+
+// Get client timeline view (simplified)
+export async function getClientTimeline(mandateId: string): Promise<{
+  mandate_id: string;
+  mandate_title: string;
+  mandate_status: string;
+  milestones: MandateMilestones;
+} | null> {
+  try {
+    const res = await fetch(`/api/data/milestones/client/${mandateId}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Timeline] getClientTimeline error:', e);
+    return null;
+  }
+}

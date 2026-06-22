@@ -3464,9 +3464,489 @@ ${consultant?.name || 'LYC Intelligence'}`,
       }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // ENGAGEMENT TIMELINE ROUTES (Phase 4.4)
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── Get mandate milestones ──
+    if (resource === 'milestones' && id) {
+      if (method === 'GET') {
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: id,
+          select: 'id, title, milestones, created_at, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        // Parse milestones JSONB if string
+        const milestones = typeof mandate.milestones === 'string'
+          ? JSON.parse(mandate.milestones)
+          : mandate.milestones || {};
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            mandate_id: mandate.id,
+            mandate_title: mandate.title,
+            created_at: mandate.created_at,
+            milestones,
+          },
+        });
+      }
+    }
+
+    // ── Update mandate milestones ──
+    if (resource === 'milestones' && id) {
+      if (method === 'PUT' || method === 'PATCH') {
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: id,
+          select: 'id, milestones, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const { milestone_key, milestone } = req.body || {};
+
+        if (!milestone_key || !milestone) {
+          return res.status(400).json({ error: 'milestone_key and milestone are required' });
+        }
+
+        // Parse existing milestones
+        const existingMilestones = typeof mandate.milestones === 'string'
+          ? JSON.parse(mandate.milestones)
+          : mandate.milestones || {};
+
+        // Update the specific milestone
+        existingMilestones[milestone_key] = milestone;
+
+        // Update mandate
+        await db.update('mandates', { column: 'id', value: id }, {
+          milestones: existingMilestones,
+          updated_at: new Date().toISOString(),
+        }, 15000);
+
+        // Check for alerts (Phase 4.4 automated alerts)
+        await checkMilestoneAlerts(id, milestone_key, milestone, authUserId);
+
+        return res.status(200).json({
+          success: true,
+          message: 'Milestone updated',
+        });
+      }
+    }
+
+    // ── Initialize milestones for mandate ──
+    if (resource === 'milestones' && sub === 'init') {
+      if (method === 'POST') {
+        const { mandate_id } = req.body || {};
+
+        if (!mandate_id) {
+          return res.status(400).json({ error: 'mandate_id is required' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: mandate_id,
+          select: 'id, created_at, milestones, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        // Initialize milestones with default SLA targets
+        const milestones = initializeMilestones(mandate.created_at);
+
+        await db.update('mandates', { column: 'id', value: mandate_id }, {
+          milestones,
+          updated_at: new Date().toISOString(),
+        }, 15000);
+
+        return res.status(200).json({
+          success: true,
+          message: 'Milestones initialized',
+          data: milestones,
+        });
+      }
+    }
+
+    // ── Get mandates with at-risk milestones (dashboard) ──
+    if (resource === 'milestones' && sub === 'at-risk') {
+      if (method === 'GET') {
+        if (!orgId && userRole !== 'super_admin') {
+          return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        // Get all mandates with milestones
+        const mandates = await db.selectMany('mandates', {
+          where: userRole === 'super_admin'
+            ? []
+            : [{ column: 'organization_id', value: orgId, operator: 'eq' }],
+          select: 'id, title, milestones, created_at, organization_id, status',
+          limit: 500,
+        }, 15000);
+
+        const today = new Date();
+        const atRiskMandates = [];
+
+        for (const mandate of mandates) {
+          if (!mandate.milestones) continue;
+
+          const milestones = typeof mandate.milestones === 'string'
+            ? JSON.parse(mandate.milestones)
+            : mandate.milestones;
+
+          let isAtRisk = false;
+          let mostUrgentKey = '';
+          let mostUrgentDays = 0;
+          let mostUrgentStatus = '';
+
+          for (const [key, m] of Object.entries(milestones) as [string, any][]) {
+            if (!m?.target_date || m?.actual_date) continue;
+
+            const status = calculateMilestoneStatusFromDate(m.target_date, m.actual_date, today);
+
+            if (status === 'at_risk' || status === 'overdue') {
+              isAtRisk = true;
+              const daysUntilDue = Math.ceil(
+                (new Date(m.target_date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+              );
+
+              if (!mostUrgentKey || daysUntilDue < mostUrgentDays) {
+                mostUrgentKey = key;
+                mostUrgentDays = daysUntilDue;
+                mostUrgentStatus = status;
+              }
+            }
+          }
+
+          if (isAtRisk) {
+            // Get client name
+            const client = await db.selectOne('clients', {
+              column: 'id',
+              value: (mandate as any).client_id,
+              select: 'company_name',
+            });
+
+            atRiskMandates.push({
+              mandateId: mandate.id,
+              mandateTitle: mandate.title,
+              clientName: client?.company_name || 'Unknown Client',
+              mostUrgentMilestone: mostUrgentKey,
+              mostUrgentDays: mostUrgentDays,
+              mostUrgentStatus,
+            });
+          }
+        }
+
+        // Sort by urgency (most overdue first)
+        atRiskMandates.sort((a, b) => a.mostUrgentDays - b.mostUrgentDays);
+
+        return res.status(200).json({
+          success: true,
+          data: atRiskMandates,
+          total: atRiskMandates.length,
+        });
+      }
+    }
+
+    // ── Get timeline analytics (time-per-stage) ──
+    if (resource === 'milestones' && sub === 'analytics') {
+      if (method === 'GET') {
+        if (!orgId && userRole !== 'super_admin') {
+          return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        // Get completed mandates with milestones
+        const mandates = await db.selectMany('mandates', {
+          where: userRole === 'super_admin'
+            ? []
+            : [{ column: 'organization_id', value: orgId, operator: 'eq' }],
+          select: 'id, title, milestones, created_at, organization_id',
+          limit: 1000,
+        }, 15000);
+
+        // Calculate stage analytics
+        const stageData: Record<string, { days: number[]; actualDays: number[] }> = {};
+        const milestoneOrder = [
+          'intake_complete', 'solution_defined', 'jd_approved', 'market_defined',
+          'longlist_ready', 'shortlist_ready', 'client_presentation', 'first_interview',
+          'offer_extended', 'placement'
+        ];
+
+        for (const milestone of milestoneOrder) {
+          stageData[milestone] = { days: [], actualDays: [] };
+        }
+
+        let completedCount = 0;
+
+        for (const mandate of mandates) {
+          if (!mandate.milestones) continue;
+
+          const milestones = typeof mandate.milestones === 'string'
+            ? JSON.parse(mandate.milestones)
+            : mandate.milestones;
+
+          const createdAt = new Date(mandate.created_at);
+
+          for (const [key, m] of Object.entries(milestones) as [string, any][]) {
+            if (!stageData[key]) continue;
+
+            const defaultDays = getDefaultSLADays(key);
+            stageData[key].days.push(defaultDays);
+
+            if (m?.actual_date) {
+              completedCount++;
+              const actualDays = Math.ceil(
+                (new Date(m.actual_date).getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24)
+              );
+              stageData[key].actualDays.push(actualDays);
+            }
+          }
+        }
+
+        // Calculate stats
+        const stageAnalytics = milestoneOrder.map(key => {
+          const data = stageData[key];
+          const actualDays = data.actualDays;
+
+          return {
+            stage: key,
+            label: getMilestoneLabel(key),
+            avgDays: actualDays.length > 0
+              ? Math.round(actualDays.reduce((a, b) => a + b, 0) / actualDays.length)
+              : data.days[0] || 0,
+            minDays: actualDays.length > 0 ? Math.min(...actualDays) : 0,
+            maxDays: actualDays.length > 0 ? Math.max(...actualDays) : 0,
+            count: actualDays.length,
+          };
+        });
+
+        // Get consultant performance
+        const consultantData: Record<string, { toShortlist: number[]; toPlacement: number[]; placements: number }> = {};
+
+        // This would need a join with mandate_members to get consultant assignments
+        // For now, return empty consultant analytics
+        const consultantAnalytics: any[] = [];
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            stage_analytics: stageAnalytics,
+            consultant_analytics: consultantAnalytics,
+            total_mandates: mandates.length,
+            completed_mandates: completedCount,
+          },
+        });
+      }
+    }
+
+    // ── Get client timeline view (simplified) ──
+    if (resource === 'milestones' && sub === 'client' && id) {
+      if (method === 'GET') {
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: id,
+          select: 'id, title, milestones, status',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        // Parse milestones
+        const milestones = typeof mandate.milestones === 'string'
+          ? JSON.parse(mandate.milestones)
+          : mandate.milestones || {};
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            mandate_id: mandate.id,
+            mandate_title: mandate.title,
+            mandate_status: mandate.status,
+            milestones,
+          },
+        });
+      }
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}${sub ? '/' + sub : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TIMELINE HELPER FUNCTIONS (Phase 4.4)
+// ═══════════════════════════════════════════════════════════════
+
+const MILESTONE_LABELS: Record<string, string> = {
+  intake_complete: 'Intake Complete',
+  solution_defined: 'Solution Defined',
+  jd_approved: 'JD Approved',
+  market_defined: 'Market Defined',
+  longlist_ready: 'Longlist Ready',
+  shortlist_ready: 'Shortlist Ready',
+  client_presentation: 'Client Presentation',
+  first_interview: 'First Interview',
+  offer_extended: 'Offer Extended',
+  placement: 'Placement',
+};
+
+const DEFAULT_SLA_DAYS: Record<string, number> = {
+  intake_complete: 7,
+  solution_defined: 14,
+  jd_approved: 21,
+  market_defined: 28,
+  longlist_ready: 42,
+  shortlist_ready: 56,
+  client_presentation: 63,
+  first_interview: 77,
+  offer_extended: 98,
+  placement: 112,
+};
+
+function getMilestoneLabel(key: string): string {
+  return MILESTONE_LABELS[key] || key;
+}
+
+function getDefaultSLADays(key: string): number {
+  return DEFAULT_SLA_DAYS[key] || 0;
+}
+
+function initializeMilestones(mandateCreatedAt: string): any {
+  const createdDate = new Date(mandateCreatedAt);
+  const milestones: Record<string, any> = {};
+
+  const milestoneKeys = [
+    'intake_complete', 'solution_defined', 'jd_approved', 'market_defined',
+    'longlist_ready', 'shortlist_ready', 'client_presentation', 'first_interview',
+    'offer_extended', 'placement'
+  ];
+
+  for (const key of milestoneKeys) {
+    const days = DEFAULT_SLA_DAYS[key] || 0;
+    const targetDate = new Date(createdDate);
+    targetDate.setDate(targetDate.getDate() + days);
+
+    milestones[key] = {
+      target_date: targetDate.toISOString().split('T')[0],
+      actual_date: null,
+      status: 'pending',
+      notes: '',
+    };
+  }
+
+  return milestones;
+}
+
+function calculateMilestoneStatusFromDate(targetDate: string, actualDate: string | null, today: Date): string {
+  if (actualDate) {
+    return new Date(actualDate) <= new Date(targetDate) ? 'completed' : 'completed_late';
+  }
+
+  const daysUntilDue = Math.ceil(
+    (new Date(targetDate).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  if (daysUntilDue < 0) return 'overdue';
+  if (daysUntilDue <= 7) return 'at_risk';
+  return 'on_track';
+}
+
+async function checkMilestoneAlerts(mandateId: string, milestoneKey: string, milestone: any, userId: string | null) {
+  const today = new Date();
+  const targetDate = new Date(milestone.target_date);
+  const daysUntilDue = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+  const milestoneLabel = getMilestoneLabel(milestoneKey);
+
+  // Get mandate info
+  const mandate = await db.selectOne('mandates', {
+    column: 'id',
+    value: mandateId,
+    select: 'id, title',
+  });
+
+  if (!mandate) return;
+
+  // Get assigned consultants
+  const members = await db.selectMany('mandate_members', {
+    where: [{ column: 'mandate_id', value: mandateId }],
+    limit: 10,
+  }, 15000);
+
+  for (const member of members) {
+    // 7 days before due date
+    if (daysUntilDue === 7) {
+      await db.insert('notifications', {
+        user_id: member.user_id,
+        type: 'milestone_upcoming',
+        title: `Upcoming: ${milestoneLabel}`,
+        message: `Milestone "${milestoneLabel}" for "${mandate.title}" is due in 7 days.`,
+        related_id: mandateId,
+        related_type: 'mandate',
+        created_at: new Date().toISOString(),
+      }, 15000);
+    }
+
+    // On due date
+    if (daysUntilDue === 0 && !milestone.actual_date) {
+      await db.insert('notifications', {
+        user_id: member.user_id,
+        type: 'milestone_due',
+        title: `Due today: ${milestoneLabel}`,
+        message: `Milestone "${milestoneLabel}" for "${mandate.title}" is due today.`,
+        related_id: mandateId,
+        related_type: 'mandate',
+        created_at: new Date().toISOString(),
+      }, 15000);
+    }
+
+    // 3 days overdue
+    if (daysUntilDue === -3 && !milestone.actual_date) {
+      await db.insert('notifications', {
+        user_id: member.user_id,
+        type: 'milestone_overdue',
+        title: `Overdue: ${milestoneLabel}`,
+        message: `Milestone "${milestoneLabel}" for "${mandate.title}" is 3 days past due.`,
+        related_id: mandateId,
+        related_type: 'mandate',
+        created_at: new Date().toISOString(),
+      }, 15000);
+    }
+
+    // 7 days overdue (critical)
+    if (daysUntilDue === -7 && !milestone.actual_date) {
+      await db.insert('notifications', {
+        user_id: member.user_id,
+        type: 'milestone_critical',
+        title: `Critical: ${milestoneLabel} is 7 days overdue`,
+        message: `Milestone "${milestoneLabel}" for "${mandate.title}" is 7 days past due. Immediate action required.`,
+        related_id: mandateId,
+        related_type: 'mandate',
+        created_at: new Date().toISOString(),
+      }, 15000);
+    }
   }
 }
 
