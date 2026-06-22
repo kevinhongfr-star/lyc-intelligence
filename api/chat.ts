@@ -4,7 +4,7 @@ const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 const COZE_API_KEY = process.env.COZE_API_KEY || '';
 const COZE_BOT_ID = process.env.COZE_BOT_ID || '';
 const COZE_ENDPOINT = process.env.COZE_API_ENDPOINT || 'https://api.coze.cn/v3/chat';
-const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || ''; // For council tier
+const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || '';
 
 const ANONYMOUS_SYSTEM_PROMPT = `You are Nexus, the career intelligence advisor for LYC Intelligence — 
 powered by LYC Partners, a global leadership advisory and executive 
@@ -62,8 +62,6 @@ interface Memory {
   timestamp: string;
 }
 
-
-// Simple in-memory rate limiting (resets on cold start — good enough for launch)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
@@ -78,7 +76,6 @@ function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
   return false;
 }
 
-// Per-provider fetch timeout (Vercel Hobby plan default is 10s, we need headroom)
 const PROVIDER_TIMEOUT_MS = 7000;
 
 async function fetchWithTimeout(url: string, options: any, timeoutMs: number): Promise<Response> {
@@ -91,169 +88,83 @@ async function fetchWithTimeout(url: string, options: any, timeoutMs: number): P
   }
 }
 
-// Allow function to run up to 60s on Vercel (Hobby default is 10s — too short for AI calls)
 export const maxDuration = 60;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
-  if (isRateLimited(ip, 30, 60 * 1000)) {
-    return res.status(429).json({ error: 'Rate limit exceeded', response: 'Too many requests. Please wait a moment and try again.' });
-  }
-
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const {
-    message,
-    history = [],
-    userId,
-    tier = 'free',
-    memoryContext = [],
-    documentContext = '',
-  } = req.body;
-
-  if (!message) return res.status(400).json({ error: 'Missing message' });
-
-  // Choose system prompt based on authentication status
-  let systemPrompt = ANONYMOUS_SYSTEM_PROMPT;
-  if (userId) {
-    systemPrompt = AUTHENTICATED_SYSTEM_PROMPT_TEMPLATE
-      .replace('{memory_context}', memoryContext.length > 0 
-        ? `User Memory:\n${memoryContext.map((m: Memory) => `- ${m.type}: ${m.content}`).join('\n')}` 
-        : 'No prior user memory available.')
-      .replace('{document_context}', documentContext 
-        ? `\nUploaded Document Context:\n${documentContext}` 
-        : '');
-  }
-
-  const messages: Message[] = [
-    { role: 'system', content: systemPrompt },
-    ...(history as Message[]),
-    { role: 'user', content: message },
-  ];
-
-  // Add instruction to generate suggested prompts
-  messages.push({
-    role: 'system',
-    content: 'Please provide your response, and also include 3 context-aware follow-up suggestions that the user might want to ask next. Format your response as a JSON object with two keys: "response" (your answer as a string) and "suggested_prompts" (array of 3 strings).'
-  });
-
-  let responseText = 'Sorry, I am having trouble responding right now. Please try again later.';
-  let suggestedPrompts: string[] = [];
-  let tokensUsed = 0;
-
-  // Try Claude first if council tier
-  if (tier === 'council' && CLAUDE_API_KEY) {
-    try {
-      const claudeRes = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': CLAUDE_API_KEY,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-3-5-sonnet-20241022',
-          max_tokens: 2048,
-          messages: messages.filter(m => m.role !== 'system').map(m => ({
-            role: m.role === 'assistant' ? 'assistant' : 'user',
-            content: m.content
-          })),
-          system: messages.find(m => m.role === 'system')?.content,
-        })
-      }, PROVIDER_TIMEOUT_MS);
-      if (claudeRes.ok) {
-        const data = await claudeRes.json();
-        const content = data.content?.[0]?.text || 'No response';
-        tokensUsed = data.usage?.total_tokens || 0;
-        
-        // Parse response and suggested prompts
-        const parsed = parseAIResponse(content);
-        responseText = parsed.response;
-        suggestedPrompts = parsed.suggested_prompts;
-        return res.status(200).json({ response: responseText, suggested_prompts: suggestedPrompts, usage: { tokens: tokensUsed } });
-      }
-    } catch (e) {
-      console.warn('[Claude] Failed:', e);
+    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
+    if (isRateLimited(ip, 30, 60 * 1000)) {
+      return res.status(429).json({ error: 'Rate limit exceeded', response: 'Too many requests. Please wait a moment and try again.' });
     }
-  }
 
-  // Try DeepSeek next
-  if (DEEPSEEK_API_KEY) {
-    try {
-      const dsRes = await fetchWithTimeout('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages,
-          max_tokens: 2048,
-          temperature: 0.3,
-          response_format: { type: 'json_object' },
-        })
-      }, PROVIDER_TIMEOUT_MS);
-      if (dsRes.ok) {
-        const data = await dsRes.json();
-        const content = data.choices?.[0]?.message?.content || '{"response":"No response","suggested_prompts":[]}';
-        tokensUsed = data.usage?.total_tokens || 0;
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const {
+      message,
+      history = [],
+      userId,
+      tier = 'free',
+      memoryContext = [],
+      documentContext = '',
+      messageCount = 0,
+    } = req.body;
 
-        const parsed = parseAIResponse(content);
-        responseText = parsed.response;
-        suggestedPrompts = parsed.suggested_prompts;
-        return res.status(200).json({ response: responseText, suggested_prompts: suggestedPrompts, usage: { tokens: tokensUsed } });
-      }
-    } catch (e) {
-      console.warn('[DeepSeek] Failed:', e);
+    if (!message) return res.status(400).json({ error: 'Missing message' });
+
+    let systemPrompt = ANONYMOUS_SYSTEM_PROMPT;
+    if (userId) {
+      systemPrompt = AUTHENTICATED_SYSTEM_PROMPT_TEMPLATE
+        .replace('{memory_context}', memoryContext.length > 0 
+          ? `User Memory:\n${memoryContext.map((m: Memory) => `- ${m.type}: ${m.content}`).join('\n')}` 
+          : 'No prior user memory available.')
+        .replace('{document_context}', documentContext 
+          ? `\nUploaded Document Context:\n${documentContext}` 
+          : '');
     }
-  }
 
-  // Fall back to Coze
-  if (COZE_API_KEY && COZE_BOT_ID) {
-    try {
-      const cozeRes = await fetchWithTimeout(COZE_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${COZE_API_KEY}`
-        },
-        body: JSON.stringify({
-          bot_id: COZE_BOT_ID,
-          user_id: userId || 'anonymous',
-          stream: false,
-          auto_save_history: true,
-          additional_messages: [{
-            role: 'user',
-            content: JSON.stringify(messages),
-            content_type: 'text'
-          }]
-        })
-      }, PROVIDER_TIMEOUT_MS);
-      if (cozeRes.ok) {
-        const data = await cozeRes.json();
-        const content = data.messages?.filter((m: any) => m.role === 'assistant' && m.type === 'answer')?.[0]?.content || '{"response":"No response","suggested_prompts":[]}';
-        
-        const parsed = parseAIResponse(content);
-        responseText = parsed.response;
-        suggestedPrompts = parsed.suggested_prompts;
-        return res.status(200).json({ response: responseText, suggested_prompts: suggestedPrompts, usage: { tokens: tokensUsed } });
+    const messages: Message[] = [
+      { role: 'system', content: systemPrompt },
+      ...(history as Message[]),
+      { role: 'user', content: message },
+    ];
+
+    messages.push({
+      role: 'system',
+      content: 'Please provide your response, and also include 3 context-aware follow-up suggestions that the user might want to ask next. Format your response as a JSON object with two keys: "response" (your answer as a string) and "suggested_prompts" (array of 3 strings).'
+    });
+
+    if (tier === 'council' && CLAUDE_API_KEY) {
+      const result = await tryClaude(messages);
+      if (result) {
+        return res.status(200).json(result);
       }
-    } catch (e) {
-      console.warn('[Coze] Failed:', e);
     }
-  }
 
-  // Default fallback
-  return res.status(200).json({
-    response: responseText,
-    suggested_prompts: [
-      'How do I start the career assessment?',
-      'What is cross-border readiness?',
-      'How does Score Match work?',
-    ],
-    usage: { tokens: 0 }
-  });
+    if (DEEPSEEK_API_KEY) {
+      const result = await tryDeepSeekStreaming(messages, res);
+      if (result) return;
+      
+      const fallbackResult = await tryDeepSeekNonStreaming(messages);
+      if (fallbackResult) {
+        return res.status(200).json(fallbackResult);
+      }
+    }
+
+    if (COZE_API_KEY && COZE_BOT_ID) {
+      const result = await tryCoze(messages, userId);
+      if (result) {
+        return res.status(200).json(result);
+      }
+    }
+
+    return res.status(200).json({
+      response: 'Sorry, I am having trouble responding right now. Please try again later.',
+      suggested_prompts: [
+        'How do I start the career assessment?',
+        'What is cross-border readiness?',
+        'How does Score Match work?',
+      ],
+      usage: { tokens: 0 }
+    });
   } catch (err: any) {
     console.error('[chat] Unhandled error:', err);
     return res.status(500).json({
@@ -262,6 +173,184 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       details: process.env.NODE_ENV === 'development' ? String(err?.message || err) : undefined
     });
   }
+}
+
+async function tryClaude(messages: Message[]): Promise<{ response: string; suggested_prompts: string[]; usage: { tokens: number } } | null> {
+  try {
+    const claudeRes = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CLAUDE_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 2048,
+        messages: messages.filter(m => m.role !== 'system').map(m => ({
+          role: m.role === 'assistant' ? 'assistant' : 'user',
+          content: m.content
+        })),
+        system: messages.find(m => m.role === 'system')?.content,
+      })
+    }, PROVIDER_TIMEOUT_MS);
+    
+    if (claudeRes.ok) {
+      const data = await claudeRes.json();
+      const content = data.content?.[0]?.text || 'No response';
+      const tokensUsed = data.usage?.total_tokens || 0;
+      const parsed = parseAIResponse(content);
+      return {
+        response: parsed.response,
+        suggested_prompts: parsed.suggested_prompts,
+        usage: { tokens: tokensUsed }
+      };
+    }
+  } catch (e) {
+    console.warn('[Claude] Failed:', e);
+  }
+  return null;
+}
+
+async function tryDeepSeekStreaming(messages: Message[], res: VercelResponse): Promise<boolean> {
+  try {
+    const dsRes = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages,
+        max_tokens: 2048,
+        temperature: 0.3,
+        stream: true,
+      })
+    });
+
+    if (!dsRes.ok || !dsRes.body) return false;
+
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Transfer-Encoding': 'chunked',
+      'Connection': 'keep-alive',
+    });
+
+    const reader = dsRes.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let fullContent = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith('data: ')) continue;
+
+        try {
+          const data = JSON.parse(trimmed.slice(6));
+          const content = data.choices?.[0]?.delta?.content;
+          if (content) {
+            fullContent += content;
+            res.write(JSON.stringify({ response: fullContent, suggested_prompts: [] }) + '\n');
+          }
+        } catch (e) {
+          console.warn('[DeepSeek Streaming] Parse error:', e);
+        }
+      }
+    }
+
+    const parsed = parseAIResponse(fullContent);
+    res.write(JSON.stringify({ 
+      response: parsed.response, 
+      suggested_prompts: parsed.suggested_prompts,
+      usage: { tokens: 0 }
+    }) + '\n');
+    res.end();
+    return true;
+  } catch (e) {
+    console.warn('[DeepSeek Streaming] Failed:', e);
+    return false;
+  }
+}
+
+async function tryDeepSeekNonStreaming(messages: Message[]): Promise<{ response: string; suggested_prompts: string[]; usage: { tokens: number } } | null> {
+  try {
+    const dsRes = await fetchWithTimeout('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages,
+        max_tokens: 2048,
+        temperature: 0.3,
+        response_format: { type: 'json_object' },
+      })
+    }, PROVIDER_TIMEOUT_MS);
+    
+    if (dsRes.ok) {
+      const data = await dsRes.json();
+      const content = data.choices?.[0]?.message?.content || '{"response":"No response","suggested_prompts":[]}';
+      const tokensUsed = data.usage?.total_tokens || 0;
+      const parsed = parseAIResponse(content);
+      return {
+        response: parsed.response,
+        suggested_prompts: parsed.suggested_prompts,
+        usage: { tokens: tokensUsed }
+      };
+    }
+  } catch (e) {
+    console.warn('[DeepSeek Non-Streaming] Failed:', e);
+  }
+  return null;
+}
+
+async function tryCoze(messages: Message[], userId: string | undefined): Promise<{ response: string; suggested_prompts: string[]; usage: { tokens: number } } | null> {
+  try {
+    const cozeRes = await fetchWithTimeout(COZE_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${COZE_API_KEY}`
+      },
+      body: JSON.stringify({
+        bot_id: COZE_BOT_ID,
+        user_id: userId || 'anonymous',
+        stream: false,
+        auto_save_history: true,
+        additional_messages: [{
+          role: 'user',
+          content: JSON.stringify(messages),
+          content_type: 'text'
+        }]
+      })
+    }, PROVIDER_TIMEOUT_MS);
+    
+    if (cozeRes.ok) {
+      const data = await cozeRes.json();
+      const content = data.messages?.filter((m: any) => m.role === 'assistant' && m.type === 'answer')?.[0]?.content || '{"response":"No response","suggested_prompts":[]}';
+      const parsed = parseAIResponse(content);
+      return {
+        response: parsed.response,
+        suggested_prompts: parsed.suggested_prompts,
+        usage: { tokens: 0 }
+      };
+    }
+  } catch (e) {
+    console.warn('[Coze] Failed:', e);
+  }
+  return null;
 }
 
 function parseAIResponse(content: string) {
@@ -276,7 +365,6 @@ function parseAIResponse(content: string) {
       ]
     };
   } catch (e) {
-    // If JSON parsing fails, assume the whole content is the response and use default suggestions
     return {
       response: content,
       suggested_prompts: [
