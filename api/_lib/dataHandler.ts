@@ -3789,6 +3789,446 @@ ${consultant?.name || 'LYC Intelligence'}`,
       }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // OFFER ROUTES (Phase 4.5)
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── List offers ──
+    if (resource === 'offers') {
+      if (method === 'GET' && !id) {
+        const { status, candidate_id, mandate_id } = req.query || {};
+
+        const where = [];
+        if (orgId && userRole !== 'super_admin') {
+          where.push({ column: 'organization_id', value: orgId, operator: 'eq' });
+        }
+        if (status) {
+          where.push({ column: 'status', value: status, operator: 'eq' });
+        }
+        if (candidate_id) {
+          where.push({ column: 'candidate_id', value: candidate_id, operator: 'eq' });
+        }
+        if (mandate_id) {
+          where.push({ column: 'mandate_id', value: mandate_id, operator: 'eq' });
+        }
+
+        const offers = await db.selectMany('offers', {
+          where,
+          select: 'id, candidate_id, mandate_id, position_title, start_date, status, created_at, organization_id',
+          order: { column: 'created_at', direction: 'desc' },
+          limit: 100,
+        }, 15000);
+
+        return res.status(200).json({ success: true, data: offers });
+      }
+    }
+
+    // ── Get single offer ──
+    if (resource === 'offers' && id) {
+      if (method === 'GET') {
+        const offer = await db.selectOne('offers', {
+          column: 'id',
+          value: id,
+          select: '*',
+        });
+
+        if (!offer) {
+          return res.status(404).json({ error: 'Offer not found' });
+        }
+
+        if (userRole !== 'super_admin' && offer.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        // Get related data
+        const candidate = await db.selectOne('contacts', {
+          column: 'id',
+          value: offer.candidate_id,
+          select: 'first_name, last_name, email',
+        });
+
+        const mandate = offer.mandate_id ? await db.selectOne('mandates', {
+          column: 'id',
+          value: offer.mandate_id,
+          select: 'title, client_id',
+        }) : null;
+
+        const client = mandate?.client_id ? await db.selectOne('clients', {
+          column: 'id',
+          value: mandate.client_id,
+          select: 'company_name',
+        }) : null;
+
+        const creator = offer.created_by ? await db.selectOne('profiles', {
+          column: 'id',
+          value: offer.created_by,
+          select: 'name, email',
+        }) : null;
+
+        const partnerApprover = offer.partner_approved_by ? await db.selectOne('profiles', {
+          column: 'id',
+          value: offer.partner_approved_by,
+          select: 'name',
+        }) : null;
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            ...offer,
+            candidate_name: candidate ? `${candidate.first_name} ${candidate.last_name}` : 'Unknown',
+            candidate_email: candidate?.email,
+            client_name: client?.company_name || 'Unknown',
+            mandate_title: mandate?.title,
+            created_by_name: creator?.name,
+            partner_approved_by_name: partnerApprover?.name,
+          },
+        });
+      }
+
+      // ── Update offer ──
+      if (method === 'PUT' || method === 'PATCH') {
+        const offer = await db.selectOne('offers', {
+          column: 'id',
+          value: id,
+          select: 'id, organization_id, status',
+        });
+
+        if (!offer) {
+          return res.status(404).json({ error: 'Offer not found' });
+        }
+
+        if (userRole !== 'super_admin' && offer.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const { status, partner_approval_notes, client_approval_notes, client_rejection_reason, partner_rejection_reason } = req.body || {};
+
+        const updates: Record<string, any> = {};
+
+        // Status transitions
+        if (status) {
+          updates.status = status;
+
+          // Set timestamps based on status
+          if (status === 'sent') updates.sent_at = new Date().toISOString();
+          if (status === 'accepted') updates.accepted_at = new Date().toISOString();
+          if (status === 'rejected') {
+            updates.rejected_at = new Date().toISOString();
+            updates.rejected_by = authUserId;
+          }
+
+          // Partner approval
+          if (status === 'pending_partner_approval') {
+            // Already has created_by set
+          }
+
+          // Client approval
+          if (status === 'pending_client_approval') {
+            updates.partner_approved_by = authUserId;
+            if (partner_approval_notes) updates.partner_approval_notes = partner_approval_notes;
+          }
+
+          // Handle rejection feedback
+          if (status === 'draft' && offer.status === 'pending_partner_approval') {
+            if (partner_rejection_reason) updates.partner_rejection_reason = partner_rejection_reason;
+          }
+          if (status === 'draft' && offer.status === 'pending_client_approval') {
+            if (client_rejection_reason) updates.client_rejection_reason = client_rejection_reason;
+          }
+        }
+
+        if (Object.keys(updates).length > 0) {
+          await db.update('offers', { column: 'id', value: id }, updates, 15000);
+
+          // If offer accepted, initialize onboarding checklist and schedule follow-ups
+          if (status === 'accepted') {
+            const updatedOffer = await db.selectOne('offers', {
+              column: 'id',
+              value: id,
+              select: 'start_date',
+            });
+
+            if (updatedOffer?.start_date) {
+              // Set probation end date (3 months from start)
+              const probationEnd = new Date(updatedOffer.start_date);
+              probationEnd.setMonth(probationEnd.getMonth() + 3);
+
+              // Initialize onboarding checklist
+              const checklist = await db.query(
+                "SELECT generate_onboarding_checklist() as checklist"
+              );
+
+              await db.update('offers', { column: 'id', value: id }, {
+                onboarding_checklist: checklist.rows?.[0]?.checklist || [],
+                probation_end_date: probationEnd.toISOString().split('T')[0],
+              }, 15000);
+
+              // Schedule post-placement follow-ups (would integrate with cron/scheduler)
+              // For now, just mark the fields exist
+            }
+          }
+        }
+
+        return res.status(200).json({ success: true, message: 'Offer updated' });
+      }
+
+      // ── Delete offer ──
+      if (method === 'DELETE') {
+        const offer = await db.selectOne('offers', {
+          column: 'id',
+          value: id,
+          select: 'id, organization_id',
+        });
+
+        if (!offer) {
+          return res.status(404).json({ error: 'Offer not found' });
+        }
+
+        if (userRole !== 'super_admin' && offer.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        await db.delete('offers', { column: 'id', value: id }, 15000);
+
+        return res.status(200).json({ success: true, message: 'Offer deleted' });
+      }
+    }
+
+    // ── Create offer ──
+    if (resource === 'offers' && sub === 'create') {
+      if (method === 'POST') {
+        const {
+          candidate_id,
+          mandate_id,
+          position_title,
+          start_date,
+          compensation,
+          conditions,
+          expiration_date,
+          cover_letter,
+          additional_notes,
+          submit_for_approval,
+        } = req.body || {};
+
+        if (!candidate_id || !position_title || !start_date || !compensation?.base_salary) {
+          return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const candidate = await db.selectOne('contacts', {
+          column: 'id',
+          value: candidate_id,
+          select: 'organization_id',
+        });
+
+        if (!candidate) {
+          return res.status(404).json({ error: 'Candidate not found' });
+        }
+
+        const status = submit_for_approval ? 'pending_partner_approval' : 'draft';
+
+        const offerId = await db.insert('offers', {
+          candidate_id,
+          mandate_id: mandate_id || null,
+          position_title,
+          start_date,
+          compensation: JSON.stringify(compensation),
+          conditions: conditions || null,
+          expiration_date,
+          cover_letter: cover_letter || null,
+          additional_notes: additional_notes || null,
+          status,
+          created_by: authUserId,
+          organization_id: candidate.organization_id || orgId,
+        }, 15000);
+
+        return res.status(201).json({
+          success: true,
+          offer_id: offerId,
+          message: submit_for_approval ? 'Offer submitted for partner approval' : 'Offer saved as draft',
+        });
+      }
+    }
+
+    // ── Update onboarding task ──
+    if (resource === 'offers' && sub === 'onboarding' && id) {
+      if (method === 'PATCH') {
+        const { task_index, completed, notes } = req.body || {};
+
+        const offer = await db.selectOne('offers', {
+          column: 'id',
+          value: id,
+          select: 'id, onboarding_checklist, organization_id',
+        });
+
+        if (!offer) {
+          return res.status(404).json({ error: 'Offer not found' });
+        }
+
+        if (userRole !== 'super_admin' && offer.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const checklist = typeof offer.onboarding_checklist === 'string'
+          ? JSON.parse(offer.onboarding_checklist)
+          : offer.onboarding_checklist || [];
+
+        if (task_index >= 0 && task_index < checklist.length) {
+          checklist[task_index].completed = completed;
+          checklist[task_index].completed_at = completed ? new Date().toISOString() : null;
+          checklist[task_index].completed_by = completed ? authUserId : null;
+          if (notes !== undefined) {
+            checklist[task_index].notes = notes;
+          }
+
+          // Check if all completed
+          const allCompleted = checklist.every((t: any) => t.completed);
+
+          await db.update('offers', { column: 'id', value: id }, {
+            onboarding_checklist: JSON.stringify(checklist),
+            onboarding_completed_at: allCompleted ? new Date().toISOString() : null,
+          }, 15000);
+        }
+
+        return res.status(200).json({ success: true, message: 'Task updated' });
+      }
+    }
+
+    // ── Record follow-up response ──
+    if (resource === 'offers' && sub === 'followup' && id) {
+      if (method === 'PATCH') {
+        const { type, response } = req.body || {};
+
+        const offer = await db.selectOne('offers', {
+          column: 'id',
+          value: id,
+          select: 'id, organization_id',
+        });
+
+        if (!offer) {
+          return res.status(404).json({ error: 'Offer not found' });
+        }
+
+        if (userRole !== 'super_admin' && offer.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const updates: Record<string, any> = {};
+        if (type === '1m') {
+          updates.follow_up_1m_response = response;
+        } else if (type === '3m') {
+          updates.follow_up_3m_response = response;
+        } else if (type === '6m') {
+          updates.follow_up_6m_response = response;
+        }
+
+        if (Object.keys(updates).length > 0) {
+          await db.update('offers', { column: 'id', value: id }, updates, 15000);
+        }
+
+        return res.status(200).json({ success: true, message: 'Response recorded' });
+      }
+    }
+
+    // ── Update probation status ──
+    if (resource === 'offers' && sub === 'probation' && id) {
+      if (method === 'PATCH') {
+        const { status, notes, extended_to } = req.body || {};
+
+        const offer = await db.selectOne('offers', {
+          column: 'id',
+          value: id,
+          select: 'id, organization_id',
+        });
+
+        if (!offer) {
+          return res.status(404).json({ error: 'Offer not found' });
+        }
+
+        if (userRole !== 'super_admin' && offer.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const updates: Record<string, any> = {};
+        if (status) updates.probation_status = status;
+        if (notes) updates.probation_notes = notes;
+        if (extended_to) updates.probation_extended_to = extended_to;
+
+        await db.update('offers', { column: 'id', value: id }, updates, 15000);
+
+        return res.status(200).json({ success: true, message: 'Probation status updated' });
+      }
+    }
+
+    // ── Get probation reviews ──
+    if (resource === 'offers' && sub === 'probation-reviews') {
+      if (method === 'GET') {
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+        const reviews = await db.selectMany('offers', {
+          where: [
+            ...(orgId && userRole !== 'super_admin' ? [{ column: 'organization_id', value: orgId, operator: 'eq' }] : []),
+            { column: 'probation_end_date', value: thirtyDaysFromNow.toISOString().split('T')[0], operator: 'lte' },
+            { column: 'probation_status', value: 'pending', operator: 'eq' },
+          ],
+          select: 'id, position_title, probation_end_date, probation_status, start_date',
+          order: { column: 'probation_end_date', direction: 'asc' },
+          limit: 50,
+        }, 15000);
+
+        // Get candidate names
+        const enrichedReviews = await Promise.all(
+          reviews.map(async (review: any) => {
+            const candidate = await db.selectOne('contacts', {
+              column: 'id',
+              value: review.candidate_id,
+              select: 'first_name, last_name',
+            });
+            return {
+              ...review,
+              candidate_name: candidate ? `${candidate.first_name} ${candidate.last_name}` : 'Unknown',
+            };
+          })
+        );
+
+        return res.status(200).json({ success: true, data: enrichedReviews });
+      }
+    }
+
+    // ── Send offer to candidate ──
+    if (resource === 'offers' && sub === 'send' && id) {
+      if (method === 'POST') {
+        const offer = await db.selectOne('offers', {
+          column: 'id',
+          value: id,
+          select: '*',
+        });
+
+        if (!offer) {
+          return res.status(404).json({ error: 'Offer not found' });
+        }
+
+        if (offer.status !== 'pending_client_approval') {
+          return res.status(400).json({ error: 'Offer must be approved by client first' });
+        }
+
+        // Update status to sent
+        await db.update('offers', { column: 'id', value: id }, {
+          status: 'sent',
+          sent_at: new Date().toISOString(),
+          client_approved_by: authUserId,
+        }, 15000);
+
+        // TODO: Send email via Resend
+        // const emailResult = await sendOfferEmail(offer);
+
+        return res.status(200).json({
+          success: true,
+          message: 'Offer sent to candidate',
+        });
+      }
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}${sub ? '/' + sub : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);

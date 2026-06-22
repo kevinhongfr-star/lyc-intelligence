@@ -2799,3 +2799,310 @@ export async function getClientTimeline(mandateId: string): Promise<{
     return null;
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// OFFER API (Phase 4.5)
+// ═══════════════════════════════════════════════════════════════
+
+export type OfferStatus = 'draft' | 'pending_partner_approval' | 'pending_client_approval' | 'sent' | 'accepted' | 'rejected' | 'withdrawn' | 'onboarding' | 'active' | 'probation' | 'completed';
+
+export type ProbationStatus = 'pending' | 'passed' | 'extended' | 'failed';
+
+export interface Compensation {
+  base_salary: number;
+  bonus?: number;
+  bonus_percentage?: number;
+  equity?: string;
+  benefits?: string;
+  total_compensation?: number;
+}
+
+export interface OnboardingTask {
+  task: string;
+  category: 'documentation' | 'verification' | 'setup' | 'communication' | 'planning';
+  completed: boolean;
+  completed_at: string | null;
+  completed_by: string | null;
+  notes: string | null;
+  due_days?: number;
+}
+
+export interface Offer {
+  id: string;
+  candidate_id: string;
+  mandate_id: string | null;
+  position_title: string;
+  start_date: string;
+  compensation: Compensation;
+  conditions: string | null;
+  expiration_date: string;
+  status: OfferStatus;
+  cover_letter?: string;
+  additional_notes?: string;
+  created_by: string;
+  partner_approved_by?: string;
+  client_approved_by?: string;
+  partner_approval_notes?: string;
+  client_approval_notes?: string;
+  sent_at?: string;
+  accepted_at?: string;
+  rejected_at?: string;
+  onboarding_checklist: OnboardingTask[];
+  onboarding_completed_at?: string;
+  follow_up_1m_sent: boolean;
+  follow_up_3m_sent: boolean;
+  follow_up_6m_sent: boolean;
+  probation_end_date?: string;
+  probation_status: ProbationStatus;
+  probation_notes?: string;
+  candidate_name: string;
+  candidate_email: string;
+  client_name: string;
+  mandate_title?: string;
+  created_by_name: string;
+  organization_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateOfferParams {
+  candidate_id: string;
+  mandate_id?: string;
+  position_title: string;
+  start_date: string;
+  compensation: Compensation;
+  conditions?: string;
+  expiration_date: string;
+  cover_letter?: string;
+  additional_notes?: string;
+  submit_for_approval?: boolean;
+}
+
+export interface ProbationReview {
+  id: string;
+  position_title: string;
+  candidate_name: string;
+  probation_end_date: string;
+  probation_status: ProbationStatus;
+  start_date: string;
+}
+
+// List offers
+export async function getOffers(params?: {
+  status?: OfferStatus;
+  candidate_id?: string;
+  mandate_id?: string;
+}): Promise<Offer[]> {
+  try {
+    const query = new URLSearchParams();
+    if (params?.status) query.set('status', params.status);
+    if (params?.candidate_id) query.set('candidate_id', params.candidate_id);
+    if (params?.mandate_id) query.set('mandate_id', params.mandate_id);
+
+    const res = await fetch(`/api/data/offers?${query.toString()}`);
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return [];
+  } catch (e) {
+    console.error('[Offer] getOffers error:', e);
+    return [];
+  }
+}
+
+// Get single offer
+export async function getOffer(offerId: string): Promise<Offer | null> {
+  try {
+    const res = await fetch(`/api/data/offers/${offerId}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Offer] getOffer error:', e);
+    return null;
+  }
+}
+
+// Create offer
+export async function createOffer(params: CreateOfferParams): Promise<{ success: boolean; offer_id?: string; message?: string }> {
+  try {
+    const res = await fetch('/api/data/offers/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      return { success: false, message: err.error };
+    }
+
+    const result = await res.json();
+    return {
+      success: result.success,
+      offer_id: result.offer_id,
+      message: result.message,
+    };
+  } catch (e) {
+    console.error('[Offer] createOffer error:', e);
+    return { success: false, message: 'Network error' };
+  }
+}
+
+// Update offer
+export async function updateOffer(
+  offerId: string,
+  updates: {
+    status?: OfferStatus;
+    partner_approval_notes?: string;
+    client_approval_notes?: string;
+    partner_rejection_reason?: string;
+    client_rejection_reason?: string;
+  }
+): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/offers/${offerId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Offer] updateOffer error:', e);
+    return false;
+  }
+}
+
+// Delete offer
+export async function deleteOffer(offerId: string): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/offers/${offerId}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Offer] deleteOffer error:', e);
+    return false;
+  }
+}
+
+// Update onboarding task
+export async function updateOnboardingTask(
+  offerId: string,
+  taskIndex: number,
+  completed: boolean,
+  notes?: string
+): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/offers/onboarding/${offerId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ task_index: taskIndex, completed, notes }),
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Offer] updateOnboardingTask error:', e);
+    return false;
+  }
+}
+
+// Record follow-up response
+export async function recordFollowUpResponse(
+  offerId: string,
+  type: '1m' | '3m' | '6m',
+  response: string
+): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/offers/followup/${offerId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, response }),
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Offer] recordFollowUpResponse error:', e);
+    return false;
+  }
+}
+
+// Update probation status
+export async function updateProbationStatus(
+  offerId: string,
+  status: ProbationStatus,
+  notes?: string,
+  extended_to?: string
+): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/offers/probation/${offerId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status, notes, extended_to }),
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Offer] updateProbationStatus error:', e);
+    return false;
+  }
+}
+
+// Get probation reviews
+export async function getProbationReviews(): Promise<ProbationReview[]> {
+  try {
+    const res = await fetch('/api/data/offers/probation-reviews');
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return [];
+  } catch (e) {
+    console.error('[Offer] getProbationReviews error:', e);
+    return [];
+  }
+}
+
+// Send offer to candidate
+export async function sendOfferToCandidate(offerId: string): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/offers/send/${offerId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Offer] sendOfferToCandidate error:', e);
+    return false;
+  }
+}
