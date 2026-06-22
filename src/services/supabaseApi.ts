@@ -1198,3 +1198,266 @@ export async function deleteTargetCompany(companyId: string): Promise<boolean> {
     return false;
   }
 }
+
+// ─── Advisory Assessment API Functions ───
+
+export interface WorkshopData {
+  id: string;
+  organization_id: string;
+  title: string;
+  assessment_type: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MOSAIC';
+  mandate_id: string | null;
+  scheduled_date: string;
+  duration_minutes: number;
+  location: string | null;
+  max_participants: number;
+  status: 'draft' | 'launched' | 'completed' | 'cancelled';
+  allow_report_download: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ParticipantData {
+  id: string;
+  workshop_id: string;
+  email: string;
+  name: string | null;
+  token: string;
+  status: 'invited' | 'started' | 'completed';
+  responses: Record<string, any> | null;
+  submitted_at: string | null;
+  created_at: string;
+}
+
+export interface WorkshopScore {
+  id: string;
+  workshop_id: string;
+  participant_id: string;
+  assessment_type: string;
+  dimension_scores: Record<string, number>;
+  archetype: string;
+  style: string;
+  strengths: string[];
+  development_areas: string[];
+  recommendations: string[];
+  raw_analysis: string;
+  created_at: string;
+}
+
+export async function createWorkshop(data: {
+  organization_id: string;
+  title: string;
+  assessment_type: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MOSAIC';
+  mandate_id?: string | null;
+  scheduled_date: string;
+  duration_minutes: number;
+  location?: string | null;
+  max_participants: number;
+  created_by: string;
+}): Promise<WorkshopData | null> {
+  try {
+    const res = await fetch('/api/data/workshops', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to create workshop' }));
+      console.error('[Workshop] createWorkshop error:', err);
+      return null;
+    }
+
+    const result = await res.json();
+    return result.data as WorkshopData;
+  } catch (e) {
+    console.error('[Workshop] createWorkshop error:', e);
+    return null;
+  }
+}
+
+export async function addWorkshopParticipants(workshopId: string, participants: Array<{ email: string; name?: string }>): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/workshops/participants', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workshop_id: workshopId, participants }),
+    });
+
+    return res.ok;
+  } catch (e) {
+    console.error('[Workshop] addWorkshopParticipants error:', e);
+    return false;
+  }
+}
+
+export async function sendInviteEmails(workshopId: string): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/workshops/send-invites', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workshop_id: workshopId }),
+    });
+
+    return res.ok;
+  } catch (e) {
+    console.error('[Workshop] sendInviteEmails error:', e);
+    return false;
+  }
+}
+
+export async function getMandatesForOrg(orgId: string): Promise<Mandate[]> {
+  try {
+    const res = await fetch(`/api/data/mandates?org_id=${orgId}`);
+    const result = await res.json();
+    if (result.success) {
+      return (result.data || []).map((m: any) => ({ ...m, title: cleanMandateTitle(m.title) }));
+    }
+    return [];
+  } catch (e) {
+    console.error('[Workshop] getMandatesForOrg error:', e);
+    return [];
+  }
+}
+
+export async function deductOrgCredits(orgId: string, amount: number, reason: string): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/orgs/deduct-credits', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ org_id: orgId, amount, reason }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to deduct credits' }));
+      console.error('[Workshop] deductOrgCredits error:', err);
+      return false;
+    }
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Workshop] deductOrgCredits error:', e);
+    return false;
+  }
+}
+
+export async function getWorkshopByToken(token: string): Promise<{ workshop: WorkshopData; participant: ParticipantData } | null> {
+  try {
+    const res = await fetch(`/api/data/workshops/participant?token=${token}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as { workshop: WorkshopData; participant: ParticipantData };
+    }
+    return null;
+  } catch (e) {
+    console.error('[Workshop] getWorkshopByToken error:', e);
+    return null;
+  }
+}
+
+export async function saveParticipantResponses(participantId: string, responses: Record<string, any>): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/workshops/participant/responses', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ participant_id: participantId, responses }),
+    });
+
+    return res.ok;
+  } catch (e) {
+    console.error('[Workshop] saveParticipantResponses error:', e);
+    return false;
+  }
+}
+
+export async function submitAssessment(participantId: string): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/workshops/participant/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ participant_id: participantId }),
+    });
+
+    return res.ok;
+  } catch (e) {
+    console.error('[Workshop] submitAssessment error:', e);
+    return false;
+  }
+}
+
+export async function scoreAdvisoryAssessment(workshopId: string, participantId: string): Promise<WorkshopScore | null> {
+  try {
+    const res = await fetch('/api/scoring/advisory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workshop_id: workshopId, participant_id: participantId }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to score assessment' }));
+      console.error('[Workshop] scoreAdvisoryAssessment error:', err);
+      return null;
+    }
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as WorkshopScore;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Workshop] scoreAdvisoryAssessment error:', e);
+    return null;
+  }
+}
+
+export async function getWorkshopById(workshopId: string): Promise<WorkshopData | null> {
+  try {
+    const res = await fetch(`/api/data/workshops/${workshopId}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as WorkshopData;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Workshop] getWorkshopById error:', e);
+    return null;
+  }
+}
+
+export async function getWorkshopParticipants(workshopId: string): Promise<ParticipantData[]> {
+  try {
+    const res = await fetch(`/api/data/workshops/${workshopId}/participants`);
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as ParticipantData[];
+    }
+    return [];
+  } catch (e) {
+    console.error('[Workshop] getWorkshopParticipants error:', e);
+    return [];
+  }
+}
+
+export async function getWorkshopScores(workshopId: string): Promise<WorkshopScore[]> {
+  try {
+    const res = await fetch(`/api/data/workshops/${workshopId}/scores`);
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as WorkshopScore[];
+    }
+    return [];
+  } catch (e) {
+    console.error('[Workshop] getWorkshopScores error:', e);
+    return [];
+  }
+}

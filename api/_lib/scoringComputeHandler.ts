@@ -1317,3 +1317,258 @@ export async function handleSHIFTReport(
     return handleError(res, 'shift.report', err);
   }
 }
+
+// ─────────────────────────────────────────────────────────────────
+// Advisory Assessment Mode — workshop-based assessments
+// ─────────────────────────────────────────────────────────────────
+
+interface AdvisoryAssessmentResponse {
+  workshop_id: string;
+  participant_id: string;
+  dimension_scores: Record<string, number>;
+  archetype: string;
+  style: string;
+  strengths: string[];
+  development_areas: string[];
+  recommendations: string[];
+}
+
+const ADVISORY_CONFIGS: Record<string, { name: string; dimensions: string[] }> = {
+  PRISM: {
+    name: 'Brand Strategy Workshop',
+    dimensions: ['Vision', 'Resilience', 'Influence', 'Strategy', 'Mastery'],
+  },
+  FORGE: {
+    name: 'Sales Leadership Alignment',
+    dimensions: ['Drive', 'Relationship', 'Strategy', 'Execution', 'Adaptability'],
+  },
+  SPARK: {
+    name: 'AI Literacy Workshop',
+    dimensions: ['AI Vision', 'Data Fluency', 'Change Leadership', 'Ethics', 'Innovation'],
+  },
+  BRIDGE: {
+    name: 'HQ Alignment',
+    dimensions: ['Cultural', 'Strategic', 'Operational', 'Political', 'Network'],
+  },
+  MOSAIC: {
+    name: 'Cross-Cultural Simulation',
+    dimensions: ['CQ Drive', 'CQ Knowledge', 'CQ Strategy', 'CQ Action', 'CQ Adaptability'],
+  },
+};
+
+function buildAdvisoryPrompt(assessmentType: string, responses: Record<string, any>): string {
+  const config = ADVISORY_CONFIGS[assessmentType];
+  const dimensionNames = config.dimensions.join(', ');
+  
+  const responseSummary = Object.entries(responses)
+    .map(([key, value]) => {
+      const dimensionId = key.split('_')[0];
+      const dimension = config.dimensions.find(d => 
+        d.toLowerCase().replace(/\s+/g, '') === dimensionId
+      ) || dimensionId;
+      return `${dimension} (question ${key.split('_')[1]}): ${value}`;
+    })
+    .join('\n');
+
+  return `
+You are an organizational psychology expert. Analyze this ${assessmentType} workshop assessment:
+
+Assessment Dimensions: ${dimensionNames}
+
+Participant responses:
+${responseSummary}
+
+For each dimension of ${assessmentType}, provide:
+1. Score (0-100) based on the participant's responses
+2. Identify the participant's primary archetype from these options: Strategic Architect, Resilient Operator, Influential Leader, Masterful Expert
+3. Identify the participant's style from these options: Analytical, Visionary, Pragmatic, Empathetic
+4. List 3-5 key strengths
+5. List 3-5 development areas
+6. Provide 3-5 workshop recommendations
+
+Return ONLY valid JSON in this format:
+{
+  "dimension_scores": { "dimension_name": score, ... },
+  "archetype": "archetype_name",
+  "style": "style_name",
+  "strengths": ["strength1", "strength2", ...],
+  "development_areas": ["area1", "area2", ...],
+  "workshop_recommendations": ["rec1", "rec2", ...]
+}
+
+Ensure all dimension names match exactly: ${dimensionNames}
+`;
+}
+
+function parseAdvisoryResponse(content: string): Partial<AdvisoryAssessmentResponse> {
+  try {
+    const jsonStr = content.replace(/```json\n?/g, '').replace(/\n?```/g, '').trim();
+    const parsed = JSON.parse(jsonStr);
+    return {
+      dimension_scores: parsed.dimension_scores || {},
+      archetype: parsed.archetype || 'Unknown',
+      style: parsed.style || 'Unknown',
+      strengths: parsed.strengths || [],
+      development_areas: parsed.development_areas || [],
+      recommendations: parsed.workshop_recommendations || [],
+    };
+  } catch {
+    return {
+      dimension_scores: {},
+      archetype: 'Unknown',
+      style: 'Unknown',
+      strengths: [],
+      development_areas: [],
+      recommendations: [],
+    };
+  }
+}
+
+export async function handleAdvisoryAssessment(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const { workshop_id, participant_id, responses, assessment_type } = req.body;
+
+    if (!workshop_id || !participant_id || !responses || !assessment_type) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields',
+      });
+    }
+
+    const validTypes = Object.keys(ADVISORY_CONFIGS);
+    if (!validTypes.includes(assessment_type)) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid assessment_type. Must be one of: ${validTypes.join(', ')}`,
+      });
+    }
+
+    const prompt = buildAdvisoryPrompt(assessment_type, responses);
+    const { content } = await callDeepSeekForSHIFT(prompt);
+    const analysis = parseAdvisoryResponse(content);
+
+    const result: AdvisoryAssessmentResponse = {
+      workshop_id,
+      participant_id,
+      dimension_scores: analysis.dimension_scores || {},
+      archetype: analysis.archetype || 'Unknown',
+      style: analysis.style || 'Unknown',
+      strengths: analysis.strengths || [],
+      development_areas: analysis.development_areas || [],
+      recommendations: analysis.recommendations || [],
+    };
+
+    return res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    return handleError(res, 'advisory.assessment', err);
+  }
+}
+
+export async function handleAdvisoryReport(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const { workshop_id, scores } = req.body;
+
+    if (!workshop_id || !scores || !Array.isArray(scores)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields',
+      });
+    }
+
+    const avgScores: Record<string, number> = {};
+    scores.forEach((score: any) => {
+      Object.entries(score.dimension_scores || {}).forEach(([dim, val]) => {
+        avgScores[dim] = (avgScores[dim] || 0) + val;
+      });
+    });
+
+    Object.keys(avgScores).forEach(dim => {
+      avgScores[dim] = Math.round(avgScores[dim] / scores.length);
+    });
+
+    const archetypeDistribution: Record<string, number> = {};
+    scores.forEach((score: any) => {
+      archetypeDistribution[score.archetype] = (archetypeDistribution[score.archetype] || 0) + 1;
+    });
+
+    const result = {
+      workshop_id,
+      participant_count: scores.length,
+      avg_dimension_scores: avgScores,
+      archetype_distribution: archetypeDistribution,
+    };
+
+    return res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    return handleError(res, 'advisory.report', err);
+  }
+}
+
+export async function handleParticipantAssessment(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const { workshop_id, token } = req.query;
+
+    if (!workshop_id || !token) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required parameters',
+      });
+    }
+
+    const participant = await selectOne('workshop_participants', {
+      column: 'token',
+      value: token as string,
+    });
+
+    if (!participant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Invalid or expired token',
+      });
+    }
+
+    const workshop = await selectOne('workshops', {
+      column: 'id',
+      value: workshop_id as string,
+    });
+
+    if (!workshop) {
+      return res.status(404).json({
+        success: false,
+        error: 'Workshop not found',
+      });
+    }
+
+    const result = {
+      workshop: {
+        id: workshop.id,
+        title: workshop.title,
+        assessment_type: workshop.assessment_type,
+        duration_minutes: workshop.duration_minutes,
+        allow_report_download: workshop.allow_report_download,
+      },
+      participant: {
+        id: participant.id,
+        email: participant.email,
+        name: participant.name,
+        status: participant.status,
+      },
+    };
+
+    return res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    return handleError(res, 'advisory.participant', err);
+  }
+}
