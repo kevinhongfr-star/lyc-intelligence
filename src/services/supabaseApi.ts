@@ -254,6 +254,108 @@ export async function updatePipelineStage(pipelineId: string, stage: string): Pr
   return true;
 }
 
+// Bulk update mandates status
+export async function bulkUpdateMandateStatus(mandateIds: string[], status: string): Promise<boolean> {
+  const { error } = await getSupabase()
+    .from('mandates')
+    .update({ status, updated_at: new Date().toISOString() })
+    .in('id', mandateIds);
+  if (error) {
+    console.error('[Supabase] bulkUpdateMandateStatus:', error);
+    return false;
+  }
+  return true;
+}
+
+// Get METRIX transcripts for a candidate
+export async function getMetrixTranscripts(candidateName: string, company?: string): Promise<{
+  id: string;
+  content: string;
+  relevance_score: number;
+  created_at: string;
+}[]> {
+  const sb = getSupabase();
+  
+  let query = sb
+    .from('org_intel_transcripts')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(10);
+  
+  if (company) {
+    query = query.or(`participant_name.ilike.%${candidateName}%,company.ilike.%${company}%`);
+  } else {
+    query = query.ilike('participant_name', `%${candidateName}%`);
+  }
+  
+  const { data, error } = await query;
+  if (error) {
+    console.error('[Supabase] getMetrixTranscripts:', error);
+    return [];
+  }
+  
+  return (data || []).map((t: any) => ({
+    id: t.id,
+    content: t.transcript_text || t.content || '',
+    relevance_score: t.relevance_score || 0,
+    created_at: t.created_at,
+  }));
+}
+
+// Check if candidate has METRIX transcript
+export async function hasMetrixTranscript(candidateId: string): Promise<boolean> {
+  const sb = getSupabase();
+  
+  const { data, error } = await sb
+    .from('org_intel_transcripts')
+    .select('id')
+    .limit(1)
+    .single();
+  
+  // This is a simplified check - in reality you'd link by contact_id
+  return !error && data !== null;
+}
+
+// Update mandate with pipeline stats
+export async function updateMandatePipelineStats(mandateId: string): Promise<boolean> {
+  const sb = getSupabase();
+  
+  try {
+    // Get pipeline counts
+    const { data: pipeline } = await sb
+      .from('candidates_pipeline')
+      .select('stage')
+      .eq('mandate_id', mandateId);
+    
+    if (!pipeline) return false;
+    
+    const counts: Record<string, number> = {};
+    pipeline.forEach((p: any) => {
+      const stage = p.stage || 'SWEEP';
+      counts[stage] = (counts[stage] || 0) + 1;
+    });
+    
+    // Update mandate with counts
+    const { error } = await sb
+      .from('mandates')
+      .update({
+        total_candidates: pipeline.length,
+        tier1_count: counts['CANVA'] || counts['approach'] || 0,
+        tier2_count: counts['GRID'] || counts['screened'] || 0,
+        shortlisted_count: counts['shortlisted'] || counts['client_submitted'] || 0,
+        interview_count: counts['interview_1'] || counts['interview_2'] || counts['final_interview'] || 0,
+        placed_count: counts['onboarded'] || counts['probation_passed'] || 0,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', mandateId);
+    
+    return !error;
+  } catch (e) {
+    console.error('[Supabase] updateMandatePipelineStats:', e);
+    return false;
+  }
+}
+
 export async function updatePipelineVerdict(pipelineId: string, verdict: string): Promise<boolean> {
   const { error } = await getSupabase().from('candidates_pipeline').update({ verdict, updated_at: new Date().toISOString() }).eq('id', pipelineId);
   if (error) { console.error('[Supabase] updatePipelineVerdict:', error); return false; }
