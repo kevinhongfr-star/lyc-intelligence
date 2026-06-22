@@ -24,7 +24,8 @@ Do not include any other text, no markdown, no code fences.`;
 export function buildCriterionPrompt(
   criterion: Criterion,
   individualContext: string,
-  mandateContext: string
+  mandateContext: string,
+  successProfileContext: string = ''
 ): string {
   return `You are evaluating a candidate against the "${criterion.name}" criterion.
 
@@ -40,9 +41,9 @@ Individual context (public sources, admin intelligence):
 ${individualContext}
 
 Target mandate (the role they would step into):
-${mandateContext}
+${mandateContext}${successProfileContext}
 
-Apply the rubric to this individual against this mandate. Output the score (0-20 integer) and a one-sentence rationale citing the strongest evidence you found in the context.
+Apply the rubric to this individual against this mandate and success profile requirements. Output the score (0-20 integer) and a one-sentence rationale citing the strongest evidence you found in the context.
 
 ${RESPONSE_FORMAT}`;
 }

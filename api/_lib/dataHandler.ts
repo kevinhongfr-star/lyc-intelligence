@@ -783,6 +783,261 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ success: true, questions });
     }
 
+    // ── Success Profile CRUD (Phase 1.2) ──
+    if (resource === 'success-profile') {
+      if (method === 'POST' && !id) {
+        const { mandate_id, ...profileData } = req.body || {};
+        if (!mandate_id) {
+          return res.status(400).json({ error: 'mandate_id is required' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: mandate_id,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const row = await db.insert('success_profiles', {
+          mandate_id,
+          ...profileData,
+          defined_by: authUserId || null,
+        }, 15000);
+        return res.status(201).json({ success: true, data: row });
+      }
+
+      if (method === 'GET' && !id) {
+        const mandateId = req.query.mandate_id as string;
+        if (!mandateId) {
+          return res.status(400).json({ error: 'mandate_id query param required' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: mandateId,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const profiles = await db.selectMany('success_profiles', {
+          where: [{ column: 'mandate_id', value: mandateId }],
+          orderBy: { column: 'created_at', ascending: false },
+          limit: 10,
+        }, 15000);
+        return res.status(200).json({ success: true, data: profiles });
+      }
+
+      if (method === 'GET' && id) {
+        const profile = await db.selectOne('success_profiles', {
+          column: 'id',
+          value: id,
+        }, 15000);
+
+        if (!profile) {
+          return res.status(404).json({ error: 'Profile not found' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: profile.mandate_id,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        return res.status(200).json({ success: true, data: profile });
+      }
+
+      if (method === 'PATCH' && id) {
+        const profile = await db.selectOne('success_profiles', {
+          column: 'id',
+          value: id,
+          select: 'id, mandate_id',
+        });
+
+        if (!profile) {
+          return res.status(404).json({ error: 'Profile not found' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: profile.mandate_id,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const updates = req.body || {};
+        delete updates.id;
+        delete updates.created_at;
+        delete updates.mandate_id;
+
+        const rows = await db.update('success_profiles', { column: 'id', value: id }, updates, 15000);
+        return res.status(200).json({ success: true, data: rows[0] || null });
+      }
+
+      if (method === 'DELETE' && id) {
+        const profile = await db.selectOne('success_profiles', {
+          column: 'id',
+          value: id,
+          select: 'id, mandate_id',
+        });
+
+        if (!profile) {
+          return res.status(404).json({ error: 'Profile not found' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: profile.mandate_id,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const count = await db.deleteRows('success_profiles', { column: 'id', value: id }, 15000);
+        return res.status(200).json({ success: true, deleted: count });
+      }
+    }
+
+    // ── Success Profile Approval (Phase 1.2) ──
+    if (resource === 'success-profile-approve') {
+      if (method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+      }
+
+      if (!authUserId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const { profile_id, notes } = req.body || {};
+      if (!profile_id) {
+        return res.status(400).json({ error: 'profile_id is required' });
+      }
+
+      const profile = await db.selectOne('success_profiles', {
+        column: 'id',
+        value: profile_id,
+        select: 'id, mandate_id, status',
+      });
+
+      if (!profile) {
+        return res.status(404).json({ error: 'Profile not found' });
+      }
+
+      if (profile.status !== 'pending_approval') {
+        return res.status(400).json({ error: 'Only profiles pending approval can be approved' });
+      }
+
+      const mandate = await db.selectOne('mandates', {
+        column: 'id',
+        value: profile.mandate_id,
+        select: 'id, organization_id',
+      });
+
+      if (!mandate) {
+        return res.status(404).json({ error: 'Mandate not found' });
+      }
+
+      if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const rows = await db.update('success_profiles', { column: 'id', value: profile_id }, {
+        status: 'approved',
+        approved_by: authUserId,
+        approval_notes: notes || null,
+        rejection_reason: null,
+      }, 15000);
+      return res.status(200).json({ success: true, data: rows[0] || null });
+    }
+
+    // ── Success Profile Reject (Phase 1.2) ──
+    if (resource === 'success-profile-reject') {
+      if (method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+      }
+
+      if (!authUserId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const { profile_id, reason } = req.body || {};
+      if (!profile_id) {
+        return res.status(400).json({ error: 'profile_id is required' });
+      }
+      if (!reason || !reason.trim()) {
+        return res.status(400).json({ error: 'rejection reason is required' });
+      }
+
+      const profile = await db.selectOne('success_profiles', {
+        column: 'id',
+        value: profile_id,
+        select: 'id, mandate_id, status',
+      });
+
+      if (!profile) {
+        return res.status(404).json({ error: 'Profile not found' });
+      }
+
+      if (profile.status !== 'pending_approval') {
+        return res.status(400).json({ error: 'Only profiles pending approval can be rejected' });
+      }
+
+      const mandate = await db.selectOne('mandates', {
+        column: 'id',
+        value: profile.mandate_id,
+        select: 'id, organization_id',
+      });
+
+      if (!mandate) {
+        return res.status(404).json({ error: 'Mandate not found' });
+      }
+
+      if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const rows = await db.update('success_profiles', { column: 'id', value: profile_id }, {
+        status: 'rejected',
+        approved_by: authUserId,
+        rejection_reason: reason,
+      }, 15000);
+      return res.status(200).json({ success: true, data: rows[0] || null });
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);

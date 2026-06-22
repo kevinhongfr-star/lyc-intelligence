@@ -90,3 +90,76 @@ export const DEFAULT_INTAKE: IntakeData = {
   client_interview_notes: null,
   intake_complete: false,
 };
+
+// ─── Success Profile (Phase 1.2) ────────────────────────────────────
+
+export type DiscProfile = 'D' | 'i' | 'S' | 'C' | 'mixed';
+export type CharacterLevel = 'essential' | 'preferred' | 'nice-to-have';
+export type LanguageLevel = 'native' | 'fluent' | 'conversational';
+export type ProfileStatus = 'draft' | 'pending_approval' | 'approved' | 'rejected';
+
+export interface PersonalityIndicator {
+  trait: string;
+  importance: number; // 1-5
+  evidence: string;
+}
+
+export interface CharacterRequirement {
+  trait: string;
+  level: CharacterLevel;
+}
+
+export interface EducationRequirement {
+  degree: string;
+  field: string;
+  required: boolean;
+}
+
+export interface LanguageRequirement {
+  language: string;
+  level: LanguageLevel;
+}
+
+export interface SuccessProfile {
+  id: string;
+  mandate_id: string;
+  // Experience
+  required_experience_years?: number | null;
+  required_industries?: string[] | null;
+  required_geographies?: string[] | null;
+  required_companies?: string[] | null;
+  deal_size_range?: string | null;
+  team_size_managed?: number | null;
+  // Personality
+  target_disc_profile?: DiscProfile | null;
+  personality_indicators?: PersonalityIndicator[] | null;
+  character_requirements?: CharacterRequirement[] | null;
+  // Background
+  education_requirements?: EducationRequirement[] | null;
+  certifications?: string[] | null;
+  language_requirements?: LanguageRequirement[] | null;
+  // Metadata
+  status: ProfileStatus;
+  defined_by?: string | null;
+  approved_by?: string | null;
+  approval_notes?: string | null;
+  rejection_reason?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const DEFAULT_SUCCESS_PROFILE: Partial<SuccessProfile> = {
+  required_experience_years: 10,
+  required_industries: [],
+  required_geographies: [],
+  required_companies: [],
+  deal_size_range: '',
+  team_size_managed: 0,
+  target_disc_profile: 'mixed',
+  personality_indicators: [],
+  character_requirements: [],
+  education_requirements: [],
+  certifications: [],
+  language_requirements: [],
+  status: 'draft',
+};

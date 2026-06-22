@@ -510,3 +510,69 @@ export function isIntakeComplete(mandate: Mandate | null | undefined): boolean {
   const intake = mandate.intake_data as any;
   return intake && intake.intake_complete === true;
 }
+
+// ─── Success Profile (Phase 1.2) ────────────────────────────────────
+
+export async function saveSuccessProfile(mandateId: string, profileData: unknown): Promise<boolean> {
+  const { error } = await getSupabase()
+    .from('success_profiles')
+    .upsert({ ...profileData, mandate_id: mandateId })
+    .select();
+  if (error) { console.error('[Supabase] saveSuccessProfile:', error); return false; }
+  return true;
+}
+
+export async function getSuccessProfiles(mandateId: string): Promise<any[]> {
+  const { data, error } = await getSupabase()
+    .from('success_profiles')
+    .select('*')
+    .eq('mandate_id', mandateId)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  if (error) { console.error('[Supabase] getSuccessProfiles:', error); return []; }
+  return data || [];
+}
+
+export async function getApprovedSuccessProfile(mandateId: string): Promise<any | null> {
+  const { data, error } = await getSupabase()
+    .from('success_profiles')
+    .select('*')
+    .eq('mandate_id', mandateId)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+  if (error) { console.error('[Supabase] getApprovedSuccessProfile:', error); return null; }
+  return data || null;
+}
+
+export async function approveSuccessProfile(profileId: string, approverId: string, notes?: string): Promise<boolean> {
+  const { error } = await getSupabase()
+    .from('success_profiles')
+    .update({
+      status: 'approved',
+      approved_by: approverId,
+      approval_notes: notes || null,
+      rejection_reason: null,
+    })
+    .eq('id', profileId);
+  if (error) { console.error('[Supabase] approveSuccessProfile:', error); return false; }
+  return true;
+}
+
+export async function rejectSuccessProfile(profileId: string, approverId: string, reason: string): Promise<boolean> {
+  const { error } = await getSupabase()
+    .from('success_profiles')
+    .update({
+      status: 'rejected',
+      approved_by: approverId,
+      rejection_reason: reason,
+    })
+    .eq('id', profileId);
+  if (error) { console.error('[Supabase] rejectSuccessProfile:', error); return false; }
+  return true;
+}
+
+export function hasApprovedSuccessProfile(mandate: Mandate | null | undefined): boolean {
+  return false;
+}

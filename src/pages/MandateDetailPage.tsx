@@ -8,7 +8,12 @@ import { executeAIAction, type AIAction } from '@/services/aiQuickActions';
 import { updateMandateStatus, updatePipelineStage, updatePipelineVerdict } from '@/services/supabaseApi';
 import { MandateTeam } from '@/components/mandate/MandateTeam';
 import { MandateIntakeForm } from '@/components/mandate/MandateIntakeForm';
+import { SuccessProfileForm } from '@/components/mandate/SuccessProfileForm';
+import { SuccessProfileApproval } from '@/components/mandate/SuccessProfileApproval';
 import { useAuthStore } from '@/stores/authStore';
+import { getSuccessProfiles } from '@/services/supabaseApi';
+import type { SuccessProfile } from '@/types';
+import { useState, useEffect, useCallback } from 'react';
 
 const STATUS_OPTIONS = [
   { value: '1_search', label: 'SWEEP', color: '#00897B' },
@@ -29,7 +34,7 @@ const AI_ACTIONS: { key: AIAction; icon: any; label: string }[] = [
   { key: 'feedback', icon: MessageSquare, label: 'Feedback' },
 ];
 
-type TabKey = 'overview' | 'intake' | 'pipeline';
+type TabKey = 'overview' | 'intake' | 'success-profile' | 'pipeline';
 
 export function MandateDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -38,6 +43,50 @@ export function MandateDetailPage() {
   const [tab, setTab] = useState<TabKey>('overview');
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState<string | null>(null);
+  const [successProfiles, setSuccessProfiles] = useState<SuccessProfile[]>([]);
+  const [loadingProfiles, setLoadingProfiles] = useState(false);
+
+  const loadProfiles = useCallback(async () => {
+    if (!mandate?.id) return;
+    setLoadingProfiles(true);
+    const profiles = await getSuccessProfiles(mandate.id);
+    setSuccessProfiles(profiles.map(p => normalizeProfile(p)));
+    setLoadingProfiles(false);
+  }, [mandate?.id]);
+
+  useEffect(() => {
+    loadProfiles();
+  }, [loadProfiles]);
+
+  const hasApprovedProfile = successProfiles.some(p => p.status === 'approved');
+  const hasPendingProfile = successProfiles.some(p => p.status === 'pending_approval');
+  const isAdmin = profile?.role === 'super_admin' || profile?.role === 'lyc_admin';
+
+  function normalizeProfile(raw: any): SuccessProfile {
+    return {
+      id: raw.id || '',
+      mandate_id: raw.mandate_id || '',
+      required_experience_years: raw.required_experience_years ?? null,
+      required_industries: Array.isArray(raw.required_industries) ? raw.required_industries : [],
+      required_geographies: Array.isArray(raw.required_geographies) ? raw.required_geographies : [],
+      required_companies: Array.isArray(raw.required_companies) ? raw.required_companies : [],
+      deal_size_range: raw.deal_size_range || null,
+      team_size_managed: raw.team_size_managed ?? null,
+      target_disc_profile: (raw.target_disc_profile as any) || 'mixed',
+      personality_indicators: Array.isArray(raw.personality_indicators) ? raw.personality_indicators : [],
+      character_requirements: Array.isArray(raw.character_requirements) ? raw.character_requirements : [],
+      education_requirements: Array.isArray(raw.education_requirements) ? raw.education_requirements : [],
+      certifications: Array.isArray(raw.certifications) ? raw.certifications : [],
+      language_requirements: Array.isArray(raw.language_requirements) ? raw.language_requirements : [],
+      status: (raw.status as any) || 'draft',
+      defined_by: raw.defined_by || null,
+      approved_by: raw.approved_by || null,
+      approval_notes: raw.approval_notes || null,
+      rejection_reason: raw.rejection_reason || null,
+      created_at: raw.created_at || new Date().toISOString(),
+      updated_at: raw.updated_at || new Date().toISOString(),
+    };
+  }
   const [aiOutput, setAiOutput] = useState<string | null>(null);
   const [statusUpdating, setStatusUpdating] = useState(false);
 
@@ -153,6 +202,7 @@ export function MandateDetailPage() {
         {([
           { key: 'overview', label: 'Overview', icon: Eye },
           { key: 'intake', label: 'Intake', icon: ListChecks, warn: !intakeComplete },
+          { key: 'success-profile', label: 'Success Profile', icon: CheckCircle, warn: !hasApprovedProfile },
           { key: 'pipeline', label: `Pipeline (${pipeline.length})`, icon: Users },
         ] as { key: TabKey; label: string; icon: any; warn?: boolean }[]).map(t => (
           <button
@@ -279,6 +329,55 @@ export function MandateDetailPage() {
 
       {tab === 'intake' && (
         <MandateIntakeForm mandate={mandate} onSaved={() => refresh()} />
+      )}
+
+      {tab === 'success-profile' && (
+        <div className="space-y-4">
+          {loadingProfiles ? (
+            <div className="py-10 text-center">Loading profiles...</div>
+          ) : (
+            <>
+              {/* Admin approval panel */}
+              {isAdmin && hasPendingProfile && (
+                <SuccessProfileApproval
+                  profile={successProfiles.find(p => p.status === 'pending_approval')!}
+                  mandateTitle={mandate.title}
+                  onApproved={() => loadProfiles()}
+                />
+              )}
+
+              {/* Success profile form */}
+              <SuccessProfileForm mandate={mandate} onSaved={() => loadProfiles()} />
+
+              {/* Profile history */}
+              {successProfiles.length > 1 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Previous Profiles</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {successProfiles.slice(1).map(p => (
+                        <div key={p.id} className="flex items-center justify-between text-sm p-2 bg-slate-50 rounded">
+                          <div>
+                            <span className={`inline-block px-2 py-0.5 rounded text-xs mr-2 ${
+                              p.status === 'approved' ? 'bg-emerald-100 text-emerald-800' :
+                              p.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                              'bg-slate-200 text-slate-700'
+                            }`}>
+                              {p.status.replace('_', ' ')}
+                            </span>
+                            Created {new Date(p.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
+        </div>
       )}
 
       {tab === 'pipeline' && (

@@ -58,6 +58,7 @@ const EVAL_TYPE = 'org_intel_v1';
 interface ComputeRequestBody {
   talent_id?: string;
   mandate_id?: string;
+  success_profile_id?: string;
   force?: boolean;
   override_summary?: string;
   public?: boolean;
@@ -463,6 +464,7 @@ async function handleAdminMode(
 
   const talentId = body.talent_id;
   const mandateId = body.mandate_id;
+  const successProfileId = body.success_profile_id;
 
   const talent = await selectOne('org_talent_pools', {
     column: 'id',
@@ -488,10 +490,40 @@ async function handleAdminMode(
     });
   }
 
+  let successProfile: any = null;
+  if (successProfileId) {
+    if (!UUID_RE.test(successProfileId)) {
+      return err(res, 400, {
+        success: false,
+        error: 'success_profile_id must be a UUID',
+        step: 'validate',
+      });
+    }
+    successProfile = await selectOne('success_profiles', {
+      column: 'id',
+      value: successProfileId,
+    });
+    if (!successProfile) {
+      return err(res, 404, {
+        success: false,
+        error: `Success profile ${successProfileId} not found in success_profiles`,
+        step: 'fetch_success_profile',
+      });
+    }
+    if (successProfile.status !== 'approved') {
+      return err(res, 400, {
+        success: false,
+        error: 'Only approved success profiles can be used for evaluation',
+        step: 'validate',
+      });
+    }
+  }
+
   const sources = buildSourcesFromTalent(talent);
   const corpus = buildCorpus(sources);
   const individualContext = buildIndividualContext(talent, corpus);
   const mandateContext = buildMandateContext(mandate);
+  const successProfileContext = successProfile ? buildSuccessProfileContext(successProfile) : '';
 
   const subScores: SubScores = { C1: 0, C2: 0, C3: 0, C4: 0, C5: 0 };
   const rationales: Record<CriterionId, string> = {
@@ -508,7 +540,7 @@ async function handleAdminMode(
     const results = await Promise.all(
       (Object.keys(CRITERIA) as CriterionId[]).map(async (cId) => {
         const c = CRITERIA[cId];
-        const prompt = buildCriterionPrompt(c, individualContext, mandateContext);
+        const prompt = buildCriterionPrompt(c, individualContext, mandateContext, successProfileContext);
         const llm = await callLLM({ prompt });
         const parsed = parseScoreResponse(llm.content);
         return {
@@ -757,4 +789,64 @@ function buildMandateContext(mandate: any): string {
     `Role description: ${mandate.role_description ?? 'Not provided'}`,
     `Engagement notes: ${mandate.notes ?? 'None'}`,
   ].join('\n');
+}
+
+function buildSuccessProfileContext(profile: any): string {
+  const lines: string[] = ['\nSuccess Profile Requirements:'];
+  
+  if (profile.required_experience_years) {
+    lines.push(`- Required experience: ${profile.required_experience_years} years`);
+  }
+  if (profile.required_industries && profile.required_industries.length > 0) {
+    lines.push(`- Required industries: ${profile.required_industries.join(', ')}`);
+  }
+  if (profile.required_geographies && profile.required_geographies.length > 0) {
+    lines.push(`- Required geographies: ${profile.required_geographies.join(', ')}`);
+  }
+  if (profile.required_companies && profile.required_companies.length > 0) {
+    lines.push(`- Target companies: ${profile.required_companies.join(', ')}`);
+  }
+  if (profile.deal_size_range) {
+    lines.push(`- Deal size range: ${profile.deal_size_range}`);
+  }
+  if (profile.team_size_managed) {
+    lines.push(`- Team size managed: ${profile.team_size_managed}`);
+  }
+  
+  if (profile.target_disc_profile) {
+    lines.push(`- Target DISC profile: ${profile.target_disc_profile}`);
+  }
+  if (profile.personality_indicators && profile.personality_indicators.length > 0) {
+    const traits = profile.personality_indicators
+      .map((pi: any) => `${pi.trait} (importance: ${pi.importance}/5)`)
+      .join(', ');
+    lines.push(`- Key personality traits: ${traits}`);
+  }
+  
+  if (profile.character_requirements && profile.character_requirements.length > 0) {
+    const chars = profile.character_requirements
+      .map((cr: any) => `${cr.trait} (${cr.level})`)
+      .join(', ');
+    lines.push(`- Character requirements: ${chars}`);
+  }
+  
+  if (profile.education_requirements && profile.education_requirements.length > 0) {
+    const ed = profile.education_requirements
+      .map((e: any) => `${e.degree} in ${e.field}${e.required ? ' (required)' : ''}`)
+      .join(', ');
+    lines.push(`- Education requirements: ${ed}`);
+  }
+  
+  if (profile.certifications && profile.certifications.length > 0) {
+    lines.push(`- Certifications: ${profile.certifications.join(', ')}`);
+  }
+  
+  if (profile.language_requirements && profile.language_requirements.length > 0) {
+    const langs = profile.language_requirements
+      .map((lr: any) => `${lr.language} (${lr.level})`)
+      .join(', ');
+    lines.push(`- Language requirements: ${langs}`);
+  }
+  
+  return lines.join('\n');
 }
