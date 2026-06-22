@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Loader2, Mail, FileText, ClipboardList, Eye, MessageSquare, FileDown, BarChart3, CheckCircle, PauseCircle, XCircle, Edit } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, FileText, ClipboardList, Eye, MessageSquare, FileDown, BarChart3, CheckCircle, PauseCircle, XCircle, AlertTriangle, ListChecks, Users } from 'lucide-react';
 import { useMandateDetail } from '@/hooks/useSupabaseData';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
 import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
 import { executeAIAction, type AIAction } from '@/services/aiQuickActions';
 import { updateMandateStatus, updatePipelineStage, updatePipelineVerdict } from '@/services/supabaseApi';
 import { MandateTeam } from '@/components/mandate/MandateTeam';
+import { MandateIntakeForm } from '@/components/mandate/MandateIntakeForm';
 import { useAuthStore } from '@/stores/authStore';
 
 const STATUS_OPTIONS = [
@@ -28,10 +29,13 @@ const AI_ACTIONS: { key: AIAction; icon: any; label: string }[] = [
   { key: 'feedback', icon: MessageSquare, label: 'Feedback' },
 ];
 
+type TabKey = 'overview' | 'intake' | 'pipeline';
+
 export function MandateDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { profile } = useAuthStore();
   const { mandate, pipeline, loading, refresh } = useMandateDetail(id || '');
+  const [tab, setTab] = useState<TabKey>('overview');
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState<string | null>(null);
   const [aiOutput, setAiOutput] = useState<string | null>(null);
@@ -52,6 +56,12 @@ export function MandateDetailPage() {
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>;
   if (!mandate) return <div className="text-text-muted text-center py-20">Mandate not found</div>;
 
+  // ── Intake gate evaluation ──
+  const intakeData = (mandate.intake_data as any) || null;
+  const intakeComplete = intakeData && intakeData.intake_complete === true;
+  const intakeBlockMessage =
+    'Complete the mandate intake (Business Pain Points + Leadership Needs) before adding candidates or running sourcing sweeps.';
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -63,7 +73,9 @@ export function MandateDetailPage() {
             <Button variant="outline" size="sm"><FileDown className="w-4 h-4" />Candidate Report</Button>
           </Link>
           <Link to="/platform/batch-scoring">
-            <Button variant="outline" size="sm"><BarChart3 className="w-4 h-4" />Match Score</Button>
+            <Button variant="outline" size="sm" disabled={!intakeComplete} title={intakeComplete ? undefined : intakeBlockMessage}>
+              <BarChart3 className="w-4 h-4" />Match Score
+            </Button>
           </Link>
           <Link to="/platform/pipeline">
             <Button variant="outline" size="sm"><Eye className="w-4 h-4" />GRID View</Button>
@@ -75,6 +87,27 @@ export function MandateDetailPage() {
         <h1 className="text-2xl font-serif font-bold text-text-primary">{mandate.title}</h1>
         <p className="text-text-muted">{mandate.company?.name ?? 'No client'}</p>
       </div>
+
+      {/* Intake warning banner */}
+      {!intakeComplete && (
+        <Card className="border-amber-300 bg-amber-50">
+          <CardContent className="py-3">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <div className="font-medium text-amber-900 text-sm">Intake not complete</div>
+                <div className="text-amber-800 text-sm mt-0.5">{intakeBlockMessage}</div>
+                <button
+                  onClick={() => setTab('intake')}
+                  className="text-xs mt-2 text-amber-900 underline hover:text-amber-950"
+                >
+                  → Go to Intake tab
+                </button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Status bar with action buttons */}
       <div className="flex items-center gap-3 flex-wrap">
@@ -96,6 +129,15 @@ export function MandateDetailPage() {
         <button onClick={() => handleStatusChange('lost')} className="flex items-center gap-1 px-3 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 min-h-[44px]">
           <XCircle className="w-3.5 h-3.5" />Lost
         </button>
+        {intakeComplete ? (
+          <span className="ml-auto inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-200">
+            <ListChecks className="w-3.5 h-3.5" /> Intake complete
+          </span>
+        ) : (
+          <span className="ml-auto inline-flex items-center gap-1 text-xs text-amber-800 bg-amber-50 px-2 py-1 rounded-full border border-amber-200">
+            <AlertTriangle className="w-3.5 h-3.5" /> Intake required
+          </span>
+        )}
       </div>
 
       {/* Stage pipeline bar */}
@@ -106,101 +148,173 @@ export function MandateDetailPage() {
         })}
       </div>
 
-      {/* PHI info if available */}
-      {mandate.phi_composite != null && (
-        <Card>
-          <CardHeader className="py-2"><CardTitle className="text-sm">PHI Health</CardTitle></CardHeader>
-          <CardContent className="py-2">
-            <div className="grid grid-cols-5 gap-2 text-center">
-              {[
-                { label: 'Urgency', val: mandate.phi_urgency },
-                { label: 'Strategic', val: mandate.phi_strategic },
-                { label: 'Value', val: mandate.phi_value },
-                { label: 'Retainer', val: mandate.phi_retainer },
-                { label: 'Decision', val: mandate.phi_decision },
-              ].map(m => (
-                <div key={m.label}>
-                  <p className="text-xs text-text-muted">{m.label}</p>
-                  <p className={`text-lg font-bold ${m.val != null ? (m.val >= 7 ? 'text-red-400' : m.val >= 4 ? 'text-tier-2' : 'text-tier-1') : 'text-text-muted'}`}>{m.val ?? '—'}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Tabs */}
+      <div className="border-b border-border flex gap-4">
+        {([
+          { key: 'overview', label: 'Overview', icon: Eye },
+          { key: 'intake', label: 'Intake', icon: ListChecks, warn: !intakeComplete },
+          { key: 'pipeline', label: `Pipeline (${pipeline.length})`, icon: Users },
+        ] as { key: TabKey; label: string; icon: any; warn?: boolean }[]).map(t => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`flex items-center gap-2 text-sm pb-3 border-b-2 -mb-px ${
+              tab === t.key
+                ? 'border-accent text-accent font-medium'
+                : 'border-transparent text-text-muted hover:text-text-primary'
+            }`}
+          >
+            <t.icon className="w-4 h-4" />
+            {t.label}
+            {t.warn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-label="action needed" />}
+          </button>
+        ))}
+      </div>
 
-      {/* Mandate Team */}
-      <Card>
-        <CardHeader className="py-2"><CardTitle className="text-sm">Team</CardTitle></CardHeader>
-        <CardContent className="py-0">
-          <MandateTeam mandateId={mandate.id} isAdmin={profile?.role === 'admin'} />
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-3">
-          <h2 className="font-serif text-lg font-semibold text-text-primary">Pipeline ({pipeline.length} candidates)</h2>
-          {pipeline.map(p => (
-            <div key={p.id} onClick={() => setSelectedCandidate(p.contact_id)} className={`bg-bg-secondary border rounded-lg p-4 cursor-pointer transition-colors ${selectedCandidate === p.contact_id ? 'border-accent' : 'border-bg-tertiary hover:border-accent/30'}`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">{p.contact?.name?.[0] ?? '?'}</div>
-                  <div>
-                    <h3 className="font-medium text-text-primary">{p.contact?.name ?? 'Unknown'}</h3>
-                    <p className="text-xs text-text-muted">{p.contact?.current_title ?? ''} · {p.contact?.company?.name ?? ''}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {p.trident_composite != null && <Badge variant={p.trident_composite >= 75 ? 'success' : p.trident_composite >= 50 ? 'warning' : 'default'}>{p.trident_composite}</Badge>}
-                  <Badge>{p.stage}</Badge>
-                </div>
-              </div>
-              {p.verdict && <p className="text-xs text-text-muted mt-1">Verdict: {p.verdict}</p>}
-              {/* Action buttons */}
-              <div className="flex gap-2 mt-2">
-                {NEXT_STAGE[p.stage] && (
-                  <button onClick={e => { e.stopPropagation(); handleStageChange(p.id, NEXT_STAGE[p.stage]); }}
-                    className="text-xs px-2 py-1 bg-accent/20 text-accent rounded hover:bg-accent/30 transition-colors">
-                    → {STAGE_CONFIG[NEXT_STAGE[p.stage] as keyof typeof STAGE_CONFIG]?.label}
-                  </button>
-                )}
-                <select
-                  value={p.verdict || ''}
-                  onClick={e => e.stopPropagation()}
-                  onChange={async e => { await updatePipelineVerdict(p.id, e.target.value); await refresh(); }}
-                  className="text-xs bg-bg-tertiary text-text-muted rounded px-1 py-0.5 border-0"
-                >
-                  <option value="">Verdict</option>
-                  {VERDICT_OPTIONS.map(v => <option key={v} value={v}>{v}</option>)}
-                </select>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="space-y-4">
-          {selectedCandidate && (
+      {tab === 'overview' && (
+        <>
+          {/* PHI info if available */}
+          {mandate.phi_composite != null && (
             <Card>
-              <CardHeader><CardTitle>AI Quick Actions</CardTitle></CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {AI_ACTIONS.map(a => (
-                    <Button key={a.key} variant="outline" size="sm" onClick={() => {
-                      const candidate = pipeline.find(p => p.contact_id === selectedCandidate)?.contact;
-                      if (!candidate) return;
-                      setAiLoading(a.key);
-                      executeAIAction(a.key, { name: candidate.name, title: candidate.current_title || undefined, company: candidate.company?.name || undefined, mandate: mandate.title, viewMode: 'internal' }).then(out => { setAiOutput(out); setAiLoading(null); });
-                    }} disabled={aiLoading !== null}>
-                      {aiLoading === a.key ? <Loader2 className="w-3 h-3 animate-spin" /> : <a.icon className="w-3 h-3" />}{a.label}
-                    </Button>
+              <CardHeader className="py-2"><CardTitle className="text-sm">PHI Health</CardTitle></CardHeader>
+              <CardContent className="py-2">
+                <div className="grid grid-cols-5 gap-2 text-center">
+                  {[
+                    { label: 'Urgency', val: mandate.phi_urgency },
+                    { label: 'Strategic', val: mandate.phi_strategic },
+                    { label: 'Value', val: mandate.phi_value },
+                    { label: 'Retainer', val: mandate.phi_retainer },
+                    { label: 'Decision', val: mandate.phi_decision },
+                  ].map(m => (
+                    <div key={m.label}>
+                      <p className="text-xs text-text-muted">{m.label}</p>
+                      <p className={`text-lg font-bold ${m.val != null ? (m.val >= 7 ? 'text-red-400' : m.val >= 4 ? 'text-tier-2' : 'text-tier-1') : 'text-text-muted'}`}>{m.val ?? '—'}</p>
+                    </div>
                   ))}
                 </div>
-                {aiOutput && <div className="bg-bg-tertiary rounded-lg p-3 text-sm text-text-secondary whitespace-pre-wrap max-h-64 overflow-auto">{aiOutput}</div>}
               </CardContent>
             </Card>
           )}
+
+          {/* Mandate Team */}
+          <Card>
+            <CardHeader className="py-2"><CardTitle className="text-sm">Team</CardTitle></CardHeader>
+            <CardContent className="py-0">
+              <MandateTeam mandateId={mandate.id} isAdmin={profile?.role === 'admin'} />
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-3">
+              <h2 className="font-serif text-lg font-semibold text-text-primary">
+                Pipeline ({pipeline.length} candidates)
+              </h2>
+              {!intakeComplete && (
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
+                  Pipeline additions are locked until intake is complete. Complete the Intake tab first.
+                </p>
+              )}
+              {pipeline.map(p => (
+                <div key={p.id} onClick={() => setSelectedCandidate(p.contact_id)} className={`bg-bg-secondary border rounded-lg p-4 cursor-pointer transition-colors ${selectedCandidate === p.contact_id ? 'border-accent' : 'border-bg-tertiary hover:border-accent/30'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">{p.contact?.name?.[0] ?? '?'}</div>
+                      <div>
+                        <h3 className="font-medium text-text-primary">{p.contact?.name ?? 'Unknown'}</h3>
+                        <p className="text-xs text-text-muted">{p.contact?.current_title ?? ''} · {p.contact?.company?.name ?? ''}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {p.trident_composite != null && <Badge variant={p.trident_composite >= 75 ? 'success' : p.trident_composite >= 50 ? 'warning' : 'default'}>{p.trident_composite}</Badge>}
+                      <Badge>{p.stage}</Badge>
+                    </div>
+                  </div>
+                  {p.verdict && <p className="text-xs text-text-muted mt-1">Verdict: {p.verdict}</p>}
+                  <div className="flex gap-2 mt-2">
+                    {NEXT_STAGE[p.stage] && (
+                      <button onClick={e => { e.stopPropagation(); handleStageChange(p.id, NEXT_STAGE[p.stage]); }}
+                        className="text-xs px-2 py-1 bg-accent/20 text-accent rounded hover:bg-accent/30 transition-colors">
+                        → {STAGE_CONFIG[NEXT_STAGE[p.stage] as keyof typeof STAGE_CONFIG]?.label}
+                      </button>
+                    )}
+                    <select
+                      value={p.verdict || ''}
+                      onClick={e => e.stopPropagation()}
+                      onChange={async e => { await updatePipelineVerdict(p.id, e.target.value); await refresh(); }}
+                      className="text-xs bg-bg-tertiary text-text-muted rounded px-1 py-0.5 border-0"
+                    >
+                      <option value="">Verdict</option>
+                      {VERDICT_OPTIONS.map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-4">
+              {selectedCandidate && (
+                <Card>
+                  <CardHeader><CardTitle>AI Quick Actions</CardTitle></CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {AI_ACTIONS.map(a => (
+                        <Button key={a.key} variant="outline" size="sm" onClick={() => {
+                          const candidate = pipeline.find(p => p.contact_id === selectedCandidate)?.contact;
+                          if (!candidate) return;
+                          setAiLoading(a.key);
+                          executeAIAction(a.key, { name: candidate.name, title: candidate.current_title || undefined, company: candidate.company?.name || undefined, mandate: mandate.title, viewMode: 'internal' }).then(out => { setAiOutput(out); setAiLoading(null); });
+                        }} disabled={aiLoading !== null}>
+                          {aiLoading === a.key ? <Loader2 className="w-3 h-3 animate-spin" /> : <a.icon className="w-3 h-3" />}{a.label}
+                        </Button>
+                      ))}
+                    </div>
+                    {aiOutput && <div className="bg-bg-tertiary rounded-lg p-3 text-sm text-text-secondary whitespace-pre-wrap max-h-64 overflow-auto">{aiOutput}</div>}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {tab === 'intake' && (
+        <MandateIntakeForm mandate={mandate} onSaved={() => refresh()} />
+      )}
+
+      {tab === 'pipeline' && (
+        <div className="space-y-3">
+          <h2 className="font-serif text-lg font-semibold text-text-primary">Full pipeline view</h2>
+          {!intakeComplete && (
+            <Card className="border-amber-300 bg-amber-50">
+              <CardContent className="py-3 text-sm text-amber-900">
+                <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{intakeBlockMessage}</div>
+              </CardContent>
+            </Card>
+          )}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-3 space-y-3">
+              {pipeline.map(p => (
+                <div key={p.id} onClick={() => setSelectedCandidate(p.contact_id)} className={`bg-bg-secondary border rounded-lg p-4 cursor-pointer transition-colors ${selectedCandidate === p.contact_id ? 'border-accent' : 'border-bg-tertiary hover:border-accent/30'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">{p.contact?.name?.[0] ?? '?'}</div>
+                      <div>
+                        <h3 className="font-medium text-text-primary">{p.contact?.name ?? 'Unknown'}</h3>
+                        <p className="text-xs text-text-muted">{p.contact?.current_title ?? ''} · {p.contact?.company?.name ?? ''}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {p.trident_composite != null && <Badge variant={p.trident_composite >= 75 ? 'success' : p.trident_composite >= 50 ? 'warning' : 'default'}>{p.trident_composite}</Badge>}
+                      <Badge>{p.stage}</Badge>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {pipeline.length === 0 && <p className="text-text-muted text-sm">No candidates yet. Add candidates to this mandate from Contacts or Match Score.</p>}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

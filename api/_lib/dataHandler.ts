@@ -80,15 +80,24 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         const mandate = await db.selectOne('mandates', {
           column: 'id',
           value: mandate_id,
-          select: 'id, organization_id',
+          select: 'id, organization_id, intake_data',
         });
-        
+
         if (!mandate) {
           return res.status(404).json({ error: 'Mandate not found' });
         }
 
         if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
           return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const intakeData = mandate.intake_data as any;
+        const intakeComplete = intakeData && intakeData.intake_complete === true;
+        if (!intakeComplete) {
+          return res.status(409).json({
+            error: 'Intake not complete',
+            detail: 'Complete the mandate intake (Business Pain Points + Leadership Needs) before adding candidates to the pipeline.',
+          });
         }
 
         const row = await db.insert('candidates_pipeline', {
@@ -687,6 +696,91 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         const count = await db.deleteRows('mandate_members', { column: 'id', value: id }, 15000);
         return res.status(200).json({ success: true, deleted: count });
       }
+    }
+
+    // ── Intake: AI-suggested discovery questions (Phase 1.1) ──
+    if (resource === 'intake-suggest') {
+      if (method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+      }
+
+      const body = req.body || {};
+      const prompt: string =
+        typeof body.prompt === 'string' && body.prompt.trim().length > 0
+          ? body.prompt
+          : 'Generate 5 discovery questions for an executive search mandate.';
+
+      const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
+      const DEEPSEEK_TIMEOUT = 7000;
+
+      const systemPrompt = [
+        'You are an executive search consultant helping capture business context before a search starts.',
+        'Your job is to generate insightful, open-ended discovery questions for client intake interviews.',
+        'The questions should probe organizational pain points, leadership needs, team dynamics, and talent gaps.',
+        'Avoid yes/no questions. Each question should work as a standalone line item for a consultant to ask.',
+      ].join(' ');
+
+      const userPrompt =
+        prompt + '\n\nReturn ONLY a JSON object with the shape: { "questions": ["q1", "q2", "q3", "q4", "q5"] }.';
+
+      let questions: string[] = [];
+
+      if (DEEPSEEK_API_KEY) {
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), DEEPSEEK_TIMEOUT);
+          const dsRes = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+            },
+            body: JSON.stringify({
+              model: 'deepseek-chat',
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt },
+              ],
+              max_tokens: 1024,
+              temperature: 0.5,
+              response_format: { type: 'json_object' },
+            }),
+            signal: controller.signal,
+          });
+          clearTimeout(timeout);
+
+          if (dsRes.ok) {
+            const data = await dsRes.json();
+            const content = data.choices?.[0]?.message?.content || '';
+            try {
+              const parsed = JSON.parse(content);
+              if (Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+                questions = parsed.questions.slice(0, 5);
+              } else if (Array.isArray(parsed) && parsed.length > 0) {
+                questions = parsed.slice(0, 5);
+              }
+            } catch (jsonErr) {
+              // sometimes model returns bullet points rather than JSON
+              const lines = content.split('\n').filter((l: string) => l.trim().length > 2).slice(0, 5);
+              questions = lines.map((l: string) => l.replace(/^\s*[-*•0-9.)]+\s*/, '').trim());
+            }
+          }
+        } catch (e) {
+          console.warn('[intake-suggest] DeepSeek call failed:', e);
+        }
+      }
+
+      if (questions.length === 0) {
+        questions = [
+          'What are the 2-3 most pressing business challenges the new leader must solve in their first 90 days?',
+          'Which leadership competencies and behaviors matter most for success in this specific team/context?',
+          'What skills, knowledge, or experiences is your current team missing that this hire must bring?',
+          'What organizational friction — process gaps, misalignment, or culture issues — could slow this leader down?',
+          'How will you know this hire has succeeded in their first year? What concrete outcomes are you measuring?',
+        ];
+      }
+
+      return res.status(200).json({ success: true, questions });
     }
 
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}` });

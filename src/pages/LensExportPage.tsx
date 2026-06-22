@@ -203,6 +203,26 @@ export function LensExportPage() {
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>;
   if (!mandate) return <div className="text-text-muted text-center py-20">Mandate not found</div>;
 
+  // ── Intake gate ──
+  const intakeData = (mandate.intake_data as any) || null;
+  const intakeComplete = intakeData && intakeData.intake_complete === true;
+  if (!intakeComplete) {
+    return (
+      <div className="max-w-2xl mx-auto py-16 text-center space-y-4">
+        <Card className="border-amber-300 bg-amber-50">
+          <CardContent className="py-6 space-y-3">
+            <Shield className="w-8 h-8 text-amber-700 mx-auto" />
+            <h2 className="font-serif text-xl text-amber-900">Intake required</h2>
+            <p className="text-sm text-amber-800">
+              Complete the mandate intake (Business Pain Points + Leadership Needs) before generating candidate shortlists.
+            </p>
+            <Button onClick={() => window.history.back()} size="sm">Back to mandate</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

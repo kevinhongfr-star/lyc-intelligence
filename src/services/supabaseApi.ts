@@ -97,6 +97,8 @@ export interface Mandate {
   phi_urgency: number | null; phi_strategic: number | null; phi_value: number | null;
   phi_retainer: number | null; phi_decision: number | null; phi_composite: number | null;
   phi_status: string | null; phi_action_priority: number | null; phi_sla_behind: boolean | null;
+  // Phase 1.1 — structured intake
+  intake_data?: any | null;
   company?: Company | null;
 }
 
@@ -445,4 +447,66 @@ export async function updateCompany(id: string, updates: Partial<Company>): Prom
     .update(updates).eq('id', id).select().single();
   if (error) { console.error('[Supabase] updateCompany:', error); return null; }
   return data as Company;
+}
+
+// ─── Mandate Intake (Phase 1.1) ────────────────────────────────────
+
+export async function saveMandateIntake(mandateId: string, intakeData: unknown): Promise<boolean> {
+  const { error } = await getSupabase()
+    .from('mandates')
+    .update({ intake_data: intakeData, updated_at: new Date().toISOString() })
+    .eq('id', mandateId);
+  if (error) { console.error('[Supabase] saveMandateIntake:', error); return false; }
+  return true;
+}
+
+export async function generateIntakeQuestions(
+  mandate: Pick<Mandate, 'title' | 'keywords' | 'location' | 'intake_data'>
+): Promise<string[]> {
+  try {
+    const existingIntake = (mandate.intake_data as any) || {};
+    const painSummary = (existingIntake.pain_points || [])
+      .slice(0, 3)
+      .map((p: any) => `- ${p.pain} (${p.severity})`)
+      .join('\n');
+
+    const prompt = [
+      'You are an executive search consultant.',
+      'Based on this mandate context:',
+      `- Title: ${mandate.title}`,
+      `- Industry: ${mandate.keywords || 'not specified'}`,
+      `- Location: ${mandate.location || 'not specified'}`,
+      painSummary ? `- Pain points already identified:\n${painSummary}` : '',
+      '',
+      'Generate exactly 5 discovery questions to ask the client to deepen intake.',
+      'Focus on organizational pain points, leadership needs, and talent gaps.',
+      'Return ONLY a JSON array of 5 strings. No preamble, no markdown. Example:',
+      '["What…", "How…", "…"]',
+    ].filter(Boolean).join('\n');
+
+    const res = await fetch('/api/data/intake-suggest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const body = await res.json();
+    if (Array.isArray(body.questions)) return body.questions as string[];
+    if (typeof body.questions === 'string') {
+      try { return JSON.parse(body.questions) as string[]; } catch {
+        return (body.questions as string).split('\n').filter(Boolean);
+      }
+    }
+    return [];
+  } catch (e) {
+    console.error('[Supabase] generateIntakeQuestions failed:', e);
+    return [];
+  }
+}
+
+export function isIntakeComplete(mandate: Mandate | null | undefined): boolean {
+  if (!mandate) return false;
+  const intake = mandate.intake_data as any;
+  return intake && intake.intake_complete === true;
 }
