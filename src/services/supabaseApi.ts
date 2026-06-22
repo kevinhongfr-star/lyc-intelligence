@@ -493,9 +493,149 @@ export async function getPipelineStats(orgId: string): Promise<{
   }
 }
 
-export async function updatePipelineVerdict(pipelineId: string, verdict: string): Promise<boolean> {
-  const { error } = await getSupabase().from('candidates_pipeline').update({ verdict, updated_at: new Date().toISOString() }).eq('id', pipelineId);
-  if (error) { console.error('[Supabase] updatePipelineVerdict:', error); return false; }
+// Mandate Solutions API
+export async function createMandateSolutions(solutions: Array<{
+  mandate_id: string;
+  solution_type: string;
+  solution_detail: Record<string, any>;
+  linked_assessment_type?: string;
+  linked_assessment_id?: string;
+  status: string;
+  defined_by?: string;
+}>): Promise<boolean> {
+  const sb = getSupabase();
+  
+  try {
+    const { error } = await sb.from('mandate_solutions').insert(solutions);
+    if (error) {
+      console.error('[Supabase] createMandateSolutions:', error);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('[Supabase] createMandateSolutions:', e);
+    return false;
+  }
+}
+
+export async function getMandateSolutions(mandateId: string): Promise<Array<{
+  id: string;
+  mandate_id: string;
+  solution_type: string;
+  solution_detail: Record<string, any>;
+  linked_assessment_type?: string;
+  linked_assessment_id?: string;
+  status: string;
+  defined_by?: string;
+  defined_by_name?: string;
+  approved_by?: string;
+  approved_by_name?: string;
+  approval_notes?: string;
+  rejection_notes?: string;
+  created_at: string;
+  updated_at: string;
+}>> {
+  const { data, error } = await getSupabase()
+    .from('mandate_solutions')
+    .select(`
+      *,
+      defined_by:profiles!defined_by(id, name),
+      approved_by:profiles!approved_by(id, name)
+    `)
+    .eq('mandate_id', mandateId)
+    .order('created_at');
+  
+  if (error) {
+    console.error('[Supabase] getMandateSolutions:', error);
+    return [];
+  }
+  
+  return (data || []).map((s: any) => ({
+    id: s.id,
+    mandate_id: s.mandate_id,
+    solution_type: s.solution_type,
+    solution_detail: s.solution_detail || {},
+    linked_assessment_type: s.linked_assessment_type,
+    linked_assessment_id: s.linked_assessment_id,
+    status: s.status,
+    defined_by: s.defined_by?.id,
+    defined_by_name: s.defined_by?.name,
+    approved_by: s.approved_by?.id,
+    approved_by_name: s.approved_by?.name,
+    approval_notes: s.approval_notes,
+    rejection_notes: s.rejection_notes,
+    created_at: s.created_at,
+    updated_at: s.updated_at,
+  }));
+}
+
+export async function updateSolutionStatus(
+  solutionId: string,
+  status: 'approved' | 'rejected',
+  approvedById: string | undefined,
+  notes: string
+): Promise<boolean> {
+  const updates: Record<string, any> = {
+    status,
+    updated_at: new Date().toISOString(),
+  };
+  
+  if (approvedById) {
+    updates.approved_by = approvedById;
+  }
+  
+  if (status === 'rejected') {
+    updates.rejection_notes = notes;
+  } else {
+    updates.approval_notes = notes;
+  }
+  
+  const { error } = await getSupabase()
+    .from('mandate_solutions')
+    .update(updates)
+    .eq('id', solutionId);
+  
+  if (error) {
+    console.error('[Supabase] updateSolutionStatus:', error);
+    return false;
+  }
+  
+  return true;
+}
+
+export async function updateMandateSolution(solutionId: string, updates: Partial<{
+  solution_detail: Record<string, any>;
+  linked_assessment_type?: string;
+  linked_assessment_id?: string;
+  status?: string;
+}>): Promise<boolean> {
+  const { error } = await getSupabase()
+    .from('mandate_solutions')
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', solutionId);
+  
+  if (error) {
+    console.error('[Supabase] updateMandateSolution:', error);
+    return false;
+  }
+  
+  return true;
+}
+
+export async function deleteMandateSolution(solutionId: string): Promise<boolean> {
+  const { error } = await getSupabase()
+    .from('mandate_solutions')
+    .delete()
+    .eq('id', solutionId);
+  
+  if (error) {
+    console.error('[Supabase] deleteMandateSolution:', error);
+    return false;
+  }
+  
   return true;
 }
 

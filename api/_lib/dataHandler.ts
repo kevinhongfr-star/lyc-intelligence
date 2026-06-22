@@ -296,6 +296,163 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    // ── Mandate Solutions CRUD ──
+    if (resource === 'mandate-solution') {
+      if (method === 'POST' && !id) {
+        const { mandate_id, solution_type, solution_detail, linked_assessment_type, linked_assessment_id, status, defined_by } = req.body || {};
+        
+        if (!mandate_id || !solution_type) {
+          return res.status(400).json({ error: 'mandate_id and solution_type are required' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: mandate_id,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const row = await db.insert('mandate_solutions', {
+          mandate_id,
+          solution_type,
+          solution_detail: solution_detail ? JSON.stringify(solution_detail) : null,
+          linked_assessment_type: linked_assessment_type || null,
+          linked_assessment_id: linked_assessment_id || null,
+          status: status || 'draft',
+          defined_by: defined_by || authUserId,
+        }, 15000);
+        return res.status(201).json({ success: true, data: row });
+      }
+
+      if (method === 'GET' && id) {
+        const solution = await db.selectOne('mandate_solutions', {
+          column: 'id',
+          value: id,
+        });
+        
+        if (!solution) {
+          return res.status(404).json({ error: 'Solution not found' });
+        }
+
+        return res.status(200).json({ success: true, data: solution });
+      }
+
+      if (method === 'GET' && !id) {
+        const mandateId = req.query.mandate_id as string;
+        
+        if (!mandateId) {
+          return res.status(400).json({ error: 'mandate_id query parameter required' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: mandateId,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const solutions = await db.select('mandate_solutions', {
+          column: 'mandate_id',
+          value: mandateId,
+        });
+
+        return res.status(200).json({ success: true, data: solutions });
+      }
+
+      if (method === 'PATCH' && id) {
+        const solution = await db.selectOne('mandate_solutions', {
+          column: 'id',
+          value: id,
+          select: 'id, mandate_id',
+        });
+        
+        if (!solution) {
+          return res.status(404).json({ error: 'Solution not found' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: solution.mandate_id,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const { solution_detail, linked_assessment_type, linked_assessment_id, status, approved_by, approval_notes, rejection_notes } = req.body || {};
+        
+        const updates: Record<string, any> = {};
+        if (solution_detail !== undefined) updates.solution_detail = JSON.stringify(solution_detail);
+        if (linked_assessment_type !== undefined) updates.linked_assessment_type = linked_assessment_type;
+        if (linked_assessment_id !== undefined) updates.linked_assessment_id = linked_assessment_id;
+        if (status !== undefined) updates.status = status;
+        if (approved_by !== undefined) updates.approved_by = approved_by;
+        if (approval_notes !== undefined) updates.approval_notes = approval_notes;
+        if (rejection_notes !== undefined) updates.rejection_notes = rejection_notes;
+        updates.updated_at = new Date().toISOString();
+
+        const row = await db.update('mandate_solutions', {
+          column: 'id',
+          value: id,
+          updates,
+        });
+        
+        return res.status(200).json({ success: true, data: row });
+      }
+
+      if (method === 'DELETE' && id) {
+        const solution = await db.selectOne('mandate_solutions', {
+          column: 'id',
+          value: id,
+          select: 'id, mandate_id',
+        });
+        
+        if (!solution) {
+          return res.status(404).json({ error: 'Solution not found' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: solution.mandate_id,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        await db.delete('mandate_solutions', {
+          column: 'id',
+          value: id,
+        });
+
+        return res.status(200).json({ success: true });
+      }
+    }
+
     // ── Contact CRUD ──
     if (resource === 'contact') {
       if (method === 'POST' && !id) {
