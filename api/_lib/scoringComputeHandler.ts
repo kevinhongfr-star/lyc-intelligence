@@ -850,3 +850,470 @@ function buildSuccessProfileContext(profile: any): string {
   
   return lines.join('\n');
 }
+
+// ─────────────────────────────────────────────────────────────────
+// SHIFT Assessment Mode — leadership self-assessment scoring
+// ─────────────────────────────────────────────────────────────────
+
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
+const DEEPSEEK_ENDPOINT = 'https://api.deepseek.com/v1/chat/completions';
+
+interface SHIFTIntake {
+  gate: { name: string; email: string; title?: string; company?: string; country?: string };
+  context: { role: string; industry: string; years_experience: number; challenges: string; improvement_goals: string };
+  dimensions: Record<string, number>;
+  evidence: Record<string, string>;
+  crossBorder: { cultural_experience: boolean; international_teams: number; global_projects: string };
+  style: { disc_profile: string | null; work_style: string };
+  goals: { short_term: string; long_term: string; success_definition: string };
+}
+
+interface SHIFTAnalysisResult {
+  dimension_scores: Record<string, number>;
+  strengths: Array<{ strength: string; evidence: string }>;
+  development_areas: Array<{ area: string; example: string }>;
+  recommendations: string[];
+  composite_score: number;
+  archetype: string;
+  confidence: number;
+}
+
+const SHIFT_CONFIGS: Record<string, { name: string; dimensions: Array<{ id: string; name: string; description: string }> }> = {
+  LEAP: {
+    name: 'Learning & Execution Potential',
+    dimensions: [
+      { id: 'strategic_thinking', name: 'Strategic Thinking', description: 'Ability to see the big picture and set direction' },
+      { id: 'execution_speed', name: 'Execution Speed', description: 'Ability to move from idea to implementation quickly' },
+      { id: 'learning_agility', name: 'Learning Agility', description: 'Ability to learn from experience and apply new knowledge' },
+    ],
+  },
+  QUEST: {
+    name: 'Questioning & Inquiry Skills',
+    dimensions: [
+      { id: 'curiosity_level', name: 'Curiosity Level', description: 'Natural drive to explore and understand' },
+      { id: 'inquiry_depth', name: 'Inquiry Depth', description: 'Ability to ask probing, meaningful questions' },
+      { id: 'open_ended_questioning', name: 'Open-Ended Questioning', description: 'Skill in asking questions that open up possibilities' },
+    ],
+  },
+  DRIVE: {
+    name: 'Driving Change & Results',
+    dimensions: [
+      { id: 'results_orientation', name: 'Results Orientation', description: 'Focus on achieving measurable outcomes' },
+      { id: 'change_tolerance', name: 'Change Tolerance', description: 'Comfort with ambiguity and change' },
+      { id: 'persistence', name: 'Persistence', description: 'Ability to sustain effort through challenges' },
+    ],
+  },
+  COACH: {
+    name: 'Coaching & Team Development',
+    dimensions: [
+      { id: 'team_development', name: 'Team Development', description: 'Ability to grow and develop team members' },
+      { id: 'feedback_quality', name: 'Feedback Quality', description: 'Skill in giving constructive, actionable feedback' },
+      { id: 'empathy', name: 'Empathy', description: 'Understanding and connecting with others perspectives' },
+    ],
+  },
+  IMPACT: {
+    name: 'Impact Measurement & Accountability',
+    dimensions: [
+      { id: 'accountability', name: 'Accountability', description: 'Taking ownership of outcomes and responsibilities' },
+      { id: 'measurement_rigor', name: 'Measurement Rigor', description: 'Commitment to tracking and measuring impact' },
+      { id: 'strategic_thinking', name: 'Strategic Thinking (Composite)', description: 'From LEAP assessment' },
+      { id: 'team_development', name: 'Team Development (Composite)', description: 'From COACH assessment' },
+      { id: 'results_orientation', name: 'Results Orientation (Composite)', description: 'From DRIVE assessment' },
+    ],
+  },
+};
+
+function buildSHIFTAnalysisPrompt(intake: SHIFTIntake, assessmentType: string): string {
+  const config = SHIFT_CONFIGS[assessmentType];
+  if (!config) throw new Error(`Unknown SHIFT assessment type: ${assessmentType}`);
+  
+  return `You are a leadership development expert specializing in SHIFT assessments for LYC Intelligence. 
+Analyze this ${config.name} (${assessmentType}) assessment:
+
+USER PROFILE:
+- Role: ${intake.context.role}
+- Industry: ${intake.context.industry}
+- Experience: ${intake.context.years_experience} years
+- Current challenges: ${intake.context.challenges}
+- Improvement goals: ${intake.context.improvement_goals}
+
+ASSESSMENT DIMENSIONS AND RESPONSES:
+${config.dimensions.map(dim => {
+  const score = intake.dimensions[dim.id] || 5;
+  const evidence = intake.evidence[dim.id] || 'No evidence provided';
+  return `
+${dim.name} (Score: ${score}/10)
+- Description: ${dim.description}
+- User Evidence: ${evidence}`;
+}).join('\n')}
+
+CROSS-BORDER CONTEXT:
+- Cultural experience: ${intake.crossBorder.cultural_experience ? 'Yes' : 'No'}
+- International teams managed: ${intake.crossBorder.international_teams}
+- Global projects: ${intake.crossBorder.global_projects}
+
+WORK STYLE:
+- DISC profile: ${intake.style.disc_profile || 'Not specified'}
+- Work style: ${intake.style.work_style}
+
+GOALS:
+- Short-term (6 months): ${intake.goals.short_term}
+- Long-term (2 years): ${intake.goals.long_term}
+- Success definition: ${intake.goals.success_definition}
+
+Provide a comprehensive analysis including:
+1. Dimension scores (0-100) for each ${assessmentType} dimension based on user responses
+2. Top 3 strengths with evidence from their responses
+3. Top 3 development areas with specific examples
+4. 3 actionable recommendations for improvement
+
+Return ONLY this JSON (no markdown, no code fences, no prose):
+{
+  "dimension_scores": { "${config.dimensions[0].id}": <0-100>, "${config.dimensions[1].id}": <0-100>, ... },
+  "strengths": [
+    { "strength": "<strength name>", "evidence": "<evidence from user responses>" },
+    { "strength": "<strength name>", "evidence": "<evidence from user responses>" },
+    { "strength": "<strength name>", "evidence": "<evidence from user responses>" }
+  ],
+  "development_areas": [
+    { "area": "<development area>", "example": "<specific example from responses>" },
+    { "area": "<development area>", "example": "<specific example from responses>" },
+    { "area": "<development area>", "example": "<specific example from responses>" }
+  ],
+  "recommendations": [
+    "<actionable recommendation 1>",
+    "<actionable recommendation 2>",
+    "<actionable recommendation 3>"
+  ],
+  "archetype": "<suggested archetype name>",
+  "confidence": <0.0-1.0>
+}`;
+}
+
+async function callDeepSeekForSHIFT(prompt: string): Promise<{ content: string; tokens: number }> {
+  if (!DEEPSEEK_API_KEY) {
+    throw new Error('DEEPSEEK_API_KEY not configured');
+  }
+
+  const response = await fetch(DEEPSEEK_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: 'You are a leadership development expert. Always respond with valid JSON only, no markdown or prose.' },
+        { role: 'user', content: prompt },
+      ],
+      max_tokens: 2048,
+      temperature: 0.3,
+      response_format: { type: 'json_object' },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content || '';
+  const tokens = data.usage?.total_tokens || 0;
+
+  return { content, tokens };
+}
+
+function parseSHIFTAnalysisResponse(raw: string, assessmentType: string): SHIFTAnalysisResult {
+  let text = raw.trim();
+  text = text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+
+  try {
+    const parsed = JSON.parse(text);
+    const config = SHIFT_CONFIGS[assessmentType];
+    
+    const dimensionScores: Record<string, number> = {};
+    for (const dim of config.dimensions) {
+      const value = parsed.dimension_scores?.[dim.id];
+      const score = Math.round(Number(value) || 50);
+      dimensionScores[dim.id] = Math.max(0, Math.min(100, score));
+    }
+
+    const strengths = Array.isArray(parsed.strengths)
+      ? parsed.strengths.slice(0, 3).map((s: any) => ({
+          strength: String(s.strength || '').slice(0, 200),
+          evidence: String(s.evidence || '').slice(0, 500),
+        }))
+      : [];
+
+    const developmentAreas = Array.isArray(parsed.development_areas)
+      ? parsed.development_areas.slice(0, 3).map((d: any) => ({
+          area: String(d.area || '').slice(0, 200),
+          example: String(d.example || '').slice(0, 500),
+        }))
+      : [];
+
+    const recommendations = Array.isArray(parsed.recommendations)
+      ? parsed.recommendations.slice(0, 3).map((r: any) => String(r).slice(0, 500))
+      : [];
+
+    const values = Object.values(dimensionScores);
+    const compositeScore = values.length > 0
+      ? Math.round(values.reduce((a, b) => a + b, 0) / values.length)
+      : 50;
+
+    const archetype = parsed.archetype || 'Balanced Leader';
+    const confidence = Math.max(0, Math.min(1, Number(parsed.confidence) || 0.85));
+
+    return {
+      dimension_scores: dimensionScores,
+      strengths,
+      development_areas: developmentAreas,
+      recommendations,
+      composite_score: compositeScore,
+      archetype,
+      confidence,
+    };
+  } catch (e) {
+    console.error('[SHIFTAnalysis] JSON parse error:', e);
+    throw new Error(`Failed to parse analysis response: ${raw.slice(0, 200)}`);
+  }
+}
+
+export async function handleSHIFTAssessment(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse> {
+  const start = Date.now();
+
+  try {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ success: false, error: 'Method not allowed. Use POST.' });
+    }
+
+    const body = req.body || {};
+    const { intake, assessment_type, user_id } = body;
+
+    if (!intake || !assessment_type) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: intake and assessment_type',
+      });
+    }
+
+    const validTypes = ['LEAP', 'QUEST', 'DRIVE', 'COACH', 'IMPACT'];
+    if (!validTypes.includes(assessment_type)) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid assessment_type. Must be one of: ${validTypes.join(', ')}`,
+      });
+    }
+
+    const prompt = buildSHIFTAnalysisPrompt(intake as SHIFTIntake, assessment_type);
+    
+    let analysis: SHIFTAnalysisResult;
+    let tokens = 0;
+
+    try {
+      const { content, tokens: usedTokens } = await callDeepSeekForSHIFT(prompt);
+      analysis = parseSHIFTAnalysisResponse(content, assessment_type);
+      tokens = usedTokens;
+    } catch (e) {
+      console.warn('[SHIFT] DeepSeek call failed, using fallback:', e);
+      
+      const config = SHIFT_CONFIGS[assessment_type];
+      const fallbackScores: Record<string, number> = {};
+      
+      for (const dim of config.dimensions) {
+        const userScore = (intake as SHIFTIntake).dimensions[dim.id] || 5;
+        fallbackScores[dim.id] = Math.round(userScore * 10);
+      }
+      
+      const values = Object.values(fallbackScores);
+      const compositeScore = values.length > 0
+        ? Math.round(values.reduce((a, b) => a + b, 0) / values.length)
+        : 50;
+      
+      analysis = {
+        dimension_scores: fallbackScores,
+        strengths: [
+          { strength: 'Self-awareness', evidence: 'Completed assessment with honest self-reflection' },
+          { strength: 'Goal orientation', evidence: intake.goals?.short_term || 'Defined clear goals' },
+          { strength: 'Experience', evidence: `${intake.context?.years_experience || 10} years in ${intake.context?.industry || 'industry'}` },
+        ],
+        development_areas: [
+          { area: 'Deepen self-reflection', example: 'Provide more detailed evidence for dimension ratings' },
+          { area: 'Expand cross-border experience', example: intake.crossBorder?.cultural_experience ? 'Continue building' : 'Consider international opportunities' },
+          { area: 'Strengthen measurement', example: 'Track progress on development goals systematically' },
+        ],
+        recommendations: [
+          'Schedule regular self-reflection sessions to deepen awareness',
+          'Seek feedback from peers and mentors on development areas',
+          'Create a 90-day action plan for your top development priority',
+        ],
+        composite_score: compositeScore,
+        archetype: 'Balanced Leader',
+        confidence: 0.6,
+      };
+    }
+
+    let scoringRunId: string | null = null;
+    
+    if (isSupabaseConfigured() && user_id) {
+      try {
+        const inserted = await insert('scoring_runs', {
+          user_id,
+          assessment_type: `SHIFT_${assessment_type}`,
+          input_params: intake,
+          output_scores: analysis.dimension_scores,
+          analysis: {
+            strengths: analysis.strengths,
+            development_areas: analysis.development_areas,
+            recommendations: analysis.recommendations,
+            archetype: analysis.archetype,
+            confidence: analysis.confidence,
+          },
+          created_at: new Date().toISOString(),
+        });
+        
+        scoringRunId = inserted?.id || null;
+      } catch (e) {
+        console.error('[SHIFT] Failed to persist scoring_run:', e);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      analysis,
+      scoring_run_id: scoringRunId,
+      assessment_type,
+      total_tokens: tokens,
+      duration_ms: Date.now() - start,
+    });
+  } catch (err) {
+    return handleError(res, 'shift.assessment', err);
+  }
+}
+
+export async function handleSHIFTReport(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse> {
+  try {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ success: false, error: 'Method not allowed. Use POST.' });
+    }
+
+    const body = req.body || {};
+    const { assessment_type, intake, analysis } = body;
+
+    if (!assessment_type || !intake || !analysis) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: assessment_type, intake, and analysis',
+      });
+    }
+
+    const config = SHIFT_CONFIGS[assessment_type];
+    if (!config) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid assessment_type: ${assessment_type}`,
+      });
+    }
+
+    const generatedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SHIFT ${assessment_type} Assessment Report</title>
+  <style>
+    body { font-family: 'DM Sans', sans-serif; color: #333; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }
+    .header { text-align: center; border-bottom: 2px solid #C108AB; padding-bottom: 20px; }
+    .logo { font-size: 24px; font-weight: 700; color: #C108AB; }
+    .title { font-size: 32px; font-weight: 700; margin-top: 8px; }
+    .score { font-size: 48px; font-weight: 700; color: #C108AB; }
+    .section { margin-top: 24px; }
+    .section-title { font-size: 20px; font-weight: 700; border-bottom: 1px solid #e5e5e5; padding-bottom: 8px; }
+    .dimension { margin: 12px 0; }
+    .dimension-name { font-weight: 600; }
+    .dimension-score { color: #C108AB; font-weight: 700; }
+    .progress-bar { height: 8px; background: #e5e5e5; border-radius: 4px; margin-top: 4px; }
+    .progress-fill { height: 100%; background: #C108AB; border-radius: 4px; }
+    .strengths { background: #22C55E15; padding: 16px; border-radius: 8px; }
+    .development { background: #EAB30815; padding: 16px; border-radius: 8px; margin-top: 16px; }
+    .recommendations { background: #f5f5f5; padding: 16px; border-radius: 8px; margin-top: 16px; }
+    .footer { margin-top: 32px; text-align: center; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">LYC Intelligence</div>
+    <div class="title">SHIFT ${assessment_type}</div>
+    <div>${config.name}</div>
+    <div style="margin-top: 16px;">${intake.gate?.name || 'Participant'} · ${intake.context?.role || 'Role'}</div>
+  </div>
+  
+  <div class="section" style="text-align: center;">
+    <div class="score">${analysis.composite_score || 50}</div>
+    <div>Composite Score (0-100)</div>
+    <div style="margin-top: 8px; padding: 8px 24px; background: #C108AB20; border-radius: 20px; display: inline-block;">
+      ${analysis.archetype || 'Balanced Leader'}
+    </div>
+  </div>
+  
+  <div class="section">
+    <div class="section-title">Dimension Scores</div>
+    ${config.dimensions.map((dim: any) => {
+      const score = analysis.dimension_scores?.[dim.id] || 50;
+      return `<div class="dimension">
+        <span class="dimension-name">${dim.name}</span>
+        <span class="dimension-score">${score}</span>
+        <div class="progress-bar"><div class="progress-fill" style="width: ${score}%"></div></div>
+      </div>`;
+    }).join('')}
+  </div>
+  
+  <div class="section">
+    <div class="strengths">
+      <div style="font-weight: 600; color: #22C55E; margin-bottom: 12px;">Top Strengths</div>
+      ${(analysis.strengths || []).map((s: any) => `<div style="margin-bottom: 8px;">
+        <div style="font-weight: 600;">${s.strength}</div>
+        <div style="color: #666;">${s.evidence}</div>
+      </div>`).join('')}
+    </div>
+    
+    <div class="development">
+      <div style="font-weight: 600; color: #EAB308; margin-bottom: 12px;">Development Areas</div>
+      ${(analysis.development_areas || []).map((d: any) => `<div style="margin-bottom: 8px;">
+        <div style="font-weight: 600;">${d.area}</div>
+        <div style="color: #666;">${d.example}</div>
+      </div>`).join('')}
+    </div>
+    
+    <div class="recommendations">
+      <div style="font-weight: 600; margin-bottom: 12px;">Recommendations</div>
+      ${(analysis.recommendations || []).map((r: string, i: number) => `<div style="margin-bottom: 8px;">
+        ${i + 1}. ${r}
+      </div>`).join('')}
+    </div>
+  </div>
+  
+  <div class="footer">
+    <div>LYC Intelligence</div>
+    <div>Building leadership that works across borders</div>
+    <div>Generated: ${generatedDate}</div>
+  </div>
+</body>
+</html>`;
+
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Content-Disposition', `attachment; filename="SHIFT_${assessment_type}_Report.html"`);
+    return res.send(html);
+  } catch (err) {
+    return handleError(res, 'shift.report', err);
+  }
+}
