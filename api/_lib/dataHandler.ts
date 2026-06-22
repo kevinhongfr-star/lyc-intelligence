@@ -1588,6 +1588,260 @@ Return as valid JSON with exactly these keys:
       return res.status(200).json({ success: true, updated });
     }
 
+    // ── LinkedIn Import Check (Phase 1.6) ──
+    // Deduplication check: compare candidates against contacts table.
+    // Used by the import UI before executing the real import to preview duplicates.
+    if (resource === 'linkedin-import-check' && method === 'POST') {
+      if (!authUserId) return res.status(401).json({ error: 'Unauthorized' });
+
+      const candidates = (req.body?.candidates as any[]) || [];
+
+      if (!Array.isArray(candidates) || candidates.length === 0) {
+        return res.status(400).json({ error: 'candidates must be a non-empty array' });
+      }
+
+      if (!orgId) {
+        return res.status(400).json({ error: 'organization_id is required' });
+      }
+
+      const emails = candidates
+        .map((c) => (typeof c.email)
+        .filter((e): e is string)
+        .map((e) => e.trim().toLowerCase())
+        .filter(Boolean);
+
+      const linkedinUrls = candidates
+        .map((c) => (typeof c.linkedin_url))
+        .filter((l): l is string)
+        .map((l) => l.trim())
+        .filter(Boolean);
+
+      const duplicates: {
+        id: string; email?: string; linkedin_url?: string; first_name?: string; last_name?: string; company?: string }[] = [];
+
+      // Check email duplicates
+      if (emails.length > 0) {
+        try {
+          const existingByEmail = await db.selectMany('contacts', {
+            where: [
+              {
+                column: 'organization_id', value: orgId, operator: 'eq' },
+              { column: 'email', value: emails, operator: 'in' },
+            ],
+            select: 'id, first_name, last_name, email, company, linkedin_url',
+          }, 15000);
+          duplicates.push(...existingByEmail);
+        } catch {
+            // Fallback: check one-by-one for robustness
+        }
+      }
+
+      // Check LinkedIn URL duplicates
+      if (linkedinUrls.length > 0) {
+        try {
+          const existingByLinkedIn = await db.selectMany('contacts', {
+            where: [
+              { column: 'organization_id', value: orgId, operator: 'eq' },
+              { column: 'linkedin_url', value: linkedinUrls, operator: 'in' },
+            ],
+            select: 'id, first_name, last_name, email, company, linkedin_url',
+          }, 15000);
+          const existingIds = new Set(duplicates.map((d) => d.id));
+          for (const c of existingByLinkedIn) {
+            if (!existingIds.has(c.id)) duplicates.push(c);
+          }
+        } catch {
+          // fallback: pass
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        totalRecords: candidates.length,
+        totalDuplicates: duplicates.length,
+        byEmail: duplicates.filter((d) => !!d.email).length,
+        byLinkedin: duplicates.filter((d) => !!d.linkedin_url).length,
+        duplicates: duplicates.map((d) => ({
+          id: d.id,
+          first_name: d.first_name,
+          last_name: d.last_name,
+          email: d.email,
+          company: d.company,
+          linkedin_url: d.linkedin_url,
+        })),
+      });
+    }
+
+    // ── LinkedIn Import Execution (Phase 1.6) ──
+    // Bulk-insert contacts and optionally add to a mandate pipeline.
+    // Supports 'skip' (default) and 'update' modes for handling duplicates.
+    if (resource === 'linkedin-import' && method === 'POST') {
+      if (!authUserId) return res.status(401).json({ error: 'Unauthorized' });
+
+      const {
+        candidates,
+        dedup_mode: dedupModeRaw,
+        mandate_id: mandateIdRaw,
+      } = req.body || {};
+
+      if (!Array.isArray(candidates) || candidates.length === 0) {
+        return res.status(400).json({ error: 'candidates must be a non-empty array' });
+      }
+
+      if (!orgId) {
+        return res.status(400).json({ error: 'organization_id is required' });
+      }
+
+      const dedupMode = dedupModeRaw === 'update' ? 'update' : 'skip';
+
+      // Validate mandate_id (if provided) belongs to user's org
+      let mandate: any = null;
+      if (mandateIdRaw) {
+        mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: mandateIdRaw,
+          select: 'id, organization_id',
+        });
+        if (!mandate) return res.status(404).json({ error: 'Mandate not found' });
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+      }
+
+      // Collect identifiers for dedup check
+      const emails: string[] = [];
+      const linkedinUrls: string[] = [];
+      for (const c of candidates) {
+        if (typeof c.email) emails.push(String(c.email).trim().toLowerCase());
+        if (typeof c.linkedin_url) linkedinUrls.push(String(c.linkedin_url).trim());
+      }
+
+      const emailSet = new Set<string>();
+      const linkedinSet = new Set<string>();
+
+      try {
+        if (emails.length > 0) {
+          const existingByEmail = await db.selectMany('contacts', {
+            where: [
+              { column: 'organization_id', value: orgId, operator: 'eq' },
+              { column: 'email', value: emails, operator: 'in' },
+            ],
+            select: 'id, email',
+          }, 15000);
+          existingByEmail.forEach((e) => e.email && emailSet.add(String(e.email).toLowerCase());
+        }
+        if (linkedinUrls.length > 0) {
+          const existingByLinkedIn = await db.selectMany('contacts', {
+            where: [
+              { column: 'organization_id', value: orgId, operator: 'eq' },
+              { column: 'linkedin_url', value: linkedinUrls, operator: 'in' },
+            ],
+            select: 'id, linkedin_url',
+          }, 15000);
+          existingByLinkedIn.forEach((e) => e.linkedin_url && linkedinSet.add(String(e.linkedin_url)));
+        }
+      } catch {
+        // If selectMany can't handle multi-column IN queries, fall back to row-by-row
+      }
+
+      // Process each candidate
+      let imported = 0;
+      let duplicates = 0;
+      let pipelineCreated = 0;
+      let errors = 0;
+      const errorList: string[] = [];
+
+      for (const candidate of candidates) {
+        try {
+          const candidateEmail = typeof candidate.email ? String(candidate.email).trim().toLowerCase() || '';
+          const candidateLinkedIn = typeof candidate.linkedin_url ? String(candidate.linkedin_url).trim() : '';
+
+          const isDuplicateByEmail = candidateEmail && emailSet.has(candidateEmail);
+          const isDuplicateByLinkedIn = candidateLinkedIn && linkedinSet.has(candidateLinkedIn);
+
+          // If either email OR linkedin already exists: handle per-mode
+          if (isDuplicateByEmail || isDuplicateByLinkedIn) {
+            if (dedupMode === 'skip') {
+              duplicates++;
+              continue;
+            }
+            // Update mode: find existing contact and fill in empty fields
+            const existing = isDuplicateByEmail
+              ? (await db.selectOne('contacts', { column: 'email', value: candidate.email }) || null)
+              : (await db.selectOne('contacts', { column: 'linkedin_url', value: candidate.linkedin_url }) || null;
+
+            if (existing) {
+              const updatePayload: Record<string, any> = {};
+              if (!existing.first_name && candidate.first_name) updatePayload.first_name = candidate.first_name;
+              if (!existing.last_name && candidate.last_name) updatePayload.last_name = candidate.last_name;
+              if (!existing.email && candidate.email) updatePayload.email = candidate.email;
+              if (!existing.phone && candidate.phone) updatePayload.phone = candidate.phone;
+              if (!existing.company && candidate.company) updatePayload.company = candidate.company;
+              if (!existing.title && candidate.title) updatePayload.title = candidate.title;
+              if (!existing.linkedin_url && candidate.linkedin_url) updatePayload.linkedin_url = candidate.linkedin_url;
+              if (!existing.location && candidate.location) updatePayload.location = candidate.location;
+              if (Object.keys(updatePayload).length > 0) {
+                await db.update('contacts', { column: 'id', value: existing.id }, updatePayload, 15000);
+              }
+              duplicates++;
+              continue;
+            }
+          }
+
+          // New contact: insert
+          const firstName = typeof candidate.first_name || candidate.last_name || '—';
+          const lastName = !candidate.first_name && candidate.last_name ? candidate.last_name : '';
+
+          const newContact = await db.insert('contacts', {
+            first_name: firstName,
+            last_name: lastName,
+            email: candidate.email || null,
+            phone: candidate.phone || null,
+            company: candidate.company || null,
+            title: candidate.title || null,
+            linkedin_url: candidate.linkedin_url || null,
+            location: candidate.location || null,
+            notes: candidate.notes || null,
+            created_by: authUserId,
+            organization_id: orgId,
+          }, 15000);
+
+          imported++;
+
+          // Add to pipeline if mandate provided
+          if (mandate && newContact?.id) {
+            await db.insert('candidates_pipeline', {
+              contact_id: newContact.id,
+              mandate_id: mandate.id,
+              stage: 'potential',
+              match_score: null,
+              created_by: authUserId,
+              organization_id: mandate.organization_id,
+            }, 15000);
+            pipelineCreated++;
+          }
+
+          // Track dedup sets for further iterations
+          if (candidate.email) emailSet.add(String(candidate.email).toLowerCase());
+          if (candidate.linkedin_url) linkedinSet.add(String(candidate.linkedin_url));
+        } catch (err: any) {
+          errors++;
+          errorList.push(String(err?.message || 'Failed to import candidate'));
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        imported,
+        duplicates,
+        errors,
+        pipeline_created: pipelineCreated,
+        error_list: errorList,
+        dedup_mode: dedupMode,
+        mandate_id: mandateIdRaw || null,
+      });
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);

@@ -1,10 +1,11 @@
 import { useAuthStore } from '@/stores/authStore';
 import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Users, Loader2, Filter, ChevronLeft, ChevronRight, ArrowUpDown, Linkedin, Globe, Briefcase, Award, Target } from 'lucide-react';
+import { Search, Users, Loader2, Filter, ChevronLeft, ChevronRight, ArrowUpDown, Linkedin, Globe, Briefcase, Award, Target, Upload } from 'lucide-react';
 import { useContacts } from '@/hooks/useSupabaseData';
 import { Badge, Card, CardContent } from '@/components/ui';
 import type { Contact } from '@/services/supabaseApi';
+import { LinkedInImportModal } from '@/components/import/LinkedInImportModal';
 
 const SENIORITY_OPTIONS = [
   { value: 'c_suite', label: 'C-Suite' },
@@ -42,6 +43,7 @@ export function CandidatesPage() {
   const [page, setPage] = useState(0);
   const [sortField, setSortField] = useState<SortField>('score');
   const [sortAsc, setSortAsc] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const limit = 30;
 
   const { data: contacts, count, loading } = useContacts({ userId: profile?.id || undefined,
@@ -97,11 +99,18 @@ export function CandidatesPage() {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-serif font-bold text-text-primary">Talent Pool</h1>
           <p className="text-text-muted">{count.toLocaleString()} contacts{filtered.length !== count ? ` · ${filtered.length} shown` : ''}</p>
         </div>
+        <button
+          onClick={() => setShowImportModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover transition-colors min-h-[44px]"
+        >
+          <Upload className="w-4 h-4" />
+          Import from LinkedIn
+        </button>
       </div>
 
       {/* Search + Filters */}
@@ -280,6 +289,14 @@ export function CandidatesPage() {
           )}
         </div>
       )}
+
+      <LinkedInImportModal
+        open={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImported={() => {
+          setShowImportModal(false);
+        }}
+      />
     </div>
   );
 }

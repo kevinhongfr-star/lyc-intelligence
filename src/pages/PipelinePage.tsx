@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, ChevronRight, Eye, FileDown, BarChart3 } from 'lucide-react';
+import { Loader2, ChevronRight, Eye, FileDown, BarChart3, Upload } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
 import { useMandates } from '@/hooks/useSupabaseData';
 import { getPipelineByMandate, updatePipelineStage } from '@/services/supabaseApi';
 import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
 import type { CandidatePipeline, Mandate } from '@/services/supabaseApi';
+import { LinkedInImportModal } from '@/components/import/LinkedInImportModal';
 
 const STAGE_COLORS: Record<string, string> = {
   SWEEP: 'border-t-sweep-light',
@@ -35,6 +36,7 @@ export function PipelinePage() {
   const [pipeline, setPipeline] = useState<Record<string, CandidatePipeline[]>>({});
   const [loadingPipeline, setLoadingPipeline] = useState(false);
   const [view, setView] = useState<'kanban' | 'list'>('kanban');
+  const [showImportModal, setShowImportModal] = useState(false);
 
   useEffect(() => {
     if (mandates.length > 0 && !selectedMandate) {
@@ -74,6 +76,10 @@ export function PipelinePage() {
         <div className="flex gap-2">
           <button onClick={() => setView('kanban')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'kanban' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Kanban</button>
           <button onClick={() => setView('list')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'list' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>List</button>
+          <button onClick={() => setShowImportModal(true)} className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg bg-bg-tertiary text-text-primary hover:bg-accent hover:text-white transition-colors min-h-[44px]">
+            <Upload className="w-4 h-4" />
+            Import
+          </button>
         </div>
       </div>
 
@@ -215,6 +221,19 @@ export function PipelinePage() {
           })}
         </div>
       )}
+
+      <LinkedInImportModal
+        open={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImported={async () => {
+          if (selectedMandate) {
+            const data = await getPipelineByMandate(selectedMandate.id);
+            setPipeline(data);
+          }
+        }}
+        defaultMandateId={selectedMandate?.id || null}
+        availableMandates={mandates.map(m => ({ id: m.id, title: m.title }))}
+      />
     </div>
   );
 }
