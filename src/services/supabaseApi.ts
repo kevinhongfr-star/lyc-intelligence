@@ -1461,3 +1461,175 @@ export async function getWorkshopScores(workshopId: string): Promise<WorkshopSco
     return [];
   }
 }
+
+// ─── Org Chart & Talent Density API Functions (Phase 3.5) ───
+
+export interface OrgNode {
+  id: string;
+  name: string;
+  title?: string;
+  department?: string;
+  location?: string;
+  reports_to?: string | null;
+  talent_relevance?: number;
+}
+
+export interface OrgChartData {
+  nodes: OrgNode[];
+}
+
+export interface TargetCompany {
+  id: string;
+  name: string;
+  domain?: string;
+  industry?: string;
+  sector?: string;
+  location?: string;
+  region?: string;
+  size?: string;
+  mandate_id?: string;
+  org_chart?: OrgChartData | null;
+  talent_density_score?: number;
+  key_talent_count?: number;
+  company_overview?: string;
+  fit_score?: number;
+  ranking_notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TalentDensityCell {
+  sector: string;
+  geography: string;
+  density_score: number;
+  company_count: number;
+  companies: TargetCompany[];
+}
+
+export interface TalentDensityData {
+  companies: TargetCompany[];
+  density_matrix: Record<string, Record<string, TalentDensityCell>>;
+  total_companies: number;
+}
+
+export interface OrgChartPDFData {
+  mandate: Mandate;
+  companies: TargetCompany[];
+  org_charts: Record<string, OrgChartData>;
+  insights: {
+    total_companies: number;
+    top_sectors: string[];
+    top_geographies: string[];
+    highest_density: { sector: string; geo: string; score: number };
+    lowest_density: { sector: string; geo: string; score: number };
+    companies_with_charts: number;
+    high_relevance_positions: number;
+  };
+}
+
+export async function getOrgChart(companyId: string): Promise<OrgChartData | null> {
+  try {
+    const res = await fetch(`/api/data/org-chart/${companyId}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as OrgChartData;
+    }
+    return null;
+  } catch (e) {
+    console.error('[OrgChart] getOrgChart error:', e);
+    return null;
+  }
+}
+
+export async function saveOrgChart(companyId: string, orgChart: OrgChartData): Promise<{ success: boolean; density_score?: number }> {
+  try {
+    const res = await fetch(`/api/data/org-chart/${companyId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ org_chart: orgChart }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to save org chart' }));
+      console.error('[OrgChart] saveOrgChart error:', err);
+      return { success: false };
+    }
+
+    const result = await res.json();
+    return { success: true, density_score: result.density_score };
+  } catch (e) {
+    console.error('[OrgChart] saveOrgChart error:', e);
+    return { success: false };
+  }
+}
+
+export async function getTalentDensity(mandateId: string): Promise<TalentDensityData | null> {
+  try {
+    const res = await fetch(`/api/data/talent-density/${mandateId}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as TalentDensityData;
+    }
+    return null;
+  } catch (e) {
+    console.error('[TalentDensity] getTalentDensity error:', e);
+    return null;
+  }
+}
+
+export async function getOrgChartPDFData(mandateId: string, companyIds?: string[]): Promise<OrgChartPDFData | null> {
+  try {
+    const res = await fetch('/api/data/org-chart-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mandate_id: mandateId, company_ids: companyIds }),
+    });
+
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as OrgChartPDFData;
+    }
+    return null;
+  } catch (e) {
+    console.error('[OrgChartPDF] getOrgChartPDFData error:', e);
+    return null;
+  }
+}
+
+export async function getTargetCompanies(mandateId: string): Promise<TargetCompany[]> {
+  try {
+    const res = await fetch(`/api/data/target-companies?mandate_id=${mandateId}`);
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as TargetCompany[];
+    }
+    return [];
+  } catch (e) {
+    console.error('[TargetCompanies] getTargetCompanies error:', e);
+    return [];
+  }
+}
+
+export async function getMandateById(mandateId: string): Promise<Mandate | null> {
+  try {
+    const res = await fetch(`/api/data/mandate/${mandateId}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as Mandate;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Mandate] getMandateById error:', e);
+    return null;
+  }
+}

@@ -1999,6 +1999,264 @@ Return as valid JSON with exactly these keys:
       });
     }
 
+    // ── Org Chart CRUD (Phase 3.5) ──
+    if (resource === 'org-chart') {
+      if (!id) {
+        return res.status(400).json({ error: 'company_id is required' });
+      }
+
+      // Get company and verify access
+      const company = await db.selectOne('target_companies', {
+        column: 'id',
+        value: id,
+        select: 'id, mandate_id, org_chart',
+      });
+
+      if (!company) {
+        return res.status(404).json({ error: 'Company not found' });
+      }
+
+      // Check mandate access
+      if (company.mandate_id) {
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: company.mandate_id,
+          select: 'id, organization_id',
+        });
+        if (mandate && userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+      }
+
+      // GET: Retrieve org chart
+      if (method === 'GET') {
+        return res.status(200).json({
+          success: true,
+          data: company.org_chart || { nodes: [] },
+        });
+      }
+
+      // POST/PATCH: Update org chart
+      if (method === 'POST' || method === 'PATCH') {
+        const { org_chart } = req.body || {};
+
+        if (!org_chart || !org_chart.nodes) {
+          return res.status(400).json({ error: 'org_chart with nodes array is required' });
+        }
+
+        // Validate nodes
+        const nodes = org_chart.nodes as any[];
+        for (const node of nodes) {
+          if (!node.id || !node.name) {
+            return res.status(400).json({ error: 'Each node must have id and name' });
+          }
+        }
+
+        // Calculate talent density score based on org chart
+        const highRelevanceCount = nodes.filter(n => n.talent_relevance >= 4).length;
+        const totalPositions = nodes.length;
+        const densityScore = totalPositions > 0 
+          ? Math.round((highRelevanceCount / totalPositions) * 50 + 50)
+          : 50;
+
+        const rows = await db.update('target_companies', { column: 'id', value: id }, {
+          org_chart: org_chart,
+          talent_density_score: densityScore,
+          key_talent_count: highRelevanceCount,
+          updated_at: new Date().toISOString(),
+        }, 15000);
+
+        return res.status(200).json({
+          success: true,
+          data: rows[0]?.org_chart || org_chart,
+          density_score: densityScore,
+        });
+      }
+    }
+
+    // ── Talent Density Heatmap Data (Phase 3.5) ──
+    if (resource === 'talent-density') {
+      if (method === 'GET') {
+        const mandateId = id || req.query.mandate_id as string;
+
+        if (!mandateId) {
+          return res.status(400).json({ error: 'mandate_id is required' });
+        }
+
+        // Check mandate access
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: mandateId,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        // Get all target companies for this mandate
+        const companies = await db.selectMany('target_companies', {
+          where: [{ column: 'mandate_id', value: mandateId }],
+          orderBy: { column: 'talent_density_score', ascending: false },
+          limit: 200,
+        }, 15000);
+
+        // Aggregate by sector and geography
+        const densityMatrix: Record<string, Record<string, { count: number; avg_score: number; companies: any[] }>> = {};
+
+        companies.forEach((company: any) => {
+          const sector = company.sector || company.industry || 'Other';
+          const geography = company.region || 'Global';
+          const score = company.talent_density_score || 50;
+
+          if (!densityMatrix[sector]) densityMatrix[sector] = {};
+          if (!densityMatrix[sector][geography]) {
+            densityMatrix[sector][geography] = { count: 0, avg_score: 0, companies: [] };
+          }
+
+          densityMatrix[sector][geography].count++;
+          densityMatrix[sector][geography].companies.push({
+            id: company.id,
+            name: company.name,
+            industry: company.industry,
+            location: company.location,
+            talent_density_score: score,
+            key_talent_count: company.key_talent_count,
+          });
+        });
+
+        // Calculate average scores
+        Object.keys(densityMatrix).forEach(sector => {
+          Object.keys(densityMatrix[sector]).forEach(geo => {
+            const cell = densityMatrix[sector][geo];
+            cell.avg_score = Math.round(
+              cell.companies.reduce((sum, c) => sum + c.talent_density_score, 0) / cell.count
+            );
+          });
+        });
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            companies,
+            density_matrix: densityMatrix,
+            total_companies: companies.length,
+          },
+        });
+      }
+    }
+
+    // ── Org Chart PDF Export (Phase 3.5) ──
+    if (resource === 'org-chart-pdf' && method === 'POST') {
+      const { mandate_id, company_ids } = req.body || {};
+
+      if (!mandate_id) {
+        return res.status(400).json({ error: 'mandate_id is required' });
+      }
+
+      // Check mandate access
+      const mandate = await db.selectOne('mandates', {
+        column: 'id',
+        value: mandate_id,
+        select: 'id, organization_id, title, status, client_first_name',
+      });
+
+      if (!mandate) {
+        return res.status(404).json({ error: 'Mandate not found' });
+      }
+
+      if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      // Get companies with org charts
+      let companies: any[] = [];
+      if (company_ids && Array.isArray(company_ids)) {
+        for (const companyId of company_ids) {
+          const company = await db.selectOne('target_companies', {
+            column: 'id',
+            value: companyId,
+          });
+          if (company) companies.push(company);
+        }
+      } else {
+        companies = await db.selectMany('target_companies', {
+          where: [{ column: 'mandate_id', value: mandate_id }],
+          orderBy: { column: 'fit_score', ascending: false },
+          limit: 10,
+        }, 15000);
+      }
+
+      // Calculate insights
+      const sectorCounts: Record<string, number> = {};
+      const geoCounts: Record<string, number> = {};
+      let highestDensity = { sector: '', geo: '', score: 0 };
+      let lowestDensity = { sector: '', geo: '', score: 100 };
+      let companiesWithCharts = 0;
+      let highRelevancePositions = 0;
+
+      companies.forEach((company: any) => {
+        const sector = company.sector || company.industry || 'Other';
+        const geo = company.region || 'Global';
+        sectorCounts[sector] = (sectorCounts[sector] || 0) + 1;
+        geoCounts[geo] = (geoCounts[geo] || 0) + 1;
+
+        if (company.talent_density_score > highestDensity.score) {
+          highestDensity = { sector, geo, score: company.talent_density_score };
+        }
+        if (company.talent_density_score < lowestDensity.score) {
+          lowestDensity = { sector, geo, score: company.talent_density_score };
+        }
+
+        if (company.org_chart && (company.org_chart as any).nodes?.length > 0) {
+          companiesWithCharts++;
+          highRelevancePositions += (company.org_chart as any).nodes.filter(
+            (n: any) => n.talent_relevance >= 4
+          ).length;
+        }
+      });
+
+      const topSectors = Object.entries(sectorCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([s]) => s);
+
+      const topGeographies = Object.entries(geoCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([g]) => g);
+
+      // Build org charts map
+      const orgCharts: Record<string, any> = {};
+      companies.forEach((company: any) => {
+        if (company.org_chart) {
+          orgCharts[company.id] = company.org_chart;
+        }
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          mandate,
+          companies,
+          org_charts: orgCharts,
+          insights: {
+            total_companies: companies.length,
+            top_sectors: topSectors,
+            top_geographies: topGeographies,
+            highest_density: highestDensity,
+            lowest_density: lowestDensity,
+            companies_with_charts: companiesWithCharts,
+            high_relevance_positions: highRelevancePositions,
+          },
+        },
+      });
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);
