@@ -111,6 +111,12 @@ export interface CandidatePipeline {
   verdict: string | null; flags: string | null; next_steps: string | null; client_stage_override: string | null;
   notion_id: string | null; source: string; created_at: string; updated_at: string;
   contact?: Contact | null; mandate?: Mandate | null;
+  client_feedback?: {
+    decision: 'approved' | 'rejected' | 'hold';
+    comment: string;
+    decided_by: string | null;
+    decided_at: string;
+  } | null;
 }
 
 // ─── Query Functions ───
@@ -316,43 +322,174 @@ export async function hasMetrixTranscript(candidateId: string): Promise<boolean>
   return !error && data !== null;
 }
 
-// Update mandate with pipeline stats
-export async function updateMandatePipelineStats(mandateId: string): Promise<boolean> {
+// Notifications API
+export async function getNotifications(userId: string): Promise<{
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  link: string;
+  read: boolean;
+  created_at: string;
+  metadata?: Record<string, any>;
+}[]> {
+  const { data, error } = await getSupabase()
+    .from('notifications')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  
+  if (error) {
+    console.error('[Supabase] getNotifications:', error);
+    return [];
+  }
+  
+  return data.map((n: any) => ({
+    id: n.id,
+    type: n.type,
+    title: n.title,
+    message: n.message,
+    link: n.link,
+    read: n.read,
+    created_at: n.created_at,
+    metadata: n.metadata,
+  }));
+}
+
+export async function markNotificationAsRead(notificationId: string): Promise<boolean> {
+  const { error } = await getSupabase()
+    .from('notifications')
+    .update({ read: true })
+    .eq('id', notificationId);
+  
+  if (error) {
+    console.error('[Supabase] markNotificationAsRead:', error);
+    return false;
+  }
+  
+  return true;
+}
+
+export async function markAllAsRead(userId: string): Promise<boolean> {
+  const { error } = await getSupabase()
+    .from('notifications')
+    .update({ read: true })
+    .eq('user_id', userId)
+    .eq('read', false);
+  
+  if (error) {
+    console.error('[Supabase] markAllAsRead:', error);
+    return false;
+  }
+  
+  return true;
+}
+
+export async function createNotification(userId: string, data: {
+  type: string;
+  title: string;
+  message: string;
+  link: string;
+  metadata?: Record<string, any>;
+}): Promise<boolean> {
+  const { error } = await getSupabase()
+    .from('notifications')
+    .insert({
+      user_id: userId,
+      type: data.type,
+      title: data.title,
+      message: data.message,
+      link: data.link,
+      metadata: data.metadata || {},
+      read: false,
+      created_at: new Date().toISOString(),
+    });
+  
+  if (error) {
+    console.error('[Supabase] createNotification:', error);
+    return false;
+  }
+  
+  return true;
+}
+
+// Client Feedback API
+export async function updateCandidateFeedback(pipelineId: string, feedback: {
+  decision: 'approved' | 'rejected' | 'hold';
+  comment: string;
+  decided_by: string | null;
+  decided_at: string;
+}): Promise<boolean> {
+  const { error } = await getSupabase()
+    .from('candidates_pipeline')
+    .update({
+      client_feedback: feedback,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', pipelineId);
+  
+  if (error) {
+    console.error('[Supabase] updateCandidateFeedback:', error);
+    return false;
+  }
+  
+  return true;
+}
+
+// Reports API
+export async function getMandatesWithStats(orgId: string): Promise<Mandate[]> {
+  const { data, error } = await getSupabase()
+    .from('mandates')
+    .select('*')
+    .eq('organization_id', orgId)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error('[Supabase] getMandatesWithStats:', error);
+    return [];
+  }
+  
+  return data as Mandate[];
+}
+
+export async function getPipelineStats(orgId: string): Promise<{
+  total_candidates: number;
+  by_stage: Record<string, number>;
+  conversion_rates: { stage: string; rate: number }[];
+  avg_time_per_stage: { stage: string; days: number }[];
+}> {
   const sb = getSupabase();
   
   try {
-    // Get pipeline counts
-    const { data: pipeline } = await sb
+    // Get total candidates
+    const { data: candidates, error: candidatesError } = await sb
       .from('candidates_pipeline')
       .select('stage')
-      .eq('mandate_id', mandateId);
+      .eq('organization_id', orgId);
     
-    if (!pipeline) return false;
+    if (candidatesError) throw candidatesError;
     
-    const counts: Record<string, number> = {};
-    pipeline.forEach((p: any) => {
-      const stage = p.stage || 'SWEEP';
-      counts[stage] = (counts[stage] || 0) + 1;
+    const byStage: Record<string, number> = {};
+    candidates.forEach((c: any) => {
+      const stage = c.stage || 'unknown';
+      byStage[stage] = (byStage[stage] || 0) + 1;
     });
     
-    // Update mandate with counts
-    const { error } = await sb
-      .from('mandates')
-      .update({
-        total_candidates: pipeline.length,
-        tier1_count: counts['CANVA'] || counts['approach'] || 0,
-        tier2_count: counts['GRID'] || counts['screened'] || 0,
-        shortlisted_count: counts['shortlisted'] || counts['client_submitted'] || 0,
-        interview_count: counts['interview_1'] || counts['interview_2'] || counts['final_interview'] || 0,
-        placed_count: counts['onboarded'] || counts['probation_passed'] || 0,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', mandateId);
-    
-    return !error;
-  } catch (e) {
-    console.error('[Supabase] updateMandatePipelineStats:', e);
-    return false;
+    return {
+      total_candidates: candidates.length,
+      by_stage: byStage,
+      conversion_rates: [],
+      avg_time_per_stage: [],
+    };
+  } catch (error) {
+    console.error('[Supabase] getPipelineStats:', error);
+    return {
+      total_candidates: 0,
+      by_stage: {},
+      conversion_rates: [],
+      avg_time_per_stage: [],
+    };
   }
 }
 
