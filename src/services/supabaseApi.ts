@@ -683,3 +683,139 @@ export async function getOutreachStatsForCandidate(candidateId: string, mandateI
     hasPositiveOutcome: attempts.some(a => a.outcome && positiveOutcomes.includes(a.outcome)),
   };
 }
+
+// ─── Market Definition (Phase 1.5) ───────────────────────────────────
+
+export interface CompanyOverviewInput {
+  name: string;
+  industry?: string;
+  location?: string;
+}
+
+export interface CompanyOverviewResult {
+  success: boolean;
+  data?: {
+    description?: string;
+    revenue?: string;
+    employee_count?: string;
+    founded?: number;
+    headquarters?: string;
+    key_products?: string[];
+    recent_news?: string;
+    generated_at?: string;
+  };
+  error?: string;
+}
+
+export async function generateCompanyOverview(
+  companyId: string,
+  input: CompanyOverviewInput
+): Promise<CompanyOverviewResult> {
+  try {
+    const res = await fetch('/api/data/company-overview-generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ company_id: companyId, ...input }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+      return { success: false, error: err.error || 'Failed to generate overview' };
+    }
+
+    const data = await res.json();
+    return { success: true, data: data.data };
+  } catch (e: any) {
+    return { success: false, error: e.message || 'Network error' };
+  }
+}
+
+export async function getTargetCompanies(mandateId?: string): Promise<any[]> {
+  try {
+    const url = mandateId
+      ? `/api/data/target-companies?mandate_id=${encodeURIComponent(mandateId)}`
+      : '/api/data/target-companies';
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.data || [];
+  } catch (e) {
+    console.error('[Market] getTargetCompanies error:', e);
+    return [];
+  }
+}
+
+export async function updateTargetCompany(companyId: string, updates: Record<string, unknown>): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/target-companies/${companyId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+    return res.ok;
+  } catch (e) {
+    console.error('[Market] updateTargetCompany error:', e);
+    return false;
+  }
+}
+
+export async function calculateFitScores(mandateId: string, successProfileId: string): Promise<{
+  success: boolean;
+  updated?: number;
+  error?: string;
+}> {
+  try {
+    const res = await fetch('/api/data/company-fit-calculate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mandate_id: mandateId, success_profile_id: successProfileId }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+      return { success: false, error: err.error };
+    }
+
+    const data = await res.json();
+    return { success: true, updated: data.updated };
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
+}
+
+export async function addTargetCompany(data: {
+  name: string;
+  industry?: string;
+  location?: string;
+  size?: string;
+  domain?: string;
+  mandate_id?: string;
+}): Promise<{ success: boolean; data?: any; error?: string }> {
+  try {
+    const res = await fetch('/api/data/target-companies', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to add company' }));
+      return { success: false, error: err.error };
+    }
+
+    const result = await res.json();
+    return { success: true, data: result.data };
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
+}
+
+export async function deleteTargetCompany(companyId: string): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/target-companies/${companyId}`, { method: 'DELETE' });
+    return res.ok;
+  } catch (e) {
+    console.error('[Market] deleteTargetCompany error:', e);
+    return false;
+  }
+}

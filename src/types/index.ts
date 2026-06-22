@@ -214,6 +214,62 @@ export const CHANNEL_ICON_LABELS: Record<OutreachChannel, string> = {
   in_person: '👥',
 };
 
+// ── Market Definition (Phase 1.5) ──
+
+export interface CompanyOverview {
+  description?: string | null;
+  revenue?: string | null;
+  employee_count?: string | null;
+  founded?: number | null;
+  headquarters?: string | null;
+  key_products?: string[] | null;
+  recent_news?: string | null;
+  generated_at?: string | null;
+}
+
+export type OverviewStatus = 'pending' | 'generating' | 'completed' | 'failed';
+
+export interface TargetCompany {
+  id: string;
+  name: string;
+  domain?: string | null;
+  industry?: string | null;
+  size?: string | null;
+  location?: string | null;
+  mandate_id?: string | null;
+  org_chart?: any | null;
+  talent_density_score?: number | null;
+  key_talent_count?: number | null;
+  company_overview?: CompanyOverview | null;
+  fit_score?: number | null;
+  ranking_notes?: string | null;
+  sector?: string | null;
+  region?: string | null;
+  primary_contact_name?: string | null;
+  primary_contact_title?: string | null;
+  primary_contact_linkedin?: string | null;
+  overview_status?: OverviewStatus | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface MarketMapFilters {
+  sectors?: string[];
+  geographies?: string[];
+  fitScoreMin?: number;
+  fitScoreMax?: number;
+  employeeCountMin?: number;
+  employeeCountMax?: number;
+}
+
+export interface MarketMapCell {
+  company: TargetCompany;
+  x: number;
+  y: number;
+  size: number;
+  color: string;
+}
+
 export const DEFAULT_SUCCESS_PROFILE: Partial<SuccessProfile> = {
   required_experience_years: 10,
   required_industries: [],

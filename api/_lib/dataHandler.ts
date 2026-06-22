@@ -1249,6 +1249,345 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ success: true, data: enriched });
     }
 
+    // ── Target Companies CRUD (Phase 1.5) ──
+    if (resource === 'target-companies') {
+      if (method === 'POST' && !id) {
+        const { name, industry, location, size, domain, mandate_id, sector, region } = req.body || {};
+
+        if (!name) {
+          return res.status(400).json({ error: 'name is required' });
+        }
+
+        let orgIdToUse = orgId;
+        if (mandate_id) {
+          const mandate = await db.selectOne('mandates', {
+            column: 'id',
+            value: mandate_id,
+            select: 'id, organization_id',
+          });
+          if (mandate) orgIdToUse = mandate.organization_id;
+        }
+
+        if (userRole !== 'super_admin' && mandate_id) {
+          const mandate = await db.selectOne('mandates', {
+            column: 'id',
+            value: mandate_id,
+            select: 'id, organization_id',
+          });
+          if (mandate && mandate.organization_id !== orgId) {
+            return res.status(403).json({ error: 'Access denied' });
+          }
+        }
+
+        const row = await db.insert('target_companies', {
+          name,
+          industry: industry || null,
+          location: location || null,
+          size: size || null,
+          domain: domain || null,
+          mandate_id: mandate_id || null,
+          sector: sector || industry || null,
+          region: region || null,
+          overview_status: 'pending',
+          created_at: new Date().toISOString(),
+        }, 15000);
+        return res.status(201).json({ success: true, data: row });
+      }
+
+      if (method === 'GET' && !id) {
+        const mandateId = req.query.mandate_id as string;
+
+        let companies: any[] = [];
+        if (mandateId) {
+          const mandate = await db.selectOne('mandates', {
+            column: 'id',
+            value: mandateId,
+            select: 'id, organization_id',
+          });
+          if (!mandate) {
+            return res.status(404).json({ error: 'Mandate not found' });
+          }
+          if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+            return res.status(403).json({ error: 'Access denied' });
+          }
+
+          companies = await db.selectMany('target_companies', {
+            where: [{ column: 'mandate_id', value: mandateId }],
+            orderBy: { column: 'fit_score', ascending: false },
+            limit: 200,
+          }, 15000);
+        } else if (userRole === 'super_admin') {
+          companies = await db.selectMany('target_companies', {
+            orderBy: { column: 'created_at', ascending: false },
+            limit: 200,
+          }, 15000);
+        }
+
+        return res.status(200).json({ success: true, data: companies });
+      }
+
+      if (method === 'PATCH' && id) {
+        const company = await db.selectOne('target_companies', {
+          column: 'id',
+          value: id,
+          select: 'id, mandate_id',
+        });
+
+        if (!company) {
+          return res.status(404).json({ error: 'Company not found' });
+        }
+
+        if (company.mandate_id) {
+          const mandate = await db.selectOne('mandates', {
+            column: 'id',
+            value: company.mandate_id,
+            select: 'id, organization_id',
+          });
+          if (mandate && userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+            return res.status(403).json({ error: 'Access denied' });
+          }
+        }
+
+        const updates = req.body || {};
+        delete updates.id;
+        delete updates.created_at;
+
+        const rows = await db.update('target_companies', { column: 'id', value: id }, {
+          ...updates,
+          updated_at: new Date().toISOString(),
+        }, 15000);
+        return res.status(200).json({ success: true, data: rows[0] || null });
+      }
+
+      if (method === 'DELETE' && id) {
+        const company = await db.selectOne('target_companies', {
+          column: 'id',
+          value: id,
+          select: 'id, mandate_id',
+        });
+
+        if (!company) {
+          return res.status(404).json({ error: 'Company not found' });
+        }
+
+        if (company.mandate_id) {
+          const mandate = await db.selectOne('mandates', {
+            column: 'id',
+            value: company.mandate_id,
+            select: 'id, organization_id',
+          });
+          if (mandate && userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+            return res.status(403).json({ error: 'Access denied' });
+          }
+        }
+
+        const count = await db.deleteRows('target_companies', { column: 'id', value: id }, 15000);
+        return res.status(200).json({ success: true, deleted: count });
+      }
+    }
+
+    // ── Company Overview Generation (Phase 1.5) ──
+    if (resource === 'company-overview-generate' && method === 'POST') {
+      if (!authUserId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const { company_id, name, industry, location } = req.body || {};
+
+      if (!company_id) {
+        return res.status(400).json({ error: 'company_id is required' });
+      }
+
+      const company = await db.selectOne('target_companies', {
+        column: 'id',
+        value: company_id,
+      });
+
+      if (!company) {
+        return res.status(404).json({ error: 'Company not found' });
+      }
+
+      // Update status to generating
+      await db.update('target_companies', { column: 'id', value: company_id }, {
+        overview_status: 'generating',
+        updated_at: new Date().toISOString(),
+      }, 15000);
+
+      try {
+        // Import the DeepSeek client
+        const { callLLM, LLMError } = await import('./llmCall.js');
+
+        const prompt = `You are a business intelligence analyst. Generate a comprehensive overview of this company:
+
+Company: ${name || company.name}
+Industry: ${industry || company.industry || 'Technology'}
+Location: ${location || company.location || 'Global'}
+
+Provide:
+1. Brief description (2-3 sentences)
+2. Estimated revenue range (e.g., '$100M-$500M', '$1B-$5B', 'Public', 'Unknown')
+3. Employee count range (e.g., '1,000-5,000', '10,000+')
+4. Founded year (number, e.g., 1990, or null if unknown)
+5. Headquarters location
+6. Key products/services (array of strings, 3-5 items)
+7. Recent news summary (1-2 sentences about recent developments, or empty string if none known)
+
+Return as valid JSON with exactly these keys:
+{
+  "description": "string",
+  "revenue": "string",
+  "employee_count": "string",
+  "founded": number | null,
+  "headquarters": "string",
+  "key_products": ["string"],
+  "recent_news": "string"
+}`;
+
+        const result = await callLLM({
+          prompt,
+          model: 'deepseek-chat',
+          temperature: 0.3,
+          maxTokens: 800,
+        });
+
+        let overviewData: any = {};
+        try {
+          const jsonMatch = result.content.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            overviewData = JSON.parse(jsonMatch[0]);
+          }
+        } catch (parseErr) {
+          console.error('[Market] Overview JSON parse error:', parseErr);
+        }
+
+        const finalOverview = {
+          ...overviewData,
+          generated_at: new Date().toISOString(),
+        };
+
+        await db.update('target_companies', { column: 'id', value: company_id }, {
+          company_overview: finalOverview,
+          overview_status: 'completed',
+          updated_at: new Date().toISOString(),
+        }, 15000);
+
+        return res.status(200).json({ success: true, data: finalOverview });
+      } catch (err: any) {
+        console.error('[Market] Overview generation error:', err);
+        await db.update('target_companies', { column: 'id', value: company_id }, {
+          overview_status: 'failed',
+          updated_at: new Date().toISOString(),
+        }, 15000);
+
+        return res.status(500).json({ error: err.message || 'Failed to generate overview' });
+      }
+    }
+
+    // ── Company Fit Score Calculation (Phase 1.5) ──
+    if (resource === 'company-fit-calculate' && method === 'POST') {
+      if (!authUserId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const { mandate_id, success_profile_id } = req.body || {};
+
+      if (!mandate_id || !success_profile_id) {
+        return res.status(400).json({ error: 'mandate_id and success_profile_id are required' });
+      }
+
+      const profile = await db.selectOne('success_profiles', {
+        column: 'id',
+        value: success_profile_id,
+      });
+
+      if (!profile) {
+        return res.status(404).json({ error: 'Success profile not found' });
+      }
+
+      if (profile.status !== 'approved') {
+        return res.status(400).json({ error: 'Only approved success profiles can be used for scoring' });
+      }
+
+      const companies = await db.selectMany('target_companies', {
+        where: [{ column: 'mandate_id', value: mandate_id }],
+        limit: 500,
+      }, 15000);
+
+      const requiredIndustries = profile.required_industries || [];
+      const requiredGeographies = profile.required_geographies || [];
+      const targetTeamSize = profile.team_size_managed || 0;
+
+      let updated = 0;
+
+      for (const company of companies) {
+        let score = 0;
+
+        // Industry match (40 points)
+        const companyIndustry = (company.industry || '').toLowerCase();
+        if (requiredIndustries.length > 0) {
+          if (requiredIndustries.some(i => i.toLowerCase() === companyIndustry)) {
+            score += 40;
+          } else if (requiredIndustries.some(i =>
+            companyIndustry.includes(i.toLowerCase()) ||
+            i.toLowerCase().includes(companyIndustry)
+          )) {
+            score += 20;
+          } else if (requiredIndustries.some(i => {
+            const keywords = i.split(/[\s,&-]+/).filter(Boolean);
+            return keywords.some(kw => companyIndustry.includes(kw.toLowerCase()));
+          })) {
+            score += 10;
+          }
+        } else {
+          score += 20;
+        }
+
+        // Geography match (30 points)
+        const companyLocation = (company.location || '').toLowerCase();
+        if (requiredGeographies.length > 0) {
+          if (requiredGeographies.some(g => companyLocation.includes(g.toLowerCase()))) {
+            score += 30;
+          }
+        } else {
+          score += 15;
+        }
+
+        // Size match (20 points)
+        const sizeStr = company.size || '';
+        const empMatch = sizeStr.match(/(\d+)/);
+        const empCount = empMatch ? parseInt(empMatch[1]) * 1000 : 500;
+
+        if (targetTeamSize > 0) {
+          if (empCount >= targetTeamSize * 0.5 && empCount <= targetTeamSize * 2) {
+            score += 20;
+          } else if (empCount >= targetTeamSize * 0.25 && empCount <= targetTeamSize * 4) {
+            score += 10;
+          } else {
+            score += 5;
+          }
+        } else {
+          score += 10;
+        }
+
+        // Talent density (10 points)
+        if (company.talent_density_score) {
+          score += Math.min(10, Math.round(company.talent_density_score));
+        } else {
+          score += 5;
+        }
+
+        score = Math.min(100, Math.max(0, score));
+
+        await db.update('target_companies', { column: 'id', value: company.id }, {
+          fit_score: score,
+          updated_at: new Date().toISOString(),
+        }, 15000);
+        updated++;
+      }
+
+      return res.status(200).json({ success: true, updated });
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);

@@ -13,10 +13,68 @@ import { SuccessProfileApproval } from '@/components/mandate/SuccessProfileAppro
 import { OutreachTimeline } from '@/components/outreach/OutreachTimeline';
 import { OutreachDashboard } from '@/components/outreach/OutreachDashboard';
 import { NextActionReminders } from '@/components/outreach/NextActionReminders';
+import { CompanyOverviewGenerator } from '@/components/market/CompanyOverviewGenerator';
+import { CompanyRanking } from '@/components/market/CompanyRanking';
+import { MarketMapVisualization } from '@/components/market/MarketMapVisualization';
 import { useAuthStore } from '@/stores/authStore';
+import { getTargetCompanies, calculateFitScores, addTargetCompany } from '@/services/supabaseApi';
 import { getSuccessProfiles } from '@/services/supabaseApi';
 import type { SuccessProfile } from '@/types';
 import { useState, useEffect, useCallback } from 'react';
+import { X } from 'lucide-react';
+
+// ─── Add Company Form Component ───────────────────────────────────────────
+
+function AddCompanyForm({ mandateId, onCompanyAdded }: { mandateId: string; onCompanyAdded: () => void }) {
+  const [show, setShow] = useState(false);
+  const [name, setName] = useState('');
+  const [industry, setIndustry] = useState('');
+  const [location, setLocation] = useState('');
+  const [size, setSize] = useState('');
+  const [domain, setDomain] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) return;
+    setSaving(true);
+    await addTargetCompany({ name: name.trim(), industry: industry.trim() || undefined, location: location.trim() || undefined, size: size.trim() || undefined, domain: domain.trim() || undefined, mandate_id: mandateId });
+    setSaving(false);
+    setName('');
+    setIndustry('');
+    setLocation('');
+    setSize('');
+    setDomain('');
+    setShow(false);
+    onCompanyAdded();
+  }
+
+  return (
+    <div className="bg-bg-secondary border border-border rounded-xl p-4">
+      {!show ? (
+        <button onClick={() => setShow(true)} className="w-full py-3 border-2 border-dashed border-border rounded-lg text-text-muted hover:text-accent hover:border-accent transition-colors text-sm font-medium">
+          + Add Target Company
+        </button>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Company name *" required className="bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm min-h-[44px]" />
+            <input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="Industry" className="bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm min-h-[44px]" />
+            <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Location (e.g., Shanghai)" className="bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm min-h-[44px]" />
+            <input value={size} onChange={e => setSize(e.target.value)} placeholder="Size (e.g., 5000)" className="bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm min-h-[44px]" />
+            <input value={domain} onChange={e => setDomain(e.target.value)} placeholder="Domain (e.g., example.com)" className="bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm min-h-[44px]" colSpan={2} />
+          </div>
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={() => setShow(false)} className="px-4 py-2 text-sm text-text-muted hover:text-text-primary min-h-[44px]">Cancel</button>
+            <button type="submit" disabled={saving || !name.trim()} className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover disabled:opacity-50 min-h-[44px]">
+              {saving ? 'Adding...' : 'Add Company'}
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
 
 const STATUS_OPTIONS = [
   { value: '1_search', label: 'SWEEP', color: '#00897B' },
@@ -37,7 +95,7 @@ const AI_ACTIONS: { key: AIAction; icon: any; label: string }[] = [
   { key: 'feedback', icon: MessageSquare, label: 'Feedback' },
 ];
 
-type TabKey = 'overview' | 'intake' | 'success-profile' | 'outreach' | 'pipeline';
+type TabKey = 'overview' | 'intake' | 'success-profile' | 'market' | 'outreach' | 'pipeline';
 
 export function MandateDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -48,6 +106,9 @@ export function MandateDetailPage() {
   const [aiLoading, setAiLoading] = useState<string | null>(null);
   const [successProfiles, setSuccessProfiles] = useState<SuccessProfile[]>([]);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
+  const [targetCompanies, setTargetCompanies] = useState<any[]>([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState<any | null>(null);
 
   const loadProfiles = useCallback(async () => {
     if (!mandate?.id) return;
@@ -60,6 +121,18 @@ export function MandateDetailPage() {
   useEffect(() => {
     loadProfiles();
   }, [loadProfiles]);
+
+  const loadCompanies = useCallback(async () => {
+    if (!mandate?.id) return;
+    setLoadingCompanies(true);
+    const companies = await getTargetCompanies(mandate.id);
+    setTargetCompanies(companies);
+    setLoadingCompanies(false);
+  }, [mandate?.id]);
+
+  useEffect(() => {
+    loadCompanies();
+  }, [loadCompanies]);
 
   const hasApprovedProfile = successProfiles.some(p => p.status === 'approved');
   const hasPendingProfile = successProfiles.some(p => p.status === 'pending_approval');
@@ -206,6 +279,7 @@ export function MandateDetailPage() {
           { key: 'overview', label: 'Overview', icon: Eye },
           { key: 'intake', label: 'Intake', icon: ListChecks, warn: !intakeComplete },
           { key: 'success-profile', label: 'Success Profile', icon: CheckCircle, warn: !hasApprovedProfile },
+          { key: 'market', label: 'Market', icon: MapPin },
           { key: 'outreach', label: 'Outreach', icon: MessageSquare },
           { key: 'pipeline', label: `Pipeline (${pipeline.length})`, icon: Users },
         ] as { key: TabKey; label: string; icon: any; warn?: boolean }[]).map(t => (
@@ -380,6 +454,77 @@ export function MandateDetailPage() {
                 </Card>
               )}
             </>
+          )}
+        </div>
+      )}
+
+      {tab === 'market' && (
+        <div className="space-y-6">
+          <div>
+            <h2 className="font-serif text-xl text-text-primary">Market Definition</h2>
+            <p className="text-sm text-text-muted mt-1">
+              Define your target market with company rankings, AI-generated overviews, and market map visualization.
+            </p>
+          </div>
+
+          {/* Add company form */}
+          <AddCompanyForm mandateId={mandate.id} onCompanyAdded={loadCompanies} />
+
+          {/* Market map and rankings */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            {/* Rankings panel */}
+            <div>
+              <h3 className="font-serif text-lg text-text-primary mb-3">Company Rankings</h3>
+              <CompanyRanking
+                companies={targetCompanies}
+                successProfile={successProfiles.find(p => p.status === 'approved')}
+                mandateId={mandate.id}
+                onRanksChanged={setTargetCompanies}
+              />
+            </div>
+
+            {/* Market map */}
+            <div>
+              <h3 className="font-serif text-lg text-text-primary mb-3">Market Map</h3>
+              <MarketMapVisualization
+                companies={targetCompanies}
+                mandateId={mandate.id}
+                onCompanyClick={(company) => setSelectedCompany(company)}
+              />
+            </div>
+          </div>
+
+          {/* Selected company detail */}
+          {selectedCompany && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedCompany(null)}>
+              <div className="bg-bg-primary rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h2 className="font-serif text-xl text-text-primary">{selectedCompany.name}</h2>
+                      <p className="text-sm text-text-muted">
+                        {selectedCompany.industry} • {selectedCompany.location}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setSelectedCompany(null)}
+                      className="p-2 text-text-muted hover:text-text-primary"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <CompanyOverviewGenerator
+                    company={selectedCompany}
+                    onOverviewGenerated={(overview) => {
+                      setTargetCompanies(prev =>
+                        prev.map(c => c.id === selectedCompany.id ? { ...c, company_overview: overview, overview_status: 'completed' } : c)
+                      );
+                      setSelectedCompany(prev => prev ? { ...prev, company_overview: overview, overview_status: 'completed' } : null);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
           )}
         </div>
       )}
