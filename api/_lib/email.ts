@@ -41,6 +41,25 @@ function renderEmail(type: string, data: any): { subject: string; html: string }
           </div>
         `,
       };
+    case 'signup':
+      return {
+        subject: 'Welcome to DEX AI — Verify Your Email',
+        html: `
+          <div style="font-family: Georgia, serif; background: #0a0a0a; color: #e5e5e5; padding: 40px; max-width: 600px; margin: auto;">
+            <h1 style="color: #e5e5e5; border-bottom: 2px solid #c108ab; padding-bottom: 20px;">DEX AI</h1>
+            <p>Hi ${data.name || 'there'},</p>
+            <p>Welcome to DEX AI! Click the link below to verify your email:</p>
+            <div style="margin:20px 0;">
+              <a href="${data.verificationUrl || 'https://dex-ai.app/verify'}" style="display:inline-block;padding:12px 24px;background:#c108ab;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">
+                Verify Email
+              </a>
+            </div>
+            <p>After verification, you'll get 2 free credits/day to continue chatting with Nexus.</p>
+            <p style="color:#999; font-size:13px; margin-top:24px;">If you didn't create an account with us, please ignore this email.</p>
+            <p>Best,<br/>The DEX AI Team</p>
+          </div>
+        `,
+      };
     case 'lead_notify':
       return {
         subject: `[LYC Lead] New ${data.leadType} Lead: ${data.name}`,

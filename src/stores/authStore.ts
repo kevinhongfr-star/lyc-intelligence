@@ -41,6 +41,28 @@ const generateReferralCode = () => {
   return code;
 };
 
+const createMemberCredits = async (userId: string) => {
+  const supabase = createClient(
+    import.meta.env.VITE_SUPABASE_URL as string,
+    (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string)
+  );
+  
+  try {
+    const { error } = await supabase.from('credits').insert({
+      user_id: userId,
+      balance: 2,
+      daily_balance: 2,
+      last_daily_reset: new Date().toISOString(),
+    });
+    
+    if (error) {
+      console.warn('[AuthStore] Credits creation error:', error);
+    }
+  } catch (e) {
+    console.warn('[AuthStore] Credits creation error:', e);
+  }
+};
+
 export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   profile: null,
@@ -111,7 +133,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     if (!supabase) return { success: false, error: 'Supabase not configured' };
 
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: { 
+          data: { 
+            tier: 'member', 
+            role: 'member',
+            name 
+          } 
+        }
+      });
       if (error) return { success: false, error: error.message };
       
       if (data.user) {
@@ -121,16 +153,29 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           email,
           name,
           icp: icp,
-          tier: 'free',
-          role: 'user',
+          tier: 'member',
+          role: 'member',
         });
         if (profileError) console.warn('[AuthStore] Profile creation error:', profileError);
         
-        // Phase 11.1 — Fire welcome email
+        // Create credits record for member (2 daily credits)
+        await createMemberCredits(data.user.id);
+        
+        // Get verification URL from Supabase
+        const verificationUrl = `${window.location.origin}/verify`;
+        
+        // Send verification/welcome email
         fetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'welcome', data: { email, name } })
+          body: JSON.stringify({ 
+            type: 'signup', 
+            data: { 
+              email, 
+              name,
+              verificationUrl 
+            } 
+          })
         }).catch(() => {}); // fire and forget
         
         set({ user: data.user });

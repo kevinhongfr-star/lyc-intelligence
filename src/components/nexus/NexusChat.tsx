@@ -46,9 +46,11 @@ interface ChatSession {
 interface NexusChatProps {
   showHeader?: boolean;
   initialPrompts?: string[];
+  onMessageSent?: () => void;
+  onCreditCheck?: () => Promise<{ balance: number; tier: string } | null>;
 }
 
-export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps) {
+export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: NexusChatProps) {
   const { user, profile } = useAuthStore();
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -247,6 +249,9 @@ export function NexusChat({ showHeader = true, initialPrompts }: NexusChatProps)
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setLoading(true);
     setMessageCount(newMessageCount);
+    
+    onMessageSent?.();
+    
     await sendMessage(userMsg);
   };
 
