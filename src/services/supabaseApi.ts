@@ -1814,3 +1814,291 @@ export async function getCandidatesForMandate(mandateId: string): Promise<Candid
     return [];
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// CANDIDATE PORTAL API (Phase 4.1)
+// ═══════════════════════════════════════════════════════════════
+
+export interface CandidateApplication {
+  id: string;
+  mandate_id: string;
+  mandate: {
+    title: string;
+    description: string;
+    jd_description?: string;
+    location: string;
+    compensation_range: string;
+    company?: { name: string; industry?: string };
+  };
+  client_name: string;
+  stage: string;
+  match_score: number | null;
+  trident_composite?: number;
+  match_reasons?: string[];
+  list_status: string | null;
+  created_at: string;
+  updated_at: string;
+  applied_date: string;
+  last_updated: string;
+  stage_history: Array<{
+    id: string;
+    from_stage: string | null;
+    to_stage: string;
+    changed_at: string;
+    notes: string | null;
+  }>;
+  next_steps: string | null;
+  client_feedback?: {
+    decision: 'approved' | 'rejected' | 'hold';
+    comment: string;
+    decided_by: string | null;
+    decided_at: string;
+  } | null;
+  feedback: {
+    decision: 'approved' | 'rejected' | 'hold';
+    comment: string;
+    decided_by: string | null;
+    decided_at: string;
+  } | null;
+}
+
+export interface CandidateProfile {
+  id: string;
+  email: string;
+  name: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  linkedin_url: string;
+  city: string;
+  country: string;
+  current_title: string;
+  current_company: string;
+  years_experience: number;
+  industries: string[];
+  skills: string[];
+  languages: string[];
+  education: Array<{ degree: string; institution: string; year: string }>;
+  career_history: Array<{ company: string; role: string; duration: string }>;
+  job_search_status: 'actively_looking' | 'open_to_opportunities' | 'not_looking';
+  preferred_industries: string[];
+  preferred_geographies: string[];
+  preferred_company_sizes: string[];
+  salary_expectation_min: number | null;
+  salary_expectation_max: number | null;
+  cv_url: string | null;
+  cv_extracted: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    experience?: Array<{ company: string; role: string; years: string }>;
+    skills?: string[];
+  } | null;
+  notification_preferences: NotificationPreferences;
+}
+
+export interface NotificationPreferences {
+  assessment_invitation: { enabled: boolean; email: boolean; in_app: boolean };
+  interview_reminder: { enabled: boolean; email: boolean; in_app: boolean };
+  stage_change: { enabled: boolean; email: boolean; in_app: boolean };
+  feedback_received: { enabled: boolean; email: boolean; in_app: boolean };
+  career_insight: { enabled: boolean; email: boolean; in_app: boolean; frequency: 'immediate' | 'daily' | 'weekly' };
+}
+
+export interface CareerInsight {
+  id: string;
+  title: string;
+  description: string;
+  category: 'market_trend' | 'opportunity' | 'company' | 'skill_demand';
+  action_items: string[];
+  related_data: {
+    companies?: string[];
+    skills?: string[];
+    geographies?: string[];
+  };
+  relevance_score: number;
+  saved: boolean;
+  created_at: string;
+}
+
+export interface CandidateNotification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  related_id: string | null;
+  related_type: string | null;
+  read: boolean;
+  created_at: string;
+}
+
+// Get candidate's applications
+export async function getCandidateApplications(): Promise<CandidateApplication[]> {
+  try {
+    const res = await fetch('/api/data/candidate/applications');
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as CandidateApplication[];
+    }
+    return [];
+  } catch (e) {
+    console.error('[Candidate] getCandidateApplications error:', e);
+    return [];
+  }
+}
+
+// Get candidate's profile
+export async function getCandidateProfile(): Promise<CandidateProfile | null> {
+  try {
+    const res = await fetch('/api/data/candidate/profile');
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as CandidateProfile;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Candidate] getCandidateProfile error:', e);
+    return null;
+  }
+}
+
+// Update candidate's profile
+export async function updateCandidateProfile(updates: Partial<CandidateProfile>): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/candidate/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Candidate] updateCandidateProfile error:', e);
+    return false;
+  }
+}
+
+// Get candidate's notifications
+export async function getCandidateNotifications(): Promise<{
+  notifications: CandidateNotification[];
+  preferences: NotificationPreferences;
+}> {
+  try {
+    const res = await fetch('/api/data/candidate/notifications');
+    if (!res.ok) return { notifications: [], preferences: getDefaultNotificationPreferences() };
+
+    const result = await res.json();
+    if (result.success) {
+      return {
+        notifications: result.data as CandidateNotification[],
+        preferences: result.preferences as NotificationPreferences,
+      };
+    }
+    return { notifications: [], preferences: getDefaultNotificationPreferences() };
+  } catch (e) {
+    console.error('[Candidate] getCandidateNotifications error:', e);
+    return { notifications: [], preferences: getDefaultNotificationPreferences() };
+  }
+}
+
+// Mark notifications as read
+export async function markCandidateNotificationsRead(notificationIds: string[]): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/candidate/notifications/read', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notification_ids: notificationIds }),
+    });
+
+    return res.ok;
+  } catch (e) {
+    console.error('[Candidate] markCandidateNotificationsRead error:', e);
+    return false;
+  }
+}
+
+// Update notification preferences
+export async function updateNotificationPreferences(preferences: NotificationPreferences): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/candidate/notifications/preferences', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(preferences),
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Candidate] updateNotificationPreferences error:', e);
+    return false;
+  }
+}
+
+// Get career insights
+export async function getCareerInsights(): Promise<CareerInsight[]> {
+  try {
+    const res = await fetch('/api/data/candidate/insights');
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as CareerInsight[];
+    }
+    return [];
+  } catch (e) {
+    console.error('[Candidate] getCareerInsights error:', e);
+    return [];
+  }
+}
+
+// Save/bookmark a career insight
+export async function saveCareerInsight(insightId: string): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/candidate/insights/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ insight_id: insightId }),
+    });
+
+    return res.ok;
+  } catch (e) {
+    console.error('[Candidate] saveCareerInsight error:', e);
+    return false;
+  }
+}
+
+// Remove saved career insight
+export async function unsaveCareerInsight(insightId: string): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/candidate/insights/save', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ insight_id: insightId }),
+    });
+
+    return res.ok;
+  } catch (e) {
+    console.error('[Candidate] unsaveCareerInsight error:', e);
+    return false;
+  }
+}
+
+// Helper function for default notification preferences
+function getDefaultNotificationPreferences(): NotificationPreferences {
+  return {
+    assessment_invitation: { enabled: true, email: true, in_app: true },
+    interview_reminder: { enabled: true, email: true, in_app: true },
+    stage_change: { enabled: true, email: false, in_app: true },
+    feedback_received: { enabled: true, email: false, in_app: true },
+    career_insight: { enabled: true, email: true, in_app: true, frequency: 'weekly' },
+  };
+}
