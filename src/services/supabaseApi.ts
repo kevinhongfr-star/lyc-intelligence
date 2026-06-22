@@ -2335,3 +2335,284 @@ export async function updateResultVisibility(resultId: string, visibility: 'full
     return false;
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// INTERVIEW MANAGEMENT API (Phase 4.3)
+// ═══════════════════════════════════════════════════════════════
+
+export type InterviewStatus = 'scheduled' | 'completed' | 'cancelled' | 'rescheduled';
+
+export type InterviewRecommendation = 'strong_hire' | 'hire' | 'no_hire' | 'strong_no_hire';
+
+export interface InterviewPanelist {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface InterviewScorecard {
+  panelist_id: string;
+  panelist_name: string;
+  competency_scores: Record<string, number>;
+  overall_score: number;
+  strengths: string[];
+  concerns: string[];
+  recommendation: InterviewRecommendation;
+  submitted_at: string;
+}
+
+export interface AggregateFeedback {
+  avg_competency_scores: Record<string, number>;
+  avg_overall_score: number;
+  consensus_recommendation: InterviewRecommendation;
+  combined_strengths: string[];
+  combined_concerns: string[];
+  panelist_count: number;
+}
+
+export interface Interview {
+  id: string;
+  candidate_id: string;
+  candidate_name: string;
+  candidate_email: string;
+  mandate_id: string;
+  mandate_title: string;
+  client_name: string;
+  round: number;
+  interview_date: string;
+  duration_minutes: number;
+  location: string;
+  meeting_link: string;
+  panel_members: InterviewPanelist[];
+  status: InterviewStatus;
+  scorecards: InterviewScorecard[];
+  aggregate_feedback: AggregateFeedback | null;
+  notes: string;
+  created_by: string;
+  organization_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ScheduleInterviewParams {
+  candidate_id: string;
+  mandate_id: string;
+  round: number;
+  interview_date: string;
+  duration_minutes?: number;
+  location?: string;
+  meeting_link?: string;
+  panel_members: Array<{ id: string; name: string; email: string }>;
+  send_invite?: boolean;
+  notes?: string;
+}
+
+export interface SubmitScorecardParams {
+  interview_id: string;
+  panelist_id: string;
+  competency_scores: Record<string, number>;
+  overall_score: number;
+  strengths: string;
+  concerns: string;
+  recommendation: InterviewRecommendation;
+}
+
+// Get interviews for a mandate
+export async function getInterviewsForMandate(mandateId: string): Promise<Interview[]> {
+  try {
+    const res = await fetch(`/api/data/interviews/mandate/${mandateId}`);
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as Interview[];
+    }
+    return [];
+  } catch (e) {
+    console.error('[Interview] getInterviewsForMandate error:', e);
+    return [];
+  }
+}
+
+// Get single interview
+export async function getInterview(interviewId: string): Promise<Interview | null> {
+  try {
+    const res = await fetch(`/api/data/interviews/${interviewId}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as Interview;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Interview] getInterview error:', e);
+    return null;
+  }
+}
+
+// Schedule new interview
+export async function scheduleInterview(params: ScheduleInterviewParams): Promise<{ success: boolean; interview_id?: string }> {
+  try {
+    const res = await fetch('/api/data/interviews/schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    if (!res.ok) return { success: false };
+
+    const result = await res.json();
+    return {
+      success: result.success,
+      interview_id: result.interview_id,
+    };
+  } catch (e) {
+    console.error('[Interview] scheduleInterview error:', e);
+    return { success: false };
+  }
+}
+
+// Update interview
+export async function updateInterview(interviewId: string, updates: Partial<Interview>): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/interviews/${interviewId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Interview] updateInterview error:', e);
+    return false;
+  }
+}
+
+// Delete interview
+export async function deleteInterview(interviewId: string): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/interviews/${interviewId}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Interview] deleteInterview error:', e);
+    return false;
+  }
+}
+
+// Submit scorecard
+export async function submitScorecard(params: SubmitScorecardParams): Promise<{ success: boolean; aggregate_feedback?: AggregateFeedback }> {
+  try {
+    const res = await fetch('/api/data/interviews/scorecard', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    if (!res.ok) return { success: false };
+
+    const result = await res.json();
+    return {
+      success: result.success,
+      aggregate_feedback: result.aggregate_feedback,
+    };
+  } catch (e) {
+    console.error('[Interview] submitScorecard error:', e);
+    return { success: false };
+  }
+}
+
+// Get aggregate feedback
+export async function getInterviewFeedback(interviewId: string): Promise<{ scorecards: InterviewScorecard[]; aggregate_feedback: AggregateFeedback | null; status: string } | null> {
+  try {
+    const res = await fetch(`/api/data/interviews/feedback/${interviewId}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Interview] getInterviewFeedback error:', e);
+    return null;
+  }
+}
+
+// Advance candidate to next stage
+export async function advanceCandidateStage(interviewId: string): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/interviews/advance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ interview_id: interviewId }),
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Interview] advanceCandidateStage error:', e);
+    return false;
+  }
+}
+
+// Get available panelists (consultants in the organization)
+export async function getPanelists(): Promise<InterviewPanelist[]> {
+  try {
+    const res = await fetch('/api/data/profiles?role=consultant');
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data.map((p: any) => ({
+        id: p.id,
+        name: p.name || p.email,
+        email: p.email,
+      }));
+    }
+    return [];
+  } catch (e) {
+    console.error('[Interview] getPanelists error:', e);
+    return [];
+  }
+}
+
+// Get candidates for a mandate
+export interface MandateCandidate {
+  id: string;
+  name: string;
+  email: string;
+  stage: string;
+}
+
+export async function getMandateCandidates(mandateId: string): Promise<MandateCandidate[]> {
+  try {
+    const res = await fetch(`/api/data/contacts?mandate=${mandateId}`);
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data.map((c: any) => ({
+        id: c.id,
+        name: c.name || c.email,
+        email: c.email,
+        stage: c.stage || 'applied',
+      }));
+    }
+    return [];
+  } catch (e) {
+    console.error('[Interview] getMandateCandidates error:', e);
+    return [];
+  }
+}

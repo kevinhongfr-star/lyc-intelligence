@@ -3072,10 +3072,494 @@ Return as valid JSON with exactly these keys:
       }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // INTERVIEW MANAGEMENT ROUTES (Phase 4.3)
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── List interviews for mandate ──
+    if (resource === 'interviews' && sub === 'mandate') {
+      if (method === 'GET') {
+        if (!id) {
+          return res.status(400).json({ error: 'mandate_id is required' });
+        }
+
+        const interviews = await db.selectMany('interviews', {
+          where: [{ column: 'mandate_id', value: id }],
+          orderBy: { column: 'interview_date', ascending: false },
+          limit: 50,
+        }, 15000);
+
+        const enriched = [];
+        for (const interview of interviews) {
+          const candidate = await db.selectOne('contacts', {
+            column: 'id',
+            value: interview.candidate_id,
+            select: 'id, first_name, last_name, email',
+          });
+
+          const panelMembers = [];
+          if (interview.panel_members && Array.isArray(interview.panel_members)) {
+            for (const panelistId of interview.panel_members) {
+              const panelist = await db.selectOne('profiles', {
+                column: 'id',
+                value: panelistId,
+                select: 'id, name, email',
+              });
+              if (panelist) {
+                panelMembers.push(panelist);
+              }
+            }
+          }
+
+          enriched.push({
+            ...interview,
+            candidate_name: candidate ? `${candidate.first_name} ${candidate.last_name}` : 'Unknown',
+            candidate_email: candidate?.email || '',
+            panel_members: panelMembers,
+          });
+        }
+
+        return res.status(200).json({
+          success: true,
+          data: enriched,
+          total: enriched.length,
+        });
+      }
+    }
+
+    // ── Get single interview ──
+    if (resource === 'interviews' && id && !sub) {
+      if (method === 'GET') {
+        const interview = await db.selectOne('interviews', {
+          column: 'id',
+          value: id,
+        }, 15000);
+
+        if (!interview) {
+          return res.status(404).json({ error: 'Interview not found' });
+        }
+
+        const candidate = await db.selectOne('contacts', {
+          column: 'id',
+          value: interview.candidate_id,
+          select: 'id, first_name, last_name, email',
+        });
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: interview.mandate_id,
+          select: 'id, title, client_id',
+        });
+
+        const client = mandate?.client_id
+          ? await db.selectOne('clients', {
+              column: 'id',
+              value: mandate.client_id,
+              select: 'id, company_name',
+            })
+          : null;
+
+        const panelMembers = [];
+        if (interview.panel_members && Array.isArray(interview.panel_members)) {
+          for (const panelistId of interview.panel_members) {
+            const panelist = await db.selectOne('profiles', {
+              column: 'id',
+              value: panelistId,
+              select: 'id, name, email',
+            });
+            if (panelist) {
+              panelMembers.push(panelist);
+            }
+          }
+        }
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            ...interview,
+            candidate_name: candidate ? `${candidate.first_name} ${candidate.last_name}` : 'Unknown',
+            candidate_email: candidate?.email || '',
+            mandate_title: mandate?.title || '',
+            client_name: client?.company_name || '',
+            panel_members: panelMembers,
+          },
+        });
+      }
+
+      // Update interview
+      if (method === 'PUT' || method === 'PATCH') {
+        const updates = req.body || {};
+        
+        await db.update('interviews', { column: 'id', value: id }, {
+          ...updates,
+          updated_at: new Date().toISOString(),
+        }, 15000);
+
+        return res.status(200).json({
+          success: true,
+          message: 'Interview updated',
+        });
+      }
+
+      // Delete interview
+      if (method === 'DELETE') {
+        await db.deleteRows('interviews', {
+          where: [{ column: 'id', value: id }],
+        }, 15000);
+
+        return res.status(200).json({
+          success: true,
+          message: 'Interview deleted',
+        });
+      }
+    }
+
+    // ── Schedule new interview ──
+    if (resource === 'interviews' && sub === 'schedule') {
+      if (method === 'POST') {
+        const {
+          candidate_id,
+          mandate_id,
+          round,
+          interview_date,
+          duration_minutes = 60,
+          location,
+          meeting_link,
+          panel_members,
+          send_invite = true,
+          notes,
+        } = req.body || {};
+
+        if (!candidate_id || !mandate_id || !round || !interview_date) {
+          return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const panelIds = panel_members?.map((p: any) => p.id) || [];
+
+        const inserted = await db.insert('interviews', {
+          candidate_id,
+          mandate_id,
+          round,
+          interview_date,
+          duration_minutes,
+          location,
+          meeting_link,
+          panel_members: panelIds,
+          status: 'scheduled',
+          scorecards: [],
+          aggregate_feedback: null,
+          notes,
+          created_by: authUserId,
+          organization_id: '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, 15000);
+
+        const interviewId = inserted?.id;
+
+        // Send invitation email if requested
+        if (send_invite && interviewId) {
+          const candidate = await db.selectOne('contacts', {
+            column: 'id',
+            value: candidate_id,
+            select: 'first_name, last_name, email',
+          });
+
+          const mandate = await db.selectOne('mandates', {
+            column: 'id',
+            value: mandate_id,
+            select: 'title, client_id',
+          });
+
+          const client = mandate?.client_id
+            ? await db.selectOne('clients', {
+                column: 'id',
+                value: mandate.client_id,
+                select: 'company_name',
+              })
+            : null;
+
+          const panelNames = [];
+          for (const panelistId of panelIds) {
+            const panelist = await db.selectOne('profiles', {
+              column: 'id',
+              value: panelistId,
+              select: 'name',
+            });
+            if (panelist) {
+              panelNames.push(panelist.name);
+            }
+          }
+
+          const consultant = await db.selectOne('profiles', {
+            column: 'id',
+            value: authUserId,
+            select: 'name',
+          });
+
+          // Store invitation
+          const date = new Date(interview_date);
+          await db.insert('interview_invitations', {
+            interview_id: interviewId,
+            candidate_id,
+            sent_at: new Date().toISOString(),
+            status: 'sent',
+            email_subject: `Interview Invitation — ${mandate?.title || ''}`,
+            email_body: `Hi ${candidate?.first_name || ''} ${candidate?.last_name || ''},
+
+You're invited to interview for ${mandate?.title || ''} at ${client?.company_name || ''}.
+
+Date: ${date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+Time: ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+Duration: ${duration_minutes} minutes
+Location: ${location || 'Virtual'}
+${meeting_link ? `Meeting Link: ${meeting_link}` : ''}
+
+Panel: ${panelNames.join(', ')}
+
+Please confirm your availability by replying to this email.
+
+Best,
+${consultant?.name || 'LYC Intelligence'}`,
+            created_at: new Date().toISOString(),
+          }, 15000);
+        }
+
+        return res.status(201).json({
+          success: true,
+          message: 'Interview scheduled',
+          interview_id: interviewId,
+        });
+      }
+    }
+
+    // ── Submit scorecard ──
+    if (resource === 'interviews' && sub === 'scorecard') {
+      if (method === 'POST') {
+        const { interview_id, panelist_id, competency_scores, overall_score, strengths, concerns, recommendation } = req.body || {};
+
+        if (!interview_id || !panelist_id || !competency_scores || overall_score === undefined || !recommendation) {
+          return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const interview = await db.selectOne('interviews', {
+          column: 'id',
+          value: interview_id,
+          select: 'scorecards, round, candidate_id, mandate_id',
+        });
+
+        if (!interview) {
+          return res.status(404).json({ error: 'Interview not found' });
+        }
+
+        const panelist = await db.selectOne('profiles', {
+          column: 'id',
+          value: panelist_id,
+          select: 'name',
+        });
+
+        const existingScorecards = interview.scorecards || [];
+        
+        // Remove existing scorecard from this panelist
+        const updatedScorecards = existingScorecards.filter(
+          (s: any) => s.panelist_id !== panelist_id
+        );
+
+        updatedScorecards.push({
+          panelist_id,
+          panelist_name: panelist?.name || 'Unknown',
+          competency_scores,
+          overall_score,
+          strengths: strengths.split('\n').filter(Boolean),
+          concerns: concerns.split('\n').filter(Boolean),
+          recommendation,
+          submitted_at: new Date().toISOString(),
+        });
+
+        // Calculate aggregate feedback
+        const aggregate = calculateAggregateFeedback(updatedScorecards);
+
+        // Update interview
+        await db.update('interviews', { column: 'id', value: interview_id }, {
+          scorecards: updatedScorecards,
+          aggregate_feedback: aggregate,
+          updated_at: new Date().toISOString(),
+        }, 15000);
+
+        // Check if all panelists have submitted
+        const panelMemberIds = interview.panel_members || [];
+        const allSubmitted = panelMemberIds.length > 0 && 
+          updatedScorecards.length === panelMemberIds.length;
+
+        // Auto-complete if all submitted
+        if (allSubmitted) {
+          await db.update('interviews', { column: 'id', value: interview_id }, {
+            status: 'completed',
+          }, 15000);
+
+          // Auto-advance pipeline stage
+          await autoAdvancePipelineStage(interview.candidate_id, interview.mandate_id, interview.round);
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: 'Scorecard submitted',
+          aggregate_feedback: aggregate,
+        });
+      }
+    }
+
+    // ── Get aggregate feedback ──
+    if (resource === 'interviews' && sub === 'feedback') {
+      if (method === 'GET') {
+        if (!id) {
+          return res.status(400).json({ error: 'interview_id is required' });
+        }
+
+        const interview = await db.selectOne('interviews', {
+          column: 'id',
+          value: id,
+        }, 15000);
+
+        if (!interview) {
+          return res.status(404).json({ error: 'Interview not found' });
+        }
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            scorecards: interview.scorecards || [],
+            aggregate_feedback: interview.aggregate_feedback || null,
+            status: interview.status,
+          },
+        });
+      }
+    }
+
+    // ── Advance candidate to next stage ──
+    if (resource === 'interviews' && sub === 'advance') {
+      if (method === 'POST') {
+        const { interview_id } = req.body || {};
+
+        if (!interview_id) {
+          return res.status(400).json({ error: 'interview_id is required' });
+        }
+
+        const interview = await db.selectOne('interviews', {
+          column: 'id',
+          value: interview_id,
+          select: 'candidate_id, mandate_id, round',
+        });
+
+        if (!interview) {
+          return res.status(404).json({ error: 'Interview not found' });
+        }
+
+        await autoAdvancePipelineStage(interview.candidate_id, interview.mandate_id, interview.round);
+
+        return res.status(200).json({
+          success: true,
+          message: 'Candidate advanced to next stage',
+        });
+      }
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}${sub ? '/' + sub : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);
   }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INTERVIEW HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+
+function calculateAggregateFeedback(scorecards: any[]): any {
+  if (!scorecards || scorecards.length === 0) {
+    return null;
+  }
+
+  const panelistCount = scorecards.length;
+
+  // Calculate average overall score
+  const avgOverallScore = Math.round(
+    scorecards.reduce((sum, s) => sum + s.overall_score, 0) / panelistCount
+  );
+
+  // Calculate average competency scores
+  const competencies = ['technical', 'communication', 'leadership', 'cultural_fit', 'problem_solving'];
+  const avgCompetencyScores: Record<string, number> = {};
+  
+  competencies.forEach(comp => {
+    avgCompetencyScores[comp] = Math.round(
+      scorecards.reduce((sum, s) => sum + (s.competency_scores?.[comp] || 0), 0) / panelistCount
+    );
+  });
+
+  // Get consensus recommendation
+  const recommendations = scorecards.map(s => s.recommendation);
+  const consensus = getConsensusRecommendation(recommendations);
+
+  // Combine strengths and concerns (deduplicate)
+  const allStrengths = scorecards.flatMap(s => s.strengths || []);
+  const allConcerns = scorecards.flatMap(s => s.concerns || []);
+
+  return {
+    avg_competency_scores: avgCompetencyScores,
+    avg_overall_score: avgOverallScore,
+    consensus_recommendation: consensus,
+    combined_strengths: deduplicateFeedback(allStrengths),
+    combined_concerns: deduplicateFeedback(allConcerns),
+    panelist_count: panelistCount,
+  };
+}
+
+function getConsensusRecommendation(recommendations: string[]): string {
+  const counts: Record<string, number> = {};
+  recommendations.forEach(r => {
+    counts[r] = (counts[r] || 0) + 1;
+  });
+
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  
+  if (sorted.length === 0) return 'hire';
+  
+  return sorted[0][0];
+}
+
+function deduplicateFeedback(items: string[]): string[] {
+  const seen = new Set<string>();
+  return items.filter(item => {
+    const normalized = item.trim().toLowerCase();
+    if (seen.has(normalized)) return false;
+    seen.add(normalized);
+    return true;
+  });
+}
+
+async function autoAdvancePipelineStage(candidateId: string, mandateId: string, round: number) {
+  const stageMap: Record<number, string> = {
+    1: 'interview_2',
+    2: 'interview_3',
+    3: 'final_interview',
+    4: 'assessment',
+    5: 'assessment',
+  };
+
+  const nextStage = stageMap[round];
+  
+  if (!nextStage) return;
+
+  // Update candidate pipeline stage
+  await db.update('candidates_pipeline', {
+    where: [
+      { column: 'contact_id', value: candidateId },
+      { column: 'mandate_id', value: mandateId },
+    ],
+  }, {
+    stage: nextStage,
+    updated_at: new Date().toISOString(),
+  }, 15000);
 }
 
 // ═══════════════════════════════════════════════════════════════
