@@ -319,8 +319,9 @@ async function handleEarn(req: VercelRequest, res: VercelResponse) {
 }
 
 /**
- * Daily reset for user-level free-tier credits (5/day).
- * Note: organization-level council credits are handled via handleDailyAllocate.
+ * Daily reset for user-level credits.
+ * Member tier: 2 credits/day
+ * Council tier: 5 credits/day
  */
 async function handleDailyReset(req: VercelRequest, res: VercelResponse) {
   const { userId } = req.body;
@@ -329,40 +330,71 @@ async function handleDailyReset(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'User ID required' });
   }
 
-  const creditData = await selectOne('credits', {
+  const profile = await selectOne('profiles', {
+    column: 'id',
+    value: userId,
+    select: 'tier, stripe_subscription_status',
+  });
+
+  let tier = profile?.tier || 'member';
+  
+  if (profile?.tier === 'council' && profile.stripe_subscription_status !== 'active') {
+    tier = 'member';
+  }
+
+  const dailyCredits = tier === 'council' ? 5 : 2;
+
+  let creditData = await selectOne('credits', {
     column: 'user_id',
     value: userId,
-    select: 'tier, balance, total_earned',
+    select: 'balance, total_earned',
   });
 
   if (!creditData) {
-    return res.status(404).json({ error: 'Credits record not found' });
+    await insert('credits', {
+      user_id: userId,
+      balance: dailyCredits,
+      total_earned: dailyCredits,
+      total_spent: 0,
+      tier,
+      created_at: new Date().toISOString(),
+    });
+
+    await logTransaction({
+      user_id: userId,
+      amount: dailyCredits,
+      reason: `Daily credit reset (${tier} tier)`,
+    });
+
+    return res.status(200).json({
+      success: true,
+      creditsGranted: dailyCredits,
+      newBalance: dailyCredits,
+      tier,
+    });
   }
 
-  if (creditData.tier !== 'free') {
-    return res.status(200).json({ success: true, creditsGranted: 0, message: 'No reset needed for paid tier' });
-  }
-
-  const dailyCredits = 5;
   const newBalance = Number(creditData.balance || 0) + dailyCredits;
   const newTotalEarned = Number(creditData.total_earned || 0) + dailyCredits;
 
   await update('credits', { column: 'user_id', value: userId }, {
     balance: newBalance,
     total_earned: newTotalEarned,
+    tier,
     updated_at: new Date().toISOString(),
   });
 
   await logTransaction({
     user_id: userId,
     amount: dailyCredits,
-    reason: 'Daily login bonus',
+    reason: `Daily credit reset (${tier} tier)`,
   });
 
   return res.status(200).json({
     success: true,
     creditsGranted: dailyCredits,
     newBalance,
+    tier,
   });
 }
 

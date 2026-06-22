@@ -295,9 +295,6 @@ async function handlePortal(req: VercelRequest, res: VercelResponse) {
 
 async function handleWebhook(req: VercelRequest, res: VercelResponse) {
   try {
-    // NOTE: req.body will be a raw string when passed through
-    // the Vercel serverless function handler if bodyParser.raw = true.
-    // In this codebase we receive it already parsed.
     const event = req.body as any;
 
     if (!event || !event.type) {
@@ -313,10 +310,10 @@ async function handleWebhook(req: VercelRequest, res: VercelResponse) {
         await handleSubscriptionDeleted(event.data.object);
         break;
       case 'invoice.payment_failed':
-        console.log('[Stripe Webhook] Payment failed:', event.data.object.customer);
+        await handleInvoicePaymentFailed(event.data.object);
         break;
       case 'invoice.payment_succeeded':
-        console.log('[Stripe Webhook] Payment succeeded:', event.data.object.customer);
+        await handleInvoicePaymentSucceeded(event.data.object);
         break;
       case 'checkout.session.completed':
         await handleCheckoutSessionCompleted(event.data.object);
@@ -329,6 +326,82 @@ async function handleWebhook(req: VercelRequest, res: VercelResponse) {
   } catch (e: any) {
     console.error('[Stripe Webhook] Error:', e);
     return res.status(400).json({ error: 'Webhook error' });
+  }
+}
+
+async function handleInvoicePaymentSucceeded(invoice: any): Promise<void> {
+  const customerId = invoice.customer;
+  const amountPaid = invoice.amount_paid / 100; // Convert cents to dollars
+
+  const profile = await db.selectOne('profiles', {
+    column: 'stripe_customer_id',
+    value: customerId,
+    select: 'id, email',
+  });
+
+  if (!profile) {
+    console.error('[Stripe] Profile not found for invoice customer:', customerId);
+    return;
+  }
+
+  try {
+    await db.insert('credit_transactions', {
+      user_id: profile.id,
+      amount: 0,
+      transaction_type: 'earn_credit',
+      description: `Subscription payment received: $${amountPaid}`,
+      stripe_session_id: invoice.id,
+    });
+
+    console.log(`[Stripe] Payment logged for user ${profile.id}: $${amountPaid}`);
+  } catch (e) {
+    console.error('[Stripe] Failed to log payment:', e);
+  }
+}
+
+async function handleInvoicePaymentFailed(invoice: any): Promise<void> {
+  const customerId = invoice.customer;
+  const paymentIntent = invoice.payment_intent;
+
+  const profile = await db.selectOne('profiles', {
+    column: 'stripe_customer_id',
+    value: customerId,
+    select: 'id, email, tier, stripe_subscription_status',
+  });
+
+  if (!profile) {
+    console.error('[Stripe] Profile not found for failed payment:', customerId);
+    return;
+  }
+
+  await db.update('profiles', { column: 'id', value: profile.id }, {
+    stripe_subscription_status: 'past_due',
+  });
+
+  console.log(`[Stripe] Payment failed for user ${profile.id} (${profile.email}) - status set to past_due`);
+
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'LYC Intelligence <support@lycintelligence.com>',
+        to: profile.email,
+        subject: 'Payment Failed - Your LYC Intelligence Subscription',
+        html: `<p>Hello,</p>
+          <p>We were unable to process your recent payment for your LYC Intelligence Council subscription.</p>
+          <p>Your subscription has been placed on hold. You have 7 days to update your payment method before your account is downgraded to Member.</p>
+          <p>Please update your payment details here: https://app.lycintelligence.com/settings/billing</p>
+          <p>Thank you,</p>
+          <p>The LYC Intelligence Team</p>`,
+      }),
+    });
+    console.log(`[Stripe] Warning email sent to ${profile.email}`);
+  } catch (e) {
+    console.error('[Stripe] Failed to send payment failure email:', e);
   }
 }
 
@@ -385,10 +458,12 @@ async function handleCheckoutSessionCompleted(session: any): Promise<void> {
 async function handleSubscriptionUpdate(subscription: any) {
   const customerId = subscription.customer;
   const status = subscription.status;
+  const subscriptionId = subscription.id;
 
   const priceId = subscription.items?.data?.[0]?.price?.id;
-  let tier = 'free';
-  if (priceId === process.env.STRIPE_PRICE_PRO) tier = 'pro';
+  let tier = 'member';
+  if (priceId === process.env.STRIPE_PRICE_COUNCIL) tier = 'council';
+  else if (priceId === process.env.STRIPE_PRICE_PRO) tier = 'pro';
   else if (priceId === process.env.STRIPE_PRICE_BASIC) tier = 'basic';
 
   const profile = await db.selectOne('profiles', {
@@ -404,15 +479,69 @@ async function handleSubscriptionUpdate(subscription: any) {
 
   const updates: Record<string, unknown> = {
     stripe_subscription_status: status,
+    stripe_subscription_id: subscriptionId,
   };
 
   if (status === 'active') {
     updates.tier = tier;
-  } else if (status === 'canceled' || status === 'past_due') {
-    updates.tier = 'free';
+    await grantDailyCreditsForTier(profile.id, tier);
+  } else if (status === 'canceled') {
+    updates.tier = 'member';
+    await grantDailyCreditsForTier(profile.id, 'member');
+  } else if (status === 'past_due') {
+    updates.tier = tier;
   }
 
   await db.update('profiles', { column: 'id', value: profile.id }, updates);
+}
+
+async function grantDailyCreditsForTier(userId: string, tier: string): Promise<void> {
+  const dailyCredits = tier === 'council' ? 5 : 2;
+  
+  try {
+    const creditData = await db.selectOne('credits', {
+      column: 'user_id',
+      value: userId,
+      select: 'balance, total_earned',
+    });
+
+    if (creditData) {
+      const newBalance = Number(creditData.balance || 0) + dailyCredits;
+      const newTotalEarned = Number(creditData.total_earned || 0) + dailyCredits;
+
+      await db.update('credits', { column: 'user_id', value: userId }, {
+        balance: newBalance,
+        total_earned: newTotalEarned,
+        tier,
+        updated_at: new Date().toISOString(),
+      });
+
+      await db.insert('credit_transactions', {
+        user_id: userId,
+        amount: dailyCredits,
+        transaction_type: 'earn_credit',
+        description: `Daily credit allocation (${tier} tier)`,
+      });
+    } else {
+      await db.insert('credits', {
+        user_id: userId,
+        balance: dailyCredits,
+        total_earned: dailyCredits,
+        total_spent: 0,
+        tier,
+        created_at: new Date().toISOString(),
+      });
+
+      await db.insert('credit_transactions', {
+        user_id: userId,
+        amount: dailyCredits,
+        transaction_type: 'earn_credit',
+        description: `Initial credit allocation (${tier} tier)`,
+      });
+    }
+  } catch (e) {
+    console.error('[Stripe] Failed to grant daily credits:', e);
+  }
 }
 
 async function handleSubscriptionDeleted(subscription: any) {
@@ -427,9 +556,11 @@ async function handleSubscriptionDeleted(subscription: any) {
   if (!profile) return;
 
   await db.update('profiles', { column: 'id', value: profile.id }, {
-    tier: 'free',
+    tier: 'member',
     stripe_subscription_status: 'canceled',
   });
+
+  await grantDailyCreditsForTier(profile.id, 'member');
 }
 
 export async function webhookHandler(req: VercelRequest, res: VercelResponse) {

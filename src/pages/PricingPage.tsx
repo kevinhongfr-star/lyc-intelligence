@@ -1,170 +1,302 @@
-import React from 'react';
-import { IconSpark, IconForge, IconQuest, Shield } from '@/components/icons/LycIcons';
-import { Check, ArrowRight, Shield } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, Crown, Zap, Shield, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-};
+interface PricingPageProps {
+  onUpgradeSuccess?: () => void;
+}
 
-const TIERS = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: 0,
-    priceDisplay: '$0',
-    period: 'forever',
-    credits: 5,
-    description: 'Start here',
-    icon: IconSpark,
-    features: [
-      '5 credits per day',
-      'Career Positioning Diagnostic',
-      'Basic Nexus chat',
-      'Leadership archetype report',
-    ],
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: 49,
-    priceDisplay: '$49',
-    period: '/month',
-    credits: 200,
-    description: 'For serious career development',
-    icon: IconQuest,
-    highlight: true,
-    features: [
-      '200 credits per month',
-      'Unlimited Nexus conversations',
-      'Match Analysis for job comparisons',
-      'Full assessment history',
-      'Priority scoring & insights',
-      'PDF export of all reports',
-    ],
-  },
-  {
-    id: 'council',
-    name: 'Council',
-    price: 199,
-    priceDisplay: '$199',
-    period: '/month',
-    credits: -1,
-    description: 'Includes quarterly advisory call with LYC partner',
-    icon: IconForge,
-    features: [
-      'Quarterly 1:1 call with a LYC partner who has placed executives in your target market',
-      'Unlimited credits',
-      'Everything in Pro',
-      'Executive CV review & optimization',
-      'Interview preparation sessions',
-      'Board readiness assessment',
-      'Private Council network access',
-    ],
-  },
-];
+export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
+  const { user, profile } = useAuthStore();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-export function PricingPage() {
+  const tiers = [
+    {
+      id: 'member',
+      name: 'Member',
+      price: '$0',
+      period: '',
+      description: 'Free tier with basic access',
+      features: [
+        '2 credits per day',
+        'Basic chat with Nexus',
+        'Career insights',
+        'Community forum',
+      ],
+      cta: 'Get Started',
+      popular: false,
+      icon: Zap,
+      color: 'bg-gray-500',
+      borderColor: 'border-gray-300',
+    },
+    {
+      id: 'council',
+      name: 'Council',
+      price: '$29',
+      period: '/month',
+      description: 'Premium leadership development',
+      features: [
+        '5 credits per day',
+        'All SHIFT assessments',
+        'Premium insights',
+        'Priority support',
+        'Unlimited reports',
+        'Exclusive content',
+      ],
+      cta: 'Upgrade to Council',
+      popular: true,
+      icon: Crown,
+      color: 'bg-accent',
+      borderColor: 'border-accent',
+    },
+  ];
+
+  const handleUpgrade = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_COUNCIL || '',
+          successUrl: `${window.location.origin}/settings?upgraded=true`,
+          cancelUrl: `${window.location.origin}/pricing`,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+    } catch (e: any) {
+      console.error('Upgrade error:', e);
+      setError(e.message || 'Failed to start upgrade');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGetStarted = () => {
+    if (!user) {
+      window.location.href = '/auth/signin';
+    } else {
+      window.location.href = '/dashboard';
+    }
+  };
+
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg }}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
       {/* Header */}
-      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>LYC Intelligence</a>
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <a href="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Back to site</a>
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <div style={{ textAlign: 'center', padding: '64px 24px 48px', maxWidth: '640px', margin: '0 auto' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: `${DS.accent}15`, borderRadius: '20px', marginBottom: '20px' }}>
-          <IconSpark size={14} color={DS.accent} />
-          <span style={{ fontSize: '11px', color: DS.accent, fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Pricing</span>
-        </div>
-        <h1 style={{ fontFamily: DS.headingFont, fontSize: '40px', fontWeight: 700, color: DS.text, margin: '0 0 16px' }}>
-          Invest in your career trajectory
+      <div className="max-w-6xl mx-auto px-4 py-16 text-center">
+        <h1 className="text-4xl font-bold text-text-primary mb-4">
+          Choose Your Plan
         </h1>
-        <p style={{ fontFamily: DS.bodyFont, fontSize: '16px', color: DS.textSecondary, lineHeight: 1.6, margin: 0 }}>
-          One in three leadership moves fails. The right intelligence changes the odds.
+        <p className="text-text-muted text-lg max-w-2xl mx-auto">
+          Select the right tier for your leadership journey. Upgrade anytime as your needs grow.
         </p>
       </div>
 
-      {/* Tier Cards */}
-      <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '960px', margin: '0 auto', padding: '0 24px 80px' }}>
-        {TIERS.map(tier => (
-          <div key={tier.id} style={{
-            background: DS.card,
-            border: tier.highlight ? `2px solid ${DS.accent}` : `1px solid ${DS.cardBorder}`,
-            borderRadius: DS.radius,
-            padding: '32px 28px',
-            boxShadow: tier.highlight ? `0 4px 20px rgba(193,8,171,0.15)` : DS.shadow,
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column',
-          }}>
-            {tier.highlight && (
-              <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: DS.accent, color: '#FFF', fontSize: '11px', fontWeight: 600, padding: '4px 16px', borderRadius: '12px', letterSpacing: '0.5px' }}>
-                MOST POPULAR
-              </div>
-            )}
-            <div style={{ color: DS.accent, marginBottom: '12px' }}>
-              <tier.icon size={28} color={DS.accent} />
-            </div>
-            <h3 style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>{tier.name}</h3>
-            <p style={{ fontSize: '13px', color: DS.muted, margin: '0 0 20px' }}>{tier.description}</p>
-            <div style={{ marginBottom: '24px' }}>
-              <span style={{ fontFamily: DS.headingFont, fontSize: '42px', fontWeight: 700, color: DS.text }}>{tier.priceDisplay}</span>
-              <span style={{ fontSize: '14px', color: DS.muted, marginLeft: '4px' }}>{tier.period}</span>
-            </div>
-            <div style={{ flex: 1 }}>
-              {tier.features.map((feature, i) => (
-                <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '12px' }}>
-                  <Check style={{ width: 16, height: 16, color: i === 0 && tier.id === 'council' ? DS.accent : '#00897B', flexShrink: 0, marginTop: '2px' }} />
-                  <span style={{ fontSize: '13px', color: i === 0 && tier.id === 'council' ? DS.accent : DS.textSecondary, fontWeight: i === 0 && tier.id === 'council' ? 600 : 400, lineHeight: 1.5 }}>
-                    {feature}
-                  </span>
+      {/* Pricing Cards */}
+      <div className="max-w-5xl mx-auto px-4 pb-16">
+        <div className="grid md:grid-cols-2 gap-8">
+          {tiers.map((tier) => {
+            const Icon = tier.icon;
+            const isCurrentTier = profile?.tier === tier.id;
+            
+            return (
+              <div
+                key={tier.id}
+                className={`relative rounded-2xl border-2 ${tier.borderColor} p-8 ${
+                  tier.popular ? 'bg-gradient-to-b from-accent/5 to-white' : 'bg-white'
+                } shadow-lg hover:shadow-xl transition-shadow`}
+              >
+                {tier.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-accent text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+
+                {isCurrentTier && (
+                  <div className="absolute -top-4 right-4">
+                    <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                      Current Plan
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-12 h-12 ${tier.color} rounded-xl flex items-center justify-center`}>
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-text-primary">{tier.name}</h3>
+                    <p className="text-sm text-text-muted">{tier.description}</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-            <a
-              href={tier.id === 'free' ? '/assessment' : '/login'}
-              className={tier.highlight ? 'cta-glow' : ''}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                padding: '14px', marginTop: '24px',
-                background: tier.highlight ? DS.accent : 'transparent',
-                color: tier.highlight ? '#FFF' : DS.text,
-                border: tier.highlight ? 'none' : `1px solid ${DS.cardBorder}`,
-                borderRadius: '8px', fontSize: '14px', fontWeight: 600,
-                textDecoration: 'none', minHeight: '48px',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              {tier.id === 'free' ? 'Start Free Assessment' : `Get ${tier.name}`}
-              <ArrowRight style={{ width: 16, height: 16 }} />
-            </a>
-          </div>
-        ))}
+
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-text-primary">{tier.price}</span>
+                  {tier.period && (
+                    <span className="text-text-muted">{tier.period}</span>
+                  )}
+                </div>
+
+                <ul className="space-y-3 mb-8">
+                  {tier.features.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-text-secondary">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  onClick={tier.id === 'council' ? handleUpgrade : handleGetStarted}
+                  disabled={loading}
+                  className={`w-full py-3 px-6 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${
+                    tier.popular
+                      ? 'bg-accent text-white hover:bg-accent-hover'
+                      : 'bg-bg-tertiary text-text-primary hover:bg-bg-secondary'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      {tier.cta}
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+
+                {error && tier.id === 'council' && (
+                  <p className="text-red-500 text-sm mt-3 text-center">{error}</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Footer trust */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', paddingBottom: '48px' }}>
-        <Shield size={14} color={DS.muted} />
-        <span style={{ fontSize: '12px', color: DS.muted }}>Secure payment · Cancel anytime · 14-day money-back guarantee</span>
+      {/* Feature Comparison */}
+      <div className="max-w-4xl mx-auto px-4 pb-16">
+        <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
+          Feature Comparison
+        </h2>
+        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-bg-tertiary">
+                <th className="px-6 py-4 text-left font-medium text-text-secondary">Feature</th>
+                <th className="px-6 py-4 text-center font-medium text-text-secondary">Member</th>
+                <th className="px-6 py-4 text-center font-medium text-accent">Council</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { feature: 'Daily Credits', member: '2', council: '5' },
+                { feature: 'Nexus Chat', member: 'Basic', council: 'Premium' },
+                { feature: 'SHIFT Assessments', member: '✗', council: '✓' },
+                { feature: 'Career Reports', member: 'Basic', council: 'Unlimited' },
+                { feature: 'Priority Support', member: '✗', council: '✓' },
+                { feature: 'Exclusive Content', member: '✗', council: '✓' },
+                { feature: 'Team Insights', member: '✗', council: '✓' },
+              ].map((row, i) => (
+                <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-bg-tertiary/50'}>
+                  <td className="px-6 py-4 text-text-secondary">{row.feature}</td>
+                  <td className="px-6 py-4 text-center">
+                    {row.member === '✓' ? (
+                      <Check className="w-5 h-5 text-green-500 mx-auto" />
+                    ) : row.member === '✗' ? (
+                      <span className="text-text-muted">—</span>
+                    ) : (
+                      <span className="text-text-primary font-medium">{row.member}</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    {row.council === '✓' ? (
+                      <Check className="w-5 h-5 text-accent mx-auto" />
+                    ) : row.council === '✗' ? (
+                      <span className="text-text-muted">—</span>
+                    ) : (
+                      <span className="text-accent font-medium">{row.council}</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* FAQ */}
+      <div className="max-w-3xl mx-auto px-4 pb-16">
+        <h2 className="text-2xl font-bold text-text-primary text-center mb-8">Frequently Asked Questions</h2>
+        <div className="space-y-4">
+          {[
+            {
+              question: 'Can I cancel my subscription at any time?',
+              answer: 'Yes, you can cancel your Council subscription at any time. You will continue to have access until the end of your current billing period.',
+            },
+            {
+              question: 'How do credits work?',
+              answer: 'Credits are used for premium features like SHIFT assessments and advanced insights. Member accounts get 2 credits per day, while Council members get 5 credits per day. Unused credits do not roll over.',
+            },
+            {
+              question: 'Can I upgrade or downgrade my plan?',
+              answer: 'Absolutely! You can upgrade to Council at any time. If you downgrade from Council to Member, your change will take effect at the end of your current billing cycle.',
+            },
+            {
+              question: 'What payment methods are accepted?',
+              answer: 'We accept all major credit cards (Visa, Mastercard, American Express) through Stripe. We also support Apple Pay and Google Pay where available.',
+            },
+          ].map((faq, i) => (
+            <div key={i} className="bg-white rounded-xl border border-border p-6">
+              <h3 className="font-semibold text-text-primary mb-2">{faq.question}</h3>
+              <p className="text-text-muted text-sm">{faq.answer}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="max-w-4xl mx-auto px-4 pb-16">
+        <div className="bg-gradient-to-r from-accent to-purple-600 rounded-2xl p-8 text-center text-white">
+          <h2 className="text-2xl font-bold mb-4">Ready to Elevate Your Leadership?</h2>
+          <p className="mb-6 opacity-90">
+            Join Council today and unlock premium features designed for ambitious leaders.
+          </p>
+          <button
+            onClick={handleUpgrade}
+            disabled={loading}
+            className="bg-white text-accent px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                Upgrade to Council
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
