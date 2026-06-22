@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LENS T2: Candidate Profile</title>
+  <style>
+    @page { 
+      size: A4; 
+      margin: 2cm; 
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #1a1a1a;
+    }
+    
+    .cover {
+      page-break-after: always;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .cover h1 {
+      font-size: 24pt;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8pt;
+    }
+    
+    .cover h2 {
+      font-size: 16pt;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 6pt;
+    }
+    
+    .cover .subtitle {
+      font-size: 12pt;
+      color: #718096;
+    }
+    
+    .cover .meta {
+      font-size: 10pt;
+      color: #a0aec0;
+      margin-top: 24pt;
+    }
+    
+    .cover .logo {
+      font-size: 12pt;
+      font-weight: 600;
+      color: #8a6f3a;
+      margin-top: 24pt;
+    }
+    
+    .section-title {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 12pt;
+      padding-bottom: 6pt;
+      border-bottom: 2px solid #8a6f3a;
+    }
+    
+    .section-subtitle {
+      font-size: 12pt;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 8pt;
+    }
+    
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16pt;
+      padding: 12pt;
+      background: #f8f9fa;
+      border-radius: 6pt;
+    }
+    
+    .profile-name {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    
+    .profile-title {
+      font-size: 12pt;
+      color: #4a5568;
+      margin-top: 4pt;
+    }
+    
+    .profile-meta {
+      font-size: 10pt;
+      color: #718096;
+      margin-top: 4pt;
+    }
+    
+    .score-badge {
+      display: inline-block;
+      padding: 6pt 12pt;
+      border-radius: 4pt;
+      font-size: 12pt;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .score-high { background: #10b981; }
+    .score-medium { background: #f59e0b; }
+    .score-low { background: #6b7280; }
+    
+    .verdict-badge {
+      display: inline-block;
+      padding: 4pt 8pt;
+      border-radius: 4pt;
+      font-size: 10pt;
+      font-weight: 600;
+    }
+    
+    .verdict-proceed { background: #d1fae5; color: #065f46; }
+    .verdict-hold { background: #fef3c7; color: #92400e; }
+    .verdict-pass { background: #fee2e2; color: #991b1b; }
+    
+    .dimensions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12pt;
+      margin-bottom: 16pt;
+    }
+    
+    .dimension-box {
+      background: #f8f9fa;
+      padding: 12pt;
+      border-radius: 6pt;
+      text-align: center;
+    }
+    
+    .dimension-label {
+      font-size: 9pt;
+      color: #718096;
+      margin-bottom: 4pt;
+    }
+    
+    .dimension-value {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    
+    .work-history {
+      page-break-inside: avoid;
+      margin-bottom: 16pt;
+    }
+    
+    .work-item {
+      padding: 12pt;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .work-item:last-child {
+      border-bottom: none;
+    }
+    
+    .work-company {
+      font-size: 12pt;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    
+    .work-title {
+      font-size: 11pt;
+      color: #4a5568;
+      margin-top: 2pt;
+    }
+    
+    .work-duration {
+      font-size: 10pt;
+      color: #718096;
+      margin-top: 2pt;
+    }
+    
+    .work-description {
+      font-size: 10pt;
+      color: #4a5568;
+      margin-top: 6pt;
+    }
+    
+    .skills-matrix {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8pt;
+      margin-bottom: 16pt;
+    }
+    
+    .skill-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8pt 12pt;
+      background: #f8f9fa;
+      border-radius: 4pt;
+    }
+    
+    .skill-name {
+      font-size: 10pt;
+      color: #1a1a1a;
+    }
+    
+    .skill-level {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #4a5568;
+    }
+    
+    .assessment-section {
+      page-break-inside: avoid;
+      margin-bottom: 16pt;
+    }
+    
+    .assessment-box {
+      background: #edf2f7;
+      padding: 12pt;
+      border-radius: 6pt;
+      border-left: 4pt solid #8a6f3a;
+    }
+    
+    .assessment-title {
+      font-size: 11pt;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 6pt;
+    }
+    
+    .assessment-content {
+      font-size: 10pt;
+      color: #1a1a1a;
+    }
+    
+    .disc-section {
+      background: #f8f9fa;
+      padding: 12pt;
+      border-radius: 6pt;
+      margin-bottom: 16pt;
+    }
+    
+    .disc-title {
+      font-size: 11pt;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 6pt;
+    }
+    
+    .disc-bars {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8pt;
+    }
+    
+    .disc-bar {
+      text-align: center;
+    }
+    
+    .disc-bar-label {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    
+    .disc-bar-value {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #4a5568;
+    }
+    
+    .reference-section {
+      page-break-inside: avoid;
+    }
+    
+    .reference-item {
+      padding: 12pt;
+      background: #f8f9fa;
+      border-radius: 6pt;
+      margin-bottom: 8pt;
+    }
+    
+    .reference-name {
+      font-size: 11pt;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    
+    .reference-role {
+      font-size: 10pt;
+      color: #4a5568;
+      margin-top: 2pt;
+    }
+    
+    .reference-feedback {
+      font-size: 10pt;
+      color: #4a5568;
+      margin-top: 6pt;
+    }
+    
+    .recommendation-box {
+      background: #edf2f7;
+      padding: 12pt;
+      border-radius: 6pt;
+      border-left: 4pt solid #8a6f3a;
+      margin-bottom: 16pt;
+    }
+    
+    .recommendation-label {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 4pt;
+    }
+    
+    .recommendation-text {
+      font-size: 11pt;
+      color: #1a1a1a;
+    }
+    
+    .footer {
+      font-size: 8pt;
+      color: #a0aec0;
+      text-align: center;
+      margin-top: 16pt;
+      padding-top: 8pt;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .bullet-list {
+      list-style-type: disc;
+      padding-left: 16pt;
+    }
+    
+    .bullet-list li {
+      font-size: 10pt;
+      color: #4a5568;
+      margin-bottom: 4pt;
+    }
+  </style>
+</head>
+<body>
+  <!-- Cover Page -->
+  <div class="cover">
+    <h1>{{candidate.name}}</h1>
+    <h2>{{candidate.title}}</h2>
+    <p class="subtitle">{{candidate.company}}</p>
+    <p class="meta">{{mandate.title}} | {{generated_at}}</p>
+    <p class="logo">LYC Intelligence | LENS T2</p>
+  </div>
+  
+  <!-- Profile Summary -->
+  <div class="profile-header">
+    <div>
+      <div class="profile-name">{{candidate.name}}</div>
+      <div class="profile-title">{{candidate.title}} at {{candidate.company}}</div>
+      <div class="profile-meta">{{candidate.location}} | {{candidate.industry}}</div>
+    </div>
+    <div style="text-align: right;">
+      <span class="score-badge {{#if match_score_high}}score-high{{else}}{{#if match_score_medium}}score-medium{{else}}score-low{{/if}}{{/if}}">Match: {{candidate.match_score}}/100</span>
+      <span class="verdict-badge verdict-{{candidate.verdict}}">{{candidate.verdict}}</span>
+    </div>
+  </div>
+  
+  <!-- Dimension Scores -->
+  <h3 class="section-subtitle">Match Dimensions</h3>
+  <div class="dimensions-grid">
+    <div class="dimension-box">
+      <div class="dimension-label">Experience</div>
+      <div class="dimension-value">{{candidate.dimensions.experience}}/100</div>
+    </div>
+    <div class="dimension-box">
+      <div class="dimension-label">Skills</div>
+      <div class="dimension-value">{{candidate.dimensions.skills}}/100</div>
+    </div>
+    <div class="dimension-box">
+      <div class="dimension-label">Fit</div>
+      <div class="dimension-value">{{candidate.dimensions.fit}}/100</div>
+    </div>
+  </div>
+  
+  <!-- Strengths & Development -->
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16pt; margin-bottom: 16pt;">
+    <div>
+      <h4 class="section-subtitle">Key Strengths</h4>
+      <ul class="bullet-list">
+        {{#each candidate.strengths}}
+        <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    </div>
+    <div>
+      <h4 class="section-subtitle">Development Areas</h4>
+      <ul class="bullet-list">
+        {{#each candidate.development_areas}}
+        <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+  
+  <!-- Work History -->
+  <h2 class="section-title">Work History</h2>
+  <div class="work-history">
+    {{#each candidate.work_history}}
+    <div class="work-item">
+      <div class="work-company">{{company}}</div>
+      <div class="work-title">{{title}}</div>
+      <div class="work-duration">{{start_date}} - {{end_date}} ({{duration}})</div>
+      {{#if description}}
+      <div class="work-description">{{description}}</div>
+      {{/if}}
+    </div>
+    {{/each}}
+  </div>
+  
+  <!-- Skills Matrix -->
+  <h2 class="section-title">Skills Matrix</h2>
+  <div class="skills-matrix">
+    {{#each candidate.skills}}
+    <div class="skill-item">
+      <span class="skill-name">{{name}}</span>
+      <span class="skill-level">{{level}}</span>
+    </div>
+    {{/each}}
+  </div>
+  
+  <!-- DISC Profile -->
+  <h2 class="section-title">DISC Profile</h2>
+  <div class="disc-section">
+    <div class="disc-title">Behavioral Profile: {{candidate.disc_type}}</div>
+    <div class="disc-bars">
+      <div class="disc-bar">
+        <div class="disc-bar-label">D</div>
+        <div class="disc-bar-value">{{candidate.disc_scores.D}}%</div>
+      </div>
+      <div class="disc-bar">
+        <div class="disc-bar-label">I</div>
+        <div class="disc-bar-value">{{candidate.disc_scores.I}}%</div>
+      </div>
+      <div class="disc-bar">
+        <div class="disc-bar-label">S</div>
+        <div class="disc-bar-value">{{candidate.disc_scores.S}}%</div>
+      </div>
+      <div class="disc-bar">
+        <div class="disc-bar-label">C</div>
+        <div class="disc-bar-value">{{candidate.disc_scores.C}}%</div>
+      </div>
+    </div>
+    <p style="font-size: 10pt; color: #4a5568; margin-top: 8pt;">{{candidate.disc_summary}}</p>
+  </div>
+  
+  <!-- SHIFT Assessment (if available) -->
+  {{#if candidate.shift_assessment}}
+  <h2 class="section-title">SHIFT Assessment Results</h2>
+  <div class="assessment-section">
+    <div class="assessment-box">
+      <div class="assessment-title">SHIFT Profile</div>
+      <div class="assessment-content">
+        <p><strong>Profile Type:</strong> {{candidate.shift_assessment.profile_type}}</p>
+        <p><strong>Overall Score:</strong> {{candidate.shift_assessment.overall_score}}/100</p>
+        <p style="margin-top: 6pt;">{{candidate.shift_assessment.summary}}</p>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+  
+  <!-- References (if available) -->
+  {{#if candidate.references}}
+  <h2 class="section-title">Reference Summary</h2>
+  <div class="reference-section">
+    {{#each candidate.references}}
+    <div class="reference-item">
+      <div class="reference-name">{{name}}</div>
+      <div class="reference-role">{{role}} at {{company}}</div>
+      <div class="reference-feedback">{{feedback}}</div>
+    </div>
+    {{/each}}
+  </div>
+  {{/if}}
+  
+  <!-- Recommendation -->
+  <h2 class="section-title">Recommendation</h2>
+  <div class="recommendation-box">
+    <div class="recommendation-label">Overall Assessment</div>
+    <div class="recommendation-text">{{candidate.recommendation}}</div>
+  </div>
+  
+  <div class="footer">
+    LYC Intelligence | LENS T2 Candidate Profile | {{mandate.title}} | {{generated_at}} | Confidential
+  </div>
+</body>
+</html>

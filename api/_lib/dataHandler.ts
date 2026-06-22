@@ -2257,6 +2257,334 @@ Return as valid JSON with exactly these keys:
       });
     }
 
+    // ── LENS Report Generation (Phase 3.6) ──
+    if (resource === 'lens-report') {
+      if (method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+      }
+
+      const { mandate_id, candidate_ids, report_type } = req.body || {};
+
+      if (!mandate_id || !candidate_ids || !Array.isArray(candidate_ids) || candidate_ids.length === 0) {
+        return res.status(400).json({ error: 'mandate_id and candidate_ids array are required' });
+      }
+
+      if (!['T1', 'T2', 'T3'].includes(report_type)) {
+        return res.status(400).json({ error: 'report_type must be T1, T2, or T3' });
+      }
+
+      // Check mandate access
+      const mandate = await db.selectOne('mandates', {
+        column: 'id',
+        value: mandate_id,
+        select: 'id, organization_id, title, client_first_name, client_last_name, status',
+      });
+
+      if (!mandate) {
+        return res.status(404).json({ error: 'Mandate not found' });
+      }
+
+      if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      // Fetch candidates with scores
+      const candidates: any[] = [];
+      for (const candidateId of candidate_ids) {
+        const pipeline = await db.selectOne('candidate_pipeline', {
+          column: 'id',
+          value: candidateId,
+          select: 'id, mandate_id, contact_id, stage, match_score, trident_composite, verdict, scoring_output, analysis, created_at',
+        });
+
+        if (pipeline && pipeline.mandate_id === mandate_id) {
+          const contact = await db.selectOne('contacts', {
+            column: 'id',
+            value: pipeline.contact_id,
+            select: 'id, first_name, last_name, current_title, company_id, location, linkedin_url',
+          });
+
+          const company = contact?.company_id 
+            ? await db.selectOne('companies', {
+                column: 'id',
+                value: contact.company_id,
+                select: 'id, name, industry, location',
+              })
+            : null;
+
+          // Get scoring data
+          const scoringRun = await db.selectOne('scoring_runs', {
+            column: 'user_id',
+            value: contact?.id,
+            orderBy: { column: 'created_at', ascending: false },
+            limit: 1,
+          });
+
+          candidates.push({
+            id: pipeline.id,
+            name: `${contact?.first_name || ''} ${contact?.last_name || ''}`,
+            title: contact?.current_title || '',
+            company: company?.name || '',
+            location: contact?.location || company?.location || '',
+            industry: company?.industry || '',
+            match_score: pipeline.match_score || 0,
+            dimensions: scoringRun?.output_scores || { experience: 0, skills: 0, fit: 0 },
+            strengths: (pipeline.analysis as any)?.strengths || [],
+            development_areas: (pipeline.analysis as any)?.development_areas || [],
+            disc_profile: (pipeline.analysis as any)?.disc_profile || 'Not assessed',
+            disc_scores: (pipeline.analysis as any)?.disc_scores || { D: 0, I: 0, S: 0, C: 0 },
+            disc_summary: (pipeline.analysis as any)?.disc_summary || '',
+            disc_type: (pipeline.analysis as any)?.disc_type || 'Unknown',
+            verdict: pipeline.verdict || 'hold',
+            trident: pipeline.trident_composite || 'N/A',
+            recommendation: (pipeline.analysis as any)?.recommendation || 'Proceed with interview',
+            work_history: [],
+            skills: [],
+            shift_assessment: null,
+            references: [],
+          });
+        }
+      }
+
+      if (candidates.length === 0) {
+        return res.status(400).json({ error: 'No valid candidates found' });
+      }
+
+      // Calculate summary stats
+      const topCandidate = candidates.reduce((top, c) => 
+        c.match_score > top.match_score ? c : top, candidates[0]);
+      const proceedCount = candidates.filter(c => c.verdict === 'proceed').length;
+      const holdCount = candidates.filter(c => c.verdict === 'hold').length;
+      const avgMatchScore = Math.round(
+        candidates.reduce((sum, c) => sum + c.match_score, 0) / candidates.length
+      );
+
+      // Build report data
+      const reportData = {
+        id: `lens_${report_type}_${mandate_id}_${Date.now()}`,
+        mandate: {
+          title: mandate.title,
+          client: `${mandate.client_first_name || ''} ${mandate.client_last_name || ''}`,
+        },
+        candidates,
+        candidate_count: candidates.length,
+        top_candidate,
+        proceed_count: proceedCount,
+        hold_count: holdCount,
+        avg_match_score: avgMatchScore,
+        generated_at: new Date().toISOString(),
+        report_type,
+      };
+
+      // Store report reference
+      const reportRecord = await db.insert('generated_reports', {
+        mandate_id,
+        report_type: `LENS_${report_type}`,
+        candidate_ids: candidate_ids,
+        organization_id: mandate.organization_id,
+        created_by: userId,
+        status: 'generated',
+        metadata: reportData,
+      }, 15000);
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...reportData,
+          pdf_url: `/api/data/lens-pdf/${reportRecord?.[0]?.id || reportData.id}`,
+        },
+      });
+    }
+
+    // ── LENS PDF Download ──
+    if (resource === 'lens-pdf' && id) {
+      const report = await db.selectOne('generated_reports', {
+        column: 'id',
+        value: id,
+        select: 'id, mandate_id, report_type, metadata, status',
+      });
+
+      if (!report) {
+        return res.status(404).json({ error: 'Report not found' });
+      }
+
+      // Check access
+      const mandate = await db.selectOne('mandates', {
+        column: 'id',
+        value: report.mandate_id,
+        select: 'id, organization_id',
+      });
+
+      if (userRole !== 'super_admin' && mandate?.organization_id !== orgId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      // Return report metadata with PDF generation info
+      return res.status(200).json({
+        success: true,
+        data: {
+          id: report.id,
+          report_type: report.report_type,
+          metadata: report.metadata,
+          pdf_available: report.status === 'generated',
+        },
+      });
+    }
+
+    // ── LENS Report Email ──
+    if (resource === 'lens-email' && method === 'POST') {
+      const { report_id, recipients } = req.body || {};
+
+      if (!report_id || !recipients || !Array.isArray(recipients)) {
+        return res.status(400).json({ error: 'report_id and recipients array are required' });
+      }
+
+      const report = await db.selectOne('generated_reports', {
+        column: 'id',
+        value: report_id,
+      });
+
+      if (!report) {
+        return res.status(404).json({ error: 'Report not found' });
+      }
+
+      // Check access
+      const mandate = await db.selectOne('mandates', {
+        column: 'id',
+        value: report.mandate_id,
+        select: 'id, organization_id',
+      });
+
+      if (userRole !== 'super_admin' && mandate?.organization_id !== orgId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      // Update report status
+      await db.update('generated_reports', { column: 'id', value: report_id }, {
+        status: 'sent',
+        sent_to: recipients,
+        sent_at: new Date().toISOString(),
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: `Report sent to ${recipients.length} recipients`,
+      });
+    }
+
+    // ── LENS Report Share Link ──
+    if (resource === 'lens-share' && method === 'POST') {
+      const { report_id, expiry } = req.body || {};
+
+      if (!report_id) {
+        return res.status(400).json({ error: 'report_id is required' });
+      }
+
+      const report = await db.selectOne('generated_reports', {
+        column: 'id',
+        value: report_id,
+      });
+
+      if (!report) {
+        return res.status(404).json({ error: 'Report not found' });
+      }
+
+      // Check access
+      const mandate = await db.selectOne('mandates', {
+        column: 'id',
+        value: report.mandate_id,
+        select: 'id, organization_id',
+      });
+
+      if (userRole !== 'super_admin' && mandate?.organization_id !== orgId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      // Generate share token
+      const shareToken = `${report_id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const expiryDate = expiry === 'never' 
+        ? null 
+        : new Date(Date.now() + (expiry === '1d' ? 1 : expiry === '7d' ? 7 : 30) * 24 * 60 * 60 * 1000);
+
+      await db.update('generated_reports', { column: 'id', value: report_id }, {
+        share_token: shareToken,
+        share_expiry: expiryDate?.toISOString() || null,
+      });
+
+      return res.status(200).json({
+        success: true,
+        share_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.lyc.ai'}/shared/report/${shareToken}`,
+      });
+    }
+
+    // ── GRID Report Generation (Phase 3.6) ──
+    if (resource === 'grid-report' && method === 'POST') {
+      const { mandate_id } = req.body || {};
+
+      if (!mandate_id) {
+        return res.status(400).json({ error: 'mandate_id is required' });
+      }
+
+      // Check mandate access
+      const mandate = await db.selectOne('mandates', {
+        column: 'id',
+        value: mandate_id,
+        select: 'id, organization_id, title, client_first_name, client_last_name',
+      });
+
+      if (!mandate) {
+        return res.status(404).json({ error: 'Mandate not found' });
+      }
+
+      if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      // Get target companies
+      const companies = await db.selectMany('target_companies', {
+        where: [{ column: 'mandate_id', value: mandate_id }],
+        orderBy: { column: 'fit_score', ascending: false },
+        limit: 50,
+      }, 15000);
+
+      // Calculate stats
+      const avgDensity = companies.length > 0
+        ? Math.round(companies.reduce((sum: number, c: any) => sum + (c.talent_density_score || 50), 0) / companies.length)
+        : 0;
+      const avgFit = companies.length > 0
+        ? Math.round(companies.reduce((sum: number, c: any) => sum + (c.fit_score || 50), 0) / companies.length)
+        : 0;
+
+      const reportData = {
+        mandate,
+        companies,
+        stats: {
+          total: companies.length,
+          avg_density: avgDensity,
+          avg_fit: avgFit,
+        },
+        generated_at: new Date().toISOString(),
+      };
+
+      // Store report
+      const reportRecord = await db.insert('generated_reports', {
+        mandate_id,
+        report_type: 'GRID',
+        organization_id: mandate.organization_id,
+        created_by: userId,
+        status: 'generated',
+        metadata: reportData,
+      }, 15000);
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...reportData,
+          pdf_url: `/api/grid-pdf/${reportRecord?.[0]?.id || mandate_id}`,
+        },
+      });
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);

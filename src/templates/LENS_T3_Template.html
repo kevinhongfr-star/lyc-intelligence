@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LENS T3: Match Scorecard</title>
+  <style>
+    @page { 
+      size: A4; 
+      margin: 2cm; 
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #1a1a1a;
+    }
+    
+    .cover {
+      page-break-after: always;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .cover h1 {
+      font-size: 24pt;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8pt;
+    }
+    
+    .cover h2 {
+      font-size: 16pt;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 6pt;
+    }
+    
+    .cover .subtitle {
+      font-size: 12pt;
+      color: #718096;
+    }
+    
+    .cover .meta {
+      font-size: 10pt;
+      color: #a0aec0;
+      margin-top: 24pt;
+    }
+    
+    .cover .logo {
+      font-size: 12pt;
+      font-weight: 600;
+      color: #8a6f3a;
+      margin-top: 24pt;
+    }
+    
+    .section-title {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 12pt;
+      padding-bottom: 6pt;
+      border-bottom: 2px solid #8a6f3a;
+    }
+    
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16pt;
+    }
+    
+    .comparison-table th {
+      background: #f8f9fa;
+      padding: 10pt;
+      font-size: 11pt;
+      font-weight: 600;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .comparison-table td {
+      padding: 10pt;
+      font-size: 11pt;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .comparison-table .dimension-row {
+      background: #f8f9fa;
+    }
+    
+    .comparison-table .dimension-row td {
+      font-weight: 600;
+      text-align: left;
+    }
+    
+    .score-high { 
+      background: #d1fae5; 
+      color: #065f46; 
+      font-weight: 600;
+    }
+    
+    .score-medium { 
+      background: #fef3c7; 
+      color: #92400e; 
+      font-weight: 600;
+    }
+    
+    .score-low { 
+      background: #fee2e2; 
+      color: #991b1b; 
+      font-weight: 600;
+    }
+    
+    .score-badge {
+      display: inline-block;
+      padding: 4pt 8pt;
+      border-radius: 4pt;
+      font-size: 10pt;
+      font-weight: 600;
+    }
+    
+    .verdict-proceed { background: #d1fae5; color: #065f46; }
+    .verdict-hold { background: #fef3c7; color: #92400e; }
+    .verdict-pass { background: #fee2e2; color: #991b1b; }
+    
+    .candidate-header {
+      background: #f8f9fa;
+      padding: 8pt;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    
+    .highlight-row {
+      background: #edf2f7;
+    }
+    
+    .winner-cell {
+      background: #d1fae5;
+      border: 2px solid #10b981;
+    }
+    
+    .radar-section {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16pt;
+      margin-bottom: 16pt;
+    }
+    
+    .radar-placeholder {
+      background: #f8f9fa;
+      border-radius: 6pt;
+      padding: 16pt;
+      text-align: center;
+      min-height: 180pt;
+    }
+    
+    .radar-placeholder-title {
+      font-size: 12pt;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8pt;
+    }
+    
+    .radar-placeholder-content {
+      font-size: 10pt;
+      color: #4a5568;
+    }
+    
+    .recommendation-matrix {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12pt;
+      margin-bottom: 16pt;
+    }
+    
+    .recommendation-card {
+      background: #f8f9fa;
+      padding: 12pt;
+      border-radius: 6pt;
+      border-left: 4pt solid #8a6f3a;
+    }
+    
+    .recommendation-name {
+      font-size: 12pt;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4pt;
+    }
+    
+    .recommendation-verdict {
+      font-size: 10pt;
+      color: #4a5568;
+      margin-bottom: 6pt;
+    }
+    
+    .recommendation-text {
+      font-size: 10pt;
+      color: #4a5568;
+    }
+    
+    .overall-recommendation {
+      background: #edf2f7;
+      padding: 16pt;
+      border-radius: 6pt;
+      border-left: 4pt solid #8a6f3a;
+      margin-bottom: 16pt;
+    }
+    
+    .overall-title {
+      font-size: 12pt;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8pt;
+    }
+    
+    .overall-text {
+      font-size: 11pt;
+      color: #4a5568;
+    }
+    
+    .strengths-comparison {
+      margin-bottom: 16pt;
+    }
+    
+    .strengths-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12pt;
+    }
+    
+    .strengths-box {
+      background: #f8f9fa;
+      padding: 12pt;
+      border-radius: 6pt;
+    }
+    
+    .strengths-title {
+      font-size: 11pt;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 6pt;
+    }
+    
+    .strengths-list {
+      list-style-type: disc;
+      padding-left: 16pt;
+    }
+    
+    .strengths-list li {
+      font-size: 10pt;
+      color: #4a5568;
+      margin-bottom: 4pt;
+    }
+    
+    .footer {
+      font-size: 8pt;
+      color: #a0aec0;
+      text-align: center;
+      margin-top: 16pt;
+      padding-top: 8pt;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12pt;
+      margin-bottom: 16pt;
+    }
+    
+    .stat-box {
+      background: #f8f9fa;
+      padding: 12pt;
+      border-radius: 6pt;
+      text-align: center;
+    }
+    
+    .stat-label {
+      font-size: 9pt;
+      color: #718096;
+      margin-bottom: 4pt;
+    }
+    
+    .stat-value {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+  </style>
+</head>
+<body>
+  <!-- Cover Page -->
+  <div class="cover">
+    <h1>Match Scorecard</h1>
+    <h2>{{mandate.title}}</h2>
+    <p class="subtitle">Comparing {{candidate_count}} Candidates</p>
+    <p class="meta">{{mandate.client}} | {{generated_at}}</p>
+    <p class="logo">LYC Intelligence | LENS T3</p>
+  </div>
+  
+  <!-- Summary Stats -->
+  <h2 class="section-title">Comparison Summary</h2>
+  <div class="summary-stats">
+    <div class="stat-box">
+      <div class="stat-label">Candidates</div>
+      <div class="stat-value">{{candidate_count}}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Top Score</div>
+      <div class="stat-value">{{top_score}}/100</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Avg Score</div>
+      <div class="stat-value">{{avg_score}}/100</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Recommended</div>
+      <div class="stat-value">{{proceed_count}}</div>
+    </div>
+  </div>
+  
+  <!-- Dimension Comparison Table -->
+  <h2 class="section-title">Dimension Scores Comparison</h2>
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th style="width: 20%;">Dimension</th>
+        {{#each candidates}}
+        <th style="width: {{column_width}}%;">{{name}}</th>
+        {{/each}}
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="dimension-row">
+        <td>Match Score</td>
+        {{#each candidates}}
+        <td class="{{#if is_winner}}winner-cell{{/if}} {{#if match_high}}score-high{{else}}{{#if match_medium}}score-medium{{else}}score-low{{/if}}{{/if}}">
+          {{match_score}}/100
+        </td>
+        {{/each}}
+      </tr>
+      <tr class="dimension-row">
+        <td>Experience</td>
+        {{#each candidates}}
+        <td class="{{#if exp_winner}}winner-cell{{/if}} {{#if exp_high}}score-high{{else}}{{#if exp_medium}}score-medium{{else}}score-low{{/if}}{{/if}}">
+          {{dimensions.experience}}/100
+        </td>
+        {{/each}}
+      </tr>
+      <tr class="dimension-row">
+        <td>Skills</td>
+        {{#each candidates}}
+        <td class="{{#if skills_winner}}winner-cell{{/if}} {{#if skills_high}}score-high{{else}}{{#if skills_medium}}score-medium{{else}}score-low{{/if}}{{/if}}">
+          {{dimensions.skills}}/100
+        </td>
+        {{/each}}
+      </tr>
+      <tr class="dimension-row">
+        <td>Fit</td>
+        {{#each candidates}}
+        <td class="{{#if fit_winner}}winner-cell{{/if}} {{#if fit_high}}score-high{{else}}{{#if fit_medium}}score-medium{{else}}score-low{{/if}}{{/if}}">
+          {{dimensions.fit}}/100
+        </td>
+        {{/each}}
+      </tr>
+      <tr class="dimension-row">
+        <td>TRIDENT</td>
+        {{#each candidates}}
+        <td>{{trident}}</td>
+        {{/each}}
+      </tr>
+      <tr class="dimension-row">
+        <td>Verdict</td>
+        {{#each candidates}}
+        <td>
+          <span class="score-badge verdict-{{verdict}}">{{verdict}}</span>
+        </td>
+        {{/each}}
+      </tr>
+    </tbody>
+  </table>
+  
+  <!-- Radar Charts -->
+  <h2 class="section-title">Visual Comparison</h2>
+  <div class="radar-section">
+    {{#each candidates}}
+    <div class="radar-placeholder">
+      <div class="radar-placeholder-title">{{name}}</div>
+      <div class="radar-placeholder-content">
+        Experience: {{dimensions.experience}}<br>
+        Skills: {{dimensions.skills}}<br>
+        Fit: {{dimensions.fit}}<br>
+        Match: {{match_score}}
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  
+  <!-- Strengths Comparison -->
+  <h2 class="section-title">Strengths Comparison</h2>
+  <div class="strengths-comparison">
+    <div class="strengths-grid">
+      {{#each candidates}}
+      <div class="strengths-box">
+        <div class="strengths-title">{{name}}</div>
+        <ul class="strengths-list">
+          {{#each strengths}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  
+  <!-- Development Areas Comparison -->
+  <h2 class="section-title">Development Areas Comparison</h2>
+  <div class="strengths-comparison">
+    <div class="strengths-grid">
+      {{#each candidates}}
+      <div class="strengths-box">
+        <div class="strengths-title">{{name}}</div>
+        <ul class="strengths-list">
+          {{#each development_areas}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  
+  <!-- DISC Profiles -->
+  <h2 class="section-title">DISC Profiles</h2>
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th style="width: 20%;">DISC Dimension</th>
+        {{#each candidates}}
+        <th style="width: {{column_width}}%;">{{name}}</th>
+        {{/each}}
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="dimension-row">
+        <td>Profile Type</td>
+        {{#each candidates}}
+        <td>{{disc_type}}</td>
+        {{/each}}
+      </tr>
+      <tr>
+        <td>D (Dominance)</td>
+        {{#each candidates}}
+        <td>{{disc_scores.D}}%</td>
+        {{/each}}
+      </tr>
+      <tr>
+        <td>I (Influence)</td>
+        {{#each candidates}}
+        <td>{{disc_scores.I}}%</td>
+        {{/each}}
+      </tr>
+      <tr>
+        <td>S (Steadiness)</td>
+        {{#each candidates}}
+        <td>{{disc_scores.S}}%</td>
+        {{/each}}
+      </tr>
+      <tr>
+        <td>C (Compliance)</td>
+        {{#each candidates}}
+        <td>{{disc_scores.C}}%</td>
+        {{/each}}
+      </tr>
+    </tbody>
+  </table>
+  
+  <!-- Individual Recommendations -->
+  <h2 class="section-title">Individual Recommendations</h2>
+  <div class="recommendation-matrix">
+    {{#each candidates}}
+    <div class="recommendation-card">
+      <div class="recommendation-name">{{name}}</div>
+      <div class="recommendation-verdict">
+        <span class="score-badge verdict-{{verdict}}">{{verdict}}</span>
+        <span style="margin-left: 8pt;">Match: {{match_score}}/100</span>
+      </div>
+      <div class="recommendation-text">{{recommendation}}</div>
+    </div>
+    {{/each}}
+  </div>
+  
+  <!-- Overall Recommendation -->
+  <h2 class="section-title">Overall Recommendation</h2>
+  <div class="overall-recommendation">
+    <div class="overall-title">Recommendation Summary</div>
+    <div class="overall-text">
+      {{overall_recommendation}}
+    </div>
+  </div>
+  
+  <div class="footer">
+    LYC Intelligence | LENS T3 Match Scorecard | {{mandate.title}} | {{generated_at}} | Confidential
+  </div>
+</body>
+</html>

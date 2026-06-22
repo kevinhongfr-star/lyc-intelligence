@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LENS T1: Talent Mapping Shortlist</title>
+  <style>
+    /* Print-friendly CSS */
+    @page { 
+      size: A4; 
+      margin: 2cm; 
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #1a1a1a;
+    }
+    
+    .cover {
+      page-break-after: always;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .cover h1 {
+      font-size: 28pt;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 12pt;
+    }
+    
+    .cover h2 {
+      font-size: 18pt;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 24pt;
+    }
+    
+    .cover .subtitle {
+      font-size: 14pt;
+      color: #718096;
+    }
+    
+    .cover .meta {
+      font-size: 10pt;
+      color: #a0aec0;
+      margin-top: 48pt;
+    }
+    
+    .cover .logo {
+      font-size: 12pt;
+      font-weight: 600;
+      color: #8a6f3a;
+      margin-top: 24pt;
+    }
+    
+    .executive-summary {
+      page-break-after: always;
+    }
+    
+    .section-title {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 16pt;
+      padding-bottom: 8pt;
+      border-bottom: 2px solid #8a6f3a;
+    }
+    
+    .candidate-page {
+      page-break-inside: avoid;
+      margin-bottom: 24pt;
+    }
+    
+    .candidate-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16pt;
+    }
+    
+    .candidate-name {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    
+    .candidate-title {
+      font-size: 11pt;
+      color: #4a5568;
+      margin-top: 4pt;
+    }
+    
+    .candidate-location {
+      font-size: 10pt;
+      color: #718096;
+    }
+    
+    .score-badge {
+      display: inline-block;
+      padding: 6pt 12pt;
+      border-radius: 4pt;
+      font-size: 12pt;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .score-high { background: #10b981; }
+    .score-medium { background: #f59e0b; }
+    .score-low { background: #6b7280; }
+    
+    .verdict-badge {
+      display: inline-block;
+      padding: 4pt 8pt;
+      border-radius: 4pt;
+      font-size: 10pt;
+      font-weight: 600;
+      margin-left: 8pt;
+    }
+    
+    .verdict-proceed { background: #d1fae5; color: #065f46; }
+    .verdict-hold { background: #fef3c7; color: #92400e; }
+    .verdict-pass { background: #fee2e2; color: #991b1b; }
+    
+    .dimensions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12pt;
+      margin-bottom: 16pt;
+    }
+    
+    .dimension-box {
+      background: #f8f9fa;
+      padding: 12pt;
+      border-radius: 6pt;
+      text-align: center;
+    }
+    
+    .dimension-label {
+      font-size: 9pt;
+      color: #718096;
+      margin-bottom: 4pt;
+    }
+    
+    .dimension-value {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    
+    .strengths-section, .development-section {
+      margin-bottom: 12pt;
+    }
+    
+    .section-subtitle {
+      font-size: 11pt;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 8pt;
+    }
+    
+    .bullet-list {
+      list-style-type: disc;
+      padding-left: 16pt;
+    }
+    
+    .bullet-list li {
+      font-size: 10pt;
+      color: #4a5568;
+      margin-bottom: 4pt;
+    }
+    
+    .disc-section {
+      background: #f8f9fa;
+      padding: 12pt;
+      border-radius: 6pt;
+      margin-bottom: 12pt;
+    }
+    
+    .disc-title {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 6pt;
+    }
+    
+    .disc-profile {
+      font-size: 11pt;
+      color: #1a1a1a;
+    }
+    
+    .recommendation-box {
+      background: #edf2f7;
+      padding: 12pt;
+      border-radius: 6pt;
+      border-left: 4pt solid #8a6f3a;
+    }
+    
+    .recommendation-label {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 4pt;
+    }
+    
+    .recommendation-text {
+      font-size: 11pt;
+      color: #1a1a1a;
+    }
+    
+    .appendix {
+      page-break-before: always;
+    }
+    
+    .appendix-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .appendix-table th {
+      background: #f8f9fa;
+      padding: 8pt;
+      font-size: 10pt;
+      font-weight: 600;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .appendix-table td {
+      padding: 8pt;
+      font-size: 10pt;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .footer {
+      font-size: 8pt;
+      color: #a0aec0;
+      text-align: center;
+      margin-top: 24pt;
+      padding-top: 8pt;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .radar-chart-placeholder {
+      width: 200pt;
+      height: 200pt;
+      background: #f8f9fa;
+      border-radius: 6pt;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 16pt auto;
+    }
+    
+    .radar-chart-placeholder span {
+      font-size: 10pt;
+      color: #718096;
+    }
+  </style>
+</head>
+<body>
+  <!-- Cover Page -->
+  <div class="cover">
+    <h1>{{mandate.title}}</h1>
+    <h2>Talent Mapping Shortlist</h2>
+    <p class="subtitle">LENS Report Type T1</p>
+    <p class="meta">{{mandate.client}} | {{generated_at}}</p>
+    <p class="logo">LYC Intelligence</p>
+  </div>
+  
+  <!-- Executive Summary -->
+  <div class="executive-summary">
+    <h2 class="section-title">Executive Summary</h2>
+    
+    <p style="font-size: 11pt; color: #4a5568; margin-bottom: 16pt;">
+      This report presents {{candidate_count}} shortlisted candidates for the {{mandate.title}} mandate.
+      Candidates have been evaluated based on experience, skills, and organizational fit dimensions.
+    </p>
+    
+    <div style="margin-bottom: 16pt;">
+      <h3 style="font-size: 12pt; font-weight: 600; color: #1a1a1a; margin-bottom: 8pt;">Key Highlights</h3>
+      <ul class="bullet-list">
+        <li>Top candidate: {{top_candidate.name}} with match score {{top_candidate.match_score}}/100</li>
+        <li>{{proceed_count}} candidates recommended to proceed</li>
+        <li>{{hold_count}} candidates on hold for further evaluation</li>
+        <li>Average match score: {{avg_match_score}}/100</li>
+      </ul>
+    </div>
+    
+    <h3 style="font-size: 12pt; font-weight: 600; color: #1a1a1a; margin-bottom: 8pt;">Candidate Overview</h3>
+    <table class="appendix-table">
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Title</th>
+          <th>Match Score</th>
+          <th>Verdict</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each candidates}}
+        <tr>
+          <td>{{name}}</td>
+          <td>{{title}}</td>
+          <td><span class="score-badge {{#if match_score_high}}score-high{{else}}{{#if match_score_medium}}score-medium{{else}}score-low{{/if}}{{/if}}">{{match_score}}/100</span></td>
+          <td><span class="verdict-badge verdict-{{verdict}}">{{verdict}}</span></td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Candidate Pages -->
+  {{#each candidates}}
+  <div class="candidate-page">
+    <div class="candidate-header">
+      <div>
+        <div class="candidate-name">{{name}}</div>
+        <div class="candidate-title">{{title}} at {{company}}</div>
+        <div class="candidate-location">{{location}}</div>
+      </div>
+      <div style="text-align: right;">
+        <span class="score-badge {{#if match_score_high}}score-high{{else}}{{#if match_score_medium}}score-medium{{else}}score-low{{/if}}{{/if}}">Match: {{match_score}}/100</span>
+        <span class="verdict-badge verdict-{{verdict}}">{{verdict}}</span>
+      </div>
+    </div>
+    
+    <!-- Dimension Scores -->
+    <div class="dimensions-grid">
+      <div class="dimension-box">
+        <div class="dimension-label">Experience</div>
+        <div class="dimension-value">{{dimensions.experience}}/100</div>
+      </div>
+      <div class="dimension-box">
+        <div class="dimension-label">Skills</div>
+        <div class="dimension-value">{{dimensions.skills}}/100</div>
+      </div>
+      <div class="dimension-box">
+        <div class="dimension-label">Fit</div>
+        <div class="dimension-value">{{dimensions.fit}}/100</div>
+      </div>
+    </div>
+    
+    <!-- Radar Chart Placeholder -->
+    <div class="radar-chart-placeholder">
+      <span>Radar Chart: {{dimensions.experience}}, {{dimensions.skills}}, {{dimensions.fit}}</span>
+    </div>
+    
+    <!-- Strengths -->
+    <div class="strengths-section">
+      <h4 class="section-subtitle">Key Strengths</h4>
+      <ul class="bullet-list">
+        {{#each strengths}}
+        <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    </div>
+    
+    <!-- Development Areas -->
+    <div class="development-section">
+      <h4 class="section-subtitle">Development Areas</h4>
+      <ul class="bullet-list">
+        {{#each development_areas}}
+        <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    </div>
+    
+    <!-- DISC Profile -->
+    <div class="disc-section">
+      <div class="disc-title">DISC Profile Summary</div>
+      <div class="disc-profile">{{disc_profile}}</div>
+    </div>
+    
+    <!-- Recommendation -->
+    <div class="recommendation-box">
+      <div class="recommendation-label">Recommendation</div>
+      <div class="recommendation-text">{{recommendation}}</div>
+    </div>
+    
+    <div class="footer">
+      LYC Intelligence | LENS T1 Report | {{generated_at}}
+    </div>
+  </div>
+  {{/each}}
+  
+  <!-- Appendix -->
+  <div class="appendix">
+    <h2 class="section-title">Appendix: Full Candidate List</h2>
+    
+    <table class="appendix-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Current Role</th>
+          <th>Company</th>
+          <th>Location</th>
+          <th>Match</th>
+          <th>Exp</th>
+          <th>Skills</th>
+          <th>Fit</th>
+          <th>Verdict</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each all_candidates}}
+        <tr>
+          <td>{{index}}</td>
+          <td>{{name}}</td>
+          <td>{{title}}</td>
+          <td>{{company}}</td>
+          <td>{{location}}</td>
+          <td>{{match_score}}</td>
+          <td>{{dimensions.experience}}</td>
+          <td>{{dimensions.skills}}</td>
+          <td>{{dimensions.fit}}</td>
+          <td>{{verdict}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    
+    <div class="footer">
+      LYC Intelligence | LENS T1 Report | {{generated_at}} | Confidential
+    </div>
+  </div>
+</body>
+</html>

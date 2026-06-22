@@ -1633,3 +1633,184 @@ export async function getMandateById(mandateId: string): Promise<Mandate | null>
     return null;
   }
 }
+
+// ─── LENS Report API Functions (Phase 3.6) ───
+
+export interface LENSReportCandidate {
+  id: string;
+  name: string;
+  title: string;
+  company: string;
+  location: string;
+  industry: string;
+  match_score: number;
+  dimensions: {
+    experience: number;
+    skills: number;
+    fit: number;
+  };
+  strengths: string[];
+  development_areas: string[];
+  disc_profile: string;
+  disc_scores: { D: number; I: number; S: number; C: number };
+  disc_summary: string;
+  disc_type: string;
+  verdict: 'proceed' | 'hold' | 'pass';
+  trident: string;
+  recommendation: string;
+  work_history: any[];
+  skills: any[];
+  shift_assessment: any;
+  references: any[];
+}
+
+export interface LENSReportData {
+  id: string;
+  mandate: {
+    title: string;
+    client: string;
+  };
+  candidates: LENSReportCandidate[];
+  candidate_count: number;
+  top_candidate: LENSReportCandidate;
+  proceed_count: number;
+  hold_count: number;
+  avg_match_score: number;
+  generated_at: string;
+  report_type: 'T1' | 'T2' | 'T3';
+  pdf_url?: string;
+  share_url?: string;
+}
+
+export interface CandidatePipeline {
+  id: string;
+  mandate_id: string;
+  contact_id: string;
+  contact?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    current_title: string;
+    company?: { name: string; industry: string };
+    location: string;
+  };
+  stage: string;
+  match_score: number | null;
+  trident_composite: string | null;
+  verdict: 'proceed' | 'hold' | 'pass' | null;
+  scoring_output: any;
+  analysis: any;
+  created_at: string;
+}
+
+export async function generateLENSReport(
+  mandateId: string,
+  candidateIds: string[],
+  reportType: 'T1' | 'T2' | 'T3'
+): Promise<LENSReportData | null> {
+  try {
+    const res = await fetch('/api/data/lens-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mandate_id: mandateId,
+        candidate_ids: candidateIds,
+        report_type: reportType,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to generate report' }));
+      console.error('[LENS] generateLENSReport error:', err);
+      return null;
+    }
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as LENSReportData;
+    }
+    return null;
+  } catch (e) {
+    console.error('[LENS] generateLENSReport error:', e);
+    return null;
+  }
+}
+
+export async function sendReportEmail(reportId: string, recipients: string[]): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/lens-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        report_id: reportId,
+        recipients: recipients,
+      }),
+    });
+
+    return res.ok;
+  } catch (e) {
+    console.error('[LENS] sendReportEmail error:', e);
+    return false;
+  }
+}
+
+export async function createReportShareLink(reportId: string, expiry: string): Promise<string | null> {
+  try {
+    const res = await fetch('/api/data/lens-share', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        report_id: reportId,
+        expiry: expiry,
+      }),
+    });
+
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.share_url;
+    }
+    return null;
+  } catch (e) {
+    console.error('[LENS] createReportShareLink error:', e);
+    return null;
+  }
+}
+
+export async function generateGRIDReport(mandateId: string): Promise<{ pdf_url: string } | null> {
+  try {
+    const res = await fetch('/api/data/grid-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mandate_id: mandateId }),
+    });
+
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as { pdf_url: string };
+    }
+    return null;
+  } catch (e) {
+    console.error('[GRID] generateGRIDReport error:', e);
+    return null;
+  }
+}
+
+export async function getCandidatesForMandate(mandateId: string): Promise<CandidatePipeline[]> {
+  try {
+    const res = await fetch(`/api/data/candidates?mandate_id=${mandateId}`);
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as CandidatePipeline[];
+    }
+    return [];
+  } catch (e) {
+    console.error('[Candidates] getCandidatesForMandate error:', e);
+    return [];
+  }
+}
