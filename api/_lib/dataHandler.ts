@@ -1038,6 +1038,217 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ success: true, data: rows[0] || null });
     }
 
+    // ── Outreach Attempts CRUD (Phase 1.4) ──
+    if (resource === 'outreach-attempts') {
+      if (method === 'POST' && !id) {
+        const {
+          candidate_id, mandate_id, channel, attempt_number, attempt_date,
+          outcome, response_text, notes, next_action, next_action_date,
+        } = req.body || {};
+
+        if (!candidate_id || !mandate_id) {
+          return res.status(400).json({ error: 'candidate_id and mandate_id are required' });
+        }
+        if (!channel) {
+          return res.status(400).json({ error: 'channel is required' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: mandate_id,
+          select: 'id, organization_id',
+        });
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const row = await db.insert('outreach_attempts', {
+          candidate_id,
+          mandate_id,
+          channel,
+          attempt_number: attempt_number || 1,
+          attempt_date: attempt_date || new Date().toISOString().split('T')[0],
+          outcome: outcome || null,
+          response_text: response_text || null,
+          notes: notes || null,
+          next_action: next_action || null,
+          next_action_date: next_action_date || null,
+          created_by: authUserId || null,
+          organization_id: mandate.organization_id,
+        }, 15000);
+        return res.status(201).json({ success: true, data: row });
+      }
+
+      if (method === 'GET' && !id) {
+        const candidateId = req.query.candidate_id as string;
+        const mandateId = req.query.mandate_id as string;
+        const all = req.query.all === 'true';
+
+        if (!candidateId && !mandateId && !all) {
+          return res.status(400).json({ error: 'candidate_id, mandate_id, or all=true is required' });
+        }
+
+        let attempts: any[] = [];
+
+        if (all && userRole === 'super_admin') {
+          attempts = await db.selectMany('outreach_attempts', {
+            orderBy: { column: 'attempt_date', ascending: false },
+            limit: 500,
+          }, 15000);
+        } else if (mandateId) {
+          const mandate = await db.selectOne('mandates', {
+            column: 'id',
+            value: mandateId,
+            select: 'id, organization_id',
+          });
+          if (!mandate) {
+            return res.status(404).json({ error: 'Mandate not found' });
+          }
+          if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+            return res.status(403).json({ error: 'Access denied' });
+          }
+
+          attempts = await db.selectMany('outreach_attempts', {
+            where: [{ column: 'mandate_id', value: mandateId }],
+            orderBy: { column: 'attempt_date', ascending: false },
+            limit: 500,
+          }, 15000);
+        } else if (candidateId) {
+          attempts = await db.selectMany('outreach_attempts', {
+            where: [{ column: 'candidate_id', value: candidateId }],
+            orderBy: { column: 'attempt_date', ascending: false },
+            limit: 500,
+          }, 15000);
+        }
+
+        return res.status(200).json({ success: true, data: attempts });
+      }
+
+      if (method === 'DELETE' && id) {
+        const attempt = await db.selectOne('outreach_attempts', {
+          column: 'id',
+          value: id,
+          select: 'id, mandate_id',
+        });
+        if (!attempt) {
+          return res.status(404).json({ error: 'Attempt not found' });
+        }
+
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: attempt.mandate_id,
+          select: 'id, organization_id',
+        });
+
+        if (!mandate) {
+          return res.status(404).json({ error: 'Mandate not found' });
+        }
+        if (userRole !== 'super_admin' && mandate.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const count = await db.deleteRows('outreach_attempts', { column: 'id', value: id }, 15000);
+        return res.status(200).json({ success: true, deleted: count });
+      }
+    }
+
+    // ── Outreach Next Actions (Phase 1.4) ──
+    if (resource === 'outreach-next-actions' && method === 'GET') {
+      const daysAhead = parseInt((req.query.days_ahead as string) || '14', 10);
+
+      // Calculate the cutoff date
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const cutoff = new Date(today.getTime() + daysAhead * 24 * 60 * 60 * 1000);
+      const cutoffStr = cutoff.toISOString().split('T')[0];
+
+      let queryParams: {
+        select: string;
+        where: Array<{ column: string; value: string | null; operator?: string; gte?: string; lte?: string }>;
+        orderBy: { column: string; ascending: boolean };
+        limit: number;
+      } = {
+        select: '*',
+        where: [{ column: 'next_action_date', value: null }],
+        orderBy: { column: 'next_action_date', ascending: true },
+        limit: 50,
+      };
+
+      // Use selectMany with a date range (most DB helpers support this)
+      const attempts = await db.selectMany('outreach_attempts', {
+        where: [{ column: 'next_action_date', value: cutoffStr }],
+        orderBy: { column: 'next_action_date', ascending: true },
+        limit: 50,
+      }, 15000);
+
+      // Filter in-memory to get upcoming (not past the cutoff but also not null)
+      const relevant = attempts.filter(a => a.next_action_date !== null);
+
+      // Enrich with candidate names (lookup from contacts) and mandate titles
+      const contactIds = [...new Set(relevant.map(a => a.candidate_id))].filter(Boolean);
+      const mandateIds = [...new Set(relevant.map(a => a.mandate_id))].filter(Boolean);
+
+      let contacts: any[] = [];
+      let mandates: any[] = [];
+
+      if (contactIds.length > 0) {
+        // Get contact names using the data helper
+        const contactPromises = contactIds.map((cid: string) =>
+          db.selectOne('contacts', {
+            column: 'id',
+            value: cid,
+            select: 'id, first_name, last_name',
+          }).catch(() => null)
+        );
+        contacts = (await Promise.all(contactPromises)).filter(Boolean) as any[];
+      }
+
+      if (mandateIds.length > 0) {
+        const mandatePromises = mandateIds.map((mid: string) =>
+          db.selectOne('mandates', {
+            column: 'id',
+            value: mid,
+            select: 'id, title, organization_id',
+          }).catch(() => null)
+        );
+        mandates = (await Promise.all(mandatePromises)).filter(Boolean) as any[];
+
+        // Org-scoping: filter to only items from the user's org
+        if (userRole !== 'super_admin') {
+          const allowedMandateIds = new Set(mandates.filter(m => m.organization_id === orgId).map(m => m.id));
+          const filtered = relevant.filter(a => allowedMandateIds.has(a.mandate_id));
+
+          const enriched = filtered.map(a => {
+            const contact = contacts.find(c => c.id === a.candidate_id);
+            const mandate = mandates.find(m => m.id === a.mandate_id);
+            return {
+              ...a,
+              candidate_name: contact ? `${contact.first_name} ${contact.last_name}`.trim() : 'Candidate',
+              mandate_title: mandate?.title || 'Mandate',
+            };
+          });
+
+          return res.status(200).json({ success: true, data: enriched });
+        }
+      }
+
+      // Super admin path (when no mandate org filtering needed)
+      const enriched = relevant.map(a => {
+        const contact = contacts.find(c => c.id === a.candidate_id);
+        const mandate = mandates.find(m => m.id === a.mandate_id);
+        return {
+          ...a,
+          candidate_name: contact ? `${contact.first_name} ${contact.last_name}`.trim() : 'Candidate',
+          mandate_title: mandate?.title || 'Mandate',
+        };
+      });
+
+      return res.status(200).json({ success: true, data: enriched });
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);

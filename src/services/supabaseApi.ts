@@ -576,3 +576,110 @@ export async function rejectSuccessProfile(profileId: string, approverId: string
 export function hasApprovedSuccessProfile(mandate: Mandate | null | undefined): boolean {
   return false;
 }
+
+// ─── Outreach Tracking (Phase 1.4) ───────────────────────────────────
+
+export async function saveOutreachAttempt(data: {
+  candidate_id: string;
+  mandate_id: string;
+  channel: string;
+  attempt_number?: number;
+  attempt_date?: string;
+  outcome?: string | null;
+  response_text?: string | null;
+  notes?: string | null;
+  next_action?: string | null;
+  next_action_date?: string | null;
+  created_by?: string | null;
+  organization_id?: string | null;
+}): Promise<boolean> {
+  try {
+    const res = await fetch('/api/data/outreach-attempts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      console.error('[Outreach] saveOutreachAttempt failed:', res.status);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('[Outreach] saveOutreachAttempt error:', e);
+    return false;
+  }
+}
+
+export async function getOutreachAttempts(candidateId: string, mandateId: string): Promise<any[]> {
+  try {
+    const res = await fetch(`/api/data/outreach-attempts?candidate_id=${encodeURIComponent(candidateId)}&mandate_id=${encodeURIComponent(mandateId)}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.data || [];
+  } catch (e) {
+    console.error('[Outreach] getOutreachAttempts error:', e);
+    return [];
+  }
+}
+
+export async function getAllOutreachAttempts(mandateId?: string): Promise<any[]> {
+  try {
+    const url = mandateId
+      ? `/api/data/outreach-attempts?mandate_id=${encodeURIComponent(mandateId)}`
+      : '/api/data/outreach-attempts?all=true';
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.data || [];
+  } catch (e) {
+    console.error('[Outreach] getAllOutreachAttempts error:', e);
+    return [];
+  }
+}
+
+export async function deleteOutreachAttempt(attemptId: string): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/data/outreach-attempts/${attemptId}`, { method: 'DELETE' });
+    if (!res.ok) return false;
+    return true;
+  } catch (e) {
+    console.error('[Outreach] deleteOutreachAttempt error:', e);
+    return false;
+  }
+}
+
+export async function getOutreachNextActions(daysAhead: number = 7): Promise<any[]> {
+  try {
+    const res = await fetch(`/api/data/outreach-next-actions?days_ahead=${daysAhead}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.data || [];
+  } catch (e) {
+    console.error('[Outreach] getOutreachNextActions error:', e);
+    return [];
+  }
+}
+
+export async function getAttemptCount(candidateId: string, mandateId: string): Promise<number> {
+  const attempts = await getOutreachAttempts(candidateId, mandateId);
+  return attempts.length;
+}
+
+export async function getOutreachStatsForCandidate(candidateId: string, mandateId: string): Promise<{
+  total: number;
+  responded: number;
+  positive: number;
+  lastAttemptDate: string | null;
+  hasPositiveOutcome: boolean;
+}> {
+  const attempts = await getOutreachAttempts(candidateId, mandateId);
+  const positiveOutcomes = ['positive', 'interested', 'scheduled_interview', 'referred_other'];
+
+  return {
+    total: attempts.length,
+    responded: attempts.filter(a => a.outcome && a.outcome !== 'no_response').length,
+    positive: attempts.filter(a => a.outcome && positiveOutcomes.includes(a.outcome)).length,
+    lastAttemptDate: attempts.length > 0 ? attempts[0].attempt_date : null,
+    hasPositiveOutcome: attempts.some(a => a.outcome && positiveOutcomes.includes(a.outcome)),
+  };
+}

@@ -10,6 +10,9 @@ import { MandateTeam } from '@/components/mandate/MandateTeam';
 import { MandateIntakeForm } from '@/components/mandate/MandateIntakeForm';
 import { SuccessProfileForm } from '@/components/mandate/SuccessProfileForm';
 import { SuccessProfileApproval } from '@/components/mandate/SuccessProfileApproval';
+import { OutreachTimeline } from '@/components/outreach/OutreachTimeline';
+import { OutreachDashboard } from '@/components/outreach/OutreachDashboard';
+import { NextActionReminders } from '@/components/outreach/NextActionReminders';
 import { useAuthStore } from '@/stores/authStore';
 import { getSuccessProfiles } from '@/services/supabaseApi';
 import type { SuccessProfile } from '@/types';
@@ -34,7 +37,7 @@ const AI_ACTIONS: { key: AIAction; icon: any; label: string }[] = [
   { key: 'feedback', icon: MessageSquare, label: 'Feedback' },
 ];
 
-type TabKey = 'overview' | 'intake' | 'success-profile' | 'pipeline';
+type TabKey = 'overview' | 'intake' | 'success-profile' | 'outreach' | 'pipeline';
 
 export function MandateDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -203,6 +206,7 @@ export function MandateDetailPage() {
           { key: 'overview', label: 'Overview', icon: Eye },
           { key: 'intake', label: 'Intake', icon: ListChecks, warn: !intakeComplete },
           { key: 'success-profile', label: 'Success Profile', icon: CheckCircle, warn: !hasApprovedProfile },
+          { key: 'outreach', label: 'Outreach', icon: MessageSquare },
           { key: 'pipeline', label: `Pipeline (${pipeline.length})`, icon: Users },
         ] as { key: TabKey; label: string; icon: any; warn?: boolean }[]).map(t => (
           <button
@@ -377,6 +381,69 @@ export function MandateDetailPage() {
               )}
             </>
           )}
+        </div>
+      )}
+
+      {tab === 'outreach' && (
+        <div className="space-y-6">
+          <div>
+            <h2 className="font-serif text-xl text-text-primary">Outreach Tracking</h2>
+            <p className="text-sm text-text-muted mt-1">Log and track every outreach attempt for each candidate in this mandate.</p>
+          </div>
+
+          {/* Outreach Dashboard: Response metrics */}
+          <div>
+            <h3 className="font-serif text-lg text-text-primary mb-3">Response Performance</h3>
+            <OutreachDashboard mandateId={mandate.id} mandateTitle={mandate.title} compact={true} />
+          </div>
+
+          {/* Next Action Reminders */}
+          <div>
+            <h3 className="font-serif text-lg text-text-primary mb-3">Upcoming Follow-ups</h3>
+            <NextActionReminders daysAhead={14} maxItems={15} />
+          </div>
+
+          {/* Per-candidate outreach panels */}
+          <div className="space-y-4">
+            <h3 className="font-serif text-lg text-text-primary">Per-Candidate Outreach</h3>
+            {pipeline.length === 0 ? (
+              <Card>
+                <CardContent className="py-6 text-center text-text-muted text-sm">
+                  No candidates in this pipeline yet. Add candidates to start tracking outreach.
+                </CardContent>
+              </Card>
+            ) : (
+              pipeline.map((p: any) => {
+                const contact = p.contact || {};
+                const contactName = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || 'Candidate';
+                return (
+                  <div key={p.id} className="bg-bg-secondary border border-border rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-accent/10 text-accent flex items-center justify-center text-sm font-medium">
+                          {contactName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-medium text-text-primary">{contactName}</p>
+                          <p className="text-xs text-text-muted">
+                            {[contact.title, contact.company?.name].filter(Boolean).join(' • ') || 'Candidate'}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-xs text-text-muted bg-bg-tertiary px-2 py-1 rounded-full">
+                        {p.stage || 'New'}
+                      </span>
+                    </div>
+                    <OutreachTimeline
+                      candidateId={contact.id || p.contact_id}
+                      mandateId={mandate.id}
+                      candidateName={contactName}
+                    />
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       )}
 

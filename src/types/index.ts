@@ -148,6 +148,72 @@ export interface SuccessProfile {
   updated_at: string;
 }
 
+// ── Outreach Tracking (Phase 1.4) ──
+
+export type OutreachChannel =
+  | 'cold_call'
+  | 'wechat_add'
+  | 'email'
+  | 'linkedin_message'
+  | 'phone_call'
+  | 'in_person';
+
+export type OutreachOutcome =
+  | 'no_response'
+  | 'positive'
+  | 'negative'
+  | 'interested'
+  | 'not_interested'
+  | 'scheduled_interview'
+  | 'referred_other'
+  | 'invalid_contact';
+
+export interface OutreachAttempt {
+  id: string;
+  candidate_id: string;
+  mandate_id: string;
+  channel: OutreachChannel;
+  attempt_number: number;
+  attempt_date: string;
+  outcome?: OutreachOutcome | null;
+  response_text?: string | null;
+  notes?: string | null;
+  next_action?: string | null;
+  next_action_date?: string | null;
+  created_by?: string | null;
+  organization_id?: string | null;
+  created_at: string;
+}
+
+export const CHANNEL_LABELS: Record<OutreachChannel, string> = {
+  cold_call: 'Cold Call',
+  wechat_add: 'WeChat',
+  email: 'Email',
+  linkedin_message: 'LinkedIn',
+  phone_call: 'Phone Call',
+  in_person: 'In Person',
+};
+
+export const OUTCOME_LABELS: Record<OutreachOutcome, string> = {
+  no_response: 'No Response',
+  positive: 'Positive',
+  negative: 'Negative',
+  interested: 'Interested',
+  not_interested: 'Not Interested',
+  scheduled_interview: 'Interview Scheduled',
+  referred_other: 'Referred Others',
+  invalid_contact: 'Invalid Contact',
+};
+
+export const CHANNEL_ICON_LABELS: Record<OutreachChannel, string> = {
+  cold_call: '📞',
+  wechat_add: '💬',
+  email: '✉️',
+  linkedin_message: 'in',
+  phone_call: '☎️',
+  in_person: '👥',
+};
+
 export const DEFAULT_SUCCESS_PROFILE: Partial<SuccessProfile> = {
   required_experience_years: 10,
   required_industries: [],
