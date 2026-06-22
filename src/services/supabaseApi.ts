@@ -2102,3 +2102,236 @@ function getDefaultNotificationPreferences(): NotificationPreferences {
     career_insight: { enabled: true, email: true, in_app: true, frequency: 'weekly' },
   };
 }
+
+// ═══════════════════════════════════════════════════════════════
+// CANDIDATE ASSESSMENT API (Phase 4.2)
+// ═══════════════════════════════════════════════════════════════
+
+export type AssessmentQuestionType = 'likert' | 'mcq_single' | 'mcq_multi' | 'text' | 'ranking';
+
+export interface AssessmentQuestion {
+  id: string;
+  type: AssessmentQuestionType;
+  text: string;
+  description?: string;
+  required?: boolean;
+  options?: string[];
+  scale_min?: number;
+  scale_max?: number;
+  scale_min_label?: string;
+  scale_max_label?: string;
+  max_length?: number;
+  ranking_items?: string[];
+}
+
+export interface AssessmentConfig {
+  id: string;
+  title: string;
+  type: string;
+  description?: string;
+  estimated_minutes: number;
+  show_timer: boolean;
+  questions: AssessmentQuestion[];
+  mandate?: {
+    id: string;
+    title: string;
+    client_name: string;
+  };
+  previous_responses?: AssessmentResponse[] | null;
+}
+
+export interface AssessmentResponse {
+  question_id: string;
+  value: string | number | string[] | number[];
+}
+
+export interface AssessmentResult {
+  id: string;
+  assessment_id: string;
+  mandate_id: string;
+  overall_score: number;
+  recommendation: 'proceed' | 'hold' | 'pass';
+  dimension_scores: Array<{
+    name: string;
+    score: number;
+    description?: string;
+  }>;
+  strengths: string[];
+  development_areas: string[];
+  visibility: 'full' | 'pass_fail' | 'hidden';
+  completed_at: string;
+}
+
+export interface AssessmentInvitation {
+  id: string;
+  candidate_id: string;
+  candidate_name: string;
+  candidate_email: string;
+  mandate_id: string;
+  mandate_title: string;
+  client_name: string;
+  assessment_type: string;
+  assessment_id: string;
+  assessment_title: string;
+  duration_minutes: number;
+  assessment_link: string;
+  consultant_name: string;
+  consultant_email: string;
+  invited_at: string;
+  expires_at?: string;
+  status: 'pending' | 'sent' | 'viewed' | 'completed' | 'expired';
+}
+
+// Get assessment configuration for a candidate
+export async function getCandidateAssessment(assessmentId: string, candidateId: string): Promise<AssessmentConfig | null> {
+  try {
+    const res = await fetch(`/scoring/candidate/assessment?assessment_id=${assessmentId}&candidate_id=${candidateId}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as AssessmentConfig;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Assessment] getCandidateAssessment error:', e);
+    return null;
+  }
+}
+
+// Submit assessment responses
+export async function submitAssessment(params: {
+  candidateId: string;
+  assessmentId: string;
+  mandateId: string;
+  assessmentType: string;
+  responses: AssessmentResponse[];
+  visibility?: 'full' | 'pass_fail' | 'hidden';
+}): Promise<boolean> {
+  try {
+    const res = await fetch('/scoring/candidate/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Assessment] submitAssessment error:', e);
+    return false;
+  }
+}
+
+// Get assessment result for candidate
+export async function getAssessmentResult(assessmentId: string, candidateId: string): Promise<AssessmentResult | null> {
+  try {
+    const res = await fetch(`/scoring/candidate/result?assessment_id=${assessmentId}&candidate_id=${candidateId}`);
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as AssessmentResult;
+    }
+    return null;
+  } catch (e) {
+    console.error('[Assessment] getAssessmentResult error:', e);
+    return null;
+  }
+}
+
+// Auto-save assessment responses (during assessment)
+export async function autoSaveAssessment(params: {
+  candidateId: string;
+  assessmentId: string;
+  mandateId: string;
+  assessmentType: string;
+  responses: AssessmentResponse[];
+}): Promise<boolean> {
+  try {
+    const res = await fetch('/scoring/candidate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...params,
+        visibility: 'hidden', // Auto-save doesn't show results
+      }),
+    });
+
+    return res.ok;
+  } catch (e) {
+    console.error('[Assessment] autoSaveAssessment error:', e);
+    return false;
+  }
+}
+
+// Send assessment invitation
+export async function sendAssessmentInvitation(params: {
+  candidateId: string;
+  candidateName: string;
+  candidateEmail: string;
+  mandateId: string;
+  mandateTitle: string;
+  clientName: string;
+  assessmentType: string;
+  assessmentId: string;
+  assessmentTitle: string;
+  durationMinutes: number;
+  assessmentLink: string;
+  consultantName: string;
+  consultantEmail: string;
+}): Promise<{ success: boolean; invitationId?: string }> {
+  try {
+    const res = await fetch('/api/data/assessments/invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    if (!res.ok) return { success: false };
+
+    const result = await res.json();
+    return { success: true, invitationId: result.invitation_id };
+  } catch (e) {
+    console.error('[Assessment] sendAssessmentInvitation error:', e);
+    return { success: false };
+  }
+}
+
+// Get candidate's assessment invitations
+export async function getAssessmentInvitations(candidateId: string): Promise<AssessmentInvitation[]> {
+  try {
+    const res = await fetch(`/api/data/assessments/invitations?candidate_id=${candidateId}`);
+    if (!res.ok) return [];
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data as AssessmentInvitation[];
+    }
+    return [];
+  } catch (e) {
+    console.error('[Assessment] getAssessmentInvitations error:', e);
+    return [];
+  }
+}
+
+// Update result visibility (consultant only)
+export async function updateResultVisibility(resultId: string, visibility: 'full' | 'pass_fail' | 'hidden'): Promise<boolean> {
+  try {
+    const res = await fetch('/scoring/candidate/visibility', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ result_id: resultId, visibility }),
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return result.success;
+  } catch (e) {
+    console.error('[Assessment] updateResultVisibility error:', e);
+    return false;
+  }
+}

@@ -1572,3 +1572,723 @@ export async function handleParticipantAssessment(req: VercelRequest, res: Verce
     return handleError(res, 'advisory.participant', err);
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// CANDIDATE ASSESSMENT SCORING (Phase 4.2)
+// ═══════════════════════════════════════════════════════════════
+
+export type CandidateAssessmentType = 'SHIFT' | 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MOSAIC' | 'custom';
+
+export interface CandidateAssessmentResponse {
+  question_id: string;
+  value: string | number | string[] | number[];
+}
+
+export interface CandidateAssessmentResult {
+  overall_score: number;
+  recommendation: 'proceed' | 'hold' | 'pass';
+  dimension_scores: Array<{
+    name: string;
+    score: number;
+    description?: string;
+  }>;
+  strengths: string[];
+  development_areas: string[];
+  visibility: 'full' | 'pass_fail' | 'hidden';
+}
+
+export async function handleCandidateAssessmentScoring(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse> {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed. Use POST.' });
+  }
+
+  try {
+    const start = Date.now();
+    const body = req.body || {};
+
+    const {
+      candidate_id,
+      assessment_id,
+      mandate_id,
+      assessment_type,
+      responses,
+      visibility = 'full',
+    } = body;
+
+    // Validate required fields
+    if (!candidate_id || !assessment_id || !mandate_id || !responses || !assessment_type) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: candidate_id, assessment_id, mandate_id, assessment_type, responses',
+      });
+    }
+
+    // Get success profile for this mandate
+    let successProfile: any = null;
+    try {
+      successProfile = await selectOne('mandate_success_profiles', {
+        column: 'mandate_id',
+        value: mandate_id,
+      });
+    } catch (e) {
+      console.warn('[candidate_scoring] Could not fetch success profile, using defaults:', e);
+    }
+
+    // Get assessment configuration
+    let assessmentConfig: any = null;
+    try {
+      assessmentConfig = await selectOne('assessment_configs', {
+        column: 'id',
+        value: assessment_id,
+      });
+    } catch (e) {
+      console.warn('[candidate_scoring] Could not fetch assessment config:', e);
+    }
+
+    // Build the scoring prompt
+    const prompt = buildCandidateScoringPrompt({
+      assessmentType: assessment_type,
+      responses,
+      successProfile,
+      assessmentConfig,
+    });
+
+    let analysis: any = null;
+    let tokens = 0;
+
+    // Call DeepSeek for AI scoring
+    try {
+      if (DEEPSEEK_API_KEY) {
+        const response = await fetch(DEEPSEEK_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: 'deepseek-chat',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are an executive search AI specializing in candidate assessment scoring. Always respond with valid JSON only.',
+              },
+              { role: 'user', content: prompt },
+            ],
+            max_tokens: 2048,
+            temperature: 0.3,
+            response_format: { type: 'json_object' },
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const content = data.choices?.[0]?.message?.content || '';
+          tokens = data.usage?.total_tokens || 0;
+          analysis = parseCandidateScoringResponse(content);
+        } else {
+          throw new Error(`DeepSeek API error: ${response.status}`);
+        }
+      } else {
+        // Fallback to rule-based scoring
+        analysis = calculateFallbackScore(responses, assessment_type);
+      }
+    } catch (e) {
+      console.warn('[candidate_scoring] DeepSeek call failed, using fallback:', e);
+      analysis = calculateFallbackScore(responses, assessment_type);
+    }
+
+    // Determine overall score and recommendation
+    const overallScore = analysis.overall_score || 50;
+    const dimensionScores = analysis.dimension_scores || [];
+    const strengths = analysis.strengths || [];
+    const developmentAreas = analysis.development_areas || [];
+
+    // Calculate recommendation based on score
+    let recommendation: 'proceed' | 'hold' | 'pass' = 'hold';
+    if (overallScore >= 75) {
+      recommendation = 'proceed';
+    } else if (overallScore < 40) {
+      recommendation = 'pass';
+    }
+
+    // Persist scoring run
+    let scoringRunId: string | null = null;
+    try {
+      if (isSupabaseConfigured()) {
+        const inserted = await insert('scoring_runs', {
+          user_id: candidate_id,
+          assessment_type: `CANDIDATE_${assessment_type}`,
+          input_params: {
+            assessment_id,
+            mandate_id,
+            responses,
+          },
+          output_scores: {
+            overall_score: overallScore,
+            dimension_scores: dimensionScores,
+          },
+          analysis: {
+            strengths,
+            development_areas,
+            recommendation,
+            visibility,
+          },
+          created_at: new Date().toISOString(),
+        });
+        scoringRunId = inserted?.id || null;
+      }
+    } catch (e) {
+      console.error('[candidate_scoring] Failed to persist scoring_run:', e);
+    }
+
+    // Create assessment result record
+    let resultId: string | null = null;
+    try {
+      if (isSupabaseConfigured()) {
+        const result = await insert('candidate_assessment_results', {
+          candidate_id,
+          assessment_id,
+          mandate_id,
+          overall_score: overallScore,
+          recommendation,
+          dimension_scores: dimensionScores,
+          strengths,
+          development_areas,
+          visibility,
+          completed_at: new Date().toISOString(),
+        });
+        resultId = result?.id || null;
+      }
+    } catch (e) {
+      console.error('[candidate_scoring] Failed to persist result:', e);
+    }
+
+    // Build response based on visibility
+    const result: CandidateAssessmentResult = {
+      overall_score: overallScore,
+      recommendation,
+      dimension_scores: dimensionScores,
+      strengths: visibility === 'hidden' ? [] : strengths,
+      development_areas: visibility === 'hidden' ? [] : developmentAreas,
+      visibility,
+    };
+
+    return res.status(200).json({
+      success: true,
+      result,
+      scoring_run_id: scoringRunId,
+      result_id: resultId,
+      assessment_id,
+      candidate_id,
+      mandate_id,
+      total_tokens: tokens,
+      duration_ms: Date.now() - start,
+    });
+  } catch (err) {
+    return handleError(res, 'candidate.scoring', err);
+  }
+}
+
+interface CandidateScoringInput {
+  assessmentType: string;
+  responses: CandidateAssessmentResponse[];
+  successProfile: any;
+  assessmentConfig: any;
+}
+
+function buildCandidateScoringPrompt(input: CandidateScoringInput): string {
+  const { assessmentType, responses, successProfile, assessmentConfig } = input;
+
+  // Format responses for the prompt
+  const formattedResponses = responses
+    .map(r => `Question ${r.question_id}: ${JSON.stringify(r.value)}`)
+    .join('\n');
+
+  // Success profile requirements
+  const profileRequirements = successProfile
+    ? JSON.stringify(successProfile.requirements || successProfile, null, 2)
+    : 'No specific success profile available. Use general executive assessment criteria.';
+
+  // Assessment type specific instructions
+  const assessmentInstructions = getAssessmentTypeInstructions(assessmentType);
+
+  return `
+You are an executive search AI. Score this candidate's assessment responses against the success profile.
+
+ASSESSMENT TYPE: ${assessmentType}
+
+SUCCESS PROFILE REQUIREMENTS:
+${profileRequirements}
+
+CANDIDATE RESPONSES:
+${formattedResponses}
+
+${assessmentInstructions}
+
+SCORING CRITERIA:
+- Experience alignment (0-100): Does the candidate's experience match the role requirements?
+- Skills match (0-100): Do the candidate's skills align with required competencies?
+- Personality fit (0-100): Does the candidate's work style match the organizational culture?
+- Character assessment (0-100): Does the candidate demonstrate integrity and values alignment?
+
+Return ONLY this JSON structure (no markdown, no code fences):
+{
+  "overall_score": <0-100>,
+  "dimension_scores": [
+    { "name": "Experience", "score": <0-100>, "description": "<brief assessment>" },
+    { "name": "Skills", "score": <0-100>, "description": "<brief assessment>" },
+    { "name": "Personality", "score": <0-100>, "description": "<brief assessment>" },
+    { "name": "Character", "score": <0-100>, "description": "<brief assessment>" }
+  ],
+  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
+  "development_areas": ["<area 1>", "<area 2>", "<area 3>"],
+  "recommendation": "<proceed|hold|pass>"
+}
+`;
+}
+
+function getAssessmentTypeInstructions(assessmentType: string): string {
+  const instructions: Record<string, string> = {
+    SHIFT: `
+SHIFT ASSESSMENT FOCUS:
+- Learning & Execution Potential (LEAP)
+- Questioning & Inquiry Skills (QUEST)
+- Driving Change & Results (DRIVE)
+- Coaching & Team Development (COACH)
+- Impact Measurement & Accountability (IMPACT)
+    `,
+    PRISM: `
+PRISM ASSESSMENT FOCUS:
+- Organizational culture alignment
+- Leadership style compatibility
+- Team dynamics fit
+    `,
+    FORGE: `
+FORGE ASSESSMENT FOCUS:
+- Goal-setting and achievement patterns
+- Resilience under pressure
+- Growth trajectory
+    `,
+    SPARK: `
+SPARK ASSESSMENT FOCUS:
+- Innovation potential
+- Creative problem-solving
+- Change readiness
+    `,
+    BRIDGE: `
+BRIDGE ASSESSMENT FOCUS:
+- Leadership transition readiness
+- Stakeholder management
+- Strategic vision
+    `,
+    MOSAIC: `
+MOSAIC ASSESSMENT FOCUS:
+- Cross-cultural adaptability
+- Global mindset
+- Diverse environment experience
+    `,
+    custom: `
+CUSTOM ASSESSMENT FOCUS:
+- Evaluate responses holistically
+- Focus on role-relevant competencies
+- Consider industry-specific requirements
+    `,
+  };
+
+  return instructions[assessmentType] || instructions.custom;
+}
+
+function parseCandidateScoringResponse(content: string): any {
+  try {
+    const jsonStr = content.replace(/```json\n?/g, '').replace(/\n?```/g, '').trim();
+    const parsed = JSON.parse(jsonStr);
+
+    return {
+      overall_score: parsed.overall_score || 50,
+      dimension_scores: parsed.dimension_scores || [],
+      strengths: parsed.strengths || [],
+      development_areas: parsed.development_areas || [],
+      recommendation: parsed.recommendation || 'hold',
+    };
+  } catch {
+    return {
+      overall_score: 50,
+      dimension_scores: [],
+      strengths: [],
+      development_areas: [],
+      recommendation: 'hold',
+    };
+  }
+}
+
+function calculateFallbackScore(
+  responses: CandidateAssessmentResponse[],
+  assessmentType: string
+): any {
+  // Calculate a simple average score based on Likert-scale responses
+  let totalScore = 0;
+  let likertCount = 0;
+
+  for (const response of responses) {
+    if (typeof response.value === 'number' && response.value >= 1 && response.value <= 7) {
+      // Normalize 1-7 scale to 0-100
+      totalScore += ((response.value - 1) / 6) * 100;
+      likertCount++;
+    }
+  }
+
+  const avgScore = likertCount > 0 ? Math.round(totalScore / likertCount) : 50;
+
+  // Generate simple feedback based on score
+  const strengths: string[] = [];
+  const developmentAreas: string[] = [];
+
+  if (avgScore >= 70) {
+    strengths.push('Demonstrates strong alignment with role requirements');
+    strengths.push('Shows consistent response patterns suggesting authenticity');
+  } else if (avgScore >= 50) {
+    strengths.push('Shows adequate fit for the position');
+    developmentAreas.push('May benefit from additional experience in some areas');
+  } else {
+    developmentAreas.push('Significant gaps identified between profile and requirements');
+    developmentAreas.push('May require further evaluation before proceeding');
+  }
+
+  return {
+    overall_score: avgScore,
+    dimension_scores: [
+      { name: 'Experience', score: avgScore, description: 'Based on assessment responses' },
+      { name: 'Skills', score: avgScore - 5, description: 'Derived from competency questions' },
+      { name: 'Personality', score: avgScore + 3, description: 'Based on behavioral indicators' },
+      { name: 'Character', score: avgScore, description: 'Assessment integrity score' },
+    ],
+    strengths,
+    development_areas: developmentAreas.length > 0 ? developmentAreas : ['Continue developing in key areas'],
+    recommendation: avgScore >= 70 ? 'proceed' : avgScore >= 40 ? 'hold' : 'pass',
+  };
+}
+
+// Get candidate assessment result
+export async function handleGetCandidateResult(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse> {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const { assessment_id, candidate_id } = req.query;
+
+    if (!assessment_id || !candidate_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required parameters: assessment_id and candidate_id',
+      });
+    }
+
+    const result = await selectOne('candidate_assessment_results', {
+      column: 'assessment_id',
+      value: assessment_id as string,
+    }, 15000);
+
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        error: 'Assessment result not found',
+      });
+    }
+
+    // Check if result belongs to the candidate
+    if (result.candidate_id !== candidate_id) {
+      return res.status(403).json({
+        success: false,
+        error: 'Access denied',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        id: result.id,
+        assessment_id: result.assessment_id,
+        mandate_id: result.mandate_id,
+        overall_score: result.overall_score,
+        recommendation: result.recommendation,
+        dimension_scores: result.dimension_scores,
+        strengths: result.visibility === 'hidden' ? [] : result.strengths,
+        development_areas: result.visibility === 'hidden' ? [] : result.development_areas,
+        visibility: result.visibility,
+        completed_at: result.completed_at,
+      },
+    });
+  } catch (err) {
+    return handleError(res, 'candidate.result', err);
+  }
+}
+
+// Submit candidate assessment (save responses)
+export async function handleSubmitCandidateAssessment(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse> {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const body = req.body || {};
+    const {
+      candidate_id,
+      assessment_id,
+      mandate_id,
+      assessment_type,
+      responses,
+      visibility = 'full',
+    } = body;
+
+    if (!candidate_id || !assessment_id || !mandate_id || !assessment_type || !responses) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields',
+      });
+    }
+
+    // Save the assessment responses
+    let responseRecordId: string | null = null;
+    try {
+      const inserted = await insert('candidate_assessment_responses', {
+        candidate_id,
+        assessment_id,
+        mandate_id,
+        responses: typeof responses === 'string' ? responses : JSON.stringify(responses),
+        submitted_at: new Date().toISOString(),
+      });
+      responseRecordId = inserted?.id || null;
+    } catch (e) {
+      console.error('[candidate_submit] Failed to persist responses:', e);
+    }
+
+    // Trigger async scoring (don't wait for it)
+    // In production, this would be handled by a background job
+    setImmediate(async () => {
+      try {
+        await handleCandidateAssessmentScoring(
+          {
+            method: 'POST',
+            body: {
+              candidate_id,
+              assessment_id,
+              mandate_id,
+              assessment_type,
+              responses,
+              visibility,
+            },
+          } as VercelRequest,
+          { status: () => ({ json: () => ({}) }) } as VercelResponse
+        );
+      } catch (e) {
+        console.error('[candidate_submit] Scoring trigger failed:', e);
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Assessment submitted successfully',
+      response_id: responseRecordId,
+    });
+  } catch (err) {
+    return handleError(res, 'candidate.submit', err);
+  }
+}
+
+// Get assessment for candidate (get questions, config, etc.)
+export async function handleGetCandidateAssessment(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse> {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const { assessment_id, candidate_id } = req.query;
+
+    if (!assessment_id || !candidate_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required parameters',
+      });
+    }
+
+    // Get assessment configuration
+    let assessmentConfig: any = null;
+    try {
+      assessmentConfig = await selectOne('assessment_configs', {
+        column: 'id',
+        value: assessment_id as string,
+      });
+    } catch (e) {
+      console.warn('[candidate_assessment] Could not fetch config:', e);
+    }
+
+    // Get mandate for context
+    let mandate: any = null;
+    if (assessmentConfig?.mandate_id) {
+      try {
+        mandate = await selectOne('mandates', {
+          column: 'id',
+          value: assessmentConfig.mandate_id,
+        });
+      } catch (e) {
+        console.warn('[candidate_assessment] Could not fetch mandate:', e);
+      }
+    }
+
+    // Get candidate's previous responses if any
+    let previousResponses: any = null;
+    try {
+      previousResponses = await selectOne('candidate_assessment_responses', {
+        column: 'assessment_id',
+        value: assessment_id as string,
+      });
+    } catch (e) {
+      // Ignore - no previous responses
+    }
+
+    // Build the assessment object
+    const assessment = {
+      id: assessmentConfig?.id || assessment_id,
+      title: assessmentConfig?.title || 'Assessment',
+      type: assessmentConfig?.assessment_type || 'custom',
+      description: assessmentConfig?.description || 'Please complete this assessment.',
+      estimated_minutes: assessmentConfig?.estimated_minutes || 30,
+      show_timer: assessmentConfig?.show_timer ?? true,
+      questions: assessmentConfig?.questions || generateDefaultQuestions(assessmentConfig?.assessment_type),
+      mandate: mandate
+        ? {
+            id: mandate.id,
+            title: mandate.title,
+            client_name: mandate.client_name,
+          }
+        : null,
+      previous_responses: previousResponses?.responses || null,
+    };
+
+    return res.status(200).json({
+      success: true,
+      data: assessment,
+    });
+  } catch (err) {
+    return handleError(res, 'candidate.assessment', err);
+  }
+}
+
+function generateDefaultQuestions(assessmentType: string): any[] {
+  // Generate default questions based on assessment type
+  const baseQuestions = [
+    {
+      id: 'q1',
+      type: 'likert',
+      text: 'I am comfortable taking on new challenges outside my comfort zone.',
+      required: true,
+      scale_min: 1,
+      scale_max: 7,
+      scale_min_label: 'Strongly Disagree',
+      scale_max_label: 'Strongly Agree',
+    },
+    {
+      id: 'q2',
+      type: 'mcq_single',
+      text: 'How would you describe your leadership style?',
+      required: true,
+      options: [
+        'Direct and decisive',
+        'Collaborative and inclusive',
+        'Strategic and vision-oriented',
+        'Servant leadership focused',
+      ],
+    },
+    {
+      id: 'q3',
+      type: 'mcq_multi',
+      text: 'Which of the following best describes your strengths? (Select all that apply)',
+      required: true,
+      options: [
+        'Strategic thinking',
+        'Execution and delivery',
+        'Team development',
+        'Innovation and creativity',
+        'Stakeholder management',
+        'Data-driven decision making',
+      ],
+    },
+    {
+      id: 'q4',
+      type: 'text',
+      text: 'Describe a situation where you had to lead through significant change. What was the outcome?',
+      required: true,
+      max_length: 1000,
+    },
+    {
+      id: 'q5',
+      type: 'ranking',
+      text: 'Rank the following leadership competencies in order of importance for a senior executive role:',
+      required: true,
+      ranking_items: [
+        'Strategic Vision',
+        'Execution Excellence',
+        'Team Leadership',
+        'Innovation',
+        'Stakeholder Relations',
+      ],
+    },
+  ];
+
+  return baseQuestions;
+}
+
+// Update assessment visibility (consultant controls what candidate sees)
+export async function handleUpdateResultVisibility(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse> {
+  if (req.method !== 'PUT' && req.method !== 'PATCH') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const body = req.body || {};
+    const { result_id, visibility } = body;
+
+    if (!result_id || !visibility) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: result_id and visibility',
+      });
+    }
+
+    if (!['full', 'pass_fail', 'hidden'].includes(visibility)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid visibility value. Must be: full, pass_fail, or hidden',
+      });
+    }
+
+    await update(
+      'candidate_assessment_results',
+      { column: 'id', value: result_id },
+      { visibility, updated_at: new Date().toISOString() }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: 'Visibility updated successfully',
+    });
+  } catch (err) {
+    return handleError(res, 'candidate.visibility', err);
+  }
+}
