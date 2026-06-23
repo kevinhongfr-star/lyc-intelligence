@@ -3106,3 +3106,195 @@ export async function sendOfferToCandidate(offerId: string): Promise<boolean> {
     return false;
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// ML PREDICTION API (Phase 6.1)
+// ═══════════════════════════════════════════════════════════════
+
+export interface MLModelInfo {
+  id: string;
+  version: string;
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1_score: number;
+  trained_at: string;
+  training_samples: number;
+  is_active: boolean;
+}
+
+export interface PredictionResult {
+  score: number | null;
+  raw_probability: number | null;
+  confidence: 'high' | 'medium' | 'low';
+  model_version: string;
+  model_id: string | null;
+  features?: Record<string, number>;
+  message?: string;
+  uses_fallback: boolean;
+}
+
+export interface OverrideResult {
+  success: boolean;
+  message: string;
+}
+
+// Check ML data availability
+export async function checkMLDataAvailability(): Promise<{
+  has_sufficient_data: boolean;
+  placement_count: number;
+  minimum_required: number;
+}> {
+  try {
+    const res = await fetch('/api/data/ml/check-availability');
+    if (!res.ok) {
+      return { has_sufficient_data: false, placement_count: 0, minimum_required: 500 };
+    }
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return { has_sufficient_data: false, placement_count: 0, minimum_required: 500 };
+  } catch (e) {
+    console.error('[ML] checkDataAvailability error:', e);
+    return { has_sufficient_data: false, placement_count: 0, minimum_required: 500 };
+  }
+}
+
+// Get active ML model info
+export async function getActiveModelInfo(): Promise<MLModelInfo | null> {
+  try {
+    const res = await fetch('/api/data/ml/model');
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return null;
+  } catch (e) {
+    console.error('[ML] getActiveModelInfo error:', e);
+    return null;
+  }
+}
+
+// Predict candidate-mandate match score
+export async function predictMatchScoreML(
+  candidateId: string,
+  mandateId: string
+): Promise<PredictionResult | null> {
+  try {
+    const res = await fetch('/api/data/ml/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ candidate_id: candidateId, mandate_id: mandateId }),
+    });
+
+    if (!res.ok) return null;
+
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return null;
+  } catch (e) {
+    console.error('[ML] predictMatchScore error:', e);
+    return null;
+  }
+}
+
+// Override ML prediction
+export async function overrideMLPrediction(
+  candidateId: string,
+  mandateId: string,
+  overrideScore: number,
+  reason: string
+): Promise<OverrideResult> {
+  try {
+    const res = await fetch('/api/data/ml/override', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        candidate_id: candidateId,
+        mandate_id: mandateId,
+        override_score: overrideScore,
+        reason,
+      }),
+    });
+
+    if (!res.ok) {
+      return { success: false, message: 'Failed to override prediction' };
+    }
+
+    const result = await res.json();
+    return {
+      success: result.success,
+      message: result.message || 'Prediction overridden',
+    };
+  } catch (e) {
+    console.error('[ML] overridePrediction error:', e);
+    return { success: false, message: 'Network error' };
+  }
+}
+
+// Trigger model training (admin only)
+export async function triggerModelTraining(): Promise<{
+  success: boolean;
+  message: string;
+  estimated_duration?: string;
+}> {
+  try {
+    const res = await fetch('/api/data/ml/train', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) {
+      return { success: false, message: 'Failed to trigger training' };
+    }
+
+    const result = await res.json();
+    if (result.success && result.data) {
+      return result.data;
+    }
+    return { success: false, message: result.message || 'Training failed' };
+  } catch (e) {
+    console.error('[ML] triggerModelTraining error:', e);
+    return { success: false, message: 'Network error' };
+  }
+}
+
+// Combined scoring with ML prediction
+export interface CombinedScore {
+  ruleBasedScore: number;
+  mlPrediction: PredictionResult | null;
+  finalScore: number;
+  usesMlpScore: boolean;
+  hasOverride: boolean;
+  overrideScore?: number;
+  overrideReason?: string;
+}
+
+export async function getCombinedScore(
+  candidateId: string,
+  mandateId: string,
+  ruleBasedScore: number
+): Promise<CombinedScore> {
+  // Get ML prediction
+  const mlResult = await predictMatchScoreML(candidateId, mandateId);
+
+  // Check for existing override
+  // In production, this would check the prediction_logs or scoring_runs
+
+  const usesMlpScore = mlResult && !mlResult.uses_fallback && mlResult.score !== null;
+  const mlScore = mlResult?.score ?? ruleBasedScore;
+
+  return {
+    ruleBasedScore,
+    mlPrediction: mlResult,
+    finalScore: mlScore,
+    usesMlpScore,
+    hasOverride: false,
+  };
+}

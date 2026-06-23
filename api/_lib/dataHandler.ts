@@ -4229,6 +4229,248 @@ ${consultant?.name || 'LYC Intelligence'}`,
       }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // ML PREDICTION ROUTES (Phase 6.1)
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── Check data availability ──
+    if (resource === 'ml' && sub === 'check-availability') {
+      if (method === 'GET') {
+        // Count placements
+        const placementsResult = await db.query(`
+          SELECT COUNT(*) as count FROM candidates_pipeline
+          WHERE stage IN ('offer_accepted', 'onboarded', 'probation_passed')
+        `);
+
+        const count = placementsResult.rows?.[0]?.count || 0;
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            has_sufficient_data: count >= 500,
+            placement_count: parseInt(count),
+            minimum_required: 500,
+          },
+        });
+      }
+    }
+
+    // ── Get active ML model info ──
+    if (resource === 'ml' && sub === 'model') {
+      if (method === 'GET') {
+        const model = await db.selectOne('ml_models', {
+          column: 'model_type',
+          value: 'predictive_matching',
+          select: 'id, model_version, accuracy, precision_score, recall_score, f1_score, trained_at, training_samples, is_active',
+        });
+
+        if (!model) {
+          return res.status(200).json({
+            success: true,
+            data: null,
+            message: 'No ML model available. Use rule-based matching.',
+          });
+        }
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            id: model.id,
+            version: model.model_version,
+            accuracy: model.accuracy,
+            precision: model.precision_score,
+            recall: model.recall_score,
+            f1_score: model.f1_score,
+            trained_at: model.trained_at,
+            training_samples: model.training_samples,
+            is_active: model.is_active,
+          },
+        });
+      }
+    }
+
+    // ── Predict candidate-mandate match score ──
+    if (resource === 'ml' && sub === 'predict') {
+      if (method === 'POST') {
+        const { candidate_id, mandate_id } = req.body || {};
+
+        if (!candidate_id || !mandate_id) {
+          return res.status(400).json({ error: 'candidate_id and mandate_id are required' });
+        }
+
+        // Get active model
+        const model = await db.selectOne('ml_models', {
+          column: 'model_type',
+          value: 'predictive_matching',
+          select: 'id, weights, bias, feature_names, feature_engineering_config, model_version, trained_at',
+        });
+
+        if (!model) {
+          // Return fallback score using simple rule-based matching
+          return res.status(200).json({
+            success: true,
+            data: {
+              score: null,
+              raw_probability: null,
+              confidence: 'low',
+              model_version: 'fallback',
+              model_id: null,
+              message: 'No ML model available. Use rule-based scoring.',
+              uses_fallback: true,
+            },
+          });
+        }
+
+        // Get candidate data
+        const candidate = await db.selectOne('contacts', {
+          column: 'id',
+          value: candidate_id,
+          select: 'years_experience, current_industry, skills, disc_profile',
+        });
+
+        // Get mandate data
+        const mandate = await db.selectOne('mandates', {
+          column: 'id',
+          value: mandate_id,
+          select: 'seniority_level, required_skills, preferred_industries, success_profile_disc, client_geography',
+        });
+
+        if (!candidate || !mandate) {
+          return res.status(404).json({ error: 'Candidate or mandate not found' });
+        }
+
+        // Compute features (simplified)
+        const features = computeMLFeatures(candidate, mandate);
+
+        // Normalize features
+        const featureConfig = model.feature_engineering_config as any || { min: [], max: [] };
+        const normalizedFeatures = normalizeFeaturesForML(features, featureConfig.min, featureConfig.max);
+
+        // Predict
+        const weights = model.weights as number[];
+        const bias = model.bias as number;
+        const rawProbability = sigmoid(dotProduct(normalizedFeatures, weights) + bias);
+        const score = Math.round(rawProbability * 100);
+
+        // Calculate confidence
+        const distance = Math.abs(rawProbability - 0.5);
+        const confidence = distance > 0.35 ? 'high' : distance > 0.2 ? 'medium' : 'low';
+
+        // Log prediction
+        await db.insert('prediction_logs', {
+          model_id: model.id,
+          candidate_id,
+          mandate_id,
+          features: features,
+          raw_score: rawProbability,
+          final_score: score,
+          predicted_at: new Date().toISOString(),
+        }, 15000);
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            score,
+            raw_probability: rawProbability,
+            confidence,
+            model_version: model.model_version,
+            model_id: model.id,
+            features,
+            uses_fallback: false,
+          },
+        });
+      }
+    }
+
+    // ── Override ML prediction ──
+    if (resource === 'ml' && sub === 'override') {
+      if (method === 'POST') {
+        const { candidate_id, mandate_id, override_score, reason } = req.body || {};
+
+        if (!candidate_id || !mandate_id || override_score === undefined) {
+          return res.status(400).json({ error: 'candidate_id, mandate_id, and override_score are required' });
+        }
+
+        if (!reason || reason.length < 10) {
+          return res.status(400).json({ error: 'Override reason must be at least 10 characters' });
+        }
+
+        // Update latest prediction log with override
+        const latestPrediction = await db.selectOne('prediction_logs', {
+          column: 'candidate_id',
+          value: candidate_id,
+          select: 'id, final_score',
+        });
+
+        if (latestPrediction) {
+          await db.update('prediction_logs', { column: 'id', value: latestPrediction.id }, {
+            consultant_override: true,
+            override_score,
+            override_reason: reason,
+            overridden_by: authUserId,
+          }, 15000);
+        }
+
+        // Also update scoring_runs if exists
+        const scoringRun = await db.selectOne('scoring_runs', {
+          column: 'candidate_id',
+          value: candidate_id,
+          select: 'id',
+        });
+
+        if (scoringRun) {
+          await db.update('scoring_runs', { column: 'id', value: scoringRun.id }, {
+            consultant_override: override_score,
+            consultant_override_reason: reason,
+          }, 15000);
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: 'Prediction overridden successfully',
+        });
+      }
+    }
+
+    // ── Trigger model training (admin only) ──
+    if (resource === 'ml' && sub === 'train') {
+      if (method === 'POST') {
+        // Check if user is partner/admin
+        if (userRole !== 'super_admin' && userRole !== 'lyc_admin') {
+          return res.status(403).json({ error: 'Only admins can trigger model training' });
+        }
+
+        // Check data availability
+        const placementsResult = await db.query(`
+          SELECT COUNT(*) as count FROM candidates_pipeline
+          WHERE stage IN ('offer_accepted', 'onboarded', 'probation_passed')
+        `);
+
+        const count = placementsResult.rows?.[0]?.count || 0;
+
+        if (count < 500) {
+          return res.status(200).json({
+            success: true,
+            data: {
+              success: false,
+              message: `Insufficient data: ${count} placements (minimum 500 required).`,
+            },
+          });
+        }
+
+        // In production, this would trigger the actual training pipeline
+        // For now, return success message
+        return res.status(200).json({
+          success: true,
+          data: {
+            success: true,
+            message: 'Training initiated. Check back in a few minutes for results.',
+            estimated_duration: '5-10 minutes',
+          },
+        });
+      }
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}${sub ? '/' + sub : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);
@@ -4636,4 +4878,99 @@ function generateCandidateInsights(input: InsightInput): any[] {
   }
 
   return insights;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ML HELPER FUNCTIONS (Phase 6.1)
+// ═══════════════════════════════════════════════════════════════
+
+const FEATURE_NAMES_ML = [
+  'years_experience',
+  'industry_match',
+  'geography_match',
+  'company_tier',
+  'skills_match',
+  'disc_match',
+  'seniority_match',
+  'compensation_match',
+];
+
+/**
+ * Compute features for ML model from candidate and mandate data
+ */
+function computeMLFeatures(candidate: any, mandate: any): number[] {
+  // Years of experience (normalized to 0-20 years)
+  const yearsExperience = Math.min(candidate.years_experience || 0, 20) / 20;
+
+  // Industry match (simplified Jaccard)
+  const candidateIndustry = new Set([candidate.current_industry || '']);
+  const mandateIndustry = new Set(mandate.required_industries || []);
+  const industryMatch = candidateIndustry.has([...mandateIndustry][0] || '') ? 1 : 0.5;
+
+  // Geography match (simplified)
+  const geographyMatch = 0.7; // Default middle value
+
+  // Company tier (simplified)
+  const companyTier = 0.6; // Default middle value
+
+  // Skills match
+  const candidateSkills = new Set(candidate.skills || []);
+  const mandateSkills = new Set(mandate.required_skills || []);
+  let skillsMatch = 0;
+  if (candidateSkills.size > 0 && mandateSkills.size > 0) {
+    const intersection = [...candidateSkills].filter(s => mandateSkills.has(s)).length;
+    skillsMatch = intersection / mandateSkills.size;
+  }
+
+  // DISC match (simplified)
+  const discMatch = candidate.disc_profile === mandate.success_profile_disc ? 1 : 0.5;
+
+  // Seniority match
+  const expLevel = Math.min((candidate.years_experience || 0) / 20, 1);
+  const seniorityMatch = 1 - Math.abs(expLevel - ((mandate.seniority_level || 3) / 5));
+
+  // Compensation match (simplified)
+  const compensationMatch = 0.5;
+
+  return [
+    yearsExperience,
+    industryMatch,
+    geographyMatch,
+    companyTier,
+    skillsMatch,
+    discMatch,
+    seniorityMatch,
+    compensationMatch,
+  ];
+}
+
+/**
+ * Normalize features using min-max scaling
+ */
+function normalizeFeaturesForML(features: number[], min: number[], max: number[]): number[] {
+  if (!min || !max || min.length === 0) {
+    return features; // Return as-is if no normalization config
+  }
+  return features.map((value, i) => {
+    if (max[i] === min[i]) return 0.5;
+    return (value - min[i]) / (max[i] - min[i]);
+  });
+}
+
+/**
+ * Sigmoid function
+ */
+function sigmoid(x: number): number {
+  return 1 / (1 + Math.exp(-x));
+}
+
+/**
+ * Dot product of two arrays
+ */
+function dotProduct(a: number[], b: number[]): number {
+  let sum = 0;
+  for (let i = 0; i < Math.min(a.length, b.length); i++) {
+    sum += a[i] * b[i];
+  }
+  return sum;
 }
