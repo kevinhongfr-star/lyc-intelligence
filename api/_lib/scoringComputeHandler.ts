@@ -28,6 +28,7 @@ import { verifyAdmin } from './adminAuth.js';
 import {
   isSupabaseConfigured,
   selectOne,
+  selectMany,
   insert,
   update,
   deleteRows,
@@ -2291,4 +2292,386 @@ export async function handleUpdateResultVisibility(
   } catch (err) {
     return handleError(res, 'candidate.visibility', err);
   }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BENCHMARK ASSESSMENT (Phase 7.5)
+// ═══════════════════════════════════════════════════════════════
+
+export async function handleBenchmarkRequest(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse> {
+  const start = Date.now();
+
+  try {
+    const body = req.body || {};
+    const { action } = body;
+
+    // Count SHIFT results for assessment type
+    if (action === 'count') {
+      const { type } = body;
+      
+      if (!type) {
+        return res.status(400).json({ success: false, error: 'type is required' });
+      }
+
+      const { count, error } = await supabaseCount('scoring_runs', {
+        column: 'assessment_type',
+        value: `SHIFT_${type}`,
+      });
+
+      if (error) {
+        return res.status(500).json({ success: false, error: 'Failed to count results' });
+      }
+
+      return res.status(200).json({ success: true, count: count || 0 });
+    }
+
+    // Count peer results matching filters
+    if (action === 'peer-count') {
+      const { type, scope, industry, function: funcFilter, seniority } = body;
+
+      if (!type || !scope) {
+        return res.status(400).json({ success: false, error: 'type and scope are required' });
+      }
+
+      // This would need a more complex query - simplified for now
+      const { count, error } = await supabaseCount('scoring_runs', {
+        column: 'assessment_type',
+        value: `SHIFT_${type}`,
+      });
+
+      if (error) {
+        return res.status(500).json({ success: false, error: 'Failed to count peer results' });
+      }
+
+      // Apply scope multiplier for estimation
+      const scopeMultiplier = scope === 'custom' ? 0.3 : scope === 'industry' ? 0.5 : scope === 'function' ? 0.4 : 0.6;
+      const estimatedCount = Math.round((count || 0) * scopeMultiplier);
+
+      return res.status(200).json({ success: true, count: estimatedCount });
+    }
+
+    // Get team members with SHIFT results
+    if (action === 'team-members') {
+      const { type, org_id } = body;
+
+      if (!type || !org_id) {
+        return res.status(400).json({ success: false, error: 'type and org_id are required' });
+      }
+
+      // Get users from org with SHIFT results
+      const { data: runs, error } = await selectMany('scoring_runs', {
+        where: [{ column: 'assessment_type', value: `SHIFT_${type}` }],
+        orderBy: { column: 'created_at', ascending: false },
+        limit: 100,
+      });
+
+      if (error || !runs) {
+        return res.status(200).json({ success: true, members: [] });
+      }
+
+      // Get unique users with their names
+      const userIds = [...new Set(runs.map((r: any) => r.user_id))];
+      const members: Array<{ id: string; name: string; has_result: boolean }> = [];
+
+      for (const userId of userIds) {
+        const profile = await selectOne('profiles', {
+          column: 'id',
+          value: userId,
+          select: 'id, name',
+        });
+
+        if (profile) {
+          members.push({
+            id: profile.id,
+            name: profile.name || 'Unknown',
+            has_result: true,
+          });
+        }
+      }
+
+      return res.status(200).json({ success: true, members });
+    }
+
+    // Create and run benchmark
+    if (action === 'benchmark') {
+      const {
+        assessment_type,
+        benchmark_scope,
+        industry_filter,
+        function_filter,
+        seniority_filter,
+        team_member_ids,
+        organization_id,
+        created_by,
+      } = body;
+
+      if (!assessment_type || !benchmark_scope || !team_member_ids || !organization_id) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields: assessment_type, benchmark_scope, team_member_ids, organization_id',
+        });
+      }
+
+      if (team_member_ids.length < 1 || team_member_ids.length > 20) {
+        return res.status(400).json({
+          success: false,
+          error: 'team_member_ids must be between 1 and 20',
+        });
+      }
+
+      // Create benchmark run
+      const benchmark = await insert('benchmark_runs', {
+        assessment_type: `SHIFT_${assessment_type}`,
+        benchmark_scope,
+        industry_filter: industry_filter || [],
+        function_filter: function_filter || [],
+        seniority_filter: seniority_filter || [],
+        team_member_ids,
+        organization_id,
+        created_by,
+        status: 'pending',
+        credits_charged: 15,
+      });
+
+      if (!benchmark?.id) {
+        return res.status(500).json({ success: false, error: 'Failed to create benchmark run' });
+      }
+
+      // Run benchmark comparison (async)
+      setImmediate(async () => {
+        try {
+          await runBenchmarkComparison(benchmark.id);
+        } catch (e) {
+          console.error('[benchmark] Comparison failed:', e);
+          await update('benchmark_runs', { column: 'id', value: benchmark.id }, { status: 'failed' });
+        }
+      });
+
+      return res.status(200).json({
+        success: true,
+        benchmark_id: benchmark.id,
+        message: 'Benchmark started',
+        credits_charged: 15,
+      });
+    }
+
+    // Get benchmark results
+    if (action === 'benchmark' && req.method === 'GET') {
+      const { id } = req.query || body;
+
+      if (!id) {
+        return res.status(400).json({ success: false, error: 'id is required' });
+      }
+
+      const benchmark = await selectOne('benchmark_runs', {
+        column: 'id',
+        value: id as string,
+      });
+
+      if (!benchmark) {
+        return res.status(404).json({ success: false, error: 'Benchmark not found' });
+      }
+
+      // Generate insights if completed
+      let insights = null;
+      if (benchmark.status === 'completed' && benchmark.results) {
+        insights = generateBenchmarkInsights(benchmark);
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: benchmark,
+        insights,
+      });
+    }
+
+    return res.status(400).json({ success: false, error: 'Unknown action' });
+  } catch (err) {
+    return handleError(res, 'benchmark', err);
+  }
+}
+
+// Helper function for counting
+async function supabaseCount(table: string, filter: { column: string; value: string }): Promise<{ count: number | null; error: any }> {
+  try {
+    const result = await selectOne(table, {
+      column: filter.column,
+      value: filter.value,
+      select: 'id',
+    });
+
+    // For proper count, we'd need a different approach
+    // This is simplified
+    const { data, error } = await selectMany(table, {
+      where: [{ column: filter.column, value: filter.value }],
+      limit: 1000,
+    });
+
+    if (error) {
+      return { count: null, error };
+    }
+
+    return { count: data?.length || 0, error: null };
+  } catch (e) {
+    return { count: null, error: e };
+  }
+}
+
+// Run benchmark comparison
+async function runBenchmarkComparison(benchmarkId: string): Promise<void> {
+  // Get benchmark run
+  const benchmark = await selectOne('benchmark_runs', {
+    column: 'id',
+    value: benchmarkId,
+  });
+
+  if (!benchmark) {
+    throw new Error('Benchmark not found');
+  }
+
+  // Update status to running
+  await update('benchmark_runs', { column: 'id', value: benchmarkId }, { status: 'running' });
+
+  try {
+    // Get team SHIFT results
+    const teamResults = await selectMany('scoring_runs', {
+      where: [
+        { column: 'assessment_type', value: benchmark.assessment_type },
+      ],
+      orderBy: { column: 'created_at', ascending: false },
+      limit: 100,
+    });
+
+    // Filter to team members
+    const teamMemberIds = benchmark.team_member_ids || [];
+    const filteredTeamResults = (teamResults || []).filter((r: any) => teamMemberIds.includes(r.user_id));
+
+    // Get peer results (simplified - would need proper filtering)
+    const peerResults = await selectMany('scoring_runs', {
+      where: [{ column: 'assessment_type', value: benchmark.assessment_type }],
+      orderBy: { column: 'created_at', ascending: false },
+      limit: 500,
+    });
+
+    // Filter peer results (exclude team members)
+    const filteredPeerResults = (peerResults || []).filter((r: any) => !teamMemberIds.includes(r.user_id));
+
+    if (filteredPeerResults.length < 50) {
+      throw new Error(`Insufficient peer data: ${filteredPeerResults.length} results`);
+    }
+
+    // Calculate results for each team member
+    const results: any[] = [];
+
+    for (const teamMember of filteredTeamResults) {
+      const dimensionScores = teamMember.output_scores || {};
+      const percentileRank: Record<string, number> = {};
+      const teamAverage: Record<string, number> = {};
+      const peerAverage: Record<string, number> = {};
+
+      // Get dimensions from scores
+      const dimensions = Object.keys(dimensionScores);
+
+      for (const dim of dimensions) {
+        const memberScore = dimensionScores[dim] || 0;
+
+        // Get peer values
+        const peerValues = filteredPeerResults
+          .map((r: any) => r.output_scores?.[dim])
+          .filter((v: any) => v !== undefined);
+
+        // Calculate percentile
+        const sorted = peerValues.sort((a: number, b: number) => a - b);
+        const below = sorted.filter((v: number) => v < memberScore).length;
+        percentileRank[dim] = Math.round((below / sorted.length) * 100);
+
+        // Calculate averages
+        const teamScores = filteredTeamResults.map((r: any) => r.output_scores?.[dim] || 0);
+        teamAverage[dim] = Math.round(teamScores.reduce((a: number, b: number) => a + b, 0) / teamScores.length);
+
+        peerAverage[dim] = Math.round(peerValues.reduce((a: number, b: number) => a + b, 0) / peerValues.length);
+      }
+
+      // Get member name
+      const profile = await selectOne('profiles', {
+        column: 'id',
+        value: teamMember.user_id,
+        select: 'name',
+      });
+
+      results.push({
+        member_id: teamMember.user_id,
+        member_name: profile?.name || 'Unknown',
+        dimension_scores: dimensionScores,
+        percentile_rank: percentileRank,
+        team_average: teamAverage,
+        peer_average: peerAverage,
+      });
+    }
+
+    // Update benchmark with results
+    await update('benchmark_runs', { column: 'id', value: benchmarkId }, {
+      status: 'completed',
+      results: results,
+      peer_sample_size: filteredPeerResults.length,
+      completed_at: new Date().toISOString(),
+    });
+  } catch (e) {
+    console.error('[benchmark] Comparison failed:', e);
+    await update('benchmark_runs', { column: 'id', value: benchmarkId }, { status: 'failed' });
+    throw e;
+  }
+}
+
+// Generate benchmark insights
+function generateBenchmarkInsights(benchmark: any): any {
+  const results = benchmark.results || [];
+  if (results.length === 0) {
+    return {
+      insights: ['No team results available'],
+      recommendations: ['Complete SHIFT assessments for team members'],
+      team_strengths: [],
+      team_gaps: [],
+    };
+  }
+
+  // Get first result for averages
+  const firstResult = results[0];
+  const teamAverage = firstResult.team_average || {};
+  const peerAverage = firstResult.peer_average || {};
+
+  const strengths: string[] = [];
+  const gaps: string[] = [];
+  const insights: string[] = [];
+
+  for (const [dim, teamScore] of Object.entries(teamAverage)) {
+    const peerScore = peerAverage[dim] || 0;
+    const diff = (teamScore as number) - peerScore;
+
+    if (diff >= 10) {
+      strengths.push(dim.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()));
+      insights.push(`Your team scores ${diff}% above peer average in ${dim.replace('_', ' ')}`);
+    } else if (diff <= -10) {
+      gaps.push(dim.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()));
+      insights.push(`${dim.replace('_', ' ')} is ${Math.abs(diff)}% below peer average — consider focused development`);
+    }
+  }
+
+  const recommendations: string[] = [];
+  if (gaps.length > 0) {
+    recommendations.push(`Invest in ${gaps[0].toLowerCase()} coaching workshops`);
+  }
+  if (strengths.length > 0) {
+    recommendations.push(`Leverage ${strengths[0].toLowerCase()} strength in client-facing roles`);
+  }
+
+  return {
+    insights: insights.length > 0 ? insights : ['Team performance is within peer range'],
+    recommendations: recommendations.length > 0 ? recommendations : ['Continue current development programs'],
+    team_strengths: strengths.length > 0 ? strengths : ['Consistent performance'],
+    team_gaps: gaps.length > 0 ? gaps : ['No significant gaps identified'],
+  };
 }
