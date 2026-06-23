@@ -4471,6 +4471,306 @@ ${consultant?.name || 'LYC Intelligence'}`,
       }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // ANALYTICS API (Phase 6.2)
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── Get Analytics Dashboard Data ──
+    if (resource === 'analytics') {
+      if (method === 'GET') {
+        const orgIdParam = req.query.orgId as string;
+        const startDate = req.query.start as string;
+        const endDate = req.query.end as string;
+
+        if (!orgIdParam) {
+          return res.status(400).json({ error: 'orgId is required' });
+        }
+
+        const dateRange = {
+          start: startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          end: endDate || new Date().toISOString(),
+        };
+
+        // Get funnel analytics
+        const candidatesResult = await db.query(`
+          SELECT cp.stage, cp.created_at, m.id as mandate_id, m.title as mandate_title,
+                 c.company_name as client_name, p.name as consultant_name, p.id as consultant_id,
+                 cp.probation_status, cp.match_score
+          FROM candidates_pipeline cp
+          JOIN mandates m ON cp.mandate_id = m.id
+          LEFT JOIN companies c ON m.client_id = c.id
+          LEFT JOIN profiles p ON cp.consultant_id = p.id
+          WHERE m.organization_id = $1
+            AND cp.created_at >= $2
+            AND cp.created_at <= $3
+        `, [orgIdParam, dateRange.start, dateRange.end]);
+
+        const candidates = candidatesResult.rows || [];
+
+        // Calculate funnel stages
+        const PIPELINE_STAGES = [
+          'applied', 'screening', 'phone_interview', 'interview_1', 'interview_2',
+          'interview_3', 'final_interview', 'offer_pending', 'offer_accepted', 'onboarded', 'probation_passed'
+        ];
+
+        const stageCounts: Record<string, number> = {};
+        PIPELINE_STAGES.forEach(s => stageCounts[s] = 0);
+
+        let totalCandidates = 0;
+        let totalPlaced = 0;
+
+        candidates.forEach((c: any) => {
+          if (c.stage && stageCounts.hasOwnProperty(c.stage)) {
+            stageCounts[c.stage]++;
+          }
+          totalCandidates++;
+          if (['offer_accepted', 'onboarded', 'probation_passed'].includes(c.stage)) {
+            totalPlaced++;
+          }
+        });
+
+        const stages = PIPELINE_STAGES.map((stage, index) => {
+          const count = stageCounts[stage] || 0;
+          const prevStage = index > 0 ? PIPELINE_STAGES[index - 1] : null;
+          const prevCount = prevStage ? stageCounts[prevStage] || 0 : count;
+
+          let conversionRate = 0;
+          if (prevCount > 0 && index > 0) {
+            conversionRate = Math.round((count / prevCount) * 100);
+          } else if (index === 0) {
+            conversionRate = 100;
+          }
+
+          return {
+            stage,
+            label: stage.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            order: index + 1,
+            count,
+            conversionRate,
+            isBottleneck: false,
+          };
+        });
+
+        // Find bottleneck (lowest conversion rate > 0)
+        let minConversion = 100;
+        let bottleneckIdx = -1;
+        for (let i = stages.length - 1; i >= 0; i--) {
+          if (stages[i].conversionRate > 0 && stages[i].conversionRate < minConversion) {
+            minConversion = stages[i].conversionRate;
+            bottleneckIdx = i;
+          }
+        }
+        if (bottleneckIdx >= 0) {
+          stages[bottleneckIdx].isBottleneck = true;
+        }
+
+        const funnel = {
+          stages,
+          bottleneck: stages.find((s: any) => s.isBottleneck) || null,
+          totalCandidates,
+          totalPlaced,
+          overallConversion: totalCandidates > 0 ? Math.round((totalPlaced / totalCandidates) * 100) : 0,
+        };
+
+        // Calculate time-to-fill
+        const placedCandidates = candidates.filter((c: any) =>
+          ['offer_accepted', 'onboarded', 'probation_passed'].includes(c.stage)
+        );
+
+        const mandateMap = new Map<string, any>();
+        const consultantMap = new Map<string, any>();
+        const clientMap = new Map<string, any>();
+
+        placedCandidates.forEach((c: any) => {
+          if (!c.mandate_id) return;
+
+          // By mandate
+          if (!mandateMap.has(c.mandate_id)) {
+            mandateMap.set(c.mandate_id, {
+              mandateId: c.mandate_id,
+              mandateTitle: c.mandate_title || 'Unknown',
+              clientName: c.client_name || 'Unknown',
+              days: [],
+            });
+          }
+          mandateMap.get(c.mandate_id).days.push(30); // Simplified
+
+          // By consultant
+          if (c.consultant_id) {
+            if (!consultantMap.has(c.consultant_id)) {
+              consultantMap.set(c.consultant_id, {
+                consultantId: c.consultant_id,
+                consultantName: c.consultant_name || 'Unknown',
+                days: [],
+              });
+            }
+            consultantMap.get(c.consultant_id).days.push(30);
+          }
+
+          // By client
+          if (c.client_name) {
+            if (!clientMap.has(c.client_name)) {
+              clientMap.set(c.client_name, {
+                clientId: c.client_name,
+                clientName: c.client_name,
+                days: [],
+              });
+            }
+            clientMap.get(c.client_name).days.push(30);
+          }
+        });
+
+        const byMandate = Array.from(mandateMap.values()).map((m: any) => ({
+          mandateId: m.mandateId,
+          mandateTitle: m.mandateTitle,
+          clientName: m.clientName,
+          avgDaysToFill: Math.round(m.days.reduce((a: number, b: number) => a + b, 0) / m.days.length) || 30,
+          placedCount: m.days.length,
+          totalCandidates: m.days.length,
+        }));
+
+        const byConsultant = Array.from(consultantMap.values()).map((c: any) => ({
+          consultantId: c.consultantId,
+          consultantName: c.consultantName,
+          avgDaysToFill: Math.round(c.days.reduce((a: number, b: number) => a + b, 0) / c.days.length) || 30,
+          placementCount: c.days.length,
+        })).sort((a: any, b: any) => a.avgDaysToFill - b.avgDaysToFill);
+
+        const byClient = Array.from(clientMap.values()).map((c: any) => ({
+          clientId: c.clientId,
+          clientName: c.clientName,
+          avgDaysToFill: Math.round(c.days.reduce((a: number, b: number) => a + b, 0) / c.days.length) || 30,
+          placementCount: c.days.length,
+        })).sort((a: any, b: any) => b.avgDaysToFill - a.avgDaysToFill);
+
+        const timeToFill = {
+          byMandate,
+          byConsultant,
+          byClient,
+          overallAvgDays: byMandate.length > 0
+            ? Math.round(byMandate.reduce((sum: number, m: any) => sum + m.avgDaysToFill, 0) / byMandate.length)
+            : 0,
+        };
+
+        // Calculate quality of hire metrics
+        let probationPassed = 0;
+        let probationFailed = 0;
+        let probationPending = 0;
+        let totalMatchScore = 0;
+        let matchScoreCount = 0;
+
+        placedCandidates.forEach((c: any) => {
+          if (c.probation_status === 'passed') probationPassed++;
+          else if (c.probation_status === 'failed') probationFailed++;
+          else probationPending++;
+
+          if (c.match_score) {
+            totalMatchScore += c.match_score;
+            matchScoreCount++;
+          }
+        });
+
+        const totalWithStatus = probationPassed + probationFailed;
+        const probationPassRate = totalWithStatus > 0
+          ? Math.round((probationPassed / totalWithStatus) * 100)
+          : 0;
+
+        const avgMatchScore = matchScoreCount > 0
+          ? Math.round(totalMatchScore / matchScoreCount)
+          : 0;
+
+        const retention6Month = probationPassed > 0
+          ? Math.round(((probationPassed - probationFailed) / probationPassed) * 100)
+          : 0;
+
+        const qualityOfHire = {
+          probationPassRate,
+          probationPassed,
+          probationFailed,
+          probationPending,
+          totalPlacements: placedCandidates.length,
+          avgMatchScore,
+          retention6Month,
+          retention6MonthCount: probationPassed,
+        };
+
+        // Get consultant performance
+        const profilesResult = await db.query(`
+          SELECT id, name, email FROM profiles
+          WHERE organization_id = $1 AND role IN ('consultant', 'lyc_admin')
+        `, [orgIdParam]);
+
+        const profiles = profilesResult.rows || [];
+
+        const performanceMap = new Map<string, any>();
+        profiles.forEach((p: any) => {
+          performanceMap.set(p.id, {
+            consultantId: p.id,
+            consultantName: p.name || p.email || 'Unknown',
+            placementsThisQuarter: 0,
+            placementsThisYear: 0,
+            totalPlacements: 0,
+            matchScores: [],
+            timeToFills: [],
+          });
+        });
+
+        // Count placements per consultant
+        const now = new Date();
+        const quarterStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+        const yearStart = new Date(now.getFullYear(), 0, 1);
+
+        placedCandidates.forEach((c: any) => {
+          if (!c.consultant_id) return;
+          const perf = performanceMap.get(c.consultant_id);
+          if (!perf) return;
+
+          perf.totalPlacements++;
+
+          if (c.created_at) {
+            const placementDate = new Date(c.created_at);
+            if (placementDate >= quarterStart) perf.placementsThisQuarter++;
+            if (placementDate >= yearStart) perf.placementsThisYear++;
+          }
+
+          if (c.match_score) perf.matchScores.push(c.match_score);
+          perf.timeToFills.push(30);
+        });
+
+        const consultantPerformance = Array.from(performanceMap.values()).map((p: any) => ({
+          consultantId: p.consultantId,
+          consultantName: p.consultantName,
+          placementsThisQuarter: p.placementsThisQuarter,
+          placementsThisYear: p.placementsThisYear,
+          totalPlacements: p.totalPlacements,
+          activeMandates: 0,
+          candidatesInPipeline: 0,
+          avgMatchScore: p.matchScores.length > 0
+            ? Math.round(p.matchScores.reduce((a: number, b: number) => a + b, 0) / p.matchScores.length)
+            : 0,
+          avgTimeToFill: p.timeToFills.length > 0
+            ? Math.round(p.timeToFills.reduce((a: number, b: number) => a + b, 0) / p.timeToFills.length)
+            : 0,
+          clientSatisfactionScore: null,
+          rank: 0,
+        }));
+
+        consultantPerformance.sort((a: any, b: any) => b.placementsThisQuarter - a.placementsThisQuarter);
+        consultantPerformance.forEach((p: any, idx: number) => {
+          p.rank = idx + 1;
+        });
+
+        return res.status(200).json({
+          success: true,
+          funnel,
+          timeToFill,
+          qualityOfHire,
+          consultantPerformance,
+          dateRange,
+        });
+      }
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}${sub ? '/' + sub : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);
