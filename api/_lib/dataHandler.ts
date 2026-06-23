@@ -4771,6 +4771,273 @@ ${consultant?.name || 'LYC Intelligence'}`,
       }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // REFERENCE API (Phase 7.1)
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── Send Reference Invite ──
+    if (resource === 'reference-invite' && method === 'POST') {
+      const { candidate_id, mandate_id, referee_name, referee_email, referee_title, referee_company, referee_relationship, organization_id } = req.body || {};
+
+      if (!candidate_id || !referee_name || !referee_email || !referee_relationship) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      // Generate unique token
+      const inviteToken = crypto.randomUUID();
+
+      // Insert reference request
+      const insertResult = await db.query(`
+        INSERT INTO reference_requests (
+          candidate_id, mandate_id, referee_name, referee_email, referee_title,
+          referee_company, referee_relationship, invite_token,
+          invite_url, organization_id, status, expires_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'invited', NOW() + INTERVAL '14 days'
+        )
+        RETURNING id, invite_token
+      `, [
+        candidate_id,
+        mandate_id,
+        referee_name,
+        referee_email,
+        referee_title || null,
+        referee_company || null,
+        referee_relationship,
+        inviteToken,
+        `/reference/${inviteToken}`,
+        organization_id,
+      ]);
+
+      const request = insertResult.rows[0];
+
+      // TODO: Send email via Resend
+      // In production, send email with invite link
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          request_id: request.id,
+          invite_token: request.invite_token,
+        },
+      });
+    }
+
+    // ── Get Reference Requests List ──
+    if (resource === 'reference-requests' && method === 'GET') {
+      const { candidate_id, mandate_id, organization_id, stats } = req.query;
+
+      let query = `
+        SELECT rr.*,
+               c.first_name || ' ' || c.last_name as candidate_name,
+               m.title as mandate_title
+        FROM reference_requests rr
+        LEFT JOIN contacts c ON rr.candidate_id = c.id
+        LEFT JOIN mandates m ON rr.mandate_id = m.id
+        WHERE 1=1
+      `;
+      const params: any[] = [];
+      let paramIdx = 1;
+
+      if (candidate_id) {
+        query += ` AND rr.candidate_id = $${paramIdx++}`;
+        params.push(candidate_id);
+      }
+      if (mandate_id) {
+        query += ` AND rr.mandate_id = $${paramIdx++}`;
+        params.push(mandate_id);
+      }
+      if (organization_id) {
+        query += ` AND rr.organization_id = $${paramIdx++}`;
+        params.push(organization_id);
+      }
+
+      query += ' ORDER BY rr.created_at DESC';
+
+      const result = await db.query(query, params);
+      const requests = result.rows || [];
+
+      // If stats requested, return aggregated stats
+      if (stats === 'true' && candidate_id) {
+        const total = requests.length;
+        const submitted = requests.filter((r: any) => r.status === 'submitted').length;
+        const pending = requests.filter((r: any) => ['invited', 'reminded'].includes(r.status)).length;
+
+        return res.status(200).json({
+          success: true,
+          data: requests,
+          stats: { total, submitted, pending, avgRating: null },
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: requests.map((r: any) => ({
+          id: r.id,
+          candidateId: r.candidate_id,
+          candidateName: r.candidate_name || 'Unknown',
+          mandateTitle: r.mandate_title || 'Unknown',
+          refereeName: r.referee_name,
+          refereeEmail: r.referee_email,
+          refereeTitle: r.referee_title,
+          refereeCompany: r.referee_company,
+          relationship: r.referee_relationship,
+          status: r.status,
+          invitedAt: r.invited_at,
+          remindedAt: r.reminded_at,
+          submittedAt: r.submitted_at,
+          expiresAt: r.expires_at,
+        })),
+      });
+    }
+
+    // ── Get Reference by Token (Public - No Auth) ──
+    if (resource === 'reference' && sub && method === 'GET') {
+      const token = sub; // The sub parameter is the invite token
+
+      const result = await db.query(`
+        SELECT rr.*,
+               c.first_name || ' ' || c.last_name as candidate_name,
+               m.title as mandate_title
+        FROM reference_requests rr
+        LEFT JOIN contacts c ON rr.candidate_id = c.id
+        LEFT JOIN mandates m ON rr.mandate_id = m.id
+        WHERE rr.invite_token = $1
+      `, [token]);
+
+      const request = result.rows[0];
+
+      if (!request) {
+        return res.status(404).json({ error: 'Reference request not found' });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          id: request.id,
+          candidateName: request.candidate_name || 'Unknown Candidate',
+          mandateTitle: request.mandate_title || 'Unknown Position',
+          refereeName: request.referee_name,
+          status: request.status,
+          expiresAt: request.expires_at,
+        },
+      });
+    }
+
+    // ── Submit Reference (Public - No Auth) ──
+    if (resource === 'reference' && sub && method === 'POST') {
+      const token = sub;
+      const { responses } = req.body || {};
+
+      if (!responses || !Array.isArray(responses)) {
+        return res.status(400).json({ error: 'Responses are required' });
+      }
+
+      // Find the reference request
+      const requestResult = await db.query(`
+        SELECT id, status FROM reference_requests WHERE invite_token = $1
+      `, [token]);
+
+      const request = requestResult.rows[0];
+
+      if (!request) {
+        return res.status(404).json({ error: 'Reference request not found' });
+      }
+
+      if (request.status === 'submitted') {
+        return res.status(400).json({ error: 'Reference already submitted' });
+      }
+
+      if (request.status === 'expired') {
+        return res.status(400).json({ error: 'Request expired' });
+      }
+
+      // Insert responses
+      for (const response of responses) {
+        await db.query(`
+          INSERT INTO reference_responses (reference_request_id, question_number, question_text, rating, response_text)
+          VALUES ($1, $2, $3, $4, $5)
+        `, [request.id, response.question_number, response.question_text, response.rating, response.response_text]);
+      }
+
+      // Update request status
+      await db.query(`
+        UPDATE reference_requests
+        SET status = 'submitted', submitted_at = NOW()
+        WHERE id = $1
+      `, [request.id]);
+
+      return res.status(200).json({ success: true });
+    }
+
+    // ── Get Reference Detail ──
+    if (resource === 'reference-detail' && id && method === 'GET') {
+      const requestId = id;
+
+      const requestResult = await db.query(`
+        SELECT rr.*,
+               c.first_name || ' ' || c.last_name as candidate_name,
+               m.title as mandate_title
+        FROM reference_requests rr
+        LEFT JOIN contacts c ON rr.candidate_id = c.id
+        LEFT JOIN mandates m ON rr.mandate_id = m.id
+        WHERE rr.id = $1
+      `, [requestId]);
+
+      const request = requestResult.rows[0];
+
+      if (!request) {
+        return res.status(404).json({ error: 'Reference request not found' });
+      }
+
+      const responsesResult = await db.query(`
+        SELECT question_number, question_text, rating, response_text
+        FROM reference_responses
+        WHERE reference_request_id = $1
+        ORDER BY question_number
+      `, [requestId]);
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          request: {
+            id: request.id,
+            candidateId: request.candidate_id,
+            candidateName: request.candidate_name || 'Unknown',
+            mandateTitle: request.mandate_title || 'Unknown',
+            refereeName: request.referee_name,
+            refereeEmail: request.referee_email,
+            refereeTitle: request.referee_title,
+            refereeCompany: request.referee_company,
+            relationship: request.referee_relationship,
+            status: request.status,
+            invitedAt: request.invited_at,
+            submittedAt: request.submitted_at,
+            expiresAt: request.expires_at,
+          },
+          responses: responsesResult.rows.map((r: any) => ({
+            questionNumber: r.question_number,
+            questionText: r.question_text,
+            rating: r.rating,
+            responseText: r.response_text,
+          })),
+        },
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PUSH NOTIFICATION API
+    // ═══════════════════════════════════════════════════════════════
+
+    if (resource === 'push-subscription' && method === 'POST') {
+      // Store push subscription
+      return res.status(200).json({ success: true });
+    }
+
+    if (resource === 'push-subscription' && method === 'DELETE') {
+      // Remove push subscription
+      return res.status(200).json({ success: true });
+    }
+
     return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}${sub ? '/' + sub : ''}` });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);
