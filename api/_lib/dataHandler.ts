@@ -5025,6 +5025,278 @@ ${consultant?.name || 'LYC Intelligence'}`,
     }
 
     // ═══════════════════════════════════════════════════════════════
+    // QUESTIONS API (Phase 7.2)
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── Get Questions List ──
+    if (resource === 'questions' && method === 'GET') {
+      const { organization_id, user_id } = req.query;
+
+      const result = await db.query(`
+        SELECT q.* FROM questions q
+        WHERE q.is_system = true
+           OR q.organization_id = $1
+           OR q.created_by = $2
+        ORDER BY q.usage_count DESC, q.created_at DESC
+      `, [organization_id || '', user_id || '']);
+
+      return res.status(200).json({
+        success: true,
+        data: result.rows.map((q: any) => ({
+          id: q.id,
+          questionText: q.question_text,
+          competency: q.competency,
+          difficulty: q.difficulty,
+          expectedAnswer: q.expected_answer,
+          followUpQuestion: q.follow_up_question,
+          isSystem: q.is_system,
+          createdBy: q.created_by,
+          starredBy: q.starred_by || [],
+          usageCount: q.usage_count || 0,
+          createdAt: q.created_at,
+          updatedAt: q.updated_at,
+        })),
+      });
+    }
+
+    // ── Create Question ──
+    if (resource === 'questions' && method === 'POST') {
+      const { question_text, competency, difficulty, expected_answer, follow_up_question, organization_id, created_by } = req.body || {};
+
+      if (!question_text || !competency) {
+        return res.status(400).json({ error: 'Question text and competency are required' });
+      }
+
+      const result = await db.query(`
+        INSERT INTO questions (
+          question_text, competency, difficulty, expected_answer,
+          follow_up_question, organization_id, created_by, is_system
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, false)
+        RETURNING *
+      `, [
+        question_text,
+        competency,
+        difficulty || 2,
+        expected_answer || null,
+        follow_up_question || null,
+        organization_id,
+        created_by,
+      ]);
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          id: result.rows[0].id,
+          questionText: result.rows[0].question_text,
+          competency: result.rows[0].competency,
+          difficulty: result.rows[0].difficulty,
+          expectedAnswer: result.rows[0].expected_answer,
+          followUpQuestion: result.rows[0].follow_up_question,
+          isSystem: false,
+          createdBy: result.rows[0].created_by,
+          starredBy: [],
+          usageCount: 0,
+        },
+      });
+    }
+
+    // ── Get Single Question ──
+    if (resource === 'questions' && id && method === 'GET') {
+      const result = await db.query(`
+        SELECT * FROM questions WHERE id = $1
+      `, [id]);
+
+      if (!result.rows[0]) {
+        return res.status(404).json({ error: 'Question not found' });
+      }
+
+      const q = result.rows[0];
+      return res.status(200).json({
+        success: true,
+        data: {
+          id: q.id,
+          questionText: q.question_text,
+          competency: q.competency,
+          difficulty: q.difficulty,
+          expectedAnswer: q.expected_answer,
+          followUpQuestion: q.follow_up_question,
+          isSystem: q.is_system,
+          createdBy: q.created_by,
+          starredBy: q.starred_by || [],
+          usageCount: q.usage_count || 0,
+          createdAt: q.created_at,
+          updatedAt: q.updated_at,
+        },
+      });
+    }
+
+    // ── Update Question ──
+    if (resource === 'questions' && id && method === 'PATCH') {
+      const { question_text, competency, difficulty, expected_answer, follow_up_question } = req.body || {};
+
+      const result = await db.query(`
+        UPDATE questions
+        SET question_text = COALESCE($1, question_text),
+            competency = COALESCE($2, competency),
+            difficulty = COALESCE($3, difficulty),
+            expected_answer = COALESCE($4, expected_answer),
+            follow_up_question = COALESCE($5, follow_up_question),
+            updated_at = NOW()
+        WHERE id = $6 AND is_system = false
+        RETURNING *
+      `, [question_text, competency, difficulty, expected_answer, follow_up_question, id]);
+
+      if (!result.rows[0]) {
+        return res.status(404).json({ error: 'Question not found or is system question' });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          id: result.rows[0].id,
+          questionText: result.rows[0].question_text,
+          competency: result.rows[0].competency,
+          difficulty: result.rows[0].difficulty,
+          expectedAnswer: result.rows[0].expected_answer,
+          followUpQuestion: result.rows[0].follow_up_question,
+          isSystem: false,
+          createdBy: result.rows[0].created_by,
+          starredBy: result.rows[0].starred_by || [],
+          usageCount: result.rows[0].usage_count || 0,
+        },
+      });
+    }
+
+    // ── Delete Question ──
+    if (resource === 'questions' && id && method === 'DELETE') {
+      const result = await db.query(`
+        DELETE FROM questions WHERE id = $1 AND is_system = false
+      `, [id]);
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Question not found or is system question' });
+      }
+
+      return res.status(200).json({ success: true });
+    }
+
+    // ── Star/Unstar Question ──
+    if (resource === 'questions' && id && sub === 'star' && method === 'POST') {
+      const { user_id } = req.body || {};
+
+      // Get current starred_by
+      const currentResult = await db.query(`
+        SELECT starred_by FROM questions WHERE id = $1
+      `, [id]);
+
+      if (!currentResult.rows[0]) {
+        return res.status(404).json({ error: 'Question not found' });
+      }
+
+      const currentStarred = currentResult.rows[0].starred_by || [];
+      const isStarred = currentStarred.includes(user_id);
+      const newStarred = isStarred
+        ? currentStarred.filter((uid: string) => uid !== user_id)
+        : [...currentStarred, user_id];
+
+      await db.query(`
+        UPDATE questions SET starred_by = $1 WHERE id = $2
+      `, [newStarred, id]);
+
+      return res.status(200).json({ success: true });
+    }
+
+    // ── Get Question Sets List ──
+    if (resource === 'question-sets' && method === 'GET') {
+      const { organization_id } = req.query;
+
+      const result = await db.query(`
+        SELECT * FROM question_sets
+        WHERE organization_id = $1
+        ORDER BY created_at DESC
+      `, [organization_id || '']);
+
+      return res.status(200).json({
+        success: true,
+        data: result.rows.map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          description: s.description,
+          questionIds: s.question_ids || [],
+          isShared: s.is_shared,
+          createdBy: s.created_by,
+          createdAt: s.created_at,
+        })),
+      });
+    }
+
+    // ── Create Question Set ──
+    if (resource === 'question-sets' && method === 'POST') {
+      const { name, description, question_ids, is_shared, organization_id, created_by } = req.body || {};
+
+      if (!name || !question_ids?.length) {
+        return res.status(400).json({ error: 'Name and questions are required' });
+      }
+
+      const result = await db.query(`
+        INSERT INTO question_sets (name, description, question_ids, is_shared, organization_id, created_by)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING *
+      `, [name, description || null, question_ids, is_shared || false, organization_id, created_by]);
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          id: result.rows[0].id,
+          name: result.rows[0].name,
+          description: result.rows[0].description,
+          questionIds: result.rows[0].question_ids,
+          isShared: result.rows[0].is_shared,
+          createdBy: result.rows[0].created_by,
+          createdAt: result.rows[0].created_at,
+        },
+      });
+    }
+
+    // ── Update Question Set ──
+    if (resource === 'question-sets' && id && method === 'PATCH') {
+      const { name, description, question_ids, is_shared } = req.body || {};
+
+      const result = await db.query(`
+        UPDATE question_sets
+        SET name = COALESCE($1, name),
+            description = COALESCE($2, description),
+            question_ids = COALESCE($3, question_ids),
+            is_shared = COALESCE($4, is_shared)
+        WHERE id = $5
+        RETURNING *
+      `, [name, description, question_ids, is_shared, id]);
+
+      if (!result.rows[0]) {
+        return res.status(404).json({ error: 'Question set not found' });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          id: result.rows[0].id,
+          name: result.rows[0].name,
+          description: result.rows[0].description,
+          questionIds: result.rows[0].question_ids,
+          isShared: result.rows[0].is_shared,
+          createdBy: result.rows[0].created_by,
+          createdAt: result.rows[0].created_at,
+        },
+      });
+    }
+
+    // ── Delete Question Set ──
+    if (resource === 'question-sets' && id && method === 'DELETE') {
+      await db.query(`DELETE FROM question_sets WHERE id = $1`, [id]);
+      return res.status(200).json({ success: true });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
     // PUSH NOTIFICATION API
     // ═══════════════════════════════════════════════════════════════
 
