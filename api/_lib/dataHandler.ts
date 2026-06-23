@@ -5297,6 +5297,190 @@ ${consultant?.name || 'LYC Intelligence'}`,
     }
 
     // ═══════════════════════════════════════════════════════════════
+    // NOTIFICATIONS API (Phase 7.3)
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── Get User Notifications ──
+    if (resource === 'notifications' && method === 'GET') {
+      const { user_id, limit, offset, filter } = req.query;
+
+      let query = `
+        SELECT * FROM notifications
+        WHERE user_id = $1
+        ORDER BY created_at DESC
+      `;
+      const params: any[] = [user_id || ''];
+
+      if (filter === 'unread') {
+        query += ' AND read = false';
+      } else if (filter && filter !== 'all') {
+        query += ' AND type = $2';
+        params.push(filter);
+      }
+
+      if (limit) {
+        const start = parseInt(offset || '0');
+        const end = start + parseInt(limit);
+        query += ` OFFSET ${start} LIMIT ${limit}`;
+      }
+
+      const result = await db.query(query, params);
+
+      return res.status(200).json({
+        success: true,
+        data: result.rows.map((n: any) => ({
+          id: n.id,
+          userId: n.user_id,
+          type: n.type,
+          title: n.title,
+          message: n.message,
+          link: n.link,
+          read: n.read,
+          emailSent: n.email_sent,
+          createdAt: n.created_at,
+        })),
+      });
+    }
+
+    // ── Create Notification ──
+    if (resource === 'notifications' && method === 'POST') {
+      const { user_id, type, title, message, link, email_sent } = req.body || {};
+
+      if (!user_id || !type || !title) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      const result = await db.query(`
+        INSERT INTO notifications (user_id, type, title, message, link, email_sent)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING *
+      `, [user_id, type, title, message || null, link || null, email_sent || false]);
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          id: result.rows[0].id,
+          userId: result.rows[0].user_id,
+          type: result.rows[0].type,
+          title: result.rows[0].title,
+          message: result.rows[0].message,
+          link: result.rows[0].link,
+          read: result.rows[0].read,
+          emailSent: result.rows[0].email_sent,
+          createdAt: result.rows[0].created_at,
+        },
+      });
+    }
+
+    // ── Mark Notification as Read ──
+    if (resource === 'notifications' && id && sub === 'read' && method === 'POST') {
+      await db.query(`UPDATE notifications SET read = true WHERE id = $1`, [id]);
+      return res.status(200).json({ success: true });
+    }
+
+    // ── Mark All Notifications as Read ──
+    if (resource === 'notifications' && id && sub === 'read-all' && method === 'POST') {
+      await db.query(`UPDATE notifications SET read = true WHERE user_id = $1`, [id]);
+      return res.status(200).json({ success: true });
+    }
+
+    // ── Delete Notification ──
+    if (resource === 'notifications' && id && method === 'DELETE') {
+      await db.query(`DELETE FROM notifications WHERE id = $1`, [id]);
+      return res.status(200).json({ success: true });
+    }
+
+    // ── Get Notification Preferences ──
+    if (resource === 'notification-preferences' && id && method === 'GET') {
+      const userId = id;
+
+      const result = await db.query(`
+        SELECT * FROM notification_preferences WHERE user_id = $1
+      `, [userId]);
+
+      if (!result.rows[0]) {
+        return res.status(200).json({
+          success: true,
+          data: {
+            feedbackReceived: 'both',
+            candidateAdvanced: 'in_app',
+            interviewScheduled: 'both',
+            newCandidateAdded: 'in_app',
+            reportReady: 'both',
+            referenceSubmitted: 'both',
+            offerStatusChanged: 'both',
+            milestoneAtRisk: 'both',
+            messageReceived: 'both',
+          },
+        });
+      }
+
+      const prefs = result.rows[0];
+      return res.status(200).json({
+        success: true,
+        data: {
+          feedbackReceived: prefs.feedback_received || 'both',
+          candidateAdvanced: prefs.candidate_advanced || 'in_app',
+          interviewScheduled: prefs.interview_scheduled || 'both',
+          newCandidateAdded: prefs.new_candidate_added || 'in_app',
+          reportReady: prefs.report_ready || 'both',
+          referenceSubmitted: prefs.reference_submitted || 'both',
+          offerStatusChanged: prefs.offer_status_changed || 'both',
+          milestoneAtRisk: prefs.milestone_at_risk || 'both',
+          messageReceived: prefs.message_received || 'both',
+        },
+      });
+    }
+
+    // ── Save Notification Preferences ──
+    if (resource === 'notification-preferences' && id && method === 'POST') {
+      const userId = id;
+      const {
+        feedbackReceived,
+        candidateAdvanced,
+        interviewScheduled,
+        newCandidateAdded,
+        reportReady,
+        referenceSubmitted,
+        offerStatusChanged,
+        milestoneAtRisk,
+        messageReceived,
+      } = req.body || {};
+
+      await db.query(`
+        INSERT INTO notification_preferences (
+          user_id, feedback_received, candidate_advanced, interview_scheduled,
+          new_candidate_added, report_ready, reference_submitted,
+          offer_status_changed, milestone_at_risk, message_received, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
+        ON CONFLICT (user_id) DO UPDATE SET
+          feedback_received = EXCLUDED.feedback_received,
+          candidate_advanced = EXCLUDED.candidate_advanced,
+          interview_scheduled = EXCLUDED.interview_scheduled,
+          new_candidate_added = EXCLUDED.new_candidate_added,
+          report_ready = EXCLUDED.report_ready,
+          reference_submitted = EXCLUDED.reference_submitted,
+          offer_status_changed = EXCLUDED.offer_status_changed,
+          milestone_at_risk = EXCLUDED.milestone_at_risk,
+          message_received = EXCLUDED.message_received,
+          updated_at = NOW()
+      `, [
+        userId,
+        feedbackReceived || 'both',
+        candidateAdvanced || 'in_app',
+        interviewScheduled || 'both',
+        newCandidateAdded || 'in_app',
+        reportReady || 'both',
+        referenceSubmitted || 'both',
+        offerStatusChanged || 'both',
+        milestoneAtRisk || 'both',
+        messageReceived || 'both',
+      ]);
+
+      return res.status(200).json({ success: true });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
     // PUSH NOTIFICATION API
     // ═══════════════════════════════════════════════════════════════
 
