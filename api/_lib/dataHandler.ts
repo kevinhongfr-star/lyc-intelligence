@@ -2151,6 +2151,114 @@ Return as valid JSON with exactly these keys:
       }
     }
 
+    // ── Background Checks CRUD (Phase 7.4) ──
+    if (resource === 'background-checks') {
+      // Create new background check
+      if (method === 'POST' && !id) {
+        const { candidate_id, mandate_id, check_type, provider, order_date, due_date, ordered_by, organization_id } = req.body || {};
+        
+        if (!candidate_id || !check_type || !provider || !order_date || !due_date) {
+          return res.status(400).json({ error: 'candidate_id, check_type, provider, order_date, and due_date are required' });
+        }
+
+        if (!hasOrgAccess(userRole)) {
+          return res.status(403).json({ error: 'Organization access required' });
+        }
+
+        const row = await db.insert('background_checks', {
+          candidate_id,
+          mandate_id: mandate_id || null,
+          check_type,
+          provider,
+          order_date,
+          due_date,
+          status: 'pending',
+          ordered_by: ordered_by || authUserId,
+          organization_id: organization_id || orgId,
+        }, 15000);
+        return res.status(201).json({ success: true, data: row });
+      }
+
+      // Get background checks for candidate
+      if (method === 'GET' && !id) {
+        const candidateId = req.query.candidate_id as string;
+        
+        if (!candidateId) {
+          return res.status(400).json({ error: 'candidate_id query param required' });
+        }
+
+        const checks = await db.selectMany('background_checks', {
+          where: [{ column: 'candidate_id', value: candidateId }],
+          orderBy: { column: 'order_date', ascending: false },
+        }, 15000);
+
+        return res.status(200).json({ success: true, data: checks });
+      }
+
+      // Get single background check
+      if (method === 'GET' && id) {
+        const check = await db.selectOne('background_checks', {
+          column: 'id',
+          value: id,
+        }, 15000);
+
+        if (!check) {
+          return res.status(404).json({ error: 'Background check not found' });
+        }
+
+        return res.status(200).json({ success: true, data: check });
+      }
+
+      // Update background check (status, results, etc.)
+      if (method === 'PATCH' && id) {
+        const check = await db.selectOne('background_checks', {
+          column: 'id',
+          value: id,
+          select: 'id, organization_id',
+        }, 15000);
+
+        if (!check) {
+          return res.status(404).json({ error: 'Background check not found' });
+        }
+
+        if (userRole !== 'super_admin' && check.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const updates = req.body || {};
+        delete updates.id;
+        delete updates.created_at;
+        
+        // If updating to completed status, set completed_at
+        if (updates.status === 'completed' && !updates.completed_at) {
+          updates.completed_at = new Date().toISOString();
+        }
+
+        const rows = await db.update('background_checks', { column: 'id', value: id }, updates, 15000);
+        return res.status(200).json({ success: true, data: rows[0] || null });
+      }
+
+      // Delete background check
+      if (method === 'DELETE' && id) {
+        const check = await db.selectOne('background_checks', {
+          column: 'id',
+          value: id,
+          select: 'id, organization_id',
+        }, 15000);
+
+        if (!check) {
+          return res.status(404).json({ error: 'Background check not found' });
+        }
+
+        if (userRole !== 'super_admin' && check.organization_id !== orgId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const count = await db.deleteRows('background_checks', { column: 'id', value: id }, 15000);
+        return res.status(200).json({ success: true, deleted: count });
+      }
+    }
+
     // ── Org Chart PDF Export (Phase 3.5) ──
     if (resource === 'org-chart-pdf' && method === 'POST') {
       const { mandate_id, company_ids } = req.body || {};
