@@ -83,6 +83,12 @@ const TL_SLADashboard = lazy(() => import('@/components/team-lead/TL_SLADashboar
 const TL_RevenueDashboard = lazy(() => import('@/components/team-lead/TL_RevenueDashboard').then(m => ({ default: m.TL_RevenueDashboard })));
 const TL_ClientOverview = lazy(() => import('@/components/team-lead/TL_ClientOverview').then(m => ({ default: m.TL_ClientOverview })));
 
+const AdminDashboardPage = lazy(() => import('@/pages/AdminDashboardPage').then(m => ({ default: m.default })));
+const UserManagement = lazy(() => import('@/components/admin/UserManagement').then(m => ({ default: m.UserManagement })));
+const CreditManagement = lazy(() => import('@/components/admin/CreditManagement').then(m => ({ default: m.CreditManagement })));
+const SystemHealth = lazy(() => import('@/components/admin/SystemHealth').then(m => ({ default: m.SystemHealth })));
+const AuditLogViewer = lazy(() => import('@/components/admin/AuditLogViewer').then(m => ({ default: m.AuditLogViewer })));
+
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
 function Loading() { return <div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>; }
@@ -172,6 +178,11 @@ export default function App() {
                 <Route path="org-intel" element={<RoleRoute allowedRoles={['admin']}><OrgIntelligencePage /></RoleRoute>} />
                 <Route path="notifications" element={<NotificationsPage />} />
                 <Route path="settings" element={<RoleRoute allowedRoles={['admin']}><SettingsPage /></RoleRoute>} />
+                <Route path="admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
+                <Route path="admin/users" element={<AdminRoute><UserManagement /></AdminRoute>} />
+                <Route path="admin/credits" element={<AdminRoute><CreditManagement /></AdminRoute>} />
+                <Route path="admin/health" element={<AdminRoute><SystemHealth /></AdminRoute>} />
+                <Route path="admin/audit" element={<AdminRoute><AuditLogViewer /></AdminRoute>} />
               </Route>
             )}
             <Route path="/client" element={
