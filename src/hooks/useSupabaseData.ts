@@ -108,7 +108,7 @@ export function useDashboard() {
   
   useEffect(() => {
     // Single consolidated API call
-    fetch('/api/dashboard')
+    fetch('/api/data/dashboard')
       .then(async (r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
@@ -20,7 +20,7 @@ export interface UserProfile {
 }
 
 interface AuthStore {
-  user: any | null;
+  user: User | null;
   profile: UserProfile | null;
   isLoading: boolean;
   supabase: SupabaseClient | null;
