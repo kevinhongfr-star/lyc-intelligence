@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Calendar, Clock, Plus, ChevronLeft, ChevronRight, MapPin, Loader2, X } from 'lucide-react';
+import { Calendar, Clock, Plus, ChevronLeft, ChevronRight, MapPin, Loader2, X, Briefcase, Users, FileText, AlertCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
-import { useEvents } from '@/hooks/useSupabaseData';
+import { useEvents, useMandates } from '@/hooks/useSupabaseData';
 import { createEvent } from '@/services/supabaseApi';
 import type { CalendarEvent } from '@/services/supabaseApi';
 
@@ -21,11 +21,44 @@ function getCalendarGrid(year: number, month: number): (Date | null)[][] {
   return weeks;
 }
 
+function getEventColor(event: CalendarEvent) {
+  switch (event.event_type) {
+    case 'interview':
+      return 'bg-blue-500/20 text-blue-500 border-l-blue-500';
+    case 'deadline':
+      return 'bg-red-500/20 text-red-500 border-l-red-500';
+    case 'followup':
+      return 'bg-amber-500/20 text-amber-600 border-l-amber-500';
+    case 'client_meeting':
+      return 'bg-green-500/20 text-green-600 border-l-green-500';
+    case 'scoring':
+      return 'bg-purple-500/20 text-purple-500 border-l-purple-500';
+    default:
+      return 'bg-accent/20 text-accent border-l-accent';
+  }
+}
+
+function getEventIcon(event: CalendarEvent) {
+  switch (event.event_type) {
+    case 'interview':
+      return <Users className="w-3 h-3" />;
+    case 'deadline':
+      return <AlertCircle className="w-3 h-3" />;
+    case 'followup':
+      return <FileText className="w-3 h-3" />;
+    case 'client_meeting':
+      return <Briefcase className="w-3 h-3" />;
+    default:
+      return <Calendar className="w-3 h-3" />;
+  }
+}
+
 function isSameDay(a: Date, b: Date) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
 function formatDate(d: Date) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
 export function SchedulerPage() {
   const { data: events, loading, setData: setEvents } = useEvents();
+  const { data: mandates } = useMandates({ limit: 20 });
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -35,10 +68,58 @@ export function SchedulerPage() {
   const [creating, setCreating] = useState(false);
   const [newEvent, setNewEvent] = useState({ title: '', date: formatDate(today), time: '10:00', location: '' });
 
+  const mandateEvents = useMemo(() => {
+    const derived: CalendarEvent[] = [];
+    mandates.forEach((m) => {
+      if (m.target_date) {
+        derived.push({
+          id: `deadline-${m.id}`,
+          title: `Deadline: ${m.title}`,
+          start_time: new Date(m.target_date).toISOString(),
+          end_time: new Date(m.target_date).toISOString(),
+          event_type: 'deadline',
+          mandate_id: m.id,
+        });
+      }
+      if (m.created_at) {
+        const weekLater = new Date(new Date(m.created_at).getTime() + 7 * 24 * 60 * 60 * 1000);
+        if (weekLater >= today) {
+          derived.push({
+            id: `followup-${m.id}`,
+            title: `Follow-up: ${m.title}`,
+            start_time: weekLater.toISOString(),
+            end_time: weekLater.toISOString(),
+            event_type: 'followup',
+            mandate_id: m.id,
+          });
+        }
+      }
+      if (m.status === '3_deliver') {
+        const interviewDate = new Date();
+        interviewDate.setDate(interviewDate.getDate() + 3);
+        derived.push({
+          id: `interview-${m.id}`,
+          title: `Interview: ${m.title}`,
+          start_time: interviewDate.toISOString(),
+          end_time: interviewDate.toISOString(),
+          event_type: 'interview',
+          mandate_id: m.id,
+        });
+      }
+    });
+    return derived;
+  }, [mandates]);
+
+  const allEvents = useMemo(() => {
+    return [...events, ...mandateEvents].sort(
+      (a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+    );
+  }, [events, mandateEvents]);
+
   const weeks = useMemo(() => getCalendarGrid(viewYear, viewMonth), [viewYear, viewMonth]);
-  const eventsForDate = (date: Date) => events.filter(e => isSameDay(new Date(e.start_time), date));
+  const eventsForDate = (date: Date) => allEvents.filter(e => isSameDay(new Date(e.start_time), date));
   const selectedEvents = selectedDate ? eventsForDate(selectedDate) : [];
-  const upcomingEvents = events.filter(e => new Date(e.start_time) >= today).slice(0, 10);
+  const upcomingEvents = allEvents.filter(e => new Date(e.start_time) >= today).slice(0, 10);
 
   const prevMonth = () => { if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); } else setViewMonth(viewMonth - 1); };
   const nextMonth = () => { if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); } else setViewMonth(viewMonth + 1); };
@@ -85,12 +166,21 @@ export function SchedulerPage() {
           </div>
         </div>
       )}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div><h1 className="text-2xl font-serif font-bold text-text-primary">Scheduler</h1><p className="text-text-secondary">Interviews, calls, and pipeline events</p></div>
-        <div className="flex gap-2">
-          <button onClick={() => openCreateModal()} className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-light text-white text-sm font-medium rounded-lg min-h-[44px]"><Plus className="w-4 h-4" />New Event</button>
-          <button onClick={() => setView('month')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'month' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Month</button>
-          <button onClick={() => setView('agenda')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'agenda' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Agenda</button>
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-3 text-xs text-text-muted">
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" />Interview</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" />Client Meeting</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" />Deadline</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" />Follow-up</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-500" />Scoring</span>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => openCreateModal()} className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-light text-white text-sm font-medium rounded-lg min-h-[44px]"><Plus className="w-4 h-4" />New Event</button>
+            <button onClick={() => setView('month')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'month' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Month</button>
+            <button onClick={() => setView('agenda')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'agenda' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Agenda</button>
+          </div>
         </div>
       </div>
       {view === 'month' ? (
@@ -114,7 +204,7 @@ export function SchedulerPage() {
                       <button key={`${wi}-${di}`} onClick={() => setSelectedDate(date)} onDoubleClick={() => openCreateModal(date)}
                         className={`p-1.5 min-h-[64px] text-left bg-bg-primary hover:bg-bg-tertiary/50 transition-colors ${isSelected ? 'ring-1 ring-accent' : ''}`}>
                         <span className={`text-xs font-medium ${isToday ? 'w-5 h-5 flex items-center justify-center rounded-full bg-accent text-white' : 'text-text-primary'}`}>{date.getDate()}</span>
-                        <div className="mt-1 space-y-0.5">{dayEvents.slice(0, 2).map((e, i) => <div key={i} className="text-[10px] px-1 py-0.5 rounded bg-accent/20 text-accent truncate">{e.title}</div>)}</div>
+                        <div className="mt-1 space-y-0.5">{dayEvents.slice(0, 2).map((e, i) => <div key={i} className={`text-[10px] px-1 py-0.5 rounded truncate border-l-2 ${getEventColor(e)}`}>{e.title}</div>)}</div>
                       </button>
                     );
                   }))}

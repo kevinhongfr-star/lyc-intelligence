@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Briefcase, ChevronRight, Loader2, CheckCircle, PauseCircle, XCircle, Plus } from 'lucide-react';
+import { Search, Briefcase, ChevronRight, Loader2, CheckCircle, PauseCircle, XCircle, Plus, User } from 'lucide-react';
 import { useMandates } from '@/hooks/useSupabaseData';
 import { Badge, Card, CardContent } from '@/components/ui';
 import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
 import { updateMandateStatus } from '@/services/supabaseApi';
+import { useAuthStore } from '@/stores/authStore';
 
 const STATUS_OPTIONS = [
   { value: '1_search', label: 'SWEEP', color: '#00897B' },
@@ -18,14 +19,24 @@ const STATUS_OPTIONS = [
 
 export function MandatesPage() {
   const navigate = useNavigate();
+  const { profile } = useAuthStore();
   const { data: mandates, count, loading, error } = useMandates({ limit: 100 });
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [viewFilter, setViewFilter] = useState<'all' | 'mine' | 'shared'>('mine');
   const [updating, setUpdating] = useState<string | null>(null);
+
+  const isLeader = profile?.icp === 'leader' || profile?.role === 'admin';
 
   const filtered = mandates
     .filter(m => !statusFilter || m.status === statusFilter)
-    .filter(m => !search || m.title.toLowerCase().includes(search.toLowerCase()) || m.company?.name?.toLowerCase().includes(search.toLowerCase()));
+    .filter(m => !search || m.title.toLowerCase().includes(search.toLowerCase()) || m.company?.name?.toLowerCase().includes(search.toLowerCase()))
+    .filter(m => {
+      if (viewFilter === 'all') return true;
+      if (viewFilter === 'mine') return m.consultant_id === profile?.id || m.created_by === profile?.id;
+      if (viewFilter === 'shared') return m.consultant_id !== profile?.id && m.created_by !== profile?.id;
+      return true;
+    });
 
   const handleStatusChange = async (mandateId: string, newStatus: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -40,15 +51,41 @@ export function MandatesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-serif font-bold text-text-primary">Mandates</h1>
-          <p className="text-text-muted">{count ?? mandates.length} mandates</p>
+          <p className="text-text-muted">{count ?? filtered.length} mandates</p>
         </div>
-        <button
-          onClick={() => navigate('/platform/mandates/new')}
-          className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Create Mandate
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="flex bg-bg-tertiary rounded-lg p-0.5">
+            <button
+              onClick={() => setViewFilter('mine')}
+              className={`px-3 py-1.5 text-xs rounded-md transition-colors min-h-[36px] ${
+                viewFilter === 'mine'
+                  ? 'bg-bg-secondary text-text-primary font-medium'
+                  : 'text-text-muted hover:text-text-secondary'
+              }`}
+            >
+              <User className="w-3.5 h-3.5 inline mr-1.5" />
+              My Mandates
+            </button>
+            <button
+              onClick={() => setViewFilter('all')}
+              className={`px-3 py-1.5 text-xs rounded-md transition-colors min-h-[36px] ${
+                viewFilter === 'all'
+                  ? 'bg-bg-secondary text-text-primary font-medium'
+                  : 'text-text-muted hover:text-text-secondary'
+              }`}
+            >
+              <Briefcase className="w-3.5 h-3.5 inline mr-1.5" />
+              All Mandates
+            </button>
+          </div>
+          <button
+            onClick={() => navigate('/platform/mandates/new')}
+            className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Create Mandate
+          </button>
+        </div>
       </div>
       <div className="flex gap-3 flex-wrap">
         <div className="relative flex-1 max-w-md">

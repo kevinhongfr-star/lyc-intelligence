@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, MessageSquare, Trash2 } from 'lucide-react';
+import { Send, Loader2, MessageSquare, Trash2, Briefcase, X } from 'lucide-react';
 import { sendChatMessage } from '@/services/coze';
-import { useAuth } from '@/contexts';
+import { useAuthStore } from '@/stores/authStore';
+import { useMandates } from '@/hooks/useSupabaseData';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -51,11 +52,16 @@ const customComponents = {
 };
 
 export function NexusPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuthStore();
+  const { data: mandates } = useMandates({ limit: 20 });
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedMandate, setSelectedMandate] = useState<string | null>(null);
+  const [showMandatePicker, setShowMandatePicker] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const selectedMandateData = mandates.find((m) => m.id === selectedMandate);
 
   const send = async () => {
     if (!input.trim() || loading) return;
@@ -63,7 +69,13 @@ export function NexusPage() {
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setLoading(true);
-    const response = await sendChatMessage(userMsg, user?.id || 'anonymous', messages.slice(-10));
+
+    let fullMessage = userMsg;
+    if (selectedMandateData) {
+      fullMessage = `[Context: Working on mandate "${selectedMandateData.title}" at ${selectedMandateData.company?.name || 'unknown company'}. Status: ${selectedMandateData.status}] ${userMsg}`;
+    }
+
+    const response = await sendChatMessage(fullMessage, user?.id || profile?.id || 'anonymous', messages.slice(-10));
     setMessages(prev => [...prev, { role: 'assistant', content: response }]);
     setLoading(false);
   };
@@ -79,12 +91,59 @@ export function NexusPage() {
           <h1 className="text-2xl font-serif font-bold text-text-primary">Nexus</h1>
           <p className="text-text-muted text-sm">Your LYC Intelligence assistant — ask about cross-border leadership, career strategy, and executive positioning</p>
         </div>
-        {messages.length > 0 && (
-          <button onClick={clearChat} className="flex items-center gap-1.5 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary rounded-lg min-h-[44px]">
-            <Trash2 className="w-3.5 h-3.5" /> Clear
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {selectedMandateData ? (
+            <div className="flex items-center gap-2 px-3 py-2 bg-accent/10 text-accent rounded-lg text-sm">
+              <Briefcase className="w-4 h-4" />
+              <span className="font-medium">{selectedMandateData.title}</span>
+              <button
+                onClick={() => setSelectedMandate(null)}
+                className="hover:bg-accent/20 rounded p-0.5"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowMandatePicker(!showMandatePicker)}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary rounded-lg min-h-[44px]"
+            >
+              <Briefcase className="w-4 h-4" />
+              Add mandate context
+            </button>
+          )}
+          {messages.length > 0 && (
+            <button onClick={clearChat} className="flex items-center gap-1.5 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary rounded-lg min-h-[44px]">
+              <Trash2 className="w-3.5 h-3.5" /> Clear
+            </button>
+          )}
+        </div>
       </div>
+
+      {showMandatePicker && (
+        <div className="mb-4 p-4 bg-bg-secondary border border-bg-tertiary rounded-lg">
+          <p className="text-sm font-medium text-text-primary mb-3">Select a mandate to add context</p>
+          <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+            {mandates.slice(0, 10).map((m) => (
+              <button
+                key={m.id}
+                onClick={() => {
+                  setSelectedMandate(m.id);
+                  setShowMandatePicker(false);
+                }}
+                className={`p-3 text-left rounded-lg text-sm transition-colors ${
+                  selectedMandate === m.id
+                    ? 'bg-accent/20 text-accent border border-accent/30'
+                    : 'bg-bg-tertiary text-text-secondary hover:bg-bg-hover'
+                }`}
+              >
+                <p className="font-medium truncate">{m.title}</p>
+                <p className="text-xs text-text-muted truncate">{m.company?.name}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 overflow-auto bg-bg-secondary rounded-lg border border-bg-tertiary p-4 space-y-4">
         {messages.length === 0 && (
