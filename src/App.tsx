@@ -4,6 +4,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { CreditProvider } from '@/contexts/CreditContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ICPRoute } from '@/components/ICPRoute';
+import { RoleRoute } from '@/components/RoleRoute';
+import { DashboardRouter } from '@/components/DashboardRouter';
 import { Loader2 } from 'lucide-react';
 import { ToastContainer } from '@/components/ui/ToastContainer';
 
@@ -130,26 +132,26 @@ export default function App() {
                   </ICPRoute>
                 </ProtectedRoute>
               }>
-                <Route index element={<ConsultantDashboard />} />
-                <Route path="mandates" element={<MandatesPage />} />
-                <Route path="mandates/new" element={<ProposalBuilderPage />} />
-                <Route path="mandates/:id/edit" element={<ProposalBuilderPage />} />
-                <Route path="mandates/:id" element={<MandateDetailPage />} />
-                <Route path="mandates/:id/lens" element={<LensExportPage />} />
-                <Route path="candidates" element={<CandidatesPage />} />
-                <Route path="candidates/:id" element={<ExecutiveProfilePage />} />
-                <Route path="candidates/:id/report" element={<CandidateReportPage />} />
-                <Route path="companies" element={<CompaniesPage />} />
-                <Route path="pipeline" element={<PipelinePage />} />
-                <Route path="batch-scoring" element={<BatchScoringPage />} />
-                <Route path="metrix" element={<MetrixPage />} />
-                <Route path="scoring-runs" element={<ScoringRunsPage />} />
-                <Route path="chat" element={<NexusPage />} />
-                <Route path="scheduler" element={<SchedulerPage />} />
-                <Route path="documents" element={<PlatformDocumentsPage />} />
-                <Route path="org-intel" element={<AdminRoute><OrgIntelligencePage /></AdminRoute>} />
+                <Route index element={<DashboardRouter />} />
+                <Route path="mandates" element={<RoleRoute allowedICP={['consultant', 'leader']}><MandatesPage /></RoleRoute>} />
+                <Route path="mandates/new" element={<RoleRoute allowedICP={['consultant']}><ProposalBuilderPage /></RoleRoute>} />
+                <Route path="mandates/:id/edit" element={<RoleRoute allowedICP={['consultant']}><ProposalBuilderPage /></RoleRoute>} />
+                <Route path="mandates/:id" element={<RoleRoute allowedICP={['consultant', 'leader']}><MandateDetailPage /></RoleRoute>} />
+                <Route path="mandates/:id/lens" element={<RoleRoute allowedICP={['consultant']}><LensExportPage /></RoleRoute>} />
+                <Route path="candidates" element={<RoleRoute allowedICP={['consultant']}><CandidatesPage /></RoleRoute>} />
+                <Route path="candidates/:id" element={<RoleRoute allowedICP={['consultant']}><ExecutiveProfilePage /></RoleRoute>} />
+                <Route path="candidates/:id/report" element={<RoleRoute allowedICP={['consultant']}><CandidateReportPage /></RoleRoute>} />
+                <Route path="companies" element={<RoleRoute allowedICP={['consultant', 'leader']}><CompaniesPage /></RoleRoute>} />
+                <Route path="pipeline" element={<RoleRoute allowedICP={['consultant']}><PipelinePage /></RoleRoute>} />
+                <Route path="batch-scoring" element={<RoleRoute allowedICP={['consultant']}><BatchScoringPage /></RoleRoute>} />
+                <Route path="metrix" element={<RoleRoute allowedICP={['consultant']}><MetrixPage /></RoleRoute>} />
+                <Route path="scoring-runs" element={<RoleRoute allowedRoles={['admin']}><ScoringRunsPage /></RoleRoute>} />
+                <Route path="chat" element={<RoleRoute allowedICP={['consultant', 'leader']}><NexusPage /></RoleRoute>} />
+                <Route path="scheduler" element={<RoleRoute allowedICP={['consultant']}><SchedulerPage /></RoleRoute>} />
+                <Route path="documents" element={<RoleRoute allowedICP={['consultant', 'leader']}><PlatformDocumentsPage /></RoleRoute>} />
+                <Route path="org-intel" element={<RoleRoute allowedRoles={['admin']}><OrgIntelligencePage /></RoleRoute>} />
                 <Route path="notifications" element={<NotificationsPage />} />
-                <Route path="settings" element={<SettingsPage />} />
+                <Route path="settings" element={<RoleRoute allowedRoles={['admin']}><SettingsPage /></RoleRoute>} />
               </Route>
             )}
             <Route path="/client" element={

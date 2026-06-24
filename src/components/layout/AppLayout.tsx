@@ -1,39 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts';
-import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDashboard, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon, Building2 } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
+import { BarChart3, Users, Briefcase, Calendar, Bell, LogOut, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon, Building2 } from 'lucide-react';
 import { CreditDisplay } from '@/components/ui/CreditDisplay';
 import { IconBridge, IconTrident, IconDrive, IconLeap, IconImpact, IconSpark, IconQuest, IconForge, IconPrism } from '@/components/icons/LycIcons';
 import { getNotifications } from '@/services/supabaseApi';
+import type { ICP } from '@/types';
 
-const NAV_ITEMS = [
-  { path: '/platform', icon: IconImpact, label: 'Dashboard', exact: true },
-  { path: '/platform/pipeline', icon: IconBridge, label: 'Pipeline' },
-  { path: '/platform/mandates', icon: Briefcase, label: 'Mandates' },
-  { path: '/platform/candidates', icon: Users, label: 'Candidates' },
-  { path: '/platform/companies', icon: Building2, label: 'Companies' },
-  { type: 'divider' as const, label: 'Scoring' },
-  { path: '/platform/batch-scoring', icon: IconTrident, label: 'Match Analysis' },
-  { path: '/platform/mandates', icon: FileDown, label: 'Candidate Report', suffix: '/lens' },
-  { path: '/platform/metrix', icon: IconSpark, label: 'Performance Metrics' },
-  { path: '/platform/scoring-runs', icon: ClipboardList, label: 'Scoring Runs' },
-  { type: 'divider' as const, label: 'Tools' },
-  { path: '/platform/chat', icon: IconQuest, label: 'Nexus' },
-  { path: '/platform/scheduler', icon: Calendar, label: 'Scheduler' },
-  { path: '/platform/documents', icon: IconPrism, label: 'Documents' },
+type NavItem = {
+  path?: string;
+  icon?: any;
+  label: string;
+  exact?: boolean;
+  type?: 'divider';
+  suffix?: string;
+  roles?: string[];
+  icp?: ICP[];
+};
+
+const NAV_ITEMS: NavItem[] = [
+  { path: '/platform', icon: IconImpact, label: 'Dashboard', exact: true, icp: ['consultant', 'leader'] },
+  { path: '/platform/pipeline', icon: IconBridge, label: 'Pipeline', icp: ['consultant'] },
+  { path: '/platform/mandates', icon: Briefcase, label: 'Mandates', icp: ['consultant', 'leader'] },
+  { path: '/platform/candidates', icon: Users, label: 'Candidates', icp: ['consultant'] },
+  { path: '/platform/companies', icon: Building2, label: 'Companies', icp: ['consultant', 'leader'] },
+  { type: 'divider', label: 'Scoring', icp: ['consultant'] },
+  { path: '/platform/batch-scoring', icon: IconTrident, label: 'Match Analysis', icp: ['consultant'] },
+  { path: '/platform/mandates', icon: FileDown, label: 'Candidate Report', suffix: '/lens', icp: ['consultant'] },
+  { path: '/platform/metrix', icon: IconSpark, label: 'Performance Metrics', icp: ['consultant'] },
+  { path: '/platform/scoring-runs', icon: ClipboardList, label: 'Scoring Runs', roles: ['admin'] },
+  { type: 'divider', label: 'Tools' },
+  { path: '/platform/chat', icon: IconQuest, label: 'Nexus', icp: ['consultant', 'leader'] },
+  { path: '/platform/scheduler', icon: Calendar, label: 'Scheduler', icp: ['consultant'] },
+  { path: '/platform/documents', icon: IconPrism, label: 'Documents', icp: ['consultant', 'leader'] },
   { path: '/platform/notifications', icon: Bell, label: 'Alerts' },
-  { path: '/platform/settings', icon: IconForge, label: 'Settings', roles: ['admin', 'recruiter'] },
+  { path: '/platform/settings', icon: IconForge, label: 'Settings', roles: ['admin'] },
+  { type: 'divider', label: 'Admin', roles: ['admin'] },
+  { path: '/platform/org-intel', icon: BarChart3, label: 'Org Intelligence', roles: ['admin'] },
 ];
 
-type NavItem = { path?: string; icon?: any; label: string; exact?: boolean; type?: 'divider'; suffix?: string; roles?: string[] };
+function filterNavItems(items: NavItem[], userICP: string | null, userRole: string | null): NavItem[] {
+  const filtered = items.filter(item => {
+    if (userRole === 'admin') return true;
+    if (item.icp && userICP && !item.icp.includes(userICP as ICP)) return false;
+    if (item.roles && userRole && !item.roles.includes(userRole)) return false;
+    return true;
+  });
+
+  return filtered.filter((item, index, arr) => {
+    if (item.type === 'divider') {
+      const nextItem = arr[index + 1];
+      return nextItem && nextItem.type !== 'divider';
+    }
+    return true;
+  });
+}
 
 export function AppLayout() {
-  const { user, logout } = useAuth();
-  const userRole = (user as any)?.role || 'user';
+  const { user, profile, logout } = useAuthStore();
+  const userICP = profile?.icp || null;
+  const userRole = profile?.role || null;
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => (localStorage.getItem('lyc-theme') as 'dark' | 'light') || 'light');
   const [pendingCount, setPendingCount] = useState(0);
+
+  const filteredNav = filterNavItems(NAV_ITEMS, userICP, userRole);
 
   useEffect(() => {
     getNotifications().then(items => {
@@ -41,7 +73,6 @@ export function AppLayout() {
     });
   }, []);
 
-  // Apply theme to document for CSS variable switching
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
@@ -68,7 +99,7 @@ export function AppLayout() {
         </div>
         
         <nav className="flex-1 py-2 overflow-y-auto">
-          {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(userRole)).map((item, i) => {
+          {filteredNav.map((item, i) => {
             if (item.type === 'divider') {
               return sidebarOpen ? (
                 <div key={i} className="px-4 pt-4 pb-1"><span className="text-[9px] uppercase tracking-[2.5px] text-accent font-semibold">{item.label}</span></div>
@@ -98,6 +129,14 @@ export function AppLayout() {
         
         <div className="p-4 border-t border-bg-tertiary space-y-2">
           {sidebarOpen && <CreditDisplay showTier />}
+          {sidebarOpen && (
+            <div className="px-2 py-1">
+              <p className="text-xs text-text-muted">Logged in as</p>
+              <p className="text-sm font-medium text-text-primary truncate">
+                {user?.email || profile?.email}
+              </p>
+            </div>
+          )}
           <button onClick={toggleTheme} className="flex items-center gap-2 text-sm text-text-muted hover:text-text-primary w-full min-h-[44px]">
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}{sidebarOpen && (theme === 'dark' ? 'Light Mode' : 'Dark Mode')}
           </button>
