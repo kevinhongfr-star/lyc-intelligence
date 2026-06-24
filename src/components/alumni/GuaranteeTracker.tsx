@@ -68,7 +68,7 @@ export function GuaranteeTracker({ alumniId }: GuaranteeTrackerProps) {
   const fetchGuarantee = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/alumni/guarantee?alumni_id=${alumniId}`);
+      const response = await fetch(`/api/x/alumni/guarantee?alumni_id=${alumniId}`);
       const result = await response.json();
 
       if (result.success) {

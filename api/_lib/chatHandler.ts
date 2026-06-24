@@ -1,4 +1,15 @@
+/**
+ * chatHandler.ts — Consolidated handler for chat, memory, and email
+ *
+ * Routes via api/chat/[[...path]].ts:
+ *   (no path)  → POST   /api/chat  chat (Nexus AI assistant)
+ *   memory     → POST   /api/chat/memory  extract & store memories
+ *   email      → POST   /api/chat/email   send transactional email
+ */
+
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { insert, isSupabaseConfigured } from './supabaseRest.js';
+import { sendEmail } from './email.js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 const COZE_API_KEY = process.env.COZE_API_KEY || '';
@@ -6,40 +17,40 @@ const COZE_BOT_ID = process.env.COZE_BOT_ID || '';
 const COZE_ENDPOINT = process.env.COZE_API_ENDPOINT || 'https://api.coze.cn/v3/chat';
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || '';
 
-const ANONYMOUS_SYSTEM_PROMPT = `You are Nexus, the career intelligence advisor for LYC Intelligence — 
-powered by LYC Partners, a global leadership advisory and executive 
+const ANONYMOUS_SYSTEM_PROMPT = `You are Nexus, the career intelligence advisor for LYC Intelligence —
+powered by LYC Partners, a global leadership advisory and executive
 search firm that has placed 500+ executives across 47 markets.
 
-YOUR PURPOSE: Help senior professionals understand their career positioning, 
+YOUR PURPOSE: Help senior professionals understand their career positioning,
 navigate cross-border leadership transitions, and make smarter decisions.
 
-YOUR KNOWLEDGE BASE: What it takes to transition executives between European 
-and Asian markets, how boards evaluate C-suite candidates differently across 
-markets, what separates candidates who land roles, executive presence and 
+YOUR KNOWLEDGE BASE: What it takes to transition executives between European
+and Asian markets, how boards evaluate C-suite candidates differently across
+markets, what separates candidates who land roles, executive presence and
 board readiness, LinkedIn positioning, interview preparation, and negotiation.
 
-YOUR TONE: Direct and honest, specific to real market dynamics, respectful, 
+YOUR TONE: Direct and honest, specific to real market dynamics, respectful,
 never motivational-speaker language. Think trusted senior partner.
 
-LEAD CAPTURE RULE: After your third response, naturally work in: "To save this 
+LEAD CAPTURE RULE: After your third response, naturally work in: "To save this
 conversation and get your personalized career brief, what's your email address?"
 
-NEVER: Mention Supabase, Notion, DeepSeek, Coze, internal weights, stage codes, 
+NEVER: Mention Supabase, Notion, DeepSeek, Coze, internal weights, stage codes,
 or position this as a marketing tool for LYC Partners.`;
 
-const AUTHENTICATED_SYSTEM_PROMPT_TEMPLATE = `You are Nexus, the career intelligence advisor for LYC Intelligence — 
-powered by LYC Partners, a global leadership advisory and executive 
+const AUTHENTICATED_SYSTEM_PROMPT_TEMPLATE = `You are Nexus, the career intelligence advisor for LYC Intelligence —
+powered by LYC Partners, a global leadership advisory and executive
 search firm that has placed 500+ executives across 47 markets.
 
-YOUR PURPOSE: Help senior professionals understand their career positioning, 
+YOUR PURPOSE: Help senior professionals understand their career positioning,
 navigate cross-border leadership transitions, and make smarter decisions.
 
-YOUR KNOWLEDGE BASE: What it takes to transition executives between European 
-and Asian markets, how boards evaluate C-suite candidates differently across 
-markets, what separates candidates who land roles, executive presence and 
+YOUR KNOWLEDGE BASE: What it takes to transition executives between European
+and Asian markets, how boards evaluate C-suite candidates differently across
+markets, what separates candidates who land roles, executive presence and
 board readiness, LinkedIn positioning, interview preparation, and negotiation.
 
-YOUR TONE: Direct and honest, specific to real market dynamics, respectful, 
+YOUR TONE: Direct and honest, specific to real market dynamics, respectful,
 never motivational-speaker language. Think trusted senior partner.
 
 USER CONTEXT:
@@ -47,7 +58,7 @@ USER CONTEXT:
 
 {document_context}
 
-NEVER: Mention Supabase, Notion, DeepSeek, Coze, internal weights, stage codes, 
+NEVER: Mention Supabase, Notion, DeepSeek, Coze, internal weights, stage codes,
 or position this as a marketing tool for LYC Partners.`;
 
 interface Message {
@@ -61,6 +72,13 @@ interface Memory {
   content: string;
   timestamp: string;
 }
+
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+const PROVIDER_TIMEOUT_MS = 7000;
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
@@ -76,8 +94,6 @@ function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
   return false;
 }
 
-const PROVIDER_TIMEOUT_MS = 7000;
-
 async function fetchWithTimeout(url: string, options: any, timeoutMs: number): Promise<Response> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -88,9 +104,192 @@ async function fetchWithTimeout(url: string, options: any, timeoutMs: number): P
   }
 }
 
-export const maxDuration = 60;
+export async function handler(req: VercelRequest, res: VercelResponse) {
+  const pathArr = (req.query.path as string[]) || [];
+  const resource = pathArr[0] || '';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // ── Email ──────────────────────────────────────────────────────────────────
+  if (resource === 'email') {
+    return handleEmail(req, res);
+  }
+
+  // ── Memory ─────────────────────────────────────────────────────────────────
+  if (resource === 'memory') {
+    return handleMemory(req, res);
+  }
+
+  // ── Chat (Nexus) ───────────────────────────────────────────────────────────
+  return handleChat(req, res);
+}
+
+// ── Email Handler ─────────────────────────────────────────────────────────────
+
+async function handleEmail(req: VercelRequest, res: VercelResponse) {
+  try {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const { type, data } = req.body;
+    if (!type || !data) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const result = await sendEmail(type, data);
+    return res.status(200).json(result);
+  } catch (err: any) {
+    console.error('[email] Unhandled error:', err);
+    return res.status(500).json({
+      error: 'Internal server error',
+      sent: false,
+      details: process.env.NODE_ENV === 'development' ? String(err?.message || err) : undefined,
+    });
+  }
+}
+
+// ── Memory Handler ─────────────────────────────────────────────────────────────
+
+interface ExtractedMemory {
+  memory_type: 'goal' | 'pain_point' | 'strength' | 'experience' | 'preference' | 'insight';
+  content: string;
+  confidence: number;
+}
+
+async function handleMemory(req: VercelRequest, res: VercelResponse) {
+  try {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const { userId, messages, sessionId, explicitGoal } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID required' });
+    }
+
+    if (!isSupabaseConfigured()) {
+      return res.status(500).json({ error: 'Server configuration error: Supabase not configured', success: false });
+    }
+
+    // Handle explicit goal storage
+    if (explicitGoal) {
+      await insert('memories', {
+        user_id: userId,
+        memory_type: 'goal',
+        content: explicitGoal,
+        source: 'explicit_user_input',
+        session_id: sessionId || null,
+        confidence: 1.0,
+        is_active: true,
+      });
+      return res.status(200).json({ success: true, message: 'Goal stored' });
+    }
+
+    // Handle memory extraction from conversation
+    if (!messages || messages.length === 0) {
+      return res.status(400).json({ error: 'Messages required for extraction' });
+    }
+
+    if (!DEEPSEEK_API_KEY) {
+      console.warn('[Memory] DEEPSEEK_API_KEY missing — skipping extraction');
+      return res.status(200).json({ success: true, memories_extracted: 0 });
+    }
+
+    try {
+      const conversationText = messages.map((m: ChatMessage) => `${m.role}: ${m.content}`).join('\n\n');
+      const memories = await extractMemories(conversationText);
+
+      let stored = 0;
+      for (const memory of memories) {
+        try {
+          await insert('memories', {
+            user_id: userId,
+            memory_type: memory.memory_type,
+            content: memory.content,
+            source: 'conversation_extraction',
+            session_id: sessionId || null,
+            confidence: memory.confidence,
+            is_active: true,
+          });
+          stored++;
+        } catch (e) {
+          console.error('[Memory] Store memory failed:', e);
+        }
+      }
+
+      return res.status(200).json({ success: true, memories_extracted: stored });
+    } catch (e) {
+      console.error('[Memory API] Extraction failed:', e);
+      return res.status(500).json({ error: 'Extraction failed', success: false });
+    }
+  } catch (err: any) {
+    console.error('[Memory] Unhandled error:', err);
+    return res.status(500).json({ error: err.message || 'Internal server error', success: false });
+  }
+}
+
+async function extractMemories(conversationText: string): Promise<ExtractedMemory[]> {
+  const extractionPrompt = `Analyze this conversation and extract important career intelligence.
+Return JSON array of memory objects (max 5, min confidence 0.6):
+[{
+  "memory_type": "goal|pain_point|strength|experience|preference|insight",
+  "content": "Concise statement in third person (e.g., 'User wants to transition to APAC CFO role')",
+  "confidence": 0.0-1.0
+}]
+
+Only extract clear, durable insights. Return empty array if no strong insights found.
+
+Conversation:
+${conversationText}`;
+
+  try {
+    const response = await fetchWithTimeout('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: extractionPrompt }],
+        max_tokens: 500,
+        temperature: 0.3,
+        response_format: { type: 'json_object' },
+      }),
+    }, PROVIDER_TIMEOUT_MS);
+
+    if (!response.ok) {
+      throw new Error(`DeepSeek API failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '[]';
+
+    let memories: any;
+    try {
+      memories = JSON.parse(content);
+    } catch {
+      return [];
+    }
+    if (!Array.isArray(memories)) return [];
+
+    return memories
+      .filter((m: any) =>
+        m.memory_type &&
+        m.content &&
+        m.confidence >= 0.6 &&
+        ['goal', 'pain_point', 'strength', 'experience', 'preference', 'insight'].includes(m.memory_type)
+      )
+      .slice(0, 5);
+  } catch (e) {
+    console.error('[Memory] Extraction error:', e);
+    return [];
+  }
+}
+
+// ── Chat Handler (Nexus AI) ──────────────────────────────────────────────────
+
+async function handleChat(req: VercelRequest, res: VercelResponse) {
   try {
     const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
     if (isRateLimited(ip, 30, 60 * 1000)) {
@@ -113,11 +312,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let systemPrompt = ANONYMOUS_SYSTEM_PROMPT;
     if (userId) {
       systemPrompt = AUTHENTICATED_SYSTEM_PROMPT_TEMPLATE
-        .replace('{memory_context}', memoryContext.length > 0 
-          ? `User Memory:\n${memoryContext.map((m: Memory) => `- ${m.type}: ${m.content}`).join('\n')}` 
+        .replace('{memory_context}', memoryContext.length > 0
+          ? `User Memory:\n${memoryContext.map((m: Memory) => `- ${m.type}: ${m.content}`).join('\n')}`
           : 'No prior user memory available.')
-        .replace('{document_context}', documentContext 
-          ? `\nUploaded Document Context:\n${documentContext}` 
+        .replace('{document_context}', documentContext
+          ? `\nUploaded Document Context:\n${documentContext}`
           : '');
     }
 
@@ -142,7 +341,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (DEEPSEEK_API_KEY) {
       const result = await tryDeepSeekStreaming(messages, res);
       if (result) return;
-      
+
       const fallbackResult = await tryDeepSeekNonStreaming(messages);
       if (fallbackResult) {
         return res.status(200).json(fallbackResult);
@@ -194,7 +393,7 @@ async function tryClaude(messages: Message[]): Promise<{ response: string; sugge
         system: messages.find(m => m.role === 'system')?.content,
       })
     }, PROVIDER_TIMEOUT_MS);
-    
+
     if (claudeRes.ok) {
       const data = await claudeRes.json();
       const content = data.content?.[0]?.text || 'No response';
@@ -247,7 +446,7 @@ async function tryDeepSeekStreaming(messages: Message[], res: VercelResponse): P
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
-      
+
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
 
@@ -269,8 +468,8 @@ async function tryDeepSeekStreaming(messages: Message[], res: VercelResponse): P
     }
 
     const parsed = parseAIResponse(fullContent);
-    res.write(JSON.stringify({ 
-      response: parsed.response, 
+    res.write(JSON.stringify({
+      response: parsed.response,
       suggested_prompts: parsed.suggested_prompts,
       usage: { tokens: 0 }
     }) + '\n');
@@ -298,7 +497,7 @@ async function tryDeepSeekNonStreaming(messages: Message[]): Promise<{ response:
         response_format: { type: 'json_object' },
       })
     }, PROVIDER_TIMEOUT_MS);
-    
+
     if (dsRes.ok) {
       const data = await dsRes.json();
       const content = data.choices?.[0]?.message?.content || '{"response":"No response","suggested_prompts":[]}';
@@ -336,7 +535,7 @@ async function tryCoze(messages: Message[], userId: string | undefined): Promise
         }]
       })
     }, PROVIDER_TIMEOUT_MS);
-    
+
     if (cozeRes.ok) {
       const data = await cozeRes.json();
       const content = data.messages?.filter((m: any) => m.role === 'assistant' && m.type === 'answer')?.[0]?.content || '{"response":"No response","suggested_prompts":[]}';

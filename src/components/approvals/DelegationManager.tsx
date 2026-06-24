@@ -70,7 +70,7 @@ export function DelegationManager({ orgId, delegatorId }: DelegationManagerProps
     setIsLoading(true);
     try {
       const response = await fetch(
-        `/api/approvals/delegations?org_id=${orgId}&delegator_id=${delegatorId}&active=true`
+        `/api/x/approvals/delegations?org_id=${orgId}&delegator_id=${delegatorId}&active=true`
       );
       const result = await response.json();
 
@@ -91,7 +91,7 @@ export function DelegationManager({ orgId, delegatorId }: DelegationManagerProps
 
     setIsSaving(true);
     try {
-      const response = await fetch('/api/approvals/delegations', {
+      const response = await fetch('/api/x/approvals/delegations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -127,7 +127,7 @@ export function DelegationManager({ orgId, delegatorId }: DelegationManagerProps
     if (!confirm('Remove this delegation?')) return;
 
     try {
-      await fetch(`/api/approvals/delegations?id=${delegationId}`, {
+      await fetch(`/api/x/approvals/delegations?id=${delegationId}`, {
         method: 'DELETE',
       });
       fetchDelegations();

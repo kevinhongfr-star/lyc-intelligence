@@ -38,7 +38,7 @@ export function BenchmarkSearch({ orgId, onSearch, initialQuery, loading }: Benc
       setSuggestionsLoading(true);
       try {
         const response = await fetch(
-          `/api/compensation/suggestions?org_id=${orgId}&q=${encodeURIComponent(jobTitle)}&type=job_title`
+          `/api/x/compensation/suggestions?org_id=${orgId}&q=${encodeURIComponent(jobTitle)}&type=job_title`
         );
         const result = await response.json();
         if (result.success) {

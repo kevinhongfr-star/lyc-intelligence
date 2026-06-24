@@ -42,7 +42,7 @@ export function DeferredAlerts({
 
   const fetchDeferred = async () => {
     try {
-      let url = `/api/bd/deferred-check?org_id=${orgId}`;
+      let url = `/api/x/bd/deferred-check?org_id=${orgId}`;
       if (includeUpcoming) {
         url += `&include_upcoming=true&upcoming_days=${upcomingDays}`;
       }

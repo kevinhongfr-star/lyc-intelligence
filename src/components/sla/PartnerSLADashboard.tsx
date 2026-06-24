@@ -71,7 +71,7 @@ export function PartnerSLADashboard({ orgId }: SLADashboardProps) {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/sla/dashboard?org_id=${orgId}`);
+      const response = await fetch(`/api/x/sla/dashboard?org_id=${orgId}`);
       const result = await response.json();
 
       if (result.success) {

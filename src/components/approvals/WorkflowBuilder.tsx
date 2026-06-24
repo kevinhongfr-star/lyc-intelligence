@@ -117,8 +117,8 @@ export function WorkflowBuilder({ orgId, userId, onSave, onCancel, initialWorkfl
     try {
       const method = initialWorkflow?.id ? 'PUT' : 'POST';
       const url = initialWorkflow?.id
-        ? `/api/approvals/workflows?id=${initialWorkflow.id}`
-        : '/api/approvals/workflows';
+        ? `/api/x/approvals/workflows?id=${initialWorkflow.id}`
+        : '/api/x/approvals/workflows';
 
       const response = await fetch(url, {
         method,

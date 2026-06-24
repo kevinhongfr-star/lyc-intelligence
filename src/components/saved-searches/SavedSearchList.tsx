@@ -58,7 +58,7 @@ export function SavedSearchList({ orgId, userId, onSelectSearch, onEditSearch }:
 
   const handleToggleActive = async (search: SavedSearch) => {
     try {
-      await fetch(`/api/saved-searches/${search.id}`, {
+      await fetch(`/api/x/saved-searches/${search.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: !search.is_active }),
@@ -73,7 +73,7 @@ export function SavedSearchList({ orgId, userId, onSelectSearch, onEditSearch }:
     if (!confirm('Are you sure you want to delete this saved search?')) return;
 
     try {
-      await fetch(`/api/saved-searches/${searchId}`, {
+      await fetch(`/api/x/saved-searches/${searchId}`, {
         method: 'DELETE',
       });
       fetchSearches();

@@ -260,6 +260,12 @@ export async function updatePipelineStage(pipelineId: string, stage: string): Pr
   return true;
 }
 
+export async function updatePipelineVerdict(pipelineId: string, verdict: string): Promise<boolean> {
+  const { error } = await getSupabase().from('candidates_pipeline').update({ verdict, updated_at: new Date().toISOString() }).eq('id', pipelineId);
+  if (error) { console.error('[Supabase] updatePipelineVerdict:', error); return false; }
+  return true;
+}
+
 // Bulk update mandates status
 export async function bulkUpdateMandateStatus(mandateIds: string[], status: string): Promise<boolean> {
   const { error } = await getSupabase()
@@ -323,7 +329,7 @@ export async function hasMetrixTranscript(candidateId: string): Promise<boolean>
 }
 
 // Notifications API
-export async function getNotifications(userId: string): Promise<{
+export async function getNotificationsByUser(userId: string): Promise<{
   id: string;
   type: string;
   title: string;
@@ -1602,7 +1608,7 @@ export async function getOrgChartPDFData(mandateId: string, companyIds?: string[
   }
 }
 
-export async function getTargetCompanies(mandateId: string): Promise<TargetCompany[]> {
+export async function getTargetCompaniesByMandate(mandateId: string): Promise<TargetCompany[]> {
   try {
     const res = await fetch(`/api/data/target-companies?mandate_id=${mandateId}`);
     if (!res.ok) return [];
@@ -2200,7 +2206,7 @@ export async function getCandidateAssessment(assessmentId: string, candidateId: 
 }
 
 // Submit assessment responses
-export async function submitAssessment(params: {
+export async function submitAssessmentResponses(params: {
   candidateId: string;
   assessmentId: string;
   mandateId: string;
