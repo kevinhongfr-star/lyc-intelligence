@@ -35,6 +35,7 @@ const TIER_STYLES: Record<string, string> = {
 type SortField = 'name' | 'score' | 'seniority' | 'country';
 
 export function CandidatesPage() {
+  const { profile } = useAuthStore();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [seniorityFilter, setSeniorityFilter] = useState<string[]>([]);
