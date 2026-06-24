@@ -63,6 +63,16 @@ const CandidateAssessments = lazy(() => import('@/components/candidate/Candidate
 const CandidateInsights = lazy(() => import('@/components/candidate/CandidateInsights').then(m => ({ default: m.CandidateInsights })));
 const CandidateSettings = lazy(() => import('@/components/candidate/CandidateSettings').then(m => ({ default: m.CandidateSettings })));
 
+const BDPortal = lazy(() => import('@/components/bd/BDPortal').then(m => ({ default: m.BDPortal })));
+const BDDashboard = lazy(() => import('@/components/bd/BDDashboard').then(m => ({ default: m.BDDashboard })));
+const OpportunityList = lazy(() => import('@/components/bd/OpportunityList').then(m => ({ default: m.OpportunityList })));
+const OpportunityDetail = lazy(() => import('@/components/bd/OpportunityDetail').then(m => ({ default: m.OpportunityDetail })));
+const OpportunityForm = lazy(() => import('@/components/bd/OpportunityForm').then(m => ({ default: m.OpportunityForm })));
+const ClientRelationships = lazy(() => import('@/components/bd/ClientRelationships').then(m => ({ default: m.ClientRelationships })));
+const ClientDetail = lazy(() => import('@/components/bd/ClientDetail').then(m => ({ default: m.ClientDetail })));
+const BDForecast = lazy(() => import('@/components/bd/BDForecast').then(m => ({ default: m.BDForecast })));
+const BDMarketIntel = lazy(() => import('@/components/bd/BDMarketIntel').then(m => ({ default: m.BDMarketIntel })));
+
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
 function Loading() { return <div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>; }
@@ -182,6 +192,25 @@ export default function App() {
               <Route path="assessments" element={<CandidateAssessments />} />
               <Route path="insights" element={<CandidateInsights />} />
               <Route path="settings" element={<CandidateSettings />} />
+            </Route>
+
+            {/* BD Portal routes */}
+            <Route path="/bd" element={
+              <ProtectedRoute>
+                <RoleRoute allowedSubtypes={['bd_manager']}>
+                  <BDPortal />
+                </RoleRoute>
+              </ProtectedRoute>
+            }>
+              <Route index element={<BDDashboard />} />
+              <Route path="opportunities" element={<OpportunityList />} />
+              <Route path="opportunities/new" element={<OpportunityForm />} />
+              <Route path="opportunities/:id" element={<OpportunityDetail />} />
+              <Route path="clients" element={<ClientRelationships />} />
+              <Route path="clients/:id" element={<ClientDetail />} />
+              <Route path="forecast" element={<BDForecast />} />
+              <Route path="market-intel" element={<BDMarketIntel />} />
+              <Route path="chat" element={<NexusPage />} />
             </Route>
           </Routes>
         </Suspense>

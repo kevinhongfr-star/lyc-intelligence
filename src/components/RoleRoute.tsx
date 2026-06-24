@@ -8,10 +8,11 @@ import { getPortalRoute } from '@/components/ICPRoute';
 interface RoleRouteProps {
   allowedICP?: ICP[];
   allowedRoles?: string[];
+  allowedSubtypes?: string[];
   children: React.ReactNode;
 }
 
-export function RoleRoute({ allowedICP, allowedRoles, children }: RoleRouteProps) {
+export function RoleRoute({ allowedICP, allowedRoles, allowedSubtypes, children }: RoleRouteProps) {
   const { profile, isLoading } = useAuthStore();
 
   if (isLoading) {
@@ -24,9 +25,19 @@ export function RoleRoute({ allowedICP, allowedRoles, children }: RoleRouteProps
 
   const userICP = profile?.icp as ICP;
   const userRole = profile?.role;
+  const userSubtype = profile?.subtype;
 
   if (userRole === 'admin') {
     return <>{children}</>;
+  }
+
+  if (allowedSubtypes && (!userSubtype || !allowedSubtypes.includes(userSubtype))) {
+    const redirectPath =
+      userSubtype === 'bd_manager' ? '/bd' :
+      userICP === 'client' ? '/client' :
+      userICP === 'candidate' ? '/candidate' :
+      '/platform';
+    return <Navigate to={redirectPath} replace />;
   }
 
   if (allowedICP && (!userICP || !allowedICP.includes(userICP))) {
