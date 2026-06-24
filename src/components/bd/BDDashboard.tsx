@@ -19,6 +19,30 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Link } from 'react-router-dom';
 import { useOpportunities } from '@/hooks/useSupabaseData';
+import type { Opportunity } from '@/services/supabaseApi';
+
+interface OpportunityItem {
+  id: string;
+  company: string;
+  title: string;
+  value: number;
+  stage: string;
+  probability: number;
+}
+
+interface StagePipeline {
+  stage: string;
+  count: number;
+  value: number;
+}
+
+interface ActivityItem {
+  id: string;
+  type: 'meeting' | 'proposal' | 'followup' | 'email';
+  title: string;
+  company: string;
+  time: string;
+}
 
 const STAGES = ['prospect', 'meeting_booked', 'meeting_done', 'proposal_sent', 'negotiation', 'won'];
 const STAGE_LABELS: Record<string, string> = {
@@ -38,21 +62,21 @@ export function BDDashboard() {
 
   const firstName = profile?.name?.split(' ')[0] || 'there';
 
-  const activeOpps = opportunities.filter((o: any) => o.stage !== 'won' && o.stage !== 'lost');
-  const wonOpps = opportunities.filter((o: any) => o.stage === 'won');
+  const activeOpps: Opportunity[] = opportunities.filter((o: Opportunity) => o.stage !== 'won' && o.stage !== 'lost');
+  const wonOpps: Opportunity[] = opportunities.filter((o: Opportunity) => o.stage === 'won');
 
-  const pipelineTotal = activeOpps.reduce((sum: number, o: any) => sum + (o.estimated_fee_usd || 0), 0);
-  const weightedPipeline = activeOpps.reduce((sum: number, o: any) => {
+  const pipelineTotal = activeOpps.reduce((sum: number, o: Opportunity) => sum + (o.estimated_fee_usd || 0), 0);
+  const weightedPipeline = activeOpps.reduce((sum: number, o: Opportunity) => {
     return sum + ((o.estimated_fee_usd || 0) * ((o.probability || 10) / 100));
   }, 0);
   const totalOpps = opportunities.length;
   const winRate = totalOpps > 0 ? Math.round((wonOpps.length / totalOpps) * 100) : 0;
   const activeOpportunities = activeOpps.length;
 
-  const hotOpportunitiesList = [...activeOpps]
-    .sort((a: any, b: any) => (b.probability || 0) - (a.probability || 0))
+  const hotOpportunitiesList: OpportunityItem[] = [...activeOpps]
+    .sort((a: Opportunity, b: Opportunity) => (b.probability || 0) - (a.probability || 0))
     .slice(0, 5)
-    .map((o: any) => ({
+    .map((o: Opportunity) => ({
       id: o.id,
       company: o.company_name || 'Unknown',
       title: o.title,
@@ -61,21 +85,21 @@ export function BDDashboard() {
       probability: o.probability || 10,
     }));
 
-  const pipelineByStage = STAGES.map((stage) => {
-    const stageOpps = activeOpps.filter((o: any) => o.stage === stage);
+  const pipelineByStage: StagePipeline[] = STAGES.map((stage) => {
+    const stageOpps = activeOpps.filter((o: Opportunity) => o.stage === stage);
     const count = stageOpps.length;
-    const value = stageOpps.reduce((sum: number, o: any) => sum + (o.estimated_fee_usd || 0), 0);
+    const value = stageOpps.reduce((sum: number, o: Opportunity) => sum + (o.estimated_fee_usd || 0), 0);
     return { stage, count, value };
   });
 
-  const thisWeekActivityList = activeOpps
-    .filter((o: any) => o.next_action_at || o.next_action)
+  const thisWeekActivityList: ActivityItem[] = activeOpps
+    .filter((o: Opportunity) => o.next_action_at || o.next_action)
     .slice(0, 5)
-    .map((o: any, i: number) => ({
+    .map((o: Opportunity, i: number) => ({
       id: o.id + '_' + i,
-      type: o.next_action?.includes('meeting') ? 'meeting' :
+      type: (o.next_action?.includes('meeting') ? 'meeting' :
             o.next_action?.includes('proposal') ? 'proposal' :
-            o.next_action?.includes('follow') ? 'followup' : 'meeting',
+            o.next_action?.includes('follow') ? 'followup' : 'meeting') as ActivityItem['type'],
       title: o.next_action || 'Follow up',
       company: o.company_name || 'Unknown',
       time: o.next_action_at ? formatDateShort(o.next_action_at) : 'TBD',
@@ -229,7 +253,7 @@ export function BDDashboard() {
               ) : hotOpportunitiesList.length === 0 ? (
                 <div className="text-center py-8 text-text-muted">No opportunities yet</div>
               ) : (
-                hotOpportunitiesList.map((opp: any) => (
+                hotOpportunitiesList.map((opp: OpportunityItem) => (
                   <Link key={opp.id} to={`/bd/opportunities/${opp.id}`}>
                     <div className="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg hover:bg-bg-secondary transition-colors">
                       <div className="flex items-center gap-3">
@@ -275,7 +299,7 @@ export function BDDashboard() {
               ) : thisWeekActivityList.length === 0 ? (
                 <div className="text-center py-8 text-text-muted">No upcoming activities</div>
               ) : (
-                thisWeekActivityList.map((activity: any) => (
+                thisWeekActivityList.map((activity: ActivityItem) => (
                   <div key={activity.id} className="flex items-center gap-3 p-3 bg-bg-tertiary rounded-lg">
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${getTypeColor(activity.type)}`}>
                       {getTypeIcon(activity.type)}
@@ -305,7 +329,7 @@ export function BDDashboard() {
                 <div className="text-center py-4 text-text-muted">Loading...</div>
               ) : (
                 pipelineByStage.map(({ stage, count, value }) => {
-                  const maxValue = Math.max(...pipelineByStage.map((s: any) => s.value), 1);
+                  const maxValue = Math.max(...pipelineByStage.map((s: StagePipeline) => s.value), 1);
                   const width = (value / maxValue) * 100;
                   return (
                     <div key={stage}>

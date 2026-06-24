@@ -19,6 +19,42 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useMandates, useApprovalRequests, useTeamAssignments } from '@/hooks/useSupabaseData';
+import type { Mandate, ApprovalRequest, TeamAssignment } from '@/services/supabaseApi';
+
+interface MandateWithExtras extends Mandate {
+  estimated_fee?: number;
+  budget?: number;
+  due_date?: string;
+  consultant_id?: string;
+  consultant?: { name?: string };
+}
+
+interface AtRiskMandateItem {
+  id: string;
+  title: string;
+  company: string;
+  consultant: string;
+  risk: 'high' | 'medium';
+  slaStatus: 'at_risk' | 'on_track';
+  dueIn: number;
+}
+
+interface ApprovalItem {
+  id: string;
+  type: string;
+  title: string;
+  mandate: string;
+  requester: string;
+  age: string;
+}
+
+interface TeamMemberItem {
+  id: string;
+  name: string;
+  activeMandates: number;
+  capacity: number;
+  score: number;
+}
 
 export function TL_Dashboard() {
   const { profile } = useAuthStore();
@@ -29,46 +65,46 @@ export function TL_Dashboard() {
 
   const firstName = profile?.name?.split(' ')[0] || 'there';
 
-  const activeMandates = mandates.filter((m: any) => m.status === 'active' || m.status === 'in_progress').length;
-  const atRiskMandates = mandates.filter((m: any) => m.priority === 'urgent' || m.status === 'on_hold').length;
+  const activeMandates = mandates.filter((m: MandateWithExtras) => m.status === 'active' || m.status === 'in_progress').length;
+  const atRiskMandates = mandates.filter((m: MandateWithExtras) => m.priority === 'urgent' || m.status === 'on_hold').length;
   const pendingApprovalsCount = approvalRequests.length;
   const teamMembersCount = teamAssignments.length;
-  const pipelineValue = mandates.reduce((sum: number, m: any) => sum + (m.estimated_fee || m.budget || 0), 0);
+  const pipelineValue = mandates.reduce((sum: number, m: MandateWithExtras) => sum + (m.estimated_fee || m.budget || 0), 0);
   const weightedForecast = Math.round(pipelineValue * 0.35);
   const slaCompliance = activeMandates > 0 ? Math.round(((activeMandates - atRiskMandates) / activeMandates) * 100) : 100;
 
-  const atRiskMandateList = mandates
-    .filter((m: any) => m.priority === 'urgent' || m.status === 'on_hold')
+  const atRiskMandateList: AtRiskMandateItem[] = mandates
+    .filter((m: MandateWithExtras) => m.priority === 'urgent' || m.status === 'on_hold')
     .slice(0, 5)
-    .map((m: any) => ({
+    .map((m: MandateWithExtras) => ({
       id: m.id,
       title: m.title || 'Untitled Mandate',
-      company: m.company_name || (m.company as any)?.name || 'Unknown',
-      consultant: (m.consultant as any)?.name || 'Unassigned',
+      company: m.company_name || (m.company as { name?: string })?.name || 'Unknown',
+      consultant: (m.consultant as { name?: string })?.name || 'Unassigned',
       risk: m.priority === 'urgent' ? 'high' : 'medium',
       slaStatus: m.status === 'on_hold' ? 'at_risk' : 'on_track',
       dueIn: m.due_date ? Math.ceil((new Date(m.due_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 7,
     }));
 
-  const pendingApprovalList = approvalRequests.slice(0, 5).map((a: any) => ({
+  const pendingApprovalList: ApprovalItem[] = approvalRequests.slice(0, 5).map((a: ApprovalRequest) => ({
     id: a.id,
     type: a.request_type,
-    title: a.request_data?.title || `${a.request_type.replace(/_/g, ' ')} request`,
+    title: (a.request_data as { title?: string })?.title || `${a.request_type.replace(/_/g, ' ')} request`,
     mandate: a.mandate_id || 'Unknown mandate',
     requester: a.requester_id || 'Unknown',
     age: a.requested_at ? formatAge(a.requested_at) : 'N/A',
   }));
 
-  const teamLoadList = teamAssignments.map((ta: any) => {
-    const consultantMandates = mandates.filter((m: any) => m.consultant_id === ta.consultant_id);
-    const activeCount = consultantMandates.filter((m: any) => m.status === 'active' || m.status === 'in_progress').length;
+  const teamLoadList: TeamMemberItem[] = teamAssignments.map((ta: TeamAssignment) => {
+    const consultantMandates = mandates.filter((m: MandateWithExtras) => m.consultant_id === ta.consultant_id);
+    const activeCount = consultantMandates.filter((m: MandateWithExtras) => m.status === 'active' || m.status === 'in_progress').length;
     const capacity = Math.min(100, activeCount * 25);
     return {
       id: ta.consultant_id,
       name: ta.consultant_id?.slice(0, 8) || 'Consultant',
       activeMandates: activeCount,
       capacity,
-      score: Math.round(60 + Math.random() * 35),
+      score: capacity + 10,
     };
   });
 
@@ -215,7 +251,7 @@ export function TL_Dashboard() {
               ) : atRiskMandateList.length === 0 ? (
                 <div className="text-center py-8 text-text-muted">No at-risk mandates</div>
               ) : (
-                atRiskMandateList.map((m: any) => (
+                atRiskMandateList.map((m: AtRiskMandateItem) => (
                   <Link key={m.id} to={`/team/mandates/${m.id}`}>
                     <div className="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg hover:bg-bg-secondary transition-colors">
                       <div className="flex items-center gap-3">
@@ -259,7 +295,7 @@ export function TL_Dashboard() {
               ) : pendingApprovalList.length === 0 ? (
                 <div className="text-center py-8 text-text-muted">No pending approvals</div>
               ) : (
-                pendingApprovalList.map((a: any) => (
+                pendingApprovalList.map((a: ApprovalItem) => (
                   <Link key={a.id} to={`/team/approvals/${a.id}`}>
                     <div className="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg hover:bg-bg-secondary transition-colors">
                       <div className="flex items-center gap-3">
@@ -300,7 +336,7 @@ export function TL_Dashboard() {
               ) : teamLoadList.length === 0 ? (
                 <div className="text-center py-4 text-text-muted">No team members</div>
               ) : (
-                teamLoadList.map((member: any) => (
+                teamLoadList.map((member: TeamMemberItem) => (
                   <div key={member.id || member.name} className="space-y-1">
                     <div className="flex items-center justify-between text-sm">
                       <span className="font-medium text-text-primary">{member.name}</span>
@@ -337,7 +373,7 @@ export function TL_Dashboard() {
               ) : teamLoadList.length === 0 ? (
                 <div className="text-center py-4 text-text-muted">No team data</div>
               ) : (
-                [...teamLoadList].sort((a, b) => b.score - a.score).map((member: any, i: number) => (
+                [...teamLoadList].sort((a: TeamMemberItem, b: TeamMemberItem) => b.score - a.score).map((member: TeamMemberItem, i: number) => (
                   <div key={member.id || member.name} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${

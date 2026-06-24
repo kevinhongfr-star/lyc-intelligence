@@ -17,6 +17,8 @@ import { Link } from 'react-router-dom';
 export function CandidateDashboard() {
   const { profile } = useAuthStore();
 
+  const firstName = profile?.name?.split(' ')[0] || 'Candidate';
+
   const activeApplications = 2;
   const completedAssessments = 1;
   const archetype = 'The Architect';
@@ -82,7 +84,7 @@ export function CandidateDashboard() {
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-serif font-bold text-text-primary">
-          Welcome back, {profile?.first_name || 'Candidate'}
+          Welcome back, {firstName}
         </h1>
         <p className="text-text-muted">Here's what's happening with your career journey</p>
       </div>
