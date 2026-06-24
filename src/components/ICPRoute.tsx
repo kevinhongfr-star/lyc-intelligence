@@ -42,8 +42,9 @@ export function getPortalRoute(icp: ICP | null): string {
       return '/client';
     case 'candidate':
       return '/candidate';
-    case 'consultant':
     case 'leader':
+      return '/team';
+    case 'consultant':
     default:
       return '/platform';
   }

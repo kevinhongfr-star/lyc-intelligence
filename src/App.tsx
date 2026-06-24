@@ -73,6 +73,16 @@ const ClientDetail = lazy(() => import('@/components/bd/ClientDetail').then(m =>
 const BDForecast = lazy(() => import('@/components/bd/BDForecast').then(m => ({ default: m.BDForecast })));
 const BDMarketIntel = lazy(() => import('@/components/bd/BDMarketIntel').then(m => ({ default: m.BDMarketIntel })));
 
+const TeamLeadPortal = lazy(() => import('@/components/team-lead/TeamLeadPortal').then(m => ({ default: m.TeamLeadPortal })));
+const TL_Dashboard = lazy(() => import('@/components/team-lead/TL_Dashboard').then(m => ({ default: m.TL_Dashboard })));
+const TL_Approvals = lazy(() => import('@/components/team-lead/TL_Approvals').then(m => ({ default: m.TL_Approvals })));
+const TL_ApprovalDetail = lazy(() => import('@/components/team-lead/TL_ApprovalDetail').then(m => ({ default: m.TL_ApprovalDetail })));
+const TL_TeamOverview = lazy(() => import('@/components/team-lead/TL_TeamOverview').then(m => ({ default: m.TL_TeamOverview })));
+const TL_MandatePortfolio = lazy(() => import('@/components/team-lead/TL_MandatePortfolio').then(m => ({ default: m.TL_MandatePortfolio })));
+const TL_SLADashboard = lazy(() => import('@/components/team-lead/TL_SLADashboard').then(m => ({ default: m.TL_SLADashboard })));
+const TL_RevenueDashboard = lazy(() => import('@/components/team-lead/TL_RevenueDashboard').then(m => ({ default: m.TL_RevenueDashboard })));
+const TL_ClientOverview = lazy(() => import('@/components/team-lead/TL_ClientOverview').then(m => ({ default: m.TL_ClientOverview })));
+
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
 function Loading() { return <div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>; }
@@ -211,6 +221,27 @@ export default function App() {
               <Route path="forecast" element={<BDForecast />} />
               <Route path="market-intel" element={<BDMarketIntel />} />
               <Route path="chat" element={<NexusPage />} />
+            </Route>
+
+            {/* Team Lead Portal routes */}
+            <Route path="/team" element={
+              <ProtectedRoute>
+                <RoleRoute allowedICP={['leader']}>
+                  <TeamLeadPortal />
+                </RoleRoute>
+              </ProtectedRoute>
+            }>
+              <Route index element={<TL_Dashboard />} />
+              <Route path="approvals" element={<TL_Approvals />} />
+              <Route path="approvals/:id" element={<TL_ApprovalDetail />} />
+              <Route path="mandates" element={<TL_MandatePortfolio />} />
+              <Route path="mandates/:id" element={<MandateDetailPage />} />
+              <Route path="sla" element={<TL_SLADashboard />} />
+              <Route path="revenue" element={<TL_RevenueDashboard />} />
+              <Route path="consultants" element={<TL_TeamOverview />} />
+              <Route path="clients" element={<TL_ClientOverview />} />
+              <Route path="chat" element={<NexusPage />} />
+              <Route path="settings" element={<SettingsPage />} />
             </Route>
           </Routes>
         </Suspense>
