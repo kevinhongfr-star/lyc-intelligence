@@ -597,6 +597,260 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    // ── Opportunities CRUD ──
+    if (resource === 'opportunity') {
+      if (method === 'GET' && !id) {
+        const limit = parseInt(req.query.limit as string) || 50;
+        const offset = parseInt(req.query.offset as string) || 0;
+        const stage = req.query.stage as string;
+        const search = req.query.q as string;
+
+        let query: any = {
+          orderBy: { column: 'created_at', ascending: false },
+          limit,
+          offset,
+        };
+
+        let where: any[] = [];
+
+        if (userRole !== 'super_admin') {
+          where.push({ column: 'bd_owner_id', value: authUserId });
+        }
+
+        if (stage) {
+          where.push({ column: 'stage', value: stage });
+        }
+
+        if (where.length > 0) {
+          query.where = where;
+        }
+
+        const rows = await db.selectMany('opportunities', query, 15000);
+        const countResult = await db.selectMany('opportunities', { select: 'count(*)', where: where.length > 0 ? where : undefined }, 15000);
+        const total = countResult?.[0]?.count || rows.length;
+
+        let filtered = rows;
+        if (search) {
+          const q = search.toLowerCase();
+          filtered = rows.filter((r: any) =>
+            (r.title || '').toLowerCase().includes(q) ||
+            (r.company_name || '').toLowerCase().includes(q)
+          );
+        }
+
+        return res.status(200).json({ success: true, data: filtered, total });
+      }
+
+      if (method === 'GET' && id) {
+        const opportunity = await db.selectOne('opportunities', {
+          column: 'id',
+          value: id,
+          select: '*',
+        }, 15000);
+
+        if (!opportunity) {
+          return res.status(404).json({ error: 'Opportunity not found' });
+        }
+
+        if (userRole !== 'super_admin' && opportunity.bd_owner_id !== authUserId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        return res.status(200).json({ success: true, data: opportunity });
+      }
+
+      if (method === 'POST' && !id) {
+        const { title, company_name, company_id, contact_name, contact_email,
+                contact_phone, stage, estimated_fee_usd, probability, fee_type,
+                source, source_detail, first_contact_at, next_action_at, next_action,
+                bd_owner_id } = req.body || {};
+
+        if (!title) {
+          return res.status(400).json({ error: 'title is required' });
+        }
+
+        const row = await db.insert('opportunities', {
+          title,
+          company_name: company_name || null,
+          company_id: company_id || null,
+          contact_name: contact_name || null,
+          contact_email: contact_email || null,
+          contact_phone: contact_phone || null,
+          stage: stage || 'prospect',
+          estimated_fee_usd: estimated_fee_usd || null,
+          probability: probability ?? 10,
+          fee_type: fee_type || 'contingency',
+          bd_owner_id: bd_owner_id || authUserId,
+          source: source || null,
+          source_detail: source_detail || null,
+          first_contact_at: first_contact_at || null,
+          next_action_at: next_action_at || null,
+          next_action: next_action || null,
+        }, 15000);
+        return res.status(201).json({ success: true, data: row });
+      }
+
+      if (method === 'PATCH' && id) {
+        const opportunity = await db.selectOne('opportunities', {
+          column: 'id',
+          value: id,
+          select: 'id, bd_owner_id',
+        });
+
+        if (!opportunity) {
+          return res.status(404).json({ error: 'Opportunity not found' });
+        }
+
+        if (userRole !== 'super_admin' && opportunity.bd_owner_id !== authUserId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const updates = req.body || {};
+        delete updates.id;
+        delete updates.created_at;
+        const rows = await db.update('opportunities', { column: 'id', value: id }, updates, 15000);
+        return res.status(200).json({ success: true, data: rows[0] || null });
+      }
+    }
+
+    // ── Approval Requests CRUD ──
+    if (resource === 'approval-request') {
+      if (method === 'GET' && !id) {
+        const limit = parseInt(req.query.limit as string) || 50;
+        const offset = parseInt(req.query.offset as string) || 0;
+        const status = req.query.status as string;
+
+        let where: any[] = [];
+
+        if (userRole !== 'super_admin') {
+          where = [
+            { column: 'approver_id', value: authUserId },
+          ];
+        }
+
+        if (status) {
+          where.push({ column: 'status', value: status });
+        }
+
+        const rows = await db.selectMany('approval_requests', {
+          where: where.length > 0 ? where : undefined,
+          orderBy: { column: 'created_at', ascending: false },
+          limit,
+          offset,
+        }, 15000);
+
+        return res.status(200).json({ success: true, data: rows, total: rows.length });
+      }
+
+      if (method === 'GET' && id) {
+        const approval = await db.selectOne('approval_requests', {
+          column: 'id',
+          value: id,
+          select: '*',
+        }, 15000);
+
+        if (!approval) {
+          return res.status(404).json({ error: 'Approval request not found' });
+        }
+
+        if (userRole !== 'super_admin' && approval.approver_id !== authUserId && approval.requester_id !== authUserId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        return res.status(200).json({ success: true, data: approval });
+      }
+
+      if (method === 'POST' && !id) {
+        const { request_type, mandate_id, candidate_id, approver_id, request_data, due_at } = req.body || {};
+
+        if (!request_type || !approver_id) {
+          return res.status(400).json({ error: 'request_type and approver_id are required' });
+        }
+
+        const row = await db.insert('approval_requests', {
+          request_type,
+          mandate_id: mandate_id || null,
+          candidate_id: candidate_id || null,
+          requester_id: authUserId,
+          approver_id,
+          request_data: request_data ? JSON.stringify(request_data) : null,
+          due_at: due_at || null,
+        }, 15000);
+        return res.status(201).json({ success: true, data: row });
+      }
+
+      if (method === 'PATCH' && id) {
+        const approval = await db.selectOne('approval_requests', {
+          column: 'id',
+          value: id,
+          select: 'id, approver_id, requester_id',
+        });
+
+        if (!approval) {
+          return res.status(404).json({ error: 'Approval request not found' });
+        }
+
+        if (userRole !== 'super_admin' && approval.approver_id !== authUserId && approval.requester_id !== authUserId) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const updates = req.body || {};
+        delete updates.id;
+        delete updates.created_at;
+        if (updates.status && !updates.reviewed_at) {
+          updates.reviewed_at = new Date().toISOString();
+        }
+        const rows = await db.update('approval_requests', { column: 'id', value: id }, updates, 15000);
+        return res.status(200).json({ success: true, data: rows[0] || null });
+      }
+    }
+
+    // ── Team Assignments CRUD ──
+    if (resource === 'team-assignment') {
+      if (method === 'GET' && !id) {
+        const team_lead_id = req.query.team_lead_id as string;
+        const consultant_id = req.query.consultant_id as string;
+
+        let where: any[] = [];
+
+        if (team_lead_id) {
+          where.push({ column: 'team_lead_id', value: team_lead_id });
+        }
+        if (consultant_id) {
+          where.push({ column: 'consultant_id', value: consultant_id });
+        }
+
+        if (userRole !== 'super_admin' && !team_lead_id && !consultant_id) {
+          where.push({ column: 'team_lead_id', value: authUserId });
+        }
+
+        const rows = await db.selectMany('team_assignments', {
+          where: where.length > 0 ? where : undefined,
+          orderBy: { column: 'created_at', ascending: false },
+        }, 15000);
+
+        return res.status(200).json({ success: true, data: rows });
+      }
+
+      if (method === 'POST' && !id) {
+        if (userRole !== 'super_admin') {
+          return res.status(403).json({ error: 'Admin access required' });
+        }
+
+        const { consultant_id, team_lead_id } = req.body || {};
+
+        if (!consultant_id || !team_lead_id) {
+          return res.status(400).json({ error: 'consultant_id and team_lead_id are required' });
+        }
+
+        const row = await db.insert('team_assignments', {
+          consultant_id,
+          team_lead_id,
+        }, 15000);
+        return res.status(201).json({ success: true, data: row });
+      }
+    }
+
     // ── Scoring Run Persistence ──
     if (resource === 'scoring-run') {
       if (method === 'POST') {

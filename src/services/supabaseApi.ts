@@ -175,12 +175,12 @@ export async function getContact(id: string): Promise<Contact | null> {
   return c;
 }
 
-export async function getMandates(params?: { status?: string; limit?: number; offset?: number; userId?: string; }): Promise<{ data: Mandate[]; count: number }> {
-  // Use the API endpoint for authorization filtering
+export async function getMandates(params?: { status?: string; limit?: number; offset?: number; userId?: string; organizationId?: string; }): Promise<{ data: Mandate[]; count: number }> {
   const queryParams = new URLSearchParams();
   if (params?.limit) queryParams.set('limit', params.limit.toString());
   if (params?.offset) queryParams.set('offset', params.offset.toString());
   if (params?.userId) queryParams.set('user_id', params.userId);
+  if (params?.organizationId) queryParams.set('organization_id', params.organizationId);
   
   try {
     const res = await fetch(`/api/data/mandate?${queryParams.toString()}`);
@@ -3303,4 +3303,196 @@ export async function getCombinedScore(
     usesMlpScore,
     hasOverride: false,
   };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// OPPORTUNITIES (BD Pipeline)
+// ═══════════════════════════════════════════════════════════════
+
+export interface Opportunity {
+  id: string;
+  title: string;
+  company_name: string | null;
+  company_id: string | null;
+  contact_name: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  stage: string;
+  estimated_fee_usd: number | null;
+  probability: number;
+  fee_type: string | null;
+  bd_owner_id: string | null;
+  source: string | null;
+  source_detail: string | null;
+  first_contact_at: string | null;
+  next_action_at: string | null;
+  next_action: string | null;
+  closed_at: string | null;
+  closed_reason: string | null;
+  converted_to_mandate_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getOpportunities(params?: {
+  stage?: string;
+  limit?: number;
+  offset?: number;
+  q?: string;
+}): Promise<{ data: Opportunity[]; total: number }> {
+  const queryParams = new URLSearchParams();
+  if (params?.stage) queryParams.set('stage', params.stage);
+  if (params?.limit) queryParams.set('limit', params.limit.toString());
+  if (params?.offset) queryParams.set('offset', params.offset.toString());
+  if (params?.q) queryParams.set('q', params.q);
+
+  try {
+    const res = await fetch(`/api/data/opportunity?${queryParams.toString()}`);
+    const result = await res.json();
+    if (result.success) {
+      return { data: result.data || [], total: result.total || 0 };
+    }
+    return { data: [], total: 0 };
+  } catch (e) {
+    console.error('[Opportunities] getOpportunities error:', e);
+    return { data: [], total: 0 };
+  }
+}
+
+export async function getOpportunity(id: string): Promise<Opportunity | null> {
+  try {
+    const res = await fetch(`/api/data/opportunity/${id}`);
+    const result = await res.json();
+    if (result.success) return result.data;
+    return null;
+  } catch (e) {
+    console.error('[Opportunities] getOpportunity error:', e);
+    return null;
+  }
+}
+
+export async function createOpportunity(data: Partial<Opportunity>): Promise<Opportunity | null> {
+  try {
+    const res = await fetch('/api/data/opportunity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (result.success) return result.data;
+    return null;
+  } catch (e) {
+    console.error('[Opportunities] createOpportunity error:', e);
+    return null;
+  }
+}
+
+export async function updateOpportunity(id: string, data: Partial<Opportunity>): Promise<Opportunity | null> {
+  try {
+    const res = await fetch(`/api/data/opportunity/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (result.success) return result.data;
+    return null;
+  } catch (e) {
+    console.error('[Opportunities] updateOpportunity error:', e);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// APPROVAL REQUESTS (Team Lead)
+// ═══════════════════════════════════════════════════════════════
+
+export interface ApprovalRequest {
+  id: string;
+  request_type: string;
+  mandate_id: string | null;
+  candidate_id: string | null;
+  requester_id: string | null;
+  approver_id: string | null;
+  status: string;
+  request_data: any;
+  reviewer_notes: string | null;
+  requested_at: string | null;
+  reviewed_at: string | null;
+  due_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getApprovalRequests(params?: {
+  status?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ data: ApprovalRequest[]; total: number }> {
+  const queryParams = new URLSearchParams();
+  if (params?.status) queryParams.set('status', params.status);
+  if (params?.limit) queryParams.set('limit', params.limit.toString());
+  if (params?.offset) queryParams.set('offset', params.offset.toString());
+
+  try {
+    const res = await fetch(`/api/data/approval-request?${queryParams.toString()}`);
+    const result = await res.json();
+    if (result.success) {
+      return { data: result.data || [], total: result.total || 0 };
+    }
+    return { data: [], total: 0 };
+  } catch (e) {
+    console.error('[Approvals] getApprovalRequests error:', e);
+    return { data: [], total: 0 };
+  }
+}
+
+export async function updateApprovalRequest(
+  id: string,
+  data: Partial<ApprovalRequest>
+): Promise<ApprovalRequest | null> {
+  try {
+    const res = await fetch(`/api/data/approval-request/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (result.success) return result.data;
+    return null;
+  } catch (e) {
+    console.error('[Approvals] updateApprovalRequest error:', e);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TEAM ASSIGNMENTS
+// ═══════════════════════════════════════════════════════════════
+
+export interface TeamAssignment {
+  id: string;
+  consultant_id: string;
+  team_lead_id: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export async function getTeamAssignments(params?: {
+  team_lead_id?: string;
+  consultant_id?: string;
+}): Promise<TeamAssignment[]> {
+  const queryParams = new URLSearchParams();
+  if (params?.team_lead_id) queryParams.set('team_lead_id', params.team_lead_id);
+  if (params?.consultant_id) queryParams.set('consultant_id', params.consultant_id);
+
+  try {
+    const res = await fetch(`/api/data/team-assignment?${queryParams.toString()}`);
+    const result = await res.json();
+    if (result.success) return result.data || [];
+    return [];
+  } catch (e) {
+    console.error('[Team] getTeamAssignments error:', e);
+    return [];
+  }
 }

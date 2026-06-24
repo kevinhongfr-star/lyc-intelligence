@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Link } from 'react-router-dom';
+import { useOpportunities } from '@/hooks/useSupabaseData';
 
 const STAGES = ['prospect', 'meeting_booked', 'meeting_done', 'proposal_sent', 'negotiation', 'won'];
 const STAGE_LABELS: Record<string, string> = {
@@ -33,25 +34,52 @@ const STAGE_LABELS: Record<string, string> = {
 export function BDDashboard() {
   const { profile } = useAuthStore();
 
-  const pipelineTotal = 1250000;
-  const weightedPipeline = 425000;
-  const winRate = 32;
-  const activeOpportunities = 18;
+  const { data: opportunities, loading: oppsLoading } = useOpportunities({ limit: 100 });
 
-  const hotOpportunities = [
-    { id: '1', company: 'TechCorp', title: 'VP Engineering', value: 150000, stage: 'negotiation', probability: 70 },
-    { id: '2', company: 'FinanceCo', title: 'Managing Director', value: 180000, stage: 'proposal_sent', probability: 50 },
-    { id: '3', company: 'ScaleUp Inc', title: 'CFO', value: 120000, stage: 'meeting_done', probability: 40 },
-  ];
+  const firstName = profile?.name?.split(' ')[0] || 'there';
 
-  const thisWeekActivity = [
-    { id: '1', type: 'meeting', title: 'TechCorp discovery call', company: 'TechCorp', time: 'Today, 2:00 PM' },
-    { id: '2', type: 'proposal', title: 'Send proposal to FinanceCo', company: 'FinanceCo', time: 'Tomorrow' },
-    { id: '3', type: 'followup', title: 'Follow up with Retail Group', company: 'Retail Group', time: 'Wed' },
-    { id: '4', type: 'meeting', title: 'ScaleUp Inc intro meeting', company: 'ScaleUp Inc', time: 'Thu, 10:00 AM' },
-  ];
+  const activeOpps = opportunities.filter((o: any) => o.stage !== 'won' && o.stage !== 'lost');
+  const wonOpps = opportunities.filter((o: any) => o.stage === 'won');
 
-  const firstName = profile?.first_name || profile?.name?.split(' ')[0] || 'there';
+  const pipelineTotal = activeOpps.reduce((sum: number, o: any) => sum + (o.estimated_fee_usd || 0), 0);
+  const weightedPipeline = activeOpps.reduce((sum: number, o: any) => {
+    return sum + ((o.estimated_fee_usd || 0) * ((o.probability || 10) / 100));
+  }, 0);
+  const totalOpps = opportunities.length;
+  const winRate = totalOpps > 0 ? Math.round((wonOpps.length / totalOpps) * 100) : 0;
+  const activeOpportunities = activeOpps.length;
+
+  const hotOpportunitiesList = [...activeOpps]
+    .sort((a: any, b: any) => (b.probability || 0) - (a.probability || 0))
+    .slice(0, 5)
+    .map((o: any) => ({
+      id: o.id,
+      company: o.company_name || 'Unknown',
+      title: o.title,
+      value: o.estimated_fee_usd || 0,
+      stage: o.stage,
+      probability: o.probability || 10,
+    }));
+
+  const pipelineByStage = STAGES.map((stage) => {
+    const stageOpps = activeOpps.filter((o: any) => o.stage === stage);
+    const count = stageOpps.length;
+    const value = stageOpps.reduce((sum: number, o: any) => sum + (o.estimated_fee_usd || 0), 0);
+    return { stage, count, value };
+  });
+
+  const thisWeekActivityList = activeOpps
+    .filter((o: any) => o.next_action_at || o.next_action)
+    .slice(0, 5)
+    .map((o: any, i: number) => ({
+      id: o.id + '_' + i,
+      type: o.next_action?.includes('meeting') ? 'meeting' :
+            o.next_action?.includes('proposal') ? 'proposal' :
+            o.next_action?.includes('follow') ? 'followup' : 'meeting',
+      title: o.next_action || 'Follow up',
+      company: o.company_name || 'Unknown',
+      time: o.next_action_at ? formatDateShort(o.next_action_at) : 'TBD',
+    }));
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -86,6 +114,17 @@ export function BDDashboard() {
     return `$${val}`;
   };
 
+  const formatDateShort = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffDays = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return 'Overdue';
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Tomorrow';
+    if (diffDays < 7) return date.toLocaleDateString('en-US', { weekday: 'short' });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -110,7 +149,7 @@ export function BDDashboard() {
               <div>
                 <p className="text-sm text-text-muted">Pipeline Value</p>
                 <p className="text-2xl font-bold text-text-primary mt-1">
-                  {formatCurrency(pipelineTotal)}
+                  {oppsLoading ? '—' : formatCurrency(pipelineTotal)}
                 </p>
               </div>
               <div className="p-3 bg-accent/10 rounded-lg">
@@ -130,7 +169,7 @@ export function BDDashboard() {
               <div>
                 <p className="text-sm text-text-muted">Weighted Forecast</p>
                 <p className="text-2xl font-bold text-text-primary mt-1">
-                  {formatCurrency(weightedPipeline)}
+                  {oppsLoading ? '—' : formatCurrency(weightedPipeline)}
                 </p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
@@ -146,7 +185,7 @@ export function BDDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-text-muted">Win Rate</p>
-                <p className="text-2xl font-bold text-text-primary mt-1">{winRate}%</p>
+                <p className="text-2xl font-bold text-text-primary mt-1">{oppsLoading ? '—' : `${winRate}%`}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
                 <Award className="w-6 h-6 text-green-600" />
@@ -161,7 +200,7 @@ export function BDDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-text-muted">Active Deals</p>
-                <p className="text-2xl font-bold text-text-primary mt-1">{activeOpportunities}</p>
+                <p className="text-2xl font-bold text-text-primary mt-1">{oppsLoading ? '—' : activeOpportunities}</p>
               </div>
               <div className="p-3 bg-purple-100 rounded-lg">
                 <Users className="w-6 h-6 text-purple-600" />
@@ -185,35 +224,41 @@ export function BDDashboard() {
               </Link>
             </CardHeader>
             <CardContent className="space-y-3">
-              {hotOpportunities.map((opp) => (
-                <Link key={opp.id} to={`/bd/opportunities/${opp.id}`}>
-                  <div className="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg hover:bg-bg-secondary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
-                        <Briefcase className="w-5 h-5 text-accent" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-text-primary">{opp.title}</p>
-                        <p className="text-sm text-text-muted">{opp.company}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="font-semibold text-text-primary">
-                          {formatCurrency(opp.value)}
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="text-[10px]">
-                            {STAGE_LABELS[opp.stage]}
-                          </Badge>
-                          <span className="text-xs text-text-muted">{opp.probability}%</span>
+              {oppsLoading ? (
+                <div className="text-center py-8 text-text-muted">Loading...</div>
+              ) : hotOpportunitiesList.length === 0 ? (
+                <div className="text-center py-8 text-text-muted">No opportunities yet</div>
+              ) : (
+                hotOpportunitiesList.map((opp: any) => (
+                  <Link key={opp.id} to={`/bd/opportunities/${opp.id}`}>
+                    <div className="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg hover:bg-bg-secondary transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                          <Briefcase className="w-5 h-5 text-accent" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-text-primary">{opp.title}</p>
+                          <p className="text-sm text-text-muted">{opp.company}</p>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-text-muted" />
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="font-semibold text-text-primary">
+                            {formatCurrency(opp.value)}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-[10px]">
+                              {STAGE_LABELS[opp.stage] || opp.stage}
+                            </Badge>
+                            <span className="text-xs text-text-muted">{opp.probability}%</span>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-text-muted" />
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))
+              )}
             </CardContent>
           </Card>
 
@@ -225,18 +270,24 @@ export function BDDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {thisWeekActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center gap-3 p-3 bg-bg-tertiary rounded-lg">
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${getTypeColor(activity.type)}`}>
-                    {getTypeIcon(activity.type)}
+              {oppsLoading ? (
+                <div className="text-center py-8 text-text-muted">Loading...</div>
+              ) : thisWeekActivityList.length === 0 ? (
+                <div className="text-center py-8 text-text-muted">No upcoming activities</div>
+              ) : (
+                thisWeekActivityList.map((activity: any) => (
+                  <div key={activity.id} className="flex items-center gap-3 p-3 bg-bg-tertiary rounded-lg">
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${getTypeColor(activity.type)}`}>
+                      {getTypeIcon(activity.type)}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-text-primary text-sm">{activity.title}</p>
+                      <p className="text-xs text-text-muted">{activity.company}</p>
+                    </div>
+                    <span className="text-xs text-text-muted whitespace-nowrap">{activity.time}</span>
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-text-primary text-sm">{activity.title}</p>
-                    <p className="text-xs text-text-muted">{activity.company}</p>
-                  </div>
-                  <span className="text-xs text-text-muted whitespace-nowrap">{activity.time}</span>
-                </div>
-              ))}
+                ))
+              )}
             </CardContent>
           </Card>
         </div>
@@ -250,26 +301,28 @@ export function BDDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {STAGES.map((stage) => {
-                const count = STAGES.indexOf(stage) + 2;
-                const value = pipelineTotal * (0.3 - STAGES.indexOf(stage) * 0.04);
-                const maxWidth = 100;
-                const width = (value / pipelineTotal) * maxWidth;
-                return (
-                  <div key={stage}>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-text-secondary">{STAGE_LABELS[stage]}</span>
-                      <span className="text-text-muted">{count} · {formatCurrency(Math.max(0, value))}</span>
+              {oppsLoading ? (
+                <div className="text-center py-4 text-text-muted">Loading...</div>
+              ) : (
+                pipelineByStage.map(({ stage, count, value }) => {
+                  const maxValue = Math.max(...pipelineByStage.map((s: any) => s.value), 1);
+                  const width = (value / maxValue) * 100;
+                  return (
+                    <div key={stage}>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-text-secondary">{STAGE_LABELS[stage] || stage}</span>
+                        <span className="text-text-muted">{count} · {formatCurrency(value)}</span>
+                      </div>
+                      <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-accent rounded-full transition-all"
+                          style={{ width: `${Math.max(5, width)}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-accent rounded-full transition-all"
-                        style={{ width: `${Math.max(5, width)}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </CardContent>
           </Card>
 

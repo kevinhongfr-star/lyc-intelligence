@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/stores/authStore';
-import { getDashboardStats, getMandates, searchContacts, getPipelineByMandate, getMandateWithPipeline, getEvents, getDocuments, getNotifications, getCompanies, getTierDistribution, getRecentActivity, getContact } from '@/services/supabaseApi';
-import type { Mandate, Contact, Company, CandidatePipeline, CalendarEvent, Document } from '@/services/supabaseApi';
+import { getDashboardStats, getMandates, searchContacts, getPipelineByMandate, getMandateWithPipeline, getEvents, getDocuments, getNotifications, getCompanies, getTierDistribution, getRecentActivity, getContact, getOpportunities, getApprovalRequests, getTeamAssignments } from '@/services/supabaseApi';
+import type { Mandate, Contact, Company, CandidatePipeline, CalendarEvent, Document, Opportunity, ApprovalRequest, TeamAssignment } from '@/services/supabaseApi';
 
 export function useDashboardStats() {
   const [stats, setStats] = useState<any>(null); const [loading, setLoading] = useState(true);
@@ -9,13 +9,13 @@ export function useDashboardStats() {
   return { stats, loading };
 }
 
-export function useMandates(params?: { status?: string; limit?: number }) {
+export function useMandates(params?: { status?: string; limit?: number; organizationId?: string; offset?: number; }) {
   const { profile } = useAuthStore();
   const [data, setData] = useState<Mandate[]>([]); const [count, setCount] = useState(0); const [loading, setLoading] = useState(true); const [error, setError] = useState<string | null>(null);
   useEffect(() => { 
     const queryParams = { ...params, userId: profile?.id };
     getMandates(queryParams).then(r => { setData(r.data); setCount(r.count); setLoading(false); }).catch(e => { setError(e.message); setLoading(false); }); 
-  }, [profile?.id]);
+  }, [profile?.id, params?.organizationId, params?.status, params?.limit, params?.offset]);
   return { data, count, loading, error };
 }
 
@@ -83,6 +83,38 @@ export function useContact(id: string | undefined) {
     if (!id) { setLoading(false); return; }
     getContact(id).then(c => { setData(c); setLoading(false); }).catch(e => { setError(e.message); setLoading(false); });
   }, [id]);
+  return { data, loading, error };
+}
+
+export function useOpportunities(params?: { stage?: string; limit?: number; offset?: number; q?: string }) {
+  const [data, setData] = useState<Opportunity[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    getOpportunities(params).then(r => { setData(r.data); setTotal(r.total); setLoading(false); }).catch(e => { setError(e.message); setLoading(false); });
+  }, [params?.stage, params?.limit, params?.offset, params?.q]);
+  return { data, total, loading, error };
+}
+
+export function useApprovalRequests(params?: { status?: string; limit?: number; offset?: number }) {
+  const [data, setData] = useState<ApprovalRequest[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    getApprovalRequests(params).then(r => { setData(r.data); setTotal(r.total); setLoading(false); }).catch(e => { setError(e.message); setLoading(false); });
+  }, [params?.status, params?.limit, params?.offset]);
+  return { data, total, loading, error };
+}
+
+export function useTeamAssignments(params?: { team_lead_id?: string; consultant_id?: string }) {
+  const [data, setData] = useState<TeamAssignment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    getTeamAssignments(params).then(d => { setData(d); setLoading(false); }).catch(e => { setError(e.message); setLoading(false); });
+  }, [params?.team_lead_id, params?.consultant_id]);
   return { data, loading, error };
 }
 

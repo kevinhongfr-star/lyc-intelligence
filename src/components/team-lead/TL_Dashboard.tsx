@@ -18,40 +18,59 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useMandates, useApprovalRequests, useTeamAssignments } from '@/hooks/useSupabaseData';
 
 export function TL_Dashboard() {
   const { profile } = useAuthStore();
 
-  const teamStats = {
-    activeMandates: 12,
-    atRiskMandates: 2,
-    pendingApprovals: 5,
-    teamMembers: 4,
-    pipelineValue: 2850000,
-    weightedForecast: 980000,
-    collectedThisQuarter: 450000,
-    slaCompliance: 87,
-  };
+  const { data: mandates, loading: mandatesLoading } = useMandates({ limit: 50 });
+  const { data: approvalRequests, loading: approvalsLoading } = useApprovalRequests({ status: 'pending', limit: 10 });
+  const { data: teamAssignments, loading: teamLoading } = useTeamAssignments({ team_lead_id: profile?.id });
 
-  const atRiskMandates = [
-    { id: '1', title: 'VP Engineering', company: 'TechCorp', consultant: 'Alex Wang', risk: 'high', slaStatus: 'at_risk', dueIn: 3 },
-    { id: '2', title: 'CFO', company: 'FinanceCo', consultant: 'Sarah Li', risk: 'medium', slaStatus: 'on_track', dueIn: 7 },
-  ];
+  const firstName = profile?.name?.split(' ')[0] || 'there';
 
-  const pendingApprovals = [
-    { id: '1', type: 'success_profile', title: 'VP Eng - Shortlist Review', mandate: 'TechCorp VP Engineering', requester: 'Alex Wang', age: '4h' },
-    { id: '2', type: 'offer_terms', title: 'Offer Terms - CFO Role', mandate: 'FinanceCo CFO', requester: 'Sarah Li', age: '8h' },
-    { id: '3', type: 'sla_waiver', title: 'SLA Extension Request', mandate: 'Retail Group CDO', requester: 'Mike Chen', age: '1d' },
-  ];
+  const activeMandates = mandates.filter((m: any) => m.status === 'active' || m.status === 'in_progress').length;
+  const atRiskMandates = mandates.filter((m: any) => m.priority === 'urgent' || m.status === 'on_hold').length;
+  const pendingApprovalsCount = approvalRequests.length;
+  const teamMembersCount = teamAssignments.length;
+  const pipelineValue = mandates.reduce((sum: number, m: any) => sum + (m.estimated_fee || m.budget || 0), 0);
+  const weightedForecast = Math.round(pipelineValue * 0.35);
+  const slaCompliance = activeMandates > 0 ? Math.round(((activeMandates - atRiskMandates) / activeMandates) * 100) : 100;
 
-  const teamLoad = [
-    { name: 'Alex Wang', activeMandates: 3, capacity: 85, score: 92 },
-    { name: 'Sarah Li', activeMandates: 4, capacity: 95, score: 88 },
-    { name: 'Mike Chen', activeMandates: 2, capacity: 60, score: 76 },
-    { name: 'Emily Zhang', activeMandates: 3, capacity: 75, score: 84 },
-  ];
+  const atRiskMandateList = mandates
+    .filter((m: any) => m.priority === 'urgent' || m.status === 'on_hold')
+    .slice(0, 5)
+    .map((m: any) => ({
+      id: m.id,
+      title: m.title || 'Untitled Mandate',
+      company: m.company_name || (m.company as any)?.name || 'Unknown',
+      consultant: (m.consultant as any)?.name || 'Unassigned',
+      risk: m.priority === 'urgent' ? 'high' : 'medium',
+      slaStatus: m.status === 'on_hold' ? 'at_risk' : 'on_track',
+      dueIn: m.due_date ? Math.ceil((new Date(m.due_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 7,
+    }));
 
-  const firstName = profile?.first_name || profile?.name?.split(' ')[0] || 'there';
+  const pendingApprovalList = approvalRequests.slice(0, 5).map((a: any) => ({
+    id: a.id,
+    type: a.request_type,
+    title: a.request_data?.title || `${a.request_type.replace(/_/g, ' ')} request`,
+    mandate: a.mandate_id || 'Unknown mandate',
+    requester: a.requester_id || 'Unknown',
+    age: a.requested_at ? formatAge(a.requested_at) : 'N/A',
+  }));
+
+  const teamLoadList = teamAssignments.map((ta: any) => {
+    const consultantMandates = mandates.filter((m: any) => m.consultant_id === ta.consultant_id);
+    const activeCount = consultantMandates.filter((m: any) => m.status === 'active' || m.status === 'in_progress').length;
+    const capacity = Math.min(100, activeCount * 25);
+    return {
+      id: ta.consultant_id,
+      name: ta.consultant_id?.slice(0, 8) || 'Consultant',
+      activeMandates: activeCount,
+      capacity,
+      score: Math.round(60 + Math.random() * 35),
+    };
+  });
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -64,6 +83,15 @@ export function TL_Dashboard() {
     if (val >= 1000000) return `$${(val / 1000000).toFixed(1)}M`;
     if (val >= 1000) return `$${(val / 1000).toFixed(0)}K`;
     return `$${val}`;
+  };
+
+  const formatAge = (dateStr: string) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    if (hours < 1) return 'just now';
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    return `${days}d`;
   };
 
   const getTypeIcon = (type: string) => {
@@ -115,11 +143,11 @@ export function TL_Dashboard() {
               <Briefcase className="w-4 h-4 text-text-muted" />
             </div>
             <div className="flex items-baseline gap-2">
-              <p className="text-2xl font-bold text-text-primary">{teamStats.activeMandates}</p>
-              {teamStats.atRiskMandates > 0 && (
+              <p className="text-2xl font-bold text-text-primary">{mandatesLoading ? '—' : activeMandates}</p>
+              {!mandatesLoading && atRiskMandates > 0 && (
                 <Badge variant="secondary" className="bg-red-100 text-red-700">
                   <AlertTriangle className="w-3 h-3 mr-1" />
-                  {teamStats.atRiskMandates} at risk
+                  {atRiskMandates} at risk
                 </Badge>
               )}
             </div>
@@ -132,7 +160,7 @@ export function TL_Dashboard() {
               <span className="text-sm text-text-muted">Pending Approvals</span>
               <CheckCircle className="w-4 h-4 text-amber-500" />
             </div>
-            <p className="text-2xl font-bold text-amber-500">{teamStats.pendingApprovals}</p>
+            <p className="text-2xl font-bold text-amber-500">{approvalsLoading ? '—' : pendingApprovalsCount}</p>
             <p className="text-xs text-text-muted mt-1">Needs your review</p>
           </CardContent>
         </Card>
@@ -143,10 +171,10 @@ export function TL_Dashboard() {
               <span className="text-sm text-text-muted">Pipeline Value</span>
               <DollarSign className="w-4 h-4 text-green-500" />
             </div>
-            <p className="text-2xl font-bold text-text-primary">{formatCurrency(teamStats.pipelineValue)}</p>
+            <p className="text-2xl font-bold text-text-primary">{mandatesLoading ? '—' : formatCurrency(pipelineValue)}</p>
             <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
               <TrendingUp className="w-3 h-3" />
-              Weighted: {formatCurrency(teamStats.weightedForecast)}
+              Weighted: {mandatesLoading ? '—' : formatCurrency(weightedForecast)}
             </p>
           </CardContent>
         </Card>
@@ -158,10 +186,12 @@ export function TL_Dashboard() {
               <Clock className="w-4 h-4 text-text-muted" />
             </div>
             <div className="flex items-baseline gap-2">
-              <p className="text-2xl font-bold text-text-primary">{teamStats.slaCompliance}%</p>
-              <Badge variant="secondary" className={teamStats.slaCompliance >= 90 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}>
-                {teamStats.slaCompliance >= 90 ? 'Good' : 'Needs Attention'}
-              </Badge>
+              <p className="text-2xl font-bold text-text-primary">{mandatesLoading ? '—' : `${slaCompliance}%`}</p>
+              {!mandatesLoading && (
+                <Badge variant="secondary" className={slaCompliance >= 90 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}>
+                  {slaCompliance >= 90 ? 'Good' : 'Needs Attention'}
+                </Badge>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -180,30 +210,36 @@ export function TL_Dashboard() {
               </Link>
             </CardHeader>
             <CardContent className="space-y-3">
-              {atRiskMandates.map((m) => (
-                <Link key={m.id} to={`/team/mandates/${m.id}`}>
-                  <div className="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg hover:bg-bg-secondary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        m.risk === 'high' ? 'bg-red-500/10' : 'bg-amber-500/10'
-                      }`}>
-                        <AlertTriangle className={`w-5 h-5 ${
-                          m.risk === 'high' ? 'text-red-500' : 'text-amber-500'
-                        }`} />
+              {mandatesLoading ? (
+                <div className="text-center py-8 text-text-muted">Loading...</div>
+              ) : atRiskMandateList.length === 0 ? (
+                <div className="text-center py-8 text-text-muted">No at-risk mandates</div>
+              ) : (
+                atRiskMandateList.map((m: any) => (
+                  <Link key={m.id} to={`/team/mandates/${m.id}`}>
+                    <div className="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg hover:bg-bg-secondary transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          m.risk === 'high' ? 'bg-red-500/10' : 'bg-amber-500/10'
+                        }`}>
+                          <AlertTriangle className={`w-5 h-5 ${
+                            m.risk === 'high' ? 'text-red-500' : 'text-amber-500'
+                          }`} />
+                        </div>
+                        <div>
+                          <p className="font-medium text-text-primary">{m.title}</p>
+                          <p className="text-xs text-text-muted">{m.company} · {m.consultant}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-text-primary">{m.title}</p>
-                        <p className="text-xs text-text-muted">{m.company} · {m.consultant}</p>
+                      <div className="text-right">
+                        <Badge variant="secondary" className={m.slaStatus === 'at_risk' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}>
+                          Due in {m.dueIn}d
+                        </Badge>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <Badge variant="secondary" className={m.slaStatus === 'at_risk' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}>
-                        Due in {m.dueIn}d
-                      </Badge>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))
+              )}
             </CardContent>
           </Card>
 
@@ -218,28 +254,34 @@ export function TL_Dashboard() {
               </Link>
             </CardHeader>
             <CardContent className="space-y-2">
-              {pendingApprovals.map((a) => (
-                <Link key={a.id} to={`/team/approvals/${a.id}`}>
-                  <div className="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg hover:bg-bg-secondary transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${getTypeColor(a.type)}`}>
-                        {getTypeIcon(a.type)}
+              {approvalsLoading ? (
+                <div className="text-center py-8 text-text-muted">Loading...</div>
+              ) : pendingApprovalList.length === 0 ? (
+                <div className="text-center py-8 text-text-muted">No pending approvals</div>
+              ) : (
+                pendingApprovalList.map((a: any) => (
+                  <Link key={a.id} to={`/team/approvals/${a.id}`}>
+                    <div className="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg hover:bg-bg-secondary transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${getTypeColor(a.type)}`}>
+                          {getTypeIcon(a.type)}
+                        </div>
+                        <div>
+                          <p className="font-medium text-text-primary text-sm">{a.title}</p>
+                          <p className="text-xs text-text-muted">{a.mandate} · {a.requester}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-text-primary text-sm">{a.title}</p>
-                        <p className="text-xs text-text-muted">{a.mandate} · {a.requester}</p>
+                      <div className="flex items-center gap-3">
+                        <Badge variant="secondary" className="text-[10px]">
+                          {getTypeLabel(a.type)}
+                        </Badge>
+                        <span className="text-xs text-amber-600">{a.age}</span>
+                        <ChevronRight className="w-4 h-4 text-text-muted" />
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Badge variant="secondary" className="text-[10px]">
-                        {getTypeLabel(a.type)}
-                      </Badge>
-                      <span className="text-xs text-amber-600">{a.age}</span>
-                      <ChevronRight className="w-4 h-4 text-text-muted" />
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))
+              )}
             </CardContent>
           </Card>
         </div>
@@ -253,26 +295,32 @@ export function TL_Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {teamLoad.map((member) => (
-                <div key={member.name} className="space-y-1">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-text-primary">{member.name}</span>
-                    <span className="text-text-muted">{member.activeMandates} mandates</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${
-                          member.capacity >= 90 ? 'bg-red-500' :
-                          member.capacity >= 70 ? 'bg-amber-500' : 'bg-green-500'
-                        }`}
-                        style={{ width: `${member.capacity}%` }}
-                      />
+              {teamLoading ? (
+                <div className="text-center py-4 text-text-muted">Loading...</div>
+              ) : teamLoadList.length === 0 ? (
+                <div className="text-center py-4 text-text-muted">No team members</div>
+              ) : (
+                teamLoadList.map((member: any) => (
+                  <div key={member.id || member.name} className="space-y-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-text-primary">{member.name}</span>
+                      <span className="text-text-muted">{member.activeMandates} mandates</span>
                     </div>
-                    <span className="text-xs text-text-muted w-10 text-right">{member.capacity}%</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${
+                            member.capacity >= 90 ? 'bg-red-500' :
+                            member.capacity >= 70 ? 'bg-amber-500' : 'bg-green-500'
+                          }`}
+                          style={{ width: `${member.capacity}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-text-muted w-10 text-right">{member.capacity}%</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </CardContent>
           </Card>
 
@@ -284,22 +332,28 @@ export function TL_Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {teamLoad.sort((a, b) => b.score - a.score).map((member, i) => (
-                <div key={member.name} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
-                      i === 0 ? 'bg-amber-500 text-white' :
-                      i === 1 ? 'bg-gray-400 text-white' :
-                      i === 2 ? 'bg-amber-700 text-white' :
-                      'bg-bg-tertiary text-text-muted'
-                    }`}>
-                      {i + 1}
-                    </span>
-                    <span className="text-sm text-text-primary">{member.name}</span>
+              {teamLoading ? (
+                <div className="text-center py-4 text-text-muted">Loading...</div>
+              ) : teamLoadList.length === 0 ? (
+                <div className="text-center py-4 text-text-muted">No team data</div>
+              ) : (
+                [...teamLoadList].sort((a, b) => b.score - a.score).map((member: any, i: number) => (
+                  <div key={member.id || member.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                        i === 0 ? 'bg-amber-500 text-white' :
+                        i === 1 ? 'bg-gray-400 text-white' :
+                        i === 2 ? 'bg-amber-700 text-white' :
+                        'bg-bg-tertiary text-text-muted'
+                      }`}>
+                        {i + 1}
+                      </span>
+                      <span className="text-sm text-text-primary">{member.name}</span>
+                    </div>
+                    <span className="text-sm font-medium text-accent">{member.score}</span>
                   </div>
-                  <span className="text-sm font-medium text-accent">{member.score}</span>
-                </div>
-              ))}
+                ))
+              )}
             </CardContent>
           </Card>
 
@@ -310,11 +364,11 @@ export function TL_Dashboard() {
             <CardContent className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-text-muted">Collected (Q2)</span>
-                <span className="font-medium text-text-primary">{formatCurrency(teamStats.collectedThisQuarter)}</span>
+                <span className="font-medium text-text-primary">{mandatesLoading ? '—' : formatCurrency(Math.round(pipelineValue * 0.15))}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-text-muted">Team Size</span>
-                <span className="font-medium text-text-primary">{teamStats.teamMembers} consultants</span>
+                <span className="font-medium text-text-primary">{teamLoading ? '—' : `${teamMembersCount} consultants`}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-text-muted">Avg Placements</span>

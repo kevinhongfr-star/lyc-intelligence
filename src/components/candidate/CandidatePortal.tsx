@@ -24,7 +24,7 @@ const CANDIDATE_NAV = [
 ];
 
 export function CandidatePortal() {
-  const { user, profile, logout } = useAuthStore();
+  const { user, profile, signOut } = useAuthStore();
   const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -86,7 +86,7 @@ export function CandidatePortal() {
           <Button
             variant="ghost"
             className="w-full justify-start"
-            onClick={logout}
+            onClick={signOut}
           >
             <LogOut className="w-4 h-4 mr-2" />
             {!sidebarCollapsed && 'Sign Out'}
