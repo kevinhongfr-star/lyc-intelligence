@@ -52,6 +52,15 @@ const ClientShortlist = lazy(() => import('@/components/client/ClientShortlist')
 const ClientReports = lazy(() => import('@/components/client/ClientReports').then(m => ({ default: m.ClientReports })));
 const ClientSettings = lazy(() => import('@/components/client/ClientSettings').then(m => ({ default: m.ClientSettings })));
 
+const CandidatePortal = lazy(() => import('@/components/candidate/CandidatePortal').then(m => ({ default: m.CandidatePortal })));
+const CandidateDashboard = lazy(() => import('@/components/candidate/CandidateDashboard').then(m => ({ default: m.CandidateDashboard })));
+const CandidateProfile = lazy(() => import('@/components/candidate/CandidateProfile').then(m => ({ default: m.CandidateProfile })));
+const CandidateApplications = lazy(() => import('@/components/candidate/CandidateApplications').then(m => ({ default: m.CandidateApplications })));
+const CandidateApplicationDetail = lazy(() => import('@/components/candidate/CandidateApplicationDetail').then(m => ({ default: m.CandidateApplicationDetail })));
+const CandidateAssessments = lazy(() => import('@/components/candidate/CandidateAssessments').then(m => ({ default: m.CandidateAssessments })));
+const CandidateInsights = lazy(() => import('@/components/candidate/CandidateInsights').then(m => ({ default: m.CandidateInsights })));
+const CandidateSettings = lazy(() => import('@/components/candidate/CandidateSettings').then(m => ({ default: m.CandidateSettings })));
+
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
 function Loading() { return <div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>; }
@@ -156,6 +165,21 @@ export default function App() {
               <Route path="mandates/:id/shortlist" element={<ClientShortlist />} />
               <Route path="reports" element={<ClientReports />} />
               <Route path="settings" element={<ClientSettings />} />
+            </Route>
+            <Route path="/candidate" element={
+              <ProtectedRoute>
+                <ICPRoute allowedICP="candidate">
+                  <CandidatePortal />
+                </ICPRoute>
+              </ProtectedRoute>
+            }>
+              <Route index element={<CandidateDashboard />} />
+              <Route path="profile" element={<CandidateProfile />} />
+              <Route path="applications" element={<CandidateApplications />} />
+              <Route path="applications/:id" element={<CandidateApplicationDetail />} />
+              <Route path="assessments" element={<CandidateAssessments />} />
+              <Route path="insights" element={<CandidateInsights />} />
+              <Route path="settings" element={<CandidateSettings />} />
             </Route>
           </Routes>
         </Suspense>

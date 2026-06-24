@@ -308,6 +308,54 @@ export function ResultsPanel({
 <Download style={{ width: 20, height: 20 }} />
         {isGeneratingPDF ? 'Generating PDF...' : 'Download Your Report'}
       </button>
+
+      {/* Create Account CTA */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(193,8,171,0.08) 0%, rgba(99,102,241,0.08) 100%)',
+        border: '1px solid rgba(193,8,171,0.2)',
+        borderRadius: DS.radius,
+        padding: '24px',
+        marginTop: '20px',
+        textAlign: 'center',
+      }}>
+        <h4 style={{
+          fontFamily: DS.headingFont,
+          fontSize: '18px',
+          color: DS.text,
+          margin: '0 0 8px',
+        }}>
+          Save Your Results & Unlock Your Career Portal
+        </h4>
+        <p style={{
+          fontSize: '14px',
+          color: DS.textSecondary,
+          margin: '0 0 16px',
+          lineHeight: 1.5,
+        }}>
+          Create an account to track your assessment history, receive personalized opportunities,
+          and manage your career journey with LYC Intelligence.
+        </p>
+        <a
+          href="/signup?icp=candidate"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            padding: '12px 28px',
+            background: DS.accent,
+            color: '#FFFFFF',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '15px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            textDecoration: 'none',
+          }}
+        >
+          Create Account to Track →
+        </a>
+      </div>
     </div>
   );
 }
