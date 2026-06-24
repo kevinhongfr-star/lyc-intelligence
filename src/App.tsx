@@ -3,10 +3,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { CreditProvider } from '@/contexts/CreditContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ICPRoute } from '@/components/ICPRoute';
 import { Loader2 } from 'lucide-react';
 import { ToastContainer } from '@/components/ui/ToastContainer';
-
-// ── Lazy-loaded page components (ESM dynamic import — works in browser) ──
 
 const Landing = lazy(() => import('@/pages/Landing').then(m => ({ default: m.Landing })));
 const AssessmentPage = lazy(() => import('@/pages/AssessmentPage').then(m => ({ default: m.AssessmentPage })));
@@ -21,10 +20,9 @@ const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ defaul
 const DashboardPage = lazy(() => import('@/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const ProgressPage = lazy(() => import('@/pages/ProgressPage').then(m => ({ default: m.ProgressPage })));
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
-const UserDocumentsPage = lazy(() => import('@/pages/UserDocumentsPage').then(m => ({ default: m.DocumentsPage })));
+const UserDocumentsPage = lazy(() => import('@/pages/UserDocumentsPage').then(m => ({ default: m.UserDocumentsPage })));
 const SharePage = lazy(() => import('@/pages/SharePage').then(m => ({ default: m.SharePage })));
 
-// ── Platform components — lazy-loaded via ESM dynamic import ──
 const AppLayout = lazy(() => import('@/components/layout/AppLayout').then(m => ({ default: m.AppLayout })));
 const ConsultantDashboard = lazy(() => import('@/components/dashboard/ConsultantDashboard').then(m => ({ default: m.ConsultantDashboard })));
 const MandatesPage = lazy(() => import('@/pages/MandatesPage').then(m => ({ default: m.MandatesPage })));
@@ -45,6 +43,14 @@ const OrgIntelligencePage = lazy(() => import('@/pages/OrgIntelligencePage').the
 const ExecutiveProfilePage = lazy(() => import('@/pages/ExecutiveProfilePage').then(m => ({ default: m.ExecutiveProfilePage })));
 const CandidateReportPage = lazy(() => import('@/pages/CandidateReportPage').then(m => ({ default: m.CandidateReportPage })));
 const ProposalBuilderPage = lazy(() => import('@/pages/ProposalBuilderPage').then(m => ({ default: m.ProposalBuilderPage })));
+
+const ClientPortal = lazy(() => import('@/components/client/ClientPortal').then(m => ({ default: m.ClientPortal })));
+const ClientDashboard = lazy(() => import('@/components/client/ClientDashboard').then(m => ({ default: m.ClientDashboard })));
+const ClientMandates = lazy(() => import('@/components/client/ClientMandates').then(m => ({ default: m.ClientMandates })));
+const ClientMandateDetail = lazy(() => import('@/components/client/ClientMandateDetail').then(m => ({ default: m.ClientMandateDetail })));
+const ClientShortlist = lazy(() => import('@/components/client/ClientShortlist').then(m => ({ default: m.ClientShortlist })));
+const ClientReports = lazy(() => import('@/components/client/ClientReports').then(m => ({ default: m.ClientReports })));
+const ClientSettings = lazy(() => import('@/components/client/ClientSettings').then(m => ({ default: m.ClientSettings })));
 
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
@@ -88,52 +94,72 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-    <CreditProvider>
-      <ToastContainer />
-      <Suspense fallback={<Loading />}>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/assessment" element={<AssessmentPage />} />
-          <Route path="/b2b" element={<B2BLanding />} />
-          <Route path="/b2c" element={<B2CLanding />} />
-          <Route path="/nexus" element={<NexusLanding />} />
-          <Route path="/match" element={<MatchPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
-          <Route path="/documents" element={<ProtectedRoute><UserDocumentsPage /></ProtectedRoute>} />
-          <Route path="/share/:id" element={<SharePage />} />
-          {ENABLE_PLATFORM && (
-            <Route path="/platform" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-              <Route index element={<ConsultantDashboard />} />
-              <Route path="mandates" element={<MandatesPage />} />
-              <Route path="mandates/new" element={<ProposalBuilderPage />} />
-              <Route path="mandates/:id/edit" element={<ProposalBuilderPage />} />
-              <Route path="mandates/:id" element={<MandateDetailPage />} />
-              <Route path="mandates/:id/lens" element={<LensExportPage />} />
-              <Route path="candidates" element={<CandidatesPage />} />
-              <Route path="candidates/:id" element={<ExecutiveProfilePage />} />
-              <Route path="candidates/:id/report" element={<CandidateReportPage />} />
-              <Route path="companies" element={<CompaniesPage />} />
-              <Route path="pipeline" element={<PipelinePage />} />
-              <Route path="batch-scoring" element={<BatchScoringPage />} />
-              <Route path="metrix" element={<MetrixPage />} />
-              <Route path="scoring-runs" element={<ScoringRunsPage />} />
-              <Route path="chat" element={<NexusPage />} />
-              <Route path="scheduler" element={<SchedulerPage />} />
-              <Route path="documents" element={<PlatformDocumentsPage />} />
-              <Route path="org-intel" element={<AdminRoute><OrgIntelligencePage /></AdminRoute>} />
-              <Route path="notifications" element={<NotificationsPage />} />
-              <Route path="settings" element={<SettingsPage />} />
+      <CreditProvider>
+        <ToastContainer />
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/assessment" element={<AssessmentPage />} />
+            <Route path="/b2b" element={<B2BLanding />} />
+            <Route path="/b2c" element={<B2CLanding />} />
+            <Route path="/nexus" element={<NexusLanding />} />
+            <Route path="/match" element={<MatchPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
+            <Route path="/documents" element={<ProtectedRoute><UserDocumentsPage /></ProtectedRoute>} />
+            <Route path="/share/:id" element={<SharePage />} />
+            {ENABLE_PLATFORM && (
+              <Route path="/platform" element={
+                <ProtectedRoute>
+                  <ICPRoute allowedICP={['consultant', 'leader']}>
+                    <AppLayout />
+                  </ICPRoute>
+                </ProtectedRoute>
+              }>
+                <Route index element={<ConsultantDashboard />} />
+                <Route path="mandates" element={<MandatesPage />} />
+                <Route path="mandates/new" element={<ProposalBuilderPage />} />
+                <Route path="mandates/:id/edit" element={<ProposalBuilderPage />} />
+                <Route path="mandates/:id" element={<MandateDetailPage />} />
+                <Route path="mandates/:id/lens" element={<LensExportPage />} />
+                <Route path="candidates" element={<CandidatesPage />} />
+                <Route path="candidates/:id" element={<ExecutiveProfilePage />} />
+                <Route path="candidates/:id/report" element={<CandidateReportPage />} />
+                <Route path="companies" element={<CompaniesPage />} />
+                <Route path="pipeline" element={<PipelinePage />} />
+                <Route path="batch-scoring" element={<BatchScoringPage />} />
+                <Route path="metrix" element={<MetrixPage />} />
+                <Route path="scoring-runs" element={<ScoringRunsPage />} />
+                <Route path="chat" element={<NexusPage />} />
+                <Route path="scheduler" element={<SchedulerPage />} />
+                <Route path="documents" element={<PlatformDocumentsPage />} />
+                <Route path="org-intel" element={<AdminRoute><OrgIntelligencePage /></AdminRoute>} />
+                <Route path="notifications" element={<NotificationsPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+              </Route>
+            )}
+            <Route path="/client" element={
+              <ProtectedRoute>
+                <ICPRoute allowedICP="client">
+                  <ClientPortal />
+                </ICPRoute>
+              </ProtectedRoute>
+            }>
+              <Route index element={<ClientDashboard />} />
+              <Route path="mandates" element={<ClientMandates />} />
+              <Route path="mandates/:id" element={<ClientMandateDetail />} />
+              <Route path="mandates/:id/shortlist" element={<ClientShortlist />} />
+              <Route path="reports" element={<ClientReports />} />
+              <Route path="settings" element={<ClientSettings />} />
             </Route>
-          )}
-        </Routes>
-      </Suspense>
-    </CreditProvider>
+          </Routes>
+        </Suspense>
+      </CreditProvider>
     </ErrorBoundary>
   );
 }
