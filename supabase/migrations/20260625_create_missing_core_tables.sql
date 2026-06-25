@@ -36,6 +36,9 @@ CREATE TABLE IF NOT EXISTS public.credits (
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Ensure organization_id exists (may be missing if table was created by earlier migration)
+ALTER TABLE public.credits ADD COLUMN IF NOT EXISTS organization_id UUID;
+
 CREATE INDEX IF NOT EXISTS idx_credits_user_id       ON public.credits (user_id);
 CREATE INDEX IF NOT EXISTS idx_credits_org_id        ON public.credits (organization_id)
   WHERE organization_id IS NOT NULL;
@@ -735,3 +738,4 @@ BEGIN
     RAISE EXCEPTION '❌ Missing tables: %', v_missing;
   END IF;
 END$$;
+
