@@ -310,3 +310,6 @@ export async function query(
   }
   return res.json();
 }
+
+/** DELETE alias — dataHandler calls db.delete(table, filter) */
+export { deleteRows as delete };
