@@ -38,11 +38,13 @@ import {
 } from './orgScopedQueries.js';
 
 export async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log('[dataHandler] raw query:', JSON.stringify(req.query), 'url:', req.url);
   const pathArr = (req.query.path as string[]) || [];
   const resource = pathArr[0] || '';
   const sub = pathArr[1] || '';
   const id = pathArr[2] || '';
   const method = req.method || 'GET';
+  console.log('[dataHandler] resource:', resource, 'sub:', sub, 'id:', id);
 
   try {
     let authUserId: string | null = null;
@@ -5602,7 +5604,7 @@ ${consultant?.name || 'LYC Intelligence'}`,
       return res.status(200).json({ success: true });
     }
 
-    return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}${sub ? '/' + sub : ''}` });
+    return res.status(404).json({ error: `Unknown route: ${method} /api/data/${resource}${id ? '/' + id : ''}${sub ? '/' + sub : ''}`, debug: { query: req.query, pathArr, resource, sub, id, method } });
   } catch (err: any) {
     return db.handleError(res, 'dataHandler', err);
   }
