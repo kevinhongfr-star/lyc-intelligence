@@ -1,8 +1,9 @@
 import type { WorkshopScore } from './supabaseApi';
+import { authFetch } from '@/utils/authFetch';
 
 export async function scoreAdvisoryAssessment(workshopId: string, participantId: string): Promise<WorkshopScore | null> {
   try {
-    const res = await fetch('/api/scoring/advisory', {
+    const res = await authFetch('/api/scoring/advisory', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ workshop_id: workshopId, participant_id: participantId }),
@@ -27,7 +28,7 @@ export async function scoreAdvisoryAssessment(workshopId: string, participantId:
 
 export async function generateWorkshopReport(workshopId: string): Promise<any | null> {
   try {
-    const res = await fetch('/api/scoring/advisory/report', {
+    const res = await authFetch('/api/scoring/advisory/report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ workshop_id: workshopId }),

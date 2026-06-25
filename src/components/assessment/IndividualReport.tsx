@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { 
   Download, Award, Target, TrendingUp, Printer, ChevronRight,
   Star, Zap, CheckCircle
@@ -14,7 +15,7 @@ interface IndividualReportProps {
 
 const getParticipantScore = async (workshopId: string, participantId: string): Promise<WorkshopScore | null> => {
   try {
-    const res = await fetch(`/api/data/workshops/${workshopId}/scores/${participantId}`);
+    const res = await authFetch(`/api/data/workshops/${workshopId}/scores/${participantId}`);
     if (!res.ok) return null;
     const result = await res.json();
     return result.success ? result.data : null;

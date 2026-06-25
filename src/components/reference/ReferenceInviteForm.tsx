@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Mail,
   User,
@@ -113,7 +114,7 @@ export function ReferenceInviteForm({
     setSubmitError(null);
 
     try {
-      const response = await fetch('/api/data/reference-invite', {
+      const response = await authFetch('/api/data/reference-invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

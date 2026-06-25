@@ -5,14 +5,15 @@ import {
   SHIFTIntake,
   SHIFTAnalysisResult,
 } from './shiftAssessmentTypes';
+import { authFetch } from '@/utils/authFetch';
 
-const API_ENDPOINT = '/api/shift/analyze';
+const API_ENDPOINT = '/api/x/shift/analyze';
 
 export async function analyzeSHIFT(
   intake: SHIFTIntake,
   assessmentType: SHIFTAssessmentType
 ): Promise<{ result: SHIFTAnalysisResult; tokens: number }> {
-  const response = await fetch(API_ENDPOINT, {
+  const response = await authFetch(API_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake, assessmentType }),
@@ -36,7 +37,7 @@ export async function submitSHIFTAssessment(
   assessmentType: SHIFTAssessmentType,
   userId?: string
 ): Promise<{ result: SHIFTAnalysisResult; scoringRunId: string }> {
-  const response = await fetch('/api/scoring/shift', {
+  const response = await authFetch('/api/scoring/shift', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

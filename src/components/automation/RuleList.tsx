@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Workflow,
   Plus,
@@ -37,7 +38,7 @@ export function RuleList({ orgId, onEdit, onCreate }: RuleListProps) {
 
   const fetchRules = async () => {
     try {
-      const response = await fetch(`/api/x/automation/rules?org_id=${orgId}`);
+      const response = await authFetch(`/api/x/automation/rules?org_id=${orgId}`);
       const result = await response.json();
       if (result.success) {
         setRules(result.data);
@@ -51,7 +52,7 @@ export function RuleList({ orgId, onEdit, onCreate }: RuleListProps) {
 
   const toggleRule = async (rule: AutomationRule) => {
     try {
-      const response = await fetch(`/api/x/automation/rules/${rule.id}`, {
+      const response = await authFetch(`/api/x/automation/rules/${rule.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'toggle' }),
@@ -69,7 +70,7 @@ export function RuleList({ orgId, onEdit, onCreate }: RuleListProps) {
     if (!confirm('Are you sure you want to delete this rule?')) return;
 
     try {
-      await fetch(`/api/x/automation/rules/${ruleId}`, {
+      await authFetch(`/api/x/automation/rules/${ruleId}`, {
         method: 'DELETE',
       });
       setRules(rules.filter(r => r.id !== ruleId));

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { ArrowRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface LeadCaptureFormProps {
@@ -80,7 +81,7 @@ export function LeadCaptureForm({
     setLoading(true);
 
     try {
-      const res = await fetch('/api/lead-capture', {
+      const res = await authFetch('/api/lead-capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

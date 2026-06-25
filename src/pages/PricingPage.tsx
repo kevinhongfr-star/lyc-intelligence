@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { Check, Crown, Zap, Shield, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -57,12 +58,12 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
     setError(null);
     
     try {
-      const response = await fetch('/api/stripe/checkout', {
+      const response = await authFetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_COUNCIL || '',
+          product: 'council',
           successUrl: `${window.location.origin}/settings?upgraded=true`,
           cancelUrl: `${window.location.origin}/pricing`,
         }),

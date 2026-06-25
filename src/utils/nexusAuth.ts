@@ -1,3 +1,4 @@
+import { authFetch } from '@/utils/authFetch';
 // NEXUS Authentication Utilities
 // All signing operations are performed server-side via /api/nexus/sign
 // This file provides client-side utilities that call the server-side signing endpoint
@@ -13,7 +14,7 @@ export async function getNexusSignature(
   const payloadStr = typeof payload === 'string' ? payload : JSON.stringify(payload);
 
   try {
-    const response = await fetch('/api/nexus/sign', {
+    const response = await authFetch('/api/x/nexus/sign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ payload: payloadStr, type }),

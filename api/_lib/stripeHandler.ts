@@ -122,10 +122,20 @@ export async function handleStripe(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleCheckout(req: VercelRequest, res: VercelResponse) {
-  const { priceId, successUrl, cancelUrl } = req.body || {};
+  const { priceId, product, successUrl, cancelUrl } = req.body || {};
 
-  if (!priceId) {
-    return res.status(400).json({ error: 'priceId is required' });
+  // Support both direct priceId and product name (lookup server-side)
+  let resolvedPriceId = priceId;
+  if (!resolvedPriceId && product) {
+    const catalog = getCreditPackCatalog();
+    const pack = catalog[product];
+    if (pack?.priceId) {
+      resolvedPriceId = pack.priceId;
+    }
+  }
+
+  if (!resolvedPriceId) {
+    return res.status(400).json({ error: 'priceId or valid product is required' });
   }
 
   const { user, error } = await getUserFromRequest(req);
@@ -157,7 +167,7 @@ async function handleCheckout(req: VercelRequest, res: VercelResponse) {
     const session = await stripeApi('POST', '/v1/checkout/sessions', {
       customer: customerId,
       'payment_method_types[0]': 'card',
-      'line_items[0][price]': priceId,
+      'line_items[0][price]': resolvedPriceId,
       'line_items[0][quantity]': '1',
       mode: 'subscription',
       success_url: successUrl || `${req.headers.origin}/dashboard?success=true`,

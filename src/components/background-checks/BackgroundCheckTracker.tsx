@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { FileCheck, Calendar, AlertCircle, CheckCircle, Clock, XCircle, Download } from 'lucide-react';
 import { Card } from '@/components/ui';
 import { Button } from '@/components/ui';
@@ -62,7 +63,7 @@ export function BackgroundCheckTracker({ candidateId, onUploadResult }: Backgrou
   const fetchChecks = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/data/background-checks?candidate_id=${candidateId}`);
+      const response = await authFetch(`/api/data/background-checks?candidate_id=${candidateId}`);
       const result = await response.json();
 
       if (result.success) {

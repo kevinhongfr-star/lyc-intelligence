@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Search,
   Filter,
@@ -62,7 +63,7 @@ export function AlumniDirectory({ orgId, onSelectAlumni }: AlumniDirectoryProps)
       if (statusFilter !== 'all') params.set('status', statusFilter);
       selectedTags.forEach(tag => params.append('tag', tag));
 
-      const response = await fetch(`/api/alumni?${params}`);
+      const response = await authFetch(`/api/alumni?${params}`);
       const result = await response.json();
 
       if (result.success) {

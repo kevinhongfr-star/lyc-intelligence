@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { Upload, FileText, CheckCircle, AlertTriangle, XCircle, Save, X } from 'lucide-react';
 import { Card } from '@/components/ui';
 import { Button } from '@/components/ui';
@@ -61,7 +62,7 @@ export function BackgroundCheckResult({ check, onSave, onCancel }: BackgroundChe
       formData.append('file', selectedFile);
       formData.append('type', 'background-check');
 
-      const response = await fetch('/api/upload', {
+      const response = await authFetch('/api/upload', {
         method: 'POST',
         body: formData,
       });

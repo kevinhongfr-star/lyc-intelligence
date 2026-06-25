@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { WifiOff, RefreshCw, X } from 'lucide-react';
 
 interface OfflineBannerProps {
@@ -62,7 +63,7 @@ export function OfflineBanner({
 
     try {
       // Try to fetch a small resource to check connectivity
-      await fetch('/api/data/health', {
+      await authFetch('/api/data/health', {
         method: 'HEAD',
         cache: 'no-store',
       });

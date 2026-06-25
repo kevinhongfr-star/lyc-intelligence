@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { ArrowRight, ArrowLeft, Loader2, AlertCircle, CheckCircle2, Download, CreditCard, Crown } from 'lucide-react';
 import {
   SHIFTAssessmentType,
@@ -167,7 +168,7 @@ export function SHIFTAssessmentWizard({
     setIsGeneratingPDF(true);
     try {
       // Generate and download PDF
-      const response = await fetch('/api/scoring/shift/report', {
+      const response = await authFetch('/api/scoring/shift/report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

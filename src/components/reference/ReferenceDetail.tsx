@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Clock,
   CheckCircle2,
@@ -90,7 +91,7 @@ export function ReferenceDetail({ referenceRequestId, onBack }: ReferenceDetailP
   useEffect(() => {
     async function fetchDetail() {
       try {
-        const response = await fetch(`/api/data/reference-detail/${referenceRequestId}`);
+        const response = await authFetch(`/api/data/reference-detail/${referenceRequestId}`);
         const result = await response.json();
 
         if (!response.ok || !result.success) {

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { toast } from '@/stores/toastStore';
 import { 
   ArrowRight, Shield, Loader2, RefreshCw, Paperclip, 
@@ -138,7 +139,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     const timeout = setTimeout(() => controller.abort(), 30000);
 
     try {
-      const res = await fetch('/api/chat', {
+      const res = await authFetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -282,7 +283,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
       formData.append('type', 'document');
       
       try {
-        const response = await fetch('/api/upload', {
+        const response = await authFetch('/api/upload', {
           method: 'POST',
           body: formData,
         });

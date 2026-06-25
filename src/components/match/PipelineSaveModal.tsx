@@ -3,6 +3,7 @@
  * Used by MatchPage results "Save to Pipeline" action.
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { toast } from '@/stores/toastStore';
 import { Search, X, Briefcase, Loader2, CheckCircle2 } from 'lucide-react';
 import { MatchResult } from '../../services/scoringClient';
@@ -49,7 +50,7 @@ export function PipelineSaveModal({ open, onClose, result, contactId, candidateN
     try {
       const params = new URLSearchParams({ limit: '30' });
       if (q) params.set('q', q);
-      const res = await fetch(`/api/data/mandate?${params}`);
+      const res = await authFetch(`/api/data/mandate?${params}`);
       const data = await res.json();
       setMandates(data.data || []);
     } catch (e) {
@@ -82,7 +83,7 @@ export function PipelineSaveModal({ open, onClose, result, contactId, candidateN
 
       // If no contact_id (manual entry candidate), create contact first
       if (!finalContactId && candidateName) {
-        const createRes = await fetch('/api/data/contact', {
+        const createRes = await authFetch('/api/data/contact', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -103,7 +104,7 @@ export function PipelineSaveModal({ open, onClose, result, contactId, candidateN
       const verdict = result.composite_score >= 75 ? 'Strong Primary' : result.composite_score >= 50 ? 'Strong Secondary' : 'Reserve';
 
       // Insert into pipeline
-      const pipelineRes = await fetch('/api/data/pipeline', {
+      const pipelineRes = await authFetch('/api/data/pipeline', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

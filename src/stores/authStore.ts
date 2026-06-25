@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { authFetch } from '@/utils/authFetch';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
@@ -165,7 +166,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         const verificationUrl = `${window.location.origin}/verify`;
         
         // Send verification/welcome email
-        fetch('/api/email', {
+        fetch('/api/x/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 

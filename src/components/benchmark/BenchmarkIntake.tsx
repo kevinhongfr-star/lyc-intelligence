@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   BarChart3,
   Users,
@@ -72,7 +73,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
 
   const fetchShiftResultCount = async () => {
     try {
-      const response = await fetch(`/api/scoring/compute?action=count&type=${assessmentType}`);
+      const response = await authFetch(`/api/scoring/compute?action=count&type=${assessmentType}`);
       const result = await response.json();
       if (result.success) {
         setShiftResultCount(result.count || 0);
@@ -93,7 +94,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
       if (functionFilter.length) params.set('function', functionFilter.join(','));
       if (seniorityFilter.length) params.set('seniority', seniorityFilter.join(','));
 
-      const response = await fetch(`/api/scoring/compute?${params}`);
+      const response = await authFetch(`/api/scoring/compute?${params}`);
       const result = await response.json();
       if (result.success) {
         setPeerCount(result.count || 0);
@@ -105,7 +106,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
 
   const fetchTeamMembers = async () => {
     try {
-      const response = await fetch(`/api/scoring/compute?action=team-members&type=${assessmentType}&org_id=${organizationId}`);
+      const response = await authFetch(`/api/scoring/compute?action=team-members&type=${assessmentType}&org_id=${organizationId}`);
       const result = await response.json();
       if (result.success) {
         setTeamMembers(result.members || []);
@@ -118,7 +119,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
   const handleRunBenchmark = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/scoring/compute', {
+      const response = await authFetch('/api/scoring/compute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

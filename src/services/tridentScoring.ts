@@ -1,3 +1,4 @@
+import { authFetch } from '@/utils/authFetch';
 export interface CandidateInput {
   name: string;
   cv: string;
@@ -26,7 +27,7 @@ export async function runTRIDENTScoring(
   userId?: string
 ): Promise<ScoringResponse> {
   try {
-    const response = await fetch('/api/scoring', {
+    const response = await authFetch('/api/scoring', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

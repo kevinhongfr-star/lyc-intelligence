@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   ArrowLeft,
   Star,
@@ -111,7 +112,7 @@ export function QuestionDetail({
       setError(null);
 
       try {
-        const response = await fetch(`/api/data/questions/${questionId}`);
+        const response = await authFetch(`/api/data/questions/${questionId}`);
         const result = await response.json();
 
         if (!response.ok || !result.success) {
@@ -142,7 +143,7 @@ export function QuestionDetail({
     if (!question) return;
 
     try {
-      await fetch(`/api/data/questions/${questionId}/star`, {
+      await authFetch(`/api/data/questions/${questionId}/star`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId }),
@@ -171,7 +172,7 @@ export function QuestionDetail({
     setSaveError(null);
 
     try {
-      const response = await fetch(`/api/data/questions/${questionId}`, {
+      const response = await authFetch(`/api/data/questions/${questionId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm),
@@ -200,7 +201,7 @@ export function QuestionDetail({
     setIsSaving(true);
 
     try {
-      const response = await fetch('/api/data/questions', {
+      const response = await authFetch('/api/data/questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -237,7 +238,7 @@ export function QuestionDetail({
     setIsSaving(true);
 
     try {
-      await fetch(`/api/data/questions/${questionId}`, {
+      await authFetch(`/api/data/questions/${questionId}`, {
         method: 'DELETE',
       });
 

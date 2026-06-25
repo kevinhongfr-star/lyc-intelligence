@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { Search, X, Briefcase, Building2, Loader2, Check } from 'lucide-react';
 
 const DS = {
@@ -46,7 +47,7 @@ export function MandateSelector({ open, onClose, onSelect }: MandateSelectorProp
     try {
       const params = new URLSearchParams({ limit: '30' });
       if (q) params.set('q', q);
-      const res = await fetch(`/api/data/mandate?${params}`);
+      const res = await authFetch(`/api/data/mandate?${params}`);
       const data = await res.json();
       setMandates(data.data || []);
     } catch (e) {

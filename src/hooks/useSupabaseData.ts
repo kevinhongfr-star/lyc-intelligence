@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { useAuthStore } from '@/stores/authStore';
 import { getDashboardStats, getMandates, searchContacts, getPipelineByMandate, getMandateWithPipeline, getEvents, getDocuments, getNotifications, getCompanies, getTierDistribution, getRecentActivity, getContact, getOpportunities, getApprovalRequests, getTeamAssignments } from '@/services/supabaseApi';
 import type { Mandate, Contact, Company, CandidatePipeline, CalendarEvent, Document, Opportunity, ApprovalRequest, TeamAssignment } from '@/services/supabaseApi';
@@ -140,7 +141,7 @@ export function useDashboard() {
   
   useEffect(() => {
     // Single consolidated API call
-    fetch('/api/data/dashboard')
+    authFetch('/api/data/dashboard')
       .then(async (r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();

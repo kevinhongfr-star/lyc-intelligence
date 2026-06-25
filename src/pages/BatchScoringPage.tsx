@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/authStore';
+import { authFetch } from '@/utils/authFetch';
 import React, { useState, useCallback } from 'react';
 import { Target, Loader2, AlertTriangle, CheckCircle2, ArrowRight, Zap, BarChart3, Database, FileText, Save } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui';
@@ -197,7 +198,7 @@ export function BatchScoringPage() {
   // Persist scoring run to DB
   const persistScoringRun = useCallback(async (result: ScoreResult) => {
     try {
-      await fetch('/api/data/scoring-run', {
+      await authFetch('/api/data/scoring-run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -243,7 +244,7 @@ export function BatchScoringPage() {
     });
 
     try {
-      const res = await fetch('/api/scoring/5', {
+      const res = await authFetch('/api/scoring/5', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jd, candidates }),

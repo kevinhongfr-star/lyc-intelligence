@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { Lock, Unlock, Loader2, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { UpgradeModal } from './UpgradeModal';
@@ -94,7 +95,7 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
     
     try {
       // Attempt to spend credits via API
-      const response = await fetch('/api/credits/spend', {
+      const response = await authFetch('/api/credits/spend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

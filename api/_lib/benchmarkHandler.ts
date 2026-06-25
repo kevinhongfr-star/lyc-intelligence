@@ -1,13 +1,26 @@
 /**
- * Server-side API route for Coze benchmark workflow.
- * Handles Coze API calls securely on the server.
+ * Benchmark handler — Coze workflow API calls.
+ * Moved from api/benchmark/coze.ts into /api/x/ dispatcher.
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getUserFromRequest } from '../_lib/adminAuth.js';
 
 const COZE_API_KEY = process.env.COZE_API_KEY || '';
 const COZE_WORKFLOW_ID = process.env.COZE_BENCHMARK_WORKFLOW_ID || 'benchmark_scoring';
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 60000 });
+    return false;
+  }
+  if (entry.count >= 10) return true;
+  entry.count++;
+  return false;
+}
 
 interface CozeBenchmarkInput {
   assessment_type: string;
@@ -75,27 +88,29 @@ function generateDefaultInsights(input: CozeBenchmarkInput): CozeBenchmarkOutput
   };
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Auth check
-  const { user, error } = await getUserFromRequest(req);
-  if (error || !user) {
-    return res.status(401).json({ error: 'Unauthorized' });
+export async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
+  if (isRateLimited(ip)) {
+    res.status(429).json({ error: 'Rate limit exceeded' });
+    return;
   }
 
   try {
     if (req.method !== 'POST') {
-      return res.status(405).json({ error: 'Method not allowed' });
+      res.status(405).json({ error: 'Method not allowed' });
+      return;
     }
 
     const input: CozeBenchmarkInput = req.body;
 
     if (!input.assessment_type || !input.team_scores) {
-      return res.status(400).json({ error: 'Missing required fields' });
+      res.status(400).json({ error: 'Missing required fields' });
+      return;
     }
 
     if (!COZE_API_KEY) {
-      // Return default insights if no API key
-      return res.status(200).json(generateDefaultInsights(input));
+      res.status(200).json(generateDefaultInsights(input));
+      return;
     }
 
     try {
@@ -113,17 +128,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (!response.ok) {
         console.warn('Coze workflow call failed:', response.status);
-        return res.status(200).json(generateDefaultInsights(input));
+        res.status(200).json(generateDefaultInsights(input));
+        return;
       }
 
       const data = await response.json();
-      return res.status(200).json(data.data || generateDefaultInsights(input));
+      res.status(200).json(data.data || generateDefaultInsights(input));
+      return;
     } catch (err) {
       console.warn('Coze workflow error:', err);
-      return res.status(200).json(generateDefaultInsights(input));
+      res.status(200).json(generateDefaultInsights(input));
+      return;
     }
   } catch (err: any) {
-    console.error('[Coze Benchmark API]', err);
-    return res.status(500).json({ error: err.message || 'Benchmark failed' });
+    console.error('[benchmarkHandler]', err);
+    res.status(500).json({
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? String(err?.message || err) : undefined,
+    });
+    return;
   }
 }

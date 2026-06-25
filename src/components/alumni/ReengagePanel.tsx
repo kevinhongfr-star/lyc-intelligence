@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Mail,
   Calendar,
@@ -75,7 +76,7 @@ export function ReengagePanel({ orgId }: ReengagePanelProps) {
   const fetchCampaigns = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/x/alumni/reengage?org_id=${orgId}`);
+      const response = await authFetch(`/api/x/alumni/reengage?org_id=${orgId}`);
       const result = await response.json();
 
       if (result.success) {
@@ -90,7 +91,7 @@ export function ReengagePanel({ orgId }: ReengagePanelProps) {
 
   const handleCreateCampaign = async () => {
     try {
-      const response = await fetch('/api/x/alumni/reengage', {
+      const response = await authFetch('/api/x/alumni/reengage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -120,7 +121,7 @@ export function ReengagePanel({ orgId }: ReengagePanelProps) {
 
   const handleSendCampaign = async (campaignId: string) => {
     try {
-      await fetch('/api/x/alumni/reengage', {
+      await authFetch('/api/x/alumni/reengage', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   CheckCircle2,
   Loader2,
@@ -115,7 +116,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
   useEffect(() => {
     async function loadRequest() {
       try {
-        const response = await fetch(`/api/data/reference/${token}`);
+        const response = await authFetch(`/api/data/reference/${token}`);
         const result = await response.json();
 
         if (!response.ok || !result.success) {
@@ -211,7 +212,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
         response_text: r.responseText,
       }));
 
-      const response = await fetch(`/api/data/reference/${token}`, {
+      const response = await authFetch(`/api/data/reference/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ responses: responsesArray }),

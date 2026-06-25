@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   UserPlus,
   Calendar,
@@ -91,7 +92,7 @@ export function DelegationManager({ orgId, delegatorId }: DelegationManagerProps
 
     setIsSaving(true);
     try {
-      const response = await fetch('/api/x/approvals/delegations', {
+      const response = await authFetch('/api/x/approvals/delegations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -127,7 +128,7 @@ export function DelegationManager({ orgId, delegatorId }: DelegationManagerProps
     if (!confirm('Remove this delegation?')) return;
 
     try {
-      await fetch(`/api/x/approvals/delegations?id=${delegationId}`, {
+      await authFetch(`/api/x/approvals/delegations?id=${delegationId}`, {
         method: 'DELETE',
       });
       fetchDelegations();

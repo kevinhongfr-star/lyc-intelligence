@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { AlertTriangle, AlertCircle, XCircle, X, Bell, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui';
 
@@ -57,7 +58,7 @@ export function EscalationBanner({ orgId, onViewEscalations }: EscalationBannerP
     const fetchEscalations = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/x/sla/escalations?org_id=${orgId}&acknowledged=true`);
+        const response = await authFetch(`/api/x/sla/escalations?org_id=${orgId}&acknowledged=true`);
         const result = await response.json();
 
         if (result.success) {
@@ -90,7 +91,7 @@ export function EscalationBanner({ orgId, onViewEscalations }: EscalationBannerP
 
   const handleAcknowledge = async (escalationId: string) => {
     try {
-      await fetch(`/api/x/sla/escalations`, {
+      await authFetch(`/api/x/sla/escalations`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: escalationId }),

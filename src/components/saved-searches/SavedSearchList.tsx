@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Search,
   Clock,
@@ -43,7 +44,7 @@ export function SavedSearchList({ orgId, userId, onSelectSearch, onEditSearch }:
   const fetchSearches = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/saved-searches?org_id=${orgId}&user_id=${userId}`);
+      const response = await authFetch(`/api/saved-searches?org_id=${orgId}&user_id=${userId}`);
       const result = await response.json();
 
       if (result.success) {
@@ -58,7 +59,7 @@ export function SavedSearchList({ orgId, userId, onSelectSearch, onEditSearch }:
 
   const handleToggleActive = async (search: SavedSearch) => {
     try {
-      await fetch(`/api/x/saved-searches/${search.id}`, {
+      await authFetch(`/api/x/saved-searches/${search.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: !search.is_active }),
@@ -73,7 +74,7 @@ export function SavedSearchList({ orgId, userId, onSelectSearch, onEditSearch }:
     if (!confirm('Are you sure you want to delete this saved search?')) return;
 
     try {
-      await fetch(`/api/x/saved-searches/${searchId}`, {
+      await authFetch(`/api/x/saved-searches/${searchId}`, {
         method: 'DELETE',
       });
       fetchSearches();

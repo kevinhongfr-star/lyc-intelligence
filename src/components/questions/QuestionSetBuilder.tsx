@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Plus,
   Trash2,
@@ -103,7 +104,7 @@ export function QuestionSetBuilder({
         const params = new URLSearchParams();
         params.set('organization_id', organizationId);
 
-        const response = await fetch(`/api/data/questions?${params}`);
+        const response = await authFetch(`/api/data/questions?${params}`);
         const result = await response.json();
 
         if (!response.ok || !result.success) {
@@ -493,7 +494,7 @@ export function QuestionSetList({
         const params = new URLSearchParams();
         params.set('organization_id', organizationId);
 
-        const response = await fetch(`/api/data/question-sets?${params}`);
+        const response = await authFetch(`/api/data/question-sets?${params}`);
         const result = await response.json();
 
         if (!response.ok || !result.success) {

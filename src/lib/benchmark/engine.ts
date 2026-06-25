@@ -1,6 +1,7 @@
 // Phase 7.5: BENCHMARK Assessment Engine
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { authFetch } from '@/utils/authFetch';
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -309,7 +310,7 @@ export async function callCozeBenchmarkWorkflow(
   input: CozeBenchmarkInput
 ): Promise<CozeBenchmarkOutput> {
   try {
-    const response = await fetch('/api/benchmark/coze', {
+    const response = await authFetch('/api/x/benchmark/coze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

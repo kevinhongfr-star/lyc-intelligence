@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft, MapPin, Mail, Linkedin, Briefcase, GraduationCap,
@@ -42,7 +43,7 @@ function ScoringPanel({ contact }: { contact: Contact }) {
   const handleScore = async () => {
     setLoading(true); setError(null);
     try {
-      const res = await fetch('/api/scoring/5', {
+      const res = await authFetch('/api/scoring/5', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contactId: contact.id }),

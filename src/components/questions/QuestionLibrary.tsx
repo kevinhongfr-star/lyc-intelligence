@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Search,
   Filter,
@@ -126,7 +127,7 @@ export function QuestionLibrary({
         params.set('organization_id', organizationId);
         params.set('user_id', userId);
 
-        const response = await fetch(`/api/data/questions?${params}`);
+        const response = await authFetch(`/api/data/questions?${params}`);
         const result = await response.json();
 
         if (!response.ok || !result.success) {
@@ -197,7 +198,7 @@ export function QuestionLibrary({
   // Handle star toggle
   const handleStar = async (questionId: string) => {
     try {
-      await fetch(`/api/data/questions/${questionId}/star`, {
+      await authFetch(`/api/data/questions/${questionId}/star`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId }),

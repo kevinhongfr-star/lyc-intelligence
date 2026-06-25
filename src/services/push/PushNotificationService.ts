@@ -1,3 +1,4 @@
+import { authFetch } from '@/utils/authFetch';
 // Phase 6.3: Push Notification Service
 // Mobile PWA - Push notifications handling
 
@@ -207,7 +208,7 @@ class PushNotificationService {
     const subscriptionData = this.subscriptionToData(subscription);
 
     try {
-      const response = await fetch('/api/data/push-subscription', {
+      const response = await authFetch('/api/data/push-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -229,7 +230,7 @@ class PushNotificationService {
    */
   private async removeSubscriptionFromBackend(): Promise<void> {
     try {
-      await fetch('/api/data/push-subscription', {
+      await authFetch('/api/data/push-subscription', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

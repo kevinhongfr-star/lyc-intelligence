@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { Loader2 } from 'lucide-react';
 
 const DS = {
@@ -34,7 +35,7 @@ export function EmailCapture({ onCapture }: EmailCaptureProps) {
 
     setCapturing(true);
     try {
-      await fetch('/api/lead-capture', {
+      await authFetch('/api/lead-capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, source: 'nexus_chat' })

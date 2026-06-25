@@ -1,13 +1,26 @@
 /**
- * Server-side API route for SHIFT assessment analysis.
- * Handles DeepSeek API calls securely on the server.
+ * SHIFT assessment analysis handler — DeepSeek API calls.
+ * Moved from api/shift/analyze.ts into /api/x/ dispatcher.
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getUserFromRequest } from '../_lib/adminAuth.js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 const DEEPSEEK_ENDPOINT = 'https://api.deepseek.com/v1/chat/completions';
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 60000 });
+    return false;
+  }
+  if (entry.count >= 10) return true;
+  entry.count++;
+  return false;
+}
 
 interface DeepSeekResponse {
   choices: Array<{
@@ -124,33 +137,33 @@ async function callDeepSeek(prompt: string): Promise<{ content: string; tokens: 
   return { content: data.choices?.[0]?.message?.content || '', tokens: data.usage?.total_tokens || 0 };
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Auth check
-  const { user, error } = await getUserFromRequest(req);
-  if (error || !user) {
-    return res.status(401).json({ error: 'Unauthorized' });
+export async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
+  if (isRateLimited(ip)) {
+    res.status(429).json({ error: 'Rate limit exceeded' });
+    return;
   }
 
   try {
     if (req.method !== 'POST') {
-      return res.status(405).json({ error: 'Method not allowed' });
+      res.status(405).json({ error: 'Method not allowed' });
+      return;
     }
 
     const { intake, assessmentType }: SHIFTAnalysisInput = req.body;
 
     if (!intake || !assessmentType) {
-      return res.status(400).json({ error: 'Missing required fields' });
+      res.status(400).json({ error: 'Missing required fields' });
+      return;
     }
 
     const prompt = buildSHIFTAnalysisPrompt(intake, assessmentType);
     const { content, tokens } = await callDeepSeek(prompt);
 
-    // Parse response
     let result: any;
     try {
       result = JSON.parse(content);
     } catch {
-      // Return fallback if parse fails
       result = {
         dimension_scores: { strategic_thinking: 70, execution: 70, learning_agility: 70, leadership_presence: 70, change_navigation: 70 },
         strengths: [{ strength: 'Self-awareness', evidence: 'Completed assessment' }],
@@ -161,9 +174,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
     }
 
-    return res.status(200).json({ result, tokens });
+    res.status(200).json({ result, tokens });
+    return;
   } catch (err: any) {
-    console.error('[SHIFT Analyze API]', err);
-    return res.status(500).json({ error: err.message || 'Analysis failed' });
+    console.error('[shiftHandler]', err);
+    res.status(500).json({
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? String(err?.message || err) : undefined,
+    });
+    return;
   }
 }

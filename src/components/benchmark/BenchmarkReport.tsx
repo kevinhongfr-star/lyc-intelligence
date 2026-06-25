@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   BarChart3,
   Download,
@@ -68,7 +69,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
   const fetchBenchmark = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/scoring/compute?action=benchmark&id=${benchmarkId}`);
+      const response = await authFetch(`/api/scoring/compute?action=benchmark&id=${benchmarkId}`);
       const result = await response.json();
 
       if (result.success) {
@@ -84,7 +85,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
 
   const handleExportPdf = async () => {
     try {
-      const response = await fetch(`/api/scoring/compute?action=export-benchmark&id=${benchmarkId}`);
+      const response = await authFetch(`/api/scoring/compute?action=export-benchmark&id=${benchmarkId}`);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

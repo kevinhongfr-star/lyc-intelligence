@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useMemo } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Upload,
   FileText,
@@ -207,7 +208,7 @@ export function LinkedInImportModal({
     const { records } = applyMapping(headers, dataRows, columnMap);
 
     try {
-      const response = await fetch('/api/data/linkedin-import-check', {
+      const response = await authFetch('/api/data/linkedin-import-check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -248,7 +249,7 @@ export function LinkedInImportModal({
     setImportProgress(`Importing ${records.length} records...`);
 
     try {
-      const response = await fetch('/api/data/linkedin-import', {
+      const response = await authFetch('/api/data/linkedin-import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

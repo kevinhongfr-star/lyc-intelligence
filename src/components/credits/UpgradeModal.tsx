@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { X, Check, Loader2, Zap, ArrowRight } from 'lucide-react';
 
 const DS = {
@@ -89,7 +90,7 @@ export function UpgradeModal({ onClose, requiredCredits, currentCredits }: Upgra
     setError(null);
 
     try {
-      const response = await fetch('/api/stripe/checkout', {
+      const response = await authFetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tier: tierId })

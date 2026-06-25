@@ -3,17 +3,47 @@
  * Routes:
  *   POST /api/x/nexus/commands  → NEXUS → DEX commands
  *   POST /api/x/nexus/webhook   → NEXUS webhook receiver
+ *   POST /api/x/nexus/sign      → Server-side HMAC signing
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as db from './supabaseRest.js';
+import crypto from 'crypto';
+
+const NEXUS_WEBHOOK_SECRET = process.env.NEXUS_WEBHOOK_SECRET || '';
+const NEXUS_API_SECRET = process.env.NEXUS_API_SECRET || '';
+
+function signPayload(payload: string, secret: string): string {
+  const hmac = crypto.createHmac('sha256', secret);
+  hmac.update(payload);
+  return hmac.digest('hex');
+}
 
 export async function handler(req: VercelRequest, res: VercelResponse) {
   const pathArr = (req.query.path as string[]) || [];
-  const resource = pathArr[0] || ''; // 'commands' or 'webhook'
+  const resource = pathArr[0] || ''; // 'commands', 'webhook', or 'sign'
   const method = req.method || 'POST';
 
   try {
+    // ── NEXUS Sign (POST only) ──
+    if (resource === 'sign' && method === 'POST') {
+      const { payload, type } = req.body || {};
+
+      if (!payload) {
+        return res.status(400).json({ error: 'Missing payload' });
+      }
+
+      const payloadStr = typeof payload === 'string' ? payload : JSON.stringify(payload);
+      const secret = type === 'webhook' ? NEXUS_WEBHOOK_SECRET : NEXUS_API_SECRET;
+
+      if (!secret) {
+        return res.status(500).json({ error: 'NEXUS secret not configured' });
+      }
+
+      const signature = signPayload(payloadStr, secret);
+      return res.status(200).json({ signature });
+    }
+
     // ── NEXUS Commands (POST only) ──
     if (resource === 'commands' && method === 'POST') {
       const body = req.body || {};

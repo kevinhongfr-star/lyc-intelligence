@@ -13,6 +13,7 @@
  *          Evaluation outcomes, Source quality).
  */
 import React, { useEffect, useMemo, useState } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   FileText, Loader2, AlertTriangle, Download, Building2, Users, BarChart3, Clock,
 } from 'lucide-react';
@@ -113,7 +114,7 @@ export function OnePagerTab() {
     try {
       const { data: sess } = await sb.auth.getSession();
       const token = sess.session?.access_token;
-      const res = await fetch('/api/admin/org-intelligence/grid-reports/generate', {
+      const res = await authFetch('/api/admin/org-intelligence/grid-reports/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

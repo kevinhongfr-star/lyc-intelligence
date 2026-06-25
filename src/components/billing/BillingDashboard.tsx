@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { CreditCard, Calendar, History, Plus, ArrowRight, Loader2, Crown, Zap, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditService';
@@ -69,7 +70,7 @@ export function BillingDashboard() {
         setSubscriptionStatus('none');
       }
 
-      const txResponse = await fetch(`/api/data/credit-transactions?user_id=${user.id}&limit=30`, {
+      const txResponse = await authFetch(`/api/data/credit-transactions?user_id=${user.id}&limit=30`, {
         credentials: 'include',
       });
       if (txResponse.ok) {
@@ -87,7 +88,7 @@ export function BillingDashboard() {
     setLoadingPack(packKey);
     
     try {
-      const response = await fetch('/api/stripe/checkout-credit', {
+      const response = await authFetch('/api/stripe/checkout-credit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -114,7 +115,7 @@ export function BillingDashboard() {
 
   const handleManageSubscription = async () => {
     try {
-      const response = await fetch('/api/stripe/portal', {
+      const response = await authFetch('/api/stripe/portal', {
         method: 'GET',
         credentials: 'include',
       });

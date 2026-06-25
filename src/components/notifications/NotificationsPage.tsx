@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Check,
   Clock,
@@ -79,7 +80,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
           params.set('filter', filter);
         }
 
-        const response = await fetch(`/api/data/notifications?${params}`);
+        const response = await authFetch(`/api/data/notifications?${params}`);
         const result = await response.json();
 
         if (result.success) {
@@ -99,7 +100,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
 
   // Mark notification as read
   const handleMarkAsRead = async (notificationId: string) => {
-    await fetch(`/api/data/notifications/${notificationId}/read`, {
+    await authFetch(`/api/data/notifications/${notificationId}/read`, {
       method: 'POST',
     });
 
@@ -111,7 +112,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
 
   // Mark all as read
   const handleMarkAllAsRead = async () => {
-    await fetch(`/api/data/notifications/${userId}/read-all`, {
+    await authFetch(`/api/data/notifications/${userId}/read-all`, {
       method: 'POST',
     });
 

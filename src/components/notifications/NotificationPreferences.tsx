@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Mail,
   Bell,
@@ -76,7 +77,7 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
       setIsLoading(true);
 
       try {
-        const response = await fetch(`/api/data/notification-preferences/${userId}`);
+        const response = await authFetch(`/api/data/notification-preferences/${userId}`);
         const result = await response.json();
 
         if (result.success && result.data) {
@@ -106,7 +107,7 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
     setSaveError(null);
 
     try {
-      const response = await fetch(`/api/data/notification-preferences/${userId}`, {
+      const response = await authFetch(`/api/data/notification-preferences/${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(preferences),

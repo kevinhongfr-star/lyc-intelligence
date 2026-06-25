@@ -1,4 +1,5 @@
 import { getSupabase } from './supabaseApi';
+import { authFetch } from '@/utils/authFetch';
 import { useAuthStore } from '../stores/authStore';
 
 export interface CreditInfo {
@@ -73,7 +74,7 @@ export async function spendCredits(
   referenceId?: string
 ): Promise<{ success: boolean; newBalance: number }> {
   try {
-    const response = await fetch('/api/credits/spend', {
+    const response = await authFetch('/api/credits/spend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, amount, action, referenceId })
@@ -94,7 +95,7 @@ export async function earnCredits(
   referenceId?: string
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/credits/earn', {
+    const response = await authFetch('/api/credits/earn', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, amount, action, referenceId })
@@ -155,7 +156,7 @@ export async function updateUserTier(
   tier: string
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/stripe/update-tier', {
+    const response = await authFetch('/api/stripe/update-tier', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, tier })
@@ -171,7 +172,7 @@ export async function updateUserTier(
 
 export async function checkAndGrantDailyCredits(userId: string): Promise<number> {
   try {
-    const response = await fetch('/api/credits/daily-reset', {
+    const response = await authFetch('/api/credits/daily-reset', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId })

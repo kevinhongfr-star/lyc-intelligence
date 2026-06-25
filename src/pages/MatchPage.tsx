@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { toast } from '@/stores/toastStore';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, BarChart3, Shield, Loader2, Upload, Database, FileText, Plus } from 'lucide-react';
@@ -78,7 +79,7 @@ export function MatchPage() {
   const handleGate = async () => {
     if (!lead.name || !lead.email) return;
     try {
-      await fetch('/api/lead-capture', {
+      await authFetch('/api/lead-capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: lead.name, email: lead.email, company: lead.company, title: lead.title, source: 'score-match' })
@@ -107,7 +108,7 @@ export function MatchPage() {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('type', type);
-        const response = await fetch('/api/upload', { method: 'POST', body: formData });
+        const response = await authFetch('/api/upload', { method: 'POST', body: formData });
         const data = await response.json();
         if (data.text) {
           if (type === 'jd') setJd(data.text);
@@ -158,7 +159,7 @@ export function MatchPage() {
 
       // Persist scoring run
       try {
-        await fetch('/api/data/scoring-run', {
+        await authFetch('/api/data/scoring-run', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -180,7 +181,7 @@ export function MatchPage() {
       } catch (e) { console.warn('[MatchPage] scoring persist failed:', e); }
 
       if (creditCost.credits > 0 && user) {
-        await fetch('/api/credits/spend', {
+        await authFetch('/api/credits/spend', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: user.id, amount: creditCost.credits, action: 'score_match' }),
@@ -238,7 +239,7 @@ export function MatchPage() {
 
   const handleShareCard = async (result: MatchResult) => {
     try {
-      const res = await fetch('/api/data/share', {
+      const res = await authFetch('/api/data/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

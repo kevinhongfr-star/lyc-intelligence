@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { Users, Plus, Shield, User, Loader2, X } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from '@/stores/toastStore';
@@ -33,7 +34,7 @@ export function TeamManagement() {
 
   const loadTeam = async () => {
     try {
-      const res = await fetch('/api/data/profile');
+      const res = await authFetch('/api/data/profile');
       if (res.ok) {
         const result = await res.json();
         if (result.success) {
@@ -53,7 +54,7 @@ export function TeamManagement() {
 
     setInviting(true);
     try {
-      const res = await fetch('/api/data/profile', {
+      const res = await authFetch('/api/data/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

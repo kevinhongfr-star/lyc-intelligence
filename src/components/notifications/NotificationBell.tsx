@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Bell,
   BellDot,
@@ -74,7 +75,7 @@ export function NotificationBell({ userId, onNotificationClick, onViewAll }: Not
       setIsLoading(true);
 
       try {
-        const response = await fetch(`/api/data/notifications?user_id=${userId}&limit=10`);
+        const response = await authFetch(`/api/data/notifications?user_id=${userId}&limit=10`);
         const result = await response.json();
 
         if (result.success) {
@@ -93,7 +94,7 @@ export function NotificationBell({ userId, onNotificationClick, onViewAll }: Not
 
   // Mark as read handler
   const handleMarkAsRead = async (notificationId: string) => {
-    await fetch(`/api/data/notifications/${notificationId}/read`, {
+    await authFetch(`/api/data/notifications/${notificationId}/read`, {
       method: 'POST',
     });
 

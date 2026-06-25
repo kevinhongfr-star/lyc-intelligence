@@ -1,5 +1,6 @@
 
 import { getSupabase } from './supabaseApi';
+import { authFetch } from '@/utils/authFetch';
 
 export type DocumentType = 
   | 'CV'
@@ -43,7 +44,7 @@ export async function uploadDocument(
   formData.append('userId', userId);
 
   try {
-    const res = await fetch('/api/upload', {
+    const res = await authFetch('/api/upload', {
       method: 'POST',
       body: formData
     });

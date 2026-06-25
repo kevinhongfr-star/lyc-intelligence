@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2, FileText, Building, MapPin, Calendar, DollarSign, Users, Target, CheckCircle2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Input } from '@/components/ui';
@@ -87,7 +88,7 @@ export function ProposalBuilderPage() {
   const loadMandate = async (mandateId: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/data/mandate/${mandateId}`);
+      const res = await authFetch(`/api/data/mandate/${mandateId}`);
       if (res.ok) {
         const result = await res.json();
         if (result.success && result.data) {
@@ -134,13 +135,13 @@ export function ProposalBuilderPage() {
 
       let res;
       if (isEditing) {
-        res = await fetch(`/api/data/mandate/${id}`, {
+        res = await authFetch(`/api/data/mandate/${id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
       } else {
-        res = await fetch(`/api/data/mandate`, {
+        res = await authFetch(`/api/data/mandate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),

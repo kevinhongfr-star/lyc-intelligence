@@ -19,6 +19,7 @@
  *             brief_description, is_comparator
  */
 import React, { useCallback, useRef, useState } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { Upload, FileText, X, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -135,7 +136,7 @@ export function CSVUploader() {
       const form = new FormData();
       form.append('file', file);
 
-      const res = await fetch('/api/admin/org-intelligence/companies/upload', {
+      const res = await authFetch('/api/admin/org-intelligence/companies/upload', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: form,

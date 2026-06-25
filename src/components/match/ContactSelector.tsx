@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { Search, X, User, Building2, Loader2, Check } from 'lucide-react';
 
 const DS = {
@@ -47,7 +48,7 @@ export function ContactSelector({ open, onClose, onSelect, multi = true }: Conta
     try {
       const params = new URLSearchParams({ limit: '30' });
       if (q) params.set('q', q);
-      const res = await fetch(`/api/data/contact?${params}`);
+      const res = await authFetch(`/api/data/contact?${params}`);
       const data = await res.json();
       setContacts(data.data || []);
     } catch (e) {

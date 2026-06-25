@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import { Plus, Trash2 } from 'lucide-react';
 
 interface TeamMember {
@@ -39,7 +40,7 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
 
   const loadTeam = async () => {
     try {
-      const res = await fetch(`/api/data/mandate-members?mandate_id=${mandateId}`);
+      const res = await authFetch(`/api/data/mandate-members?mandate_id=${mandateId}`);
       const data = await res.json();
       if (data.success) {
         setMembers(data.data || []);
@@ -53,7 +54,7 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
 
   const loadAvailableUsers = async () => {
     try {
-      const res = await fetch('/api/data/profile');
+      const res = await authFetch('/api/data/profile');
       const data = await res.json();
       if (data.success) {
         setAvailableUsers(data.data || []);
@@ -70,7 +71,7 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
     }
 
     try {
-      const res = await fetch('/api/data/mandate-members', {
+      const res = await authFetch('/api/data/mandate-members', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -97,7 +98,7 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
     if (!confirm('Remove this user from the mandate?')) return;
 
     try {
-      const res = await fetch(`/api/data/mandate-members/${memberId}`, {
+      const res = await authFetch(`/api/data/mandate-members/${memberId}`, {
         method: 'DELETE',
       });
       const data = await res.json();

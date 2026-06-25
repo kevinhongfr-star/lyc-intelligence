@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Clock,
   CheckCircle2,
@@ -92,7 +93,7 @@ export function ReferenceTracker({
       if (mandateId) params.set('mandate_id', mandateId);
       if (organizationId) params.set('organization_id', organizationId);
 
-      const response = await fetch(`/api/data/reference-requests?${params}`);
+      const response = await authFetch(`/api/data/reference-requests?${params}`);
       const result = await response.json();
 
       if (!response.ok || !result.success) {
@@ -311,7 +312,7 @@ export function ReferenceStatsCards({ candidateId }: { candidateId: string }) {
 
   useEffect(() => {
     async function fetch() {
-      const response = await fetch(`/api/data/reference-requests?candidate_id=${candidateId}&stats=true`);
+      const response = await authFetch(`/api/data/reference-requests?candidate_id=${candidateId}&stats=true`);
       const result = await response.json();
       if (result.success) {
         setStats(result.stats);

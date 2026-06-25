@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { authFetch } from '@/utils/authFetch';
 import { getSupabase } from '../services/supabaseApi';
 
 export type MemoryType = 'goal' | 'pain_point' | 'strength' | 'experience' | 'preference' | 'insight' | 'assessment_note' | 'document_note';
@@ -153,7 +154,7 @@ export const useMemoryStore = create<MemoryStore>((set, get) => ({
 
   extractAndStoreMemories: async (userId: string, messages: ChatMessage[], sessionId?: string) => {
     try {
-      await fetch('/api/memory', {
+      await authFetch('/api/memory', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, messages, sessionId })

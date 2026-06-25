@@ -1,3 +1,4 @@
+import { authFetch } from '@/utils/authFetch';
 // coze.ts — Chat proxy + legacy single-candidate scoring wrapper.
 // All LLM calls go through /api/chat (chat proxy) or
 // /api/admin/org-intelligence/scoring/compute (public mode, see scoringClient.ts).
@@ -10,7 +11,7 @@ export async function sendChatMessage(
   options?: { systemPrompt?: string; memoryContext?: any[]; documentContext?: string; tier?: string }
 ): Promise<string> {
   try {
-    const res = await fetch('/api/chat', {
+    const res = await authFetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -39,7 +40,7 @@ export async function sendChatMessageWithSuggestions(
   options?: { systemPrompt?: string; memoryContext?: any[]; documentContext?: string; tier?: string }
 ): Promise<{ response: string; suggested_prompts: string[] }> {
   try {
-    const res = await fetch('/api/chat', {
+    const res = await authFetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

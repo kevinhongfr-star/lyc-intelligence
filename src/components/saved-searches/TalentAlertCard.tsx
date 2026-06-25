@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   Bell,
   BellDot,
@@ -38,7 +39,7 @@ export function TalentAlertCard({ userId, onViewCandidate }: TalentAlertCardProp
   const fetchAlerts = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/talent-alerts?user_id=${userId}`);
+      const response = await authFetch(`/api/talent-alerts?user_id=${userId}`);
       const result = await response.json();
 
       if (result.success) {
@@ -54,7 +55,7 @@ export function TalentAlertCard({ userId, onViewCandidate }: TalentAlertCardProp
 
   const handleMarkAsViewed = async (alertId: string) => {
     try {
-      await fetch(`/api/x/talent-alerts/${alertId}`, {
+      await authFetch(`/api/x/talent-alerts/${alertId}`, {
         method: 'PUT',
       });
       fetchAlerts();
@@ -65,7 +66,7 @@ export function TalentAlertCard({ userId, onViewCandidate }: TalentAlertCardProp
 
   const handleMarkAllAsViewed = async () => {
     try {
-      await fetch(`/api/x/talent-alerts/mark-all?user_id=${userId}`, {
+      await authFetch(`/api/x/talent-alerts/mark-all?user_id=${userId}`, {
         method: 'PUT',
       });
       fetchAlerts();

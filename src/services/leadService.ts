@@ -1,5 +1,6 @@
 
 import { getSupabase } from './supabaseApi';
+import { authFetch } from '@/utils/authFetch';
 
 export interface B2CLeadInput {
   name: string;
@@ -20,7 +21,7 @@ export interface B2BLeadInput {
 
 export async function captureB2CLead(lead: B2CLeadInput): Promise<boolean> {
   try {
-    const res = await fetch('/api/lead-capture', {
+    const res = await authFetch('/api/lead-capture', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...lead, type: 'b2c' }),
@@ -34,7 +35,7 @@ export async function captureB2CLead(lead: B2CLeadInput): Promise<boolean> {
 
 export async function captureB2BLead(lead: B2BLeadInput): Promise<boolean> {
   try {
-    const res = await fetch('/api/lead-capture', {
+    const res = await authFetch('/api/lead-capture', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...lead, type: 'b2b' }),
@@ -51,7 +52,7 @@ export async function sendEmailNotification(data: {
   payload: any;
 }): Promise<boolean> {
   try {
-    const res = await fetch('/api/email', {
+    const res = await authFetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),

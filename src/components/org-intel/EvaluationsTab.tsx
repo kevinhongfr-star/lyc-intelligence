@@ -11,6 +11,7 @@
  * Phase 1: read + re-score + override. No batch operations.
  */
 import React, { useEffect, useMemo, useState } from 'react';
+import { authFetch } from '@/utils/authFetch';
 import {
   ClipboardCheck, Loader2, RefreshCw, AlertTriangle,
   ChevronRight, ChevronDown, Edit3, CheckCircle2, X,
@@ -147,7 +148,7 @@ export function EvaluationsTab() {
     try {
       const { data: sess } = await sb.auth.getSession();
       const token = sess.session?.access_token;
-      const res = await fetch('/api/admin/org-intelligence/scoring/compute', {
+      const res = await authFetch('/api/admin/org-intelligence/scoring/compute', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
