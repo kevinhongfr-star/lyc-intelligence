@@ -28,7 +28,7 @@
 import type { VercelRequest } from '@vercel/node';
 import { jwtVerify, SignJWT } from 'jose';
 import { isSupabaseConfigured, selectOne } from './supabaseRest.js';
-import type { UserRole } from '@/types';
+import type { UserRole } from '../../src/types/index.js';
 
 export interface AdminUser {
   id: string;
