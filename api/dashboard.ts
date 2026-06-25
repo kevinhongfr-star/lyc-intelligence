@@ -5,35 +5,48 @@ export const maxDuration = 30;
 
 /**
  * Consolidated dashboard endpoint — optimized for performance.
- * Uses countRows for simple counts, minimal data fetches for aggregations.
+ * Consolidates contact queries to avoid fetching the same table 3x.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    // Run all queries in parallel
     const [statsResult, mandatesResult, tiersResult, activityResult] = await Promise.all([
-      // 1. Dashboard stats — use countRows for simple counts, fetch only grouping columns
+      // 1. Dashboard stats — use countRows for totals (instant), fetch minimal grouping data
       (async () => {
-        const [totalContacts, totalMandates, totalCompanies, totalProposals, contactsBySeniority, mandatesByStatus] = await Promise.all([
+        const [totalContacts, totalMandates, totalCompanies, totalProposals, seniorityAndTiers, statuses] = await Promise.all([
           countRows('contacts'),
           countRows('mandates'),
           countRows('companies'),
           countRows('proposals'),
-          // Fetch only seniority column for grouping
-          (async () => {
-            const rows = await selectMany('contacts', { select: 'seniority', limit: 50000 });
-            const groups: Record<string, number> = {};
-            for (const c of rows) { const k = c.seniority || 'unknown'; groups[k] = (groups[k] || 0) + 1; }
-            return groups;
-          })(),
-          // Fetch only status column for grouping
-          (async () => {
-            const rows = await selectMany('mandates', { select: 'status', limit: 50000 });
-            const groups: Record<string, number> = {};
-            for (const m of rows) { const k = m.status || 'unknown'; groups[k] = (groups[k] || 0) + 1; }
-            return groups;
-          })(),
+          // Single query for both seniority grouping AND tier distribution
+          selectMany('contacts', { 
+            select: 'seniority,trident_composite,cxo_stamp',
+            limit: 20000,
+          }, 10000),
+          selectMany('mandates', { 
+            select: 'status',
+            limit: 10000,
+          }, 10000),
         ]);
-        return { totalContacts, totalMandates, totalCompanies, totalProposals, mandatesByStatus, contactsBySeniority };
+
+        const contactsBySeniority: Record<string, number> = {};
+        const tiers = { S: 0, A: 0, B: 0, C: 0 };
+        for (const c of seniorityAndTiers) {
+          const k = c.seniority || 'unknown';
+          contactsBySeniority[k] = (contactsBySeniority[k] || 0) + 1;
+          const score = c.trident_composite ?? 0;
+          if (c.cxo_stamp || score >= 85) tiers.S++;
+          else if (score >= 65) tiers.A++;
+          else if (score >= 45) tiers.B++;
+          else tiers.C++;
+        }
+
+        const mandatesByStatus: Record<string, number> = {};
+        for (const m of statuses) {
+          const k = m.status || 'unknown';
+          mandatesByStatus[k] = (mandatesByStatus[k] || 0) + 1;
+        }
+
+        return { totalContacts, totalMandates, totalCompanies, totalProposals, mandatesByStatus, contactsBySeniority, _tiers: tiers };
       })(),
       
       // 2. Recent mandates — minimal fields, small limit
@@ -43,22 +56,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         limit: 10 
       }),
       
-      // 3. Tier distribution — fetch only scoring fields
-      (async () => {
-        const contacts = await selectMany('contacts', { 
-          select: 'trident_composite,cxo_stamp',
-          limit: 50000 
-        });
-        const tiers = { S: 0, A: 0, B: 0, C: 0 };
-        for (const c of contacts) {
-          const score = c.trident_composite ?? 0;
-          if (c.cxo_stamp || score >= 85) tiers.S++;
-          else if (score >= 65) tiers.A++;
-          else if (score >= 45) tiers.B++;
-          else tiers.C++;
-        }
-        return tiers;
-      })(),
+      // 3. Tier distribution — placeholder, will be filled from stats
+      Promise.resolve(null),
       
       // 4. Recent activity feed
       (async () => {
@@ -95,10 +94,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })(),
     ]);
 
+    // Use tier data computed in stats query (avoid redundant fetch)
+    const tierDistribution = statsResult._tiers || { S: 0, A: 0, B: 0, C: 0 };
+    delete (statsResult as any)._tiers;
+
     res.status(200).json({
       stats: statsResult,
       mandates: mandatesResult,
-      tierDistribution: tiersResult,
+      tierDistribution,
       recentActivity: activityResult,
     });
   } catch (err) {
