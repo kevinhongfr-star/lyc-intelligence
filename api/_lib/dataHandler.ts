@@ -278,22 +278,11 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       if (method === 'GET' && !id) {
         const limit = parseInt(req.query.limit as string) || 50;
         const offset = parseInt(req.query.offset as string) || 0;
-        const search = req.query.q as string;
+        const search = (req.query.q as string) || (req.query.search as string) || undefined;
         
-        const mandates = await getOrgScopedMandates(authUserId || '', userRole, orgId || '');
+        const result = await getOrgScopedMandates(authUserId || '', userRole, orgId || '', { limit, offset, search });
         
-        let filtered = mandates;
-        if (search) {
-          const q = search.toLowerCase();
-          filtered = mandates.filter((r: any) =>
-            (r.title || '').toLowerCase().includes(q) ||
-            (r.company?.name || '').toLowerCase().includes(q)
-          );
-        }
-        
-        const paginated = filtered.slice(offset, offset + limit);
-        
-        return res.status(200).json({ success: true, data: paginated, total: filtered.length });
+        return res.status(200).json({ success: true, data: result.data, total: result.total });
       }
     }
 
@@ -539,25 +528,13 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       if (method === 'GET' && !id) {
         const limit = parseInt(req.query.limit as string) || 50;
         const offset = parseInt(req.query.offset as string) || 0;
-        const search = req.query.q as string;
+        const search = (req.query.q as string) || (req.query.search as string) || undefined;
+        const seniority = req.query.seniority ? (req.query.seniority as string).split(',') : undefined;
+        const country = req.query.country as string || undefined;
 
-        const contacts = await getOrgScopedContacts(authUserId || '', userRole, orgId || '');
+        const result = await getOrgScopedContacts(authUserId || '', userRole, orgId || '', { limit, offset, search, seniority, country });
 
-        let filtered = contacts;
-        if (search) {
-          const q = search.toLowerCase();
-          filtered = contacts.filter((r: any) =>
-            (r.name || '').toLowerCase().includes(q) ||
-            (r.current_title || '').toLowerCase().includes(q) ||
-            (r.headline || '').toLowerCase().includes(q) ||
-            (r.company?.name || '').toLowerCase().includes(q)
-          );
-        }
-
-        const total = filtered.length;
-        const paginated = filtered.slice(offset, offset + limit);
-
-        return res.status(200).json({ success: true, data: paginated, total });
+        return res.status(200).json({ success: true, data: result.data, total: result.total });
       }
     }
 
@@ -566,28 +543,18 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       if (method === 'GET' && !id) {
         const limit = parseInt(req.query.limit as string) || 50;
         const offset = parseInt(req.query.offset as string) || 0;
-        const search = req.query.q as string;
+        const search = (req.query.q as string) || (req.query.search as string) || undefined;
 
-        const companies = await getOrgScopedCompanies(authUserId || '', userRole, orgId || '');
+        const result = await getOrgScopedCompanies(authUserId || '', userRole, orgId || '', { limit, offset, search });
 
-        let filtered = companies;
-        if (search) {
-          const q = search.toLowerCase();
-          filtered = companies.filter((c: any) =>
-            (c.name || '').toLowerCase().includes(q) ||
-            (c.industry || '').toLowerCase().includes(q)
-          );
-        }
-
-        const total = filtered.length;
-        const paginated = filtered.slice(offset, offset + limit);
-
-        return res.status(200).json({ success: true, data: paginated, total });
+        return res.status(200).json({ success: true, data: result.data, total: result.total });
       }
 
       if (method === 'GET' && id) {
-        const companies = await getOrgScopedCompanies(authUserId || '', userRole, orgId || '');
-        const company = companies.find((c: any) => c.id === id);
+        const company = await db.selectOne('companies', {
+          column: 'id', value: id,
+          select: 'id, name, industry, stain_group, stain_tier, proximity, country, city, region, headcount_range, website, linkedin_url, description, total_contacts, active_mandates, engagement_score',
+        });
         
         if (!company) {
           return res.status(404).json({ error: 'Company not found' });

@@ -82,7 +82,7 @@ export async function selectMany(
   table: string,
   options: {
     select?: string;
-    where?: Array<{ column: string; value: string | number | boolean; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }>;
+    where?: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }>;
     orderBy?: { column: string; ascending?: boolean };
     limit?: number;
     offset?: number;
@@ -97,7 +97,15 @@ export async function selectMany(
   if (options.where) {
     for (const w of options.where) {
       const op = w.op || 'eq';
-      parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
+      if (op === 'in') {
+        // in operator needs format: column=in.(val1,val2) — don't encode parens/commas
+        const vals = Array.isArray(w.value) ? w.value.join(',') : String(w.value);
+        parts.push(`${w.column}=in.(${vals})`);
+      } else if (op === 'ilike') {
+        parts.push(`${w.column}=ilike.${encodeURIComponent(String(w.value))}`);
+      } else {
+        parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
+      }
     }
   }
   if (options.orderBy) {
@@ -116,6 +124,77 @@ export async function selectMany(
     throw new Error(`Supabase GET ${table} failed: ${res.status} ${text}`);
   }
   return (await res.json()) as any[];
+}
+
+
+/** COUNT rows without fetching data. Uses Supabase Content-Range header. */
+export async function countRows(
+  table: string,
+  options: {
+    where?: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }>;
+  } = {},
+  timeoutMs?: number
+): Promise<number> {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
+  }
+  const parts: string[] = ['select=id', 'limit=0'];
+  if (options.where) {
+    for (const w of options.where) {
+      const op = w.op || 'eq';
+      if (op === 'in') {
+        const vals = Array.isArray(w.value) ? w.value.join(',') : String(w.value);
+        parts.push(`${w.column}=in.(${vals})`);
+      } else if (op === 'ilike') {
+        parts.push(`${w.column}=ilike.${encodeURIComponent(String(w.value))}`);
+      } else {
+        parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
+      }
+    }
+  }
+  const res = await fetchWithTimeout(
+    buildUrl(table, parts.join('&')),
+    { 
+      method: 'GET', 
+      headers: { ...getHeaders(), 'Prefer': 'count=exact' }
+    },
+    timeoutMs
+  );
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Supabase COUNT ${table} failed: ${res.status} ${text}`);
+  }
+  const range = res.headers.get('content-range') || '';
+  const match = range.match(/\/(\d+)$/);
+  return match ? parseInt(match[1], 10) : 0;
+}
+
+/** COUNT grouped by a column. Returns Record<string, number>. */
+export async function countGroupedBy(
+  table: string,
+  groupColumn: string,
+  timeoutMs?: number
+): Promise<Record<string, number>> {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Supabase not configured');
+  }
+  // Fetch just the grouping column with a high limit
+  const res = await fetchWithTimeout(
+    buildUrl(table, `select=${encodeURIComponent(groupColumn)}&limit=50000`),
+    { method: 'GET', headers: getHeaders() },
+    timeoutMs || 10000
+  );
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Supabase GROUP ${table}.${groupColumn} failed: ${res.status} ${text}`);
+  }
+  const rows = await res.json();
+  const groups: Record<string, number> = {};
+  for (const row of rows) {
+    const key = row[groupColumn] || 'unknown';
+    groups[key] = (groups[key] || 0) + 1;
+  }
+  return groups;
 }
 
 /** INSERT a single row. Returns the inserted row (with `Prefer: return=representation`). */

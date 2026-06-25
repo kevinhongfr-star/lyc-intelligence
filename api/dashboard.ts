@@ -1,62 +1,55 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { selectMany, handleError } from './_lib/supabaseRest.js';
+import { selectMany, countRows, handleError } from './_lib/supabaseRest.js';
 
 export const maxDuration = 30;
 
 /**
- * Consolidated dashboard endpoint — runs all queries in parallel.
- * Returns: stats, mandates, tierDistribution, recentActivity in one response.
+ * Consolidated dashboard endpoint — optimized for performance.
+ * Uses countRows for simple counts, minimal data fetches for aggregations.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    // Run all 4 queries in parallel
+    // Run all queries in parallel
     const [statsResult, mandatesResult, tiersResult, activityResult] = await Promise.all([
-      // 1. Dashboard stats (counts + breakdowns)
+      // 1. Dashboard stats — use countRows for simple counts, fetch only grouping columns
       (async () => {
-        const [contacts, mandates, companies, proposals] = await Promise.all([
-          selectMany('contacts', { select: 'id,seniority', limit: 10000 }),
-          selectMany('mandates', { select: 'id,status', limit: 10000 }),
-          selectMany('companies', { select: 'id', limit: 1 }),
-          selectMany('proposals', { select: 'id', limit: 1 }),
+        const [totalContacts, totalMandates, totalCompanies, totalProposals, contactsBySeniority, mandatesByStatus] = await Promise.all([
+          countRows('contacts'),
+          countRows('mandates'),
+          countRows('companies'),
+          countRows('proposals'),
+          // Fetch only seniority column for grouping
+          (async () => {
+            const rows = await selectMany('contacts', { select: 'seniority', limit: 50000 });
+            const groups: Record<string, number> = {};
+            for (const c of rows) { const k = c.seniority || 'unknown'; groups[k] = (groups[k] || 0) + 1; }
+            return groups;
+          })(),
+          // Fetch only status column for grouping
+          (async () => {
+            const rows = await selectMany('mandates', { select: 'status', limit: 50000 });
+            const groups: Record<string, number> = {};
+            for (const m of rows) { const k = m.status || 'unknown'; groups[k] = (groups[k] || 0) + 1; }
+            return groups;
+          })(),
         ]);
-        
-        const contactsBySeniority: Record<string, number> = {};
-        for (const c of contacts) {
-          const k = c.seniority || 'unknown';
-          contactsBySeniority[k] = (contactsBySeniority[k] || 0) + 1;
-        }
-        
-        const mandatesByStatus: Record<string, number> = {};
-        for (const m of mandates) {
-          const k = m.status || 'unknown';
-          mandatesByStatus[k] = (mandatesByStatus[k] || 0) + 1;
-        }
-        
-        return {
-          totalContacts: contacts.length,
-          totalMandates: mandates.length,
-          totalCompanies: companies.length,
-          totalProposals: proposals.length,
-          mandatesByStatus,
-          contactsBySeniority,
-        };
+        return { totalContacts, totalMandates, totalCompanies, totalProposals, mandatesByStatus, contactsBySeniority };
       })(),
       
-      // 2. Recent mandates — simplified, no JOIN (frontend can resolve company names)
+      // 2. Recent mandates — minimal fields, small limit
       selectMany('mandates', { 
         select: 'id,title,status,client_id,tier1_count,tier2_count,shortlisted_count,interview_count,placed_count,updated_at',
         orderBy: { column: 'updated_at', ascending: false },
         limit: 10 
       }),
       
-      // 3. Tier distribution — fetch minimal fields
+      // 3. Tier distribution — fetch only scoring fields
       (async () => {
         const contacts = await selectMany('contacts', { 
           select: 'trident_composite,cxo_stamp',
-          limit: 15000 
+          limit: 50000 
         });
         const tiers = { S: 0, A: 0, B: 0, C: 0 };
-        
         for (const c of contacts) {
           const score = c.trident_composite ?? 0;
           if (c.cxo_stamp || score >= 85) tiers.S++;
@@ -81,46 +74,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             limit: 15 
           }),
         ]);
-        
         const activities: any[] = [];
-        
         for (const sr of scoringRuns) {
           activities.push({
-            type: 'scoring',
-            id: sr.id,
+            type: 'scoring', id: sr.id,
             title: `Scored: ${sr.run_type}`,
             detail: sr.verdict ? `Verdict: ${sr.verdict}` : `Score: ${sr.composite_score ?? '—'}`,
-            timestamp: sr.created_at,
-            contact_id: sr.contact_id,
-            mandate_id: sr.mandate_id,
+            timestamp: sr.created_at, contact_id: sr.contact_id, mandate_id: sr.mandate_id,
           });
         }
-        
         for (const c of recentContacts) {
           activities.push({
-            type: 'contact_update',
-            id: c.id,
-            title: c.name,
-            detail: c.current_title ?? 'Profile updated',
+            type: 'contact_update', id: c.id,
+            title: c.name, detail: c.current_title ?? 'Profile updated',
             timestamp: c.updated_at,
           });
         }
-        
-        return activities
-          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-          .slice(0, 20);
+        activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        return activities.slice(0, 20);
       })(),
     ]);
-    
-    res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate');
-    return res.status(200).json({
+
+    res.status(200).json({
       stats: statsResult,
       mandates: mandatesResult,
       tierDistribution: tiersResult,
       recentActivity: activityResult,
     });
-  } catch (error: any) {
-    console.error('[Dashboard API] Error:', error);
-    return handleError(res, 'dashboard', error);
+  } catch (err) {
+    handleError(res, err, 'Dashboard fetch failed');
   }
 }
