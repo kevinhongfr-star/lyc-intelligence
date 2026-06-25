@@ -3,6 +3,7 @@
  * All data reads from Supabase.
  */
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { authFetch } from '@/utils/authFetch';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
@@ -133,7 +134,7 @@ export async function searchContacts(params: { query?: string; seniority?: strin
     qp.set('limit', String(params.limit ?? 50));
     qp.set('offset', String(params.offset ?? 0));
     qp.set('user_id', params.userId);
-    const res = await fetch(`/api/data/contact?${qp}`);
+    const res = await authFetch(`/api/data/contact?${qp}`);
     const json = await res.json();
     const contacts = (json.data || []) as Contact[];
     // Apply heuristic trident enrichment
@@ -175,15 +176,15 @@ export async function getContact(id: string): Promise<Contact | null> {
   return c;
 }
 
-export async function getMandates(params?: { status?: string; limit?: number; offset?: number; userId?: string; }): Promise<{ data: Mandate[]; count: number }> {
-  // Use the API endpoint for authorization filtering
+export async function getMandates(params?: { status?: string; limit?: number; offset?: number; userId?: string; organizationId?: string; }): Promise<{ data: Mandate[]; count: number }> {
   const queryParams = new URLSearchParams();
   if (params?.limit) queryParams.set('limit', params.limit.toString());
   if (params?.offset) queryParams.set('offset', params.offset.toString());
   if (params?.userId) queryParams.set('user_id', params.userId);
+  if (params?.organizationId) queryParams.set('organization_id', params.organizationId);
   
   try {
-    const res = await fetch(`/api/data/mandate?${queryParams.toString()}`);
+    const res = await authFetch(`/api/data/mandate?${queryParams.toString()}`);
     const result = await res.json();
     if (result.success) {
       const mandates = (result.data || []).map((m: any) => ({ ...m, title: cleanMandateTitle(m.title, m.company?.name) }));
@@ -869,7 +870,7 @@ export async function generateIntakeQuestions(
       '["What…", "How…", "…"]',
     ].filter(Boolean).join('\n');
 
-    const res = await fetch('/api/data/intake-suggest', {
+    const res = await authFetch('/api/data/intake-suggest', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt }),
@@ -979,7 +980,7 @@ export async function saveOutreachAttempt(data: {
   organization_id?: string | null;
 }): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/outreach-attempts', {
+    const res = await authFetch('/api/data/outreach-attempts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -997,7 +998,7 @@ export async function saveOutreachAttempt(data: {
 
 export async function getOutreachAttempts(candidateId: string, mandateId: string): Promise<any[]> {
   try {
-    const res = await fetch(`/api/data/outreach-attempts?candidate_id=${encodeURIComponent(candidateId)}&mandate_id=${encodeURIComponent(mandateId)}`);
+    const res = await authFetch(`/api/data/outreach-attempts?candidate_id=${encodeURIComponent(candidateId)}&mandate_id=${encodeURIComponent(mandateId)}`);
     if (!res.ok) return [];
     const data = await res.json();
     return data.data || [];
@@ -1024,7 +1025,7 @@ export async function getAllOutreachAttempts(mandateId?: string): Promise<any[]>
 
 export async function deleteOutreachAttempt(attemptId: string): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/outreach-attempts/${attemptId}`, { method: 'DELETE' });
+    const res = await authFetch(`/api/data/outreach-attempts/${attemptId}`, { method: 'DELETE' });
     if (!res.ok) return false;
     return true;
   } catch (e) {
@@ -1035,7 +1036,7 @@ export async function deleteOutreachAttempt(attemptId: string): Promise<boolean>
 
 export async function getOutreachNextActions(daysAhead: number = 7): Promise<any[]> {
   try {
-    const res = await fetch(`/api/data/outreach-next-actions?days_ahead=${daysAhead}`);
+    const res = await authFetch(`/api/data/outreach-next-actions?days_ahead=${daysAhead}`);
     if (!res.ok) return [];
     const data = await res.json();
     return data.data || [];
@@ -1097,7 +1098,7 @@ export async function generateCompanyOverview(
   input: CompanyOverviewInput
 ): Promise<CompanyOverviewResult> {
   try {
-    const res = await fetch('/api/data/company-overview-generate', {
+    const res = await authFetch('/api/data/company-overview-generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ company_id: companyId, ...input }),
@@ -1132,7 +1133,7 @@ export async function getTargetCompanies(mandateId?: string): Promise<any[]> {
 
 export async function updateTargetCompany(companyId: string, updates: Record<string, unknown>): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/target-companies/${companyId}`, {
+    const res = await authFetch(`/api/data/target-companies/${companyId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
@@ -1150,7 +1151,7 @@ export async function calculateFitScores(mandateId: string, successProfileId: st
   error?: string;
 }> {
   try {
-    const res = await fetch('/api/data/company-fit-calculate', {
+    const res = await authFetch('/api/data/company-fit-calculate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mandate_id: mandateId, success_profile_id: successProfileId }),
@@ -1177,7 +1178,7 @@ export async function addTargetCompany(data: {
   mandate_id?: string;
 }): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    const res = await fetch('/api/data/target-companies', {
+    const res = await authFetch('/api/data/target-companies', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -1197,7 +1198,7 @@ export async function addTargetCompany(data: {
 
 export async function deleteTargetCompany(companyId: string): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/target-companies/${companyId}`, { method: 'DELETE' });
+    const res = await authFetch(`/api/data/target-companies/${companyId}`, { method: 'DELETE' });
     return res.ok;
   } catch (e) {
     console.error('[Market] deleteTargetCompany error:', e);
@@ -1263,7 +1264,7 @@ export async function createWorkshop(data: {
   created_by: string;
 }): Promise<WorkshopData | null> {
   try {
-    const res = await fetch('/api/data/workshops', {
+    const res = await authFetch('/api/data/workshops', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -1285,7 +1286,7 @@ export async function createWorkshop(data: {
 
 export async function addWorkshopParticipants(workshopId: string, participants: Array<{ email: string; name?: string }>): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/workshops/participants', {
+    const res = await authFetch('/api/data/workshops/participants', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ workshop_id: workshopId, participants }),
@@ -1300,7 +1301,7 @@ export async function addWorkshopParticipants(workshopId: string, participants: 
 
 export async function sendInviteEmails(workshopId: string): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/workshops/send-invites', {
+    const res = await authFetch('/api/data/workshops/send-invites', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ workshop_id: workshopId }),
@@ -1315,7 +1316,7 @@ export async function sendInviteEmails(workshopId: string): Promise<boolean> {
 
 export async function getMandatesForOrg(orgId: string): Promise<Mandate[]> {
   try {
-    const res = await fetch(`/api/data/mandates?org_id=${orgId}`);
+    const res = await authFetch(`/api/data/mandates?org_id=${orgId}`);
     const result = await res.json();
     if (result.success) {
       return (result.data || []).map((m: any) => ({ ...m, title: cleanMandateTitle(m.title) }));
@@ -1329,7 +1330,7 @@ export async function getMandatesForOrg(orgId: string): Promise<Mandate[]> {
 
 export async function deductOrgCredits(orgId: string, amount: number, reason: string): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/orgs/deduct-credits', {
+    const res = await authFetch('/api/data/orgs/deduct-credits', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ org_id: orgId, amount, reason }),
@@ -1351,7 +1352,7 @@ export async function deductOrgCredits(orgId: string, amount: number, reason: st
 
 export async function getWorkshopByToken(token: string): Promise<{ workshop: WorkshopData; participant: ParticipantData } | null> {
   try {
-    const res = await fetch(`/api/data/workshops/participant?token=${token}`);
+    const res = await authFetch(`/api/data/workshops/participant?token=${token}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -1367,7 +1368,7 @@ export async function getWorkshopByToken(token: string): Promise<{ workshop: Wor
 
 export async function saveParticipantResponses(participantId: string, responses: Record<string, any>): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/workshops/participant/responses', {
+    const res = await authFetch('/api/data/workshops/participant/responses', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ participant_id: participantId, responses }),
@@ -1382,7 +1383,7 @@ export async function saveParticipantResponses(participantId: string, responses:
 
 export async function submitAssessment(participantId: string): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/workshops/participant/submit', {
+    const res = await authFetch('/api/data/workshops/participant/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ participant_id: participantId }),
@@ -1397,7 +1398,7 @@ export async function submitAssessment(participantId: string): Promise<boolean> 
 
 export async function scoreAdvisoryAssessment(workshopId: string, participantId: string): Promise<WorkshopScore | null> {
   try {
-    const res = await fetch('/api/scoring/advisory', {
+    const res = await authFetch('/api/scoring/advisory', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ workshop_id: workshopId, participant_id: participantId }),
@@ -1422,7 +1423,7 @@ export async function scoreAdvisoryAssessment(workshopId: string, participantId:
 
 export async function getWorkshopById(workshopId: string): Promise<WorkshopData | null> {
   try {
-    const res = await fetch(`/api/data/workshops/${workshopId}`);
+    const res = await authFetch(`/api/data/workshops/${workshopId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -1438,7 +1439,7 @@ export async function getWorkshopById(workshopId: string): Promise<WorkshopData 
 
 export async function getWorkshopParticipants(workshopId: string): Promise<ParticipantData[]> {
   try {
-    const res = await fetch(`/api/data/workshops/${workshopId}/participants`);
+    const res = await authFetch(`/api/data/workshops/${workshopId}/participants`);
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -1454,7 +1455,7 @@ export async function getWorkshopParticipants(workshopId: string): Promise<Parti
 
 export async function getWorkshopScores(workshopId: string): Promise<WorkshopScore[]> {
   try {
-    const res = await fetch(`/api/data/workshops/${workshopId}/scores`);
+    const res = await authFetch(`/api/data/workshops/${workshopId}/scores`);
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -1535,7 +1536,7 @@ export interface OrgChartPDFData {
 
 export async function getOrgChart(companyId: string): Promise<OrgChartData | null> {
   try {
-    const res = await fetch(`/api/data/org-chart/${companyId}`);
+    const res = await authFetch(`/api/data/org-chart/${companyId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -1551,7 +1552,7 @@ export async function getOrgChart(companyId: string): Promise<OrgChartData | nul
 
 export async function saveOrgChart(companyId: string, orgChart: OrgChartData): Promise<{ success: boolean; density_score?: number }> {
   try {
-    const res = await fetch(`/api/data/org-chart/${companyId}`, {
+    const res = await authFetch(`/api/data/org-chart/${companyId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ org_chart: orgChart }),
@@ -1573,7 +1574,7 @@ export async function saveOrgChart(companyId: string, orgChart: OrgChartData): P
 
 export async function getTalentDensity(mandateId: string): Promise<TalentDensityData | null> {
   try {
-    const res = await fetch(`/api/data/talent-density/${mandateId}`);
+    const res = await authFetch(`/api/data/talent-density/${mandateId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -1589,7 +1590,7 @@ export async function getTalentDensity(mandateId: string): Promise<TalentDensity
 
 export async function getOrgChartPDFData(mandateId: string, companyIds?: string[]): Promise<OrgChartPDFData | null> {
   try {
-    const res = await fetch('/api/data/org-chart-pdf', {
+    const res = await authFetch('/api/data/org-chart-pdf', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mandate_id: mandateId, company_ids: companyIds }),
@@ -1610,7 +1611,7 @@ export async function getOrgChartPDFData(mandateId: string, companyIds?: string[
 
 export async function getTargetCompaniesByMandate(mandateId: string): Promise<TargetCompany[]> {
   try {
-    const res = await fetch(`/api/data/target-companies?mandate_id=${mandateId}`);
+    const res = await authFetch(`/api/data/target-companies?mandate_id=${mandateId}`);
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -1626,7 +1627,7 @@ export async function getTargetCompaniesByMandate(mandateId: string): Promise<Ta
 
 export async function getMandateById(mandateId: string): Promise<Mandate | null> {
   try {
-    const res = await fetch(`/api/data/mandate/${mandateId}`);
+    const res = await authFetch(`/api/data/mandate/${mandateId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -1715,7 +1716,7 @@ export async function generateLENSReport(
   reportType: 'T1' | 'T2' | 'T3'
 ): Promise<LENSReportData | null> {
   try {
-    const res = await fetch('/api/data/lens-report', {
+    const res = await authFetch('/api/data/lens-report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1744,7 +1745,7 @@ export async function generateLENSReport(
 
 export async function sendReportEmail(reportId: string, recipients: string[]): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/lens-email', {
+    const res = await authFetch('/api/data/lens-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1762,7 +1763,7 @@ export async function sendReportEmail(reportId: string, recipients: string[]): P
 
 export async function createReportShareLink(reportId: string, expiry: string): Promise<string | null> {
   try {
-    const res = await fetch('/api/data/lens-share', {
+    const res = await authFetch('/api/data/lens-share', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1786,7 +1787,7 @@ export async function createReportShareLink(reportId: string, expiry: string): P
 
 export async function generateGRIDReport(mandateId: string): Promise<{ pdf_url: string } | null> {
   try {
-    const res = await fetch('/api/data/grid-report', {
+    const res = await authFetch('/api/data/grid-report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mandate_id: mandateId }),
@@ -1807,7 +1808,7 @@ export async function generateGRIDReport(mandateId: string): Promise<{ pdf_url: 
 
 export async function getCandidatesForMandate(mandateId: string): Promise<CandidatePipeline[]> {
   try {
-    const res = await fetch(`/api/data/candidates?mandate_id=${mandateId}`);
+    const res = await authFetch(`/api/data/candidates?mandate_id=${mandateId}`);
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -1941,7 +1942,7 @@ export interface CandidateNotification {
 // Get candidate's applications
 export async function getCandidateApplications(): Promise<CandidateApplication[]> {
   try {
-    const res = await fetch('/api/data/candidate/applications');
+    const res = await authFetch('/api/data/candidate/applications');
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -1958,7 +1959,7 @@ export async function getCandidateApplications(): Promise<CandidateApplication[]
 // Get candidate's profile
 export async function getCandidateProfile(): Promise<CandidateProfile | null> {
   try {
-    const res = await fetch('/api/data/candidate/profile');
+    const res = await authFetch('/api/data/candidate/profile');
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -1975,7 +1976,7 @@ export async function getCandidateProfile(): Promise<CandidateProfile | null> {
 // Update candidate's profile
 export async function updateCandidateProfile(updates: Partial<CandidateProfile>): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/candidate/profile', {
+    const res = await authFetch('/api/data/candidate/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
@@ -1997,7 +1998,7 @@ export async function getCandidateNotifications(): Promise<{
   preferences: NotificationPreferences;
 }> {
   try {
-    const res = await fetch('/api/data/candidate/notifications');
+    const res = await authFetch('/api/data/candidate/notifications');
     if (!res.ok) return { notifications: [], preferences: getDefaultNotificationPreferences() };
 
     const result = await res.json();
@@ -2017,7 +2018,7 @@ export async function getCandidateNotifications(): Promise<{
 // Mark notifications as read
 export async function markCandidateNotificationsRead(notificationIds: string[]): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/candidate/notifications/read', {
+    const res = await authFetch('/api/data/candidate/notifications/read', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ notification_ids: notificationIds }),
@@ -2033,7 +2034,7 @@ export async function markCandidateNotificationsRead(notificationIds: string[]):
 // Update notification preferences
 export async function updateNotificationPreferences(preferences: NotificationPreferences): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/candidate/notifications/preferences', {
+    const res = await authFetch('/api/data/candidate/notifications/preferences', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(preferences),
@@ -2052,7 +2053,7 @@ export async function updateNotificationPreferences(preferences: NotificationPre
 // Get career insights
 export async function getCareerInsights(): Promise<CareerInsight[]> {
   try {
-    const res = await fetch('/api/data/candidate/insights');
+    const res = await authFetch('/api/data/candidate/insights');
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -2069,7 +2070,7 @@ export async function getCareerInsights(): Promise<CareerInsight[]> {
 // Save/bookmark a career insight
 export async function saveCareerInsight(insightId: string): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/candidate/insights/save', {
+    const res = await authFetch('/api/data/candidate/insights/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ insight_id: insightId }),
@@ -2085,7 +2086,7 @@ export async function saveCareerInsight(insightId: string): Promise<boolean> {
 // Remove saved career insight
 export async function unsaveCareerInsight(insightId: string): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/candidate/insights/save', {
+    const res = await authFetch('/api/data/candidate/insights/save', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ insight_id: insightId }),
@@ -2191,7 +2192,7 @@ export interface AssessmentInvitation {
 // Get assessment configuration for a candidate
 export async function getCandidateAssessment(assessmentId: string, candidateId: string): Promise<AssessmentConfig | null> {
   try {
-    const res = await fetch(`/scoring/candidate/assessment?assessment_id=${assessmentId}&candidate_id=${candidateId}`);
+    const res = await authFetch(`/api/scoring/candidate/assessment?assessment_id=${assessmentId}&candidate_id=${candidateId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -2215,7 +2216,7 @@ export async function submitAssessmentResponses(params: {
   visibility?: 'full' | 'pass_fail' | 'hidden';
 }): Promise<boolean> {
   try {
-    const res = await fetch('/scoring/candidate/submit', {
+    const res = await authFetch('/api/scoring/candidate/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -2234,7 +2235,7 @@ export async function submitAssessmentResponses(params: {
 // Get assessment result for candidate
 export async function getAssessmentResult(assessmentId: string, candidateId: string): Promise<AssessmentResult | null> {
   try {
-    const res = await fetch(`/scoring/candidate/result?assessment_id=${assessmentId}&candidate_id=${candidateId}`);
+    const res = await authFetch(`/api/scoring/candidate/result?assessment_id=${assessmentId}&candidate_id=${candidateId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -2257,7 +2258,7 @@ export async function autoSaveAssessment(params: {
   responses: AssessmentResponse[];
 }): Promise<boolean> {
   try {
-    const res = await fetch('/scoring/candidate', {
+    const res = await authFetch('/api/scoring/candidate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2290,7 +2291,7 @@ export async function sendAssessmentInvitation(params: {
   consultantEmail: string;
 }): Promise<{ success: boolean; invitationId?: string }> {
   try {
-    const res = await fetch('/api/data/assessments/invite', {
+    const res = await authFetch('/api/data/assessments/invite', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -2309,7 +2310,7 @@ export async function sendAssessmentInvitation(params: {
 // Get candidate's assessment invitations
 export async function getAssessmentInvitations(candidateId: string): Promise<AssessmentInvitation[]> {
   try {
-    const res = await fetch(`/api/data/assessments/invitations?candidate_id=${candidateId}`);
+    const res = await authFetch(`/api/data/assessments/invitations?candidate_id=${candidateId}`);
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -2326,7 +2327,7 @@ export async function getAssessmentInvitations(candidateId: string): Promise<Ass
 // Update result visibility (consultant only)
 export async function updateResultVisibility(resultId: string, visibility: 'full' | 'pass_fail' | 'hidden'): Promise<boolean> {
   try {
-    const res = await fetch('/scoring/candidate/visibility', {
+    const res = await authFetch('/api/scoring/candidate/visibility', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ result_id: resultId, visibility }),
@@ -2426,7 +2427,7 @@ export interface SubmitScorecardParams {
 // Get interviews for a mandate
 export async function getInterviewsForMandate(mandateId: string): Promise<Interview[]> {
   try {
-    const res = await fetch(`/api/data/interviews/mandate/${mandateId}`);
+    const res = await authFetch(`/api/data/interviews/mandate/${mandateId}`);
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -2443,7 +2444,7 @@ export async function getInterviewsForMandate(mandateId: string): Promise<Interv
 // Get single interview
 export async function getInterview(interviewId: string): Promise<Interview | null> {
   try {
-    const res = await fetch(`/api/data/interviews/${interviewId}`);
+    const res = await authFetch(`/api/data/interviews/${interviewId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -2460,7 +2461,7 @@ export async function getInterview(interviewId: string): Promise<Interview | nul
 // Schedule new interview
 export async function scheduleInterview(params: ScheduleInterviewParams): Promise<{ success: boolean; interview_id?: string }> {
   try {
-    const res = await fetch('/api/data/interviews/schedule', {
+    const res = await authFetch('/api/data/interviews/schedule', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -2482,7 +2483,7 @@ export async function scheduleInterview(params: ScheduleInterviewParams): Promis
 // Update interview
 export async function updateInterview(interviewId: string, updates: Partial<Interview>): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/interviews/${interviewId}`, {
+    const res = await authFetch(`/api/data/interviews/${interviewId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
@@ -2501,7 +2502,7 @@ export async function updateInterview(interviewId: string, updates: Partial<Inte
 // Delete interview
 export async function deleteInterview(interviewId: string): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/interviews/${interviewId}`, {
+    const res = await authFetch(`/api/data/interviews/${interviewId}`, {
       method: 'DELETE',
     });
 
@@ -2518,7 +2519,7 @@ export async function deleteInterview(interviewId: string): Promise<boolean> {
 // Submit scorecard
 export async function submitScorecard(params: SubmitScorecardParams): Promise<{ success: boolean; aggregate_feedback?: AggregateFeedback }> {
   try {
-    const res = await fetch('/api/data/interviews/scorecard', {
+    const res = await authFetch('/api/data/interviews/scorecard', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -2540,7 +2541,7 @@ export async function submitScorecard(params: SubmitScorecardParams): Promise<{ 
 // Get aggregate feedback
 export async function getInterviewFeedback(interviewId: string): Promise<{ scorecards: InterviewScorecard[]; aggregate_feedback: AggregateFeedback | null; status: string } | null> {
   try {
-    const res = await fetch(`/api/data/interviews/feedback/${interviewId}`);
+    const res = await authFetch(`/api/data/interviews/feedback/${interviewId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -2557,7 +2558,7 @@ export async function getInterviewFeedback(interviewId: string): Promise<{ score
 // Advance candidate to next stage
 export async function advanceCandidateStage(interviewId: string): Promise<boolean> {
   try {
-    const res = await fetch('/api/data/interviews/advance', {
+    const res = await authFetch('/api/data/interviews/advance', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ interview_id: interviewId }),
@@ -2576,7 +2577,7 @@ export async function advanceCandidateStage(interviewId: string): Promise<boolea
 // Get available panelists (consultants in the organization)
 export async function getPanelists(): Promise<InterviewPanelist[]> {
   try {
-    const res = await fetch('/api/data/profiles?role=consultant');
+    const res = await authFetch('/api/data/profiles?role=consultant');
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -2604,7 +2605,7 @@ export interface MandateCandidate {
 
 export async function getMandateCandidates(mandateId: string): Promise<MandateCandidate[]> {
   try {
-    const res = await fetch(`/api/data/contacts?mandate=${mandateId}`);
+    const res = await authFetch(`/api/data/contacts?mandate=${mandateId}`);
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -2686,7 +2687,7 @@ export interface ConsultantAnalytics {
 // Get mandate milestones
 export async function getMandateMilestones(mandateId: string): Promise<MandateMilestoneData | null> {
   try {
-    const res = await fetch(`/api/data/milestones/${mandateId}`);
+    const res = await authFetch(`/api/data/milestones/${mandateId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -2707,7 +2708,7 @@ export async function updateMilestone(
   milestone: Milestone
 ): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/milestones/${mandateId}`, {
+    const res = await authFetch(`/api/data/milestones/${mandateId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ milestone_key: milestoneKey, milestone }),
@@ -2726,7 +2727,7 @@ export async function updateMilestone(
 // Initialize milestones for a mandate
 export async function initializeMilestones(mandateId: string): Promise<MandateMilestones | null> {
   try {
-    const res = await fetch('/api/data/milestones/init', {
+    const res = await authFetch('/api/data/milestones/init', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mandate_id: mandateId }),
@@ -2748,7 +2749,7 @@ export async function initializeMilestones(mandateId: string): Promise<MandateMi
 // Get mandates with at-risk milestones
 export async function getMandatesAtRisk(): Promise<AtRiskMandate[]> {
   try {
-    const res = await fetch('/api/data/milestones/at-risk');
+    const res = await authFetch('/api/data/milestones/at-risk');
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -2770,7 +2771,7 @@ export async function getTimelineAnalytics(): Promise<{
   completed_mandates: number;
 } | null> {
   try {
-    const res = await fetch('/api/data/milestones/analytics');
+    const res = await authFetch('/api/data/milestones/analytics');
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -2792,7 +2793,7 @@ export async function getClientTimeline(mandateId: string): Promise<{
   milestones: MandateMilestones;
 } | null> {
   try {
-    const res = await fetch(`/api/data/milestones/client/${mandateId}`);
+    const res = await authFetch(`/api/data/milestones/client/${mandateId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -2905,7 +2906,7 @@ export async function getOffers(params?: {
     if (params?.candidate_id) query.set('candidate_id', params.candidate_id);
     if (params?.mandate_id) query.set('mandate_id', params.mandate_id);
 
-    const res = await fetch(`/api/data/offers?${query.toString()}`);
+    const res = await authFetch(`/api/data/offers?${query.toString()}`);
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -2922,7 +2923,7 @@ export async function getOffers(params?: {
 // Get single offer
 export async function getOffer(offerId: string): Promise<Offer | null> {
   try {
-    const res = await fetch(`/api/data/offers/${offerId}`);
+    const res = await authFetch(`/api/data/offers/${offerId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -2939,7 +2940,7 @@ export async function getOffer(offerId: string): Promise<Offer | null> {
 // Create offer
 export async function createOffer(params: CreateOfferParams): Promise<{ success: boolean; offer_id?: string; message?: string }> {
   try {
-    const res = await fetch('/api/data/offers/create', {
+    const res = await authFetch('/api/data/offers/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -2974,7 +2975,7 @@ export async function updateOffer(
   }
 ): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/offers/${offerId}`, {
+    const res = await authFetch(`/api/data/offers/${offerId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
@@ -2993,7 +2994,7 @@ export async function updateOffer(
 // Delete offer
 export async function deleteOffer(offerId: string): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/offers/${offerId}`, {
+    const res = await authFetch(`/api/data/offers/${offerId}`, {
       method: 'DELETE',
     });
 
@@ -3015,7 +3016,7 @@ export async function updateOnboardingTask(
   notes?: string
 ): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/offers/onboarding/${offerId}`, {
+    const res = await authFetch(`/api/data/offers/onboarding/${offerId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ task_index: taskIndex, completed, notes }),
@@ -3038,7 +3039,7 @@ export async function recordFollowUpResponse(
   response: string
 ): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/offers/followup/${offerId}`, {
+    const res = await authFetch(`/api/data/offers/followup/${offerId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type, response }),
@@ -3062,7 +3063,7 @@ export async function updateProbationStatus(
   extended_to?: string
 ): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/offers/probation/${offerId}`, {
+    const res = await authFetch(`/api/data/offers/probation/${offerId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status, notes, extended_to }),
@@ -3081,7 +3082,7 @@ export async function updateProbationStatus(
 // Get probation reviews
 export async function getProbationReviews(): Promise<ProbationReview[]> {
   try {
-    const res = await fetch('/api/data/offers/probation-reviews');
+    const res = await authFetch('/api/data/offers/probation-reviews');
     if (!res.ok) return [];
 
     const result = await res.json();
@@ -3098,7 +3099,7 @@ export async function getProbationReviews(): Promise<ProbationReview[]> {
 // Send offer to candidate
 export async function sendOfferToCandidate(offerId: string): Promise<boolean> {
   try {
-    const res = await fetch(`/api/data/offers/send/${offerId}`, {
+    const res = await authFetch(`/api/data/offers/send/${offerId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -3152,7 +3153,7 @@ export async function checkMLDataAvailability(): Promise<{
   minimum_required: number;
 }> {
   try {
-    const res = await fetch('/api/data/ml/check-availability');
+    const res = await authFetch('/api/data/ml/check-availability');
     if (!res.ok) {
       return { has_sufficient_data: false, placement_count: 0, minimum_required: 500 };
     }
@@ -3171,7 +3172,7 @@ export async function checkMLDataAvailability(): Promise<{
 // Get active ML model info
 export async function getActiveModelInfo(): Promise<MLModelInfo | null> {
   try {
-    const res = await fetch('/api/data/ml/model');
+    const res = await authFetch('/api/data/ml/model');
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -3191,7 +3192,7 @@ export async function predictMatchScoreML(
   mandateId: string
 ): Promise<PredictionResult | null> {
   try {
-    const res = await fetch('/api/data/ml/predict', {
+    const res = await authFetch('/api/data/ml/predict', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ candidate_id: candidateId, mandate_id: mandateId }),
@@ -3218,7 +3219,7 @@ export async function overrideMLPrediction(
   reason: string
 ): Promise<OverrideResult> {
   try {
-    const res = await fetch('/api/data/ml/override', {
+    const res = await authFetch('/api/data/ml/override', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -3251,7 +3252,7 @@ export async function triggerModelTraining(): Promise<{
   estimated_duration?: string;
 }> {
   try {
-    const res = await fetch('/api/data/ml/train', {
+    const res = await authFetch('/api/data/ml/train', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -3303,4 +3304,196 @@ export async function getCombinedScore(
     usesMlpScore,
     hasOverride: false,
   };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// OPPORTUNITIES (BD Pipeline)
+// ═══════════════════════════════════════════════════════════════
+
+export interface Opportunity {
+  id: string;
+  title: string;
+  company_name: string | null;
+  company_id: string | null;
+  contact_name: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  stage: string;
+  estimated_fee_usd: number | null;
+  probability: number;
+  fee_type: string | null;
+  bd_owner_id: string | null;
+  source: string | null;
+  source_detail: string | null;
+  first_contact_at: string | null;
+  next_action_at: string | null;
+  next_action: string | null;
+  closed_at: string | null;
+  closed_reason: string | null;
+  converted_to_mandate_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getOpportunities(params?: {
+  stage?: string;
+  limit?: number;
+  offset?: number;
+  q?: string;
+}): Promise<{ data: Opportunity[]; total: number }> {
+  const queryParams = new URLSearchParams();
+  if (params?.stage) queryParams.set('stage', params.stage);
+  if (params?.limit) queryParams.set('limit', params.limit.toString());
+  if (params?.offset) queryParams.set('offset', params.offset.toString());
+  if (params?.q) queryParams.set('q', params.q);
+
+  try {
+    const res = await authFetch(`/api/data/opportunity?${queryParams.toString()}`);
+    const result = await res.json();
+    if (result.success) {
+      return { data: result.data || [], total: result.total || 0 };
+    }
+    return { data: [], total: 0 };
+  } catch (e) {
+    console.error('[Opportunities] getOpportunities error:', e);
+    return { data: [], total: 0 };
+  }
+}
+
+export async function getOpportunity(id: string): Promise<Opportunity | null> {
+  try {
+    const res = await authFetch(`/api/data/opportunity/${id}`);
+    const result = await res.json();
+    if (result.success) return result.data;
+    return null;
+  } catch (e) {
+    console.error('[Opportunities] getOpportunity error:', e);
+    return null;
+  }
+}
+
+export async function createOpportunity(data: Partial<Opportunity>): Promise<Opportunity | null> {
+  try {
+    const res = await authFetch('/api/data/opportunity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (result.success) return result.data;
+    return null;
+  } catch (e) {
+    console.error('[Opportunities] createOpportunity error:', e);
+    return null;
+  }
+}
+
+export async function updateOpportunity(id: string, data: Partial<Opportunity>): Promise<Opportunity | null> {
+  try {
+    const res = await authFetch(`/api/data/opportunity/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (result.success) return result.data;
+    return null;
+  } catch (e) {
+    console.error('[Opportunities] updateOpportunity error:', e);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// APPROVAL REQUESTS (Team Lead)
+// ═══════════════════════════════════════════════════════════════
+
+export interface ApprovalRequest {
+  id: string;
+  request_type: string;
+  mandate_id: string | null;
+  candidate_id: string | null;
+  requester_id: string | null;
+  approver_id: string | null;
+  status: string;
+  request_data: any;
+  reviewer_notes: string | null;
+  requested_at: string | null;
+  reviewed_at: string | null;
+  due_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getApprovalRequests(params?: {
+  status?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ data: ApprovalRequest[]; total: number }> {
+  const queryParams = new URLSearchParams();
+  if (params?.status) queryParams.set('status', params.status);
+  if (params?.limit) queryParams.set('limit', params.limit.toString());
+  if (params?.offset) queryParams.set('offset', params.offset.toString());
+
+  try {
+    const res = await authFetch(`/api/data/approval-request?${queryParams.toString()}`);
+    const result = await res.json();
+    if (result.success) {
+      return { data: result.data || [], total: result.total || 0 };
+    }
+    return { data: [], total: 0 };
+  } catch (e) {
+    console.error('[Approvals] getApprovalRequests error:', e);
+    return { data: [], total: 0 };
+  }
+}
+
+export async function updateApprovalRequest(
+  id: string,
+  data: Partial<ApprovalRequest>
+): Promise<ApprovalRequest | null> {
+  try {
+    const res = await authFetch(`/api/data/approval-request/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (result.success) return result.data;
+    return null;
+  } catch (e) {
+    console.error('[Approvals] updateApprovalRequest error:', e);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TEAM ASSIGNMENTS
+// ═══════════════════════════════════════════════════════════════
+
+export interface TeamAssignment {
+  id: string;
+  consultant_id: string;
+  team_lead_id: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export async function getTeamAssignments(params?: {
+  team_lead_id?: string;
+  consultant_id?: string;
+}): Promise<TeamAssignment[]> {
+  const queryParams = new URLSearchParams();
+  if (params?.team_lead_id) queryParams.set('team_lead_id', params.team_lead_id);
+  if (params?.consultant_id) queryParams.set('consultant_id', params.consultant_id);
+
+  try {
+    const res = await authFetch(`/api/data/team-assignment?${queryParams.toString()}`);
+    const result = await res.json();
+    if (result.success) return result.data || [];
+    return [];
+  } catch (e) {
+    console.error('[Team] getTeamAssignments error:', e);
+    return [];
+  }
 }
