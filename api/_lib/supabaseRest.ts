@@ -234,7 +234,7 @@ export function handleError(res: VercelResponse, endpoint: string, err: any) {
   return res.status(500).json({
     error: 'Internal server error',
     success: false,
-    details: process.env.NODE_ENV === 'development' ? String(err?.message || err) : undefined,
+    details: String(err?.message || err),
   });
 }
 
