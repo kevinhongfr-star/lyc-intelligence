@@ -17,21 +17,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const pathArr = (req.query.path as string[]) || [];
   const sub = pathArr[0] || '';
 
-  // SHIFT Assessment routes (Phase 2.2)
-  if (sub === 'shift') return handleSHIFTAssessment(req, res);
+  // SHIFT Assessment routes — sub-routes FIRST
   if (sub === 'shift' && pathArr[1] === 'report') return handleSHIFTReport(req, res);
+  if (sub === 'shift') return handleSHIFTAssessment(req, res);
 
-  // Advisory Assessment routes (Phase 3.4)
-  if (sub === 'advisory') return handleAdvisoryAssessment(req, res);
+  // Advisory Assessment routes — sub-routes FIRST
   if (sub === 'advisory' && pathArr[1] === 'report') return handleAdvisoryReport(req, res);
   if (sub === 'advisory' && pathArr[1] === 'participant') return handleParticipantAssessment(req, res);
+  if (sub === 'advisory') return handleAdvisoryAssessment(req, res);
 
-  // Candidate Assessment routes (Phase 4.2)
-  if (sub === 'candidate') return handleCandidateAssessmentScoring(req, res);
+  // Candidate Assessment routes — sub-routes FIRST
   if (sub === 'candidate' && pathArr[1] === 'submit') return handleSubmitCandidateAssessment(req, res);
   if (sub === 'candidate' && pathArr[1] === 'assessment') return handleGetCandidateAssessment(req, res);
   if (sub === 'candidate' && pathArr[1] === 'result') return handleGetCandidateResult(req, res);
   if (sub === 'candidate' && pathArr[1] === 'visibility') return handleUpdateResultVisibility(req, res);
+  if (sub === 'candidate') return handleCandidateAssessmentScoring(req, res);
 
   if (sub === '5') return handleScore5(req, res);
   return handleScore(req, res);

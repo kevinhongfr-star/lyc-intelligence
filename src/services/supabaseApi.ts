@@ -1012,7 +1012,7 @@ export async function getAllOutreachAttempts(mandateId?: string): Promise<any[]>
     const url = mandateId
       ? `/api/data/outreach-attempts?mandate_id=${encodeURIComponent(mandateId)}`
       : '/api/data/outreach-attempts?all=true';
-    const res = await fetch(url);
+    const res = await authFetch(url);
     if (!res.ok) return [];
     const data = await res.json();
     return data.data || [];
@@ -1120,7 +1120,7 @@ export async function getTargetCompanies(mandateId?: string): Promise<any[]> {
     const url = mandateId
       ? `/api/data/target-companies?mandate_id=${encodeURIComponent(mandateId)}`
       : '/api/data/target-companies';
-    const res = await fetch(url);
+    const res = await authFetch(url);
     if (!res.ok) return [];
     const data = await res.json();
     return data.data || [];
