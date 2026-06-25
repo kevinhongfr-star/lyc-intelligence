@@ -1,0 +1,12 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { handler } from '../../_lib/dataHandler.js';
+
+export const maxDuration = 60;
+
+export default async function contactHandler(req: VercelRequest, res: VercelResponse) {
+  // Ensure path is set for the handler
+  if (!req.query.path || (Array.isArray(req.query.path) && req.query.path.length === 0)) {
+    req.query.path = ['contact'];
+  }
+  return handler(req, res);
+}
