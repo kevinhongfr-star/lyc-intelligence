@@ -44,7 +44,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       // 2. Recent mandates — simplified, no JOIN (frontend can resolve company names)
       selectMany('mandates', { 
-        select: 'id,title,status,company_id,tier1_count,tier2_count,shortlisted_count,interview_count,placed_count,updated_at',
+        select: 'id,title,status,client_id,tier1_count,tier2_count,shortlisted_count,interview_count,placed_count,updated_at',
         orderBy: { column: 'updated_at', ascending: false },
         limit: 10 
       }),
