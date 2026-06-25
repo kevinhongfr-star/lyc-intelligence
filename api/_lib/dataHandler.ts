@@ -1763,14 +1763,14 @@ Return as valid JSON with exactly these keys:
       }
 
       const emails = candidates
-        .map((c) => (typeof c.email)
-        .filter((e): e is string)
+        .map((c) => c.email as string | undefined)
+        .filter((e): e is string => typeof e === 'string' && e !== null)
         .map((e) => e.trim().toLowerCase())
         .filter(Boolean);
 
       const linkedinUrls = candidates
-        .map((c) => (typeof c.linkedin_url))
-        .filter((l): l is string)
+        .map((c) => c.linkedin_url as string | undefined)
+        .filter((l): l is string => typeof l === 'string' && l !== null)
         .map((l) => l.trim())
         .filter(Boolean);
 
@@ -1886,7 +1886,7 @@ Return as valid JSON with exactly these keys:
             ],
             select: 'id, email',
           }, 15000);
-          existingByEmail.forEach((e) => e.email && emailSet.add(String(e.email).toLowerCase());
+          existingByEmail.forEach((e) => { if (e.email) emailSet.add(String(e.email).toLowerCase()); });
         }
         if (linkedinUrls.length > 0) {
           const existingByLinkedIn = await db.selectMany('contacts', {
@@ -1911,7 +1911,7 @@ Return as valid JSON with exactly these keys:
 
       for (const candidate of candidates) {
         try {
-          const candidateEmail = typeof candidate.email ? String(candidate.email).trim().toLowerCase() || '';
+          const candidateEmail = typeof candidate.email === 'string' ? String(candidate.email).trim().toLowerCase() : '';
           const candidateLinkedIn = typeof candidate.linkedin_url ? String(candidate.linkedin_url).trim() : '';
 
           const isDuplicateByEmail = candidateEmail && emailSet.has(candidateEmail);
@@ -1926,7 +1926,7 @@ Return as valid JSON with exactly these keys:
             // Update mode: find existing contact and fill in empty fields
             const existing = isDuplicateByEmail
               ? (await db.selectOne('contacts', { column: 'email', value: candidate.email }) || null)
-              : (await db.selectOne('contacts', { column: 'linkedin_url', value: candidate.linkedin_url }) || null;
+              : (await db.selectOne('contacts', { column: 'linkedin_url', value: candidate.linkedin_url }) || null);
 
             if (existing) {
               const updatePayload: Record<string, any> = {};

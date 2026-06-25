@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handler } from '../../_lib/chatHandler.js';
+import { handler } from '../_lib/chatHandler.js';
 
 export const maxDuration = 60;
 

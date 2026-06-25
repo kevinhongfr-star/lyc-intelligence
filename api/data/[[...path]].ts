@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handler } from '../../_lib/dataHandler.js';
+import { handler } from '../_lib/dataHandler.js';
 
 export const maxDuration = 60;
 

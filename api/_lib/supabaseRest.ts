@@ -263,3 +263,50 @@ export async function deleteRows(
   const out = await res.json().catch(() => []);
   return Array.isArray(out) ? out.length : 0;
 }
+
+// ── Compatibility aliases ──────────────────────────────────────────
+// These aliases are used by various handlers that expect a simpler API.
+
+/** DELETE a row by its `id` column. Alias for deleteRows with id filter. */
+export async function remove(
+  table: string,
+  id: string | number,
+  timeoutMs?: number
+): Promise<number> {
+  return deleteRows(table, { column: 'id', value: id }, timeoutMs);
+}
+
+/** SELECT with flexible options — alias that maps to selectMany. */
+export async function select<T = any>(
+  table: string,
+  options: {
+    select?: string;
+    where?: Array<{ column: string; value: string | number | boolean; op?: string }>;
+    orderBy?: { column: string; ascending?: boolean };
+    limit?: number;
+    offset?: number;
+  } = {},
+  timeoutMs?: number
+): Promise<T[]> {
+  return selectMany(table, options as any, timeoutMs);
+}
+
+/**
+ * Execute a raw PostgREST query string.
+ * E.g. query('rpc', 'my_function', 'param1=val1') → POST /rest/v1/rpc/my_function
+ */
+export async function query(
+  path: string,
+  ...args: string[]
+): Promise<any> {
+  const url = `${SUPABASE_URL}/rest/v1/${path}` + (args.length ? `/${args.join('/')}` : '');
+  const res = await fetchWithTimeout(url, {
+    method: 'GET',
+    headers: getHeaders(),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Supabase query ${path} failed: ${res.status} ${text}`);
+  }
+  return res.json();
+}
