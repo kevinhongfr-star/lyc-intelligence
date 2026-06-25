@@ -84,7 +84,7 @@ export function InterviewQuestionGenerator({
   // Generate questions
   const handleGenerate = async () => {
     if (!aiConfigured) {
-      setError('AI is not configured. Please set VITE_DEEPSEEK_API_KEY.');
+      setError('AI is not configured. Please contact your administrator if this issue persists.');
       return;
     }
 

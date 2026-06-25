@@ -5,9 +5,6 @@ import { ArrowLeft, Save, Loader2, FileText, Building, MapPin, Calendar, DollarS
 import { Card, CardHeader, CardTitle, CardContent, Button, Input } from '@/components/ui';
 import { toast } from '@/stores/toastStore';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
-
 interface Company {
   id: string;
   name: string;
@@ -74,11 +71,10 @@ export function ProposalBuilderPage() {
 
   const loadCompanies = async () => {
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/companies?select=id,name,industry,city,country&limit=100`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
-      });
+      const res = await authFetch('/api/data/company?limit=100');
       if (res.ok) {
-        setCompanies(await res.json());
+        const data = await res.json();
+        setCompanies(data.data || []);
       }
     } catch (e) {
       console.error('Failed to load companies:', e);

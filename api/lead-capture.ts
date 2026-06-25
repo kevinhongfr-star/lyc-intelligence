@@ -4,7 +4,18 @@ import { sendEmail } from './_lib/email.js';
 
 export const maxDuration = 60;
 
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Rate limiting: 5 requests per minute per IP
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (entry && now < entry.resetAt && entry.count >= 5) {
+    return res.status(429).json({ error: 'Rate limit exceeded. Please wait a minute before trying again.' });
+  }
+  rateLimitMap.set(ip, { count: (entry?.count || 0) + 1, resetAt: now + 60000 });
+
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });

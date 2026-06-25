@@ -124,7 +124,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
     }
 
     if (!aiConfigured) {
-      setError('AI analysis is not configured. Please set VITE_DEEPSEEK_API_KEY.');
+      setError('AI analysis is not configured. Please contact your administrator if this issue persists.');
       return;
     }
 

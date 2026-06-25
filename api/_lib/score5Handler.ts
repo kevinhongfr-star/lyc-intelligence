@@ -1,8 +1,23 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { insert, isSupabaseConfigured, handleError } from './supabaseRest.js';
+import { getUserFromRequest } from './adminAuth.js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 export const maxDuration = 60;
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 60000 });
+    return false;
+  }
+  if (entry.count >= 10) return true;
+  entry.count++;
+  return false;
+}
 
 const PROVIDER_TIMEOUT_MS = 15000;
 
@@ -48,6 +63,18 @@ interface FiveCriteriaResult {
 }
 
 export async function handleScore5(req: VercelRequest, res: VercelResponse) {
+  // Auth check
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  // Rate limiting
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
+  if (isRateLimited(ip)) {
+    return res.status(429).json({ error: 'Rate limit exceeded' });
+  }
+
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });

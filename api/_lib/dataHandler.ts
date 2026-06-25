@@ -2881,7 +2881,7 @@ Return as valid JSON with exactly these keys:
 
       return res.status(200).json({
         success: true,
-        share_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.lyc.ai'}/shared/report/${shareToken}`,
+        share_url: `https://app.lyc.ai/shared/report/${shareToken}`,
       });
     }
 

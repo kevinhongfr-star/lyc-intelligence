@@ -2192,7 +2192,7 @@ export interface AssessmentInvitation {
 // Get assessment configuration for a candidate
 export async function getCandidateAssessment(assessmentId: string, candidateId: string): Promise<AssessmentConfig | null> {
   try {
-    const res = await fetch(`/scoring/candidate/assessment?assessment_id=${assessmentId}&candidate_id=${candidateId}`);
+    const res = await authFetch(`/api/scoring/candidate/assessment?assessment_id=${assessmentId}&candidate_id=${candidateId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -2216,7 +2216,7 @@ export async function submitAssessmentResponses(params: {
   visibility?: 'full' | 'pass_fail' | 'hidden';
 }): Promise<boolean> {
   try {
-    const res = await fetch('/scoring/candidate/submit', {
+    const res = await authFetch('/api/scoring/candidate/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -2235,7 +2235,7 @@ export async function submitAssessmentResponses(params: {
 // Get assessment result for candidate
 export async function getAssessmentResult(assessmentId: string, candidateId: string): Promise<AssessmentResult | null> {
   try {
-    const res = await fetch(`/scoring/candidate/result?assessment_id=${assessmentId}&candidate_id=${candidateId}`);
+    const res = await authFetch(`/api/scoring/candidate/result?assessment_id=${assessmentId}&candidate_id=${candidateId}`);
     if (!res.ok) return null;
 
     const result = await res.json();
@@ -2258,7 +2258,7 @@ export async function autoSaveAssessment(params: {
   responses: AssessmentResponse[];
 }): Promise<boolean> {
   try {
-    const res = await fetch('/scoring/candidate', {
+    const res = await authFetch('/api/scoring/candidate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2327,7 +2327,7 @@ export async function getAssessmentInvitations(candidateId: string): Promise<Ass
 // Update result visibility (consultant only)
 export async function updateResultVisibility(resultId: string, visibility: 'full' | 'pass_fail' | 'hidden'): Promise<boolean> {
   try {
-    const res = await fetch('/scoring/candidate/visibility', {
+    const res = await authFetch('/api/scoring/candidate/visibility', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ result_id: resultId, visibility }),

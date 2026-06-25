@@ -27,7 +27,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(400).json({ error: 'org_id is required' });
         }
 
-        const config = await db.selectOne('sla_config', {
+        const config = await db.selectOne('sla_configurations', {
           select: '*',
           where: [{ column: 'org_id', value: org_id }],
         });
@@ -50,16 +50,16 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           updated_at: new Date().toISOString(),
         };
 
-        const existing = await db.selectOne('sla_config', {
+        const existing = await db.selectOne('sla_configurations', {
           select: 'id',
           where: [{ column: 'org_id', value: org_id }],
         });
 
         let result;
         if (existing) {
-          result = await db.update('sla_config', updates, existing.id);
+          result = await db.update('sla_configurations', updates, existing.id);
         } else {
-          result = await db.insert('sla_config', { org_id, ...updates });
+          result = await db.insert('sla_configurations', { org_id, ...updates });
         }
 
         return res.status(200).json({ success: true, config: result });

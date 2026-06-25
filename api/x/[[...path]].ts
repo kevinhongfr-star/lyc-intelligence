@@ -48,6 +48,7 @@ const handlers: Record<string, () => Promise<HandlerModule>> = {
   'cron': () => import('../_lib/cronHandler.js'),
   'benchmark': () => import('../_lib/benchmarkHandler.js'),
   'shift': () => import('../_lib/shiftHandler.js'),
+  'ai': () => import('../_lib/aiHandler.js'),
 };
 
 // Modules that use shared secret instead of JWT (cron jobs, etc.)

@@ -30,7 +30,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       if (title) filters.push({ column: 'title', value: title });
       if (location) filters.push({ column: 'location', value: location });
 
-      const rows = await db.selectMany('compensation_benchmark', {
+      const rows = await db.selectMany('comp_benchmarks', {
         select: '*',
         where: filters,
         orderBy: { column: 'percentile_50', ascending: true },
@@ -50,7 +50,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       const filters = [{ column: 'org_id', value: org_id }];
       if (benchmark_id) filters.push({ column: 'benchmark_id', value: benchmark_id });
 
-      const rows = await db.selectMany('compensation_data_points', {
+      const rows = await db.selectMany('comp_data_points', {
         select: '*',
         where: filters,
         orderBy: { column: 'created_at', ascending: false },
@@ -73,20 +73,20 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       const now = new Date().toISOString();
 
       if (benchmark_id) {
-        const result = await db.update('compensation_benchmark', {
+        const result = await db.update('comp_benchmarks', {
           last_refreshed_at: now,
         }, benchmark_id);
         return res.status(200).json({ success: true, benchmark: result });
       }
 
       // Refresh all benchmarks for org
-      const benchmarks = await db.selectMany('compensation_benchmark', {
+      const benchmarks = await db.selectMany('comp_benchmarks', {
         select: 'id',
         where: [{ column: 'org_id', value: org_id }],
       });
 
       for (const b of benchmarks) {
-        await db.update('compensation_benchmark', { last_refreshed_at: now }, b.id);
+        await db.update('comp_benchmarks', { last_refreshed_at: now }, b.id);
       }
 
       return res.status(200).json({
@@ -108,7 +108,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       if (title) filters.push({ column: 'title', value: title });
       if (location) filters.push({ column: 'location', value: location });
 
-      const benchmark = await db.selectOne('compensation_benchmark', {
+      const benchmark = await db.selectOne('comp_benchmarks', {
         select: '*',
         where: filters,
       });
@@ -160,7 +160,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       let imported = 0;
       for (const point of data_points) {
         try {
-          await db.insert('compensation_data_points', {
+          await db.insert('comp_data_points', {
             org_id,
             benchmark_id: point.benchmark_id || null,
             title: point.title,
