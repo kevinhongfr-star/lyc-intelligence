@@ -303,41 +303,29 @@ export async function runBenchmarkComparison(
 }
 
 /**
- * Call Coze workflow for AI insights
+ * Call Coze workflow for AI insights via server-side API route.
  */
 export async function callCozeBenchmarkWorkflow(
   input: CozeBenchmarkInput
 ): Promise<CozeBenchmarkOutput> {
-  const COZE_API_KEY = process.env.COZE_API_KEY || '';
-  const COZE_WORKFLOW_ID = process.env.COZE_BENCHMARK_WORKFLOW_ID || 'benchmark_scoring';
-
-  if (!COZE_API_KEY) {
-    // Return default insights if no API key
-    return generateDefaultInsights(input);
-  }
-
   try {
-    const response = await fetch('https://api.coze.com/v1/workflow/run', {
+    const response = await fetch('/api/benchmark/coze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${COZE_API_KEY}`,
       },
-      body: JSON.stringify({
-        workflow_id: COZE_WORKFLOW_ID,
-        parameters: input,
-      }),
+      body: JSON.stringify(input),
     });
 
     if (!response.ok) {
-      console.warn('Coze workflow call failed:', response.status);
+      console.warn('Coze benchmark API call failed:', response.status);
       return generateDefaultInsights(input);
     }
 
     const data = await response.json();
-    return data.data || generateDefaultInsights(input);
+    return data as CozeBenchmarkOutput;
   } catch (error) {
-    console.warn('Coze workflow error:', error);
+    console.warn('Coze benchmark error:', error);
     return generateDefaultInsights(input);
   }
 }

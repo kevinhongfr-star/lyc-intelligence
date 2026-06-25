@@ -28,20 +28,20 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/platform/batch-scoring', icon: IconTrident, label: 'Match Analysis', icp: ['consultant'] },
   { path: '/platform/mandates', icon: FileDown, label: 'Candidate Report', suffix: '/lens', icp: ['consultant'] },
   { path: '/platform/metrix', icon: IconSpark, label: 'Performance Metrics', icp: ['consultant'] },
-  { path: '/platform/scoring-runs', icon: ClipboardList, label: 'Scoring Runs', roles: ['admin'] },
+  { path: '/platform/scoring-runs', icon: ClipboardList, label: 'Scoring Runs', roles: ['lyc_admin'] },
   { type: 'divider', label: 'Tools' },
   { path: '/platform/chat', icon: IconQuest, label: 'Nexus', icp: ['consultant', 'leader'] },
   { path: '/platform/scheduler', icon: Calendar, label: 'Scheduler', icp: ['consultant'] },
   { path: '/platform/documents', icon: IconPrism, label: 'Documents', icp: ['consultant', 'leader'] },
   { path: '/platform/notifications', icon: Bell, label: 'Alerts' },
-  { path: '/platform/settings', icon: IconForge, label: 'Settings', roles: ['admin'] },
-  { type: 'divider', label: 'Admin', roles: ['admin'] },
-  { path: '/platform/org-intel', icon: BarChart3, label: 'Org Intelligence', roles: ['admin'] },
+  { path: '/platform/settings', icon: IconForge, label: 'Settings', roles: ['lyc_admin'] },
+  { type: 'divider', label: 'Admin', roles: ['lyc_admin'] },
+  { path: '/platform/org-intel', icon: BarChart3, label: 'Org Intelligence', roles: ['lyc_admin'] },
 ];
 
 function filterNavItems(items: NavItem[], userICP: string | null, userRole: string | null): NavItem[] {
   const filtered = items.filter(item => {
-    if (userRole === 'admin') return true;
+    if (userRole === 'super_admin' || userRole === 'lyc_admin') return true;
     if (item.icp && userICP && !item.icp.includes(userICP as ICP)) return false;
     if (item.roles && userRole && !item.roles.includes(userRole)) return false;
     return true;

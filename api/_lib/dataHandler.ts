@@ -57,7 +57,12 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         orgId = await getOrgId(user.id);
       }
     } catch (e) {
-      console.warn('[dataHandler] Auth check failed:', (e as any).message);
+      console.error('[dataHandler] Auth check failed:', (e as any).message);
+      return res.status(401).json({ error: 'Unauthorized', success: false });
+    }
+
+    if (!authUserId) {
+      return res.status(401).json({ error: 'Unauthorized', success: false });
     }
 
     if (method !== 'GET') {

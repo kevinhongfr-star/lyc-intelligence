@@ -29,7 +29,7 @@ export function DashboardRouter() {
     return <TL_Dashboard />;
   }
 
-  if (role === 'admin') {
+  if (role === 'super_admin') {
     return <ConsultantDashboard />;
   }
 

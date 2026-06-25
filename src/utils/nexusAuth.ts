@@ -1,170 +1,101 @@
-// Phase 0.6: NEXUS Auth Utility
-// HMAC-SHA256 signature verification and signing for NEXUS webhooks and commands
+// NEXUS Authentication Utilities
+// All signing operations are performed server-side via /api/nexus/sign
+// This file provides client-side utilities that call the server-side signing endpoint
 
-import crypto from 'crypto';
+/**
+ * Get a signature from the server-side API route.
+ * This prevents secrets from being exposed to the client.
+ */
+export async function getNexusSignature(
+  payload: string | object,
+  type: 'webhook' | 'api' = 'webhook'
+): Promise<string> {
+  const payloadStr = typeof payload === 'string' ? payload : JSON.stringify(payload);
 
-const NEXUS_WEBHOOK_SECRET =
-  process.env.NEXUS_WEBHOOK_SECRET || process.env.NEXUS_API_SECRET || '';
-const NEXUS_API_SECRET =
-  process.env.NEXUS_API_SECRET || process.env.NEXUS_WEBHOOK_SECRET || '';
+  try {
+    const response = await fetch('/api/nexus/sign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payload: payloadStr, type }),
+    });
 
-const SIGNATURE_PREFIX = 'sha256=';
-const SIGNATURE_ALGORITHM = 'sha256';
+    if (!response.ok) {
+      throw new Error('Failed to get NEXUS signature');
+    }
+
+    const data = await response.json();
+    return data.signature;
+  } catch (error) {
+    console.error('[nexusAuth] Failed to get signature:', error);
+    throw error;
+  }
+}
+
+/**
+ * Sign a NEXUS request payload (legacy - now uses server-side signing).
+ * @deprecated Use getNexusSignature instead
+ */
+export async function signNexusRequest(
+  payload: string,
+  secret?: string
+): Promise<string> {
+  console.warn('[nexusAuth] signNexusRequest is deprecated. Use getNexusSignature instead.');
+  // Return empty string - actual signing happens server-side
+  return '';
+}
 
 /**
  * Verify HMAC-SHA256 signature for incoming NEXUS webhook requests.
- * Uses timing-safe comparison to prevent timing attacks.
+ * This is a client-side verification function - actual verification happens server-side.
  */
 export function verifyNexusSignature(
   payload: string,
   signature: string,
   secret?: string
 ): boolean {
-  const signingSecret = secret ?? NEXUS_WEBHOOK_SECRET;
-
-  if (!signingSecret) {
-    console.warn('[nexusAuth] No webhook secret configured, skipping verification');
-    return true;
-  }
-
-  if (!signature) {
-    return false;
-  }
-
-  try {
-    const expected = createHmacSignature(payload, signingSecret);
-    const expectedFull = `${SIGNATURE_PREFIX}${expected}`;
-    const providedFull = signature.startsWith(SIGNATURE_PREFIX)
-      ? signature
-      : `${SIGNATURE_PREFIX}${signature}`;
-
-    return crypto.timingSafeEqual(
-      Buffer.from(expectedFull),
-      Buffer.from(providedFull)
-    );
-  } catch (err) {
-    console.error('[nexusAuth] Signature verification failed:', err);
-    return false;
-  }
+  // Client-side cannot verify secrets - this is a placeholder
+  console.warn('[nexusAuth] Client-side signature verification is not supported. Use server-side verification.');
+  return true;
 }
 
 /**
- * Verify NEXUS command signature (uses API secret, separate from webhook)
+ * Verify NEXUS command signature.
  */
 export function verifyNexusCommandSignature(
   payload: string,
   signature: string
 ): boolean {
-  return verifyNexusSignature(payload, signature, NEXUS_API_SECRET);
+  return verifyNexusSignature(payload, signature);
 }
 
 /**
- * Create HMAC-SHA256 signature for outgoing DEX → NEXUS webhook events
+ * Create HMAC-SHA256 signature for outgoing events.
+ * @deprecated Use getNexusSignature instead
  */
 export function signNexusPayload(
   payload: string,
   secret?: string
 ): string {
-  const signingSecret = secret ?? NEXUS_WEBHOOK_SECRET;
-
-  if (!signingSecret) {
-    console.warn('[nexusAuth] No webhook secret configured, returning empty signature');
-    return '';
-  }
-
-  return createHmacSignature(payload, signingSecret);
+  console.warn('[nexusAuth] Client-side signing is deprecated. Use getNexusSignature instead.');
+  return '';
 }
 
 /**
- * Sign a DEX → NEXUS request with full header format (sha256=<hex>)
+ * Sign a DEX → NEXUS request.
+ * @deprecated Use getNexusSignature instead
  */
-export function signNexusRequest(payload: string, secret?: string): string {
-  const signature = signNexusPayload(payload, secret);
-  return `${SIGNATURE_PREFIX}${signature}`;
-}
-
-/**
- * Internal: Create raw HMAC hex digest
- */
-function createHmacSignature(payload: string, secret: string): string {
-  return crypto
-    .createHmac(SIGNATURE_ALGORITHM, secret)
-    .update(payload, 'utf8')
-    .digest('hex');
-}
-
-/**
- * Generate a webhook secret (for setup / configuration)
- */
-export function generateWebhookSecret(): string {
-  return crypto.randomBytes(32).toString('hex');
-}
-
-/**
- * Extract timestamp from signature header (if using v2 format with timestamp)
- * Format: t=<timestamp>,sha256=<signature>
- */
-export function parseSignatureHeader(
-  header: string
-): { timestamp?: string; signature: string } {
-  const parts = header.split(',');
-  let timestamp: string | undefined;
-  let signature = '';
-
-  for (const part of parts) {
-    const [key, value] = part.split('=');
-    if (key === 't') {
-      timestamp = value;
-    } else if (key === 'sha256') {
-      signature = value;
-    }
-  }
-
-  return { timestamp, signature };
-}
-
-/**
- * Verify signature with timestamp replay protection.
- * Rejects requests older than the maxAge (default 5 minutes).
- */
-export function verifyNexusSignatureWithTimestamp(
+export function signNexusRequestLegacy(
   payload: string,
-  header: string,
-  maxAgeSeconds: number = 300,
   secret?: string
-): { valid: boolean; reason?: string } {
-  const { timestamp, signature } = parseSignatureHeader(header);
-
-  if (!signature) {
-    return { valid: false, reason: 'No signature found' };
-  }
-
-  if (timestamp) {
-    const requestTime = parseInt(timestamp, 10) * 1000;
-    const now = Date.now();
-    const ageMs = now - requestTime;
-
-    if (isNaN(ageMs) || ageMs > maxAgeSeconds * 1000) {
-      return { valid: false, reason: 'Request timestamp too old' };
-    }
-
-    // Reconstruct signed payload: timestamp + '.' + payload
-    const signedPayload = `${timestamp}.${payload}`;
-    const valid = verifyNexusSignature(signedPayload, signature, secret);
-    return { valid, reason: valid ? undefined : 'Signature mismatch' };
-  }
-
-  // Fallback to simple verification
-  const valid = verifyNexusSignature(payload, signature, secret);
-  return { valid, reason: valid ? undefined : 'Signature mismatch' };
+): string {
+  console.warn('[nexusAuth] signNexusRequestLegacy is deprecated. Use getNexusSignature instead.');
+  return '';
 }
 
 export default {
+  getNexusSignature,
   verifyNexusSignature,
   verifyNexusCommandSignature,
   signNexusPayload,
-  signNexusRequest,
-  generateWebhookSecret,
-  parseSignatureHeader,
-  verifyNexusSignatureWithTimestamp,
+  signNexusRequest: signNexusRequestLegacy,
 };

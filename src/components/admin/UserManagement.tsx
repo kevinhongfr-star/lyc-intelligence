@@ -85,7 +85,7 @@ export function UserManagement() {
   };
 
   const getRoleBadge = (role: string) => {
-    if (role === 'admin') {
+    if (role === 'super_admin') {
       return <Badge variant="secondary" className="bg-red-100 text-red-700"><Shield className="w-3 h-3 mr-1" />Admin</Badge>;
     }
     return <Badge variant="secondary" className="bg-gray-100 text-gray-700">User</Badge>;
@@ -255,17 +255,17 @@ export function UserManagement() {
                 <div className="space-y-2 pt-4 border-t border-border">
                   <h4 className="text-sm font-medium text-text-primary">Quick Actions</h4>
                   <div className="space-y-2">
-                    {selected.role !== 'admin' && (
+                    {selected.role !== 'super_admin' && (
                       <Button
                         variant="outline"
                         size="sm"
                         className="w-full justify-start"
-                        onClick={() => { setNewRole('admin'); setShowRoleModal(true); }}
+                        onClick={() => { setNewRole('super_admin'); setShowRoleModal(true); }}
                       >
                         <Shield className="w-4 h-4 mr-2" /> Make Admin
                       </Button>
                     )}
-                    {selected.role === 'admin' && selected.email !== 'kevin@lycintelligence.com' && (
+                    {selected.role === 'super_admin' && selected.email !== 'kevin@lycintelligence.com' && (
                       <Button
                         variant="outline"
                         size="sm"

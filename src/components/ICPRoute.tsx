@@ -21,7 +21,7 @@ export function ICPRoute({ allowedICP, children }: ICPRouteProps) {
   }
 
   const userICP = profile?.icp as ICP;
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = profile?.role === 'super_admin' || profile?.role === 'lyc_admin';
 
   if (isAdmin) {
     return <>{children}</>;

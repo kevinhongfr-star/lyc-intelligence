@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { insert, isSupabaseConfigured, handleError } from './supabaseRest.js';
+import { getUserFromRequest } from './adminAuth.js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 
@@ -57,6 +58,12 @@ function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
 }
 
 export async function handleScore(req: VercelRequest, res: VercelResponse) {
+  // Auth check
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   try {
     const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
     if (isRateLimited(ip, 10, 60 * 1000)) {

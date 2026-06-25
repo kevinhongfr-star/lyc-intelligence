@@ -328,7 +328,7 @@ export function MandateDetailPage() {
           <Card>
             <CardHeader className="py-2"><CardTitle className="text-sm">Team</CardTitle></CardHeader>
             <CardContent className="py-0">
-              <MandateTeam mandateId={mandate.id} isAdmin={profile?.role === 'admin'} />
+              <MandateTeam mandateId={mandate.id} isAdmin={profile?.role === 'super_admin' || profile?.role === 'lyc_admin'} />
             </CardContent>
           </Card>
 

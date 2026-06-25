@@ -24,7 +24,7 @@ export function TeamManagement() {
   const [inviteRole, setInviteRole] = useState<'user' | 'admin'>('user');
   const [inviting, setInviting] = useState(false);
 
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = profile?.role === 'super_admin' || profile?.role === 'lyc_admin';
 
   useEffect(() => {
     if (isAdmin) loadTeam();
@@ -173,10 +173,10 @@ export function TeamManagement() {
             }}>
               <div style={{
                 width: '36px', height: '36px', borderRadius: '50%',
-                background: m.role === 'admin' ? '#C108AB15' : '#F3F4F6',
+                background: m.role === 'super_admin' || m.role === 'lyc_admin' ? '#C108AB15' : '#F3F4F6',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                {m.role === 'admin'
+                {m.role === 'super_admin' || m.role === 'lyc_admin'
                   ? <Shield style={{ width: 16, height: 16, color: '#C108AB' }} />
                   : <User style={{ width: 16, height: 16, color: '#6B7280' }} />
                 }
@@ -188,11 +188,11 @@ export function TeamManagement() {
               <div style={{ display: 'flex', gap: '8px' }}>
                 <span style={{
                   padding: '2px 8px', borderRadius: '4px', fontSize: '11px',
-                  background: m.role === 'admin' ? '#C108AB15' : '#F3F4F6',
-                  color: m.role === 'admin' ? '#C108AB' : '#6B7280',
-                  fontWeight: m.role === 'admin' ? 600 : 400,
+                  background: m.role === 'super_admin' || m.role === 'lyc_admin' ? '#C108AB15' : '#F3F4F6',
+                  color: m.role === 'super_admin' || m.role === 'lyc_admin' ? '#C108AB' : '#6B7280',
+                  fontWeight: m.role === 'super_admin' || m.role === 'lyc_admin' ? 600 : 400,
                 }}>
-                  {m.role === 'admin' ? 'Admin' : 'Member'}
+                  {m.role === 'super_admin' || m.role === 'lyc_admin' ? 'Admin' : 'Member'}
                 </span>
                 <span style={{
                   padding: '2px 8px', borderRadius: '4px', fontSize: '11px',

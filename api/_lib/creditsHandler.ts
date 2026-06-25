@@ -148,9 +148,21 @@ async function logTransaction(params: {
 
 /**
  * Spend credits: check org balance first, fall back to user balance.
+ * Requires authentication and user can only spend their own credits (unless super_admin).
  */
 async function handleSpend(req: VercelRequest, res: VercelResponse) {
+  // Auth check
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: 'Unauthorized', success: false });
+  }
+
   const { userId, amount, action, referenceId } = req.body;
+
+  // IDOR check: users can only spend their own credits unless super_admin
+  if (userId !== user.id && user.role !== 'super_admin') {
+    return res.status(403).json({ error: 'Cannot spend credits for another user', success: false });
+  }
 
   if (!userId || !amount || !action) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -235,8 +247,15 @@ async function handleSpend(req: VercelRequest, res: VercelResponse) {
 /**
  * Earn credits: top up the user's organization balance if they have one,
  * otherwise add to the user's personal credits record.
+ * Requires authentication.
  */
 async function handleEarn(req: VercelRequest, res: VercelResponse) {
+  // Auth check
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: 'Unauthorized', success: false });
+  }
+
   const { userId, amount, action, referenceId } = req.body;
 
   if (!userId || !amount || !action) {
@@ -322,8 +341,15 @@ async function handleEarn(req: VercelRequest, res: VercelResponse) {
  * Daily reset for user-level credits.
  * Member tier: 2 credits/day
  * Council tier: 5 credits/day
+ * Requires authentication.
  */
 async function handleDailyReset(req: VercelRequest, res: VercelResponse) {
+  // Auth check
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: 'Unauthorized', success: false });
+  }
+
   const { userId } = req.body;
 
   if (!userId) {
@@ -337,7 +363,7 @@ async function handleDailyReset(req: VercelRequest, res: VercelResponse) {
   });
 
   let tier = profile?.tier || 'member';
-  
+
   if (profile?.tier === 'council' && profile.stripe_subscription_status !== 'active') {
     tier = 'member';
   }

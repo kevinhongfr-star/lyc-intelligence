@@ -507,17 +507,24 @@ async function handleUsersRoleChange(req: VercelRequest, res: VercelResponse) {
   }
 
   const { newRole } = req.body || {};
-  if (!newRole || !['admin', 'user'].includes(newRole)) {
-    return res.status(400).json({ error: 'Invalid role. Must be "admin" or "user".' });
+  // Valid canonical roles
+  const VALID_ROLES = ['super_admin', 'lyc_admin', 'lyc_consultant', 'client_admin', 'client_viewer', 'member', 'council', 'candidate'];
+  if (!newRole || !VALID_ROLES.includes(newRole)) {
+    return res.status(400).json({ error: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}` });
   }
 
   try {
-    if (newRole === 'user') {
+    // Check if demoting the last admin
+    if (newRole !== 'super_admin' && newRole !== 'lyc_admin') {
       const admins = await selectMany('profiles', {
         select: 'id',
-        where: [{ column: 'role', value: 'admin' }],
+        where: [{ column: 'role', value: 'super_admin' }],
       }, 10000, 10);
-      if ((admins || []).length <= 1) {
+      const lycAdmins = await selectMany('profiles', {
+        select: 'id',
+        where: [{ column: 'role', value: 'lyc_admin' }],
+      }, 10000, 10);
+      if ((admins || []).length + (lycAdmins || []).length <= 1) {
         return res.status(400).json({ error: 'Cannot demote the last admin' });
       }
     }

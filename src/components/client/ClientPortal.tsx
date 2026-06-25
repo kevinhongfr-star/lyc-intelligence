@@ -26,10 +26,10 @@ export function ClientPortal() {
   const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = profile?.role === 'super_admin' || profile?.role === 'lyc_admin';
 
   const navItems = CLIENT_NAV.filter(item => {
-    if (item.roles && !item.roles.includes(isAdmin ? 'admin' : 'user')) {
+    if (item.roles && !item.roles.includes(isAdmin ? 'lyc_admin' : 'user')) {
       return false;
     }
     return true;

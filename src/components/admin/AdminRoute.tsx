@@ -3,7 +3,7 @@
  *
  * Behavior:
  *   - Unauthenticated -> redirect to /login
- *   - Authenticated but role !== 'admin' -> redirect to /dashboard
+ *   - Authenticated but role !== 'lyc_admin' -> redirect to /dashboard
  *     (avoids leaking admin paths to non-admins via 404 vs 403 signal noise)
  *   - Admin -> render children
  *
@@ -37,7 +37,9 @@ export function AdminRoute({ children, fallbackPath = '/dashboard' }: AdminRoute
 
   // Profile is the source of truth for role; fall back to user metadata
   const role = profile?.role ?? (user as any)?.app_metadata?.role ?? null;
-  if (role !== 'admin') {
+  // Allow both super_admin and lyc_admin roles
+  const isAdmin = role === 'super_admin' || role === 'lyc_admin';
+  if (!isAdmin) {
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-3 text-center px-6">
         <ShieldOff className="w-12 h-12 text-text-muted" />

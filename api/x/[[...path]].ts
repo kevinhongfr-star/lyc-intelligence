@@ -17,10 +17,11 @@
  *   /api/x/data-subject-requests/* → dsrHandler
  *   /api/x/kpis/*            → kpisHandler
  *   /api/x/nexus/*           → nexusHandler
- *   /api/x/cron/*            → cronHandler
+ *   /api/x/cron/*            → cronHandler (uses CRON_SECRET instead of JWT)
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getUserFromRequest } from '../_lib/adminAuth.js';
 
 export const maxDuration = 60;
 
@@ -43,9 +44,29 @@ const handlers: Record<string, () => Promise<HandlerModule>> = {
   'cron': () => import('../_lib/cronHandler.js'),
 };
 
+// Modules that use shared secret instead of JWT (cron jobs, etc.)
+const PUBLIC_MODULES = ['cron'];
+
 export default async function dispatcher(req: VercelRequest, res: VercelResponse) {
   const pathArr = (req.query.path as string[]) || [];
   const module = pathArr[0] || '';
+
+  // ── AUTH CHECK ──
+  if (!PUBLIC_MODULES.includes(module)) {
+    // All protected modules require JWT authentication
+    const { user, error } = await getUserFromRequest(req);
+    if (error || !user) {
+      return res.status(401).json({ error: 'Unauthorized', success: false });
+    }
+    // Attach user to request for downstream handlers
+    (req as any).__authenticatedUser = user;
+  } else {
+    // For cron, verify shared secret instead of JWT
+    const cronSecret = req.headers['x-cron-secret'] || req.query.secret;
+    if (cronSecret !== process.env.CRON_SECRET) {
+      return res.status(401).json({ error: 'Unauthorized', success: false });
+    }
+  }
 
   const loader = handlers[module];
   if (!loader) {

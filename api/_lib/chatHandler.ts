@@ -10,6 +10,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { insert, isSupabaseConfigured } from './supabaseRest.js';
 import { sendEmail } from './email.js';
+import { getUserFromRequest } from './adminAuth.js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 const COZE_API_KEY = process.env.COZE_API_KEY || '';
@@ -125,6 +126,12 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
 // ── Email Handler ─────────────────────────────────────────────────────────────
 
 async function handleEmail(req: VercelRequest, res: VercelResponse) {
+  // Auth check
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: 'Unauthorized', sent: false });
+  }
+
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
@@ -156,16 +163,21 @@ interface ExtractedMemory {
 }
 
 async function handleMemory(req: VercelRequest, res: VercelResponse) {
+  // Auth check
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: 'Unauthorized', success: false });
+  }
+
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { userId, messages, sessionId, explicitGoal } = req.body;
+    const { messages, sessionId, explicitGoal } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID required' });
-    }
+    // Use authenticated user's ID, not from body (prevents IDOR)
+    const authenticatedUserId = user.id;
 
     if (!isSupabaseConfigured()) {
       return res.status(500).json({ error: 'Server configuration error: Supabase not configured', success: false });
@@ -174,7 +186,7 @@ async function handleMemory(req: VercelRequest, res: VercelResponse) {
     // Handle explicit goal storage
     if (explicitGoal) {
       await insert('memories', {
-        user_id: userId,
+        user_id: authenticatedUserId,
         memory_type: 'goal',
         content: explicitGoal,
         source: 'explicit_user_input',
@@ -203,7 +215,7 @@ async function handleMemory(req: VercelRequest, res: VercelResponse) {
       for (const memory of memories) {
         try {
           await insert('memories', {
-            user_id: userId,
+            user_id: authenticatedUserId,
             memory_type: memory.memory_type,
             content: memory.content,
             source: 'conversation_extraction',

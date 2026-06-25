@@ -9,15 +9,15 @@ import type {
   OutboxStatus,
 } from '@/types/nexusEvents';
 import { NEXUS_EVENT_VERSION, NEXUS_SOURCE } from '@/types/nexusEvents';
-import { signNexusRequest } from '@/utils/nexusAuth';
-
-const NEXUS_WEBHOOK_URL =
-  process.env.NEXUS_WEBHOOK_URL || '';
+import { getNexusSignature } from '@/utils/nexusAuth';
 
 const MAX_RETRY_COUNT = 10;
 const BASE_BACKOFF_MS = 1000;
 const MAX_BACKOFF_MS = 300_000; // 5 minutes
 const DELIVERY_TIMEOUT_MS = 10_000; // 10 seconds
+
+// NEXUS Webhook URL - this is a public URL, not a secret
+const NEXUS_WEBHOOK_URL = import.meta.env.VITE_NEXUS_WEBHOOK_URL || '';
 
 /**
  * Generate a UUID v4 using crypto
@@ -132,7 +132,13 @@ export async function deliverEvent<T>(
   }
 
   const payloadJson = JSON.stringify(event);
-  const signature = signNexusRequest(payloadJson);
+  let signature: string;
+
+  try {
+    signature = await getNexusSignature(payloadJson, 'webhook');
+  } catch (err) {
+    return { success: false, responseBody: 'Failed to get signature' };
+  }
 
   try {
     const controller = new AbortController();

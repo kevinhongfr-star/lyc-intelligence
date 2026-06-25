@@ -105,7 +105,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   if (isLoading) return <Loading />;
   if (!user) return <Navigate to="/login" replace />;
   const role = profile?.role ?? (user as any)?.app_metadata?.role ?? null;
-  if (role !== 'admin') {
+  if (role !== 'super_admin') {
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-3 text-center px-6">
         <h1 className="text-2xl font-serif">Admin access required</h1>
@@ -171,13 +171,13 @@ export default function App() {
                 <Route path="pipeline" element={<RoleRoute allowedICP={['consultant']}><PipelinePage /></RoleRoute>} />
                 <Route path="batch-scoring" element={<RoleRoute allowedICP={['consultant']}><BatchScoringPage /></RoleRoute>} />
                 <Route path="metrix" element={<RoleRoute allowedICP={['consultant']}><MetrixPage /></RoleRoute>} />
-                <Route path="scoring-runs" element={<RoleRoute allowedRoles={['admin']}><ScoringRunsPage /></RoleRoute>} />
+                <Route path="scoring-runs" element={<RoleRoute allowedRoles={['lyc_admin']}><ScoringRunsPage /></RoleRoute>} />
                 <Route path="chat" element={<RoleRoute allowedICP={['consultant', 'leader']}><NexusPage /></RoleRoute>} />
                 <Route path="scheduler" element={<RoleRoute allowedICP={['consultant']}><SchedulerPage /></RoleRoute>} />
                 <Route path="documents" element={<RoleRoute allowedICP={['consultant', 'leader']}><PlatformDocumentsPage /></RoleRoute>} />
-                <Route path="org-intel" element={<RoleRoute allowedRoles={['admin']}><OrgIntelligencePage /></RoleRoute>} />
+                <Route path="org-intel" element={<RoleRoute allowedRoles={['lyc_admin']}><OrgIntelligencePage /></RoleRoute>} />
                 <Route path="notifications" element={<NotificationsPage />} />
-                <Route path="settings" element={<RoleRoute allowedRoles={['admin']}><SettingsPage /></RoleRoute>} />
+                <Route path="settings" element={<RoleRoute allowedRoles={['lyc_admin']}><SettingsPage /></RoleRoute>} />
                 <Route path="admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
                 <Route path="admin/users" element={<AdminRoute><UserManagement /></AdminRoute>} />
                 <Route path="admin/credits" element={<AdminRoute><CreditManagement /></AdminRoute>} />

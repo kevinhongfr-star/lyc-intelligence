@@ -27,7 +27,7 @@ export function RoleRoute({ allowedICP, allowedRoles, allowedSubtypes, children 
   const userRole = profile?.role;
   const userSubtype = profile?.subtype;
 
-  if (userRole === 'admin') {
+  if (userRole === 'super_admin' || userRole === 'lyc_admin') {
     return <>{children}</>;
   }
 

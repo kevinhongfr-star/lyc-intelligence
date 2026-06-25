@@ -26,7 +26,7 @@ export function MandatesPage() {
   const [viewFilter, setViewFilter] = useState<'all' | 'mine' | 'shared'>('mine');
   const [updating, setUpdating] = useState<string | null>(null);
 
-  const isLeader = profile?.icp === 'leader' || profile?.role === 'admin';
+  const isLeader = profile?.icp === 'leader' || profile?.role === 'super_admin' || profile?.role === 'lyc_admin';
 
   const filtered = mandates
     .filter(m => !statusFilter || m.status === statusFilter)

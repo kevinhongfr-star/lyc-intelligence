@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { insert, isSupabaseConfigured, handleError } from './_lib/supabaseRest.js';
+import { getUserFromRequest } from './_lib/adminAuth.js';
 
 export const maxDuration = 60;
 
@@ -13,6 +14,12 @@ function uuidv4(): string {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Auth check
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
@@ -22,10 +29,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'Server configuration error: Supabase not configured' });
     }
 
-    const { type, data, userId } = req.body;
-    if (!type || !data || !userId) {
+    const { type, data } = req.body;
+    if (!type || !data) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
+
+    // Use authenticated user's ID, not from body (prevents IDOR)
+    const authenticatedUserId = user.id;
 
     const publicUuid = uuidv4();
     const placeholderImageUrl =
@@ -33,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const shareCard = await insert('share_cards', {
       id: uuidv4(),
-      user_id: userId,
+      user_id: authenticatedUserId,
       type,
       data,
       image_url: placeholderImageUrl,
