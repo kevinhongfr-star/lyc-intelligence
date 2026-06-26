@@ -230,11 +230,30 @@ export async function getDashboardStats(): Promise<{
   return { totalContacts: cRes.count ?? contacts.length, totalMandates: mRes.count ?? mandates.length, totalCompanies: coRes.count ?? 0, totalProposals: pRes.count ?? 0, mandatesByStatus, contactsBySeniority };
 }
 
+// Backward compat: map old stage names to new 19-stage pipeline
+const STAGE_MIGRATION_MAP: Record<string, string> = {
+  'SWEEP': 'approach',
+  'CANVA': 'screened',
+  'GRID': 'client_submitted',
+  'LENS': 'interview_1',
+  'PLACED': 'offer_accepted',
+};
+
 export async function getPipelineByMandate(mandateId: string): Promise<Record<string, CandidatePipeline[]>> {
   const { data, error } = await getSupabase().from('candidates_pipeline').select('*, contact:contacts(*, company:companies(*))').eq('mandate_id', mandateId);
   if (error || !data) return {};
   const grouped: Record<string, CandidatePipeline[]> = {};
-  for (const item of data as CandidatePipeline[]) { const stage = item.stage || 'SWEEP'; if (!grouped[stage]) grouped[stage] = []; grouped[stage].push(item); }
+  for (const item of data as CandidatePipeline[]) {
+    const rawStage = item.stage || 'approach';
+    const stage = STAGE_MIGRATION_MAP[rawStage] || rawStage;
+    // Migrate old values in-place
+    if (STAGE_MIGRATION_MAP[rawStage]) {
+      item.stage = stage;
+      getSupabase().from('candidates_pipeline').update({ stage }).eq('id', item.id).then();
+    }
+    if (!grouped[stage]) grouped[stage] = [];
+    grouped[stage].push(item);
+  }
   return grouped;
 }
 

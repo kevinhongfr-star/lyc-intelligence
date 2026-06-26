@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Briefcase, ChevronRight, Loader2, CheckCircle, PauseCircle, XCircle, Plus } from 'lucide-react';
+import { Search, Loader2, CheckCircle, PauseCircle, XCircle, Plus } from 'lucide-react';
 import { useMandates } from '@/hooks/useSupabaseData';
-import { Badge, Card, CardContent } from '@/components/ui';
-import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
+import { Badge } from '@/components/ui';
+import { PIPELINE_STAGE_ORDER, STAGE_CONFIG, PIPELINE_PHASES, getStagesByPhase } from '@/types/pipelineStages';
 import { updateMandateStatus } from '@/services/supabaseApi';
+
+// Map old stage values to new 19-stage pipeline
+const OLD_TO_NEW_STAGE: Record<string, string> = {
+  'SWEEP': 'approach',
+  'CANVA': 'screened',
+  'GRID': 'client_submitted',
+  'LENS': 'interview_1',
+  'PLACED': 'offer_accepted',
+  'Candidate Report': 'assessment',
+};
 
 const STATUS_OPTIONS = [
   { value: '1_search', label: 'SWEEP', color: '#00897B' },
@@ -12,13 +22,24 @@ const STATUS_OPTIONS = [
   { value: '3_deliver', label: 'GRID/LENS', color: '#10B981' },
   { value: 'won', label: 'Won', color: '#10B981' },
   { value: 'on_hold', label: 'On Hold', color: '#F59E0B' },
-  { value: 'lost', label: 'Lost', color: '#EF4444' },
+  { value: 'lost', label: 'Lost', color: '#EF4848' },
   { value: 'completed', label: 'Completed', color: '#333333' },
 ];
 
+// Phase colors for the summary bar
+const PHASE_COLORS: Record<string, string> = {
+  'Sourcing': '#6366F1',
+  'Client': '#EC4899',
+  'Interview': '#F59E0B',
+  'Evaluation': '#10B981',
+  'Offer': '#14B8A6',
+  'Post-Placement': '#06B6D4',
+  'Terminal': '#6B7280',
+};
+
 export function MandatesPage() {
   const navigate = useNavigate();
-  const { data: mandates, count, loading, error } = useMandates({ limit: 100 });
+  const { data: mandates, count, loading } = useMandates({ limit: 100 });
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [updating, setUpdating] = useState<string | null>(null);
@@ -34,6 +55,9 @@ export function MandatesPage() {
     setUpdating(null);
     window.location.reload();
   };
+
+  const totalPipeline = (m: any) =>
+    (m.tier1_count || 0) + (m.tier2_count || 0) + (m.shortlisted_count || 0) + (m.interview_count || 0) + (m.placed_count || 0);
 
   return (
     <div className="space-y-6">
@@ -80,16 +104,31 @@ export function MandatesPage() {
                   {updating === m.id && <Loader2 className="w-3 h-3 animate-spin text-accent" />}
                 </div>
               </div>
+              {/* Phase summary bar */}
               <div className="flex gap-1">
-                {STAGE_ORDER.map(s => {
-                  const c = s === 'SWEEP' ? m.tier1_count : s === 'CANVA' ? m.tier2_count : s === 'GRID' ? m.shortlisted_count : s === 'LENS' ? m.interview_count : m.placed_count;
-                  return <div key={s} className="flex-1 h-6 rounded flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{c}</div>;
+                {Object.entries(PHASE_COLORS).map(([phase, color]) => {
+                  const stagesInPhase = getStagesByPhase(phase as any).map(s => s.id);
+                  // Map old mandate counts to phases
+                  let phaseCount = 0;
+                  if (phase === 'Sourcing') phaseCount = m.tier1_count || 0;
+                  else if (phase === 'Client') phaseCount = m.tier2_count || 0;
+                  else if (phase === 'Interview') phaseCount = (m.shortlisted_count || 0) + (m.interview_count || 0);
+                  else if (phase === 'Post-Placement') phaseCount = m.placed_count || 0;
+                  return (
+                    <div key={phase} className="flex-1 h-7 rounded flex items-center justify-center text-[10px] font-medium"
+                      style={{ backgroundColor: `${color}15`, color }}>
+                      {phase}: {phaseCount}
+                    </div>
+                  );
                 })}
               </div>
-              <div className="flex gap-2 mt-2" onClick={e => e.stopPropagation()}>
-                <button onClick={() => handleStatusChange(m.id, 'won', e)} className="text-xs px-2 py-1 bg-tier-1/20 text-tier-1 rounded hover:bg-tier-1/30 flex items-center gap-1"><CheckCircle className="w-3 h-3" />Won</button>
-                <button onClick={() => handleStatusChange(m.id, 'on_hold', e)} className="text-xs px-2 py-1 bg-tier-2/20 text-tier-2 rounded hover:bg-tier-2/30 flex items-center gap-1"><PauseCircle className="w-3 h-3" />Hold</button>
-                <button onClick={() => handleStatusChange(m.id, 'lost', e)} className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 flex items-center gap-1"><XCircle className="w-3 h-3" />Lost</button>
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-[10px] text-text-muted">{totalPipeline(m)} candidates in pipeline</span>
+                <div className="flex gap-2" onClick={e => e.stopPropagation()}>
+                  <button onClick={e => handleStatusChange(m.id, 'won', e)} className="text-xs px-2 py-1 bg-tier-1/20 text-tier-1 rounded hover:bg-tier-1/30 flex items-center gap-1"><CheckCircle className="w-3 h-3" />Won</button>
+                  <button onClick={e => handleStatusChange(m.id, 'on_hold', e)} className="text-xs px-2 py-1 bg-tier-2/20 text-tier-2 rounded hover:bg-tier-2/30 flex items-center gap-1"><PauseCircle className="w-3 h-3" />Hold</button>
+                  <button onClick={e => handleStatusChange(m.id, 'lost', e)} className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 flex items-center gap-1"><XCircle className="w-3 h-3" />Lost</button>
+                </div>
               </div>
             </div>
           ))}

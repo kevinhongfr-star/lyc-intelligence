@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Loader2, Mail, FileText, ClipboardList, Eye, MessageSquare, FileDown, BarChart3, CheckCircle, PauseCircle, XCircle, AlertTriangle, ListChecks, Users } from 'lucide-react';
 import { useMandateDetail } from '@/hooks/useSupabaseData';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
-import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
+import { PIPELINE_STAGE_ORDER, STAGE_CONFIG as PIPELINE_STAGE_CONFIG, PIPELINE_PHASES, getStagesByPhase } from '@/types/pipelineStages';
+import type { PipelineStageName } from '@/types/pipelineStages';
 import { executeAIAction, type AIAction } from '@/services/aiQuickActions';
 import { updateMandateStatus, updatePipelineStage, updatePipelineVerdict } from '@/services/supabaseApi';
 import { MandateTeam } from '@/components/mandate/MandateTeam';
@@ -86,7 +87,27 @@ const STATUS_OPTIONS = [
   { value: 'completed', label: 'Completed', color: '#333333' },
 ];
 
-const NEXT_STAGE: Record<string, string> = { SWEEP: 'CANVA', CANVA: 'GRID', GRID: 'LENS', LENS: 'PLACED' };
+const NEXT_STAGE: Record<string, string> = {
+  approach: 'screened',
+  screened: 'partner_approved',
+  partner_approved: 'client_submitted',
+  client_submitted: 'client_approved',
+  client_approved: 'interview_1',
+  interview_1: 'interview_2',
+  interview_2: 'interview_3',
+  interview_3: 'final_interview',
+  final_interview: 'assessment',
+  assessment: 'reference_check',
+  reference_check: 'offer_sent',
+  offer_sent: 'offer_accepted',
+  offer_accepted: 'onboarded',
+  onboarded: 'follow_up_1m',
+  follow_up_1m: 'follow_up_3m',
+  follow_up_3m: 'follow_up_6m',
+  follow_up_6m: 'probation_passed',
+  // Backward compat
+  SWEEP: 'approach', CANVA: 'screened', GRID: 'client_submitted', LENS: 'interview_1', PLACED: 'offer_accepted',
+};
 const VERDICT_OPTIONS = ['Strong Fit', 'Conditional Fit', 'Weak Fit', 'Hold', 'Reject'];
 
 const AI_ACTIONS: { key: AIAction; icon: any; label: string }[] = [
@@ -265,11 +286,19 @@ export function MandateDetailPage() {
         )}
       </div>
 
-      {/* Stage pipeline bar */}
-      <div className="flex gap-1">
-        {STAGE_ORDER.map(s => {
-          const c = s === 'SWEEP' ? mandate.tier1_count : s === 'CANVA' ? mandate.tier2_count : s === 'GRID' ? mandate.shortlisted_count : s === 'LENS' ? mandate.interview_count : mandate.placed_count;
-          return <div key={s} className="flex-1 h-10 rounded flex items-center justify-center text-sm font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{s}: {c}</div>;
+      {/* Pipeline phase summary bar */}
+      <div className="flex gap-1 flex-wrap">
+        {Object.entries(PIPELINE_PHASES).filter(([key]) => key !== 'TERMINAL').map(([key, phase]) => {
+          const stagesInPhase = getStagesByPhase(phase as any).map(s => s.id);
+          const phaseCount = pipeline.filter((p: any) => stagesInPhase.includes(p.stage)).length;
+          const phaseColor = PIPELINE_STAGE_CONFIG[stagesInPhase[0] as PipelineStageName]?.color || '#6B7280';
+          return (
+            <div key={phase} className="flex-1 min-w-[80px] h-8 rounded flex flex-col items-center justify-center text-[10px] font-medium"
+              style={{ backgroundColor: `${phaseColor}15`, color: phaseColor }}>
+              <span className="text-[9px]">{phase}</span>
+              <span className="font-bold">{phaseCount}</span>
+            </div>
+          );
         })}
       </div>
 
@@ -354,7 +383,7 @@ export function MandateDetailPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {p.trident_composite != null && <Badge variant={p.trident_composite >= 75 ? 'success' : p.trident_composite >= 50 ? 'warning' : 'default'}>{p.trident_composite}</Badge>}
-                      <Badge>{p.stage}</Badge>
+                      <Badge>{PIPELINE_STAGE_CONFIG[p.stage as PipelineStageName]?.label || p.stage}</Badge>
                     </div>
                   </div>
                   {p.verdict && <p className="text-xs text-text-muted mt-1">Verdict: {p.verdict}</p>}
@@ -362,7 +391,7 @@ export function MandateDetailPage() {
                     {NEXT_STAGE[p.stage] && (
                       <button onClick={e => { e.stopPropagation(); handleStageChange(p.id, NEXT_STAGE[p.stage]); }}
                         className="text-xs px-2 py-1 bg-accent/20 text-accent rounded hover:bg-accent/30 transition-colors">
-                        → {STAGE_CONFIG[NEXT_STAGE[p.stage] as keyof typeof STAGE_CONFIG]?.label}
+                        → {PIPELINE_STAGE_CONFIG[NEXT_STAGE[p.stage] as PipelineStageName]?.label}
                       </button>
                     )}
                     <select
@@ -616,7 +645,7 @@ export function MandateDetailPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {p.trident_composite != null && <Badge variant={p.trident_composite >= 75 ? 'success' : p.trident_composite >= 50 ? 'warning' : 'default'}>{p.trident_composite}</Badge>}
-                      <Badge>{p.stage}</Badge>
+                      <Badge>{PIPELINE_STAGE_CONFIG[p.stage as PipelineStageName]?.label || p.stage}</Badge>
                     </div>
                   </div>
                 </div>
