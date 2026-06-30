@@ -152,17 +152,21 @@ export async function handleGrid(req: VercelRequest, res: VercelResponse) {
         return handleMotivationCalibration(req, res, subResource);
       }
 
-      if (subResource && subSubResource === 'sectors' && req.method === 'POST') {
-        return handleAddSector(req, res, subResource);
+      if (subResource && subSubResource === 'sectors') {
+        if (req.method === 'POST') return handleAddSector(req, res, subResource);
+        if (req.method === 'GET') return handleListSectors(req, res, subResource);
       }
-      if (subResource && subSubResource === 'companies' && req.method === 'POST') {
-        return handleAddCompany(req, res, subResource);
+      if (subResource && subSubResource === 'companies') {
+        if (req.method === 'POST') return handleAddCompany(req, res, subResource);
+        if (req.method === 'GET') return handleListCompanies(req, res, subResource);
       }
-      if (subResource && subSubResource === 'functions' && req.method === 'POST') {
-        return handleAddFunction(req, res, subResource);
+      if (subResource && subSubResource === 'functions') {
+        if (req.method === 'POST') return handleAddFunction(req, res, subResource);
+        if (req.method === 'GET') return handleListFunctions(req, res, subResource);
       }
       if (subResource && subSubResource === 'entries') {
         if (req.method === 'POST') return handleAddEntry(req, res, subResource);
+        if (req.method === 'GET') return handleListEntries(req, res, subResource);
         if (pathArr[3] === 'bulk' && req.method === 'POST') return handleBulkAddEntries(req, res, subResource);
       }
     }
@@ -529,6 +533,79 @@ async function handleBulkAddEntries(req: VercelRequest, res: VercelResponse, map
     results,
     added_count: results.filter(r => r.success).length,
     failed_count: results.filter(r => !r.success).length,
+  });
+}
+
+async function handleListSectors(req: VercelRequest, res: VercelResponse, mappingId: string) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ success: false, error: error || 'Unauthorized' });
+  }
+
+  const sectors = await selectMany('grid_sectors', {
+    select: '*',
+    where: [{ column: 'grid_mapping_id', value: mappingId }],
+    orderBy: { column: 'sort_order', ascending: true },
+  }, 15000);
+
+  return res.status(200).json({ success: true, data: sectors, count: sectors.length });
+}
+
+async function handleListCompanies(req: VercelRequest, res: VercelResponse, mappingId: string) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ success: false, error: error || 'Unauthorized' });
+  }
+
+  const companies = await selectMany('grid_companies', {
+    select: '*',
+    where: [{ column: 'grid_mapping_id', value: mappingId }],
+    orderBy: { column: 'sort_order', ascending: true },
+  }, 15000);
+
+  return res.status(200).json({ success: true, data: companies, count: companies.length });
+}
+
+async function handleListFunctions(req: VercelRequest, res: VercelResponse, mappingId: string) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ success: false, error: error || 'Unauthorized' });
+  }
+
+  const functions = await selectMany('grid_functions', {
+    select: '*',
+    where: [{ column: 'grid_mapping_id', value: mappingId }],
+    orderBy: { column: 'sort_order', ascending: true },
+  }, 15000);
+
+  return res.status(200).json({ success: true, data: functions, count: functions.length });
+}
+
+async function handleListEntries(req: VercelRequest, res: VercelResponse, mappingId: string) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ success: false, error: error || 'Unauthorized' });
+  }
+
+  const entries = await selectMany('grid_candidate_entries', {
+    select: '*',
+    where: [{ column: 'grid_mapping_id', value: mappingId }],
+    orderBy: { column: 'priority', ascending: true },
+  }, 15000);
+
+  const contactIds = entries.map(e => e.contact_id);
+  const contacts = contactIds.length > 0
+    ? await selectMany('contacts', {
+        select: 'id, name, current_title, company_id',
+        where: [{ column: 'id', value: `(${contactIds.join(',')})`, op: 'in' }],
+      }, 15000)
+    : [];
+  const contactMap = new Map(contacts.map(c => [c.id, c]));
+
+  return res.status(200).json({
+    success: true,
+    data: entries.map(e => ({ ...e, contact: contactMap.get(e.contact_id) || null })),
+    count: entries.length,
   });
 }
 
