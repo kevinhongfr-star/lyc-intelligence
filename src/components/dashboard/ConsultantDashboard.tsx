@@ -1,147 +1,260 @@
-import React, { useState } from 'react';
-import { BarChart3, Users, Briefcase, TrendingUp, CheckCircle2, Zap, Loader2, Activity, Clock, Award } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
-import { useAuth } from '@/contexts';
-import { STAGE_CONFIG, STAGE_ORDER } from '@/types/mandate';
-import { useDashboard } from '@/hooks/useSupabaseData';
-import { CommandCenter } from './CommandCenter';
+'use client';
 
-const STATUS_LABELS: Record<string, string> = { '1_search': 'SWEEP', '2_call': 'CANVA', '3_deliver': 'GRID/LENS', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
-
-const TIER_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
-  S: { color: '#D4AF37', bg: 'rgba(212,175,55,0.12)', label: 'S — C-Suite Elite' },
-  A: { color: '#22C55E', bg: 'rgba(34,197,94,0.12)', label: 'A — Senior Leader' },
-  B: { color: '#3B82F6', bg: 'rgba(59,130,246,0.12)', label: 'B — Mid-Senior' },
-  C: { color: '#94A3B8', bg: 'rgba(148,163,184,0.12)', label: 'C — Emerging' },
-};
-
-function TierBar({ tier, count, total }: { tier: string; count: number; total: number }) {
-  const pct = total > 0 ? (count / total) * 100 : 0;
-  const cfg = TIER_CONFIG[tier] || TIER_CONFIG.C;
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between text-xs">
-        <span className="font-medium" style={{ color: cfg.color }}>{cfg.label}</span>
-        <span className="text-text-muted">{count} ({pct.toFixed(1)}%)</span>
-      </div>
-      <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: cfg.color }} />
-      </div>
-    </div>
-  );
-}
-
-function ActivityItem({ item }: { item: any }) {
-  const icon = item.type === 'scoring' ? <Award className="w-4 h-4" /> : <Users className="w-4 h-4" />;
-  const color = item.type === 'scoring' ? 'text-accent bg-accent/10' : 'text-blue-500 bg-blue-500/10';
-  const timeAgo = (ts: string) => {
-    const diff = Date.now() - new Date(ts).getTime();
-    if (diff < 60000) return 'Just now';
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-    return `${Math.floor(diff / 86400000)}d ago`;
-  };
-  return (
-    <div className="flex items-start gap-3 py-2.5 border-b border-bg-tertiary last:border-0">
-      <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${color}`}>{icon}</div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-text-primary truncate">{item.title}</p>
-        <p className="text-xs text-text-muted truncate">{item.detail}</p>
-      </div>
-      <span className="text-[10px] text-text-muted whitespace-nowrap flex-shrink-0">{timeAgo(item.timestamp)}</span>
-    </div>
-  );
-}
+import React, { useState, useEffect } from 'react';
+import {
+  Users,
+  Calendar,
+  Target,
+  TrendingUp,
+  CheckSquare,
+  Clock,
+  Loader2,
+  Mail,
+  MessageCircle,
+  Phone,
+  BarChart3,
+} from 'lucide-react';
+import {
+  StatCard,
+  PipelineFunnel,
+  ActivityFeed,
+} from './DashboardWidgets';
 
 export function ConsultantDashboard() {
-  const { user } = useAuth();
-  const { data, loading } = useDashboard();
-  const [activeTab, setActiveTab] = useState<'overview' | 'command'>('overview');
+  const [loading, setLoading] = useState(true);
+  const [pipelineData, setPipelineData] = useState<any>(null);
+  const [velocityData, setVelocityData] = useState<any>(null);
+  const [activityData, setActivityData] = useState<any[]>([]);
+  const [kpisData, setKpisData] = useState<any[]>([]);
 
-  const stats = data?.stats;
-  const mandates = data?.mandates || [];
-  const tiers = data?.tierDistribution || { S: 0, A: 0, B: 0, C: 0 };
-  const activity = data?.recentActivity || [];
-  const totalTier = tiers.S + tiers.A + tiers.B + tiers.C;
+  useEffect(() => {
+    loadAllData();
+  }, []);
+
+  const loadAllData = async () => {
+    setLoading(true);
+    try {
+      const [pipelineRes, velocityRes, activityRes, kpisRes] = await Promise.all([
+        fetch('/api/analytics/pipeline?scope=personal'),
+        fetch('/api/analytics/velocity'),
+        fetch('/api/analytics/activity?limit=15'),
+        fetch('/api/analytics/kpis'),
+      ]);
+
+      const [pipeline, velocity, activity, kpis] = await Promise.all([
+        pipelineRes.json(),
+        velocityRes.json(),
+        activityRes.json(),
+        kpisRes.json(),
+      ]);
+
+      if (pipeline.success) setPipelineData(pipeline);
+      if (velocity.success) setVelocityData(velocity);
+      if (activity.success) setActivityData(activity.items || []);
+      if (kpis.success) setKpisData(kpis.kpis || []);
+    } catch (e) {
+      console.error('Failed to load dashboard:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-16">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <span className="ml-3 text-text-muted">Loading your dashboard...</span>
+      </div>
+    );
+  }
+
+  const myKPIs = kpisData.filter((k: any) => k.applies_to === 'individual' || k.category === 'activity');
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-text-primary">Good morning, {user?.name?.split(' ')[0]}</h1>
-          <p className="text-text-secondary">Here's your pipeline overview for today</p>
+          <h1 className="text-2xl font-bold text-text-primary">My Dashboard</h1>
+          <p className="text-text-muted mt-1">Your pipeline and activity overview</p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setActiveTab('overview')} className={`px-4 py-2 text-sm rounded-lg min-h-[44px] ${activeTab === 'overview' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Overview</button>
-          <button onClick={() => setActiveTab('command')} className={`px-4 py-2 text-sm rounded-lg min-h-[44px] ${activeTab === 'command' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Command Center</button>
+        <div className="flex items-center gap-2 text-sm text-text-muted">
+          <BarChart3 className="w-4 h-4" />
+          <span>Real-time data</span>
         </div>
       </div>
 
-      {activeTab === 'overview' ? (
-        <>
-          {/* KPI Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card><CardContent className="p-4"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-sweep/20 flex items-center justify-center"><Briefcase className="w-5 h-5 text-sweep-light" /></div><div><p className="text-2xl font-bold text-text-primary">{loading ? '—' : ((stats?.mandatesByStatus?.['1_search'] ?? 0) + (stats?.mandatesByStatus?.['2_call'] ?? 0) + (stats?.mandatesByStatus?.['3_deliver'] ?? 0))}</p><p className="text-xs text-text-muted">Active Mandates</p></div></div></CardContent></Card>
-            <Card><CardContent className="p-4"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-sweep/20 flex items-center justify-center"><Users className="w-5 h-5 text-sweep-light" /></div><div><p className="text-2xl font-bold text-text-primary">{loading ? '—' : stats?.totalContacts?.toLocaleString() ?? '0'}</p><p className="text-xs text-text-muted">Total Candidates</p></div></div></CardContent></Card>
-            <Card><CardContent className="p-4"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-tier-1Bg flex items-center justify-center"><CheckCircle2 className="w-5 h-5 text-tier-1" /></div><div><p className="text-2xl font-bold text-tier-1">{loading ? '—' : stats?.totalCompanies?.toLocaleString() ?? '0'}</p><p className="text-xs text-text-muted">Companies</p></div></div></CardContent></Card>
-            <Card><CardContent className="p-4"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-tier-1Bg flex items-center justify-center"><TrendingUp className="w-5 h-5 text-tier-1" /></div><div><p className="text-2xl font-bold text-tier-1">{loading ? '—' : stats?.totalProposals ?? 0}</p><p className="text-xs text-text-muted">Proposals</p></div></div></CardContent></Card>
-          </div>
+      {/* Top Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="My Candidates"
+          value={pipelineData?.summary?.total_active || 0}
+          icon={Users}
+          color="blue"
+          subtitle={`${pipelineData?.summary?.engagement_rate || 0}% engagement`}
+        />
+        <StatCard
+          title="Engaged"
+          value={pipelineData?.summary?.engaged || 0}
+          icon={Target}
+          color="green"
+          subtitle="actively in conversation"
+        />
+        <StatCard
+          title="This Week"
+          value={velocityData?.candidates_advancing_per_week || 0}
+          icon={TrendingUp}
+          color="purple"
+          subtitle="stage advances"
+        />
+        <StatCard
+          title="Placements"
+          value={pipelineData?.summary?.closed || 0}
+          icon={CheckSquare}
+          color="amber"
+          subtitle="total closed won"
+        />
+      </div>
 
-          {/* Two-column: Mandates + Tier/Activity */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Mandates — 2/3 width */}
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Active Mandates</CardTitle></CardHeader>
-                <CardContent className="space-y-4">
-                  {loading ? <div className="flex items-center justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-text-muted" /></div> :
-                    mandates.slice(0, 5).map((m: any) => (
-                      <div key={m.id} className="p-4 bg-bg-tertiary rounded-lg">
-                        <div className="flex items-center justify-between mb-3"><div><h3 className="font-medium text-text-primary">{m.title}</h3><p className="text-sm text-text-muted">{STATUS_LABELS[m.status] ?? m.status}</p></div><Badge variant={m.status === 'won' ? 'success' : 'default'}>{STATUS_LABELS[m.status] ?? m.status}</Badge></div>
-                        <div className="flex gap-1">{STAGE_ORDER.map(s => { const c = s === 'SWEEP' ? m.tier1_count : s === 'CANVA' ? m.tier2_count : s === 'GRID' ? m.shortlisted_count : s === 'LENS' ? m.interview_count : m.placed_count; return <div key={s} className="flex-1 h-8 rounded flex items-center justify-center text-xs font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{c}</div>; })}</div>
-                      </div>
-                    ))}
-                </CardContent>
-              </Card>
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Pipeline Funnel */}
+        <div className="lg:col-span-2">
+          <PipelineFunnel
+            funnel={pipelineData?.funnel || {}}
+            conversions={pipelineData?.conversions || {}}
+          />
+        </div>
+
+        {/* Today's Actions */}
+        <div className="bg-card border border-border rounded-xl p-5">
+          <h3 className="font-semibold text-text-primary mb-4">Today's Actions</h3>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-lg">
+              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                <Mail className="w-5 h-5 text-blue-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-text-primary">Follow up on emails</p>
+                <p className="text-xs text-text-muted">
+                  {Math.round((pipelineData?.funnel?.S3_Contacted || 0) * 0.3)} candidates need follow-up
+                </p>
+              </div>
             </div>
-
-            {/* Right column: Tier distribution + Activity feed */}
-            <div className="space-y-6">
-              {/* Tier Distribution */}
-              <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2"><BarChart3 className="w-4 h-4 text-accent" />Talent Tier Distribution</CardTitle></CardHeader>
-                <CardContent className="space-y-3">
-                  {loading ? (
-                    <div className="flex items-center justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-text-muted" /></div>
-                  ) : (
-                    <>
-                      <TierBar tier="S" count={tiers.S} total={totalTier} />
-                      <TierBar tier="A" count={tiers.A} total={totalTier} />
-                      <TierBar tier="B" count={tiers.B} total={totalTier} />
-                      <TierBar tier="C" count={tiers.C} total={totalTier} />
-                      <p className="text-[10px] text-text-muted pt-1 border-t border-bg-tertiary">Based on TRIDENT composite scores across {totalTier.toLocaleString()} contacts</p>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Activity Feed */}
-              <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2"><Activity className="w-4 h-4 text-accent" />Recent Activity</CardTitle></CardHeader>
-                <CardContent>
-                  {loading ? (
-                    <div className="flex items-center justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-text-muted" /></div>
-                  ) : activity.length === 0 ? (
-                    <p className="text-sm text-text-muted text-center py-4">No recent activity</p>
-                  ) : (
-                    activity.slice(0, 8).map((item: any, i: number) => <ActivityItem key={`${item.type}-${item.id}-${i}`} item={item} />)
-                  )}
-                </CardContent>
-              </Card>
+            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-lg">
+              <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                <MessageCircle className="w-5 h-5 text-green-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-text-primary">WeChat check-ins</p>
+                <p className="text-xs text-text-muted">
+                  {pipelineData?.funnel?.S6_WeChat_Added || 0} candidates to check in with
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-lg">
+              <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+                <Phone className="w-5 h-5 text-purple-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-text-primary">Scheduling calls</p>
+                <p className="text-xs text-text-muted">
+                  {pipelineData?.funnel?.S7_Interested || 0} interested candidates
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-lg">
+              <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-amber-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-text-primary">Interviews this week</p>
+                <p className="text-xs text-text-muted">
+                  {(pipelineData?.funnel?.S11_Internal_Interview || 0) +
+                   (pipelineData?.funnel?.S13_Client_Int_Scheduled || 0)} upcoming
+                </p>
+              </div>
             </div>
           </div>
-        </>
-      ) : <CommandCenter />}
+        </div>
+      </div>
+
+      {/* Second Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Personal KPIs */}
+        <div className="bg-card border border-border rounded-xl p-5">
+          <h3 className="font-semibold text-text-primary mb-4">My Performance</h3>
+          <div className="space-y-4">
+            {myKPIs.slice(0, 4).map((kpi: any) => {
+              const progress = Math.min(kpi.progress_percent || 0, 100);
+              const statusColor = kpi.status === 'met'
+                ? 'bg-emerald-500'
+                : kpi.status === 'on_track'
+                ? 'bg-blue-500'
+                : 'bg-amber-500';
+
+              return (
+                <div key={kpi.id} className="space-y-1.5">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium text-text-primary">{kpi.name}</span>
+                    <span className="text-text-muted">
+                      {kpi.current_value} / {kpi.target_value}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-bg-alt rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${statusColor} transition-all`}
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Activity Feed */}
+        <div className="lg:col-span-2">
+          <ActivityFeed items={activityData} />
+        </div>
+      </div>
+
+      {/* Velocity */}
+      <div className="bg-card border border-border rounded-xl p-5">
+        <h3 className="font-semibold text-text-primary mb-4">My Pipeline Velocity</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center p-4 bg-bg-alt rounded-lg">
+            <TrendingUp className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
+            <p className="text-xl font-bold text-text-primary">
+              {velocityData?.candidates_advancing_per_week || 0}
+            </p>
+            <p className="text-xs text-text-muted">advancing / week</p>
+          </div>
+          <div className="text-center p-4 bg-bg-alt rounded-lg">
+            <Clock className="w-5 h-5 text-blue-500 mx-auto mb-2" />
+            <p className="text-xl font-bold text-text-primary">
+              {velocityData?.total_transitions_90d || 0}
+            </p>
+            <p className="text-xs text-text-muted">transitions (90d)</p>
+          </div>
+          <div className="text-center p-4 bg-bg-alt rounded-lg">
+            <Target className="w-5 h-5 text-purple-500 mx-auto mb-2" />
+            <p className="text-xl font-bold text-text-primary">
+              {pipelineData?.summary?.advancement_rate || 0}%
+            </p>
+            <p className="text-xs text-text-muted">to S11+ stage</p>
+          </div>
+          <div className="text-center p-4 bg-bg-alt rounded-lg">
+            <CheckSquare className="w-5 h-5 text-amber-500 mx-auto mb-2" />
+            <p className="text-xl font-bold text-text-primary">
+              {pipelineData?.summary?.placement_rate || 0}%
+            </p>
+            <p className="text-xs text-text-muted">placement rate</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
+
+export default ConsultantDashboard;
