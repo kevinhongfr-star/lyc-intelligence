@@ -41,11 +41,11 @@ export interface AuthResult {
   error: string | null;
 }
 
-// Cache the JWT secret encoder
-let _jwtSecret: TextEncoder | null = null;
-function getJwtSecret(): TextEncoder {
+// Cache the encoded JWT secret
+let _jwtSecret: Uint8Array | null = null;
+function getJwtSecret(): Uint8Array {
   if (!_jwtSecret) {
-    _jwtSecret = new TextEncoder();
+    _jwtSecret = new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!);
   }
   return _jwtSecret;
 }

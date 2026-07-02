@@ -1,34 +1,28 @@
-import { createClient } from '@supabase/supabase-js';
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+import * as db from '../supabaseRest.js';
 
 export async function handleAutoEnrollNurture() {
-  const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-    auth: { autoRefreshToken: false, persistSession: false },
+  const s8Candidates = await db.selectMany('contacts', {
+    select: 'id',
+    where: [
+      { column: 'pipeline_stage', value: 'S8_Not_Interested' },
+      { column: 'not_interested_reason', value: 'conflict_of_interest', op: 'neq' },
+      { column: 'nurture_enrolled', value: false },
+    ],
+    limit: 50,
   });
-
-  // Find S8 candidates with non-comp reasons
-  const { data: s8Candidates } = await supabase
-    .from('contacts')
-    .select('id')
-    .eq('pipeline_stage', 'S8_Not_Interested')
-    .neq('not_interested_reason', 'conflict_of_interest')
-    .eq('nurture_enrolled', false)
-    .limit(50);
 
   let enrolled = 0;
 
-  for (const c of s8Candidates || []) {
+  for (const c of s8Candidates) {
     try {
-      await supabase.from('nurture_sequences').insert({
+      await db.insert('nurture_sequences', {
         contact_id: c.id,
         sequence_type: 'S8_NOT_INTERESTED',
         total_steps: 6,
         cadence_days: 14,
         next_touch_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
       });
-      await supabase.from('contacts').update({ nurture_enrolled: true }).eq('id', c.id);
+      await db.update('contacts', { column: 'id', value: c.id }, { nurture_enrolled: true });
       enrolled++;
     } catch (e) {
       console.error(`Enroll failed for ${c.id}:`, e);
@@ -37,7 +31,7 @@ export async function handleAutoEnrollNurture() {
 
   return {
     success: true,
-    candidates_found: s8Candidates?.length || 0,
+    candidates_found: s8Candidates.length,
     enrolled,
     timestamp: new Date().toISOString(),
   };

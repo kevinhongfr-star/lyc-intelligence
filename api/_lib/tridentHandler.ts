@@ -321,7 +321,7 @@ async function handleSweep(req: VercelRequest, res: VercelResponse) {
   // Get all contacts
   const contacts = await selectMany('contacts', {
     select: '*',
-    where: [{ column: 'id', value: `(${contact_ids.map(id => `'${id}'`).join(',')})`, op: 'in' }],
+    where: [{ column: 'id', value: contact_ids, op: 'in' }],
   }, 15000);
 
   // Run preflight on all
@@ -566,7 +566,7 @@ async function handleCompare(req: VercelRequest, res: VercelResponse) {
   const contacts = contactIds.length > 0
     ? await selectMany('contacts', {
         select: 'id, full_name, company_name, title, pipeline_stage, current_title',
-        where: [{ column: 'id', value: `(${contactIds.map(id => `'${id}'`).join(',')})`, op: 'in' }],
+        where: [{ column: 'id', value: contactIds, op: 'in' }],
       }, 15000)
     : [];
   const contactMap = new Map(contacts.map(c => [c.id, c]));
@@ -725,7 +725,7 @@ async function handleReviewQueue(req: VercelRequest, res: VercelResponse) {
   const contacts = contactIds.length > 0
     ? await selectMany('contacts', {
         select: 'id, full_name',
-        where: [{ column: 'id', value: `(${contactIds.map(id => `'${id}'`).join(',')})`, op: 'in' }],
+        where: [{ column: 'id', value: contactIds, op: 'in' }],
       }, 15000)
     : [];
   const contactMap = new Map(contacts.map(c => [c.id, c]));
@@ -733,7 +733,7 @@ async function handleReviewQueue(req: VercelRequest, res: VercelResponse) {
   const mandates = mandateIds.length > 0
     ? await selectMany('mandates', {
         select: 'id, title, role_title',
-        where: [{ column: 'id', value: `(${mandateIds.map(id => `'${id}'`).join(',')})`, op: 'in' }],
+        where: [{ column: 'id', value: mandateIds, op: 'in' }],
       }, 15000)
     : [];
   const mandateMap = new Map(mandates.map(m => [m.id, m]));
@@ -741,7 +741,7 @@ async function handleReviewQueue(req: VercelRequest, res: VercelResponse) {
   const profiles = scorerIds.length > 0
     ? await selectMany('profiles', {
         select: 'id, full_name',
-        where: [{ column: 'id', value: `(${scorerIds.map(id => `'${id}'`).join(',')})`, op: 'in' }],
+        where: [{ column: 'id', value: scorerIds, op: 'in' }],
       }, 15000)
     : [];
   const profileMap = new Map(profiles.map(p => [p.id, p]));

@@ -48,6 +48,27 @@ import { handler as handleChat } from './_lib/chatHandler.js';
 
 export const maxDuration = 300;
 
+// ── Rate limiter (in-memory, per-serverless-instance) ──
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(key: string, maxRequests: number, windowMs: number): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(key);
+  if (entry && now < entry.resetAt) {
+    if (entry.count >= maxRequests) return false;
+    entry.count++;
+    return true;
+  }
+  rateLimitMap.set(key, { count: 1, resetAt: now + windowMs });
+  return true;
+}
+
+function getClientIp(req: VercelRequest): string {
+  return ((req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()) ||
+    (req.headers['x-real-ip'] as string) ||
+    'unknown';
+}
+
 // ── Email rate limiter ──
 const emailRateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
@@ -64,6 +85,8 @@ function uuidv4(): string {
 // INLINE: Dashboard (from api/dashboard.ts)
 // ════════════════════════════════════════════
 async function handleDashboard(req: VercelRequest, res: VercelResponse) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const [contactsData, mandatesData, activityResult] = await Promise.all([
       selectMany(
@@ -192,6 +215,8 @@ async function handleDashboard(req: VercelRequest, res: VercelResponse) {
 // INLINE: Upload (from api/upload.ts)
 // ════════════════════════════════════════════
 async function handleUpload(req: VercelRequest, res: VercelResponse) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) return res.status(401).json({ error: 'Unauthorized' });
   try {
     if (req.method !== 'POST')
       return res.status(405).json({ error: 'Method not allowed' });
@@ -373,6 +398,18 @@ export default async function handler(
   // Strip first segment so handlers see path relative to their mount point
   if (pathArr.length > 0) {
     (req.query as any).path = pathArr.slice(1);
+  }
+
+  const ip = getClientIp(req);
+  const publicRoutes = ['lead-capture', 'share'];
+  const isPublic = publicRoutes.includes(module) ||
+    (module === 'email') ||
+    (module === 'stripe' && pathArr[1] === 'webhook') ||
+    (module === 'x' && pathArr[1] === 'cron');
+
+  if (!checkRateLimit(ip, isPublic ? 30 : 100, 60000)) {
+    res.setHeader('Retry-After', '60');
+    return res.status(429).json({ error: 'Rate limit exceeded' });
   }
 
   try {

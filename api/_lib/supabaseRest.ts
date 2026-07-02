@@ -77,12 +77,13 @@ export async function selectOne(
   return Array.isArray(data) && data.length > 0 ? data[0] : null;
 }
 
-/** GET multiple rows. `options.where` is an array of `column=value` filters (already URL-encoded strings OK). */
+/** GET multiple rows. `options.where` is an array of `column=value` filters. `or` is a raw Supabase or-expression string (e.g. "col.is.null,col2.gt.val"). */
 export async function selectMany(
   table: string,
   options: {
     select?: string;
-    where?: Array<{ column: string; value: string | number | boolean; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }>;
+    where?: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }>;
+    or?: string;
     orderBy?: { column: string; ascending?: boolean };
     limit?: number;
     offset?: number;
@@ -97,8 +98,16 @@ export async function selectMany(
   if (options.where) {
     for (const w of options.where) {
       const op = w.op || 'eq';
-      parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
+      if (op === 'in' && Array.isArray(w.value)) {
+        const escaped = (w.value as any[]).map(v => String(v).replace(/,/g, '\\,'));
+        parts.push(`${w.column}=in.(${escaped.join(',')})`);
+      } else {
+        parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
+      }
     }
+  }
+  if (options.or) {
+    parts.push(`or=(${options.or})`);
   }
   if (options.orderBy) {
     parts.push(`order=${encodeURIComponent(options.orderBy.column)}.${options.orderBy.ascending === false ? 'desc' : 'asc'}`);
@@ -147,14 +156,30 @@ export async function insert(
 /** UPDATE rows matching the filter. Returns the updated row array. */
 export async function update(
   table: string,
-  filter: { column: string; value: string | number | boolean },
+  filter:
+    | { column: string; value: string | number | boolean }
+    | { where: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }> },
   data: Record<string, any>,
   timeoutMs?: number
 ): Promise<any[]> {
   if (!isSupabaseConfigured()) {
     throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
   }
-  const query = `${filter.column}=eq.${encodeURIComponent(String(filter.value))}`;
+  const parts: string[] = [];
+  if ('where' in filter && Array.isArray(filter.where)) {
+    for (const w of filter.where) {
+      const op = w.op || 'eq';
+      if (op === 'in' && Array.isArray(w.value)) {
+        const escaped = (w.value as any[]).map(v => String(v).replace(/,/g, '\\,'));
+        parts.push(`${w.column}=in.(${escaped.join(',')})`);
+      } else {
+        parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
+      }
+    }
+  } else {
+    parts.push(`${filter.column}=eq.${encodeURIComponent(String(filter.value))}`);
+  }
+  const query = parts.join('&');
   const res = await fetchWithTimeout(
     buildUrl(table, query),
     {
@@ -236,6 +261,50 @@ export function handleError(res: VercelResponse, endpoint: string, err: any) {
     success: false,
     details: process.env.NODE_ENV === 'development' ? String(err?.message || err) : undefined,
   });
+}
+
+/** COUNT rows matching the filter. Returns the count number. */
+export async function countRows(
+  table: string,
+  options: {
+    where?: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }>;
+  } = {},
+  timeoutMs?: number
+): Promise<number> {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
+  }
+  const parts: string[] = [];
+  parts.push('select=count');
+  if (options.where) {
+    for (const w of options.where) {
+      const op = w.op || 'eq';
+      if (op === 'in' && Array.isArray(w.value)) {
+        const escaped = (w.value as any[]).map(v => String(v).replace(/,/g, '\\,'));
+        parts.push(`${w.column}=in.(${escaped.join(',')})`);
+      } else {
+        parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
+      }
+    }
+  }
+  const res = await fetchWithTimeout(
+    `${buildUrl(table, parts.join('&'))}`,
+    {
+      method: 'HEAD',
+      headers: getHeaders({ Prefer: 'count=exact' }),
+    },
+    timeoutMs
+  );
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Supabase COUNT ${table} failed: ${res.status} ${text}`);
+  }
+  const count = res.headers.get('content-range');
+  if (count) {
+    const match = count.match(/\/(\d+)/);
+    if (match) return parseInt(match[1], 10);
+  }
+  return 0;
 }
 
 /** DELETE rows matching the filter. Returns the count of deleted rows. */

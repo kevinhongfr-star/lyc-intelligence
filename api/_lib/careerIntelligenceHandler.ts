@@ -1,14 +1,8 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
+import * as db from './supabaseRest.js';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
-
-const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
 
 const SEQUENCE_TEMPLATES: Record<string, { step: number; dayOffset: number; intelligenceTypes: string[]; messageTemplate: string }[]> = {
   ALPHA_CAREER: [
@@ -115,27 +109,29 @@ async function callDeepSeek(prompt: string, options: { max_tokens?: number; temp
   return await res.json();
 }
 
-async function generateCareerBenchmark(supabase: any, contactId: string) {
-  const { data: contact, error: contactErr } = await supabase
-    .from('contacts')
-    .select('id, full_name, current_role, current_company, industry, location, years_experience, skills, trident_scores')
-    .eq('id', contactId)
-    .single();
+async function generateCareerBenchmark(contactId: string) {
+  const contact = await db.selectOne('contacts', {
+    select: 'id, full_name, current_role, current_company, industry, location, years_experience, skills, trident_scores',
+    column: 'id',
+    value: contactId,
+  });
 
-  if (contactErr || !contact) throw new Error('Contact not found');
+  if (!contact) throw new Error('Contact not found');
 
-  const { data: closedPlacements } = await supabase
-    .from('contacts')
-    .select('current_role, current_company, location, stage_change_date')
-    .eq('pipeline_stage', 'S19_Closed')
-    .eq('is_archived', false)
-    .limit(50);
+  const closedPlacements = await db.selectMany('contacts', {
+    select: 'current_role, current_company, location, stage_change_date',
+    where: [
+      { column: 'pipeline_stage', value: 'S19_Closed' },
+      { column: 'is_archived', value: false },
+    ],
+    limit: 50,
+  });
 
-  const { data: activeMandates } = await supabase
-    .from('mandates')
-    .select('id, title, required_skills, location, status')
-    .in('status', ['active', 'in_progress'])
-    .limit(20);
+  const activeMandates = await db.selectMany('mandates', {
+    select: 'id, title, required_skills, location, status',
+    where: [{ column: 'status', value: ['active', 'in_progress'], op: 'in' }],
+    limit: 20,
+  });
 
   const compPlacements = (closedPlacements || []).map((p: any) => ({
     role: p.current_role,
@@ -224,37 +220,37 @@ Respond in JSON: {"narrative": "the summary text"}`;
   const dataPoints = relevantComps + trajectoryHistory.length + matchingMandates.length;
   const dataConfidence = Math.min(1, dataPoints / 30);
 
-  const { data: benchmark } = await supabase
-    .from('career_benchmarks')
-    .insert({
-      contact_id: contactId,
-      data_confidence: dataConfidence,
-      data_sources_used: ['placement_history', 'pipeline_transitions', 'active_mandates', 'trident_scores'],
-      comp_data_points: relevantComps,
-      trajectory_paths: trajectoryPaths,
-      current_skills: contact.skills || [],
-      skill_gaps: skillGaps,
-      market_demand_score: demandScore,
-      active_mandates_matching: matchingMandates.length,
-      demand_trend: demandScore > 60 ? 'increasing' : demandScore > 30 ? 'stable' : 'decreasing',
-      narrative_summary: narrative,
-      tokens_used: tokensUsed,
-      is_current: true,
-    })
-    .select()
-    .single();
+  const benchmark = await db.insert('career_benchmarks', {
+    contact_id: contactId,
+    data_confidence: dataConfidence,
+    data_sources_used: ['placement_history', 'pipeline_transitions', 'active_mandates', 'trident_scores'],
+    comp_data_points: relevantComps,
+    trajectory_paths: trajectoryPaths,
+    current_skills: contact.skills || [],
+    skill_gaps: skillGaps,
+    market_demand_score: demandScore,
+    active_mandates_matching: matchingMandates.length,
+    demand_trend: demandScore > 60 ? 'increasing' : demandScore > 30 ? 'stable' : 'decreasing',
+    narrative_summary: narrative,
+    tokens_used: tokensUsed,
+    is_current: true,
+  });
 
   if (benchmark) {
-    await supabase
-      .from('career_benchmarks')
-      .update({ is_current: false, superseded_by: benchmark.id })
-      .eq('contact_id', contactId)
-      .eq('is_current', true)
-      .neq('id', benchmark.id);
+    await db.update('career_benchmarks',
+      {
+        where: [
+          { column: 'contact_id', value: contactId },
+          { column: 'is_current', value: true },
+          { column: 'id', value: benchmark.id, op: 'neq' },
+        ],
+      },
+      { is_current: false, superseded_by: benchmark.id }
+    );
 
-    await supabase
-      .from('contacts')
-      .update({
+    await db.update('contacts',
+      { column: 'id', value: contactId },
+      {
         career_benchmark: {
           comp_percentile: null,
           trajectory_paths: trajectoryPaths,
@@ -262,19 +258,19 @@ Respond in JSON: {"narrative": "the summary text"}`;
           market_demand_score: demandScore,
           generated_at: new Date().toISOString(),
         },
-      })
-      .eq('id', contactId);
+      }
+    );
   }
 
   return benchmark;
 }
 
-async function detectMovementSignals(supabase: any, contactId: string) {
-  const { data: contact } = await supabase
-    .from('contacts')
-    .select('*, trident_scores')
-    .eq('id', contactId)
-    .single();
+async function detectMovementSignals(contactId: string) {
+  const contact = await db.selectOne('contacts', {
+    select: '*, trident_scores',
+    column: 'id',
+    value: contactId,
+  });
 
   if (!contact) return [];
 
@@ -294,13 +290,15 @@ async function detectMovementSignals(supabase: any, contactId: string) {
 
   if (contact.current_company) {
     const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: peers } = await supabase
-      .from('contacts')
-      .select('id, full_name, pipeline_stage, current_role')
-      .eq('current_company', contact.current_company)
-      .neq('id', contactId)
-      .gte('stage_change_date', ninetyDaysAgo)
-      .in('pipeline_stage', ['S12_Presented_to_Client', 'S17_Offer_Accepted', 'S19_Closed']);
+    const peers = await db.selectMany('contacts', {
+      select: 'id, full_name, pipeline_stage, current_role',
+      where: [
+        { column: 'current_company', value: contact.current_company },
+        { column: 'id', value: contactId, op: 'neq' },
+        { column: 'stage_change_date', value: ninetyDaysAgo, op: 'gte' },
+        { column: 'pipeline_stage', value: ['S12_Presented_to_Client', 'S17_Offer_Accepted', 'S19_Closed'], op: 'in' },
+      ],
+    });
 
     if (peers && peers.length >= 2) {
       signals.push({
@@ -342,10 +340,10 @@ async function detectMovementSignals(supabase: any, contactId: string) {
     }
   }
 
-  await supabase
-    .from('contacts')
-    .update({ movement_signals: newSignals })
-    .eq('id', contactId);
+  await db.update('contacts',
+    { column: 'id', value: contactId },
+    { movement_signals: newSignals }
+  );
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const recentSignals = newSignals.filter(
@@ -355,7 +353,7 @@ async function detectMovementSignals(supabase: any, contactId: string) {
 
   if (highSeverityCount >= 2 || recentSignals.length >= 3) {
     try {
-      await supabase.from('notifications').insert({
+      await db.insert('notifications', {
         type: 'movement_signal_alert',
         recipient_id: contact.assigned_to,
         title: `Movement signals detected for ${contact.full_name}`,
@@ -372,49 +370,47 @@ async function detectMovementSignals(supabase: any, contactId: string) {
   return signals;
 }
 
-async function enrollInNurture(supabase: any, contactId: string, sequenceType: string, consultantId?: string) {
+async function enrollInNurture(contactId: string, sequenceType: string, consultantId?: string) {
   const template = SEQUENCE_TEMPLATES[sequenceType];
   if (!template) throw new Error(`Unknown sequence type: ${sequenceType}`);
 
   const now = new Date();
   const nextTouch = new Date(now.getTime() + template[0].dayOffset * 24 * 60 * 60 * 1000);
 
-  const { data: sequence } = await supabase
-    .from('nurture_sequences')
-    .insert({
-      contact_id: contactId,
-      sequence_type: sequenceType,
-      current_step: 1,
-      total_steps: template.length,
-      cadence_days: template.length > 1 ? template[1].dayOffset - template[0].dayOffset : 30,
-      next_touch_at: nextTouch.toISOString(),
-      status: 'ACTIVE',
-      intelligence_types: template[0].intelligenceTypes,
-      consultant_id: consultantId,
-    })
-    .select()
-    .single();
+  const sequence = await db.insert('nurture_sequences', {
+    contact_id: contactId,
+    sequence_type: sequenceType,
+    current_step: 1,
+    total_steps: template.length,
+    cadence_days: template.length > 1 ? template[1].dayOffset - template[0].dayOffset : 30,
+    next_touch_at: nextTouch.toISOString(),
+    status: 'ACTIVE',
+    intelligence_types: template[0].intelligenceTypes,
+    consultant_id: consultantId,
+  });
 
-  await supabase
-    .from('contacts')
-    .update({
+  await db.update('contacts',
+    { column: 'id', value: contactId },
+    {
       nurture_enrolled: true,
       nurture_stage: 'WAITING',
       nurture_next_touch: nextTouch.toISOString(),
-    })
-    .eq('id', contactId);
+    }
+  );
 
   return sequence;
 }
 
-async function processNurtureQueue(supabase: any, limit = 50) {
+async function processNurtureQueue(limit = 50) {
   const now = new Date().toISOString();
-  const { data: dueSequences } = await supabase
-    .from('nurture_sequences')
-    .select('*, contacts(id, full_name, current_role, current_company, industry, location, skills, career_tier, preference_model, career_benchmark, agent_conversation_log)')
-    .eq('status', 'ACTIVE')
-    .lte('next_touch_at', now)
-    .limit(limit);
+  const dueSequences = await db.selectMany('nurture_sequences', {
+    select: '*, contacts(id, full_name, current_role, current_company, industry, location, skills, career_tier, preference_model, career_benchmark, agent_conversation_log)',
+    where: [
+      { column: 'status', value: 'ACTIVE' },
+      { column: 'next_touch_at', value: now, op: 'lte' },
+    ],
+    limit,
+  });
 
   let processed = 0;
   let sent = 0;
@@ -427,10 +423,10 @@ async function processNurtureQueue(supabase: any, limit = 50) {
       const currentTemplate = template[sequence.current_step - 1];
 
       if (!currentTemplate) {
-        await supabase
-          .from('nurture_sequences')
-          .update({ status: 'COMPLETED', completed_at: new Date().toISOString() })
-          .eq('id', sequence.id);
+        await db.update('nurture_sequences',
+          { column: 'id', value: sequence.id },
+          { status: 'COMPLETED', completed_at: new Date().toISOString() }
+        );
         processed++;
         continue;
       }
@@ -477,7 +473,7 @@ Respond in JSON: {"subject": "subject line", "message": "the message text", "sum
         console.error('DeepSeek nurture message failed:', e);
       }
 
-      await supabase.from('career_intelligence_log').insert({
+      await db.insert('career_intelligence_log', {
         contact_id: contact.id,
         intelligence_type: currentTemplate.intelligenceTypes[0] || 'nurture_touch',
         direction: 'outbound',
@@ -496,26 +492,26 @@ Respond in JSON: {"subject": "subject line", "message": "the message text", "sum
         nextTouchDate = new Date(Date.now() + daysUntilNext * 24 * 60 * 60 * 1000);
       }
 
-      await supabase
-        .from('nurture_sequences')
-        .update({
+      await db.update('nurture_sequences',
+        { column: 'id', value: sequence.id },
+        {
           current_step: isComplete ? sequence.total_steps : nextStep,
           next_touch_at: nextTouchDate?.toISOString() || now,
           status: isComplete ? 'COMPLETED' : 'ACTIVE',
           touch_count: sequence.touch_count + 1,
           last_touch_at: new Date().toISOString(),
           completed_at: isComplete ? new Date().toISOString() : null,
-        })
-        .eq('id', sequence.id);
+        }
+      );
 
-      await supabase
-        .from('contacts')
-        .update({
+      await db.update('contacts',
+        { column: 'id', value: contact.id },
+        {
           nurture_stage: isComplete ? 'ENGAGED' : 'ENGAGED',
           nurture_next_touch: nextTouchDate?.toISOString() || null,
           last_engaged_at: new Date().toISOString(),
-        })
-        .eq('id', contact.id);
+        }
+      );
 
       sent++;
     } catch (err) {
@@ -528,12 +524,12 @@ Respond in JSON: {"subject": "subject line", "message": "the message text", "sum
   return { processed, sent, errors };
 }
 
-async function processConversationResponse(supabase: any, contactId: string, conversationText: string, direction: 'inbound' | 'outbound') {
-  const { data: contact } = await supabase
-    .from('contacts')
-    .select('*, motivation_assessment, preference_model')
-    .eq('id', contactId)
-    .single();
+async function processConversationResponse(contactId: string, conversationText: string, direction: 'inbound' | 'outbound') {
+  const contact = await db.selectOne('contacts', {
+    select: '*, motivation_assessment, preference_model',
+    column: 'id',
+    value: contactId,
+  });
 
   if (!contact) return null;
 
@@ -662,11 +658,14 @@ Extract the following in JSON format:
     updates.career_tier = 'GAMMA';
   }
 
-  await supabase.from('contacts').update(updates).eq('id', contactId);
+  await db.update('contacts',
+    { column: 'id', value: contactId },
+    updates
+  );
 
   if (signals.escalation_needed && contact.assigned_to) {
     try {
-      await supabase.from('notifications').insert({
+      await db.insert('notifications', {
         type: 'conversation_escalation',
         recipient_id: contact.assigned_to,
         title: `Conversation requires your attention: ${contact.full_name}`,
@@ -680,7 +679,7 @@ Extract the following in JSON format:
     }
   }
 
-  await supabase.from('career_intelligence_log').insert({
+  await db.insert('career_intelligence_log', {
     contact_id: contactId,
     intelligence_type: 'general',
     direction: direction,
@@ -693,57 +692,66 @@ Extract the following in JSON format:
   return signals;
 }
 
-async function runAutoEnroll(supabase: any) {
+async function runAutoEnroll() {
   const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-  const { data: s8Candidates } = await supabase
-    .from('contacts')
-    .select('id, assigned_to')
-    .eq('pipeline_stage', 'S8_Not_Interested')
-    .eq('nurture_enrolled', false)
-    .eq('is_archived', false)
-    .neq('decline_reason', 'COMPENSATION')
-    .gte('stage_change_date', fourteenDaysAgo);
+  const s8Candidates = await db.selectMany('contacts', {
+    select: 'id, assigned_to',
+    where: [
+      { column: 'pipeline_stage', value: 'S8_Not_Interested' },
+      { column: 'nurture_enrolled', value: false },
+      { column: 'is_archived', value: false },
+      { column: 'decline_reason', value: 'COMPENSATION', op: 'neq' },
+      { column: 'stage_change_date', value: fourteenDaysAgo, op: 'gte' },
+    ],
+  });
 
   let s8Enrolled = 0;
   for (const c of s8Candidates || []) {
     try {
-      await enrollInNurture(supabase, c.id, 'S8_NOT_INTERESTED', c.assigned_to);
+      await enrollInNurture(c.id, 'S8_NOT_INTERESTED', c.assigned_to);
       s8Enrolled++;
     } catch (e) { /* skip */ }
   }
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const { data: s4Candidates } = await supabase
-    .from('contacts')
-    .select('id, assigned_to, career_tier')
-    .eq('pipeline_stage', 'S4_No_Response')
-    .eq('nurture_enrolled', false)
-    .eq('is_archived', false)
-    .in('career_tier', ['ALPHA', 'BETA'])
-    .lte('last_engaged_at', thirtyDaysAgo);
+  const s4Candidates = await db.selectMany('contacts', {
+    select: 'id, assigned_to, career_tier',
+    where: [
+      { column: 'pipeline_stage', value: 'S4_No_Response' },
+      { column: 'nurture_enrolled', value: false },
+      { column: 'is_archived', value: false },
+      { column: 'career_tier', value: ['ALPHA', 'BETA'], op: 'in' },
+      { column: 'last_engaged_at', value: thirtyDaysAgo, op: 'lte' },
+    ],
+  });
 
   let s4Enrolled = 0;
   for (const c of s4Candidates || []) {
     try {
-      await enrollInNurture(supabase, c.id, 'S4_NO_RESPONSE', c.assigned_to);
+      await enrollInNurture(c.id, 'S4_NO_RESPONSE', c.assigned_to);
       s4Enrolled++;
     } catch (e) { /* skip */ }
   }
 
-  const { data: highValueGamma } = await supabase
-    .from('contacts')
-    .select('id, assigned_to, trident_scores')
-    .eq('career_tier', 'GAMMA')
-    .eq('is_archived', false)
-    .eq('nurture_enrolled', false);
+  const highValueGamma = await db.selectMany('contacts', {
+    select: 'id, assigned_to, trident_scores',
+    where: [
+      { column: 'career_tier', value: 'GAMMA' },
+      { column: 'is_archived', value: false },
+      { column: 'nurture_enrolled', value: false },
+    ],
+  });
 
   let gammaPromoted = 0;
   for (const c of highValueGamma || []) {
     const capability = c.trident_scores?.capability || 0;
     if (capability >= 70) {
       try {
-        await supabase.from('contacts').update({ career_tier: 'BETA' }).eq('id', c.id);
-        await enrollInNurture(supabase, c.id, 'BETA_QUARTERLY', c.assigned_to);
+        await db.update('contacts',
+          { column: 'id', value: c.id },
+          { career_tier: 'BETA' }
+        );
+        await enrollInNurture(c.id, 'BETA_QUARTERLY', c.assigned_to);
         gammaPromoted++;
       } catch (e) { /* skip */ }
     }
@@ -753,12 +761,12 @@ async function runAutoEnroll(supabase: any) {
 }
 
 async function getUserRole(userId: string): Promise<string> {
-  const { data } = await supabaseAdmin
-    .from('profiles')
-    .select('role')
-    .eq('id', userId)
-    .single();
-  return data?.role || 'consultant';
+  const profile = await db.selectOne('profiles', {
+    select: 'role',
+    column: 'id',
+    value: userId,
+  });
+  return profile?.role || 'consultant';
 }
 
 async function getUserIdFromReq(req: VercelRequest): Promise<string | null> {
@@ -766,8 +774,19 @@ async function getUserIdFromReq(req: VercelRequest): Promise<string | null> {
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.slice(7);
     try {
-      const { data: user } = await supabaseAdmin.auth.getUser(token);
-      return user?.user?.id || null;
+      const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+      const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+        method: 'GET',
+        headers: {
+          'apikey': SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) return null;
+      const user = await res.json();
+      return user?.id || null;
     } catch {
       return null;
     }
@@ -788,8 +807,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const isTeamLead = userRole === 'team_lead' || userRole === 'admin';
   const isAdmin = userRole === 'admin';
 
-  const supabase = supabaseAdmin;
-
   try {
     // CI-1: POST /api/career/benchmark/generate
     if (req.method === 'POST' && resource === 'benchmark' && id === 'generate') {
@@ -797,19 +814,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
       const { contact_id } = body;
       if (!contact_id) return res.status(400).json({ error: 'contact_id required' });
-      const benchmark = await generateCareerBenchmark(supabase, contact_id);
+      const benchmark = await generateCareerBenchmark(contact_id);
       return res.status(200).json({ success: true, benchmark });
     }
 
     // CI-2: GET /api/career/benchmark/:contactId
     if (req.method === 'GET' && resource === 'benchmark' && id && action !== 'history') {
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-      const { data: benchmark } = await supabase
-        .from('career_benchmarks')
-        .select('*')
-        .eq('contact_id', id)
-        .eq('is_current', true)
-        .maybeSingle();
+      const benchmarks = await db.selectMany('career_benchmarks', {
+        select: '*',
+        where: [
+          { column: 'contact_id', value: id },
+          { column: 'is_current', value: true },
+        ],
+        limit: 1,
+      });
+      const benchmark = benchmarks && benchmarks.length > 0 ? benchmarks[0] : null;
       return res.status(200).json({ success: true, benchmark });
     }
 
@@ -822,12 +842,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'GET' && resource === 'benchmark' && action === 'history') {
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
       const contactId = id;
-      const { data: history } = await supabase
-        .from('career_benchmarks')
-        .select('id, generated_at, data_confidence, market_demand_score, skill_gaps, narrative_summary')
-        .eq('contact_id', contactId)
-        .order('generated_at', { ascending: false })
-        .limit(10);
+      const history = await db.selectMany('career_benchmarks', {
+        select: 'id, generated_at, data_confidence, market_demand_score, skill_gaps, narrative_summary',
+        where: [{ column: 'contact_id', value: contactId }],
+        orderBy: { column: 'generated_at', ascending: false },
+        limit: 10,
+      });
       return res.status(200).json({ success: true, history });
     }
 
@@ -837,7 +857,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
       const { contact_id, sequence_type } = body;
       if (!contact_id || !sequence_type) return res.status(400).json({ error: 'contact_id and sequence_type required' });
-      const sequence = await enrollInNurture(supabase, contact_id, sequence_type, userId);
+      const sequence = await enrollInNurture(contact_id, sequence_type, userId);
       return res.status(200).json({ success: true, sequence });
     }
 
@@ -847,28 +867,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
       const { contact_id, reason } = body;
       if (!contact_id) return res.status(400).json({ error: 'contact_id required' });
-      const { data } = await supabase
-        .from('nurture_sequences')
-        .update({ status: 'PAUSED', pause_reason: reason || 'Paused by consultant' })
-        .eq('contact_id', contact_id)
-        .eq('status', 'ACTIVE')
-        .select();
-      await supabase
-        .from('contacts')
-        .update({ nurture_enrolled: false, nurture_stage: null })
-        .eq('id', contact_id);
+      const data = await db.update('nurture_sequences',
+        {
+          where: [
+            { column: 'contact_id', value: contact_id },
+            { column: 'status', value: 'ACTIVE' },
+          ],
+        },
+        { status: 'PAUSED', pause_reason: reason || 'Paused by consultant' }
+      );
+      await db.update('contacts',
+        { column: 'id', value: contact_id },
+        { nurture_enrolled: false, nurture_stage: null }
+      );
       return res.status(200).json({ success: true, paused: data?.length || 0 });
     }
 
     // CI-6: GET /api/career/nurture/queue
     if (req.method === 'GET' && resource === 'nurture' && id === 'queue') {
       if (!userId || !isTeamLead) return res.status(403).json({ error: 'Team Lead+ required' });
-      const { data } = await supabase
-        .from('nurture_sequences')
-        .select('*, contacts(full_name, current_role, current_company, career_tier, engagement_score)')
-        .eq('status', 'ACTIVE')
-        .order('next_touch_at', { ascending: true })
-        .limit(50);
+      const data = await db.selectMany('nurture_sequences', {
+        select: '*, contacts(full_name, current_role, current_company, career_tier, engagement_score)',
+        where: [{ column: 'status', value: 'ACTIVE' }],
+        orderBy: { column: 'next_touch_at', ascending: true },
+        limit: 50,
+      });
       return res.status(200).json({ success: true, sequences: data });
     }
 
@@ -877,7 +900,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
       const { contact_id } = body;
       if (!contact_id) return res.status(400).json({ error: 'contact_id required' });
-      const signals = await detectMovementSignals(supabase, contact_id);
+      const signals = await detectMovementSignals(contact_id);
       return res.status(200).json({ success: true, signals_detected: signals.length, signals });
     }
 
@@ -885,11 +908,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'GET' && resource === 'signals' && id && id !== 'detect') {
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
       const contactId = id;
-      const { data: contact } = await supabase
-        .from('contacts')
-        .select('movement_signals')
-        .eq('id', contactId)
-        .single();
+      const contact = await db.selectOne('contacts', {
+        select: 'movement_signals',
+        column: 'id',
+        value: contactId,
+      });
       return res.status(200).json({ success: true, signals: contact?.movement_signals || [] });
     }
 
@@ -899,7 +922,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
       const { contact_id, text, direction = 'inbound' } = body;
       if (!contact_id || !text) return res.status(400).json({ error: 'contact_id and text required' });
-      const result = await processConversationResponse(supabase, contact_id, text, direction);
+      const result = await processConversationResponse(contact_id, text, direction);
       return res.status(200).json({ success: true, signals: result });
     }
 
@@ -907,12 +930,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'GET' && resource === 'log' && id) {
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
       const contactId = id;
-      const { data: log } = await supabase
-        .from('career_intelligence_log')
-        .select('*')
-        .eq('contact_id', contactId)
-        .order('created_at', { ascending: false })
-        .limit(50);
+      const log = await db.selectMany('career_intelligence_log', {
+        select: '*',
+        where: [{ column: 'contact_id', value: contactId }],
+        orderBy: { column: 'created_at', ascending: false },
+        limit: 50,
+      });
       return res.status(200).json({ success: true, log });
     }
 
@@ -921,14 +944,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!userId || !isTeamLead) return res.status(403).json({ error: 'Team Lead+ required' });
       const tier = url.searchParams.get('tier');
       const limit = parseInt(url.searchParams.get('limit') || '50');
-      let query = supabase
-        .from('contacts')
-        .select('id, full_name, current_role, current_company, career_tier, engagement_score, last_engaged_at, nurture_stage, pipeline_stage, assigned_to')
-        .eq('is_archived', false)
-        .order('engagement_score', { ascending: false })
-        .limit(limit);
-      if (tier) query = query.eq('career_tier', tier);
-      const { data } = await query;
+      const where: any[] = [{ column: 'is_archived', value: false }];
+      if (tier) where.push({ column: 'career_tier', value: tier });
+      const data = await db.selectMany('contacts', {
+        select: 'id, full_name, current_role, current_company, career_tier, engagement_score, last_engaged_at, nurture_stage, pipeline_stage, assigned_to',
+        where,
+        orderBy: { column: 'engagement_score', ascending: false },
+        limit,
+      });
       return res.status(200).json({ success: true, candidates: data, total: data?.length || 0 });
     }
 
@@ -936,19 +959,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'GET' && resource === 'dashboard') {
       if (!userId || !isTeamLead) return res.status(403).json({ error: 'Team Lead+ required' });
 
-      const { data: tierDist } = await supabase
-        .from('contacts')
-        .select('career_tier')
-        .eq('is_archived', false);
+      const tierDist = await db.selectMany('contacts', {
+        select: 'career_tier',
+        where: [{ column: 'is_archived', value: false }],
+      });
 
       const tierCounts: Record<string, number> = { ALPHA: 0, BETA: 0, GAMMA: 0, DORMANT: 0 };
       for (const c of tierDist || []) {
         tierCounts[c.career_tier] = (tierCounts[c.career_tier] || 0) + 1;
       }
 
-      const { data: nurtureStats } = await supabase
-        .from('nurture_sequences')
-        .select('status, sequence_type, touch_count, response_count');
+      const nurtureStats = await db.selectMany('nurture_sequences', {
+        select: 'status, sequence_type, touch_count, response_count',
+      });
 
       const nurtureByStatus: Record<string, number> = {};
       let totalTouches = 0;
@@ -959,26 +982,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         totalResponses += n.response_count;
       }
 
-      const { count: pendingAlerts } = await supabase
-        .from('contacts')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_archived', false)
-        .neq('movement_signals', '[]');
+      const pendingAlertsContacts = await db.selectMany('contacts', {
+        select: 'id',
+        where: [
+          { column: 'is_archived', value: false },
+          { column: 'movement_signals', value: '[]', op: 'neq' },
+        ],
+      });
+      const pendingAlerts = pendingAlertsContacts?.length || 0;
 
       const sevenDaysOut = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-      const { count: dueNurture } = await supabase
-        .from('nurture_sequences')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'ACTIVE')
-        .lte('next_touch_at', sevenDaysOut);
+      const dueNurtureSeqs = await db.selectMany('nurture_sequences', {
+        select: 'id',
+        where: [
+          { column: 'status', value: 'ACTIVE' },
+          { column: 'next_touch_at', value: sevenDaysOut, op: 'lte' },
+        ],
+      });
+      const dueNurture = dueNurtureSeqs?.length || 0;
 
       const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
-      const { data: staleCandidates } = await supabase
-        .from('contacts')
-        .select('id')
-        .in('career_tier', ['ALPHA', 'BETA'])
-        .eq('is_archived', false)
-        .or(`career_benchmark.is.null,career_benchmark->>'generated_at'.lt.${ninetyDaysAgo}`);
+      const allAlphaBeta = await db.selectMany('contacts', {
+        select: 'id, career_benchmark',
+        where: [
+          { column: 'career_tier', value: ['ALPHA', 'BETA'], op: 'in' },
+          { column: 'is_archived', value: false },
+        ],
+      });
+      const staleCandidates = (allAlphaBeta || []).filter((c: any) => {
+        const benchmark = c.career_benchmark;
+        if (!benchmark) return true;
+        const generatedAt = benchmark.generated_at;
+        if (!generatedAt) return true;
+        return new Date(generatedAt).getTime() < new Date(ninetyDaysAgo).getTime();
+      });
 
       return res.status(200).json({
         success: true,
@@ -999,11 +1036,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'GET' && resource === 'nurture' && id && id !== 'queue' && id !== 'enroll' && id !== 'pause') {
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
       const contactId = id;
-      const { data: sequences } = await supabase
-        .from('nurture_sequences')
-        .select('*')
-        .eq('contact_id', contactId)
-        .order('created_at', { ascending: false });
+      const sequences = await db.selectMany('nurture_sequences', {
+        select: '*',
+        where: [{ column: 'contact_id', value: contactId }],
+        orderBy: { column: 'created_at', ascending: false },
+      });
       return res.status(200).json({ success: true, sequences });
     }
 
