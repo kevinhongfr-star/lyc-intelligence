@@ -27,12 +27,12 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(400).json({ error: 'org_id is required' });
         }
 
-        const filters = [{ column: 'org_id', value: org_id }];
+        const filters: any[] = [{ column: 'org_id', value: org_id }];
         if (severity) filters.push({ column: 'severity', value: severity });
         if (acknowledged === 'false') {
-          filters.push({ column: 'acknowledged_at', value: null, operator: 'is' });
+          filters.push({ column: 'acknowledged_at', value: null, op: 'is' });
         } else if (acknowledged === 'true') {
-          filters.push({ column: 'acknowledged_at', value: null, operator: 'neq' });
+          filters.push({ column: 'acknowledged_at', value: 'not.null', op: 'is' });
         }
 
         const alerts = await db.selectMany('kpi_alerts', {
