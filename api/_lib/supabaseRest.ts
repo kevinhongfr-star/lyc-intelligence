@@ -77,12 +77,35 @@ export async function selectOne(
   return Array.isArray(data) && data.length > 0 ? data[0] : null;
 }
 
+type WhereOp = 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' | 'is';
+type WhereFilter = {
+  column: string;
+  value: string | number | boolean | any[] | null;
+  op?: WhereOp;
+  operator?: WhereOp;
+};
+
+function buildWherePart(w: WhereFilter): string {
+  const op = w.op || w.operator || 'eq';
+  if (op === 'in' && Array.isArray(w.value)) {
+    const escaped = (w.value as any[]).map(v => String(v).replace(/,/g, '\\,'));
+    return `${w.column}=in.(${escaped.join(',')})`;
+  }
+  if (op === 'is') {
+    if (w.value === null) return `${w.column}=is.null`;
+    if (w.value === true) return `${w.column}=is.true`;
+    if (w.value === false) return `${w.column}=is.false`;
+    return `${w.column}=is.${w.value}`;
+  }
+  return `${w.column}=${op}.${encodeURIComponent(String(w.value))}`;
+}
+
 /** GET multiple rows. `options.where` is an array of `column=value` filters. `or` is a raw Supabase or-expression string (e.g. "col.is.null,col2.gt.val"). */
 export async function selectMany(
   table: string,
   options: {
     select?: string;
-    where?: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }>;
+    where?: WhereFilter[];
     or?: string;
     orderBy?: { column: string; ascending?: boolean };
     limit?: number;
@@ -97,13 +120,7 @@ export async function selectMany(
   parts.push(`select=${encodeURIComponent(options.select || '*')}`);
   if (options.where) {
     for (const w of options.where) {
-      const op = w.op || 'eq';
-      if (op === 'in' && Array.isArray(w.value)) {
-        const escaped = (w.value as any[]).map(v => String(v).replace(/,/g, '\\,'));
-        parts.push(`${w.column}=in.(${escaped.join(',')})`);
-      } else {
-        parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
-      }
+      parts.push(buildWherePart(w));
     }
   }
   if (options.or) {
@@ -153,31 +170,50 @@ export async function insert(
   return Array.isArray(out) && out.length === 1 ? out[0] : out;
 }
 
-/** UPDATE rows matching the filter. Returns the updated row array. */
+/**
+ * UPDATE rows matching the filter. Returns the updated row array.
+ *
+ * Supports two calling conventions:
+ *   update(table, { column, value }, data, timeout?)  — filter object first
+ *   update(table, data, value, columnName?, timeout?)  — data first (legacy)
+ */
 export async function update(
   table: string,
-  filter:
-    | { column: string; value: string | number | boolean }
-    | { where: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }> },
-  data: Record<string, any>,
-  timeoutMs?: number
+  filterOrData: any,
+  dataOrValue: any,
+  columnNameOrTimeout?: string | number,
+  maybeTimeout?: number
 ): Promise<any[]> {
   if (!isSupabaseConfigured()) {
     throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
   }
+
+  let filter: { column: string; value: any } | { where: WhereFilter[] };
+  let data: Record<string, any>;
+  let timeoutMs: number | undefined;
+
+  const isFilterObj = (x: any): boolean =>
+    x && typeof x === 'object' && ('column' in x || 'where' in x);
+
+  if (isFilterObj(filterOrData)) {
+    filter = filterOrData;
+    data = dataOrValue;
+    timeoutMs = columnNameOrTimeout as number | undefined;
+  } else {
+    data = filterOrData;
+    const columnName = (typeof columnNameOrTimeout === 'string') ? columnNameOrTimeout : 'id';
+    filter = { column: columnName, value: dataOrValue };
+    if (typeof columnNameOrTimeout === 'number') timeoutMs = columnNameOrTimeout;
+    if (typeof maybeTimeout === 'number') timeoutMs = maybeTimeout;
+  }
+
   const parts: string[] = [];
   if ('where' in filter && Array.isArray(filter.where)) {
     for (const w of filter.where) {
-      const op = w.op || 'eq';
-      if (op === 'in' && Array.isArray(w.value)) {
-        const escaped = (w.value as any[]).map(v => String(v).replace(/,/g, '\\,'));
-        parts.push(`${w.column}=in.(${escaped.join(',')})`);
-      } else {
-        parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
-      }
+      parts.push(buildWherePart(w));
     }
-  } else {
-    parts.push(`${filter.column}=eq.${encodeURIComponent(String(filter.value))}`);
+  } else if ('column' in filter) {
+    parts.push(`${filter.column}=eq.${encodeURIComponent(String((filter as any).value))}`);
   }
   const query = parts.join('&');
   const res = await fetchWithTimeout(
@@ -267,7 +303,7 @@ export function handleError(res: VercelResponse, endpoint: string, err: any) {
 export async function countRows(
   table: string,
   options: {
-    where?: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }>;
+    where?: WhereFilter[];
   } = {},
   timeoutMs?: number
 ): Promise<number> {
@@ -278,13 +314,7 @@ export async function countRows(
   parts.push('select=count');
   if (options.where) {
     for (const w of options.where) {
-      const op = w.op || 'eq';
-      if (op === 'in' && Array.isArray(w.value)) {
-        const escaped = (w.value as any[]).map(v => String(v).replace(/,/g, '\\,'));
-        parts.push(`${w.column}=in.(${escaped.join(',')})`);
-      } else {
-        parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
-      }
+      parts.push(buildWherePart(w));
     }
   }
   const res = await fetchWithTimeout(

@@ -28,9 +28,9 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       const expiring = await db.selectMany('data_consents', {
         select: 'id',
         where: [
-          { column: 'expires_at', value: now, operator: 'lte' },
+          { column: 'expires_at', value: now, op: 'lte' },
           { column: 'consent_given', value: true },
-          { column: 'withdrawn_at', value: null, operator: 'is' },
+          { column: 'withdrawn_at', value: null, op: 'is' },
         ],
         limit: 100,
       });
@@ -62,7 +62,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       const overdue = await db.selectMany('mandates', {
         select: 'id, org_id, title, sla_due_at',
         where: [
-          { column: 'sla_due_at', value: now, operator: 'lte' },
+          { column: 'sla_due_at', value: now, op: 'lte' },
           { column: 'status', value: 'active' },
         ],
         limit: 100,
@@ -83,7 +83,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
         select: 'id, org_id, request_type, sla_due_at',
         where: [
           { column: 'status', value: 'pending' },
-          { column: 'sla_due_at', value: now, operator: 'lte' },
+          { column: 'sla_due_at', value: now, op: 'lte' },
         ],
         limit: 100,
       });
