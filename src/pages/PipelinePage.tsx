@@ -1,40 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, Eye, FileDown, BarChart3, Upload } from 'lucide-react';
+import { Loader2, ChevronRight, Eye, FileDown, BarChart3, Upload } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
 import { useMandates } from '@/hooks/useSupabaseData';
-import { getPipelineByMandate, updatePipelineStage, updatePipelineVerdict } from '@/services/supabaseApi';
-import { PIPELINE_STAGE_ORDER, STAGE_CONFIG, PIPELINE_PHASES, getStagesByPhase } from '@/types/pipelineStages';
-import type { PipelineStageName } from '@/types/pipelineStages';
+import { getPipelineByMandate, updatePipelineStage } from '@/services/supabaseApi';
+import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
 import type { CandidatePipeline, Mandate } from '@/services/supabaseApi';
 import { LinkedInImportModal } from '@/components/import/LinkedInImportModal';
 
-// Next stage mapping for 19-stage pipeline
+const STAGE_COLORS: Record<string, string> = {
+  SWEEP: 'border-t-sweep-light',
+  CANVA: 'border-t-tier-2',
+  GRID: 'border-t-tier-1',
+  'Candidate Report': 'border-t-accent',
+  PLACED: 'border-t-purple-400',
+};
+
+const STAGE_BG: Record<string, string> = {
+  SWEEP: 'bg-sweep/5',
+  CANVA: 'bg-tier-2Bg',
+  GRID: 'bg-tier-1Bg',
+  'Candidate Report': 'bg-accent/5',
+  PLACED: 'bg-purple-500/5',
+};
+
 const NEXT_STAGE: Record<string, string> = {
-  approach: 'screened',
-  screened: 'partner_approved',
-  partner_approved: 'client_submitted',
-  client_submitted: 'client_approved',
-  client_approved: 'interview_1',
-  interview_1: 'interview_2',
-  interview_2: 'interview_3',
-  interview_3: 'final_interview',
-  final_interview: 'assessment',
-  assessment: 'reference_check',
-  reference_check: 'offer_sent',
-  offer_sent: 'offer_accepted',
-  offer_accepted: 'onboarded',
-  onboarded: 'follow_up_1m',
-  follow_up_1m: 'follow_up_3m',
-  follow_up_3m: 'follow_up_6m',
-  follow_up_6m: 'probation_passed',
-  // Terminal stages have no next stage
+  SWEEP: 'CANVA', CANVA: 'GRID', GRID: 'Candidate Report', 'Candidate Report': 'PLACED',
 };
 
 const VERDICT_OPTIONS = ['Strong Fit', 'Conditional Fit', 'Weak Fit', 'Hold', 'Reject'];
-
-// Only show active (non-terminal) stages in kanban
-const KANBAN_STAGES = PIPELINE_STAGE_ORDER.filter(s => s !== 'withdrawn' && s !== 'rejected');
 
 export function PipelinePage() {
   const { data: mandates, loading } = useMandates({ limit: 50 });
@@ -43,7 +37,6 @@ export function PipelinePage() {
   const [loadingPipeline, setLoadingPipeline] = useState(false);
   const [view, setView] = useState<'kanban' | 'list'>('kanban');
   const [showImportModal, setShowImportModal] = useState(false);
-  const [activePhase, setActivePhase] = useState<string>('Sourcing');
 
   useEffect(() => {
     if (mandates.length > 0 && !selectedMandate) {
@@ -63,21 +56,13 @@ export function PipelinePage() {
   const handleStageChange = async (pipelineId: string, newStage: string) => {
     const ok = await updatePipelineStage(pipelineId, newStage);
     if (ok && selectedMandate) {
-      const data = await getPipelineByMandate(selectedMandate.id);
-      setPipeline(data);
-    }
-  };
-
-  const handleVerdictChange = async (pipelineId: string, verdict: string) => {
-    await updatePipelineVerdict(pipelineId, verdict);
-    if (selectedMandate) {
+      // Refresh pipeline
       const data = await getPipelineByMandate(selectedMandate.id);
       setPipeline(data);
     }
   };
 
   const totalCandidates = Object.values(pipeline).reduce((sum, arr) => sum + arr.length, 0);
-  const stagesInPhase = getStagesByPhase(activePhase as any).filter(s => s.id !== 'withdrawn' && s.id !== 'rejected');
 
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>;
 
@@ -86,13 +71,14 @@ export function PipelinePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-serif font-bold text-text-primary">Pipeline</h1>
-          <p className="text-text-muted">Move candidates through the 19-stage pipeline</p>
+          <p className="text-text-muted">Drag candidates through the search stages</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => setView('kanban')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'kanban' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Kanban</button>
           <button onClick={() => setView('list')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'list' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>List</button>
           <button onClick={() => setShowImportModal(true)} className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg bg-bg-tertiary text-text-primary hover:bg-accent hover:text-white transition-colors min-h-[44px]">
-            <Upload className="w-4 h-4" />Import
+            <Upload className="w-4 h-4" />
+            Import
           </button>
         </div>
       </div>
@@ -123,43 +109,26 @@ export function PipelinePage() {
         </div>
       )}
 
-      {/* Phase tabs for kanban */}
-      {view === 'kanban' && (
-        <div className="flex gap-1 border-b border-bg-tertiary pb-2 overflow-x-auto">
-          {Object.entries(PIPELINE_PHASES).filter(([key]) => key !== 'TERMINAL').map(([key, phase]) => {
-            const phaseStages = getStagesByPhase(phase).filter(s => s.id !== 'withdrawn' && s.id !== 'rejected');
-            const phaseCount = phaseStages.reduce((sum, s) => sum + (pipeline[s.id]?.length || 0), 0);
-            return (
-              <button key={key} onClick={() => setActivePhase(phase)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm whitespace-nowrap transition-colors ${
-                  activePhase === phase ? 'bg-accent/10 text-accent border border-accent/30' : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-bg-tertiary'
-                }`}>
-                {phase} <Badge>{phaseCount}</Badge>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
       {loadingPipeline ? (
         <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-accent" /></div>
       ) : view === 'kanban' ? (
-        <div className={`grid gap-3 min-h-[500px]`} style={{ gridTemplateColumns: `repeat(${stagesInPhase.length}, minmax(220px, 1fr))` }}>
-          {stagesInPhase.map(stage => {
-            const cfg = STAGE_CONFIG[stage.id as PipelineStageName];
-            const candidates = pipeline[stage.id] || [];
+        /* KANBAN VIEW */
+        <div className="grid grid-cols-5 gap-3 min-h-[500px]">
+          {STAGE_ORDER.map(stage => {
+            const candidates = pipeline[stage] || [];
+            const cfg = STAGE_CONFIG[stage];
             return (
-              <div key={stage.id} className="rounded-lg border border-bg-tertiary flex flex-col" style={{ backgroundColor: `${cfg.color}05` }}>
+              <div key={stage} className={`rounded-lg border border-bg-tertiary ${STAGE_BG[stage]} flex flex-col`}>
                 <div className="px-3 py-2 border-b border-bg-tertiary flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cfg.color }} />
-                    <span className="text-xs font-medium text-text-primary">{cfg.label}</span>
+                    <span className="text-sm font-medium text-text-primary">{cfg.label}</span>
                   </div>
                   <Badge variant="default">{candidates.length}</Badge>
                 </div>
-                <div className="flex-1 p-2 space-y-2 overflow-auto max-h-[600px]">
+                <div className="flex-1 p-2 space-y-2 overflow-auto">
                   {candidates.map(cp => (
-                    <div key={cp.id} className="bg-bg-primary border border-bg-tertiary rounded-lg p-3 border-t-2" style={{ borderTopColor: cfg.color }}>
+                    <div key={cp.id} className={`bg-bg-primary border border-bg-tertiary rounded-lg p-3 ${STAGE_COLORS[stage]} border-t-2`}>
                       <div className="flex items-center gap-2 mb-1">
                         <div className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-accent text-[10px] font-bold flex-shrink-0">
                           {cp.contact?.name?.[0] ?? '?'}
@@ -171,7 +140,7 @@ export function PipelinePage() {
                       </div>
                       {cp.trident_composite != null && (
                         <div className="flex items-center gap-1 mt-1">
-                          <span className="text-[10px] text-text-muted">Score:</span>
+                          <span className="text-[10px] text-text-muted">Match Analysis:</span>
                           <span className="text-[10px] font-bold" style={{ color: cp.trident_composite >= 75 ? '#10B981' : cp.trident_composite >= 50 ? '#F59E0B' : '#6B7280' }}>
                             {cp.trident_composite}
                           </span>
@@ -179,15 +148,24 @@ export function PipelinePage() {
                       )}
                       {cp.verdict && <p className="text-[10px] text-text-muted mt-0.5 truncate">{cp.verdict}</p>}
                       <div className="flex gap-1 mt-2">
-                        {NEXT_STAGE[stage.id] && (
-                          <button onClick={() => handleStageChange(cp.id, NEXT_STAGE[stage.id])}
+                        {NEXT_STAGE[stage] && (
+                          <button onClick={() => handleStageChange(cp.id, NEXT_STAGE[stage])}
                             className="text-[10px] px-2 py-1 bg-accent/20 text-accent rounded hover:bg-accent/30 transition-colors flex items-center gap-0.5">
-                            → {STAGE_CONFIG[NEXT_STAGE[stage.id] as PipelineStageName]?.label}
+                            → {STAGE_CONFIG[NEXT_STAGE[stage] as keyof typeof STAGE_CONFIG]?.label}
                           </button>
                         )}
                         <select
                           value={cp.verdict || ''}
-                          onChange={e => handleVerdictChange(cp.id, e.target.value)}
+                          onChange={async (e) => {
+                            const v = e.target.value;
+                            const { updatePipelineVerdict } = await import('@/services/supabaseApi');
+                            await updatePipelineVerdict(cp.id, v);
+                            // Refresh
+                            if (selectedMandate) {
+                              const data = await getPipelineByMandate(selectedMandate.id);
+                              setPipeline(data);
+                            }
+                          }}
                           className="text-[10px] bg-bg-tertiary text-text-muted rounded px-1 py-0.5 border-0"
                         >
                           <option value="">Verdict</option>
@@ -207,13 +185,12 @@ export function PipelinePage() {
       ) : (
         /* LIST VIEW */
         <div className="space-y-2">
-          {PIPELINE_STAGE_ORDER.map(stageId => {
-            const candidates = pipeline[stageId] || [];
+          {STAGE_ORDER.map(stage => {
+            const candidates = pipeline[stage] || [];
             if (candidates.length === 0) return null;
-            const cfg = STAGE_CONFIG[stageId as PipelineStageName];
-            if (!cfg) return null;
+            const cfg = STAGE_CONFIG[stage];
             return (
-              <Card key={stageId}>
+              <Card key={stage}>
                 <CardHeader className="py-3">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cfg.color }} />
@@ -231,9 +208,9 @@ export function PipelinePage() {
                       </div>
                       {cp.trident_composite != null && <Badge variant={cp.trident_composite >= 75 ? 'success' : cp.trident_composite >= 50 ? 'warning' : 'default'}>{cp.trident_composite}</Badge>}
                       {cp.verdict && <Badge>{cp.verdict}</Badge>}
-                      {NEXT_STAGE[stageId] && (
-                        <button onClick={() => handleStageChange(cp.id, NEXT_STAGE[stageId])} className="text-xs px-3 py-1.5 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-colors">
-                          → {STAGE_CONFIG[NEXT_STAGE[stageId] as PipelineStageName]?.label}
+                      {NEXT_STAGE[stage] && (
+                        <button onClick={() => handleStageChange(cp.id, NEXT_STAGE[stage])} className="text-xs px-3 py-1.5 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-colors">
+                          → {STAGE_CONFIG[NEXT_STAGE[stage] as keyof typeof STAGE_CONFIG]?.label}
                         </button>
                       )}
                     </div>

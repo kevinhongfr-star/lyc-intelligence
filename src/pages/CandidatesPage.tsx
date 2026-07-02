@@ -51,7 +51,7 @@ export function CandidatesPage() {
     query: search || undefined,
     seniority: seniorityFilter.length ? seniorityFilter : undefined,
     country: countryFilter || undefined,
-    limit: 50,
+    limit: 200, // fetch more for client-side tier filtering
   });
 
   // Client-side tier filtering + sorting

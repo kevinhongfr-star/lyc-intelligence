@@ -77,12 +77,13 @@ export async function selectOne(
   return Array.isArray(data) && data.length > 0 ? data[0] : null;
 }
 
-/** GET multiple rows. `options.where` is an array of `column=value` filters (already URL-encoded strings OK). */
+/** GET multiple rows. `options.where` is an array of `column=value` filters. `or` is a raw Supabase or-expression string (e.g. "col.is.null,col2.gt.val"). */
 export async function selectMany(
   table: string,
   options: {
     select?: string;
     where?: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }>;
+    or?: string;
     orderBy?: { column: string; ascending?: boolean };
     limit?: number;
     offset?: number;
@@ -97,16 +98,16 @@ export async function selectMany(
   if (options.where) {
     for (const w of options.where) {
       const op = w.op || 'eq';
-      if (op === 'in') {
-        // in operator needs format: column=in.(val1,val2) — don't encode parens/commas
-        const vals = Array.isArray(w.value) ? w.value.join(',') : String(w.value);
-        parts.push(`${w.column}=in.(${vals})`);
-      } else if (op === 'ilike') {
-        parts.push(`${w.column}=ilike.${encodeURIComponent(String(w.value))}`);
+      if (op === 'in' && Array.isArray(w.value)) {
+        const escaped = (w.value as any[]).map(v => String(v).replace(/,/g, '\\,'));
+        parts.push(`${w.column}=in.(${escaped.join(',')})`);
       } else {
         parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
       }
     }
+  }
+  if (options.or) {
+    parts.push(`or=(${options.or})`);
   }
   if (options.orderBy) {
     parts.push(`order=${encodeURIComponent(options.orderBy.column)}.${options.orderBy.ascending === false ? 'desc' : 'asc'}`);
@@ -124,77 +125,6 @@ export async function selectMany(
     throw new Error(`Supabase GET ${table} failed: ${res.status} ${text}`);
   }
   return (await res.json()) as any[];
-}
-
-
-/** COUNT rows without fetching data. Uses Supabase Content-Range header. */
-export async function countRows(
-  table: string,
-  options: {
-    where?: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }>;
-  } = {},
-  timeoutMs?: number
-): Promise<number> {
-  if (!isSupabaseConfigured()) {
-    throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
-  }
-  const parts: string[] = ['select=id', 'limit=0'];
-  if (options.where) {
-    for (const w of options.where) {
-      const op = w.op || 'eq';
-      if (op === 'in') {
-        const vals = Array.isArray(w.value) ? w.value.join(',') : String(w.value);
-        parts.push(`${w.column}=in.(${vals})`);
-      } else if (op === 'ilike') {
-        parts.push(`${w.column}=ilike.${encodeURIComponent(String(w.value))}`);
-      } else {
-        parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
-      }
-    }
-  }
-  const res = await fetchWithTimeout(
-    buildUrl(table, parts.join('&')),
-    { 
-      method: 'GET', 
-      headers: { ...getHeaders(), 'Prefer': 'count=exact' }
-    },
-    timeoutMs
-  );
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`Supabase COUNT ${table} failed: ${res.status} ${text}`);
-  }
-  const range = res.headers.get('content-range') || '';
-  const match = range.match(/\/(\d+)$/);
-  return match ? parseInt(match[1], 10) : 0;
-}
-
-/** COUNT grouped by a column. Returns Record<string, number>. */
-export async function countGroupedBy(
-  table: string,
-  groupColumn: string,
-  timeoutMs?: number
-): Promise<Record<string, number>> {
-  if (!isSupabaseConfigured()) {
-    throw new Error('Supabase not configured');
-  }
-  // Fetch just the grouping column with a high limit
-  const res = await fetchWithTimeout(
-    buildUrl(table, `select=${encodeURIComponent(groupColumn)}&limit=50000`),
-    { method: 'GET', headers: getHeaders() },
-    timeoutMs || 10000
-  );
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`Supabase GROUP ${table}.${groupColumn} failed: ${res.status} ${text}`);
-  }
-  const rows = await res.json();
-  const groups: Record<string, number> = {};
-  for (const row of rows) {
-    const key = row[groupColumn] || 'unknown';
-    groups[key] = (groups[key] || 0) + 1;
-  }
-  return groups;
 }
 
 /** INSERT a single row. Returns the inserted row (with `Prefer: return=representation`). */
@@ -226,14 +156,30 @@ export async function insert(
 /** UPDATE rows matching the filter. Returns the updated row array. */
 export async function update(
   table: string,
-  filter: { column: string; value: string | number | boolean },
+  filter:
+    | { column: string; value: string | number | boolean }
+    | { where: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }> },
   data: Record<string, any>,
   timeoutMs?: number
 ): Promise<any[]> {
   if (!isSupabaseConfigured()) {
     throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
   }
-  const query = `${filter.column}=eq.${encodeURIComponent(String(filter.value))}`;
+  const parts: string[] = [];
+  if ('where' in filter && Array.isArray(filter.where)) {
+    for (const w of filter.where) {
+      const op = w.op || 'eq';
+      if (op === 'in' && Array.isArray(w.value)) {
+        const escaped = (w.value as any[]).map(v => String(v).replace(/,/g, '\\,'));
+        parts.push(`${w.column}=in.(${escaped.join(',')})`);
+      } else {
+        parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
+      }
+    }
+  } else {
+    parts.push(`${filter.column}=eq.${encodeURIComponent(String(filter.value))}`);
+  }
+  const query = parts.join('&');
   const res = await fetchWithTimeout(
     buildUrl(table, query),
     {
@@ -313,8 +259,52 @@ export function handleError(res: VercelResponse, endpoint: string, err: any) {
   return res.status(500).json({
     error: 'Internal server error',
     success: false,
-    details: String(err?.message || err),
+    details: process.env.NODE_ENV === 'development' ? String(err?.message || err) : undefined,
   });
+}
+
+/** COUNT rows matching the filter. Returns the count number. */
+export async function countRows(
+  table: string,
+  options: {
+    where?: Array<{ column: string; value: string | number | boolean | any[]; op?: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'ilike' }>;
+  } = {},
+  timeoutMs?: number
+): Promise<number> {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
+  }
+  const parts: string[] = [];
+  parts.push('select=count');
+  if (options.where) {
+    for (const w of options.where) {
+      const op = w.op || 'eq';
+      if (op === 'in' && Array.isArray(w.value)) {
+        const escaped = (w.value as any[]).map(v => String(v).replace(/,/g, '\\,'));
+        parts.push(`${w.column}=in.(${escaped.join(',')})`);
+      } else {
+        parts.push(`${w.column}=${op}.${encodeURIComponent(String(w.value))}`);
+      }
+    }
+  }
+  const res = await fetchWithTimeout(
+    `${buildUrl(table, parts.join('&'))}`,
+    {
+      method: 'HEAD',
+      headers: getHeaders({ Prefer: 'count=exact' }),
+    },
+    timeoutMs
+  );
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Supabase COUNT ${table} failed: ${res.status} ${text}`);
+  }
+  const count = res.headers.get('content-range');
+  if (count) {
+    const match = count.match(/\/(\d+)/);
+    if (match) return parseInt(match[1], 10);
+  }
+  return 0;
 }
 
 /** DELETE rows matching the filter. Returns the count of deleted rows. */
@@ -342,53 +332,3 @@ export async function deleteRows(
   const out = await res.json().catch(() => []);
   return Array.isArray(out) ? out.length : 0;
 }
-
-// ── Compatibility aliases ──────────────────────────────────────────
-// These aliases are used by various handlers that expect a simpler API.
-
-/** DELETE a row by its `id` column. Alias for deleteRows with id filter. */
-export async function remove(
-  table: string,
-  id: string | number,
-  timeoutMs?: number
-): Promise<number> {
-  return deleteRows(table, { column: 'id', value: id }, timeoutMs);
-}
-
-/** SELECT with flexible options — alias that maps to selectMany. */
-export async function select<T = any>(
-  table: string,
-  options: {
-    select?: string;
-    where?: Array<{ column: string; value: string | number | boolean; op?: string }>;
-    orderBy?: { column: string; ascending?: boolean };
-    limit?: number;
-    offset?: number;
-  } = {},
-  timeoutMs?: number
-): Promise<T[]> {
-  return selectMany(table, options as any, timeoutMs);
-}
-
-/**
- * Execute a raw PostgREST query string.
- * E.g. query('rpc', 'my_function', 'param1=val1') → POST /rest/v1/rpc/my_function
- */
-export async function query(
-  path: string,
-  ...args: string[]
-): Promise<any> {
-  const url = `${SUPABASE_URL}/rest/v1/${path}` + (args.length ? `/${args.join('/')}` : '');
-  const res = await fetchWithTimeout(url, {
-    method: 'GET',
-    headers: getHeaders(),
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`Supabase query ${path} failed: ${res.status} ${text}`);
-  }
-  return res.json();
-}
-
-/** DELETE alias — dataHandler calls db.delete(table, filter) */
-export { deleteRows as delete };

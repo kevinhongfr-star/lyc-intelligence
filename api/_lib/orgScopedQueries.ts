@@ -1,22 +1,16 @@
 /**
- * Organization-scoped query helpers — simplified for current schema.
+ * Organization-scoped query helpers for multi-tenant authorization.
  * 
- * Current DB schema notes:
- * - profiles.organization_id is null for all users (multi-tenant not yet active)
- * - Until multi-tenant is implemented, all authenticated users get full access.
- * 
- * Performance: All queries now have proper limits and support server-side filtering.
+ * Role-based access control:
+ * - super_admin: all orgs (global)
+ * - lyc_admin: all mandates in their org
+ * - lyc_consultant: only mandates assigned via mandate_members
+ * - client_admin / client_viewer: only their org's data
+ * - member / council / candidate: only their own data
  */
 
-import type { UserRole } from '../../src/types/index.js';
-import { selectOne, selectMany, countRows } from './supabaseRest.js';
-
-/** Map DB role to UserRole enum */
-function mapRole(dbRole: string | null | undefined): UserRole {
-  if (dbRole === 'admin') return 'super_admin';
-  if (dbRole === 'user') return 'member';
-  return (dbRole as UserRole) || 'member';
-}
+import type { UserRole } from '@/types';
+import { selectOne, selectMany } from './supabaseRest';
 
 export async function getOrgId(userId: string): Promise<string | null> {
   const profile = await selectOne('profiles', {
@@ -33,117 +27,169 @@ export async function getUserRole(userId: string): Promise<UserRole> {
     value: userId,
     select: 'role',
   });
-  return mapRole(profile?.role);
+  const role = profile?.role as UserRole;
+  return role || 'member';
 }
 
-export async function getOrgScopedMandates(
-  userId: string, userRole: UserRole, orgId: string | null,
-  options?: { limit?: number; offset?: number; search?: string }
-): Promise<{ data: any[]; total: number }> {
-  const limit = options?.limit ?? 50;
-  const offset = options?.offset ?? 0;
-  const where: Array<{ column: string; value: string | number | boolean | any[]; op?: string }> = [];
-
-  // Server-side search
-  if (options?.search) {
-    where.push({ column: 'title', value: `%${options.search}%`, op: 'ilike' });
+export async function getOrgScopedMandates(userId: string, userRole: UserRole, orgId: string): Promise<any[]> {
+  if (userRole === 'super_admin') {
+    return selectMany('mandates', {
+      select: 'id, title, status, priority, client_id, jd_description, search_definition, skills_requirements, company:companies(id, name)',
+      orderBy: { column: 'updated_at', ascending: false },
+    }, 15000);
   }
 
-  const [data, total] = await Promise.all([
-    selectMany('mandates', {
-      select: 'id, title, status, priority, client_id, tier1_count, tier2_count, shortlisted_count, interview_count, placed_count, updated_at',
-      where,
+  if (userRole === 'lyc_admin') {
+    return selectMany('mandates', {
+      select: 'id, title, status, priority, client_id, jd_description, search_definition, skills_requirements, company:companies(id, name)',
+      where: [{ column: 'organization_id', value: orgId }],
       orderBy: { column: 'updated_at', ascending: false },
-      limit,
-      offset,
-    }, 10000),
-    countRows('mandates', { where }),
-  ]);
+    }, 15000);
+  }
 
-  return { data, total };
+  if (userRole === 'lyc_consultant') {
+    const assignments = await selectMany('mandate_members', {
+      select: 'mandate_id',
+      where: [{ column: 'user_id', value: userId }],
+    }, 15000);
+    const mandateIds = assignments?.map((a: any) => a.mandate_id) || [];
+    
+    if (mandateIds.length === 0) return [];
+    
+    return selectMany('mandates', {
+      select: 'id, title, status, priority, client_id, jd_description, search_definition, skills_requirements, company:companies(id, name)',
+      where: [
+        { column: 'organization_id', value: orgId },
+        { column: 'id', value: `(${mandateIds.join(',')})`, op: 'in' },
+      ],
+      orderBy: { column: 'updated_at', ascending: false },
+    }, 15000);
+  }
+
+  if (['client_admin', 'client_viewer'].includes(userRole)) {
+    return selectMany('mandates', {
+      select: 'id, title, status, priority, client_id, jd_description, search_definition, skills_requirements, company:companies(id, name)',
+      where: [{ column: 'organization_id', value: orgId }],
+      orderBy: { column: 'updated_at', ascending: false },
+    }, 15000);
+  }
+
+  return [];
 }
 
-export async function getOrgScopedPipeline(
-  userId: string, userRole: UserRole, orgId: string | null, mandateId?: string
-): Promise<any[]> {
-  const where: Array<{ column: string; value: string | number | boolean | any[]; op?: string }> = [];
+export async function getOrgScopedPipeline(userId: string, userRole: UserRole, orgId: string, mandateId?: string): Promise<any[]> {
+  const where: Array<{ column: string; value: string | number | boolean; op?: string }> = [];
+  
   if (mandateId) {
     where.push({ column: 'mandate_id', value: mandateId });
   }
+
+  if (['member', 'council', 'candidate'].includes(userRole)) {
+    const mandates = await getOrgScopedMandates(userId, userRole, orgId);
+    const mandateIds = mandates.map((m: any) => m.id);
+    
+    if (mandateIds.length === 0) return [];
+    where.push({ column: 'mandate_id', value: `(${mandateIds.join(',')})`, op: 'in' });
+  } else if (userRole !== 'super_admin') {
+    const mandates = await getOrgScopedMandates(userId, userRole, orgId);
+    const mandateIds = mandates.map((m: any) => m.id);
+    
+    if (mandateIds.length === 0) return [];
+    where.push({ column: 'mandate_id', value: `(${mandateIds.join(',')})`, op: 'in' });
+  }
+
   return selectMany('candidates_pipeline', {
     select: '*, contact:contacts(id, name, current_title, email, company:companies(id, name)), mandate:mandates(id, title)',
     where,
     orderBy: { column: 'match_score', ascending: false },
-    limit: 200,
-  }, 10000);
+  }, 15000);
 }
 
-export async function getOrgScopedContacts(
-  userId: string, userRole: UserRole, orgId: string | null,
-  options?: { limit?: number; offset?: number; search?: string; seniority?: string[]; country?: string }
-): Promise<{ data: any[]; total: number }> {
-  const limit = options?.limit ?? 50;
-  const offset = options?.offset ?? 0;
-  const where: Array<{ column: string; value: string | number | boolean | any[]; op?: string }> = [];
+export async function getOrgScopedContacts(userId: string, userRole: UserRole, orgId: string): Promise<any[]> {
+  if (['member', 'council', 'candidate'].includes(userRole)) {
+    const mandates = await getOrgScopedMandates(userId, userRole, orgId);
+    const mandateIds = mandates.map((m: any) => m.id);
+    
+    if (mandateIds.length === 0) return [];
 
-  if (options?.search) {
-    where.push({ column: 'name', value: `%${options.search}%`, op: 'ilike' });
-  }
-  if (options?.seniority?.length) {
-    where.push({ column: 'seniority', value: options.seniority, op: 'in' });
-  }
-  if (options?.country) {
-    where.push({ column: 'country', value: options.country });
-  }
+    const pipelineEntries = await selectMany('candidates_pipeline', {
+      select: 'contact_id',
+      where: [{ column: 'mandate_id', value: `(${mandateIds.join(',')})`, op: 'in' }],
+    }, 15000);
+    
+    const contactIds = [...new Set(pipelineEntries.map((p: any) => p.contact_id))];
+    
+    if (contactIds.length === 0) return [];
 
-  const [data, total] = await Promise.all([
-    selectMany('contacts', {
-      select: 'id, name, email, current_title, company_id, country, city, seniority, headline, trident_composite, trident_d1, trident_d2, trident_d3, cxo_stamp, linkedin_url, company:companies(id, name)',
-      where,
+    return selectMany('contacts', {
+      select: 'id, name, email, current_title, company_id, location, country, seniority, skills, headline, summary, career_history, trident_composite, trident_d1, trident_d2, trident_d3, company:companies(id, name)',
+      where: [{ column: 'id', value: `(${contactIds.join(',')})`, op: 'in' }],
       orderBy: { column: 'updated_at', ascending: false },
-      limit,
-      offset,
-    }, 10000),
-    countRows('contacts', { where }),
-  ]);
+    }, 15000);
+  }
 
-  return { data, total };
+  if (userRole === 'super_admin') {
+    return selectMany('contacts', {
+      select: 'id, name, email, current_title, company_id, location, country, seniority, skills, headline, summary, career_history, trident_composite, trident_d1, trident_d2, trident_d3, company:companies(id, name)',
+      orderBy: { column: 'updated_at', ascending: false },
+      limit: 1000,
+    }, 15000);
+  }
+
+  const mandates = await getOrgScopedMandates(userId, userRole, orgId);
+  const mandateIds = mandates.map((m: any) => m.id);
+  
+  if (mandateIds.length === 0) return [];
+
+  const pipelineEntries = await selectMany('candidates_pipeline', {
+    select: 'contact_id',
+    where: [{ column: 'mandate_id', value: `(${mandateIds.join(',')})`, op: 'in' }],
+  }, 15000);
+  
+  const contactIds = [...new Set(pipelineEntries.map((p: any) => p.contact_id))];
+  
+  if (contactIds.length === 0) return [];
+
+  return selectMany('contacts', {
+    select: 'id, name, email, current_title, company_id, location, country, seniority, skills, headline, summary, career_history, trident_composite, trident_d1, trident_d2, trident_d3, company:companies(id, name)',
+    where: [{ column: 'id', value: `(${contactIds.join(',')})`, op: 'in' }],
+    orderBy: { column: 'updated_at', ascending: false },
+  }, 15000);
 }
 
 export function hasOrgAccess(userRole: UserRole): boolean {
-  return true;
+  return ['client_admin', 'client_viewer', 'lyc_consultant', 'lyc_admin', 'super_admin'].includes(userRole);
 }
 
 export function isOrgAdmin(userRole: UserRole): boolean {
-  return userRole === 'super_admin';
+  return ['client_admin', 'lyc_admin', 'super_admin'].includes(userRole);
 }
 
 export function isReadOnly(userRole: UserRole): boolean {
   return userRole === 'client_viewer';
 }
 
-export async function getOrgScopedCompanies(
-  userId: string, userRole: UserRole, orgId: string | null,
-  options?: { limit?: number; offset?: number; search?: string }
-): Promise<{ data: any[]; total: number }> {
-  const limit = options?.limit ?? 50;
-  const offset = options?.offset ?? 0;
-  const where: Array<{ column: string; value: string | number | boolean | any[]; op?: string }> = [];
-
-  if (options?.search) {
-    where.push({ column: 'name', value: `%${options.search}%`, op: 'ilike' });
+export async function getOrgScopedCompanies(userId: string, userRole: UserRole, orgId: string): Promise<any[]> {
+  if (userRole === 'super_admin') {
+    return selectMany('companies', {
+      select: 'id, name, industry, stain_group, stain_tier, proximity, country, city, region, headcount_range, website, linkedin_url, description',
+      orderBy: { column: 'engagement_score', ascending: false },
+      limit: 500,
+    }, 15000);
   }
 
-  const [data, total] = await Promise.all([
-    selectMany('companies', {
-      select: 'id, name, industry, stain_group, stain_tier, country, city, headcount_range, website',
-      where,
-      orderBy: { column: 'engagement_score', ascending: false },
-      limit,
-      offset,
-    }, 10000),
-    countRows('companies', { where }),
-  ]);
+  if (!hasOrgAccess(userRole)) {
+    return [];
+  }
 
-  return { data, total };
+  const mandates = await getOrgScopedMandates(userId, userRole, orgId);
+  const companyIds = [...new Set(mandates.map((m: any) => m.client_id).filter(Boolean))];
+  
+  if (companyIds.length === 0) return [];
+
+  return selectMany('companies', {
+    select: 'id, name, industry, stain_group, stain_tier, proximity, country, city, region, headcount_range, website, linkedin_url, description',
+    where: [{ column: 'id', value: `(${companyIds.join(',')})`, op: 'in' }],
+    orderBy: { column: 'engagement_score', ascending: false },
+  }, 15000);
 }

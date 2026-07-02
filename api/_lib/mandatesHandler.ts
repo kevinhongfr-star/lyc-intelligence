@@ -411,11 +411,18 @@ async function getNextPhase(mandateId: string, currentPhase: string): Promise<st
     limit: 1,
   }, 15000);
 
-  const canvasProfiles = await selectMany('canvas_profiles', {
-    select: 'id',
-    where: [{ column: 'contact_id', value: `(SELECT contact_id FROM candidate_mandate_links WHERE mandate_id = '${mandateId}')`, op: 'in' }],
-    limit: 1,
+  const links = await selectMany('candidate_mandate_links', {
+    select: 'contact_id',
+    where: [{ column: 'mandate_id', value: mandateId }],
   }, 15000);
+  const canvasContactIds = links.map((l: any) => l.contact_id);
+  const canvasProfiles = canvasContactIds.length > 0
+    ? await selectMany('canvas_profiles', {
+        select: 'id',
+        where: [{ column: 'contact_id', value: canvasContactIds, op: 'in' }],
+        limit: 1,
+      }, 15000)
+    : [];
 
   const counts = {
     total: candidateLinks.length,
@@ -531,7 +538,7 @@ async function handlePaymentOverview(req: VercelRequest, res: VercelResponse) {
   const mandates = mandateIds.length > 0
     ? await selectMany('mandates', {
         select: 'id, title, client_id',
-        where: [{ column: 'id', value: `(${mandateIds.map(id => `'${id}'`).join(',')})`, op: 'in' }],
+        where: [{ column: 'id', value: mandateIds, op: 'in' }],
       }, 15000)
     : [];
   const mandateMap = new Map(mandates.map(m => [m.id, m]));
@@ -612,7 +619,7 @@ async function handleAnalyticsOverview(req: VercelRequest, res: VercelResponse) 
   const consultants = consultantIds.length > 0
     ? await selectMany('profiles', {
         select: 'id, full_name',
-        where: [{ column: 'id', value: `(${consultantIds.map(id => `'${id}'`).join(',')})`, op: 'in' }],
+        where: [{ column: 'id', value: consultantIds, op: 'in' }],
       }, 15000)
     : [];
   const consultantMap = new Map(consultants.map(c => [c.id, c]));
@@ -737,7 +744,7 @@ async function handleAnalyticsRevenue(req: VercelRequest, res: VercelResponse) {
   const mandates = mandateIds.length > 0
     ? await selectMany('mandates', {
         select: 'id, title, client_id',
-        where: [{ column: 'id', value: `(${mandateIds.map(id => `'${id}'`).join(',')})`, op: 'in' }],
+        where: [{ column: 'id', value: mandateIds, op: 'in' }],
       }, 15000)
     : [];
   const mandateMap = new Map(mandates.map(m => [m.id, m]));
@@ -980,7 +987,7 @@ async function handleQualityMetricsAggregate(req: VercelRequest, res: VercelResp
 
   const gridMappings = await selectMany('grid_mappings', {
     select: '*',
-    where: [{ column: 'mandate_id', value: `(${activeMandates.map(m => `'${m.id}'`).join(',')})`, op: 'in' }],
+    where: [{ column: 'mandate_id', value: activeMandates.map((m: any) => m.id), op: 'in' }],
   }, 15000);
 
   const entries = await selectMany('grid_candidate_entries', {

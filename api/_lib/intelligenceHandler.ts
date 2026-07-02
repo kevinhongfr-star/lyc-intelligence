@@ -1,13 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
+import * as db from './supabaseRest.js';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
-
-const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
 
 function matchesRole(roleA: string, roleB: string): boolean {
   if (!roleA || !roleB) return false;
@@ -74,16 +68,18 @@ async function callDeepSeek(prompt: string, options: { max_tokens?: number; temp
   return await res.json();
 }
 
-async function computeCompensationBenchmark(supabase: any, params: {
+async function computeCompensationBenchmark(params: {
   role: string;
   industry?: string;
   geography?: string;
   clientCurrentComp?: { base: number; bonus_pct: number; currency: string };
 }) {
-  const { data: placements } = await supabase
-    .from('contacts')
-    .select('accepted_compensation, currency, pipeline_stage, current_role, industry, location')
-    .in('pipeline_stage', ['S17_Offer_Accepted', 'S19_Closed']);
+  const placements = await db.selectMany('contacts', {
+    select: 'accepted_compensation, currency, pipeline_stage, current_role, industry, location',
+    where: [
+      { column: 'pipeline_stage', value: ['S17_Offer_Accepted', 'S19_Closed'], op: 'in' },
+    ],
+  });
 
   const relevant = (placements || []).filter((p: any) =>
     matchesRole(p.current_role, params.role) &&
@@ -141,7 +137,7 @@ async function computeCompensationBenchmark(supabase: any, params: {
   return result;
 }
 
-async function selectTalentRadar(supabase: any, params: {
+async function selectTalentRadar(params: {
   industrySectors: string[];
   jobFunctions: string[];
   geographies: string[];
@@ -150,18 +146,21 @@ async function selectTalentRadar(supabase: any, params: {
 }) {
   const count = params.count || 10;
 
-  let query = supabase
-    .from('contacts')
-    .select('id, full_name, industry, current_role, location, skills, years_experience, career_tier, engagement_score, movement_signals, trident_scores')
-    .eq('is_archived', false)
-    .in('career_tier', ['ALPHA', 'BETA'])
-    .order('engagement_score', { ascending: false });
+  const where: any[] = [
+    { column: 'is_archived', value: false },
+    { column: 'career_tier', value: ['ALPHA', 'BETA'], op: 'in' },
+  ];
 
   if (params.industrySectors && params.industrySectors.length > 0) {
-    query = query.in('industry', params.industrySectors);
+    where.push({ column: 'industry', value: params.industrySectors, op: 'in' });
   }
 
-  const { data: candidates } = await query.limit(count * 3);
+  const candidates = await db.selectMany('contacts', {
+    select: 'id, full_name, industry, current_role, location, skills, years_experience, career_tier, engagement_score, movement_signals, trident_scores',
+    where,
+    orderBy: { column: 'engagement_score', ascending: false },
+    limit: count * 3,
+  });
 
   if (!candidates || candidates.length === 0) return [];
 
@@ -178,16 +177,14 @@ async function selectTalentRadar(supabase: any, params: {
   const anonymized = [];
 
   for (const candidate of selected) {
-    let { data: anonProfile } = await supabase
-      .from('anonymized_talent_profiles')
-      .select('*')
-      .eq('real_contact_id', candidate.id)
-      .maybeSingle();
+    let anonProfile = await db.selectOne('anonymized_talent_profiles', {
+      column: 'real_contact_id',
+      value: candidate.id,
+      select: '*',
+    });
 
     if (!anonProfile) {
-      const { count: totalCount } = await supabase
-        .from('anonymized_talent_profiles')
-        .select('*', { count: 'exact', head: true });
+      const totalCount = await db.countRows('anonymized_talent_profiles', {});
 
       const nextIndex = (totalCount || 0) + 1;
       let nextLabel;
@@ -199,38 +196,34 @@ async function selectTalentRadar(supabase: any, params: {
         nextLabel = `Profile ${first}${second}`;
       }
 
-      const { data: newProfile } = await supabase
-        .from('anonymized_talent_profiles')
-        .insert({
-          real_contact_id: candidate.id,
-          anonymized_label: nextLabel,
-          industry: candidate.industry,
-          function_field: extractFunction(candidate.current_role),
-          seniority_level: extractSeniority(candidate.current_role),
-          geography: candidate.location,
-          years_experience: candidate.years_experience,
-          key_skills: candidate.skills || [],
-          trident_capability: candidate.trident_scores?.capability,
-          trident_overall: candidate.trident_scores?.overall || candidate.trident_scores?.capability,
-          career_tier: candidate.career_tier,
-          engagement_score: candidate.engagement_score,
-          movement_signal_count: candidate.movement_signals?.length || 0,
-        })
-        .select()
-        .single();
-      anonProfile = newProfile;
+      anonProfile = await db.insert('anonymized_talent_profiles', {
+        real_contact_id: candidate.id,
+        anonymized_label: nextLabel,
+        industry: candidate.industry,
+        function_field: extractFunction(candidate.current_role),
+        seniority_level: extractSeniority(candidate.current_role),
+        geography: candidate.location,
+        years_experience: candidate.years_experience,
+        key_skills: candidate.skills || [],
+        trident_capability: candidate.trident_scores?.capability,
+        trident_overall: candidate.trident_scores?.overall || candidate.trident_scores?.capability,
+        career_tier: candidate.career_tier,
+        engagement_score: candidate.engagement_score,
+        movement_signal_count: candidate.movement_signals?.length || 0,
+      });
     } else {
-      await supabase
-        .from('anonymized_talent_profiles')
-        .update({
+      const updated = await db.update('anonymized_talent_profiles',
+        { column: 'id', value: anonProfile.id },
+        {
           trident_capability: candidate.trident_scores?.capability,
           trident_overall: candidate.trident_scores?.overall || candidate.trident_scores?.capability,
           career_tier: candidate.career_tier,
           engagement_score: candidate.engagement_score,
           movement_signal_count: candidate.movement_signals?.length || 0,
           last_updated_at: new Date().toISOString(),
-        })
-        .eq('id', anonProfile.id);
+        }
+      );
+      anonProfile = updated[0];
     }
 
     anonymized.push({
@@ -249,7 +242,7 @@ async function selectTalentRadar(supabase: any, params: {
   return anonymized;
 }
 
-async function generateQuarterlyReport(supabase: any, params: {
+async function generateQuarterlyReport(params: {
   clientId: string;
   clientName: string;
   industrySectors: string[];
@@ -261,33 +254,36 @@ async function generateQuarterlyReport(supabase: any, params: {
   const { clientId, industrySectors, jobFunctions, geographies, periodStart, periodEnd } = params;
   const startTime = Date.now();
 
-  const { count: activeCandidates } = await supabase
-    .from('contacts')
-    .select('*', { count: 'exact', head: true })
-    .eq('is_archived', false)
-    .in('industry', industrySectors);
+  const activeCandidates = await db.countRows('contacts', {
+    where: [
+      { column: 'is_archived', value: false },
+      { column: 'industry', value: industrySectors, op: 'in' },
+    ],
+  });
 
-  const { count: newEntrants } = await supabase
-    .from('contacts')
-    .select('*', { count: 'exact', head: true })
-    .eq('is_archived', false)
-    .in('industry', industrySectors)
-    .gte('created_at', periodStart.toISOString())
-    .lte('created_at', periodEnd.toISOString());
+  const newEntrants = await db.countRows('contacts', {
+    where: [
+      { column: 'is_archived', value: false },
+      { column: 'industry', value: industrySectors, op: 'in' },
+      { column: 'created_at', value: periodStart.toISOString(), op: 'gte' },
+      { column: 'created_at', value: periodEnd.toISOString(), op: 'lte' },
+    ],
+  });
 
-  const { count: activeMandates } = await supabase
-    .from('mandates')
-    .select('*', { count: 'exact', head: true })
-    .in('status', ['active', 'in_progress'])
-    .in('industry', industrySectors);
+  const activeMandates = await db.countRows('mandates', {
+    where: [
+      { column: 'status', value: ['active', 'in_progress'], op: 'in' },
+      { column: 'industry', value: industrySectors, op: 'in' },
+    ],
+  });
 
-  const compData = await computeCompensationBenchmark(supabase, {
+  const compData = await computeCompensationBenchmark({
     role: jobFunctions[0] || 'manager',
     industry: industrySectors[0],
     geography: geographies[0],
   });
 
-  const radarProfiles = await selectTalentRadar(supabase, {
+  const radarProfiles = await selectTalentRadar({
     industrySectors,
     jobFunctions,
     geographies,
@@ -365,58 +361,54 @@ Strategic Recommendations:
 
   const execSummary = narrative.substring(0, 200) + (narrative.length > 200 ? '...' : '');
 
-  const { data: report } = await supabase
-    .from('client_intelligence_reports')
-    .insert({
-      client_id: clientId,
-      report_type: 'quarterly_landscape',
-      title: `Q${Math.ceil(periodEnd.getMonth() / 3)} ${periodEnd.getFullYear()} Talent Landscape — ${industrySectors.join(', ')}`,
-      content: {
-        narrative,
-        supply_demand: {
-          active_candidates: activeCandidates,
-          new_entrants: newEntrants,
-          active_mandates: activeMandates,
-          net_trend: (newEntrants || 0) > 5 ? 'growing' : 'stable',
-        },
-        compensation: compData,
-        skill_demand: {
-          rising: [...new Set(radarProfiles.flatMap((p: any) => p.key_skills || []))].slice(0, 5),
-          declining: [],
-          gaps: [],
-        },
-        talent_radar: radarProfiles,
+  const report = await db.insert('client_intelligence_reports', {
+    client_id: clientId,
+    report_type: 'quarterly_landscape',
+    title: `Q${Math.ceil(periodEnd.getMonth() / 3)} ${periodEnd.getFullYear()} Talent Landscape — ${industrySectors.join(', ')}`,
+    content: {
+      narrative,
+      supply_demand: {
+        active_candidates: activeCandidates,
+        new_entrants: newEntrants,
+        active_mandates: activeMandates,
+        net_trend: (newEntrants || 0) > 5 ? 'growing' : 'stable',
       },
-      executive_summary: execSummary,
-      overall_confidence: overallConfidence,
-      data_sources: dataSources,
-      status: 'under_review',
-      period_start: periodStart.toISOString().split('T')[0],
-      period_end: periodEnd.toISOString().split('T')[0],
-      tokens_used: tokensUsed,
-      generation_time_ms: Date.now() - startTime,
-    })
-    .select()
-    .single();
+      compensation: compData,
+      skill_demand: {
+        rising: [...new Set(radarProfiles.flatMap((p: any) => p.key_skills || []))].slice(0, 5),
+        declining: [],
+        gaps: [],
+      },
+      talent_radar: radarProfiles,
+    },
+    executive_summary: execSummary,
+    overall_confidence: overallConfidence,
+    data_sources: dataSources,
+    status: 'under_review',
+    period_start: periodStart.toISOString().split('T')[0],
+    period_end: periodEnd.toISOString().split('T')[0],
+    tokens_used: tokensUsed,
+    generation_time_ms: Date.now() - startTime,
+  });
 
   return report;
 }
 
-async function generatePreMandateAssessment(supabase: any, mandateId: string) {
+async function generatePreMandateAssessment(mandateId: string) {
   const startTime = Date.now();
 
-  const { data: mandate } = await supabase
-    .from('mandates')
-    .select('*, clients(name)')
-    .eq('id', mandateId)
-    .single();
+  const mandate = await db.selectOne('mandates', {
+    select: '*, clients(name)',
+    column: 'id',
+    value: mandateId,
+  });
 
   if (!mandate) throw new Error('Mandate not found');
 
-  const { data: candidates } = await supabase
-    .from('contacts')
-    .select('id, pipeline_stage, industry, current_role, location, skills, trident_scores, career_tier, engagement_score')
-    .eq('is_archived', false);
+  const candidates = await db.selectMany('contacts', {
+    select: 'id, pipeline_stage, industry, current_role, location, skills, trident_scores, career_tier, engagement_score',
+    where: [{ column: 'is_archived', value: false }],
+  });
 
   const relevant = (candidates || []).filter((c: any) =>
     matchesRole(c.current_role, mandate.role_title || mandate.title) &&
@@ -435,7 +427,7 @@ async function generatePreMandateAssessment(supabase: any, mandateId: string) {
   else if (poolSize > 100 && qualifiedCount > 20) difficulty = 2;
   else if (poolSize > 200) difficulty = 1;
 
-  const compBenchmark = await computeCompensationBenchmark(supabase, {
+  const compBenchmark = await computeCompensationBenchmark({
     role: mandate.role_title || mandate.title,
     industry: mandate.industry,
     geography: mandate.location,
@@ -486,29 +478,25 @@ Generate a 300-500 word assessment. Be honest and data-driven.`;
     // fallback to template narrative
   }
 
-  const { data: report } = await supabase
-    .from('client_intelligence_reports')
-    .insert({
-      client_id: mandate.client_id,
-      mandate_id: mandateId,
-      report_type: 'pre_mandate_assessment',
-      title: `Pre-Mandate Assessment: ${mandate.title}`,
-      content: {
-        narrative,
-        pool_size: poolSize,
-        qualified_count: qualifiedCount,
-        reachable_count: reachableCount,
-        difficulty,
-        compensation: compBenchmark,
-      },
-      executive_summary: narrative.substring(0, 200),
-      overall_confidence: poolSize >= 20 ? 'high' : poolSize >= 10 ? 'medium' : 'low',
-      status: 'under_review',
-      tokens_used: tokensUsed,
-      generation_time_ms: Date.now() - startTime,
-    })
-    .select()
-    .single();
+  const report = await db.insert('client_intelligence_reports', {
+    client_id: mandate.client_id,
+    mandate_id: mandateId,
+    report_type: 'pre_mandate_assessment',
+    title: `Pre-Mandate Assessment: ${mandate.title}`,
+    content: {
+      narrative,
+      pool_size: poolSize,
+      qualified_count: qualifiedCount,
+      reachable_count: reachableCount,
+      difficulty,
+      compensation: compBenchmark,
+    },
+    executive_summary: narrative.substring(0, 200),
+    overall_confidence: poolSize >= 20 ? 'high' : poolSize >= 10 ? 'medium' : 'low',
+    status: 'under_review',
+    tokens_used: tokensUsed,
+    generation_time_ms: Date.now() - startTime,
+  });
 
   return report;
 }
@@ -547,20 +535,22 @@ function calculateSignalRelevance(signal: any, subscription: any): { score: numb
   return { score: Math.min(1, score), reason: reasons.join('; ') };
 }
 
-async function processMarketSignal(supabase: any, signalId: string) {
-  const { data: signal } = await supabase
-    .from('market_signals')
-    .select('*')
-    .eq('id', signalId)
-    .single();
+async function processMarketSignal(signalId: string) {
+  const signal = await db.selectOne('market_signals', {
+    select: '*',
+    column: 'id',
+    value: signalId,
+  });
 
   if (!signal) return null;
 
-  const { data: subscriptions } = await supabase
-    .from('client_market_subscriptions')
-    .select('*, clients(id, name)')
-    .eq('is_active', true)
-    .eq('subscription_type', 'market_alerts');
+  const subscriptions = await db.selectMany('client_market_subscriptions', {
+    select: '*, clients(id, name)',
+    where: [
+      { column: 'is_active', value: true },
+      { column: 'subscription_type', value: 'market_alerts' },
+    ],
+  });
 
   const alertsGenerated: string[] = [];
 
@@ -578,43 +568,39 @@ Relevance: ${Math.round(relevance.score * 100)}%
 
 This alert was automatically generated by LYC Intelligence.`;
 
-    const { data: report } = await supabase
-      .from('client_intelligence_reports')
-      .insert({
-        client_id: sub.client_id,
-        report_type: 'market_alert',
-        title: `Market Alert: ${signal.title}`,
-        content: {
-          signal_id: signalId,
-          alert_content: alertContent,
-          relevance_score: relevance.score,
-          relevance_reason: relevance.reason,
-        },
-        executive_summary: `${signal.title} — ${signal.severity} severity`,
-        overall_confidence: signal.confidence > 0.7 ? 'high' : signal.confidence > 0.4 ? 'medium' : 'low',
-        status: signal.severity === 'critical' ? 'under_review' : 'draft',
-      })
-      .select()
-      .single();
+    const report = await db.insert('client_intelligence_reports', {
+      client_id: sub.client_id,
+      report_type: 'market_alert',
+      title: `Market Alert: ${signal.title}`,
+      content: {
+        signal_id: signalId,
+        alert_content: alertContent,
+        relevance_score: relevance.score,
+        relevance_reason: relevance.reason,
+      },
+      executive_summary: `${signal.title} — ${signal.severity} severity`,
+      overall_confidence: signal.confidence > 0.7 ? 'high' : signal.confidence > 0.4 ? 'medium' : 'low',
+      status: signal.severity === 'critical' ? 'under_review' : 'draft',
+    });
 
     if (report) alertsGenerated.push(report.id);
   }
 
-  await supabase
-    .from('market_signals')
-    .update({ alerts_generated: alertsGenerated })
-    .eq('id', signalId);
+  await db.update('market_signals',
+    { column: 'id', value: signalId },
+    { alerts_generated: alertsGenerated }
+  );
 
   return alertsGenerated;
 }
 
 async function getUserRole(userId: string): Promise<string> {
-  const { data } = await supabaseAdmin
-    .from('profiles')
-    .select('role')
-    .eq('id', userId)
-    .single();
-  return data?.role || 'consultant';
+  const profile = await db.selectOne('profiles', {
+    select: 'role',
+    column: 'id',
+    value: userId,
+  });
+  return profile?.role || 'consultant';
 }
 
 async function getUserIdFromReq(req: VercelRequest): Promise<string | null> {
@@ -622,8 +608,19 @@ async function getUserIdFromReq(req: VercelRequest): Promise<string | null> {
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.slice(7);
     try {
-      const { data: user } = await supabaseAdmin.auth.getUser(token);
-      return user?.user?.id || null;
+      const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+      const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+        method: 'GET',
+        headers: {
+          'apikey': SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) return null;
+      const user = await res.json();
+      return user?.id || null;
     } catch {
       return null;
     }
@@ -644,8 +641,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const isTeamLead = userRole === 'team_lead' || userRole === 'admin';
   const isAdmin = userRole === 'admin';
 
-  const supabase = supabaseAdmin;
-
   try {
     // R-1: GET /api/intelligence/reports
     if (req.method === 'GET' && resource === 'reports' && !id) {
@@ -654,17 +649,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const type = url.searchParams.get('type');
       const status = url.searchParams.get('status');
 
-      let query = supabase
-        .from('client_intelligence_reports')
-        .select('id, title, report_type, status, overall_confidence, created_at, period_start, period_end, client_id, clients(name)')
-        .order('created_at', { ascending: false })
-        .limit(100);
+      const where: any[] = [];
+      if (clientId) where.push({ column: 'client_id', value: clientId });
+      if (type) where.push({ column: 'report_type', value: type });
+      if (status) where.push({ column: 'status', value: status });
 
-      if (clientId) query = query.eq('client_id', clientId);
-      if (type) query = query.eq('report_type', type);
-      if (status) query = query.eq('status', status);
-
-      const { data } = await query;
+      const data = await db.selectMany('client_intelligence_reports', {
+        select: 'id, title, report_type, status, overall_confidence, created_at, period_start, period_end, client_id, clients(name)',
+        where: where.length > 0 ? where : undefined,
+        orderBy: { column: 'created_at', ascending: false },
+        limit: 100,
+      });
       return res.status(200).json({ success: true, reports: data });
     }
 
@@ -675,53 +670,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { client_id, report_type, mandate_id } = body;
 
       if (report_type === 'pre_mandate_assessment' && mandate_id) {
-        const report = await generatePreMandateAssessment(supabase, mandate_id);
+        const report = await generatePreMandateAssessment(mandate_id);
         return res.status(200).json({ success: true, report });
       }
 
       if (report_type === 'comp_snapshot' && client_id) {
-        const benchmark = await computeCompensationBenchmark(supabase, {
+        const benchmark = await computeCompensationBenchmark({
           role: body.role || 'manager',
           industry: body.industry,
           geography: body.geography,
         });
-        const { data: report } = await supabase
-          .from('client_intelligence_reports')
-          .insert({
-            client_id,
-            report_type: 'comp_snapshot',
-            title: `Compensation Benchmark — ${body.role || 'Role'}`,
-            content: { benchmark },
-            executive_summary: `Compensation benchmark for ${body.role || 'role'} — ${benchmark.confidence} confidence`,
-            overall_confidence: benchmark.confidence,
-            status: 'under_review',
-          })
-          .select()
-          .single();
+        const report = await db.insert('client_intelligence_reports', {
+          client_id,
+          report_type: 'comp_snapshot',
+          title: `Compensation Benchmark — ${body.role || 'Role'}`,
+          content: { benchmark },
+          executive_summary: `Compensation benchmark for ${body.role || 'role'} — ${benchmark.confidence} confidence`,
+          overall_confidence: benchmark.confidence,
+          status: 'under_review',
+        });
         return res.status(200).json({ success: true, report });
       }
 
       if (report_type === 'talent_radar' && client_id) {
-        const radar = await selectTalentRadar(supabase, {
+        const radar = await selectTalentRadar({
           industrySectors: body.industries || [],
           jobFunctions: body.functions || [],
           geographies: body.geographies || [],
           count: body.count || 10,
           clientId: client_id,
         });
-        const { data: report } = await supabase
-          .from('client_intelligence_reports')
-          .insert({
-            client_id,
-            report_type: 'talent_radar',
-            title: `Talent Radar — ${body.industries?.[0] || 'Market'}`,
-            content: { profiles: radar },
-            executive_summary: `${radar.length} top anonymized profiles selected`,
-            overall_confidence: radar.length >= 8 ? 'high' : 'medium',
-            status: 'under_review',
-          })
-          .select()
-          .single();
+        const report = await db.insert('client_intelligence_reports', {
+          client_id,
+          report_type: 'talent_radar',
+          title: `Talent Radar — ${body.industries?.[0] || 'Market'}`,
+          content: { profiles: radar },
+          executive_summary: `${radar.length} top anonymized profiles selected`,
+          overall_confidence: radar.length >= 8 ? 'high' : 'medium',
+          status: 'under_review',
+        });
         return res.status(200).json({ success: true, report });
       }
 
@@ -731,11 +718,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // R-3: GET /api/intelligence/reports/:id
     if (req.method === 'GET' && resource === 'reports' && id && action !== 'deliver') {
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-      const { data: report } = await supabase
-        .from('client_intelligence_reports')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const report = await db.selectOne('client_intelligence_reports', {
+        select: '*',
+        column: 'id',
+        value: id,
+      });
       if (!report) return res.status(404).json({ error: 'Report not found' });
       return res.status(200).json({ success: true, report });
     }
@@ -744,11 +731,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (resource === 'reviews') {
       if (req.method === 'GET' && id === 'pending') {
         if (!userId || !isConsultant) return res.status(403).json({ error: 'Consultant+ required' });
-        const { data: pending } = await supabase
-          .from('client_intelligence_reports')
-          .select('id, title, report_type, created_at, overall_confidence, client_id, clients(name)')
-          .eq('status', 'under_review')
-          .order('created_at', { ascending: false });
+        const pending = await db.selectMany('client_intelligence_reports', {
+          select: 'id, title, report_type, created_at, overall_confidence, client_id, clients(name)',
+          where: [{ column: 'status', value: 'under_review' }],
+          orderBy: { column: 'created_at', ascending: false },
+        });
         return res.status(200).json({ success: true, reports: pending });
       }
 
@@ -757,11 +744,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
         const { report_id, action, notes, content_changes } = body;
 
-        const { data: report } = await supabase
-          .from('client_intelligence_reports')
-          .select('*')
-          .eq('id', report_id)
-          .single();
+        const report = await db.selectOne('client_intelligence_reports', {
+          select: '*',
+          column: 'id',
+          value: report_id,
+        });
 
         if (!report) return res.status(404).json({ error: 'Report not found' });
 
@@ -794,38 +781,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             break;
         }
 
-        const { data: updated } = await supabase
-          .from('client_intelligence_reports')
-          .update(updates)
-          .eq('id', report_id)
-          .select()
-          .single();
+        const updated = await db.update('client_intelligence_reports',
+          { column: 'id', value: report_id },
+          updates
+        );
 
-        return res.status(200).json({ success: true, action, report: updated });
+        return res.status(200).json({ success: true, action, report: updated[0] });
       }
     }
 
     // R-6: POST /api/intelligence/reports/:id/deliver
     if (req.method === 'POST' && resource === 'reports' && id && action === 'deliver') {
       if (!userId || !isConsultant) return res.status(403).json({ error: 'Consultant+ required' });
-      const { data: report } = await supabase
-        .from('client_intelligence_reports')
-        .update({
+      const updated = await db.update('client_intelligence_reports',
+        { column: 'id', value: id },
+        {
           status: 'delivered',
           delivered_at: new Date().toISOString(),
           delivery_channel: 'portal',
-        })
-        .eq('id', id)
-        .select()
-        .single();
-      return res.status(200).json({ success: true, report });
+        }
+      );
+      return res.status(200).json({ success: true, report: updated[0] });
     }
 
     // R-7: POST /api/intelligence/comp-benchmark
     if (req.method === 'POST' && resource === 'comp-benchmark') {
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
-      const result = await computeCompensationBenchmark(supabase, body);
+      const result = await computeCompensationBenchmark(body);
       return res.status(200).json({ success: true, benchmark: result });
     }
 
@@ -835,14 +818,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const clientId = id;
       const count = parseInt(url.searchParams.get('count') || '10');
 
-      const { data: sub } = await supabase
-        .from('client_market_subscriptions')
-        .select('industry_sectors, job_functions, geographies')
-        .eq('client_id', clientId)
-        .eq('subscription_type', 'talent_radar')
-        .single();
+      const subs = await db.selectMany('client_market_subscriptions', {
+        select: 'industry_sectors, job_functions, geographies',
+        where: [
+          { column: 'client_id', value: clientId },
+          { column: 'subscription_type', value: 'talent_radar' },
+        ],
+        limit: 1,
+      });
+      const sub = subs && subs.length > 0 ? subs[0] : null;
 
-      const radar = await selectTalentRadar(supabase, {
+      const radar = await selectTalentRadar({
         industrySectors: sub?.industry_sectors || [],
         jobFunctions: sub?.job_functions || [],
         geographies: sub?.geographies || [],
@@ -859,16 +845,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const severity = url.searchParams.get('severity');
       const type = url.searchParams.get('type');
 
-      let query = supabase
-        .from('market_signals')
-        .select('*')
-        .order('detected_at', { ascending: false })
-        .limit(100);
+      const where: any[] = [];
+      if (severity) where.push({ column: 'severity', value: severity });
+      if (type) where.push({ column: 'signal_type', value: type });
 
-      if (severity) query = query.eq('severity', severity);
-      if (type) query = query.eq('signal_type', type);
-
-      const { data } = await query;
+      const data = await db.selectMany('market_signals', {
+        select: '*',
+        where: where.length > 0 ? where : undefined,
+        orderBy: { column: 'detected_at', ascending: false },
+        limit: 100,
+      });
       return res.status(200).json({ success: true, signals: data });
     }
 
@@ -876,18 +862,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'POST' && resource === 'signals' && !id) {
       if (!userId || !isConsultant) return res.status(403).json({ error: 'Consultant+ required' });
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
-      const { data: signal } = await supabase
-        .from('market_signals')
-        .insert({
-          ...body,
-          source: body.source || 'manual',
-          verified_by: userId,
-          verified_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
+      const signal = await db.insert('market_signals', {
+        ...body,
+        source: body.source || 'manual',
+        verified_by: userId,
+        verified_at: new Date().toISOString(),
+      });
 
-      processMarketSignal(supabase, signal.id).catch(console.error);
+      processMarketSignal(signal.id).catch(console.error);
 
       return res.status(200).json({ success: true, signal });
     }
@@ -896,9 +878,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'GET' && resource === 'subscriptions' && !id) {
       if (!userId || !isConsultant) return res.status(403).json({ error: 'Consultant+ required' });
       const clientId = url.searchParams.get('client_id');
-      let query = supabase.from('client_market_subscriptions').select('*').order('created_at', { ascending: false });
-      if (clientId) query = query.eq('client_id', clientId);
-      const { data } = await query;
+      const data = await db.selectMany('client_market_subscriptions', {
+        orderBy: { column: 'created_at', ascending: false },
+        where: clientId ? [{ column: 'client_id', value: clientId }] : undefined,
+      });
       return res.status(200).json({ success: true, subscriptions: data });
     }
 
@@ -906,11 +889,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'POST' && resource === 'subscriptions' && !id) {
       if (!userId || !isConsultant) return res.status(403).json({ error: 'Consultant+ required' });
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
-      const { data: sub } = await supabase
-        .from('client_market_subscriptions')
-        .upsert(body, { onConflict: 'client_id,subscription_type' })
-        .select()
-        .single();
+
+      let sub: any = null;
+      if (body.client_id && body.subscription_type) {
+        const existing = await db.selectMany('client_market_subscriptions', {
+          select: '*',
+          where: [
+            { column: 'client_id', value: body.client_id },
+            { column: 'subscription_type', value: body.subscription_type },
+          ],
+          limit: 1,
+        });
+        sub = existing && existing.length > 0 ? existing[0] : null;
+      }
+
+      if (sub) {
+        const updated = await db.update('client_market_subscriptions',
+          { column: 'id', value: sub.id },
+          body
+        );
+        sub = updated[0];
+      } else {
+        sub = await db.insert('client_market_subscriptions', body);
+      }
       return res.status(200).json({ success: true, subscription: sub });
     }
 
@@ -928,7 +929,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (lower.includes('compensation') || lower.includes('salary') || lower.includes('pay') || lower.includes('market rate')) {
         queryType = 'compensation';
-        const bench = await computeCompensationBenchmark(supabase, {
+        const bench = await computeCompensationBenchmark({
           role: query_text,
           industry: body.industry,
           geography: body.geography,
@@ -936,7 +937,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         response = JSON.stringify(bench);
       } else if (lower.includes('top talent') || lower.includes('radar') || lower.includes('best candidates')) {
         queryType = 'talent_radar';
-        const radar = await selectTalentRadar(supabase, {
+        const radar = await selectTalentRadar({
           industrySectors: body.industries || [],
           jobFunctions: [],
           geographies: body.geographies || [],
@@ -949,7 +950,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         response = 'General market intelligence query. For detailed insights, request a full quarterly report or compensation benchmark.';
       }
 
-      await supabase.from('intelligence_queries').insert({
+      await db.insert('intelligence_queries', {
         client_id,
         user_id: userId,
         channel,
@@ -966,9 +967,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'GET' && resource === 'oversight') {
       if (!userId || !isAdmin) return res.status(403).json({ error: 'Admin only' });
 
-      const { data: subs } = await supabase
-        .from('client_market_subscriptions')
-        .select('subscription_type, tier, is_active');
+      const subs = await db.selectMany('client_market_subscriptions', {
+        select: 'subscription_type, tier, is_active',
+      });
 
       const subCounts: Record<string, any> = {};
       for (const s of subs || []) {
@@ -983,10 +984,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const monthStart = new Date();
       monthStart.setDate(1);
 
-      const { data: monthlyReports } = await supabase
-        .from('client_intelligence_reports')
-        .select('report_type, status, delivered_at, opened_at, created_at')
-        .gte('created_at', monthStart.toISOString());
+      const monthlyReports = await db.selectMany('client_intelligence_reports', {
+        select: 'report_type, status, delivered_at, opened_at, created_at',
+        where: [{ column: 'created_at', value: monthStart.toISOString(), op: 'gte' }],
+      });
 
       const reportStats = {
         generated: monthlyReports?.length || 0,
@@ -995,16 +996,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         opened: monthlyReports?.filter((r: any) => r.opened_at).length || 0,
       };
 
-      const { count: signalsThisMonth } = await supabase
-        .from('market_signals')
-        .select('*', { count: 'exact', head: true })
-        .gte('detected_at', monthStart.toISOString());
+      const signalsThisMonth = await db.countRows('market_signals', {
+        where: [{ column: 'detected_at', value: monthStart.toISOString(), op: 'gte' }],
+      });
 
-      const { data: reviewData } = await supabase
-        .from('client_intelligence_reports')
-        .select('reviewed_at, created_at, review_changes_made, status')
-        .eq('status', 'delivered')
-        .gte('created_at', monthStart.toISOString());
+      const reviewData = await db.selectMany('client_intelligence_reports', {
+        select: 'reviewed_at, created_at, review_changes_made, status',
+        where: [
+          { column: 'status', value: 'delivered' },
+          { column: 'created_at', value: monthStart.toISOString(), op: 'gte' },
+        ],
+      });
 
       const avgReviewTime = reviewData?.length
         ? reviewData.reduce((sum: number, r: any) => sum + (new Date(r.reviewed_at).getTime() - new Date(r.created_at).getTime()), 0) / reviewData.length / (60 * 60 * 1000)
@@ -1014,10 +1016,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ? reviewData.filter((r: any) => r.review_changes_made).length / reviewData.length
         : 0;
 
-      const { count: queryCount } = await supabase
-        .from('intelligence_queries')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', monthStart.toISOString());
+      const queryCount = await db.countRows('intelligence_queries', {
+        where: [{ column: 'created_at', value: monthStart.toISOString(), op: 'gte' }],
+      });
 
       return res.status(200).json({
         success: true,
@@ -1037,7 +1038,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'POST' && resource === 'pre-mandate' && id) {
       if (!userId || !isConsultant) return res.status(403).json({ error: 'Consultant+ required' });
       const mandateId = id;
-      const report = await generatePreMandateAssessment(supabase, mandateId);
+      const report = await generatePreMandateAssessment(mandateId);
       return res.status(200).json({ success: true, report });
     }
 

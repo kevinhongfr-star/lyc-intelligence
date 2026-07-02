@@ -19,6 +19,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createHmac } from 'crypto';
 import * as db from './supabaseRest.js';
 import { getUserFromRequest } from './adminAuth.js';
 import { applyCreditPackPurchase, type CreditPackPurchase } from './creditsHandler.js';
@@ -295,6 +296,43 @@ async function handlePortal(req: VercelRequest, res: VercelResponse) {
 
 async function handleWebhook(req: VercelRequest, res: VercelResponse) {
   try {
+    const signature = req.headers['stripe-signature'] as string;
+    if (!signature) {
+      return res.status(400).json({ error: 'Missing stripe-signature header' });
+    }
+
+    let rawBody: string;
+    if (typeof (req as any).rawBody === 'string') {
+      rawBody = (req as any).rawBody;
+    } else if (Buffer.isBuffer((req as any).rawBody)) {
+      rawBody = (req as any).rawBody.toString('utf8');
+    } else {
+      rawBody = JSON.stringify(req.body);
+    }
+
+    if (STRIPE_WEBHOOK_SECRET) {
+      const sigParts: Record<string, string> = {};
+      for (const part of signature.split(',')) {
+        const [k, v] = part.split('=');
+        if (k && v !== undefined) sigParts[k] = v;
+      }
+      const timestamp = sigParts['t'];
+      const sig = sigParts['v1'];
+      if (!timestamp || !sig) {
+        return res.status(400).json({ error: 'Invalid signature format' });
+      }
+      const expectedSig = createHmac('sha256', STRIPE_WEBHOOK_SECRET)
+        .update(`${timestamp}.${rawBody}`)
+        .digest('hex');
+      if (sig !== expectedSig) {
+        return res.status(400).json({ error: 'Invalid signature' });
+      }
+      const timestampNum = parseInt(timestamp, 10);
+      if (Math.abs(Date.now() / 1000 - timestampNum) > 300) {
+        return res.status(400).json({ error: 'Signature expired' });
+      }
+    }
+
     const event = req.body as any;
 
     if (!event || !event.type) {
