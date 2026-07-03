@@ -435,7 +435,7 @@ export default async function handler(
         const sub = pathArr[1] || '';
         if (sub === 'client-accounts') return handleAdminClientAccounts(req, res);
         if (sub === 'rbac') return handleAdminRbac(req, res);
-        if (sub === 'payments') return handleMandates(req, res);
+        if (sub === 'payments') { (req.query as any).path = ['admin', ...pathArr.slice(1)]; return handleMandates(req, res); }
         if (sub === 'org-intelligence') {
           const key = pathArr.slice(2).join('/');
           if (key.startsWith('companies'))
@@ -467,6 +467,7 @@ export default async function handler(
       case 'client':
         return handleClient(req, res);
       case 'consultants':
+        (req.query as any).path = ['consultants', ...pathArr.slice(1)];
         return handleMandates(req, res);
       case 'credits':
         return handleCredits(req, res);
@@ -481,6 +482,7 @@ export default async function handler(
       case 'linkedin':
         return handleLinkedIn(req, res);
       case 'mandates':
+        (req.query as any).path = ['mandates', ...pathArr.slice(1)];
         return handleMandates(req, res);
       case 'matching':
         return handleMatching(req, res);

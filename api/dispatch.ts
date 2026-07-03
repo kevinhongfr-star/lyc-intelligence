@@ -25,7 +25,13 @@ const handlers: Record<string, () => Promise<any>> = {
   'shift': () => import('./_lib/shiftHandler.js'),
   'ai': () => import('./_lib/aiHandler.js'),
   'compensation': () => import('./_lib/compensationHandler.js'),
+  'mandates': () => import('./_lib/mandatesHandler.js'),
+  'consultants': () => import('./_lib/mandatesHandler.js'),
+  'admin': () => import('./_lib/mandatesHandler.js'),
 };
+
+// Modules whose handlers expect the full path (including module name) in req.query.path
+const FULL_PATH_MODULES = new Set(['mandates', 'consultants', 'admin']);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Read module and sub-path from query params (set by vercel.json rewrite)
@@ -38,7 +44,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   
   // Set req.query.path for downstream handlers
   const segments = subPath ? subPath.split('/').filter(Boolean) : [];
-  (req.query as any).path = segments;
+  if (FULL_PATH_MODULES.has(mod)) {
+    (req.query as any).path = [mod, ...segments];
+  } else {
+    (req.query as any).path = segments;
+  }
   
   // Auth check (all sub-modules require authentication)
   const { user, error } = await getUserFromRequest(req);
