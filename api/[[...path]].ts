@@ -394,7 +394,6 @@ export default async function handler(
 ) {
   // Parse path from URL — strip query string first (Vercel appends [...path] as query param)
   // DEBUG: Log request details for rewrite debugging
-  console.log("[DEBUG]", JSON.stringify({url: req.url, method: req.method, query: req.query, headers: Object.fromEntries(Object.entries(req.headers).filter(([k]) => k.startsWith("x-") || k === "host"))}));
   const cleanUrl = (req.url || '').split('?')[0].replace(/^\//, '');
   const pathArr = cleanUrl ? cleanUrl.split('/').filter(Boolean) : [];
   // Strip 'api' prefix if present (Vercel includes it in req.url)
@@ -578,7 +577,50 @@ export default async function handler(
       case 'lead-capture':
         return handleLeadCapture(req, res);
 
-      // ── Universal /api/x/* dispatcher ──
+      // ── Direct sub-module dispatchers (frontend calls /api/{module}/* directly) ──
+      case 'bd':
+      case 'compensation':
+      case 'approvals':
+      case 'automation':
+      case 'sla':
+      case 'alumni':
+      case 'saved-searches':
+      case 'talent-alerts':
+      case 'consents':
+      case 'data-subject-requests':
+      case 'kpis':
+      case 'nexus':
+      case 'benchmark':
+      case 'shift':
+      case 'ai': {
+        const { user: _u, error: _e } = await getUserFromRequest(req);
+        if (_e || !_u) return res.status(401).json({ error: 'Unauthorized', success: false });
+        (req as any).__authenticatedUser = _u;
+        const _subMod = pathArr[0];
+        const _subHandlers: Record<string, () => Promise<any>> = {
+          'bd': () => import('./_lib/bdHandler.js'),
+          'compensation': () => import('./_lib/compensationHandler.js'),
+          'approvals': () => import('./_lib/approvalsHandler.js'),
+          'automation': () => import('./_lib/automationHandler.js'),
+          'sla': () => import('./_lib/slaHandler.js'),
+          'alumni': () => import('./_lib/alumniHandler.js'),
+          'saved-searches': () => import('./_lib/savedSearchesHandler.js'),
+          'talent-alerts': () => import('./_lib/talentAlertsHandler.js'),
+          'consents': () => import('./_lib/consentsHandler.js'),
+          'data-subject-requests': () => import('./_lib/dsrHandler.js'),
+          'kpis': () => import('./_lib/kpisHandler.js'),
+          'nexus': () => import('./_lib/nexusHandler.js'),
+          'benchmark': () => import('./_lib/benchmarkHandler.js'),
+          'shift': () => import('./_lib/shiftHandler.js'),
+          'ai': () => import('./_lib/aiHandler.js'),
+        };
+        const _loader = _subHandlers[_subMod];
+        if (!_loader) return res.status(404).json({ error: `Unknown module: ${_subMod}` });
+        const _handlerMod = await _loader();
+        return _handlerMod.handler(req, res);
+      }
+
+      // ── Legacy /api/x/* dispatcher (backward compat) ──
       case 'x': {
         const xModule = pathArr[1] || '';
         (req.query as any).path = pathArr.slice(2);
