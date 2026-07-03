@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS interviews (
   meeting_link text, -- Zoom/Teams/Meet URL
   
   -- Panel
-  panel_members uuid[] REFERENCES profiles(id),
+  panel_members uuid[], -- FK not supported on array columns; enforce at app layer
   
   -- Status
   status text DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'completed', 'cancelled', 'rescheduled')),
