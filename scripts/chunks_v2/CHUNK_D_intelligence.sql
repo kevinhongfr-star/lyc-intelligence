@@ -260,12 +260,15 @@ CREATE INDEX IF NOT EXISTS idx_credits_tier           ON public.credits (tier);
 
 ALTER TABLE public.credits ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on credits" ON ON public.credits;
+DROP POLICY IF EXISTS "Service role full access on credits" ON public.credits;
 CREATE POLICY "Service role full access on credits"
   ON public.credits FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read own credits" ON ON public.credits;
+DROP POLICY IF EXISTS "Users read own credits" ON public.credits;
 CREATE POLICY "Users read own credits"
   ON public.credits FOR SELECT USING (auth.uid() = user_id);
 DROP POLICY IF EXISTS "Users update own credits" ON ON public.credits;
+DROP POLICY IF EXISTS "Users update own credits" ON public.credits;
 CREATE POLICY "Users update own credits"
   ON public.credits FOR UPDATE USING (auth.uid() = user_id);
 
@@ -296,9 +299,11 @@ CREATE INDEX IF NOT EXISTS idx_credit_trans_created   ON public.credit_transacti
 
 ALTER TABLE public.credit_transactions ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on credit_transactions" ON ON public.credit_transactions;
+DROP POLICY IF EXISTS "Service role full access on credit_transactions" ON public.credit_transactions;
 CREATE POLICY "Service role full access on credit_transactions"
   ON public.credit_transactions FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read own credit transactions" ON ON public.credit_transactions;
+DROP POLICY IF EXISTS "Users read own credit transactions" ON public.credit_transactions;
 CREATE POLICY "Users read own credit transactions"
   ON public.credit_transactions FOR SELECT USING (auth.uid() = user_id);
 
@@ -318,14 +323,17 @@ CREATE INDEX IF NOT EXISTS idx_organizations_plan    ON public.organizations (pl
 
 ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on organizations" ON ON public.organizations;
+DROP POLICY IF EXISTS "Service role full access on organizations" ON public.organizations;
 CREATE POLICY "Service role full access on organizations"
   ON public.organizations FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Admins read organizations" ON ON public.organizations;
+DROP POLICY IF EXISTS "Admins read organizations" ON public.organizations;
 CREATE POLICY "Admins read organizations"
   ON public.organizations FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin'))
   );
 DROP POLICY IF EXISTS "Admins write organizations" ON ON public.organizations;
+DROP POLICY IF EXISTS "Admins write organizations" ON public.organizations;
 CREATE POLICY "Admins write organizations"
   ON public.organizations FOR ALL USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin'))
@@ -369,14 +377,17 @@ CREATE INDEX IF NOT EXISTS idx_mandates_updated     ON public.mandates (updated_
 
 ALTER TABLE public.mandates ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on mandates" ON ON public.mandates;
+DROP POLICY IF EXISTS "Service role full access on mandates" ON public.mandates;
 CREATE POLICY "Service role full access on mandates"
   ON public.mandates FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Admins read mandates" ON ON public.mandates;
+DROP POLICY IF EXISTS "Admins read mandates" ON public.mandates;
 CREATE POLICY "Admins read mandates"
   ON public.mandates FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
   );
 DROP POLICY IF EXISTS "Admins write mandates" ON ON public.mandates;
+DROP POLICY IF EXISTS "Admins write mandates" ON public.mandates;
 CREATE POLICY "Admins write mandates"
   ON public.mandates FOR ALL USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
@@ -416,14 +427,17 @@ CREATE INDEX IF NOT EXISTS idx_companies_engagement ON public.companies (engagem
 
 ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on companies" ON ON public.companies;
+DROP POLICY IF EXISTS "Service role full access on companies" ON public.companies;
 CREATE POLICY "Service role full access on companies"
   ON public.companies FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Admins read companies" ON ON public.companies;
+DROP POLICY IF EXISTS "Admins read companies" ON public.companies;
 CREATE POLICY "Admins read companies"
   ON public.companies FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
   );
 DROP POLICY IF EXISTS "Admins write companies" ON ON public.companies;
+DROP POLICY IF EXISTS "Admins write companies" ON public.companies;
 CREATE POLICY "Admins write companies"
   ON public.companies FOR ALL USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
@@ -467,14 +481,17 @@ CREATE INDEX IF NOT EXISTS idx_contacts_country    ON public.contacts (country);
 
 ALTER TABLE public.contacts ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on contacts" ON ON public.contacts;
+DROP POLICY IF EXISTS "Service role full access on contacts" ON public.contacts;
 CREATE POLICY "Service role full access on contacts"
   ON public.contacts FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read contacts" ON ON public.contacts;
+DROP POLICY IF EXISTS "Users read contacts" ON public.contacts;
 CREATE POLICY "Users read contacts"
   ON public.contacts FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin', 'lyc_consultant'))
   );
 DROP POLICY IF EXISTS "Users write contacts" ON ON public.contacts;
+DROP POLICY IF EXISTS "Users write contacts" ON public.contacts;
 CREATE POLICY "Users write contacts"
   ON public.contacts FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
@@ -504,9 +521,11 @@ CREATE INDEX IF NOT EXISTS idx_clients_company_name ON public.clients (company_n
 
 ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on clients" ON ON public.clients;
+DROP POLICY IF EXISTS "Service role full access on clients" ON public.clients;
 CREATE POLICY "Service role full access on clients"
   ON public.clients FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read clients" ON ON public.clients;
+DROP POLICY IF EXISTS "Users read clients" ON public.clients;
 CREATE POLICY "Users read clients"
   ON public.clients FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
@@ -534,9 +553,11 @@ CREATE INDEX IF NOT EXISTS idx_mandate_members_user_id ON public.mandate_members
 
 ALTER TABLE public.mandate_members ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on mandate_members" ON ON public.mandate_members;
+DROP POLICY IF EXISTS "Service role full access on mandate_members" ON public.mandate_members;
 CREATE POLICY "Service role full access on mandate_members"
   ON public.mandate_members FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read mandate members" ON ON public.mandate_members;
+DROP POLICY IF EXISTS "Users read mandate members" ON public.mandate_members;
 CREATE POLICY "Users read mandate members"
   ON public.mandate_members FOR SELECT USING (auth.uid() = user_id);
 
@@ -579,14 +600,17 @@ CREATE INDEX IF NOT EXISTS idx_candidates_pipeline_stage      ON public.candidat
 
 ALTER TABLE public.candidates_pipeline ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on candidates_pipeline" ON ON public.candidates_pipeline;
+DROP POLICY IF EXISTS "Service role full access on candidates_pipeline" ON public.candidates_pipeline;
 CREATE POLICY "Service role full access on candidates_pipeline"
   ON public.candidates_pipeline FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read candidates pipeline" ON ON public.candidates_pipeline;
+DROP POLICY IF EXISTS "Users read candidates pipeline" ON public.candidates_pipeline;
 CREATE POLICY "Users read candidates pipeline"
   ON public.candidates_pipeline FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid())
   );
 DROP POLICY IF EXISTS "Users write candidates pipeline" ON ON public.candidates_pipeline;
+DROP POLICY IF EXISTS "Users write candidates pipeline" ON public.candidates_pipeline;
 CREATE POLICY "Users write candidates pipeline"
   ON public.candidates_pipeline FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
@@ -626,9 +650,11 @@ CREATE INDEX IF NOT EXISTS idx_scoring_runs_created     ON public.scoring_runs (
 
 ALTER TABLE public.scoring_runs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on scoring_runs" ON ON public.scoring_runs;
+DROP POLICY IF EXISTS "Service role full access on scoring_runs" ON public.scoring_runs;
 CREATE POLICY "Service role full access on scoring_runs"
   ON public.scoring_runs FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read own scoring runs" ON ON public.scoring_runs;
+DROP POLICY IF EXISTS "Users read own scoring runs" ON public.scoring_runs;
 CREATE POLICY "Users read own scoring runs"
   ON public.scoring_runs FOR SELECT USING (auth.uid() = user_id OR auth.role() = 'service_role');
 
@@ -655,9 +681,11 @@ CREATE INDEX IF NOT EXISTS idx_generated_reports_created   ON public.generated_r
 
 ALTER TABLE public.generated_reports ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on generated_reports" ON ON public.generated_reports;
+DROP POLICY IF EXISTS "Service role full access on generated_reports" ON public.generated_reports;
 CREATE POLICY "Service role full access on generated_reports"
   ON public.generated_reports FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read generated reports" ON ON public.generated_reports;
+DROP POLICY IF EXISTS "Users read generated reports" ON public.generated_reports;
 CREATE POLICY "Users read generated reports"
   ON public.generated_reports FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid())
@@ -683,12 +711,15 @@ CREATE INDEX IF NOT EXISTS idx_candidate_saved_insights_profile_id
 
 ALTER TABLE public.candidate_saved_insights ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on candidate_saved_insights" ON ON public.candidate_saved_insights;
+DROP POLICY IF EXISTS "Service role full access on candidate_saved_insights" ON public.candidate_saved_insights;
 CREATE POLICY "Service role full access on candidate_saved_insights"
   ON public.candidate_saved_insights FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read own saved insights" ON ON public.candidate_saved_insights;
+DROP POLICY IF EXISTS "Users read own saved insights" ON public.candidate_saved_insights;
 CREATE POLICY "Users read own saved insights"
   ON public.candidate_saved_insights FOR SELECT USING (auth.uid() = profile_id);
 DROP POLICY IF EXISTS "Users write own saved insights" ON ON public.candidate_saved_insights;
+DROP POLICY IF EXISTS "Users write own saved insights" ON public.candidate_saved_insights;
 CREATE POLICY "Users write own saved insights"
   ON public.candidate_saved_insights FOR INSERT WITH CHECK (auth.uid() = profile_id);
 
@@ -722,9 +753,11 @@ CREATE INDEX IF NOT EXISTS idx_car_mandate_id      ON public.candidate_assessmen
 
 ALTER TABLE public.candidate_assessment_results ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on candidate_assessment_results" ON ON public.candidate_assessment_results;
+DROP POLICY IF EXISTS "Service role full access on candidate_assessment_results" ON public.candidate_assessment_results;
 CREATE POLICY "Service role full access on candidate_assessment_results"
   ON public.candidate_assessment_results FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read own assessment results" ON ON public.candidate_assessment_results;
+DROP POLICY IF EXISTS "Users read own assessment results" ON public.candidate_assessment_results;
 CREATE POLICY "Users read own assessment results"
   ON public.candidate_assessment_results FOR SELECT USING (auth.uid() IS NOT NULL);
 
@@ -749,9 +782,11 @@ CREATE INDEX IF NOT EXISTS idx_car_resp_assessment_id   ON public.candidate_asse
 
 ALTER TABLE public.candidate_assessment_responses ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on candidate_assessment_responses" ON ON public.candidate_assessment_responses;
+DROP POLICY IF EXISTS "Service role full access on candidate_assessment_responses" ON public.candidate_assessment_responses;
 CREATE POLICY "Service role full access on candidate_assessment_responses"
   ON public.candidate_assessment_responses FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users write own assessment responses" ON ON public.candidate_assessment_responses;
+DROP POLICY IF EXISTS "Users write own assessment responses" ON public.candidate_assessment_responses;
 CREATE POLICY "Users write own assessment responses"
   ON public.candidate_assessment_responses FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
@@ -772,6 +807,7 @@ CREATE INDEX IF NOT EXISTS idx_assessment_configs_active ON public.assessment_co
 
 ALTER TABLE public.assessment_configs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on assessment_configs" ON ON public.assessment_configs;
+DROP POLICY IF EXISTS "Service role full access on assessment_configs" ON public.assessment_configs;
 CREATE POLICY "Service role full access on assessment_configs"
   ON public.assessment_configs FOR ALL USING (auth.role() = 'service_role');
 
@@ -795,6 +831,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_msp_mandate_version
 
 ALTER TABLE public.mandate_success_profiles ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on mandate_success_profiles" ON ON public.mandate_success_profiles;
+DROP POLICY IF EXISTS "Service role full access on mandate_success_profiles" ON public.mandate_success_profiles;
 CREATE POLICY "Service role full access on mandate_success_profiles"
   ON public.mandate_success_profiles FOR ALL USING (auth.role() = 'service_role');
 
@@ -822,9 +859,11 @@ CREATE INDEX IF NOT EXISTS idx_ai_generations_created  ON public.ai_generations 
 
 ALTER TABLE public.ai_generations ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on ai_generations" ON ON public.ai_generations;
+DROP POLICY IF EXISTS "Service role full access on ai_generations" ON public.ai_generations;
 CREATE POLICY "Service role full access on ai_generations"
   ON public.ai_generations FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read own ai generations" ON ON public.ai_generations;
+DROP POLICY IF EXISTS "Users read own ai generations" ON public.ai_generations;
 CREATE POLICY "Users read own ai generations"
   ON public.ai_generations FOR SELECT USING (auth.uid() = user_id OR auth.role() = 'service_role');
 
@@ -845,9 +884,11 @@ CREATE INDEX IF NOT EXISTS idx_match_history_created ON public.match_history (cr
 
 ALTER TABLE public.match_history ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on match_history" ON ON public.match_history;
+DROP POLICY IF EXISTS "Service role full access on match_history" ON public.match_history;
 CREATE POLICY "Service role full access on match_history"
   ON public.match_history FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read own match history" ON ON public.match_history;
+DROP POLICY IF EXISTS "Users read own match history" ON public.match_history;
 CREATE POLICY "Users read own match history"
   ON public.match_history FOR SELECT USING (auth.uid() = user_id);
 
@@ -878,9 +919,11 @@ CREATE INDEX IF NOT EXISTS idx_alumni_placements_status   ON public.alumni_place
 
 ALTER TABLE public.alumni_placements ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on alumni_placements" ON ON public.alumni_placements;
+DROP POLICY IF EXISTS "Service role full access on alumni_placements" ON public.alumni_placements;
 CREATE POLICY "Service role full access on alumni_placements"
   ON public.alumni_placements FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read alumni placements" ON ON public.alumni_placements;
+DROP POLICY IF EXISTS "Users read alumni placements" ON public.alumni_placements;
 CREATE POLICY "Users read alumni placements"
   ON public.alumni_placements FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
@@ -912,9 +955,11 @@ CREATE INDEX IF NOT EXISTS idx_automation_executions_executed ON public.automati
 
 ALTER TABLE public.automation_executions ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on automation_executions" ON ON public.automation_executions;
+DROP POLICY IF EXISTS "Service role full access on automation_executions" ON public.automation_executions;
 CREATE POLICY "Service role full access on automation_executions"
   ON public.automation_executions FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read automation executions" ON ON public.automation_executions;
+DROP POLICY IF EXISTS "Users read automation executions" ON public.automation_executions;
 CREATE POLICY "Users read automation executions"
   ON public.automation_executions FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
@@ -939,9 +984,11 @@ CREATE INDEX IF NOT EXISTS idx_pipeline_stage_history_created
 
 ALTER TABLE public.pipeline_stage_history ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on pipeline_stage_history" ON ON public.pipeline_stage_history;
+DROP POLICY IF EXISTS "Service role full access on pipeline_stage_history" ON public.pipeline_stage_history;
 CREATE POLICY "Service role full access on pipeline_stage_history"
   ON public.pipeline_stage_history FOR ALL USING (auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Users read pipeline stage history" ON ON public.pipeline_stage_history;
+DROP POLICY IF EXISTS "Users read pipeline stage history" ON public.pipeline_stage_history;
 CREATE POLICY "Users read pipeline stage history"
   ON public.pipeline_stage_history FOR SELECT USING (auth.uid() IS NOT NULL);
 
@@ -966,6 +1013,7 @@ CREATE INDEX IF NOT EXISTS idx_candidate_pipeline_contact_id ON public.candidate
 
 ALTER TABLE public.candidate_pipeline ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on candidate_pipeline" ON ON public.candidate_pipeline;
+DROP POLICY IF EXISTS "Service role full access on candidate_pipeline" ON public.candidate_pipeline;
 CREATE POLICY "Service role full access on candidate_pipeline"
   ON public.candidate_pipeline FOR ALL USING (auth.role() = 'service_role');
 

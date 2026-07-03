@@ -33,9 +33,13 @@ DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Admins can view all profiles" ON public.profiles;
 DROP POLICY IF EXISTS "Admins can manage all profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Admins can view all profiles" ON public.profiles;
 CREATE POLICY "Admins can view all profiles" ON public.profiles FOR SELECT USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','lyc_admin')));
+DROP POLICY IF EXISTS "Admins can manage all profiles" ON public.profiles;
 CREATE POLICY "Admins can manage all profiles" ON public.profiles FOR ALL USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','lyc_admin')));
 
 -- PART 0b: organizations table (needed by many migrations)
@@ -50,8 +54,11 @@ ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on organizations" ON public.organizations;
 DROP POLICY IF EXISTS "Admins read organizations" ON public.organizations;
 DROP POLICY IF EXISTS "Admins write organizations" ON public.organizations;
+DROP POLICY IF EXISTS "Service role full access on organizations" ON public.organizations;
 CREATE POLICY "Service role full access on organizations" ON public.organizations FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Admins read organizations" ON public.organizations;
 CREATE POLICY "Admins read organizations" ON public.organizations FOR SELECT USING (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin','super_admin')));
+DROP POLICY IF EXISTS "Admins write organizations" ON public.organizations;
 CREATE POLICY "Admins write organizations" ON public.organizations FOR ALL USING (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin','super_admin')));
 
 -- PART 0c: set_updated_at function
@@ -127,21 +134,25 @@ CREATE INDEX IF NOT EXISTS idx_memories_created_at
 ALTER TABLE public.memories ENABLE ROW LEVEL SECURITY;
 
 -- Service role has full access (backend operations, cross-user admin tasks)
+DROP POLICY IF EXISTS "Service role full access on memories" ON public.memories;
 CREATE POLICY "Service role full access on memories"
   ON public.memories FOR ALL
   USING (auth.role() = 'service_role');
 
 -- Users can read their own memories
+DROP POLICY IF EXISTS "Users read own memories" ON public.memories;
 CREATE POLICY "Users read own memories"
   ON public.memories FOR SELECT
   USING (auth.uid() = user_id);
 
 -- Users can insert memories for themselves (frontend optimistic + offline)
+DROP POLICY IF EXISTS "Users insert own memories" ON public.memories;
 CREATE POLICY "Users insert own memories"
   ON public.memories FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
 -- Users can update (e.g., deactivate) their own memories
+DROP POLICY IF EXISTS "Users update own memories" ON public.memories;
 CREATE POLICY "Users update own memories"
   ON public.memories FOR UPDATE
   USING (auth.uid() = user_id);
@@ -200,22 +211,26 @@ CREATE INDEX IF NOT EXISTS idx_share_cards_type
 ALTER TABLE public.share_cards ENABLE ROW LEVEL SECURITY;
 
 -- Service role has full access
+DROP POLICY IF EXISTS "Service role full access on share_cards" ON public.share_cards;
 CREATE POLICY "Service role full access on share_cards"
   ON public.share_cards FOR ALL
   USING (auth.role() = 'service_role');
 
 -- Users can read their own share cards
+DROP POLICY IF EXISTS "Users read own share_cards" ON public.share_cards;
 CREATE POLICY "Users read own share_cards"
   ON public.share_cards FOR SELECT
   USING (auth.uid() = user_id);
 
 -- Users can insert their own share cards
+DROP POLICY IF EXISTS "Users insert own share_cards" ON public.share_cards;
 CREATE POLICY "Users insert own share_cards"
   ON public.share_cards FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
 -- Public read access for active, non-expired cards by public_uuid
 -- (Needed for share preview pages accessed by anonymous users)
+DROP POLICY IF EXISTS "Public read active share cards by uuid" ON public.share_cards;
 CREATE POLICY "Public read active share cards by uuid"
   ON public.share_cards FOR SELECT
   USING (
@@ -287,10 +302,12 @@ CREATE INDEX IF NOT EXISTS idx_target_companies_comparator
 
 ALTER TABLE public.target_companies ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on target_companies" ON public.target_companies;
 CREATE POLICY "Service role full access on target_companies"
   ON public.target_companies FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read target_companies" ON public.target_companies;
 CREATE POLICY "Admins read target_companies"
   ON public.target_companies FOR SELECT
   USING (
@@ -298,6 +315,7 @@ CREATE POLICY "Admins read target_companies"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write target_companies" ON public.target_companies;
 CREATE POLICY "Admins write target_companies"
   ON public.target_companies FOR ALL
   USING (
@@ -330,10 +348,12 @@ CREATE INDEX IF NOT EXISTS idx_org_snapshots_company_date
 
 ALTER TABLE public.org_snapshots ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_snapshots" ON public.org_snapshots;
 CREATE POLICY "Service role full access on org_snapshots"
   ON public.org_snapshots FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_snapshots" ON public.org_snapshots;
 CREATE POLICY "Admins read org_snapshots"
   ON public.org_snapshots FOR SELECT
   USING (
@@ -341,6 +361,7 @@ CREATE POLICY "Admins read org_snapshots"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write org_snapshots" ON public.org_snapshots;
 CREATE POLICY "Admins write org_snapshots"
   ON public.org_snapshots FOR ALL
   USING (
@@ -387,10 +408,12 @@ CREATE INDEX IF NOT EXISTS idx_org_talent_pools_manager
 
 ALTER TABLE public.org_talent_pools ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_talent_pools" ON public.org_talent_pools;
 CREATE POLICY "Service role full access on org_talent_pools"
   ON public.org_talent_pools FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_talent_pools" ON public.org_talent_pools;
 CREATE POLICY "Admins read org_talent_pools"
   ON public.org_talent_pools FOR SELECT
   USING (
@@ -398,6 +421,7 @@ CREATE POLICY "Admins read org_talent_pools"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write org_talent_pools" ON public.org_talent_pools;
 CREATE POLICY "Admins write org_talent_pools"
   ON public.org_talent_pools FOR ALL
   USING (
@@ -438,10 +462,12 @@ CREATE INDEX IF NOT EXISTS idx_org_evaluations_final
 
 ALTER TABLE public.org_evaluations ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_evaluations" ON public.org_evaluations;
 CREATE POLICY "Service role full access on org_evaluations"
   ON public.org_evaluations FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_evaluations" ON public.org_evaluations;
 CREATE POLICY "Admins read org_evaluations"
   ON public.org_evaluations FOR SELECT
   USING (
@@ -449,6 +475,7 @@ CREATE POLICY "Admins read org_evaluations"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write org_evaluations" ON public.org_evaluations;
 CREATE POLICY "Admins write org_evaluations"
   ON public.org_evaluations FOR ALL
   USING (
@@ -489,10 +516,12 @@ CREATE INDEX IF NOT EXISTS idx_org_evaluation_scores_criterion
 
 ALTER TABLE public.org_evaluation_scores ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_evaluation_scores" ON public.org_evaluation_scores;
 CREATE POLICY "Service role full access on org_evaluation_scores"
   ON public.org_evaluation_scores FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_evaluation_scores" ON public.org_evaluation_scores;
 CREATE POLICY "Admins read org_evaluation_scores"
   ON public.org_evaluation_scores FOR SELECT
   USING (
@@ -500,6 +529,7 @@ CREATE POLICY "Admins read org_evaluation_scores"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write org_evaluation_scores" ON public.org_evaluation_scores;
 CREATE POLICY "Admins write org_evaluation_scores"
   ON public.org_evaluation_scores FOR ALL
   USING (
@@ -529,10 +559,12 @@ CREATE TABLE IF NOT EXISTS public.sourcing_channels (
 
 ALTER TABLE public.sourcing_channels ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on sourcing_channels" ON public.sourcing_channels;
 CREATE POLICY "Service role full access on sourcing_channels"
   ON public.sourcing_channels FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read sourcing_channels" ON public.sourcing_channels;
 CREATE POLICY "Admins read sourcing_channels"
   ON public.sourcing_channels FOR SELECT
   USING (
@@ -540,6 +572,7 @@ CREATE POLICY "Admins read sourcing_channels"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write sourcing_channels" ON public.sourcing_channels;
 CREATE POLICY "Admins write sourcing_channels"
   ON public.sourcing_channels FOR ALL
   USING (
@@ -578,10 +611,12 @@ CREATE INDEX IF NOT EXISTS idx_org_talent_attachments_talent
 
 ALTER TABLE public.org_talent_attachments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_talent_attachments" ON public.org_talent_attachments;
 CREATE POLICY "Service role full access on org_talent_attachments"
   ON public.org_talent_attachments FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_talent_attachments" ON public.org_talent_attachments;
 CREATE POLICY "Admins read org_talent_attachments"
   ON public.org_talent_attachments FOR SELECT
   USING (
@@ -589,6 +624,7 @@ CREATE POLICY "Admins read org_talent_attachments"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write org_talent_attachments" ON public.org_talent_attachments;
 CREATE POLICY "Admins write org_talent_attachments"
   ON public.org_talent_attachments FOR ALL
   USING (
@@ -619,10 +655,12 @@ CREATE INDEX IF NOT EXISTS idx_one_pagers_published
 
 ALTER TABLE public.one_pagers ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on one_pagers" ON public.one_pagers;
 CREATE POLICY "Service role full access on one_pagers"
   ON public.one_pagers FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read one_pagers" ON public.one_pagers;
 CREATE POLICY "Admins read one_pagers"
   ON public.one_pagers FOR SELECT
   USING (
@@ -630,6 +668,7 @@ CREATE POLICY "Admins read one_pagers"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write one_pagers" ON public.one_pagers;
 CREATE POLICY "Admins write one_pagers"
   ON public.one_pagers FOR ALL
   USING (
@@ -669,10 +708,12 @@ CREATE INDEX IF NOT EXISTS idx_grid_reports_status
 
 ALTER TABLE public.grid_reports ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on grid_reports" ON public.grid_reports;
 CREATE POLICY "Service role full access on grid_reports"
   ON public.grid_reports FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read grid_reports" ON public.grid_reports;
 CREATE POLICY "Admins read grid_reports"
   ON public.grid_reports FOR SELECT
   USING (
@@ -680,6 +721,7 @@ CREATE POLICY "Admins read grid_reports"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write grid_reports" ON public.grid_reports;
 CREATE POLICY "Admins write grid_reports"
   ON public.grid_reports FOR ALL
   USING (
@@ -712,10 +754,12 @@ CREATE INDEX IF NOT EXISTS idx_org_audit_log_action
 
 ALTER TABLE public.org_audit_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_audit_log" ON public.org_audit_log;
 CREATE POLICY "Service role full access on org_audit_log"
   ON public.org_audit_log FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_audit_log" ON public.org_audit_log;
 CREATE POLICY "Admins read org_audit_log"
   ON public.org_audit_log FOR SELECT
   USING (
@@ -835,6 +879,7 @@ CREATE TRIGGER trg_audit_mandates
 
 -- RLS: admin-only read
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Admin read audit_logs" ON audit_logs;
 CREATE POLICY "Admin read audit_logs" ON audit_logs FOR SELECT USING (
   EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
 );
@@ -1978,36 +2023,43 @@ ALTER TABLE alumni_referrals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE alumni_campaigns ENABLE ROW LEVEL SECURITY;
 
 -- Organization-based access policies
+DROP POLICY IF EXISTS "Users can view org alumni" ON alumni;
 CREATE POLICY "Users can view org alumni" ON alumni
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can create org alumni" ON alumni;
 CREATE POLICY "Users can create org alumni" ON alumni
   FOR INSERT WITH CHECK (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can update org alumni" ON alumni;
 CREATE POLICY "Users can update org alumni" ON alumni
   FOR UPDATE USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org alumni engagements" ON alumni_engagements;
 CREATE POLICY "Users can view org alumni engagements" ON alumni_engagements
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org guarantee periods" ON guarantee_periods;
 CREATE POLICY "Users can view org guarantee periods" ON guarantee_periods
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org alumni referrals" ON alumni_referrals;
 CREATE POLICY "Users can view org alumni referrals" ON alumni_referrals
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org alumni campaigns" ON alumni_campaigns;
 CREATE POLICY "Users can view org alumni campaigns" ON alumni_campaigns
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
@@ -2141,18 +2193,23 @@ ALTER TABLE approval_step_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE approval_delegations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE approval_audit_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_workflows" ON approval_workflows;
 CREATE POLICY "org_workflows" ON approval_workflows
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_requests" ON approval_requests;
 CREATE POLICY "org_requests" ON approval_requests
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_steps" ON approval_step_records;
 CREATE POLICY "org_steps" ON approval_step_records
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_delegations" ON approval_delegations;
 CREATE POLICY "org_delegations" ON approval_delegations
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_audit" ON approval_audit_log;
 CREATE POLICY "org_audit" ON approval_audit_log
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
@@ -2213,16 +2270,19 @@ CREATE INDEX IF NOT EXISTS idx_background_checks_status ON background_checks(sta
 
 ALTER TABLE background_checks ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view org background checks" ON background_checks;
 CREATE POLICY "Users can view org background checks" ON background_checks
   FOR SELECT USING (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can create background checks" ON background_checks;
 CREATE POLICY "Users can create background checks" ON background_checks
   FOR INSERT WITH CHECK (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can update background checks" ON background_checks;
 CREATE POLICY "Users can update background checks" ON background_checks
   FOR UPDATE USING (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
@@ -2388,15 +2448,19 @@ ALTER TABLE bd_activities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bd_proposals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bd_pipeline_metrics ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_bd_opps" ON bd_opportunities;
 CREATE POLICY "org_bd_opps" ON bd_opportunities
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_bd_activities" ON bd_activities;
 CREATE POLICY "org_bd_activities" ON bd_activities
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_bd_proposals" ON bd_proposals;
 CREATE POLICY "org_bd_proposals" ON bd_proposals
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_bd_metrics" ON bd_pipeline_metrics;
 CREATE POLICY "org_bd_metrics" ON bd_pipeline_metrics
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -2431,16 +2495,19 @@ CREATE INDEX IF NOT EXISTS idx_benchmark_runs_type ON benchmark_runs(assessment_
 
 ALTER TABLE benchmark_runs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view org benchmark runs" ON benchmark_runs;
 CREATE POLICY "Users can view org benchmark runs" ON benchmark_runs
   FOR SELECT USING (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can create benchmark runs" ON benchmark_runs;
 CREATE POLICY "Users can create benchmark runs" ON benchmark_runs
   FOR INSERT WITH CHECK (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can update org benchmark runs" ON benchmark_runs;
 CREATE POLICY "Users can update org benchmark runs" ON benchmark_runs
   FOR UPDATE USING (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
@@ -2537,12 +2604,15 @@ ALTER TABLE comp_benchmarks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comp_data_points ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comp_survey_imports ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_benchmarks" ON comp_benchmarks;
 CREATE POLICY "org_benchmarks" ON comp_benchmarks
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_data_points" ON comp_data_points;
 CREATE POLICY "org_data_points" ON comp_data_points
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_surveys" ON comp_survey_imports;
 CREATE POLICY "org_surveys" ON comp_survey_imports
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -2573,6 +2643,7 @@ CREATE INDEX IF NOT EXISTS idx_kpi_values_org_kpi ON kpi_values(org_id, kpi_id, 
 
 ALTER TABLE kpi_values ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_read_own_kpis" ON kpi_values;
 CREATE POLICY "org_read_own_kpis" ON kpi_values
   FOR SELECT USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -2596,9 +2667,11 @@ CREATE INDEX IF NOT EXISTS idx_kpi_alerts_org ON kpi_alerts(org_id, created_at D
 
 ALTER TABLE kpi_alerts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_read_own_alerts" ON kpi_alerts;
 CREATE POLICY "org_read_own_alerts" ON kpi_alerts
   FOR SELECT USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_manage_alerts" ON kpi_alerts;
 CREATE POLICY "org_manage_alerts" ON kpi_alerts
   FOR UPDATE USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -2650,22 +2723,27 @@ ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notification_preferences ENABLE ROW LEVEL SECURITY;
 
 -- Users can view their own notifications
+DROP POLICY IF EXISTS "Users can view their notifications" ON notifications;
 CREATE POLICY "Users can view their notifications" ON notifications
   FOR SELECT USING (user_id = auth.uid());
 
 -- Users can update their own notifications (mark as read)
+DROP POLICY IF EXISTS "Users can update their notifications" ON notifications;
 CREATE POLICY "Users can update their notifications" ON notifications
   FOR UPDATE USING (user_id = auth.uid());
 
 -- Users can view their own preferences
+DROP POLICY IF EXISTS "Users can view their preferences" ON notification_preferences;
 CREATE POLICY "Users can view their preferences" ON notification_preferences
   FOR SELECT USING (user_id = auth.uid());
 
 -- Users can update their own preferences
+DROP POLICY IF EXISTS "Users can update their preferences" ON notification_preferences;
 CREATE POLICY "Users can update their preferences" ON notification_preferences
   FOR UPDATE USING (user_id = auth.uid());
 
 -- Users can insert their own preferences
+DROP POLICY IF EXISTS "Users can insert their preferences" ON notification_preferences;
 CREATE POLICY "Users can insert their preferences" ON notification_preferences
   FOR INSERT WITH CHECK (user_id = auth.uid());
 
@@ -2779,15 +2857,19 @@ ALTER TABLE data_residency_tags ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cross_border_transfers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE data_subject_requests ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_consents" ON data_consents;
 CREATE POLICY "org_consents" ON data_consents
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_residency" ON data_residency_tags;
 CREATE POLICY "org_residency" ON data_residency_tags
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "service_role_transfers" ON cross_border_transfers;
 CREATE POLICY "service_role_transfers" ON cross_border_transfers
   FOR ALL USING (false);
 
+DROP POLICY IF EXISTS "org_requests" ON data_subject_requests;
 CREATE POLICY "org_requests" ON data_subject_requests
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -2846,6 +2928,7 @@ ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE question_sets ENABLE ROW LEVEL SECURITY;
 
 -- Users can view system questions and their org's questions
+DROP POLICY IF EXISTS "Users can view accessible questions" ON questions;
 CREATE POLICY "Users can view accessible questions" ON questions
   FOR SELECT USING (
     is_system = true
@@ -2856,6 +2939,7 @@ CREATE POLICY "Users can view accessible questions" ON questions
   );
 
 -- Users can create questions for their org
+DROP POLICY IF EXISTS "Users can create questions" ON questions;
 CREATE POLICY "Users can create questions" ON questions
   FOR INSERT WITH CHECK (
     organization_id IN (
@@ -2864,6 +2948,7 @@ CREATE POLICY "Users can create questions" ON questions
   );
 
 -- Users can update their own questions
+DROP POLICY IF EXISTS "Users can update own questions" ON questions;
 CREATE POLICY "Users can update own questions" ON questions
   FOR UPDATE USING (
     created_by = auth.uid()
@@ -2871,6 +2956,7 @@ CREATE POLICY "Users can update own questions" ON questions
   );
 
 -- Users can delete their own questions
+DROP POLICY IF EXISTS "Users can delete own questions" ON questions;
 CREATE POLICY "Users can delete own questions" ON questions
   FOR DELETE USING (
     created_by = auth.uid()
@@ -2878,6 +2964,7 @@ CREATE POLICY "Users can delete own questions" ON questions
   );
 
 -- Question sets policies
+DROP POLICY IF EXISTS "Users can view accessible sets" ON question_sets;
 CREATE POLICY "Users can view accessible sets" ON question_sets
   FOR SELECT USING (
     organization_id IN (
@@ -2886,6 +2973,7 @@ CREATE POLICY "Users can view accessible sets" ON question_sets
     OR created_by = auth.uid()
   );
 
+DROP POLICY IF EXISTS "Users can create sets" ON question_sets;
 CREATE POLICY "Users can create sets" ON question_sets
   FOR INSERT WITH CHECK (
     organization_id IN (
@@ -2893,9 +2981,11 @@ CREATE POLICY "Users can create sets" ON question_sets
     )
   );
 
+DROP POLICY IF EXISTS "Users can update own sets" ON question_sets;
 CREATE POLICY "Users can update own sets" ON question_sets
   FOR UPDATE USING (created_by = auth.uid());
 
+DROP POLICY IF EXISTS "Users can delete own sets" ON question_sets;
 CREATE POLICY "Users can delete own sets" ON question_sets
   FOR DELETE USING (created_by = auth.uid());
 
@@ -2955,6 +3045,7 @@ ALTER TABLE reference_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reference_responses ENABLE ROW LEVEL SECURITY;
 
 -- Consultant/org can view all references for their candidates
+DROP POLICY IF EXISTS "Consultants can view reference requests" ON reference_requests;
 CREATE POLICY "Consultants can view reference requests" ON reference_requests
   FOR SELECT USING (
     organization_id IN (
@@ -2963,13 +3054,16 @@ CREATE POLICY "Consultants can view reference requests" ON reference_requests
   );
 
 -- Referees can view/update their own request (via token)
+DROP POLICY IF EXISTS "Referee can view own request" ON reference_requests;
 CREATE POLICY "Referee can view own request" ON reference_requests
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Referee can update own request" ON reference_requests;
 CREATE POLICY "Referee can update own request" ON reference_requests
   FOR UPDATE USING (true);
 
 -- Responses follow request permissions
+DROP POLICY IF EXISTS "Responses follow request access" ON reference_responses;
 CREATE POLICY "Responses follow request access" ON reference_responses
   FOR ALL USING (
     reference_request_id IN (
@@ -3055,27 +3149,32 @@ ALTER TABLE saved_search_subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE search_executions ENABLE ROW LEVEL SECURITY;
 
 -- Organization-based access policies
+DROP POLICY IF EXISTS "Users can view their saved searches" ON saved_searches;
 CREATE POLICY "Users can view their saved searches" ON saved_searches
   FOR SELECT USING (
     user_id = auth.uid() OR
     (is_shared = true AND org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()))
   );
 
+DROP POLICY IF EXISTS "Users can create saved searches" ON saved_searches;
 CREATE POLICY "Users can create saved searches" ON saved_searches
   FOR INSERT WITH CHECK (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can update their saved searches" ON saved_searches;
 CREATE POLICY "Users can update their saved searches" ON saved_searches
   FOR UPDATE USING (
     user_id = auth.uid()
   );
 
+DROP POLICY IF EXISTS "Users can view their talent alerts" ON talent_alerts;
 CREATE POLICY "Users can view their talent alerts" ON talent_alerts
   FOR SELECT USING (
     user_id = auth.uid()
   );
 
+DROP POLICY IF EXISTS "Users can view their subscriptions" ON saved_search_subscriptions;
 CREATE POLICY "Users can view their subscriptions" ON saved_search_subscriptions
   FOR SELECT USING (
     user_id = auth.uid()
@@ -3157,31 +3256,37 @@ ALTER TABLE sla_escalations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sla_performance_history ENABLE ROW LEVEL SECURITY;
 
 -- Organization-based access policies
+DROP POLICY IF EXISTS "Users can view org SLA configs" ON sla_configurations;
 CREATE POLICY "Users can view org SLA configs" ON sla_configurations
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can create org SLA configs" ON sla_configurations;
 CREATE POLICY "Users can create org SLA configs" ON sla_configurations
   FOR INSERT WITH CHECK (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can update org SLA configs" ON sla_configurations;
 CREATE POLICY "Users can update org SLA configs" ON sla_configurations
   FOR UPDATE USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org mandate timelines" ON mandate_timelines;
 CREATE POLICY "Users can view org mandate timelines" ON mandate_timelines
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org escalations" ON sla_escalations;
 CREATE POLICY "Users can view org escalations" ON sla_escalations
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org SLA performance" ON sla_performance_history;
 CREATE POLICY "Users can view org SLA performance" ON sla_performance_history
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
@@ -3310,12 +3415,15 @@ ALTER TABLE automation_rules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rule_executions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rule_scheduled_checks ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_rules" ON automation_rules;
 CREATE POLICY "org_rules" ON automation_rules
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_executions" ON rule_executions;
 CREATE POLICY "org_executions" ON rule_executions
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_scheduled" ON rule_scheduled_checks;
 CREATE POLICY "org_scheduled" ON rule_scheduled_checks
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
@@ -3446,6 +3554,7 @@ CREATE INDEX IF NOT EXISTS idx_outbox_next_retry ON nexus_event_outbox(next_retr
 -- RLS: only service role can access
 ALTER TABLE nexus_event_outbox ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "service_role_only_outbox" ON nexus_event_outbox;
 CREATE POLICY "service_role_only_outbox" ON nexus_event_outbox
   FOR ALL USING (false);
 
@@ -3469,6 +3578,7 @@ CREATE INDEX IF NOT EXISTS idx_event_log_direction ON nexus_event_log(direction,
 
 ALTER TABLE nexus_event_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_read_own_events" ON nexus_event_log;
 CREATE POLICY "org_read_own_events" ON nexus_event_log
   FOR SELECT USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -3490,6 +3600,7 @@ CREATE INDEX IF NOT EXISTS idx_sync_state_pending ON nexus_sync_state(sync_statu
 
 ALTER TABLE nexus_sync_state ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_sync_state" ON nexus_sync_state;
 CREATE POLICY "org_sync_state" ON nexus_sync_state
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -3514,6 +3625,7 @@ CREATE INDEX IF NOT EXISTS idx_command_log_type ON nexus_command_log(command_typ
 
 ALTER TABLE nexus_command_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_read_own_commands" ON nexus_command_log;
 CREATE POLICY "org_read_own_commands" ON nexus_command_log
   FOR SELECT USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -3578,10 +3690,13 @@ CREATE INDEX IF NOT EXISTS idx_credits_org_id        ON public.credits (organiza
 CREATE INDEX IF NOT EXISTS idx_credits_tier           ON public.credits (tier);
 
 ALTER TABLE public.credits ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on credits" ON public.credits;
 CREATE POLICY "Service role full access on credits"
   ON public.credits FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read own credits" ON public.credits;
 CREATE POLICY "Users read own credits"
   ON public.credits FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users update own credits" ON public.credits;
 CREATE POLICY "Users update own credits"
   ON public.credits FOR UPDATE USING (auth.uid() = user_id);
 
@@ -3611,8 +3726,10 @@ CREATE INDEX IF NOT EXISTS idx_credit_trans_type      ON public.credit_transacti
 CREATE INDEX IF NOT EXISTS idx_credit_trans_created   ON public.credit_transactions (created_at DESC);
 
 ALTER TABLE public.credit_transactions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on credit_transactions" ON public.credit_transactions;
 CREATE POLICY "Service role full access on credit_transactions"
   ON public.credit_transactions FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read own credit transactions" ON public.credit_transactions;
 CREATE POLICY "Users read own credit transactions"
   ON public.credit_transactions FOR SELECT USING (auth.uid() = user_id);
 
@@ -3631,12 +3748,15 @@ CREATE TABLE IF NOT EXISTS public.organizations (
 CREATE INDEX IF NOT EXISTS idx_organizations_plan    ON public.organizations (plan);
 
 ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on organizations" ON public.organizations;
 CREATE POLICY "Service role full access on organizations"
   ON public.organizations FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Admins read organizations" ON public.organizations;
 CREATE POLICY "Admins read organizations"
   ON public.organizations FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin'))
   );
+DROP POLICY IF EXISTS "Admins write organizations" ON public.organizations;
 CREATE POLICY "Admins write organizations"
   ON public.organizations FOR ALL USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin'))
@@ -3679,12 +3799,15 @@ CREATE INDEX IF NOT EXISTS idx_mandates_status       ON public.mandates (status)
 CREATE INDEX IF NOT EXISTS idx_mandates_updated     ON public.mandates (updated_at DESC);
 
 ALTER TABLE public.mandates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on mandates" ON public.mandates;
 CREATE POLICY "Service role full access on mandates"
   ON public.mandates FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Admins read mandates" ON public.mandates;
 CREATE POLICY "Admins read mandates"
   ON public.mandates FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
   );
+DROP POLICY IF EXISTS "Admins write mandates" ON public.mandates;
 CREATE POLICY "Admins write mandates"
   ON public.mandates FOR ALL USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
@@ -3723,12 +3846,15 @@ CREATE INDEX IF NOT EXISTS idx_companies_country    ON public.companies (country
 CREATE INDEX IF NOT EXISTS idx_companies_engagement ON public.companies (engagement_score DESC);
 
 ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on companies" ON public.companies;
 CREATE POLICY "Service role full access on companies"
   ON public.companies FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Admins read companies" ON public.companies;
 CREATE POLICY "Admins read companies"
   ON public.companies FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
   );
+DROP POLICY IF EXISTS "Admins write companies" ON public.companies;
 CREATE POLICY "Admins write companies"
   ON public.companies FOR ALL USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
@@ -3771,12 +3897,15 @@ CREATE INDEX IF NOT EXISTS idx_contacts_company_id ON public.contacts (company_i
 CREATE INDEX IF NOT EXISTS idx_contacts_country    ON public.contacts (country);
 
 ALTER TABLE public.contacts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on contacts" ON public.contacts;
 CREATE POLICY "Service role full access on contacts"
   ON public.contacts FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read contacts" ON public.contacts;
 CREATE POLICY "Users read contacts"
   ON public.contacts FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin', 'lyc_consultant'))
   );
+DROP POLICY IF EXISTS "Users write contacts" ON public.contacts;
 CREATE POLICY "Users write contacts"
   ON public.contacts FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
@@ -3805,8 +3934,10 @@ CREATE TABLE IF NOT EXISTS public.clients (
 CREATE INDEX IF NOT EXISTS idx_clients_company_name ON public.clients (company_name);
 
 ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on clients" ON public.clients;
 CREATE POLICY "Service role full access on clients"
   ON public.clients FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read clients" ON public.clients;
 CREATE POLICY "Users read clients"
   ON public.clients FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
@@ -3833,8 +3964,10 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_mandate_members_unique
 CREATE INDEX IF NOT EXISTS idx_mandate_members_user_id ON public.mandate_members (user_id);
 
 ALTER TABLE public.mandate_members ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on mandate_members" ON public.mandate_members;
 CREATE POLICY "Service role full access on mandate_members"
   ON public.mandate_members FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read mandate members" ON public.mandate_members;
 CREATE POLICY "Users read mandate members"
   ON public.mandate_members FOR SELECT USING (auth.uid() = user_id);
 
@@ -3876,12 +4009,15 @@ CREATE INDEX IF NOT EXISTS idx_candidates_pipeline_contact_id ON public.candidat
 CREATE INDEX IF NOT EXISTS idx_candidates_pipeline_stage      ON public.candidates_pipeline (stage);
 
 ALTER TABLE public.candidates_pipeline ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on candidates_pipeline" ON public.candidates_pipeline;
 CREATE POLICY "Service role full access on candidates_pipeline"
   ON public.candidates_pipeline FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read candidates pipeline" ON public.candidates_pipeline;
 CREATE POLICY "Users read candidates pipeline"
   ON public.candidates_pipeline FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid())
   );
+DROP POLICY IF EXISTS "Users write candidates pipeline" ON public.candidates_pipeline;
 CREATE POLICY "Users write candidates pipeline"
   ON public.candidates_pipeline FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
@@ -3920,8 +4056,10 @@ CREATE INDEX IF NOT EXISTS idx_scoring_runs_run_type    ON public.scoring_runs (
 CREATE INDEX IF NOT EXISTS idx_scoring_runs_created     ON public.scoring_runs (created_at DESC);
 
 ALTER TABLE public.scoring_runs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on scoring_runs" ON public.scoring_runs;
 CREATE POLICY "Service role full access on scoring_runs"
   ON public.scoring_runs FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read own scoring runs" ON public.scoring_runs;
 CREATE POLICY "Users read own scoring runs"
   ON public.scoring_runs FOR SELECT USING (auth.uid() = user_id OR auth.role() = 'service_role');
 
@@ -3947,8 +4085,10 @@ CREATE INDEX IF NOT EXISTS idx_generated_reports_status     ON public.generated_
 CREATE INDEX IF NOT EXISTS idx_generated_reports_created   ON public.generated_reports (created_at DESC);
 
 ALTER TABLE public.generated_reports ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on generated_reports" ON public.generated_reports;
 CREATE POLICY "Service role full access on generated_reports"
   ON public.generated_reports FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read generated reports" ON public.generated_reports;
 CREATE POLICY "Users read generated reports"
   ON public.generated_reports FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid())
@@ -3973,10 +4113,13 @@ CREATE INDEX IF NOT EXISTS idx_candidate_saved_insights_profile_id
   ON public.candidate_saved_insights (profile_id);
 
 ALTER TABLE public.candidate_saved_insights ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on candidate_saved_insights" ON public.candidate_saved_insights;
 CREATE POLICY "Service role full access on candidate_saved_insights"
   ON public.candidate_saved_insights FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read own saved insights" ON public.candidate_saved_insights;
 CREATE POLICY "Users read own saved insights"
   ON public.candidate_saved_insights FOR SELECT USING (auth.uid() = profile_id);
+DROP POLICY IF EXISTS "Users write own saved insights" ON public.candidate_saved_insights;
 CREATE POLICY "Users write own saved insights"
   ON public.candidate_saved_insights FOR INSERT WITH CHECK (auth.uid() = profile_id);
 
@@ -4009,8 +4152,10 @@ CREATE INDEX IF NOT EXISTS idx_car_mandate_id      ON public.candidate_assessmen
   WHERE mandate_id IS NOT NULL;
 
 ALTER TABLE public.candidate_assessment_results ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on candidate_assessment_results" ON public.candidate_assessment_results;
 CREATE POLICY "Service role full access on candidate_assessment_results"
   ON public.candidate_assessment_results FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read own assessment results" ON public.candidate_assessment_results;
 CREATE POLICY "Users read own assessment results"
   ON public.candidate_assessment_results FOR SELECT USING (auth.uid() IS NOT NULL);
 
@@ -4034,8 +4179,10 @@ CREATE INDEX IF NOT EXISTS idx_car_resp_candidate_id    ON public.candidate_asse
 CREATE INDEX IF NOT EXISTS idx_car_resp_assessment_id   ON public.candidate_assessment_responses (assessment_id);
 
 ALTER TABLE public.candidate_assessment_responses ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on candidate_assessment_responses" ON public.candidate_assessment_responses;
 CREATE POLICY "Service role full access on candidate_assessment_responses"
   ON public.candidate_assessment_responses FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users write own assessment responses" ON public.candidate_assessment_responses;
 CREATE POLICY "Users write own assessment responses"
   ON public.candidate_assessment_responses FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
@@ -4055,6 +4202,7 @@ CREATE INDEX IF NOT EXISTS idx_assessment_configs_active ON public.assessment_co
   WHERE is_active = TRUE;
 
 ALTER TABLE public.assessment_configs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on assessment_configs" ON public.assessment_configs;
 CREATE POLICY "Service role full access on assessment_configs"
   ON public.assessment_configs FOR ALL USING (auth.role() = 'service_role');
 
@@ -4077,6 +4225,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_msp_mandate_version
   ON public.mandate_success_profiles (mandate_id, version);
 
 ALTER TABLE public.mandate_success_profiles ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on mandate_success_profiles" ON public.mandate_success_profiles;
 CREATE POLICY "Service role full access on mandate_success_profiles"
   ON public.mandate_success_profiles FOR ALL USING (auth.role() = 'service_role');
 
@@ -4103,8 +4252,10 @@ CREATE INDEX IF NOT EXISTS idx_ai_generations_type     ON public.ai_generations 
 CREATE INDEX IF NOT EXISTS idx_ai_generations_created  ON public.ai_generations (created_at DESC);
 
 ALTER TABLE public.ai_generations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on ai_generations" ON public.ai_generations;
 CREATE POLICY "Service role full access on ai_generations"
   ON public.ai_generations FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read own ai generations" ON public.ai_generations;
 CREATE POLICY "Users read own ai generations"
   ON public.ai_generations FOR SELECT USING (auth.uid() = user_id OR auth.role() = 'service_role');
 
@@ -4124,8 +4275,10 @@ CREATE INDEX IF NOT EXISTS idx_match_history_user_id  ON public.match_history (u
 CREATE INDEX IF NOT EXISTS idx_match_history_created ON public.match_history (created_at DESC);
 
 ALTER TABLE public.match_history ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on match_history" ON public.match_history;
 CREATE POLICY "Service role full access on match_history"
   ON public.match_history FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read own match history" ON public.match_history;
 CREATE POLICY "Users read own match history"
   ON public.match_history FOR SELECT USING (auth.uid() = user_id);
 
@@ -4155,8 +4308,10 @@ CREATE INDEX IF NOT EXISTS idx_alumni_placements_mandate_id ON public.alumni_pla
 CREATE INDEX IF NOT EXISTS idx_alumni_placements_status   ON public.alumni_placements (status);
 
 ALTER TABLE public.alumni_placements ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on alumni_placements" ON public.alumni_placements;
 CREATE POLICY "Service role full access on alumni_placements"
   ON public.alumni_placements FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read alumni placements" ON public.alumni_placements;
 CREATE POLICY "Users read alumni placements"
   ON public.alumni_placements FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
@@ -4187,8 +4342,10 @@ CREATE INDEX IF NOT EXISTS idx_automation_executions_status  ON public.automatio
 CREATE INDEX IF NOT EXISTS idx_automation_executions_executed ON public.automation_executions (executed_at DESC);
 
 ALTER TABLE public.automation_executions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on automation_executions" ON public.automation_executions;
 CREATE POLICY "Service role full access on automation_executions"
   ON public.automation_executions FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read automation executions" ON public.automation_executions;
 CREATE POLICY "Users read automation executions"
   ON public.automation_executions FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'super_admin', 'lyc_admin'))
@@ -4212,8 +4369,10 @@ CREATE INDEX IF NOT EXISTS idx_pipeline_stage_history_created
   ON public.pipeline_stage_history (created_at DESC);
 
 ALTER TABLE public.pipeline_stage_history ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on pipeline_stage_history" ON public.pipeline_stage_history;
 CREATE POLICY "Service role full access on pipeline_stage_history"
   ON public.pipeline_stage_history FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users read pipeline stage history" ON public.pipeline_stage_history;
 CREATE POLICY "Users read pipeline stage history"
   ON public.pipeline_stage_history FOR SELECT USING (auth.uid() IS NOT NULL);
 
@@ -4237,6 +4396,7 @@ CREATE INDEX IF NOT EXISTS idx_candidate_pipeline_mandate_id ON public.candidate
 CREATE INDEX IF NOT EXISTS idx_candidate_pipeline_contact_id ON public.candidate_pipeline (contact_id);
 
 ALTER TABLE public.candidate_pipeline ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on candidate_pipeline" ON public.candidate_pipeline;
 CREATE POLICY "Service role full access on candidate_pipeline"
   ON public.candidate_pipeline FOR ALL USING (auth.role() = 'service_role');
 
@@ -4399,14 +4559,17 @@ CREATE INDEX IF NOT EXISTS idx_outreach_created_by ON public.candidate_outreach_
 
 ALTER TABLE public.candidate_outreach_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view outreach logs" ON public.candidate_outreach_log;
 CREATE POLICY "Team can view outreach logs"
   ON public.candidate_outreach_log FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Team can create outreach logs" ON public.candidate_outreach_log;
 CREATE POLICY "Team can create outreach logs"
   ON public.candidate_outreach_log FOR INSERT TO authenticated
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Team can update own outreach logs" ON public.candidate_outreach_log;
 CREATE POLICY "Team can update own outreach logs"
   ON public.candidate_outreach_log FOR UPDATE TO authenticated
   USING (created_by = auth.uid());
@@ -4442,14 +4605,17 @@ CREATE INDEX IF NOT EXISTS idx_cmdl_priority ON public.candidate_mandate_links(p
 
 ALTER TABLE public.candidate_mandate_links ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view mandate links" ON public.candidate_mandate_links;
 CREATE POLICY "Team can view mandate links"
   ON public.candidate_mandate_links FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Team can create mandate links" ON public.candidate_mandate_links;
 CREATE POLICY "Team can create mandate links"
   ON public.candidate_mandate_links FOR INSERT TO authenticated
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Team can update mandate links" ON public.candidate_mandate_links;
 CREATE POLICY "Team can update mandate links"
   ON public.candidate_mandate_links FOR UPDATE TO authenticated
   USING (true);
@@ -4471,10 +4637,12 @@ CREATE TABLE IF NOT EXISTS public.saved_searches (
 
 ALTER TABLE public.saved_searches ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own saved searches" ON public.saved_searches;
 CREATE POLICY "Users can view own saved searches"
   ON public.saved_searches FOR SELECT TO authenticated
   USING (created_by = auth.uid());
 
+DROP POLICY IF EXISTS "Users can manage own saved searches" ON public.saved_searches;
 CREATE POLICY "Users can manage own saved searches"
   ON public.saved_searches FOR ALL TO authenticated
   USING (created_by = auth.uid());
@@ -4499,10 +4667,12 @@ CREATE TABLE IF NOT EXISTS public.import_logs (
 
 ALTER TABLE public.import_logs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view import logs" ON public.import_logs;
 CREATE POLICY "Team can view import logs"
   ON public.import_logs FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Team can create import logs" ON public.import_logs;
 CREATE POLICY "Team can create import logs"
   ON public.import_logs FOR INSERT TO authenticated
   WITH CHECK (true);
@@ -4535,10 +4705,12 @@ CREATE INDEX IF NOT EXISTS idx_pt_changed_by ON public.pipeline_transitions(chan
 
 ALTER TABLE public.pipeline_transitions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view pipeline transitions" ON public.pipeline_transitions;
 CREATE POLICY "Team can view pipeline transitions"
   ON public.pipeline_transitions FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "System can create pipeline transitions" ON public.pipeline_transitions;
 CREATE POLICY "System can create pipeline transitions"
   ON public.pipeline_transitions FOR INSERT TO authenticated
   WITH CHECK (true);
@@ -4815,14 +4987,17 @@ CREATE INDEX IF NOT EXISTS idx_grid_mappings_type ON public.grid_mappings(mappin
 
 ALTER TABLE public.grid_mappings ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view grid mappings" ON public.grid_mappings;
 CREATE POLICY "Team can view grid mappings"
   ON public.grid_mappings FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Team can create grid mappings" ON public.grid_mappings;
 CREATE POLICY "Team can create grid mappings"
   ON public.grid_mappings FOR INSERT TO authenticated
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Team can update grid mappings" ON public.grid_mappings;
 CREATE POLICY "Team can update grid mappings"
   ON public.grid_mappings FOR UPDATE TO authenticated
   USING (true);
@@ -4846,10 +5021,12 @@ CREATE INDEX IF NOT EXISTS idx_grid_sectors_mapping ON public.grid_sectors(grid_
 
 ALTER TABLE public.grid_sectors ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view grid sectors" ON public.grid_sectors;
 CREATE POLICY "Team can view grid sectors"
   ON public.grid_sectors FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Team can manage grid sectors" ON public.grid_sectors;
 CREATE POLICY "Team can manage grid sectors"
   ON public.grid_sectors FOR ALL TO authenticated
   USING (true);
@@ -4883,10 +5060,12 @@ CREATE INDEX IF NOT EXISTS idx_grid_companies_relevance ON public.grid_companies
 
 ALTER TABLE public.grid_companies ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view grid companies" ON public.grid_companies;
 CREATE POLICY "Team can view grid companies"
   ON public.grid_companies FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Team can manage grid companies" ON public.grid_companies;
 CREATE POLICY "Team can manage grid companies"
   ON public.grid_companies FOR ALL TO authenticated
   USING (true);
@@ -4928,10 +5107,12 @@ CREATE INDEX IF NOT EXISTS idx_grid_functions_mapping ON public.grid_functions(g
 
 ALTER TABLE public.grid_functions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view grid functions" ON public.grid_functions;
 CREATE POLICY "Team can view grid functions"
   ON public.grid_functions FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Team can manage grid functions" ON public.grid_functions;
 CREATE POLICY "Team can manage grid functions"
   ON public.grid_functions FOR ALL TO authenticated
   USING (true);
@@ -4975,10 +5156,12 @@ CREATE INDEX IF NOT EXISTS idx_grid_entries_status ON public.grid_candidate_entr
 
 ALTER TABLE public.grid_candidate_entries ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view grid candidate entries" ON public.grid_candidate_entries;
 CREATE POLICY "Team can view grid candidate entries"
   ON public.grid_candidate_entries FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Team can manage grid candidate entries" ON public.grid_candidate_entries;
 CREATE POLICY "Team can manage grid candidate entries"
   ON public.grid_candidate_entries FOR ALL TO authenticated
   USING (true);
@@ -5059,10 +5242,12 @@ CREATE INDEX IF NOT EXISTS idx_grid_standards_mapping ON public.grid_minimum_sta
 
 ALTER TABLE public.grid_minimum_standards ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view grid standards" ON public.grid_minimum_standards;
 CREATE POLICY "Team can view grid standards"
   ON public.grid_minimum_standards FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "System can update grid standards" ON public.grid_minimum_standards;
 CREATE POLICY "System can update grid standards"
   ON public.grid_minimum_standards FOR ALL TO authenticated
   USING (true);
@@ -5330,10 +5515,12 @@ CREATE INDEX IF NOT EXISTS idx_payment_due_date ON public.mandate_payment_milest
 
 ALTER TABLE public.mandate_payment_milestones ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view payment milestones" ON public.mandate_payment_milestones;
 CREATE POLICY "Team can view payment milestones"
   ON public.mandate_payment_milestones FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Admin can manage payment milestones" ON public.mandate_payment_milestones;
 CREATE POLICY "Admin can manage payment milestones"
   ON public.mandate_payment_milestones FOR ALL TO authenticated
   USING (EXISTS (
@@ -5396,10 +5583,12 @@ CREATE TABLE IF NOT EXISTS public.mandate_analytics_snapshots (
 
 ALTER TABLE public.mandate_analytics_snapshots ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view analytics" ON public.mandate_analytics_snapshots;
 CREATE POLICY "Team can view analytics"
   ON public.mandate_analytics_snapshots FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "System can create snapshots" ON public.mandate_analytics_snapshots;
 CREATE POLICY "System can create snapshots"
   ON public.mandate_analytics_snapshots FOR INSERT TO authenticated
   WITH CHECK (true);
@@ -5663,11 +5852,13 @@ ALTER TABLE public.signals ENABLE ROW LEVEL SECURITY;
 
 -- D-2: Restricted RLS
 -- All authenticated users can write (INSERT)
+DROP POLICY IF EXISTS "Authenticated users can create signals" ON public.signals;
 CREATE POLICY "Authenticated users can create signals"
   ON public.signals FOR INSERT TO authenticated
   WITH CHECK (true);
 
 -- Read: owner + team lead + Kevin (admin)
+DROP POLICY IF EXISTS "Signal read - owner, team lead, or admin" ON public.signals;
 CREATE POLICY "Signal read - owner, team lead, or admin"
   ON public.signals FOR SELECT TO authenticated
   USING (
@@ -5677,6 +5868,7 @@ CREATE POLICY "Signal read - owner, team lead, or admin"
   );
 
 -- Update/DELETE: service role only (system-managed)
+DROP POLICY IF EXISTS "Service role full access on signals" ON public.signals;
 CREATE POLICY "Service role full access on signals"
   ON public.signals FOR ALL
   USING (auth.role() = 'service_role');
@@ -5717,10 +5909,12 @@ CREATE INDEX IF NOT EXISTS idx_agent_actions_reviewer ON public.agent_actions (r
 ALTER TABLE public.agent_actions ENABLE ROW LEVEL SECURITY;
 
 -- RLS: same as signals (restricted)
+DROP POLICY IF EXISTS "Authenticated users can create agent actions" ON public.agent_actions;
 CREATE POLICY "Authenticated users can create agent actions"
   ON public.agent_actions FOR INSERT TO authenticated
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Agent action read - actor, team lead, or admin" ON public.agent_actions;
 CREATE POLICY "Agent action read - actor, team lead, or admin"
   ON public.agent_actions FOR SELECT TO authenticated
   USING (
@@ -5729,12 +5923,14 @@ CREATE POLICY "Agent action read - actor, team lead, or admin"
     OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'team_lead')
   );
 
+DROP POLICY IF EXISTS "Authenticated users can review agent actions" ON public.agent_actions;
 CREATE POLICY "Authenticated users can review agent actions"
   ON public.agent_actions FOR UPDATE TO authenticated
   USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','team_lead'))
   );
 
+DROP POLICY IF EXISTS "Service role full access on agent_actions" ON public.agent_actions;
 CREATE POLICY "Service role full access on agent_actions"
   ON public.agent_actions FOR ALL
   USING (auth.role() = 'service_role');
@@ -5928,12 +6124,15 @@ CREATE INDEX IF NOT EXISTS idx_cmm_mandate_grade ON public.candidate_mandate_mat
 
 ALTER TABLE public.candidate_mandate_matches ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view matches" ON public.candidate_mandate_matches;
 CREATE POLICY "Team can view matches" ON public.candidate_mandate_matches
   FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Team can create matches" ON public.candidate_mandate_matches;
 CREATE POLICY "Team can create matches" ON public.candidate_mandate_matches
   FOR INSERT TO authenticated WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Team can update matches" ON public.candidate_mandate_matches;
 CREATE POLICY "Team can update matches" ON public.candidate_mandate_matches
   FOR UPDATE TO authenticated USING (true);
 
@@ -5967,12 +6166,15 @@ CREATE INDEX IF NOT EXISTS idx_mr_status ON public.match_runs(status);
 
 ALTER TABLE public.match_runs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view match runs" ON public.match_runs;
 CREATE POLICY "Team can view match runs" ON public.match_runs
   FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Team can create match runs" ON public.match_runs;
 CREATE POLICY "Team can create match runs" ON public.match_runs
   FOR INSERT TO authenticated WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Team can update match runs" ON public.match_runs;
 CREATE POLICY "Team can update match runs" ON public.match_runs
   FOR UPDATE TO authenticated USING (true);
 
@@ -6334,6 +6536,7 @@ CREATE INDEX IF NOT EXISTS idx_canvas_scorecard ON public.canvas_profiles (score
 -- ── 3. RLS POLICIES ────────────────────────────────────────────────────
 ALTER TABLE public.canvas_profiles ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Canvas profile read - generator, mandate lead, or admin" ON public.canvas_profiles;
 CREATE POLICY "Canvas profile read - generator, mandate lead, or admin" ON public.canvas_profiles
   FOR SELECT TO authenticated
   USING (
@@ -6342,10 +6545,12 @@ CREATE POLICY "Canvas profile read - generator, mandate lead, or admin" ON publi
     OR mandate_id IN (SELECT id FROM public.mandates WHERE lead_consultant_id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Authenticated users can create canvas profiles" ON public.canvas_profiles;
 CREATE POLICY "Authenticated users can create canvas profiles" ON public.canvas_profiles
   FOR INSERT TO authenticated
   WITH CHECK (auth.uid() = generated_by);
 
+DROP POLICY IF EXISTS "Canvas profile update - generator or admin" ON public.canvas_profiles;
 CREATE POLICY "Canvas profile update - generator or admin" ON public.canvas_profiles
   FOR UPDATE TO authenticated
   USING (
@@ -6500,12 +6705,16 @@ CREATE INDEX IF NOT EXISTS idx_career_log_date ON career_intelligence_log(create
 
 ALTER TABLE career_intelligence_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view intelligence log" ON career_intelligence_log;
 CREATE POLICY "Team can view intelligence log" ON career_intelligence_log
   FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "System can insert intelligence log" ON career_intelligence_log;
 CREATE POLICY "System can insert intelligence log" ON career_intelligence_log
   FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "No updates to intelligence log" ON career_intelligence_log;
 CREATE POLICY "No updates to intelligence log" ON career_intelligence_log
   FOR UPDATE TO authenticated USING (false);
+DROP POLICY IF EXISTS "No deletes from intelligence log" ON career_intelligence_log;
 CREATE POLICY "No deletes from intelligence log" ON career_intelligence_log
   FOR DELETE TO authenticated USING (false);
 
@@ -6548,8 +6757,10 @@ CREATE INDEX IF NOT EXISTS idx_nurture_type ON nurture_sequences(sequence_type);
 
 ALTER TABLE nurture_sequences ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view nurture sequences" ON nurture_sequences;
 CREATE POLICY "Team can view nurture sequences" ON nurture_sequences
   FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "System can manage nurture sequences" ON nurture_sequences;
 CREATE POLICY "System can manage nurture sequences" ON nurture_sequences
   FOR ALL TO authenticated USING (true);
 
@@ -6588,8 +6799,10 @@ CREATE INDEX IF NOT EXISTS idx_benchmark_current ON career_benchmarks(contact_id
 
 ALTER TABLE career_benchmarks ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view benchmarks" ON career_benchmarks;
 CREATE POLICY "Team can view benchmarks" ON career_benchmarks
   FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "System can manage benchmarks" ON career_benchmarks;
 CREATE POLICY "System can manage benchmarks" ON career_benchmarks
   FOR ALL TO authenticated USING (true);
 
@@ -6626,10 +6839,12 @@ CREATE TABLE IF NOT EXISTS movement_signal_definitions (
 
 ALTER TABLE movement_signal_definitions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admin manages signal definitions" ON movement_signal_definitions;
 CREATE POLICY "Admin manages signal definitions" ON movement_signal_definitions
   FOR ALL TO authenticated USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'team_lead'))
   );
+DROP POLICY IF EXISTS "Team can view signal definitions" ON movement_signal_definitions;
 CREATE POLICY "Team can view signal definitions" ON movement_signal_definitions
   FOR SELECT TO authenticated USING (is_active = TRUE);
 
@@ -6710,10 +6925,12 @@ CREATE INDEX IF NOT EXISTS idx_report_period ON client_intelligence_reports(peri
 
 ALTER TABLE client_intelligence_reports ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view all reports" ON client_intelligence_reports;
 CREATE POLICY "Team can view all reports" ON client_intelligence_reports
   FOR SELECT TO authenticated USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'team_lead', 'consultant'))
   );
+DROP POLICY IF EXISTS "Consultants manage assigned client reports" ON client_intelligence_reports;
 CREATE POLICY "Consultants manage assigned client reports" ON client_intelligence_reports
   FOR ALL TO authenticated USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'team_lead'))
@@ -6756,10 +6973,12 @@ CREATE INDEX IF NOT EXISTS idx_subscription_type ON client_market_subscriptions(
 
 ALTER TABLE client_market_subscriptions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view subscriptions" ON client_market_subscriptions;
 CREATE POLICY "Team can view subscriptions" ON client_market_subscriptions
   FOR SELECT TO authenticated USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'team_lead', 'consultant'))
   );
+DROP POLICY IF EXISTS "Admin/Consultant manages subscriptions" ON client_market_subscriptions;
 CREATE POLICY "Admin/Consultant manages subscriptions" ON client_market_subscriptions
   FOR ALL TO authenticated USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'team_lead', 'consultant'))
@@ -6815,8 +7034,10 @@ CREATE INDEX IF NOT EXISTS idx_signal_source ON market_signals(source);
 
 ALTER TABLE market_signals ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view signals" ON market_signals;
 CREATE POLICY "Team can view signals" ON market_signals
   FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Admin/Consultant creates signals" ON market_signals;
 CREATE POLICY "Admin/Consultant creates signals" ON market_signals
   FOR ALL TO authenticated USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'team_lead', 'consultant'))
@@ -6863,10 +7084,12 @@ CREATE INDEX IF NOT EXISTS idx_anon_trident ON anonymized_talent_profiles(triden
 
 ALTER TABLE anonymized_talent_profiles ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admin/Consultant can view anonymized profiles" ON anonymized_talent_profiles;
 CREATE POLICY "Admin/Consultant can view anonymized profiles" ON anonymized_talent_profiles
   FOR SELECT TO authenticated USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'team_lead', 'consultant'))
   );
+DROP POLICY IF EXISTS "System manages anonymized profiles" ON anonymized_talent_profiles;
 CREATE POLICY "System manages anonymized profiles" ON anonymized_talent_profiles
   FOR ALL TO authenticated USING (true);
 
@@ -6894,10 +7117,12 @@ CREATE INDEX IF NOT EXISTS idx_query_channel ON intelligence_queries(channel);
 
 ALTER TABLE intelligence_queries ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view queries" ON intelligence_queries;
 CREATE POLICY "Team can view queries" ON intelligence_queries
   FOR SELECT TO authenticated USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'team_lead', 'consultant'))
   );
+DROP POLICY IF EXISTS "System inserts queries" ON intelligence_queries;
 CREATE POLICY "System inserts queries" ON intelligence_queries
   FOR INSERT TO authenticated WITH CHECK (true);
 
@@ -6938,10 +7163,12 @@ CREATE INDEX IF NOT EXISTS idx_client_accounts_auth ON public.client_accounts (a
 
 ALTER TABLE public.client_accounts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Client account read - self only" ON public.client_accounts;
 CREATE POLICY "Client account read - self only" ON public.client_accounts
   FOR SELECT TO authenticated
   USING (auth.uid() = auth_user_id);
 
+DROP POLICY IF EXISTS "Admin full access on client accounts" ON public.client_accounts;
 CREATE POLICY "Admin full access on client accounts" ON public.client_accounts
   FOR ALL TO authenticated
   USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
@@ -6962,6 +7189,7 @@ CREATE INDEX IF NOT EXISTS idx_cma_mandate ON public.client_mandate_access (mand
 
 ALTER TABLE public.client_mandate_access ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Client mandate access - self or admin" ON public.client_mandate_access;
 CREATE POLICY "Client mandate access - self or admin" ON public.client_mandate_access
   FOR SELECT TO authenticated
   USING (
@@ -6993,6 +7221,7 @@ CREATE INDEX IF NOT EXISTS idx_cf_client ON public.client_feedback (client_accou
 
 ALTER TABLE public.client_feedback ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Client feedback read - self or admin or consultant" ON public.client_feedback;
 CREATE POLICY "Client feedback read - self or admin or consultant" ON public.client_feedback
   FOR SELECT TO authenticated
   USING (
@@ -7001,6 +7230,7 @@ CREATE POLICY "Client feedback read - self or admin or consultant" ON public.cli
     OR EXISTS (SELECT 1 FROM public.mandates WHERE id = mandate_id AND lead_consultant_id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Client can create feedback" ON public.client_feedback;
 CREATE POLICY "Client can create feedback" ON public.client_feedback
   FOR INSERT TO authenticated
   WITH CHECK (
@@ -7011,6 +7241,7 @@ CREATE POLICY "Client can create feedback" ON public.client_feedback
     )
   );
 
+DROP POLICY IF EXISTS "Staff can update feedback" ON public.client_feedback;
 CREATE POLICY "Staff can update feedback" ON public.client_feedback
   FOR UPDATE TO authenticated
   USING (
@@ -7057,15 +7288,18 @@ CREATE INDEX IF NOT EXISTS idx_cn_unread ON public.client_notifications (client_
 
 ALTER TABLE public.client_notifications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Client notifications read - self only" ON public.client_notifications;
 CREATE POLICY "Client notifications read - self only" ON public.client_notifications
   FOR SELECT TO authenticated
   USING (client_account_id IN (SELECT id FROM public.client_accounts WHERE auth_user_id = auth.uid()));
 
+DROP POLICY IF EXISTS "Client can mark notification as read" ON public.client_notifications;
 CREATE POLICY "Client can mark notification as read" ON public.client_notifications
   FOR UPDATE TO authenticated
   USING (client_account_id IN (SELECT id FROM public.client_accounts WHERE auth_user_id = auth.uid()))
   WITH CHECK (client_account_id IN (SELECT id FROM public.client_accounts WHERE auth_user_id = auth.uid()));
 
+DROP POLICY IF EXISTS "Admin can create client notifications" ON public.client_notifications;
 CREATE POLICY "Admin can create client notifications" ON public.client_notifications
   FOR INSERT TO authenticated
   USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
@@ -7147,6 +7381,7 @@ CREATE INDEX IF NOT EXISTS idx_analytics_platform ON analytics_snapshots(snapsho
 -- RLS for analytics_snapshots
 ALTER TABLE analytics_snapshots ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admin sees all snapshots" ON analytics_snapshots;
 CREATE POLICY "Admin sees all snapshots" ON analytics_snapshots
     FOR SELECT TO authenticated
     USING (
@@ -7183,6 +7418,7 @@ CREATE INDEX IF NOT EXISTS idx_dash_user ON dashboard_widgets_config(user_id);
 -- RLS for dashboard_widgets_config
 ALTER TABLE dashboard_widgets_config ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users manage own widgets" ON dashboard_widgets_config;
 CREATE POLICY "Users manage own widgets" ON dashboard_widgets_config
     FOR ALL TO authenticated
     USING (user_id = auth.uid());
@@ -7239,6 +7475,7 @@ CREATE INDEX IF NOT EXISTS idx_kpi_active ON kpis(is_active) WHERE is_active = T
 -- RLS for kpis
 ALTER TABLE kpis ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admin manages KPIs" ON kpis;
 CREATE POLICY "Admin manages KPIs" ON kpis
     FOR ALL TO authenticated
     USING (
@@ -7248,6 +7485,7 @@ CREATE POLICY "Admin manages KPIs" ON kpis
         )
     );
 
+DROP POLICY IF EXISTS "Team can view KPIs" ON kpis;
 CREATE POLICY "Team can view KPIs" ON kpis
     FOR SELECT TO authenticated
     USING (is_active = TRUE);
@@ -7346,6 +7584,7 @@ CREATE INDEX IF NOT EXISTS idx_li_import_created ON linkedin_imports(created_at 
 -- RLS for linkedin_imports
 ALTER TABLE linkedin_imports ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own imports" ON linkedin_imports;
 CREATE POLICY "Users can view own imports" ON linkedin_imports
     FOR SELECT TO authenticated
     USING (
@@ -7356,10 +7595,12 @@ CREATE POLICY "Users can view own imports" ON linkedin_imports
         )
     );
 
+DROP POLICY IF EXISTS "Users can create imports" ON linkedin_imports;
 CREATE POLICY "Users can create imports" ON linkedin_imports
     FOR INSERT TO authenticated
     WITH CHECK (created_by = auth.uid());
 
+DROP POLICY IF EXISTS "System can update imports" ON linkedin_imports;
 CREATE POLICY "System can update imports" ON linkedin_imports
     FOR UPDATE TO authenticated
     USING (true);
@@ -7422,6 +7663,7 @@ CREATE INDEX IF NOT EXISTS idx_li_item_pending ON linkedin_import_items(deepseek
 -- RLS for linkedin_import_items
 ALTER TABLE linkedin_import_items ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own import items" ON linkedin_import_items;
 CREATE POLICY "Users can view own import items" ON linkedin_import_items
     FOR SELECT TO authenticated
     USING (
@@ -7437,6 +7679,7 @@ CREATE POLICY "Users can view own import items" ON linkedin_import_items
         )
     );
 
+DROP POLICY IF EXISTS "System can manage import items" ON linkedin_import_items;
 CREATE POLICY "System can manage import items" ON linkedin_import_items
     FOR ALL TO authenticated
     USING (
@@ -7479,6 +7722,7 @@ CREATE INDEX IF NOT EXISTS idx_li_cache_parse ON linkedin_data_cache(parse_statu
 -- RLS for linkedin_data_cache
 ALTER TABLE linkedin_data_cache ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "System manages cache" ON linkedin_data_cache;
 CREATE POLICY "System manages cache" ON linkedin_data_cache
     FOR ALL TO authenticated
     USING (
@@ -7644,10 +7888,12 @@ CREATE INDEX IF NOT EXISTS idx_role_permissions_resource ON public.role_permissi
 
 ALTER TABLE public.role_permissions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can manage role permissions" ON public.role_permissions;
 CREATE POLICY "Admins can manage role permissions" ON public.role_permissions
   FOR ALL TO authenticated
   USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
 
+DROP POLICY IF EXISTS "Authenticated users can read role permissions" ON public.role_permissions;
 CREATE POLICY "Authenticated users can read role permissions" ON public.role_permissions
   FOR SELECT TO authenticated
   USING (true);
@@ -7673,10 +7919,12 @@ CREATE INDEX IF NOT EXISTS idx_perm_overrides_active ON public.permission_overri
 
 ALTER TABLE public.permission_overrides ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins manage overrides" ON public.permission_overrides;
 CREATE POLICY "Admins manage overrides" ON public.permission_overrides
   FOR ALL TO authenticated
   USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
 
+DROP POLICY IF EXISTS "Users can read own overrides" ON public.permission_overrides;
 CREATE POLICY "Users can read own overrides" ON public.permission_overrides
   FOR SELECT TO authenticated
   USING (
@@ -7708,6 +7956,7 @@ CREATE INDEX IF NOT EXISTS idx_perm_audit_change_type ON public.permission_audit
 
 ALTER TABLE public.permission_audit_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can read audit log" ON public.permission_audit_log;
 CREATE POLICY "Admins can read audit log" ON public.permission_audit_log
   FOR SELECT TO authenticated
   USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
@@ -7745,6 +7994,7 @@ CREATE INDEX IF NOT EXISTS idx_notif_type ON public.notifications(type);
 
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users read own notifications" ON public.notifications;
 CREATE POLICY "Users read own notifications" ON public.notifications
   FOR SELECT TO authenticated
   USING (
@@ -7752,10 +8002,12 @@ CREATE POLICY "Users read own notifications" ON public.notifications
     OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Authenticated users can create notifications" ON public.notifications;
 CREATE POLICY "Authenticated users can create notifications" ON public.notifications
   FOR INSERT TO authenticated
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Users mark own notifications read" ON public.notifications;
 CREATE POLICY "Users mark own notifications read" ON public.notifications
   FOR UPDATE TO authenticated
   USING (recipient_id = auth.uid());
@@ -7775,6 +8027,7 @@ CREATE INDEX IF NOT EXISTS idx_notif_prefs_user ON public.notification_preferenc
 
 ALTER TABLE public.notification_preferences ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users manage own preferences" ON public.notification_preferences;
 CREATE POLICY "Users manage own preferences" ON public.notification_preferences
   FOR ALL TO authenticated
   USING (user_id = auth.uid());
@@ -7800,6 +8053,7 @@ CREATE INDEX IF NOT EXISTS idx_email_queue_status ON public.email_notification_q
 
 ALTER TABLE public.email_notification_queue ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can read email queue" ON public.email_notification_queue;
 CREATE POLICY "Admins can read email queue" ON public.email_notification_queue
   FOR SELECT TO authenticated
   USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
@@ -8002,6 +8256,7 @@ CREATE INDEX IF NOT EXISTS idx_trident_stale ON public.trident_scorecards (stale
 
 ALTER TABLE public.trident_scorecards ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Trident scorecard read - scorer, mandate owner, or admin" ON public.trident_scorecards;
 CREATE POLICY "Trident scorecard read - scorer, mandate owner, or admin"
   ON public.trident_scorecards FOR SELECT TO authenticated
   USING (
@@ -8010,10 +8265,12 @@ CREATE POLICY "Trident scorecard read - scorer, mandate owner, or admin"
     OR mandate_id IN (SELECT id FROM mandates WHERE lead_consultant_id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Authenticated users can create scorecards" ON public.trident_scorecards;
 CREATE POLICY "Authenticated users can create scorecards"
   ON public.trident_scorecards FOR INSERT TO authenticated
   WITH CHECK (auth.uid() = scored_by);
 
+DROP POLICY IF EXISTS "Trident scorecard update - scorer or admin" ON public.trident_scorecards;
 CREATE POLICY "Trident scorecard update - scorer or admin"
   ON public.trident_scorecards FOR UPDATE TO authenticated
   USING (
@@ -8285,6 +8542,7 @@ CREATE INDEX IF NOT EXISTS idx_channel_sync ON public.channel_accounts(sync_stat
 
 ALTER TABLE public.channel_accounts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own accounts" ON public.channel_accounts;
 CREATE POLICY "Users can view own accounts" ON public.channel_accounts
   FOR SELECT TO authenticated
   USING (
@@ -8292,6 +8550,7 @@ CREATE POLICY "Users can view own accounts" ON public.channel_accounts
     OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Users can manage own accounts" ON public.channel_accounts;
 CREATE POLICY "Users can manage own accounts" ON public.channel_accounts
   FOR ALL TO authenticated
   USING (user_id = auth.uid());
@@ -8311,9 +8570,11 @@ CREATE TABLE IF NOT EXISTS public.email_sync_state (
 
 ALTER TABLE public.email_sync_state ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role manages sync state" ON public.email_sync_state;
 CREATE POLICY "Service role manages sync state" ON public.email_sync_state
   FOR ALL USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins can view sync state" ON public.email_sync_state;
 CREATE POLICY "Admins can view sync state" ON public.email_sync_state
   FOR SELECT TO authenticated
   USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
@@ -8354,6 +8615,7 @@ CREATE INDEX IF NOT EXISTS idx_email_thread_last_msg ON public.email_threads(las
 
 ALTER TABLE public.email_threads ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own email threads" ON public.email_threads;
 CREATE POLICY "Users can view own email threads" ON public.email_threads
   FOR SELECT TO authenticated
   USING (
@@ -8364,10 +8626,12 @@ CREATE POLICY "Users can view own email threads" ON public.email_threads
     )
   );
 
+DROP POLICY IF EXISTS "Users can create email threads" ON public.email_threads;
 CREATE POLICY "Users can create email threads" ON public.email_threads
   FOR INSERT TO authenticated
   WITH CHECK (owner_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can update own email threads" ON public.email_threads;
 CREATE POLICY "Users can update own email threads" ON public.email_threads
   FOR UPDATE TO authenticated
   USING (owner_id = auth.uid());
@@ -8408,6 +8672,7 @@ CREATE INDEX IF NOT EXISTS idx_email_msg_sent ON public.email_messages(sent_at D
 
 ALTER TABLE public.email_messages ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view messages from own threads" ON public.email_messages;
 CREATE POLICY "Users can view messages from own threads" ON public.email_messages
   FOR SELECT TO authenticated
   USING (
@@ -8424,6 +8689,7 @@ CREATE POLICY "Users can view messages from own threads" ON public.email_message
     )
   );
 
+DROP POLICY IF EXISTS "Users can create messages" ON public.email_messages;
 CREATE POLICY "Users can create messages" ON public.email_messages
   FOR INSERT TO authenticated
   WITH CHECK (true);
@@ -8468,12 +8734,15 @@ CREATE INDEX IF NOT EXISTS idx_wechat_unlinked ON public.wechat_interactions(out
 
 ALTER TABLE public.wechat_interactions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Team can view WeChat interactions" ON public.wechat_interactions;
 CREATE POLICY "Team can view WeChat interactions" ON public.wechat_interactions
   FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Team can create WeChat interactions" ON public.wechat_interactions;
 CREATE POLICY "Team can create WeChat interactions" ON public.wechat_interactions
   FOR INSERT TO authenticated WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Users can update own WeChat interactions" ON public.wechat_interactions;
 CREATE POLICY "Users can update own WeChat interactions" ON public.wechat_interactions
   FOR UPDATE TO authenticated
   USING (logged_by = auth.uid());
@@ -8503,10 +8772,12 @@ CREATE INDEX IF NOT EXISTS idx_tpl_shared ON public.email_templates(is_shared)
 
 ALTER TABLE public.email_templates ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own + shared templates" ON public.email_templates;
 CREATE POLICY "Users can view own + shared templates" ON public.email_templates
   FOR SELECT TO authenticated
   USING (created_by = auth.uid() OR is_shared = TRUE);
 
+DROP POLICY IF EXISTS "Users can manage own templates" ON public.email_templates;
 CREATE POLICY "Users can manage own templates" ON public.email_templates
   FOR ALL TO authenticated
   USING (created_by = auth.uid());
@@ -8598,8 +8869,11 @@ CREATE TABLE IF NOT EXISTS grid_mappings (
 CREATE INDEX IF NOT EXISTS idx_grid_mandate ON grid_mappings(mandate_id);
 
 ALTER TABLE grid_mappings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view GRID mappings" ON grid_mappings;
 CREATE POLICY "Team can view GRID mappings" ON grid_mappings FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can create GRID mappings" ON grid_mappings;
 CREATE POLICY "Team can create GRID mappings" ON grid_mappings FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Team can update GRID mappings" ON grid_mappings;
 CREATE POLICY "Team can update GRID mappings" ON grid_mappings FOR UPDATE TO authenticated USING (true);
 
 --- grid_sectors TABLE ---
@@ -8614,7 +8888,9 @@ CREATE TABLE IF NOT EXISTS grid_sectors (
 );
 CREATE INDEX IF NOT EXISTS idx_grid_sectors_mapping ON grid_sectors(mapping_id);
 ALTER TABLE grid_sectors ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view sectors" ON grid_sectors;
 CREATE POLICY "Team can view sectors" ON grid_sectors FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can manage sectors" ON grid_sectors;
 CREATE POLICY "Team can manage sectors" ON grid_sectors FOR ALL TO authenticated USING (true);
 
 --- grid_companies TABLE ---
@@ -8632,7 +8908,9 @@ CREATE TABLE IF NOT EXISTS grid_companies (
 CREATE INDEX IF NOT EXISTS idx_grid_companies_mapping ON grid_companies(mapping_id);
 CREATE INDEX IF NOT EXISTS idx_grid_companies_sector ON grid_companies(sector_id);
 ALTER TABLE grid_companies ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view companies" ON grid_companies;
 CREATE POLICY "Team can view companies" ON grid_companies FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can manage companies" ON grid_companies;
 CREATE POLICY "Team can manage companies" ON grid_companies FOR ALL TO authenticated USING (true);
 
 --- grid_functions TABLE ---
@@ -8647,7 +8925,9 @@ CREATE TABLE IF NOT EXISTS grid_functions (
 );
 CREATE INDEX IF NOT EXISTS idx_grid_functions_mapping ON grid_functions(mapping_id);
 ALTER TABLE grid_functions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view functions" ON grid_functions;
 CREATE POLICY "Team can view functions" ON grid_functions FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can manage functions" ON grid_functions;
 CREATE POLICY "Team can manage functions" ON grid_functions FOR ALL TO authenticated USING (true);
 
 --- grid_candidate_entries TABLE ---
@@ -8664,7 +8944,9 @@ CREATE TABLE IF NOT EXISTS grid_candidate_entries (
 CREATE INDEX IF NOT EXISTS idx_grid_entries_mapping ON grid_candidate_entries(mapping_id);
 CREATE INDEX IF NOT EXISTS idx_grid_entries_contact ON grid_candidate_entries(contact_id);
 ALTER TABLE grid_candidate_entries ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view entries" ON grid_candidate_entries;
 CREATE POLICY "Team can view entries" ON grid_candidate_entries FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can manage entries" ON grid_candidate_entries;
 CREATE POLICY "Team can manage entries" ON grid_candidate_entries FOR ALL TO authenticated USING (true);
 
 --- grid_minimum_standards TABLE ---
@@ -8678,7 +8960,9 @@ CREATE TABLE IF NOT EXISTS grid_minimum_standards (
 );
 CREATE INDEX IF NOT EXISTS idx_grid_standards_mapping ON grid_minimum_standards(mapping_id);
 ALTER TABLE grid_minimum_standards ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view standards" ON grid_minimum_standards;
 CREATE POLICY "Team can view standards" ON grid_minimum_standards FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can manage standards" ON grid_minimum_standards;
 CREATE POLICY "Team can manage standards" ON grid_minimum_standards FOR ALL TO authenticated USING (true);
 
 -- ════════════════════════════════════════════════════════════════════════
