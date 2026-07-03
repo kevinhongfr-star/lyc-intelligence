@@ -73,7 +73,7 @@ export async function analyzeCV(cvText: string): Promise<{
   error?: string;
 }> {
   try {
-    const res = await authFetch('/api/x/ai/analyze-cv', {
+    const res = await authFetch('/api/ai/analyze-cv', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cvText }),
@@ -126,7 +126,7 @@ export async function generateInterviewQuestions(
   error?: string;
 }> {
   try {
-    const res = await authFetch('/api/x/ai/generate-questions', {
+    const res = await authFetch('/api/ai/generate-questions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mandate, successProfile }),
@@ -188,7 +188,7 @@ export async function suggestOffer(
   error?: string;
 }> {
   try {
-    const res = await authFetch('/api/x/ai/negotiate-offer', {
+    const res = await authFetch('/api/ai/negotiate-offer', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ candidate, mandate, marketData }),

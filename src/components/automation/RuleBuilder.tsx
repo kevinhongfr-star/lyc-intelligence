@@ -127,8 +127,8 @@ export function RuleBuilder({ orgId, userId, initialRule, onSave, onCancel }: Ru
     try {
       const method = initialRule?.id ? 'PUT' : 'POST';
       const url = initialRule?.id
-        ? `/api/x/automation/rules/${initialRule.id}`
-        : '/api/x/automation/rules';
+        ? `/api/automation/rules/${initialRule.id}`
+        : '/api/automation/rules';
 
       const response = await fetch(url, {
         method,

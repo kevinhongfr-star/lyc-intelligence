@@ -55,7 +55,7 @@ export function PipelineMetrics({ orgId, period = 'all' }: PipelineMetricsProps)
   const fetchMetrics = async () => {
     try {
       const response = await fetch(
-        `/api/x/bd/metrics?org_id=${orgId}&period=${period}`
+        `/api/bd/metrics?org_id=${orgId}&period=${period}`
       );
       const result = await response.json();
       if (result.success) {

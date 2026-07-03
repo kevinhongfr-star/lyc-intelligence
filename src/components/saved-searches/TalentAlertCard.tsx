@@ -54,7 +54,7 @@ export function TalentAlertCard({ userId, onViewCandidate }: TalentAlertCardProp
 
   const handleMarkAsViewed = async (alertId: string) => {
     try {
-      await fetch(`/api/x/talent-alerts/${alertId}`, {
+      await fetch(`/api/talent-alerts/${alertId}`, {
         method: 'PUT',
       });
       fetchAlerts();
@@ -65,7 +65,7 @@ export function TalentAlertCard({ userId, onViewCandidate }: TalentAlertCardProp
 
   const handleMarkAllAsViewed = async () => {
     try {
-      await fetch(`/api/x/talent-alerts/mark-all?user_id=${userId}`, {
+      await fetch(`/api/talent-alerts/mark-all?user_id=${userId}`, {
         method: 'PUT',
       });
       fetchAlerts();

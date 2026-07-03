@@ -75,7 +75,7 @@ export function ApprovalHistory({ orgId, onSelectRequest }: ApprovalHistoryProps
   const fetchApprovals = async () => {
     setIsLoading(true);
     try {
-      let url = `/api/x/approvals/requests?org_id=${orgId}`;
+      let url = `/api/approvals/requests?org_id=${orgId}`;
       if (statusFilter) {
         url += `&status=${statusFilter}`;
       }

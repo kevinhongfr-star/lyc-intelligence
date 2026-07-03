@@ -57,7 +57,7 @@ export function EscalationBanner({ orgId, onViewEscalations }: EscalationBannerP
     const fetchEscalations = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/x/sla/escalations?org_id=${orgId}&acknowledged=true`);
+        const response = await fetch(`/api/sla/escalations?org_id=${orgId}&acknowledged=true`);
         const result = await response.json();
 
         if (result.success) {
@@ -90,7 +90,7 @@ export function EscalationBanner({ orgId, onViewEscalations }: EscalationBannerP
 
   const handleAcknowledge = async (escalationId: string) => {
     try {
-      await fetch(`/api/x/sla/escalations`, {
+      await fetch(`/api/sla/escalations`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: escalationId }),

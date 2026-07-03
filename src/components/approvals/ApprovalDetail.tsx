@@ -96,7 +96,7 @@ export function ApprovalDetail({ requestId, approverId, onClose, onActionComplet
   const fetchDetail = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/x/approvals/requests/${requestId}`);
+      const response = await fetch(`/api/approvals/requests/${requestId}`);
       const result = await response.json();
 
       if (result.success) {
@@ -120,7 +120,7 @@ export function ApprovalDetail({ requestId, approverId, onClose, onActionComplet
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/x/approvals/requests/${requestId}/approve`, {
+      const response = await fetch(`/api/approvals/requests/${requestId}/approve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

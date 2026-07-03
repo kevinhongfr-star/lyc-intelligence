@@ -63,7 +63,7 @@ export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity
 
   const fetchPipeline = useCallback(async () => {
     try {
-      const response = await fetch(`/api/x/bd/pipeline?org_id=${orgId}`);
+      const response = await fetch(`/api/bd/pipeline?org_id=${orgId}`);
       const result = await response.json();
       if (result.success) {
         setKanbanData(result.data);
@@ -107,7 +107,7 @@ export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity
     }
 
     try {
-      const response = await fetch(`/api/x/bd/opportunities/${draggedItem.id}`, {
+      const response = await fetch(`/api/bd/opportunities/${draggedItem.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

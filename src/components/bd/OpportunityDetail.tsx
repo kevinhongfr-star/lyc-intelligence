@@ -57,7 +57,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
 
   const fetchOpportunity = async () => {
     try {
-      const response = await fetch(`/api/x/bd/opportunities/${opportunityId}?org_id=${orgId}`);
+      const response = await fetch(`/api/bd/opportunities/${opportunityId}?org_id=${orgId}`);
       const result = await response.json();
       if (result.success) {
         setOpportunity(result.data);
@@ -73,7 +73,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
   const fetchActivities = async () => {
     try {
       const response = await fetch(
-        `/api/x/bd/opportunities/${opportunityId}/activities?org_id=${orgId}`
+        `/api/bd/opportunities/${opportunityId}/activities?org_id=${orgId}`
       );
       const result = await response.json();
       if (result.success) {
@@ -87,7 +87,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
   const fetchProposals = async () => {
     try {
       const response = await fetch(
-        `/api/x/bd/proposals?org_id=${orgId}&opportunity_id=${opportunityId}`
+        `/api/bd/proposals?org_id=${orgId}&opportunity_id=${opportunityId}`
       );
       const result = await response.json();
       if (result.success) {
@@ -102,7 +102,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
     if (!opportunity) return;
 
     try {
-      const response = await fetch(`/api/x/bd/opportunities/${opportunityId}`, {
+      const response = await fetch(`/api/bd/opportunities/${opportunityId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -129,7 +129,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
 
     try {
       const response = await fetch(
-        `/api/x/bd/opportunities/${opportunityId}/activities`,
+        `/api/bd/opportunities/${opportunityId}/activities`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -156,7 +156,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
     if (!confirm('Hand off this opportunity to the Intake module?')) return;
 
     try {
-      const response = await fetch(`/api/x/bd/opportunities/${opportunityId}`, {
+      const response = await fetch(`/api/bd/opportunities/${opportunityId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -44,7 +44,7 @@ export function ReferralForm({ alumniId, orgId, onSuccess }: ReferralFormProps) 
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/x/alumni/referrals', {
+      const response = await fetch('/api/alumni/referrals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

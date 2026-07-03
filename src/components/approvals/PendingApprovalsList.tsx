@@ -65,7 +65,7 @@ export function PendingApprovalsList({ userId, orgId, onSelectRequest }: Pending
     setIsLoading(true);
     try {
       const response = await fetch(
-        `/api/x/approvals/my-pending?user_id=${userId}&org_id=${orgId}`
+        `/api/approvals/my-pending?user_id=${userId}&org_id=${orgId}`
       );
       const result = await response.json();
 

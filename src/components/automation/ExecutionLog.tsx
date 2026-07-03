@@ -48,7 +48,7 @@ export function ExecutionLog({ orgId, ruleId, limit = 50 }: ExecutionLogProps) {
   const fetchExecutions = async () => {
     setLoading(true);
     try {
-      let url = `/api/x/automation/executions?org_id=${orgId}&limit=${limit}`;
+      let url = `/api/automation/executions?org_id=${orgId}&limit=${limit}`;
       if (ruleId) url += `&rule_id=${ruleId}`;
       if (statusFilter !== 'all') url += `&status=${statusFilter}`;
 
