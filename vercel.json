@@ -4,11 +4,11 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "^/api/([^/]+)(?:/(.*))?$",
-      "destination": "/api?__module=$1&__path=$2"
+      "source": "/api/:segment/:path*",
+      "destination": "/api?__module=:segment&__path=:path*"
     },
     {
-      "source": "^/((?!api).*)$",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ],
