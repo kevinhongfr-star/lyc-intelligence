@@ -23,8 +23,14 @@ CREATE TABLE IF NOT EXISTS grid_mappings (
 CREATE INDEX IF NOT EXISTS idx_grid_mandate ON grid_mappings(mandate_id);
 
 ALTER TABLE grid_mappings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view GRID mappings" ON grid_mappings;
+DROP POLICY IF EXISTS "Team can view GRID mappings" ON grid_mappings;
 CREATE POLICY "Team can view GRID mappings" ON grid_mappings FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can create GRID mappings" ON grid_mappings;
+DROP POLICY IF EXISTS "Team can create GRID mappings" ON grid_mappings;
 CREATE POLICY "Team can create GRID mappings" ON grid_mappings FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Team can update GRID mappings" ON grid_mappings;
+DROP POLICY IF EXISTS "Team can update GRID mappings" ON grid_mappings;
 CREATE POLICY "Team can update GRID mappings" ON grid_mappings FOR UPDATE TO authenticated USING (true);
 
 --- grid_sectors TABLE ---
@@ -39,7 +45,11 @@ CREATE TABLE IF NOT EXISTS grid_sectors (
 );
 CREATE INDEX IF NOT EXISTS idx_grid_sectors_mapping ON grid_sectors(mapping_id);
 ALTER TABLE grid_sectors ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view sectors" ON grid_sectors;
+DROP POLICY IF EXISTS "Team can view sectors" ON grid_sectors;
 CREATE POLICY "Team can view sectors" ON grid_sectors FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can manage sectors" ON grid_sectors;
+DROP POLICY IF EXISTS "Team can manage sectors" ON grid_sectors;
 CREATE POLICY "Team can manage sectors" ON grid_sectors FOR ALL TO authenticated USING (true);
 
 --- grid_companies TABLE ---
@@ -57,7 +67,11 @@ CREATE TABLE IF NOT EXISTS grid_companies (
 CREATE INDEX IF NOT EXISTS idx_grid_companies_mapping ON grid_companies(mapping_id);
 CREATE INDEX IF NOT EXISTS idx_grid_companies_sector ON grid_companies(sector_id);
 ALTER TABLE grid_companies ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view companies" ON grid_companies;
+DROP POLICY IF EXISTS "Team can view companies" ON grid_companies;
 CREATE POLICY "Team can view companies" ON grid_companies FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can manage companies" ON grid_companies;
+DROP POLICY IF EXISTS "Team can manage companies" ON grid_companies;
 CREATE POLICY "Team can manage companies" ON grid_companies FOR ALL TO authenticated USING (true);
 
 --- grid_functions TABLE ---
@@ -72,7 +86,11 @@ CREATE TABLE IF NOT EXISTS grid_functions (
 );
 CREATE INDEX IF NOT EXISTS idx_grid_functions_mapping ON grid_functions(mapping_id);
 ALTER TABLE grid_functions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view functions" ON grid_functions;
+DROP POLICY IF EXISTS "Team can view functions" ON grid_functions;
 CREATE POLICY "Team can view functions" ON grid_functions FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can manage functions" ON grid_functions;
+DROP POLICY IF EXISTS "Team can manage functions" ON grid_functions;
 CREATE POLICY "Team can manage functions" ON grid_functions FOR ALL TO authenticated USING (true);
 
 --- grid_candidate_entries TABLE ---
@@ -89,7 +107,11 @@ CREATE TABLE IF NOT EXISTS grid_candidate_entries (
 CREATE INDEX IF NOT EXISTS idx_grid_entries_mapping ON grid_candidate_entries(mapping_id);
 CREATE INDEX IF NOT EXISTS idx_grid_entries_contact ON grid_candidate_entries(contact_id);
 ALTER TABLE grid_candidate_entries ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view entries" ON grid_candidate_entries;
+DROP POLICY IF EXISTS "Team can view entries" ON grid_candidate_entries;
 CREATE POLICY "Team can view entries" ON grid_candidate_entries FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can manage entries" ON grid_candidate_entries;
+DROP POLICY IF EXISTS "Team can manage entries" ON grid_candidate_entries;
 CREATE POLICY "Team can manage entries" ON grid_candidate_entries FOR ALL TO authenticated USING (true);
 
 --- grid_minimum_standards TABLE ---
@@ -103,7 +125,11 @@ CREATE TABLE IF NOT EXISTS grid_minimum_standards (
 );
 CREATE INDEX IF NOT EXISTS idx_grid_standards_mapping ON grid_minimum_standards(mapping_id);
 ALTER TABLE grid_minimum_standards ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Team can view standards" ON grid_minimum_standards;
+DROP POLICY IF EXISTS "Team can view standards" ON grid_minimum_standards;
 CREATE POLICY "Team can view standards" ON grid_minimum_standards FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Team can manage standards" ON grid_minimum_standards;
+DROP POLICY IF EXISTS "Team can manage standards" ON grid_minimum_standards;
 CREATE POLICY "Team can manage standards" ON grid_minimum_standards FOR ALL TO authenticated USING (true);
 
 -- ════════════════════════════════════════════════════════════════════════

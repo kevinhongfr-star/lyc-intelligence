@@ -33,9 +33,17 @@ DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Admins can view all profiles" ON public.profiles;
 DROP POLICY IF EXISTS "Admins can manage all profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Admins can view all profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Admins can view all profiles" ON public.profiles;
 CREATE POLICY "Admins can view all profiles" ON public.profiles FOR SELECT USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','lyc_admin')));
+DROP POLICY IF EXISTS "Admins can manage all profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Admins can manage all profiles" ON public.profiles;
 CREATE POLICY "Admins can manage all profiles" ON public.profiles FOR ALL USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','lyc_admin')));
 
 -- PART 0b: organizations table (needed by many migrations)
@@ -50,8 +58,14 @@ ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role full access on organizations" ON public.organizations;
 DROP POLICY IF EXISTS "Admins read organizations" ON public.organizations;
 DROP POLICY IF EXISTS "Admins write organizations" ON public.organizations;
+DROP POLICY IF EXISTS "Service role full access on organizations" ON public.organizations;
+DROP POLICY IF EXISTS "Service role full access on organizations" ON public.organizations;
 CREATE POLICY "Service role full access on organizations" ON public.organizations FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Admins read organizations" ON public.organizations;
+DROP POLICY IF EXISTS "Admins read organizations" ON public.organizations;
 CREATE POLICY "Admins read organizations" ON public.organizations FOR SELECT USING (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin','super_admin')));
+DROP POLICY IF EXISTS "Admins write organizations" ON public.organizations;
+DROP POLICY IF EXISTS "Admins write organizations" ON public.organizations;
 CREATE POLICY "Admins write organizations" ON public.organizations FOR ALL USING (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin','super_admin')));
 
 -- PART 0c: set_updated_at function
@@ -126,21 +140,25 @@ CREATE INDEX IF NOT EXISTS idx_memories_created_at
 ALTER TABLE public.memories ENABLE ROW LEVEL SECURITY;
 
 -- Service role has full access (backend operations, cross-user admin tasks)
+DROP POLICY IF EXISTS "Service role full access on memories" ON ON public.memories;
 CREATE POLICY "Service role full access on memories"
   ON public.memories FOR ALL
   USING (auth.role() = 'service_role');
 
 -- Users can read their own memories
+DROP POLICY IF EXISTS "Users read own memories" ON ON public.memories;
 CREATE POLICY "Users read own memories"
   ON public.memories FOR SELECT
   USING (auth.uid() = user_id);
 
 -- Users can insert memories for themselves (frontend optimistic + offline)
+DROP POLICY IF EXISTS "Users insert own memories" ON ON public.memories;
 CREATE POLICY "Users insert own memories"
   ON public.memories FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
 -- Users can update (e.g., deactivate) their own memories
+DROP POLICY IF EXISTS "Users update own memories" ON ON public.memories;
 CREATE POLICY "Users update own memories"
   ON public.memories FOR UPDATE
   USING (auth.uid() = user_id);
@@ -199,22 +217,26 @@ CREATE INDEX IF NOT EXISTS idx_share_cards_type
 ALTER TABLE public.share_cards ENABLE ROW LEVEL SECURITY;
 
 -- Service role has full access
+DROP POLICY IF EXISTS "Service role full access on share_cards" ON ON public.share_cards;
 CREATE POLICY "Service role full access on share_cards"
   ON public.share_cards FOR ALL
   USING (auth.role() = 'service_role');
 
 -- Users can read their own share cards
+DROP POLICY IF EXISTS "Users read own share_cards" ON ON public.share_cards;
 CREATE POLICY "Users read own share_cards"
   ON public.share_cards FOR SELECT
   USING (auth.uid() = user_id);
 
 -- Users can insert their own share cards
+DROP POLICY IF EXISTS "Users insert own share_cards" ON ON public.share_cards;
 CREATE POLICY "Users insert own share_cards"
   ON public.share_cards FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
 -- Public read access for active, non-expired cards by public_uuid
 -- (Needed for share preview pages accessed by anonymous users)
+DROP POLICY IF EXISTS "Public read active share cards by uuid" ON ON public.share_cards;
 CREATE POLICY "Public read active share cards by uuid"
   ON public.share_cards FOR SELECT
   USING (
@@ -283,10 +305,12 @@ CREATE INDEX IF NOT EXISTS idx_target_companies_comparator
 
 ALTER TABLE public.target_companies ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on target_companies" ON ON public.target_companies;
 CREATE POLICY "Service role full access on target_companies"
   ON public.target_companies FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read target_companies" ON ON public.target_companies;
 CREATE POLICY "Admins read target_companies"
   ON public.target_companies FOR SELECT
   USING (
@@ -294,6 +318,7 @@ CREATE POLICY "Admins read target_companies"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write target_companies" ON ON public.target_companies;
 CREATE POLICY "Admins write target_companies"
   ON public.target_companies FOR ALL
   USING (
@@ -326,10 +351,12 @@ CREATE INDEX IF NOT EXISTS idx_org_snapshots_company_date
 
 ALTER TABLE public.org_snapshots ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_snapshots" ON ON public.org_snapshots;
 CREATE POLICY "Service role full access on org_snapshots"
   ON public.org_snapshots FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_snapshots" ON ON public.org_snapshots;
 CREATE POLICY "Admins read org_snapshots"
   ON public.org_snapshots FOR SELECT
   USING (
@@ -337,6 +364,7 @@ CREATE POLICY "Admins read org_snapshots"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write org_snapshots" ON ON public.org_snapshots;
 CREATE POLICY "Admins write org_snapshots"
   ON public.org_snapshots FOR ALL
   USING (
@@ -383,10 +411,12 @@ CREATE INDEX IF NOT EXISTS idx_org_talent_pools_manager
 
 ALTER TABLE public.org_talent_pools ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_talent_pools" ON ON public.org_talent_pools;
 CREATE POLICY "Service role full access on org_talent_pools"
   ON public.org_talent_pools FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_talent_pools" ON ON public.org_talent_pools;
 CREATE POLICY "Admins read org_talent_pools"
   ON public.org_talent_pools FOR SELECT
   USING (
@@ -394,6 +424,7 @@ CREATE POLICY "Admins read org_talent_pools"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write org_talent_pools" ON ON public.org_talent_pools;
 CREATE POLICY "Admins write org_talent_pools"
   ON public.org_talent_pools FOR ALL
   USING (
@@ -434,10 +465,12 @@ CREATE INDEX IF NOT EXISTS idx_org_evaluations_final
 
 ALTER TABLE public.org_evaluations ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_evaluations" ON ON public.org_evaluations;
 CREATE POLICY "Service role full access on org_evaluations"
   ON public.org_evaluations FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_evaluations" ON ON public.org_evaluations;
 CREATE POLICY "Admins read org_evaluations"
   ON public.org_evaluations FOR SELECT
   USING (
@@ -445,6 +478,7 @@ CREATE POLICY "Admins read org_evaluations"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write org_evaluations" ON ON public.org_evaluations;
 CREATE POLICY "Admins write org_evaluations"
   ON public.org_evaluations FOR ALL
   USING (
@@ -485,10 +519,12 @@ CREATE INDEX IF NOT EXISTS idx_org_evaluation_scores_criterion
 
 ALTER TABLE public.org_evaluation_scores ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_evaluation_scores" ON ON public.org_evaluation_scores;
 CREATE POLICY "Service role full access on org_evaluation_scores"
   ON public.org_evaluation_scores FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_evaluation_scores" ON ON public.org_evaluation_scores;
 CREATE POLICY "Admins read org_evaluation_scores"
   ON public.org_evaluation_scores FOR SELECT
   USING (
@@ -496,6 +532,7 @@ CREATE POLICY "Admins read org_evaluation_scores"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write org_evaluation_scores" ON ON public.org_evaluation_scores;
 CREATE POLICY "Admins write org_evaluation_scores"
   ON public.org_evaluation_scores FOR ALL
   USING (
@@ -525,10 +562,12 @@ CREATE TABLE IF NOT EXISTS public.sourcing_channels (
 
 ALTER TABLE public.sourcing_channels ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on sourcing_channels" ON ON public.sourcing_channels;
 CREATE POLICY "Service role full access on sourcing_channels"
   ON public.sourcing_channels FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read sourcing_channels" ON ON public.sourcing_channels;
 CREATE POLICY "Admins read sourcing_channels"
   ON public.sourcing_channels FOR SELECT
   USING (
@@ -536,6 +575,7 @@ CREATE POLICY "Admins read sourcing_channels"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write sourcing_channels" ON ON public.sourcing_channels;
 CREATE POLICY "Admins write sourcing_channels"
   ON public.sourcing_channels FOR ALL
   USING (
@@ -574,10 +614,12 @@ CREATE INDEX IF NOT EXISTS idx_org_talent_attachments_talent
 
 ALTER TABLE public.org_talent_attachments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_talent_attachments" ON ON public.org_talent_attachments;
 CREATE POLICY "Service role full access on org_talent_attachments"
   ON public.org_talent_attachments FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_talent_attachments" ON ON public.org_talent_attachments;
 CREATE POLICY "Admins read org_talent_attachments"
   ON public.org_talent_attachments FOR SELECT
   USING (
@@ -585,6 +627,7 @@ CREATE POLICY "Admins read org_talent_attachments"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write org_talent_attachments" ON ON public.org_talent_attachments;
 CREATE POLICY "Admins write org_talent_attachments"
   ON public.org_talent_attachments FOR ALL
   USING (
@@ -615,10 +658,12 @@ CREATE INDEX IF NOT EXISTS idx_one_pagers_published
 
 ALTER TABLE public.one_pagers ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on one_pagers" ON ON public.one_pagers;
 CREATE POLICY "Service role full access on one_pagers"
   ON public.one_pagers FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read one_pagers" ON ON public.one_pagers;
 CREATE POLICY "Admins read one_pagers"
   ON public.one_pagers FOR SELECT
   USING (
@@ -626,6 +671,7 @@ CREATE POLICY "Admins read one_pagers"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write one_pagers" ON ON public.one_pagers;
 CREATE POLICY "Admins write one_pagers"
   ON public.one_pagers FOR ALL
   USING (
@@ -665,10 +711,12 @@ CREATE INDEX IF NOT EXISTS idx_grid_reports_status
 
 ALTER TABLE public.grid_reports ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on grid_reports" ON ON public.grid_reports;
 CREATE POLICY "Service role full access on grid_reports"
   ON public.grid_reports FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read grid_reports" ON ON public.grid_reports;
 CREATE POLICY "Admins read grid_reports"
   ON public.grid_reports FOR SELECT
   USING (
@@ -676,6 +724,7 @@ CREATE POLICY "Admins read grid_reports"
             WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
   );
 
+DROP POLICY IF EXISTS "Admins write grid_reports" ON ON public.grid_reports;
 CREATE POLICY "Admins write grid_reports"
   ON public.grid_reports FOR ALL
   USING (
@@ -708,10 +757,12 @@ CREATE INDEX IF NOT EXISTS idx_org_audit_log_action
 
 ALTER TABLE public.org_audit_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on org_audit_log" ON ON public.org_audit_log;
 CREATE POLICY "Service role full access on org_audit_log"
   ON public.org_audit_log FOR ALL
   USING (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Admins read org_audit_log" ON ON public.org_audit_log;
 CREATE POLICY "Admins read org_audit_log"
   ON public.org_audit_log FOR SELECT
   USING (
@@ -828,6 +879,8 @@ CREATE TRIGGER trg_audit_mandates
 
 -- RLS: admin-only read
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Admin read audit_logs" ON audit_logs;
+DROP POLICY IF EXISTS "Admin read audit_logs" ON audit_logs;
 CREATE POLICY "Admin read audit_logs" ON audit_logs FOR SELECT USING (
   EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
 );

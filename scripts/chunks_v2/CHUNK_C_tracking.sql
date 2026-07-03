@@ -110,36 +110,50 @@ ALTER TABLE alumni_referrals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE alumni_campaigns ENABLE ROW LEVEL SECURITY;
 
 -- Organization-based access policies
+DROP POLICY IF EXISTS "Users can view org alumni" ON alumni;
+DROP POLICY IF EXISTS "Users can view org alumni" ON alumni;
 CREATE POLICY "Users can view org alumni" ON alumni
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can create org alumni" ON alumni;
+DROP POLICY IF EXISTS "Users can create org alumni" ON alumni;
 CREATE POLICY "Users can create org alumni" ON alumni
   FOR INSERT WITH CHECK (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can update org alumni" ON alumni;
+DROP POLICY IF EXISTS "Users can update org alumni" ON alumni;
 CREATE POLICY "Users can update org alumni" ON alumni
   FOR UPDATE USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org alumni engagements" ON alumni_engagements;
+DROP POLICY IF EXISTS "Users can view org alumni engagements" ON alumni_engagements;
 CREATE POLICY "Users can view org alumni engagements" ON alumni_engagements
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org guarantee periods" ON guarantee_periods;
+DROP POLICY IF EXISTS "Users can view org guarantee periods" ON guarantee_periods;
 CREATE POLICY "Users can view org guarantee periods" ON guarantee_periods
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org alumni referrals" ON alumni_referrals;
+DROP POLICY IF EXISTS "Users can view org alumni referrals" ON alumni_referrals;
 CREATE POLICY "Users can view org alumni referrals" ON alumni_referrals
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org alumni campaigns" ON alumni_campaigns;
+DROP POLICY IF EXISTS "Users can view org alumni campaigns" ON alumni_campaigns;
 CREATE POLICY "Users can view org alumni campaigns" ON alumni_campaigns
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
@@ -271,18 +285,28 @@ ALTER TABLE approval_step_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE approval_delegations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE approval_audit_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_workflows" ON approval_workflows;
+DROP POLICY IF EXISTS "org_workflows" ON approval_workflows;
 CREATE POLICY "org_workflows" ON approval_workflows
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_requests" ON approval_requests;
+DROP POLICY IF EXISTS "org_requests" ON approval_requests;
 CREATE POLICY "org_requests" ON approval_requests
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_steps" ON approval_step_records;
+DROP POLICY IF EXISTS "org_steps" ON approval_step_records;
 CREATE POLICY "org_steps" ON approval_step_records
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_delegations" ON approval_delegations;
+DROP POLICY IF EXISTS "org_delegations" ON approval_delegations;
 CREATE POLICY "org_delegations" ON approval_delegations
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_audit" ON approval_audit_log;
+DROP POLICY IF EXISTS "org_audit" ON approval_audit_log;
 CREATE POLICY "org_audit" ON approval_audit_log
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
@@ -340,16 +364,22 @@ CREATE INDEX IF NOT EXISTS idx_background_checks_status ON background_checks(sta
 
 ALTER TABLE background_checks ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view org background checks" ON background_checks;
+DROP POLICY IF EXISTS "Users can view org background checks" ON background_checks;
 CREATE POLICY "Users can view org background checks" ON background_checks
   FOR SELECT USING (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can create background checks" ON background_checks;
+DROP POLICY IF EXISTS "Users can create background checks" ON background_checks;
 CREATE POLICY "Users can create background checks" ON background_checks
   FOR INSERT WITH CHECK (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can update background checks" ON background_checks;
+DROP POLICY IF EXISTS "Users can update background checks" ON background_checks;
 CREATE POLICY "Users can update background checks" ON background_checks
   FOR UPDATE USING (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
@@ -513,15 +543,23 @@ ALTER TABLE bd_activities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bd_proposals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bd_pipeline_metrics ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_bd_opps" ON bd_opportunities;
+DROP POLICY IF EXISTS "org_bd_opps" ON bd_opportunities;
 CREATE POLICY "org_bd_opps" ON bd_opportunities
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_bd_activities" ON bd_activities;
+DROP POLICY IF EXISTS "org_bd_activities" ON bd_activities;
 CREATE POLICY "org_bd_activities" ON bd_activities
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_bd_proposals" ON bd_proposals;
+DROP POLICY IF EXISTS "org_bd_proposals" ON bd_proposals;
 CREATE POLICY "org_bd_proposals" ON bd_proposals
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_bd_metrics" ON bd_pipeline_metrics;
+DROP POLICY IF EXISTS "org_bd_metrics" ON bd_pipeline_metrics;
 CREATE POLICY "org_bd_metrics" ON bd_pipeline_metrics
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -553,16 +591,22 @@ CREATE INDEX IF NOT EXISTS idx_benchmark_runs_type ON benchmark_runs(assessment_
 
 ALTER TABLE benchmark_runs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view org benchmark runs" ON benchmark_runs;
+DROP POLICY IF EXISTS "Users can view org benchmark runs" ON benchmark_runs;
 CREATE POLICY "Users can view org benchmark runs" ON benchmark_runs
   FOR SELECT USING (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can create benchmark runs" ON benchmark_runs;
+DROP POLICY IF EXISTS "Users can create benchmark runs" ON benchmark_runs;
 CREATE POLICY "Users can create benchmark runs" ON benchmark_runs
   FOR INSERT WITH CHECK (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can update org benchmark runs" ON benchmark_runs;
+DROP POLICY IF EXISTS "Users can update org benchmark runs" ON benchmark_runs;
 CREATE POLICY "Users can update org benchmark runs" ON benchmark_runs
   FOR UPDATE USING (
     organization_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
@@ -657,12 +701,18 @@ ALTER TABLE comp_benchmarks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comp_data_points ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comp_survey_imports ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_benchmarks" ON comp_benchmarks;
+DROP POLICY IF EXISTS "org_benchmarks" ON comp_benchmarks;
 CREATE POLICY "org_benchmarks" ON comp_benchmarks
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_data_points" ON comp_data_points;
+DROP POLICY IF EXISTS "org_data_points" ON comp_data_points;
 CREATE POLICY "org_data_points" ON comp_data_points
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_surveys" ON comp_survey_imports;
+DROP POLICY IF EXISTS "org_surveys" ON comp_survey_imports;
 CREATE POLICY "org_surveys" ON comp_survey_imports
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -690,6 +740,8 @@ CREATE INDEX IF NOT EXISTS idx_kpi_values_org_kpi ON kpi_values(org_id, kpi_id, 
 
 ALTER TABLE kpi_values ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_read_own_kpis" ON kpi_values;
+DROP POLICY IF EXISTS "org_read_own_kpis" ON kpi_values;
 CREATE POLICY "org_read_own_kpis" ON kpi_values
   FOR SELECT USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -713,9 +765,13 @@ CREATE INDEX IF NOT EXISTS idx_kpi_alerts_org ON kpi_alerts(org_id, created_at D
 
 ALTER TABLE kpi_alerts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_read_own_alerts" ON kpi_alerts;
+DROP POLICY IF EXISTS "org_read_own_alerts" ON kpi_alerts;
 CREATE POLICY "org_read_own_alerts" ON kpi_alerts
   FOR SELECT USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_manage_alerts" ON kpi_alerts;
+DROP POLICY IF EXISTS "org_manage_alerts" ON kpi_alerts;
 CREATE POLICY "org_manage_alerts" ON kpi_alerts
   FOR UPDATE USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -764,22 +820,32 @@ ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notification_preferences ENABLE ROW LEVEL SECURITY;
 
 -- Users can view their own notifications
+DROP POLICY IF EXISTS "Users can view their notifications" ON notifications;
+DROP POLICY IF EXISTS "Users can view their notifications" ON notifications;
 CREATE POLICY "Users can view their notifications" ON notifications
   FOR SELECT USING (user_id = auth.uid());
 
 -- Users can update their own notifications (mark as read)
+DROP POLICY IF EXISTS "Users can update their notifications" ON notifications;
+DROP POLICY IF EXISTS "Users can update their notifications" ON notifications;
 CREATE POLICY "Users can update their notifications" ON notifications
   FOR UPDATE USING (user_id = auth.uid());
 
 -- Users can view their own preferences
+DROP POLICY IF EXISTS "Users can view their preferences" ON notification_preferences;
+DROP POLICY IF EXISTS "Users can view their preferences" ON notification_preferences;
 CREATE POLICY "Users can view their preferences" ON notification_preferences
   FOR SELECT USING (user_id = auth.uid());
 
 -- Users can update their own preferences
+DROP POLICY IF EXISTS "Users can update their preferences" ON notification_preferences;
+DROP POLICY IF EXISTS "Users can update their preferences" ON notification_preferences;
 CREATE POLICY "Users can update their preferences" ON notification_preferences
   FOR UPDATE USING (user_id = auth.uid());
 
 -- Users can insert their own preferences
+DROP POLICY IF EXISTS "Users can insert their preferences" ON notification_preferences;
+DROP POLICY IF EXISTS "Users can insert their preferences" ON notification_preferences;
 CREATE POLICY "Users can insert their preferences" ON notification_preferences
   FOR INSERT WITH CHECK (user_id = auth.uid());
 
@@ -891,15 +957,23 @@ ALTER TABLE data_residency_tags ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cross_border_transfers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE data_subject_requests ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_consents" ON data_consents;
+DROP POLICY IF EXISTS "org_consents" ON data_consents;
 CREATE POLICY "org_consents" ON data_consents
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "org_residency" ON data_residency_tags;
+DROP POLICY IF EXISTS "org_residency" ON data_residency_tags;
 CREATE POLICY "org_residency" ON data_residency_tags
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
+DROP POLICY IF EXISTS "service_role_transfers" ON cross_border_transfers;
+DROP POLICY IF EXISTS "service_role_transfers" ON cross_border_transfers;
 CREATE POLICY "service_role_transfers" ON cross_border_transfers
   FOR ALL USING (false);
 
+DROP POLICY IF EXISTS "org_requests" ON data_subject_requests;
+DROP POLICY IF EXISTS "org_requests" ON data_subject_requests;
 CREATE POLICY "org_requests" ON data_subject_requests
   FOR ALL USING (org_id = current_setting('app.current_org_id', true)::UUID);
 
@@ -955,6 +1029,8 @@ ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE question_sets ENABLE ROW LEVEL SECURITY;
 
 -- Users can view system questions and their org's questions
+DROP POLICY IF EXISTS "Users can view accessible questions" ON questions;
+DROP POLICY IF EXISTS "Users can view accessible questions" ON questions;
 CREATE POLICY "Users can view accessible questions" ON questions
   FOR SELECT USING (
     is_system = true
@@ -965,6 +1041,8 @@ CREATE POLICY "Users can view accessible questions" ON questions
   );
 
 -- Users can create questions for their org
+DROP POLICY IF EXISTS "Users can create questions" ON questions;
+DROP POLICY IF EXISTS "Users can create questions" ON questions;
 CREATE POLICY "Users can create questions" ON questions
   FOR INSERT WITH CHECK (
     organization_id IN (
@@ -973,6 +1051,8 @@ CREATE POLICY "Users can create questions" ON questions
   );
 
 -- Users can update their own questions
+DROP POLICY IF EXISTS "Users can update own questions" ON questions;
+DROP POLICY IF EXISTS "Users can update own questions" ON questions;
 CREATE POLICY "Users can update own questions" ON questions
   FOR UPDATE USING (
     created_by = auth.uid()
@@ -980,6 +1060,8 @@ CREATE POLICY "Users can update own questions" ON questions
   );
 
 -- Users can delete their own questions
+DROP POLICY IF EXISTS "Users can delete own questions" ON questions;
+DROP POLICY IF EXISTS "Users can delete own questions" ON questions;
 CREATE POLICY "Users can delete own questions" ON questions
   FOR DELETE USING (
     created_by = auth.uid()
@@ -987,6 +1069,8 @@ CREATE POLICY "Users can delete own questions" ON questions
   );
 
 -- Question sets policies
+DROP POLICY IF EXISTS "Users can view accessible sets" ON question_sets;
+DROP POLICY IF EXISTS "Users can view accessible sets" ON question_sets;
 CREATE POLICY "Users can view accessible sets" ON question_sets
   FOR SELECT USING (
     organization_id IN (
@@ -995,6 +1079,8 @@ CREATE POLICY "Users can view accessible sets" ON question_sets
     OR created_by = auth.uid()
   );
 
+DROP POLICY IF EXISTS "Users can create sets" ON question_sets;
+DROP POLICY IF EXISTS "Users can create sets" ON question_sets;
 CREATE POLICY "Users can create sets" ON question_sets
   FOR INSERT WITH CHECK (
     organization_id IN (
@@ -1002,9 +1088,13 @@ CREATE POLICY "Users can create sets" ON question_sets
     )
   );
 
+DROP POLICY IF EXISTS "Users can update own sets" ON question_sets;
+DROP POLICY IF EXISTS "Users can update own sets" ON question_sets;
 CREATE POLICY "Users can update own sets" ON question_sets
   FOR UPDATE USING (created_by = auth.uid());
 
+DROP POLICY IF EXISTS "Users can delete own sets" ON question_sets;
+DROP POLICY IF EXISTS "Users can delete own sets" ON question_sets;
 CREATE POLICY "Users can delete own sets" ON question_sets
   FOR DELETE USING (created_by = auth.uid());
 
@@ -1062,6 +1152,8 @@ ALTER TABLE reference_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reference_responses ENABLE ROW LEVEL SECURITY;
 
 -- Consultant/org can view all references for their candidates
+DROP POLICY IF EXISTS "Consultants can view reference requests" ON reference_requests;
+DROP POLICY IF EXISTS "Consultants can view reference requests" ON reference_requests;
 CREATE POLICY "Consultants can view reference requests" ON reference_requests
   FOR SELECT USING (
     organization_id IN (
@@ -1070,13 +1162,19 @@ CREATE POLICY "Consultants can view reference requests" ON reference_requests
   );
 
 -- Referees can view/update their own request (via token)
+DROP POLICY IF EXISTS "Referee can view own request" ON reference_requests;
+DROP POLICY IF EXISTS "Referee can view own request" ON reference_requests;
 CREATE POLICY "Referee can view own request" ON reference_requests
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Referee can update own request" ON reference_requests;
+DROP POLICY IF EXISTS "Referee can update own request" ON reference_requests;
 CREATE POLICY "Referee can update own request" ON reference_requests
   FOR UPDATE USING (true);
 
 -- Responses follow request permissions
+DROP POLICY IF EXISTS "Responses follow request access" ON reference_responses;
+DROP POLICY IF EXISTS "Responses follow request access" ON reference_responses;
 CREATE POLICY "Responses follow request access" ON reference_responses
   FOR ALL USING (
     reference_request_id IN (
@@ -1159,27 +1257,37 @@ ALTER TABLE saved_search_subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE search_executions ENABLE ROW LEVEL SECURITY;
 
 -- Organization-based access policies
+DROP POLICY IF EXISTS "Users can view their saved searches" ON saved_searches;
+DROP POLICY IF EXISTS "Users can view their saved searches" ON saved_searches;
 CREATE POLICY "Users can view their saved searches" ON saved_searches
   FOR SELECT USING (
     user_id = auth.uid() OR
     (is_shared = true AND org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()))
   );
 
+DROP POLICY IF EXISTS "Users can create saved searches" ON saved_searches;
+DROP POLICY IF EXISTS "Users can create saved searches" ON saved_searches;
 CREATE POLICY "Users can create saved searches" ON saved_searches
   FOR INSERT WITH CHECK (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can update their saved searches" ON saved_searches;
+DROP POLICY IF EXISTS "Users can update their saved searches" ON saved_searches;
 CREATE POLICY "Users can update their saved searches" ON saved_searches
   FOR UPDATE USING (
     user_id = auth.uid()
   );
 
+DROP POLICY IF EXISTS "Users can view their talent alerts" ON talent_alerts;
+DROP POLICY IF EXISTS "Users can view their talent alerts" ON talent_alerts;
 CREATE POLICY "Users can view their talent alerts" ON talent_alerts
   FOR SELECT USING (
     user_id = auth.uid()
   );
 
+DROP POLICY IF EXISTS "Users can view their subscriptions" ON saved_search_subscriptions;
+DROP POLICY IF EXISTS "Users can view their subscriptions" ON saved_search_subscriptions;
 CREATE POLICY "Users can view their subscriptions" ON saved_search_subscriptions
   FOR SELECT USING (
     user_id = auth.uid()
@@ -1259,31 +1367,43 @@ ALTER TABLE sla_escalations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sla_performance_history ENABLE ROW LEVEL SECURITY;
 
 -- Organization-based access policies
+DROP POLICY IF EXISTS "Users can view org SLA configs" ON sla_configurations;
+DROP POLICY IF EXISTS "Users can view org SLA configs" ON sla_configurations;
 CREATE POLICY "Users can view org SLA configs" ON sla_configurations
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can create org SLA configs" ON sla_configurations;
+DROP POLICY IF EXISTS "Users can create org SLA configs" ON sla_configurations;
 CREATE POLICY "Users can create org SLA configs" ON sla_configurations
   FOR INSERT WITH CHECK (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can update org SLA configs" ON sla_configurations;
+DROP POLICY IF EXISTS "Users can update org SLA configs" ON sla_configurations;
 CREATE POLICY "Users can update org SLA configs" ON sla_configurations
   FOR UPDATE USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org mandate timelines" ON mandate_timelines;
+DROP POLICY IF EXISTS "Users can view org mandate timelines" ON mandate_timelines;
 CREATE POLICY "Users can view org mandate timelines" ON mandate_timelines
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org escalations" ON sla_escalations;
+DROP POLICY IF EXISTS "Users can view org escalations" ON sla_escalations;
 CREATE POLICY "Users can view org escalations" ON sla_escalations
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can view org SLA performance" ON sla_performance_history;
+DROP POLICY IF EXISTS "Users can view org SLA performance" ON sla_performance_history;
 CREATE POLICY "Users can view org SLA performance" ON sla_performance_history
   FOR SELECT USING (
     org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid())
@@ -1410,12 +1530,18 @@ ALTER TABLE automation_rules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rule_executions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rule_scheduled_checks ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org_rules" ON automation_rules;
+DROP POLICY IF EXISTS "org_rules" ON automation_rules;
 CREATE POLICY "org_rules" ON automation_rules
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_executions" ON rule_executions;
+DROP POLICY IF EXISTS "org_executions" ON rule_executions;
 CREATE POLICY "org_executions" ON rule_executions
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
+DROP POLICY IF EXISTS "org_scheduled" ON rule_scheduled_checks;
+DROP POLICY IF EXISTS "org_scheduled" ON rule_scheduled_checks;
 CREATE POLICY "org_scheduled" ON rule_scheduled_checks
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
 
