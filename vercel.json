@@ -2,7 +2,16 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [],
+  "rewrites": [
+    {
+      "source": "/api/:mod/:path(.*)",
+      "destination": "/api/dispatch?__mod=:mod&__sub=:path"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
