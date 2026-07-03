@@ -45,6 +45,7 @@ export default async function handler(
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
+  console.log("[CRON-DEBUG] query:", JSON.stringify(req.query), "url:", req.url);
   const pathArr = (req.query.path as string[]) || [];
   const jobName = pathArr[0] || '';
 

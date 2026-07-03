@@ -429,6 +429,19 @@ export default async function handler(
   }
 
   try {
+    // Debug endpoint to diagnose routing
+    if (module === 'route-debug') {
+      return res.status(200).json({
+        url: req.url,
+        query: req.query,
+        pathArr,
+        module,
+        headers: {
+          host: req.headers.host,
+          'x-vercel-id': req.headers['x-vercel-id'],
+        }
+      });
+    }
     switch (module) {
       // ── Admin ──
       case 'admin': {
