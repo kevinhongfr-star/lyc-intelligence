@@ -445,7 +445,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(403).json({ error: 'Access denied' });
         }
 
-        await db.delete('mandate_solutions', {
+        await db.deleteRows('mandate_solutions', {
           column: 'id',
           value: id,
         });
@@ -1763,14 +1763,14 @@ Return as valid JSON with exactly these keys:
       }
 
       const emails = candidates
-        .map((c) => (typeof c.email)
-        .filter((e): e is string)
+        .map((c) => (typeof c.email === 'string' ? c.email : undefined))
+        .filter((e): e is string => typeof e === 'string')
         .map((e) => e.trim().toLowerCase())
         .filter(Boolean);
 
       const linkedinUrls = candidates
-        .map((c) => (typeof c.linkedin_url))
-        .filter((l): l is string)
+        .map((c) => (typeof c.linkedin_url === 'string' ? c.linkedin_url : undefined))
+        .filter((l): l is string => typeof l === 'string')
         .map((l) => l.trim())
         .filter(Boolean);
 
@@ -1886,7 +1886,7 @@ Return as valid JSON with exactly these keys:
             ],
             select: 'id, email',
           }, 15000);
-          existingByEmail.forEach((e) => e.email && emailSet.add(String(e.email).toLowerCase());
+          existingByEmail.forEach((e) => { if (e.email) emailSet.add(String(e.email).toLowerCase()); });
         }
         if (linkedinUrls.length > 0) {
           const existingByLinkedIn = await db.selectMany('contacts', {
@@ -1911,8 +1911,8 @@ Return as valid JSON with exactly these keys:
 
       for (const candidate of candidates) {
         try {
-          const candidateEmail = typeof candidate.email ? String(candidate.email).trim().toLowerCase() || '';
-          const candidateLinkedIn = typeof candidate.linkedin_url ? String(candidate.linkedin_url).trim() : '';
+          const candidateEmail = typeof candidate.email === 'string' ? String(candidate.email).trim().toLowerCase() : '';
+          const candidateLinkedIn = typeof candidate.linkedin_url === 'string' ? String(candidate.linkedin_url).trim() : '';
 
           const isDuplicateByEmail = candidateEmail && emailSet.has(candidateEmail);
           const isDuplicateByLinkedIn = candidateLinkedIn && linkedinSet.has(candidateLinkedIn);
@@ -1925,8 +1925,8 @@ Return as valid JSON with exactly these keys:
             }
             // Update mode: find existing contact and fill in empty fields
             const existing = isDuplicateByEmail
-              ? (await db.selectOne('contacts', { column: 'email', value: candidate.email }) || null)
-              : (await db.selectOne('contacts', { column: 'linkedin_url', value: candidate.linkedin_url }) || null;
+              ? (await db.selectOne('contacts', { column: 'email', value: candidate.email })) || null
+              : (await db.selectOne('contacts', { column: 'linkedin_url', value: candidate.linkedin_url })) || null;
 
             if (existing) {
               const updatePayload: Record<string, any> = {};
@@ -4096,7 +4096,7 @@ ${consultant?.name || 'LYC Intelligence'}`,
           return res.status(403).json({ error: 'Access denied' });
         }
 
-        await db.delete('offers', { column: 'id', value: id }, 15000);
+        await db.deleteRows('offers', { column: 'id', value: id }, 15000);
 
         return res.status(200).json({ success: true, message: 'Offer deleted' });
       }

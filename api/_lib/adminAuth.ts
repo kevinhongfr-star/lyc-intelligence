@@ -28,7 +28,7 @@
 import type { VercelRequest } from '@vercel/node';
 import { jwtVerify, SignJWT } from 'jose';
 import { isSupabaseConfigured, selectOne } from './supabaseRest.js';
-import type { UserRole } from '@/types';
+import type { UserRole } from '../../src/types/index.js';
 
 export interface AdminUser {
   id: string;
@@ -200,4 +200,38 @@ export function hasOrgAccess(role: UserRole): boolean {
  */
 export function isOrgAdmin(role: UserRole): boolean {
   return ['client_admin', 'lyc_admin', 'super_admin'].includes(role);
+}
+
+/**
+ * Get user's role from the profiles table.
+ */
+export async function getUserRole(userId: string): Promise<UserRole> {
+  if (!isSupabaseConfigured()) {
+    return 'member'; // Default fallback
+  }
+  try {
+    const profile = await selectOne('profiles', {
+      column: 'id',
+      value: userId,
+      select: 'role',
+    });
+    return (profile?.role as UserRole) || 'member';
+  } catch {
+    return 'member';
+  }
+}
+
+/**
+ * Check if user has admin role (super_admin or lyc_admin).
+ */
+export async function isAdmin(userId: string): Promise<boolean> {
+  const role = await getUserRole(userId);
+  return role === 'super_admin' || role === 'lyc_admin';
+}
+
+/**
+ * Check if user has team lead or admin role.
+ */
+export function isTeamLead(role: UserRole): boolean {
+  return role === 'team_lead' || role === 'admin' || role === 'lyc_admin' || role === 'super_admin';
 }

@@ -2,6 +2,8 @@ export type UserRole =
   | 'candidate'
   | 'member'
   | 'council'
+  | 'team_lead'
+  | 'admin'
   | 'client_admin'
   | 'client_viewer'
   | 'lyc_consultant'
