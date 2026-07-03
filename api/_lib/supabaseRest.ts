@@ -53,17 +53,35 @@ function buildUrl(table: string, query?: string): string {
   return query ? `${base}?${query}` : base;
 }
 
-/** GET single row matching the filter. Returns the first element or null. */
+/** GET single row matching the filter. Returns the first element or null.
+ * Supports both new and legacy filter formats with additional options.
+ */
 export async function selectOne(
   table: string,
-  filter: { column: string; value: string | number | boolean } & { select?: string },
+  filter: any,
   timeoutMs?: number
 ): Promise<any | null> {
   if (!isSupabaseConfigured()) {
     throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
   }
   const select = filter.select || '*';
-  const query = `select=${encodeURIComponent(select)}&${filter.column}=eq.${encodeURIComponent(String(filter.value))}&limit=1`;
+  let query = `select=${encodeURIComponent(select)}`;
+
+  if (filter.where && Array.isArray(filter.where)) {
+    for (const w of filter.where) {
+      query += '&' + buildWherePart(w);
+    }
+  } else if (filter.column && filter.value) {
+    query += `&${filter.column}=eq.${encodeURIComponent(String(filter.value))}`;
+  }
+  query += '&limit=1';
+
+  // Add orderBy if present
+  if (filter.orderBy) {
+    const ob = filter.orderBy;
+    query += `&order=${encodeURIComponent(ob.column)}.${ob.ascending === false ? 'desc' : 'asc'}`;
+  }
+
   const res = await fetchWithTimeout(
     buildUrl(table, query),
     { method: 'GET', headers: getHeaders() },
@@ -100,22 +118,75 @@ function buildWherePart(w: WhereFilter): string {
   return `${w.column}=${op}.${encodeURIComponent(String(w.value))}`;
 }
 
-/** GET multiple rows. `options.where` is an array of `column=value` filters. `or` is a raw Supabase or-expression string (e.g. "col.is.null,col2.gt.val"). */
+/** GET multiple rows. Supports both new object-based and legacy positional calling conventions.
+ *
+ * New: selectMany(table, { select?, where?, or?, orderBy?, limit?, offset? }, timeoutMs?)
+ * Legacy: selectMany(table, filters, orderBy?, limit?, offset?, select?)
+ */
 export async function selectMany(
   table: string,
-  options: {
+  optionsOrFilters?: any,
+  orderByOrLimit?: any,
+  limitOrOffset?: any,
+  offsetOrSelect?: any,
+  selectOrTimeout?: any,
+  maybeTimeout?: number
+): Promise<any[]> {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
+  }
+
+  // Detect calling convention
+  const isNewStyle = (x: any): boolean =>
+    x && typeof x === 'object' && !Array.isArray(x) &&
+    ('select' in x || 'where' in x || 'or' in x || 'orderBy' in x || 'limit' in x || 'offset' in x);
+
+  let options: {
     select?: string;
     where?: WhereFilter[];
     or?: string;
     orderBy?: { column: string; ascending?: boolean };
     limit?: number;
     offset?: number;
-  } = {},
-  timeoutMs?: number
-): Promise<any[]> {
-  if (!isSupabaseConfigured()) {
-    throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
+  };
+  let timeoutMs: number | undefined;
+
+  if (isNewStyle(optionsOrFilters)) {
+    options = optionsOrFilters;
+    timeoutMs = typeof orderByOrLimit === 'number' ? orderByOrLimit : undefined;
+  } else {
+    // Legacy positional args: table, filters, orderBy, limit, offset, select
+    const filters = optionsOrFilters || {};
+    const orderByArr = Array.isArray(orderByOrLimit) ? orderByOrLimit : [];
+    const limit = typeof limitOrOffset === 'number' ? limitOrOffset : undefined;
+    const offset = typeof offsetOrSelect === 'number' ? offsetOrSelect : undefined;
+    const select = typeof selectOrTimeout === 'string' ? selectOrTimeout : '*';
+    timeoutMs = typeof selectOrTimeout === 'number' ? selectOrTimeout : (typeof maybeTimeout === 'number' ? maybeTimeout : undefined);
+
+    // Convert legacy filters (object with column: value) to where array
+    const where: WhereFilter[] = [];
+    for (const [col, val] of Object.entries(filters)) {
+      if (val !== undefined && val !== null) {
+        where.push({ column: col, value: val as any, op: 'eq' });
+      }
+    }
+
+    // Parse orderBy array like ['changed_at DESC'] -> { column: 'changed_at', ascending: false }
+    let orderBy: { column: string; ascending?: boolean } | undefined;
+    if (orderByArr.length > 0) {
+      const first = orderByArr[0];
+      if (typeof first === 'string') {
+        const parts = first.trim().split(/\s+/);
+        orderBy = {
+          column: parts[0],
+          ascending: parts[1]?.toUpperCase() !== 'DESC',
+        };
+      }
+    }
+
+    options = { select, where, orderBy, limit, offset };
   }
+
   const parts: string[] = [];
   parts.push(`select=${encodeURIComponent(options.select || '*')}`);
   if (options.where) {
@@ -173,14 +244,15 @@ export async function insert(
 /**
  * UPDATE rows matching the filter. Returns the updated row array.
  *
- * Supports two calling conventions:
+ * Supports multiple calling conventions:
  *   update(table, { column, value }, data, timeout?)  — filter object first
  *   update(table, data, value, columnName?, timeout?)  — data first (legacy)
+ *   update(table, { column, value, ...data }, timeout?)  — combined filter+data
  */
 export async function update(
   table: string,
   filterOrData: any,
-  dataOrValue: any,
+  dataOrValue?: any,
   columnNameOrTimeout?: string | number,
   maybeTimeout?: number
 ): Promise<any[]> {
@@ -192,14 +264,21 @@ export async function update(
   let data: Record<string, any>;
   let timeoutMs: number | undefined;
 
-  const isFilterObj = (x: any): boolean =>
-    x && typeof x === 'object' && ('column' in x || 'where' in x);
-
-  if (isFilterObj(filterOrData)) {
+  // Case 1: Combined filter+data object (has column, value, and other data fields like 'updates')
+  if (filterOrData && typeof filterOrData === 'object' && 'column' in filterOrData && 'value' in filterOrData) {
+    const { column, value, ...restData } = filterOrData;
+    filter = { column, value };
+    data = restData;
+    timeoutMs = dataOrValue as number | undefined;
+  }
+  // Case 2: Filter object with where array
+  else if (filterOrData && typeof filterOrData === 'object' && 'where' in filterOrData) {
     filter = filterOrData;
-    data = dataOrValue;
+    data = dataOrValue || {};
     timeoutMs = columnNameOrTimeout as number | undefined;
-  } else {
+  }
+  // Case 3: Data-first (legacy)
+  else {
     data = filterOrData;
     const columnName = (typeof columnNameOrTimeout === 'string') ? columnNameOrTimeout : 'id';
     filter = { column: columnName, value: dataOrValue };
@@ -340,15 +419,22 @@ export async function countRows(
 /** DELETE rows matching the filter. Returns the count of deleted rows. */
 export async function deleteRows(
   table: string,
-  filter: { column: string; value: string | number | boolean },
+  filter: { column: string; value: string | number | boolean } | { where: WhereFilter[] },
   timeoutMs?: number
 ): Promise<number> {
   if (!isSupabaseConfigured()) {
     throw new Error('Supabase not configured (missing SUPABASE_URL or SUPABASE_SERVICE_KEY)');
   }
-  const query = `${filter.column}=eq.${encodeURIComponent(String(filter.value))}`;
+  const parts: string[] = [];
+  if ('where' in filter && Array.isArray(filter.where)) {
+    for (const w of filter.where) {
+      parts.push(buildWherePart(w));
+    }
+  } else if ('column' in filter) {
+    parts.push(`${filter.column}=eq.${encodeURIComponent(String(filter.value))}`);
+  }
   const res = await fetchWithTimeout(
-    buildUrl(table, query),
+    buildUrl(table, parts.join('&')),
     {
       method: 'DELETE',
       headers: getHeaders({ Prefer: 'return=representation' }),
@@ -361,4 +447,63 @@ export async function deleteRows(
   }
   const out = await res.json().catch(() => []);
   return Array.isArray(out) ? out.length : 0;
+}
+
+/** Alias for deleteRows — legacy naming convention used by many handlers.
+ * Supports: remove(table, id) -> delete by id
+ * Supports: remove(table, { column, value }) -> delete by filter
+ */
+export async function remove(
+  table: string,
+  filterOrId: string | number | { column: string; value: string | number | boolean } | { where: WhereFilter[] },
+  timeoutMs?: number
+): Promise<number> {
+  // Handle legacy `remove(table, id)` -> delete by 'id' column
+  if (typeof filterOrId === 'string' || typeof filterOrId === 'number') {
+    return deleteRows(table, { column: 'id', value: filterOrId }, timeoutMs);
+  }
+  return deleteRows(table, filterOrId, timeoutMs);
+}
+
+/**
+ * Execute a raw SQL query via Supabase RPC or PostgREST.
+ * NOTE: This is a stub implementation. For complex queries, consider
+ * rewriting them using selectMany/update/insert/deleteRows.
+ *
+ * Returns PostgreSQL-style result object: { rows: any[], rowCount: number }
+ * Stub returns empty result with warning.
+ *
+ * @param sql - The SQL query string (parameterized with $1, $2, etc.)
+ * @param params - Array of parameter values
+ * @param timeoutMs - Optional timeout in milliseconds
+ * @returns Query result object (stub returns { rows: [], rowCount: 0 })
+ */
+export async function query(
+  sql: string,
+  params?: any[],
+  timeoutMs?: number
+): Promise<{ rows: any[]; rowCount: number }> {
+  console.warn('[supabaseRest] query() stub called - raw SQL not supported via REST API:', sql.slice(0, 100));
+  // Stub: return PostgreSQL-style empty result. Real implementation would need Supabase RPC endpoint.
+  return { rows: [], rowCount: 0 };
+}
+
+// Re-export types for use in other modules
+export type { WhereFilter, WhereOp };
+
+/**
+ * Legacy `select` function - wraps selectMany with backward compatibility.
+ * Handles: select(table, { column, value }) -> returns multiple rows filtered by column=value
+ * Handles: select(table, { where: [...] }) -> new style
+ */
+export async function select(
+  table: string,
+  filterOrOptions: any,
+  ...rest: any[]
+): Promise<any[]> {
+  // If filter has `column` and `value` but no `where`, convert to selectMany format
+  if (filterOrOptions && typeof filterOrOptions === 'object' && 'column' in filterOrOptions && 'value' in filterOrOptions && !('where' in filterOrOptions)) {
+    return selectMany(table, { where: [{ column: filterOrOptions.column, value: filterOrOptions.value, op: 'eq' }] }, ...rest);
+  }
+  return selectMany(table, filterOrOptions, ...rest);
 }

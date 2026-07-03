@@ -9,8 +9,8 @@
  * - member / council / candidate: only their own data
  */
 
-import type { UserRole } from '@/types';
-import { selectOne, selectMany } from './supabaseRest';
+import type { UserRole } from '../../src/types/index.js';
+import { selectOne, selectMany } from './supabaseRest.js';
 
 export async function getOrgId(userId: string): Promise<string | null> {
   const profile = await selectOne('profiles', {

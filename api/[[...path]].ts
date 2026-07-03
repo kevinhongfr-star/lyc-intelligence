@@ -21,7 +21,7 @@ import { handleAnalytics } from './_lib/analyticsHandler.js';
 import { handler as handleCompaniesUpload } from './_lib/companiesUploadHandler.js';
 import { handleCandidates } from './_lib/candidatesHandler.js';
 import { handleCanvas } from './_lib/canvasHandler.js';
-import { handler as handleCareer } from './_lib/careerIntelligenceHandler.js';
+import handleCareer from './_lib/careerIntelligenceHandler.js';
 import {
   handleChannels,
   handleEmail,
@@ -33,7 +33,7 @@ import { handleCredits } from './_lib/creditsHandler.js';
 import { handler as handleData } from './_lib/dataHandler.js';
 import { handleEnrichment } from './_lib/enrichmentHandler.js';
 import { handler as handleGridReportsGenerate } from './_lib/gridReportsGenerateHandler.js';
-import { handler as handleIntelligence } from './_lib/intelligenceHandler.js';
+import handleIntelligence from './_lib/intelligenceHandler.js';
 import { handleKevinOversight } from './_lib/kevinHandler.js';
 import { handleLinkedIn } from './_lib/linkedinHandler.js';
 import { handleMandates } from './_lib/mandatesHandler.js';
