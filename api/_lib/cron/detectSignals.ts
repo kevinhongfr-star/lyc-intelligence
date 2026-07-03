@@ -1,5 +1,5 @@
 import * as db from '../supabaseRest.js';
-import { detectMovementSignals } from '../careerIntelligenceHandler';
+import { detectMovementSignals } from '../careerIntelligenceHandler.js';
 
 export async function handleDetectSignals() {
   const candidates = await db.selectMany('contacts', {
