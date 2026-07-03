@@ -942,3 +942,5 @@ BEGIN
     RAISE EXCEPTION '[FAIL] Missing tables: %', v_missing;
   END IF;
 END$$;
+
+COMMIT;

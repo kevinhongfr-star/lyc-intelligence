@@ -831,3 +831,5 @@ ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Admin read audit_logs" ON audit_logs FOR SELECT USING (
   EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
 );
+
+COMMIT;

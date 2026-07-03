@@ -1418,3 +1418,5 @@ CREATE POLICY "org_executions" ON rule_executions
 
 CREATE POLICY "org_scheduled" ON rule_scheduled_checks
   FOR ALL USING (org_id IN (SELECT organization_id FROM profiles WHERE id = auth.uid()));
+
+COMMIT;

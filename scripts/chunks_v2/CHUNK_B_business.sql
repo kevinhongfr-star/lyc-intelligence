@@ -995,3 +995,5 @@ SELECT
   , 0) as completion_percentage
 FROM offers o
 LEFT JOIN contacts c ON o.candidate_id = c.id;
+
+COMMIT;
