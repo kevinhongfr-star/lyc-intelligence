@@ -392,6 +392,16 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
+  // Debug: log request info to diagnose rewrite behavior
+  console.log("[ROUTE-DEBUG]", JSON.stringify({
+    url: req.url,
+    query: req.query,
+    xInvokePath: req.headers['x-invoke-path'] || null,
+    xInvokeQuery: req.headers['x-invoke-query'] || null,
+    xMatchedPath: req.headers['x-matched-path'] || null,
+    host: req.headers.host,
+  }));
+
   // Parse path from URL — strip query string first (Vercel appends [...path] as query param)
   // DEBUG: Log request details for rewrite debugging
   const cleanUrl = (req.url || '').split('?')[0].replace(/^\//, '');
