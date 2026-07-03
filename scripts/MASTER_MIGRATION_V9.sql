@@ -3505,7 +3505,7 @@ END $$;
 CREATE INDEX IF NOT EXISTS idx_audit_logs_org ON audit_logs(organization_id, created_at DESC);
 
 -- Update RLS: add org-scoped read for org admins
-DROP POLICY IF EXISTS "org_admins_read_own_logs";
+DROP POLICY IF EXISTS "org_admins_read_own_logs" ON audit_logs;
 CREATE POLICY "org_admins_read_own_logs" ON audit_logs
   FOR SELECT USING (
     organization_id IN (
