@@ -392,28 +392,29 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  // Debug: log request info to diagnose rewrite behavior
-  console.log("[ROUTE-DEBUG]", JSON.stringify({
-    url: req.url,
-    query: req.query,
-    xInvokePath: req.headers['x-invoke-path'] || null,
-    xInvokeQuery: req.headers['x-invoke-query'] || null,
-    xMatchedPath: req.headers['x-matched-path'] || null,
-    host: req.headers.host,
-  }));
+  // Parse route from regex rewrite query params (__module, __path)
+  // vercel.json regex rewrite: /api/{module}/{sub-path} → /api?__module={module}&__path={sub-path}
+  const rwModule = (req.query as any).__module as string | undefined;
+  const rwPath = (req.query as any).__path as string | undefined;
 
-  // Parse path from URL — strip query string first (Vercel appends [...path] as query param)
-  // DEBUG: Log request details for rewrite debugging
-  const cleanUrl = (req.url || '').split('?')[0].replace(/^\//, '');
-  const pathArr = cleanUrl ? cleanUrl.split('/').filter(Boolean) : [];
-  // Strip 'api' prefix if present (Vercel includes it in req.url)
-  if (pathArr[0] === 'api') pathArr.shift();
-  const module = pathArr[0] || '';
+  let module: string;
+  let pathArr: string[];
 
-  // Strip first segment so handlers see path relative to their mount point
-  if (pathArr.length > 0) {
-    (req.query as any).path = pathArr.slice(1);
+  if (rwModule) {
+    module = rwModule;
+    const subSegs = (rwPath || '').split('/').filter(Boolean);
+    pathArr = [module, ...subSegs];
+    delete (req.query as any).__module;
+    delete (req.query as any).__path;
+  } else {
+    const cleanUrl = (req.url || '').split('?')[0].replace(/^\//, '');
+    pathArr = cleanUrl ? cleanUrl.split('/').filter(Boolean) : [];
+    if (pathArr[0] === 'api') pathArr.shift();
+    module = pathArr[0] || '';
   }
+
+  // Set req.query.path for downstream handlers (segments after the module name)
+  (req.query as any).path = pathArr.slice(1);
 
   const ip = getClientIp(req);
   const publicRoutes = ['lead-capture', 'share'];
