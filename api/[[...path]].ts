@@ -393,6 +393,8 @@ export default async function handler(
   res: VercelResponse
 ) {
   // Parse path from URL — strip query string first (Vercel appends [...path] as query param)
+  // DEBUG: Log request details for rewrite debugging
+  console.log("[DEBUG]", JSON.stringify({url: req.url, method: req.method, query: req.query, headers: Object.fromEntries(Object.entries(req.headers).filter(([k]) => k.startsWith("x-") || k === "host"))}));
   const cleanUrl = (req.url || '').split('?')[0].replace(/^\//, '');
   const pathArr = cleanUrl ? cleanUrl.split('/').filter(Boolean) : [];
   // Strip 'api' prefix if present (Vercel includes it in req.url)
