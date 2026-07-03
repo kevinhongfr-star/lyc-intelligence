@@ -392,7 +392,11 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  const pathArr = (req.query.path as string[]) || [];
+  // Parse path from URL — more reliable than req.query.path with catch-all routes
+  const urlPath = (req.url || '').replace(/^\//, '');
+  const pathArr = urlPath ? urlPath.split('/').filter(Boolean) : [];
+  // Strip 'api' prefix if present (Vercel includes it in req.url)
+  if (pathArr[0] === 'api') pathArr.shift();
   const module = pathArr[0] || '';
 
   // Strip first segment so handlers see path relative to their mount point
