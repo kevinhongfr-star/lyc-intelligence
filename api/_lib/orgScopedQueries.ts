@@ -32,7 +32,7 @@ export async function getUserRole(userId: string): Promise<UserRole> {
 }
 
 export async function getOrgScopedMandates(userId: string, userRole: UserRole, orgId: string): Promise<any[]> {
-  if (userRole === 'super_admin') {
+  if (userRole === 'super_admin' || userRole === 'admin') {
     return selectMany('mandates', {
       select: 'id, title, status, priority, client_id, jd_description, search_definition, skills_requirements, company:companies(id, name)',
       orderBy: { column: 'updated_at', ascending: false },
@@ -90,7 +90,7 @@ export async function getOrgScopedPipeline(userId: string, userRole: UserRole, o
     
     if (mandateIds.length === 0) return [];
     where.push({ column: 'mandate_id', value: `(${mandateIds.join(',')})`, op: 'in' });
-  } else if (userRole !== 'super_admin') {
+  } else if (userRole !== 'super_admin' && userRole !== 'admin') {
     const mandates = await getOrgScopedMandates(userId, userRole, orgId);
     const mandateIds = mandates.map((m: any) => m.id);
     
@@ -128,7 +128,7 @@ export async function getOrgScopedContacts(userId: string, userRole: UserRole, o
     }, 15000);
   }
 
-  if (userRole === 'super_admin') {
+  if (userRole === 'super_admin' || userRole === 'admin') {
     return selectMany('contacts', {
       select: 'id, name, email, current_title, company_id, location, country, seniority, skills, headline, summary, career_history, trident_composite, trident_d1, trident_d2, trident_d3, company:companies(id, name)',
       orderBy: { column: 'updated_at', ascending: false },
@@ -158,11 +158,11 @@ export async function getOrgScopedContacts(userId: string, userRole: UserRole, o
 }
 
 export function hasOrgAccess(userRole: UserRole): boolean {
-  return ['client_admin', 'client_viewer', 'lyc_consultant', 'lyc_admin', 'super_admin'].includes(userRole);
+  return ['client_admin', 'client_viewer', 'lyc_consultant', 'lyc_admin', 'super_admin', 'admin'].includes(userRole);
 }
 
 export function isOrgAdmin(userRole: UserRole): boolean {
-  return ['client_admin', 'lyc_admin', 'super_admin'].includes(userRole);
+  return ['client_admin', 'lyc_admin', 'super_admin', 'admin'].includes(userRole);
 }
 
 export function isReadOnly(userRole: UserRole): boolean {
@@ -170,7 +170,7 @@ export function isReadOnly(userRole: UserRole): boolean {
 }
 
 export async function getOrgScopedCompanies(userId: string, userRole: UserRole, orgId: string): Promise<any[]> {
-  if (userRole === 'super_admin') {
+  if (userRole === 'super_admin' || userRole === 'admin') {
     return selectMany('companies', {
       select: 'id, name, industry, stain_group, stain_tier, proximity, country, city, region, headcount_range, website, linkedin_url, description',
       orderBy: { column: 'engagement_score', ascending: false },
