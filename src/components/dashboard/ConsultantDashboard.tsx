@@ -19,6 +19,7 @@ import {
   PipelineFunnel,
   ActivityFeed,
 } from './DashboardWidgets';
+import { authFetch } from '@/utils/authFetch';
 
 export function ConsultantDashboard() {
   const [loading, setLoading] = useState(true);
@@ -35,10 +36,10 @@ export function ConsultantDashboard() {
     setLoading(true);
     try {
       const [pipelineRes, velocityRes, activityRes, kpisRes] = await Promise.all([
-        fetch('/api/analytics/pipeline?scope=personal'),
-        fetch('/api/analytics/velocity'),
-        fetch('/api/analytics/activity?limit=15'),
-        fetch('/api/analytics/kpis'),
+        authFetch('/api/analytics/pipeline?scope=personal'),
+        authFetch('/api/analytics/velocity'),
+        authFetch('/api/analytics/activity?limit=15'),
+        authFetch('/api/analytics/kpis'),
       ]);
 
       const [pipeline, velocity, activity, kpis] = await Promise.all([
