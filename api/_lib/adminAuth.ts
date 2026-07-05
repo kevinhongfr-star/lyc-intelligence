@@ -13,10 +13,9 @@
  *
  * Flow:
  *   1. Read `Authorization: Bearer <jwt>` header
- *   2. Verify JWT signature using jose library (HS256)
- *      - Uses SUPABASE_JWT_SECRET environment variable
- *      - Falls back to Supabase /auth/v1/verify endpoint
- *   3. Extract the user id (sub claim) from verified payload
+ *   2. Verify JWT by calling Supabase /auth/v1/user endpoint
+ *      (works with both HS256 and ES256 JWTs — no local secret needed)
+ *   3. Extract the user id from the verified response
  *   4. Look up the matching row in `profiles` via the service role key
  *   5. For verifyAdmin: reject unless role is super_admin or lyc_admin
  *   6. For getUserFromRequest: return any authenticated user
@@ -26,7 +25,6 @@
  */
 
 import type { VercelRequest } from '@vercel/node';
-import { jwtVerify, SignJWT } from 'jose';
 import { isSupabaseConfigured, selectOne } from './supabaseRest.js';
 import type { UserRole } from '../../src/types/index.js';
 
@@ -41,78 +39,40 @@ export interface AuthResult {
   error: string | null;
 }
 
-// Cache the encoded JWT secret
-let _jwtSecret: Uint8Array | null = null;
-function getJwtSecret(): Uint8Array {
-  if (!_jwtSecret) {
-    _jwtSecret = new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!);
-  }
-  return _jwtSecret;
-}
-
 /**
- * Verify JWT signature and extract the sub claim.
- * Uses SUPABASE_JWT_SECRET if available, otherwise falls back to Supabase's verify endpoint.
+ * Verify JWT by calling Supabase's /auth/v1/user endpoint.
+ * This works regardless of JWT signing algorithm (HS256, ES256, etc.)
+ * because Supabase handles verification internally.
  */
 async function verifyAndDecodeJwt(token: string): Promise<string | null> {
   try {
-    // Option A: Verify using JWT secret (recommended for performance)
-    const jwtSecret = process.env.SUPABASE_JWT_SECRET;
-    if (jwtSecret && jwtSecret.length > 0) {
-      const secret = getJwtSecret();
-      // Supabase uses HS256
-      const { payload } = await jwtVerify(token, secret, {
-        algorithms: ['HS256'],
-      });
-      return typeof payload.sub === 'string' ? payload.sub : null;
-    }
-
-    // Option B: Fallback to Supabase's /auth/v1/verify endpoint
     const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const serviceKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !serviceKey) {
-      console.error('[adminAuth] Missing SUPABASE_URL or service key for JWT verification');
+      console.error('[adminAuth] Missing SUPABASE_URL or service key');
       return null;
     }
 
-    const verifyRes = await fetch(`${supabaseUrl}/auth/v1/verify`, {
-      method: 'POST',
+    // Call /auth/v1/user with the user's JWT as bearer token
+    // If the JWT is valid, Supabase returns the user object
+    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
         'apikey': serviceKey,
-        'Authorization': `Bearer ${serviceKey}`,
+        'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ token }),
     });
 
-    if (!verifyRes.ok) {
-      console.warn('[adminAuth] Supabase verify returned:', verifyRes.status);
+    if (!userRes.ok) {
+      console.warn(`[adminAuth] /auth/v1/user returned ${userRes.status}`);
       return null;
     }
 
-    const data = await verifyRes.json();
-    return typeof data.sub === 'string' ? data.sub : null;
+    const userData = await userRes.json();
+    return typeof userData.id === 'string' ? userData.id : null;
   } catch (err) {
     console.error('[adminAuth] JWT verification failed:', err);
-    return null;
-  }
-}
-
-/**
- * Decode JWT payload WITHOUT verification (for debugging/logging only).
- * DO NOT use for authentication — use verifyAndDecodeJwt instead.
- */
-function decodeJwtSubUnsafe(token: string): string | null {
-  const parts = token.split('.');
-  if (parts.length !== 3) return null;
-  try {
-    let b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    while (b64.length % 4 !== 0) b64 += '=';
-    const json = Buffer.from(b64, 'base64').toString('utf-8');
-    const payload = JSON.parse(json);
-    return typeof payload.sub === 'string' ? payload.sub : null;
-  } catch {
     return null;
   }
 }
@@ -192,14 +152,14 @@ export async function getUserFromRequest(req: VercelRequest): Promise<AuthResult
  * Check if user has org-level access permissions.
  */
 export function hasOrgAccess(role: UserRole): boolean {
-  return ['client_admin', 'client_viewer', 'lyc_consultant', 'lyc_admin', 'super_admin'].includes(role);
+  return ['client_admin', 'client_viewer', 'lyc_consultant', 'lyc_admin', 'super_admin', 'admin'].includes(role);
 }
 
 /**
  * Check if user is an org admin.
  */
 export function isOrgAdmin(role: UserRole): boolean {
-  return ['client_admin', 'lyc_admin', 'super_admin'].includes(role);
+  return ['client_admin', 'lyc_admin', 'super_admin', 'admin'].includes(role);
 }
 
 /**
@@ -226,7 +186,7 @@ export async function getUserRole(userId: string): Promise<UserRole> {
  */
 export async function isAdmin(userId: string): Promise<boolean> {
   const role = await getUserRole(userId);
-  return role === 'super_admin' || role === 'lyc_admin';
+  return role === 'super_admin' || role === 'lyc_admin' || role === 'admin';
 }
 
 /**
