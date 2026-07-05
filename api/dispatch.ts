@@ -33,8 +33,6 @@ const handlers: Record<string, () => Promise<any>> = {
   'contacts': () => import('./_lib/communicationsHandler.js'),
   'channels': () => import('./_lib/communicationsHandler.js'),
   'upload': () => import('./_lib/companiesUploadHandler.js').then(m => ({ handler: m.handler })),
-  'share': () => import('./_lib/shareHandler.js').then(m => ({ handler: m.default || m.handler })),
-  'lead-capture': () => import('./_lib/leadCaptureHandler.js').then(m => ({ handler: m.default || m.handler })),
   'agents': () => import('./_lib/agentsHandler.js'),
   'agent-actions': () => import('./_lib/agentActionsHandler.js'),
   'linkedin': () => import('./_lib/linkedinHandler.js'),
@@ -49,8 +47,6 @@ const handlers: Record<string, () => Promise<any>> = {
   'canvas': () => import('./_lib/canvasHandler.js'),
   'grid': () => import('./_lib/gridReportsGenerateHandler.js').then(m => ({ handler: m.handler })),
   'scoring': () => import('./_lib/scoringComputeHandler.js'),
-  'dashboard': () => import('./_lib/dashboardHandler.js').then(m => ({ handler: m.default || m.handler })),
-  'wechat': () => import('./_lib/communicationsHandler.js').then(m => ({ handler: m.handleWechat })),
 };
 
 // Modules whose handlers expect the full path (including module name) in req.query.path
