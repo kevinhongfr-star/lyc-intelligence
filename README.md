@@ -72,3 +72,5 @@ npm run dev
 - [ ] Input sanitization to prevent prompt injection
 - [ ] CORS configured (only allow lyc-intelligence.app)
 - [ ] No internal methodology exposed client-side
+
+<!-- deploy trigger -->
