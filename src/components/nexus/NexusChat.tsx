@@ -43,6 +43,120 @@ interface ChatSession {
   updatedAt: number;
 }
 
+interface DiagnosticState {
+  role: 'missing' | 'partial' | 'collected';
+  situation: 'missing' | 'partial' | 'collected';
+  constraint: 'missing' | 'partial' | 'collected';
+  emotion: 'missing' | 'partial' | 'collected';
+  success: 'missing' | 'partial' | 'collected';
+}
+
+interface MilestoneState {
+  status: 'none' | 'declared' | 'midpoint' | 'reached' | 'partial';
+  text: string;
+  nextAction?: string;
+}
+
+const INITIAL_DIAGNOSTIC: DiagnosticState = {
+  role: 'missing', situation: 'missing', constraint: 'missing',
+  emotion: 'missing', success: 'missing'
+};
+
+function parseDiagnosticTags(content: string): DiagnosticState | null {
+  const tags: Partial<DiagnosticState> = {};
+  const regex = /\[DIAGNOSTIC:\s*(role|situation|constraint|emotion|success)=(missing|partial|collected)\]/g;
+  let match;
+  let found = false;
+  while ((match = regex.exec(content)) !== null) {
+    tags[match[1] as keyof DiagnosticState] = match[2] as DiagnosticState[keyof DiagnosticState];
+    found = true;
+  }
+  if (!found) return null;
+  return { ...INITIAL_DIAGNOSTIC, ...tags };
+}
+
+function parseMilestoneTags(content: string): Partial<MilestoneState> | null {
+  const result: Partial<MilestoneState> = {};
+  const declaredMatch = content.match(/\[MILESTONE:\s*declared="([^"]+)"\]/);
+  if (declaredMatch) { result.status = 'declared'; result.text = declaredMatch[1]; return result; }
+  const midpointMatch = content.match(/\[MILESTONE:\s*midpoint=true\]/);
+  if (midpointMatch) { result.status = 'midpoint'; return result; }
+  const closedMatch = content.match(/\[MILESTONE:\s*closed=(reached|partial),\s*next_action="([^"]+)"\]/);
+  if (closedMatch) { result.status = closedMatch[1] as 'reached' | 'partial'; result.nextAction = closedMatch[2]; return result; }
+  return null;
+}
+
+function stripHiddenTags(content: string): string {
+  return content
+    .replace(/\[DIAGNOSTIC:[^\]]*\]\n?/g, '')
+    .replace(/\[MILESTONE:[^\]]*\]\n?/g, '')
+    .replace(/\[CONFIDENTIALITY:[^\]]*\]\n?/g, '')
+    .trim();
+}
+
+function DiagnosticProgressBar({ state }: { state: DiagnosticState }) {
+  const dimensions = [
+    { key: 'role' as const, label: 'Role' },
+    { key: 'situation' as const, label: 'Situation' },
+    { key: 'constraint' as const, label: 'Constraints' },
+    { key: 'emotion' as const, label: 'Context' },
+    { key: 'success' as const, label: 'Goals' },
+  ];
+  const completedCount = dimensions.filter(d => state[d.key] === 'collected').length;
+  if (completedCount === 5) return null;
+  return (
+    <div style={{
+      padding: '12px 16px',
+      background: '#F8F7FF',
+      borderRadius: '10px',
+      border: '1px solid #E8E5F0',
+      marginBottom: '12px',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <span style={{ fontSize: '11px', fontWeight: 600, color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          Understanding your situation
+        </span>
+        <span style={{ fontSize: '11px', color: '#999' }}>{completedCount}/5</span>
+      </div>
+      <div style={{ display: 'flex', gap: '6px' }}>
+        {dimensions.map(d => (
+          <div key={d.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            <div style={{
+              height: '4px', width: '100%', borderRadius: '2px',
+              background: state[d.key] === 'collected' ? '#C108AB' : state[d.key] === 'partial' ? '#E8B4D8' : '#E5E5E5',
+              transition: 'background 0.3s ease',
+            }} />
+            <span style={{
+              fontSize: '9px',
+              color: state[d.key] === 'collected' ? '#C108AB' : '#999',
+              fontWeight: state[d.key] === 'collected' ? 600 : 400,
+            }}>{d.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MilestoneBanner({ milestone }: { milestone: MilestoneState }) {
+  if (milestone.status === 'none') return null;
+  let text = '';
+  let color = DS.accent;
+  if (milestone.status === 'declared') { text = `Session goal: ${milestone.text}`; }
+  else if (milestone.status === 'midpoint') { text = `Working toward: ${milestone.text}`; }
+  else if (milestone.status === 'reached') { text = `Goal reached!${milestone.nextAction ? ` Next: ${milestone.nextAction}` : ''}`; color = '#16a34a'; }
+  else if (milestone.status === 'partial') { text = `Partial progress.${milestone.nextAction ? ` Next: ${milestone.nextAction}` : ''}`; color = '#d97706'; }
+  return (
+    <div style={{
+      padding: '8px 14px', background: `${color}10`, borderRadius: '8px',
+      fontSize: '12px', color: '#555', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px',
+    }}>
+      <span style={{ color }}>&#9678;</span>
+      <span>{text}</span>
+    </div>
+  );
+}
+
 interface NexusChatProps {
   showHeader?: boolean;
   initialPrompts?: string[];
@@ -77,6 +191,8 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
   const [messageCount, setMessageCount] = useState(0);
   const [pendingApproval, setPendingApproval] = useState(false);
   const [streamingContent, setStreamingContent] = useState<string | null>(null);
+  const [diagnosticState, setDiagnosticState] = useState<DiagnosticState>(INITIAL_DIAGNOSTIC);
+  const [milestoneState, setMilestoneState] = useState<MilestoneState>({ status: 'none', text: '' });
   
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -212,7 +328,16 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
   };
 
   const handleResponse = (data: { response: string; suggested_prompts?: string[] }) => {
-    setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+    const rawContent = data.response || '';
+    const cleanedContent = stripHiddenTags(rawContent);
+
+    const diag = parseDiagnosticTags(rawContent);
+    if (diag) setDiagnosticState(diag);
+
+    const ms = parseMilestoneTags(rawContent);
+    if (ms) setMilestoneState(prev => ({ ...prev, ...ms }));
+
+    setMessages(prev => [...prev, { role: 'assistant', content: cleanedContent }]);
     setSuggestedPrompts(data.suggested_prompts || suggestedPrompts);
     setAiState('idle');
     setStreamingContent(null);
@@ -435,7 +560,10 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             </div>
           )}
 
-          <div style={{ flex: 1, overflowY: 'auto', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: 'calc(100vh - 280px)' }}>
+          <DiagnosticProgressBar state={diagnosticState} />
+          <MilestoneBanner milestone={milestoneState} />
+
+          <div style={{ flex: 1, overflowY: 'auto', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: 'calc(100vh - 320px)' }}>
             {messages.map((m, i) => (
               <div
                 key={i}
@@ -475,7 +603,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                   lineHeight: '1.6',
                 }}
               >
-                {streamingContent}
+                {stripHiddenTags(streamingContent)}
                 <span className="animate-pulse">|</span>
               </div>
             )}
