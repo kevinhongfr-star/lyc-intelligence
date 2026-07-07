@@ -8,13 +8,18 @@ export interface UserProfile {
   id: string;
   email: string;
   name: string;
-  role: string | null;
+  role: 'admin' | 'consultant' | 'client' | 'candidate' | 'leader' | 'member' | null;
   tier: 'free' | 'pro' | 'council' | 'enterprise';
   icp: string | null;
   active_surface: string | null;
   organization_id: string | null;
   subtype: string | null;
   notion_profile_id: string | null;
+  title?: string;
+  company?: string;
+  country?: string;
+  archetype?: string;
+  seniority_level?: string;
   created_at: string;
   updated_at: string;
 }

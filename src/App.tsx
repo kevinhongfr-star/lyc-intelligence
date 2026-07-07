@@ -5,6 +5,7 @@ import { CreditProvider } from '@/contexts/CreditContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Loader2 } from 'lucide-react';
 import { ToastContainer } from '@/components/ui/ToastContainer';
+import { PortalRouteGuard } from '@/components/shared/PortalRouteGuard';
 
 // ── Lazy-loaded page components (ESM dynamic import — works in browser) ──
 
@@ -45,6 +46,9 @@ const OrgIntelligencePage = lazy(() => import('@/pages/OrgIntelligencePage').the
 const ExecutiveProfilePage = lazy(() => import('@/pages/ExecutiveProfilePage').then(m => ({ default: m.ExecutiveProfilePage })));
 const CandidateReportPage = lazy(() => import('@/pages/CandidateReportPage').then(m => ({ default: m.CandidateReportPage })));
 const ProposalBuilderPage = lazy(() => import('@/pages/ProposalBuilderPage').then(m => ({ default: m.ProposalBuilderPage })));
+
+// ── Portal pages — lazy-loaded via ESM dynamic import ──
+const ClientOverview = lazy(() => import('@/pages/client/ClientOverview').then(m => ({ default: m.ClientOverview })));
 
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
@@ -131,6 +135,39 @@ export default function App() {
               <Route path="settings" element={<SettingsPage />} />
             </Route>
           )}
+
+          {/* ── B2B Client Portal ── */}
+          <Route path="/client-portal" element={<PortalRouteGuard requiredRole="client"><ClientOverview /></PortalRouteGuard>}>
+          </Route>
+          <Route path="/client-portal/overview" element={<PortalRouteGuard requiredRole="client"><ClientOverview /></PortalRouteGuard>} />
+          <Route path="/client-portal/mandates" element={<PortalRouteGuard requiredRole="client"><ClientOverview /></PortalRouteGuard>} />
+          <Route path="/client-portal/candidates" element={<PortalRouteGuard requiredRole="client"><ClientOverview /></PortalRouteGuard>} />
+          <Route path="/client-portal/pipeline-analytics" element={<PortalRouteGuard requiredRole="client"><ClientOverview /></PortalRouteGuard>} />
+          <Route path="/client-portal/talent-intel" element={<PortalRouteGuard requiredRole="client"><ClientOverview /></PortalRouteGuard>} />
+          <Route path="/client-portal/nexus-assistant" element={<PortalRouteGuard requiredRole="client"><NexusPage /></PortalRouteGuard>} />
+          <Route path="/client-portal/documents" element={<PortalRouteGuard requiredRole="client"><ClientOverview /></PortalRouteGuard>} />
+          <Route path="/client-portal/collaboration" element={<PortalRouteGuard requiredRole="client"><ClientOverview /></PortalRouteGuard>} />
+
+          {/* ── B2C Leader Portal ── */}
+          <Route path="/leader-portal" element={<PortalRouteGuard requiredRole="leader"><DashboardPage /></PortalRouteGuard>} />
+          <Route path="/leader-portal/coach" element={<PortalRouteGuard requiredRole="leader"><NexusPage /></PortalRouteGuard>} />
+          <Route path="/leader-portal/intelligence" element={<PortalRouteGuard requiredRole="leader"><DashboardPage /></PortalRouteGuard>} />
+          <Route path="/leader-portal/career-intel" element={<PortalRouteGuard requiredRole="leader"><DashboardPage /></PortalRouteGuard>} />
+          <Route path="/leader-portal/growth" element={<PortalRouteGuard requiredRole="leader"><ProgressPage /></PortalRouteGuard>} />
+          <Route path="/leader-portal/credits" element={<PortalRouteGuard requiredRole="leader"><PricingPage /></PortalRouteGuard>} />
+          <Route path="/leader-portal/profile-settings" element={<PortalRouteGuard requiredRole="leader"><ProfilePage /></PortalRouteGuard>} />
+
+          {/* ── Candidate Portal ── */}
+          <Route path="/candidate" element={<PortalRouteGuard requiredRole="candidate"><DashboardPage /></PortalRouteGuard>} />
+          <Route path="/candidate/dashboard" element={<PortalRouteGuard requiredRole="candidate"><DashboardPage /></PortalRouteGuard>} />
+          <Route path="/candidate/opportunities" element={<PortalRouteGuard requiredRole="candidate"><DashboardPage /></PortalRouteGuard>} />
+          <Route path="/candidate/applications" element={<PortalRouteGuard requiredRole="candidate"><DashboardPage /></PortalRouteGuard>} />
+          <Route path="/candidate/interview-prep" element={<PortalRouteGuard requiredRole="candidate"><NexusPage /></PortalRouteGuard>} />
+          <Route path="/candidate/assessments" element={<PortalRouteGuard requiredRole="candidate"><AssessmentPage /></PortalRouteGuard>} />
+          <Route path="/candidate/offers" element={<PortalRouteGuard requiredRole="candidate"><DashboardPage /></PortalRouteGuard>} />
+          <Route path="/candidate/career-dev" element={<PortalRouteGuard requiredRole="candidate"><ProgressPage /></PortalRouteGuard>} />
+          <Route path="/candidate/nexus-coach" element={<PortalRouteGuard requiredRole="candidate"><NexusPage /></PortalRouteGuard>} />
+          <Route path="/candidate/profile" element={<PortalRouteGuard requiredRole="candidate"><ProfilePage /></PortalRouteGuard>} />
         </Routes>
       </Suspense>
     </CreditProvider>
