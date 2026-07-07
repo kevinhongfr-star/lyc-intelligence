@@ -87,6 +87,13 @@ const CandidateAdvAssessPage = lazy(() => import('@/pages/CandidateAdvAssessPage
 const CandidateSettingsPage = lazy(() => import('@/pages/CandidateSettingsPage').then(m => ({ default: m.CandidateSettingsPage })));
 const CandidateProfilePage = lazy(() => import('@/pages/CandidateProfilePage').then(m => ({ default: m.CandidateProfilePage })));
 
+// ── Reports Module — lazy-loaded (admin/consultant) ──
+const ReportsListPage = lazy(() => import('@/pages/ReportsListPage').then(m => ({ default: m.ReportsListPage })));
+const CompetitiveIntelReportPage = lazy(() => import('@/pages/CompetitiveIntelReportPage').then(m => ({ default: m.CompetitiveIntelReportPage })));
+const OrgHealthReportPage = lazy(() => import('@/pages/OrgHealthReportPage').then(m => ({ default: m.OrgHealthReportPage })));
+const TalentDeepDiveReportPage = lazy(() => import('@/pages/TalentDeepDiveReportPage').then(m => ({ default: m.TalentDeepDiveReportPage })));
+const ReportBuilderPage = lazy(() => import('@/pages/ReportBuilderPage').then(m => ({ default: m.ReportBuilderPage })));
+
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
 function Loading() { return <div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>; }
@@ -217,6 +224,13 @@ export default function App() {
             <Route path="settings" element={<CandidateSettingsPage />} />
             <Route path="profile" element={<CandidateProfilePage />} />
           </Route>
+
+          {/* === REPORTS MODULE (admin/consultant) === */}
+          <Route path="/reports" element={<AdminRoute><ReportsListPage /></AdminRoute>} />
+          <Route path="/reports/competitive-intel" element={<AdminRoute><CompetitiveIntelReportPage /></AdminRoute>} />
+          <Route path="/reports/org-health" element={<AdminRoute><OrgHealthReportPage /></AdminRoute>} />
+          <Route path="/reports/talent-deep-dive" element={<AdminRoute><TalentDeepDiveReportPage /></AdminRoute>} />
+          <Route path="/reports/builder" element={<AdminRoute><ReportBuilderPage /></AdminRoute>} />
         </Routes>
       </Suspense>
     </CreditProvider>

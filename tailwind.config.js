@@ -20,6 +20,9 @@ export default {
         'ocean': 'var(--ocean, #4FC3F7)',
         'ocean-deep': 'var(--ocean-deep, #0288D1)',
         'slate': 'var(--slate, #607D8B)',
+        /* Semantic status colors */
+        'warning': 'var(--color-warning, #F59E0B)',
+        'error': 'var(--color-error, #DC2626)',
         'sky': 'var(--sky, #E8F4FD)',
         'mist': 'var(--mist, #F0F7FF)',
         'lavender': 'var(--lavender, #EDE7F6)',
