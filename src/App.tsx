@@ -60,6 +60,33 @@ const ClientPortalAdmin = lazy(() => import('@/pages/ClientPortalAdmin').then(m 
 
 const PortalRouteGuard = lazy(() => import('@/components/shared/PortalRouteGuard').then(m => ({ default: m.PortalRouteGuard })));
 
+// ── B2C Leader Portal — lazy-loaded ──
+const B2CPortalLayout = lazy(() => import('@/components/b2c/B2CPortalLayout').then(m => ({ default: m.B2CPortalLayout })));
+const B2CCoachPage = lazy(() => import('@/pages/B2CCoachPage').then(m => ({ default: m.B2CCoachPage })));
+const B2CIntelligencePage = lazy(() => import('@/pages/B2CIntelligencePage').then(m => ({ default: m.B2CIntelligencePage })));
+const B2CCareerIntelPage = lazy(() => import('@/pages/B2CCareerIntelPage').then(m => ({ default: m.B2CCareerIntelPage })));
+const B2CGrowthPage = lazy(() => import('@/pages/B2CGrowthPage').then(m => ({ default: m.B2CGrowthPage })));
+const B2CCareerServicesPage = lazy(() => import('@/pages/B2CCareerServicesPage').then(m => ({ default: m.B2CCareerServicesPage })));
+const B2CEngagementPage = lazy(() => import('@/pages/B2CEngagementPage').then(m => ({ default: m.B2CEngagementPage })));
+const B2CCreditsPage = lazy(() => import('@/pages/B2CCreditsPage').then(m => ({ default: m.B2CCreditsPage })));
+const B2CChatPlusPage = lazy(() => import('@/pages/B2CChatPlusPage').then(m => ({ default: m.B2CChatPlusPage })));
+const B2CProfileSettingsPage = lazy(() => import('@/pages/B2CProfileSettingsPage').then(m => ({ default: m.B2CProfileSettingsPage })));
+
+// ── Candidate Portal — lazy-loaded ──
+const CandidatePortalLayout = lazy(() => import('@/components/candidate/CandidatePortalLayout').then(m => ({ default: m.CandidatePortalLayout })));
+const CandidateDashboardPage = lazy(() => import('@/pages/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
+const CandidateOpportunitiesPage = lazy(() => import('@/pages/CandidateOpportunitiesPage').then(m => ({ default: m.CandidateOpportunitiesPage })));
+const CandidateApplicationsPage = lazy(() => import('@/pages/CandidateApplicationsPage').then(m => ({ default: m.CandidateApplicationsPage })));
+const CandidateInterviewPrepPage = lazy(() => import('@/pages/CandidateInterviewPrepPage').then(m => ({ default: m.CandidateInterviewPrepPage })));
+const CandidateAssessmentsPage = lazy(() => import('@/pages/CandidateAssessmentsPage').then(m => ({ default: m.CandidateAssessmentsPage })));
+const CandidateOffersPage = lazy(() => import('@/pages/CandidateOffersPage').then(m => ({ default: m.CandidateOffersPage })));
+const CandidateCareerDevPage = lazy(() => import('@/pages/CandidateCareerDevPage').then(m => ({ default: m.CandidateCareerDevPage })));
+const CandidateNexusCoachPage = lazy(() => import('@/pages/CandidateNexusCoachPage').then(m => ({ default: m.CandidateNexusCoachPage })));
+const CandidateCommunityPage = lazy(() => import('@/pages/CandidateCommunityPage').then(m => ({ default: m.CandidateCommunityPage })));
+const CandidateAdvAssessPage = lazy(() => import('@/pages/CandidateAdvAssessPage').then(m => ({ default: m.CandidateAdvAssessPage })));
+const CandidateSettingsPage = lazy(() => import('@/pages/CandidateSettingsPage').then(m => ({ default: m.CandidateSettingsPage })));
+const CandidateProfilePage = lazy(() => import('@/pages/CandidateProfilePage').then(m => ({ default: m.CandidateProfilePage })));
+
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
 function Loading() { return <div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>; }
@@ -158,6 +185,37 @@ export default function App() {
             <Route path="collaboration" element={<ClientPortalCollaboration />} />
             <Route path="onboarding" element={<ClientPortalOnboarding />} />
             <Route path="admin" element={<ClientPortalAdmin />} />
+          </Route>
+
+          {/* === B2C LEADER PORTAL === */}
+          <Route path="/leader-portal" element={<ProtectedRoute><PortalRouteGuard requiredRole="leader"><B2CPortalLayout /></PortalRouteGuard></ProtectedRoute>}>
+            <Route index element={<Navigate to="coach" />} />
+            <Route path="coach" element={<B2CCoachPage />} />
+            <Route path="intelligence" element={<B2CIntelligencePage />} />
+            <Route path="career-intel" element={<B2CCareerIntelPage />} />
+            <Route path="growth" element={<B2CGrowthPage />} />
+            <Route path="career-services" element={<B2CCareerServicesPage />} />
+            <Route path="engagement" element={<B2CEngagementPage />} />
+            <Route path="credits" element={<B2CCreditsPage />} />
+            <Route path="chat-plus" element={<B2CChatPlusPage />} />
+            <Route path="profile-settings" element={<B2CProfileSettingsPage />} />
+          </Route>
+
+          {/* === CANDIDATE PORTAL === */}
+          <Route path="/candidate" element={<ProtectedRoute><PortalRouteGuard requiredRole="candidate"><CandidatePortalLayout /></PortalRouteGuard></ProtectedRoute>}>
+            <Route index element={<Navigate to="dashboard" />} />
+            <Route path="dashboard" element={<CandidateDashboardPage />} />
+            <Route path="opportunities" element={<CandidateOpportunitiesPage />} />
+            <Route path="applications" element={<CandidateApplicationsPage />} />
+            <Route path="interview-prep" element={<CandidateInterviewPrepPage />} />
+            <Route path="assessments" element={<CandidateAssessmentsPage />} />
+            <Route path="offers" element={<CandidateOffersPage />} />
+            <Route path="career-dev" element={<CandidateCareerDevPage />} />
+            <Route path="nexus-coach" element={<CandidateNexusCoachPage />} />
+            <Route path="community" element={<CandidateCommunityPage />} />
+            <Route path="advanced-assess" element={<CandidateAdvAssessPage />} />
+            <Route path="settings" element={<CandidateSettingsPage />} />
+            <Route path="profile" element={<CandidateProfilePage />} />
           </Route>
         </Routes>
       </Suspense>
