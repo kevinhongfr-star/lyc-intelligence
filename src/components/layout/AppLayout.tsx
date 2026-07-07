@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts';
-import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDashboard, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon, Building2 } from 'lucide-react';
+import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDashboard, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon, Building2, Shield, KanbanSquare, Trophy, Database, Bot, Cog } from 'lucide-react';
 import { CreditDisplay } from '@/components/ui/CreditDisplay';
 import { IconBridge, IconTrident, IconDrive, IconLeap, IconImpact, IconSpark, IconQuest, IconForge, IconPrism } from '@/components/icons/LycIcons';
 import { getNotifications } from '@/services/supabaseApi';
@@ -24,6 +24,16 @@ const NAV_ITEMS = [
   { path: '/platform/documents', icon: IconPrism, label: 'Documents' },
   { path: '/platform/notifications', icon: Bell, label: 'Alerts' },
   { path: '/platform/settings', icon: IconForge, label: 'Settings', roles: ['admin', 'recruiter'] },
+  { type: 'divider' as const, label: 'Phase 5' },
+  { path: '/platform/tasks', icon: KanbanSquare, label: 'Tasks' },
+  { path: '/platform/analytics', icon: Trophy, label: 'Analytics' },
+  { path: '/platform/team', icon: Users, label: 'Team' },
+  { path: '/platform/scheduling-plus', icon: Calendar, label: 'Scheduling+' },
+  { path: '/platform/intelligence-plus', icon: Activity, label: 'Intelligence+' },
+  { path: '/platform/nexus-engine', icon: Bot, label: 'NEXUS Engine', roles: ['admin'] },
+  { path: '/platform/platform-settings', icon: Cog, label: 'Platform', roles: ['admin'] },
+  { path: '/platform/advanced-ops', icon: Activity, label: 'Advanced Ops', roles: ['admin'] },
+  { path: '/platform/compliance', icon: Shield, label: 'Compliance', roles: ['admin'] },
 ];
 
 type NavItem = { path?: string; icon?: any; label: string; exact?: boolean; type?: 'divider'; suffix?: string; roles?: string[] };

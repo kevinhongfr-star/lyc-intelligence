@@ -10,13 +10,15 @@ export class ErrorBoundary extends React.Component<{children: React.ReactNode}, 
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: 32, fontFamily: 'system-ui', maxWidth: 600, margin: '0 auto' }}>
-          <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12 }}>Something went wrong</h1>
-          <pre style={{ background: '#f5f5f5', padding: 16, borderRadius: 8, fontSize: 13, overflow: 'auto', color: '#c00' }}>
+        <div className="bg-bg-primary border border-bg-tertiary p-8 max-w-2xl mx-auto my-16">
+          <h1 className="font-serif text-xl font-bold text-text-primary mb-3">Something went wrong</h1>
+          <pre className="bg-bg-secondary border border-bg-tertiary p-4 text-xs overflow-auto text-error font-mono">
             {this.state.error?.message}
           </pre>
-          <button onClick={() => { this.setState({ hasError: false, error: null }); window.location.reload(); }}
-            style={{ marginTop: 16, padding: '10px 20px', background: '#C108AB', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
+          <button
+            onClick={() => { this.setState({ hasError: false, error: null }); window.location.reload(); }}
+            className="mt-4 bg-accent text-white px-5 py-2 text-sm font-medium hover:bg-accent-hover transition-colors"
+          >
             Reload
           </button>
         </div>
