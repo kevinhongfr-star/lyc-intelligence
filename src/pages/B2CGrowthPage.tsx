@@ -1,21 +1,29 @@
 import React from 'react';
+import { DevelopmentPlan } from '@/components/b2c/DevelopmentPlan';
+import { SkillProgression } from '@/components/b2c/SkillProgression';
+import { GoalTracker } from '@/components/b2c/GoalTracker';
+import { ResourceRecommendations } from '@/components/b2c/ResourceRecommendations';
+import { MentorMatching } from '@/components/b2c/MentorMatching';
 
 export function B2CGrowthPage() {
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="font-serif text-2xl font-bold text-text-primary">Growth</h1>
-        <p className="text-text-muted mt-1">Development plan mockup</p>
+      <header className="border-b border-bg-tertiary pb-4">
+        <h1 className="font-serif text-2xl font-bold text-text-primary">GROWTH &amp; DEVELOPMENT</h1>
+        <p className="text-text-muted mt-1 text-sm">
+          Personalized development plan, skill tracking, and growth resources.
+        </p>
       </header>
-      <div className="bg-bg-secondary border border-bg-tertiary p-12 text-center">
-        <div className="max-w-md mx-auto">
-          <p className="text-text-secondary text-lg mb-4">
-            Personalized development plan builder, milestone tracking, and growth metrics.
-          </p>
-          <div className="h-32 bg-bg-tertiary flex items-center justify-center">
-            <span className="text-text-muted">Placeholder</span>
-          </div>
-        </div>
+
+      <DevelopmentPlan />
+
+      <SkillProgression />
+
+      <GoalTracker />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ResourceRecommendations />
+        <MentorMatching />
       </div>
     </div>
   );

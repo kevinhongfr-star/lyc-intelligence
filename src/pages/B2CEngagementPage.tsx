@@ -1,21 +1,25 @@
 import React from 'react';
+import { CommunityFeed } from '@/components/b2c/CommunityFeed';
+import { EventsList } from '@/components/b2c/EventsList';
+import { PeerNetwork } from '@/components/b2c/PeerNetwork';
+import { ReferralProgram } from '@/components/b2c/ReferralProgram';
 
 export function B2CEngagementPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-serif text-2xl font-bold text-text-primary">Engagement</h1>
-        <p className="text-text-muted mt-1">Community feed mockup</p>
+        <h1 className="font-serif text-2xl font-bold text-text-primary">
+          COMMUNITY & ENGAGEMENT
+        </h1>
       </header>
-      <div className="bg-bg-secondary border border-bg-tertiary p-12 text-center">
-        <div className="max-w-md mx-auto">
-          <p className="text-text-secondary text-lg mb-4">
-            Council discussions, peer threads, event invitations, and AMAs with LYC advisors.
-          </p>
-          <div className="h-32 bg-bg-tertiary flex items-center justify-center">
-            <span className="text-text-muted">Placeholder</span>
-          </div>
-        </div>
+
+      <CommunityFeed />
+
+      <EventsList />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <PeerNetwork />
+        <ReferralProgram />
       </div>
     </div>
   );

@@ -1,21 +1,21 @@
 import React from 'react';
+import { PremiumAssessments } from '@/components/candidate/PremiumAssessments';
+import { AssessmentResults } from '@/components/candidate/AssessmentResults';
+import { ResultsExport } from '@/components/candidate/ResultsExport';
 
 export function CandidateAdvAssessPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-serif text-2xl font-bold text-text-primary">Advanced Assessments</h1>
-        <p className="text-text-muted mt-1">Assessment catalog</p>
+        <h1 className="font-serif text-2xl font-bold text-text-primary">ADVANCED ASSESSMENTS</h1>
+        <p className="text-text-muted mt-1">Premium tools to differentiate your profile</p>
       </header>
-      <div className="bg-bg-secondary border border-bg-tertiary p-12 text-center">
-        <div className="max-w-md mx-auto">
-          <p className="text-text-secondary text-lg mb-4">
-            Browse deeper assessments calibrated for specialized and executive roles.
-          </p>
-          <div className="h-32 bg-bg-tertiary flex items-center justify-center">
-            <span className="text-text-muted">Placeholder</span>
-          </div>
-        </div>
+
+      <PremiumAssessments />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <AssessmentResults />
+        <ResultsExport />
       </div>
     </div>
   );

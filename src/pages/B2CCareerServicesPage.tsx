@@ -1,23 +1,27 @@
 import React from 'react';
+import { ServiceCatalog } from '@/components/b2c/ServiceCatalog';
+import { BookingCalendar } from '@/components/b2c/BookingCalendar';
+import { ServiceProviderProfile } from '@/components/b2c/ServiceProviderProfile';
+import { ServiceHistory } from '@/components/b2c/ServiceHistory';
 
 export function B2CCareerServicesPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-serif text-2xl font-bold text-text-primary">Career Services</h1>
-        <p className="text-text-muted mt-1">Service catalog mockup</p>
+        <h1 className="font-serif text-2xl font-bold text-text-primary">CAREER SERVICES</h1>
+        <p className="text-text-muted mt-1">
+          Browse and book executive coaching, resume refinement, interview prep, and negotiation support.
+        </p>
       </header>
-      <div className="bg-bg-secondary border border-bg-tertiary p-12 text-center">
-        <div className="max-w-md mx-auto">
-          <p className="text-text-secondary text-lg mb-4">
-            Browse and book LYC career services — executive coaching, resume refinement,
-            interview prep, and negotiation support.
-          </p>
-          <div className="h-32 bg-bg-tertiary flex items-center justify-center">
-            <span className="text-text-muted">Placeholder</span>
-          </div>
-        </div>
+
+      <ServiceCatalog />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <BookingCalendar />
+        <ServiceProviderProfile />
       </div>
+
+      <ServiceHistory />
     </div>
   );
 }

@@ -1,22 +1,20 @@
 import React from 'react';
+import { CandidatePeerNetwork } from '@/components/candidate/CandidatePeerNetwork';
+import { IndustryEvents } from '@/components/candidate/IndustryEvents';
+import { DiscussionForum } from '@/components/candidate/DiscussionForum';
+import { ReferralRequests } from '@/components/candidate/ReferralRequests';
 
 export function CandidateCommunityPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-serif text-2xl font-bold text-text-primary">Community</h1>
-        <p className="text-text-muted mt-1">Peer network</p>
+        <h1 className="font-serif text-2xl font-bold text-text-primary">CANDIDATE COMMUNITY</h1>
       </header>
-      <div className="bg-bg-secondary border border-bg-tertiary p-12 text-center">
-        <div className="max-w-md mx-auto">
-          <p className="text-text-secondary text-lg mb-4">
-            Connect with a vetted peer network of senior leaders and operators.
-          </p>
-          <div className="h-32 bg-bg-tertiary flex items-center justify-center">
-            <span className="text-text-muted">Placeholder</span>
-          </div>
-        </div>
-      </div>
+
+      <CandidatePeerNetwork />
+      <IndustryEvents />
+      <DiscussionForum />
+      <ReferralRequests />
     </div>
   );
 }
