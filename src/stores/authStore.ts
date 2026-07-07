@@ -4,11 +4,13 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
 
+export type UserRole = 'admin' | 'consultant' | 'client' | 'candidate' | 'leader';
+
 export interface UserProfile {
   id: string;
   email: string;
   name: string;
-  role: string | null;
+  role: UserRole;
   tier: 'free' | 'pro' | 'council' | 'enterprise';
   icp: string | null;
   active_surface: string | null;
@@ -17,6 +19,9 @@ export interface UserProfile {
   notion_profile_id: string | null;
   created_at: string;
   updated_at: string;
+  title?: string;
+  company?: string;
+  country?: string;
 }
 
 interface AuthStore {

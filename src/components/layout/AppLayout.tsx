@@ -5,6 +5,7 @@ import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDa
 import { CreditDisplay } from '@/components/ui/CreditDisplay';
 import { IconBridge, IconTrident, IconDrive, IconLeap, IconImpact, IconSpark, IconQuest, IconForge, IconPrism } from '@/components/icons/LycIcons';
 import { getNotifications } from '@/services/supabaseApi';
+import { PortalSwitcher } from '@/components/shared/PortalSwitcher';
 
 const NAV_ITEMS = [
   { path: '/platform', icon: IconImpact, label: 'Dashboard', exact: true },
@@ -109,7 +110,15 @@ export function AppLayout() {
           </button>
         </div>
       </aside>
-      <main className="flex-1 overflow-auto p-6"><Outlet /></main>
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="h-10 bg-bg-secondary border-b border-bg-tertiary flex items-center justify-between px-6">
+          <PortalSwitcher />
+          <div className="flex items-center gap-4">
+            {sidebarOpen && <CreditDisplay showTier />}
+          </div>
+        </div>
+        <div className="flex-1 overflow-auto p-6"><Outlet /></div>
+      </main>
     </div>
   );
 }

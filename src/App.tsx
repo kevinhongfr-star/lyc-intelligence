@@ -46,6 +46,20 @@ const ExecutiveProfilePage = lazy(() => import('@/pages/ExecutiveProfilePage').t
 const CandidateReportPage = lazy(() => import('@/pages/CandidateReportPage').then(m => ({ default: m.CandidateReportPage })));
 const ProposalBuilderPage = lazy(() => import('@/pages/ProposalBuilderPage').then(m => ({ default: m.ProposalBuilderPage })));
 
+const ClientPortalLayout = lazy(() => import('@/components/client/ClientPortalLayout').then(m => ({ default: m.ClientPortalLayout })));
+const ClientPortalOverview = lazy(() => import('@/pages/ClientPortalOverview').then(m => ({ default: m.ClientPortalOverview })));
+const ClientPortalMandates = lazy(() => import('@/pages/ClientPortalMandates').then(m => ({ default: m.ClientPortalMandates })));
+const ClientPortalCandidates = lazy(() => import('@/pages/ClientPortalCandidates').then(m => ({ default: m.ClientPortalCandidates })));
+const ClientPortalPipelineAnalytics = lazy(() => import('@/pages/ClientPortalPipelineAnalytics').then(m => ({ default: m.ClientPortalPipelineAnalytics })));
+const ClientPortalTalentIntel = lazy(() => import('@/pages/ClientPortalTalentIntel').then(m => ({ default: m.ClientPortalTalentIntel })));
+const ClientPortalNexus = lazy(() => import('@/pages/ClientPortalNexus').then(m => ({ default: m.ClientPortalNexus })));
+const ClientPortalDocuments = lazy(() => import('@/pages/ClientPortalDocuments').then(m => ({ default: m.ClientPortalDocuments })));
+const ClientPortalCollaboration = lazy(() => import('@/pages/ClientPortalCollaboration').then(m => ({ default: m.ClientPortalCollaboration })));
+const ClientPortalOnboarding = lazy(() => import('@/pages/ClientPortalOnboarding').then(m => ({ default: m.ClientPortalOnboarding })));
+const ClientPortalAdmin = lazy(() => import('@/pages/ClientPortalAdmin').then(m => ({ default: m.ClientPortalAdmin })));
+
+const PortalRouteGuard = lazy(() => import('@/components/shared/PortalRouteGuard').then(m => ({ default: m.PortalRouteGuard })));
+
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
 function Loading() { return <div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>; }
@@ -131,6 +145,20 @@ export default function App() {
               <Route path="settings" element={<SettingsPage />} />
             </Route>
           )}
+          
+          <Route path="/client-portal" element={<ProtectedRoute><PortalRouteGuard requiredRole="client"><ClientPortalLayout /></PortalRouteGuard></ProtectedRoute>}>
+            <Route index element={<Navigate to="overview" />} />
+            <Route path="overview" element={<ClientPortalOverview />} />
+            <Route path="mandates" element={<ClientPortalMandates />} />
+            <Route path="candidates" element={<ClientPortalCandidates />} />
+            <Route path="pipeline-analytics" element={<ClientPortalPipelineAnalytics />} />
+            <Route path="talent-intel" element={<ClientPortalTalentIntel />} />
+            <Route path="nexus-assistant" element={<ClientPortalNexus />} />
+            <Route path="documents" element={<ClientPortalDocuments />} />
+            <Route path="collaboration" element={<ClientPortalCollaboration />} />
+            <Route path="onboarding" element={<ClientPortalOnboarding />} />
+            <Route path="admin" element={<ClientPortalAdmin />} />
+          </Route>
         </Routes>
       </Suspense>
     </CreditProvider>
