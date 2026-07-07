@@ -9,6 +9,8 @@ import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditSe
 import { CreditGate } from './CreditGate';
 import { CareerInsight } from './CareerInsight';
 import { CouncilUpsell } from './CouncilUpsell';
+import { DiagnosticProgressBar, parseDiagnosticProgress, DEFAULT_DIAGNOSTIC_DIMENSIONS } from './DiagnosticProgressBar';
+import { stripTagsForDisplay } from '@/services/nexusPersona';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -23,8 +25,9 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
+  // LYC Brand: Zero border-radius
+  radius: '0px',
+  radiusSm: '0px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
@@ -77,6 +80,10 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
   const [messageCount, setMessageCount] = useState(0);
   const [pendingApproval, setPendingApproval] = useState(false);
   const [streamingContent, setStreamingContent] = useState<string | null>(null);
+  
+  // Diagnostic tracking state
+  const [diagnosticProgress, setDiagnosticProgress] = useState(0);
+  const [diagnosticDimensions, setDiagnosticDimensions] = useState(DEFAULT_DIAGNOSTIC_DIMENSIONS);
   
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -149,6 +156,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
           documentContext: '',
           memoryContext: [],
           messageCount: messageCount + 1,
+          profile: { title: profile?.title, company: profile?.company }, // For seniority detection
         }),
         signal: controller.signal,
       });
@@ -182,9 +190,9 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
         
         try {
           const parsed = JSON.parse(fullContent);
-          setStreamingContent(parsed.response || '');
+          setStreamingContent(stripTagsForDisplay(parsed.response || ''));
         } catch {
-          setStreamingContent(fullContent);
+          setStreamingContent(stripTagsForDisplay(fullContent));
         }
       }
 
@@ -211,11 +219,18 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     }
   };
 
-  const handleResponse = (data: { response: string; suggested_prompts?: string[] }) => {
-    setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+  const handleResponse = (data: { response: string; suggested_prompts?: string[]; diagnostic_status?: string; milestones?: any }) => {
+    // Strip diagnostic/milestone tags for display
+    const displayContent = stripTagsForDisplay(data.response);
+    setMessages(prev => [...prev, { role: 'assistant', content: displayContent }]);
     setSuggestedPrompts(data.suggested_prompts || suggestedPrompts);
     setAiState('idle');
     setStreamingContent(null);
+    
+    // Parse diagnostic progress from raw response (before stripping)
+    const diagnostic = parseDiagnosticProgress(data.response);
+    setDiagnosticProgress(diagnostic.progress);
+    setDiagnosticDimensions(diagnostic.dimensions);
     
     if (user?.id) {
       getCreditBalance(user.id).then(info => {
@@ -433,6 +448,14 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>Nexus</h1>
               <p style={{ fontSize: '14px', color: DS.muted }}>Know where you stand. Know where to go.</p>
             </div>
+          )}
+
+          {/* Diagnostic Progress Bar — shows when diagnostic started */}
+          {diagnosticProgress > 0 && (
+            <DiagnosticProgressBar
+              dimensions={diagnosticDimensions}
+              progress={diagnosticProgress}
+            />
           )}
 
           <div style={{ flex: 1, overflowY: 'auto', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: 'calc(100vh - 280px)' }}>

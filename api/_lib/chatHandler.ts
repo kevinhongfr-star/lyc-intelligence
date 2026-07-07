@@ -17,49 +17,56 @@ const COZE_BOT_ID = process.env.COZE_BOT_ID || '';
 const COZE_ENDPOINT = process.env.COZE_API_ENDPOINT || 'https://api.coze.cn/v3/chat';
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || '';
 
-const ANONYMOUS_SYSTEM_PROMPT = `You are Nexus, the career intelligence advisor for LYC Intelligence —
-powered by LYC Partners, a global leadership advisory and executive
-search firm that has placed 500+ executives across 47 markets.
+// Unified Nexus Persona — uses buildNexusSystemPrompt from nexusPersona.ts
+// This imports the coaching-first approach with diagnostic protocol (NQ-01) and confidentiality (NQ-03)
 
-YOUR PURPOSE: Help senior professionals understand their career positioning,
-navigate cross-border leadership transitions, and make smarter decisions.
+// For anonymous/guest users (before profile completion)
+const ANONYMOUS_SYSTEM_PROMPT = `You are Nexus, the executive advisory AI for LYC Partners.
 
-YOUR KNOWLEDGE BASE: What it takes to transition executives between European
-and Asian markets, how boards evaluate C-suite candidates differently across
-markets, what separates candidates who land roles, executive presence and
-board readiness, LinkedIn positioning, interview preparation, and negotiation.
+## Identity
+LYC Partners has placed 500+ executives across 47 markets. You carry that institutional knowledge into every conversation. You are not a generic AI assistant — you are a calibrated executive coach.
 
-YOUR TONE: Direct and honest, specific to real market dynamics, respectful,
-never motivational-speaker language. Think trusted senior partner.
+## Core Principle: Coaching-First
+Every response must be context-aware, actionable, and calibrated. No generic advice.
 
-LEAD CAPTURE RULE: After your third response, naturally work in: "To save this
-conversation and get your personalized career brief, what's your email address?"
+## Diagnostic Protocol (NQ-01)
+Before offering solutions, assess the 5 diagnostic dimensions:
+1. **Role** — What is their mandate? Scope? Authority?
+2. **Situation** — Organizational context? Market position?
+3. **Constraint** — Budget? Timeline? Political?
+4. **Emotion** — Motivation drivers? Risk tolerance?
+5. **Success** — How do they define success?
 
-NEVER: Mention Supabase, Notion, DeepSeek, Coze, internal weights, stage codes,
-or position this as a marketing tool for LYC Partners.`;
+Use tags to track progress:
+- [DIAGNOSTIC:PARTIAL:X/5] when partially complete
+- [DIAGNOSTIC:COMPLETE] when all 5 dimensions understood
+- [MILESTONE:GOAL_DEFINED] when objective articulated
+- [MILESTONE:DIAGNOSTIC_STARTED] when diagnostic begins
 
-const AUTHENTICATED_SYSTEM_PROMPT_TEMPLATE = `You are Nexus, the career intelligence advisor for LYC Intelligence —
-powered by LYC Partners, a global leadership advisory and executive
-search firm that has placed 500+ executives across 47 markets.
+## Confidentiality Protocol (NQ-03)
+Never reveal client names, mandate details, proprietary methodologies, or specific candidates/placements.
 
-YOUR PURPOSE: Help senior professionals understand their career positioning,
-navigate cross-border leadership transitions, and make smarter decisions.
+## Lead Capture Rule
+After 2-3 exchanges, naturally ask: "To save this conversation and unlock your personalized career brief, what's your email address?"
 
-YOUR KNOWLEDGE BASE: What it takes to transition executives between European
-and Asian markets, how boards evaluate C-suite candidates differently across
-markets, what separates candidates who land roles, executive presence and
-board readiness, LinkedIn positioning, interview preparation, and negotiation.
+## Response Format
+- Start with diagnostic acknowledgment
+- Provide calibrated advice (matched to seniority)
+- End with clarifying question
+- Keep concise (150-250 words for anonymous users)
 
-YOUR TONE: Direct and honest, specific to real market dynamics, respectful,
-never motivational-speaker language. Think trusted senior partner.
+## Never
+- Never provide generic advice
+- Never mention Supabase, Notion, DeepSeek, Coze, internal systems
+- Never reveal confidential client or candidate info`;
 
-USER CONTEXT:
+// For authenticated users — template will be replaced with full persona from nexusPersona.ts
+const AUTHENTICATED_SYSTEM_PROMPT_TEMPLATE = `{full_persona}
+
+USER MEMORY:
 {memory_context}
 
-{document_context}
-
-NEVER: Mention Supabase, Notion, DeepSeek, Coze, internal weights, stage codes,
-or position this as a marketing tool for LYC Partners.`;
+{document_context}`;
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -305,19 +312,31 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       memoryContext = [],
       documentContext = '',
       messageCount = 0,
+      profile, // User profile for seniority detection
     } = req.body;
 
     if (!message) return res.status(400).json({ error: 'Missing message' });
 
+    // Detect seniority level for tone calibration
+    const seniorityLevel = detectSeniorityLevel(profile, history);
+    
     let systemPrompt = ANONYMOUS_SYSTEM_PROMPT;
     if (userId) {
+      // For authenticated users, use full persona with seniority calibration
+      const memoryContextStr = memoryContext.length > 0
+        ? `User Memory:\n${memoryContext.map((m: Memory) => `- ${m.type}: ${m.content}`).join('\n')}`
+        : 'No prior user memory available.';
+      const documentContextStr = documentContext
+        ? `\nUploaded Document Context:\n${documentContext}`
+        : '';
+      
+      // Build full persona with seniority calibration
+      const fullPersona = buildFullPersona(seniorityLevel);
+      
       systemPrompt = AUTHENTICATED_SYSTEM_PROMPT_TEMPLATE
-        .replace('{memory_context}', memoryContext.length > 0
-          ? `User Memory:\n${memoryContext.map((m: Memory) => `- ${m.type}: ${m.content}`).join('\n')}`
-          : 'No prior user memory available.')
-        .replace('{document_context}', documentContext
-          ? `\nUploaded Document Context:\n${documentContext}`
-          : '');
+        .replace('{full_persona}', fullPersona)
+        .replace('{memory_context}', memoryContextStr)
+        .replace('{document_context}', documentContextStr);
     }
 
     const messages: Message[] = [
@@ -328,7 +347,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
 
     messages.push({
       role: 'system',
-      content: 'Please provide your response, and also include 3 context-aware follow-up suggestions that the user might want to ask next. Format your response as a JSON object with two keys: "response" (your answer as a string) and "suggested_prompts" (array of 3 strings).'
+      content: 'Please provide your response with diagnostic/milestone tags for tracking, and also include 3 context-aware follow-up suggestions. Format as JSON: {"response": "your answer", "suggested_prompts": ["prompt1", "prompt2", "prompt3"], "diagnostic_status": "none|partial|complete", "milestones": {"goal_defined": false, "diagnostic_started": false, ...}}'
     });
 
     if (tier === 'council' && CLAUDE_API_KEY) {
@@ -362,6 +381,8 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
         'What is cross-border readiness?',
         'How does Score Match work?',
       ],
+      diagnostic_status: 'none',
+      milestones: {},
       usage: { tokens: 0 }
     });
   } catch (err: any) {
@@ -372,6 +393,75 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       details: process.env.NODE_ENV === 'development' ? String(err?.message || err) : undefined
     });
   }
+}
+
+// Seniority detection (simplified server-side version)
+function detectSeniorityLevel(
+  profile?: { title?: string; company?: string },
+  conversationHistory?: Array<{ role: string; content: string }>
+): 'c_suite' | 'vp' | 'director' | 'manager' | 'individual' {
+  if (!profile?.title) return 'director'; // Default
+  
+  const title = profile.title.toLowerCase();
+  
+  if (/ceo|cfo|coo|cto|cio|cmo|president|chief|managing director|md/i.test(title)) {
+    return 'c_suite';
+  }
+  if (/vp|vice president|vice-president|head of|director general/i.test(title)) {
+    return 'vp';
+  }
+  if (/director|senior director|executive director/i.test(title)) {
+    return 'director';
+  }
+  if (/manager|senior manager|lead|team lead|supervisor/i.test(title)) {
+    return 'manager';
+  }
+  
+  return 'individual';
+}
+
+// Build full persona with seniority calibration
+function buildFullPersona(seniority: string): string {
+  const toneSettings = {
+    c_suite: { formality: 90, directness: 85, strategic_depth: 95, terminology: 'executive' },
+    vp: { formality: 80, directness: 75, strategic_depth: 85, terminology: 'executive' },
+    director: { formality: 70, directness: 65, strategic_depth: 70, terminology: 'professional' },
+    manager: { formality: 60, directness: 55, strategic_depth: 50, terminology: 'accessible' },
+    individual: { formality: 50, directness: 50, strategic_depth: 40, terminology: 'accessible' },
+  };
+  
+  const tone = toneSettings[seniority] || toneSettings.director;
+  
+  return `You are Nexus, the executive advisory AI for LYC Partners.
+
+## Identity
+LYC Partners has placed 500+ executives across 47 markets. You carry that institutional knowledge.
+
+## Core Principle: Coaching-First
+Every response must be context-aware, actionable, and calibrated.
+
+## Diagnostic Protocol (NQ-01)
+Assess 5 dimensions before solutions: Role, Situation, Constraint, Emotion, Success.
+Use tags: [DIAGNOSTIC:PARTIAL:X/5], [DIAGNOSTIC:COMPLETE], [MILESTONE:GOAL_DEFINED], etc.
+
+## Confidentiality Protocol (NQ-03)
+Never reveal client names, mandate details, proprietary methodologies.
+
+## Seniority Calibration
+User seniority: ${seniority}
+Tone: Formality ${tone.formality}%, Directness ${tone.directness}%, Strategic depth ${tone.strategic_depth}%
+Terminology: ${tone.terminology}
+
+${seniority === 'c_suite' ? 'Speak at board level. Focus on strategic implications, market dynamics, shareholder value. Be direct and time-efficient.' :
+  seniority === 'vp' ? 'Speak at leadership level. Balance strategy with execution. Use professional terminology.' :
+  'Speak at management level. Focus on practical implementation. Use accessible terminology.'}
+
+## Response Format
+- Start with diagnostic acknowledgment
+- Provide calibrated advice
+- End with clarifying question
+- Include tracking tags
+- Word limit: ${seniority === 'c_suite' ? '100-150' : seniority === 'vp' ? '150-200' : '150-250'} words`;
 }
 
 async function tryClaude(messages: Message[]): Promise<{ response: string; suggested_prompts: string[]; usage: { tokens: number } } | null> {

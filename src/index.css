@@ -3,6 +3,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── LYC Brand Rule: ZERO BORDER RADIUS ── */
+/* Override all Tailwind rounded utilities */
+*, *::before, *::after {
+  border-radius: 0 !important;
+}
+
 /* Font declarations — bundled locally, NO Google CDN */
 @font-face {
   font-family: 'Libre Baskerville';
