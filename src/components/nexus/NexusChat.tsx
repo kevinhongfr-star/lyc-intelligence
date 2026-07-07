@@ -11,6 +11,7 @@ import { CreditGate } from './CreditGate';
 import { CareerInsight } from './CareerInsight';
 import { CouncilUpsell } from './CouncilUpsell';
 import { DiagnosticProgressBar, parseDiagnosticProgress, DEFAULT_DIAGNOSTIC_DIMENSIONS } from './DiagnosticProgressBar';
+import { MilestoneBanner, parseMilestones, DEFAULT_MILESTONES } from './MilestoneBanner';
 import { stripTagsForDisplay } from '@/services/nexusPersona';
 
 const DS = {
@@ -85,6 +86,10 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
   // Diagnostic tracking state
   const [diagnosticProgress, setDiagnosticProgress] = useState(0);
   const [diagnosticDimensions, setDiagnosticDimensions] = useState(DEFAULT_DIAGNOSTIC_DIMENSIONS);
+  
+  // Milestone tracking state
+  const [milestones, setMilestones] = useState(DEFAULT_MILESTONES);
+  const [currentGoal, setCurrentGoal] = useState<string | undefined>(undefined);
   
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -269,6 +274,16 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     const diagnostic = parseDiagnosticProgress(data.response);
     setDiagnosticProgress(diagnostic.progress);
     setDiagnosticDimensions(diagnostic.dimensions);
+    
+    // Parse milestones from raw response
+    const parsedMilestones = parseMilestones(data.response);
+    setMilestones(parsedMilestones);
+    
+    // Extract current goal from response if present
+    const goalMatch = data.response.match(/\[GOAL:([^\]]+)\]/);
+    if (goalMatch) {
+      setCurrentGoal(goalMatch[1]);
+    }
     
     // Persist chat to Supabase if user is authenticated
     if (user?.id && sessionId) {
@@ -526,6 +541,14 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             <DiagnosticProgressBar
               dimensions={diagnosticDimensions}
               progress={diagnosticProgress}
+            />
+          )}
+
+          {/* Milestone Banner — shows session goal progress */}
+          {(milestones.some(m => m.complete) || currentGoal) && (
+            <MilestoneBanner
+              milestones={milestones}
+              currentGoal={currentGoal}
             />
           )}
 

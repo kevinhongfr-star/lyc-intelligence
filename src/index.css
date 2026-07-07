@@ -3,6 +3,51 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── LYC Design Tokens ── */
+:root {
+  /* Primary Colors */
+  --color-primary: #C108AB;
+  --color-primary-hover: #A00790;
+  --color-primary-light: rgba(193, 8, 171, 0.08);
+  
+  /* Background Colors */
+  --color-bg: #FFFFFF;
+  --color-bg-warm: #FAF8F5;
+  --color-bg-alt: #F5F5F5;
+  --color-card: #FFFFFF;
+  --color-card-border: #E5E5E5;
+  
+  /* Text Colors */
+  --color-text: #000000;
+  --color-text-secondary: #333333;
+  --color-muted: #666666;
+  --color-border: #E5E5E5;
+  
+  /* Accent Colors */
+  --color-teal: #00897B;
+  --color-success: #00897B;
+  --color-warning: #F59E0B;
+  --color-error: #DC2626;
+  
+  /* Typography */
+  --font-heading: 'Libre Baskerville', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  
+  /* Brand Rule: Zero Border Radius */
+  --radius-none: 0px;
+}
+
 /* ── LYC Brand Rule: ZERO BORDER RADIUS ── */
 /* Override all Tailwind rounded utilities */
 *, *::before, *::after {
