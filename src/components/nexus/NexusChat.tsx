@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditService';
+import { supabase } from '@/lib/supabase';
 import { CreditGate } from './CreditGate';
 import { CareerInsight } from './CareerInsight';
 import { CouncilUpsell } from './CouncilUpsell';
@@ -89,6 +90,70 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
 
   const FREE_TRIAL_LIMIT = 5;
 
+  // ── Chat Persistence Helpers ──
+  async function createChatSession(userId: string, title?: string) {
+    const { data, error } = await supabase
+      .from('chat_sessions')
+      .insert({
+        user_id: userId,
+        title: title || 'New Conversation',
+        use_case: null,
+        diagnostic_progress: 0,
+        diagnostic_dimensions: [],
+        milestone_status: {},
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Failed to create chat session:', error);
+      return null;
+    }
+    return data;
+  }
+
+  async function persistChatMessage(
+    userId: string,
+    sessionId: string,
+    role: 'user' | 'assistant',
+    content: string,
+    metadata?: any
+  ) {
+    const { error } = await supabase
+      .from('chat_messages')
+      .insert({
+        session_id: sessionId,
+        role,
+        content,
+        metadata: metadata || {},
+      });
+    
+    if (error) {
+      console.error('Failed to persist chat message:', error);
+    }
+  }
+
+  async function updateSessionDiagnostic(
+    sessionId: string,
+    progress: number,
+    dimensions: any[],
+    milestones: any
+  ) {
+    const { error } = await supabase
+      .from('chat_sessions')
+      .update({
+        diagnostic_progress: progress,
+        diagnostic_dimensions: dimensions,
+        milestone_status: milestones,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', sessionId);
+    
+    if (error) {
+      console.error('Failed to update session diagnostic:', error);
+    }
+  }
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamingContent]);
@@ -145,18 +210,20 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     const timeout = setTimeout(() => controller.abort(), 30000);
 
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch('/api/nexus/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         body: JSON.stringify({
           message: userMsg,
-          userId: user?.id,
-          tier: profile?.tier || creditTier,
           history: getContextWindow(),
-          documentContext: '',
-          memoryContext: [],
-          messageCount: messageCount + 1,
-          profile: { title: profile?.title, company: profile?.company }, // For seniority detection
+          session_id: sessionId,
+          use_case: null, // Auto-detect by persona
+          profile: { title: profile?.title, company: profile?.company },
+          tier: profile?.tier || creditTier,
+          stream: false, // Use non-streaming for reliable tag parsing
         }),
         signal: controller.signal,
       });
@@ -171,37 +238,8 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
         throw new Error(serverMsg);
       }
 
-      const reader = res.body?.getReader();
-      if (!reader) {
-        const data = await res.json();
-        handleResponse(data);
-        return;
-      }
-
-      const decoder = new TextDecoder();
-      let fullContent = '';
-      
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        const chunk = decoder.decode(value, { stream: true });
-        fullContent += chunk;
-        
-        try {
-          const parsed = JSON.parse(fullContent);
-          setStreamingContent(stripTagsForDisplay(parsed.response || ''));
-        } catch {
-          setStreamingContent(stripTagsForDisplay(fullContent));
-        }
-      }
-
-      try {
-        const data = JSON.parse(fullContent);
-        handleResponse(data);
-      } catch {
-        handleResponse({ response: fullContent, suggested_prompts: [] });
-      }
+      const data = await res.json();
+      handleResponse(data);
     } catch (e: any) {
       clearTimeout(timeout);
       console.error('Chat failed:', e);
@@ -219,7 +257,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     }
   };
 
-  const handleResponse = (data: { response: string; suggested_prompts?: string[]; diagnostic_status?: string; milestones?: any }) => {
+  const handleResponse = (data: { response: string; suggested_prompts?: string[]; diagnostic_tags?: string[]; milestone_tags?: string[]; seniority?: string }) => {
     // Strip diagnostic/milestone tags for display
     const displayContent = stripTagsForDisplay(data.response);
     setMessages(prev => [...prev, { role: 'assistant', content: displayContent }]);
@@ -231,6 +269,24 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     const diagnostic = parseDiagnosticProgress(data.response);
     setDiagnosticProgress(diagnostic.progress);
     setDiagnosticDimensions(diagnostic.dimensions);
+    
+    // Persist chat to Supabase if user is authenticated
+    if (user?.id && sessionId) {
+      persistChatMessage(user.id, sessionId, 'assistant', data.response, {
+        diagnostic_tags: data.diagnostic_tags,
+        milestone_tags: data.milestone_tags,
+        seniority: data.seniority,
+      });
+      
+      // Update session diagnostic progress
+      updateSessionDiagnostic(sessionId, diagnostic.progress, diagnostic.dimensions, {
+        goal_defined: data.response.includes('[MILESTONE:GOAL_DEFINED]'),
+        diagnostic_started: data.response.includes('[MILESTONE:DIAGNOSTIC_STARTED]'),
+        diagnostic_complete: data.response.includes('[MILESTONE:DIAGNOSTIC_COMPLETE]'),
+        solution_path: data.response.includes('[MILESTONE:SOLUTION_PATH]'),
+        next_steps: data.response.includes('[MILESTONE:NEXT_STEPS]'),
+      });
+    }
     
     if (user?.id) {
       getCreditBalance(user.id).then(info => {
@@ -266,6 +322,21 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     setMessageCount(newMessageCount);
     
     onMessageSent?.();
+    
+    // Create session if authenticated and no session exists
+    let currentSessionId = sessionId;
+    if (user?.id && !currentSessionId) {
+      const session = await createChatSession(user.id, userMsg.substring(0, 50));
+      if (session) {
+        currentSessionId = session.id;
+        setSessionId(session.id);
+      }
+    }
+    
+    // Persist user message
+    if (user?.id && currentSessionId) {
+      await persistChatMessage(user.id, currentSessionId, 'user', userMsg);
+    }
     
     await sendMessage(userMsg);
   };

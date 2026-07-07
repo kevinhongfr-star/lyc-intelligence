@@ -1,19 +1,26 @@
 /**
  * api/_lib/nexusHandler.ts
  * Routes:
- *   POST /api/x/nexus/commands  → NEXUS → DEX commands
- *   POST /api/x/nexus/webhook   → NEXUS webhook receiver
+ *   POST /api/nexus/chat       → Nexus chatbot with DeepSeek + unified persona
+ *   POST /api/x/nexus/commands → NEXUS → DEX commands
+ *   POST /api/x/nexus/webhook  → NEXUS webhook receiver
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as db from './supabaseRest.js';
+import { handleNexusChat } from './nexusChatHandler.js';
 
 export async function handler(req: VercelRequest, res: VercelResponse) {
   const pathArr = (req.query.path as string[]) || [];
-  const resource = pathArr[0] || ''; // 'commands' or 'webhook'
+  const resource = pathArr[0] || ''; // 'chat', 'commands', or 'webhook'
   const method = req.method || 'POST';
 
   try {
+    // ── Nexus Chat (POST only) ──
+    if (resource === 'chat' && method === 'POST') {
+      return handleNexusChat(req, res);
+    }
+
     // ── NEXUS Commands (POST only) ──
     if (resource === 'commands' && method === 'POST') {
       const body = req.body || {};

@@ -145,12 +145,12 @@ export function SignupPrompt({ messageCount, onSignUp, onContinueAsGuest }: Sign
       <div className="flex items-center justify-between">
         <div>
           <p className="text-amber-800 font-semibold">
-            {messageCount >= 7 ? 'Limit reached!' : 'Continue with an account'}
+            {messageCount >= 2 ? 'Guest limit reached' : 'Continue with an account'}
           </p>
           <p className="text-amber-600 text-sm mt-1">
-            {messageCount >= 7 
+            {messageCount >= 2 
               ? 'Please sign up to continue chatting with Nexus.'
-              : `You've used ${messageCount} free messages. Create an account for 2 credits/day!`
+              : `You've used ${messageCount} free message${messageCount === 1 ? '' : 's'}. Create an account for 5 credits/day!`
             }
           </p>
         </div>
@@ -162,10 +162,10 @@ export function SignupPrompt({ messageCount, onSignUp, onContinueAsGuest }: Sign
             <UserPlus className="w-4 h-4" />
             Sign Up
           </button>
-          {messageCount < 7 && (
+          {messageCount < 2 && (
             <button
               onClick={onContinueAsGuest}
-              className="px-4 py-2 bg-white text-amber-700 rounded-lg text-sm font-medium hover:bg-amber-100 transition-colors border border-amber-300"
+              className="px-4 py-2 bg-white text-amber-700 text-sm font-medium hover:bg-amber-100 transition-colors border border-amber-300"
             >
               Continue as Guest
             </button>

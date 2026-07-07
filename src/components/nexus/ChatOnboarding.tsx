@@ -18,7 +18,6 @@ export function ChatOnboarding({ onComplete }: ChatOnboardingProps) {
   const [guestMode, setGuestMode] = useState(false);
   const [guestMessagesLeft, setGuestMessagesLeft] = useState(2);
 
-  const FREE_TRIAL_LIMIT = 5;
   const GUEST_LIMIT = 2;
 
   useEffect(() => {
@@ -55,12 +54,11 @@ export function ChatOnboarding({ onComplete }: ChatOnboardingProps) {
     setMessageCount(newCount);
 
     // Check if we need to show signup prompt
-    if (newCount === FREE_TRIAL_LIMIT) {
-      setOnboardingState('signup-prompt');
-    } else if (guestMode && newCount >= FREE_TRIAL_LIMIT + GUEST_LIMIT) {
+    // Spec: exactly 2 guest messages → signup prompt
+    if (newCount >= GUEST_LIMIT) {
       setOnboardingState('signup-prompt');
     }
-  }, [messageCount, user, guestMode]);
+  }, [messageCount, user]);
 
   const handleSignUp = useCallback(() => {
     setOnboardingState('profile');
