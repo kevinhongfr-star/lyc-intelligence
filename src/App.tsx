@@ -68,6 +68,13 @@ const CompliancePage = lazy(() => import('@/pages/internal/CompliancePage').then
 const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage').then(m => ({ default: m.NexusEnginePage })));
 const KevinOversightDashboard = lazy(() => import('@/components/kevin/KevinOversightDashboard').then(m => ({ default: m.KevinOversightDashboard })));
 
+// ── B2B Client Portal pages (EO-1) ──
+const ClientOverviewPage = lazy(() => import('@/pages/client/ClientOverviewPage').then(m => ({ default: m.ClientOverviewPage })));
+const ClientPipelineAnalyticsPage = lazy(() => import('@/pages/client/ClientPipelineAnalyticsPage').then(m => ({ default: m.ClientPipelineAnalyticsPage })));
+const ClientMandatesPage = lazy(() => import('@/pages/client/ClientMandatesPage').then(m => ({ default: m.ClientMandatesPage })));
+const ClientCandidatesPage = lazy(() => import('@/pages/client/ClientCandidatesPage').then(m => ({ default: m.ClientCandidatesPage })));
+const ClientDocumentsPage = lazy(() => import('@/pages/client/ClientDocumentsPage').then(m => ({ default: m.ClientDocumentsPage })));
+
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const PlaceholderPage = lazy(() => import('@/pages/PlaceholderPage').then(m => ({ default: m.PlaceholderPage })));
@@ -148,13 +155,13 @@ export default function App() {
           {/* ── B2B Client Portal (mockup surface) ── */}
           <Route path="/client" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route index element={<Navigate to="overview" replace />} />
-            <Route path="overview" element={<PlaceholderPage title="B2B Overview" />} />
-            <Route path="pipeline-analytics" element={<PlaceholderPage title="Pipeline Analytics" />} />
+            <Route path="overview" element={<ClientOverviewPage />} />
+            <Route path="pipeline-analytics" element={<ClientPipelineAnalyticsPage />} />
             <Route path="talent-intel" element={<PlaceholderPage title="Talent Intelligence" />} />
-            <Route path="mandates" element={<PlaceholderPage title="B2B Mandates" />} />
-            <Route path="candidates" element={<PlaceholderPage title="B2B Candidates" />} />
+            <Route path="mandates" element={<ClientMandatesPage />} />
+            <Route path="candidates" element={<ClientCandidatesPage />} />
             <Route path="nexus-assistant" element={<PlaceholderPage title="NEXUS Assistant" />} />
-            <Route path="documents" element={<PlaceholderPage title="Documents & Billing" />} />
+            <Route path="documents" element={<ClientDocumentsPage />} />
             <Route path="admin" element={<PlaceholderPage title="Admin & Security" />} />
             <Route path="collaboration" element={<PlaceholderPage title="Collaboration" />} />
             <Route path="onboarding" element={<PlaceholderPage title="Onboarding" />} />
