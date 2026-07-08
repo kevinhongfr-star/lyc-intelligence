@@ -56,6 +56,7 @@ const TasksPage = lazy(() => import('@/pages/internal/TasksPage').then(m => ({ d
 const AnalyticsPage = lazy(() => import('@/pages/internal/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
 const CompliancePage = lazy(() => import('@/pages/internal/CompliancePage').then(m => ({ default: m.CompliancePage })));
 const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage').then(m => ({ default: m.NexusEnginePage })));
+const KevinOversightDashboard = lazy(() => import('@/components/kevin/KevinOversightDashboard').then(m => ({ default: m.KevinOversightDashboard })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const ErrorPage = lazy(() => import('@/pages/ErrorPage'));
 
@@ -151,6 +152,7 @@ export default function App() {
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="compliance" element={<CompliancePage />} />
               <Route path="nexus-engine" element={<AdminRoute><NexusEnginePage /></AdminRoute>} />
+              <Route path="oversight" element={<AdminRoute><KevinOversightDashboard /></AdminRoute>} />
             </Route>
           )}
           <Route path="*" element={<NotFoundPage />} />
