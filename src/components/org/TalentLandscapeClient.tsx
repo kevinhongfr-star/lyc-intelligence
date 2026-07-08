@@ -173,7 +173,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
 
   if (loading) {
     return (
-      <div className="bg-bg rounded-xl p-8 flex items-center justify-center">
+      <div className="bg-bg rounded-none p-8 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-accent" />
         <span className="ml-3 text-text-muted">Loading talent landscape...</span>
       </div>
@@ -182,7 +182,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
 
   if (error) {
     return (
-      <div className="bg-bg rounded-xl p-8 flex items-center justify-center">
+      <div className="bg-bg rounded-none p-8 flex items-center justify-center">
         <AlertCircle className="w-8 h-8 text-red-500" />
         <span className="ml-3 text-red-500">{error}</span>
       </div>
@@ -190,7 +190,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
   }
 
   return (
-    <div className="bg-bg rounded-xl">
+    <div className="bg-bg rounded-none">
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-border">
         <div>
@@ -225,7 +225,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
       <div className="flex items-center gap-1 p-4 bg-bg-alt border-b border-border">
         <button
           onClick={() => setActiveTab('overview')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`px-4 py-2 rounded-none text-sm font-medium transition-all ${
             activeTab === 'overview'
               ? 'bg-accent text-white'
               : 'text-text-muted hover:text-text-primary hover:bg-bg'
@@ -236,7 +236,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
         </button>
         <button
           onClick={() => setActiveTab('orgcharts')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`px-4 py-2 rounded-none text-sm font-medium transition-all ${
             activeTab === 'orgcharts'
               ? 'bg-accent text-white'
               : 'text-text-muted hover:text-text-primary hover:bg-bg'
@@ -247,7 +247,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
         </button>
         <button
           onClick={() => setActiveTab('heatmap')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`px-4 py-2 rounded-none text-sm font-medium transition-all ${
             activeTab === 'heatmap'
               ? 'bg-accent text-white'
               : 'text-text-muted hover:text-text-primary hover:bg-bg'
@@ -264,7 +264,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
           <div className="space-y-6">
             {/* Summary stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-card rounded-xl p-4 border border-card-border">
+              <div className="bg-card rounded-none p-4 border border-card-border">
                 <div className="flex items-center gap-3 mb-2">
                   <Building2 className="w-5 h-5 text-accent" />
                   <span className="text-sm text-text-muted">Target Companies</span>
@@ -274,7 +274,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
                 </div>
               </div>
 
-              <div className="bg-card rounded-xl p-4 border border-card-border">
+              <div className="bg-card rounded-none p-4 border border-card-border">
                 <div className="flex items-center gap-3 mb-2">
                   <Users className="w-5 h-5 text-green-500" />
                   <span className="text-sm text-text-muted">Org Charts</span>
@@ -284,7 +284,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
                 </div>
               </div>
 
-              <div className="bg-card rounded-xl p-4 border border-card-border">
+              <div className="bg-card rounded-none p-4 border border-card-border">
                 <div className="flex items-center gap-3 mb-2">
                   <TrendingUp className="w-5 h-5 text-yellow-500" />
                   <span className="text-sm text-text-muted">High Relevance Positions</span>
@@ -294,7 +294,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
                 </div>
               </div>
 
-              <div className="bg-card rounded-xl p-4 border border-card-border">
+              <div className="bg-card rounded-none p-4 border border-card-border">
                 <div className="flex items-center gap-3 mb-2">
                   <MapPin className="w-5 h-5 text-blue-500" />
                   <span className="text-sm text-text-muted">Top Geography</span>
@@ -306,13 +306,13 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
             </div>
 
             {/* Key insights */}
-            <div className="bg-card rounded-xl p-6 border border-card-border">
+            <div className="bg-card rounded-none p-6 border border-card-border">
               <h3 className="text-lg font-semibold text-text-primary mb-4">
                 Key Insights
               </h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-green-500/10">
+                  <div className="p-2 rounded-none bg-green-500/10">
                     <TrendingUp className="w-5 h-5 text-green-500" />
                   </div>
                   <div>
@@ -327,7 +327,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-accent/10">
+                  <div className="p-2 rounded-none bg-accent/10">
                     <Building2 className="w-5 h-5 text-accent" />
                   </div>
                   <div>
@@ -341,7 +341,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-blue-500/10">
+                  <div className="p-2 rounded-none bg-blue-500/10">
                     <MapPin className="w-5 h-5 text-blue-500" />
                   </div>
                   <div>
@@ -379,7 +379,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
 
             {/* Quick preview of top org charts */}
             {companiesWithOrgCharts.length > 0 && (
-              <div className="bg-card rounded-xl p-6 border border-card-border">
+              <div className="bg-card rounded-none p-6 border border-card-border">
                 <h3 className="text-lg font-semibold text-text-primary mb-4">
                   Top Target Companies
                 </h3>
@@ -387,7 +387,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
                   {companiesWithOrgCharts.slice(0, 3).map(company => (
                     <div
                       key={company.id}
-                      className="bg-bg-alt rounded-lg p-4 border border-border hover:border-accent/50 cursor-pointer transition-all"
+                      className="bg-bg-alt rounded-none p-4 border border-border hover:border-accent/50 cursor-pointer transition-all"
                       onClick={() => {
                         setSelectedCompanyId(company.id);
                         setActiveTab('orgcharts');
@@ -425,7 +425,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
               <select
                 value={selectedCompanyId || ''}
                 onChange={(e) => setSelectedCompanyId(e.target.value)}
-                className="px-4 py-2 bg-bg border border-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
+                className="px-4 py-2 bg-bg border border-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 {companiesWithOrgCharts.map(company => (
                   <option key={company.id} value={company.id}>
@@ -446,7 +446,7 @@ export function TalentLandscapeClient({ mandateId, userRole }: TalentLandscapeCl
             )}
 
             {!selectedCompanyId && (
-              <div className="bg-card rounded-xl p-8 text-center">
+              <div className="bg-card rounded-none p-8 text-center">
                 <Users className="w-12 h-12 mx-auto mb-3 text-text-muted opacity-50" />
                 <p className="text-text-muted">Select a company to view its org chart</p>
               </div>

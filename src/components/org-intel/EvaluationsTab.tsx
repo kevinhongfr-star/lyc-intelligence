@@ -182,7 +182,7 @@ export function EvaluationsTab() {
           <Loader2 className="w-4 h-4 animate-spin" /> Loading evaluations…
         </div>
       ) : error ? (
-        <div className="text-sm text-red-600 py-4 border border-red-200 bg-red-50 rounded-md p-3">
+        <div className="text-sm text-red-600 py-4 border border-red-200 bg-red-50 rounded-none p-3">
           <AlertTriangle className="w-4 h-4 inline mr-1" /> {error}
         </div>
       ) : evaluations.length === 0 ? (
@@ -191,7 +191,7 @@ export function EvaluationsTab() {
           note="Re-score a talent from this page, or trigger scoring from the Scoring tab."
         />
       ) : (
-        <div className="border border-bg-hover rounded-md overflow-hidden">
+        <div className="border border-bg-hover rounded-none overflow-hidden">
           {evaluations.map((ev) => {
             const isOpen = expanded.has(ev.id);
             const tier = ev.scorecard?.tier ?? null;
@@ -229,7 +229,7 @@ export function EvaluationsTab() {
                   <button
                     onClick={() => rescore(ev)}
                     disabled={rescoring === ev.id}
-                    className="px-2 py-1 text-xs border border-bg-hover rounded-md hover:bg-bg-secondary flex items-center gap-1"
+                    className="px-2 py-1 text-xs border border-bg-hover rounded-none hover:bg-bg-secondary flex items-center gap-1"
                   >
                     {rescoring === ev.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
                     Re-score
@@ -243,7 +243,7 @@ export function EvaluationsTab() {
                           {scores[ev.id].length} criteria · source: {ev.scorecard?.model ?? '—'} · tokens: {ev.scorecard?.total_tokens ?? '—'}
                         </div>
                         {scores[ev.id].map((s) => (
-                          <div key={s.id} className="border border-bg-hover rounded-md p-3 bg-white">
+                          <div key={s.id} className="border border-bg-hover rounded-none p-3 bg-white">
                             <div className="flex items-center gap-2">
                               <span className="font-mono font-semibold text-text-primary">{s.criterion_key}</span>
                               <span className="text-sm text-text-secondary">{s.criterion_label}</span>
@@ -261,7 +261,7 @@ export function EvaluationsTab() {
                         ))}
                         <button
                           onClick={() => setOverrideTarget({ evaluationId: ev.id, scores: scores[ev.id] })}
-                          className="px-3 py-1.5 text-xs border border-bg-hover rounded-md hover:bg-bg-secondary flex items-center gap-1"
+                          className="px-3 py-1.5 text-xs border border-bg-hover rounded-none hover:bg-bg-secondary flex items-center gap-1"
                         >
                           <Edit3 className="w-3 h-3" /> Override sub-scores
                         </button>
@@ -357,7 +357,7 @@ function OverrideModal({ evaluationId, scores, onClose, onSaved }: {
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
+      <div className="bg-white rounded-none max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium">Override sub-scores</h3>
           <button onClick={onClose} className="text-text-muted hover:text-text-primary">
@@ -373,7 +373,7 @@ function OverrideModal({ evaluationId, scores, onClose, onSaved }: {
             const c = CRITERIA[id];
             const newVal = overrides[s.criterion_key] ?? s.score;
             return (
-              <div key={s.id} className="border border-bg-hover rounded-md p-3">
+              <div key={s.id} className="border border-bg-hover rounded-none p-3">
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-semibold">{s.criterion_key}</span>
                   <span className="text-sm text-text-secondary">{c?.name ?? s.criterion_label}</span>
@@ -418,7 +418,7 @@ function OverrideModal({ evaluationId, scores, onClose, onSaved }: {
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={3}
-            className="w-full border border-bg-hover rounded-md px-2 py-1.5 text-sm"
+            className="w-full border border-bg-hover rounded-none px-2 py-1.5 text-sm"
             placeholder="Explain why these sub-scores need manual adjustment…"
           />
           <div className="text-xs text-text-muted mt-1">
@@ -429,18 +429,18 @@ function OverrideModal({ evaluationId, scores, onClose, onSaved }: {
           </div>
         </div>
         {error && (
-          <div className="text-sm text-red-600 border border-red-200 bg-red-50 rounded-md p-2">
+          <div className="text-sm text-red-600 border border-red-200 bg-red-50 rounded-none p-2">
             <AlertTriangle className="w-4 h-4 inline mr-1" /> {error}
           </div>
         )}
         <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="px-3 py-1.5 text-sm border border-bg-hover rounded-md">
+          <button onClick={onClose} className="px-3 py-1.5 text-sm border border-bg-hover rounded-none">
             Cancel
           </button>
           <button
             onClick={save}
             disabled={submitting || changed.length === 0 || reason.length < OVERRIDE_MIN_REASON_LENGTH}
-            className="px-3 py-1.5 text-sm bg-accent text-white rounded-md hover:bg-accent-light disabled:opacity-50 flex items-center gap-1"
+            className="px-3 py-1.5 text-sm bg-accent text-white rounded-none hover:bg-accent-light disabled:opacity-50 flex items-center gap-1"
           >
             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
             Save {changed.length > 0 && `(${changed.length})`}
@@ -453,7 +453,7 @@ function OverrideModal({ evaluationId, scores, onClose, onSaved }: {
 
 function EmptyHint({ title, note }: { title: string; note?: string }) {
   return (
-    <div className="border-2 border-dashed border-bg-hover rounded-lg p-8 text-center">
+    <div className="border-2 border-dashed border-bg-hover rounded-none p-8 text-center">
       <ClipboardCheck className="w-6 h-6 text-text-muted mx-auto mb-2" />
       <p className="text-text-primary font-medium">{title}</p>
       {note && <p className="text-text-muted text-sm mt-1">{note}</p>}

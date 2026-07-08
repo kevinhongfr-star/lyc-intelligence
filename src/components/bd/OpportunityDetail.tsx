@@ -219,7 +219,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
         {onBack && (
           <button
             onClick={onBack}
-            className="p-2 hover:bg-bg-secondary rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-secondary rounded-none transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-text-secondary" />
           </button>
@@ -258,7 +258,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
           </Button>
 
           {showStageMenu && (
-            <div className="absolute right-0 mt-2 w-48 bg-bg-base border border-bg-hover rounded-lg shadow-lg z-10">
+            <div className="absolute right-0 mt-2 w-48 bg-bg-base border border-bg-hover rounded-none shadow-lg z-10">
               {validNextStages.map((stage) => (
                 <button
                   key={stage}
@@ -519,7 +519,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
               {proposals.map((proposal) => (
                 <div
                   key={proposal.id}
-                  className="p-4 bg-bg-secondary rounded-lg hover:bg-bg-hover transition-colors cursor-pointer"
+                  className="p-4 bg-bg-secondary rounded-none hover:bg-bg-hover transition-colors cursor-pointer"
                 >
                   <div className="flex items-center justify-between">
                     <div>

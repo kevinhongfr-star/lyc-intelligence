@@ -92,7 +92,7 @@ export function ResetPasswordPage() {
                       required
                       style={{
                         width: '100%', padding: '12px 16px 12px 44px',
-                        background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px',
+                        background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px',
                         color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
                         fontFamily: DS.bodyFont,
                       }}
@@ -101,7 +101,7 @@ export function ResetPasswordPage() {
                 </div>
 
                 {error && (
-                  <div style={{ padding: '12px 16px', background: '#FEF2F2', borderRadius: '8px', color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
+                  <div style={{ padding: '12px 16px', background: '#FEF2F2', borderRadius: '0px', color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
                     {error}
                   </div>
                 )}
@@ -112,7 +112,7 @@ export function ResetPasswordPage() {
                   style={{
                     width: '100%', padding: '14px',
                     background: DS.accent, color: '#FFFFFF',
-                    border: 'none', borderRadius: '8px',
+                    border: 'none', borderRadius: '0px',
                     fontSize: '15px', fontWeight: 600,
                     cursor: loading ? 'not-allowed' : 'pointer',
                     opacity: loading ? 0.7 : 1,

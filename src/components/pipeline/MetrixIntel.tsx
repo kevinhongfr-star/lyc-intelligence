@@ -68,7 +68,7 @@ export function MetrixIntelView({ candidateName, company, onClose }: MetrixIntel
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl p-8">
+        <div className="bg-white rounded-none p-8">
           <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto" />
           <p className="text-text-muted mt-4">Loading METRIX Intel...</p>
         </div>
@@ -79,9 +79,9 @@ export function MetrixIntelView({ candidateName, company, onClose }: MetrixIntel
   if (error) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl p-8 max-w-md">
+        <div className="bg-white rounded-none p-8 max-w-md">
           <p className="text-red-500 mb-4">{error}</p>
-          <button onClick={onClose} className="px-4 py-2 bg-accent text-white rounded-lg">
+          <button onClick={onClose} className="px-4 py-2 bg-accent text-white rounded-none">
             Close
           </button>
         </div>
@@ -92,7 +92,7 @@ export function MetrixIntelView({ candidateName, company, onClose }: MetrixIntel
   if (transcripts.length === 0) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl p-8 max-w-md text-center">
+        <div className="bg-white rounded-none p-8 max-w-md text-center">
           <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
             <MessageSquare className="w-8 h-8 text-purple-600" />
           </div>
@@ -101,7 +101,7 @@ export function MetrixIntelView({ candidateName, company, onClose }: MetrixIntel
             No interview transcripts found for {candidateName}
             {company && ` at ${company}`}.
           </p>
-          <button onClick={onClose} className="px-4 py-2 bg-accent text-white rounded-lg">
+          <button onClick={onClose} className="px-4 py-2 bg-accent text-white rounded-none">
             Close
           </button>
         </div>
@@ -125,7 +125,7 @@ export function MetrixIntelView({ candidateName, company, onClose }: MetrixIntel
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-none">
             <X className="w-5 h-5 text-text-muted" />
           </button>
         </div>
@@ -139,7 +139,7 @@ export function MetrixIntelView({ candidateName, company, onClose }: MetrixIntel
                 <button
                   key={transcript.id}
                   onClick={() => setSelectedTranscript(transcript)}
-                  className={`w-full text-left p-3 rounded-lg border transition-all ${
+                  className={`w-full text-left p-3 rounded-none border transition-all ${
                     selectedTranscript?.id === transcript.id
                       ? 'border-accent bg-accent/5'
                       : 'border-bg-tertiary hover:border-accent/50'
@@ -200,7 +200,7 @@ export function MetrixIntelView({ candidateName, company, onClose }: MetrixIntel
                     <FileText className="w-4 h-4 text-text-muted" />
                     <h3 className="text-sm font-semibold text-text-primary">Transcript</h3>
                   </div>
-                  <div className="bg-bg-secondary rounded-lg p-4">
+                  <div className="bg-bg-secondary rounded-none p-4">
                     <p className="text-sm text-text-secondary whitespace-pre-wrap leading-relaxed">
                       {selectedTranscript.content}
                     </p>

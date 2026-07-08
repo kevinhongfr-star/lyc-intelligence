@@ -45,18 +45,18 @@ export function CommandCenter() {
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex gap-2">
           {FILTER_OPTIONS.map(opt => (
-            <button key={opt.key} onClick={() => setStatusFilter(opt.key)} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${statusFilter === opt.key ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>
+            <button key={opt.key} onClick={() => setStatusFilter(opt.key)} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${statusFilter === opt.key ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>
               {opt.label} {opt.key !== 'all' ? (counts[opt.key] ?? 0) : enriched.length}
             </button>
           ))}
         </div>
-        <button onClick={() => setSortBy(sortBy === 'phi' ? 'age' : 'phi')} className="flex items-center gap-1 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary rounded-lg min-h-[44px]"><ArrowUpDown className="w-3 h-3" />Sort: {sortBy === 'phi' ? 'PHI Score' : 'Age'}</button>
+        <button onClick={() => setSortBy(sortBy === 'phi' ? 'age' : 'phi')} className="flex items-center gap-1 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary rounded-none min-h-[44px]"><ArrowUpDown className="w-3 h-3" />Sort: {sortBy === 'phi' ? 'PHI Score' : 'Age'}</button>
       </div>
 
       {loading ? <div className="text-text-muted text-center py-12">Loading mandates...</div> : filtered.length === 0 ? <div className="text-text-muted text-center py-12">No mandates found</div> : (
         <div className="space-y-2">
           {filtered.map(m => (
-            <div key={m.id} className="bg-bg-secondary border border-bg-tertiary rounded-lg p-4">
+            <div key={m.id} className="bg-bg-secondary border border-bg-tertiary rounded-none p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-text-primary truncate">{m.title}</h3>

@@ -154,7 +154,7 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
             });
             setParticipants([]);
           }}
-          className="px-6 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent/90"
+          className="px-6 py-3 bg-accent text-white rounded-none font-medium hover:bg-accent/90"
         >
           Create Another Workshop
         </button>
@@ -202,7 +202,7 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
       </div>
 
       {/* Form Content */}
-      <div className="bg-bg-secondary rounded-xl p-6">
+      <div className="bg-bg-secondary rounded-none p-6">
         {/* Step 1: Details */}
         {step === 'details' && (
           <div className="space-y-6">
@@ -225,7 +225,7 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
                   <button
                     key={type.id}
                     onClick={() => setWorkshopDetails(prev => ({ ...prev, assessment_type: type.id }))}
-                    className={`p-4 rounded-lg border text-left transition-all ${
+                    className={`p-4 rounded-none border text-left transition-all ${
                       workshopDetails.assessment_type === type.id
                         ? 'border-accent bg-accent/5'
                         : 'border-bg-tertiary hover:border-accent/50'
@@ -250,7 +250,7 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
               <select
                 value={workshopDetails.mandate_id || ''}
                 onChange={(e) => setWorkshopDetails(prev => ({ ...prev, mandate_id: e.target.value || undefined }))}
-                className="w-full px-4 py-2 bg-white border border-bg-tertiary rounded-lg focus:outline-none focus:border-accent"
+                className="w-full px-4 py-2 bg-white border border-bg-tertiary rounded-none focus:outline-none focus:border-accent"
               >
                 <option value="">Select a mandate...</option>
                 {mandates.map(m => (
@@ -346,7 +346,7 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
                 value={emailsText}
                 onChange={(e) => setEmailsText(e.target.value)}
                 placeholder="john@example.com, jane@company.org&#10;bob@workplace.com"
-                className="w-full px-4 py-3 border border-bg-tertiary rounded-lg focus:outline-none focus:border-accent resize-none"
+                className="w-full px-4 py-3 border border-bg-tertiary rounded-none focus:outline-none focus:border-accent resize-none"
                 rows={4}
               />
               <Button
@@ -367,7 +367,7 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
                 </h3>
                 <div className="space-y-2">
                   {participants.map(p => (
-                    <div key={p.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-bg-tertiary">
+                    <div key={p.id} className="flex items-center justify-between p-3 bg-white rounded-none border border-bg-tertiary">
                       <div>
                         <p className="font-medium text-text-primary">{p.email}</p>
                       </div>
@@ -390,7 +390,7 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
         {/* Step 3: Review */}
         {step === 'review' && (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg p-6 border border-bg-tertiary">
+            <div className="bg-white rounded-none p-6 border border-bg-tertiary">
               <h3 className="text-lg font-semibold text-text-primary mb-4">Workshop Details</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -424,7 +424,7 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 border border-bg-tertiary">
+            <div className="bg-white rounded-none p-6 border border-bg-tertiary">
               <h3 className="text-lg font-semibold text-text-primary mb-4">Participants</h3>
               <div className="flex flex-wrap gap-2">
                 {participants.map(p => (
@@ -434,7 +434,7 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
               <p className="text-sm text-text-muted mt-3">{participants.length} participant{participants.length !== 1 ? 's' : ''}</p>
             </div>
 
-            <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+            <div className="bg-amber-50 rounded-none p-4 border border-amber-200">
               <div className="flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
@@ -451,7 +451,7 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
 
       {/* Error */}
       {error && (
-        <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+        <div className="mt-6 bg-red-50 border border-red-200 rounded-none p-4 text-red-700">
           {error}
         </div>
       )}

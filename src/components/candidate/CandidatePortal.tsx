@@ -113,9 +113,9 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
     <div className="space-y-6">
       {/* Stats cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-card rounded-xl p-5 border border-card-border">
+        <div className="bg-card rounded-none p-5 border border-card-border">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-accent/10">
+            <div className="p-3 rounded-none bg-accent/10">
               <Briefcase className="w-6 h-6 text-accent" />
             </div>
             <div>
@@ -125,9 +125,9 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
           </div>
         </div>
 
-        <div className="bg-card rounded-xl p-5 border border-card-border">
+        <div className="bg-card rounded-none p-5 border border-card-border">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-green-500/10">
+            <div className="p-3 rounded-none bg-green-500/10">
               <TrendingUp className="w-6 h-6 text-green-500" />
             </div>
             <div>
@@ -137,9 +137,9 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
           </div>
         </div>
 
-        <div className="bg-card rounded-xl p-5 border border-card-border">
+        <div className="bg-card rounded-none p-5 border border-card-border">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-blue-500/10">
+            <div className="p-3 rounded-none bg-blue-500/10">
               <Calendar className="w-6 h-6 text-blue-500" />
             </div>
             <div>
@@ -149,9 +149,9 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
           </div>
         </div>
 
-        <div className="bg-card rounded-xl p-5 border border-card-border">
+        <div className="bg-card rounded-none p-5 border border-card-border">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-yellow-500/10">
+            <div className="p-3 rounded-none bg-yellow-500/10">
               <FileText className="w-6 h-6 text-yellow-500" />
             </div>
             <div>
@@ -165,7 +165,7 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
       {/* Recent Activity & Notifications */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Applications */}
-        <div className="bg-card rounded-xl border border-card-border">
+        <div className="bg-card rounded-none border border-card-border">
           <div className="p-4 border-b border-border">
             <h3 className="font-semibold text-text-primary">Recent Applications</h3>
           </div>
@@ -194,7 +194,7 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
         </div>
 
         {/* Notifications */}
-        <div className="bg-card rounded-xl border border-card-border">
+        <div className="bg-card rounded-none border border-card-border">
           <div className="p-4 border-b border-border flex items-center justify-between">
             <h3 className="font-semibold text-text-primary">Notifications</h3>
             {unreadCount > 0 && (
@@ -234,7 +234,7 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
 
       {/* Career Insights Preview */}
       {careerInsights.length > 0 && (
-        <div className="bg-card rounded-xl border border-card-border">
+        <div className="bg-card rounded-none border border-card-border">
           <div className="p-4 border-b border-border flex items-center justify-between">
             <h3 className="font-semibold text-text-primary">Insights for You</h3>
             <Button variant="ghost" size="sm" onClick={() => setActiveNav('insights')}>
@@ -243,7 +243,7 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
           </div>
           <div className="p-4 space-y-3">
             {careerInsights.slice(0, 3).map((insight, i) => (
-              <div key={i} className="flex items-start gap-3 p-3 bg-bg-alt rounded-lg">
+              <div key={i} className="flex items-start gap-3 p-3 bg-bg-alt rounded-none">
                 <Lightbulb className="w-5 h-5 text-accent mt-0.5" />
                 <div>
                   <div className="font-medium text-text-primary text-sm">{insight.title}</div>
@@ -276,7 +276,7 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
         return <CandidateProfileComponent profile={profile} onUpdate={setProfile} />;
       case 'assessments':
         return (
-          <div className="bg-card rounded-xl border border-card-border p-8">
+          <div className="bg-card rounded-none border border-card-border p-8">
             <h2 className="text-xl font-semibold text-text-primary mb-4">Assessments</h2>
             <p className="text-text-muted">
               Complete your assessments to help our consultants better understand your profile.
@@ -300,7 +300,7 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
         {/* Logo */}
         <div className="p-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+            <div className="w-10 h-10 rounded-none bg-accent flex items-center justify-center">
               <span className="text-white font-bold text-lg">LYC</span>
             </div>
             {sidebarOpen && (
@@ -315,7 +315,7 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
             <button
               key={item.id}
               onClick={() => setActiveNav(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-none transition-colors ${
                 activeNav === item.id
                   ? 'bg-accent text-white'
                   : 'text-text-muted hover:bg-bg-alt hover:text-text-primary'
@@ -343,7 +343,7 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
         <div className="p-3 border-t border-border">
           <button
             onClick={() => {/* Toggle notifications panel */}}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:bg-bg-alt transition-colors relative"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-none text-text-muted hover:bg-bg-alt transition-colors relative"
           >
             <Bell className="w-5 h-5" />
             {sidebarOpen && <span className="flex-1 text-left font-medium">Notifications</span>}
@@ -359,7 +359,7 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
         <div className="p-3 border-t border-border">
           <button
             onClick={onLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:bg-bg-alt transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-none text-text-muted hover:bg-bg-alt transition-colors"
           >
             <LogOut className="w-5 h-5" />
             {sidebarOpen && <span className="flex-1 text-left font-medium">Logout</span>}

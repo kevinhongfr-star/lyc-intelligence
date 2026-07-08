@@ -181,7 +181,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
       </div>
 
       {error && (
-        <div className="p-4 bg-red-500/10 rounded-lg flex items-center gap-3">
+        <div className="p-4 bg-red-500/10 rounded-none flex items-center gap-3">
           <AlertCircle className="w-5 h-5 text-red-500" />
           <span className="text-red-500">{error}</span>
         </div>
@@ -192,7 +192,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
         {NOTIFICATION_TYPES.map(({ key, label, description, icon: Icon, color }) => (
           <div 
             key={key}
-            className={`bg-card rounded-xl border p-5 transition-all ${
+            className={`bg-card rounded-none border p-5 transition-all ${
               preferences[key].enabled 
                 ? 'border-card-border' 
                 : 'border-border opacity-60'
@@ -200,7 +200,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className={`p-3 rounded-xl ${getIconColor(color)}`}>
+                <div className={`p-3 rounded-none ${getIconColor(color)}`}>
                   <Icon className="w-6 h-6" />
                 </div>
                 <div>
@@ -225,7 +225,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
             {preferences[key].enabled && (
               <div className="pl-[72px] space-y-3">
                 {/* Email toggle */}
-                <label className="flex items-center justify-between p-3 bg-bg-alt rounded-lg cursor-pointer hover:bg-bg transition-colors">
+                <label className="flex items-center justify-between p-3 bg-bg-alt rounded-none cursor-pointer hover:bg-bg transition-colors">
                   <div className="flex items-center gap-3">
                     <Mail className="w-5 h-5 text-text-muted" />
                     <div>
@@ -242,7 +242,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
                 </label>
 
                 {/* In-app toggle */}
-                <label className="flex items-center justify-between p-3 bg-bg-alt rounded-lg cursor-pointer hover:bg-bg transition-colors">
+                <label className="flex items-center justify-between p-3 bg-bg-alt rounded-none cursor-pointer hover:bg-bg transition-colors">
                   <div className="flex items-center gap-3">
                     <Bell className="w-5 h-5 text-text-muted" />
                     <div>
@@ -260,14 +260,14 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
 
                 {/* Frequency selector for career insights */}
                 {key === 'career_insight' && (
-                  <div className="p-3 bg-bg-alt rounded-lg">
+                  <div className="p-3 bg-bg-alt rounded-none">
                     <div className="text-sm font-medium text-text-primary mb-2">Email Frequency</div>
                     <div className="flex gap-2">
                       {(['immediate', 'daily', 'weekly'] as const).map(freq => (
                         <button
                           key={freq}
                           onClick={() => updatePreference(key, 'frequency', freq)}
-                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                          className={`px-3 py-1.5 rounded-none text-sm font-medium transition-all ${
                             preferences[key].frequency === freq
                               ? 'bg-accent text-white'
                               : 'bg-bg text-text-muted hover:text-text-primary'
@@ -286,9 +286,9 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
       </div>
 
       {/* Email digest section */}
-      <div className="bg-card rounded-xl border border-card-border p-5">
+      <div className="bg-card rounded-none border border-card-border p-5">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 rounded-xl bg-accent/10 text-accent">
+          <div className="p-3 rounded-none bg-accent/10 text-accent">
             <Mail className="w-6 h-6" />
           </div>
           <div>
@@ -311,7 +311,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
             {['Immediate', 'Daily', 'Weekly'].map(freq => (
               <button
                 key={freq}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-bg-alt text-text-muted hover:text-text-primary transition-colors"
+                className="px-3 py-1.5 rounded-none text-sm font-medium bg-bg-alt text-text-muted hover:text-text-primary transition-colors"
               >
                 {freq}
               </button>
@@ -321,9 +321,9 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
       </div>
 
       {/* Quiet hours */}
-      <div className="bg-card rounded-xl border border-card-border p-5">
+      <div className="bg-card rounded-none border border-card-border p-5">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 rounded-xl bg-gray-500/10 text-gray-500">
+          <div className="p-3 rounded-none bg-gray-500/10 text-gray-500">
             <Bell className="w-6 h-6" />
           </div>
           <div>
@@ -347,7 +347,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
               <input
                 type="time"
                 defaultValue="22:00"
-                className="px-3 py-2 bg-bg border border-border rounded-lg text-text-primary"
+                className="px-3 py-2 bg-bg border border-border rounded-none text-text-primary"
               />
             </div>
             <div>
@@ -355,7 +355,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
               <input
                 type="time"
                 defaultValue="08:00"
-                className="px-3 py-2 bg-bg border border-border rounded-lg text-text-primary"
+                className="px-3 py-2 bg-bg border border-border rounded-none text-text-primary"
               />
             </div>
           </div>

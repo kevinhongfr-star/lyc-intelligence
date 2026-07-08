@@ -378,7 +378,7 @@ function GateStep({ state, setState, onSubmit, error, creditsRequired, creditBal
             value={state.gate.name}
             onChange={(e) => setState(prev => ({ ...prev, gate: { ...prev.gate, name: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px'
             }}
             placeholder="Your full name"
           />
@@ -393,7 +393,7 @@ function GateStep({ state, setState, onSubmit, error, creditsRequired, creditBal
             value={state.gate.email}
             onChange={(e) => setState(prev => ({ ...prev, gate: { ...prev.gate, email: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px'
             }}
             placeholder="you@company.com"
           />
@@ -408,7 +408,7 @@ function GateStep({ state, setState, onSubmit, error, creditsRequired, creditBal
             value={state.gate.title || ''}
             onChange={(e) => setState(prev => ({ ...prev, gate: { ...prev.gate, title: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px'
             }}
             placeholder="e.g., VP of Engineering"
           />
@@ -425,7 +425,7 @@ function GateStep({ state, setState, onSubmit, error, creditsRequired, creditBal
             padding: '16px',
             fontSize: '16px',
             fontWeight: 'bold',
-            borderRadius: '8px',
+            borderRadius: '0px',
             border: 'none',
             cursor: 'pointer',
             display: 'flex',
@@ -468,7 +468,7 @@ function ContextStep({ state, setState, onNext, onBack }: any) {
             value={state.context.role}
             onChange={(e) => setState(prev => ({ ...prev, context: { ...prev.context, role: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px'
             }}
             placeholder="e.g., Senior Director, Product Management"
           />
@@ -508,7 +508,7 @@ function ContextStep({ state, setState, onNext, onBack }: any) {
             value={state.context.years_experience}
             onChange={(e) => setState(prev => ({ ...prev, context: { ...prev.context, years_experience: parseInt(e.target.value) || 0 } }))}
             style={{
-              width: '100px', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
+              width: '100px', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px'
             }}
             min={0}
             max={40}
@@ -523,7 +523,7 @@ function ContextStep({ state, setState, onNext, onBack }: any) {
             value={state.context.challenges}
             onChange={(e) => setState(prev => ({ ...prev, context: { ...prev.context, challenges: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px', minHeight: '100px', resize: 'vertical'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px', minHeight: '100px', resize: 'vertical'
             }}
             placeholder="e.g., Leading a team through organizational change, scaling operations..."
           />
@@ -537,7 +537,7 @@ function ContextStep({ state, setState, onNext, onBack }: any) {
             value={state.context.improvement_goals}
             onChange={(e) => setState(prev => ({ ...prev, context: { ...prev.context, improvement_goals: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px', minHeight: '100px', resize: 'vertical'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px', minHeight: '100px', resize: 'vertical'
             }}
             placeholder="e.g., Better strategic decision-making, more effective team coaching..."
           />
@@ -553,7 +553,7 @@ function ContextStep({ state, setState, onNext, onBack }: any) {
               padding: '16px',
               fontSize: '16px',
               fontWeight: 600,
-              borderRadius: '8px',
+              borderRadius: '0px',
               border: `1px solid ${DS.border}`,
               cursor: 'pointer',
               display: 'flex',
@@ -573,7 +573,7 @@ function ContextStep({ state, setState, onNext, onBack }: any) {
               padding: '16px',
               fontSize: '16px',
               fontWeight: 600,
-              borderRadius: '8px',
+              borderRadius: '0px',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
@@ -644,7 +644,7 @@ function DimensionStep({ dimension, currentScore, currentEvidence, onAnswer, onB
           value={evidence}
           onChange={(e) => setEvidence(e.target.value)}
           style={{
-            width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px', minHeight: '120px', resize: 'vertical'
+            width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px', minHeight: '120px', resize: 'vertical'
           }}
           placeholder="Provide a specific example from your experience..."
         />
@@ -660,7 +660,7 @@ function DimensionStep({ dimension, currentScore, currentEvidence, onAnswer, onB
             padding: '16px',
             fontSize: '16px',
             fontWeight: 600,
-            borderRadius: '8px',
+            borderRadius: '0px',
             border: `1px solid ${DS.border}`,
             cursor: 'pointer',
             display: 'flex',
@@ -680,7 +680,7 @@ function DimensionStep({ dimension, currentScore, currentEvidence, onAnswer, onB
             padding: '16px',
             fontSize: '16px',
             fontWeight: 600,
-            borderRadius: '8px',
+            borderRadius: '0px',
             border: 'none',
             cursor: 'pointer',
             display: 'flex',
@@ -720,7 +720,7 @@ function CrossBorderStep({ state, setState, onNext, onBack }: any) {
                 padding: '14px',
                 background: state.crossBorder.cultural_experience ? `${DS.accent}20` : DS.card,
                 border: `1px solid ${state.crossBorder.cultural_experience ? DS.accent : DS.border}`,
-                borderRadius: '8px',
+                borderRadius: '0px',
                 color: DS.textSecondary,
                 cursor: 'pointer',
                 fontSize: '15px',
@@ -735,7 +735,7 @@ function CrossBorderStep({ state, setState, onNext, onBack }: any) {
                 padding: '14px',
                 background: !state.crossBorder.cultural_experience ? `${DS.accent}20` : DS.card,
                 border: `1px solid ${!state.crossBorder.cultural_experience ? DS.accent : DS.border}`,
-                borderRadius: '8px',
+                borderRadius: '0px',
                 color: DS.textSecondary,
                 cursor: 'pointer',
                 fontSize: '15px',
@@ -755,7 +755,7 @@ function CrossBorderStep({ state, setState, onNext, onBack }: any) {
             value={state.crossBorder.international_teams}
             onChange={(e) => setState(prev => ({ ...prev, crossBorder: { ...prev.crossBorder, international_teams: parseInt(e.target.value) || 0 } }))}
             style={{
-              width: '100px', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
+              width: '100px', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px'
             }}
             min={0}
             max={50}
@@ -770,7 +770,7 @@ function CrossBorderStep({ state, setState, onNext, onBack }: any) {
             value={state.crossBorder.global_projects}
             onChange={(e) => setState(prev => ({ ...prev, crossBorder: { ...prev.crossBorder, global_projects: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px', minHeight: '100px', resize: 'vertical'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px', minHeight: '100px', resize: 'vertical'
             }}
             placeholder="e.g., Led expansion into APAC market, managed team across 3 time zones..."
           />
@@ -786,7 +786,7 @@ function CrossBorderStep({ state, setState, onNext, onBack }: any) {
               padding: '16px',
               fontSize: '16px',
               fontWeight: 600,
-              borderRadius: '8px',
+              borderRadius: '0px',
               border: `1px solid ${DS.border}`,
               cursor: 'pointer',
               display: 'flex',
@@ -806,7 +806,7 @@ function CrossBorderStep({ state, setState, onNext, onBack }: any) {
               padding: '16px',
               fontSize: '16px',
               fontWeight: 600,
-              borderRadius: '8px',
+              borderRadius: '0px',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
@@ -855,7 +855,7 @@ function StyleStep({ state, setState, onNext, onBack }: any) {
                   padding: '16px',
                   background: state.style.disc_profile === profile.id ? `${DS.accent}20` : DS.card,
                   border: `1px solid ${state.style.disc_profile === profile.id ? DS.accent : DS.border}`,
-                  borderRadius: '8px',
+                  borderRadius: '0px',
                   color: DS.textSecondary,
                   cursor: 'pointer',
                   textAlign: 'left',
@@ -876,7 +876,7 @@ function StyleStep({ state, setState, onNext, onBack }: any) {
             value={state.style.work_style}
             onChange={(e) => setState(prev => ({ ...prev, style: { ...prev.style, work_style: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px', minHeight: '80px', resize: 'vertical'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px', minHeight: '80px', resize: 'vertical'
             }}
             placeholder="e.g., I prefer structured planning with clear milestones..."
           />
@@ -892,7 +892,7 @@ function StyleStep({ state, setState, onNext, onBack }: any) {
               padding: '16px',
               fontSize: '16px',
               fontWeight: 600,
-              borderRadius: '8px',
+              borderRadius: '0px',
               border: `1px solid ${DS.border}`,
               cursor: 'pointer',
               display: 'flex',
@@ -912,7 +912,7 @@ function StyleStep({ state, setState, onNext, onBack }: any) {
               padding: '16px',
               fontSize: '16px',
               fontWeight: 600,
-              borderRadius: '8px',
+              borderRadius: '0px',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
@@ -949,7 +949,7 @@ function GoalsStep({ state, setState, onComplete, onBack, isSubmitting }: any) {
             value={state.goals.short_term}
             onChange={(e) => setState(prev => ({ ...prev, goals: { ...prev.goals, short_term: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px', minHeight: '80px', resize: 'vertical'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px', minHeight: '80px', resize: 'vertical'
             }}
             placeholder="e.g., Improve team feedback quality, complete leadership training..."
           />
@@ -963,7 +963,7 @@ function GoalsStep({ state, setState, onComplete, onBack, isSubmitting }: any) {
             value={state.goals.long_term}
             onChange={(e) => setState(prev => ({ ...prev, goals: { ...prev.goals, long_term: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px', minHeight: '80px', resize: 'vertical'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px', minHeight: '80px', resize: 'vertical'
             }}
             placeholder="e.g., Transition to C-suite role, build board-ready profile..."
           />
@@ -977,7 +977,7 @@ function GoalsStep({ state, setState, onComplete, onBack, isSubmitting }: any) {
             value={state.goals.success_definition}
             onChange={(e) => setState(prev => ({ ...prev, goals: { ...prev.goals, success_definition: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px', minHeight: '80px', resize: 'vertical'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px', minHeight: '80px', resize: 'vertical'
             }}
             placeholder="e.g., Leading a high-performing team, recognized as industry expert..."
           />
@@ -994,7 +994,7 @@ function GoalsStep({ state, setState, onComplete, onBack, isSubmitting }: any) {
               padding: '16px',
               fontSize: '16px',
               fontWeight: 600,
-              borderRadius: '8px',
+              borderRadius: '0px',
               border: `1px solid ${DS.border}`,
               cursor: isSubmitting ? 'not-allowed' : 'pointer',
               opacity: isSubmitting ? 0.5 : 1,
@@ -1016,7 +1016,7 @@ function GoalsStep({ state, setState, onComplete, onBack, isSubmitting }: any) {
               padding: '16px',
               fontSize: '16px',
               fontWeight: 600,
-              borderRadius: '8px',
+              borderRadius: '0px',
               border: 'none',
               cursor: isSubmitting ? 'not-allowed' : 'pointer',
               opacity: isSubmitting ? 0.5 : 1,
@@ -1217,7 +1217,7 @@ function ResultsStep({ assessmentType, result, intake, onDownloadPDF, isGenerati
           padding: '16px',
           fontSize: '16px',
           fontWeight: 600,
-          borderRadius: '8px',
+          borderRadius: '0px',
           border: 'none',
           cursor: isGeneratingPDF ? 'not-allowed' : 'pointer',
           opacity: isGeneratingPDF ? 0.5 : 1,
@@ -1293,7 +1293,7 @@ function UpgradeModal({ creditsRequired, currentBalance, onClose }: any) {
               background: DS.accent,
               color: '#FFFFFF',
               padding: '14px',
-              borderRadius: '8px',
+              borderRadius: '0px',
               fontWeight: 600,
               textDecoration: 'none'
             }}
@@ -1306,7 +1306,7 @@ function UpgradeModal({ creditsRequired, currentBalance, onClose }: any) {
               background: DS.bgAlt,
               color: DS.textSecondary,
               padding: '14px',
-              borderRadius: '8px',
+              borderRadius: '0px',
               border: `1px solid ${DS.border}`,
               cursor: 'pointer',
               fontWeight: 600

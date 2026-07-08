@@ -189,7 +189,7 @@ export function PipelineBoard({
             onClick={() => {
               /* Open comparison view */
             }}
-            className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90"
+            className="px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent/90"
           >
             Compare {selectedCandidates.length} Candidates
           </button>
@@ -210,7 +210,7 @@ export function PipelineBoard({
             return (
               <div
                 key={stageName}
-                className={`w-44 flex-shrink-0 rounded-lg border-2 transition-all ${
+                className={`w-44 flex-shrink-0 rounded-none border-2 transition-all ${
                   isDragOver ? 'border-accent bg-accent/5' : 'border-bg-tertiary'
                 }`}
                 onDragOver={(e) => handleDragOver(e, stageName)}
@@ -271,7 +271,7 @@ export function PipelineBoard({
       {/* Move Confirmation Modal */}
       {showMoveConfirmation && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+          <div className="bg-white rounded-none p-6 max-w-sm w-full mx-4 shadow-2xl">
             <h3 className="text-lg font-semibold text-text-primary mb-4">Confirm Move</h3>
             <p className="text-text-secondary mb-6">
               Move <strong>{showMoveConfirmation.name}</strong> from{' '}
@@ -281,13 +281,13 @@ export function PipelineBoard({
             <div className="flex gap-3">
               <button
                 onClick={cancelMove}
-                className="flex-1 px-4 py-2 border border-bg-tertiary rounded-lg text-text-secondary hover:bg-bg-tertiary"
+                className="flex-1 px-4 py-2 border border-bg-tertiary rounded-none text-text-secondary hover:bg-bg-tertiary"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmMove}
-                className="flex-1 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90"
+                className="flex-1 px-4 py-2 bg-accent text-white rounded-none hover:bg-accent/90"
               >
                 Move
               </button>
@@ -333,7 +333,7 @@ function CandidateCard({
       draggable
       onDragStart={onDragStart}
       onClick={onSelect}
-      className={`bg-bg-primary border border-bg-tertiary rounded-lg p-3 cursor-pointer transition-all hover:shadow-md group ${
+      className={`bg-bg-primary border border-bg-tertiary rounded-none p-3 cursor-pointer transition-all hover:shadow-md group ${
         isDragging ? 'opacity-50 scale-95' : ''
       } ${isSelected ? 'ring-2 ring-accent' : ''}`}
       style={{ borderLeftColor: stageConfig.color, borderLeftWidth: '3px' }}

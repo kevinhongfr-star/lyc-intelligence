@@ -66,9 +66,9 @@ export function LinkedInProfileSection({
 
   if (!hasData) {
     return (
-      <div className="bg-card border border-border rounded-xl p-6">
+      <div className="bg-card border border-border rounded-none p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-none bg-blue-50 flex items-center justify-center">
             <Linkedin className="w-5 h-5 text-blue-600" />
           </div>
           <div>
@@ -84,14 +84,14 @@ export function LinkedInProfileSection({
   }
 
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-border rounded-none overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full px-6 py-4 flex items-center justify-between hover:bg-bg-alt/30 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-none bg-blue-50 flex items-center justify-center">
             <Linkedin className="w-5 h-5 text-blue-600" />
           </div>
           <div className="text-left">
@@ -108,7 +108,7 @@ export function LinkedInProfileSection({
               target="_blank"
               rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
-              className="p-2 hover:bg-bg-alt rounded-lg text-text-muted hover:text-primary"
+              className="p-2 hover:bg-bg-alt rounded-none text-text-muted hover:text-primary"
               title="Open LinkedIn"
             >
               <ExternalLink className="w-4 h-4" />

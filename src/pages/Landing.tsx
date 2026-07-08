@@ -82,7 +82,7 @@ export function Landing() {
           {navLinks.map(l => (
             <a key={l.href} href={l.href} style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</a>
           ))}
-          <a href="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '6px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+          <a href="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
             <Lock style={{ width: 14, height: 14 }} />Platform
           </a>
         </div>
@@ -242,10 +242,10 @@ export function Landing() {
             See it, shape it, accelerate it. Leadership intelligence starts here.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/b2c" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: '#C108AB', color: '#FFFFFF', borderRadius: '6px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <a href="/b2c" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: '#C108AB', color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               For Leaders <ArrowRight style={{ width: 14, height: 14 }} />
             </a>
-            <a href="/b2b" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid rgba(193,8,171,0.5)', color: '#C108AB', borderRadius: '6px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <a href="/b2b" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid rgba(193,8,171,0.5)', color: '#C108AB', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               For Firms
             </a>
           </div>

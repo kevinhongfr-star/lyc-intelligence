@@ -98,7 +98,7 @@ export function MilestoneDetail({
     : null;
 
   return (
-    <div className="bg-card border border-card-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-card-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-card-border bg-bg-alt flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -114,7 +114,7 @@ export function MilestoneDetail({
         </div>
         <button
           onClick={onClose}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-gray-100 rounded-none transition-colors"
         >
           <X className="w-5 h-5 text-text-muted" />
         </button>
@@ -123,7 +123,7 @@ export function MilestoneDetail({
       {/* Content */}
       <div className="p-6 space-y-6">
         {/* Status Info */}
-        <div className={`p-4 rounded-xl border ${statusColors.bg} ${statusColors.border}`}>
+        <div className={`p-4 rounded-none border ${statusColors.bg} ${statusColors.border}`}>
           <div className="flex items-start gap-3">
             <Info className={`w-5 h-5 ${statusColors.text} flex-shrink-0 mt-0.5`} />
             <div>
@@ -171,7 +171,7 @@ export function MilestoneDetail({
             type="date"
             value={targetDate}
             onChange={(e) => setTargetDate(e.target.value)}
-            className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
+            className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
           <p className="text-xs text-text-muted mt-1">
             Default SLA: {DEFAULT_SLA_DAYS[milestoneKey] || 0} days from mandate creation
@@ -189,7 +189,7 @@ export function MilestoneDetail({
             value={actualDate}
             onChange={(e) => setActualDate(e.target.value)}
             placeholder="Leave empty if not completed"
-            className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
+            className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
           <p className="text-xs text-text-muted mt-1">
             Leave empty if the milestone is not yet completed
@@ -199,7 +199,7 @@ export function MilestoneDetail({
         {/* Days Info */}
         {daysUntilDue !== null && (
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-bg-alt rounded-lg">
+            <div className="p-4 bg-bg-alt rounded-none">
               <div className="flex items-center gap-2 text-text-muted mb-1">
                 <Clock className="w-4 h-4" />
                 <span className="text-sm">Days Until Due</span>
@@ -212,7 +212,7 @@ export function MilestoneDetail({
               </p>
             </div>
             {actualDate && daysLate !== null && (
-              <div className="p-4 bg-bg-alt rounded-lg">
+              <div className="p-4 bg-bg-alt rounded-none">
                 <div className="flex items-center gap-2 text-text-muted mb-1">
                   <AlertTriangle className="w-4 h-4" />
                   <span className="text-sm">Days Late/Early</span>
@@ -238,13 +238,13 @@ export function MilestoneDetail({
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Add notes about this milestone..."
             rows={4}
-            className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
+            className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
           />
         </div>
 
         {/* Error */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          <div className="p-3 bg-red-50 border border-red-200 rounded-none text-red-700 text-sm">
             {error}
           </div>
         )}

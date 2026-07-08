@@ -293,7 +293,7 @@ export function LinkedInImportModal({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-none bg-accent/10 flex items-center justify-center">
               <Users className="w-5 h-5 text-accent" />
             </div>
             <div>
@@ -311,7 +311,7 @@ export function LinkedInImportModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-2 rounded-lg text-text-muted hover:bg-slate-100 hover:text-text-primary"
+            className="p-2 rounded-none text-text-muted hover:bg-slate-100 hover:text-text-primary"
           >
             <X className="w-5 h-5" />
           </button>
@@ -326,7 +326,7 @@ export function LinkedInImportModal({
                   onClick={() => {
                     if (s <= step) setStep(s as Step);
                   }}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-none text-sm font-medium transition-colors ${
                     s === step
                       ? 'bg-accent text-white'
                       : s < step
@@ -380,7 +380,7 @@ export function LinkedInImportModal({
                 }}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+                className={`border-2 border-dashed rounded-none p-8 text-center cursor-pointer transition-colors ${
                   dragActive
                     ? 'border-accent bg-accent/5'
                     : 'border-border hover:border-accent/40 hover:bg-slate-50'
@@ -399,7 +399,7 @@ export function LinkedInImportModal({
 
                 {fileName ? (
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-14 h-14 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-none bg-emerald-100 text-emerald-600 flex items-center justify-center">
                       <CheckCircle className="w-7 h-7" />
                     </div>
                     <p className="font-medium text-text-primary">{fileName}</p>
@@ -423,7 +423,7 @@ export function LinkedInImportModal({
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-14 h-14 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-none bg-accent/10 text-accent flex items-center justify-center">
                       <Upload className="w-7 h-7" />
                     </div>
                     <p className="font-medium text-text-primary">Drag CSV file here</p>
@@ -434,13 +434,13 @@ export function LinkedInImportModal({
               </div>
 
               {uploadError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-start gap-2">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-none text-sm text-red-700 flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{uploadError}</span>
                 </div>
               )}
 
-              <div className="text-xs text-text-muted bg-slate-50 rounded-lg p-3 border border-border/50">
+              <div className="text-xs text-text-muted bg-slate-50 rounded-none p-3 border border-border/50">
                 <div className="font-semibold mb-1 text-text-primary">Expected CSV columns:</div>
                 <div className="flex flex-wrap gap-2">
                   {[
@@ -453,7 +453,7 @@ export function LinkedInImportModal({
                     'LinkedIn URL',
                     'Location',
                   ].map((col) => (
-                    <span key={col} className="px-2 py-1 bg-white rounded-md border border-border/60">
+                    <span key={col} className="px-2 py-1 bg-white rounded-none border border-border/60">
                       {col}
                     </span>
                   ))}
@@ -473,7 +473,7 @@ export function LinkedInImportModal({
                 mapping below — especially for any columns marked in amber (auto-skip).
               </div>
 
-              <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center bg-bg-secondary rounded-lg px-4 py-3 text-xs font-semibold text-text-primary border border-border">
+              <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center bg-bg-secondary rounded-none px-4 py-3 text-xs font-semibold text-text-primary border border-border">
                 <div>CSV Column</div>
                 <div className="text-text-muted font-normal text-center">→ maps to →</div>
                 <div>Database Field</div>
@@ -488,7 +488,7 @@ export function LinkedInImportModal({
                   return (
                     <div
                       key={header}
-                      className={`grid grid-cols-[1fr_auto_1fr] gap-3 items-center rounded-lg px-4 py-3 border transition-colors ${
+                      className={`grid grid-cols-[1fr_auto_1fr] gap-3 items-center rounded-none px-4 py-3 border transition-colors ${
                         isUnmapped
                           ? 'bg-amber-50/40 border-amber-200'
                           : 'bg-bg-secondary border-border hover:bg-slate-50'
@@ -519,7 +519,7 @@ export function LinkedInImportModal({
                               [header]: e.target.value as DbColumn,
                             }));
                           }}
-                          className="w-full px-3 py-2 text-sm bg-white border border-border rounded-lg focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                          className="w-full px-3 py-2 text-sm bg-white border border-border rounded-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
                         >
                           {ALL_DB_COLUMNS.map((col) => (
                             <option key={col} value={col}>
@@ -538,7 +538,7 @@ export function LinkedInImportModal({
                 <h4 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
                   <Eye className="w-4 h-4 text-accent" /> Preview of first 5 rows after mapping
                 </h4>
-                <div className="overflow-x-auto rounded-lg border border-border">
+                <div className="overflow-x-auto rounded-none border border-border">
                   <table className="w-full text-sm">
                     <thead className="bg-slate-50">
                       <tr>
@@ -568,7 +568,7 @@ export function LinkedInImportModal({
               </div>
 
               {unmappedCount > 0 && unmappedCount < headers.length && (
-                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-none text-sm text-amber-800">
                   <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <div>
                     <span className="font-medium">{unmappedCount} column(s) are set to skip</span>.
@@ -584,15 +584,15 @@ export function LinkedInImportModal({
           {step === 3 && dedupResult && (
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-bg-secondary border border-border rounded-xl p-4 text-center">
+                <div className="bg-bg-secondary border border-border rounded-none p-4 text-center">
                   <div className="text-3xl font-bold text-text-primary">{dedupResult.totalRecords}</div>
                   <div className="text-xs text-text-muted mt-1">Total records in CSV</div>
                 </div>
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+                <div className="bg-amber-50 border border-amber-200 rounded-none p-4 text-center">
                   <div className="text-3xl font-bold text-amber-700">{dedupResult.totalDuplicates}</div>
                   <div className="text-xs text-amber-800 mt-1">Duplicates detected</div>
                 </div>
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-none p-4 text-center">
                   <div className="text-3xl font-bold text-emerald-700">
                     {Math.max(0, dedupResult.totalRecords - dedupResult.totalDuplicates)}
                   </div>
@@ -606,7 +606,7 @@ export function LinkedInImportModal({
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setDedupMode('skip')}
-                    className={`flex items-start gap-3 p-3 text-left rounded-lg border transition-colors ${
+                    className={`flex items-start gap-3 p-3 text-left rounded-none border transition-colors ${
                       dedupMode === 'skip'
                         ? 'border-accent bg-accent/5'
                         : 'border-border bg-bg-secondary hover:border-accent/40'
@@ -625,7 +625,7 @@ export function LinkedInImportModal({
 
                   <button
                     onClick={() => setDedupMode('update')}
-                    className={`flex items-start gap-3 p-3 text-left rounded-lg border transition-colors ${
+                    className={`flex items-start gap-3 p-3 text-left rounded-none border transition-colors ${
                       dedupMode === 'update'
                         ? 'border-accent bg-accent/5'
                         : 'border-border bg-bg-secondary hover:border-accent/40'
@@ -650,7 +650,7 @@ export function LinkedInImportModal({
                   <h4 className="text-sm font-semibold text-text-primary mb-2">
                     Duplicates found ({dedupResult.duplicates.length})
                   </h4>
-                  <div className="max-h-48 overflow-y-auto rounded-lg border border-border">
+                  <div className="max-h-48 overflow-y-auto rounded-none border border-border">
                     <table className="w-full text-sm">
                       <thead className="bg-slate-50 sticky top-0">
                         <tr>
@@ -693,7 +693,7 @@ export function LinkedInImportModal({
                   <select
                     value={selectedMandateId || ''}
                     onChange={(e) => setSelectedMandateId(e.target.value || null)}
-                    className="w-full px-3 py-2 text-sm bg-white border border-border rounded-lg focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                    className="w-full px-3 py-2 text-sm bg-white border border-border rounded-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
                   >
                     <option value="">— Do not add to any mandate —</option>
                     {availableMandates.map((m) => (
@@ -712,23 +712,23 @@ export function LinkedInImportModal({
             <div className="space-y-6">
               {/* Result summary cards */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-none p-4 text-center">
                   <div className="text-3xl font-bold text-emerald-700">{importResult.imported}</div>
                   <div className="text-xs text-emerald-800 mt-1">New contacts imported</div>
                 </div>
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+                <div className="bg-amber-50 border border-amber-200 rounded-none p-4 text-center">
                   <div className="text-3xl font-bold text-amber-700">{importResult.duplicates}</div>
                   <div className="text-xs text-amber-800 mt-1">Duplicates skipped/updated</div>
                 </div>
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                <div className="bg-red-50 border border-red-200 rounded-none p-4 text-center">
                   <div className="text-3xl font-bold text-red-700">{importResult.errors}</div>
                   <div className="text-xs text-red-800 mt-1">Failed to import</div>
                 </div>
               </div>
 
               {importResult.pipeline_created > 0 && (
-                <div className="p-4 bg-accent/5 border border-accent/30 rounded-xl flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center flex-shrink-0">
+                <div className="p-4 bg-accent/5 border border-accent/30 rounded-none flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-none bg-accent/10 text-accent flex items-center justify-center flex-shrink-0">
                     <MapIcon className="w-5 h-5" />
                   </div>
                   <div>
@@ -745,7 +745,7 @@ export function LinkedInImportModal({
                   <h4 className="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
                     <XCircle className="w-4 h-4 text-red-500" /> Errors ({importResult.errorList.length})
                   </h4>
-                  <div className="max-h-48 overflow-y-auto bg-red-50 border border-red-200 rounded-lg divide-y divide-red-100">
+                  <div className="max-h-48 overflow-y-auto bg-red-50 border border-red-200 rounded-none divide-y divide-red-100">
                     {importResult.errorList.slice(0, 20).map((msg, idx) => (
                       <div key={idx} className="px-3 py-2 text-sm text-red-700">{msg}</div>
                     ))}
@@ -756,7 +756,7 @@ export function LinkedInImportModal({
               <div className="flex items-center justify-center pt-2">
                 <button
                   onClick={handleClose}
-                  className="px-6 py-2.5 bg-accent text-white rounded-lg hover:bg-accent-hover font-medium text-sm min-h-[44px]"
+                  className="px-6 py-2.5 bg-accent text-white rounded-none hover:bg-accent-hover font-medium text-sm min-h-[44px]"
                 >
                   Done
                 </button>
@@ -770,7 +770,7 @@ export function LinkedInImportModal({
           <div className="px-6 py-4 border-t border-border flex items-center justify-between">
             <button
               onClick={step === 1 ? handleClose : () => setStep((s) => (s - 1) as Step)}
-              className="px-4 py-2 text-sm text-text-primary border border-border rounded-lg hover:bg-slate-50 min-h-[44px]"
+              className="px-4 py-2 text-sm text-text-primary border border-border rounded-none hover:bg-slate-50 min-h-[44px]"
             >
               {step === 1 ? 'Cancel' : 'Back'}
             </button>
@@ -787,7 +787,7 @@ export function LinkedInImportModal({
                 <button
                   disabled={!fileName || !!importing}
                   onClick={() => setStep(2)}
-                  className="px-5 py-2 text-sm text-white bg-accent rounded-lg hover:bg-accent-hover disabled:bg-slate-300 disabled:cursor-not-allowed min-h-[44px]"
+                  className="px-5 py-2 text-sm text-white bg-accent rounded-none hover:bg-accent-hover disabled:bg-slate-300 disabled:cursor-not-allowed min-h-[44px]"
                 >
                   Next: Map columns
                 </button>
@@ -797,7 +797,7 @@ export function LinkedInImportModal({
                 <button
                   disabled={!!importing || headers.length === 0}
                   onClick={() => setStep(3)}
-                  className="px-5 py-2 text-sm text-white bg-accent rounded-lg hover:bg-accent-hover disabled:bg-slate-300 disabled:cursor-not-allowed min-h-[44px]"
+                  className="px-5 py-2 text-sm text-white bg-accent rounded-none hover:bg-accent-hover disabled:bg-slate-300 disabled:cursor-not-allowed min-h-[44px]"
                 >
                   Next: Check for duplicates
                 </button>
@@ -813,7 +813,7 @@ export function LinkedInImportModal({
                     setStep(4);
                     await doImport();
                   }}
-                  className="px-5 py-2 text-sm text-white bg-accent rounded-lg hover:bg-accent-hover disabled:bg-slate-300 disabled:cursor-not-allowed min-h-[44px] font-medium"
+                  className="px-5 py-2 text-sm text-white bg-accent rounded-none hover:bg-accent-hover disabled:bg-slate-300 disabled:cursor-not-allowed min-h-[44px] font-medium"
                 >
                   {dedupResult ? `Import ${dedupResult.totalRecords} contacts` : 'Check & import'}
                 </button>

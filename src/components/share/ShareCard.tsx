@@ -62,7 +62,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 background: `${DS.accent}20`, 
                 color: DS.accent, 
                 fontWeight: 700, 
-                borderRadius: '8px', 
+                borderRadius: '0px', 
                 fontSize: '14px' 
               }}>
                 LYC Intelligence
@@ -108,7 +108,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 background: `${DS.success}20`, 
                 color: DS.success, 
                 fontWeight: 700, 
-                borderRadius: '8px',
+                borderRadius: '0px',
                 fontSize: '14px'
               }}>
                 {data?.cross_border_readiness?.label || 'Advanced'} — {data?.cross_border_readiness?.score || 80}/100
@@ -149,7 +149,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 background: `${DS.accent}20`, 
                 color: DS.accent, 
                 fontWeight: 700, 
-                borderRadius: '8px', 
+                borderRadius: '0px', 
                 fontSize: '14px' 
               }}>
                 LYC Intelligence
@@ -216,7 +216,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 background: `${DS.accent}20`, 
                 color: DS.accent, 
                 fontWeight: 700, 
-                borderRadius: '8px', 
+                borderRadius: '0px', 
                 fontSize: '14px' 
               }}>
                 LYC Intelligence
@@ -243,11 +243,11 @@ export function ShareCard({ type, data, className = '' }: Props) {
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '8px' }}>
-                        <div style={{ flex: 1, height: '12px', background: '#1a1a1a', borderRadius: '6px', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${item.old}%`, background: '#333333', borderRadius: '6px' }} />
+                        <div style={{ flex: 1, height: '12px', background: '#1a1a1a', borderRadius: '0px', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${item.old}%`, background: '#333333', borderRadius: '0px' }} />
                         </div>
-                        <div style={{ flex: 1, height: '12px', background: '#1a1a1a', borderRadius: '6px', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${item.new}%`, background: DS.success, borderRadius: '6px' }} />
+                        <div style={{ flex: 1, height: '12px', background: '#1a1a1a', borderRadius: '0px', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${item.new}%`, background: DS.success, borderRadius: '0px' }} />
                         </div>
                       </div>
                     </div>
@@ -260,7 +260,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
                   padding: '20px', 
                   background: `${DS.success}15`, 
                   border: `1px solid ${DS.success}30`, 
-                  borderRadius: '12px' 
+                  borderRadius: '0px' 
                 }}>
                   <div style={{ fontSize: '14px', color: DS.textSecondary, marginBottom: '4px' }}>Cross-border Readiness</div>
                   <div style={{ fontSize: '16px', fontWeight: 700, color: DS.success }}>

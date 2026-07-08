@@ -469,7 +469,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
 
         <button
           onClick={createNewSession}
-          className="w-full m-4 px-4 py-3 bg-accent text-white rounded-xl font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
+          className="w-full m-4 px-4 py-3 bg-accent text-white rounded-none font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
         >
           <Plus className="w-4 h-4" />
           New Chat
@@ -479,7 +479,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
           {sessions.map(session => (
             <button
               key={session.id}
-              className={`w-full text-left px-3 py-3 rounded-lg hover:bg-bg-tertiary transition-colors ${
+              className={`w-full text-left px-3 py-3 rounded-none hover:bg-bg-tertiary transition-colors ${
                 session.id === sessionId ? 'bg-accent/10' : ''
               }`}
             >
@@ -619,7 +619,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             )}
 
             {aiState === 'error' && (
-              <div style={{ alignSelf: 'flex-start', width: '100%', maxWidth: '400px', background: 'rgba(193, 8, 171, 0.1)', border: '1px solid rgba(193, 8, 171, 0.3)', borderRadius: '12px', padding: '16px' }}>
+              <div style={{ alignSelf: 'flex-start', width: '100%', maxWidth: '400px', background: 'rgba(193, 8, 171, 0.1)', border: '1px solid rgba(193, 8, 171, 0.3)', borderRadius: '0px', padding: '16px' }}>
                 <p style={{ fontSize: '13px', color: DS.textSecondary, marginBottom: '12px' }}>
                   Oops, something went wrong. Want to try again?
                 </p>
@@ -633,7 +633,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                     background: DS.accent,
                     color: '#FFFFFF',
                     border: 'none',
-                    borderRadius: '8px',
+                    borderRadius: '0px',
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -674,7 +674,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 padding: '14px 16px',
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '8px',
+                borderRadius: '0px',
                 color: DS.text,
                 fontSize: '14px',
                 outline: 'none',
@@ -689,7 +689,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 padding: '14px',
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '8px',
+                borderRadius: '0px',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.5 : 1,
                 minHeight: '44px',
@@ -712,7 +712,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 background: DS.accent,
                 color: '#FFFFFF',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '0px',
                 cursor: (loading || !input.trim()) ? 'not-allowed' : 'pointer',
                 opacity: (loading || !input.trim()) ? 0.5 : 1,
                 minHeight: '44px',
@@ -788,7 +788,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                   setShowUpgradeModal(false);
                   window.open('/pricing', '_blank');
                 }}
-                className="w-full py-3 px-4 bg-accent text-white rounded-xl font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 bg-accent text-white rounded-none font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
               >
                 Start 14-Day Free Trial
                 <ArrowRight className="w-4 h-4" />
@@ -796,7 +796,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
 
               <button
                 onClick={() => setShowUpgradeModal(false)}
-                className="w-full mt-3 py-3 px-4 bg-bg-tertiary text-text-primary rounded-xl font-medium hover:bg-bg-secondary transition-colors"
+                className="w-full mt-3 py-3 px-4 bg-bg-tertiary text-text-primary rounded-none font-medium hover:bg-bg-secondary transition-colors"
               >
                 Maybe Later
               </button>

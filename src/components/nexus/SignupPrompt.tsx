@@ -56,7 +56,7 @@ export function SignupPrompt({ messageCount, onSignUp, onContinueAsGuest }: Sign
 
   if (showSignupForm) {
     return (
-      <div className="bg-gradient-to-r from-accent to-purple-600 rounded-xl p-6 mb-4">
+      <div className="bg-gradient-to-r from-accent to-purple-600 rounded-none p-6 mb-4">
         <button
           onClick={() => setShowSignupForm(false)}
           className="float-right text-white/70 hover:text-white transition-colors"
@@ -84,7 +84,7 @@ export function SignupPrompt({ messageCount, onSignUp, onContinueAsGuest }: Sign
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Full name"
-                  className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  className="w-full px-4 py-2 rounded-none bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
                 />
               </div>
               
@@ -94,7 +94,7 @@ export function SignupPrompt({ messageCount, onSignUp, onContinueAsGuest }: Sign
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email address"
-                  className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  className="w-full px-4 py-2 rounded-none bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
                 />
               </div>
               
@@ -104,7 +104,7 @@ export function SignupPrompt({ messageCount, onSignUp, onContinueAsGuest }: Sign
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Create password"
-                  className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  className="w-full px-4 py-2 rounded-none bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
                 />
               </div>
 
@@ -115,7 +115,7 @@ export function SignupPrompt({ messageCount, onSignUp, onContinueAsGuest }: Sign
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-white text-accent rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3 px-4 bg-white text-accent rounded-none font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -141,7 +141,7 @@ export function SignupPrompt({ messageCount, onSignUp, onContinueAsGuest }: Sign
   }
 
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 mb-4">
+    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-none p-4 mb-4">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-amber-800 font-semibold">
@@ -157,7 +157,7 @@ export function SignupPrompt({ messageCount, onSignUp, onContinueAsGuest }: Sign
         <div className="flex gap-2">
           <button
             onClick={() => setShowSignupForm(true)}
-            className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent-hover transition-colors flex items-center gap-2"
           >
             <UserPlus className="w-4 h-4" />
             Sign Up

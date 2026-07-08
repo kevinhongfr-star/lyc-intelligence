@@ -167,7 +167,7 @@ export function CanvasProfileView({ profile, trident, contact, onEdit, onSendFor
         <h3 className="font-semibold text-gray-800 mb-4">CANVAS Dimension Scores</h3>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {dimensionCards.map((dim) => (
-            <div key={dim.key} className={`p-4 rounded-lg ${dim.color}`}>
+            <div key={dim.key} className={`p-4 rounded-none ${dim.color}`}>
               <div className="flex items-center gap-2 mb-2">
                 <dim.icon className="w-4 h-4 text-gray-600" />
                 <span className="text-sm font-medium text-gray-700">{dim.label}</span>
@@ -183,7 +183,7 @@ export function CanvasProfileView({ profile, trident, contact, onEdit, onSendFor
         <h3 className="font-semibold text-gray-800 mb-4">Executive Profile</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {narrativeCards.map((card) => (
-            <div key={card.key} className="p-4 bg-gray-50 rounded-lg">
+            <div key={card.key} className="p-4 bg-gray-50 rounded-none">
               <div className="font-medium text-gray-700 mb-2">{card.label}</div>
               {card.isList && Array.isArray(card.content) ? (
                 <ul className="space-y-1">

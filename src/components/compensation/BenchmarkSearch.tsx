@@ -115,7 +115,7 @@ export function BenchmarkSearch({ orgId, onSearch, initialQuery, loading }: Benc
 
           {/* Suggestions dropdown */}
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-bg-base border border-bg-hover rounded-lg shadow-lg max-h-48 overflow-y-auto">
+            <div className="absolute z-10 w-full mt-1 bg-bg-base border border-bg-hover rounded-none shadow-lg max-h-48 overflow-y-auto">
               {suggestions.map((suggestion, idx) => (
                 <button
                   key={idx}
@@ -177,7 +177,7 @@ export function BenchmarkSearch({ orgId, onSearch, initialQuery, loading }: Benc
             <select
               value={level}
               onChange={(e) => setLevel(e.target.value)}
-              className="w-full mt-1 px-3 py-2 bg-bg-tertiary border border-bg-hover rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+              className="w-full mt-1 px-3 py-2 bg-bg-tertiary border border-bg-hover rounded-none text-sm text-text-primary focus:outline-none focus:border-accent"
             >
               <option value="">Any level</option>
               <option value="junior">Junior</option>

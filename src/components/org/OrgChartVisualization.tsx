@@ -338,7 +338,7 @@ export function OrgChartVisualization({
 
     return (
       <div
-        className="absolute bg-card rounded-lg border border-card-border p-4 shadow-lg z-10"
+        className="absolute bg-card rounded-none border border-card-border p-4 shadow-lg z-10"
         style={{
           left: '50%',
           top: '20px',
@@ -372,7 +372,7 @@ export function OrgChartVisualization({
   };
 
   return (
-    <div className="bg-card rounded-xl border border-card-border overflow-hidden">
+    <div className="bg-card rounded-none border border-card-border overflow-hidden">
       {/* Header with filters */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-4">
@@ -386,7 +386,7 @@ export function OrgChartVisualization({
 
         <div className="flex items-center gap-3">
           {/* Zoom controls */}
-          <div className="flex items-center gap-2 bg-bg-alt rounded-lg px-2 py-1">
+          <div className="flex items-center gap-2 bg-bg-alt rounded-none px-2 py-1">
             <button
               onClick={() => setZoom(z => Math.max(0.5, z - 0.1))}
               className="p-1 hover:bg-bg rounded text-text-muted"
@@ -431,7 +431,7 @@ export function OrgChartVisualization({
               <select
                 value={selectedFilters.department}
                 onChange={(e) => setSelectedFilters(prev => ({ ...prev, department: e.target.value }))}
-                className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-text-primary"
+                className="w-full px-3 py-2 bg-bg border border-border rounded-none text-text-primary"
               >
                 <option value="">All Departments</option>
                 {departments.map(d => (
@@ -448,7 +448,7 @@ export function OrgChartVisualization({
               <select
                 value={selectedFilters.location}
                 onChange={(e) => setSelectedFilters(prev => ({ ...prev, location: e.target.value }))}
-                className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-text-primary"
+                className="w-full px-3 py-2 bg-bg border border-border rounded-none text-text-primary"
               >
                 <option value="">All Locations</option>
                 {locations.map(l => (

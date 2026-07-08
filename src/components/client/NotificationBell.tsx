@@ -93,7 +93,7 @@ export function NotificationBell() {
       {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
+        className="relative p-2 hover:bg-bg-tertiary rounded-none transition-colors"
       >
         <Bell className="w-5 h-5 text-text-secondary" />
         {unreadCount > 0 && (
@@ -107,7 +107,7 @@ export function NotificationBell() {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-bg-tertiary rounded-xl shadow-xl z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-bg-tertiary rounded-none shadow-xl z-50 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-bg-tertiary">
             <h3 className="font-semibold text-text-primary">Notifications</h3>

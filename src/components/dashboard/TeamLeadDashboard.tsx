@@ -154,7 +154,7 @@ export function TeamLeadDashboard() {
       {/* Second Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Workload Distribution */}
-        <div className="bg-card border border-border rounded-xl p-5">
+        <div className="bg-card border border-border rounded-none p-5">
           <h3 className="font-semibold text-text-primary mb-4">Workload Distribution</h3>
           <div className="space-y-3">
             {consultantsData.map(c => {
@@ -205,31 +205,31 @@ export function TeamLeadDashboard() {
         <MandateHealthGrid mandates={mandatesData} />
 
         {/* Velocity Stats */}
-        <div className="bg-card border border-border rounded-xl p-5">
+        <div className="bg-card border border-border rounded-none p-5">
           <h3 className="font-semibold text-text-primary mb-4">Team Velocity</h3>
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 bg-bg-alt rounded-lg text-center">
+            <div className="p-4 bg-bg-alt rounded-none text-center">
               <Activity className="w-5 h-5 text-blue-500 mx-auto mb-2" />
               <p className="text-xl font-bold text-text-primary">
                 {velocityData?.total_transitions_90d || 0}
               </p>
               <p className="text-xs text-text-muted">transitions (90d)</p>
             </div>
-            <div className="p-4 bg-bg-alt rounded-lg text-center">
+            <div className="p-4 bg-bg-alt rounded-none text-center">
               <TrendingUp className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
               <p className="text-xl font-bold text-text-primary">
                 {velocityData?.candidates_advancing_per_week || 0}/wk
               </p>
               <p className="text-xs text-text-muted">advancement rate</p>
             </div>
-            <div className="p-4 bg-bg-alt rounded-lg text-center">
+            <div className="p-4 bg-bg-alt rounded-none text-center">
               <Clock className="w-5 h-5 text-purple-500 mx-auto mb-2" />
               <p className="text-xl font-bold text-text-primary">
                 {Object.keys(velocityData?.avg_days_per_transition || {}).length}
               </p>
               <p className="text-xs text-text-muted">stage transitions tracked</p>
             </div>
-            <div className="p-4 bg-bg-alt rounded-lg text-center">
+            <div className="p-4 bg-bg-alt rounded-none text-center">
               <Target className="w-5 h-5 text-amber-500 mx-auto mb-2" />
               <p className="text-xl font-bold text-text-primary">
                 {pipelineData?.summary?.advancement_rate || 0}%

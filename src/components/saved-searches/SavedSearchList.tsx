@@ -104,7 +104,7 @@ export function SavedSearchList({ orgId, userId, onSelectSearch, onEditSearch }:
           placeholder="Search saved searches..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-bg-base text-sm"
+          className="w-full pl-10 pr-4 py-2 rounded-none border border-border bg-bg-base text-sm"
         />
       </div>
 

@@ -264,7 +264,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-none text-sm font-medium border transition-colors ${
               showFilters || hasActiveFilters
                 ? 'bg-accent text-white border-accent'
                 : 'bg-bg-secondary text-text-primary border-border hover:bg-slate-50'
@@ -279,7 +279,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
             )}
           </button>
 
-          <div className="flex items-center border border-border rounded-lg overflow-hidden">
+          <div className="flex items-center border border-border rounded-none overflow-hidden">
             <button
               onClick={() => setViewMode('grid')}
               className={`px-3 py-2 text-sm ${viewMode === 'grid' ? 'bg-accent text-white' : 'bg-bg-secondary text-text-muted hover:bg-slate-50'}`}
@@ -311,14 +311,14 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
           </span>
           <button
             onClick={handleExportPDF}
-            className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-none text-sm font-medium hover:bg-red-700 transition-colors"
           >
             <Download className="w-4 h-4" />
             PDF
           </button>
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-none text-sm font-medium hover:bg-emerald-700 transition-colors"
           >
             <Download className="w-4 h-4" />
             CSV
@@ -328,7 +328,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
 
       {/* Filters panel */}
       {showFilters && (
-        <div className="bg-bg-secondary border border-border rounded-xl p-4 space-y-4">
+        <div className="bg-bg-secondary border border-border rounded-none p-4 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Sector filter */}
             <div>
@@ -425,7 +425,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
 
       {/* Grid view */}
       {viewMode === 'grid' && (
-        <div className="relative bg-slate-50 border border-border rounded-xl overflow-hidden" style={{ height: '500px' }}>
+        <div className="relative bg-slate-50 border border-border rounded-none overflow-hidden" style={{ height: '500px' }}>
           <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
             {/* Grid lines */}
             <defs>
@@ -471,7 +471,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
           {/* Tooltip */}
           {hoveredCompany && (
             <div
-              className="absolute bg-white shadow-xl border border-border rounded-lg p-3 z-10 pointer-events-none min-w-[200px]"
+              className="absolute bg-white shadow-xl border border-border rounded-none p-3 z-10 pointer-events-none min-w-[200px]"
               style={{
                 left: tooltipPos.x + 10,
                 top: tooltipPos.y + 10,
@@ -518,7 +518,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
 
       {/* List view */}
       {viewMode === 'list' && (
-        <div className="bg-bg-secondary border border-border rounded-xl overflow-hidden">
+        <div className="bg-bg-secondary border border-border rounded-none overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>

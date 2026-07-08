@@ -202,7 +202,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
     <div className="space-y-4">
       {/* Header stats */}
       <div className="grid grid-cols-4 gap-3">
-        <div className="bg-bg-secondary border border-border rounded-xl p-4">
+        <div className="bg-bg-secondary border border-border rounded-none p-4">
           <div className="flex items-center gap-2 text-text-muted mb-1">
             <Trophy className="w-4 h-4" />
             <span className="text-xs font-medium">Top Company</span>
@@ -217,7 +217,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
           )}
         </div>
 
-        <div className="bg-bg-secondary border border-border rounded-xl p-4">
+        <div className="bg-bg-secondary border border-border rounded-none p-4">
           <div className="flex items-center gap-2 text-text-muted mb-1">
             <TrendingUp className="w-4 h-4" />
             <span className="text-xs font-medium">Average Score</span>
@@ -226,7 +226,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
           <p className="text-xs text-text-muted">{getScoreLabel(avgScore)} fit</p>
         </div>
 
-        <div className="bg-bg-secondary border border-border rounded-xl p-4">
+        <div className="bg-bg-secondary border border-border rounded-none p-4">
           <div className="flex items-center gap-2 text-text-muted mb-1">
             <Star className="w-4 h-4" />
             <span className="text-xs font-medium">Excellent (80+)</span>
@@ -237,7 +237,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
           <p className="text-xs text-text-muted">companies</p>
         </div>
 
-        <div className="bg-bg-secondary border border-border rounded-xl p-4">
+        <div className="bg-bg-secondary border border-border rounded-none p-4">
           <div className="flex items-center gap-2 text-text-muted mb-1">
             <Trophy className="w-4 h-4" />
             <span className="text-xs font-medium">Total Companies</span>
@@ -294,7 +294,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
       )}
 
       {/* Rankings table */}
-      <div className="bg-bg-secondary border border-border rounded-xl overflow-hidden">
+      <div className="bg-bg-secondary border border-border rounded-none overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -380,7 +380,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
                           onChange={(e) => setNotesValue(e.target.value)}
                           placeholder="Add ranking notes..."
                           rows={2}
-                          className="w-full text-sm bg-white border border-border rounded-lg px-2 py-1 resize-none"
+                          className="w-full text-sm bg-white border border-border rounded-none px-2 py-1 resize-none"
                         />
                         <div className="flex gap-1">
                           <button

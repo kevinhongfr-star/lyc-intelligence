@@ -10,7 +10,7 @@ interface Message { role: 'user' | 'assistant'; content: string; }
 const customComponents = {
   table: ({ children }: any) => (
     <div className="overflow-x-auto my-3">
-      <table className="min-w-full border-collapse border border-gray-700 rounded-lg overflow-hidden">
+      <table className="min-w-full border-collapse border border-gray-700 rounded-none overflow-hidden">
         {children}
       </table>
     </div>
@@ -33,7 +33,7 @@ const customComponents = {
   code: ({ inline, className, children, ...props }: any) => {
     if (inline) return <code className="bg-gray-800 rounded px-1.5 py-0.5 text-xs text-accent" {...props}>{children}</code>;
     return (
-      <pre className="bg-gray-900 rounded-lg p-3 overflow-x-auto my-2 text-xs">
+      <pre className="bg-gray-900 rounded-none p-3 overflow-x-auto my-2 text-xs">
         <code className={className} {...props}>{children}</code>
       </pre>
     );
@@ -80,27 +80,27 @@ export function NexusPage() {
           <p className="text-text-muted text-sm">Your LYC Intelligence assistant — ask about cross-border leadership, career strategy, and executive positioning</p>
         </div>
         {messages.length > 0 && (
-          <button onClick={clearChat} className="flex items-center gap-1.5 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary rounded-lg min-h-[44px]">
+          <button onClick={clearChat} className="flex items-center gap-1.5 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary rounded-none min-h-[44px]">
             <Trash2 className="w-3.5 h-3.5" /> Clear
           </button>
         )}
       </div>
 
-      <div className="flex-1 overflow-auto bg-bg-secondary rounded-lg border border-bg-tertiary p-4 space-y-4">
+      <div className="flex-1 overflow-auto bg-bg-secondary rounded-none border border-bg-tertiary p-4 space-y-4">
         {messages.length === 0 && (
           <div className="text-text-muted text-center py-12">
             <MessageSquare className="w-8 h-8 mx-auto mb-3 opacity-50" />
             <p className="font-medium mb-2">Nexus is ready</p>
             <div className="grid grid-cols-2 gap-2 max-w-md mx-auto text-sm">
               {['How do I position for a cross-border role?', 'What makes a strong leadership profile?', 'What do boards look for in C-suite candidates?', 'How should I prepare for a board interview?'].map(q => (
-                <button key={q} onClick={() => { setInput(q); }} className="p-2 bg-bg-tertiary rounded-lg hover:bg-bg-hover text-text-secondary text-left transition-colors">{q}</button>
+                <button key={q} onClick={() => { setInput(q); }} className="p-2 bg-bg-tertiary rounded-none hover:bg-bg-hover text-text-secondary text-left transition-colors">{q}</button>
               ))}
             </div>
           </div>
         )}
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] rounded-lg px-4 py-2.5 text-sm ${m.role === 'user' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-primary'}`}>
+            <div className={`max-w-[85%] rounded-none px-4 py-2.5 text-sm ${m.role === 'user' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-primary'}`}>
               {m.role === 'assistant' ? (
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
@@ -114,7 +114,7 @@ export function NexusPage() {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-bg-tertiary rounded-lg px-4 py-3 flex items-center gap-2">
+            <div className="bg-bg-tertiary rounded-none px-4 py-3 flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-accent" />
               <span className="text-sm text-text-muted">Thinking...</span>
             </div>
@@ -129,12 +129,12 @@ export function NexusPage() {
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
           placeholder="Ask Nexus about career positioning, cross-border leadership..."
-          className="flex-1 px-4 py-3 bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent min-h-[44px]"
+          className="flex-1 px-4 py-3 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent min-h-[44px]"
         />
         <button
           onClick={send}
           disabled={loading || !input.trim()}
-          className="px-4 py-3 bg-accent hover:bg-accent-light text-white rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-50 transition-colors"
+          className="px-4 py-3 bg-accent hover:bg-accent-light text-white rounded-none min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-50 transition-colors"
         >
           <Send className="w-4 h-4" />
         </button>

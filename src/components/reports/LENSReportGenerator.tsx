@@ -200,7 +200,7 @@ export function LENSReportGenerator({
     return (
       <div
         onClick={() => toggleCandidate(candidate.id)}
-        className={`p-4 rounded-lg border cursor-pointer transition-all ${
+        className={`p-4 rounded-none border cursor-pointer transition-all ${
           isSelected
             ? 'border-accent bg-accent/5'
             : 'border-border hover:border-accent/50'
@@ -262,7 +262,7 @@ export function LENSReportGenerator({
   };
 
   return (
-    <div className="bg-bg rounded-xl max-w-4xl mx-auto">
+    <div className="bg-bg rounded-none max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-border">
         <div>
@@ -275,7 +275,7 @@ export function LENSReportGenerator({
         </div>
 
         {onClose && (
-          <button onClick={onClose} className="p-2 hover:bg-bg-alt rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-bg-alt rounded-none">
             <X className="w-5 h-5 text-text-muted" />
           </button>
         )}
@@ -301,7 +301,7 @@ export function LENSReportGenerator({
       {/* Content */}
       <div className="p-6">
         {error && (
-          <div className="mb-4 p-4 bg-red-500/10 rounded-lg flex items-center gap-3">
+          <div className="mb-4 p-4 bg-red-500/10 rounded-none flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-500" />
             <span className="text-red-500">{error}</span>
           </div>
@@ -323,7 +323,7 @@ export function LENSReportGenerator({
                       setReportType(type);
                       setSelectedCandidates([]);
                     }}
-                    className={`p-4 rounded-lg border text-left transition-all ${
+                    className={`p-4 rounded-none border text-left transition-all ${
                       reportType === type
                         ? 'border-accent bg-accent/5'
                         : 'border-border hover:border-accent/50'
@@ -385,7 +385,7 @@ export function LENSReportGenerator({
         {step === 'configure' && (
           <div className="space-y-6">
             {/* Summary */}
-            <div className="bg-bg-alt rounded-lg p-4">
+            <div className="bg-bg-alt rounded-none p-4">
               <div className="flex items-center gap-4 mb-4">
                 <FileText className="w-8 h-8 text-accent" />
                 <div>
@@ -477,7 +477,7 @@ export function LENSReportGenerator({
                     <select
                       value={deliveryOptions.shareExpiry}
                       onChange={(e) => setDeliveryOptions(prev => ({ ...prev, shareExpiry: e.target.value }))}
-                      className="px-3 py-1 bg-bg border border-border rounded-lg text-sm"
+                      className="px-3 py-1 bg-bg border border-border rounded-none text-sm"
                     >
                       <option value="1d">1 day</option>
                       <option value="7d">7 days</option>
@@ -528,7 +528,7 @@ export function LENSReportGenerator({
         {step === 'deliver' && generatedReport && (
           <div className="space-y-6">
             {/* Success message */}
-            <div className="flex items-center gap-4 bg-green-500/10 rounded-lg p-4">
+            <div className="flex items-center gap-4 bg-green-500/10 rounded-none p-4">
               <CheckCircle2 className="w-8 h-8 text-green-500" />
               <div>
                 <div className="font-medium text-green-600">Report Generated Successfully</div>
@@ -539,7 +539,7 @@ export function LENSReportGenerator({
             </div>
 
             {/* Report preview */}
-            <div className="bg-bg-alt rounded-lg p-4">
+            <div className="bg-bg-alt rounded-none p-4">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-medium text-text-primary">Report Preview</h4>
                 <Badge variant="default">{reportType}</Badge>
@@ -548,7 +548,7 @@ export function LENSReportGenerator({
               {/* Preview cards */}
               <div className="grid grid-cols-2 gap-4">
                 {generatedReport.candidates.slice(0, 4).map((candidate, i) => (
-                  <div key={i} className="bg-bg rounded-lg p-3 border border-border">
+                  <div key={i} className="bg-bg rounded-none p-3 border border-border">
                     <div className="font-medium text-text-primary">{candidate.name}</div>
                     <div className="text-sm text-text-muted">{candidate.title}</div>
                     <div className="flex items-center gap-2 mt-2">
@@ -606,7 +606,7 @@ export function LENSReportGenerator({
 
             {/* Share link display */}
             {generatedReport.share_url && (
-              <div className="bg-bg-alt rounded-lg p-4">
+              <div className="bg-bg-alt rounded-none p-4">
                 <label className="block text-sm font-medium text-text-primary mb-2">
                   Share Link
                 </label>

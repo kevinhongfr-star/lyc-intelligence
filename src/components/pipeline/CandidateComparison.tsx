@@ -113,7 +113,7 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl p-8">
+        <div className="bg-white rounded-none p-8">
           <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto" />
           <p className="text-text-muted mt-4">Loading candidates...</p>
         </div>
@@ -124,9 +124,9 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
   if (error || candidates.length === 0) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl p-8 max-w-md">
+        <div className="bg-white rounded-none p-8 max-w-md">
           <p className="text-red-500 mb-4">{error || 'No candidates to compare'}</p>
-          <button onClick={onClose} className="px-4 py-2 bg-accent text-white rounded-lg">
+          <button onClick={onClose} className="px-4 py-2 bg-accent text-white rounded-none">
             Close
           </button>
         </div>
@@ -155,12 +155,12 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
           <div className="flex items-center gap-2">
             <button
               onClick={exportToCSV}
-              className="px-4 py-2 bg-bg-tertiary text-text-primary rounded-lg text-sm font-medium hover:bg-bg-secondary flex items-center gap-2"
+              className="px-4 py-2 bg-bg-tertiary text-text-primary rounded-none text-sm font-medium hover:bg-bg-secondary flex items-center gap-2"
             >
               <Download className="w-4 h-4" />
               Export CSV
             </button>
-            <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-lg">
+            <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-none">
               <X className="w-5 h-5 text-text-muted" />
             </button>
           </div>
@@ -243,7 +243,7 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
                         <td key={c.contact.id} className="px-4 py-4 text-center">
                           <div className="flex flex-col items-center gap-2">
                             <div 
-                              className={`text-2xl font-bold ${isBest ? 'ring-2 ring-green-500 rounded-lg px-2' : ''}`}
+                              className={`text-2xl font-bold ${isBest ? 'ring-2 ring-green-500 rounded-none px-2' : ''}`}
                               style={{ color: scoreColor }}
                             >
                               {score}

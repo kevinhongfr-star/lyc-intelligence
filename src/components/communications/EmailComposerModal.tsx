@@ -154,14 +154,14 @@ export function EmailComposerModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-card border border-border rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+      <div className="bg-card border border-border rounded-none w-full max-w-2xl max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Mail className="w-5 h-5 text-primary" />
             <h2 className="text-lg font-semibold text-text-primary">New Email</h2>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-bg-alt rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-bg-alt rounded-none">
             <X className="w-5 h-5 text-text-muted" />
           </button>
         </div>
@@ -170,7 +170,7 @@ export function EmailComposerModal({
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-none text-sm">
               {error}
             </div>
           )}
@@ -193,7 +193,7 @@ export function EmailComposerModal({
             </Button>
 
             {showTemplatePicker && (
-              <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-lg shadow-xl max-h-64 overflow-y-auto">
+              <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-none shadow-xl max-h-64 overflow-y-auto">
                 {templates.length === 0 ? (
                   <div className="p-4 text-center text-text-muted text-sm">
                     No templates available
@@ -223,7 +223,7 @@ export function EmailComposerModal({
               type="email"
               value={to}
               onChange={e => setTo(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="recipient@example.com"
             />
           </div>
@@ -237,7 +237,7 @@ export function EmailComposerModal({
               type="text"
               value={cc}
               onChange={e => setCc(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="cc@example.com, cc2@example.com"
             />
           </div>
@@ -249,7 +249,7 @@ export function EmailComposerModal({
               type="text"
               value={subject}
               onChange={e => setSubject(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Email subject"
             />
           </div>
@@ -269,14 +269,14 @@ export function EmailComposerModal({
             </div>
             {showPreview ? (
               <div
-                className="w-full min-h-[200px] p-4 rounded-lg bg-bg-base border border-border prose prose-sm max-w-none"
+                className="w-full min-h-[200px] p-4 rounded-none bg-bg-base border border-border prose prose-sm max-w-none"
                 dangerouslySetInnerHTML={{ __html: body }}
               />
             ) : (
               <textarea
                 value={body}
                 onChange={e => setBody(e.target.value)}
-                className="w-full h-64 px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
+                className="w-full h-64 px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
                 placeholder="Write your email here... (HTML supported)"
               />
             )}

@@ -57,7 +57,7 @@ Example:
           minHeight: '200px',
           background: DS.bg,
           border: `1px solid ${DS.cardBorder}`,
-          borderRadius: '8px',
+          borderRadius: '0px',
           padding: '14px',
           color: DS.text,
           fontSize: '13px',
@@ -73,7 +73,7 @@ Example:
         padding: '12px',
         background: `${DS.accent}10`,
         border: `1px solid ${DS.accent}30`,
-        borderRadius: '8px'
+        borderRadius: '0px'
       }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
           <Lightbulb style={{ width: 16, height: 16, color: DS.accent, flexShrink: 0, marginTop: '2px' }} />

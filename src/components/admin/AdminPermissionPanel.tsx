@@ -275,7 +275,7 @@ export function AdminPermissionPanel({ userRole }: AdminPermissionPanelProps) {
 
   if (!isAdmin) {
     return (
-      <div className="bg-card border border-border rounded-xl p-8 text-center">
+      <div className="bg-card border border-border rounded-none p-8 text-center">
         <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto" />
         <h3 className="text-lg font-semibold text-text-primary mt-4">Admin Access Required</h3>
         <p className="text-text-muted mt-2">
@@ -357,7 +357,7 @@ export function AdminPermissionPanel({ userRole }: AdminPermissionPanelProps) {
 
       {showOverrideModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md">
+          <div className="bg-card border border-border rounded-none p-6 w-full max-w-md">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-text-primary">Create Permission Override</h3>
               <button onClick={() => setShowOverrideModal(false)} className="p-1 hover:bg-bg-alt rounded">
@@ -371,7 +371,7 @@ export function AdminPermissionPanel({ userRole }: AdminPermissionPanelProps) {
                 <select
                   value={newOverride.user_id}
                   onChange={e => setNewOverride(prev => ({ ...prev, user_id: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary"
+                  className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary"
                 >
                   <option value="">Select user...</option>
                   {users.map(u => (
@@ -385,7 +385,7 @@ export function AdminPermissionPanel({ userRole }: AdminPermissionPanelProps) {
                 <select
                   value={newOverride.resource}
                   onChange={e => setNewOverride(prev => ({ ...prev, resource: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary"
+                  className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary"
                 >
                   {RESOURCES.map(r => (
                     <option key={r} value={r}>{r.replace(/_/g, ' ')}</option>
@@ -398,7 +398,7 @@ export function AdminPermissionPanel({ userRole }: AdminPermissionPanelProps) {
                 <select
                   value={newOverride.action}
                   onChange={e => setNewOverride(prev => ({ ...prev, action: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary"
+                  className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary"
                 >
                   {ACTIONS.map(a => (
                     <option key={a} value={a}>{ACTION_LABELS[a] || a}</option>
@@ -411,7 +411,7 @@ export function AdminPermissionPanel({ userRole }: AdminPermissionPanelProps) {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setNewOverride(prev => ({ ...prev, allowed: true }))}
-                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex-1 px-4 py-2 rounded-none text-sm font-medium transition-colors ${
                       newOverride.allowed
                         ? 'bg-green-100 text-green-700 border-2 border-green-500'
                         : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -421,7 +421,7 @@ export function AdminPermissionPanel({ userRole }: AdminPermissionPanelProps) {
                   </button>
                   <button
                     onClick={() => setNewOverride(prev => ({ ...prev, allowed: false }))}
-                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex-1 px-4 py-2 rounded-none text-sm font-medium transition-colors ${
                       !newOverride.allowed
                         ? 'bg-red-100 text-red-700 border-2 border-red-500'
                         : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -437,7 +437,7 @@ export function AdminPermissionPanel({ userRole }: AdminPermissionPanelProps) {
                 <textarea
                   value={newOverride.reason}
                   onChange={e => setNewOverride(prev => ({ ...prev, reason: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary"
+                  className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary"
                   rows={2}
                   placeholder="Why is this override needed?"
                 />
@@ -449,7 +449,7 @@ export function AdminPermissionPanel({ userRole }: AdminPermissionPanelProps) {
                   type="datetime-local"
                   value={newOverride.expires_at}
                   onChange={e => setNewOverride(prev => ({ ...prev, expires_at: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary"
+                  className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary"
                 />
               </div>
             </div>
@@ -509,7 +509,7 @@ function RoleMatrixTab({ permissions, onToggle, saving }: {
             <button
               key={role.value}
               onClick={() => setSelectedRole(role.value)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-none text-sm font-medium transition-colors ${
                 selectedRole === role.value
                   ? `${role.color} border-2 border-current`
                   : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -549,7 +549,7 @@ function RoleMatrixTab({ permissions, onToggle, saving }: {
                     <td key={action} className="py-3 px-2 text-center">
                       <button
                         onClick={() => onToggle(selectedRole, resource, action, allowed)}
-                        className={`w-6 h-6 rounded-md flex items-center justify-center transition-all ${
+                        className={`w-6 h-6 rounded-none flex items-center justify-center transition-all ${
                           allowed
                             ? 'bg-green-500 text-white'
                             : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -581,7 +581,7 @@ function UsersTab({ users, onRoleChange }: {
     ROLES.find(r => r.value === role)?.color || 'bg-gray-100 text-gray-700';
 
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-border rounded-none overflow-hidden">
       <table className="w-full">
         <thead className="bg-bg-alt">
           <tr>
@@ -642,7 +642,7 @@ function OverridesTab({ overrides, users, onAdd, onDelete }: {
         </Button>
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <div className="bg-card border border-border rounded-none overflow-hidden">
         <table className="w-full">
           <thead className="bg-bg-alt">
             <tr>
@@ -696,7 +696,7 @@ function OverridesTab({ overrides, users, onAdd, onDelete }: {
 
 function AuditLogTab({ entries }: { entries: AuditEntry[] }) {
   return (
-    <div className="bg-card border border-border rounded-xl p-6 text-center">
+    <div className="bg-card border border-border rounded-none p-6 text-center">
       <History className="w-12 h-12 text-text-muted mx-auto" />
       <h3 className="font-medium text-text-primary mt-4">Audit Log</h3>
       <p className="text-sm text-text-muted mt-2">

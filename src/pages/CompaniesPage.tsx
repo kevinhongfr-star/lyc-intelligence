@@ -57,13 +57,13 @@ export function CompaniesPage() {
             placeholder="Search companies by name or industry..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(0); }}
-            className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
+            className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
           />
         </div>
         <select
           value={industry}
           onChange={e => { setIndustry(e.target.value); setPage(0); }}
-          className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent min-w-[160px]"
+          className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent min-w-[160px]"
         >
           <option value="">All Industries</option>
           {INDUSTRY_OPTIONS.map(i => <option key={i} value={i}>{i}</option>)}
@@ -71,7 +71,7 @@ export function CompaniesPage() {
         <select
           value={country}
           onChange={e => { setCountry(e.target.value); setPage(0); }}
-          className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent min-w-[140px]"
+          className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent min-w-[140px]"
         >
           <option value="">All Countries</option>
           {countries.map(c => <option key={c} value={c ?? ''}>{c}</option>)}
@@ -79,7 +79,7 @@ export function CompaniesPage() {
         {(search || industry || country) && (
           <button
             onClick={() => { setSearch(''); setIndustry(''); setCountry(''); setPage(0); }}
-            className="px-3 py-2.5 text-sm text-accent hover:bg-accent/10 rounded-lg transition-colors"
+            className="px-3 py-2.5 text-sm text-accent hover:bg-accent/10 rounded-none transition-colors"
           >
             Clear filters
           </button>
@@ -107,7 +107,7 @@ export function CompaniesPage() {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-none bg-accent/10 flex items-center justify-center">
                         <Building2 className="w-5 h-5 text-accent" />
                       </div>
                       <div>

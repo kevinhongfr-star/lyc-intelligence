@@ -193,7 +193,7 @@ export function OfferCreate({
         /* Offer Form */
         <div className="space-y-6">
           {/* Basic Info */}
-          <div className="bg-card border border-card-border rounded-xl p-6">
+          <div className="bg-card border border-card-border rounded-none p-6">
             <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
               <Briefcase className="w-5 h-5 text-accent" />
               Position Details
@@ -209,7 +209,7 @@ export function OfferCreate({
                   value={formData.position_title}
                   onChange={(e) => setFormData(prev => ({ ...prev, position_title: e.target.value }))}
                   placeholder="e.g., Senior Software Engineer"
-                  className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
+                  className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
                 />
                 {errors.position_title && (
                   <p className="text-red-500 text-sm mt-1">{errors.position_title}</p>
@@ -225,7 +225,7 @@ export function OfferCreate({
                   type="date"
                   value={formData.start_date}
                   onChange={(e) => setFormData(prev => ({ ...prev, start_date: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
+                  className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
                 />
                 {errors.start_date && (
                   <p className="text-red-500 text-sm mt-1">{errors.start_date}</p>
@@ -235,7 +235,7 @@ export function OfferCreate({
           </div>
 
           {/* Compensation */}
-          <div className="bg-card border border-card-border rounded-xl p-6">
+          <div className="bg-card border border-card-border rounded-none p-6">
             <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
               <DollarSign className="w-5 h-5 text-green-500" />
               Compensation Package
@@ -253,7 +253,7 @@ export function OfferCreate({
                     value={formData.compensation.base_salary || ''}
                     onChange={(e) => handleCompensationChange('base_salary', parseInt(e.target.value) || 0)}
                     placeholder="150,000"
-                    className="w-full pl-8 pr-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
+                    className="w-full pl-8 pr-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
                   />
                 </div>
                 {errors.base_salary && (
@@ -272,7 +272,7 @@ export function OfferCreate({
                     value={formData.compensation.bonus || ''}
                     onChange={(e) => handleCompensationChange('bonus', parseInt(e.target.value) || 0)}
                     placeholder="25,000"
-                    className="w-full pl-8 pr-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
+                    className="w-full pl-8 pr-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
                   />
                 </div>
               </div>
@@ -286,7 +286,7 @@ export function OfferCreate({
                   value={formData.compensation.equity || ''}
                   onChange={(e) => handleCompensationChange('equity', e.target.value)}
                   placeholder="e.g., 10,000 RSUs over 4 years"
-                  className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
+                  className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
                 />
               </div>
 
@@ -299,13 +299,13 @@ export function OfferCreate({
                   value={formData.compensation.benefits || ''}
                   onChange={(e) => handleCompensationChange('benefits', e.target.value)}
                   placeholder="e.g., Health, 401k, PTO"
-                  className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
+                  className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
                 />
               </div>
             </div>
 
             {/* Total Compensation Summary */}
-            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-none">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-green-800">Estimated Total First Year Compensation</span>
                 <span className="text-xl font-bold text-green-600">
@@ -318,7 +318,7 @@ export function OfferCreate({
           </div>
 
           {/* Conditions */}
-          <div className="bg-card border border-card-border rounded-xl p-6">
+          <div className="bg-card border border-card-border rounded-none p-6">
             <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
               <FileText className="w-5 h-5 text-orange-500" />
               Offer Conditions
@@ -332,7 +332,7 @@ export function OfferCreate({
                 value={formData.conditions}
                 onChange={(e) => setFormData(prev => ({ ...prev, conditions: e.target.value }))}
                 rows={4}
-                className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
+                className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
               />
               <p className="text-xs text-text-muted mt-1">
                 These conditions will appear in the offer letter (background check, references, etc.)
@@ -341,7 +341,7 @@ export function OfferCreate({
           </div>
 
           {/* Timeline */}
-          <div className="bg-card border border-card-border rounded-xl p-6">
+          <div className="bg-card border border-card-border rounded-none p-6">
             <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
               <Calendar className="w-5 h-5 text-blue-500" />
               Offer Timeline
@@ -355,7 +355,7 @@ export function OfferCreate({
                 type="date"
                 value={formData.expiration_date}
                 onChange={(e) => setFormData(prev => ({ ...prev, expiration_date: e.target.value }))}
-                className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
+                className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50"
               />
               {errors.expiration_date && (
                 <p className="text-red-500 text-sm mt-1">{errors.expiration_date}</p>
@@ -367,7 +367,7 @@ export function OfferCreate({
           </div>
 
           {/* Additional Notes */}
-          <div className="bg-card border border-card-border rounded-xl p-6">
+          <div className="bg-card border border-card-border rounded-none p-6">
             <h2 className="text-lg font-semibold text-text-primary mb-4">
               Additional Notes
             </h2>
@@ -381,14 +381,14 @@ export function OfferCreate({
                 onChange={(e) => setFormData(prev => ({ ...prev, cover_letter: e.target.value }))}
                 placeholder="Optional cover letter or additional notes for the offer..."
                 rows={4}
-                className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
+                className="w-full px-4 py-2.5 bg-bg-alt border border-card-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
               />
             </div>
           </div>
 
           {/* Error */}
           {errors.submit && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-none flex items-center gap-2 text-red-700">
               <AlertCircle className="w-5 h-5" />
               {errors.submit}
             </div>
@@ -445,7 +445,7 @@ function OfferPreview({ formData, candidateName, clientName, onClose, onSave, sa
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div className="bg-white border border-gray-200 rounded-none overflow-hidden">
       {/* Preview Header */}
       <div className="p-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
         <h3 className="font-semibold text-text-primary">Offer Letter Preview</h3>
@@ -545,7 +545,7 @@ function OfferPreview({ formData, candidateName, clientName, onClose, onSave, sa
             </div>
           )}
 
-          <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+          <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-none">
             <p className="text-sm">
               <strong>Please respond by:</strong> {formatDate(formData.expiration_date)}
             </p>

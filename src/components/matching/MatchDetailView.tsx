@@ -104,7 +104,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
   if (isLoading) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-card border border-border rounded-xl p-8">
+        <div className="bg-card border border-border rounded-none p-8">
           <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
           <p className="text-text-muted mt-4">Loading match analysis...</p>
         </div>
@@ -123,7 +123,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-card border border-border rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-card border border-border rounded-none w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b border-border flex items-start justify-between">
           <div>
@@ -140,7 +140,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
               {candidate?.full_name || candidate?.name || 'Candidate'} ↔ {mandate?.title || 'Mandate'}
             </p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-bg-alt rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-bg-alt rounded-none">
             <X className="w-5 h-5 text-text-muted" />
           </button>
         </div>
@@ -209,15 +209,15 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
 
               {/* Quick stats */}
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-bg-alt rounded-lg p-4 text-center">
+                <div className="bg-bg-alt rounded-none p-4 text-center">
                   <div className="text-2xl font-bold text-blue-600">{match.trident_component?.toFixed(0)}</div>
                   <div className="text-xs text-text-muted mt-1">TRIDENT Score</div>
                 </div>
-                <div className="bg-bg-alt rounded-lg p-4 text-center">
+                <div className="bg-bg-alt rounded-none p-4 text-center">
                   <div className="text-2xl font-bold text-emerald-600">{match.pipeline_component?.toFixed(0)}</div>
                   <div className="text-xs text-text-muted mt-1">Pipeline Fit</div>
                 </div>
-                <div className="bg-bg-alt rounded-lg p-4 text-center">
+                <div className="bg-bg-alt rounded-none p-4 text-center">
                   <div className="text-2xl font-bold text-amber-600">{match.heuristic_component?.toFixed(0)}</div>
                   <div className="text-xs text-text-muted mt-1">Heuristic Fit</div>
                 </div>
@@ -235,7 +235,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
                     const notes = dimScores[dim]?.fit_notes || '';
                     const labels = ['Capability (D1)', 'Behavioral (D2)', 'Cultural (D3)'];
                     return (
-                      <div key={dim} className="bg-bg-alt rounded-lg p-4">
+                      <div key={dim} className="bg-bg-alt rounded-none p-4">
                         <div className="text-center">
                           <div className="text-3xl font-bold text-blue-600">{score?.toFixed(1)}</div>
                           <div className="text-sm font-medium text-text-secondary mt-1">{labels[i]}</div>
@@ -249,7 +249,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
                   })}
                 </div>
               ) : (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="bg-amber-50 border border-amber-200 rounded-none p-4">
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
                     <div>
@@ -268,14 +268,14 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
             <div className="space-y-4">
               <h3 className="font-semibold text-text-primary">Pipeline Compatibility</h3>
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-bg-alt rounded-lg p-4">
+                <div className="bg-bg-alt rounded-none p-4">
                   <div className="text-sm text-text-muted">Stage</div>
                   <div className="font-medium text-text-primary mt-1">{pipelineCompat.stage || '—'}</div>
                   <div className={`text-xs mt-1 ${pipelineCompat.stage_compatible ? 'text-emerald-600' : 'text-red-600'}`}>
                     {pipelineCompat.stage_compatible ? '✓ Stage compatible' : '✗ Stage incompatible'}
                   </div>
                 </div>
-                <div className="bg-bg-alt rounded-lg p-4">
+                <div className="bg-bg-alt rounded-none p-4">
                   <div className="text-sm text-text-muted">Motivation</div>
                   <div className={`font-medium mt-1 ${
                     pipelineCompat.motivation_fit === 'GREEN' ? 'text-emerald-600' :
@@ -284,13 +284,13 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
                     {pipelineCompat.motivation_fit || '—'}
                   </div>
                 </div>
-                <div className="bg-bg-alt rounded-lg p-4">
+                <div className="bg-bg-alt rounded-none p-4">
                   <div className="text-sm text-text-muted">Reachability</div>
                   <div className={`font-medium mt-1 ${pipelineCompat.reachability_ok ? 'text-emerald-600' : 'text-amber-600'}`}>
                     {pipelineCompat.reachability_ok ? 'Good' : 'Needs verification'}
                   </div>
                 </div>
-                <div className="bg-bg-alt rounded-lg p-4">
+                <div className="bg-bg-alt rounded-none p-4">
                   <div className="text-sm text-text-muted">Availability</div>
                   <div className={`font-medium mt-1 ${pipelineCompat.available ? 'text-emerald-600' : 'text-amber-600'}`}>
                     {pipelineCompat.available ? 'Available' : 'In late pipeline'}
@@ -298,7 +298,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
                 </div>
               </div>
               {pipelineCompat.notes && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-none p-4">
                   <p className="text-sm text-blue-800">{pipelineCompat.notes}</p>
                 </div>
               )}
@@ -314,13 +314,13 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
 
               {aiAnalysis.match_summary ? (
                 <>
-                  <div className="bg-bg-alt rounded-lg p-4">
+                  <div className="bg-bg-alt rounded-none p-4">
                     <h4 className="font-medium text-text-primary mb-2">Match Summary</h4>
                     <p className="text-sm text-text-secondary">{aiAnalysis.match_summary}</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-none p-4">
                       <div className="flex items-center gap-2 mb-3">
                         <CheckCircle className="w-5 h-5 text-emerald-600" />
                         <h4 className="font-medium text-emerald-800">Key Strengths</h4>
@@ -334,7 +334,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
                         ))}
                       </ul>
                     </div>
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="bg-red-50 border border-red-200 rounded-none p-4">
                       <div className="flex items-center gap-2 mb-3">
                         <AlertTriangle className="w-5 h-5 text-red-600" />
                         <h4 className="font-medium text-red-800">Key Risks</h4>
@@ -351,22 +351,22 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
                   </div>
 
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-bg-alt rounded-lg p-3 text-center">
+                    <div className="bg-bg-alt rounded-none p-3 text-center">
                       <div className="text-xs text-text-muted">Compensation</div>
                       <div className="font-medium text-text-primary mt-1">{aiAnalysis.compensation_fit || '—'}</div>
                     </div>
-                    <div className="bg-bg-alt rounded-lg p-3 text-center">
+                    <div className="bg-bg-alt rounded-none p-3 text-center">
                       <div className="text-xs text-text-muted">Location</div>
                       <div className="font-medium text-text-primary mt-1">{aiAnalysis.location_fit || '—'}</div>
                     </div>
-                    <div className="bg-bg-alt rounded-lg p-3 text-center">
+                    <div className="bg-bg-alt rounded-none p-3 text-center">
                       <div className="text-xs text-text-muted">Recommendation</div>
                       <div className="font-medium text-primary mt-1">{aiAnalysis.recommendation || '—'}</div>
                     </div>
                   </div>
 
                   {aiAnalysis.talking_points?.length > 0 && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-none p-4">
                       <div className="flex items-center gap-2 mb-3">
                         <MessageSquare className="w-5 h-5 text-blue-600" />
                         <h4 className="font-medium text-blue-800">Talking Points for Outreach</h4>
@@ -383,7 +383,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
                   )}
                 </>
               ) : (
-                <div className="bg-bg-alt rounded-lg p-8 text-center">
+                <div className="bg-bg-alt rounded-none p-8 text-center">
                   <Lightbulb className="w-12 h-12 text-text-muted mx-auto" />
                   <h4 className="font-medium text-text-primary mt-4">No AI Analysis</h4>
                   <p className="text-sm text-text-muted mt-1">
@@ -417,7 +417,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
         {/* Override modal */}
         {showOverride && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md m-4">
+            <div className="bg-card border border-border rounded-none p-6 w-full max-w-md m-4">
               <h3 className="text-lg font-semibold text-text-primary">Override Match Score</h3>
               <p className="text-sm text-text-muted mt-1">
                 Manually adjust the match score and grade.
@@ -432,7 +432,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
                     max="100"
                     value={overrideForm.override_score}
                     onChange={e => setOverrideForm(prev => ({ ...prev, override_score: parseFloat(e.target.value) }))}
-                    className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary"
+                    className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary"
                   />
                 </div>
                 <div>
@@ -440,7 +440,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
                   <select
                     value={overrideForm.override_grade}
                     onChange={e => setOverrideForm(prev => ({ ...prev, override_grade: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary"
+                    className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary"
                   >
                     <option value="EXCEPTIONAL">EXCEPTIONAL</option>
                     <option value="STRONG">STRONG</option>
@@ -454,7 +454,7 @@ export function MatchDetailView({ matchId, mandateId, contactId, onClose, userRo
                   <textarea
                     value={overrideForm.override_reason}
                     onChange={e => setOverrideForm(prev => ({ ...prev, override_reason: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary"
+                    className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary"
                     rows={2}
                     placeholder="Why are you overriding this score?"
                   />

@@ -182,7 +182,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
         step="0.1"
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full h-2 bg-bg-alt rounded-lg appearance-none cursor-pointer"
+        className="w-full h-2 bg-bg-alt rounded-none appearance-none cursor-pointer"
       />
       <div className="flex items-center justify-between text-xs text-text-muted">
         <span>1.0</span>

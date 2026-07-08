@@ -128,11 +128,11 @@ export function ConsultantDashboard() {
         </div>
 
         {/* Today's Actions */}
-        <div className="bg-card border border-border rounded-xl p-5">
+        <div className="bg-card border border-border rounded-none p-5">
           <h3 className="font-semibold text-text-primary mb-4">Today's Actions</h3>
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-lg">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-none">
+              <div className="w-10 h-10 rounded-none bg-blue-50 flex items-center justify-center">
                 <Mail className="w-5 h-5 text-blue-500" />
               </div>
               <div className="flex-1">
@@ -142,8 +142,8 @@ export function ConsultantDashboard() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-lg">
-              <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-none">
+              <div className="w-10 h-10 rounded-none bg-green-50 flex items-center justify-center">
                 <MessageCircle className="w-5 h-5 text-green-500" />
               </div>
               <div className="flex-1">
@@ -153,8 +153,8 @@ export function ConsultantDashboard() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-lg">
-              <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-none">
+              <div className="w-10 h-10 rounded-none bg-purple-50 flex items-center justify-center">
                 <Phone className="w-5 h-5 text-purple-500" />
               </div>
               <div className="flex-1">
@@ -164,8 +164,8 @@ export function ConsultantDashboard() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-lg">
-              <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
+            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-none">
+              <div className="w-10 h-10 rounded-none bg-amber-50 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-amber-500" />
               </div>
               <div className="flex-1">
@@ -183,7 +183,7 @@ export function ConsultantDashboard() {
       {/* Second Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Personal KPIs */}
-        <div className="bg-card border border-border rounded-xl p-5">
+        <div className="bg-card border border-border rounded-none p-5">
           <h3 className="font-semibold text-text-primary mb-4">My Performance</h3>
           <div className="space-y-4">
             {myKPIs.slice(0, 4).map((kpi: any) => {
@@ -221,31 +221,31 @@ export function ConsultantDashboard() {
       </div>
 
       {/* Velocity */}
-      <div className="bg-card border border-border rounded-xl p-5">
+      <div className="bg-card border border-border rounded-none p-5">
         <h3 className="font-semibold text-text-primary mb-4">My Pipeline Velocity</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 bg-bg-alt rounded-lg">
+          <div className="text-center p-4 bg-bg-alt rounded-none">
             <TrendingUp className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
             <p className="text-xl font-bold text-text-primary">
               {velocityData?.candidates_advancing_per_week || 0}
             </p>
             <p className="text-xs text-text-muted">advancing / week</p>
           </div>
-          <div className="text-center p-4 bg-bg-alt rounded-lg">
+          <div className="text-center p-4 bg-bg-alt rounded-none">
             <Clock className="w-5 h-5 text-blue-500 mx-auto mb-2" />
             <p className="text-xl font-bold text-text-primary">
               {velocityData?.total_transitions_90d || 0}
             </p>
             <p className="text-xs text-text-muted">transitions (90d)</p>
           </div>
-          <div className="text-center p-4 bg-bg-alt rounded-lg">
+          <div className="text-center p-4 bg-bg-alt rounded-none">
             <Target className="w-5 h-5 text-purple-500 mx-auto mb-2" />
             <p className="text-xl font-bold text-text-primary">
               {pipelineData?.summary?.advancement_rate || 0}%
             </p>
             <p className="text-xs text-text-muted">to S11+ stage</p>
           </div>
-          <div className="text-center p-4 bg-bg-alt rounded-lg">
+          <div className="text-center p-4 bg-bg-alt rounded-none">
             <CheckSquare className="w-5 h-5 text-amber-500 mx-auto mb-2" />
             <p className="text-xl font-bold text-text-primary">
               {pipelineData?.summary?.placement_rate || 0}%

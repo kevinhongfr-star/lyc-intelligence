@@ -315,7 +315,7 @@ export function GRIDInteractiveView({
             {/* Placeholder for talent pool details */}
             <div className="mt-3 grid grid-cols-3 gap-3">
               {[1, 2, 3].map(i => (
-                <div key={i} className="bg-bg rounded-lg p-3 border border-border">
+                <div key={i} className="bg-bg rounded-none p-3 border border-border">
                   <div className="text-xs text-text-muted">Position {i}</div>
                   <div className="text-sm text-text-primary mt-1">Talent details</div>
                 </div>
@@ -329,7 +329,7 @@ export function GRIDInteractiveView({
 
   if (loading) {
     return (
-      <div className="bg-card rounded-xl border border-card-border p-8 flex items-center justify-center">
+      <div className="bg-card rounded-none border border-card-border p-8 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-accent" />
         <span className="ml-3 text-text-muted">Loading GRID data...</span>
       </div>
@@ -337,7 +337,7 @@ export function GRIDInteractiveView({
   }
 
   return (
-    <div className="bg-card rounded-xl border border-card-border overflow-hidden">
+    <div className="bg-card rounded-none border border-card-border overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-4">
@@ -351,10 +351,10 @@ export function GRIDInteractiveView({
 
         <div className="flex items-center gap-3">
           {/* View mode toggle */}
-          <div className="flex bg-bg-alt rounded-lg p-1">
+          <div className="flex bg-bg-alt rounded-none p-1">
             <button
               onClick={() => setViewMode('table')}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-none text-sm font-medium transition-all ${
                 viewMode === 'table'
                   ? 'bg-accent text-white'
                   : 'text-text-muted hover:text-text-primary'
@@ -364,7 +364,7 @@ export function GRIDInteractiveView({
             </button>
             <button
               onClick={() => setViewMode('heatmap')}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-none text-sm font-medium transition-all ${
                 viewMode === 'heatmap'
                   ? 'bg-accent text-white'
                   : 'text-text-muted hover:text-text-primary'
@@ -374,7 +374,7 @@ export function GRIDInteractiveView({
             </button>
             <button
               onClick={() => setViewMode('orgchart')}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-none text-sm font-medium transition-all ${
                 viewMode === 'orgchart'
                   ? 'bg-accent text-white'
                   : 'text-text-muted hover:text-text-primary'
@@ -439,7 +439,7 @@ export function GRIDInteractiveView({
               <select
                 value={filters.sector}
                 onChange={(e) => setFilters(prev => ({ ...prev, sector: e.target.value }))}
-                className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-text-primary"
+                className="w-full px-3 py-2 bg-bg border border-border rounded-none text-text-primary"
               >
                 <option value="">All Sectors</option>
                 {sectors.map(s => (
@@ -456,7 +456,7 @@ export function GRIDInteractiveView({
               <select
                 value={filters.location}
                 onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
-                className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-text-primary"
+                className="w-full px-3 py-2 bg-bg border border-border rounded-none text-text-primary"
               >
                 <option value="">All Locations</option>
                 {locations.map(l => (
@@ -477,7 +477,7 @@ export function GRIDInteractiveView({
                   max={100}
                   value={filters.minDensity}
                   onChange={(e) => setFilters(prev => ({ ...prev, minDensity: parseInt(e.target.value) || 0 }))}
-                  className="w-16 px-2 py-1 bg-bg border border-border rounded-lg text-sm"
+                  className="w-16 px-2 py-1 bg-bg border border-border rounded-none text-sm"
                 />
                 <span className="text-text-muted">-</span>
                 <input
@@ -486,7 +486,7 @@ export function GRIDInteractiveView({
                   max={100}
                   value={filters.maxDensity}
                   onChange={(e) => setFilters(prev => ({ ...prev, maxDensity: parseInt(e.target.value) || 100 }))}
-                  className="w-16 px-2 py-1 bg-bg border border-border rounded-lg text-sm"
+                  className="w-16 px-2 py-1 bg-bg border border-border rounded-none text-sm"
                 />
               </div>
             </div>
@@ -503,7 +503,7 @@ export function GRIDInteractiveView({
                   max={100}
                   value={filters.minFit}
                   onChange={(e) => setFilters(prev => ({ ...prev, minFit: parseInt(e.target.value) || 0 }))}
-                  className="w-16 px-2 py-1 bg-bg border border-border rounded-lg text-sm"
+                  className="w-16 px-2 py-1 bg-bg border border-border rounded-none text-sm"
                 />
                 <span className="text-text-muted">-</span>
                 <input
@@ -512,7 +512,7 @@ export function GRIDInteractiveView({
                   max={100}
                   value={filters.maxFit}
                   onChange={(e) => setFilters(prev => ({ ...prev, maxFit: parseInt(e.target.value) || 100 }))}
-                  className="w-16 px-2 py-1 bg-bg border border-border rounded-lg text-sm"
+                  className="w-16 px-2 py-1 bg-bg border border-border rounded-none text-sm"
                 />
               </div>
             </div>
@@ -536,7 +536,7 @@ export function GRIDInteractiveView({
       {/* Summary stats */}
       <div className="grid grid-cols-5 gap-4 p-4 bg-bg-alt border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-accent/10">
+          <div className="p-2 rounded-none bg-accent/10">
             <Building2 className="w-5 h-5 text-accent" />
           </div>
           <div>
@@ -546,7 +546,7 @@ export function GRIDInteractiveView({
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-green-500/10">
+          <div className="p-2 rounded-none bg-green-500/10">
             <TrendingUp className="w-5 h-5 text-green-500" />
           </div>
           <div>
@@ -556,7 +556,7 @@ export function GRIDInteractiveView({
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-yellow-500/10">
+          <div className="p-2 rounded-none bg-yellow-500/10">
             <BarChart3 className="w-5 h-5 text-yellow-500" />
           </div>
           <div>
@@ -566,7 +566,7 @@ export function GRIDInteractiveView({
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-blue-500/10">
+          <div className="p-2 rounded-none bg-blue-500/10">
             <Users className="w-5 h-5 text-blue-500" />
           </div>
           <div>
@@ -576,7 +576,7 @@ export function GRIDInteractiveView({
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-purple-500/10">
+          <div className="p-2 rounded-none bg-purple-500/10">
             <Eye className="w-5 h-5 text-purple-500" />
           </div>
           <div>

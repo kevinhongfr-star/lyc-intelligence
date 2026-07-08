@@ -307,7 +307,7 @@ export function QuestionDetail({
             <textarea
               value={editForm.questionText}
               onChange={(e) => setEditForm({ ...editForm, questionText: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
               rows={3}
             />
           </div>
@@ -320,7 +320,7 @@ export function QuestionDetail({
               <select
                 value={editForm.competency}
                 onChange={(e) => setEditForm({ ...editForm, competency: e.target.value })}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+                className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
               >
                 {COMPETENCIES.map(c => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -334,7 +334,7 @@ export function QuestionDetail({
               <select
                 value={editForm.difficulty}
                 onChange={(e) => setEditForm({ ...editForm, difficulty: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+                className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
               >
                 {[1, 2, 3].map(d => (
                   <option key={d} value={d}>{DIFFICULTY_LABELS[d]}</option>
@@ -350,7 +350,7 @@ export function QuestionDetail({
             <textarea
               value={editForm.expectedAnswer}
               onChange={(e) => setEditForm({ ...editForm, expectedAnswer: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
               rows={3}
             />
           </div>
@@ -362,13 +362,13 @@ export function QuestionDetail({
             <textarea
               value={editForm.followUpQuestion}
               onChange={(e) => setEditForm({ ...editForm, followUpQuestion: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
               rows={2}
             />
           </div>
 
           {saveError && (
-            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
               <AlertCircle className="w-5 h-5" />
               <span className="text-sm">{saveError}</span>
             </div>
@@ -411,7 +411,7 @@ export function QuestionDetail({
             <textarea
               value={editForm.questionText}
               onChange={(e) => setEditForm({ ...editForm, questionText: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
               rows={3}
             />
           </div>
@@ -424,7 +424,7 @@ export function QuestionDetail({
               <select
                 value={editForm.competency}
                 onChange={(e) => setEditForm({ ...editForm, competency: e.target.value })}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+                className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
               >
                 {COMPETENCIES.map(c => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -438,7 +438,7 @@ export function QuestionDetail({
               <select
                 value={editForm.difficulty}
                 onChange={(e) => setEditForm({ ...editForm, difficulty: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+                className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
               >
                 {[1, 2, 3].map(d => (
                   <option key={d} value={d}>{DIFFICULTY_LABELS[d]}</option>
@@ -454,7 +454,7 @@ export function QuestionDetail({
             <textarea
               value={editForm.expectedAnswer}
               onChange={(e) => setEditForm({ ...editForm, expectedAnswer: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
               rows={3}
             />
           </div>
@@ -466,13 +466,13 @@ export function QuestionDetail({
             <textarea
               value={editForm.followUpQuestion}
               onChange={(e) => setEditForm({ ...editForm, followUpQuestion: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
               rows={2}
             />
           </div>
 
           {saveError && (
-            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
               <AlertCircle className="w-5 h-5" />
               <span className="text-sm">{saveError}</span>
             </div>
@@ -553,7 +553,7 @@ export function QuestionDetail({
 
           {/* Expected Answer */}
           {question.expectedAnswer && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="bg-green-50 border border-green-200 rounded-none p-4">
               <h3 className="text-sm font-medium text-green-800 mb-2">
                 What to Listen For
               </h3>
@@ -565,7 +565,7 @@ export function QuestionDetail({
 
           {/* Follow-up Question */}
           {question.followUpQuestion && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-none p-4">
               <h3 className="text-sm font-medium text-blue-800 mb-2">
                 Follow-up Question
               </h3>

@@ -280,7 +280,7 @@ export function MatchPage() {
         padding: '8px 14px',
         background: fromDb ? `${DS.accent}10` : DS.card,
         border: `1px solid ${fromDb ? DS.accent : DS.cardBorder}`,
-        borderRadius: '8px',
+        borderRadius: '0px',
         color: fromDb ? DS.accent : DS.textSecondary,
         fontSize: '12px',
         fontWeight: fromDb ? 600 : 400,
@@ -322,15 +322,15 @@ export function MatchPage() {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <input placeholder="Full name" value={lead.name} onChange={e => setLead({ ...lead, name: e.target.value })}
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} />
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
               <input placeholder="Work email" type="email" value={lead.email} onChange={e => setLead({ ...lead, email: e.target.value })}
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} />
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
               <input placeholder="Company" value={lead.company} onChange={e => setLead({ ...lead, company: e.target.value })}
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} />
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
               <input placeholder="Job title" value={lead.title} onChange={e => setLead({ ...lead, title: e.target.value })}
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', color: DS.text, fontSize: '14px', outline: 'none' }} />
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
               <button onClick={handleGate} disabled={!lead.name || !lead.email}
-                style={{ padding: '14px', background: DS.accent, color: '#FFFFFF', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: 600, cursor: (lead.name && lead.email) ? 'pointer' : 'not-allowed', opacity: (lead.name && lead.email) ? 1 : 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '44px' }}>
+                style={{ padding: '14px', background: DS.accent, color: '#FFFFFF', border: 'none', borderRadius: '0px', fontSize: '15px', fontWeight: 600, cursor: (lead.name && lead.email) ? 'pointer' : 'not-allowed', opacity: (lead.name && lead.email) ? 1 : 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '44px' }}>
                 Access Match Engine <ArrowRight style={{ width: 16, height: 16 }} />
               </button>
             </div>
@@ -377,7 +377,7 @@ export function MatchPage() {
                 />
                 {!jdFromDb && (
                   <button onClick={() => handleFileUpload('jd')}
-                    style={{ padding: '8px 14px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', color: DS.textSecondary, fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', minHeight: '36px' }}>
+                    style={{ padding: '8px 14px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.textSecondary, fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', minHeight: '36px' }}>
                     <Upload style={{ width: 14, height: 14 }} /> Upload
                   </button>
                 )}
@@ -408,7 +408,7 @@ export function MatchPage() {
                 />
                 {!candidatesFromDb && (
                   <button onClick={addCandidate}
-                    style={{ padding: '8px 14px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', color: DS.textSecondary, fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', minHeight: '36px' }}>
+                    style={{ padding: '8px 14px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.textSecondary, fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', minHeight: '36px' }}>
                     <Plus style={{ width: 14, height: 14 }} /> Add
                   </button>
                 )}
@@ -421,14 +421,14 @@ export function MatchPage() {
                   {candidates.filter(c => c.contact_id).length} candidates selected from database
                 </p>
                 <button onClick={() => setShowContactSelector(true)}
-                  style={{ padding: '10px 20px', background: `${DS.accent}10`, border: `1px solid ${DS.accent}`, borderRadius: '8px', color: DS.accent, fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  style={{ padding: '10px 20px', background: `${DS.accent}10`, border: `1px solid ${DS.accent}`, borderRadius: '0px', color: DS.accent, fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Database style={{ width: 16, height: 16 }} />
                   Select from Database
                 </button>
                 {candidates.filter(c => c.contact_id).length > 0 && (
                   <div style={{ marginTop: '12px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {candidates.filter(c => c.contact_id).map((c, i) => (
-                      <span key={i} style={{ padding: '4px 10px', background: `${DS.accent}10`, borderRadius: '6px', fontSize: '12px', color: DS.accent }}>
+                      <span key={i} style={{ padding: '4px 10px', background: `${DS.accent}10`, borderRadius: '0px', fontSize: '12px', color: DS.accent }}>
                         {c.name}
                       </span>
                     ))}
@@ -468,7 +468,7 @@ export function MatchPage() {
                 )}
               </div>
               <button onClick={handleRunScoring} disabled={scoring || validCandidates.length === 0 || !jd}
-                style={{ padding: '12px 24px', background: DS.accent, color: '#FFFFFF', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 600, cursor: (scoring || validCandidates.length === 0 || !jd) ? 'not-allowed' : 'pointer', opacity: (scoring || validCandidates.length === 0 || !jd) ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '8px', minHeight: '44px' }}>
+                style={{ padding: '12px 24px', background: DS.accent, color: '#FFFFFF', border: 'none', borderRadius: '0px', fontSize: '14px', fontWeight: 600, cursor: (scoring || validCandidates.length === 0 || !jd) ? 'not-allowed' : 'pointer', opacity: (scoring || validCandidates.length === 0 || !jd) ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '8px', minHeight: '44px' }}>
                 {scoring ? (<><Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} /> Scoring... {progress}%</>) : 'Run Match'}
               </button>
             </div>
@@ -483,10 +483,10 @@ export function MatchPage() {
         {/* Credit modal */}
         {showCreditModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', zIndex: 1000 }}>
-            <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '16px', padding: '32px', maxWidth: '400px', textAlign: 'center' }}>
+            <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '32px', maxWidth: '400px', textAlign: 'center' }}>
               <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', color: DS.text, marginBottom: '12px' }}>Insufficient Credits</h3>
               <p style={{ fontSize: '14px', color: DS.muted, marginBottom: '20px' }}>You need {creditCost.credits} credits but only have {userCredits}.</p>
-              <button onClick={() => setShowCreditModal(false)} style={{ padding: '10px 20px', background: DS.accent, border: 'none', borderRadius: '8px', color: '#FFFFFF', cursor: 'pointer', fontWeight: 600, minHeight: '44px' }}>
+              <button onClick={() => setShowCreditModal(false)} style={{ padding: '10px 20px', background: DS.accent, border: 'none', borderRadius: '0px', color: '#FFFFFF', cursor: 'pointer', fontWeight: 600, minHeight: '44px' }}>
                 Understood
               </button>
             </div>
@@ -515,7 +515,7 @@ export function MatchPage() {
             <p style={{ fontSize: '13px', color: DS.muted, margin: 0 }}>{results.length} candidate{results.length !== 1 ? 's' : ''} scored</p>
           </div>
           <button onClick={() => { setStep('engine'); setResults([]); }}
-            style={{ padding: '10px 20px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', color: DS.textSecondary, fontSize: '13px', cursor: 'pointer', minHeight: '44px' }}>
+            style={{ padding: '10px 20px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.textSecondary, fontSize: '13px', cursor: 'pointer', minHeight: '44px' }}>
             Score More
           </button>
         </div>

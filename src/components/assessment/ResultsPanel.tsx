@@ -284,7 +284,7 @@ export function ResultsPanel({
         <div style={{
           background: 'rgba(193,8,171,0.08)',
           border: '1px solid rgba(193,8,171,0.25)',
-          borderRadius: '12px',
+          borderRadius: '0px',
           padding: '20px 24px',
           marginTop: '24px',
         }}>
@@ -299,7 +299,7 @@ export function ResultsPanel({
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
               padding: '10px 20px', background: DS.accent, color: '#fff',
-              borderRadius: '8px', textDecoration: 'none', fontWeight: 600, fontSize: '14px'
+              borderRadius: '0px', textDecoration: 'none', fontWeight: 600, fontSize: '14px'
             }}
           >
             Build your 90-day plan with Nexus →

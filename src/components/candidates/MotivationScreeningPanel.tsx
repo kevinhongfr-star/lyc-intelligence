@@ -108,7 +108,7 @@ export function MotivationScreeningPanel({ contactId, currentMotivation, onSubmi
         <div className="space-y-4">
           {/* Factor Assessment Grid */}
           {MOTIVATION_FACTORS.map((factor) => (
-            <div key={factor.key} className="border rounded-lg p-3">
+            <div key={factor.key} className="border rounded-none p-3">
               {/* Factor Label */}
               <div className="flex items-center justify-between mb-2">
                 <div>
@@ -132,7 +132,7 @@ export function MotivationScreeningPanel({ contactId, currentMotivation, onSubmi
                     <button
                       key={value}
                       onClick={() => setAssessments({ ...assessments, [factor.key]: value })}
-                      className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg border transition-all ${
+                      className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-none border transition-all ${
                         isSelected ? `${colors.bg} ${colors.border} ${colors.text}` : 'bg-bg-tertiary border-bg-tertiary text-text-secondary hover:bg-gray-50'
                       }`}
                     >
@@ -153,12 +153,12 @@ export function MotivationScreeningPanel({ contactId, currentMotivation, onSubmi
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Assessment rationale..."
               rows={3}
-              className="w-full px-3 py-2 mt-1 text-sm rounded-lg border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="w-full px-3 py-2 mt-1 text-sm rounded-none border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
           </div>
 
           {/* Overall Result */}
-          <div className={`p-4 rounded-lg ${
+          <div className={`p-4 rounded-none ${
             overall === 'GREEN' ? 'bg-green-50 border border-green-200' :
             overall === 'RED' ? 'bg-red-50 border border-red-200' :
             overall === 'YELLOW' ? 'bg-yellow-50 border border-yellow-200' :
@@ -180,7 +180,7 @@ export function MotivationScreeningPanel({ contactId, currentMotivation, onSubmi
 
           {/* S2→S3 Gate Status */}
           {overall === 'RED' && (
-            <div className="p-3 bg-red-100 border border-red-300 rounded-lg text-red-700">
+            <div className="p-3 bg-red-100 border border-red-300 rounded-none text-red-700">
               <strong>Gate Blocked:</strong> Motivation is RED — candidate cannot advance to S3_Contacted.
             </div>
           )}

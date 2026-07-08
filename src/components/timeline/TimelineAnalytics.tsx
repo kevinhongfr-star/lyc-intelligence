@@ -79,7 +79,7 @@ export function TimelineAnalytics({
     <div className="space-y-6">
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-card border border-card-border rounded-xl p-6">
+        <div className="bg-card border border-card-border rounded-none p-6">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
               <Clock className="w-5 h-5 text-blue-600" />
@@ -92,7 +92,7 @@ export function TimelineAnalytics({
           <p className="text-xs text-text-muted">days from mandate start</p>
         </div>
 
-        <div className="bg-card border border-card-border rounded-xl p-6">
+        <div className="bg-card border border-card-border rounded-none p-6">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
               <Calendar className="w-5 h-5 text-purple-600" />
@@ -105,7 +105,7 @@ export function TimelineAnalytics({
           <p className="text-xs text-text-muted">days from mandate start</p>
         </div>
 
-        <div className="bg-card border border-card-border rounded-xl p-6">
+        <div className="bg-card border border-card-border rounded-none p-6">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
               <Award className="w-5 h-5 text-green-600" />
@@ -118,7 +118,7 @@ export function TimelineAnalytics({
           <p className="text-xs text-text-muted">days (best case)</p>
         </div>
 
-        <div className="bg-card border border-card-border rounded-xl p-6">
+        <div className="bg-card border border-card-border rounded-none p-6">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-accent" />
@@ -133,7 +133,7 @@ export function TimelineAnalytics({
       </div>
 
       {/* Stage Analytics Chart */}
-      <div className="bg-card border border-card-border rounded-xl p-6">
+      <div className="bg-card border border-card-border rounded-none p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="font-semibold text-text-primary flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-accent" />
@@ -153,7 +153,7 @@ export function TimelineAnalytics({
             return (
               <div
                 key={stage.stage}
-                className="cursor-pointer hover:bg-bg-alt rounded-lg p-3 -mx-3 transition-colors"
+                className="cursor-pointer hover:bg-bg-alt rounded-none p-3 -mx-3 transition-colors"
                 onClick={() => onStageClick?.(stage.stage)}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -201,7 +201,7 @@ export function TimelineAnalytics({
       </div>
 
       {/* Consultant Breakdown */}
-      <div className="bg-card border border-card-border rounded-xl p-6">
+      <div className="bg-card border border-card-border rounded-none p-6">
         <h3 className="font-semibold text-text-primary flex items-center gap-2 mb-6">
           <Users className="w-5 h-5 text-accent" />
           Consultant Performance
@@ -213,7 +213,7 @@ export function TimelineAnalytics({
             .map((consultant, idx) => (
               <div
                 key={consultant.consultantId}
-                className="flex items-center gap-4 p-4 bg-bg-alt rounded-lg"
+                className="flex items-center gap-4 p-4 bg-bg-alt rounded-none"
               >
                 <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent font-semibold">
                   {idx + 1}

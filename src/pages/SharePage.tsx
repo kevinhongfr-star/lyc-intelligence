@@ -117,7 +117,7 @@ export function SharePage() {
             background: DS.accent,
             color: '#FFFFFF',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: '0px',
             fontSize: '14px',
             fontWeight: 600,
             cursor: 'pointer'
@@ -154,7 +154,7 @@ export function SharePage() {
               padding: '8px 16px',
               background: 'transparent',
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '8px',
+              borderRadius: '0px',
               color: DS.textSecondary,
               fontSize: '13px',
               cursor: 'pointer',
@@ -177,7 +177,7 @@ export function SharePage() {
         <div style={{ 
           background: DS.card, 
           border: `1px solid ${DS.cardBorder}`, 
-          borderRadius: '16px', 
+          borderRadius: '0px', 
           overflow: 'hidden' 
         }}>
           <div style={{ 
@@ -207,7 +207,7 @@ export function SharePage() {
               background: DS.accent,
               color: '#FFFFFF',
               border: 'none',
-              borderRadius: '10px',
+              borderRadius: '0px',
               fontSize: '15px',
               fontWeight: 600,
               cursor: 'pointer'

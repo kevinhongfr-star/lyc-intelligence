@@ -140,7 +140,7 @@ export function MandateMatchPanel({ mandateId, mandateTitle, onCandidateClick }:
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-border">
         <div className="flex items-center justify-between">
@@ -179,7 +179,7 @@ export function MandateMatchPanel({ mandateId, mandateTitle, onCandidateClick }:
         </div>
 
         {runStatus && (
-          <div className="mt-3 flex items-center gap-2 text-sm text-primary bg-primary/5 rounded-lg px-3 py-2">
+          <div className="mt-3 flex items-center gap-2 text-sm text-primary bg-primary/5 rounded-none px-3 py-2">
             <Zap className="w-4 h-4 animate-pulse" />
             {runStatus}
           </div>
@@ -210,7 +210,7 @@ export function MandateMatchPanel({ mandateId, mandateTitle, onCandidateClick }:
           <select
             value={gradeFilter}
             onChange={e => setGradeFilter(e.target.value as GradeFilter)}
-            className="px-2 py-1 text-sm rounded-lg bg-bg-base border border-border text-text-primary"
+            className="px-2 py-1 text-sm rounded-none bg-bg-base border border-border text-text-primary"
           >
             <option value="all">All Grades</option>
             <option value="EXCEPTIONAL">Exceptional</option>
@@ -226,7 +226,7 @@ export function MandateMatchPanel({ mandateId, mandateTitle, onCandidateClick }:
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value as SortBy)}
-            className="px-2 py-1 text-sm rounded-lg bg-bg-base border border-border text-text-primary"
+            className="px-2 py-1 text-sm rounded-none bg-bg-base border border-border text-text-primary"
           >
             <option value="match_score">Overall Score</option>
             <option value="trident_component">TRIDENT Fit</option>

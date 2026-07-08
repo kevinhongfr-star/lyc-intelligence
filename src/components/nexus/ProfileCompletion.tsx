@@ -89,7 +89,7 @@ export function ProfileCompletion({ onComplete, onSkip }: ProfileCompletionProps
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your full name"
-              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/50"
+              className="w-full px-4 py-3 border border-border rounded-none focus:outline-none focus:ring-2 focus:ring-accent/50"
             />
           </div>
 
@@ -103,7 +103,7 @@ export function ProfileCompletion({ onComplete, onSkip }: ProfileCompletionProps
               value={role}
               onChange={(e) => setRole(e.target.value)}
               placeholder="e.g., Senior Director, Engineering"
-              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/50"
+              className="w-full px-4 py-3 border border-border rounded-none focus:outline-none focus:ring-2 focus:ring-accent/50"
             />
           </div>
 
@@ -115,7 +115,7 @@ export function ProfileCompletion({ onComplete, onSkip }: ProfileCompletionProps
             <select
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
-              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/50 bg-white"
+              className="w-full px-4 py-3 border border-border rounded-none focus:outline-none focus:ring-2 focus:ring-accent/50 bg-white"
             >
               <option value="">Select industry</option>
               {industries.map((ind) => (
@@ -134,7 +134,7 @@ export function ProfileCompletion({ onComplete, onSkip }: ProfileCompletionProps
               value={linkedinUrl}
               onChange={(e) => setLinkedinUrl(e.target.value)}
               placeholder="https://linkedin.com/in/your-profile"
-              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/50"
+              className="w-full px-4 py-3 border border-border rounded-none focus:outline-none focus:ring-2 focus:ring-accent/50"
             />
           </div>
         </div>
@@ -143,7 +143,7 @@ export function ProfileCompletion({ onComplete, onSkip }: ProfileCompletionProps
         <div className="p-6 pt-0 flex gap-3">
           <button
             onClick={onSkip}
-            className="flex-1 py-3 px-4 border border-border rounded-lg text-text-secondary hover:bg-bg-tertiary transition-colors flex items-center justify-center gap-2"
+            className="flex-1 py-3 px-4 border border-border rounded-none text-text-secondary hover:bg-bg-tertiary transition-colors flex items-center justify-center gap-2"
           >
             <SkipForward className="w-4 h-4" />
             Skip
@@ -151,7 +151,7 @@ export function ProfileCompletion({ onComplete, onSkip }: ProfileCompletionProps
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 py-3 px-4 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            className="flex-1 py-3 px-4 bg-accent text-white rounded-none hover:bg-accent-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {loading ? (
               <span>Saving...</span>

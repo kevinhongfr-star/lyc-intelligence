@@ -143,7 +143,7 @@ export function MetrixPage() {
         </div>
         <div className="flex gap-2">
           {(['7d', '30d', '90d', 'all'] as const).map(p => (
-            <button key={p} onClick={() => setPeriod(p)} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${period === p ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>
+            <button key={p} onClick={() => setPeriod(p)} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${period === p ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>
               {p === 'all' ? 'All Time' : p.toUpperCase()}
             </button>
           ))}

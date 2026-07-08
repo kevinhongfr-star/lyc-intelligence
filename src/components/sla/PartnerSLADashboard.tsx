@@ -229,7 +229,7 @@ export function PartnerSLADashboard({ orgId }: SLADashboardProps) {
               return (
                 <div
                   key={timeline.id}
-                  className="flex items-center gap-4 p-4 bg-bg-alt rounded-lg hover:bg-bg-base transition-colors cursor-pointer"
+                  className="flex items-center gap-4 p-4 bg-bg-alt rounded-none hover:bg-bg-base transition-colors cursor-pointer"
                 >
                   {/* Status */}
                   <div className={`w-10 h-10 rounded-full ${healthConfig.bg} flex items-center justify-center`}>

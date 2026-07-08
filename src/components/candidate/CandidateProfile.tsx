@@ -385,7 +385,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
           Education
         </label>
         {formData.education?.map((edu, i) => (
-          <div key={i} className="flex items-center gap-3 mb-2 p-3 bg-bg-alt rounded-lg">
+          <div key={i} className="flex items-center gap-3 mb-2 p-3 bg-bg-alt rounded-none">
             <div className="flex-1">
               <div className="font-medium text-text-primary">{edu.degree}</div>
               <div className="text-sm text-text-muted">{edu.institution} • {edu.year}</div>
@@ -419,7 +419,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
     <div className="space-y-6">
       {/* Upload area */}
       <div
-        className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
+        className={`border-2 border-dashed rounded-none p-8 text-center transition-colors ${
           formData.cv_url 
             ? 'border-green-500 bg-green-500/5' 
             : 'border-border hover:border-accent/50'
@@ -472,7 +472,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
 
       {/* Extracted data */}
       {formData.cv_extracted && (
-        <div className="bg-card rounded-xl border border-card-border p-5">
+        <div className="bg-card rounded-none border border-card-border p-5">
           <h4 className="font-semibold text-text-primary mb-4">
             <CheckCircle2 className="w-5 h-5 text-green-500 inline mr-2" />
             Extracted Information
@@ -495,9 +495,9 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
 
       {/* CV Preview */}
       {formData.cv_url && (
-        <div className="bg-card rounded-xl border border-card-border p-5">
+        <div className="bg-card rounded-none border border-card-border p-5">
           <h4 className="font-semibold text-text-primary mb-4">CV Preview</h4>
-          <div className="bg-bg-alt rounded-lg p-4 text-center">
+          <div className="bg-bg-alt rounded-none p-4 text-center">
             <FileText className="w-8 h-8 mx-auto text-text-muted mb-2" />
             <p className="text-sm text-text-muted">PDF Preview Coming Soon</p>
           </div>
@@ -517,7 +517,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
           {JOB_STATUS.map(option => (
             <label
               key={option.value}
-              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+              className={`flex items-center gap-3 p-3 rounded-none border cursor-pointer transition-all ${
                 formData.job_search_status === option.value
                   ? 'border-accent bg-accent/5'
                   : 'border-border hover:border-accent/50'
@@ -632,14 +632,14 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
   );
 
   return (
-    <div className="bg-card rounded-xl border border-card-border">
+    <div className="bg-card rounded-none border border-card-border">
       {/* Tabs */}
       <div className="flex items-center gap-1 p-4 border-b border-border overflow-x-auto">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-none text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === tab.id
                 ? 'bg-accent text-white'
                 : 'text-text-muted hover:bg-bg-alt hover:text-text-primary'
@@ -654,7 +654,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
       {/* Content */}
       <div className="p-6">
         {error && (
-          <div className="mb-4 p-4 bg-red-500/10 rounded-lg flex items-center gap-3">
+          <div className="mb-4 p-4 bg-red-500/10 rounded-none flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-500" />
             <span className="text-red-500">{error}</span>
           </div>

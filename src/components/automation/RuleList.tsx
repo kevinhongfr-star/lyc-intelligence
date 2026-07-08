@@ -137,7 +137,7 @@ export function RuleList({ orgId, onEdit, onCreate }: RuleListProps) {
           {filteredRules.map((rule) => (
             <div
               key={rule.id}
-              className="p-4 bg-bg-secondary rounded-lg hover:bg-bg-hover transition-colors"
+              className="p-4 bg-bg-secondary rounded-none hover:bg-bg-hover transition-colors"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -181,7 +181,7 @@ export function RuleList({ orgId, onEdit, onCreate }: RuleListProps) {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => toggleRule(rule)}
-                    className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
+                    className="p-2 hover:bg-bg-tertiary rounded-none transition-colors"
                     title={rule.is_active ? 'Deactivate' : 'Activate'}
                   >
                     {rule.is_active ? (
@@ -200,14 +200,14 @@ export function RuleList({ orgId, onEdit, onCreate }: RuleListProps) {
                   </button>
                   <button
                     onClick={() => onEdit(rule)}
-                    className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
+                    className="p-2 hover:bg-bg-tertiary rounded-none transition-colors"
                     title="Edit"
                   >
                     <Edit2 className="w-4 h-4 text-text-muted" />
                   </button>
                   <button
                     onClick={() => deleteRule(rule.id)}
-                    className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors text-red-500"
+                    className="p-2 hover:bg-bg-tertiary rounded-none transition-colors text-red-500"
                     title="Delete"
                   >
                     <Trash2 className="w-4 h-4" />

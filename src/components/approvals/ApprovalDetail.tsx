@@ -200,7 +200,7 @@ export function ApprovalDetail({ requestId, approverId, onClose, onActionComplet
 
       {/* SLA Deadline */}
       {request.sla_deadline && (
-        <div className="mb-6 p-4 bg-bg-alt rounded-lg">
+        <div className="mb-6 p-4 bg-bg-alt rounded-none">
           <div className="flex items-center gap-2 text-sm">
             <Calendar className="w-4 h-4 text-text-muted" />
             <span className="text-text-muted">SLA Deadline: </span>

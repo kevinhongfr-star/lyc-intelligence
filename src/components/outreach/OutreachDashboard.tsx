@@ -198,14 +198,14 @@ function StatCard({
   color?: string;
 }) {
   return (
-    <div className="bg-bg-secondary border border-border rounded-xl p-4">
+    <div className="bg-bg-secondary border border-border rounded-none p-4">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs text-text-muted font-medium uppercase tracking-wide">{label}</p>
           <p className="text-2xl font-bold text-text-primary mt-1">{value}</p>
           {sublabel && <p className="text-xs text-text-muted mt-1">{sublabel}</p>}
         </div>
-        <div className={`p-2 bg-bg-tertiary rounded-lg ${color}`}>
+        <div className={`p-2 bg-bg-tertiary rounded-none ${color}`}>
           <Icon className="w-5 h-5" />
         </div>
       </div>
@@ -274,7 +274,7 @@ export function OutreachDashboard({ mandateId, mandateTitle, compact = false }: 
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value as any)}
-            className="bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm text-text-primary min-h-[44px]"
+            className="bg-bg-secondary border border-border rounded-none px-3 py-2 text-sm text-text-primary min-h-[44px]"
           >
             <option value="all">All time</option>
             <option value="30">Last 30 days</option>
@@ -333,7 +333,7 @@ export function OutreachDashboard({ mandateId, mandateTitle, compact = false }: 
 
       {/* Channel breakdown */}
       {(view === 'overview' || view === 'channel') && (
-        <div className="bg-bg-secondary border border-border rounded-xl p-5">
+        <div className="bg-bg-secondary border border-border rounded-none p-5">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-accent" />
             Channel Effectiveness
@@ -367,7 +367,7 @@ export function OutreachDashboard({ mandateId, mandateTitle, compact = false }: 
                 {dashboard.byChannel.length > 0 && (() => {
                   const best = [...dashboard.byChannel].sort((a, b) => b.positiveRate - a.positiveRate)[0];
                   return (
-                    <div className="flex items-center justify-between p-3 bg-accent/5 border border-accent/20 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-accent/5 border border-accent/20 rounded-none">
                       <span className="text-sm font-medium text-text-primary">{CHANNEL_LABELS[best.channel]}</span>
                       <span className="text-sm font-bold text-accent">{best.positiveRate.toFixed(1)}% positive</span>
                     </div>
@@ -381,7 +381,7 @@ export function OutreachDashboard({ mandateId, mandateTitle, compact = false }: 
 
       {/* Consultant breakdown */}
       {(view === 'overview' || view === 'consultant') && dashboard.byConsultant.length > 1 && (
-        <div className="bg-bg-secondary border border-border rounded-xl p-5">
+        <div className="bg-bg-secondary border border-border rounded-none p-5">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <Users className="w-4 h-4 text-accent" />
             Per-Consultant Performance
@@ -412,7 +412,7 @@ export function OutreachDashboard({ mandateId, mandateTitle, compact = false }: 
 
       {/* Funnel overview */}
       {view === 'overview' && (
-        <div className="bg-bg-secondary border border-border rounded-xl p-5">
+        <div className="bg-bg-secondary border border-border rounded-none p-5">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-accent" />
             Candidate Engagement Funnel
@@ -451,7 +451,7 @@ export function OutreachDashboard({ mandateId, mandateTitle, compact = false }: 
 
       {/* Last 14 days activity */}
       {view === 'overview' && dashboard.timeSeries.some(d => d.attempts > 0) && (
-        <div className="bg-bg-secondary border border-border rounded-xl p-5">
+        <div className="bg-bg-secondary border border-border rounded-none p-5">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-accent" />
             Last 14 Days Activity

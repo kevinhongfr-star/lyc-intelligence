@@ -118,12 +118,12 @@ export function ClientHome() {
     return (
       <PageContainer>
         <div className="animate-pulse space-y-4">
-          <div className="h-16 bg-bg-alt rounded-xl" />
+          <div className="h-16 bg-bg-alt rounded-none" />
           <div className="grid grid-cols-2 gap-3">
-            <div className="h-20 bg-bg-alt rounded-xl" />
-            <div className="h-20 bg-bg-alt rounded-xl" />
+            <div className="h-20 bg-bg-alt rounded-none" />
+            <div className="h-20 bg-bg-alt rounded-none" />
           </div>
-          <div className="h-32 bg-bg-alt rounded-xl" />
+          <div className="h-32 bg-bg-alt rounded-none" />
         </div>
       </PageContainer>
     );
@@ -231,11 +231,11 @@ export function ClientHome() {
                   </div>
                 </div>
                 <div className="flex gap-2 mt-3">
-                  <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                  <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white rounded-none text-sm font-medium hover:bg-green-700 transition-colors">
                     <ThumbsUp className="w-4 h-4" />
                     Approve
                   </button>
-                  <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+                  <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-600 text-white rounded-none text-sm font-medium hover:bg-red-700 transition-colors">
                     <ThumbsDown className="w-4 h-4" />
                     Reject
                   </button>
@@ -300,9 +300,9 @@ export function ClientHome() {
         <div className="grid grid-cols-2 gap-3">
           <Link
             href="/client/pipeline"
-            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-xl hover:bg-bg-alt transition-colors"
+            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-none hover:bg-bg-alt transition-colors"
           >
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center">
               <Users className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -312,9 +312,9 @@ export function ClientHome() {
           </Link>
           <Link
             href="/client/feedback"
-            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-xl hover:bg-bg-alt transition-colors"
+            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-none hover:bg-bg-alt transition-colors"
           >
-            <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-none bg-amber-100 flex items-center justify-center">
               <ThumbsUp className="w-5 h-5 text-amber-600" />
             </div>
             <div>

@@ -217,7 +217,7 @@ export function InterviewFeedback({ interview, onViewScorecard, onAdvanceStage, 
         )}
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-6 mb-6">
+      <div className="bg-card border border-card-border rounded-none p-6 mb-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center">
@@ -255,7 +255,7 @@ export function InterviewFeedback({ interview, onViewScorecard, onAdvanceStage, 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className="bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20 rounded-xl p-6 text-center">
+        <div className="bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20 rounded-none p-6 text-center">
           <div className={`w-24 h-24 rounded-full ${getScoreBgColor(stats.avgOverall)} flex items-center justify-center mx-auto mb-4`}>
             <span className={`text-4xl font-bold ${getScoreColor(stats.avgOverall)}`}>
               {stats.avgOverall}
@@ -265,7 +265,7 @@ export function InterviewFeedback({ interview, onViewScorecard, onAdvanceStage, 
           <p className="font-semibold text-text-primary">Out of 10</p>
         </div>
 
-        <div className="bg-card border border-card-border rounded-xl p-6 text-center">
+        <div className="bg-card border border-card-border rounded-none p-6 text-center">
           <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
             <Users className="w-12 h-12 text-blue-600" />
           </div>
@@ -273,7 +273,7 @@ export function InterviewFeedback({ interview, onViewScorecard, onAdvanceStage, 
           <p className="text-2xl font-bold text-text-primary">{stats.panelistCount}</p>
         </div>
 
-        <div className="bg-card border border-card-border rounded-xl p-6 text-center">
+        <div className="bg-card border border-card-border rounded-none p-6 text-center">
           <div className={`w-24 h-24 rounded-full ${recommendationConfig.bgColor} flex items-center justify-center mx-auto mb-4`}>
             <RecommendationIcon className={`w-12 h-12 ${recommendationConfig.color}`} />
           </div>
@@ -285,7 +285,7 @@ export function InterviewFeedback({ interview, onViewScorecard, onAdvanceStage, 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div className="bg-card border border-card-border rounded-xl p-6">
+        <div className="bg-card border border-card-border rounded-none p-6">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-accent" />
             Competency Radar
@@ -293,7 +293,7 @@ export function InterviewFeedback({ interview, onViewScorecard, onAdvanceStage, 
           <RadarChart />
         </div>
 
-        <div className="bg-card border border-card-border rounded-xl p-6">
+        <div className="bg-card border border-card-border rounded-none p-6">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <Star className="w-5 h-5 text-accent" />
             Competency Scores
@@ -323,7 +323,7 @@ export function InterviewFeedback({ interview, onViewScorecard, onAdvanceStage, 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+        <div className="bg-green-50 border border-green-200 rounded-none p-6">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-500" />
             Strengths
@@ -338,7 +338,7 @@ export function InterviewFeedback({ interview, onViewScorecard, onAdvanceStage, 
           </ul>
         </div>
 
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+        <div className="bg-amber-50 border border-amber-200 rounded-none p-6">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-amber-500" />
             Areas for Development
@@ -355,7 +355,7 @@ export function InterviewFeedback({ interview, onViewScorecard, onAdvanceStage, 
       </div>
 
       {scorecards && scorecards.length > 0 && (
-        <div className="bg-card border border-card-border rounded-xl p-6 mb-6">
+        <div className="bg-card border border-card-border rounded-none p-6 mb-6">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-accent" />
             Individual Scorecards
@@ -366,7 +366,7 @@ export function InterviewFeedback({ interview, onViewScorecard, onAdvanceStage, 
               return (
                 <div
                   key={idx}
-                  className="p-4 bg-bg-alt rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="p-4 bg-bg-alt rounded-none cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => onViewScorecard?.(scorecard.panelist_id)}
                 >
                   <div className="flex items-center justify-between mb-3">

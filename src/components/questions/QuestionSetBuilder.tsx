@@ -266,7 +266,7 @@ export function QuestionSetBuilder({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
               placeholder="e.g., Executive Leadership Assessment"
             />
           </div>
@@ -278,7 +278,7 @@ export function QuestionSetBuilder({
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
               rows={2}
               placeholder="Describe the purpose of this question set..."
             />
@@ -314,7 +314,7 @@ export function QuestionSetBuilder({
           </div>
 
           {selectedQuestions.length === 0 ? (
-            <div className="text-center py-8 bg-bg-alt rounded-lg">
+            <div className="text-center py-8 bg-bg-alt rounded-none">
               <p className="text-text-muted">No questions added yet</p>
               <Button
                 variant="outline"
@@ -330,7 +330,7 @@ export function QuestionSetBuilder({
               {selectedQuestions.map((question, index) => (
                 <div
                   key={question.id}
-                  className="flex items-center gap-3 p-3 bg-bg-alt rounded-lg"
+                  className="flex items-center gap-3 p-3 bg-bg-alt rounded-none"
                 >
                   {/* Drag handle + order */}
                   <div className="flex items-center gap-2 flex-shrink-0">
@@ -384,7 +384,7 @@ export function QuestionSetBuilder({
 
         {/* Question Picker */}
         {showQuestionPicker && (
-          <div className="border border-border rounded-lg p-4 bg-card">
+          <div className="border border-border rounded-none p-4 bg-card">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium text-text-primary">Available Questions</h4>
@@ -404,7 +404,7 @@ export function QuestionSetBuilder({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search questions..."
-                  className="w-full pl-9 pr-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+                  className="w-full pl-9 pr-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
                 />
               </div>
 
@@ -419,7 +419,7 @@ export function QuestionSetBuilder({
                     <button
                       key={question.id}
                       onClick={() => handleAddQuestion(question)}
-                      className="w-full flex items-center gap-3 p-2 hover:bg-bg-alt rounded-lg transition-colors text-left"
+                      className="w-full flex items-center gap-3 p-2 hover:bg-bg-alt rounded-none transition-colors text-left"
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-text-primary line-clamp-1">
@@ -443,7 +443,7 @@ export function QuestionSetBuilder({
 
         {/* Error */}
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
             <AlertCircle className="w-5 h-5" />
             <span className="text-sm">{error}</span>
           </div>

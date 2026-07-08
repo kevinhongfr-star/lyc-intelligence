@@ -33,7 +33,7 @@ interface RuleExecution {
   executed_at: string;
 }
 
-const selectClassName = 'w-full px-3 py-2 bg-bg-tertiary border border-bg-hover rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent';
+const selectClassName = 'w-full px-3 py-2 bg-bg-tertiary border border-bg-hover rounded-none text-sm text-text-primary focus:outline-none focus:border-accent';
 
 export function ExecutionLog({ orgId, ruleId, limit = 50 }: ExecutionLogProps) {
   const [executions, setExecutions] = useState<RuleExecution[]>([]);
@@ -146,7 +146,7 @@ export function ExecutionLog({ orgId, ruleId, limit = 50 }: ExecutionLogProps) {
           {executions.map((exec) => (
             <div
               key={exec.id}
-              className="p-3 bg-bg-secondary rounded-lg"
+              className="p-3 bg-bg-secondary rounded-none"
             >
               <div
                 className="flex items-center justify-between cursor-pointer"

@@ -24,7 +24,7 @@ const DS = {
 const customComponents = {
   table: ({ children }: any) => (
     <div style={{ overflowX: 'auto', margin: '8px 0' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', border: `1px solid ${DS.cardBorder}`, borderRadius: '8px', overflow: 'hidden' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', overflow: 'hidden' }}>
         {children}
       </table>
     </div>
@@ -47,7 +47,7 @@ const customComponents = {
   code: ({ inline, children, ...props }: any) => {
     if (inline) return <code style={{ background: '#FFFFFF', padding: '2px 6px', borderRadius: '4px', fontSize: '12px', color: DS.accent, fontFamily: 'monospace' }} {...props}>{children}</code>;
     return (
-      <pre style={{ background: '#FFFFFF', padding: '14px', borderRadius: '8px', overflowX: 'auto', margin: '8px 0', fontSize: '12px', color: DS.textSecondary, fontFamily: 'monospace', lineHeight: 1.5 }}>
+      <pre style={{ background: '#FFFFFF', padding: '14px', borderRadius: '0px', overflowX: 'auto', margin: '8px 0', fontSize: '12px', color: DS.textSecondary, fontFamily: 'monospace', lineHeight: 1.5 }}>
         <code {...props}>{children}</code>
       </pre>
     );

@@ -55,7 +55,7 @@ export function SLACountdown({ targetDate, label = 'Target Date', size = 'medium
   };
 
   return (
-    <div className={`${sizeClasses[size]} p-4 rounded-xl ${
+    <div className={`${sizeClasses[size]} p-4 rounded-none ${
       timeLeft.overdue ? 'bg-red-50 border border-red-200' :
       isCritical ? 'bg-amber-50 border border-amber-200' :
       isUrgent ? 'bg-yellow-50 border border-yellow-200' :

@@ -37,7 +37,7 @@ export function FunnelChart({
   }, [stages]);
 
   return (
-    <div className="bg-card border border-card-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-card-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center justify-between mb-4">
@@ -54,19 +54,19 @@ export function FunnelChart({
 
         {/* Summary Stats */}
         <div className="grid grid-cols-4 gap-4">
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-text-primary">{totalCandidates}</div>
             <div className="text-sm text-text-muted">Total Candidates</div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-green-600">{totalPlaced}</div>
             <div className="text-sm text-text-muted">Total Placed</div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-blue-600">{overallConversion}%</div>
             <div className="text-sm text-text-muted">Overall Conversion</div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-purple-600">{avgConversion}%</div>
             <div className="text-sm text-text-muted">Avg Stage Conversion</div>
           </div>
@@ -112,7 +112,7 @@ export function FunnelChart({
                   {/* Funnel Bar */}
                   <div className="flex-1 relative">
                     <div
-                      className={`h-10 rounded-lg transition-all duration-500 flex items-center justify-end pr-4 ${
+                      className={`h-10 rounded-none transition-all duration-500 flex items-center justify-end pr-4 ${
                         isBottleneck
                           ? 'bg-gradient-to-r from-red-200 to-red-300 border-2 border-red-400'
                           : stage.count === 0
@@ -197,7 +197,7 @@ export function FunnelStatsCards({
 }) {
   return (
     <div className="grid grid-cols-3 gap-4">
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
             <Users className="w-5 h-5 text-blue-600" />
@@ -209,7 +209,7 @@ export function FunnelStatsCards({
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
             <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -221,7 +221,7 @@ export function FunnelStatsCards({
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
             <Target className="w-5 h-5 text-purple-600" />

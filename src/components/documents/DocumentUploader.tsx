@@ -86,7 +86,7 @@ export function DocumentUploader({
     <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px' }}>
       {selectedFile ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '16px', background: DS.bg, border: `1px solid ${DS.border}`, borderRadius: '0px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <FileText style={{ width: 24, height: 24, color: DS.accent }} />
               <div>
@@ -114,7 +114,7 @@ export function DocumentUploader({
                 padding: '10px 14px',
                 background: DS.bg,
                 border: `1px solid ${DS.border}`,
-                borderRadius: '8px',
+                borderRadius: '0px',
                 color: DS.text,
                 fontSize: '14px',
                 cursor: 'pointer'
@@ -127,7 +127,7 @@ export function DocumentUploader({
           </div>
 
           {error && (
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '10px 14px', background: `${DS.error}15`, border: `1px solid ${DS.error}30`, borderRadius: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '10px 14px', background: `${DS.error}15`, border: `1px solid ${DS.error}30`, borderRadius: '0px' }}>
               <AlertCircle style={{ width: 16, height: 16, color: DS.error }} />
               <span style={{ fontSize: '13px', color: DS.textSecondary }}>{error}</span>
             </div>
@@ -145,7 +145,7 @@ export function DocumentUploader({
               background: DS.accent,
               color: '#FFF',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '0px',
               fontSize: '14px',
               fontWeight: 600,
               cursor: isUploading ? 'not-allowed' : 'pointer',
@@ -169,7 +169,7 @@ export function DocumentUploader({
           onDrop={handleDrop}
           style={{
             border: `2px dashed ${dragOver ? DS.accent : DS.border}`,
-            borderRadius: '12px',
+            borderRadius: '0px',
             padding: '48px 24px',
             textAlign: 'center',
             background: dragOver ? `${DS.accent}10` : 'transparent',
@@ -185,7 +185,7 @@ export function DocumentUploader({
             padding: '8px 20px',
             background: `${DS.accent}20`,
             color: DS.accent,
-            borderRadius: '8px',
+            borderRadius: '0px',
             fontSize: '14px',
             fontWeight: 600,
             cursor: 'pointer'

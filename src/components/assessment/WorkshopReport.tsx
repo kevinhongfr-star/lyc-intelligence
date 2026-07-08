@@ -147,28 +147,28 @@ export function WorkshopReport({ workshopId }: WorkshopReportProps) {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-bg-secondary rounded-xl p-4">
+        <div className="bg-bg-secondary rounded-none p-4">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-5 h-5 text-accent" />
             <span className="text-sm text-text-muted">Total Participants</span>
           </div>
           <p className="text-2xl font-bold text-text-primary">{participants.length}</p>
         </div>
-        <div className="bg-bg-secondary rounded-xl p-4">
+        <div className="bg-bg-secondary rounded-none p-4">
           <div className="flex items-center gap-2 mb-2">
             <Target className="w-5 h-5 text-green-500" />
             <span className="text-sm text-text-muted">Completed</span>
           </div>
           <p className="text-2xl font-bold text-text-primary">{completedCount}</p>
         </div>
-        <div className="bg-bg-secondary rounded-xl p-4">
+        <div className="bg-bg-secondary rounded-none p-4">
           <div className="flex items-center gap-2 mb-2">
             <Award className="w-5 h-5 text-amber-500" />
             <span className="text-sm text-text-muted">Responses</span>
           </div>
           <p className="text-2xl font-bold text-text-primary">{scores.length}</p>
         </div>
-        <div className="bg-bg-secondary rounded-xl p-4">
+        <div className="bg-bg-secondary rounded-none p-4">
           <div className="flex items-center gap-2 mb-2">
             <Calendar className="w-5 h-5 text-blue-500" />
             <span className="text-sm text-text-muted">Duration</span>
@@ -178,7 +178,7 @@ export function WorkshopReport({ workshopId }: WorkshopReportProps) {
       </div>
 
       {/* Dimension Averages */}
-      <div className="bg-bg-secondary rounded-xl p-6 mb-6">
+      <div className="bg-bg-secondary rounded-none p-6 mb-6">
         <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
           <BarChart3 className="w-5 h-5" />
           Dimension Averages
@@ -205,7 +205,7 @@ export function WorkshopReport({ workshopId }: WorkshopReportProps) {
 
       {/* Archetype Distribution */}
       <div className="grid grid-cols-2 gap-6 mb-6">
-        <div className="bg-bg-secondary rounded-xl p-6">
+        <div className="bg-bg-secondary rounded-none p-6">
           <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
             <Award className="w-5 h-5" />
             Archetype Distribution
@@ -228,7 +228,7 @@ export function WorkshopReport({ workshopId }: WorkshopReportProps) {
           </div>
         </div>
 
-        <div className="bg-bg-secondary rounded-xl p-6">
+        <div className="bg-bg-secondary rounded-none p-6">
           <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
             Style Distribution
@@ -254,7 +254,7 @@ export function WorkshopReport({ workshopId }: WorkshopReportProps) {
 
       {/* Strengths & Development Areas */}
       <div className="grid grid-cols-2 gap-6 mb-6">
-        <div className="bg-bg-secondary rounded-xl p-6">
+        <div className="bg-bg-secondary rounded-none p-6">
           <h2 className="text-lg font-semibold text-text-primary mb-4">Top Strengths</h2>
           <div className="space-y-3">
             {getAllStrengths().map(([strength, count], index) => (
@@ -274,7 +274,7 @@ export function WorkshopReport({ workshopId }: WorkshopReportProps) {
           </div>
         </div>
 
-        <div className="bg-bg-secondary rounded-xl p-6">
+        <div className="bg-bg-secondary rounded-none p-6">
           <h2 className="text-lg font-semibold text-text-primary mb-4">Development Areas</h2>
           <div className="space-y-3">
             {getAllDevelopmentAreas().map(([area, count], index) => (
@@ -296,7 +296,7 @@ export function WorkshopReport({ workshopId }: WorkshopReportProps) {
       </div>
 
       {/* Participants */}
-      <div className="bg-bg-secondary rounded-xl p-6">
+      <div className="bg-bg-secondary rounded-none p-6">
         <button
           onClick={() => setExpandedParticipants(!expandedParticipants)}
           className="w-full flex items-center justify-between"
@@ -311,7 +311,7 @@ export function WorkshopReport({ workshopId }: WorkshopReportProps) {
         {expandedParticipants && (
           <div className="mt-4 space-y-2">
             {participants.map(p => (
-              <div key={p.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
+              <div key={p.id} className="flex items-center justify-between p-3 bg-white rounded-none">
                 <div>
                   <p className="font-medium text-text-primary">{p.name || p.email}</p>
                   <p className="text-sm text-text-muted">{p.email}</p>

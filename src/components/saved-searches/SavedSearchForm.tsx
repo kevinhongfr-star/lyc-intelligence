@@ -105,7 +105,7 @@ export function SavedSearchForm({ currentFilters, onSave, onCancel }: SavedSearc
           </label>
         </div>
 
-        <div className="p-3 bg-bg-alt rounded-lg">
+        <div className="p-3 bg-bg-alt rounded-none">
           <label className="text-sm font-medium text-text-muted">Current Filters</label>
           <div className="mt-2 flex flex-wrap gap-2">
             {currentFilters.title && (

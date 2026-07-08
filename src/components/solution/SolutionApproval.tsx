@@ -131,19 +131,19 @@ export function SolutionApproval({ mandate, onComplete }: SolutionApprovalProps)
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+        <div className="bg-red-50 border border-red-200 rounded-none p-4 text-red-700">
           {error}
         </div>
       )}
 
       {/* Action Toggle */}
-      <div className="bg-bg-secondary rounded-xl p-4">
+      <div className="bg-bg-secondary rounded-none p-4">
         <div className="flex items-center gap-4">
           <span className="text-sm font-medium text-text-primary">Action:</span>
-          <div className="flex bg-bg-primary rounded-lg p-1">
+          <div className="flex bg-bg-primary rounded-none p-1">
             <button
               onClick={() => setAction('approve')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-none text-sm font-medium transition-all ${
                 action === 'approve' 
                   ? 'bg-accent text-white' 
                   : 'text-text-muted hover:text-text-primary'
@@ -153,7 +153,7 @@ export function SolutionApproval({ mandate, onComplete }: SolutionApprovalProps)
             </button>
             <button
               onClick={() => setAction('reject')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-none text-sm font-medium transition-all ${
                 action === 'reject' 
                   ? 'bg-red-500 text-white' 
                   : 'text-text-muted hover:text-text-primary'
@@ -172,7 +172,7 @@ export function SolutionApproval({ mandate, onComplete }: SolutionApprovalProps)
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Please provide a reason for rejection..."
               rows={3}
-              className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-lg resize-none"
+              className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none resize-none"
             />
           </div>
         )}
@@ -187,7 +187,7 @@ export function SolutionApproval({ mandate, onComplete }: SolutionApprovalProps)
           return (
             <div 
               key={solution.id}
-              className={`border rounded-xl p-4 transition-all ${
+              className={`border rounded-none p-4 transition-all ${
                 isSelected ? 'border-accent bg-accent/5' : 'border-bg-tertiary'
               }`}
             >
@@ -208,7 +208,7 @@ export function SolutionApproval({ mandate, onComplete }: SolutionApprovalProps)
 
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center text-accent">
+                    <div className="w-10 h-10 rounded-none bg-accent/10 flex items-center text-accent">
                       {config?.icon}
                     </div>
                     <div>
@@ -224,7 +224,7 @@ export function SolutionApproval({ mandate, onComplete }: SolutionApprovalProps)
                   </div>
 
                   {/* Solution Details */}
-                  <div className="bg-bg-secondary rounded-lg p-4 mb-3">
+                  <div className="bg-bg-secondary rounded-none p-4 mb-3">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       {solution.solution_detail?.key_roles && (
                         <div>

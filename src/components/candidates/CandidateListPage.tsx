@@ -199,7 +199,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
               placeholder="Search by name, company, title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="w-full pl-9 pr-4 py-2 text-sm rounded-none border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
           </div>
 
@@ -211,7 +211,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
               const selected = Array.from(e.target.selectedOptions, opt => opt.value);
               setStageFilter(selected);
             }}
-            className="px-3 py-2 text-sm rounded-lg border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="px-3 py-2 text-sm rounded-none border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
           >
             {Object.entries(STAGE_LABELS).map(([stage, label]) => (
               <option key={stage} value={stage}>{label}</option>
@@ -222,7 +222,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
           <select
             value={motivationFilter || ''}
             onChange={(e) => setMotivationFilter(e.target.value || null)}
-            className="px-3 py-2 text-sm rounded-lg border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="px-3 py-2 text-sm rounded-none border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
           >
             <option value="">All Motivation</option>
             <option value="GREEN">GREEN</option>
@@ -235,7 +235,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
           <select
             value={tierFilter || ''}
             onChange={(e) => setTierFilter(e.target.value || null)}
-            className="px-3 py-2 text-sm rounded-lg border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="px-3 py-2 text-sm rounded-none border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
           >
             <option value="">All Tiers</option>
             <option value="A">Tier A</option>
@@ -260,7 +260,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
             <div
               key={candidate.id}
               onClick={() => onSelectCandidate?.(candidate.id)}
-              className="flex items-center gap-4 p-4 rounded-lg bg-bg-secondary border border-bg-tertiary hover:border-border-focus hover:shadow-sm cursor-pointer transition-all"
+              className="flex items-center gap-4 p-4 rounded-none bg-bg-secondary border border-bg-tertiary hover:border-border-focus hover:shadow-sm cursor-pointer transition-all"
             >
               {/* Avatar */}
               <div className="w-10 h-10 rounded-full bg-bg-tertiary flex items-center justify-center text-text-secondary">

@@ -54,7 +54,7 @@ export function EmailCapture({ onCapture }: EmailCaptureProps) {
       maxWidth: '400px',
       background: DS.card,
       border: `1px solid ${DS.cardBorder}`,
-      borderRadius: '12px',
+      borderRadius: '0px',
       padding: '20px',
       boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
     }}>
@@ -85,7 +85,7 @@ export function EmailCapture({ onCapture }: EmailCaptureProps) {
             padding: '12px 16px',
             background: DS.bg,
             border: `1px solid ${DS.cardBorder}`,
-            borderRadius: '8px',
+            borderRadius: '0px',
             color: DS.text,
             fontSize: '14px',
             outline: 'none',
@@ -100,7 +100,7 @@ export function EmailCapture({ onCapture }: EmailCaptureProps) {
             background: DS.accent,
             color: '#FFFFFF',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: '0px',
             fontSize: '14px',
             fontWeight: 600,
             cursor: (capturing || !email) ? 'not-allowed' : 'pointer',

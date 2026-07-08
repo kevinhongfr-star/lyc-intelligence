@@ -197,7 +197,7 @@ export function TimelineView({
   const todayPosition = getPositionForDate(today.toISOString());
 
   return (
-    <div className="bg-card border border-card-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-card-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-card-border bg-bg-alt">
         <div className="flex items-center justify-between">

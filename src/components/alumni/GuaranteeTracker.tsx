@@ -136,7 +136,7 @@ export function GuaranteeTracker({ alumniId }: GuaranteeTrackerProps) {
       </div>
 
       {/* Countdown */}
-      <div className={`p-4 rounded-lg mb-6 ${
+      <div className={`p-4 rounded-none mb-6 ${
         isOverdue ? 'bg-red-50' : isUrgent ? 'bg-amber-50' : 'bg-bg-alt'
       }`}>
         <div className="flex items-center justify-between">
@@ -183,7 +183,7 @@ export function GuaranteeTracker({ alumniId }: GuaranteeTrackerProps) {
             return (
               <div
                 key={date}
-                className={`flex items-center justify-between p-3 rounded-lg ${
+                className={`flex items-center justify-between p-3 rounded-none ${
                   completed ? 'bg-green-50' : passed && !completed ? 'bg-red-50' : 'bg-bg-alt'
                 }`}
               >
@@ -225,7 +225,7 @@ export function GuaranteeTracker({ alumniId }: GuaranteeTrackerProps) {
           <h4 className="font-medium text-text-primary mb-3">Completed Check-ins</h4>
           <div className="space-y-2">
             {guarantee.check_ins_completed.map((checkIn, index) => (
-              <div key={index} className="flex items-start gap-3 p-3 bg-bg-alt rounded-lg">
+              <div key={index} className="flex items-start gap-3 p-3 bg-bg-alt rounded-none">
                 <MessageSquare className="w-4 h-4 text-text-muted mt-0.5" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">

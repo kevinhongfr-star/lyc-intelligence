@@ -156,7 +156,7 @@ export function OnePagerTab() {
           <Loader2 className="w-4 h-4 animate-spin" /> Loading company data…
         </div>
       ) : error ? (
-        <div className="text-sm text-red-600 py-4 border border-red-200 bg-red-50 rounded-md p-3">
+        <div className="text-sm text-red-600 py-4 border border-red-200 bg-red-50 rounded-none p-3">
           <AlertTriangle className="w-4 h-4 inline mr-1" /> {error}
         </div>
       ) : !company ? (
@@ -164,7 +164,7 @@ export function OnePagerTab() {
       ) : (
         <>
           {/* Company overview */}
-          <div className="border border-bg-hover rounded-md p-4 space-y-2">
+          <div className="border border-bg-hover rounded-none p-4 space-y-2">
             <div className="flex items-start gap-2">
               <Building2 className="w-5 h-5 text-accent mt-0.5" />
               <div className="flex-1">
@@ -218,7 +218,7 @@ export function OnePagerTab() {
           </div>
 
           {/* Generate button */}
-          <div className="border border-bg-hover rounded-md p-4 bg-bg-secondary/30">
+          <div className="border border-bg-hover rounded-none p-4 bg-bg-secondary/30">
             <h3 className="text-sm font-medium text-text-primary mb-2">Generate GRID PDF</h3>
             <p className="text-sm text-text-muted mb-3">
               Produces a 5-slide deck: company overview, org structure, talent pool stats,
@@ -228,7 +228,7 @@ export function OnePagerTab() {
               <button
                 onClick={generatePdf}
                 disabled={generating}
-                className="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-light disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 bg-accent text-white rounded-none hover:bg-accent-light disabled:opacity-50 flex items-center gap-2"
               >
                 {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
                 {generating ? 'Generating…' : 'Generate GRID PDF'}
@@ -241,7 +241,7 @@ export function OnePagerTab() {
 
           {/* Past reports */}
           {reports.length > 0 && (
-            <div className="border border-bg-hover rounded-md p-4">
+            <div className="border border-bg-hover rounded-none p-4">
               <h3 className="text-sm font-medium text-text-primary mb-3">Past reports ({reports.length})</h3>
               <div className="space-y-1">
                 {reports.map((r) => (
@@ -266,7 +266,7 @@ export function OnePagerTab() {
 
 function StatCard({ label, value, icon, sub }: { label: string; value: number | string; icon?: React.ReactNode; sub?: string }) {
   return (
-    <div className="border border-bg-hover rounded-md p-3">
+    <div className="border border-bg-hover rounded-none p-3">
       <div className="flex items-center gap-1 text-xs text-text-muted">
         {icon}
         {label}
@@ -279,7 +279,7 @@ function StatCard({ label, value, icon, sub }: { label: string; value: number | 
 
 function EmptyHint({ title }: { title: string }) {
   return (
-    <div className="border-2 border-dashed border-bg-hover rounded-lg p-8 text-center">
+    <div className="border-2 border-dashed border-bg-hover rounded-none p-8 text-center">
       <FileText className="w-6 h-6 text-text-muted mx-auto mb-2" />
       <p className="text-text-primary font-medium">{title}</p>
     </div>

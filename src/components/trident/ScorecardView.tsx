@@ -247,7 +247,7 @@ export function ScorecardView({ scorecardId, onEdit, onSendForReview }: Scorecar
         )}
 
         {scorecard.original_composite && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-none p-3 mb-3">
             <div className="text-sm text-yellow-800">
               <strong>Adjusted by Kevin</strong> — Original: D1={scorecard.original_d1}, D2={scorecard.original_d2}, D3={scorecard.original_d3}, Composite={scorecard.original_composite?.toFixed(1)}
             </div>

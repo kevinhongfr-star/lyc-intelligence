@@ -122,7 +122,7 @@ export function BenchmarkCard({ benchmark, query, loading }: BenchmarkCardProps)
 
       {/* Relaxation Note */}
       {benchmark.relaxationNote && (
-        <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-lg">
+        <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-none">
           <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-amber-800">{benchmark.relaxationNote}</p>
         </div>

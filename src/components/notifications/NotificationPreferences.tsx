@@ -172,7 +172,7 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
                         <button
                           key={option.value}
                           onClick={() => handleChange(key as keyof NotificationPreferencesForm, option.value)}
-                          className={`flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                          className={`flex items-center justify-center gap-1 px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
                             preferences[key as keyof NotificationPreferencesForm] === option.value
                               ? option.value === 'none'
                                 ? 'bg-gray-100 text-gray-700'
@@ -192,7 +192,7 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap items-center gap-4 p-4 bg-bg-alt rounded-lg">
+        <div className="flex flex-wrap items-center gap-4 p-4 bg-bg-alt rounded-none">
           <span className="text-sm text-text-muted">Legend:</span>
           <div className="flex items-center gap-2">
             <Mail className="w-4 h-4 text-text-muted" />
@@ -210,14 +210,14 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
 
         {/* Save status */}
         {saveStatus === 'success' && (
-          <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
+          <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-none text-green-700">
             <CheckCircle2 className="w-5 h-5" />
             <span className="text-sm">Preferences saved successfully</span>
           </div>
         )}
 
         {saveStatus === 'error' && saveError && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
             <AlertCircle className="w-5 h-5" />
             <span className="text-sm">{saveError}</span>
           </div>

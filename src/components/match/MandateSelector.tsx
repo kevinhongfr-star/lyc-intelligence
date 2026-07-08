@@ -84,7 +84,7 @@ export function MandateSelector({ open, onClose, onSelect }: MandateSelectorProp
     }}>
       <div style={{
         background: DS.card, border: `1px solid ${DS.cardBorder}`,
-        borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '640px',
+        borderRadius: '0px', padding: '24px', width: '100%', maxWidth: '640px',
         maxHeight: '80vh', display: 'flex', flexDirection: 'column'
       }}>
         {/* Header */}
@@ -107,7 +107,7 @@ export function MandateSelector({ open, onClose, onSelect }: MandateSelectorProp
             style={{
               width: '100%', padding: '10px 12px 10px 38px',
               background: DS.bgAlt, border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
+              borderRadius: '0px', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
             }}
             autoFocus
           />
@@ -133,7 +133,7 @@ export function MandateSelector({ open, onClose, onSelect }: MandateSelectorProp
                     padding: '14px 16px',
                     background: DS.bgAlt,
                     border: `1px solid ${DS.cardBorder}`,
-                    borderRadius: '8px',
+                    borderRadius: '0px',
                     cursor: 'pointer',
                     transition: 'all 0.15s'
                   }}
@@ -182,7 +182,7 @@ export function MandateSelector({ open, onClose, onSelect }: MandateSelectorProp
         <div style={{ textAlign: 'center' }}>
           <button onClick={onClose} style={{
             padding: '10px 24px', background: DS.bgAlt, border: `1px solid ${DS.cardBorder}`,
-            borderRadius: '8px', color: DS.textSecondary, fontSize: '14px', cursor: 'pointer'
+            borderRadius: '0px', color: DS.textSecondary, fontSize: '14px', cursor: 'pointer'
           }}>
             Cancel
           </button>

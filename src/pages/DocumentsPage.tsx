@@ -107,29 +107,29 @@ export function DocumentsPage() {
       {/* Upload Modal */}
       {showUpload && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShowUpload(false)}>
-          <div className="bg-bg-secondary rounded-xl border border-bg-tertiary w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
+          <div className="bg-bg-secondary rounded-none border border-bg-tertiary w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-serif font-bold text-text-primary">Register Document</h3>
-              <button onClick={() => setShowUpload(false)} className="p-2 hover:bg-bg-tertiary rounded-lg"><X className="w-4 h-4 text-text-muted" /></button>
+              <button onClick={() => setShowUpload(false)} className="p-2 hover:bg-bg-tertiary rounded-none"><X className="w-4 h-4 text-text-muted" /></button>
             </div>
             <input
               value={newDoc.name}
               onChange={e => setNewDoc(p => ({ ...p, name: e.target.value }))}
               placeholder="Document name"
-              className="w-full px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
+              className="w-full px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
             />
             <div className="grid grid-cols-2 gap-3">
               <select
                 value={newDoc.type}
                 onChange={e => setNewDoc(p => ({ ...p, type: e.target.value }))}
-                className="px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                className="px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent"
               >
                 {DOC_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
               <select
                 value={newDoc.visibility}
                 onChange={e => setNewDoc(p => ({ ...p, visibility: e.target.value }))}
-                className="px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                className="px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent"
               >
                 {VISIBILITY_OPTIONS.map(v => <option key={v.value} value={v.value}>{v.label}</option>)}
               </select>
@@ -139,7 +139,7 @@ export function DocumentsPage() {
               onChange={e => setNewDoc(p => ({ ...p, notes: e.target.value }))}
               placeholder="Notes (optional)"
               rows={2}
-              className="w-full px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent resize-none"
+              className="w-full px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent resize-none"
             />
             <Button onClick={handleUpload} disabled={uploading || !newDoc.name.trim()} className="w-full">
               {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
@@ -157,7 +157,7 @@ export function DocumentsPage() {
         </div>
         <button
           onClick={() => setShowUpload(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-light text-white text-sm font-medium rounded-lg min-h-[44px]"
+          className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-light text-white text-sm font-medium rounded-none min-h-[44px]"
         >
           <Plus className="w-4 h-4" />
           Register Document
@@ -172,13 +172,13 @@ export function DocumentsPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search documents..."
-            className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent min-h-[44px]"
+            className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent min-h-[44px]"
           />
         </div>
         <div className="flex gap-1.5 overflow-x-auto">
           <button
             onClick={() => setTypeFilter('all')}
-            className={`px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap min-h-[36px] transition-colors ${
+            className={`px-3 py-2 text-xs font-medium rounded-none whitespace-nowrap min-h-[36px] transition-colors ${
               typeFilter === 'all' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted hover:text-text-primary'
             }`}
           >
@@ -191,7 +191,7 @@ export function DocumentsPage() {
               <button
                 key={t.value}
                 onClick={() => setTypeFilter(t.value)}
-                className={`px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap min-h-[36px] transition-colors ${
+                className={`px-3 py-2 text-xs font-medium rounded-none whitespace-nowrap min-h-[36px] transition-colors ${
                   typeFilter === t.value ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted hover:text-text-primary'
                 }`}
               >
@@ -233,8 +233,8 @@ export function DocumentsPage() {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {docs.map(doc => (
-                    <div key={doc.id} className="flex items-center gap-3 p-3 bg-bg-tertiary/50 rounded-lg hover:bg-bg-tertiary transition-colors">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${typeConfig.color}15` }}>
+                    <div key={doc.id} className="flex items-center gap-3 p-3 bg-bg-tertiary/50 rounded-none hover:bg-bg-tertiary transition-colors">
+                      <div className="w-8 h-8 rounded-none flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${typeConfig.color}15` }}>
                         <FileText size={14} style={{ color: typeConfig.color }} />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -258,7 +258,7 @@ export function DocumentsPage() {
                         )}
                         <button
                           onClick={() => handleDelete(doc.id)}
-                          className="p-2 rounded-lg hover:bg-red-500/10 text-text-muted hover:text-red-400 transition-colors"
+                          className="p-2 rounded-none hover:bg-red-500/10 text-text-muted hover:text-red-400 transition-colors"
                           title="Delete document"
                         >
                           <Trash2 size={13} />

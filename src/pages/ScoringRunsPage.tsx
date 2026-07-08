@@ -58,7 +58,7 @@ export function ScoringRunsPage() {
         </div>
         <div className="flex gap-2">
           {runTypes.map(t => (
-            <button key={t} onClick={() => { setFilterType(t); setPage(0); }} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${filterType === t ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>
+            <button key={t} onClick={() => { setFilterType(t); setPage(0); }} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${filterType === t ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>
               {t === 'all' ? 'All' : t.charAt(0).toUpperCase() + t.slice(1)}
             </button>
           ))}
@@ -88,7 +88,7 @@ export function ScoringRunsPage() {
                       </p>
                     </div>
                   </div>
-                  <button onClick={() => setExpandedId(expandedId === run.id ? null : run.id)} className="p-2 hover:bg-bg-tertiary rounded-lg text-text-muted min-h-[44px] min-w-[44px] flex items-center justify-center">
+                  <button onClick={() => setExpandedId(expandedId === run.id ? null : run.id)} className="p-2 hover:bg-bg-tertiary rounded-none text-text-muted min-h-[44px] min-w-[44px] flex items-center justify-center">
                     <ChevronDown className={`w-4 h-4 transition-transform ${expandedId === run.id ? 'rotate-180' : ''}`} />
                   </button>
                 </div>
@@ -97,13 +97,13 @@ export function ScoringRunsPage() {
                     {run.input_params && (
                       <div>
                         <p className="text-xs text-text-muted mb-1">Input</p>
-                        <pre className="text-xs text-text-secondary bg-bg-tertiary p-3 rounded-lg overflow-x-auto">{typeof run.input_params === 'string' ? run.input_params : JSON.stringify(run.input_params, null, 2)}</pre>
+                        <pre className="text-xs text-text-secondary bg-bg-tertiary p-3 rounded-none overflow-x-auto">{typeof run.input_params === 'string' ? run.input_params : JSON.stringify(run.input_params, null, 2)}</pre>
                       </div>
                     )}
                     {run.output_scores && (
                       <div>
                         <p className="text-xs text-text-muted mb-1">Output</p>
-                        <pre className="text-xs text-text-secondary bg-bg-tertiary p-3 rounded-lg overflow-x-auto">{typeof run.output_scores === 'string' ? run.output_scores : JSON.stringify(run.output_scores, null, 2)}</pre>
+                        <pre className="text-xs text-text-secondary bg-bg-tertiary p-3 rounded-none overflow-x-auto">{typeof run.output_scores === 'string' ? run.output_scores : JSON.stringify(run.output_scores, null, 2)}</pre>
                       </div>
                     )}
                   </div>

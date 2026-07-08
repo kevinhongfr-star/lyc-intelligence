@@ -155,7 +155,7 @@ export function PostPlacementFollowUp({
   };
 
   return (
-    <div className="bg-card border border-card-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-card-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center gap-3 mb-4">
@@ -195,7 +195,7 @@ export function PostPlacementFollowUp({
             return (
               <div
                 key={type}
-                className={`p-4 rounded-xl border-2 ${
+                className={`p-4 rounded-none border-2 ${
                   followUp?.status === 'responded'
                     ? 'bg-green-50 border-green-500'
                     : followUp?.status === 'sent'
@@ -270,7 +270,7 @@ export function PostPlacementFollowUp({
 
                 {/* Response */}
                 {followUp?.response && (
-                  <div className="mt-4 p-3 bg-white rounded-lg border border-green-200">
+                  <div className="mt-4 p-3 bg-white rounded-none border border-green-200">
                     <p className="text-sm font-medium text-green-800 mb-1">Candidate Response:</p>
                     <p className="text-sm text-green-700 whitespace-pre-line">{followUp.response}</p>
                   </div>
@@ -284,7 +284,7 @@ export function PostPlacementFollowUp({
       {/* Response Modal */}
       {showResponseModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-xl p-6 max-w-lg w-full mx-4">
+          <div className="bg-card rounded-none p-6 max-w-lg w-full mx-4">
             <h3 className="text-lg font-semibold text-text-primary mb-4">
               Record Response
             </h3>
@@ -296,7 +296,7 @@ export function PostPlacementFollowUp({
               onChange={(e) => setResponseText(e.target.value)}
               placeholder="Enter the candidate's feedback..."
               rows={6}
-              className="w-full px-4 py-3 bg-bg-alt border border-card-border rounded-lg text-text-primary resize-none mb-4"
+              className="w-full px-4 py-3 bg-bg-alt border border-card-border rounded-none text-text-primary resize-none mb-4"
             />
             <div className="flex justify-end gap-3">
               <Button

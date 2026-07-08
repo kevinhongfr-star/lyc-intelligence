@@ -140,7 +140,7 @@ export function ScoringTab() {
           <Loader2 className="w-4 h-4 animate-spin" /> Loading scoring data…
         </div>
       ) : error ? (
-        <div className="text-sm text-red-600 py-4 border border-red-200 bg-red-50 rounded-md p-3">
+        <div className="text-sm text-red-600 py-4 border border-red-200 bg-red-50 rounded-none p-3">
           <AlertTriangle className="w-4 h-4 inline mr-1" /> {error}
         </div>
       ) : totalEvals === 0 ? (
@@ -169,7 +169,7 @@ export function ScoringTab() {
           </div>
 
           {/* Tier distribution */}
-          <div className="border border-bg-hover rounded-md p-4">
+          <div className="border border-bg-hover rounded-none p-4">
             <h3 className="text-sm font-medium text-text-primary mb-3 flex items-center gap-2">
               <TrendingUp className="w-4 h-4" /> Tier distribution
             </h3>
@@ -179,7 +179,7 @@ export function ScoringTab() {
                 const count = tierCounts[t];
                 const pct = totalEvals > 0 ? (count / totalEvals) * 100 : 0;
                 return (
-                  <div key={t} className="border border-bg-hover rounded-md p-3">
+                  <div key={t} className="border border-bg-hover rounded-none p-3">
                     <div className={`text-2xl font-semibold ${t === 'T1_STRONG' ? 'text-green-700' : t === 'T2_GOOD' ? 'text-blue-700' : t === 'T3_POTENTIAL' ? 'text-amber-700' : 'text-text-muted'}`}>
                       {count}
                     </div>
@@ -192,7 +192,7 @@ export function ScoringTab() {
           </div>
 
           {/* Average per criterion — bar chart */}
-          <div className="border border-bg-hover rounded-md p-4">
+          <div className="border border-bg-hover rounded-none p-4">
             <h3 className="text-sm font-medium text-text-primary mb-3">
               Average sub-score per criterion
             </h3>
@@ -210,7 +210,7 @@ export function ScoringTab() {
                         if (!active || !payload || !payload[0]) return null;
                         const d = payload[0].payload;
                         return (
-                          <div className="bg-white border border-bg-hover rounded-md p-2 text-xs shadow-sm">
+                          <div className="bg-white border border-bg-hover rounded-none p-2 text-xs shadow-sm">
                             <div className="font-medium">{d.fullName}</div>
                             <div>Avg: <span className="font-mono">{d.avg}</span> / 20</div>
                             <div className="text-text-muted">n = {d.n}</div>
@@ -230,7 +230,7 @@ export function ScoringTab() {
           </div>
 
           {/* Recent evaluations */}
-          <div className="border border-bg-hover rounded-md p-4">
+          <div className="border border-bg-hover rounded-none p-4">
             <h3 className="text-sm font-medium text-text-primary mb-3">
               Recent evaluations (top 10)
             </h3>
@@ -257,7 +257,7 @@ export function ScoringTab() {
 
 function StatCard({ label, value, icon, color }: { label: string; value: number; icon?: React.ReactNode; color?: string }) {
   return (
-    <div className="border border-bg-hover rounded-md p-3">
+    <div className="border border-bg-hover rounded-none p-3">
       <div className="flex items-center gap-1 text-xs text-text-muted">
         {icon}
         {label}
@@ -271,7 +271,7 @@ function StatCard({ label, value, icon, color }: { label: string; value: number;
 
 function EmptyHint({ title, note }: { title: string; note?: string }) {
   return (
-    <div className="border-2 border-dashed border-bg-hover rounded-lg p-8 text-center">
+    <div className="border-2 border-dashed border-bg-hover rounded-none p-8 text-center">
       <BarChart3 className="w-6 h-6 text-text-muted mx-auto mb-2" />
       <p className="text-text-primary font-medium">{title}</p>
       {note && <p className="text-text-muted text-sm mt-1">{note}</p>}

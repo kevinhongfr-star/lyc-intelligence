@@ -140,7 +140,7 @@ function FullResultsView({ result }: { result: AssessmentResult }) {
       </div>
 
       {/* Dimension Scores */}
-      <div className="bg-card rounded-xl border border-card-border p-5">
+      <div className="bg-card rounded-none border border-card-border p-5">
         <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
           <Target className="w-5 h-5 text-accent" />
           Dimension Scores
@@ -154,7 +154,7 @@ function FullResultsView({ result }: { result: AssessmentResult }) {
 
       {/* Strengths */}
       {result.strengths.length > 0 && (
-        <div className="bg-card rounded-xl border border-card-border p-5">
+        <div className="bg-card rounded-none border border-card-border p-5">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-green-500" />
             Strengths
@@ -172,7 +172,7 @@ function FullResultsView({ result }: { result: AssessmentResult }) {
 
       {/* Development Areas */}
       {result.development_areas.length > 0 && (
-        <div className="bg-card rounded-xl border border-card-border p-5">
+        <div className="bg-card rounded-none border border-card-border p-5">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-yellow-500" />
             Development Areas
@@ -191,7 +191,7 @@ function FullResultsView({ result }: { result: AssessmentResult }) {
       )}
 
       {/* Recommendation Summary */}
-      <div className="bg-accent/5 border border-accent/20 rounded-xl p-5">
+      <div className="bg-accent/5 border border-accent/20 rounded-none p-5">
         <h3 className="font-semibold text-text-primary mb-2 flex items-center gap-2">
           <Award className="w-5 h-5 text-accent" />
           Recommendation
@@ -260,7 +260,7 @@ function HiddenResultsView() {
         and they will be in touch with the next steps.
       </p>
 
-      <div className="mt-6 p-4 bg-bg-alt rounded-lg">
+      <div className="mt-6 p-4 bg-bg-alt rounded-none">
         <p className="text-sm text-text-muted">
           If you have any questions about the process, please contact your recruiter directly.
         </p>
@@ -388,7 +388,7 @@ export function ResultsSummary({ results, onViewDetails, onChangeVisibility }: R
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
               filter === f
                 ? 'bg-accent text-white'
                 : 'text-text-muted hover:bg-gray-100'
@@ -409,7 +409,7 @@ export function ResultsSummary({ results, onViewDetails, onChangeVisibility }: R
         {filteredResults.map(result => (
           <div
             key={result.id}
-            className="bg-white rounded-xl border border-card-border p-4 hover:shadow-md transition-shadow"
+            className="bg-white rounded-none border border-card-border p-4 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -429,7 +429,7 @@ export function ResultsSummary({ results, onViewDetails, onChangeVisibility }: R
                   <select
                     value={result.visibility}
                     onChange={e => onChangeVisibility(result.id, e.target.value as ResultVisibility)}
-                    className="text-sm border border-border rounded-lg px-2 py-1"
+                    className="text-sm border border-border rounded-none px-2 py-1"
                   >
                     <option value="full">Full Results</option>
                     <option value="pass_fail">Pass/Fail Only</option>

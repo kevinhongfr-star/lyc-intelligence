@@ -50,23 +50,23 @@ function AddCompanyForm({ mandateId, onCompanyAdded }: { mandateId: string; onCo
   }
 
   return (
-    <div className="bg-bg-secondary border border-border rounded-xl p-4">
+    <div className="bg-bg-secondary border border-border rounded-none p-4">
       {!show ? (
-        <button onClick={() => setShow(true)} className="w-full py-3 border-2 border-dashed border-border rounded-lg text-text-muted hover:text-accent hover:border-accent transition-colors text-sm font-medium">
+        <button onClick={() => setShow(true)} className="w-full py-3 border-2 border-dashed border-border rounded-none text-text-muted hover:text-accent hover:border-accent transition-colors text-sm font-medium">
           + Add Target Company
         </button>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Company name *" required className="bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm min-h-[44px]" />
-            <input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="Industry" className="bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm min-h-[44px]" />
-            <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Location (e.g., Shanghai)" className="bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm min-h-[44px]" />
-            <input value={size} onChange={e => setSize(e.target.value)} placeholder="Size (e.g., 5000)" className="bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm min-h-[44px]" />
-            <input value={domain} onChange={e => setDomain(e.target.value)} placeholder="Domain (e.g., example.com)" className="bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm min-h-[44px]" colSpan={2} />
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Company name *" required className="bg-bg-primary border border-border rounded-none px-3 py-2 text-sm min-h-[44px]" />
+            <input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="Industry" className="bg-bg-primary border border-border rounded-none px-3 py-2 text-sm min-h-[44px]" />
+            <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Location (e.g., Shanghai)" className="bg-bg-primary border border-border rounded-none px-3 py-2 text-sm min-h-[44px]" />
+            <input value={size} onChange={e => setSize(e.target.value)} placeholder="Size (e.g., 5000)" className="bg-bg-primary border border-border rounded-none px-3 py-2 text-sm min-h-[44px]" />
+            <input value={domain} onChange={e => setDomain(e.target.value)} placeholder="Domain (e.g., example.com)" className="bg-bg-primary border border-border rounded-none px-3 py-2 text-sm min-h-[44px]" colSpan={2} />
           </div>
           <div className="flex justify-end gap-2">
             <button type="button" onClick={() => setShow(false)} className="px-4 py-2 text-sm text-text-muted hover:text-text-primary min-h-[44px]">Cancel</button>
-            <button type="submit" disabled={saving || !name.trim()} className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover disabled:opacity-50 min-h-[44px]">
+            <button type="submit" disabled={saving || !name.trim()} className="px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent-hover disabled:opacity-50 min-h-[44px]">
               {saving ? 'Adding...' : 'Add Company'}
             </button>
           </div>
@@ -241,17 +241,17 @@ export function MandateDetailPage() {
           value={mandate.status}
           onChange={e => handleStatusChange(e.target.value)}
           disabled={statusUpdating}
-          className="text-sm bg-bg-tertiary text-text-primary rounded-lg px-3 py-2 border-0 min-h-[44px]"
+          className="text-sm bg-bg-tertiary text-text-primary rounded-none px-3 py-2 border-0 min-h-[44px]"
         >
           {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
-        <button onClick={() => handleStatusChange('won')} className="flex items-center gap-1 px-3 py-2 bg-tier-1/20 text-tier-1 rounded-lg text-sm hover:bg-tier-1/30 min-h-[44px]">
+        <button onClick={() => handleStatusChange('won')} className="flex items-center gap-1 px-3 py-2 bg-tier-1/20 text-tier-1 rounded-none text-sm hover:bg-tier-1/30 min-h-[44px]">
           <CheckCircle className="w-3.5 h-3.5" />Won
         </button>
-        <button onClick={() => handleStatusChange('on_hold')} className="flex items-center gap-1 px-3 py-2 bg-tier-2/20 text-tier-2 rounded-lg text-sm hover:bg-tier-2/30 min-h-[44px]">
+        <button onClick={() => handleStatusChange('on_hold')} className="flex items-center gap-1 px-3 py-2 bg-tier-2/20 text-tier-2 rounded-none text-sm hover:bg-tier-2/30 min-h-[44px]">
           <PauseCircle className="w-3.5 h-3.5" />Hold
         </button>
-        <button onClick={() => handleStatusChange('lost')} className="flex items-center gap-1 px-3 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 min-h-[44px]">
+        <button onClick={() => handleStatusChange('lost')} className="flex items-center gap-1 px-3 py-2 bg-red-500/20 text-red-400 rounded-none text-sm hover:bg-red-500/30 min-h-[44px]">
           <XCircle className="w-3.5 h-3.5" />Lost
         </button>
         {intakeComplete ? (
@@ -343,7 +343,7 @@ export function MandateDetailPage() {
                 </p>
               )}
               {pipeline.map(p => (
-                <div key={p.id} onClick={() => setSelectedCandidate(p.contact_id)} className={`bg-bg-secondary border rounded-lg p-4 cursor-pointer transition-colors ${selectedCandidate === p.contact_id ? 'border-accent' : 'border-bg-tertiary hover:border-accent/30'}`}>
+                <div key={p.id} onClick={() => setSelectedCandidate(p.contact_id)} className={`bg-bg-secondary border rounded-none p-4 cursor-pointer transition-colors ${selectedCandidate === p.contact_id ? 'border-accent' : 'border-bg-tertiary hover:border-accent/30'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">{p.contact?.name?.[0] ?? '?'}</div>
@@ -396,7 +396,7 @@ export function MandateDetailPage() {
                         </Button>
                       ))}
                     </div>
-                    {aiOutput && <div className="bg-bg-tertiary rounded-lg p-3 text-sm text-text-secondary whitespace-pre-wrap max-h-64 overflow-auto">{aiOutput}</div>}
+                    {aiOutput && <div className="bg-bg-tertiary rounded-none p-3 text-sm text-text-secondary whitespace-pre-wrap max-h-64 overflow-auto">{aiOutput}</div>}
                   </CardContent>
                 </Card>
               )}
@@ -562,7 +562,7 @@ export function MandateDetailPage() {
                 const contact = p.contact || {};
                 const contactName = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || 'Candidate';
                 return (
-                  <div key={p.id} className="bg-bg-secondary border border-border rounded-xl p-4">
+                  <div key={p.id} className="bg-bg-secondary border border-border rounded-none p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-accent/10 text-accent flex items-center justify-center text-sm font-medium">
@@ -605,7 +605,7 @@ export function MandateDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-3 space-y-3">
               {pipeline.map(p => (
-                <div key={p.id} onClick={() => setSelectedCandidate(p.contact_id)} className={`bg-bg-secondary border rounded-lg p-4 cursor-pointer transition-colors ${selectedCandidate === p.contact_id ? 'border-accent' : 'border-bg-tertiary hover:border-accent/30'}`}>
+                <div key={p.id} onClick={() => setSelectedCandidate(p.contact_id)} className={`bg-bg-secondary border rounded-none p-4 cursor-pointer transition-colors ${selectedCandidate === p.contact_id ? 'border-accent' : 'border-bg-tertiary hover:border-accent/30'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">{p.contact?.name?.[0] ?? '?'}</div>

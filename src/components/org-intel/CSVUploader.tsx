@@ -170,7 +170,7 @@ export function CSVUploader() {
         onDrop={onDrop}
         onClick={() => inputRef.current?.click()}
         className={`
-          cursor-pointer border-2 border-dashed rounded-lg p-8
+          cursor-pointer border-2 border-dashed rounded-none p-8
           flex flex-col items-center justify-center text-center
           transition-colors
           ${isDragging
@@ -200,7 +200,7 @@ export function CSVUploader() {
 
       {/* Preview */}
       {preview && preview.header.length > 0 && (
-        <div className="border border-bg-hover rounded-lg overflow-hidden">
+        <div className="border border-bg-hover rounded-none overflow-hidden">
           <div className="px-3 py-2 bg-bg-secondary text-sm font-medium flex items-center gap-2">
             <FileText className="w-4 h-4" />
             Preview (first {preview.rows.length} of data rows)
@@ -250,7 +250,7 @@ export function CSVUploader() {
           <button
             onClick={onSubmit}
             disabled={uploading}
-            className="px-4 py-2 bg-accent text-white rounded-md font-medium
+            className="px-4 py-2 bg-accent text-white rounded-none font-medium
                        hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed
                        flex items-center gap-2"
           >
@@ -278,7 +278,7 @@ export function CSVUploader() {
 
       {/* Error */}
       {error && (
-        <div className="border border-red-200 bg-red-50 text-red-800 rounded-md p-3 flex items-start gap-2">
+        <div className="border border-red-200 bg-red-50 text-red-800 rounded-none p-3 flex items-start gap-2">
           <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <div className="text-sm">{error}</div>
         </div>
@@ -286,7 +286,7 @@ export function CSVUploader() {
 
       {/* Success summary */}
       {response?.success && (
-        <div className="border border-green-200 bg-green-50 text-green-800 rounded-md p-3 space-y-2">
+        <div className="border border-green-200 bg-green-50 text-green-800 rounded-none p-3 space-y-2">
           <div className="flex items-center gap-2 font-medium">
             <CheckCircle2 className="w-5 h-5" />
             Upload complete — {response.inserted} of {response.total} rows inserted

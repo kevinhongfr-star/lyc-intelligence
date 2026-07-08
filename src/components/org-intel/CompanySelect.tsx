@@ -79,7 +79,7 @@ export function CompanySelect({ value, onChange, className, allowAll }: Props) {
         <select
           value={value ?? (allowAll ? '__all__' : '')}
           onChange={(e) => onChange(e.target.value === '__all__' ? null : e.target.value)}
-          className="w-full md:w-96 border border-bg-hover rounded-md px-3 py-2 text-sm bg-white"
+          className="w-full md:w-96 border border-bg-hover rounded-none px-3 py-2 text-sm bg-white"
         >
           {allowAll && <option value="__all__">All companies</option>}
           {!allowAll && <option value="">— Select a company —</option>}

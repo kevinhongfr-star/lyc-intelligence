@@ -123,7 +123,7 @@ export function CanvasScoringPanel({ scorecardId, contactId, mandateId, onGenera
 
   return (
     <div className="flex gap-6 h-full">
-      <div className="w-1/4 bg-gray-50 rounded-xl p-6 overflow-y-auto">
+      <div className="w-1/4 bg-gray-50 rounded-none p-6 overflow-y-auto">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-blue-600" />
           <h3 className="font-semibold text-gray-800">TRIDENT Summary</h3>
@@ -156,7 +156,7 @@ export function CanvasScoringPanel({ scorecardId, contactId, mandateId, onGenera
             </div>
           </div>
         )}
-        <div className="mt-6 p-3 bg-blue-50 rounded-lg">
+        <div className="mt-6 p-3 bg-blue-50 rounded-none">
           <div className="flex items-start gap-2">
             <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-blue-700 leading-relaxed">
@@ -166,7 +166,7 @@ export function CanvasScoringPanel({ scorecardId, contactId, mandateId, onGenera
         </div>
       </div>
 
-      <div className="flex-1 bg-white rounded-xl p-6 overflow-y-auto">
+      <div className="flex-1 bg-white rounded-none p-6 overflow-y-auto">
         <h2 className="text-xl font-bold text-gray-800 mb-6">CANVAS 6 Dimensions</h2>
         <div className="grid grid-cols-2 gap-6">
           {dimensions.map((dim) => (
@@ -186,7 +186,7 @@ export function CanvasScoringPanel({ scorecardId, contactId, mandateId, onGenera
                   step="0.5"
                   value={scores[dim.key]}
                   onChange={(e) => handleScoreChange(dim.key, parseFloat(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                  className="w-full h-2 bg-gray-200 rounded-none appearance-none cursor-pointer accent-blue-600"
                 />
                 <div className="flex justify-between mt-1">
                   <span className="text-sm text-gray-500">1.0</span>
@@ -206,7 +206,7 @@ export function CanvasScoringPanel({ scorecardId, contactId, mandateId, onGenera
         </div>
       </div>
 
-      <div className="w-1/4 bg-gray-50 rounded-xl p-6 flex flex-col items-center justify-center">
+      <div className="w-1/4 bg-gray-50 rounded-none p-6 flex flex-col items-center justify-center">
         <div className="text-center">
           <div className="text-5xl font-bold text-gray-800 mb-1">{composite.toFixed(1)}</div>
           <div className="text-gray-500 mb-4">CANVAS Composite</div>

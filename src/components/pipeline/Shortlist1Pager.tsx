@@ -231,7 +231,7 @@ export function Shortlist1Pager({
       </div>
 
       {/* Ranking Table */}
-      <div className="bg-white border border-[#E5E5E5] rounded-lg overflow-hidden">
+      <div className="bg-white border border-[#E5E5E5] rounded-none overflow-hidden">
         {/* Table Header */}
         <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-[#F7F7F5] border-b border-[#E5E5E5] text-[10px] text-[#8A8A8A] uppercase tracking-wider">
           <div className="col-span-1">#</div>
@@ -342,7 +342,7 @@ export function Shortlist1Pager({
 
       {/* Empty State */}
       {sorted.length === 0 && (
-        <div className="bg-white border border-[#E5E5E5] rounded-lg p-8 text-center">
+        <div className="bg-white border border-[#E5E5E5] rounded-none p-8 text-center">
           <p className="text-[#8A8A8A]">No candidates shortlisted yet.</p>
         </div>
       )}

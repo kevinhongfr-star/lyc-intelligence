@@ -96,11 +96,11 @@ export function CareerInsights({ insights }: CareerInsightsProps) {
   const renderInsightCard = (insight: CareerInsight) => (
     <div 
       key={insight.id}
-      className="bg-card rounded-xl border border-card-border p-5 hover:border-accent/50 transition-all"
+      className="bg-card rounded-none border border-card-border p-5 hover:border-accent/50 transition-all"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className={`p-2 rounded-lg ${
+          <div className={`p-2 rounded-none ${
             insight.category === 'market_trend' ? 'bg-blue-500/10 text-blue-500' :
             insight.category === 'opportunity' ? 'bg-green-500/10 text-green-500' :
             insight.category === 'company' ? 'bg-yellow-500/10 text-yellow-500' :
@@ -196,7 +196,7 @@ export function CareerInsights({ insights }: CareerInsightsProps) {
 
   // Render empty state
   const renderEmptyState = () => (
-    <div className="bg-card rounded-xl border border-card-border p-8 text-center">
+    <div className="bg-card rounded-none border border-card-border p-8 text-center">
       <Lightbulb className="w-12 h-12 mx-auto text-text-muted opacity-50 mb-3" />
       <h3 className="font-semibold text-text-primary mb-2">No Insights Available</h3>
       <p className="text-text-muted mb-4">
@@ -239,7 +239,7 @@ export function CareerInsights({ insights }: CareerInsightsProps) {
           <button
             key={key}
             onClick={() => setCategory(key)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-none text-sm font-medium whitespace-nowrap transition-all ${
               category === key
                 ? 'bg-accent text-white'
                 : 'bg-bg-alt text-text-muted hover:text-text-primary'
@@ -276,10 +276,10 @@ export function CareerInsights({ insights }: CareerInsightsProps) {
       )}
 
       {/* Insights summary */}
-      <div className="bg-card rounded-xl border border-card-border p-5">
+      <div className="bg-card rounded-none border border-card-border p-5">
         <h3 className="font-semibold text-text-primary mb-4">Your Personalized Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 bg-bg-alt rounded-lg">
+          <div className="p-4 bg-bg-alt rounded-none">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-blue-500" />
               <span className="font-medium text-text-primary">Market Trends</span>
@@ -289,7 +289,7 @@ export function CareerInsights({ insights }: CareerInsightsProps) {
             </p>
           </div>
 
-          <div className="p-4 bg-bg-alt rounded-lg">
+          <div className="p-4 bg-bg-alt rounded-none">
             <div className="flex items-center gap-2 mb-2">
               <Users className="w-5 h-5 text-green-500" />
               <span className="font-medium text-text-primary">Opportunities</span>
@@ -299,7 +299,7 @@ export function CareerInsights({ insights }: CareerInsightsProps) {
             </p>
           </div>
 
-          <div className="p-4 bg-bg-alt rounded-lg">
+          <div className="p-4 bg-bg-alt rounded-none">
             <div className="flex items-center gap-2 mb-2">
               <Building2 className="w-5 h-5 text-yellow-500" />
               <span className="font-medium text-text-primary">Top Companies</span>
@@ -311,7 +311,7 @@ export function CareerInsights({ insights }: CareerInsightsProps) {
         </div>
 
         {/* Recommended next action */}
-        <div className="mt-4 p-4 bg-accent/5 border border-accent/20 rounded-lg">
+        <div className="mt-4 p-4 bg-accent/5 border border-accent/20 rounded-none">
           <div className="flex items-start gap-3">
             <ThumbsUp className="w-5 h-5 text-accent mt-0.5" />
             <div>

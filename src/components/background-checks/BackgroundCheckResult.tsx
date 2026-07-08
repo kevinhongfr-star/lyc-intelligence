@@ -103,7 +103,7 @@ export function BackgroundCheckResult({ check, onSave, onCancel }: BackgroundChe
       </div>
 
       {/* Check Info */}
-      <div className="p-4 bg-bg-alt rounded-lg mb-6">
+      <div className="p-4 bg-bg-alt rounded-none mb-6">
         <div className="flex items-center gap-2">
           <FileText className="w-5 h-5 text-text-muted" />
           <span className="font-medium text-text-primary">{check.check_type}</span>
@@ -117,7 +117,7 @@ export function BackgroundCheckResult({ check, onSave, onCancel }: BackgroundChe
         <div>
           <label className="text-sm font-medium text-text-muted">Upload Report PDF *</label>
           <div
-            className={`mt-2 p-4 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
+            className={`mt-2 p-4 border-2 border-dashed rounded-none text-center cursor-pointer transition-colors ${
               selectedFile ? 'border-primary bg-primary/5' : 'border-border hover:border-primary'
             }`}
             onClick={() => fileInputRef.current?.click()}
@@ -176,7 +176,7 @@ export function BackgroundCheckResult({ check, onSave, onCancel }: BackgroundChe
                   key={option.value}
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, result: option.value as 'clear' | 'discrepancy' | 'unresolved' }))}
-                  className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors ${
+                  className={`flex flex-col items-center gap-2 p-3 rounded-none border-2 transition-colors ${
                     formData.result === option.value
                       ? `${option.bg} border-current ${option.color}`
                       : 'border-border hover:border-text-muted'

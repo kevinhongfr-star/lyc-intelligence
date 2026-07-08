@@ -103,7 +103,7 @@ export function ClientFeedback({ candidate, mandate, onClose, onSubmit }: Client
             <h3 className="text-lg font-semibold text-text-primary">Provide Feedback</h3>
             <p className="text-sm text-text-muted">{candidate.contact?.name}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-none">
             <X className="w-5 h-5 text-text-muted" />
           </button>
         </div>
@@ -111,7 +111,7 @@ export function ClientFeedback({ candidate, mandate, onClose, onSubmit }: Client
         {/* Content */}
         <div className="p-6 space-y-6">
           {/* Candidate Info */}
-          <div className="flex items-center gap-3 p-4 bg-bg-secondary rounded-lg">
+          <div className="flex items-center gap-3 p-4 bg-bg-secondary rounded-none">
             <div 
               className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold"
               style={{ backgroundColor: '#6B7280' }}
@@ -138,7 +138,7 @@ export function ClientFeedback({ candidate, mandate, onClose, onSubmit }: Client
                 return (
                   <label
                     key={dec}
-                    className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all ${
+                    className={`flex items-center gap-3 p-3 border rounded-none cursor-pointer transition-all ${
                       decision === dec
                         ? 'border-accent bg-accent/5'
                         : 'border-bg-tertiary hover:border-accent/50'
@@ -184,7 +184,7 @@ export function ClientFeedback({ candidate, mandate, onClose, onSubmit }: Client
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Please explain your decision..."
-              className="w-full px-4 py-3 border border-bg-tertiary rounded-lg focus:outline-none focus:border-accent resize-none"
+              className="w-full px-4 py-3 border border-bg-tertiary rounded-none focus:outline-none focus:border-accent resize-none"
               rows={4}
             />
             {error && (
@@ -194,7 +194,7 @@ export function ClientFeedback({ candidate, mandate, onClose, onSubmit }: Client
 
           {/* Preview */}
           <div 
-            className="p-4 rounded-lg"
+            className="p-4 rounded-none"
             style={{ backgroundColor: `${decisionInfo.color}10` }}
           >
             <div className="flex items-center gap-2 mb-2">
@@ -213,14 +213,14 @@ export function ClientFeedback({ candidate, mandate, onClose, onSubmit }: Client
         <div className="px-6 py-4 border-t border-bg-tertiary bg-bg-secondary flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-bg-tertiary rounded-lg text-text-secondary hover:bg-bg-tertiary"
+            className="flex-1 px-4 py-2 border border-bg-tertiary rounded-none text-text-secondary hover:bg-bg-tertiary"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 px-4 py-2 bg-accent text-white rounded-lg font-medium hover:bg-accent/90 flex items-center justify-center gap-2 disabled:opacity-50"
+            className="flex-1 px-4 py-2 bg-accent text-white rounded-none font-medium hover:bg-accent/90 flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {loading ? (
               <>

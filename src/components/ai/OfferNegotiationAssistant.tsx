@@ -198,7 +198,7 @@ export function OfferNegotiationAssistant({
   if (error && !suggestion) {
     return (
       <div className="space-y-4">
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-none">
           <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
           <div>
             <p className="font-medium text-red-800">Failed to Generate Suggestion</p>
@@ -235,7 +235,7 @@ export function OfferNegotiationAssistant({
 
       {/* Market Context */}
       {marketData?.avgBaseSalary && (
-        <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700">
+        <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-none text-blue-700">
           <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <div className="text-sm">
             <p className="font-medium">Market Context</p>
@@ -248,7 +248,7 @@ export function OfferNegotiationAssistant({
       )}
 
       {/* Total Compensation Card */}
-      <div className="bg-primary rounded-xl p-6 text-white">
+      <div className="bg-primary rounded-none p-6 text-white">
         <p className="text-sm opacity-75 mb-1">Suggested Total Compensation</p>
         <p className="text-4xl font-bold">{formatCurrency(calculateTotalComp())}</p>
         <p className="text-sm opacity-75 mt-1">
@@ -259,7 +259,7 @@ export function OfferNegotiationAssistant({
       {/* Breakdown Sections */}
       <div className="space-y-3">
         {/* Base Salary */}
-        <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border border-border rounded-none overflow-hidden">
           <button
             className="w-full flex items-center justify-between p-4 hover:bg-bg-alt transition-colors"
             onClick={() => setExpandedSection(expandedSection === 'breakdown' ? null : 'breakdown')}
@@ -289,7 +289,7 @@ export function OfferNegotiationAssistant({
                   type="number"
                   value={adjustedOffer?.baseSalary || ''}
                   onChange={(e) => handleAdjust('baseSalary', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+                  className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
                 />
               </div>
               {suggestion?.baseSalaryRange && (
@@ -307,7 +307,7 @@ export function OfferNegotiationAssistant({
         </div>
 
         {/* Bonus */}
-        <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border border-border rounded-none overflow-hidden">
           <button
             className="w-full flex items-center justify-between p-4 hover:bg-bg-alt transition-colors"
             onClick={() => setExpandedSection(expandedSection === 'bonus' ? null : 'bonus')}
@@ -339,7 +339,7 @@ export function OfferNegotiationAssistant({
                   max={100}
                   value={adjustedOffer?.bonusPercentage || 0}
                   onChange={(e) => handleAdjust('bonusPercentage', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+                  className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
                 />
               </div>
               <p className="text-sm text-text-muted">
@@ -350,7 +350,7 @@ export function OfferNegotiationAssistant({
         </div>
 
         {/* Equity */}
-        <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border border-border rounded-none overflow-hidden">
           <button
             className="w-full flex items-center justify-between p-4 hover:bg-bg-alt transition-colors"
             onClick={() => setExpandedSection(expandedSection === 'equity' ? null : 'equity')}
@@ -380,14 +380,14 @@ export function OfferNegotiationAssistant({
                 value={adjustedOffer?.equity || ''}
                 onChange={(e) => handleAdjust('equity', e.target.value)}
                 placeholder="e.g., 0.1% over 4 years, $100K RSU"
-                className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+                className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
               />
             </div>
           )}
         </div>
 
         {/* Benefits */}
-        <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border border-border rounded-none overflow-hidden">
           <button
             className="w-full flex items-center justify-between p-4 hover:bg-bg-alt transition-colors"
             onClick={() => setExpandedSection(expandedSection === 'benefits' ? null : 'benefits')}
@@ -421,7 +421,7 @@ export function OfferNegotiationAssistant({
 
         {/* Negotiation Strategy */}
         {adjustedOffer?.rationale && (
-          <div className="border border-border rounded-lg p-4 bg-amber-50">
+          <div className="border border-border rounded-none p-4 bg-amber-50">
             <div className="flex items-center gap-2 mb-2">
               <AlertCircle className="w-5 h-5 text-amber-600" />
               <span className="font-medium text-amber-800">Negotiation Strategy</span>

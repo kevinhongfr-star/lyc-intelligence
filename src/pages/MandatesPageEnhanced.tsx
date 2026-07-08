@@ -207,14 +207,14 @@ export function MandatesPageEnhanced({ onCreateMandate }: MandatesPageProps) {
         <div className="flex gap-2">
           <button
             onClick={exportToCSV}
-            className="px-4 py-2 bg-bg-tertiary text-text-primary rounded-lg text-sm font-medium hover:bg-bg-secondary flex items-center gap-2"
+            className="px-4 py-2 bg-bg-tertiary text-text-primary rounded-none text-sm font-medium hover:bg-bg-secondary flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
             Export
           </button>
           <button
             onClick={() => navigate('/platform/mandates/new')}
-            className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 flex items-center gap-2"
+            className="px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent/90 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Create Mandate
@@ -231,7 +231,7 @@ export function MandatesPageEnhanced({ onCreateMandate }: MandatesPageProps) {
             placeholder="Search by title, client, keywords..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
+            className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
           />
         </div>
 
@@ -239,7 +239,7 @@ export function MandatesPageEnhanced({ onCreateMandate }: MandatesPageProps) {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary px-3 py-2.5 min-h-[44px]"
+          className="bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary px-3 py-2.5 min-h-[44px]"
         >
           {STATUS_OPTIONS.map((s) => (
             <option key={s.value} value={s.value}>
@@ -253,7 +253,7 @@ export function MandatesPageEnhanced({ onCreateMandate }: MandatesPageProps) {
           <select
             value={consultantFilter}
             onChange={(e) => setConsultantFilter(e.target.value)}
-            className="bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary px-3 py-2.5 min-h-[44px]"
+            className="bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary px-3 py-2.5 min-h-[44px]"
           >
             <option value="">All Consultants</option>
             {consultants.map((c) => (
@@ -280,7 +280,7 @@ export function MandatesPageEnhanced({ onCreateMandate }: MandatesPageProps) {
 
       {/* Bulk Actions Bar */}
       {selectedIds.size > 0 && (
-        <div className="bg-accent/10 border border-accent/30 rounded-lg px-4 py-3 flex items-center justify-between">
+        <div className="bg-accent/10 border border-accent/30 rounded-none px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium text-accent">
               {selectedIds.size} selected
@@ -298,7 +298,7 @@ export function MandatesPageEnhanced({ onCreateMandate }: MandatesPageProps) {
                 key={action.value}
                 onClick={() => handleBulkAction(action.value)}
                 disabled={updating}
-                className="px-3 py-1.5 bg-white border border-accent/30 rounded-lg text-sm text-text-primary hover:bg-accent hover:text-white flex items-center gap-1 disabled:opacity-50"
+                className="px-3 py-1.5 bg-white border border-accent/30 rounded-none text-sm text-text-primary hover:bg-accent hover:text-white flex items-center gap-1 disabled:opacity-50"
               >
                 {updating ? <Loader2 className="w-3 h-3 animate-spin" /> : <action.icon className="w-3 h-3" />}
                 {action.label}
@@ -309,7 +309,7 @@ export function MandatesPageEnhanced({ onCreateMandate }: MandatesPageProps) {
       )}
 
       {/* Table View */}
-      <div className="bg-bg-secondary border border-bg-tertiary rounded-xl overflow-hidden">
+      <div className="bg-bg-secondary border border-bg-tertiary rounded-none overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-bg-tertiary">
@@ -392,7 +392,7 @@ export function MandatesPageEnhanced({ onCreateMandate }: MandatesPageProps) {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-none bg-accent/10 flex items-center justify-center">
                           <Briefcase className="w-4 h-4 text-accent" />
                         </div>
                         <div>
@@ -443,13 +443,13 @@ export function MandatesPageEnhanced({ onCreateMandate }: MandatesPageProps) {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => navigate(`/platform/mandates/${mandate.id}`)}
-                          className="px-3 py-1.5 text-xs bg-accent/10 text-accent rounded-lg hover:bg-accent hover:text-white"
+                          className="px-3 py-1.5 text-xs bg-accent/10 text-accent rounded-none hover:bg-accent hover:text-white"
                         >
                           View
                         </button>
                         <button
                           onClick={() => navigate(`/platform/mandates/${mandate.id}/pipeline`)}
-                          className="px-3 py-1.5 text-xs bg-bg-tertiary text-text-secondary rounded-lg hover:bg-bg-secondary"
+                          className="px-3 py-1.5 text-xs bg-bg-tertiary text-text-secondary rounded-none hover:bg-bg-secondary"
                         >
                           Pipeline
                         </button>

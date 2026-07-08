@@ -175,14 +175,14 @@ export function LinkedInImportPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-bg-alt p-1 rounded-lg">
+      <div className="flex gap-1 mb-6 bg-bg-alt p-1 rounded-none">
         {tabs.map(tab => {
           const Icon = tab.icon;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-colors ${
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-none text-sm font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'bg-card text-text-primary shadow-sm'
                   : 'text-text-muted hover:text-text-secondary'
@@ -202,12 +202,12 @@ export function LinkedInImportPage() {
       {activeTab === 'history' && (
         <div className="space-y-4">
           {isLoadingImports ? (
-            <div className="bg-card border border-border rounded-xl p-8 text-center">
+            <div className="bg-card border border-border rounded-none p-8 text-center">
               <Loader2 className="w-6 h-6 text-primary animate-spin mx-auto" />
               <p className="text-text-muted mt-2">Loading import history...</p>
             </div>
           ) : imports.length === 0 ? (
-            <div className="bg-card border border-border rounded-xl p-8 text-center">
+            <div className="bg-card border border-border rounded-none p-8 text-center">
               <History className="w-12 h-12 text-text-muted mx-auto" />
               <h3 className="font-medium text-text-primary mt-4">No imports yet</h3>
               <p className="text-sm text-text-muted mt-1">
@@ -219,7 +219,7 @@ export function LinkedInImportPage() {
               {imports.map(imp => (
                 <div
                   key={imp.id}
-                  className="bg-card border border-border rounded-xl overflow-hidden"
+                  className="bg-card border border-border rounded-none overflow-hidden"
                 >
                   <button
                     onClick={() => loadImportDetails(imp.id)}
@@ -277,7 +277,7 @@ export function LinkedInImportPage() {
                           {importItems.map(item => (
                             <div
                               key={item.id}
-                              className="bg-card border border-border rounded-lg overflow-hidden"
+                              className="bg-card border border-border rounded-none overflow-hidden"
                             >
                               <button
                                 onClick={() => toggleItem(item.id)}
@@ -409,9 +409,9 @@ function URLImportTab({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6">
+    <div className="bg-card border border-border rounded-none p-6">
       <div className="flex items-start gap-3 mb-4">
-        <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-none bg-blue-50 flex items-center justify-center flex-shrink-0">
           <LinkIcon className="w-5 h-5 text-blue-500" />
         </div>
         <div>
@@ -423,13 +423,13 @@ function URLImportTab({ onSuccess }: { onSuccess: () => void }) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm mb-4">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-none text-sm mb-4">
           {error}
         </div>
       )}
 
       {result && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm mb-4">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-none text-sm mb-4">
           <div className="font-medium">{result.message}</div>
           <div className="text-xs mt-1 opacity-80">
             Import ID: {result.import_id}
@@ -445,7 +445,7 @@ function URLImportTab({ onSuccess }: { onSuccess: () => void }) {
           <textarea
             value={urls}
             onChange={e => setUrls(e.target.value)}
-            className="w-full h-40 px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
+            className="w-full h-40 px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
             placeholder="https://www.linkedin.com/in/john-doe-123456&#10;https://www.linkedin.com/in/jane-smith-789012&#10;..."
           />
           <div className="flex justify-between items-center mt-2">
@@ -555,9 +555,9 @@ function CSVImportTab({ onSuccess }: { onSuccess: () => void }) {
   const rowCount = csvText.trim() ? csvText.trim().split('\n').length - 1 : 0;
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6">
+    <div className="bg-card border border-border rounded-none p-6">
       <div className="flex items-start gap-3 mb-4">
-        <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-none bg-purple-50 flex items-center justify-center flex-shrink-0">
           <Upload className="w-5 h-5 text-purple-500" />
         </div>
         <div>
@@ -569,13 +569,13 @@ function CSVImportTab({ onSuccess }: { onSuccess: () => void }) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm mb-4">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-none text-sm mb-4">
           {error}
         </div>
       )}
 
       {result && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm mb-4">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-none text-sm mb-4">
           <div className="font-medium">Import started!</div>
           <div className="text-xs mt-1 opacity-80">
             {result.total_rows} rows detected — format: {result.detected_format}
@@ -584,11 +584,11 @@ function CSVImportTab({ onSuccess }: { onSuccess: () => void }) {
       )}
 
       <div className="space-y-4">
-        <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors">
+        <div className="border-2 border-dashed border-border rounded-none p-8 text-center hover:border-primary/50 transition-colors">
           <Upload className="w-10 h-10 text-text-muted mx-auto mb-3" />
           <p className="text-sm text-text-secondary mb-1">Drag & drop CSV file here</p>
           <p className="text-xs text-text-muted mb-3">or</p>
-          <label className="inline-flex items-center gap-2 px-4 py-2 bg-bg-alt hover:bg-bg-base rounded-lg cursor-pointer text-sm font-medium text-text-primary border border-border">
+          <label className="inline-flex items-center gap-2 px-4 py-2 bg-bg-alt hover:bg-bg-base rounded-none cursor-pointer text-sm font-medium text-text-primary border border-border">
             <FileText className="w-4 h-4" />
             Choose File
             <input
@@ -607,7 +607,7 @@ function CSVImportTab({ onSuccess }: { onSuccess: () => void }) {
           <textarea
             value={csvText}
             onChange={e => setCsvText(e.target.value)}
-            className="w-full h-40 px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs"
+            className="w-full h-40 px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs"
             placeholder="First Name,Last Name,LinkedIn URL,Email,Company,Title..."
           />
           {csvText && (
@@ -627,7 +627,7 @@ function CSVImportTab({ onSuccess }: { onSuccess: () => void }) {
           <select
             value={format}
             onChange={e => setFormat(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+            className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary text-sm"
           >
             <option value="auto">Auto-detect</option>
             <option value="linkedin_recruiter">LinkedIn Recruiter Export</option>
@@ -693,9 +693,9 @@ function PasteImportTab({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6">
+    <div className="bg-card border border-border rounded-none p-6">
       <div className="flex items-start gap-3 mb-4">
-        <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-none bg-green-50 flex items-center justify-center flex-shrink-0">
           <FileText className="w-5 h-5 text-green-500" />
         </div>
         <div>
@@ -707,13 +707,13 @@ function PasteImportTab({ onSuccess }: { onSuccess: () => void }) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm mb-4">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-none text-sm mb-4">
           {error}
         </div>
       )}
 
       {result && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm mb-4">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-none text-sm mb-4">
           <div className="font-medium">{result.message}</div>
           <div className="text-xs mt-1 opacity-80">
             Import ID: {result.import_id}
@@ -730,7 +730,7 @@ function PasteImportTab({ onSuccess }: { onSuccess: () => void }) {
             type="url"
             value={linkedinUrl}
             onChange={e => setLinkedinUrl(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="https://www.linkedin.com/in/..."
           />
         </div>
@@ -742,7 +742,7 @@ function PasteImportTab({ onSuccess }: { onSuccess: () => void }) {
           <textarea
             value={profileText}
             onChange={e => setProfileText(e.target.value)}
-            className="w-full h-64 px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs"
+            className="w-full h-64 px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs"
             placeholder="Copy the About section, Experience, Education, Skills from a LinkedIn profile and paste here..."
           />
           <div className="flex justify-between items-center mt-2">

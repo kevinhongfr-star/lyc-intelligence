@@ -170,7 +170,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
               <h4 className="text-sm font-medium text-text-muted mb-3">Key Insights</h4>
               <div className="space-y-2">
                 {insights.insights.map((insight, i) => (
-                  <div key={i} className="p-3 bg-bg-alt rounded-lg text-sm text-text-primary">
+                  <div key={i} className="p-3 bg-bg-alt rounded-none text-sm text-text-primary">
                     {insight}
                   </div>
                 ))}
@@ -182,7 +182,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
               <h4 className="text-sm font-medium text-text-muted mb-3">Recommendations</h4>
               <div className="space-y-2">
                 {insights.recommendations.map((rec, i) => (
-                  <div key={i} className="p-3 bg-primary/5 rounded-lg text-sm text-text-primary">
+                  <div key={i} className="p-3 bg-primary/5 rounded-none text-sm text-text-primary">
                     {rec}
                   </div>
                 ))}
@@ -270,7 +270,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
         
         <div className="space-y-4">
           {benchmark.results.map(result => (
-            <div key={result.member_id} className="border border-border rounded-lg">
+            <div key={result.member_id} className="border border-border rounded-none">
               <div
                 className="flex items-center justify-between p-4 cursor-pointer hover:bg-bg-alt"
                 onClick={() => setExpandedMember(expandedMember === result.member_id ? null : result.member_id)}

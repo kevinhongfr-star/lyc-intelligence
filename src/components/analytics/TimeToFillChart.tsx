@@ -57,7 +57,7 @@ export function TimeToFillChart({
   }, [viewMode, byMandate, byConsultant, byClient]);
 
   return (
-    <div className="bg-card border border-card-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-card-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center justify-between mb-4">
@@ -74,21 +74,21 @@ export function TimeToFillChart({
 
         {/* Summary Stats */}
         <div className="grid grid-cols-4 gap-4">
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-text-primary">{overallAvgDays}</div>
             <div className="text-sm text-text-muted">Overall Average</div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-green-600">{avgTime}</div>
             <div className="text-sm text-text-muted">Current View Avg</div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-blue-600">{sortedData.length}</div>
             <div className="text-sm text-text-muted">
               {viewMode === 'mandate' ? 'Mandates' : viewMode === 'consultant' ? 'Consultants' : 'Clients'}
             </div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-purple-600">{Math.round(maxDays)}</div>
             <div className="text-sm text-text-muted">Longest</div>
           </div>
@@ -98,7 +98,7 @@ export function TimeToFillChart({
         <div className="flex gap-2 mt-4">
           <button
             onClick={() => setViewMode('mandate')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-none text-sm font-medium transition-colors ${
               viewMode === 'mandate'
                 ? 'bg-accent text-white'
                 : 'bg-bg-alt text-text-secondary hover:bg-gray-200'
@@ -108,7 +108,7 @@ export function TimeToFillChart({
           </button>
           <button
             onClick={() => setViewMode('consultant')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-none text-sm font-medium transition-colors ${
               viewMode === 'consultant'
                 ? 'bg-accent text-white'
                 : 'bg-bg-alt text-text-secondary hover:bg-gray-200'
@@ -118,7 +118,7 @@ export function TimeToFillChart({
           </button>
           <button
             onClick={() => setViewMode('client')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-none text-sm font-medium transition-colors ${
               viewMode === 'client'
                 ? 'bg-accent text-white'
                 : 'bg-bg-alt text-text-secondary hover:bg-gray-200'
@@ -172,7 +172,7 @@ export function TimeToFillChart({
                   {/* Bar */}
                   <div className="flex-1 relative">
                     <div
-                      className={`h-8 rounded-lg transition-all duration-500 flex items-center justify-end pr-3 ${
+                      className={`h-8 rounded-none transition-all duration-500 flex items-center justify-end pr-3 ${
                         isAboveAvg
                           ? 'bg-gradient-to-r from-orange-200 to-orange-300'
                           : 'bg-gradient-to-r from-green-200 to-green-300'
@@ -235,7 +235,7 @@ export function TimeToFillChart({
 export function TimeStatsCards({ overallAvgDays }: { overallAvgDays: number }) {
   return (
     <div className="grid grid-cols-4 gap-4">
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
             <Calendar className="w-5 h-5 text-blue-600" />
@@ -247,7 +247,7 @@ export function TimeStatsCards({ overallAvgDays }: { overallAvgDays: number }) {
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
             <TrendingDown className="w-5 h-5 text-green-600" />
@@ -261,7 +261,7 @@ export function TimeStatsCards({ overallAvgDays }: { overallAvgDays: number }) {
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
             <TrendingUp className="w-5 h-5 text-orange-600" />
@@ -275,7 +275,7 @@ export function TimeStatsCards({ overallAvgDays }: { overallAvgDays: number }) {
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
             <BarChart3 className="w-5 h-5 text-purple-600" />

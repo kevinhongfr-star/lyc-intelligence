@@ -115,7 +115,7 @@ export function CandidateMatchPanel({ contactId, candidateName, onMandateClick }
   const sortedMatches = [...matches].sort((a, b) => b.match_score - a.match_score);
 
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-border">
         <div className="flex items-center justify-between">
@@ -154,7 +154,7 @@ export function CandidateMatchPanel({ contactId, candidateName, onMandateClick }
         </div>
 
         {runStatus && (
-          <div className="mt-3 flex items-center gap-2 text-sm text-primary bg-primary/5 rounded-lg px-3 py-2">
+          <div className="mt-3 flex items-center gap-2 text-sm text-primary bg-primary/5 rounded-none px-3 py-2">
             <Zap className="w-4 h-4 animate-pulse" />
             {runStatus}
           </div>

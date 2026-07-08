@@ -106,7 +106,7 @@ export function AlumniDirectory({ orgId, onSelectAlumni }: AlumniDirectoryProps)
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-border bg-bg-base text-sm"
+            className="px-4 py-2 rounded-none border border-border bg-bg-base text-sm"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>

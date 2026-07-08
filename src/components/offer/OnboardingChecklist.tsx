@@ -159,7 +159,7 @@ export function OnboardingChecklist({
   };
 
   return (
-    <div className="bg-card border border-card-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-card-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center justify-between mb-4">
@@ -263,7 +263,7 @@ export function OnboardingChecklist({
                     return (
                       <div
                         key={idx}
-                        className={`px-4 py-3 mx-4 my-1 rounded-lg ${
+                        className={`px-4 py-3 mx-4 my-1 rounded-none ${
                           task.completed
                             ? 'bg-green-50'
                             : isOverdueTask

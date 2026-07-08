@@ -82,7 +82,7 @@ function ScoreCard({ result, rank, onSave }: { result: ScoreResult; rank: number
           {onSave && (
             <button
               onClick={onSave}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-accent/10 text-accent rounded-lg hover:bg-accent/20 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-accent/10 text-accent rounded-none hover:bg-accent/20 transition-colors"
             >
               <Save className="w-3 h-3" />
               Save to Pipeline
@@ -96,7 +96,7 @@ function ScoreCard({ result, rank, onSave }: { result: ScoreResult; rank: number
           ))}
         </div>
 
-        <div className="flex items-end gap-1.5 h-16 mb-5 p-3 bg-bg-tertiary rounded-lg">
+        <div className="flex items-end gap-1.5 h-16 mb-5 p-3 bg-bg-tertiary rounded-none">
           {Object.entries(result.dimension_scores).map(([key, score]) => {
             const meta = CRITERIA_META[key];
             return (
@@ -139,7 +139,7 @@ function ScoreCard({ result, rank, onSave }: { result: ScoreResult; rank: number
         )}
 
         {result.approach_strategy && (
-          <div className="p-3 bg-accent/5 rounded-lg border border-accent/10">
+          <div className="p-3 bg-accent/5 rounded-none border border-accent/10">
             <h4 className="text-xs font-medium text-accent uppercase tracking-wider mb-1 flex items-center gap-1">
               <ArrowRight className="w-3 h-3" /> Approach Strategy
             </h4>
@@ -297,13 +297,13 @@ export function BatchScoringPage() {
               <div className="flex gap-1">
                 <button
                   onClick={() => setJdMode('paste')}
-                  className={`px-2.5 py-1 text-xs rounded-md transition-colors ${jdMode === 'paste' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted hover:text-text-primary'}`}
+                  className={`px-2.5 py-1 text-xs rounded-none transition-colors ${jdMode === 'paste' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted hover:text-text-primary'}`}
                 >
                   <FileText className="w-3 h-3 inline mr-1" />Paste
                 </button>
                 <button
                   onClick={() => setJdMode('db')}
-                  className={`px-2.5 py-1 text-xs rounded-md transition-colors ${jdMode === 'db' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted hover:text-text-primary'}`}
+                  className={`px-2.5 py-1 text-xs rounded-none transition-colors ${jdMode === 'db' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted hover:text-text-primary'}`}
                 >
                   <Database className="w-3 h-3 inline mr-1" />From DB
                 </button>
@@ -316,12 +316,12 @@ export function BatchScoringPage() {
                 value={jd}
                 onChange={e => setJd(e.target.value)}
                 placeholder="Paste the job description or mandate brief here..."
-                className="w-full h-48 p-3 bg-bg-tertiary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted resize-none focus:outline-none focus:border-accent"
+                className="w-full h-48 p-3 bg-bg-tertiary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted resize-none focus:outline-none focus:border-accent"
               />
             ) : (
               <div>
                 {mandateId ? (
-                  <div className="p-4 bg-bg-tertiary rounded-lg border border-accent/20">
+                  <div className="p-4 bg-bg-tertiary rounded-none border border-accent/20">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-text-primary">{mandateTitle}</span>
                       <button onClick={() => setShowMandateSelector(true)} className="text-xs text-accent hover:underline">Change</button>
@@ -330,13 +330,13 @@ export function BatchScoringPage() {
                       value={jd}
                       onChange={e => setJd(e.target.value)}
                       placeholder="Edit JD text..."
-                      className="w-full h-32 p-3 bg-white border border-bg-tertiary rounded-lg text-sm text-text-primary resize-none focus:outline-none focus:border-accent"
+                      className="w-full h-32 p-3 bg-white border border-bg-tertiary rounded-none text-sm text-text-primary resize-none focus:outline-none focus:border-accent"
                     />
                   </div>
                 ) : (
                   <button
                     onClick={() => setShowMandateSelector(true)}
-                    className="w-full p-6 border-2 border-dashed border-bg-tertiary rounded-lg text-center text-sm text-text-muted hover:border-accent hover:text-accent transition-colors"
+                    className="w-full p-6 border-2 border-dashed border-bg-tertiary rounded-none text-center text-sm text-text-muted hover:border-accent hover:text-accent transition-colors"
                   >
                     <Database className="w-6 h-6 mx-auto mb-2 opacity-50" />
                     Select a mandate from the database
@@ -354,7 +354,7 @@ export function BatchScoringPage() {
               <CardTitle className="flex items-center gap-2"><Zap className="w-4 h-4 text-accent" />Candidates ({selectedIds.length})</CardTitle>
               <button
                 onClick={() => setShowContactSelector(true)}
-                className="px-2.5 py-1 text-xs bg-accent/10 text-accent rounded-md hover:bg-accent/20 transition-colors"
+                className="px-2.5 py-1 text-xs bg-accent/10 text-accent rounded-none hover:bg-accent/20 transition-colors"
               >
                 <Database className="w-3 h-3 inline mr-1" />Select from DB
               </button>
@@ -380,7 +380,7 @@ export function BatchScoringPage() {
               placeholder="Or search candidates..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full px-3 py-2 bg-bg-tertiary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
+              className="w-full px-3 py-2 bg-bg-tertiary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
             />
             <div className="h-32 overflow-y-auto space-y-1">
               {contactsLoading ? (
@@ -407,7 +407,7 @@ export function BatchScoringPage() {
         <button
           onClick={runScoring}
           disabled={loading || !jd.trim() || selectedIds.length === 0}
-          className="px-6 py-3 bg-accent text-white rounded-lg font-medium text-sm disabled:opacity-40 hover:bg-accent/90 transition-colors flex items-center gap-2"
+          className="px-6 py-3 bg-accent text-white rounded-none font-medium text-sm disabled:opacity-40 hover:bg-accent/90 transition-colors flex items-center gap-2"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <BarChart3 className="w-4 h-4" />}
           {loading ? 'Scoring...' : `Score ${selectedIds.length} Candidate${selectedIds.length !== 1 ? 's' : ''}`}

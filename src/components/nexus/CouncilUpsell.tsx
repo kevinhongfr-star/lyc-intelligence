@@ -34,7 +34,7 @@ export function CouncilUpsell({ trigger, messageCount, onUpgrade }: CouncilUpsel
   const content = getContent();
 
   return (
-    <div className="bg-gradient-to-r from-accent/5 to-purple-50 border border-accent/20 rounded-xl p-5 mb-4">
+    <div className="bg-gradient-to-r from-accent/5 to-purple-50 border border-accent/20 rounded-none p-5 mb-4">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
@@ -44,7 +44,7 @@ export function CouncilUpsell({ trigger, messageCount, onUpgrade }: CouncilUpsel
           <p className="text-sm text-text-muted mb-3">{content.description}</p>
           <button
             onClick={onUpgrade}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent-hover transition-colors"
           >
             {content.highlight}
             <ArrowRight className="w-4 h-4" />

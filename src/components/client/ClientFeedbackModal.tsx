@@ -79,7 +79,7 @@ export function ClientFeedbackModal({ candidate, mandateId, onClose, onSubmit }:
                 key={option.value}
                 type="button"
                 onClick={() => setFeedbackType(option.value as any)}
-                className={`w-full p-4 rounded-lg border-2 text-left transition-colors ${
+                className={`w-full p-4 rounded-none border-2 text-left transition-colors ${
                   feedbackType === option.value
                     ? `${option.bgColor} border-current ${option.color}`
                     : 'border-gray-200 hover:border-gray-300'

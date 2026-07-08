@@ -166,7 +166,7 @@ export function EscalationBanner({ orgId, onViewEscalations }: EscalationBannerP
             return (
               <div
                 key={escalation.id}
-                className={`p-3 rounded-lg ${config.bg}`}
+                className={`p-3 rounded-none ${config.bg}`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">

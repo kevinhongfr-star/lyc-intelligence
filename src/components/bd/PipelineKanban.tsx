@@ -185,7 +185,7 @@ export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity
               key={stage}
               className={cn(
                 'flex-shrink-0 w-72 flex flex-col',
-                'rounded-lg',
+                'rounded-none',
                 isDragOver && 'ring-2 ring-accent ring-offset-2'
               )}
               onDragOver={(e) => handleDragOver(e, stage)}
@@ -230,7 +230,7 @@ export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity
                         onDragEnd={handleDragEnd}
                         onClick={() => onSelectOpportunity?.(opp)}
                         className={cn(
-                          'p-3 bg-bg-base rounded-lg cursor-pointer',
+                          'p-3 bg-bg-base rounded-none cursor-pointer',
                           'hover:bg-bg-hover transition-colors',
                           'border border-bg-hover',
                           isDragging && 'opacity-50'
@@ -270,7 +270,7 @@ export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity
 
                 {/* Drop zone indicator */}
                 {isDragOver && draggedItem && draggedItem.stage !== stage && (
-                  <div className="border-2 border-dashed border-accent rounded-lg p-4 text-center text-xs text-accent">
+                  <div className="border-2 border-dashed border-accent rounded-none p-4 text-center text-xs text-accent">
                     Drop to move here
                   </div>
                 )}

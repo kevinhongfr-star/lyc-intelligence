@@ -159,7 +159,7 @@ export function ReferenceInviteForm({
               Reference request has been sent to {formData.refereeEmail}
             </p>
           </div>
-          <div className="bg-bg-alt rounded-lg p-4 w-full text-left">
+          <div className="bg-bg-alt rounded-none p-4 w-full text-left">
             <p className="text-sm text-text-secondary">
               <strong>Next steps:</strong>
             </p>
@@ -210,7 +210,7 @@ export function ReferenceInviteForm({
               type="text"
               value={formData.refereeName}
               onChange={(e) => handleChange('refereeName', e.target.value)}
-              className={`w-full pl-10 pr-3 py-2 border rounded-lg bg-bg-base text-text-primary ${
+              className={`w-full pl-10 pr-3 py-2 border rounded-none bg-bg-base text-text-primary ${
                 errors.refereeName ? 'border-red-500' : 'border-border'
               }`}
               placeholder="John Smith"
@@ -232,7 +232,7 @@ export function ReferenceInviteForm({
               type="email"
               value={formData.refereeEmail}
               onChange={(e) => handleChange('refereeEmail', e.target.value)}
-              className={`w-full pl-10 pr-3 py-2 border rounded-lg bg-bg-base text-text-primary ${
+              className={`w-full pl-10 pr-3 py-2 border rounded-none bg-bg-base text-text-primary ${
                 errors.refereeEmail ? 'border-red-500' : 'border-border'
               }`}
               placeholder="referee@company.com"
@@ -254,7 +254,7 @@ export function ReferenceInviteForm({
               type="text"
               value={formData.refereeTitle}
               onChange={(e) => handleChange('refereeTitle', e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+              className="w-full pl-10 pr-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
               placeholder="VP of Engineering"
             />
           </div>
@@ -271,7 +271,7 @@ export function ReferenceInviteForm({
               type="text"
               value={formData.refereeCompany}
               onChange={(e) => handleChange('refereeCompany', e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+              className="w-full pl-10 pr-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
               placeholder="Acme Corp"
             />
           </div>
@@ -285,7 +285,7 @@ export function ReferenceInviteForm({
           <select
             value={formData.relationship}
             onChange={(e) => handleChange('relationship', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg bg-bg-base text-text-primary ${
+            className={`w-full px-3 py-2 border rounded-none bg-bg-base text-text-primary ${
               errors.relationship ? 'border-red-500' : 'border-border'
             }`}
           >
@@ -303,7 +303,7 @@ export function ReferenceInviteForm({
 
         {/* Error */}
         {submitError && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <p className="text-sm">{submitError}</p>
           </div>

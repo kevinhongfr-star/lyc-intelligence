@@ -166,7 +166,7 @@ export function NotificationBell({ userId, onNotificationClick, onViewAll }: Not
           />
 
           {/* Content */}
-          <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden">
+          <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-none shadow-xl z-50 overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <h3 className="font-medium text-text-primary">Notifications</h3>

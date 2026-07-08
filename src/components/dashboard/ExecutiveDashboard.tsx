@@ -168,28 +168,28 @@ export function ExecutiveDashboard() {
       {/* Third Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Summary */}
-        <div className="bg-card border border-border rounded-xl p-5">
+        <div className="bg-card border border-border rounded-none p-5">
           <h3 className="font-semibold text-text-primary mb-4">Revenue Pipeline</h3>
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-bg-alt rounded-lg">
+            <div className="p-4 bg-bg-alt rounded-none">
               <p className="text-sm text-text-muted">Active Mandates</p>
               <p className="text-2xl font-bold text-text-primary mt-1">
                 {revenueData?.active_mandates || 0}
               </p>
             </div>
-            <div className="p-4 bg-bg-alt rounded-lg">
+            <div className="p-4 bg-bg-alt rounded-none">
               <p className="text-sm text-text-muted">Total Pipeline Value</p>
               <p className="text-2xl font-bold text-emerald-600 mt-1">
                 ¥{((revenueData?.total_pipeline_value || 0) / 10000).toFixed(0)}万
               </p>
             </div>
-            <div className="p-4 bg-bg-alt rounded-lg">
+            <div className="p-4 bg-bg-alt rounded-none">
               <p className="text-sm text-text-muted">Avg Fee / Mandate</p>
               <p className="text-2xl font-bold text-text-primary mt-1">
                 ¥{((revenueData?.avg_fee_per_mandate || 0) / 10000).toFixed(1)}万
               </p>
             </div>
-            <div className="p-4 bg-bg-alt rounded-lg">
+            <div className="p-4 bg-bg-alt rounded-none">
               <p className="text-sm text-text-muted">Placements This Quarter</p>
               <p className="text-2xl font-bold text-text-primary mt-1">
                 {revenueData?.placements_this_quarter || 0}
@@ -203,31 +203,31 @@ export function ExecutiveDashboard() {
       </div>
 
       {/* Velocity Stats */}
-      <div className="bg-card border border-border rounded-xl p-5">
+      <div className="bg-card border border-border rounded-none p-5">
         <h3 className="font-semibold text-text-primary mb-4">Pipeline Velocity</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 bg-bg-alt rounded-lg">
+          <div className="text-center p-4 bg-bg-alt rounded-none">
             <TrendingUp className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
             <p className="text-2xl font-bold text-text-primary">
               {velocityData?.candidates_advancing_per_week || 0}
             </p>
             <p className="text-xs text-text-muted mt-1">advancing / week</p>
           </div>
-          <div className="text-center p-4 bg-bg-alt rounded-lg">
+          <div className="text-center p-4 bg-bg-alt rounded-none">
             <Activity className="w-6 h-6 text-blue-500 mx-auto mb-2" />
             <p className="text-2xl font-bold text-text-primary">
               {velocityData?.total_transitions_90d || 0}
             </p>
             <p className="text-xs text-text-muted mt-1">transitions (90d)</p>
           </div>
-          <div className="text-center p-4 bg-bg-alt rounded-lg">
+          <div className="text-center p-4 bg-bg-alt rounded-none">
             <AlertTriangle className="w-6 h-6 text-amber-500 mx-auto mb-2" />
             <p className="text-2xl font-bold text-text-primary">
               {velocityData?.backward_rate || 0}%
             </p>
             <p className="text-xs text-text-muted mt-1">backward rate</p>
           </div>
-          <div className="text-center p-4 bg-bg-alt rounded-lg">
+          <div className="text-center p-4 bg-bg-alt rounded-none">
             <Target className="w-6 h-6 text-purple-500 mx-auto mb-2" />
             <p className="text-2xl font-bold text-text-primary">
               {pipelineData?.summary?.advancement_rate || 0}%

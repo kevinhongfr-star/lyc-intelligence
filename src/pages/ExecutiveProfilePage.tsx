@@ -109,7 +109,7 @@ function ScoringPanel({ contact }: { contact: Contact }) {
           </div>
         )}
         {result.approach_strategy && (
-          <div className="bg-accent/5 border border-accent/20 rounded-lg p-3 space-y-1">
+          <div className="bg-accent/5 border border-accent/20 rounded-none p-3 space-y-1">
             <span className="text-[10px] font-bold text-accent uppercase tracking-wider">Approach Strategy</span>
             <p className="text-[11px] text-text-secondary leading-relaxed">{result.approach_strategy}</p>
           </div>
@@ -126,7 +126,7 @@ function ScoringPanel({ contact }: { contact: Contact }) {
         <span className="text-xs font-bold uppercase tracking-wider">5-Criteria Assessment</span>
       </div>
       <p className="text-[11px] text-text-muted">Run AI-powered assessment across Industry, Functional, Leadership, Track Record, and Strategic Fit criteria.</p>
-      <Button onClick={handleScore} disabled={loading} className="w-full bg-accent hover:bg-accent/90 text-white text-xs font-bold py-2.5 rounded-lg transition-all">
+      <Button onClick={handleScore} disabled={loading} className="w-full bg-accent hover:bg-accent/90 text-white text-xs font-bold py-2.5 rounded-none transition-all">
         {loading ? (
           <span className="flex items-center gap-2"><Clock size={13} className="animate-spin" /> Assessing...</span>
         ) : (
@@ -199,7 +199,7 @@ function AIQuickActionsPanel({ contact }: { contact: Contact }) {
               <button
                 key={action.key}
                 onClick={() => handleAction(action.key)}
-                className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium border transition-all min-h-[44px] ${
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-none text-xs font-medium border transition-all min-h-[44px] ${
                   isActive
                     ? 'border-accent bg-accent/10 text-accent'
                     : 'border-bg-tertiary bg-bg-primary text-text-secondary hover:border-accent/30 hover:bg-accent/5'
@@ -217,7 +217,7 @@ function AIQuickActionsPanel({ contact }: { contact: Contact }) {
 
         {/* Output area */}
         {activeAction && (
-          <div className="border border-bg-tertiary rounded-lg overflow-hidden">
+          <div className="border border-bg-tertiary rounded-none overflow-hidden">
             <div className="flex items-center justify-between px-3 py-2 bg-bg-tertiary/50 border-b border-bg-tertiary">
               <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
                 {AI_ACTIONS_LIST.find(a => a.key === activeAction)?.label}
@@ -316,7 +316,7 @@ export function ExecutiveProfilePage() {
         <Link to="/platform/candidates" className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-accent transition-colors">
           <ArrowLeft size={13} /> Back to Talent Pool
         </Link>
-        <Link to={`/platform/candidates/${id}/report`} target="_blank" className="inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:text-accent/80 transition-colors bg-accent/10 px-3 py-1.5 rounded-lg">
+        <Link to={`/platform/candidates/${id}/report`} target="_blank" className="inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:text-accent/80 transition-colors bg-accent/10 px-3 py-1.5 rounded-none">
           <FileDown size={13} /> Generate Report
         </Link>
       </div>
@@ -426,7 +426,7 @@ export function ExecutiveProfilePage() {
               {contact.education && contact.education.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {contact.education.map((edu, idx) => (
-                    <div key={idx} className="bg-bg-tertiary/50 border border-border-subtle rounded-lg p-3 space-y-0.5">
+                    <div key={idx} className="bg-bg-tertiary/50 border border-border-subtle rounded-none p-3 space-y-0.5">
                       <h4 className="text-xs font-bold text-text-primary">{edu.degree}</h4>
                       <p className="text-[11px] text-text-muted">{edu.school}</p>
                     </div>

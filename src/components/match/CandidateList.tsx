@@ -55,7 +55,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
             padding: '8px 16px',
             background: DS.bg,
             border: `1px solid ${DS.cardBorder}`,
-            borderRadius: '8px',
+            borderRadius: '0px',
             color: DS.textSecondary,
             fontSize: '13px',
             cursor: 'pointer',
@@ -77,7 +77,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
             style={{ 
               background: DS.bg, 
               border: `1px solid ${DS.cardBorder}`, 
-              borderRadius: '8px', 
+              borderRadius: '0px', 
               padding: '16px' 
             }}
           >
@@ -92,7 +92,7 @@ export function CandidateList({ candidates, onAdd, onRemove, onUpdate, onUploadC
                   padding: '10px 14px', 
                   background: DS.card, 
                   border: `1px solid ${DS.cardBorder}`, 
-                  borderRadius: '6px', 
+                  borderRadius: '0px', 
                   color: DS.text, 
                   fontSize: '13px', 
                   outline: 'none',
@@ -136,7 +136,7 @@ Include: work history, education, key achievements, skills"
                     minHeight: '100px', 
                     background: DS.card, 
                     border: `1px solid ${DS.cardBorder}`, 
-                    borderRadius: '6px', 
+                    borderRadius: '0px', 
                     padding: '10px 10px 10px 38px', 
                     color: DS.text, 
                     fontSize: '12px', 
@@ -155,7 +155,7 @@ Include: work history, education, key achievements, skills"
                     padding: '10px 16px',
                     background: DS.card,
                     border: `1px solid ${DS.cardBorder}`,
-                    borderRadius: '6px',
+                    borderRadius: '0px',
                     color: DS.textSecondary,
                     fontSize: '12px',
                     cursor: 'pointer',
@@ -187,7 +187,7 @@ Include: work history, education, key achievements, skills"
           padding: '20px',
           background: `${DS.warning}10`,
           border: `1px solid ${DS.warning}30`,
-          borderRadius: '8px',
+          borderRadius: '0px',
           textAlign: 'center'
         }}>
           <p style={{ fontSize: '13px', color: DS.textSecondary, margin: 0 }}>
@@ -202,7 +202,7 @@ Include: work history, education, key achievements, skills"
           padding: '12px',
           background: `${DS.success}10`,
           border: `1px solid ${DS.success}30`,
-          borderRadius: '8px',
+          borderRadius: '0px',
           display: 'flex',
           alignItems: 'center',
           gap: '8px'

@@ -197,19 +197,19 @@ export function ReferenceTracker({
     <div className="space-y-4">
       {/* Summary Stats */}
       <div className="grid grid-cols-4 gap-3">
-        <div className="bg-card border border-border rounded-lg p-3 text-center">
+        <div className="bg-card border border-border rounded-none p-3 text-center">
           <p className="text-2xl font-bold text-text-primary">{stats.total}</p>
           <p className="text-xs text-text-muted">Total</p>
         </div>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+        <div className="bg-green-50 border border-green-200 rounded-none p-3 text-center">
           <p className="text-2xl font-bold text-green-600">{stats.submitted}</p>
           <p className="text-xs text-green-600">Submitted</p>
         </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
+        <div className="bg-amber-50 border border-amber-200 rounded-none p-3 text-center">
           <p className="text-2xl font-bold text-amber-600">{stats.pending}</p>
           <p className="text-xs text-amber-600">Pending</p>
         </div>
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
+        <div className="bg-gray-50 border border-gray-200 rounded-none p-3 text-center">
           <p className="text-2xl font-bold text-gray-600">{stats.expired}</p>
           <p className="text-xs text-gray-600">Inactive</p>
         </div>
@@ -324,7 +324,7 @@ export function ReferenceStatsCards({ candidateId }: { candidateId: string }) {
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      <div className="bg-card border border-border rounded-lg p-3">
+      <div className="bg-card border border-border rounded-none p-3">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-green-600" />
           <span className="text-sm text-text-muted">Submitted</span>
@@ -333,7 +333,7 @@ export function ReferenceStatsCards({ candidateId }: { candidateId: string }) {
           {stats.submitted} / {stats.total}
         </p>
       </div>
-      <div className="bg-card border border-border rounded-lg p-3">
+      <div className="bg-card border border-border rounded-none p-3">
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4 text-amber-600" />
           <span className="text-sm text-text-muted">Pending</span>

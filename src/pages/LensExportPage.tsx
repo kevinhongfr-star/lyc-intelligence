@@ -24,7 +24,7 @@ function ScopeBar({ mandate }: { mandate: Mandate }) {
     { label: 'Candidates', value: String(mandate.total_candidates) },
   ];
   return (
-    <div className="flex border border-bg-tertiary rounded-lg overflow-hidden">
+    <div className="flex border border-bg-tertiary rounded-none overflow-hidden">
       {cells.map((c, i) => (
         <div key={i} className={`flex-1 p-3 ${i < cells.length - 1 ? 'border-r border-bg-tertiary' : ''}`}>
           <p className="text-[10px] text-text-muted uppercase tracking-wider">{c.label}</p>
@@ -47,7 +47,7 @@ function LensCandidateCard({ candidate }: { candidate: CandidatePipeline }) {
   const keyMatch = candidate.key_match_reasons || candidate.match_reasons || '';
 
   return (
-    <div className="bg-bg-secondary border border-bg-tertiary rounded-lg p-4">
+    <div className="bg-bg-secondary border border-bg-tertiary rounded-none p-4">
       <div className="flex items-start justify-between mb-2">
         <div>
           <h4 className="text-sm font-medium text-text-primary">{name}</h4>
@@ -245,7 +245,7 @@ export function LensExportPage() {
       </div>
 
       {!showConfidential && (
-        <div className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+        <div className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded-none">
           <Shield className="w-4 h-4 text-green-400 flex-shrink-0" />
           <p className="text-xs text-green-400">Client-safe view — TRIDENT formulas, weights, run IDs, and internal stage names are hidden.</p>
         </div>
@@ -276,7 +276,7 @@ export function LensExportPage() {
               <label className="text-xs text-text-muted mb-1 block">Client Email (optional)</label>
               <Input placeholder="client@company.com" value={emailTo} onChange={e => setEmailTo(e.target.value)} />
             </div>
-            <pre className="bg-bg-tertiary p-4 rounded-lg text-sm text-text-secondary whitespace-pre-wrap overflow-auto max-h-96 font-sans">{emailDraft}</pre>
+            <pre className="bg-bg-tertiary p-4 rounded-none text-sm text-text-secondary whitespace-pre-wrap overflow-auto max-h-96 font-sans">{emailDraft}</pre>
           </CardContent>
         </Card>
       )}

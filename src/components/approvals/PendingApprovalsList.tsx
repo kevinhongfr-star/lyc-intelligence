@@ -157,12 +157,12 @@ export function PendingApprovalsList({ userId, orgId, onSelectRequest }: Pending
             return (
               <div
                 key={approval.id}
-                className="p-4 bg-bg-alt rounded-lg cursor-pointer hover:bg-bg-base transition-colors"
+                className="p-4 bg-bg-alt rounded-none cursor-pointer hover:bg-bg-base transition-colors"
                 onClick={() => onSelectRequest(approval.id)}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center">
                       <FileText className="w-5 h-5 text-primary" />
                     </div>
                     <div>

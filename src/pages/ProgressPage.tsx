@@ -192,7 +192,7 @@ export function ProgressPage() {
                 background: DS.accent,
                 color: '#FFFFFF',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '0px',
                 fontSize: '14px',
                 fontWeight: 600,
                 cursor: 'pointer'
@@ -205,7 +205,7 @@ export function ProgressPage() {
         </div>
 
         {assessments.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 0', background: DS.card, borderRadius: '16px', border: `1px solid ${DS.cardBorder}` }}>
+          <div style={{ textAlign: 'center', padding: '80px 0', background: DS.card, borderRadius: '0px', border: `1px solid ${DS.cardBorder}` }}>
             <Target style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
             <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', color: DS.text, marginBottom: '8px' }}>
               No assessments yet
@@ -223,7 +223,7 @@ export function ProgressPage() {
                 background: DS.accent,
                 color: '#FFFFFF',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '0px',
                 fontSize: '15px',
                 fontWeight: 600,
                 cursor: 'pointer'
@@ -239,7 +239,7 @@ export function ProgressPage() {
               <div style={{
                 background: `${DS.warning}15`,
                 border: `1px solid ${DS.warning}40`,
-                borderRadius: '12px',
+                borderRadius: '0px',
                 padding: '16px 20px',
                 marginBottom: '24px',
                 display: 'flex',
@@ -271,7 +271,7 @@ export function ProgressPage() {
                     padding: '10px 16px',
                     background: selectedAssessment?.id === a.id ? `${DS.accent}20` : DS.card,
                     border: `1px solid ${selectedAssessment?.id === a.id ? DS.accent : DS.border}`,
-                    borderRadius: '8px',
+                    borderRadius: '0px',
                     color: selectedAssessment?.id === a.id ? DS.text : DS.textSecondary,
                     fontSize: '13px',
                     cursor: 'pointer',
@@ -290,7 +290,7 @@ export function ProgressPage() {
                 <div style={{ 
                   background: 'linear-gradient(135deg, rgba(193,8,171,0.15), rgba(99,102,241,0.1))',
                   border: `1px solid ${DS.accent}40`,
-                  borderRadius: '16px',
+                  borderRadius: '0px',
                   padding: '32px',
                   marginBottom: '24px'
                 }}>
@@ -298,7 +298,7 @@ export function ProgressPage() {
                     <div style={{
                       width: '64px',
                       height: '64px',
-                      borderRadius: '16px',
+                      borderRadius: '0px',
                       background: `${DS.accent}20`,
                       display: 'flex',
                       alignItems: 'center',
@@ -319,13 +319,13 @@ export function ProgressPage() {
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
-                    <div style={{ textAlign: 'center', padding: '20px', background: DS.bg, borderRadius: '12px' }}>
+                    <div style={{ textAlign: 'center', padding: '20px', background: DS.bg, borderRadius: '0px' }}>
                       <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>OVERALL SCORE</p>
                       <p style={{ fontSize: '48px', fontWeight: 800, color: DS.success, lineHeight: 1 }}>
                         {selectedAssessment.composite_score}
                       </p>
                     </div>
-                    <div style={{ textAlign: 'center', padding: '20px', background: DS.bg, borderRadius: '12px' }}>
+                    <div style={{ textAlign: 'center', padding: '20px', background: DS.bg, borderRadius: '0px' }}>
                       <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>CROSS-BORDER READINESS</p>
                       <p style={{ fontSize: '48px', fontWeight: 800, color: DS.accent, lineHeight: 1 }}>
                         {selectedAssessment.cross_border_score}
@@ -335,7 +335,7 @@ export function ProgressPage() {
                 </div>
 
                 {/* Dimension Breakdown */}
-                <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
+                <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '24px', marginBottom: '24px' }}>
                   <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 600, color: DS.text, marginBottom: '24px' }}>
                     Dimension Breakdown
                   </h3>
@@ -382,13 +382,13 @@ export function ProgressPage() {
 
                 {/* Comparison with Previous */}
                 {previousAssessment && (
-                  <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '16px', padding: '24px' }}>
+                  <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '24px' }}>
                     <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 600, color: DS.text, marginBottom: '24px' }}>
                       Progress Since {new Date(previousAssessment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </h3>
                     
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
-                      <div style={{ textAlign: 'center', padding: '16px', background: DS.bg, borderRadius: '12px' }}>
+                      <div style={{ textAlign: 'center', padding: '16px', background: DS.bg, borderRadius: '0px' }}>
                         <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>OVERALL</p>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                           {getDeltaIcon(selectedAssessment.composite_score - previousAssessment.composite_score)}
@@ -397,7 +397,7 @@ export function ProgressPage() {
                           </span>
                         </div>
                       </div>
-                      <div style={{ textAlign: 'center', padding: '16px', background: DS.bg, borderRadius: '12px' }}>
+                      <div style={{ textAlign: 'center', padding: '16px', background: DS.bg, borderRadius: '0px' }}>
                         <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>CROSS-BORDER</p>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                           {getDeltaIcon(selectedAssessment.cross_border_score - previousAssessment.cross_border_score)}

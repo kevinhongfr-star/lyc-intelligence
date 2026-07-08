@@ -167,7 +167,7 @@ export function OrgChartEditor({ companyId, companyName, initialData, onSave }: 
     return (
       <div className="select-none">
         <div
-          className={`flex items-center gap-2 py-2 px-3 rounded-lg cursor-pointer transition-all ${
+          className={`flex items-center gap-2 py-2 px-3 rounded-none cursor-pointer transition-all ${
             isSelected 
               ? 'bg-accent/10 border border-accent/30' 
               : 'hover:bg-bg-alt'
@@ -258,14 +258,14 @@ export function OrgChartEditor({ companyId, companyName, initialData, onSave }: 
     const path = getNodePath(editingNode.id);
 
     return (
-      <div className="bg-card rounded-xl border border-card-border p-6">
+      <div className="bg-card rounded-none border border-card-border p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-text-primary">
             Edit Position
           </h3>
           <button
             onClick={() => setEditingNode(null)}
-            className="p-2 hover:bg-bg-alt rounded-lg"
+            className="p-2 hover:bg-bg-alt rounded-none"
           >
             <X className="w-5 h-5 text-text-muted" />
           </button>
@@ -342,7 +342,7 @@ export function OrgChartEditor({ companyId, companyName, initialData, onSave }: 
             <select
               value={editingNode.reports_to || ''}
               onChange={(e) => updateNode(editingNode.id, { reports_to: e.target.value || null })}
-              className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full px-3 py-2 bg-bg border border-border rounded-none text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
             >
               <option value="">None (Root/CEO)</option>
               {potentialParents.map(parent => (
@@ -363,7 +363,7 @@ export function OrgChartEditor({ companyId, companyName, initialData, onSave }: 
                 <button
                   key={level}
                   onClick={() => updateNode(editingNode.id, { talent_relevance: level })}
-                  className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center font-medium transition-all ${
+                  className={`w-10 h-10 rounded-none border-2 flex items-center justify-center font-medium transition-all ${
                     editingNode.talent_relevance === level
                       ? 'border-accent bg-accent/10 text-accent'
                       : 'border-border hover:border-accent/50 text-text-muted'
@@ -388,7 +388,7 @@ export function OrgChartEditor({ companyId, companyName, initialData, onSave }: 
   };
 
   return (
-    <div className="bg-bg rounded-xl">
+    <div className="bg-bg rounded-none">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div>
@@ -415,10 +415,10 @@ export function OrgChartEditor({ companyId, companyName, initialData, onSave }: 
             </div>
           )}
 
-          <div className="flex bg-bg-alt rounded-lg p-1">
+          <div className="flex bg-bg-alt rounded-none p-1">
             <button
               onClick={() => setViewMode('edit')}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-none text-sm font-medium transition-all ${
                 viewMode === 'edit'
                   ? 'bg-accent text-white'
                   : 'text-text-muted hover:text-text-primary'
@@ -428,7 +428,7 @@ export function OrgChartEditor({ companyId, companyName, initialData, onSave }: 
             </button>
             <button
               onClick={() => setViewMode('visualize')}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-none text-sm font-medium transition-all ${
                 viewMode === 'visualize'
                   ? 'bg-accent text-white'
                   : 'text-text-muted hover:text-text-primary'
@@ -449,7 +449,7 @@ export function OrgChartEditor({ companyId, companyName, initialData, onSave }: 
       {viewMode === 'edit' ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
           {/* Tree View */}
-          <div className="bg-card rounded-xl border border-card-border p-4">
+          <div className="bg-card rounded-none border border-card-border p-4">
             <h3 className="text-sm font-medium text-text-muted mb-4">
               Organization Tree
             </h3>
@@ -475,7 +475,7 @@ export function OrgChartEditor({ companyId, companyName, initialData, onSave }: 
             {editingNode ? (
               <NodeForm />
             ) : (
-              <div className="bg-card rounded-xl border border-card-border p-8 text-center">
+              <div className="bg-card rounded-none border border-card-border p-8 text-center">
                 <User className="w-12 h-12 mx-auto mb-3 text-text-muted opacity-50" />
                 <p className="text-text-muted">Select a position to edit</p>
                 <p className="text-sm mt-1">Or add a new position from the tree</p>

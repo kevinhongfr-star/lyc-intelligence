@@ -170,7 +170,7 @@ export function InterviewQuestionGenerator({
   // Render configure step
   const renderConfigure = () => (
     <div className="space-y-6">
-      <div className="bg-bg-alt rounded-lg p-4">
+      <div className="bg-bg-alt rounded-none p-4">
         <h3 className="font-medium text-text-primary mb-2">Mandate</h3>
         <p className="text-sm text-text-secondary">{mandate.title}</p>
         <p className="text-xs text-text-muted mt-1">
@@ -178,7 +178,7 @@ export function InterviewQuestionGenerator({
         </p>
       </div>
 
-      <div className="bg-bg-alt rounded-lg p-4">
+      <div className="bg-bg-alt rounded-none p-4">
         <h3 className="font-medium text-text-primary mb-2">Success Profile</h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
@@ -213,7 +213,7 @@ export function InterviewQuestionGenerator({
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
           <span className="text-sm">{error}</span>
         </div>
       )}
@@ -254,7 +254,7 @@ export function InterviewQuestionGenerator({
     return (
       <div
         key={question.id}
-        className={`border rounded-lg transition-colors ${
+        className={`border rounded-none transition-colors ${
           isEditing ? 'border-primary' : 'border-border'
         }`}
       >
@@ -317,7 +317,7 @@ export function InterviewQuestionGenerator({
                   <textarea
                     value={question.question}
                     onChange={(e) => handleUpdateQuestion(question.id, { question: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary resize-none"
+                    className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
                     rows={2}
                     placeholder="Enter the interview question..."
                   />
@@ -331,7 +331,7 @@ export function InterviewQuestionGenerator({
                   <select
                     value={question.competencyArea}
                     onChange={(e) => handleUpdateQuestion(question.id, { competencyArea: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+                    className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
                   >
                     <option value="Technical">Technical</option>
                     <option value="Leadership">Leadership</option>
@@ -348,7 +348,7 @@ export function InterviewQuestionGenerator({
                   <textarea
                     value={question.whatToListenFor}
                     onChange={(e) => handleUpdateQuestion(question.id, { whatToListenFor: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary resize-none"
+                    className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
                     rows={2}
                     placeholder="Key indicators in a good answer..."
                   />
@@ -362,7 +362,7 @@ export function InterviewQuestionGenerator({
                   <textarea
                     value={question.followUpQuestion}
                     onChange={(e) => handleUpdateQuestion(question.id, { followUpQuestion: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary resize-none"
+                    className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
                     rows={2}
                     placeholder="A probing follow-up question..."
                   />
@@ -432,7 +432,7 @@ export function InterviewQuestionGenerator({
       })}
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
           <span className="text-sm">{error}</span>
         </div>
       )}

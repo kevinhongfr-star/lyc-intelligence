@@ -108,7 +108,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
             <div className="space-y-4">
               <button
                 onClick={onUpgrade}
-                className="w-full py-3 px-4 bg-accent text-white rounded-xl font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 bg-accent text-white rounded-none font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
               >
                 <Crown className="w-5 h-5" />
                 Upgrade to Council
@@ -116,7 +116,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
 
               <button
                 onClick={onCancel}
-                className="w-full py-3 px-4 bg-bg-tertiary text-text-primary rounded-xl font-medium hover:bg-bg-secondary transition-colors"
+                className="w-full py-3 px-4 bg-bg-tertiary text-text-primary rounded-none font-medium hover:bg-bg-secondary transition-colors"
               >
                 Maybe Later
               </button>

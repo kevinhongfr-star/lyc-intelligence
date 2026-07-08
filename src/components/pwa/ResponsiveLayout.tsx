@@ -145,7 +145,7 @@ function PWAUpdateToast() {
 
   return (
     <div className="fixed bottom-20 lg:bottom-4 left-4 right-4 lg:left-auto lg:right-4 lg:w-96">
-      <div className="bg-card border border-card-border rounded-xl shadow-lg p-4">
+      <div className="bg-card border border-card-border rounded-none shadow-lg p-4">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
             <span className="text-primary font-bold">!</span>
@@ -158,7 +158,7 @@ function PWAUpdateToast() {
             <div className="flex gap-2 mt-3">
               <button
                 onClick={handleUpdate}
-                className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                className="px-4 py-2 bg-primary text-white rounded-none text-sm font-medium hover:bg-primary/90 transition-colors"
               >
                 Update Now
               </button>
@@ -206,7 +206,7 @@ export function Card({
   return (
     <Component
       onClick={onClick}
-      className={`bg-card border border-card-border rounded-xl p-4 ${
+      className={`bg-card border border-card-border rounded-none p-4 ${
         onClick ? 'hover:bg-bg-alt active:scale-[0.98] transition-all w-full text-left' : ''
       } ${className}`}
     >
@@ -274,7 +274,7 @@ export function StatCard({
           )}
         </div>
         {icon && (
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+          <div className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center text-primary">
             {icon}
           </div>
         )}
@@ -302,10 +302,10 @@ export function ListItem({
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 p-3 bg-card border border-card-border rounded-xl hover:bg-bg-alt active:scale-[0.99] transition-all text-left ${className}`}
+      className={`w-full flex items-center gap-3 p-3 bg-card border border-card-border rounded-none hover:bg-bg-alt active:scale-[0.99] transition-all text-left ${className}`}
     >
       {leftIcon && (
-        <div className="w-10 h-10 rounded-lg bg-bg-alt flex items-center justify-center flex-shrink-0 text-text-muted">
+        <div className="w-10 h-10 rounded-none bg-bg-alt flex items-center justify-center flex-shrink-0 text-text-muted">
           {leftIcon}
         </div>
       )}

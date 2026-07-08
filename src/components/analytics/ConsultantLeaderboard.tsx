@@ -76,7 +76,7 @@ export function ConsultantLeaderboard({ consultants }: ConsultantLeaderboardProp
   );
 
   return (
-    <div className="bg-card border border-card-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-card-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center gap-3 mb-4">
@@ -269,7 +269,7 @@ export function ConsultantStatsCards({ consultants }: { consultants: ConsultantP
 
   return (
     <div className="grid grid-cols-4 gap-4">
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
             <Trophy className="w-5 h-5 text-yellow-600" />
@@ -281,7 +281,7 @@ export function ConsultantStatsCards({ consultants }: { consultants: ConsultantP
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
             <Users className="w-5 h-5 text-green-600" />
@@ -293,7 +293,7 @@ export function ConsultantStatsCards({ consultants }: { consultants: ConsultantP
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
             <Target className="w-5 h-5 text-blue-600" />
@@ -305,7 +305,7 @@ export function ConsultantStatsCards({ consultants }: { consultants: ConsultantP
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
             <Clock className="w-5 h-5 text-purple-600" />

@@ -111,7 +111,7 @@ export function ProfilePage() {
               padding: '12px 16px',
               background: DS.bg,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '8px',
+              borderRadius: '0px',
               color: DS.text,
               fontSize: '15px',
               outline: 'none',
@@ -134,7 +134,7 @@ export function ProfilePage() {
                 padding: '12px 16px',
                 background: DS.bg,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '8px',
+                borderRadius: '0px',
                 color: DS.text,
                 fontSize: '15px',
                 outline: 'none',
@@ -156,7 +156,7 @@ export function ProfilePage() {
                 padding: '12px 16px',
                 background: DS.bg,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '8px',
+                borderRadius: '0px',
                 color: DS.text,
                 fontSize: '15px',
                 outline: 'none',
@@ -179,7 +179,7 @@ export function ProfilePage() {
               padding: '12px 16px',
               background: DS.bg,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '8px',
+              borderRadius: '0px',
               color: DS.text,
               fontSize: '15px',
               outline: 'none',
@@ -211,7 +211,7 @@ export function ProfilePage() {
               padding: '12px 16px',
               background: DS.bg,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '8px',
+              borderRadius: '0px',
               color: DS.text,
               fontSize: '15px',
               outline: 'none',
@@ -234,7 +234,7 @@ export function ProfilePage() {
               padding: '12px 16px',
               background: DS.bg,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '8px',
+              borderRadius: '0px',
               color: DS.text,
               fontSize: '15px',
               outline: 'none',
@@ -257,7 +257,7 @@ export function ProfilePage() {
               padding: '12px 16px',
               background: DS.bg,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '8px',
+              borderRadius: '0px',
               color: DS.text,
               fontSize: '15px',
               outline: 'none',
@@ -295,7 +295,7 @@ export function ProfilePage() {
                     {new Date(assessment.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                   </p>
                 </div>
-                <div style={{ background: `${DS.accent}20`, padding: '6px 12px', borderRadius: '6px' }}>
+                <div style={{ background: `${DS.accent}20`, padding: '6px 12px', borderRadius: '0px' }}>
                   <span style={{ fontSize: '14px', fontWeight: 600, color: DS.accent }}>{assessment.composite_score}</span>
                 </div>
               </div>
@@ -342,7 +342,7 @@ export function ProfilePage() {
             background: DS.accent,
             color: '#FFFFFF',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: '0px',
             fontSize: '14px',
             fontWeight: 600,
             cursor: 'pointer',
@@ -379,7 +379,7 @@ export function ProfilePage() {
       </h2>
       <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-          <div style={{ width: '48px', height: '48px', background: `${DS.accent}20`, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: '48px', height: '48px', background: `${DS.accent}20`, borderRadius: '0px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <FileText style={{ width: 24, height: 24, color: DS.accent }} />
           </div>
           <div>
@@ -393,7 +393,7 @@ export function ProfilePage() {
           background: DS.bg,
           color: DS.text,
           border: `1px solid ${DS.cardBorder}`,
-          borderRadius: '8px',
+          borderRadius: '0px',
           fontSize: '14px',
           fontWeight: 500,
           cursor: 'pointer',
@@ -404,7 +404,7 @@ export function ProfilePage() {
       </div>
       <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-          <div style={{ width: '48px', height: '48px', background: `${DS.accent}20`, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: '48px', height: '48px', background: `${DS.accent}20`, borderRadius: '0px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <ExternalLink style={{ width: 24, height: 24, color: DS.accent }} />
           </div>
           <div>
@@ -423,7 +423,7 @@ export function ProfilePage() {
               padding: '12px 16px',
               background: DS.bg,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '8px',
+              borderRadius: '0px',
               color: DS.text,
               fontSize: '14px',
               outline: 'none',
@@ -435,7 +435,7 @@ export function ProfilePage() {
             background: DS.accent,
             color: '#FFFFFF',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: '0px',
             fontSize: '14px',
             fontWeight: 600,
             cursor: 'pointer',
@@ -471,7 +471,7 @@ export function ProfilePage() {
               background: DS.accent,
               color: '#FFFFFF',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '0px',
               fontSize: '14px',
               fontWeight: 600,
               cursor: saving ? 'not-allowed' : 'pointer',
@@ -500,7 +500,7 @@ export function ProfilePage() {
                   padding: '14px 16px',
                   background: activeSection === section.id ? DS.card : 'transparent',
                   border: `1px solid ${activeSection === section.id ? DS.accent : 'transparent'}`,
-                  borderRadius: '8px',
+                  borderRadius: '0px',
                   cursor: 'pointer',
                   textAlign: 'left',
                   transition: 'all 0.2s',

@@ -99,7 +99,7 @@ export function NextActionReminders({ daysAhead = 7, maxItems = 20, onCandidateC
 
   if (loading) {
     return (
-      <div className="bg-bg-secondary border border-border rounded-xl p-5">
+      <div className="bg-bg-secondary border border-border rounded-none p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-text-primary flex items-center gap-2">
             <Bell className="w-4 h-4 text-accent" />
@@ -112,7 +112,7 @@ export function NextActionReminders({ daysAhead = 7, maxItems = 20, onCandidateC
   }
 
   return (
-    <div className="bg-bg-secondary border border-border rounded-xl p-5">
+    <div className="bg-bg-secondary border border-border rounded-none p-5">
       <div className="flex items-start justify-between mb-4 gap-2 flex-wrap">
         <div>
           <h3 className="font-semibold text-text-primary flex items-center gap-2">
@@ -163,7 +163,7 @@ export function NextActionReminders({ daysAhead = 7, maxItems = 20, onCandidateC
               <button
                 key={item.id}
                 onClick={() => onCandidateClick?.(item.candidateId, item.mandateId)}
-                className={`w-full text-left p-3 rounded-lg border transition-all hover:shadow-sm ${
+                className={`w-full text-left p-3 rounded-none border transition-all hover:shadow-sm ${
                   dateInfo.isOverdue
                     ? 'border-red-200 bg-red-50 hover:bg-red-100'
                     : dateInfo.isToday
@@ -172,7 +172,7 @@ export function NextActionReminders({ daysAhead = 7, maxItems = 20, onCandidateC
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg flex-shrink-0 ${
+                  <div className={`p-2 rounded-none flex-shrink-0 ${
                     dateInfo.isOverdue
                       ? 'bg-red-100 text-red-600'
                       : dateInfo.isToday

@@ -42,7 +42,7 @@ export function CandidateReportPage() {
         <Link to={`/platform/candidates/${id}`} className="flex items-center gap-1.5 text-xs text-text-muted hover:text-accent">
           <ArrowLeft size={13} /> Back to Profile
         </Link>
-        <Button onClick={handlePrint} className="bg-accent hover:bg-accent/90 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2">
+        <Button onClick={handlePrint} className="bg-accent hover:bg-accent/90 text-white text-xs font-bold px-4 py-2 rounded-none flex items-center gap-2">
           <Download size={13} /> Export PDF
         </Button>
       </div>
@@ -58,7 +58,7 @@ export function CandidateReportPage() {
               <p className="text-sm text-gray-500 mt-1 font-sans">{contact.name} — {contact.current_title || 'Executive'}</p>
             </div>
             <div className="text-right">
-              <div className="w-14 h-14 rounded-xl text-white font-bold text-2xl flex items-center justify-center uppercase" style={{ backgroundColor: tier.color, fontFamily: "'Liberation Serif', serif" }}>
+              <div className="w-14 h-14 rounded-none text-white font-bold text-2xl flex items-center justify-center uppercase" style={{ backgroundColor: tier.color, fontFamily: "'Liberation Serif', serif" }}>
                 {initials}
               </div>
               <p className="text-[10px] text-gray-400 mt-2 font-sans">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
@@ -139,7 +139,7 @@ export function CandidateReportPage() {
           {contact.education && contact.education.length > 0 ? (
             <div className="grid grid-cols-2 gap-4">
               {contact.education.map((edu, idx) => (
-                <div key={idx} className="bg-gray-50 border border-gray-100 rounded-lg p-3">
+                <div key={idx} className="bg-gray-50 border border-gray-100 rounded-none p-3">
                   <p className="text-sm font-bold">{edu.degree}</p>
                   <p className="text-xs text-gray-500 font-sans">{edu.school}</p>
                 </div>

@@ -108,7 +108,7 @@ export function TalentPoolTab() {
           <Loader2 className="w-4 h-4 animate-spin" /> Loading talent pool…
         </div>
       ) : error ? (
-        <div className="text-sm text-red-600 py-4 border border-red-200 bg-red-50 rounded-md p-3">
+        <div className="text-sm text-red-600 py-4 border border-red-200 bg-red-50 rounded-none p-3">
           <AlertTriangle className="w-4 h-4 inline mr-1" /> {error}
         </div>
       ) : (
@@ -120,7 +120,7 @@ export function TalentPoolTab() {
               <select
                 value={buFilter}
                 onChange={(e) => setBuFilter(e.target.value)}
-                className="border border-bg-hover rounded-md px-2 py-1 text-sm bg-white"
+                className="border border-bg-hover rounded-none px-2 py-1 text-sm bg-white"
               >
                 <option value="">All BUs</option>
                 {bus.map((b) => <option key={b} value={b}>{b}</option>)}
@@ -131,7 +131,7 @@ export function TalentPoolTab() {
               <select
                 value={levelFilter}
                 onChange={(e) => setLevelFilter(e.target.value)}
-                className="border border-bg-hover rounded-md px-2 py-1 text-sm bg-white"
+                className="border border-bg-hover rounded-none px-2 py-1 text-sm bg-white"
               >
                 <option value="">All levels</option>
                 {levels.map((l) => <option key={l} value={String(l)}>L{l}</option>)}
@@ -148,7 +148,7 @@ export function TalentPoolTab() {
             <div className="ml-auto">
               <button
                 onClick={() => setShowAddForm((v) => !v)}
-                className="px-3 py-1.5 text-sm bg-accent text-white rounded-md hover:bg-accent-light flex items-center gap-1"
+                className="px-3 py-1.5 text-sm bg-accent text-white rounded-none hover:bg-accent-light flex items-center gap-1"
               >
                 {showAddForm ? <X className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
                 {showAddForm ? 'Cancel' : 'Add individual'}
@@ -179,7 +179,7 @@ export function TalentPoolTab() {
               note={talent.length === 0 ? 'Use the form above to add the first individual, or import a CSV (Phase 2).' : undefined}
             />
           ) : (
-            <div className="border border-bg-hover rounded-md overflow-x-auto">
+            <div className="border border-bg-hover rounded-none overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-bg-secondary text-text-secondary">
                   <tr>
@@ -278,7 +278,7 @@ function AddIndividualForm({ companyId, onAdded }: { companyId: string; onAdded:
   };
 
   return (
-    <form onSubmit={submit} className="border border-bg-hover rounded-md p-4 bg-bg-secondary/30 space-y-3">
+    <form onSubmit={submit} className="border border-bg-hover rounded-none p-4 bg-bg-secondary/30 space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Field label="Name *" value={name} onChange={setName} required />
         <Field label="Title" value={title} onChange={setTitle} />
@@ -297,7 +297,7 @@ function AddIndividualForm({ companyId, onAdded }: { companyId: string; onAdded:
         <button
           type="submit"
           disabled={submitting}
-          className="px-3 py-1.5 text-sm bg-accent text-white rounded-md hover:bg-accent-light disabled:opacity-50 flex items-center gap-1"
+          className="px-3 py-1.5 text-sm bg-accent text-white rounded-none hover:bg-accent-light disabled:opacity-50 flex items-center gap-1"
         >
           {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
           Add
@@ -325,7 +325,7 @@ function Field({ label, value, onChange, type, required }: {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
-        className="w-full border border-bg-hover rounded-md px-2 py-1.5 text-sm bg-white"
+        className="w-full border border-bg-hover rounded-none px-2 py-1.5 text-sm bg-white"
       />
     </div>
   );
@@ -333,7 +333,7 @@ function Field({ label, value, onChange, type, required }: {
 
 function EmptyHint({ icon, title, note }: { icon: React.ReactNode; title: string; note?: string }) {
   return (
-    <div className="border-2 border-dashed border-bg-hover rounded-lg p-8 text-center">
+    <div className="border-2 border-dashed border-bg-hover rounded-none p-8 text-center">
       <div className="flex justify-center mb-2 text-text-muted">{icon}</div>
       <p className="text-text-primary font-medium">{title}</p>
       {note && <p className="text-text-muted text-sm mt-1">{note}</p>}

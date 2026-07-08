@@ -163,7 +163,7 @@ export function ClientMandateDashboard({ mandateId, onBack }: ClientMandateDashb
                 {mandate.pipeline?.stages.map((stage: any) => (
                   <div key={stage.stage} className="flex-1 text-center">
                     <div className="relative mb-2">
-                      <div className={`w-full h-16 rounded-lg ${getStageColor(stage.stage)} bg-opacity-20 flex items-center justify-center`}>
+                      <div className={`w-full h-16 rounded-none ${getStageColor(stage.stage)} bg-opacity-20 flex items-center justify-center`}>
                         <span className="text-xl font-bold text-gray-800">{stage.count}</span>
                       </div>
                       <div className={`absolute -top-1 -right-1 w-4 h-4 rounded-full ${getStageColor(stage.stage)}`}></div>
@@ -194,7 +194,7 @@ export function ClientMandateDashboard({ mandateId, onBack }: ClientMandateDashb
                     return (
                       <div
                         key={candidate.contact_id}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="flex items-center justify-between p-4 bg-gray-50 rounded-none hover:bg-gray-100 transition-colors"
                       >
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">

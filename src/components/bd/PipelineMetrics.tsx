@@ -174,9 +174,9 @@ export function PipelineMetrics({ orgId, period = 'all' }: PipelineMetricsProps)
                 {item.label}
               </div>
               <div className="flex-1">
-                <div className="h-8 bg-bg-secondary rounded-lg overflow-hidden flex items-center">
+                <div className="h-8 bg-bg-secondary rounded-none overflow-hidden flex items-center">
                   <div
-                    className={cn(item.color, 'h-full rounded-lg flex items-center justify-end pr-2')}
+                    className={cn(item.color, 'h-full rounded-none flex items-center justify-end pr-2')}
                     style={{ width: `${Math.max((item.count / Math.max(metrics.total_opportunities, 1)) * 100, 5)}%` }}
                   >
                     <span className="text-xs font-medium text-white">

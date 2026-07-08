@@ -331,7 +331,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
 
       {/* Question */}
       <div className="max-w-xl mx-auto px-4 py-8">
-        <div className="bg-card rounded-xl border border-border p-6">
+        <div className="bg-card rounded-none border border-border p-6">
           <h2 className="text-lg font-medium text-text-primary mb-6">
             {questionText}
           </h2>
@@ -344,7 +344,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
                   <button
                     key={value}
                     onClick={() => handleResponse(question.number, { rating: value })}
-                    className={`w-14 h-14 rounded-xl border-2 font-semibold transition-all ${
+                    className={`w-14 h-14 rounded-none border-2 font-semibold transition-all ${
                       response?.rating === value
                         ? 'border-primary bg-primary text-white'
                         : 'border-border hover:border-primary/50 text-text-muted'
@@ -377,7 +377,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
                       responseText: option.label,
                     })
                   }
-                  className={`flex-1 py-4 rounded-xl border-2 font-medium transition-all ${
+                  className={`flex-1 py-4 rounded-none border-2 font-medium transition-all ${
                     response?.responseText === option.label
                       ? `border-${option.color}-500 bg-${option.color}-50 text-${option.color}-700`
                       : 'border-border hover:border-primary/50 text-text-muted'
@@ -396,7 +396,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
               onChange={(e) =>
                 handleResponse(question.number, { responseText: e.target.value })
               }
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg-base text-text-primary resize-none"
+              className="w-full px-4 py-3 border border-border rounded-none bg-bg-base text-text-primary resize-none"
               rows={5}
               placeholder="Please share your thoughts..."
             />
@@ -410,7 +410,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
                 onChange={(e) =>
                   handleResponse(question.number, { responseText: e.target.value })
                 }
-                className="w-full px-4 py-3 border border-border rounded-xl bg-bg-base text-text-primary resize-none"
+                className="w-full px-4 py-3 border border-border rounded-none bg-bg-base text-text-primary resize-none"
                 rows={3}
                 placeholder="Optional: Add more detail..."
               />
@@ -433,7 +433,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
             <button
               onClick={() => setCurrentQuestion(currentQuestion + 1)}
               disabled={question.required && !isCurrentAnswered()}
-              className="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-none font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
               <ChevronRight className="w-5 h-5" />
@@ -442,7 +442,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
             <button
               onClick={handleSubmit}
               disabled={!canSubmit() || isSubmitting}
-              className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-none font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>
@@ -473,7 +473,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
                 <button
                   key={q.number}
                   onClick={() => setCurrentQuestion(idx)}
-                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                  className={`w-8 h-8 rounded-none text-sm font-medium transition-colors ${
                     idx === currentQuestion
                       ? 'bg-primary text-white'
                       : isAnswered

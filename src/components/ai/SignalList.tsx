@@ -139,7 +139,7 @@ export function SignalList({ contactId, limit = 50 }: SignalListProps) {
         return (
           <div
             key={signal.id}
-            className="flex items-start gap-3 p-3 rounded-lg bg-bg-secondary border border-bg-tertiary hover:border-border-focus transition-colors"
+            className="flex items-start gap-3 p-3 rounded-none bg-bg-secondary border border-bg-tertiary hover:border-border-focus transition-colors"
           >
             {/* Icon */}
             <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${config.color}`}>

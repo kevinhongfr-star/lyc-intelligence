@@ -214,7 +214,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
               <button
                 key={type.value}
                 onClick={() => setAssessmentType(type.value)}
-                className={`p-4 rounded-lg border-2 text-left transition-colors ${
+                className={`p-4 rounded-none border-2 text-left transition-colors ${
                   assessmentType === type.value
                     ? 'border-primary bg-primary/5'
                     : 'border-border hover:border-text-muted'
@@ -226,7 +226,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
             ))}
           </div>
 
-          <div className={`p-4 rounded-lg ${shiftResultCount >= 50 ? 'bg-green-50' : 'bg-amber-50'}`}>
+          <div className={`p-4 rounded-none ${shiftResultCount >= 50 ? 'bg-green-50' : 'bg-amber-50'}`}>
             <div className="flex items-center gap-2">
               {shiftResultCount >= 50 ? (
                 <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -333,7 +333,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
             </div>
           )}
 
-          <div className={`p-4 rounded-lg ${peerCount >= 50 ? 'bg-green-50' : 'bg-amber-50'}`}>
+          <div className={`p-4 rounded-none ${peerCount >= 50 ? 'bg-green-50' : 'bg-amber-50'}`}>
             <div className="flex items-center gap-2">
               {peerCount >= 50 ? (
                 <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -359,7 +359,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
           </div>
 
           {eligibleMembers.length === 0 ? (
-            <div className="p-8 text-center bg-bg-alt rounded-lg">
+            <div className="p-8 text-center bg-bg-alt rounded-none">
               <Users className="w-12 h-12 text-text-muted mx-auto" />
               <p className="text-text-muted mt-4">No team members have completed this assessment</p>
             </div>
@@ -368,7 +368,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
               {eligibleMembers.map(member => (
                 <div
                   key={member.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                  className={`flex items-center gap-3 p-3 rounded-none cursor-pointer transition-colors ${
                     selectedMembers.includes(member.id)
                       ? 'bg-primary/10 border-2 border-primary'
                       : 'bg-bg-alt border-2 border-transparent hover:border-border'
@@ -403,7 +403,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
             </p>
           </div>
 
-          <div className="p-4 bg-bg-alt rounded-lg space-y-3">
+          <div className="p-4 bg-bg-alt rounded-none space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-text-muted">Assessment Type</span>
               <span className="font-medium text-text-primary">{assessmentType}</span>
@@ -422,7 +422,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
             </div>
           </div>
 
-          <div className="p-4 bg-primary/5 rounded-lg">
+          <div className="p-4 bg-primary/5 rounded-none">
             <div className="flex items-center gap-3">
               <CreditCard className="w-5 h-5 text-primary" />
               <div>

@@ -109,7 +109,7 @@ export function TeamManagement() {
           style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             padding: '8px 16px', background: '#C108AB', color: '#FFF',
-            border: 'none', borderRadius: '8px', fontSize: '13px',
+            border: 'none', borderRadius: '0px', fontSize: '13px',
             fontWeight: 500, cursor: 'pointer',
           }}
         >
@@ -127,18 +127,18 @@ export function TeamManagement() {
             <div>
               <label style={{ display: 'block', fontSize: '12px', color: '#666', marginBottom: '4px' }}>Name</label>
               <input value={inviteName} onChange={(e) => setInviteName(e.target.value)} placeholder="Full name"
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E5E5', borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E5E5', borderRadius: '0px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '12px', color: '#666', marginBottom: '4px' }}>Email</label>
               <input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="team@company.com"
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E5E5', borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E5E5', borderRadius: '0px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
             <label style={{ fontSize: '12px', color: '#666' }}>Role:</label>
             <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value as 'user' | 'admin')}
-              style={{ padding: '6px 10px', border: '1px solid #E5E5E5', borderRadius: '6px', fontSize: '13px', outline: 'none', background: '#FFF' }}>
+              style={{ padding: '6px 10px', border: '1px solid #E5E5E5', borderRadius: '0px', fontSize: '13px', outline: 'none', background: '#FFF' }}>
               <option value="user">Member</option>
               <option value="admin">Admin</option>
             </select>
@@ -147,7 +147,7 @@ export function TeamManagement() {
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
               padding: '10px 20px', background: '#C108AB', color: '#FFF',
-              border: 'none', borderRadius: '8px', fontSize: '13px',
+              border: 'none', borderRadius: '0px', fontSize: '13px',
               fontWeight: 500, cursor: inviting ? 'not-allowed' : 'pointer',
               opacity: inviting ? 0.7 : 1,
             }}>

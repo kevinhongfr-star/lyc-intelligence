@@ -138,7 +138,7 @@ export function WeChatQuickLog({ contactId, contactName = '', onLogged }: WeChat
       {/* Modal */}
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-card border border-border rounded-xl w-full max-w-lg max-h-[90vh] flex flex-col">
+          <div className="bg-card border border-border rounded-none w-full max-w-lg max-h-[90vh] flex flex-col">
             {/* Header */}
             <div className="px-6 py-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -149,7 +149,7 @@ export function WeChatQuickLog({ contactId, contactName = '', onLogged }: WeChat
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 hover:bg-bg-alt rounded-lg"
+                className="p-2 hover:bg-bg-alt rounded-none"
               >
                 <X className="w-5 h-5 text-text-muted" />
               </button>
@@ -158,7 +158,7 @@ export function WeChatQuickLog({ contactId, contactName = '', onLogged }: WeChat
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-5">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-none text-sm">
                   {error}
                 </div>
               )}
@@ -175,7 +175,7 @@ export function WeChatQuickLog({ contactId, contactName = '', onLogged }: WeChat
                       <button
                         key={type.value}
                         onClick={() => setInteractionType(type.value)}
-                        className={`p-2 rounded-lg border text-xs font-medium transition-all flex flex-col items-center gap-1 ${
+                        className={`p-2 rounded-none border text-xs font-medium transition-all flex flex-col items-center gap-1 ${
                           interactionType === type.value
                             ? 'border-green-500 bg-green-50 text-green-700'
                             : 'border-border text-text-muted hover:border-green-300'
@@ -198,7 +198,7 @@ export function WeChatQuickLog({ contactId, contactName = '', onLogged }: WeChat
                   type="text"
                   value={summary}
                   onChange={e => setSummary(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="Brief description of the interaction"
                 />
               </div>
@@ -211,7 +211,7 @@ export function WeChatQuickLog({ contactId, contactName = '', onLogged }: WeChat
                 <textarea
                   value={content}
                   onChange={e => setContent(e.target.value)}
-                  className="w-full h-24 px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  className="w-full h-24 px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                   placeholder="Message content or call notes..."
                 />
               </div>
@@ -225,7 +225,7 @@ export function WeChatQuickLog({ contactId, contactName = '', onLogged }: WeChat
                   type="text"
                   value={wechatId}
                   onChange={e => setWechatId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="candidate_wechat_id"
                 />
               </div>
@@ -242,7 +242,7 @@ export function WeChatQuickLog({ contactId, contactName = '', onLogged }: WeChat
                       <button
                         key={o.value}
                         onClick={() => setOutcome(o.value)}
-                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1 ${
+                        className={`px-3 py-1.5 rounded-none border text-xs font-medium transition-all flex items-center gap-1 ${
                           outcome === o.value
                             ? `${o.color} bg-bg-alt border-current`
                             : 'border-border text-text-muted hover:border-gray-400'
@@ -283,7 +283,7 @@ export function WeChatQuickLog({ contactId, contactName = '', onLogged }: WeChat
                     <select
                       value={suggestedStage}
                       onChange={e => setSuggestedStage(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                      className="w-full px-3 py-2 rounded-none bg-bg-base border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                     >
                       {STAGE_OPTIONS.map(stage => (
                         <option key={stage.value} value={stage.value}>

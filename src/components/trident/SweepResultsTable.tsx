@@ -198,15 +198,15 @@ export function SweepResultsTable({ mandateId, contactIds, onComplete }: SweepRe
         </div>
 
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="p-3 bg-green-50 rounded-lg">
+          <div className="p-3 bg-green-50 rounded-none">
             <div className="text-sm text-green-600">Pass</div>
             <div className="text-2xl font-bold text-green-700">{passCount}</div>
           </div>
-          <div className="p-3 bg-yellow-50 rounded-lg">
+          <div className="p-3 bg-yellow-50 rounded-none">
             <div className="text-sm text-yellow-600">Warnings</div>
             <div className="text-2xl font-bold text-yellow-700">{warnCount}</div>
           </div>
-          <div className="p-3 bg-red-50 rounded-lg">
+          <div className="p-3 bg-red-50 rounded-none">
             <div className="text-sm text-red-600">Halt</div>
             <div className="text-2xl font-bold text-red-700">{haltCount}</div>
           </div>

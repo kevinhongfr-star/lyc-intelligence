@@ -87,14 +87,14 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
         <div className="flex gap-2">
           <button
             onClick={handlePrint}
-            className="px-4 py-2 bg-bg-tertiary text-text-primary rounded-lg text-sm font-medium hover:bg-bg-secondary flex items-center gap-2"
+            className="px-4 py-2 bg-bg-tertiary text-text-primary rounded-none text-sm font-medium hover:bg-bg-secondary flex items-center gap-2"
           >
             <Printer className="w-4 h-4" />
             Print
           </button>
           <button
             onClick={handleDownload}
-            className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 flex items-center gap-2"
+            className="px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent/90 flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
             Download PDF
@@ -103,7 +103,7 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
       </div>
 
       {/* Document */}
-      <div className={`bg-white rounded-xl shadow-lg overflow-hidden ${isPrinting ? 'print-container' : ''}`}>
+      <div className={`bg-white rounded-none shadow-lg overflow-hidden ${isPrinting ? 'print-container' : ''}`}>
         {/* Header */}
         <div className="bg-gradient-to-r from-accent to-purple-600 text-white p-8">
           <div className="flex items-center justify-between">
@@ -152,13 +152,13 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
                 const config = SOLUTION_TYPES[solution.solution_type as SolutionType];
                 
                 return (
-                  <div key={solution.id} className="border border-bg-tertiary rounded-lg overflow-hidden">
+                  <div key={solution.id} className="border border-bg-tertiary rounded-none overflow-hidden">
                     <div 
                       className="px-4 py-3"
                       style={{ backgroundColor: index % 2 === 0 ? '#f8fafc' : '#ffffff' }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center text-accent">
+                        <div className="w-10 h-10 rounded-none bg-accent/10 flex items-center text-accent">
                           {config?.icon}
                         </div>
                         <div className="flex-1">
@@ -252,7 +252,7 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
             <h3 className="text-lg font-semibold text-text-primary mb-4">Linked Assessments</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {solutions.filter(s => s.linked_assessment_type).map(solution => (
-                <div key={solution.id} className="bg-accent/5 rounded-lg p-4">
+                <div key={solution.id} className="bg-accent/5 rounded-none p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Award className="w-4 h-4 text-accent" />
                     <span className="font-medium text-text-primary">

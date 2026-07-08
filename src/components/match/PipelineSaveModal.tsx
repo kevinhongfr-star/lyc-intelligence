@@ -151,7 +151,7 @@ export function PipelineSaveModal({ open, onClose, result, contactId, candidateN
     }}>
       <div style={{
         background: DS.card, border: `1px solid ${DS.cardBorder}`,
-        borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '540px',
+        borderRadius: '0px', padding: '24px', width: '100%', maxWidth: '540px',
         maxHeight: '80vh', display: 'flex', flexDirection: 'column'
       }}>
         {success ? (
@@ -179,7 +179,7 @@ export function PipelineSaveModal({ open, onClose, result, contactId, candidateN
             {/* Candidate summary */}
             {result && (
               <div style={{
-                padding: '12px 16px', background: DS.bgAlt, borderRadius: '8px',
+                padding: '12px 16px', background: DS.bgAlt, borderRadius: '0px',
                 marginBottom: '16px', fontSize: '13px'
               }}>
                 <strong>{result.candidate_name}</strong> — Score: <strong>{result.composite_score}</strong>
@@ -201,7 +201,7 @@ export function PipelineSaveModal({ open, onClose, result, contactId, candidateN
                 style={{
                   width: '100%', padding: '10px 12px 10px 38px',
                   background: DS.bgAlt, border: `1px solid ${DS.cardBorder}`,
-                  borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
+                  borderRadius: '0px', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
                 }}
                 autoFocus
               />
@@ -223,7 +223,7 @@ export function PipelineSaveModal({ open, onClose, result, contactId, candidateN
                         padding: '10px 14px',
                         background: selectedMandate?.id === m.id ? `${DS.accent}08` : DS.bgAlt,
                         border: `1px solid ${selectedMandate?.id === m.id ? DS.accent : DS.cardBorder}`,
-                        borderRadius: '8px', cursor: 'pointer',
+                        borderRadius: '0px', cursor: 'pointer',
                         display: 'flex', alignItems: 'center', gap: '8px'
                       }}
                     >
@@ -244,7 +244,7 @@ export function PipelineSaveModal({ open, onClose, result, contactId, candidateN
               disabled={!selectedMandate || saving}
               style={{
                 padding: '12px 24px', background: DS.accent, border: 'none',
-                borderRadius: '8px', color: '#fff', fontSize: '14px', fontWeight: 600,
+                borderRadius: '0px', color: '#fff', fontSize: '14px', fontWeight: 600,
                 cursor: selectedMandate && !saving ? 'pointer' : 'not-allowed',
                 opacity: selectedMandate && !saving ? 1 : 0.5,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'

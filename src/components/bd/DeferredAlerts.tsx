@@ -111,7 +111,7 @@ export function DeferredAlerts({
                     key={opp.id}
                     onClick={() => onSelectOpportunity?.(opp)}
                     className={cn(
-                      'w-full p-3 rounded-lg text-left',
+                      'w-full p-3 rounded-none text-left',
                       'bg-red-50 border border-red-100',
                       'hover:bg-red-100 transition-colors',
                       'flex items-center justify-between'
@@ -152,7 +152,7 @@ export function DeferredAlerts({
                     key={opp.id}
                     onClick={() => onSelectOpportunity?.(opp)}
                     className={cn(
-                      'w-full p-3 rounded-lg text-left',
+                      'w-full p-3 rounded-none text-left',
                       'bg-bg-secondary border border-bg-hover',
                       'hover:bg-bg-hover transition-colors',
                       'flex items-center justify-between'

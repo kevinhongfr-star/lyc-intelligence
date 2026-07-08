@@ -186,7 +186,7 @@ export function WorkshopAssessment({ token }: { token: string }) {
             <h1 className="text-2xl font-bold text-text-primary mb-2">{workshop.title}</h1>
             <p className="text-text-muted mb-6">{ASSESSMENT_CATALOG[workshop.assessment_type as keyof typeof ASSESSMENT_CATALOG]?.b2cName}</p>
             
-            <div className="bg-bg-secondary rounded-xl p-6 mb-6 text-left">
+            <div className="bg-bg-secondary rounded-none p-6 mb-6 text-left">
               <h3 className="font-semibold text-text-primary mb-4">What to expect:</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
@@ -269,7 +269,7 @@ export function WorkshopAssessment({ token }: { token: string }) {
                       <button
                         key={num}
                         onClick={() => handleAnswer(num)}
-                        className={`aspect-square rounded-lg flex items-center justify-center text-lg font-bold transition-all ${
+                        className={`aspect-square rounded-none flex items-center justify-center text-lg font-bold transition-all ${
                           responses[currentQuestion.id] === num
                             ? 'bg-accent text-white shadow-lg'
                             : 'bg-bg-secondary text-text-secondary hover:bg-accent/10'
@@ -292,7 +292,7 @@ export function WorkshopAssessment({ token }: { token: string }) {
                     <button
                       key={index}
                       onClick={() => handleAnswer(option)}
-                      className={`w-full p-4 rounded-lg border text-left transition-all ${
+                      className={`w-full p-4 rounded-none border text-left transition-all ${
                         responses[currentQuestion.id] === option
                           ? 'border-accent bg-accent/5'
                           : 'border-bg-tertiary hover:border-accent/50'
@@ -357,7 +357,7 @@ export function WorkshopAssessment({ token }: { token: string }) {
             <h1 className="text-2xl font-bold text-text-primary mb-2">Thank You!</h1>
             <p className="text-text-muted mb-6">Your assessment has been submitted successfully.</p>
 
-            <div className="bg-bg-secondary rounded-xl p-6 mb-6">
+            <div className="bg-bg-secondary rounded-none p-6 mb-6">
               <h3 className="font-semibold text-text-primary mb-4">Your Results</h3>
               {showSummary ? (
                 <div className="space-y-4">

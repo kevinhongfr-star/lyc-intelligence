@@ -135,7 +135,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                 )}
 
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-12 h-12 ${tier.color} rounded-xl flex items-center justify-center`}>
+                  <div className={`w-12 h-12 ${tier.color} rounded-none flex items-center justify-center`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -163,7 +163,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                 <button
                   onClick={tier.id === 'council' ? handleUpgrade : handleGetStarted}
                   disabled={loading}
-                  className={`w-full py-3 px-6 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${
+                  className={`w-full py-3 px-6 rounded-none font-medium flex items-center justify-center gap-2 transition-all ${
                     tier.popular
                       ? 'bg-accent text-white hover:bg-accent-hover'
                       : 'bg-bg-tertiary text-text-primary hover:bg-bg-secondary'
@@ -264,7 +264,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
               answer: 'We accept all major credit cards (Visa, Mastercard, American Express) through Stripe. We also support Apple Pay and Google Pay where available.',
             },
           ].map((faq, i) => (
-            <div key={i} className="bg-white rounded-xl border border-border p-6">
+            <div key={i} className="bg-white rounded-none border border-border p-6">
               <h3 className="font-semibold text-text-primary mb-2">{faq.question}</h3>
               <p className="text-text-muted text-sm">{faq.answer}</p>
             </div>
@@ -282,7 +282,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
           <button
             onClick={handleUpgrade}
             disabled={loading}
-            className="bg-white text-accent px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
+            className="bg-white text-accent px-8 py-3 rounded-none font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
           >
             {loading ? (
               <>

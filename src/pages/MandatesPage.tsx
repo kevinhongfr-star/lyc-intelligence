@@ -44,7 +44,7 @@ export function MandatesPage() {
         </div>
         <button
           onClick={() => navigate('/platform/mandates/new')}
-          className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent/90 transition-colors flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Create Mandate
@@ -54,10 +54,10 @@ export function MandatesPage() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input placeholder="Search mandates..." value={search} onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" />
+            className="w-full pl-10 pr-4 py-2 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" />
         </div>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-          className="bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary px-3 py-2 min-h-[44px]">
+          className="bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary px-3 py-2 min-h-[44px]">
           <option value="">All Statuses</option>
           {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
@@ -66,7 +66,7 @@ export function MandatesPage() {
         <div className="space-y-3">
           {filtered.map(m => (
             <div key={m.id} onClick={() => navigate(`/platform/mandates/${m.id}`)}
-              className="bg-bg-secondary border border-bg-tertiary rounded-lg p-4 cursor-pointer hover:border-accent/50 transition-colors">
+              className="bg-bg-secondary border border-bg-tertiary rounded-none p-4 cursor-pointer hover:border-accent/50 transition-colors">
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <h3 className="font-medium text-text-primary">{m.title}</h3>

@@ -86,7 +86,7 @@ export function BottomNavigation({
         {/* Logo */}
         <div className="p-4 border-b border-card-border">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+            <div className="w-10 h-10 rounded-none bg-primary flex items-center justify-center">
               <span className="text-white font-bold text-lg">D</span>
             </div>
             <div>
@@ -104,7 +104,7 @@ export function BottomNavigation({
               <Link
                 key={item.id}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-none transition-colors ${
                   isActive
                     ? 'bg-primary text-white'
                     : 'text-text-muted hover:bg-bg-alt hover:text-text-primary'
@@ -128,7 +128,7 @@ export function BottomNavigation({
             <Link
               key={item.id}
               href={item.href}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-bg-alt hover:text-text-primary transition-colors"
+              className="flex items-center gap-3 px-4 py-3 rounded-none text-text-muted hover:bg-bg-alt hover:text-text-primary transition-colors"
             >
               {item.icon}
               <span className="font-medium">{item.label}</span>
@@ -189,7 +189,7 @@ export function BottomNavigation({
               className="fixed inset-0 bg-black/50 z-40"
               onClick={() => setShowMore(false)}
             />
-            <div className="absolute bottom-16 right-4 bg-card rounded-xl shadow-lg border border-card-border z-50 w-56 overflow-hidden">
+            <div className="absolute bottom-16 right-4 bg-card rounded-none shadow-lg border border-card-border z-50 w-56 overflow-hidden">
               {moreItems.map((item) => (
                 <Link
                   key={item.id}

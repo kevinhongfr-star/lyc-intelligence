@@ -218,7 +218,7 @@ export function TalentDensityHeatmap({
     if (!cell) return null;
 
     return (
-      <div className="absolute bg-card rounded-lg border border-card-border p-3 shadow-lg z-20 pointer-events-none"
+      <div className="absolute bg-card rounded-none border border-card-border p-3 shadow-lg z-20 pointer-events-none"
         style={{
           left: '50%',
           top: '10px',
@@ -253,7 +253,7 @@ export function TalentDensityHeatmap({
 
   if (loading) {
     return (
-      <div className="bg-card rounded-xl border border-card-border p-8 flex items-center justify-center">
+      <div className="bg-card rounded-none border border-card-border p-8 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-accent" />
         <span className="ml-3 text-text-muted">Loading talent density data...</span>
       </div>
@@ -261,7 +261,7 @@ export function TalentDensityHeatmap({
   }
 
   return (
-    <div className="bg-card rounded-xl border border-card-border overflow-hidden">
+    <div className="bg-card rounded-none border border-card-border overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-4">
@@ -377,7 +377,7 @@ export function TalentDensityHeatmap({
       <div className="p-4 bg-bg-alt border-b border-border">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-green-500/10">
+            <div className="p-2 rounded-none bg-green-500/10">
               <TrendingUp className="w-5 h-5 text-green-500" />
             </div>
             <div>
@@ -391,7 +391,7 @@ export function TalentDensityHeatmap({
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-red-500/10">
+            <div className="p-2 rounded-none bg-red-500/10">
               <TrendingDown className="w-5 h-5 text-red-500" />
             </div>
             <div>
@@ -405,7 +405,7 @@ export function TalentDensityHeatmap({
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-accent/10">
+            <div className="p-2 rounded-none bg-accent/10">
               <MapPin className="w-5 h-5 text-accent" />
             </div>
             <div>
@@ -460,7 +460,7 @@ export function TalentDensityHeatmap({
                       onClick={() => handleCellClick(sector, geo)}
                     >
                       <div
-                        className={`w-full h-12 rounded-lg flex flex-col items-center justify-center ${
+                        className={`w-full h-12 rounded-none flex flex-col items-center justify-center ${
                           cell?.company_count > 0 
                             ? getDensityBgClass(cell.density_score)
                             : 'bg-bg-alt border border-border'
@@ -521,7 +521,7 @@ export function TalentDensityHeatmap({
             </h4>
             <button
               onClick={() => setSelectedCell(null)}
-              className="p-2 hover:bg-bg-alt rounded-lg"
+              className="p-2 hover:bg-bg-alt rounded-none"
             >
               <X className="w-5 h-5 text-text-muted" />
             </button>
@@ -531,7 +531,7 @@ export function TalentDensityHeatmap({
             {selectedCompanies.slice(0, 12).map(company => (
               <div
                 key={company.id}
-                className="bg-bg-alt rounded-lg p-3 border border-border hover:border-accent/50 transition-all"
+                className="bg-bg-alt rounded-none p-3 border border-border hover:border-accent/50 transition-all"
               >
                 <div className="font-medium text-text-primary mb-1">
                   {company.name}

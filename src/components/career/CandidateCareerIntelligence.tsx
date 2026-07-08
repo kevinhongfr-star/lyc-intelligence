@@ -230,7 +230,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowConvoInput(!showConvoInput)}
-            className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-bg-alt flex items-center gap-1.5"
+            className="px-3 py-1.5 text-sm border border-border rounded-none hover:bg-bg-alt flex items-center gap-1.5"
           >
             <MessageSquare className="w-4 h-4" />
             Log Conversation
@@ -238,7 +238,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
           <button
             onClick={handleGenerateBenchmark}
             disabled={generating}
-            className="px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5"
+            className="px-3 py-1.5 text-sm bg-primary text-white rounded-none hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5"
           >
             <Sparkles className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
             {generating ? 'Generating...' : 'Generate Benchmark'}
@@ -248,25 +248,25 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
 
       {/* Conversation Input */}
       {showConvoInput && (
-        <div className="bg-card border border-border rounded-xl p-4">
+        <div className="bg-card border border-border rounded-none p-4">
           <h4 className="font-medium text-text-primary mb-3">Log Candidate Conversation</h4>
           <textarea
             value={conversationText}
             onChange={e => setConversationText(e.target.value)}
             placeholder="Paste or type the conversation content here. The AI will extract signals, preferences, and update the candidate profile."
-            className="w-full h-32 p-3 border border-border rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            className="w-full h-32 p-3 border border-border rounded-none text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           />
           <div className="flex justify-end gap-2 mt-3">
             <button
               onClick={() => setShowConvoInput(false)}
-              className="px-4 py-1.5 text-sm border border-border rounded-lg hover:bg-bg-alt"
+              className="px-4 py-1.5 text-sm border border-border rounded-none hover:bg-bg-alt"
             >
               Cancel
             </button>
             <button
               onClick={handleProcessConversation}
               disabled={processingConvo || !conversationText.trim()}
-              className="px-4 py-1.5 text-sm bg-primary text-white rounded-lg hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5"
+              className="px-4 py-1.5 text-sm bg-primary text-white rounded-none hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5"
             >
               <Sparkles className={`w-4 h-4 ${processingConvo ? 'animate-spin' : ''}`} />
               {processingConvo ? 'Processing...' : 'Process with AI'}
@@ -276,7 +276,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
       )}
 
       {/* Career Benchmark */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <div className="bg-card border border-border rounded-none overflow-hidden">
         <button
           onClick={() => toggleSection('benchmark')}
           className="w-full px-5 py-4 flex items-center justify-between hover:bg-bg-alt/50"
@@ -297,28 +297,28 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
             {benchmark ? (
               <div className="space-y-4">
                 {/* Narrative */}
-                <div className="p-4 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-lg">
+                <div className="p-4 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-none">
                   <p className="text-sm text-text-primary leading-relaxed">{benchmark.narrative_summary}</p>
                 </div>
 
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="p-3 bg-bg-alt rounded-lg text-center">
+                  <div className="p-3 bg-bg-alt rounded-none text-center">
                     <Target className="w-5 h-5 text-blue-500 mx-auto mb-1" />
                     <p className="text-lg font-bold text-text-primary">{benchmark.market_demand_score || 0}/100</p>
                     <p className="text-xs text-text-muted">Market Demand</p>
                   </div>
-                  <div className="p-3 bg-bg-alt rounded-lg text-center">
+                  <div className="p-3 bg-bg-alt rounded-none text-center">
                     <Activity className="w-5 h-5 text-purple-500 mx-auto mb-1" />
                     <p className="text-lg font-bold text-text-primary">{benchmark.active_mandates_matching || 0}</p>
                     <p className="text-xs text-text-muted">Matching Mandates</p>
                   </div>
-                  <div className="p-3 bg-bg-alt rounded-lg text-center">
+                  <div className="p-3 bg-bg-alt rounded-none text-center">
                     <Zap className="w-5 h-5 text-amber-500 mx-auto mb-1" />
                     <p className="text-lg font-bold text-text-primary">{(benchmark.skill_gaps || []).length}</p>
                     <p className="text-xs text-text-muted">Skill Gaps</p>
                   </div>
-                  <div className="p-3 bg-bg-alt rounded-lg text-center">
+                  <div className="p-3 bg-bg-alt rounded-none text-center">
                     <Award className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
                     <p className="text-lg font-bold text-text-primary">{Math.round((benchmark.data_confidence || 0) * 100)}%</p>
                     <p className="text-xs text-text-muted">Data Confidence</p>
@@ -369,7 +369,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
                 <button
                   onClick={handleGenerateBenchmark}
                   disabled={generating}
-                  className="px-4 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90"
+                  className="px-4 py-2 text-sm bg-primary text-white rounded-none hover:opacity-90"
                 >
                   {generating ? 'Generating...' : 'Generate First Benchmark'}
                 </button>
@@ -380,7 +380,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
       </div>
 
       {/* Movement Signals */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <div className="bg-card border border-border rounded-none overflow-hidden">
         <button
           onClick={() => toggleSection('signals')}
           className="w-full px-5 py-4 flex items-center justify-between hover:bg-bg-alt/50"
@@ -410,7 +410,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
             {signals.length > 0 ? (
               <div className="space-y-2">
                 {signals.slice(0, 10).map((signal: any, i: number) => (
-                  <div key={i} className="flex items-start gap-3 p-3 bg-bg-alt rounded-lg">
+                  <div key={i} className="flex items-start gap-3 p-3 bg-bg-alt rounded-none">
                     <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${SEVERITY_COLORS[signal.severity] || 'bg-gray-400'}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -438,7 +438,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
       </div>
 
       {/* Nurture Sequences */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <div className="bg-card border border-border rounded-none overflow-hidden">
         <button
           onClick={() => toggleSection('nurture')}
           className="w-full px-5 py-4 flex items-center justify-between hover:bg-bg-alt/50"
@@ -467,7 +467,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
                   </div>
                   <button
                     onClick={handlePauseNurture}
-                    className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-bg-alt flex items-center gap-1.5"
+                    className="px-3 py-1.5 text-sm border border-border rounded-none hover:bg-bg-alt flex items-center gap-1.5"
                   >
                     <PauseCircle className="w-4 h-4" />
                     Pause
@@ -495,7 +495,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
                 )}
 
                 {activeNurture.response_count > 0 && (
-                  <div className="p-3 bg-green-50 rounded-lg">
+                  <div className="p-3 bg-green-50 rounded-none">
                     <p className="text-sm text-green-700">
                       {activeNurture.response_count} response{activeNurture.response_count > 1 ? 's' : ''} received
                     </p>
@@ -511,7 +511,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
                       key={type}
                       onClick={() => handleEnrollNurture(type)}
                       disabled={enrolling}
-                      className="p-3 border border-border rounded-lg text-left hover:bg-bg-alt transition-colors disabled:opacity-50"
+                      className="p-3 border border-border rounded-none text-left hover:bg-bg-alt transition-colors disabled:opacity-50"
                     >
                       <p className="text-sm font-medium text-text-primary">{type.replace(/_/g, ' ')}</p>
                       <p className="text-xs text-text-muted mt-0.5">
@@ -531,7 +531,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
       </div>
 
       {/* Intelligence Log */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <div className="bg-card border border-border rounded-none overflow-hidden">
         <button
           onClick={() => toggleSection('log')}
           className="w-full px-5 py-4 flex items-center justify-between hover:bg-bg-alt/50"

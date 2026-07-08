@@ -172,7 +172,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
   const renderUpload = () => (
     <div className="space-y-4">
       <div
-        className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
+        className={`border-2 border-dashed rounded-none p-8 text-center transition-colors ${
           dragActive
             ? 'border-primary bg-primary/5'
             : 'border-border hover:border-primary/50'
@@ -217,7 +217,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <p className="text-sm">{error}</p>
         </div>
@@ -289,7 +289,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
               type="text"
               value={editedData.name || ''}
               onChange={(e) => handleFieldEdit('name', e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
             />
           </div>
           <div>
@@ -300,7 +300,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
               type="text"
               value={editedData.currentTitle || ''}
               onChange={(e) => handleFieldEdit('currentTitle', e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
             />
           </div>
           <div>
@@ -311,7 +311,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
               type="text"
               value={editedData.currentCompany || ''}
               onChange={(e) => handleFieldEdit('currentCompany', e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
             />
           </div>
           <div>
@@ -322,7 +322,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
               type="number"
               value={editedData.yearsExperience || ''}
               onChange={(e) => handleFieldEdit('yearsExperience', parseInt(e.target.value) || null)}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
             />
           </div>
         </div>
@@ -369,7 +369,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
                     newHighlights[idx] = e.target.value;
                     handleFieldEdit('careerHighlights', newHighlights);
                   }}
-                  className="flex-1 px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary resize-none"
+                  className="flex-1 px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
                   rows={2}
                 />
               </li>
@@ -379,7 +379,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
 
         {/* Red Flags */}
         {editedData.potentialRedFlags && editedData.potentialRedFlags.length > 0 && (
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-none">
             <div className="flex items-center gap-2 mb-2">
               <AlertCircle className="w-5 h-5 text-amber-600" />
               <h4 className="font-medium text-amber-800">Potential Red Flags</h4>
@@ -393,7 +393,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
         )}
 
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <p className="text-sm">{error}</p>
           </div>

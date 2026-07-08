@@ -153,7 +153,7 @@ export function ChannelSettings() {
 
   if (isLoading) {
     return (
-      <div className="bg-card border border-border rounded-xl p-8 text-center">
+      <div className="bg-card border border-border rounded-none p-8 text-center">
         <Loader2 className="w-6 h-6 text-primary animate-spin mx-auto" />
         <p className="text-text-muted mt-2">Loading channels...</p>
       </div>
@@ -170,10 +170,10 @@ export function ChannelSettings() {
       </div>
 
       {/* Outlook Section */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <div className="bg-card border border-border rounded-none overflow-hidden">
         <div className="px-6 py-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-none bg-blue-50 flex items-center justify-center">
               <Mail className="w-5 h-5 text-blue-500" />
             </div>
             <div>
@@ -219,13 +219,13 @@ export function ChannelSettings() {
             </div>
 
             {outlookAccount.sync_status === 'error' && outlookAccount.error_message && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-none text-sm">
                 {outlookAccount.error_message}
               </div>
             )}
 
             {outlookAccount.sync_status === 'auth_expired' && (
-              <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2 rounded-lg text-sm">
+              <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2 rounded-none text-sm">
                 Authentication expired. Please reconnect your account.
               </div>
             )}
@@ -309,10 +309,10 @@ export function ChannelSettings() {
       </div>
 
       {/* WeChat Section */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <div className="bg-card border border-border rounded-none overflow-hidden">
         <div className="px-6 py-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-none bg-green-50 flex items-center justify-center">
               <MessageCircle className="w-5 h-5 text-green-500" />
             </div>
             <div>
@@ -333,14 +333,14 @@ export function ChannelSettings() {
             pages to manually log interactions.
           </p>
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg bg-bg-base border border-border">
+            <div className="p-4 rounded-none bg-bg-base border border-border">
               <div className="font-medium text-text-primary text-sm">Manual Logging</div>
               <p className="text-xs text-text-muted mt-1">
                 Use the floating button on candidate pages to quickly log WeChat conversations,
                 calls, and file shares.
               </p>
             </div>
-            <div className="p-4 rounded-lg bg-bg-base border border-border">
+            <div className="p-4 rounded-none bg-bg-base border border-border">
               <div className="font-medium text-text-primary text-sm">WeCom (Optional)</div>
               <p className="text-xs text-text-muted mt-1">
                 For teams using 企业微信, connect via API for automated message sync
@@ -352,7 +352,7 @@ export function ChannelSettings() {
       </div>
 
       {/* Security Notice */}
-      <div className="bg-bg-alt border border-border rounded-xl p-4">
+      <div className="bg-bg-alt border border-border rounded-none p-4">
         <h4 className="font-medium text-text-primary text-sm mb-2">Security & Privacy</h4>
         <p className="text-xs text-text-muted">
           All OAuth tokens are encrypted at rest using AES-256-GCM. Email content is stored

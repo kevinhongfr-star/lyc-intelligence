@@ -158,7 +158,7 @@ export function GridReviewDashboard() {
         <div className="grid grid-cols-4 gap-4">
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-accent/10">
+              <div className="p-2 rounded-none bg-accent/10">
                 <Target className="w-5 h-5 text-accent" />
               </div>
               <div>
@@ -170,7 +170,7 @@ export function GridReviewDashboard() {
 
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-500/10">
+              <div className="p-2 rounded-none bg-green-500/10">
                 <CheckCircle className="w-5 h-5 text-green-500" />
               </div>
               <div>
@@ -182,7 +182,7 @@ export function GridReviewDashboard() {
 
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-red-500/10">
+              <div className="p-2 rounded-none bg-red-500/10">
                 <AlertCircle className="w-5 h-5 text-red-500" />
               </div>
               <div>
@@ -194,7 +194,7 @@ export function GridReviewDashboard() {
 
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
+              <div className="p-2 rounded-none bg-blue-500/10">
                 <Users className="w-5 h-5 text-blue-500" />
               </div>
               <div>
@@ -221,7 +221,7 @@ export function GridReviewDashboard() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-none bg-accent/10 flex items-center justify-center">
                       <Building2 className="w-5 h-5 text-accent" />
                     </div>
                     <div>
@@ -271,7 +271,7 @@ export function GridReviewDashboard() {
                       )}
                     </div>
 
-                    <button className="p-2 hover:bg-bg rounded-lg">
+                    <button className="p-2 hover:bg-bg rounded-none">
                       <Eye className="w-4 h-4 text-text-muted" />
                     </button>
                   </div>
@@ -319,7 +319,7 @@ export function GridReviewDashboard() {
                 <Send className="w-4 h-4 mr-1" /> Send to Feishu
               </Button>
             </div>
-            <pre className="text-sm text-text-primary whitespace-pre-wrap bg-bg-alt p-4 rounded-lg max-h-[400px] overflow-y-auto">
+            <pre className="text-sm text-text-primary whitespace-pre-wrap bg-bg-alt p-4 rounded-none max-h-[400px] overflow-y-auto">
               {dailyGrid.message_text}
             </pre>
           </Card>
@@ -375,7 +375,7 @@ export function GridReviewDashboard() {
             {qualityMetrics.alerts.length > 0 && (
               <div className="mt-4 space-y-2">
                 {qualityMetrics.alerts.map((alert, i) => (
-                  <div key={i} className={`flex items-center gap-2 p-2 rounded-lg ${alert.type === 'warning' ? 'bg-yellow-50' : 'bg-red-50'}`}>
+                  <div key={i} className={`flex items-center gap-2 p-2 rounded-none ${alert.type === 'warning' ? 'bg-yellow-50' : 'bg-red-50'}`}>
                     <AlertCircle className={`w-4 h-4 ${alert.type === 'warning' ? 'text-yellow-500' : 'text-red-500'}`} />
                     <span className={`text-sm ${alert.type === 'warning' ? 'text-yellow-700' : 'text-red-700'}`}>
                       {alert.message}
@@ -390,7 +390,7 @@ export function GridReviewDashboard() {
         <Card className="p-4">
           <h3 className="font-medium text-text-primary mb-4">Motivation Calibration</h3>
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-green-50 rounded-lg p-4">
+            <div className="bg-green-50 rounded-none p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Star className="w-4 h-4 text-green-500" />
                 <span className="text-sm font-medium text-green-700">GREEN</span>
@@ -403,7 +403,7 @@ export function GridReviewDashboard() {
               </div>
             </div>
 
-            <div className="bg-yellow-50 rounded-lg p-4">
+            <div className="bg-yellow-50 rounded-none p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Star className="w-4 h-4 text-yellow-500" />
                 <span className="text-sm font-medium text-yellow-700">YELLOW</span>
@@ -416,7 +416,7 @@ export function GridReviewDashboard() {
               </div>
             </div>
 
-            <div className="bg-red-50 rounded-lg p-4">
+            <div className="bg-red-50 rounded-none p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Star className="w-4 h-4 text-red-500" />
                 <span className="text-sm font-medium text-red-700">RED</span>
@@ -444,7 +444,7 @@ export function GridReviewDashboard() {
           <h3 className="font-medium text-text-primary mb-4">Stale Candidates</h3>
           <div className="grid grid-cols-3 gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-yellow-500/10">
+              <div className="p-2 rounded-none bg-yellow-500/10">
                 <Clock className="w-5 h-5 text-yellow-500" />
               </div>
               <div>
@@ -456,7 +456,7 @@ export function GridReviewDashboard() {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-red-500/10">
+              <div className="p-2 rounded-none bg-red-500/10">
                 <AlertCircle className="w-5 h-5 text-red-500" />
               </div>
               <div>
@@ -468,7 +468,7 @@ export function GridReviewDashboard() {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-orange-500/10">
+              <div className="p-2 rounded-none bg-orange-500/10">
                 <Users className="w-5 h-5 text-orange-500" />
               </div>
               <div>

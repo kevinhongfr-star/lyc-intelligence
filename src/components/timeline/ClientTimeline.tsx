@@ -83,7 +83,7 @@ export function ClientTimeline({ milestones, mandateTitle, mandateStatus }: Clie
   };
 
   return (
-    <div className="bg-card border border-card-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-card-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center justify-between mb-4">

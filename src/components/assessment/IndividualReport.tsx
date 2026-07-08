@@ -111,7 +111,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
 
       {/* Archetype & Style */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-bg-secondary rounded-xl p-5">
+        <div className="bg-bg-secondary rounded-none p-5">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
               <Star className="w-5 h-5 text-yellow-600" />
@@ -128,7 +128,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
           )}
         </div>
 
-        <div className="bg-bg-secondary rounded-xl p-5">
+        <div className="bg-bg-secondary rounded-none p-5">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
               <Zap className="w-5 h-5 text-blue-600" />
@@ -147,7 +147,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
       </div>
 
       {/* Dimension Scores */}
-      <div className="bg-bg-secondary rounded-xl p-6 mb-6">
+      <div className="bg-bg-secondary rounded-none p-6 mb-6">
         <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
           <Target className="w-5 h-5" />
           Dimension Breakdown
@@ -156,7 +156,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
           {catalog.dimensions.map(dim => {
             const dimScore = score.dimension_scores[dim.name] || 0;
             return (
-              <div key={dim.id} className="bg-white rounded-lg p-4">
+              <div key={dim.id} className="bg-white rounded-none p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-text-primary font-medium">{dim.name}</span>
@@ -191,7 +191,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
       </div>
 
       {/* Strengths */}
-      <div className="bg-bg-secondary rounded-xl p-6 mb-6">
+      <div className="bg-bg-secondary rounded-none p-6 mb-6">
         <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
           <CheckCircle className="w-5 h-5 text-green-500" />
           Your Strengths
@@ -209,7 +209,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
       </div>
 
       {/* Development Areas */}
-      <div className="bg-bg-secondary rounded-xl p-6 mb-6">
+      <div className="bg-bg-secondary rounded-none p-6 mb-6">
         <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-amber-500" />
           Development Opportunities
@@ -227,11 +227,11 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
       </div>
 
       {/* Recommendations */}
-      <div className="bg-bg-secondary rounded-xl p-6 mb-6">
+      <div className="bg-bg-secondary rounded-none p-6 mb-6">
         <h2 className="text-lg font-semibold text-text-primary mb-4">Recommendations</h2>
         <div className="space-y-3">
           {score.recommendations.map((rec, index) => (
-            <div key={index} className="p-3 bg-white rounded-lg border-l-4 border-accent">
+            <div key={index} className="p-3 bg-white rounded-none border-l-4 border-accent">
               <p className="text-text-secondary">{rec}</p>
             </div>
           ))}

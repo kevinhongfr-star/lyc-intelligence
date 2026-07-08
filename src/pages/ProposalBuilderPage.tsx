@@ -223,7 +223,7 @@ export function ProposalBuilderPage() {
                 placeholder="Search companies..."
                 className="mb-2"
               />
-              <div className="max-h-40 overflow-y-auto border border-border rounded-lg">
+              <div className="max-h-40 overflow-y-auto border border-border rounded-none">
                 {filteredCompanies.map(c => (
                   <div
                     key={c.id}
@@ -249,7 +249,7 @@ export function ProposalBuilderPage() {
               <select
                 value={mandate.status}
                 onChange={(e) => setMandate({ ...mandate, status: e.target.value })}
-                className="w-full px-3 py-2 bg-bg-secondary border border-border rounded-lg text-sm"
+                className="w-full px-3 py-2 bg-bg-secondary border border-border rounded-none text-sm"
               >
                 {STATUS_OPTIONS.map(s => (
                   <option key={s.value} value={s.value}>{s.label}</option>
@@ -274,7 +274,7 @@ export function ProposalBuilderPage() {
                 value={mandate.description}
                 onChange={(e) => setMandate({ ...mandate, description: e.target.value })}
                 placeholder="Brief overview of the role..."
-                className="w-full h-20 px-3 py-2 bg-bg-secondary border border-border rounded-lg text-sm resize-none"
+                className="w-full h-20 px-3 py-2 bg-bg-secondary border border-border rounded-none text-sm resize-none"
               />
             </div>
 
@@ -284,7 +284,7 @@ export function ProposalBuilderPage() {
                 value={mandate.jd_description}
                 onChange={(e) => setMandate({ ...mandate, jd_description: e.target.value })}
                 placeholder="Complete job description, responsibilities, requirements..."
-                className="w-full h-40 px-3 py-2 bg-bg-secondary border border-border rounded-lg text-sm resize-none"
+                className="w-full h-40 px-3 py-2 bg-bg-secondary border border-border rounded-none text-sm resize-none"
               />
             </div>
 
@@ -294,7 +294,7 @@ export function ProposalBuilderPage() {
                 value={mandate.search_definition}
                 onChange={(e) => setMandate({ ...mandate, search_definition: e.target.value })}
                 placeholder="Ideal candidate profile, must-haves, nice-to-haves..."
-                className="w-full h-32 px-3 py-2 bg-bg-secondary border border-border rounded-lg text-sm resize-none"
+                className="w-full h-32 px-3 py-2 bg-bg-secondary border border-border rounded-none text-sm resize-none"
               />
             </div>
           </CardContent>

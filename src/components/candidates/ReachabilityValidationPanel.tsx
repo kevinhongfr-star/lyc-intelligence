@@ -110,7 +110,7 @@ export function ReachabilityValidationPanel({ contactId, currentReachability, on
         <div className="space-y-4">
           {/* Reachability Checks */}
           {REACHABILITY_CHECKS.map((check) => (
-            <div key={check.key} className="border rounded-lg p-3">
+            <div key={check.key} className="border rounded-none p-3">
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <div className="font-medium text-text-primary">{check.label}</div>
@@ -122,7 +122,7 @@ export function ReachabilityValidationPanel({ contactId, currentReachability, on
               <div className="flex gap-2 mt-2">
                 <button
                   onClick={() => setChecks({ ...checks, [check.key]: true })}
-                  className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg border transition-all ${
+                  className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-none border transition-all ${
                     checks[check.key] === true
                       ? 'bg-green-100 border-green-300 text-green-700'
                       : 'bg-bg-tertiary border-bg-tertiary text-text-secondary hover:bg-gray-50'
@@ -133,7 +133,7 @@ export function ReachabilityValidationPanel({ contactId, currentReachability, on
                 </button>
                 <button
                   onClick={() => setChecks({ ...checks, [check.key]: false })}
-                  className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg border transition-all ${
+                  className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-none border transition-all ${
                     checks[check.key] === false
                       ? 'bg-red-100 border-red-300 text-red-700'
                       : 'bg-bg-tertiary border-bg-tertiary text-text-secondary hover:bg-gray-50'
@@ -144,7 +144,7 @@ export function ReachabilityValidationPanel({ contactId, currentReachability, on
                 </button>
                 <button
                   onClick={() => setChecks({ ...checks, [check.key]: 'unknown' })}
-                  className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg border transition-all ${
+                  className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-none border transition-all ${
                     checks[check.key] === 'unknown'
                       ? 'bg-yellow-100 border-yellow-300 text-yellow-700'
                       : 'bg-bg-tertiary border-bg-tertiary text-text-secondary hover:bg-gray-50'
@@ -158,14 +158,14 @@ export function ReachabilityValidationPanel({ contactId, currentReachability, on
           ))}
 
           {/* Contact Channel Selection */}
-          <div className="border rounded-lg p-3">
+          <div className="border rounded-none p-3">
             <div className="font-medium text-text-primary mb-2">Primary Contact Channel</div>
             <div className="grid grid-cols-2 gap-2">
               {CHANNEL_OPTIONS.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => setContactChannel(option.value)}
-                  className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-all ${
+                  className={`flex items-center justify-center gap-2 px-3 py-2 rounded-none border transition-all ${
                     contactChannel === option.value
                       ? 'bg-primary/10 border-primary text-primary'
                       : 'bg-bg-tertiary border-bg-tertiary text-text-secondary hover:bg-gray-50'
@@ -179,7 +179,7 @@ export function ReachabilityValidationPanel({ contactId, currentReachability, on
           </div>
 
           {/* Validation Result */}
-          <div className={`p-4 rounded-lg ${
+          <div className={`p-4 rounded-none ${
             verified ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
           }`}>
             <div className="flex items-center gap-2">
@@ -202,12 +202,12 @@ export function ReachabilityValidationPanel({ contactId, currentReachability, on
 
           {/* S2→S3 Gate Status */}
           {!verified && (
-            <div className="p-3 bg-red-100 border border-red-300 rounded-lg text-red-700">
+            <div className="p-3 bg-red-100 border border-red-300 rounded-none text-red-700">
               <strong>Gate Blocked:</strong> Too many unknowns — candidate cannot advance to S3_Contacted.
             </div>
           )}
           {contactChannel === 'NONE' && (
-            <div className="p-3 bg-yellow-100 border border-yellow-300 rounded-lg text-yellow-700">
+            <div className="p-3 bg-yellow-100 border border-yellow-300 rounded-none text-yellow-700">
               <strong>Warning:</strong> No contact channel selected — S2→S3 gate will be blocked.
             </div>
           )}

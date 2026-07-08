@@ -111,12 +111,12 @@ export function BackgroundCheckTracker({ candidateId, onUploadResult }: Backgrou
             return (
               <div
                 key={check.id}
-                className="p-4 bg-bg-alt rounded-lg"
+                className="p-4 bg-bg-alt rounded-none"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg ${statusConfig.bg} flex items-center justify-center`}>
+                      <div className={`w-10 h-10 rounded-none ${statusConfig.bg} flex items-center justify-center`}>
                         <StatusIcon className={`w-5 h-5 ${statusConfig.color}`} />
                       </div>
                       <div>

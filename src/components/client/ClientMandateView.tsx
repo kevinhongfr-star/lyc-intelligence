@@ -121,7 +121,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
     return (
       <div className="text-center py-12">
         <p className="text-text-muted">Mandate not found</p>
-        <button onClick={onBack} className="mt-4 px-4 py-2 bg-accent text-white rounded-lg">
+        <button onClick={onBack} className="mt-4 px-4 py-2 bg-accent text-white rounded-none">
           Back to Mandates
         </button>
       </div>
@@ -134,7 +134,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
       <div className="flex items-center gap-4">
         <button
           onClick={onBack}
-          className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
+          className="p-2 hover:bg-bg-tertiary rounded-none transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-text-secondary" />
         </button>
@@ -181,7 +181,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
       </div>
 
       {/* Pipeline Kanban (Read-only) */}
-      <div className="bg-bg-secondary rounded-xl p-6">
+      <div className="bg-bg-secondary rounded-none p-6">
         <h2 className="text-lg font-semibold text-text-primary mb-4">Candidate Pipeline</h2>
         
         {/* Phase Grouped Layout */}
@@ -204,7 +204,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
                   return (
                     <div
                       key={stageName}
-                      className="w-48 flex-shrink-0 bg-white rounded-lg border border-bg-tertiary"
+                      className="w-48 flex-shrink-0 bg-white rounded-none border border-bg-tertiary"
                     >
                       {/* Stage Header */}
                       <div 
@@ -240,7 +240,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
                             <div
                               key={candidate.id}
                               onClick={() => setSelectedCandidate(candidate)}
-                              className="bg-bg-primary border border-bg-tertiary rounded-lg p-3 cursor-pointer hover:shadow-md transition-shadow"
+                              className="bg-bg-primary border border-bg-tertiary rounded-none p-3 cursor-pointer hover:shadow-md transition-shadow"
                             >
                               {/* Header */}
                               <div className="flex items-start gap-2 mb-2">
@@ -322,7 +322,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
               </div>
               <button
                 onClick={() => setSelectedCandidate(null)}
-                className="p-2 hover:bg-bg-tertiary rounded-lg"
+                className="p-2 hover:bg-bg-tertiary rounded-none"
               >
                 <XCircle className="w-5 h-5 text-text-muted" />
               </button>
@@ -332,7 +332,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
             <div className="p-6 space-y-4">
               {/* Match Strength */}
               {selectedCandidate.trident_composite && (
-                <div className="bg-bg-secondary rounded-lg p-4">
+                <div className="bg-bg-secondary rounded-none p-4">
                   <p className="text-sm text-text-muted mb-2">Match Strength</p>
                   <div className="flex items-center gap-3">
                     <span 
@@ -397,7 +397,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
               {/* Feedback */}
               {selectedCandidate.client_feedback && (
                 <div 
-                  className="rounded-lg p-4"
+                  className="rounded-none p-4"
                   style={{ 
                     backgroundColor: selectedCandidate.client_feedback.decision === 'approved' ? '#22C55E10' :
                                    selectedCandidate.client_feedback.decision === 'rejected' ? '#EF444410' : '#EAB30810'
@@ -431,7 +431,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
               {isAdmin && !selectedCandidate.client_feedback && (
                 <button
                   onClick={() => setShowFeedback(true)}
-                  className="w-full py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent/90"
+                  className="w-full py-3 bg-accent text-white rounded-none font-medium hover:bg-accent/90"
                 >
                   Provide Feedback
                 </button>

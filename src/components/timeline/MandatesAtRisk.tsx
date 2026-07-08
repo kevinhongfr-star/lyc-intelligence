@@ -95,7 +95,7 @@ export function MandatesAtRisk({ mandates, loading, onMandateClick, onViewAll }:
 
   if (loading) {
     return (
-      <div className="bg-card border border-card-border rounded-xl p-6">
+      <div className="bg-card border border-card-border rounded-none p-6">
         <div className="flex items-center justify-center py-12">
           <Loader2 className="w-8 h-8 text-accent animate-spin" />
         </div>
@@ -104,7 +104,7 @@ export function MandatesAtRisk({ mandates, loading, onMandateClick, onViewAll }:
   }
 
   return (
-    <div className="bg-card border border-card-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-card-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-card-border">
         <div className="flex items-center justify-between">

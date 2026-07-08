@@ -74,9 +74,9 @@ export function PipelinePage() {
           <p className="text-text-muted">Drag candidates through the search stages</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setView('kanban')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'kanban' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Kanban</button>
-          <button onClick={() => setView('list')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'list' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>List</button>
-          <button onClick={() => setShowImportModal(true)} className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg bg-bg-tertiary text-text-primary hover:bg-accent hover:text-white transition-colors min-h-[44px]">
+          <button onClick={() => setView('kanban')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${view === 'kanban' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Kanban</button>
+          <button onClick={() => setView('list')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${view === 'list' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>List</button>
+          <button onClick={() => setShowImportModal(true)} className="flex items-center gap-2 px-3 py-2 text-sm rounded-none bg-bg-tertiary text-text-primary hover:bg-accent hover:text-white transition-colors min-h-[44px]">
             <Upload className="w-4 h-4" />
             Import
           </button>
@@ -87,7 +87,7 @@ export function PipelinePage() {
       <div className="flex gap-2 overflow-x-auto pb-2">
         {mandates.filter(m => ['1_search', '2_call', '3_deliver'].includes(m.status)).slice(0, 15).map(m => (
           <button key={m.id} onClick={() => setSelectedMandate(m)}
-            className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm border transition-colors min-h-[44px] ${selectedMandate?.id === m.id ? 'border-accent bg-accent/10 text-accent' : 'border-bg-tertiary bg-bg-secondary text-text-secondary hover:border-accent/30'}`}>
+            className={`flex-shrink-0 px-4 py-2 rounded-none text-sm border transition-colors min-h-[44px] ${selectedMandate?.id === m.id ? 'border-accent bg-accent/10 text-accent' : 'border-bg-tertiary bg-bg-secondary text-text-secondary hover:border-accent/30'}`}>
             {m.title?.substring(0, 30)}{m.title?.length > 30 ? '...' : ''}
           </button>
         ))}
@@ -118,7 +118,7 @@ export function PipelinePage() {
             const candidates = pipeline[stage] || [];
             const cfg = STAGE_CONFIG[stage];
             return (
-              <div key={stage} className={`rounded-lg border border-bg-tertiary ${STAGE_BG[stage]} flex flex-col`}>
+              <div key={stage} className={`rounded-none border border-bg-tertiary ${STAGE_BG[stage]} flex flex-col`}>
                 <div className="px-3 py-2 border-b border-bg-tertiary flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cfg.color }} />
@@ -128,7 +128,7 @@ export function PipelinePage() {
                 </div>
                 <div className="flex-1 p-2 space-y-2 overflow-auto">
                   {candidates.map(cp => (
-                    <div key={cp.id} className={`bg-bg-primary border border-bg-tertiary rounded-lg p-3 ${STAGE_COLORS[stage]} border-t-2`}>
+                    <div key={cp.id} className={`bg-bg-primary border border-bg-tertiary rounded-none p-3 ${STAGE_COLORS[stage]} border-t-2`}>
                       <div className="flex items-center gap-2 mb-1">
                         <div className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-accent text-[10px] font-bold flex-shrink-0">
                           {cp.contact?.name?.[0] ?? '?'}
@@ -200,7 +200,7 @@ export function PipelinePage() {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {candidates.map(cp => (
-                    <div key={cp.id} className="flex items-center gap-3 p-3 bg-bg-tertiary rounded-lg">
+                    <div key={cp.id} className="flex items-center gap-3 p-3 bg-bg-tertiary rounded-none">
                       <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">{cp.contact?.name?.[0] ?? '?'}</div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-text-primary">{cp.contact?.name}</p>
@@ -209,7 +209,7 @@ export function PipelinePage() {
                       {cp.trident_composite != null && <Badge variant={cp.trident_composite >= 75 ? 'success' : cp.trident_composite >= 50 ? 'warning' : 'default'}>{cp.trident_composite}</Badge>}
                       {cp.verdict && <Badge>{cp.verdict}</Badge>}
                       {NEXT_STAGE[stage] && (
-                        <button onClick={() => handleStageChange(cp.id, NEXT_STAGE[stage])} className="text-xs px-3 py-1.5 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-colors">
+                        <button onClick={() => handleStageChange(cp.id, NEXT_STAGE[stage])} className="text-xs px-3 py-1.5 bg-accent/20 text-accent rounded-none hover:bg-accent/30 transition-colors">
                           → {STAGE_CONFIG[NEXT_STAGE[stage] as keyof typeof STAGE_CONFIG]?.label}
                         </button>
                       )}

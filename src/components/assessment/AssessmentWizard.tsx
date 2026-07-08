@@ -213,7 +213,7 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
               padding: '16px',
               fontSize: '16px',
               fontWeight: 600,
-              borderRadius: '8px',
+              borderRadius: '0px',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
@@ -271,7 +271,7 @@ function GateStep({ state, setState, onSubmit, error }: any) {
             value={state.gate.name}
             onChange={(e) => setState(prev => ({ ...prev, gate: { ...prev.gate, name: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px'
             }}
             placeholder="Your full name"
           />
@@ -285,7 +285,7 @@ function GateStep({ state, setState, onSubmit, error }: any) {
             value={state.gate.email}
             onChange={(e) => setState(prev => ({ ...prev, gate: { ...prev.gate, email: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '8px', fontSize: '15px'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px'
             }}
             placeholder="you@company.com"
           />
@@ -300,7 +300,7 @@ function GateStep({ state, setState, onSubmit, error }: any) {
             padding: '16px',
             fontSize: '16px',
             fontWeight: 'bold',
-            borderRadius: '8px',
+            borderRadius: '0px',
             border: 'none',
             cursor: 'pointer',
             display: 'flex',

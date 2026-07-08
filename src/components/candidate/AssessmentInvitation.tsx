@@ -116,7 +116,7 @@ export function AssessmentInvitationCard({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-card-border overflow-hidden">
+    <div className="bg-white rounded-none border border-card-border overflow-hidden">
       {/* Header */}
       <div className="p-5 border-b border-border">
         <div className="flex items-start justify-between">
@@ -355,7 +355,7 @@ export function BatchInvitationModal({
   return (
     <div className="space-y-4">
       {/* Select all header */}
-      <div className="flex items-center justify-between p-4 bg-bg-alt rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-bg-alt rounded-none">
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
@@ -375,7 +375,7 @@ export function BatchInvitationModal({
         {candidates.map(candidate => (
           <label
             key={candidate.id}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-bg-alt cursor-pointer"
+            className="flex items-center gap-3 p-3 rounded-none hover:bg-bg-alt cursor-pointer"
           >
             <input
               type="checkbox"

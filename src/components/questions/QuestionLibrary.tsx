@@ -315,7 +315,7 @@ export function QuestionLibrary({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search questions..."
-            className="w-full pl-10 pr-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+            className="w-full pl-10 pr-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
           />
         </div>
 
@@ -335,7 +335,7 @@ export function QuestionLibrary({
         </Button>
 
         {/* View Mode */}
-        <div className="flex items-center gap-1 bg-bg-alt rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-bg-alt rounded-none p-1">
           <button
             onClick={() => setViewMode('list')}
             className={`p-1.5 rounded ${viewMode === 'list' ? 'bg-primary text-white' : 'text-text-muted'}`}
@@ -354,7 +354,7 @@ export function QuestionLibrary({
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="px-3 py-2 border border-border rounded-lg bg-bg-base text-text-primary"
+          className="px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
         >
           <option value="usage">Most Used</option>
           <option value="newest">Newest</option>
@@ -398,7 +398,7 @@ export function QuestionLibrary({
                   <button
                     key={level}
                     onClick={() => setSelectedDifficulty(selectedDifficulty === level ? null : level)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
                       selectedDifficulty === level
                         ? 'bg-primary text-white'
                         : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -420,7 +420,7 @@ export function QuestionLibrary({
                   <button
                     key={option.value}
                     onClick={() => setSelectedSource(option.value)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
                       selectedSource === option.value
                         ? 'bg-primary text-white'
                         : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -436,7 +436,7 @@ export function QuestionLibrary({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowStarredOnly(!showStarredOnly)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
                   showStarredOnly
                     ? 'bg-amber-100 text-amber-700'
                     : 'bg-bg-alt text-text-muted hover:bg-bg-base'

@@ -164,7 +164,7 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl p-8">
+        <div className="bg-white rounded-none p-8">
           <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto" />
           <p className="text-text-muted mt-4">Loading scorecard...</p>
         </div>
@@ -175,9 +175,9 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
   if (error || !scorecard) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl p-8 max-w-md">
+        <div className="bg-white rounded-none p-8 max-w-md">
           <p className="text-red-500 mb-4">{error || 'Failed to load scorecard'}</p>
-          <button onClick={onClose} className="px-4 py-2 bg-accent text-white rounded-lg">
+          <button onClick={onClose} className="px-4 py-2 bg-accent text-white rounded-none">
             Close
           </button>
         </div>
@@ -202,7 +202,7 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
               <p className="text-sm text-text-muted">AI-Generated Candidate Analysis</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-none">
             <X className="w-5 h-5 text-text-muted" />
           </button>
         </div>
@@ -224,7 +224,7 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
             </div>
             <span
               style={{ backgroundColor: verdictInfo.color }}
-              className="px-4 py-2 text-sm font-semibold text-white rounded-lg"
+              className="px-4 py-2 text-sm font-semibold text-white rounded-none"
             >
               {verdictInfo.label}
             </span>
@@ -240,7 +240,7 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
             return (
               <div 
                 key={key}
-                className="border border-bg-tertiary rounded-lg overflow-hidden"
+                className="border border-bg-tertiary rounded-none overflow-hidden"
               >
                 <button
                   onClick={() => toggleDimension(key)}

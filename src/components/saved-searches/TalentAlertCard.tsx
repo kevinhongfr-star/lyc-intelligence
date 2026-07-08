@@ -127,7 +127,7 @@ export function TalentAlertCard({ userId, onViewCandidate }: TalentAlertCardProp
             return (
               <div
                 key={alert.id}
-                className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                className={`p-3 rounded-none cursor-pointer transition-colors ${
                   alert.viewed_at ? 'bg-bg-alt' : 'bg-blue-50'
                 } hover:bg-bg-base`}
                 onClick={() => onViewCandidate?.(alert.candidate_id)}

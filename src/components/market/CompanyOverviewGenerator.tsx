@@ -75,11 +75,11 @@ export function CompanyOverviewGenerator({ company, onOverviewGenerated, onError
   const hasOverview = status === 'completed' && overview;
 
   return (
-    <div className="bg-bg-secondary border border-border rounded-xl overflow-hidden">
+    <div className="bg-bg-secondary border border-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border bg-slate-50">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${status === 'completed' ? 'bg-emerald-100 text-emerald-600' : status === 'failed' ? 'bg-red-100 text-red-600' : status === 'generating' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'}`}>
+          <div className={`p-2 rounded-none ${status === 'completed' ? 'bg-emerald-100 text-emerald-600' : status === 'failed' ? 'bg-red-100 text-red-600' : status === 'generating' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'}`}>
             <Building2 className="w-5 h-5" />
           </div>
           <div>
@@ -107,7 +107,7 @@ export function CompanyOverviewGenerator({ company, onOverviewGenerated, onError
           <button
             onClick={handleGenerate}
             disabled={!canGenerate}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-none text-sm font-medium transition-all ${
               canGenerate
                 ? 'bg-accent text-white hover:bg-accent-hover'
                 : 'bg-slate-200 text-slate-500 cursor-not-allowed'
@@ -130,7 +130,7 @@ export function CompanyOverviewGenerator({ company, onOverviewGenerated, onError
 
       {/* Error message */}
       {error && (
-        <div className="mx-4 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+        <div className="mx-4 mt-4 p-3 bg-red-50 border border-red-200 rounded-none flex items-start gap-2">
           <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
           <div>
             <p className="text-sm text-red-800 font-medium">Generation failed</p>
@@ -166,7 +166,7 @@ export function CompanyOverviewGenerator({ company, onOverviewGenerated, onError
           {/* Quick stats grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {overview?.revenue && (
-              <div className="bg-white rounded-lg p-3 border border-border">
+              <div className="bg-white rounded-none p-3 border border-border">
                 <div className="flex items-center gap-2 text-text-muted mb-1">
                   <Globe className="w-3 h-3" />
                   <span className="text-xs font-medium">Revenue</span>
@@ -176,7 +176,7 @@ export function CompanyOverviewGenerator({ company, onOverviewGenerated, onError
             )}
 
             {overview?.employee_count && (
-              <div className="bg-white rounded-lg p-3 border border-border">
+              <div className="bg-white rounded-none p-3 border border-border">
                 <div className="flex items-center gap-2 text-text-muted mb-1">
                   <Users className="w-3 h-3" />
                   <span className="text-xs font-medium">Employees</span>
@@ -186,7 +186,7 @@ export function CompanyOverviewGenerator({ company, onOverviewGenerated, onError
             )}
 
             {overview?.founded && (
-              <div className="bg-white rounded-lg p-3 border border-border">
+              <div className="bg-white rounded-none p-3 border border-border">
                 <div className="flex items-center gap-2 text-text-muted mb-1">
                   <Calendar className="w-3 h-3" />
                   <span className="text-xs font-medium">Founded</span>
@@ -196,7 +196,7 @@ export function CompanyOverviewGenerator({ company, onOverviewGenerated, onError
             )}
 
             {overview?.headquarters && (
-              <div className="bg-white rounded-lg p-3 border border-border">
+              <div className="bg-white rounded-none p-3 border border-border">
                 <div className="flex items-center gap-2 text-text-muted mb-1">
                   <MapPin className="w-3 h-3" />
                   <span className="text-xs font-medium">HQ</span>
@@ -230,7 +230,7 @@ export function CompanyOverviewGenerator({ company, onOverviewGenerated, onError
                 <Newspaper className="w-3 h-3" />
                 Recent News
               </h4>
-              <p className="text-sm text-text-primary leading-relaxed bg-slate-50 rounded-lg p-3">
+              <p className="text-sm text-text-primary leading-relaxed bg-slate-50 rounded-none p-3">
                 {overview.recent_news}
               </p>
             </div>
@@ -272,10 +272,10 @@ export function CompanyOverviewGenerator({ company, onOverviewGenerated, onError
           <div className="h-4 bg-slate-200 rounded w-1/2" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-20 bg-slate-200 rounded-lg" />
+              <div key={i} className="h-20 bg-slate-200 rounded-none" />
             ))}
           </div>
-          <div className="h-24 bg-slate-200 rounded-lg" />
+          <div className="h-24 bg-slate-200 rounded-none" />
         </div>
       )}
     </div>

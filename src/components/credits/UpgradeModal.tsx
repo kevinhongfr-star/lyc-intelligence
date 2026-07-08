@@ -132,7 +132,7 @@ export function UpgradeModal({ onClose, requiredCredits, currentCredits }: Upgra
       <div style={{
         background: DS.card,
         border: `1px solid ${DS.border}`,
-        borderRadius: '16px',
+        borderRadius: '0px',
         maxWidth: '900px',
         width: '100%',
         maxHeight: '90vh',
@@ -177,7 +177,7 @@ export function UpgradeModal({ onClose, requiredCredits, currentCredits }: Upgra
             padding: '12px',
             background: `${DS.error}20`,
             border: `1px solid ${DS.error}40`,
-            borderRadius: '8px',
+            borderRadius: '0px',
             color: DS.error,
             fontSize: '14px'
           }}>
@@ -199,7 +199,7 @@ export function UpgradeModal({ onClose, requiredCredits, currentCredits }: Upgra
                 padding: '24px',
                 background: tier.popular ? `linear-gradient(135deg, ${DS.accent}20, ${DS.accent}05)` : DS.bg,
                 border: `2px solid ${tier.popular ? DS.accent : DS.border}`,
-                borderRadius: '12px',
+                borderRadius: '0px',
                 position: 'relative'
               }}
             >
@@ -214,7 +214,7 @@ export function UpgradeModal({ onClose, requiredCredits, currentCredits }: Upgra
                   color: '#FFF',
                   fontSize: '11px',
                   fontWeight: 700,
-                  borderRadius: '12px',
+                  borderRadius: '0px',
                   textTransform: 'uppercase'
                 }}>
                   Most Popular
@@ -264,7 +264,7 @@ export function UpgradeModal({ onClose, requiredCredits, currentCredits }: Upgra
                   padding: '14px',
                   background: tier.popular ? DS.accent : 'transparent',
                   border: `1px solid ${tier.popular ? DS.accent : DS.border}`,
-                  borderRadius: '8px',
+                  borderRadius: '0px',
                   color: '#FFF',
                   fontSize: '15px',
                   fontWeight: 600,

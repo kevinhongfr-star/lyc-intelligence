@@ -67,17 +67,17 @@ export function SchedulerPage() {
     <div className="space-y-6">
       {showCreate && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShowCreate(false)}>
-          <div className="bg-bg-secondary rounded-xl border border-bg-tertiary w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
+          <div className="bg-bg-secondary rounded-none border border-bg-tertiary w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-serif font-bold text-text-primary">New Event</h3>
-              <button onClick={() => setShowCreate(false)} className="p-2 hover:bg-bg-tertiary rounded-lg"><X className="w-4 h-4 text-text-muted" /></button>
+              <button onClick={() => setShowCreate(false)} className="p-2 hover:bg-bg-tertiary rounded-none"><X className="w-4 h-4 text-text-muted" /></button>
             </div>
-            <input value={newEvent.title} onChange={e => setNewEvent(p => ({ ...p, title: e.target.value }))} placeholder="Event title" className="w-full px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" />
+            <input value={newEvent.title} onChange={e => setNewEvent(p => ({ ...p, title: e.target.value }))} placeholder="Event title" className="w-full px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" />
             <div className="grid grid-cols-2 gap-3">
-              <input type="date" value={newEvent.date} onChange={e => setNewEvent(p => ({ ...p, date: e.target.value }))} className="px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent" />
-              <input type="time" value={newEvent.time} onChange={e => setNewEvent(p => ({ ...p, time: e.target.value }))} className="px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent" />
+              <input type="date" value={newEvent.date} onChange={e => setNewEvent(p => ({ ...p, date: e.target.value }))} className="px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent" />
+              <input type="time" value={newEvent.time} onChange={e => setNewEvent(p => ({ ...p, time: e.target.value }))} className="px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent" />
             </div>
-            <input value={newEvent.location} onChange={e => setNewEvent(p => ({ ...p, location: e.target.value }))} placeholder="Location (optional)" className="w-full px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" />
+            <input value={newEvent.location} onChange={e => setNewEvent(p => ({ ...p, location: e.target.value }))} placeholder="Location (optional)" className="w-full px-4 py-3 bg-bg-primary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" />
             <Button onClick={handleCreate} disabled={creating || !newEvent.title.trim()} className="w-full">
               {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               <span className="ml-2">{creating ? 'Creating...' : 'Create Event'}</span>
@@ -88,9 +88,9 @@ export function SchedulerPage() {
       <div className="flex items-center justify-between">
         <div><h1 className="text-2xl font-serif font-bold text-text-primary">Scheduler</h1><p className="text-text-secondary">Interviews, calls, and pipeline events</p></div>
         <div className="flex gap-2">
-          <button onClick={() => openCreateModal()} className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-light text-white text-sm font-medium rounded-lg min-h-[44px]"><Plus className="w-4 h-4" />New Event</button>
-          <button onClick={() => setView('month')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'month' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Month</button>
-          <button onClick={() => setView('agenda')} className={`px-3 py-2 text-sm rounded-lg min-h-[44px] ${view === 'agenda' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Agenda</button>
+          <button onClick={() => openCreateModal()} className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-light text-white text-sm font-medium rounded-none min-h-[44px]"><Plus className="w-4 h-4" />New Event</button>
+          <button onClick={() => setView('month')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${view === 'month' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Month</button>
+          <button onClick={() => setView('agenda')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${view === 'agenda' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Agenda</button>
         </div>
       </div>
       {view === 'month' ? (
@@ -98,9 +98,9 @@ export function SchedulerPage() {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <button onClick={prevMonth} className="p-2 hover:bg-bg-tertiary rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"><ChevronLeft className="w-4 h-4 text-text-muted" /></button>
+                <button onClick={prevMonth} className="p-2 hover:bg-bg-tertiary rounded-none min-h-[44px] min-w-[44px] flex items-center justify-center"><ChevronLeft className="w-4 h-4 text-text-muted" /></button>
                 <CardTitle>{MONTHS[viewMonth]} {viewYear}</CardTitle>
-                <button onClick={nextMonth} className="p-2 hover:bg-bg-tertiary rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"><ChevronRight className="w-4 h-4 text-text-muted" /></button>
+                <button onClick={nextMonth} className="p-2 hover:bg-bg-tertiary rounded-none min-h-[44px] min-w-[44px] flex items-center justify-center"><ChevronRight className="w-4 h-4 text-text-muted" /></button>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-7 gap-px bg-bg-tertiary">
@@ -128,7 +128,7 @@ export function SchedulerPage() {
               {selectedEvents.length === 0 ? (
                 <div className="text-center py-6"><p className="text-text-muted text-sm mb-3">No events</p><button onClick={() => openCreateModal(selectedDate || undefined)} className="text-accent text-sm hover:underline">+ Add event</button></div>
               ) : selectedEvents.map(e => (
-                <div key={e.id} className="p-3 bg-bg-tertiary rounded-lg mb-2">
+                <div key={e.id} className="p-3 bg-bg-tertiary rounded-none mb-2">
                   <p className="text-sm font-medium text-text-primary">{e.title}</p>
                   <div className="flex items-center gap-2 mt-1 text-xs text-text-muted"><Clock className="w-3 h-3" />{new Date(e.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}{e.location && <><MapPin className="w-3 h-3 ml-1" />{e.location}</>}</div>
                 </div>
@@ -143,7 +143,7 @@ export function SchedulerPage() {
             {upcomingEvents.length === 0 ? (
               <div className="text-center py-8"><p className="text-text-muted text-sm mb-3">No upcoming events</p><button onClick={() => openCreateModal()} className="text-accent text-sm hover:underline">+ Schedule an event</button></div>
             ) : upcomingEvents.map(e => (
-              <div key={e.id} className="flex items-center gap-4 p-3 bg-bg-tertiary rounded-lg mb-2">
+              <div key={e.id} className="flex items-center gap-4 p-3 bg-bg-tertiary rounded-none mb-2">
                 <div className="w-12 text-center flex-shrink-0"><p className="text-lg font-bold text-text-primary">{new Date(e.start_time).getDate()}</p><p className="text-[10px] text-text-muted uppercase">{new Date(e.start_time).toLocaleDateString('en-US', { month: 'short' })}</p></div>
                 <div className="flex-1 min-w-0"><p className="text-sm font-medium text-text-primary truncate">{e.title}</p><div className="flex items-center gap-2 text-xs text-text-muted mt-0.5"><Clock className="w-3 h-3" />{new Date(e.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div></div>
               </div>

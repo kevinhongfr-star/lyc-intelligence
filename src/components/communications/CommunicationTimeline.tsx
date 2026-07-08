@@ -135,7 +135,7 @@ export function CommunicationTimeline({ contactId, onEmailThreadClick }: Communi
 
   if (isLoading) {
     return (
-      <div className="bg-card border border-border rounded-xl p-8 text-center">
+      <div className="bg-card border border-border rounded-none p-8 text-center">
         <Loader2 className="w-6 h-6 text-primary animate-spin mx-auto" />
         <p className="text-text-muted mt-2">Loading communications...</p>
       </div>
@@ -143,7 +143,7 @@ export function CommunicationTimeline({ contactId, onEmailThreadClick }: Communi
   }
 
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-border">
         <div className="flex items-center justify-between">
@@ -177,7 +177,7 @@ export function CommunicationTimeline({ contactId, onEmailThreadClick }: Communi
               <button
                 key={filter}
                 onClick={() => setChannelFilter(filter)}
-                className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                className={`px-3 py-1 rounded-none text-xs font-medium transition-colors ${
                   channelFilter === filter
                     ? 'bg-primary text-white'
                     : 'bg-bg-alt text-text-muted hover:bg-bg-base'

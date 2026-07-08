@@ -183,7 +183,7 @@ function IntelligenceHub() {
         </div>
         <button
           onClick={loadTabData}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-bg-alt"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm border border-border rounded-none hover:bg-bg-alt"
         >
           <RefreshCw className="w-4 h-4" />
           Refresh
@@ -191,12 +191,12 @@ function IntelligenceHub() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-bg-alt rounded-lg w-fit">
+      <div className="flex gap-1 p-1 bg-bg-alt rounded-none w-fit">
         {tabs.map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key as any)}
-            className={`px-4 py-2 text-sm rounded-md flex items-center gap-2 transition-colors ${
+            className={`px-4 py-2 text-sm rounded-none flex items-center gap-2 transition-colors ${
               activeTab === tab.key
                 ? 'bg-card text-text-primary shadow-sm'
                 : 'text-text-muted hover:text-text-primary'
@@ -219,7 +219,7 @@ function IntelligenceHub() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <select
-                className="px-3 py-1.5 text-sm border border-border rounded-lg bg-card focus:outline-none"
+                className="px-3 py-1.5 text-sm border border-border rounded-none bg-card focus:outline-none"
                 onChange={e => {
                   const status = e.target.value;
                   if (status === 'all') {
@@ -243,12 +243,12 @@ function IntelligenceHub() {
               <Loader2 className="w-6 h-6 text-primary animate-spin" />
             </div>
           ) : reports.length === 0 ? (
-            <div className="bg-card border border-border rounded-xl p-12 text-center">
+            <div className="bg-card border border-border rounded-none p-12 text-center">
               <FileBarChart className="w-12 h-12 text-text-muted mx-auto mb-3 opacity-50" />
               <p className="text-text-muted">No reports found</p>
             </div>
           ) : (
-            <div className="bg-card border border-border rounded-xl overflow-hidden">
+            <div className="bg-card border border-border rounded-none overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-bg-alt">
@@ -316,7 +316,7 @@ function IntelligenceHub() {
       {/* Talent Radar Tab */}
       {activeTab === 'radar' && (
         <div className="space-y-4">
-          <div className="bg-card border border-border rounded-xl p-5">
+          <div className="bg-card border border-border rounded-none p-5">
             <h3 className="font-semibold text-text-primary mb-3">Talent Radar</h3>
             <p className="text-sm text-text-muted mb-4">
               Anonymized view of top talent in the market. Select a client and parameters to generate a radar.
@@ -327,7 +327,7 @@ function IntelligenceHub() {
                 <input
                   type="text"
                   placeholder="e.g., Technology, Healthcare"
-                  className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-none focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>
               <div>
@@ -335,12 +335,12 @@ function IntelligenceHub() {
                 <input
                   type="text"
                   placeholder="e.g., Operations, Finance"
-                  className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-none focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>
               <div>
                 <label className="block text-sm text-text-muted mb-1">Count</label>
-                <select className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none">
+                <select className="w-full px-3 py-2 text-sm border border-border rounded-none focus:outline-none">
                   <option>10 profiles</option>
                   <option>20 profiles</option>
                   <option>50 profiles</option>
@@ -353,10 +353,10 @@ function IntelligenceHub() {
             </p>
           </div>
 
-          <div className="bg-card border border-border rounded-xl p-8 text-center">
+          <div className="bg-card border border-border rounded-none p-8 text-center">
             <Target className="w-12 h-12 text-text-muted mx-auto mb-3 opacity-50" />
             <p className="text-text-muted mb-3">Select parameters and generate a Talent Radar</p>
-            <button className="px-4 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90 flex items-center gap-2 mx-auto">
+            <button className="px-4 py-2 text-sm bg-primary text-white rounded-none hover:opacity-90 flex items-center gap-2 mx-auto">
               <Sparkles className="w-4 h-4" />
               Generate Radar
             </button>
@@ -371,7 +371,7 @@ function IntelligenceHub() {
             <div className="flex items-center gap-2">
               <span className="text-sm text-text-muted">{signals.length} signals</span>
             </div>
-            <button className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:opacity-90">
+            <button className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-white rounded-none hover:opacity-90">
               <Plus className="w-4 h-4" />
               Log Signal
             </button>
@@ -382,17 +382,17 @@ function IntelligenceHub() {
               <Loader2 className="w-6 h-6 text-primary animate-spin" />
             </div>
           ) : signals.length === 0 ? (
-            <div className="bg-card border border-border rounded-xl p-12 text-center">
+            <div className="bg-card border border-border rounded-none p-12 text-center">
               <Bell className="w-12 h-12 text-text-muted mx-auto mb-3 opacity-50" />
               <p className="text-text-muted">No market signals detected</p>
             </div>
           ) : (
             <div className="space-y-3">
               {signals.slice(0, 20).map((signal: any) => (
-                <div key={signal.id} className="bg-card border border-border rounded-xl p-4 hover:shadow-sm transition-shadow">
+                <div key={signal.id} className="bg-card border border-border rounded-none p-4 hover:shadow-sm transition-shadow">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${
+                      <div className={`p-2 rounded-none ${
                         signal.severity === 'critical' ? 'bg-red-50' :
                         signal.severity === 'high' ? 'bg-orange-50' :
                         signal.severity === 'medium' ? 'bg-amber-50' : 'bg-gray-50'
@@ -442,7 +442,7 @@ function IntelligenceHub() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-text-muted">{subscriptions.length} subscriptions</span>
-            <button className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:opacity-90">
+            <button className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-white rounded-none hover:opacity-90">
               <Plus className="w-4 h-4" />
               New Subscription
             </button>
@@ -453,14 +453,14 @@ function IntelligenceHub() {
               <Loader2 className="w-6 h-6 text-primary animate-spin" />
             </div>
           ) : subscriptions.length === 0 ? (
-            <div className="bg-card border border-border rounded-xl p-12 text-center">
+            <div className="bg-card border border-border rounded-none p-12 text-center">
               <Settings className="w-12 h-12 text-text-muted mx-auto mb-3 opacity-50" />
               <p className="text-text-muted">No client subscriptions configured</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {subscriptions.map((sub: any) => (
-                <div key={sub.id} className="bg-card border border-border rounded-xl p-5">
+                <div key={sub.id} className="bg-card border border-border rounded-none p-5">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <h4 className="font-medium text-text-primary capitalize">
@@ -508,7 +508,7 @@ function IntelligenceHub() {
       {activeTab === 'oversight' && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-5 rounded-xl border border-border bg-card">
+            <div className="p-5 rounded-none border border-border bg-card">
               <div className="flex items-center gap-2 text-text-muted text-sm mb-2">
                 <FileBarChart className="w-4 h-4" />
                 Reports This Month
@@ -518,7 +518,7 @@ function IntelligenceHub() {
                 {oversight?.reports_this_month?.delivered || 0} delivered · {oversight?.reports_this_month?.pending_review || 0} pending
               </p>
             </div>
-            <div className="p-5 rounded-xl border border-border bg-card">
+            <div className="p-5 rounded-none border border-border bg-card">
               <div className="flex items-center gap-2 text-text-muted text-sm mb-2">
                 <Bell className="w-4 h-4" />
                 Signals This Month
@@ -526,7 +526,7 @@ function IntelligenceHub() {
               <p className="text-2xl font-bold text-text-primary">{oversight?.signals_this_month || 0}</p>
               <p className="text-xs text-text-muted mt-1">Market events detected</p>
             </div>
-            <div className="p-5 rounded-xl border border-border bg-card">
+            <div className="p-5 rounded-none border border-border bg-card">
               <div className="flex items-center gap-2 text-text-muted text-sm mb-2">
                 <Users className="w-4 h-4" />
                 Intelligence Queries
@@ -534,7 +534,7 @@ function IntelligenceHub() {
               <p className="text-2xl font-bold text-text-primary">{oversight?.queries_this_month || 0}</p>
               <p className="text-xs text-text-muted mt-1">Client queries handled</p>
             </div>
-            <div className="p-5 rounded-xl border border-border bg-card">
+            <div className="p-5 rounded-none border border-border bg-card">
               <div className="flex items-center gap-2 text-text-muted text-sm mb-2">
                 <Clock className="w-4 h-4" />
                 Avg Review Time
@@ -548,7 +548,7 @@ function IntelligenceHub() {
 
           {/* Subscriptions by Type */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-card border border-border rounded-xl p-5">
+            <div className="bg-card border border-border rounded-none p-5">
               <h3 className="font-semibold text-text-primary mb-4">Subscriptions by Type</h3>
               <div className="space-y-4">
                 {Object.entries(oversight?.subscriptions || {}).map(([type, data]: [string, any]) => (
@@ -575,7 +575,7 @@ function IntelligenceHub() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-5">
+            <div className="bg-card border border-border rounded-none p-5">
               <h3 className="font-semibold text-text-primary mb-4">Report Funnel</h3>
               <div className="space-y-3">
                 {[
@@ -607,7 +607,7 @@ function IntelligenceHub() {
       {/* Report Detail Modal */}
       {showReportDetail && selectedReport && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-card border border-border rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-card border border-border rounded-none w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div className="p-5 border-b border-border flex items-start justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-text-primary">{selectedReport.title}</h3>
@@ -627,7 +627,7 @@ function IntelligenceHub() {
 
             <div className="p-5">
               {selectedReport.executive_summary && (
-                <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-none">
                   <p className="text-sm text-text-primary leading-relaxed">{selectedReport.executive_summary}</p>
                 </div>
               )}
@@ -635,7 +635,7 @@ function IntelligenceHub() {
               {selectedReport.content?.narrative && (
                 <div className="mb-4">
                   <h4 className="font-medium text-text-primary mb-2">Full Report</h4>
-                  <div className="p-4 bg-bg-alt rounded-lg text-sm text-text-primary whitespace-pre-line leading-relaxed">
+                  <div className="p-4 bg-bg-alt rounded-none text-sm text-text-primary whitespace-pre-line leading-relaxed">
                     {selectedReport.content.narrative}
                   </div>
                 </div>
@@ -649,7 +649,7 @@ function IntelligenceHub() {
                   ) : (
                     <div className="grid grid-cols-5 gap-2">
                       {['p10', 'p25', 'median', 'p75', 'p90'].map(p => (
-                        <div key={p} className="text-center p-2 bg-bg-alt rounded-lg">
+                        <div key={p} className="text-center p-2 bg-bg-alt rounded-none">
                           <p className="text-lg font-bold text-text-primary">
                             {selectedReport.content.compensation.base?.[p] || '—'}
                           </p>
@@ -668,7 +668,7 @@ function IntelligenceHub() {
                   </h4>
                   <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
                     {selectedReport.content.talent_radar.map((p: any, i: number) => (
-                      <div key={i} className="p-3 bg-bg-alt rounded-lg">
+                      <div key={i} className="p-3 bg-bg-alt rounded-none">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium text-text-primary">{p.label}</span>
                           <span className="text-xs text-text-muted capitalize">{p.seniority?.replace(/_/g, ' ')}</span>
@@ -694,13 +694,13 @@ function IntelligenceHub() {
                     value={reviewNotes}
                     onChange={e => setReviewNotes(e.target.value)}
                     placeholder="Add review notes (optional)..."
-                    className="w-full h-20 p-3 border border-border rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 mb-3"
+                    className="w-full h-20 p-3 border border-border rounded-none text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 mb-3"
                   />
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleReview('approve')}
                       disabled={reviewAction !== null}
-                      className="flex-1 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="flex-1 py-2 text-sm bg-green-600 text-white rounded-none hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {reviewAction === 'approve' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                       Approve & Deliver
@@ -708,21 +708,21 @@ function IntelligenceHub() {
                     <button
                       onClick={() => handleReview('edit')}
                       disabled={reviewAction !== null}
-                      className="px-4 py-2 text-sm border border-border rounded-lg hover:bg-bg-alt disabled:opacity-50"
+                      className="px-4 py-2 text-sm border border-border rounded-none hover:bg-bg-alt disabled:opacity-50"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleReview('reject')}
                       disabled={reviewAction !== null}
-                      className="px-4 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50"
+                      className="px-4 py-2 text-sm text-red-600 border border-red-200 rounded-none hover:bg-red-50 disabled:opacity-50"
                     >
                       Reject
                     </button>
                     <button
                       onClick={() => handleReview('escalate')}
                       disabled={reviewAction !== null}
-                      className="px-4 py-2 text-sm text-amber-600 border border-amber-200 rounded-lg hover:bg-amber-50 disabled:opacity-50"
+                      className="px-4 py-2 text-sm text-amber-600 border border-amber-200 rounded-none hover:bg-amber-50 disabled:opacity-50"
                     >
                       Escalate
                     </button>

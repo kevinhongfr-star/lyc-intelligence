@@ -185,7 +185,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
               setIsRefreshing(true);
               setFilter('all');
             }}
-            className="p-2 hover:bg-bg-alt rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-alt rounded-none transition-colors"
           >
             <RefreshCw className={`w-5 h-5 text-text-muted ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
@@ -198,7 +198,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
         <div className="flex gap-2">
           <button
             onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
               filter === 'all'
                 ? 'bg-primary text-white'
                 : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -208,7 +208,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
           </button>
           <button
             onClick={() => setFilter('unread')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
               filter === 'unread'
                 ? 'bg-primary text-white'
                 : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -220,7 +220,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
             <select
               value={filter === 'all' || filter === 'unread' ? '' : filter}
               onChange={(e) => setFilter(e.target.value || 'all')}
-              className="px-3 py-1.5 rounded-lg text-sm font-medium bg-bg-alt text-text-muted border-none focus:outline-none focus:ring-2 focus:ring-primary"
+              className="px-3 py-1.5 rounded-none text-sm font-medium bg-bg-alt text-text-muted border-none focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">Filter by type...</option>
               {Object.entries(NOTIFICATION_TYPE_LABELS).map(([value, label]) => (

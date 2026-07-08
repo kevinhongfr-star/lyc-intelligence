@@ -221,7 +221,7 @@ export function GridMappingEditor() {
     ];
 
     return (
-      <div className="bg-card rounded-xl border border-card-border p-4 mb-4">
+      <div className="bg-card rounded-none border border-card-border p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-medium text-text-primary">Minimum Standards (M1-M7)</h3>
           <Badge variant={standards.m7_last_update?.status === 'green' ? 'success' : 'warning'}>
@@ -373,7 +373,7 @@ export function GridMappingEditor() {
           <h4 className="font-medium text-text-primary mb-3">Add Company</h4>
           <div className="space-y-3">
             <Input placeholder="Company name" />
-            <select className="w-full px-3 py-2 bg-bg border border-border rounded-lg">
+            <select className="w-full px-3 py-2 bg-bg border border-border rounded-none">
               <option value="">Select sector</option>
               {sectors.map(s => <option key={s.id} value={s.id}>{s.sector_name}</option>)}
             </select>
@@ -500,7 +500,7 @@ export function GridMappingEditor() {
                 </div>
                 <div className="flex items-center gap-4 text-sm">
                   <span className="text-text-muted">Reason:</span>
-                  <select className="px-3 py-1 bg-bg border border-border rounded-lg text-sm">
+                  <select className="px-3 py-1 bg-bg border border-border rounded-none text-sm">
                     <option value="">Select reason</option>
                     <option value="not_interested">Not interested</option>
                     <option value="not_found">Not found</option>
@@ -606,7 +606,7 @@ export function GridMappingEditor() {
 
   if (loading) {
     return (
-      <div className="bg-card rounded-xl border border-card-border p-8 flex items-center justify-center">
+      <div className="bg-card rounded-none border border-card-border p-8 flex items-center justify-center">
         <RefreshCw className="w-8 h-8 animate-spin text-accent" />
         <span className="ml-3 text-text-muted">Loading GRID mapping...</span>
       </div>
@@ -617,7 +617,7 @@ export function GridMappingEditor() {
     <div className="space-y-4">
       {mapping && <StandardsBar />}
 
-      <div className="bg-card rounded-xl border border-card-border overflow-hidden">
+      <div className="bg-card rounded-none border border-card-border overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-4">
             <h3 className="text-lg font-semibold text-text-primary">

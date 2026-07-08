@@ -168,7 +168,7 @@ export function DelegationManager({ orgId, delegatorId }: DelegationManagerProps
 
       {/* Add Form */}
       {showAddForm && (
-        <div className="mb-6 p-4 bg-bg-alt rounded-lg">
+        <div className="mb-6 p-4 bg-bg-alt rounded-none">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-medium text-text-primary">New Delegation</h4>
             <Button variant="ghost" size="icon" onClick={() => setShowAddForm(false)}>
@@ -260,7 +260,7 @@ export function DelegationManager({ orgId, delegatorId }: DelegationManagerProps
       ) : (
         <div className="space-y-3">
           {delegations.map(delegation => (
-            <div key={delegation.id} className="p-4 bg-bg-alt rounded-lg">
+            <div key={delegation.id} className="p-4 bg-bg-alt rounded-none">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="font-medium text-text-primary">

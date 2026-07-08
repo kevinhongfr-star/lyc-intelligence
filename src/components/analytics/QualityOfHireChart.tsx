@@ -36,7 +36,7 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
   }, [probationPassed, probationFailed]);
 
   return (
-    <div className="bg-card border border-card-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-card-border rounded-none overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center gap-3 mb-4">
@@ -51,19 +51,19 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-4 gap-4">
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-green-600">{probationPassRate}%</div>
             <div className="text-sm text-text-muted">Probation Pass Rate</div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-text-primary">{totalPlacements}</div>
             <div className="text-sm text-text-muted">Total Placements</div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-blue-600">{avgMatchScore}</div>
             <div className="text-sm text-text-muted">Avg Match Score</div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-lg text-center">
+          <div className="p-4 bg-bg-alt rounded-none text-center">
             <div className="text-2xl font-bold text-purple-600">{retention6Month}%</div>
             <div className="text-sm text-text-muted">6-Month Retention</div>
           </div>
@@ -137,7 +137,7 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
             <h3 className="font-semibold text-text-primary mb-4">Detailed Breakdown</h3>
             <div className="space-y-4">
               {/* Passed */}
-              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="p-4 bg-green-50 border border-green-200 rounded-none">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -154,7 +154,7 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
               </div>
 
               {/* Failed */}
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="p-4 bg-red-50 border border-red-200 rounded-none">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <XCircle className="w-5 h-5 text-red-600" />
@@ -171,7 +171,7 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
               </div>
 
               {/* Pending */}
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-none">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-yellow-600" />
@@ -231,7 +231,7 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
 export function QualityStatsCards({ metrics }: { metrics: QualityOfHireMetrics }) {
   return (
     <div className="grid grid-cols-4 gap-4">
-      <div className="bg-card border border-green-200 rounded-xl p-4 bg-green-50">
+      <div className="bg-card border border-green-200 rounded-none p-4 bg-green-50">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
             <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -243,7 +243,7 @@ export function QualityStatsCards({ metrics }: { metrics: QualityOfHireMetrics }
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
             <Target className="w-5 h-5 text-blue-600" />
@@ -255,7 +255,7 @@ export function QualityStatsCards({ metrics }: { metrics: QualityOfHireMetrics }
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
             <TrendingUp className="w-5 h-5 text-purple-600" />
@@ -267,7 +267,7 @@ export function QualityStatsCards({ metrics }: { metrics: QualityOfHireMetrics }
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-xl p-4">
+      <div className="bg-card border border-card-border rounded-none p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
             <Award className="w-5 h-5 text-orange-600" />

@@ -130,23 +130,23 @@ export function ApprovalHistory({ orgId, onSelectRequest }: ApprovalHistoryProps
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="p-3 bg-bg-alt rounded-lg text-center">
+        <div className="p-3 bg-bg-alt rounded-none text-center">
           <div className="text-2xl font-bold text-text-primary">{approvals.length}</div>
           <div className="text-xs text-text-muted">Total</div>
         </div>
-        <div className="p-3 bg-green-50 rounded-lg text-center">
+        <div className="p-3 bg-green-50 rounded-none text-center">
           <div className="text-2xl font-bold text-green-600">
             {approvals.filter(a => a.status === 'approved').length}
           </div>
           <div className="text-xs text-green-600">Approved</div>
         </div>
-        <div className="p-3 bg-red-50 rounded-lg text-center">
+        <div className="p-3 bg-red-50 rounded-none text-center">
           <div className="text-2xl font-bold text-red-600">
             {approvals.filter(a => a.status === 'rejected').length}
           </div>
           <div className="text-xs text-red-600">Rejected</div>
         </div>
-        <div className="p-3 bg-blue-50 rounded-lg text-center">
+        <div className="p-3 bg-blue-50 rounded-none text-center">
           <div className="text-2xl font-bold text-blue-600">
             {approvals.filter(a => a.status === 'in_review' || a.status === 'pending').length}
           </div>
@@ -173,12 +173,12 @@ export function ApprovalHistory({ orgId, onSelectRequest }: ApprovalHistoryProps
             return (
               <div
                 key={approval.id}
-                className="p-4 bg-bg-alt rounded-lg cursor-pointer hover:bg-bg-base transition-colors"
+                className="p-4 bg-bg-alt rounded-none cursor-pointer hover:bg-bg-base transition-colors"
                 onClick={() => onSelectRequest(approval.id)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    <div className={`w-10 h-10 rounded-none flex items-center justify-center ${
                       approval.status === 'approved' ? 'bg-green-100' :
                       approval.status === 'rejected' ? 'bg-red-100' :
                       approval.status === 'escalated' ? 'bg-amber-100' :

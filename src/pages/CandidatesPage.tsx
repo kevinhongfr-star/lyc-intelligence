@@ -107,7 +107,7 @@ export function CandidatesPage() {
         </div>
         <button
           onClick={() => setShowImportModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover transition-colors min-h-[44px]"
+          className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent-hover transition-colors min-h-[44px]"
         >
           <Upload className="w-4 h-4" />
           Import from LinkedIn
@@ -123,13 +123,13 @@ export function CandidatesPage() {
               placeholder="Search by name, title, headline, skills..."
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(0); }}
-              className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
+              className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
             />
           </div>
           <select
             value={countryFilter}
             onChange={e => { setCountryFilter(e.target.value); setPage(0); }}
-            className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent min-w-[140px]"
+            className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent min-w-[140px]"
           >
             <option value="">All Countries</option>
             {countries.map(c => <option key={c} value={c}>{c}</option>)}
@@ -137,7 +137,7 @@ export function CandidatesPage() {
           <select
             value={tierFilter}
             onChange={e => { setTierFilter(e.target.value); setPage(0); }}
-            className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent min-w-[120px]"
+            className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent min-w-[120px]"
           >
             <option value="">All Tiers</option>
             <option value="S">S — C-Suite Elite</option>
@@ -185,7 +185,7 @@ export function CandidatesPage() {
           <p className="text-text-muted">No candidates match your filters</p>
         </div>
       ) : (
-        <div className="bg-bg-secondary rounded-lg border border-bg-tertiary overflow-hidden">
+        <div className="bg-bg-secondary rounded-none border border-bg-tertiary overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>

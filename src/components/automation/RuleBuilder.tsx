@@ -66,8 +66,8 @@ const ACTION_TYPES: ActionType[] = [
   'send_webhook',
 ];
 
-const selectClassName = 'w-full px-3 py-2 bg-bg-tertiary border border-bg-hover rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent';
-const textareaClassName = 'w-full px-3 py-2 bg-bg-tertiary border border-bg-hover rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent resize-y min-h-[60px]';
+const selectClassName = 'w-full px-3 py-2 bg-bg-tertiary border border-bg-hover rounded-none text-sm text-text-primary focus:outline-none focus:border-accent';
+const textareaClassName = 'w-full px-3 py-2 bg-bg-tertiary border border-bg-hover rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent resize-y min-h-[60px]';
 
 export function RuleBuilder({ orgId, userId, initialRule, onSave, onCancel }: RuleBuilderProps) {
   const [name, setName] = useState(initialRule?.name || '');
@@ -413,7 +413,7 @@ export function RuleBuilder({ orgId, userId, initialRule, onSave, onCancel }: Ru
             {initialRule ? 'Edit Rule' : 'New Automation Rule'}
           </h2>
         </div>
-        <button onClick={onCancel} className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors">
+        <button onClick={onCancel} className="p-2 hover:bg-bg-tertiary rounded-none transition-colors">
           <X className="w-5 h-5 text-text-secondary" />
         </button>
       </div>
@@ -442,7 +442,7 @@ export function RuleBuilder({ orgId, userId, initialRule, onSave, onCancel }: Ru
       </div>
 
       {/* Trigger */}
-      <div className="mb-6 p-4 bg-bg-secondary rounded-lg">
+      <div className="mb-6 p-4 bg-bg-secondary rounded-none">
         <div className="flex items-center gap-2 mb-4">
           <Zap className="w-5 h-5 text-amber-500" />
           <h3 className="font-medium text-text-primary">WHEN: Trigger</h3>
@@ -470,7 +470,7 @@ export function RuleBuilder({ orgId, userId, initialRule, onSave, onCancel }: Ru
       </div>
 
       {/* Conditions */}
-      <div className="mb-6 p-4 bg-bg-secondary rounded-lg">
+      <div className="mb-6 p-4 bg-bg-secondary rounded-none">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-blue-500" />
@@ -523,7 +523,7 @@ export function RuleBuilder({ orgId, userId, initialRule, onSave, onCancel }: Ru
                 />
                 <button
                   onClick={() => removeCondition(index)}
-                  className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors text-red-500"
+                  className="p-2 hover:bg-bg-tertiary rounded-none transition-colors text-red-500"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -534,7 +534,7 @@ export function RuleBuilder({ orgId, userId, initialRule, onSave, onCancel }: Ru
       </div>
 
       {/* Actions */}
-      <div className="mb-6 p-4 bg-bg-secondary rounded-lg">
+      <div className="mb-6 p-4 bg-bg-secondary rounded-none">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Play className="w-5 h-5 text-green-500" />
@@ -551,7 +551,7 @@ export function RuleBuilder({ orgId, userId, initialRule, onSave, onCancel }: Ru
         ) : (
           <div className="space-y-4">
             {actions.map((action, index) => (
-              <div key={index} className="p-3 bg-bg-base rounded-lg">
+              <div key={index} className="p-3 bg-bg-base rounded-none">
                 <div className="flex items-center justify-between mb-3">
                   <select
                     value={action.type}
@@ -567,7 +567,7 @@ export function RuleBuilder({ orgId, userId, initialRule, onSave, onCancel }: Ru
                   </select>
                   <button
                     onClick={() => removeAction(index)}
-                    className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors text-red-500"
+                    className="p-2 hover:bg-bg-tertiary rounded-none transition-colors text-red-500"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -591,7 +591,7 @@ export function RuleBuilder({ orgId, userId, initialRule, onSave, onCancel }: Ru
         </button>
 
         {showPreview && (
-          <div className="mt-3 p-4 bg-accent/10 rounded-lg">
+          <div className="mt-3 p-4 bg-accent/10 rounded-none">
             <p className="text-sm text-text-primary">
               <span className="font-medium">WHEN</span> {TRIGGER_TYPE_LABELS[triggerType]}
               {conditions.length > 0 && (

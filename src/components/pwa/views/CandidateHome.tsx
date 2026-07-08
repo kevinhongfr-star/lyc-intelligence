@@ -123,9 +123,9 @@ export function CandidateHome() {
     return (
       <PageContainer>
         <div className="animate-pulse space-y-4">
-          <div className="h-24 bg-bg-alt rounded-xl" />
-          <div className="h-16 bg-bg-alt rounded-xl" />
-          <div className="h-32 bg-bg-alt rounded-xl" />
+          <div className="h-24 bg-bg-alt rounded-none" />
+          <div className="h-16 bg-bg-alt rounded-none" />
+          <div className="h-32 bg-bg-alt rounded-none" />
         </div>
       </PageContainer>
     );
@@ -288,9 +288,9 @@ export function CandidateHome() {
         <div className="grid grid-cols-2 gap-3">
           <Link
             href="/candidate/mandates"
-            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-xl hover:bg-bg-alt transition-colors"
+            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-none hover:bg-bg-alt transition-colors"
           >
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center">
               <Briefcase className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -300,9 +300,9 @@ export function CandidateHome() {
           </Link>
           <Link
             href="/candidate/profile"
-            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-xl hover:bg-bg-alt transition-colors"
+            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-none hover:bg-bg-alt transition-colors"
           >
-            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-none bg-purple-100 flex items-center justify-center">
               <FileText className="w-5 h-5 text-purple-600" />
             </div>
             <div>

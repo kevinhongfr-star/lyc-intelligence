@@ -62,7 +62,7 @@ export function StatCard({
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5 hover:shadow-md transition-shadow">
+    <div className="bg-card border border-border rounded-none p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-text-muted">{title}</p>
@@ -70,7 +70,7 @@ export function StatCard({
           {subtitle && <p className="text-xs text-text-muted mt-1">{subtitle}</p>}
         </div>
         {Icon && (
-          <div className={`w-10 h-10 rounded-lg ${colors.bg} flex items-center justify-center`}>
+          <div className={`w-10 h-10 rounded-none ${colors.bg} flex items-center justify-center`}>
             <Icon className={`w-5 h-5 ${colors.icon}`} />
           </div>
         )}
@@ -114,7 +114,7 @@ export function PipelineFunnel({ funnel, conversions = {} }: PipelineFunnelProps
   const maxCount = Math.max(...Object.values(funnel), 1);
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5">
+    <div className="bg-card border border-border rounded-none p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-text-primary">Pipeline Funnel</h3>
         <span className="text-sm text-text-muted">
@@ -138,9 +138,9 @@ export function PipelineFunnel({ funnel, conversions = {} }: PipelineFunnelProps
                 <span className="text-xs font-medium text-text-muted w-12 flex-shrink-0">
                   {formatStageShort(stage)}
                 </span>
-                <div className="flex-1 h-8 bg-bg-alt rounded-md overflow-hidden relative">
+                <div className="flex-1 h-8 bg-bg-alt rounded-none overflow-hidden relative">
                   <div
-                    className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-md transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-none transition-all duration-500"
                     style={{ width: `${widthPercent}%` }}
                   />
                   <span className="absolute inset-0 flex items-center px-3 text-xs font-medium text-white drop-shadow-sm">
@@ -190,7 +190,7 @@ export function KPIScorecard({ kpis }: KPIScorecardProps) {
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5">
+    <div className="bg-card border border-border rounded-none p-5">
       <h3 className="font-semibold text-text-primary mb-4">KPI Scorecard</h3>
       <div className="space-y-3">
         {kpis.slice(0, 6).map(kpi => {
@@ -247,7 +247,7 @@ export function MandateHealthGrid({ mandates }: MandateHealthGridProps) {
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5">
+    <div className="bg-card border border-border rounded-none p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-text-primary">Mandate Health</h3>
         <span className="text-sm text-text-muted">{mandates.length} active</span>
@@ -265,7 +265,7 @@ export function MandateHealthGrid({ mandates }: MandateHealthGridProps) {
             return (
               <div
                 key={mandate.mandate_id}
-                className={`p-3 rounded-lg border ${colors.bg} hover:shadow-sm transition-shadow cursor-pointer`}
+                className={`p-3 rounded-none border ${colors.bg} hover:shadow-sm transition-shadow cursor-pointer`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
@@ -329,7 +329,7 @@ export function ActivityFeed({ items }: ActivityFeedProps) {
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5">
+    <div className="bg-card border border-border rounded-none p-5">
       <h3 className="font-semibold text-text-primary mb-4">Recent Activity</h3>
       <div className="space-y-3 max-h-80 overflow-y-auto">
         {items.length === 0 ? (
@@ -342,7 +342,7 @@ export function ActivityFeed({ items }: ActivityFeedProps) {
             const Icon = typeIcons[item.type] || Activity;
             return (
               <div key={idx} className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-bg-alt flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-none bg-bg-alt flex items-center justify-center flex-shrink-0">
                   <Icon className="w-4 h-4 text-text-muted" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -369,13 +369,13 @@ interface ConsultantLeaderboardProps {
 
 export function ConsultantLeaderboard({ consultants }: ConsultantLeaderboardProps) {
   return (
-    <div className="bg-card border border-border rounded-xl p-5">
+    <div className="bg-card border border-border rounded-none p-5">
       <h3 className="font-semibold text-text-primary mb-4">Team Leaderboard</h3>
       <div className="space-y-2">
         {consultants.map((c, idx) => (
           <div
             key={c.consultant_id}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-bg-alt/50 transition-colors"
+            className="flex items-center gap-3 p-2 rounded-none hover:bg-bg-alt/50 transition-colors"
           >
             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
               idx === 0 ? 'bg-amber-100 text-amber-700' :
@@ -418,7 +418,7 @@ export function BottleneckAlert({ bottlenecks }: BottleneckAlertProps) {
   };
 
   return (
-    <div className={`p-4 rounded-lg border ${severityColors[bottlenecks[0].severity] || severityColors.warning}`}>
+    <div className={`p-4 rounded-none border ${severityColors[bottlenecks[0].severity] || severityColors.warning}`}>
       <div className="flex items-center gap-2 mb-2">
         <AlertCircle className="w-5 h-5" />
         <h4 className="font-semibold">Pipeline Bottlenecks Detected</h4>

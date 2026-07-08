@@ -211,7 +211,7 @@ export function WorkflowBuilder({ orgId, userId, onSave, onCancel, initialWorkfl
 
         <div className="space-y-4">
           {steps.map((step, index) => (
-            <div key={index} className="p-4 bg-bg-alt rounded-lg">
+            <div key={index} className="p-4 bg-bg-alt rounded-none">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">

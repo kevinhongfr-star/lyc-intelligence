@@ -262,7 +262,7 @@ export function CandidateAssessment({
             <button
               key={value}
               onClick={() => handleResponseChange(value)}
-              className={`flex-1 py-4 px-2 rounded-xl border-2 transition-all text-center font-medium ${
+              className={`flex-1 py-4 px-2 rounded-none border-2 transition-all text-center font-medium ${
                 currentValue === value
                   ? 'border-accent bg-accent/10 text-accent'
                   : 'border-gray-200 hover:border-gray-300 text-gray-700'
@@ -287,7 +287,7 @@ export function CandidateAssessment({
           <button
             key={idx}
             onClick={() => handleResponseChange(option)}
-            className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+            className={`w-full p-4 rounded-none border-2 text-left transition-all ${
               currentValue === option
                 ? 'border-accent bg-accent/10'
                 : 'border-gray-200 hover:border-gray-300'
@@ -331,7 +331,7 @@ export function CandidateAssessment({
           <button
             key={idx}
             onClick={() => toggleOption(option)}
-            className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+            className={`w-full p-4 rounded-none border-2 text-left transition-all ${
               currentValue.includes(option)
                 ? 'border-accent bg-accent/10'
                 : 'border-gray-200 hover:border-gray-300'
@@ -367,7 +367,7 @@ export function CandidateAssessment({
           onChange={e => handleResponseChange(e.target.value)}
           maxLength={maxLength}
           rows={6}
-          className="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-accent focus:outline-none resize-none text-gray-800"
+          className="w-full p-4 rounded-none border-2 border-gray-200 focus:border-accent focus:outline-none resize-none text-gray-800"
           placeholder="Type your answer here..."
         />
         <div className="text-right text-sm text-gray-400">
@@ -404,7 +404,7 @@ export function CandidateAssessment({
         {currentValue.map((itemIndex, displayIndex) => (
           <div
             key={itemIndex}
-            className="flex items-center gap-3 p-4 bg-white rounded-xl border-2 border-gray-200"
+            className="flex items-center gap-3 p-4 bg-white rounded-none border-2 border-gray-200"
           >
             <span className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600">
               {displayIndex + 1}
@@ -414,14 +414,14 @@ export function CandidateAssessment({
               <button
                 onClick={() => displayIndex > 0 && moveItem(displayIndex, displayIndex - 1)}
                 disabled={displayIndex === 0}
-                className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 rounded-none hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={() => displayIndex < items.length - 1 && moveItem(displayIndex, displayIndex + 1)}
                 disabled={displayIndex === items.length - 1}
-                className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 rounded-none hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -459,7 +459,7 @@ export function CandidateAssessment({
               {onExit && (
                 <button
                   onClick={() => setShowExitConfirm(true)}
-                  className="p-2 hover:bg-gray-100 rounded-lg"
+                  className="p-2 hover:bg-gray-100 rounded-none"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>

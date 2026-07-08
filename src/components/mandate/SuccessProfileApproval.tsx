@@ -64,7 +64,7 @@ export function SuccessProfileApproval({ profile, mandateTitle, onApproved }: Pr
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Context info */}
-        <div className="bg-white rounded-lg p-4 border border-slate-200">
+        <div className="bg-white rounded-none p-4 border border-slate-200">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-slate-500">Mandate:</span>
@@ -86,7 +86,7 @@ export function SuccessProfileApproval({ profile, mandateTitle, onApproved }: Pr
         </div>
 
         {/* Preview of requirements */}
-        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-none border border-slate-200 overflow-hidden">
           <div className="p-4 border-b border-slate-200 bg-slate-50">
             <h4 className="font-medium text-sm">Profile Summary</h4>
           </div>
@@ -196,7 +196,7 @@ export function SuccessProfileApproval({ profile, mandateTitle, onApproved }: Pr
         {/* Approval actions */}
         <div className="space-y-4">
           {action === 'approve' && (
-            <div className="bg-white rounded-lg p-4 border border-emerald-200">
+            <div className="bg-white rounded-none p-4 border border-emerald-200">
               <label className="text-sm font-medium text-emerald-800">Approval notes (optional)</label>
               <textarea
                 className="w-full mt-2 border border-slate-200 rounded px-3 py-2 text-sm min-h-[80px]"
@@ -214,7 +214,7 @@ export function SuccessProfileApproval({ profile, mandateTitle, onApproved }: Pr
           )}
 
           {action === 'reject' && (
-            <div className="bg-white rounded-lg p-4 border border-red-200">
+            <div className="bg-white rounded-none p-4 border border-red-200">
               <label className="text-sm font-medium text-red-800">Rejection reason (required)</label>
               <textarea
                 className="w-full mt-2 border border-slate-200 rounded px-3 py-2 text-sm min-h-[80px]"
@@ -252,7 +252,7 @@ export function SuccessProfileApproval({ profile, mandateTitle, onApproved }: Pr
           )}
 
           {profile.status === 'rejected' && (
-            <div className="bg-red-50 rounded-lg p-3">
+            <div className="bg-red-50 rounded-none p-3">
               <div className="flex items-center gap-2 text-red-700 mb-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
