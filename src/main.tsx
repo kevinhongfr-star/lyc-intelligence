@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { AuthProvider } from './contexts';
 import './index.css';
+import './styles/tokens.css';
 import { initAnalytics } from './lib/analytics';
 
 initAnalytics();

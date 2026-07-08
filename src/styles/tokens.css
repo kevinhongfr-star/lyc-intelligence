@@ -1,0 +1,75 @@
+/**
+ * DEX AI Design Tokens — Mockup v14
+ * CSS custom properties for consistent theming
+ */
+
+:root {
+  /* Base colors */
+  --white: #fff;
+  --bg: #fafafa;
+  --bg-warm: #f7f6f4;
+  --border: #e8e6e3;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555;
+  --text-muted: #999;
+
+  /* Brand */
+  --fuchsia: #C108AB;
+  --fuchsia-light: rgba(193,8,171,.08);
+  --fuchsia-10: rgba(193,8,171,.1);
+  --fuchsia-20: rgba(193,8,171,.2);
+
+  /* Semantic */
+  --green: #2d8a4e;
+  --amber: #b8860b;
+  --red: #c0392b;
+  --blue: #2c5282;
+
+  /* Typography */
+  --font-serif: 'Libre Baskerville', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-modal: 0 8px 32px rgba(0,0,0,0.15);
+
+  /* Border radius */
+  --radius-card: 12px;
+  --radius-sm: 8px;
+  --radius-full: 9999px;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Selection */
+::selection {
+  background: var(--fuchsia-light);
+  color: var(--fuchsia);
+}
