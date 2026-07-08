@@ -56,6 +56,22 @@ const TasksPage = lazy(() => import('@/pages/internal/TasksPage').then(m => ({ d
 const AnalyticsPage = lazy(() => import('@/pages/internal/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
 const CompliancePage = lazy(() => import('@/pages/internal/CompliancePage').then(m => ({ default: m.CompliancePage })));
 const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage').then(m => ({ default: m.NexusEnginePage })));
+
+// ── Client portal pages — lazy-loaded via ESM dynamic import ──
+const ClientPortal = lazy(() => import('@/components/client/ClientPortal').then(m => ({ default: m.ClientPortal })));
+const ClientDashboardPage = lazy(() => import('@/pages/client/ClientDashboardPage').then(m => ({ default: m.ClientDashboardPage })));
+const ClientMandatesPage = lazy(() => import('@/pages/client/ClientMandatesPage').then(m => ({ default: m.ClientMandatesPage })));
+const ClientReportsPage = lazy(() => import('@/pages/client/ClientReportsPage').then(m => ({ default: m.ClientReportsPage })));
+
+// ── Candidate portal pages — lazy-loaded via ESM dynamic import ──
+const CandidatePortal = lazy(() => import('@/components/candidate/CandidatePortal').then(m => ({ default: m.CandidatePortal })));
+const CandidateAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAssessmentsPage').then(m => ({ default: m.CandidateAssessmentsPage })));
+const CandidateCommunityPage = lazy(() => import('@/pages/candidate/CandidateCommunityPage').then(m => ({ default: m.CandidateCommunityPage })));
+
+// ── Coaching portal pages — lazy-loaded via ESM dynamic import (EO-5) ──
+const CoachingPortal = lazy(() => import('@/components/coaching/CoachingPortal').then(m => ({ default: m.CoachingPortal })));
+const CoachingDashboardPage = lazy(() => import('@/pages/coaching/CoachingDashboardPage').then(m => ({ default: m.CoachingDashboardPage })));
+
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const ErrorPage = lazy(() => import('@/pages/ErrorPage'));
 
@@ -153,6 +169,28 @@ export default function App() {
               <Route path="nexus-engine" element={<AdminRoute><NexusEnginePage /></AdminRoute>} />
             </Route>
           )}
+
+          {/* ── Client Portal Routes (EO-1) ── */}
+          <Route path="/client" element={<ProtectedRoute><ClientPortal /></ProtectedRoute>}>
+            <Route index element={<ClientDashboardPage />} />
+            <Route path="dashboard" element={<ClientDashboardPage />} />
+            <Route path="mandates" element={<ClientMandatesPage />} />
+            <Route path="reports" element={<ClientReportsPage />} />
+          </Route>
+
+          {/* ── Candidate Portal Routes (EO-4) ── */}
+          <Route path="/candidate" element={<ProtectedRoute><CandidatePortal candidateId="current" /></ProtectedRoute>}>
+            <Route index element={<div></div>} />
+          </Route>
+          <Route path="/candidate/assessments" element={<ProtectedRoute><CandidateAssessmentsPage /></ProtectedRoute>} />
+          <Route path="/candidate/community" element={<ProtectedRoute><CandidateCommunityPage /></ProtectedRoute>} />
+
+          {/* ── Coaching Portal Routes (EO-5) ── */}
+          <Route path="/coaching" element={<ProtectedRoute><CoachingPortal /></ProtectedRoute>}>
+            <Route index element={<CoachingDashboardPage />} />
+            <Route path="dashboard" element={<CoachingDashboardPage />} />
+          </Route>
+
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
