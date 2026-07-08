@@ -625,7 +625,7 @@ export default async function handler(
           'nexus': () => import('./_lib/nexusHandler.js'),
           'benchmark': () => import('./_lib/benchmarkHandler.js'),
           'shift': () => import('./_lib/shiftHandler.js'),
-          'ai': () => import('./_lib/aiHandler.js'),
+          'ai': () => import('./_lib/aiFeaturesHandler.js'),
         };
         const _loader = _subHandlers[_subMod];
         if (!_loader) return res.status(404).json({ error: `Unknown module: ${_subMod}` });
@@ -686,7 +686,7 @@ export default async function handler(
           'cron': () => import('./_lib/cronHandler.js'),
           'benchmark': () => import('./_lib/benchmarkHandler.js'),
           'shift': () => import('./_lib/shiftHandler.js'),
-          'ai': () => import('./_lib/aiHandler.js'),
+          'ai': () => import('./_lib/aiFeaturesHandler.js'),
         };
         const loader = xHandlers[xModule];
         if (!loader)

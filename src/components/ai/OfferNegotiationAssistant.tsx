@@ -20,7 +20,6 @@ import {
 import {
   suggestOffer,
   type OfferSuggestion,
-  isAIConfigured,
 } from '@/services/ai/aiService';
 import { Button } from '@/components/ui';
 import { Card } from '@/components/ui';
@@ -96,17 +95,11 @@ export function OfferNegotiationAssistant({
   const [error, setError] = useState<string | null>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>('breakdown');
 
-  const aiConfigured = isAIConfigured();
+  
 
   // Generate suggestion on mount
   React.useEffect(() => {
     const generate = async () => {
-      if (!aiConfigured) {
-        setError('AI is not configured. Please set VITE_DEEPSEEK_API_KEY.');
-        setStep('suggestion');
-        return;
-      }
-
       setStep('loading');
       setError(null);
 

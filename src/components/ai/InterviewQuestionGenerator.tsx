@@ -16,7 +16,7 @@ import {
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
-import { generateInterviewQuestions, type InterviewQuestion, isAIConfigured } from '@/services/ai/aiService';
+import { generateInterviewQuestions, type InterviewQuestion } from '@/services/ai/aiService';
 import { Button } from '@/components/ui';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
 
@@ -79,15 +79,10 @@ export function InterviewQuestionGenerator({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
 
-  const aiConfigured = isAIConfigured();
+  
 
   // Generate questions
   const handleGenerate = async () => {
-    if (!aiConfigured) {
-      setError('AI is not configured. Please set VITE_DEEPSEEK_API_KEY.');
-      return;
-    }
-
     setStep('generating');
     setError(null);
 

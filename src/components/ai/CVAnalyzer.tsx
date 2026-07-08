@@ -15,7 +15,7 @@ import {
   Save,
   Sparkles,
 } from 'lucide-react';
-import { analyzeCV, type CVExtractedData, isAIConfigured } from '@/services/ai/aiService';
+import { analyzeCV, type CVExtractedData } from '@/services/ai/aiService';
 import { Button } from '@/components/ui';
 import { Card } from '@/components/ui';
 
@@ -44,7 +44,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
   const [error, setError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
-  const aiConfigured = isAIConfigured();
+  
 
   // Handle file drop
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -123,10 +123,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
       return;
     }
 
-    if (!aiConfigured) {
-      setError('AI analysis is not configured. Please set VITE_DEEPSEEK_API_KEY.');
-      return;
-    }
+    
 
     setStep('analyzing');
     setError(null);
