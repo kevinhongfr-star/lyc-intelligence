@@ -46,6 +46,19 @@ const ExecutiveProfilePage = lazy(() => import('@/pages/ExecutiveProfilePage').t
 const CandidateReportPage = lazy(() => import('@/pages/CandidateReportPage').then(m => ({ default: m.CandidateReportPage })));
 const ProposalBuilderPage = lazy(() => import('@/pages/ProposalBuilderPage').then(m => ({ default: m.ProposalBuilderPage })));
 
+// ── Internal platform pages — lazy-loaded via ESM dynamic import ──
+const AdvancedOpsPage = lazy(() => import('@/pages/internal/AdvancedOpsPage').then(m => ({ default: m.AdvancedOpsPage })));
+const SchedulingPlusPage = lazy(() => import('@/pages/internal/SchedulingPlusPage').then(m => ({ default: m.SchedulingPlusPage })));
+const IntelligencePlusPage = lazy(() => import('@/pages/internal/IntelligencePlusPage').then(m => ({ default: m.IntelligencePlusPage })));
+const PlatformSettingsPage = lazy(() => import('@/pages/internal/PlatformSettingsPage').then(m => ({ default: m.PlatformSettingsPage })));
+const TeamPage = lazy(() => import('@/pages/internal/TeamPage').then(m => ({ default: m.TeamPage })));
+const TasksPage = lazy(() => import('@/pages/internal/TasksPage').then(m => ({ default: m.TasksPage })));
+const AnalyticsPage = lazy(() => import('@/pages/internal/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
+const CompliancePage = lazy(() => import('@/pages/internal/CompliancePage').then(m => ({ default: m.CompliancePage })));
+const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage').then(m => ({ default: m.NexusEnginePage })));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+const ErrorPage = lazy(() => import('@/pages/ErrorPage'));
+
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
 function Loading() { return <div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>; }
@@ -129,8 +142,18 @@ export default function App() {
               <Route path="org-intel" element={<AdminRoute><OrgIntelligencePage /></AdminRoute>} />
               <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="advanced-ops" element={<AdvancedOpsPage />} />
+              <Route path="scheduling-plus" element={<SchedulingPlusPage />} />
+              <Route path="intelligence-plus" element={<IntelligencePlusPage />} />
+              <Route path="platform-settings" element={<PlatformSettingsPage />} />
+              <Route path="team" element={<TeamPage />} />
+              <Route path="tasks" element={<TasksPage />} />
+              <Route path="analytics" element={<AnalyticsPage />} />
+              <Route path="compliance" element={<CompliancePage />} />
+              <Route path="nexus-engine" element={<AdminRoute><NexusEnginePage /></AdminRoute>} />
             </Route>
           )}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </CreditProvider>
