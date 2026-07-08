@@ -1,17 +1,17 @@
 /**
  * NexusCommandBar — Floating AI assistant bar at bottom of screen
  * Mockup v14 style: centered floating bar with input + send button
- * Phase 1 scope: UI shell only, mock responses
+ * EO-8: Wired to DeepSeek via /api/nexus/chat serverless endpoint
  */
 import React, { useState, useRef } from 'react';
-import { Send, X, Sparkles, Loader2 } from 'lucide-react';
+import { Send, X, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { sendNexusCommand } from '@/services/nexusCommandService';
 
 interface NexusCommandBarProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
-// Mock suggestions for Phase 1
 const SUGGESTIONS = [
   'Summarize active mandates',
   'Show candidates at risk',
@@ -19,40 +19,30 @@ const SUGGESTIONS = [
   'Analyze pipeline velocity',
 ];
 
-// Mock responses for Phase 1
-const MOCK_RESPONSES: Record<string, string> = {
-  'summarize': 'You have 24 active mandates. 3 are at risk (velocity < 2 candidates/week). Top mandate: VP Engineering at TechCorp - 12 candidates in pipeline.',
-  'candidates': '8 candidates flagged as at-risk: 3 with no recent activity, 2 with stalled interviews, 3 approaching deadline without finalist.',
-  'interview': '4 interviews scheduled this week. Next: John Smith (VP Engineering) tomorrow 2pm. 2 feedback pending from last week.',
-  'pipeline': 'Pipeline velocity: 24 candidates in SWEEP, 18 in CANVA, 12 in GRID, 8 in LENS, 2 PLACED. Conversion rate: 8.3% to placement.',
-  'default': 'I can help you analyze your pipeline, track mandate health, or schedule interviews. What would you like to know?',
-};
-
 export function NexusCommandBar({ isOpen, onToggle }: NexusCommandBarProps) {
   const [input, setInput] = useState('');
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
     setLoading(true);
+    setError(null);
     setShowSuggestions(false);
+    setResponse(null);
 
-    // Phase 1: Mock response
-    setTimeout(() => {
-      const lowerInput = input.toLowerCase();
-      let mockResponse = MOCK_RESPONSES.default;
-      for (const key of Object.keys(MOCK_RESPONSES)) {
-        if (lowerInput.includes(key)) {
-          mockResponse = MOCK_RESPONSES[key];
-          break;
-        }
-      }
-      setResponse(mockResponse);
+    try {
+      const result = await sendNexusCommand(input.trim());
+      setResponse(result.response || 'No response received. Please try again.');
+    } catch (err: any) {
+      console.error('[NexusCommandBar] Error:', err);
+      setError(err.message || 'Failed to get a response. Please try again.');
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -64,6 +54,7 @@ export function NexusCommandBar({ isOpen, onToggle }: NexusCommandBarProps) {
   const handleClear = () => {
     setInput('');
     setResponse(null);
+    setError(null);
     setShowSuggestions(true);
   };
 
@@ -86,19 +77,31 @@ export function NexusCommandBar({ isOpen, onToggle }: NexusCommandBarProps) {
   return (
     <>
       {/* Response panel above bar */}
-      {(response || loading) && (
+      {(response || loading || error) && (
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-xl bg-white rounded-card shadow-modal border border-border p-4 z-fixed">
           {loading ? (
             <div className="flex items-center gap-2 text-text-muted">
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-sm">Analyzing...</span>
+              <span className="text-sm">NEXUS is analyzing...</span>
+            </div>
+          ) : error ? (
+            <div className="text-sm text-red">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p>{error}</p>
+                </div>
+                <button onClick={handleClear} className="text-text-muted hover:text-text-primary">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           ) : (
             <div className="text-sm text-text-primary">
               <div className="flex items-start gap-3">
                 <Sparkles className="w-5 h-5 text-fuchsia flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p>{response}</p>
+                  <p className="whitespace-pre-wrap">{response}</p>
                 </div>
                 <button onClick={handleClear} className="text-text-muted hover:text-text-primary">
                   <X className="w-4 h-4" />
