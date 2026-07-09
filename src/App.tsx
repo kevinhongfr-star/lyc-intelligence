@@ -75,6 +75,13 @@ const ClientMandatesPage = lazy(() => import('@/pages/client/ClientMandatesPage'
 const ClientCandidatesPage = lazy(() => import('@/pages/client/ClientCandidatesPage').then(m => ({ default: m.ClientCandidatesPage })));
 const ClientDocumentsPage = lazy(() => import('@/pages/client/ClientDocumentsPage').then(m => ({ default: m.ClientDocumentsPage })));
 
+// ── Candidate Portal pages (EO-4) ──
+const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
+const CandidateApplicationsPage = lazy(() => import('@/pages/candidate/CandidateApplicationsPage').then(m => ({ default: m.CandidateApplicationsPage })));
+const CandidateAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAssessmentsPage').then(m => ({ default: m.CandidateAssessmentsPage })));
+const CandidateCommunityPage = lazy(() => import('@/pages/candidate/CandidateCommunityPage').then(m => ({ default: m.CandidateCommunityPage })));
+const CandidateInterviewPrepPage = lazy(() => import('@/pages/candidate/CandidateInterviewPrepPage').then(m => ({ default: m.CandidateInterviewPrepPage })));
+
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const PlaceholderPage = lazy(() => import('@/pages/PlaceholderPage').then(m => ({ default: m.PlaceholderPage })));
@@ -184,14 +191,14 @@ export default function App() {
           {/* ── Candidate Portal (mockup surface) ── */}
           <Route path="/candidate" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<PlaceholderPage title="Candidate Dashboard" />} />
-            <Route path="applications" element={<PlaceholderPage title="Applications" />} />
+            <Route path="dashboard" element={<CandidateDashboardPage />} />
+            <Route path="applications" element={<CandidateApplicationsPage />} />
             <Route path="offers" element={<PlaceholderPage title="Offers & Decisions" />} />
             <Route path="opportunities" element={<PlaceholderPage title="My Opportunities" />} />
-            <Route path="interview-prep" element={<PlaceholderPage title="Interview Prep" />} />
-            <Route path="assessments" element={<PlaceholderPage title="Assessments" />} />
+            <Route path="interview-prep" element={<CandidateInterviewPrepPage />} />
+            <Route path="assessments" element={<CandidateAssessmentsPage />} />
             <Route path="career-dev" element={<PlaceholderPage title="Career Development" />} />
-            <Route path="community" element={<PlaceholderPage title="Community" />} />
+            <Route path="community" element={<CandidateCommunityPage />} />
             <Route path="nexus-coach" element={<PlaceholderPage title="NEXUS Coach" />} />
             <Route path="profile" element={<PlaceholderPage title="Candidate Profile" />} />
             <Route path="advanced-assessments" element={<PlaceholderPage title="Advanced Assessments" />} />
