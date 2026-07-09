@@ -3,6 +3,7 @@ import { initScrollReveal } from '@/lib/utils';
 import { IconImpact, IconLeap, IconTrident, IconSpark, IconQuest, IconForge } from '@/components/icons/LycIcons';
 import { ArrowRight, Menu, X, Lock } from 'lucide-react';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
+import { Link } from 'react-router-dom';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -46,14 +47,14 @@ export function B2CLanding() {
     <div style={{ minHeight: '100vh', background: DS.bg }}>
       {/* Nav */}
       <nav className="nav-sticky" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>LYC Intelligence</a>
+        <Link to="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>LYC Intelligence</Link>
         <div className="nav-links">
           {navLinks.map(l => (
-            <a key={l.href} href={l.href} style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</a>
+            <Link key={l.href} to={l.href} style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</Link>
           ))}
-          <a href="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+          <Link to="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
             <Lock style={{ width: 14, height: 14 }} />Platform
-          </a>
+          </Link>
         </div>
         <button className="nav-toggle" onClick={() => setMobileOpen(true)} aria-label="Open menu"><Menu /></button>
       </nav>
@@ -62,8 +63,8 @@ export function B2CLanding() {
       <div className={`nav-mobile-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
       <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`}>
         <button className="nav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu"><X style={{ width: 24, height: 24, color: '#000' }} /></button>
-        {navLinks.map(l => (<a key={l.href} href={l.href} onClick={() => setMobileOpen(false)}>{l.label}</a>))}
-        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</a>
+        {navLinks.map(l => (<Link key={l.href} to={l.href} onClick={() => setMobileOpen(false)}>{l.label}</Link>))}
+        <Link to="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</Link>
       </div>
 
       {/* Hero — fuchsia glow */}
@@ -80,12 +81,12 @@ export function B2CLanding() {
             Understand your trajectory. Benchmark your leadership. Discover opportunities that match where you're headed.
           </p>
           <div className="cta-row" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/assessment" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <Link to="/assessment" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               Free Assessment <ArrowRight style={{ width: 16, height: 16 }} />
-            </a>
-            <a href="/nexus" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            </Link>
+            <Link to="/nexus" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               Consult Nexus
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -172,16 +173,16 @@ export function B2CLanding() {
           <div>
             <div className="footer-label">Platform</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <a href="/match">Match Analysis</a>
-              <a href="/assessment">Assessment</a>
-              <a href="/nexus">Nexus</a>
+              <Link to="/match">Match Analysis</Link>
+              <Link to="/assessment">Assessment</Link>
+              <Link to="/nexus">Nexus</Link>
             </div>
           </div>
           <div>
             <div className="footer-label">Company</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <a href="https://lyc-partners.ai" target="_blank" rel="noopener">LYC Partners</a>
-              <a href="/pricing">Contact</a>
+              <Link to="/pricing">Contact</Link>
             </div>
           </div>
         </div>

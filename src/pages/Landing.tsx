@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { initScrollReveal } from '@/lib/utils';
 import { IconTrident, IconQuest, IconSpark, IconBridge, IconLeap, IconImpact, IconPrism, IconCompass } from '@/components/icons/LycIcons';
 import { Menu, X, Lock, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -75,16 +76,16 @@ export function Landing() {
     <div style={{ minHeight: '100vh', background: DS.bg }}>
       {/* Nav — sticky with backdrop blur */}
       <nav className="nav-sticky" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>
+        <Link to="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>
           LYC Intelligence
-        </a>
+        </Link>
         <div className="nav-links">
           {navLinks.map(l => (
-            <a key={l.href} href={l.href} style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</a>
+            <Link key={l.href} to={l.href} style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</Link>
           ))}
-          <a href="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+          <Link to="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
             <Lock style={{ width: 14, height: 14 }} />Platform
-          </a>
+          </Link>
         </div>
         <button className="nav-toggle" onClick={() => setMobileOpen(true)} aria-label="Open menu">
           <Menu />
@@ -98,9 +99,9 @@ export function Landing() {
           <X style={{ width: 24, height: 24, color: '#000' }} />
         </button>
         {navLinks.map(l => (
-          <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)}>{l.label}</a>
+          <Link key={l.href} to={l.href} onClick={() => setMobileOpen(false)}>{l.label}</Link>
         ))}
-        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</a>
+        <Link to="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</Link>
       </div>
 
       {/* Hero — VIDEO BACKGROUND with dark overlay */}
@@ -155,9 +156,9 @@ export function Landing() {
 
           {/* Dual CTA — white text on dark */}
           <div className="grid-responsive-2 reveal reveal-delay-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', maxWidth: '600px', margin: '0 auto' }}>
-            <a
+            <Link
               className="card-hover"
-              href="/b2c"
+              to="/b2c"
               style={{
                 background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: DS.radius,
                 padding: '32px 24px', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -170,9 +171,9 @@ export function Landing() {
               <span style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: '#C108AB', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 Get Started <ArrowRight style={{ width: 16, height: 16 }} />
               </span>
-            </a>
-            <a
-              href="/b2b"
+            </Link>
+            <Link
+              to="/b2b"
               className="card-hover"
               style={{
                 background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: DS.radius,
@@ -186,7 +187,7 @@ export function Landing() {
               <span style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: '#C108AB', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 Get Started <ArrowRight style={{ width: 16, height: 16 }} />
               </span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -213,7 +214,7 @@ export function Landing() {
         </h2>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           {services.map(p => (
-            <a key={p.title} href={p.href} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '28px 24px', textDecoration: 'none', display: 'block', boxShadow: DS.shadow }}>
+            <Link key={p.title} to={p.href} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '28px 24px', textDecoration: 'none', display: 'block', boxShadow: DS.shadow }}>
               <div style={{ color: DS.accent, marginBottom: '16px' }} className={p.animClass}>
                 {p.icon ? <p.icon size={28} color={DS.accent} /> : <div style={{ width: '40px', height: '3px', background: DS.accent, borderRadius: '1px' }} />}
               </div>
@@ -222,7 +223,7 @@ export function Landing() {
               <span style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.accent, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 {p.cta} <ArrowRight style={{ width: 14, height: 14 }} />
               </span>
-            </a>
+            </Link>
           ))}
         </div>
       </div>
@@ -242,12 +243,12 @@ export function Landing() {
             See it, shape it, accelerate it. Leadership intelligence starts here.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/b2c" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: '#C108AB', color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <Link to="/b2c" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: '#C108AB', color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               For Leaders <ArrowRight style={{ width: 14, height: 14 }} />
-            </a>
-            <a href="/b2b" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid rgba(193,8,171,0.5)', color: '#C108AB', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            </Link>
+            <Link to="/b2b" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid rgba(193,8,171,0.5)', color: '#C108AB', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               For Firms
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -262,16 +263,16 @@ export function Landing() {
           <div>
             <div className="footer-label">Platform</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <a href="/match">Match Analysis</a>
-              <a href="/assessment">Assessment</a>
-              <a href="/nexus">Nexus</a>
+              <Link to="/match">Match Analysis</Link>
+              <Link to="/assessment">Assessment</Link>
+              <Link to="/nexus">Nexus</Link>
             </div>
           </div>
           <div>
             <div className="footer-label">Company</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <a href="https://lyc-partners.ai" target="_blank" rel="noopener">LYC Partners</a>
-              <a href="/pricing">Contact</a>
+              <Link to="/pricing">Contact</Link>
             </div>
           </div>
         </div>
