@@ -536,7 +536,6 @@ export function MatchPage() {
         <MandateSelector open={showMandateSelector} onClose={() => setShowMandateSelector(false)} onSelect={handleMandateSelect} />
 
         <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-        </div>
         <MinimalFooter />
       </div>
     );
