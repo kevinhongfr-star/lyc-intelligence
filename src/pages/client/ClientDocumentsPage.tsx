@@ -3,8 +3,10 @@
  * Renders inside AppShell → Outlet.
  */
 import React, { useState, useEffect } from 'react';
-import { FileText, Download, Calendar, RefreshCw, Search } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
+import { FileText, Download, Calendar, RefreshCw, Search, User } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, EmptyState } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
+import { getDocuments, type Document } from '@/services/supabaseApi';
 
 interface ClientDocument {
   id: string;
@@ -14,14 +16,6 @@ interface ClientDocument {
   size: string;
   mandateId?: string;
 }
-
-const MOCK_DOCS: ClientDocument[] = [
-  { id: 'd1', title: 'Talent Deep-Dive — VP Engineering Pipeline', type: 'Report', date: '2025-01-15', size: '2.4 MB', mandateId: 'm1' },
-  { id: 'd2', title: 'Q4 2024 Invoice — TechCorp', type: 'Invoice', date: '2025-01-05', size: '180 KB' },
-  { id: 'd3', title: 'Executive Search Agreement — FinScale', type: 'Contract', date: '2024-12-01', size: '450 KB', mandateId: 'm2' },
-  { id: 'd4', title: 'GRID Report — CTO CloudPeak', type: 'Report', date: '2025-01-12', size: '1.8 MB', mandateId: 'm4' },
-  { id: 'd5', title: 'Proposal — Head of Product DataMesh', type: 'Proposal', date: '2024-12-15', size: '620 KB', mandateId: 'm3' },
-];
 
 const typeColors: Record<string, string> = {
   'Report': 'bg-fuchsia/10 text-fuchsia',
@@ -35,14 +29,45 @@ export function ClientDocumentsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [error, setError] = useState<string | null>(null);
+  const { clientAccount, profile, isLoading: authLoading } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDocs(MOCK_DOCS);
+    if (authLoading) {
       setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+      return;
+    }
+
+    const loadDocs = async () => {
+      try {
+        const result = await getDocuments();
+        const mapped: ClientDocument[] = result.map((d: Document) => {
+          let docType: 'Report' | 'Invoice' | 'Contract' | 'Proposal' = 'Report';
+          const typeLower = d.type.toLowerCase();
+          if (typeLower.includes('invoice')) docType = 'Invoice';
+          else if (typeLower.includes('contract') || typeLower.includes('agreement')) docType = 'Contract';
+          else if (typeLower.includes('proposal')) docType = 'Proposal';
+          else if (typeLower.includes('report')) docType = 'Report';
+          return {
+            id: d.id,
+            title: d.name,
+            type: docType,
+            date: d.created_at ? new Date(d.created_at).toLocaleDateString() : '',
+            size: '—',
+            mandateId: d.mandate_id ?? undefined,
+          };
+        });
+        setDocs(mapped);
+      } catch (e) {
+        console.error('[ClientDocumentsPage] Error:', e);
+        setError('Failed to load');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDocs();
+  }, [authLoading]);
 
   const filteredDocs = docs.filter(d => {
     const matchesSearch = d.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -50,12 +75,28 @@ export function ClientDocumentsPage() {
     return matchesSearch && matchesType;
   });
 
+  const displayName = clientAccount?.name || profile?.name || 'Client User';
+  const organization = clientAccount?.organization || 'Your Organization';
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-serif font-bold text-2xl text-text-primary">Documents & Billing</h1>
-          <p className="text-text-secondary text-sm mt-1">Reports, invoices, contracts, and proposals.</p>
+          <div className="flex items-start justify-between mb-2">
+            <div>
+              <h1 className="font-serif font-bold text-2xl text-text-primary">Documents & Billing</h1>
+              <p className="text-text-secondary text-sm mt-1">Reports, invoices, contracts, and proposals.</p>
+            </div>
+            <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+              <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+                <User className="w-4 h-4 text-fuchsia" />
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-medium text-text-primary">{displayName}</div>
+                <div className="text-xs text-text-muted">{organization}</div>
+              </div>
+            </div>
+          </div>
         </div>
         <Button variant="outline" size="sm">
           <RefreshCw className="w-4 h-4" />
@@ -90,8 +131,13 @@ export function ClientDocumentsPage() {
       {/* Documents list */}
       {loading ? (
         <div className="py-12 text-center text-text-muted text-sm">Loading documents...</div>
+      ) : error ? (
+        <div className="py-12 text-center text-text-muted text-sm">{error}</div>
       ) : filteredDocs.length === 0 ? (
-        <div className="py-12 text-center text-text-muted text-sm">No documents found.</div>
+        <EmptyState
+          title="No documents found"
+          description="Adjust your search or type filter to see more results."
+        />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {filteredDocs.map((doc) => (

@@ -3,7 +3,7 @@
  * Renders inside AppShell → Outlet. Shows skill assessments, market
  * insights, and salary benchmarks.
  */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Brain,
   TrendingUp,
@@ -13,8 +13,10 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Award,
+  User,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Progress } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
 
 interface SkillAssessment {
   id: string;
@@ -43,7 +45,8 @@ interface SalaryBenchmark {
   yourCurrent: number;
 }
 
-const MOCK_SKILLS: SkillAssessment[] = [
+// Static content - career intelligence, no direct table backing
+const STATIC_SKILLS: SkillAssessment[] = [
   { id: 's1', skill: 'Strategic Leadership', score: 82, benchmark: 71, trend: 'up', category: 'Leadership' },
   { id: 's2', skill: 'Stakeholder Management', score: 78, benchmark: 74, trend: 'up', category: 'Leadership' },
   { id: 's3', skill: 'Financial Modeling', score: 65, benchmark: 70, trend: 'flat', category: 'Technical' },
@@ -52,14 +55,14 @@ const MOCK_SKILLS: SkillAssessment[] = [
   { id: 's6', skill: 'Negotiation', score: 80, benchmark: 68, trend: 'up', category: 'Communication' },
 ];
 
-const MOCK_INSIGHTS: MarketInsight[] = [
+const STATIC_INSIGHTS: MarketInsight[] = [
   { id: 'm1', role: 'VP Engineering', demandLevel: 'High', openings: 1240, growthRate: '+18% YoY', topLocations: ['San Francisco', 'New York', 'Remote'] },
   { id: 'm2', role: 'CFO', demandLevel: 'Moderate', openings: 480, growthRate: '+6% YoY', topLocations: ['New York', 'Chicago', 'Boston'] },
   { id: 'm3', role: 'Head of Product', demandLevel: 'High', openings: 890, growthRate: '+22% YoY', topLocations: ['San Francisco', 'Seattle', 'Remote'] },
   { id: 'm4', role: 'COO', demandLevel: 'Low', openings: 210, growthRate: '+2% YoY', topLocations: ['New York', 'London', 'Singapore'] },
 ];
 
-const MOCK_SALARIES: SalaryBenchmark[] = [
+const STATIC_SALARIES: SalaryBenchmark[] = [
   { id: 'sal1', role: 'VP Engineering', percentile25: 280000, percentile50: 340000, percentile75: 410000, yourCurrent: 315000 },
   { id: 'sal2', role: 'CFO', percentile25: 320000, percentile50: 390000, percentile75: 475000, yourCurrent: 360000 },
   { id: 'sal3', role: 'Head of Product', percentile25: 250000, percentile50: 305000, percentile75: 370000, yourCurrent: 298000 },
@@ -76,21 +79,11 @@ function formatCurrency(value: number): string {
 }
 
 export function CoachingCareerIntelPage() {
-  const [skills, setSkills] = useState<SkillAssessment[]>([]);
-  const [insights, setInsights] = useState<MarketInsight[]>([]);
-  const [salaries, setSalaries] = useState<SalaryBenchmark[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { profile } = useTenantContext();
 
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/coaching/career-intel
-    const timer = setTimeout(() => {
-      setSkills(MOCK_SKILLS);
-      setInsights(MOCK_INSIGHTS);
-      setSalaries(MOCK_SALARIES);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const skills = STATIC_SKILLS;
+  const insights = STATIC_INSIGHTS;
+  const salaries = STATIC_SALARIES;
 
   const avgScore =
     skills.length > 0
@@ -98,14 +91,30 @@ export function CoachingCareerIntelPage() {
       : 0;
   const aboveBenchmark = skills.filter(s => s.score >= s.benchmark).length;
 
+  const displayName = profile?.name || 'Coachee';
+  const tier = profile?.tier || 'Professional';
+
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Career Intelligence</h1>
-        <p className="text-text-secondary text-sm mt-1">
-          Data-driven insights into your skills, the market, and compensation benchmarks.
-        </p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Career Intelligence</h1>
+            <p className="text-text-secondary text-sm mt-1">
+              Data-driven insights into your skills, the market, and compensation benchmarks.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{tier}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Top metrics */}
@@ -116,7 +125,7 @@ export function CoachingCareerIntelPage() {
               <Brain className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : avgScore}</div>
+              <div className="text-2xl font-bold text-text-primary">{avgScore}</div>
               <div className="text-xs text-text-muted">Avg. Skill Score</div>
             </div>
           </div>
@@ -127,7 +136,7 @@ export function CoachingCareerIntelPage() {
               <Target className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : `${aboveBenchmark}/${skills.length}`}</div>
+              <div className="text-2xl font-bold text-text-primary">{`${aboveBenchmark}/${skills.length}`}</div>
               <div className="text-xs text-text-muted">Above Peer Benchmark</div>
             </div>
           </div>
@@ -154,9 +163,7 @@ export function CoachingCareerIntelPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading assessments...</div>
-          ) : skills.length === 0 ? (
+          {skills.length === 0 ? (
             <div className="py-8 text-center text-text-muted text-sm">No skill assessments yet.</div>
           ) : (
             <div className="space-y-5">
@@ -206,9 +213,6 @@ export function CoachingCareerIntelPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading insights...</div>
-            ) : (
               <div className="space-y-4">
                 {insights.map((insight) => (
                   <div key={insight.id} className="py-3 border-b border-border last:border-b-0">
@@ -234,7 +238,6 @@ export function CoachingCareerIntelPage() {
                   </div>
                 ))}
               </div>
-            )}
           </CardContent>
         </Card>
 
@@ -247,9 +250,6 @@ export function CoachingCareerIntelPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading benchmarks...</div>
-            ) : (
               <div className="space-y-5">
                 {salaries.map((sal) => {
                   const position =
@@ -302,7 +302,6 @@ export function CoachingCareerIntelPage() {
                   );
                 })}
               </div>
-            )}
           </CardContent>
         </Card>
       </div>

@@ -3,8 +3,10 @@
  * Renders inside AppShell → Outlet.
  */
 import React, { useState, useEffect } from 'react';
-import { Search, Star, Mail, Briefcase, MapPin } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Input } from '@/components/ui';
+import { Search, Star, Mail, Briefcase, MapPin, User } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Input, EmptyState } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
+import { searchContacts, type Contact } from '@/services/supabaseApi';
 
 interface ClientCandidate {
   id: string;
@@ -18,15 +20,6 @@ interface ClientCandidate {
   mandateId: string;
   mandateTitle: string;
 }
-
-const MOCK_CANDIDATES: ClientCandidate[] = [
-  { id: 'c1', name: 'Sarah Chen', title: 'VP Engineering', company: 'Meta', location: 'San Francisco', tier: 'S', status: 'Interview', score: 92, mandateId: 'm1', mandateTitle: 'VP Engineering — TechCorp' },
-  { id: 'c2', name: 'Michael Wong', title: 'CFO', company: 'Stripe', location: 'New York', tier: 'S', status: 'Shortlisted', score: 89, mandateId: 'm2', mandateTitle: 'CFO — FinScale' },
-  { id: 'c3', name: 'Emily Rodriguez', title: 'Head of Product', company: 'Airbnb', location: 'Remote', tier: 'A', status: 'Screening', score: 78, mandateId: 'm1', mandateTitle: 'VP Engineering — TechCorp' },
-  { id: 'c4', name: 'David Kim', title: 'CTO', company: 'Shopify', location: 'Seattle', tier: 'S', status: 'Offer', score: 95, mandateId: 'm4', mandateTitle: 'CTO — CloudPeak' },
-  { id: 'c5', name: 'Jessica Liu', title: 'VP Sales', company: 'HubSpot', location: 'Boston', tier: 'A', status: 'New', score: 72, mandateId: 'm4', mandateTitle: 'CTO — CloudPeak' },
-  { id: 'c6', name: 'Robert Taylor', title: 'VP Engineering', company: 'Google', location: 'San Francisco', tier: 'A', status: 'Shortlisted', score: 81, mandateId: 'm1', mandateTitle: 'VP Engineering — TechCorp' },
-];
 
 const tierColors: Record<string, string> = {
   S: 'bg-fuchsia text-white',
@@ -49,14 +42,48 @@ export function ClientCandidatesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [tierFilter, setTierFilter] = useState('all');
+  const [error, setError] = useState<string | null>(null);
+  const { clientAccount, profile, isLoading: authLoading } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setCandidates(MOCK_CANDIDATES);
+    if (authLoading) {
       setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+      return;
+    }
+
+    const loadCandidates = async () => {
+      try {
+        const result = await searchContacts({ query: searchTerm, limit: 50, userId: profile?.id });
+        const mapped: ClientCandidate[] = result.data.map((c: Contact) => {
+          const score = c.trident_composite ?? c.match_score_best ?? 50;
+          let tier: 'S' | 'A' | 'B' | 'C' = 'C';
+          if (c.cxo_stamp || score >= 85) tier = 'S';
+          else if (score >= 65) tier = 'A';
+          else if (score >= 45) tier = 'B';
+          return {
+            id: c.id,
+            name: c.name,
+            title: c.current_title || 'Professional',
+            company: c.company?.name || 'Unknown Company',
+            location: c.location || c.city || c.country || 'Unknown',
+            tier,
+            status: 'New' as const,
+            score: Math.round(score),
+            mandateId: '',
+            mandateTitle: '',
+          };
+        });
+        setCandidates(mapped);
+      } catch (e) {
+        console.error('[ClientCandidatesPage] Error:', e);
+        setError('Failed to load');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCandidates();
+  }, [searchTerm, profile?.id, authLoading]);
 
   const filteredCandidates = candidates.filter(c => {
     const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -65,11 +92,27 @@ export function ClientCandidatesPage() {
     return matchesSearch && matchesTier;
   });
 
+  const displayName = clientAccount?.name || profile?.name || 'Client User';
+  const organization = clientAccount?.organization || 'Your Organization';
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Candidates</h1>
-        <p className="text-text-secondary text-sm mt-1">View and track candidates across all mandates.</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Candidates</h1>
+            <p className="text-text-secondary text-sm mt-1">View and track candidates across all mandates.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{organization}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}
@@ -99,8 +142,13 @@ export function ClientCandidatesPage() {
       {/* Candidate list */}
       {loading ? (
         <div className="py-12 text-center text-text-muted text-sm">Loading candidates...</div>
+      ) : error ? (
+        <div className="py-12 text-center text-text-muted text-sm">{error}</div>
       ) : filteredCandidates.length === 0 ? (
-        <div className="py-12 text-center text-text-muted text-sm">No candidates found.</div>
+        <EmptyState
+          title="No candidates found"
+          description="Adjust your search or tier filter to see more results."
+        />
       ) : (
         <div className="space-y-3">
           {filteredCandidates.map((candidate) => (

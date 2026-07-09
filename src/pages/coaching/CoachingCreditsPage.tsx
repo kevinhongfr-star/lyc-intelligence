@@ -4,8 +4,10 @@
  * history, and available plan tiers.
  */
 import React, { useState, useEffect } from 'react';
-import { Coins, TrendingUp, Check, ArrowRight, Plus, Receipt } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Progress } from '@/components/ui';
+import { Coins, TrendingUp, Check, ArrowRight, Plus, Receipt, User } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Progress, EmptyState } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
+import { getCoachingCredits, type CoachingCreditData } from '@/services/supabaseApi';
 
 interface CreditBalance {
   current: number;
@@ -32,14 +34,7 @@ interface PlanTier {
   current?: boolean;
 }
 
-const MOCK_BALANCE: CreditBalance = {
-  current: 18,
-  reserved: 3,
-  expiresAt: '2025-03-31',
-  monthlyResetAt: '2025-02-01',
-};
-
-const MOCK_USAGE: UsageRecord[] = [
+const STATIC_USAGE: UsageRecord[] = [
   { id: 'u1', description: '1:1 Career Strategy Session', amount: -2, date: '2025-01-15', type: 'Session' },
   { id: 'u2', description: 'Monthly credit refresh', amount: 20, date: '2025-01-01', type: 'Top-up' },
   { id: 'u3', description: 'Leadership Assessment (SHIFT)', amount: -3, date: '2024-12-28', type: 'Assessment' },
@@ -48,7 +43,7 @@ const MOCK_USAGE: UsageRecord[] = [
   { id: 'u6', description: 'Credit top-up purchase', amount: 10, date: '2024-12-10', type: 'Top-up' },
 ];
 
-const MOCK_PLANS: PlanTier[] = [
+const STATIC_PLANS: PlanTier[] = [
   {
     id: 'starter',
     name: 'Starter',
@@ -76,35 +71,79 @@ const MOCK_PLANS: PlanTier[] = [
 
 export function CoachingCreditsPage() {
   const [balance, setBalance] = useState<CreditBalance | null>(null);
-  const [usage, setUsage] = useState<UsageRecord[]>([]);
-  const [plans, setPlans] = useState<PlanTier[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user, profile } = useTenantContext();
+
+  const usage = STATIC_USAGE;
+  const plans = STATIC_PLANS;
 
   useEffect(() => {
-    // TODO: Replace with real API call to /api/coaching/credits
-    const timer = setTimeout(() => {
-      setBalance(MOCK_BALANCE);
-      setUsage(MOCK_USAGE);
-      setPlans(MOCK_PLANS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    if (!user?.id) { setLoading(false); return; }
+
+    const fetchCredits = async () => {
+      try {
+        setError(null);
+        const data = await getCoachingCredits(user.id);
+        if (data) {
+          setBalance({
+            current: data.current_credits,
+            reserved: 0,
+            expiresAt: '',
+            monthlyResetAt: '',
+          });
+        } else {
+          setBalance(null);
+        }
+      } catch (e) {
+        console.error('[CoachingCreditsPage] Error:', e);
+        setError('Failed to load credits');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCredits();
+  }, [user?.id]);
 
   const available = balance ? balance.current - balance.reserved : 0;
   const usageRatio = balance ? Math.min(100, ((balance.current + 0) / 20) * 100) : 0;
+
+  const displayName = profile?.name || 'Coachee';
+  const tier = profile?.tier || 'Professional';
 
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Credits & Plans</h1>
-        <p className="text-text-secondary text-sm mt-1">Manage your coaching credits and subscription plan.</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Credits & Plans</h1>
+            <p className="text-text-secondary text-sm mt-1">Manage your coaching credits and subscription plan.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{tier}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Balance overview */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 p-5">
+          {loading ? (
+            <EmptyState title="Loading credits..." description="Fetching your credit balance." />
+          ) : error ? (
+            <EmptyState title="Error loading credits" description={error} />
+          ) : !balance ? (
+            <EmptyState title="No credit data" description="Purchase a plan to get started with coaching credits." actionLabel="View Plans" onAction={() => {}} />
+          ) : (
+          <>
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-fuchsia flex items-center justify-center">
@@ -112,7 +151,7 @@ export function CoachingCreditsPage() {
               </div>
               <div>
                 <div className="text-3xl font-bold text-text-primary">
-                  {loading || !balance ? '—' : balance.current}
+                  {balance.current}
                 </div>
                 <div className="text-xs text-text-muted">Credits available</div>
               </div>
@@ -126,25 +165,27 @@ export function CoachingCreditsPage() {
             <div>
               <div className="flex justify-between text-xs text-text-secondary mb-1.5">
                 <span>Monthly balance</span>
-                <span>{loading || !balance ? '—' : `${balance.current} / 20`}</span>
+                <span>{`${balance.current} / 20`}</span>
               </div>
-              <Progress value={loading ? 0 : usageRatio} />
+              <Progress value={usageRatio} />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
               <div className="p-3 bg-bg-warm border border-border">
-                <div className="text-sm font-semibold text-text-primary">{loading || !balance ? '—' : available}</div>
+                <div className="text-sm font-semibold text-text-primary">{available}</div>
                 <div className="text-xs text-text-muted">Spendable now</div>
               </div>
               <div className="p-3 bg-bg-warm border border-border">
-                <div className="text-sm font-semibold text-text-primary">{loading || !balance ? '—' : balance.reserved}</div>
+                <div className="text-sm font-semibold text-text-primary">{balance.reserved}</div>
                 <div className="text-xs text-text-muted">Reserved</div>
               </div>
               <div className="p-3 bg-bg-warm border border-border">
-                <div className="text-sm font-semibold text-text-primary">{loading || !balance ? '—' : balance.monthlyResetAt}</div>
+                <div className="text-sm font-semibold text-text-primary">{balance.monthlyResetAt}</div>
                 <div className="text-xs text-text-muted">Next reset</div>
               </div>
             </div>
           </div>
+          </>
+          )}
         </Card>
 
         <Card className="p-5">
@@ -152,6 +193,9 @@ export function CoachingCreditsPage() {
             <TrendingUp className="w-4 h-4 text-fuchsia" />
             <span className="text-sm font-medium text-text-primary">This Month</span>
           </div>
+          {loading || !balance ? (
+            <div className="py-4 text-center text-text-muted text-sm">Loading stats...</div>
+          ) : (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs text-text-muted">Sessions used</span>
@@ -167,9 +211,10 @@ export function CoachingCreditsPage() {
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-border">
               <span className="text-xs text-text-muted">Expires</span>
-              <span className="text-xs font-medium text-text-secondary">{loading || !balance ? '—' : balance.expiresAt}</span>
+              <span className="text-xs font-medium text-text-secondary">{balance.expiresAt}</span>
             </div>
           </div>
+          )}
         </Card>
       </div>
 
@@ -182,9 +227,7 @@ export function CoachingCreditsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading usage history...</div>
-          ) : usage.length === 0 ? (
+          {usage.length === 0 ? (
             <div className="py-8 text-center text-text-muted text-sm">No usage records yet.</div>
           ) : (
             <div className="space-y-1">
@@ -221,9 +264,7 @@ export function CoachingCreditsPage() {
       <div>
         <h2 className="font-serif font-semibold text-lg text-text-primary mb-4">Available Plans</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {loading
-            ? null
-            : plans.map((plan) => (
+          {plans.map((plan) => (
                 <Card
                   key={plan.id}
                   className={`p-5 relative ${

@@ -5,3 +5,4 @@ export { Input } from './Input';
 export { Progress } from './Progress';
 export { UpgradeBanner } from './UpgradeBanner';
 export { CreditDisplay } from './CreditDisplay';
+export { EmptyState } from './EmptyState';

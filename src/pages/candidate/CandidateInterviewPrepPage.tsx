@@ -3,9 +3,12 @@
  * Renders inside AppShell → Outlet. Shows prep tips by category and practice
  * questions with difficulty labels.
  */
-import React, { useState, useEffect } from 'react';
-import { Lightbulb, BookOpen, CheckCircle2, ChevronRight, Video, FileText, Brain, Target, Star } from 'lucide-react';
+import React, { useState } from 'react';
+import { Lightbulb, BookOpen, CheckCircle2, ChevronRight, Video, FileText, Brain, Target, Star, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Progress } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
+
+// Static content - interview prep educational materials
 
 interface PrepTip {
   id: string;
@@ -28,7 +31,7 @@ interface PrepChecklistItem {
   done: boolean;
 }
 
-const MOCK_TIPS: PrepTip[] = [
+const STATIC_TIPS: PrepTip[] = [
   {
     id: 'tip1',
     category: 'Behavioral',
@@ -71,7 +74,7 @@ const MOCK_TIPS: PrepTip[] = [
   },
 ];
 
-const MOCK_QUESTIONS: PracticeQuestion[] = [
+const STATIC_QUESTIONS: PracticeQuestion[] = [
   { id: 'q1', question: 'Tell me about a time you led a team through ambiguity.', category: 'Behavioral', difficulty: 'Medium', framework: 'STAR' },
   { id: 'q2', question: 'Describe a strategic decision you made with incomplete data.', category: 'Leadership', difficulty: 'Hard', framework: 'STAR + Trade-offs' },
   { id: 'q3', question: 'Estimate the market size for premium EVs in Southeast Asia.', category: 'Case Study', difficulty: 'Hard', framework: 'Market Sizing' },
@@ -88,7 +91,7 @@ const DIFFICULTY_COLORS: Record<PracticeQuestion['difficulty'], string> = {
   'Hard': 'bg-red/10 text-red',
 };
 
-const MOCK_CHECKLIST: PrepChecklistItem[] = [
+const STATIC_CHECKLIST: PrepChecklistItem[] = [
   { id: 'c1', label: 'Research the company and recent news', done: true },
   { id: 'c2', label: 'Review the role spec and success profile', done: true },
   { id: 'c3', label: 'Prepare 5 STAR stories with quantified results', done: true },
@@ -98,31 +101,36 @@ const MOCK_CHECKLIST: PrepChecklistItem[] = [
 ];
 
 export function CandidateInterviewPrepPage() {
-  const [tips, setTips] = useState<PrepTip[]>([]);
-  const [questions, setQuestions] = useState<PracticeQuestion[]>([]);
-  const [checklist, setChecklist] = useState<PrepChecklistItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/candidate/interview-prep
-    const timer = setTimeout(() => {
-      setTips(MOCK_TIPS);
-      setQuestions(MOCK_QUESTIONS);
-      setChecklist(MOCK_CHECKLIST);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const tips = STATIC_TIPS;
+  const questions = STATIC_QUESTIONS;
+  const checklist = STATIC_CHECKLIST;
+  const { candidateProfile, profile } = useTenantContext();
 
   const checklistDone = checklist.filter((c) => c.done).length;
   const checklistProgress = checklist.length ? Math.round((checklistDone / checklist.length) * 100) : 0;
+
+  const displayName = candidateProfile?.name || profile?.name || 'Candidate';
+  const currentTitle = candidateProfile?.current_title || 'Professional';
 
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Interview Prep</h1>
-        <p className="text-text-secondary text-sm mt-1">Frameworks, tips, and practice questions to help you perform your best.</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Interview Prep</h1>
+            <p className="text-text-secondary text-sm mt-1">Frameworks, tips, and practice questions to help you perform your best.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{currentTitle}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Prep checklist + resources */}
@@ -133,25 +141,19 @@ export function CandidateInterviewPrepPage() {
             <CardTitle>Prep Checklist</CardTitle>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-6 text-center text-text-muted text-sm">Loading...</div>
-            ) : (
-              <>
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-text-secondary">{checklistDone}/{checklist.length} complete</span>
-                  <span className="text-fuchsia font-medium">{checklistProgress}%</span>
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-text-secondary">{checklistDone}/{checklist.length} complete</span>
+              <span className="text-fuchsia font-medium">{checklistProgress}%</span>
+            </div>
+            <Progress value={checklistProgress} className="mb-4" />
+            <div className="space-y-2">
+              {checklist.map((item) => (
+                <div key={item.id} className="flex items-start gap-2 text-sm">
+                  <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${item.done ? 'text-fuchsia' : 'text-text-muted'}`} />
+                  <span className={item.done ? 'text-text-muted line-through' : 'text-text-primary'}>{item.label}</span>
                 </div>
-                <Progress value={checklistProgress} className="mb-4" />
-                <div className="space-y-2">
-                  {checklist.map((item) => (
-                    <div key={item.id} className="flex items-start gap-2 text-sm">
-                      <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${item.done ? 'text-fuchsia' : 'text-text-muted'}`} />
-                      <span className={item.done ? 'text-text-muted line-through' : 'text-text-primary'}>{item.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -188,28 +190,24 @@ export function CandidateInterviewPrepPage() {
           <Lightbulb className="w-4 h-4 text-fuchsia" />
           <h2 className="font-serif font-semibold text-lg text-text-primary">Tips by Category</h2>
         </div>
-        {loading ? (
-          <div className="py-6 text-center text-text-muted text-sm">Loading tips...</div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {tips.map((tip) => (
-              <Card key={tip.id} className="p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xl">{tip.icon}</span>
-                  <h3 className="font-serif font-semibold text-text-primary">{tip.category}</h3>
-                </div>
-                <ul className="space-y-2">
-                  {tip.tips.map((t, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                      <ChevronRight className="w-3 h-3 mt-1 text-fuchsia flex-shrink-0" />
-                      <span>{t}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {tips.map((tip) => (
+            <Card key={tip.id} className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xl">{tip.icon}</span>
+                <h3 className="font-serif font-semibold text-text-primary">{tip.category}</h3>
+              </div>
+              <ul className="space-y-2">
+                {tip.tips.map((t, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                    <ChevronRight className="w-3 h-3 mt-1 text-fuchsia flex-shrink-0" />
+                    <span>{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          ))}
+        </div>
       </div>
 
       {/* Practice questions */}
@@ -223,22 +221,19 @@ export function CandidateInterviewPrepPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading questions...</div>
-          ) : (
-            <div className="space-y-1">
-              {questions.map((q) => (
-                <div
-                  key={q.id}
-                  className="flex items-start gap-3 py-3 border-b border-border last:border-b-0 hover:bg-bg-warm transition-colors -mx-4 px-4"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-fuchsia-light flex items-center justify-center flex-shrink-0">
-                    <Target className="w-4 h-4 text-fuchsia" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-text-primary">{q.question}</p>
-                    <div className="flex items-center gap-3 text-xs text-text-muted mt-2 flex-wrap">
-                      <span className="px-1.5 py-0.5 rounded bg-fuchsia-light text-fuchsia">{q.category}</span>
+          <div className="space-y-1">
+            {questions.map((q) => (
+              <div
+                key={q.id}
+                className="flex items-start gap-3 py-3 border-b border-border last:border-b-0 hover:bg-bg-warm transition-colors -mx-4 px-4"
+              >
+                <div className="w-8 h-8 rounded-lg bg-fuchsia-light flex items-center justify-center flex-shrink-0">
+                  <Target className="w-4 h-4 text-fuchsia" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-text-primary">{q.question}</p>
+                  <div className="flex items-center gap-3 text-xs text-text-muted mt-2 flex-wrap">
+                    <span className="px-1.5 py-0.5 rounded bg-fuchsia-light text-fuchsia">{q.category}</span>
                       <span className={`px-1.5 py-0.5 rounded ${DIFFICULTY_COLORS[q.difficulty]}`}>{q.difficulty}</span>
                       <span className="inline-flex items-center gap-1"><BookOpen className="w-3 h-3" /> {q.framework}</span>
                     </div>
@@ -247,7 +242,6 @@ export function CandidateInterviewPrepPage() {
                 </div>
               ))}
             </div>
-          )}
         </CardContent>
       </Card>
     </div>

@@ -3,8 +3,10 @@
  * Renders inside AppShell → Outlet. Lists active applications with status tracking.
  */
 import React, { useState, useEffect } from 'react';
-import { Search, Briefcase, Users, Award, CheckCircle2, Building2, Calendar, MapPin, ArrowRight } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Input } from '@/components/ui';
+import { Search, Briefcase, Users, Award, CheckCircle2, Building2, Calendar, MapPin, ArrowRight, User } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, Input, EmptyState } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
+import { getCandidateApplications } from '@/services/supabaseApi';
 
 type ApplicationStatus =
   | 'Under Review'
@@ -27,13 +29,25 @@ interface CandidateApplication {
   nextStep: string;
 }
 
-const MOCK_APPLICATIONS: CandidateApplication[] = [
-  { id: 'a1', company: 'TechCorp', role: 'VP Engineering', seniority: 'VP', location: 'San Francisco', status: 'Interview Stage', progress: 60, submittedAt: '2025-01-05', updatedAt: '2025-01-15', nextStep: 'Final round interview on Jan 22' },
-  { id: 'a2', company: 'FinScale', role: 'Chief Financial Officer', seniority: 'C-Level', location: 'New York', status: 'Submitted to Client', progress: 40, submittedAt: '2025-01-02', updatedAt: '2025-01-14', nextStep: 'Awaiting client feedback' },
-  { id: 'a3', company: 'DataMesh', role: 'Head of Product', seniority: 'Director', location: 'Remote', status: 'Under Review', progress: 20, submittedAt: '2025-01-09', updatedAt: '2025-01-10', nextStep: 'Initial screening in progress' },
-  { id: 'a4', company: 'CloudPeak', role: 'CTO', seniority: 'C-Level', location: 'Seattle', status: 'Offer Stage', progress: 85, submittedAt: '2024-12-10', updatedAt: '2025-01-16', nextStep: 'Offer under review' },
-  { id: 'a5', company: 'GrowthLab', role: 'VP Sales', seniority: 'VP', location: 'Boston', status: 'Not Selected', progress: 100, submittedAt: '2024-11-01', updatedAt: '2024-12-20', nextStep: 'Closed — role filled' },
-];
+function mapStageToStatus(stage: string): ApplicationStatus {
+  const s = stage.toLowerCase();
+  if (s.includes('offer') || s.includes('offer_stage')) return 'Offer Stage';
+  if (s.includes('interview') || s.includes('interview_stage')) return 'Interview Stage';
+  if (s.includes('submitted') || s.includes('client')) return 'Submitted to Client';
+  if (s.includes('placed') || s.includes('hired')) return 'Placed';
+  if (s.includes('rejected') || s.includes('not_selected') || s.includes('closed')) return 'Not Selected';
+  return 'Under Review';
+}
+
+function mapStageToProgress(stage: string): number {
+  const s = stage.toLowerCase();
+  if (s.includes('offer') || s.includes('offer_stage')) return 85;
+  if (s.includes('interview') || s.includes('interview_stage')) return 60;
+  if (s.includes('submitted') || s.includes('client')) return 40;
+  if (s.includes('placed') || s.includes('hired')) return 100;
+  if (s.includes('rejected') || s.includes('not_selected') || s.includes('closed')) return 100;
+  return 20;
+}
 
 const STATUS_COLORS: Record<ApplicationStatus, string> = {
   'Under Review': 'bg-amber/10 text-amber',
@@ -56,16 +70,36 @@ const STATUS_OPTIONS: { value: 'all' | ApplicationStatus; label: string }[] = [
 export function CandidateApplicationsPage() {
   const [applications, setApplications] = useState<CandidateApplication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | ApplicationStatus>('all');
+  const { candidateProfile, profile } = useTenantContext();
 
   useEffect(() => {
-    // TODO: Replace with real API call to /api/candidate/applications
-    const timer = setTimeout(() => {
-      setApplications(MOCK_APPLICATIONS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    async function loadApplications() {
+      try {
+        const data = await getCandidateApplications();
+        const mapped: CandidateApplication[] = data.map((app: any) => ({
+          id: app.id,
+          company: app.mandate?.company?.name || app.client_name || 'Unknown',
+          role: app.mandate?.title || 'Position',
+          seniority: app.mandate?.title?.match(/VP|Director|Chief|CTO|CFO|CEO|COO|CMO|CPO|CIO|CISO/i)?.[0] || 'Professional',
+          location: app.mandate?.location || '—',
+          status: mapStageToStatus(app.stage || ''),
+          progress: mapStageToProgress(app.stage || ''),
+          submittedAt: app.applied_date?.split('T')[0] || app.created_at?.split('T')[0] || '',
+          updatedAt: app.last_updated?.split('T')[0] || app.updated_at?.split('T')[0] || '',
+          nextStep: app.next_steps || 'Awaiting next update',
+        }));
+        setApplications(mapped);
+      } catch (e) {
+        console.error('[CandidateApplicationsPage] Error:', e);
+        setError('Failed to load applications');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadApplications();
   }, []);
 
   const filtered = applications.filter((a) => {
@@ -81,12 +115,28 @@ export function CandidateApplicationsPage() {
   const offerCount = applications.filter((a) => a.status === 'Offer Stage').length;
   const totalCount = applications.length;
 
+  const displayName = candidateProfile?.name || profile?.name || 'Candidate';
+  const currentTitle = candidateProfile?.current_title || 'Professional';
+
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Applications</h1>
-        <p className="text-text-secondary text-sm mt-1">Track the roles you've been submitted to and their status.</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Applications</h1>
+            <p className="text-text-secondary text-sm mt-1">Track the roles you've been submitted to and their status.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{currentTitle}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Summary metric cards */}
@@ -162,8 +212,13 @@ export function CandidateApplicationsPage() {
       {/* Application list */}
       {loading ? (
         <div className="py-12 text-center text-text-muted text-sm">Loading applications...</div>
+      ) : error ? (
+        <EmptyState title="Failed to load" description="Could not load applications. Please try again later." />
       ) : filtered.length === 0 ? (
-        <div className="py-12 text-center text-text-muted text-sm">No applications found.</div>
+        <EmptyState
+          title={applications.length === 0 ? 'No applications yet' : 'No matching applications'}
+          description={applications.length === 0 ? "You don't have any applications at this time." : 'Try adjusting your search or filters.'}
+        />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {filtered.map((app) => (

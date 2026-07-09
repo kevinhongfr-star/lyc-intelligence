@@ -2,9 +2,12 @@
  * CandidateCommunityPage — Candidate Portal community forum
  * Renders inside AppShell → Outlet. Shows forum categories and a list of threads.
  */
-import React, { useState, useEffect } from 'react';
-import { Search, MessageSquare, Users, Clock, Pin, ArrowRight, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, MessageSquare, Users, Clock, Pin, ArrowRight, Plus, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Input, Button } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
+
+// Static content - community forum not backed by database
 
 interface ForumCategory {
   id: string;
@@ -26,7 +29,7 @@ interface ForumThread {
   excerpt: string;
 }
 
-const MOCK_CATEGORIES: ForumCategory[] = [
+const STATIC_CATEGORIES: ForumCategory[] = [
   { id: 'cat1', name: 'Career Strategy', description: 'Long-term planning, pivots, and growth paths', threadCount: 142, icon: '🎯' },
   { id: 'cat2', name: 'Interview Tips', description: 'Prep, frameworks, and shared experiences', threadCount: 98, icon: '🎤' },
   { id: 'cat3', name: 'Compensation', description: 'Offers, negotiation, and benchmarks', threadCount: 76, icon: '💰' },
@@ -35,7 +38,7 @@ const MOCK_CATEGORIES: ForumCategory[] = [
   { id: 'cat6', name: 'Community', description: 'Introductions, events, and peer support', threadCount: 41, icon: '🤝' },
 ];
 
-const MOCK_THREADS: ForumThread[] = [
+const STATIC_THREADS: ForumThread[] = [
   { id: 't1', title: 'How to frame a 6-month career gap in executive interviews', author: 'Sarah C.', category: 'Interview Tips', replies: 24, views: 412, lastActivity: '2h ago', pinned: true, excerpt: "After a sabbatical, I'm re-entering the market and wondering how senior leaders frame a gap without underselling..." },
   { id: 't2', title: 'VP Engineering comp benchmarks — Series B fintech, SF', author: 'Michael W.', category: 'Compensation', replies: 18, views: 287, lastActivity: '5h ago', pinned: false, excerpt: 'Got an offer at $380K base + 0.4% equity. Curious how this compares to recent Series B benchmarks...' },
   { id: 't3', title: 'Cross-border move: HK → Singapore, what I learned', author: 'Jia L.', category: 'Career Strategy', replies: 31, views: 540, lastActivity: '1d ago', pinned: false, excerpt: 'Sharing my relocation playbook and the negotiation levers that mattered most for an APAC move...' },
@@ -45,21 +48,11 @@ const MOCK_THREADS: ForumThread[] = [
 ];
 
 export function CandidateCommunityPage() {
-  const [categories, setCategories] = useState<ForumCategory[]>([]);
-  const [threads, setThreads] = useState<ForumThread[]>([]);
-  const [loading, setLoading] = useState(true);
+  const categories = STATIC_CATEGORIES;
+  const threads = STATIC_THREADS;
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
-
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/candidate/community/threads
-    const timer = setTimeout(() => {
-      setCategories(MOCK_CATEGORIES);
-      setThreads(MOCK_THREADS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const { candidateProfile, profile } = useTenantContext();
 
   const filteredThreads = threads.filter((t) => {
     const matchesSearch =
@@ -72,53 +65,65 @@ export function CandidateCommunityPage() {
   // Pinned first, then by last activity recency (stable sort on existing order)
   const sortedThreads = [...filteredThreads].sort((a, b) => Number(b.pinned) - Number(a.pinned));
 
+  const displayName = candidateProfile?.name || profile?.name || 'Candidate';
+  const currentTitle = candidateProfile?.current_title || 'Professional';
+
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="font-serif font-bold text-2xl text-text-primary">Community</h1>
-          <p className="text-text-secondary text-sm mt-1">Connect with peers, share insights, and grow together.</p>
+        <div className="flex items-start justify-between w-full">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Community</h1>
+            <p className="text-text-secondary text-sm mt-1">Connect with peers, share insights, and grow together.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+              <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+                <User className="w-4 h-4 text-fuchsia" />
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-medium text-text-primary">{displayName}</div>
+                <div className="text-xs text-text-muted">{currentTitle}</div>
+              </div>
+            </div>
+            <Button size="sm">
+              <Plus className="w-3 h-3" /> New Thread
+            </Button>
+          </div>
         </div>
-        <Button size="sm">
-          <Plus className="w-3 h-3" /> New Thread
-        </Button>
       </div>
 
       {/* Categories */}
       <div>
         <div className="text-sm font-medium text-text-secondary mb-3">Categories</div>
-        {loading ? (
-          <div className="py-6 text-center text-text-muted text-sm">Loading categories...</div>
-        ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          <button
+            onClick={() => setActiveCategory('all')}
+            className={`text-left p-4 border transition-colors ${activeCategory === 'all' ? 'border-fuchsia bg-fuchsia-light' : 'border-border bg-white hover:border-fuchsia'}`}
+            style={{ borderRadius: 0 }}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">🌟</span>
+              <span className="font-medium text-text-primary text-sm">All Categories</span>
+            </div>
+            <div className="text-xs text-text-muted">{threads.length} threads</div>
+          </button>
+          {categories.map((cat) => (
             <button
-              onClick={() => setActiveCategory('all')}
-              className={`text-left p-4 border transition-colors ${activeCategory === 'all' ? 'border-fuchsia bg-fuchsia-light' : 'border-border bg-white hover:border-fuchsia'}`}
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.name)}
+              className={`text-left p-4 border transition-colors ${activeCategory === cat.name ? 'border-fuchsia bg-fuchsia-light' : 'border-border bg-white hover:border-fuchsia'}`}
               style={{ borderRadius: 0 }}
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-lg">🌟</span>
-                <span className="font-medium text-text-primary text-sm">All Categories</span>
+                <span className="text-lg">{cat.icon}</span>
+                <span className="font-medium text-text-primary text-sm">{cat.name}</span>
               </div>
-              <div className="text-xs text-text-muted">{threads.length} threads</div>
+              <div className="text-xs text-text-muted">{cat.threadCount} threads</div>
             </button>
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.name)}
-                className={`text-left p-4 border transition-colors ${activeCategory === cat.name ? 'border-fuchsia bg-fuchsia-light' : 'border-border bg-white hover:border-fuchsia'}`}
-                style={{ borderRadius: 0 }}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">{cat.icon}</span>
-                  <span className="font-medium text-text-primary text-sm">{cat.name}</span>
-                </div>
-                <div className="text-xs text-text-muted">{cat.threadCount} threads</div>
-              </button>
-            ))}
-          </div>
-        )}
+          ))}
+        </div>
       </div>
 
       {/* Search */}
@@ -138,9 +143,7 @@ export function CandidateCommunityPage() {
           <CardTitle>Recent Threads</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading threads...</div>
-          ) : sortedThreads.length === 0 ? (
+          {sortedThreads.length === 0 ? (
             <div className="py-8 text-center text-text-muted text-sm">No threads found.</div>
           ) : (
             <div className="space-y-1">

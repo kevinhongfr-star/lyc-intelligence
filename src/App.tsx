@@ -74,6 +74,11 @@ const ClientPipelineAnalyticsPage = lazy(() => import('@/pages/client/ClientPipe
 const ClientMandatesPage = lazy(() => import('@/pages/client/ClientMandatesPage').then(m => ({ default: m.ClientMandatesPage })));
 const ClientCandidatesPage = lazy(() => import('@/pages/client/ClientCandidatesPage').then(m => ({ default: m.ClientCandidatesPage })));
 const ClientDocumentsPage = lazy(() => import('@/pages/client/ClientDocumentsPage').then(m => ({ default: m.ClientDocumentsPage })));
+const ClientTalentIntelPage = lazy(() => import('@/pages/client/ClientTalentIntelPage').then(m => ({ default: m.ClientTalentIntelPage })));
+const ClientNexusAssistantPage = lazy(() => import('@/pages/client/ClientNexusAssistantPage').then(m => ({ default: m.ClientNexusAssistantPage })));
+const ClientAdminPage = lazy(() => import('@/pages/client/ClientAdminPage').then(m => ({ default: m.ClientAdminPage })));
+const ClientCollaborationPage = lazy(() => import('@/pages/client/ClientCollaborationPage').then(m => ({ default: m.ClientCollaborationPage })));
+const ClientOnboardingPage = lazy(() => import('@/pages/client/ClientOnboardingPage').then(m => ({ default: m.ClientOnboardingPage })));
 
 // ── Candidate Portal pages (EO-4) ──
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
@@ -81,11 +86,23 @@ const CandidateApplicationsPage = lazy(() => import('@/pages/candidate/Candidate
 const CandidateAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAssessmentsPage').then(m => ({ default: m.CandidateAssessmentsPage })));
 const CandidateCommunityPage = lazy(() => import('@/pages/candidate/CandidateCommunityPage').then(m => ({ default: m.CandidateCommunityPage })));
 const CandidateInterviewPrepPage = lazy(() => import('@/pages/candidate/CandidateInterviewPrepPage').then(m => ({ default: m.CandidateInterviewPrepPage })));
+const CandidateOffersPage = lazy(() => import('@/pages/candidate/CandidateOffersPage').then(m => ({ default: m.CandidateOffersPage })));
+const CandidateOpportunitiesPage = lazy(() => import('@/pages/candidate/CandidateOpportunitiesPage').then(m => ({ default: m.CandidateOpportunitiesPage })));
+const CandidateCareerDevPage = lazy(() => import('@/pages/candidate/CandidateCareerDevPage').then(m => ({ default: m.CandidateCareerDevPage })));
+const CandidateNexusCoachPage = lazy(() => import('@/pages/candidate/CandidateNexusCoachPage').then(m => ({ default: m.CandidateNexusCoachPage })));
+const CandidateProfilePage = lazy(() => import('@/pages/candidate/CandidateProfilePage').then(m => ({ default: m.CandidateProfilePage })));
+const CandidateAdvancedAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAdvancedAssessmentsPage').then(m => ({ default: m.CandidateAdvancedAssessmentsPage })));
+const CandidateSettingsPlusPage = lazy(() => import('@/pages/candidate/CandidateSettingsPlusPage').then(m => ({ default: m.CandidateSettingsPlusPage })));
 // ── B2C Coaching Portal pages (EO-5) ──
 const CoachingCoachPage = lazy(() => import('@/pages/coaching/CoachingCoachPage').then(m => ({ default: m.CoachingCoachPage })));
 const CoachingCreditsPage = lazy(() => import('@/pages/coaching/CoachingCreditsPage').then(m => ({ default: m.CoachingCreditsPage })));
 const CoachingCareerIntelPage = lazy(() => import('@/pages/coaching/CoachingCareerIntelPage').then(m => ({ default: m.CoachingCareerIntelPage })));
 const CoachingGrowthPage = lazy(() => import('@/pages/coaching/CoachingGrowthPage').then(m => ({ default: m.CoachingGrowthPage })));
+const CoachingIntelligencePage = lazy(() => import('@/pages/coaching/CoachingIntelligencePage').then(m => ({ default: m.CoachingIntelligencePage })));
+const CoachingProfileSettingsPage = lazy(() => import('@/pages/coaching/CoachingProfileSettingsPage').then(m => ({ default: m.CoachingProfileSettingsPage })));
+const CoachingChatFeaturesPage = lazy(() => import('@/pages/coaching/CoachingChatFeaturesPage').then(m => ({ default: m.CoachingChatFeaturesPage })));
+const CoachingCareerServicesPage = lazy(() => import('@/pages/coaching/CoachingCareerServicesPage').then(m => ({ default: m.CoachingCareerServicesPage })));
+const CoachingEngagementPage = lazy(() => import('@/pages/coaching/CoachingEngagementPage').then(m => ({ default: m.CoachingEngagementPage })));
 
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
@@ -169,14 +186,14 @@ export default function App() {
             <Route index element={<Navigate to="overview" replace />} />
             <Route path="overview" element={<ClientOverviewPage />} />
             <Route path="pipeline-analytics" element={<ClientPipelineAnalyticsPage />} />
-            <Route path="talent-intel" element={<PlaceholderPage title="Talent Intelligence" />} />
+            <Route path="talent-intel" element={<ClientTalentIntelPage />} />
             <Route path="mandates" element={<ClientMandatesPage />} />
             <Route path="candidates" element={<ClientCandidatesPage />} />
-            <Route path="nexus-assistant" element={<PlaceholderPage title="NEXUS Assistant" />} />
+            <Route path="nexus-assistant" element={<ClientNexusAssistantPage />} />
             <Route path="documents" element={<ClientDocumentsPage />} />
-            <Route path="admin" element={<PlaceholderPage title="Admin & Security" />} />
-            <Route path="collaboration" element={<PlaceholderPage title="Collaboration" />} />
-            <Route path="onboarding" element={<PlaceholderPage title="Onboarding" />} />
+            <Route path="admin" element={<ClientAdminPage />} />
+            <Route path="collaboration" element={<ClientCollaborationPage />} />
+            <Route path="onboarding" element={<ClientOnboardingPage />} />
           </Route>
 
           {/* ── B2C Coaching (mockup surface) ── */}
@@ -184,12 +201,12 @@ export default function App() {
             <Route index element={<Navigate to="coach" replace />} />
             <Route path="coach" element={<CoachingCoachPage />} />
             <Route path="credits" element={<CoachingCreditsPage />} />
-            <Route path="intelligence" element={<PlaceholderPage title="B2C Intelligence" />} />
+            <Route path="intelligence" element={<CoachingIntelligencePage />} />
             <Route path="career-intel" element={<CoachingCareerIntelPage />} />
-            <Route path="profile" element={<PlaceholderPage title="Profile & Settings" />} />
-            <Route path="chat-features" element={<PlaceholderPage title="Chat Features" />} />
-            <Route path="career-services" element={<PlaceholderPage title="Career Services" />} />
-            <Route path="engagement" element={<PlaceholderPage title="Engagement" />} />
+            <Route path="profile" element={<CoachingProfileSettingsPage />} />
+            <Route path="chat-features" element={<CoachingChatFeaturesPage />} />
+            <Route path="career-services" element={<CoachingCareerServicesPage />} />
+            <Route path="engagement" element={<CoachingEngagementPage />} />
             <Route path="growth" element={<CoachingGrowthPage />} />
           </Route>
 
@@ -198,16 +215,16 @@ export default function App() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<CandidateDashboardPage />} />
             <Route path="applications" element={<CandidateApplicationsPage />} />
-            <Route path="offers" element={<PlaceholderPage title="Offers & Decisions" />} />
-            <Route path="opportunities" element={<PlaceholderPage title="My Opportunities" />} />
+            <Route path="offers" element={<CandidateOffersPage />} />
+            <Route path="opportunities" element={<CandidateOpportunitiesPage />} />
             <Route path="interview-prep" element={<CandidateInterviewPrepPage />} />
             <Route path="assessments" element={<CandidateAssessmentsPage />} />
-            <Route path="career-dev" element={<PlaceholderPage title="Career Development" />} />
+            <Route path="career-dev" element={<CandidateCareerDevPage />} />
             <Route path="community" element={<CandidateCommunityPage />} />
-            <Route path="nexus-coach" element={<PlaceholderPage title="NEXUS Coach" />} />
-            <Route path="profile" element={<PlaceholderPage title="Candidate Profile" />} />
-            <Route path="advanced-assessments" element={<PlaceholderPage title="Advanced Assessments" />} />
-            <Route path="settings-plus" element={<PlaceholderPage title="Settings+" />} />
+            <Route path="nexus-coach" element={<CandidateNexusCoachPage />} />
+            <Route path="profile" element={<CandidateProfilePage />} />
+            <Route path="advanced-assessments" element={<CandidateAdvancedAssessmentsPage />} />
+            <Route path="settings-plus" element={<CandidateSettingsPlusPage />} />
           </Route>
 
           {/* ── Authenticated user pages (standalone) ── */}

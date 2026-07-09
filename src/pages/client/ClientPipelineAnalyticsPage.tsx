@@ -3,8 +3,9 @@
  * Renders inside AppShell → Outlet.
  */
 import React from 'react';
-import { TrendingUp, Users, Clock, Target, BarChart3 } from 'lucide-react';
+import { TrendingUp, Users, Clock, Target, BarChart3, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Progress } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
 
 const STAGES = [
   { name: 'Sourcing', count: 48, percentage: 100, color: 'bg-blue' },
@@ -24,15 +25,32 @@ const TRENDS = [
 ];
 
 export function ClientPipelineAnalyticsPage() {
+  const { clientAccount, profile } = useTenantContext();
   const maxCandidates = Math.max(...TRENDS.map(t => t.candidates));
   const conversionRate = ((2 / 48) * 100).toFixed(1);
   const avgTimeToPlace = 68;
 
+  const displayName = clientAccount?.name || profile?.name || 'Client User';
+  const organization = clientAccount?.organization || 'Your Organization';
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Pipeline Analytics</h1>
-        <p className="text-text-secondary text-sm mt-1">Real-time funnel metrics and conversion trends.</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Pipeline Analytics</h1>
+            <p className="text-text-secondary text-sm mt-1">Real-time funnel metrics and conversion trends.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{organization}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Key metrics */}

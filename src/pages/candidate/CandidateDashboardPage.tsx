@@ -4,8 +4,10 @@
  * interviews, latest assessment results, and career progress.
  */
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Calendar, ClipboardCheck, TrendingUp, ArrowRight, Clock, Video, MapPin, Star } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Progress } from '@/components/ui';
+import { Briefcase, Calendar, ClipboardCheck, TrendingUp, ArrowRight, Clock, Video, MapPin, Star, User } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, Progress, EmptyState } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
+import { getOffers, getAssessmentInvitations } from '@/services/supabaseApi';
 
 interface ApplicationStatus {
   id: string;
@@ -41,32 +43,12 @@ interface CareerGoal {
   progress: number;
 }
 
-const MOCK_APPLICATIONS: ApplicationStatus[] = [
-  { id: 'a1', company: 'TechCorp', role: 'VP Engineering', status: 'Interview Stage', progress: 60, updatedAt: '2025-01-15' },
-  { id: 'a2', company: 'FinScale', role: 'Chief Financial Officer', status: 'Submitted to Client', progress: 40, updatedAt: '2025-01-14' },
-  { id: 'a3', company: 'DataMesh', role: 'Head of Product', status: 'Under Review', progress: 20, updatedAt: '2025-01-10' },
-];
-
-const MOCK_INTERVIEWS: UpcomingInterview[] = [
+const STATIC_INTERVIEWS: UpcomingInterview[] = [
   { id: 'i1', company: 'TechCorp', role: 'VP Engineering', date: 'Jan 22, 2025', time: '10:00 AM', format: 'Video', location: 'Zoom' },
   { id: 'i2', company: 'CloudPeak', role: 'CTO', date: 'Jan 24, 2025', time: '2:30 PM', format: 'On-site', location: 'Seattle, WA' },
 ];
 
-const MOCK_ASSESSMENT: AssessmentResult = {
-  id: 'r1',
-  name: 'Leadership Archetype Assessment',
-  archetype: 'The Architect',
-  score: 87,
-  takenAt: '2025-01-08',
-  dimensions: [
-    { name: 'Strategic Vision', score: 92 },
-    { name: 'Execution', score: 84 },
-    { name: 'Influence', score: 78 },
-    { name: 'Resilience', score: 88 },
-  ],
-};
-
-const MOCK_GOALS: CareerGoal[] = [
+const STATIC_GOALS: CareerGoal[] = [
   { id: 'g1', label: 'Complete profile', progress: 100 },
   { id: 'g2', label: 'Take baseline assessment', progress: 100 },
   { id: 'g3', label: 'Apply to 3 target roles', progress: 67 },
@@ -87,18 +69,56 @@ export function CandidateDashboardPage() {
   const [assessment, setAssessment] = useState<AssessmentResult | null>(null);
   const [goals, setGoals] = useState<CareerGoal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { candidateProfile, profile } = useTenantContext();
 
   useEffect(() => {
-    // TODO: Replace with real API calls
-    const timer = setTimeout(() => {
-      setApplications(MOCK_APPLICATIONS);
-      setInterviews(MOCK_INTERVIEWS);
-      setAssessment(MOCK_ASSESSMENT);
-      setGoals(MOCK_GOALS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    async function loadData() {
+      try {
+        const offersResult = await getOffers();
+        const offers = Array.isArray(offersResult) ? offersResult : (offersResult as any).data || [];
+        const mappedOffers: ApplicationStatus[] = offers.map((o: any) => ({
+          id: o.id,
+          company: o.client_name || 'Unknown',
+          role: o.position_title || 'Position',
+          status: (o.status === 'accepted' ? 'Offer Stage' : o.status === 'sent' ? 'Submitted to Client' : 'Under Review') as ApplicationStatus['status'],
+          progress: o.status === 'accepted' ? 85 : o.status === 'sent' ? 40 : 20,
+          updatedAt: o.updated_at?.split('T')[0] || o.created_at?.split('T')[0] || '',
+        }));
+        setApplications(mappedOffers);
+
+        setInterviews(STATIC_INTERVIEWS);
+
+        if (candidateProfile?.id) {
+          try {
+            const invitations = await getAssessmentInvitations(candidateProfile.id);
+            const completed = invitations.filter((i: any) => i.status === 'completed');
+            if (completed.length > 0) {
+              const latest = completed[0];
+              setAssessment({
+                id: latest.id,
+                name: latest.assessment_title || 'Assessment',
+                archetype: 'Completed',
+                score: 0,
+                takenAt: latest.invited_at?.split('T')[0] || '',
+                dimensions: [],
+              });
+            }
+          } catch (e) {
+            console.error('[CandidateDashboardPage] Assessment error:', e);
+          }
+        }
+
+        setGoals(STATIC_GOALS);
+      } catch (e) {
+        console.error('[CandidateDashboardPage] Error:', e);
+        setError('Failed to load dashboard');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [candidateProfile?.id]);
 
   const activeCount = applications.length;
   const interviewCount = interviews.length;
@@ -107,12 +127,28 @@ export function CandidateDashboardPage() {
     ? Math.round(goals.reduce((sum, g) => sum + g.progress, 0) / goals.length)
     : 0;
 
+  const displayName = candidateProfile?.name || profile?.name || 'Candidate';
+  const currentTitle = candidateProfile?.current_title || 'Professional';
+
   return (
     <div className="space-y-6">
-      {/* Page header */}
+      {/* Page header with user info */}
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Candidate Dashboard</h1>
-        <p className="text-text-secondary text-sm mt-1">Your career journey at a glance.</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Candidate Dashboard</h1>
+            <p className="text-text-secondary text-sm mt-1">Your career journey at a glance.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{currentTitle}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Status metric cards */}
@@ -177,8 +213,10 @@ export function CandidateDashboardPage() {
           <CardContent>
             {loading ? (
               <div className="py-8 text-center text-text-muted text-sm">Loading applications...</div>
+            ) : error ? (
+              <EmptyState title="Failed to load" description="Could not load applications. Please try again later." />
             ) : applications.length === 0 ? (
-              <div className="py-8 text-center text-text-muted text-sm">No active applications yet.</div>
+              <EmptyState title="No applications yet" description="You don't have any active applications at this time." />
             ) : (
               <div className="space-y-4">
                 {applications.map((app) => (
@@ -216,7 +254,7 @@ export function CandidateDashboardPage() {
             {loading ? (
               <div className="py-8 text-center text-text-muted text-sm">Loading interviews...</div>
             ) : interviews.length === 0 ? (
-              <div className="py-8 text-center text-text-muted text-sm">No interviews scheduled.</div>
+              <EmptyState title="No interviews scheduled" description="No upcoming interviews at this time." />
             ) : (
               <div className="space-y-4">
                 {interviews.map((iv) => (
@@ -246,8 +284,10 @@ export function CandidateDashboardPage() {
           <CardTitle>Latest Assessment Results</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading || !assessment ? (
-            <div className="py-8 text-center text-text-muted text-sm">{loading ? 'Loading results...' : 'No assessments taken yet.'}</div>
+          {loading ? (
+            <div className="py-8 text-center text-text-muted text-sm">Loading results...</div>
+          ) : !assessment ? (
+            <EmptyState title="No assessments yet" description="You haven't completed any assessments yet." />
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="flex flex-col items-center justify-center text-center bg-fuchsia-light rounded-lg p-6">
