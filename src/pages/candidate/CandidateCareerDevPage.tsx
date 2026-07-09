@@ -3,10 +3,11 @@
  * Renders inside AppShell → Outlet. Shows learning goals, skills progress,
  * certifications, and career path planning.
  */
-import React, { useState } from 'react';
-import { Target, Trophy, BookOpen, Award, TrendingUp, CheckCircle2, Circle, User } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button } from '@/components/ui';
+import React, { useState, useEffect } from 'react';
+import { Target, Trophy, BookOpen, Award, TrendingUp, CheckCircle2, Circle, User, Calendar } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getCoacheePastSessions, getAssessmentInvitations, type CoachingSession, type AssessmentInvitation } from '@/services/supabaseApi';
 
 interface LearningGoal {
   id: string;
@@ -17,14 +18,6 @@ interface LearningGoal {
   status: 'In Progress' | 'Completed' | 'Not Started';
 }
 
-interface SkillLevel {
-  id: string;
-  skill: string;
-  level: number;
-  target: number;
-  category: string;
-}
-
 interface Milestone {
   id: string;
   title: string;
@@ -33,16 +26,8 @@ interface Milestone {
   date?: string;
 }
 
-// Static content — career development tracking, no direct table backing yet
-const STATIC_GOALS: LearningGoal[] = [
-  { id: 'g1', title: 'Complete AWS Solutions Architect Cert', category: 'Certification', progress: 75, deadline: 'Feb 15, 2025', status: 'In Progress' },
-  { id: 'g2', title: 'Publish Technical Article on System Design', category: 'Project', progress: 40, deadline: 'Mar 1, 2025', status: 'In Progress' },
-  { id: 'g3', title: 'Build Open Source Side Project', category: 'Project', progress: 60, deadline: 'Apr 1, 2025', status: 'In Progress' },
-  { id: 'g4', title: 'Mentor Junior Engineers (5 hrs)', category: 'Network', progress: 100, deadline: 'Jan 31, 2025', status: 'Completed' },
-  { id: 'g5', title: 'Master Distributed Systems', category: 'Skill', progress: 30, deadline: 'Jun 1, 2025', status: 'In Progress' },
-];
-
-const STATIC_SKILLS: SkillLevel[] = [
+// Static content — skills tracking has no direct table backing
+const STATIC_SKILLS = [
   { id: 's1', skill: 'System Design', level: 85, target: 95, category: 'Engineering' },
   { id: 's2', skill: 'Leadership', level: 78, target: 90, category: 'Management' },
   { id: 's3', skill: 'Strategic Planning', level: 70, target: 85, category: 'Business' },
@@ -50,6 +35,7 @@ const STATIC_SKILLS: SkillLevel[] = [
   { id: 's5', skill: 'Product Vision', level: 72, target: 88, category: 'Product' },
 ];
 
+// Static content — career milestones, no direct table backing
 const STATIC_MILESTONES: Milestone[] = [
   { id: 'm1', title: 'Promoted to Engineering Manager', description: 'Led team of 8 engineers', achieved: true, date: '2023' },
   { id: 'm2', title: 'Led Cloud Migration Project', description: '$2M initiative, on time and under budget', achieved: true, date: '2024' },
@@ -71,10 +57,57 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export function CandidateCareerDevPage() {
-  const [goals] = useState<LearningGoal[]>(STATIC_GOALS);
-  const [skills] = useState<SkillLevel[]>(STATIC_SKILLS);
-  const [milestones] = useState<Milestone[]>(STATIC_MILESTONES);
-  const { candidateProfile, profile } = useTenantContext();
+  const [sessions, setSessions] = useState<CoachingSession[]>([]);
+  const [assessments, setAssessments] = useState<AssessmentInvitation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user, candidateProfile, profile } = useTenantContext();
+
+  useEffect(() => {
+    if (!user?.id && !candidateProfile?.id) { setLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const [sessionData, assessmentData] = await Promise.all([
+          user?.id ? getCoacheePastSessions(user.id) : Promise.resolve<CoachingSession[]>([]),
+          candidateProfile?.id ? getAssessmentInvitations(candidateProfile.id) : Promise.resolve<AssessmentInvitation[]>([]),
+        ]);
+        if (cancelled) return;
+        setSessions(sessionData);
+        setAssessments(assessmentData);
+        setError(null);
+      } catch (e) {
+        console.error('[CandidateCareerDevPage] Error:', e);
+        if (!cancelled) setError('Failed to load development data');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id, candidateProfile?.id]);
+
+  // Derive learning goals from completed coaching sessions and assessments
+  const goals: LearningGoal[] = [
+    ...sessions.slice(0, 5).map((s, i) => ({
+      id: `sess-${s.id}`,
+      title: s.title,
+      category: 'Skill' as const,
+      progress: s.status === 'completed' ? 100 : 50,
+      deadline: new Date(s.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      status: s.status === 'completed' ? 'Completed' as const : 'In Progress' as const,
+    })),
+    ...assessments.slice(0, 5).map((a, i) => ({
+      id: `assess-${a.id}`,
+      title: a.assessment_type || `Assessment ${i + 1}`,
+      category: 'Certification' as const,
+      progress: a.status === 'completed' ? 100 : a.status === 'viewed' ? 50 : 0,
+      deadline: '—',
+      status: a.status === 'completed' ? 'Completed' as const : a.status === 'viewed' ? 'In Progress' as const : 'Not Started' as const,
+    })),
+  ];
+
+  const skills = STATIC_SKILLS;
+  const milestones = STATIC_MILESTONES;
 
   const displayName = candidateProfile?.name || profile?.name || 'Candidate';
   const currentTitle = candidateProfile?.current_title || 'Professional';
@@ -148,8 +181,15 @@ export function CandidateCareerDevPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {goals.map((goal) => (
+          {loading ? (
+            <div className="py-8 text-center text-text-muted text-sm">Loading goals...</div>
+          ) : error ? (
+            <EmptyState title="Failed to load" description={error} />
+          ) : goals.length === 0 ? (
+            <EmptyState title="No goals yet" description="Your coaching sessions and assessments will appear here as development goals." />
+          ) : (
+            <div className="space-y-3">
+              {goals.map((goal) => (
               <div key={goal.id} className="p-4 bg-bg-warm rounded-lg">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
@@ -166,8 +206,9 @@ export function CandidateCareerDevPage() {
                   <span className="text-xs font-bold text-text-primary w-10 text-right">{goal.progress}%</span>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 

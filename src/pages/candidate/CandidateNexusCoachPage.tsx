@@ -8,6 +8,7 @@ import { Sparkles, Send, MessageSquare, Clock, Target, TrendingUp, Lightbulb, Us
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
 import { getChatSessions, type ChatSession } from '@/services/supabaseApi';
+import { sendChatMessage } from '@/services/coze';
 
 interface ChatMessage {
   id: string;
@@ -89,8 +90,10 @@ export function CandidateNexusCoachPage() {
   const displayName = candidateProfile?.name || profile?.name || 'Candidate';
   const currentTitle = candidateProfile?.current_title || 'Professional';
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
+  const [sending, setSending] = useState(false);
+
+  const handleSend = async () => {
+    if (!inputValue.trim() || sending) return;
 
     const userMessage: ChatMessage = {
       id: `m${Date.now()}`,
@@ -99,17 +102,42 @@ export function CandidateNexusCoachPage() {
       timestamp: 'Just now',
     };
 
+    const history = messages.map(m => ({ role: m.role, content: m.content }));
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
+    setSending(true);
 
-    const assistantMessage: ChatMessage = {
-      id: `m${Date.now() + 1}`,
-      role: 'assistant',
-      content: 'That\'s a great question. Based on your profile and current market data, here are my recommendations...',
-      timestamp: 'Just now',
-    };
+    try {
+      const response = await sendChatMessage(
+        userMessage.content,
+        user?.id || 'anonymous',
+        history,
+        {
+          tier: profile?.tier || 'free',
+          systemPrompt: 'You are NEXUS Coach, a personal AI career advisor for executive candidates. Help with interview prep, career planning, skill development, and compensation negotiation. Be concise, actionable, and encouraging.',
+        }
+      );
 
-    setMessages((prev) => [...prev, assistantMessage]);
+      const assistantMessage: ChatMessage = {
+        id: `m${Date.now() + 1}`,
+        role: 'assistant',
+        content: response,
+        timestamp: 'Just now',
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (e) {
+      console.error('[CandidateNexusCoachPage] Chat error:', e);
+      const errorMessage: ChatMessage = {
+        id: `m${Date.now() + 1}`,
+        role: 'assistant',
+        content: 'I\'m having trouble connecting right now. Please try again in a moment.',
+        timestamp: 'Just now',
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleQuickAction = (action: QuickAction) => {
@@ -200,7 +228,7 @@ export function CandidateNexusCoachPage() {
                   placeholder="Ask NEXUS Coach anything..."
                   className="flex-1"
                 />
-                <Button onClick={handleSend} disabled={!inputValue.trim()}>
+                <Button onClick={handleSend} disabled={!inputValue.trim() || sending}>
                   <Send className="w-4 h-4" />
                 </Button>
               </div>

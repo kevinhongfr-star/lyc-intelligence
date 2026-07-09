@@ -8,6 +8,7 @@ import { User, Mail, Phone, MapPin, Briefcase, FileText, Globe, Star, CheckCircl
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, Progress, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
 import { getSupabase } from '@/services/supabaseApi';
+import { useAuthStore } from '@/stores/authStore';
 
 interface Experience {
   id: string;
@@ -48,12 +49,17 @@ interface ExtendedProfileFields {
 
 export function CandidateProfilePage() {
   const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editHeadline, setEditHeadline] = useState('');
   const [experience] = useState(STATIC_EXPERIENCE);
   const [education] = useState(STATIC_EDUCATION);
   const [extended, setExtended] = useState<ExtendedProfileFields>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { candidateProfile, profile } = useTenantContext();
+  const updateProfile = useAuthStore(s => s.updateProfile);
 
   useEffect(() => {
     let cancelled = false;
@@ -182,12 +188,41 @@ export function CandidateProfilePage() {
                 <CardTitle>Personal Information</CardTitle>
               </div>
               {editing ? (
-                <Button size="sm" onClick={() => setEditing(false)}>
+                <Button size="sm" onClick={async () => {
+                  setSaving(true);
+                  setSaveError(null);
+                  try {
+                    // Save name to profiles table
+                    if (editName && editName !== (candidateProfile?.name || profile?.name)) {
+                      const result = await updateProfile({ name: editName });
+                      if (!result.success) {
+                        setSaveError(result.error || 'Failed to save');
+                        setSaving(false);
+                        return;
+                      }
+                    }
+                    // Save headline to contacts table
+                    if (candidateProfile?.id && editHeadline) {
+                      const sb = getSupabase();
+                      await sb.from('contacts').update({ headline: editHeadline }).eq('id', candidateProfile.id);
+                    }
+                    setEditing(false);
+                  } catch (e) {
+                    console.error('[CandidateProfilePage] Save error:', e);
+                    setSaveError('Failed to save changes');
+                  } finally {
+                    setSaving(false);
+                  }
+                }} disabled={saving}>
                   <Save className="w-4 h-4 mr-2" />
-                  Save
+                  {saving ? 'Saving...' : 'Save'}
                 </Button>
               ) : (
-                <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+                <Button variant="outline" size="sm" onClick={() => {
+                  setEditName(candidateProfile?.name || profile?.name || '');
+                  setEditHeadline(candidateProfile?.headline || '');
+                  setEditing(true);
+                }}>
                   <Edit2 className="w-4 h-4 mr-2" />
                   Edit
                 </Button>
@@ -195,36 +230,44 @@ export function CandidateProfilePage() {
             </div>
           </CardHeader>
           <CardContent>
+            {saveError && (
+              <div className="mb-3 p-3 bg-red/10 text-red text-sm rounded-md">{saveError}</div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs text-text-muted mb-1 block">Full Name</label>
-                <Input value={displayName} disabled={!editing} />
+                <Input
+                  value={editing ? editName : displayName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  disabled={!editing}
+                />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1 block">Current Title</label>
-                <Input value={currentTitle} disabled={!editing} />
+                <Input value={currentTitle} disabled={true} />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1 block">Email</label>
-                <Input value={email} disabled={!editing} />
+                <Input value={email} disabled={true} />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1 block">Phone</label>
-                <Input value={phone} disabled={!editing} />
+                <Input value={phone} disabled={true} />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1 block">Location</label>
-                <Input value={location} disabled={!editing} />
+                <Input value={location} disabled={true} />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1 block">Years of Experience</label>
-                <Input value="10+" disabled={!editing} />
+                <Input value="10+" disabled={true} />
               </div>
             </div>
             <div className="mt-4">
               <label className="text-xs text-text-muted mb-1 block">Headline</label>
               <Input
-                value={headline}
+                value={editing ? editHeadline : headline}
+                onChange={(e) => setEditHeadline(e.target.value)}
                 disabled={!editing}
               />
             </div>
