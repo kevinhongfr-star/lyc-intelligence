@@ -34,6 +34,63 @@ type Step = 'gate' | 'context' | 'dimensions' | 'cross_border' | 'style' | 'goal
 
 const TOTAL_DIMENSION_QUESTIONS = CPD_SCENARIOS.length;
 
+const STEP_LABELS = ['Background', 'Leadership', 'Cross-Border', 'Style', 'Goals'];
+
+const stepToIndex: Record<string, number> = {
+  context: 0,
+  dimensions: 1,
+  cross_border: 2,
+  style: 3,
+  goals: 4,
+};
+
+function ProgressBar({ currentStep }: { currentStep: Step }) {
+  if (currentStep === 'gate' || currentStep === 'results') return null;
+  const activeIndex = stepToIndex[currentStep] ?? 0;
+  return (
+    <div style={{ maxWidth: '700px', margin: '24px auto 0', padding: '0 24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${STEP_LABELS.length}, 1fr)`, gap: '4px', marginBottom: '8px' }}>
+        {STEP_LABELS.map((label, i) => {
+          const isActive = i === activeIndex;
+          const isComplete = i < activeIndex;
+          return (
+            <div
+              key={label}
+              style={{
+                textAlign: 'center',
+                fontFamily: DS.bodyFont,
+                fontSize: '11px',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                color: (isActive || isComplete) ? DS.accent : DS.muted,
+                fontWeight: isActive ? 700 : 500,
+              }}
+            >
+              {label}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${STEP_LABELS.length}, 1fr)`, gap: '4px' }}>
+        {STEP_LABELS.map((label, i) => {
+          const isActive = i === activeIndex;
+          const isComplete = i < activeIndex;
+          return (
+            <div
+              key={label}
+              style={{
+                height: '4px',
+                background: (isActive || isComplete) ? DS.accent : DS.cardBorder,
+                borderRadius: '0px',
+              }}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export interface AssessmentWizardProps {
   prefillEmail?: string;
   prefillName?: string;
@@ -167,6 +224,7 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
           <span style={{ color: DS.text }}>{error}</span>
         </div>
       )}
+      <ProgressBar currentStep={step} />
       {/* Step: {step} */}
       {/* Render Step */}
       {step === 'gate' && (
@@ -177,6 +235,9 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
       )}
       {step === 'dimensions' && (
         <div style={{ padding: '24px' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto 16px', padding: '0 24px', fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, textTransform: 'uppercase', letterSpacing: '1px' }}>
+            Scenario {currentQuestionIndex + 1} of {TOTAL_DIMENSION_QUESTIONS}
+          </div>
           <ScenarioQuestion
             question={CPD_SCENARIOS[currentQuestionIndex]}
             currentAnswer={state.dimensions[CPD_SCENARIOS[currentQuestionIndex].id]}
@@ -449,8 +510,8 @@ function CrossBorderStep({ state, setState, index, onAnswer }: any) {
 
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto', padding: '24px' }}>
-      <p style={{ color: DS.muted, marginBottom: '8px' }}>
-        Cross-Border Readiness: {index + 1}/{CROSS_BORDER_QUESTIONS.length}
+      <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+        Cross-Border Readiness: Question {index + 1} of {CROSS_BORDER_QUESTIONS.length}
       </p>
       <h2 style={{ fontFamily: DS.headingFont, color: DS.text, fontSize: '20px', marginBottom: '24px' }}>
         {question.question}
