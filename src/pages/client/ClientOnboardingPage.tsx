@@ -5,8 +5,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Circle, ArrowRight, User, Settings, FileText, Users, Briefcase, Sparkles, Lightbulb } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getClientOnboardingStatus } from '@/services/supabaseApi';
 
 interface OnboardingStep {
   id: string;
@@ -31,7 +32,7 @@ interface ResourceLink {
   description: string;
 }
 
-const MOCK_STEPS: OnboardingStep[] = [
+const STATIC_STEPS: OnboardingStep[] = [
   { id: 's1', title: 'Profile Setup', description: 'Complete your organization profile and preferences', icon: <User className="w-5 h-5" />, completed: true, estimatedTime: '5 min' },
   { id: 's2', title: 'Team Invitation', description: 'Add team members and set permissions', icon: <Users className="w-5 h-5" />, completed: true, estimatedTime: '10 min' },
   { id: 's3', title: 'First Mandate', description: 'Create your first executive search mandate', icon: <Briefcase className="w-5 h-5" />, completed: false, estimatedTime: '15 min' },
@@ -39,13 +40,13 @@ const MOCK_STEPS: OnboardingStep[] = [
   { id: 's5', title: 'Integration Setup', description: 'Connect your ATS and HR systems', icon: <Settings className="w-5 h-5" />, completed: false, estimatedTime: '20 min' },
 ];
 
-const MOCK_QUICKSTART: QuickStartItem[] = [
+const STATIC_QUICKSTART: QuickStartItem[] = [
   { id: 'q1', title: 'Create a Mandate', description: 'Start your first executive search with our guided wizard', action: 'Get Started' },
   { id: 'q2', title: 'Search Talent Pool', description: 'Explore our pre-qualified executive candidates', action: 'Browse Candidates' },
   { id: 'q3', title: 'Schedule Demo', description: 'Book a 1:1 with our team to learn more', action: 'Schedule Now' },
 ];
 
-const MOCK_RESOURCES: ResourceLink[] = [
+const STATIC_RESOURCES: ResourceLink[] = [
   { id: 'r1', title: 'Client Portal Guide', category: 'Guide', description: 'Learn how to navigate and use all features' },
   { id: 'r2', title: 'Executive Search Best Practices', category: 'Video', description: '30-minute training video' },
   { id: 'r3', title: 'FAQ: Getting Started', category: 'FAQ', description: 'Answers to common questions' },
@@ -53,17 +54,35 @@ const MOCK_RESOURCES: ResourceLink[] = [
 ];
 
 export function ClientOnboardingPage() {
-  const [steps, setSteps] = useState<OnboardingStep[]>([]);
+  const [steps, setSteps] = useState<OnboardingStep[]>(STATIC_STEPS);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { clientAccount, profile } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setSteps(MOCK_STEPS);
+    const clientAccountId = clientAccount?.id;
+    if (!clientAccountId) {
       setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        setError(null);
+        const status = await getClientOnboardingStatus(clientAccountId);
+        if (cancelled) return;
+        setSteps(prev => prev.map(step =>
+          step.id === 's3' ? { ...step, completed: status.mandateAccessCount > 0 } : step
+        ));
+      } catch (e) {
+        console.error('[ClientOnboardingPage] Error:', e);
+        if (!cancelled) setError('Failed to load onboarding status');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [clientAccount?.id]);
 
   const completedSteps = steps.filter(s => s.completed).length;
   const progressPercent = steps.length ? Math.round((completedSteps / steps.length) * 100) : 0;
@@ -133,6 +152,10 @@ export function ClientOnboardingPage() {
         <CardContent>
           {loading ? (
             <div className="py-8 text-center text-text-muted text-sm">Loading steps...</div>
+          ) : !clientAccount?.id ? (
+            <EmptyState title="No client account available" description="We couldn't load your onboarding checklist because no client account is associated with your user." />
+          ) : error ? (
+            <EmptyState title="Failed to load onboarding status" description={error} />
           ) : (
             <div className="space-y-4">
               {steps.map((step, index) => (
@@ -177,7 +200,7 @@ export function ClientOnboardingPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {MOCK_QUICKSTART.map((item) => (
+              {STATIC_QUICKSTART.map((item) => (
                 <div key={item.id} className="flex items-center justify-between p-4 bg-bg-warm rounded-lg">
                   <div>
                     <div className="font-medium text-text-primary text-sm">{item.title}</div>
@@ -201,7 +224,7 @@ export function ClientOnboardingPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {MOCK_RESOURCES.map((resource) => (
+              {STATIC_RESOURCES.map((resource) => (
                 <button key={resource.id} className="w-full text-left p-3 hover:bg-bg-warm rounded-lg transition-colors">
                   <div className="flex items-center gap-3">
                     <Badge className={categoryColors[resource.category]}>{resource.category}</Badge>

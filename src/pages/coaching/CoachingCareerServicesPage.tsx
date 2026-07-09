@@ -3,7 +3,7 @@
  * Renders inside AppShell → Outlet. Shows resume review, interview prep,
  * salary negotiation, and other career services.
  */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { FileText, Briefcase, DollarSign, Users, Target, Award, CheckCircle2, Clock, ArrowRight, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
@@ -26,7 +26,8 @@ interface ServicePackage {
   popular?: boolean;
 }
 
-const MOCK_SERVICES: CareerService[] = [
+// Static content — service catalog, not backed by a database table
+const STATIC_SERVICES: CareerService[] = [
   { id: 's1', title: 'Resume Review & Optimization', description: 'Expert feedback on resume structure, content, and impact', icon: <FileText className="w-5 h-5" />, status: 'Completed', estimatedTime: '3-5 days', credits: 5 },
   { id: 's2', title: 'LinkedIn Profile Makeover', description: 'Complete LinkedIn optimization for visibility', icon: <Users className="w-5 h-5" />, status: 'In Progress', estimatedTime: '2-3 days', credits: 4 },
   { id: 's3', title: 'Interview Preparation', description: 'Mock interviews with detailed feedback', icon: <Briefcase className="w-5 h-5" />, status: 'Available', estimatedTime: '1-2 weeks', credits: 8 },
@@ -35,7 +36,7 @@ const MOCK_SERVICES: CareerService[] = [
   { id: 's6', title: 'Career Strategy Session', description: 'Personalized career path planning', icon: <Target className="w-5 h-5" />, status: 'Available', estimatedTime: '1 week', credits: 7 },
 ];
 
-const MOCK_PACKAGES: ServicePackage[] = [
+const STATIC_PACKAGES: ServicePackage[] = [
   {
     id: 'p1',
     name: 'Job Seeker',
@@ -64,25 +65,13 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function CoachingCareerServicesPage() {
-  const [services, setServices] = useState<CareerService[]>([]);
-  const [packages, setPackages] = useState<ServicePackage[]>([]);
-  const [loading, setLoading] = useState(true);
   const { profile } = useTenantContext();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setServices(MOCK_SERVICES);
-      setPackages(MOCK_PACKAGES);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const displayName = profile?.name || 'Coachee';
   const tier = profile?.tier || 'Professional';
 
-  const completedCount = services.filter(s => s.status === 'Completed').length;
-  const inProgressCount = services.filter(s => s.status === 'In Progress').length;
+  const completedCount = STATIC_SERVICES.filter(s => s.status === 'Completed').length;
+  const inProgressCount = STATIC_SERVICES.filter(s => s.status === 'In Progress').length;
 
   return (
     <div className="space-y-6">
@@ -111,7 +100,7 @@ export function CoachingCareerServicesPage() {
               <Target className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : services.length}</div>
+              <div className="text-2xl font-bold text-text-primary">{STATIC_SERVICES.length}</div>
               <div className="text-xs text-text-muted">Available Services</div>
             </div>
           </div>
@@ -122,7 +111,7 @@ export function CoachingCareerServicesPage() {
               <Clock className="w-5 h-5 text-amber" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : inProgressCount}</div>
+              <div className="text-2xl font-bold text-text-primary">{inProgressCount}</div>
               <div className="text-xs text-text-muted">In Progress</div>
             </div>
           </div>
@@ -133,7 +122,7 @@ export function CoachingCareerServicesPage() {
               <CheckCircle2 className="w-5 h-5 text-green" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : completedCount}</div>
+              <div className="text-2xl font-bold text-text-primary">{completedCount}</div>
               <div className="text-xs text-text-muted">Completed</div>
             </div>
           </div>
@@ -145,43 +134,39 @@ export function CoachingCareerServicesPage() {
           <CardTitle>Service Packages</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading packages...</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {packages.map((pkg) => (
-                <div
-                  key={pkg.id}
-                  className={`p-6 rounded-lg border-2 transition-all ${
-                    pkg.popular
-                      ? 'border-fuchsia bg-fuchsia-light/30 relative'
-                      : 'border-border bg-bg-warm hover:border-fuchsia/50'
-                  }`}
-                >
-                  {pkg.popular && (
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-fuchsia text-white">
-                      Most Popular
-                    </Badge>
-                  )}
-                  <div className="text-center mb-4">
-                    <h3 className="font-serif font-bold text-xl text-text-primary mb-2">{pkg.name}</h3>
-                    <div className="text-3xl font-bold text-fuchsia">{pkg.price}</div>
-                  </div>
-                  <ul className="space-y-2 mb-6">
-                    {pkg.services.map((service, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                        <CheckCircle2 className="w-4 h-4 text-fuchsia flex-shrink-0 mt-0.5" />
-                        {service}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button className="w-full" variant={pkg.popular ? 'default' : 'outline'}>
-                    Get Started <ArrowRight className="w-3 h-3 ml-1" />
-                  </Button>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {STATIC_PACKAGES.map((pkg) => (
+              <div
+                key={pkg.id}
+                className={`p-6 rounded-lg border-2 transition-all ${
+                  pkg.popular
+                    ? 'border-fuchsia bg-fuchsia-light/30 relative'
+                    : 'border-border bg-bg-warm hover:border-fuchsia/50'
+                }`}
+              >
+                {pkg.popular && (
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-fuchsia text-white">
+                    Most Popular
+                  </Badge>
+                )}
+                <div className="text-center mb-4">
+                  <h3 className="font-serif font-bold text-xl text-text-primary mb-2">{pkg.name}</h3>
+                  <div className="text-3xl font-bold text-fuchsia">{pkg.price}</div>
                 </div>
-              ))}
-            </div>
-          )}
+                <ul className="space-y-2 mb-6">
+                  {pkg.services.map((service, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                      <CheckCircle2 className="w-4 h-4 text-fuchsia flex-shrink-0 mt-0.5" />
+                      {service}
+                    </li>
+                  ))}
+                </ul>
+                <Button className="w-full" variant={pkg.popular ? 'default' : 'outline'}>
+                  Get Started <ArrowRight className="w-3 h-3 ml-1" />
+                </Button>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
@@ -190,33 +175,29 @@ export function CoachingCareerServicesPage() {
           <CardTitle>Individual Services</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading services...</div>
-          ) : (
-            <div className="space-y-3">
-              {services.map((service) => (
-                <div key={service.id} className="flex items-center justify-between p-4 bg-bg-warm rounded-lg">
-                  <div className="flex items-start gap-3 flex-1">
-                    <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center text-fuchsia flex-shrink-0">
-                      {service.icon}
-                    </div>
-                    <div>
-                      <div className="font-medium text-text-primary text-sm">{service.title}</div>
-                      <div className="text-xs text-text-muted mt-1">{service.description}</div>
-                      <div className="flex items-center gap-4 mt-2">
-                        <Badge className={STATUS_COLORS[service.status]}>{service.status}</Badge>
-                        <span className="text-xs text-text-muted">⏱ {service.estimatedTime}</span>
-                        <span className="text-xs text-fuchsia font-medium">{service.credits} credits</span>
-                      </div>
+          <div className="space-y-3">
+            {STATIC_SERVICES.map((service) => (
+              <div key={service.id} className="flex items-center justify-between p-4 bg-bg-warm rounded-lg">
+                <div className="flex items-start gap-3 flex-1">
+                  <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center text-fuchsia flex-shrink-0">
+                    {service.icon}
+                  </div>
+                  <div>
+                    <div className="font-medium text-text-primary text-sm">{service.title}</div>
+                    <div className="text-xs text-text-muted mt-1">{service.description}</div>
+                    <div className="flex items-center gap-4 mt-2">
+                      <Badge className={STATUS_COLORS[service.status]}>{service.status}</Badge>
+                      <span className="text-xs text-text-muted">⏱ {service.estimatedTime}</span>
+                      <span className="text-xs text-fuchsia font-medium">{service.credits} credits</span>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" disabled={service.status === 'Completed'}>
-                    {service.status === 'Completed' ? 'Done' : service.status === 'In Progress' ? 'Continue' : 'Start'}
-                  </Button>
                 </div>
-              ))}
-            </div>
-          )}
+                <Button variant="outline" size="sm" disabled={service.status === 'Completed'}>
+                  {service.status === 'Completed' ? 'Done' : service.status === 'In Progress' ? 'Continue' : 'Start'}
+                </Button>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>

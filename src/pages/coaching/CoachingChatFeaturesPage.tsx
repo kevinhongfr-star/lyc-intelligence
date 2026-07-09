@@ -3,7 +3,7 @@
  * Renders inside AppShell → Outlet. Shows available chat features,
  * messaging capabilities, and AI tools.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { MessageSquare, Sparkles, Mic, Video, Paperclip, Smile, Send, Bot, Wand2, Languages, FileText, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
@@ -17,7 +17,8 @@ interface ChatFeature {
   available: boolean;
 }
 
-const MOCK_FEATURES: ChatFeature[] = [
+// Static content — feature catalog, not backed by a database table
+const STATIC_FEATURES: ChatFeature[] = [
   { id: 'f1', title: 'AI Coaching Assistant', description: 'Get instant answers to career questions 24/7', icon: <Bot className="w-5 h-5" />, category: 'AI', available: true },
   { id: 'f2', title: 'Voice Messages', description: 'Send and receive voice notes', icon: <Mic className="w-5 h-5" />, category: 'Communication', available: true },
   { id: 'f3', title: 'Video Calls', description: '1:1 video sessions with your coach', icon: <Video className="w-5 h-5" />, category: 'Communication', available: true },
@@ -35,25 +36,15 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export function CoachingChatFeaturesPage() {
-  const [features, setFeatures] = useState<ChatFeature[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'All' | 'AI' | 'Communication' | 'Productivity'>('All');
   const { profile } = useTenantContext();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setFeatures(MOCK_FEATURES);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const displayName = profile?.name || 'Coachee';
   const tier = profile?.tier || 'Professional';
 
-  const filteredFeatures = filter === 'All' ? features : features.filter(f => f.category === filter);
+  const filteredFeatures = filter === 'All' ? STATIC_FEATURES : STATIC_FEATURES.filter(f => f.category === filter);
 
-  const availableCount = features.filter(f => f.available).length;
+  const availableCount = STATIC_FEATURES.filter(f => f.available).length;
 
   return (
     <div className="space-y-6">
@@ -128,27 +119,23 @@ export function CoachingChatFeaturesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {loading ? (
-          <div className="col-span-full py-8 text-center text-text-muted text-sm">Loading features...</div>
-        ) : (
-          filteredFeatures.map((feature) => (
-            <Card key={feature.id} className={`p-5 hover:shadow-card-hover transition-shadow ${!feature.available ? 'opacity-60' : ''}`}>
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center text-fuchsia">
-                  {feature.icon}
-                </div>
-                {!feature.available && (
-                  <Badge variant="outline" className="text-xs">Coming Soon</Badge>
-                )}
+        {filteredFeatures.map((feature) => (
+          <Card key={feature.id} className={`p-5 hover:shadow-card-hover transition-shadow ${!feature.available ? 'opacity-60' : ''}`}>
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center text-fuchsia">
+                {feature.icon}
               </div>
-              <h3 className="font-medium text-text-primary text-sm mb-1">{feature.title}</h3>
-              <p className="text-xs text-text-muted">{feature.description}</p>
-              <div className="mt-3">
-                <Badge className={CATEGORY_COLORS[feature.category]}>{feature.category}</Badge>
-              </div>
-            </Card>
-          ))
-        )}
+              {!feature.available && (
+                <Badge variant="outline" className="text-xs">Coming Soon</Badge>
+              )}
+            </div>
+            <h3 className="font-medium text-text-primary text-sm mb-1">{feature.title}</h3>
+            <p className="text-xs text-text-muted">{feature.description}</p>
+            <div className="mt-3">
+              <Badge className={CATEGORY_COLORS[feature.category]}>{feature.category}</Badge>
+            </div>
+          </Card>
+        ))}
       </div>
 
       <Card>

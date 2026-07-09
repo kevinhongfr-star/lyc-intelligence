@@ -3497,3 +3497,158 @@ export async function getTeamAssignments(params?: {
     return [];
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// PORTAL DATA — T6 Supabase wiring for T3/T4/T5 pages
+// ═══════════════════════════════════════════════════════════════
+
+// ── Client Admin: team members ──
+export interface ClientTeamMember {
+  id: string;
+  name: string;
+  email: string;
+  role: 'client_admin' | 'client_user';
+  is_active: boolean;
+  title: string;
+  created_at: string;
+}
+
+export async function getClientTeamMembers(organization: string): Promise<ClientTeamMember[]> {
+  try {
+    const { data, error } = await getSupabase()
+      .from('client_accounts')
+      .select('id, name, email, role, is_active, title, created_at')
+      .eq('organization', organization)
+      .order('created_at', { ascending: false });
+    if (error) { console.error('[Portal] getClientTeamMembers:', error); return []; }
+    return (data || []) as ClientTeamMember[];
+  } catch (e) {
+    console.error('[Portal] getClientTeamMembers error:', e);
+    return [];
+  }
+}
+
+// ── Client Onboarding: mandate access status ──
+export async function getClientOnboardingStatus(clientAccountId: string): Promise<{ mandateAccessCount: number; firstAccessAt: string | null }> {
+  try {
+    const { data, error } = await getSupabase()
+      .from('client_mandate_access')
+      .select('id, mandate_id, created_at')
+      .eq('client_account_id', clientAccountId);
+    if (error) { console.error('[Portal] getClientOnboardingStatus:', error); return { mandateAccessCount: 0, firstAccessAt: null }; }
+    const items = data || [];
+    return {
+      mandateAccessCount: items.length,
+      firstAccessAt: items.length > 0 ? items[0].created_at : null,
+    };
+  } catch (e) {
+    console.error('[Portal] getClientOnboardingStatus error:', e);
+    return { mandateAccessCount: 0, firstAccessAt: null };
+  }
+}
+
+// ── Chat sessions (NEXUS) ──
+export interface ChatSession {
+  id: string;
+  user_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getChatSessions(userId: string): Promise<ChatSession[]> {
+  try {
+    const { data, error } = await getSupabase()
+      .from('chat_sessions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false })
+      .limit(20);
+    if (error) { console.error('[Portal] getChatSessions:', error); return []; }
+    return (data || []) as ChatSession[];
+  } catch (e) {
+    console.error('[Portal] getChatSessions error:', e);
+    return [];
+  }
+}
+
+export interface ChatMessageRecord {
+  id: string;
+  session_id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+}
+
+export async function getChatMessages(sessionId: string): Promise<ChatMessageRecord[]> {
+  try {
+    const { data, error } = await getSupabase()
+      .from('chat_messages')
+      .select('*')
+      .eq('session_id', sessionId)
+      .order('created_at', { ascending: true });
+    if (error) { console.error('[Portal] getChatMessages:', error); return []; }
+    return (data || []) as ChatMessageRecord[];
+  } catch (e) {
+    console.error('[Portal] getChatMessages error:', e);
+    return [];
+  }
+}
+
+// ── Coaching engagement: credits ──
+export interface CoachingCreditData {
+  current_credits: number;
+  used_credits: number;
+  total_purchased: number;
+}
+
+export async function getCoachingCredits(userId: string): Promise<CoachingCreditData | null> {
+  try {
+    const { data, error } = await getSupabase()
+      .from('user_credits')
+      .select('current_credits, used_credits, total_purchased')
+      .eq('user_id', userId)
+      .single();
+    if (error) { console.error('[Portal] getCoachingCredits:', error); return null; }
+    return data as CoachingCreditData;
+  } catch (e) {
+    console.error('[Portal] getCoachingCredits error:', e);
+    return null;
+  }
+}
+
+// ── Assessment catalog ──
+export async function getAssessmentCatalog(): Promise<any[]> {
+  try {
+    const { data, error } = await getSupabase()
+      .from('assessment_configs')
+      .select('id, title, description, type, estimated_minutes')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+    if (error) { console.error('[Portal] getAssessmentCatalog:', error); return []; }
+    return data || [];
+  } catch (e) {
+    console.error('[Portal] getAssessmentCatalog error:', e);
+    return [];
+  }
+}
+
+// ── Open mandates for candidate opportunities ──
+export async function getOpenMandates(limit?: number): Promise<any[]> {
+  try {
+    const { data, error } = await getSupabase()
+      .from('mandates')
+      .select(`
+        id, title, status, location, compensation_range,
+        company:companies(name, industry)
+      `)
+      .in('status', ['open', 'active', 'searching'])
+      .order('created_at', { ascending: false })
+      .limit(limit || 20);
+    if (error) { console.error('[Portal] getOpenMandates:', error); return []; }
+    return data || [];
+  } catch (e) {
+    console.error('[Portal] getOpenMandates error:', e);
+    return [];
+  }
+}

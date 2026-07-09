@@ -5,8 +5,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Briefcase, FileText, Globe, Star, CheckCircle2, Edit2, Save, Eye } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, Progress } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, Progress, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getSupabase } from '@/services/supabaseApi';
 
 interface Experience {
   id: string;
@@ -26,28 +27,104 @@ interface Education {
   year: string;
 }
 
-const MOCK_EXPERIENCE: Experience[] = [
+// Static content — experience history (could be sourced from contacts.career_history JSON, kept static for now)
+const STATIC_EXPERIENCE: Experience[] = [
   { id: 'e1', company: 'TechCorp Inc.', role: 'Senior Engineering Manager', startDate: '2021', endDate: 'Present', current: true, description: 'Leading team of 12 engineers across platform and infrastructure.' },
   { id: 'e2', company: 'CloudScale', role: 'Engineering Manager', startDate: '2018', endDate: '2021', current: false, description: 'Grew team from 3 to 8, led cloud migration project.' },
   { id: 'e3', company: 'DataSystems', role: 'Senior Software Engineer', startDate: '2015', endDate: '2018', current: false, description: 'Built distributed data processing pipeline.' },
 ];
 
-const MOCK_EDUCATION: Education[] = [
+// Static content — education history (could be sourced from contacts.education JSON, kept static for now)
+const STATIC_EDUCATION: Education[] = [
   { id: 'ed1', school: 'Stanford University', degree: 'MS', field: 'Computer Science', year: '2015' },
   { id: 'ed2', school: 'UC Berkeley', degree: 'BS', field: 'Computer Science', year: '2013' },
 ];
 
+interface ExtendedProfileFields {
+  phone?: string | null;
+  bio?: string | null;
+  company_name?: string | null;
+}
+
 export function CandidateProfilePage() {
   const [editing, setEditing] = useState(false);
-  const [experience] = useState(MOCK_EXPERIENCE);
-  const [education] = useState(MOCK_EDUCATION);
-  const [profileStrength, setProfileStrength] = useState(78);
+  const [experience] = useState(STATIC_EXPERIENCE);
+  const [education] = useState(STATIC_EDUCATION);
+  const [extended, setExtended] = useState<ExtendedProfileFields>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { candidateProfile, profile } = useTenantContext();
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchExtended = async () => {
+      if (!candidateProfile?.id) {
+        if (!cancelled) setLoading(false);
+        return;
+      }
+      try {
+        setError(null);
+        const sb = getSupabase();
+        const { data, error: sbError } = await sb
+          .from('contacts')
+          .select('phone, summary, company:companies(name)')
+          .eq('id', candidateProfile.id)
+          .maybeSingle();
+        if (cancelled) return;
+        if (sbError) {
+          console.error('[CandidateProfilePage] Error:', sbError);
+          setError('Failed to load profile');
+        } else if (data) {
+          const company = (data as any).company;
+          setExtended({
+            phone: (data as any).phone ?? null,
+            bio: (data as any).summary ?? null,
+            company_name: company?.name ?? null,
+          });
+        }
+      } catch (e) {
+        console.error('[CandidateProfilePage] Error:', e);
+        if (!cancelled) setError('Failed to load profile');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchExtended();
+    return () => { cancelled = true; };
+  }, [candidateProfile?.id]);
 
   const displayName = candidateProfile?.name || profile?.name || 'Candidate';
   const currentTitle = candidateProfile?.current_title || 'Professional';
   const email = candidateProfile?.email || profile?.email || 'candidate@example.com';
   const location = candidateProfile?.location || 'San Francisco, CA';
+  const headline = candidateProfile?.headline || 'Senior Engineering Leader | Cloud Architecture | Team Building';
+  const phone = extended.phone || '+1 (555) 123-4567';
+
+  // Compute profile strength from available fields
+  const profileStrength = (() => {
+    let score = 0;
+    if (candidateProfile?.name) score += 12;
+    if (candidateProfile?.email) score += 12;
+    if (candidateProfile?.current_title) score += 12;
+    if (candidateProfile?.location) score += 10;
+    if (candidateProfile?.headline) score += 12;
+    if (extended.phone) score += 10;
+    if (extended.bio) score += 10;
+    if (extended.company_name) score += 10;
+    if (STATIC_EXPERIENCE.length > 0) score += 6;
+    if (STATIC_EDUCATION.length > 0) score += 6;
+    return Math.min(100, score);
+  })();
+
+  if (loading) {
+    return (
+      <div className="py-12 text-center text-text-muted text-sm">Loading profile...</div>
+    );
+  }
+
+  if (error && !candidateProfile) {
+    return <EmptyState title="Failed to load profile" description={error} />;
+  }
 
   return (
     <div className="space-y-6">
@@ -133,7 +210,7 @@ export function CandidateProfilePage() {
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1 block">Phone</label>
-                <Input value="+1 (555) 123-4567" disabled={!editing} />
+                <Input value={phone} disabled={!editing} />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1 block">Location</label>
@@ -147,7 +224,7 @@ export function CandidateProfilePage() {
             <div className="mt-4">
               <label className="text-xs text-text-muted mb-1 block">Headline</label>
               <Input
-                value="Senior Engineering Leader | Cloud Architecture | Team Building"
+                value={headline}
                 disabled={!editing}
               />
             </div>

@@ -3,7 +3,7 @@
  * Renders inside AppShell → Outlet. Shows engagement analytics,
  * progress insights, and personalized recommendations.
  */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Brain, TrendingUp, Activity, Sparkles, BarChart3, Target, ArrowUpRight, ArrowDownRight, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
@@ -24,14 +24,15 @@ interface Recommendation {
   priority: 'High' | 'Medium' | 'Low';
 }
 
-const MOCK_METRICS: InsightMetric[] = [
+// Static content — AI-generated recommendations, no direct table backing
+const STATIC_METRICS: InsightMetric[] = [
   { id: 'm1', label: 'Engagement Score', value: '87', change: 12, direction: 'up' },
   { id: 'm2', label: 'Session Velocity', value: '2.4/wk', change: 8, direction: 'up' },
   { id: 'm3', label: 'Goal Progress', value: '68%', change: -3, direction: 'down' },
   { id: 'm4', label: 'Skill Velocity', value: 'High', change: 15, direction: 'up' },
 ];
 
-const MOCK_RECS: Recommendation[] = [
+const STATIC_RECS: Recommendation[] = [
   { id: 'r1', title: 'Focus on System Design Mastery', description: 'Your assessment shows strong potential. Dedicated practice would accelerate your path to principal engineer.', category: 'Skills', priority: 'High' },
   { id: 'r2', title: 'Expand Industry Network', description: 'Connect with 3 senior leaders in your target companies this month.', category: 'Network', priority: 'High' },
   { id: 'r3', title: 'Refine Executive Presence', description: 'Practice high-stakes presentations with your coach to strengthen communication.', category: 'Growth', priority: 'Medium' },
@@ -52,19 +53,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export function CoachingIntelligencePage() {
-  const [metrics, setMetrics] = useState<InsightMetric[]>([]);
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  const [loading, setLoading] = useState(true);
   const { profile } = useTenantContext();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setMetrics(MOCK_METRICS);
-      setRecommendations(MOCK_RECS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const displayName = profile?.name || 'Coachee';
   const tier = profile?.tier || 'Professional';
@@ -90,7 +79,7 @@ export function CoachingIntelligencePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {metrics.map((metric) => (
+        {STATIC_METRICS.map((metric) => (
           <Card key={metric.id} className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -122,26 +111,22 @@ export function CoachingIntelligencePage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading recommendations...</div>
-            ) : (
-              <div className="space-y-3">
-                {recommendations.map((rec) => (
-                  <div key={rec.id} className="p-4 bg-bg-warm rounded-lg hover:shadow-card-hover transition-shadow">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-text-primary text-sm">{rec.title}</span>
-                          <Badge className={CATEGORY_COLORS[rec.category]}>{rec.category}</Badge>
-                        </div>
-                        <div className="text-xs text-text-muted">{rec.description}</div>
+            <div className="space-y-3">
+              {STATIC_RECS.map((rec) => (
+                <div key={rec.id} className="p-4 bg-bg-warm rounded-lg hover:shadow-card-hover transition-shadow">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-text-primary text-sm">{rec.title}</span>
+                        <Badge className={CATEGORY_COLORS[rec.category]}>{rec.category}</Badge>
                       </div>
-                      <Badge className={PRIORITY_COLORS[rec.priority]}>{rec.priority}</Badge>
+                      <div className="text-xs text-text-muted">{rec.description}</div>
                     </div>
+                    <Badge className={PRIORITY_COLORS[rec.priority]}>{rec.priority}</Badge>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 

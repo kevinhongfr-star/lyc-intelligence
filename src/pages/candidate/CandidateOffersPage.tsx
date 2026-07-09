@@ -5,8 +5,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Briefcase, DollarSign, Calendar, CheckCircle2, Clock, FileText, TrendingUp, ArrowRight, User, Star } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Progress } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Progress, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getOffers, type Offer as SupabaseOffer } from '@/services/supabaseApi';
 
 interface Offer {
   id: string;
@@ -28,34 +29,8 @@ interface NegotiationTip {
   category: string;
 }
 
-const MOCK_OFFERS: Offer[] = [
-  {
-    id: 'o1',
-    company: 'TechCorp',
-    role: 'VP Engineering',
-    baseSalary: 285000,
-    bonus: 50000,
-    equity: '0.75% over 4 years',
-    benefits: 'Full health, 25 PTO, $5K learning budget',
-    status: 'Active',
-    deadline: 'Jan 30, 2025',
-    receivedAt: 'Jan 15, 2025',
-  },
-  {
-    id: 'o2',
-    company: 'CloudPeak',
-    role: 'CTO',
-    baseSalary: 320000,
-    bonus: 75000,
-    equity: '1.2% over 4 years',
-    benefits: 'Premium health, 30 PTO, executive coaching',
-    status: 'Pending',
-    deadline: 'Feb 5, 2025',
-    receivedAt: 'Jan 18, 2025',
-  },
-];
-
-const MOCK_TIPS: NegotiationTip[] = [
+// Static content — negotiation tips are static resources, no direct table backing
+const STATIC_TIPS: NegotiationTip[] = [
   { id: 't1', title: 'Counter with Market Data', description: 'Use levels.fyi and Pave data to justify your counter', category: 'Research' },
   { id: 't2', title: 'Negotiate Equity Refreshers', description: 'Request annual equity refresh for top performers', category: 'Equity' },
   { id: 't3', title: 'Signing Bonus Strategy', description: 'Convert some equity to signing bonus for immediate value', category: 'Cash' },
@@ -68,26 +43,76 @@ const STATUS_COLORS: Record<string, string> = {
   Expired: 'bg-text-muted/10 text-text-muted',
 };
 
+// Map supabase Offer status to UI status
+function mapOfferStatus(status: SupabaseOffer['status']): Offer['status'] {
+  if (status === 'accepted' || status === 'active' || status === 'sent' || status === 'onboarding' || status === 'completed' || status === 'probation') {
+    return 'Active';
+  }
+  if (status === 'rejected' || status === 'withdrawn') {
+    return 'Expired';
+  }
+  return 'Pending';
+}
+
+function mapOffer(o: SupabaseOffer): Offer {
+  const comp = o.compensation || ({} as any);
+  const fmtDate = (iso?: string) => {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+  return {
+    id: o.id,
+    company: o.client_name || o.mandate_title || '—',
+    role: o.position_title || '—',
+    baseSalary: comp.base_salary ?? 0,
+    bonus: comp.bonus ?? 0,
+    equity: comp.equity || '—',
+    benefits: comp.benefits || '—',
+    status: mapOfferStatus(o.status),
+    deadline: fmtDate(o.expiration_date),
+    receivedAt: fmtDate(o.created_at),
+  };
+}
+
 export function CandidateOffersPage() {
   const [offers, setOffers] = useState<Offer[]>([]);
-  const [tips, setTips] = useState<NegotiationTip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { candidateProfile, profile } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setOffers(MOCK_OFFERS);
-      setTips(MOCK_TIPS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    let cancelled = false;
+    const fetchOffers = async () => {
+      try {
+        setError(null);
+        const data = await getOffers({ candidate_id: candidateProfile?.id });
+        if (cancelled) return;
+        setOffers(data.map(mapOffer));
+      } catch (e) {
+        console.error('[CandidateOffersPage] Error:', e);
+        if (!cancelled) setError('Failed to load offers');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchOffers();
+    return () => { cancelled = true; };
+  }, [candidateProfile?.id]);
 
   const displayName = candidateProfile?.name || profile?.name || 'Candidate';
   const currentTitle = candidateProfile?.current_title || 'Professional';
 
   const activeOffers = offers.filter(o => o.status === 'Active').length;
   const totalValue = offers.reduce((sum, o) => sum + o.baseSalary + o.bonus, 0);
+
+  // Next deadline (earliest non-expired)
+  const upcomingDeadlines = offers
+    .filter(o => o.status !== 'Expired')
+    .map(o => o.deadline)
+    .sort();
+  const nextDeadlineLabel = upcomingDeadlines.length ? upcomingDeadlines[0] : '—';
 
   return (
     <div className="space-y-6">
@@ -138,7 +163,7 @@ export function CandidateOffersPage() {
               <Clock className="w-5 h-5 text-amber" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">12d</div>
+              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : nextDeadlineLabel}</div>
               <div className="text-xs text-text-muted">Next Deadline</div>
             </div>
           </div>
@@ -152,8 +177,10 @@ export function CandidateOffersPage() {
         <CardContent>
           {loading ? (
             <div className="py-8 text-center text-text-muted text-sm">Loading offers...</div>
+          ) : error ? (
+            <EmptyState title="Failed to load offers" description={error} />
           ) : offers.length === 0 ? (
-            <div className="py-8 text-center text-text-muted text-sm">No active offers yet.</div>
+            <EmptyState title="No offers yet" description="When a firm extends an offer, it will appear here for your review." />
           ) : (
             <div className="space-y-4">
               {offers.map((offer) => (
@@ -215,7 +242,7 @@ export function CandidateOffersPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {tips.map((tip) => (
+              {STATIC_TIPS.map((tip) => (
                 <div key={tip.id} className="p-3 bg-bg-warm rounded-lg">
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-medium text-text-primary text-sm">{tip.title}</span>

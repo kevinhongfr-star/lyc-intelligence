@@ -5,8 +5,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Briefcase, MapPin, DollarSign, Star, Filter, TrendingUp, ArrowRight, Bookmark, Send, User } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getOpenMandates } from '@/services/supabaseApi';
 
 interface Opportunity {
   id: string;
@@ -23,13 +24,42 @@ interface Opportunity {
   saved: boolean;
 }
 
-const MOCK_OPPORTUNITIES: Opportunity[] = [
-  { id: 'op1', company: 'TechCorp', role: 'VP Engineering', location: 'San Francisco, CA', remote: true, salaryMin: 280, salaryMax: 340, matchScore: 95, tier: 'S', industry: 'SaaS', posted: '2d ago', saved: true },
-  { id: 'op2', company: 'FinScale', role: 'Chief Technology Officer', location: 'New York, NY', remote: false, salaryMin: 320, salaryMax: 400, matchScore: 88, tier: 'A', industry: 'FinTech', posted: '5d ago', saved: false },
-  { id: 'op3', company: 'DataMesh', role: 'Head of Product', location: 'Remote', remote: true, salaryMin: 240, salaryMax: 290, matchScore: 82, tier: 'A', industry: 'AI/ML', posted: '1w ago', saved: true },
-  { id: 'op4', company: 'CloudPeak', role: 'SVP Engineering', location: 'Seattle, WA', remote: true, salaryMin: 300, salaryMax: 360, matchScore: 78, tier: 'B', industry: 'Cloud', posted: '1w ago', saved: false },
-  { id: 'op5', company: 'GrowthLabs', role: 'VP Product', location: 'Austin, TX', remote: true, salaryMin: 260, salaryMax: 310, matchScore: 72, tier: 'B', industry: 'Growth', posted: '2w ago', saved: false },
-];
+// Parse a compensation_range string (e.g. "$280K - $340K" or "280000-340000") into min/max in $K
+function parseCompRange(raw: any): { min: number; max: number; label: string } {
+  if (raw == null || raw === '') return { min: 0, max: 0, label: '—' };
+  const str = String(raw);
+  const nums = str.match(/[\d,.]+/g)?.map((s) => parseFloat(s.replace(/,/g, ''))) ?? [];
+  if (nums.length >= 2) {
+    // Normalize: if values >= 1000 assume raw dollars; convert to $K
+    const min = nums[0] >= 1000 ? Math.round(nums[0] / 1000) : Math.round(nums[0]);
+    const max = nums[1] >= 1000 ? Math.round(nums[1] / 1000) : Math.round(nums[1]);
+    return { min, max, label: `$${min}K - $${max}K` };
+  }
+  if (nums.length === 1) {
+    const v = nums[0] >= 1000 ? Math.round(nums[0] / 1000) : Math.round(nums[0]);
+    return { min: v, max: v, label: `$${v}K` };
+  }
+  return { min: 0, max: 0, label: str };
+}
+
+function mapMandate(m: any): Opportunity {
+  const company = (m as any).company ?? null;
+  const comp = parseCompRange((m as any).compensation_range);
+  return {
+    id: (m as any).id ?? '',
+    company: company?.name ?? '—',
+    role: (m as any).title ?? 'Untitled Role',
+    location: (m as any).location ?? '—',
+    remote: false,
+    salaryMin: comp.min,
+    salaryMax: comp.max,
+    matchScore: 0, // requires matching logic not available yet
+    tier: 'A', // default tier
+    industry: company?.industry ?? '—',
+    posted: '—',
+    saved: false,
+  };
+}
 
 const TIER_COLORS: Record<string, string> = {
   S: 'bg-fuchsia text-white',
@@ -41,16 +71,28 @@ const TIER_COLORS: Record<string, string> = {
 export function CandidateOpportunitiesPage() {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [tierFilter, setTierFilter] = useState('all');
   const { candidateProfile, profile } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setOpportunities(MOCK_OPPORTUNITIES);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    let cancelled = false;
+    const fetchOpps = async () => {
+      try {
+        setError(null);
+        const data = await getOpenMandates(20);
+        if (cancelled) return;
+        setOpportunities(data.map(mapMandate));
+      } catch (e) {
+        console.error('[CandidateOpportunitiesPage] Error:', e);
+        if (!cancelled) setError('Failed to load opportunities');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchOpps();
+    return () => { cancelled = true; };
   }, []);
 
   const filteredOpps = opportunities.filter(o => {
@@ -156,8 +198,15 @@ export function CandidateOpportunitiesPage() {
       <div className="space-y-3">
         {loading ? (
           <div className="py-12 text-center text-text-muted text-sm">Loading opportunities...</div>
+        ) : error ? (
+          <EmptyState title="Failed to load opportunities" description={error} />
         ) : filteredOpps.length === 0 ? (
-          <div className="py-12 text-center text-text-muted text-sm">No opportunities found.</div>
+          <EmptyState
+            title="No opportunities found"
+            description={searchTerm || tierFilter !== 'all'
+              ? 'Try adjusting your search or filter criteria.'
+              : 'There are no open mandates available right now. Check back soon.'}
+          />
         ) : (
           filteredOpps.map((opp) => (
             <Card key={opp.id} className="p-5 hover:shadow-card-hover transition-shadow">
@@ -190,7 +239,9 @@ export function CandidateOpportunitiesPage() {
                 </div>
                 <div className="flex items-center gap-1 text-xs text-text-muted">
                   <DollarSign className="w-3 h-3" />
-                  ${opp.salaryMin}K - ${opp.salaryMax}K
+                  {opp.salaryMin > 0 || opp.salaryMax > 0
+                    ? `$${opp.salaryMin}K - $${opp.salaryMax}K`
+                    : '—'}
                 </div>
                 <div className="text-xs text-text-muted">Industry: {opp.industry}</div>
                 <div className="text-xs text-text-muted">Posted: {opp.posted}</div>

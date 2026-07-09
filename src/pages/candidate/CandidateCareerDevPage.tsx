@@ -3,7 +3,7 @@
  * Renders inside AppShell → Outlet. Shows learning goals, skills progress,
  * certifications, and career path planning.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Target, Trophy, BookOpen, Award, TrendingUp, CheckCircle2, Circle, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
@@ -33,7 +33,8 @@ interface Milestone {
   date?: string;
 }
 
-const MOCK_GOALS: LearningGoal[] = [
+// Static content — career development tracking, no direct table backing yet
+const STATIC_GOALS: LearningGoal[] = [
   { id: 'g1', title: 'Complete AWS Solutions Architect Cert', category: 'Certification', progress: 75, deadline: 'Feb 15, 2025', status: 'In Progress' },
   { id: 'g2', title: 'Publish Technical Article on System Design', category: 'Project', progress: 40, deadline: 'Mar 1, 2025', status: 'In Progress' },
   { id: 'g3', title: 'Build Open Source Side Project', category: 'Project', progress: 60, deadline: 'Apr 1, 2025', status: 'In Progress' },
@@ -41,7 +42,7 @@ const MOCK_GOALS: LearningGoal[] = [
   { id: 'g5', title: 'Master Distributed Systems', category: 'Skill', progress: 30, deadline: 'Jun 1, 2025', status: 'In Progress' },
 ];
 
-const MOCK_SKILLS: SkillLevel[] = [
+const STATIC_SKILLS: SkillLevel[] = [
   { id: 's1', skill: 'System Design', level: 85, target: 95, category: 'Engineering' },
   { id: 's2', skill: 'Leadership', level: 78, target: 90, category: 'Management' },
   { id: 's3', skill: 'Strategic Planning', level: 70, target: 85, category: 'Business' },
@@ -49,7 +50,7 @@ const MOCK_SKILLS: SkillLevel[] = [
   { id: 's5', skill: 'Product Vision', level: 72, target: 88, category: 'Product' },
 ];
 
-const MOCK_MILESTONES: Milestone[] = [
+const STATIC_MILESTONES: Milestone[] = [
   { id: 'm1', title: 'Promoted to Engineering Manager', description: 'Led team of 8 engineers', achieved: true, date: '2023' },
   { id: 'm2', title: 'Led Cloud Migration Project', description: '$2M initiative, on time and under budget', achieved: true, date: '2024' },
   { id: 'm3', title: 'VP Engineering Role', description: 'Target promotion to VP-level', achieved: false },
@@ -70,21 +71,10 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export function CandidateCareerDevPage() {
-  const [goals, setGoals] = useState<LearningGoal[]>([]);
-  const [skills, setSkills] = useState<SkillLevel[]>([]);
-  const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [goals] = useState<LearningGoal[]>(STATIC_GOALS);
+  const [skills] = useState<SkillLevel[]>(STATIC_SKILLS);
+  const [milestones] = useState<Milestone[]>(STATIC_MILESTONES);
   const { candidateProfile, profile } = useTenantContext();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setGoals(MOCK_GOALS);
-      setSkills(MOCK_SKILLS);
-      setMilestones(MOCK_MILESTONES);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const displayName = candidateProfile?.name || profile?.name || 'Candidate';
   const currentTitle = candidateProfile?.current_title || 'Professional';
@@ -121,7 +111,7 @@ export function CandidateCareerDevPage() {
               <Target className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : goals.length}</div>
+              <div className="text-2xl font-bold text-text-primary">{goals.length}</div>
               <div className="text-xs text-text-muted">Active Goals</div>
             </div>
           </div>
@@ -132,7 +122,7 @@ export function CandidateCareerDevPage() {
               <Trophy className="w-5 h-5 text-green" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : completedGoals}</div>
+              <div className="text-2xl font-bold text-text-primary">{completedGoals}</div>
               <div className="text-xs text-text-muted">Completed</div>
             </div>
           </div>
@@ -143,7 +133,7 @@ export function CandidateCareerDevPage() {
               <TrendingUp className="w-5 h-5 text-blue" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : `${avgProgress}%`}</div>
+              <div className="text-2xl font-bold text-text-primary">{`${avgProgress}%`}</div>
               <div className="text-xs text-text-muted">Avg Progress</div>
             </div>
           </div>
@@ -158,30 +148,26 @@ export function CandidateCareerDevPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading goals...</div>
-          ) : (
-            <div className="space-y-3">
-              {goals.map((goal) => (
-                <div key={goal.id} className="p-4 bg-bg-warm rounded-lg">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-text-primary text-sm">{goal.title}</span>
-                        <Badge className={CATEGORY_COLORS[goal.category]}>{goal.category}</Badge>
-                      </div>
-                      <div className="text-xs text-text-muted">Due: {goal.deadline}</div>
+          <div className="space-y-3">
+            {goals.map((goal) => (
+              <div key={goal.id} className="p-4 bg-bg-warm rounded-lg">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-text-primary text-sm">{goal.title}</span>
+                      <Badge className={CATEGORY_COLORS[goal.category]}>{goal.category}</Badge>
                     </div>
-                    <Badge className={STATUS_COLORS[goal.status]}>{goal.status}</Badge>
+                    <div className="text-xs text-text-muted">Due: {goal.deadline}</div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Progress value={goal.progress} className="h-2 flex-1" />
-                    <span className="text-xs font-bold text-text-primary w-10 text-right">{goal.progress}%</span>
-                  </div>
+                  <Badge className={STATUS_COLORS[goal.status]}>{goal.status}</Badge>
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="flex items-center gap-3">
+                  <Progress value={goal.progress} className="h-2 flex-1" />
+                  <span className="text-xs font-bold text-text-primary w-10 text-right">{goal.progress}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
@@ -194,29 +180,25 @@ export function CandidateCareerDevPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading skills...</div>
-            ) : (
-              <div className="space-y-4">
-                {skills.map((skill) => (
-                  <div key={skill.id}>
-                    <div className="flex items-center justify-between mb-1">
-                      <div>
-                        <span className="text-sm font-medium text-text-primary">{skill.skill}</span>
-                        <span className="text-xs text-text-muted ml-2">({skill.category})</span>
-                      </div>
-                      <div className="text-xs font-bold text-text-primary">
-                        {skill.level} / {skill.target}
-                      </div>
+            <div className="space-y-4">
+              {skills.map((skill) => (
+                <div key={skill.id}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div>
+                      <span className="text-sm font-medium text-text-primary">{skill.skill}</span>
+                      <span className="text-xs text-text-muted ml-2">({skill.category})</span>
                     </div>
-                    <div className="relative h-2 bg-bg-tertiary rounded-full overflow-hidden">
-                      <div className="absolute h-full bg-fuchsia rounded-full" style={{ width: `${skill.level}%` }} />
-                      <div className="absolute h-full w-0.5 bg-text-muted" style={{ left: `${skill.target}%` }} />
+                    <div className="text-xs font-bold text-text-primary">
+                      {skill.level} / {skill.target}
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="relative h-2 bg-bg-tertiary rounded-full overflow-hidden">
+                    <div className="absolute h-full bg-fuchsia rounded-full" style={{ width: `${skill.level}%` }} />
+                    <div className="absolute h-full w-0.5 bg-text-muted" style={{ left: `${skill.target}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 

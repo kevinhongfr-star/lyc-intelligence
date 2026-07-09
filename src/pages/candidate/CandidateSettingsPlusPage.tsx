@@ -3,7 +3,7 @@
  * Renders inside AppShell → Outlet. Shows notification preferences,
  * privacy controls, integrations, and account management.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Bell, Lock, Globe, Mail, Smartphone, Eye, Trash2, Download, LogOut, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
@@ -25,7 +25,8 @@ interface Integration {
   icon: string;
 }
 
-const MOCK_NOTIFICATIONS: NotificationPref[] = [
+// Static content — settings UI, notification preferences are client-side state
+const STATIC_NOTIFICATIONS: NotificationPref[] = [
   { id: 'n1', label: 'New Opportunities', description: 'Get notified about matched roles', email: true, push: true, sms: false },
   { id: 'n2', label: 'Application Updates', description: 'Status changes on your applications', email: true, push: true, sms: true },
   { id: 'n3', label: 'Interview Reminders', description: 'Reminders before scheduled interviews', email: true, push: true, sms: true },
@@ -34,7 +35,7 @@ const MOCK_NOTIFICATIONS: NotificationPref[] = [
   { id: 'n6', label: 'Marketing Emails', description: 'Product updates and promotions', email: false, push: false, sms: false },
 ];
 
-const MOCK_INTEGRATIONS: Integration[] = [
+const STATIC_INTEGRATIONS: Integration[] = [
   { id: 'i1', name: 'LinkedIn', description: 'Sync your profile and network', connected: true, icon: 'in' },
   { id: 'i2', name: 'Google Calendar', description: 'Sync interviews and sessions', connected: true, icon: 'gc' },
   { id: 'i3', name: 'GitHub', description: 'Showcase your technical projects', connected: false, icon: 'gh' },
@@ -42,19 +43,9 @@ const MOCK_INTEGRATIONS: Integration[] = [
 ];
 
 export function CandidateSettingsPlusPage() {
-  const [notifications, setNotifications] = useState<NotificationPref[]>([]);
-  const [integrations, setIntegrations] = useState<Integration[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [notifications, setNotifications] = useState<NotificationPref[]>(STATIC_NOTIFICATIONS);
+  const [integrations, setIntegrations] = useState<Integration[]>(STATIC_INTEGRATIONS);
   const { candidateProfile, profile } = useTenantContext();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setNotifications(MOCK_NOTIFICATIONS);
-      setIntegrations(MOCK_INTEGRATIONS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const displayName = candidateProfile?.name || profile?.name || 'Candidate';
   const currentTitle = candidateProfile?.current_title || 'Professional';
@@ -99,62 +90,58 @@ export function CandidateSettingsPlusPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading preferences...</div>
-          ) : (
-            <div className="space-y-2">
-              <div className="grid grid-cols-12 gap-2 text-xs font-medium text-text-muted px-3 py-2">
-                <div className="col-span-6">Preference</div>
-                <div className="col-span-2 text-center">Email</div>
-                <div className="col-span-2 text-center">Push</div>
-                <div className="col-span-2 text-center">SMS</div>
-              </div>
-              {notifications.map((notif) => (
-                <div key={notif.id} className="grid grid-cols-12 gap-2 items-center p-3 bg-bg-warm rounded-lg">
-                  <div className="col-span-6">
-                    <div className="font-medium text-text-primary text-sm">{notif.label}</div>
-                    <div className="text-xs text-text-muted">{notif.description}</div>
-                  </div>
-                  <div className="col-span-2 text-center">
-                    <button
-                      onClick={() => toggleNotification(notif.id, 'email')}
-                      className={`w-10 h-5 rounded-full transition-colors ${
-                        notif.email ? 'bg-fuchsia' : 'bg-bg-tertiary'
-                      }`}
-                    >
-                      <span className={`block w-4 h-4 rounded-full bg-white transition-transform ${
-                        notif.email ? 'translate-x-5' : 'translate-x-0.5'
-                      }`} />
-                    </button>
-                  </div>
-                  <div className="col-span-2 text-center">
-                    <button
-                      onClick={() => toggleNotification(notif.id, 'push')}
-                      className={`w-10 h-5 rounded-full transition-colors ${
-                        notif.push ? 'bg-fuchsia' : 'bg-bg-tertiary'
-                      }`}
-                    >
-                      <span className={`block w-4 h-4 rounded-full bg-white transition-transform ${
-                        notif.push ? 'translate-x-5' : 'translate-x-0.5'
-                      }`} />
-                    </button>
-                  </div>
-                  <div className="col-span-2 text-center">
-                    <button
-                      onClick={() => toggleNotification(notif.id, 'sms')}
-                      className={`w-10 h-5 rounded-full transition-colors ${
-                        notif.sms ? 'bg-fuchsia' : 'bg-bg-tertiary'
-                      }`}
-                    >
-                      <span className={`block w-4 h-4 rounded-full bg-white transition-transform ${
-                        notif.sms ? 'translate-x-5' : 'translate-x-0.5'
-                      }`} />
-                    </button>
-                  </div>
-                </div>
-              ))}
+          <div className="space-y-2">
+            <div className="grid grid-cols-12 gap-2 text-xs font-medium text-text-muted px-3 py-2">
+              <div className="col-span-6">Preference</div>
+              <div className="col-span-2 text-center">Email</div>
+              <div className="col-span-2 text-center">Push</div>
+              <div className="col-span-2 text-center">SMS</div>
             </div>
-          )}
+            {notifications.map((notif) => (
+              <div key={notif.id} className="grid grid-cols-12 gap-2 items-center p-3 bg-bg-warm rounded-lg">
+                <div className="col-span-6">
+                  <div className="font-medium text-text-primary text-sm">{notif.label}</div>
+                  <div className="text-xs text-text-muted">{notif.description}</div>
+                </div>
+                <div className="col-span-2 text-center">
+                  <button
+                    onClick={() => toggleNotification(notif.id, 'email')}
+                    className={`w-10 h-5 rounded-full transition-colors ${
+                      notif.email ? 'bg-fuchsia' : 'bg-bg-tertiary'
+                    }`}
+                  >
+                    <span className={`block w-4 h-4 rounded-full bg-white transition-transform ${
+                      notif.email ? 'translate-x-5' : 'translate-x-0.5'
+                    }`} />
+                  </button>
+                </div>
+                <div className="col-span-2 text-center">
+                  <button
+                    onClick={() => toggleNotification(notif.id, 'push')}
+                    className={`w-10 h-5 rounded-full transition-colors ${
+                      notif.push ? 'bg-fuchsia' : 'bg-bg-tertiary'
+                    }`}
+                  >
+                    <span className={`block w-4 h-4 rounded-full bg-white transition-transform ${
+                      notif.push ? 'translate-x-5' : 'translate-x-0.5'
+                    }`} />
+                  </button>
+                </div>
+                <div className="col-span-2 text-center">
+                  <button
+                    onClick={() => toggleNotification(notif.id, 'sms')}
+                    className={`w-10 h-5 rounded-full transition-colors ${
+                      notif.sms ? 'bg-fuchsia' : 'bg-bg-tertiary'
+                    }`}
+                  >
+                    <span className={`block w-4 h-4 rounded-full bg-white transition-transform ${
+                      notif.sms ? 'translate-x-5' : 'translate-x-0.5'
+                    }`} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
@@ -167,32 +154,28 @@ export function CandidateSettingsPlusPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading integrations...</div>
-            ) : (
-              <div className="space-y-3">
-                {integrations.map((integration) => (
-                  <div key={integration.id} className="flex items-center justify-between p-3 bg-bg-warm rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center font-bold text-fuchsia">
-                        {integration.icon}
-                      </div>
-                      <div>
-                        <div className="font-medium text-text-primary text-sm">{integration.name}</div>
-                        <div className="text-xs text-text-muted">{integration.description}</div>
-                      </div>
+            <div className="space-y-3">
+              {integrations.map((integration) => (
+                <div key={integration.id} className="flex items-center justify-between p-3 bg-bg-warm rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center font-bold text-fuchsia">
+                      {integration.icon}
                     </div>
-                    <Button
-                      variant={integration.connected ? 'outline' : 'default'}
-                      size="sm"
-                      onClick={() => toggleIntegration(integration.id)}
-                    >
-                      {integration.connected ? 'Disconnect' : 'Connect'}
-                    </Button>
+                    <div>
+                      <div className="font-medium text-text-primary text-sm">{integration.name}</div>
+                      <div className="text-xs text-text-muted">{integration.description}</div>
+                    </div>
                   </div>
-                ))}
-              </div>
-            )}
+                  <Button
+                    variant={integration.connected ? 'outline' : 'default'}
+                    size="sm"
+                    onClick={() => toggleIntegration(integration.id)}
+                  >
+                    {integration.connected ? 'Disconnect' : 'Connect'}
+                  </Button>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 

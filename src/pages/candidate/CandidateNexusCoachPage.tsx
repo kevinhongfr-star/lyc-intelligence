@@ -5,8 +5,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Send, MessageSquare, Clock, Target, TrendingUp, Lightbulb, User } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getChatSessions, type ChatSession } from '@/services/supabaseApi';
 
 interface ChatMessage {
   id: string;
@@ -28,33 +29,67 @@ interface Insight {
   icon: React.ReactNode;
 }
 
-const QUICK_ACTIONS: QuickAction[] = [
+// Static content — quick actions are static UI prompts
+const STATIC_QUICK_ACTIONS: QuickAction[] = [
   { id: 'a1', label: 'Interview Prep', prompt: 'Help me prepare for an upcoming interview' },
   { id: 'a2', label: 'Negotiate Offer', prompt: 'I need help negotiating my compensation' },
   { id: 'a3', label: 'Career Path', prompt: 'What are my next career steps?' },
   { id: 'a4', label: 'Skill Gap', prompt: 'What skills should I develop next?' },
 ];
 
+// Static content — insights are static UI hints
+const STATIC_INSIGHTS: Insight[] = [
+  { id: 'i1', title: 'Interview Tomorrow', description: 'TechCorp VP Engineering final round at 10 AM', icon: <Target className="w-4 h-4" /> },
+  { id: 'i2', title: 'Skill Match', description: 'You match 92% of senior engineer roles', icon: <TrendingUp className="w-4 h-4" /> },
+  { id: 'i3', title: 'Profile Tip', description: 'Add 2 more projects to boost visibility by 40%', icon: <Lightbulb className="w-4 h-4" /> },
+];
+
 const INITIAL_MESSAGES: ChatMessage[] = [
   { id: 'm1', role: 'assistant', content: 'Hi! I\'m NEXUS Coach, your personal AI career advisor. I can help you with interview prep, career planning, skill development, and more. What would you like to work on today?', timestamp: 'Just now' },
+];
+
+const STATIC_TOPICS: string[] = [
+  'System design interview prep',
+  'Negotiating VP-level offers',
+  'Building executive presence',
+  'Networking strategies',
 ];
 
 export function CandidateNexusCoachPage() {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const { candidateProfile, profile } = useTenantContext();
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
+  const [sessionsError, setSessionsError] = useState<string | null>(null);
+  const { user, candidateProfile, profile } = useTenantContext();
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchSessions = async () => {
+      if (!user?.id) {
+        if (!cancelled) setSessionsLoading(false);
+        return;
+      }
+      try {
+        setSessionsError(null);
+        const data = await getChatSessions(user.id);
+        if (cancelled) return;
+        setSessions(data);
+      } catch (e) {
+        console.error('[CandidateNexusCoachPage] Error:', e);
+        if (!cancelled) setSessionsError('Failed to load chat sessions');
+      } finally {
+        if (!cancelled) setSessionsLoading(false);
+      }
+    };
+    fetchSessions();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const displayName = candidateProfile?.name || profile?.name || 'Candidate';
   const currentTitle = candidateProfile?.current_title || 'Professional';
 
-  const insights: Insight[] = [
-    { id: 'i1', title: 'Interview Tomorrow', description: 'TechCorp VP Engineering final round at 10 AM', icon: <Target className="w-4 h-4" /> },
-    { id: 'i2', title: 'Skill Match', description: 'You match 92% of senior engineer roles', icon: <TrendingUp className="w-4 h-4" /> },
-    { id: 'i3', title: 'Profile Tip', description: 'Add 2 more projects to boost visibility by 40%', icon: <Lightbulb className="w-4 h-4" /> },
-  ];
-
-  const handleSend = async () => {
+  const handleSend = () => {
     if (!inputValue.trim()) return;
 
     const userMessage: ChatMessage = {
@@ -66,9 +101,6 @@ export function CandidateNexusCoachPage() {
 
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
-    setIsTyping(true);
-
-    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const assistantMessage: ChatMessage = {
       id: `m${Date.now() + 1}`,
@@ -78,11 +110,16 @@ export function CandidateNexusCoachPage() {
     };
 
     setMessages((prev) => [...prev, assistantMessage]);
-    setIsTyping(false);
   };
 
   const handleQuickAction = (action: QuickAction) => {
     setInputValue(action.prompt);
+  };
+
+  const fmtSessionDate = (iso: string) => {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   return (
@@ -142,24 +179,10 @@ export function CandidateNexusCoachPage() {
                   </div>
                 </div>
               ))}
-              {isTyping && (
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-fuchsia-light flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-4 h-4 text-fuchsia" />
-                  </div>
-                  <div className="bg-bg-warm px-4 py-3 rounded-2xl rounded-tl-md">
-                    <div className="flex gap-1">
-                      <span className="w-2 h-2 bg-text-muted rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-2 h-2 bg-text-muted rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-2 h-2 bg-text-muted rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                  </div>
-                </div>
-              )}
             </CardContent>
             <div className="p-4 border-t border-border">
               <div className="flex gap-2 flex-wrap mb-3">
-                {QUICK_ACTIONS.map((action) => (
+                {STATIC_QUICK_ACTIONS.map((action) => (
                   <button
                     key={action.id}
                     onClick={() => handleQuickAction(action)}
@@ -195,7 +218,7 @@ export function CandidateNexusCoachPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {insights.map((insight) => (
+                {STATIC_INSIGHTS.map((insight) => (
                   <div key={insight.id} className="p-3 bg-bg-warm rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-fuchsia">{insight.icon}</span>
@@ -212,17 +235,47 @@ export function CandidateNexusCoachPage() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-fuchsia" />
-                <CardTitle>Recent Topics</CardTitle>
+                <CardTitle>Recent Sessions</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {sessionsLoading ? (
+                <div className="py-8 text-center text-text-muted text-sm">Loading sessions...</div>
+              ) : sessionsError ? (
+                <EmptyState title="Failed to load sessions" description={sessionsError} />
+              ) : sessions.length === 0 ? (
+                <EmptyState
+                  title="No chat sessions yet"
+                  description="Start a conversation with NEXUS Coach and your past sessions will appear here."
+                />
+              ) : (
+                <div className="space-y-2">
+                  {sessions.map((session) => (
+                    <button
+                      key={session.id}
+                      onClick={() => setInputValue(session.title)}
+                      className="w-full text-left px-3 py-2 hover:bg-bg-warm rounded-lg text-sm text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2"
+                    >
+                      <MessageSquare className="w-3 h-3 flex-shrink-0" />
+                      <span className="truncate flex-1">{session.title}</span>
+                      <span className="text-xs text-text-muted flex-shrink-0">{fmtSessionDate(session.updated_at || session.created_at)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-fuchsia" />
+                <CardTitle>Suggested Topics</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {[
-                  'System design interview prep',
-                  'Negotiating VP-level offers',
-                  'Building executive presence',
-                  'Networking strategies',
-                ].map((topic, i) => (
+                {STATIC_TOPICS.map((topic, i) => (
                   <button
                     key={i}
                     onClick={() => setInputValue(topic)}

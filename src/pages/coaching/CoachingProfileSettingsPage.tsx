@@ -5,8 +5,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Briefcase, Bell, Lock, Globe, Save, Edit2 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getSupabase } from '@/services/supabaseApi';
 
 interface UserProfile {
   name: string;
@@ -27,7 +28,7 @@ interface NotificationSetting {
   enabled: boolean;
 }
 
-const MOCK_NOTIFICATIONS: NotificationSetting[] = [
+const STATIC_NOTIFICATIONS: NotificationSetting[] = [
   { id: 'n1', label: 'Session Reminders', description: 'Get notified 1 hour before coaching sessions', enabled: true },
   { id: 'n2', label: 'Weekly Progress Reports', description: 'Receive weekly progress summary emails', enabled: true },
   { id: 'n3', label: 'New Resources', description: 'Be notified when new resources are added', enabled: false },
@@ -37,29 +38,67 @@ const MOCK_NOTIFICATIONS: NotificationSetting[] = [
 
 export function CoachingProfileSettingsPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [notifications, setNotifications] = useState<NotificationSetting[]>([]);
+  const [notifications, setNotifications] = useState<NotificationSetting[]>(STATIC_NOTIFICATIONS);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
-  const { profile: authProfile } = useTenantContext();
+  const { profile: authProfile, candidateProfile } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setProfile({
-        name: authProfile?.name || 'Coachee User',
-        email: authProfile?.email || 'coachee@example.com',
-        phone: '+1 (555) 123-4567',
-        location: 'San Francisco, CA',
-        title: 'Senior Engineering Manager',
-        company: 'TechCorp Inc.',
-        bio: 'Passionate engineering leader with 10+ years of experience building scalable systems and high-performing teams.',
-        timezone: 'America/Los_Angeles',
-        language: 'English',
-      });
-      setNotifications(MOCK_NOTIFICATIONS);
+    const contactId = candidateProfile?.id || authProfile?.id;
+    if (!contactId) {
       setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [authProfile]);
+      setError('Unable to identify your contact record.');
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const sb = getSupabase();
+        const { data, error: sbError } = await sb
+          .from('contacts')
+          .select('*, company:companies(*)')
+          .eq('id', contactId)
+          .single();
+        if (cancelled) return;
+        if (sbError || !data) {
+          console.error('[CoachingProfileSettingsPage] Error:', sbError);
+          setError('Failed to load profile');
+          setLoading(false);
+          return;
+        }
+        const c = data as {
+          name?: string | null;
+          email?: string | null;
+          phone?: string | null;
+          location?: string | null;
+          city?: string | null;
+          current_title?: string | null;
+          summary?: string | null;
+          bio?: string | null;
+          company?: { name?: string | null } | null;
+        };
+        setProfile({
+          name: c.name || candidateProfile?.name || 'Coachee User',
+          email: c.email || candidateProfile?.email || '',
+          phone: c.phone ?? '',
+          location: c.location || c.city || candidateProfile?.location || '',
+          title: c.current_title || candidateProfile?.current_title || '',
+          company: c.company?.name || '',
+          bio: c.bio || c.summary || '',
+          timezone: 'America/Los_Angeles',
+          language: 'English',
+        });
+        setError(null);
+      } catch (e) {
+        console.error('[CoachingProfileSettingsPage] Error:', e);
+        if (!cancelled) setError('Failed to load profile');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [candidateProfile, authProfile]);
 
   const displayName = authProfile?.name || 'Coachee';
   const tier = authProfile?.tier || 'Professional';
@@ -118,7 +157,9 @@ export function CoachingProfileSettingsPage() {
           <CardContent>
             {loading ? (
               <div className="py-8 text-center text-text-muted text-sm">Loading profile...</div>
-            ) : profile ? (
+            ) : error || !profile ? (
+              <EmptyState title="Profile unavailable" description={error || 'We could not load your profile information.'} />
+            ) : (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -181,7 +222,7 @@ export function CoachingProfileSettingsPage() {
                   />
                 </div>
               </div>
-            ) : null}
+            )}
           </CardContent>
         </Card>
 
@@ -258,30 +299,26 @@ export function CoachingProfileSettingsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading settings...</div>
-          ) : (
-            <div className="space-y-3">
-              {notifications.map((setting) => (
-                <div key={setting.id} className="flex items-center justify-between p-4 bg-bg-warm rounded-lg">
-                  <div>
-                    <div className="font-medium text-text-primary text-sm">{setting.label}</div>
-                    <div className="text-xs text-text-muted mt-1">{setting.description}</div>
-                  </div>
-                  <button
-                    onClick={() => toggleNotification(setting.id)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      setting.enabled ? 'bg-fuchsia' : 'bg-bg-tertiary'
-                    }`}
-                  >
-                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                      setting.enabled ? 'left-7' : 'left-1'
-                    }`} />
-                  </button>
+          <div className="space-y-3">
+            {notifications.map((setting) => (
+              <div key={setting.id} className="flex items-center justify-between p-4 bg-bg-warm rounded-lg">
+                <div>
+                  <div className="font-medium text-text-primary text-sm">{setting.label}</div>
+                  <div className="text-xs text-text-muted mt-1">{setting.description}</div>
                 </div>
-              ))}
-            </div>
-          )}
+                <button
+                  onClick={() => toggleNotification(setting.id)}
+                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                    setting.enabled ? 'bg-fuchsia' : 'bg-bg-tertiary'
+                  }`}
+                >
+                  <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                    setting.enabled ? 'left-7' : 'left-1'
+                  }`} />
+                </button>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>

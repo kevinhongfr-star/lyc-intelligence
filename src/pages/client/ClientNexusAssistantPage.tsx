@@ -5,8 +5,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Send, Sparkles, Clock, FileText, Users, Briefcase, User } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getChatSessions, type ChatSession } from '@/services/supabaseApi';
 
 interface ChatMessage {
   id: string;
@@ -35,7 +36,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   { id: 'a4', label: 'Market trends', icon: <Sparkles className="w-4 h-4" /> },
 ];
 
-const MOCK_INSIGHTS: InsightCard[] = [
+const STATIC_INSIGHTS: InsightCard[] = [
   { id: 'i1', title: 'High-Demand Skills', description: 'Cloud Architecture and AI/ML Engineering show 25% increased demand this quarter.', type: 'trend' },
   { id: 'i2', title: 'Pipeline Alert', description: '3 candidates in your VP Engineering pipeline have upcoming expirations.', type: 'alert' },
   { id: 'i3', title: 'Talent Opportunity', description: 'Identified 5 highly-scored candidates matching your CFO mandate criteria.', type: 'opportunity' },
@@ -49,17 +50,28 @@ export function ClientNexusAssistantPage() {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [insights, setInsights] = useState<InsightCard[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { clientAccount, profile } = useTenantContext();
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
+  const { clientAccount, profile, user } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setInsights(MOCK_INSIGHTS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    if (!user?.id) {
+      setSessionsLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getChatSessions(user.id);
+        if (!cancelled) setSessions(data);
+      } catch (e) {
+        console.error('[ClientNexusAssistantPage] Error:', e);
+      } finally {
+        if (!cancelled) setSessionsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const handleSend = async () => {
     if (!inputValue.trim()) return;
@@ -213,15 +225,40 @@ export function ClientNexusAssistantPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {loading ? (
-                <div className="py-8 text-center text-text-muted text-sm">Loading insights...</div>
+              <div className="space-y-3">
+                {STATIC_INSIGHTS.map((insight) => (
+                  <div key={insight.id} className={`p-3 rounded-lg border ${typeColors[insight.type]}`}>
+                    <div className="font-medium text-sm mb-1">{insight.title}</div>
+                    <div className="text-xs opacity-80">{insight.description}</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-fuchsia" />
+                <CardTitle>Recent Sessions</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {sessionsLoading ? (
+                <div className="py-8 text-center text-text-muted text-sm">Loading sessions...</div>
+              ) : sessions.length === 0 ? (
+                <EmptyState title="No chat sessions" description="Start a conversation with NEXUS to see your session history here." />
               ) : (
-                <div className="space-y-3">
-                  {insights.map((insight) => (
-                    <div key={insight.id} className={`p-3 rounded-lg border ${typeColors[insight.type]}`}>
-                      <div className="font-medium text-sm mb-1">{insight.title}</div>
-                      <div className="text-xs opacity-80">{insight.description}</div>
-                    </div>
+                <div className="space-y-2">
+                  {sessions.map((session) => (
+                    <button
+                      key={session.id}
+                      onClick={() => setInputValue(session.title)}
+                      className="w-full text-left px-3 py-2 hover:bg-bg-warm rounded-lg text-sm text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2"
+                    >
+                      <MessageSquare className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">{session.title}</span>
+                    </button>
                   ))}
                 </div>
               )}

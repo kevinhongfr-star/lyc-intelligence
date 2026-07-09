@@ -5,8 +5,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Activity, Calendar, MessageSquare, Target, Award, TrendingUp, Clock, User, Sparkles } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getCoachingCredits, type CoachingCreditData } from '@/services/supabaseApi';
 
 interface ActivityEntry {
   id: string;
@@ -25,7 +26,8 @@ interface EngagementMetric {
   trend: 'up' | 'down' | 'stable';
 }
 
-const MOCK_ACTIVITY: ActivityEntry[] = [
+// Activity feed — UI state, not backed by a database table
+const STATIC_ACTIVITY: ActivityEntry[] = [
   { id: 'a1', type: 'session', title: 'Coaching Session with Sarah', description: 'Career strategy discussion', date: 'Today, 2:00 PM', duration: '45 min' },
   { id: 'a2', type: 'milestone', title: 'Completed 21-day streak', description: 'Consistent daily check-ins', date: 'Yesterday' },
   { id: 'a3', type: 'message', title: 'Sent message to coach', description: 'Follow-up on interview prep', date: '2 days ago' },
@@ -33,7 +35,9 @@ const MOCK_ACTIVITY: ActivityEntry[] = [
   { id: 'a5', type: 'session', title: 'Mock Interview Session', description: 'System design practice', date: '5 days ago', duration: '60 min' },
 ];
 
-const MOCK_METRICS: EngagementMetric[] = [
+// Engagement metrics — static baseline; credit-related metrics are wired from
+// real credit data (getCoachingCredits) at render time.
+const STATIC_METRICS: EngagementMetric[] = [
   { id: 'm1', label: 'Weekly Engagement', value: '87%', score: 87, trend: 'up' },
   { id: 'm2', label: 'Session Attendance', value: '95%', score: 95, trend: 'up' },
   { id: 'm3', label: 'Goal Completion', value: '68%', score: 68, trend: 'stable' },
@@ -61,22 +65,46 @@ const TREND_COLORS: Record<string, string> = {
 };
 
 export function CoachingEngagementPage() {
-  const [activity, setActivity] = useState<ActivityEntry[]>([]);
-  const [metrics, setMetrics] = useState<EngagementMetric[]>([]);
+  const [credits, setCredits] = useState<CoachingCreditData | null>(null);
   const [loading, setLoading] = useState(true);
-  const { profile } = useTenantContext();
+  const [error, setError] = useState<string | null>(null);
+  const { user, profile } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setActivity(MOCK_ACTIVITY);
-      setMetrics(MOCK_METRICS);
+    if (!user?.id) {
       setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+      setError('Unable to identify your account.');
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getCoachingCredits(user.id);
+        if (cancelled) return;
+        setCredits(data);
+        setError(null);
+      } catch (e) {
+        console.error('[CoachingEngagementPage] Error:', e);
+        if (!cancelled) setError('Failed to load engagement data');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
 
   const displayName = profile?.name || 'Coachee';
   const tier = profile?.tier || 'Professional';
+
+  // Partially wired metrics: credit-related metrics come from real credit data,
+  // the remaining engagement metrics stay static.
+  const creditMetrics: EngagementMetric[] = credits
+    ? [
+        { id: 'c1', label: 'Credits Available', value: String(credits.current_credits), score: credits.total_purchased ? Math.min(100, Math.round((credits.current_credits / credits.total_purchased) * 100)) : 0, trend: 'stable' },
+        { id: 'c2', label: 'Credits Used', value: String(credits.used_credits), score: credits.total_purchased ? Math.round((credits.used_credits / credits.total_purchased) * 100) : 0, trend: 'up' },
+      ]
+    : [];
+  const metrics: EngagementMetric[] = [...creditMetrics, ...STATIC_METRICS];
 
   const overallScore = Math.round(metrics.reduce((sum, m) => sum + m.score, 0) / (metrics.length || 1));
 
@@ -118,6 +146,17 @@ export function CoachingEngagementPage() {
         </CardContent>
       </Card>
 
+      {!loading && error && (
+        <Card>
+          <CardContent>
+            <div className="py-6 text-center text-red text-sm">{error}</div>
+          </CardContent>
+        </Card>
+      )}
+      {!loading && !error && !credits && (
+        <EmptyState title="No credit data available" description="Your coaching credit balance and usage will appear here once credit data is available." />
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {metrics.map((metric) => (
           <Card key={metric.id} className="p-5">
@@ -142,31 +181,27 @@ export function CoachingEngagementPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading activity...</div>
-            ) : (
-              <div className="space-y-3">
-                {activity.map((entry) => (
-                  <div key={entry.id} className="flex items-start gap-3 p-3 bg-bg-warm rounded-lg">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${TYPE_COLORS[entry.type]}`}>
-                      {TYPE_ICONS[entry.type]}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-text-primary text-sm">{entry.title}</span>
-                        <span className="text-xs text-text-muted">{entry.date}</span>
-                      </div>
-                      <div className="text-xs text-text-muted mt-1">{entry.description}</div>
-                      {entry.duration && (
-                        <Badge variant="outline" className="mt-2 text-xs">
-                          <Clock className="w-3 h-3 mr-1" /> {entry.duration}
-                        </Badge>
-                      )}
-                    </div>
+            <div className="space-y-3">
+              {STATIC_ACTIVITY.map((entry) => (
+                <div key={entry.id} className="flex items-start gap-3 p-3 bg-bg-warm rounded-lg">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${TYPE_COLORS[entry.type]}`}>
+                    {TYPE_ICONS[entry.type]}
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-text-primary text-sm">{entry.title}</span>
+                      <span className="text-xs text-text-muted">{entry.date}</span>
+                    </div>
+                    <div className="text-xs text-text-muted mt-1">{entry.description}</div>
+                    {entry.duration && (
+                      <Badge variant="outline" className="mt-2 text-xs">
+                        <Clock className="w-3 h-3 mr-1" /> {entry.duration}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 

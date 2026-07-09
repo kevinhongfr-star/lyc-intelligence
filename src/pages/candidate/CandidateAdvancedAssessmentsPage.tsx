@@ -5,14 +5,17 @@
  */
 import React, { useState, useEffect } from 'react';
 import { ClipboardCheck, Brain, Target, Award, Clock, Star, ArrowRight, BarChart3, User } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Progress } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Progress, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getAssessmentCatalog, getAssessmentInvitations, type AssessmentInvitation } from '@/services/supabaseApi';
+
+type AssessmentCategory = 'Cognitive' | 'Personality' | 'Skills' | 'Executive';
 
 interface Assessment {
   id: string;
   title: string;
   description: string;
-  category: 'Cognitive' | 'Personality' | 'Skills' | 'Executive';
+  category: AssessmentCategory;
   duration: number;
   questions: number;
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
@@ -20,15 +23,6 @@ interface Assessment {
   score?: number;
   icon: React.ReactNode;
 }
-
-const MOCK_ASSESSMENTS: Assessment[] = [
-  { id: 'a1', title: 'Executive Leadership Assessment', description: 'Comprehensive 360° leadership evaluation', category: 'Executive', duration: 90, questions: 120, difficulty: 'Expert', status: 'Completed', score: 88, icon: <Award className="w-5 h-5" /> },
-  { id: 'a2', title: 'Strategic Thinking Deep Dive', description: 'Case-based strategic reasoning evaluation', category: 'Cognitive', duration: 60, questions: 40, difficulty: 'Advanced', status: 'In Progress', icon: <Brain className="w-5 h-5" /> },
-  { id: 'a3', title: 'System Design Mastery', description: 'Senior+ engineering system design', category: 'Skills', duration: 120, questions: 15, difficulty: 'Expert', status: 'Available', icon: <Target className="w-5 h-5" /> },
-  { id: 'a4', title: 'EQ & Self-Awareness', description: 'Emotional intelligence profiling', category: 'Personality', duration: 45, questions: 80, difficulty: 'Intermediate', status: 'Available', icon: <BarChart3 className="w-5 h-5" /> },
-  { id: 'a5', title: 'Board Readiness', description: 'Director/VP level board competencies', category: 'Executive', duration: 75, questions: 60, difficulty: 'Expert', status: 'Available', icon: <Star className="w-5 h-5" /> },
-  { id: 'a6', title: 'Crisis Management Simulation', description: 'Real-time crisis decision scenarios', category: 'Cognitive', duration: 90, questions: 25, difficulty: 'Advanced', status: 'Available', icon: <ClipboardCheck className="w-5 h-5" /> },
-];
 
 const DIFFICULTY_COLORS: Record<string, string> = {
   Beginner: 'bg-green/10 text-green',
@@ -50,19 +44,83 @@ const STATUS_COLORS: Record<string, string> = {
   Completed: 'bg-green/10 text-green',
 };
 
+// Map an arbitrary catalog type string to one of the UI categories
+function categorizeType(type: string | null | undefined): AssessmentCategory {
+  const t = (type || '').toLowerCase();
+  if (!t) return 'Skills';
+  if (t.includes('exec') || t.includes('leader') || t.includes('prism')) return 'Executive';
+  if (t.includes('cognit') || t.includes('brain') || t.includes('forge') || t.includes('strategic')) return 'Cognitive';
+  if (t.includes('person') || t.includes('eq') || t.includes('mosaic') || t.includes('emotion')) return 'Personality';
+  return 'Skills';
+}
+
+function iconForCategory(category: AssessmentCategory): React.ReactNode {
+  switch (category) {
+    case 'Executive': return <Award className="w-5 h-5" />;
+    case 'Cognitive': return <Brain className="w-5 h-5" />;
+    case 'Personality': return <BarChart3 className="w-5 h-5" />;
+    default: return <Target className="w-5 h-5" />;
+  }
+}
+
 export function CandidateAdvancedAssessmentsPage() {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'All' | 'Cognitive' | 'Personality' | 'Skills' | 'Executive'>('All');
+  const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'All' | AssessmentCategory>('All');
   const { candidateProfile, profile } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setAssessments(MOCK_ASSESSMENTS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    let cancelled = false;
+    const fetchAssessments = async () => {
+      try {
+        setError(null);
+        const [catalog, invitations] = await Promise.all([
+          getAssessmentCatalog(),
+          candidateProfile?.id ? getAssessmentInvitations(candidateProfile.id) : Promise.resolve<AssessmentInvitation[]>([]),
+        ]);
+        if (cancelled) return;
+
+        // Build a lookup of invitation status by assessment_id (and assessment_type as fallback)
+        const invByAssessmentId = new Map<string, AssessmentInvitation>();
+        const invByType = new Map<string, AssessmentInvitation>();
+        for (const inv of invitations) {
+          if (inv.assessment_id) invByAssessmentId.set(inv.assessment_id, inv);
+          if (inv.assessment_type) invByType.set(inv.assessment_type.toLowerCase(), inv);
+        }
+
+        const mapped: Assessment[] = (catalog || []).map((c: any) => {
+          const category = categorizeType(c.type);
+          const inv = (c.id && invByAssessmentId.get(c.id)) || (c.type && invByType.get(String(c.type).toLowerCase())) || null;
+          let status: Assessment['status'] = 'Available';
+          if (inv) {
+            if (inv.status === 'completed') status = 'Completed';
+            else if (inv.status === 'viewed' || inv.status === 'sent' || inv.status === 'pending') status = 'In Progress';
+          }
+          return {
+            id: c.id ?? '',
+            title: c.title ?? 'Untitled Assessment',
+            description: c.description ?? '',
+            category,
+            duration: c.estimated_minutes ?? 0,
+            questions: 0,
+            difficulty: 'Advanced',
+            status,
+            icon: iconForCategory(category),
+          };
+        });
+
+        setAssessments(mapped);
+      } catch (e) {
+        console.error('[CandidateAdvancedAssessmentsPage] Error:', e);
+        if (!cancelled) setError('Failed to load assessments');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchAssessments();
+    return () => { cancelled = true; };
+  }, [candidateProfile?.id]);
 
   const displayName = candidateProfile?.name || profile?.name || 'Candidate';
   const currentTitle = candidateProfile?.current_title || 'Professional';
@@ -71,8 +129,10 @@ export function CandidateAdvancedAssessmentsPage() {
 
   const completed = assessments.filter(a => a.status === 'Completed').length;
   const inProgress = assessments.filter(a => a.status === 'In Progress').length;
-  const avgScore = assessments.filter(a => a.score).reduce((sum, a) => sum + (a.score || 0), 0) /
-    (assessments.filter(a => a.score).length || 1);
+  const scored = assessments.filter(a => a.score !== undefined);
+  const avgScore = scored.length
+    ? scored.reduce((sum, a) => sum + (a.score || 0), 0) / scored.length
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -160,6 +220,24 @@ export function CandidateAdvancedAssessmentsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
           <div className="col-span-full py-8 text-center text-text-muted text-sm">Loading assessments...</div>
+        ) : error ? (
+          <div className="col-span-full">
+            <EmptyState title="Failed to load assessments" description={error} />
+          </div>
+        ) : assessments.length === 0 ? (
+          <div className="col-span-full">
+            <EmptyState
+              title="No assessments available"
+              description="There are no assessments in the catalog right now. Check back later."
+            />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="col-span-full">
+            <EmptyState
+              title="No assessments in this category"
+              description="Try selecting a different category filter."
+            />
+          </div>
         ) : (
           filtered.map((assessment) => (
             <Card key={assessment.id} className="p-5 hover:shadow-card-hover transition-shadow">
@@ -177,10 +255,10 @@ export function CandidateAdvancedAssessmentsPage() {
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs text-text-muted mb-4">
                 <div className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> {assessment.duration} min
+                  <Clock className="w-3 h-3" /> {assessment.duration ? `${assessment.duration} min` : '—'}
                 </div>
                 <div className="flex items-center gap-1">
-                  <ClipboardCheck className="w-3 h-3" /> {assessment.questions} questions
+                  <ClipboardCheck className="w-3 h-3" /> {assessment.questions ? `${assessment.questions} questions` : '—'}
                 </div>
               </div>
               {assessment.score !== undefined && (

@@ -3,10 +3,12 @@
  * Renders inside AppShell → Outlet. Shows talent market insights,
  * skill trends, and competitive landscape.
  */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Brain, TrendingUp, Users, BarChart3, Globe, ArrowUpRight, ArrowDownRight, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Progress } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+
+// Static content — market intelligence analytics not backed by a direct table
 
 interface MarketTrend {
   id: string;
@@ -31,14 +33,14 @@ interface TalentPool {
   location: string;
 }
 
-const MOCK_TRENDS: MarketTrend[] = [
+const STATIC_TRENDS: MarketTrend[] = [
   { id: 't1', label: 'Active Candidates', value: '12.4K', change: 15, direction: 'up' },
   { id: 't2', label: 'Market Activity', value: 'High', change: 8, direction: 'up' },
   { id: 't3', label: 'Time-to-Hire', value: '42 days', change: -12, direction: 'down' },
   { id: 't4', label: 'Offer Acceptance', value: '78%', change: 5, direction: 'up' },
 ];
 
-const MOCK_SKILLS: SkillDemand[] = [
+const STATIC_SKILLS: SkillDemand[] = [
   { id: 's1', skill: 'Cloud Architecture', demand: 95, trend: 'increasing' },
   { id: 's2', skill: 'AI/ML Engineering', demand: 88, trend: 'increasing' },
   { id: 's3', skill: 'Data Strategy', demand: 72, trend: 'stable' },
@@ -47,7 +49,7 @@ const MOCK_SKILLS: SkillDemand[] = [
   { id: 's6', skill: 'DevOps', demand: 76, trend: 'decreasing' },
 ];
 
-const MOCK_POOLS: TalentPool[] = [
+const STATIC_POOLS: TalentPool[] = [
   { id: 'p1', title: 'VP Engineering — Bay Area', count: 45, avgScore: 92, location: 'San Francisco, CA' },
   { id: 'p2', title: 'CFO — FinTech', count: 28, avgScore: 88, location: 'New York, NY' },
   { id: 'p3', title: 'Head of Product — SaaS', count: 36, avgScore: 90, location: 'Remote' },
@@ -55,21 +57,7 @@ const MOCK_POOLS: TalentPool[] = [
 ];
 
 export function ClientTalentIntelPage() {
-  const [trends, setTrends] = useState<MarketTrend[]>([]);
-  const [skills, setSkills] = useState<SkillDemand[]>([]);
-  const [pools, setPools] = useState<TalentPool[]>([]);
-  const [loading, setLoading] = useState(true);
   const { clientAccount, profile } = useTenantContext();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setTrends(MOCK_TRENDS);
-      setSkills(MOCK_SKILLS);
-      setPools(MOCK_POOLS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const displayName = clientAccount?.name || profile?.name || 'Client User';
   const organization = clientAccount?.organization || 'Your Organization';
@@ -95,7 +83,7 @@ export function ClientTalentIntelPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {trends.map((trend) => (
+        {STATIC_TRENDS.map((trend) => (
           <Card key={trend.id} className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -126,26 +114,22 @@ export function ClientTalentIntelPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading skill data...</div>
-            ) : (
-              <div className="space-y-4">
-                {skills.map((item) => (
-                  <div key={item.id}>
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-text-primary">{item.skill}</span>
-                        <Badge variant="outline" className="text-xs">
-                          {item.trend}
-                        </Badge>
-                      </div>
-                      <span className="text-sm font-bold text-text-secondary">{item.demand}%</span>
+            <div className="space-y-4">
+              {STATIC_SKILLS.map((item) => (
+                <div key={item.id}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-text-primary">{item.skill}</span>
+                      <Badge variant="outline" className="text-xs">
+                        {item.trend}
+                      </Badge>
                     </div>
-                    <Progress value={item.demand} className="h-2" />
+                    <span className="text-sm font-bold text-text-secondary">{item.demand}%</span>
                   </div>
-                ))}
-              </div>
-            )}
+                  <Progress value={item.demand} className="h-2" />
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -157,27 +141,23 @@ export function ClientTalentIntelPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading talent pools...</div>
-            ) : (
-              <div className="space-y-3">
-                {pools.map((pool) => (
-                  <div key={pool.id} className="flex items-center justify-between p-3 bg-bg-warm rounded-lg">
-                    <div className="flex-1">
-                      <div className="font-medium text-text-primary text-sm">{pool.title}</div>
-                      <div className="text-xs text-text-muted mt-0.5 flex items-center gap-1">
-                        <Globe className="w-3 h-3" />
-                        {pool.location}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-text-primary">{pool.count}</div>
-                      <div className="text-xs text-fuchsia font-medium">Avg Score: {pool.avgScore}</div>
+            <div className="space-y-3">
+              {STATIC_POOLS.map((pool) => (
+                <div key={pool.id} className="flex items-center justify-between p-3 bg-bg-warm rounded-lg">
+                  <div className="flex-1">
+                    <div className="font-medium text-text-primary text-sm">{pool.title}</div>
+                    <div className="text-xs text-text-muted mt-0.5 flex items-center gap-1">
+                      <Globe className="w-3 h-3" />
+                      {pool.location}
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-text-primary">{pool.count}</div>
+                    <div className="text-xs text-fuchsia font-medium">Avg Score: {pool.avgScore}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>

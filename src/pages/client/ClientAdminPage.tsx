@@ -5,8 +5,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Shield, Users, Settings, Key, Lock, Activity, User, Edit, Trash2, Check, X } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getClientTeamMembers, type ClientTeamMember } from '@/services/supabaseApi';
 
 interface TeamMember {
   id: string;
@@ -24,15 +25,7 @@ interface SecuritySetting {
   enabled: boolean;
 }
 
-const MOCK_MEMBERS: TeamMember[] = [
-  { id: 'u1', name: 'Alex Chen', email: 'alex@techcorp.com', role: 'client_admin', status: 'Active', lastLogin: '2h ago' },
-  { id: 'u2', name: 'Sarah Kim', email: 'sarah@techcorp.com', role: 'client_user', status: 'Active', lastLogin: '5h ago' },
-  { id: 'u3', name: 'Michael Wong', email: 'michael@techcorp.com', role: 'client_user', status: 'Invited', lastLogin: '—' },
-  { id: 'u4', name: 'Emily Davis', email: 'emily@techcorp.com', role: 'client_user', status: 'Active', lastLogin: '1d ago' },
-  { id: 'u5', name: 'James Liu', email: 'james@techcorp.com', role: 'client_user', status: 'Inactive', lastLogin: '2w ago' },
-];
-
-const MOCK_SETTINGS: SecuritySetting[] = [
+const STATIC_SETTINGS: SecuritySetting[] = [
   { id: 's1', label: 'Two-Factor Authentication', description: 'Require 2FA for all user logins', enabled: true },
   { id: 's2', label: 'Session Timeout', description: 'Auto-logout after 30 minutes of inactivity', enabled: true },
   { id: 's3', label: 'IP Whitelisting', description: 'Restrict access to specific IP ranges', enabled: false },
@@ -43,20 +36,43 @@ const MOCK_SETTINGS: SecuritySetting[] = [
 
 export function ClientAdminPage() {
   const [members, setMembers] = useState<TeamMember[]>([]);
-  const [settings, setSettings] = useState<SecuritySetting[]>([]);
+  const [settings, setSettings] = useState<SecuritySetting[]>(STATIC_SETTINGS);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const { clientAccount, profile } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setMembers(MOCK_MEMBERS);
-      setSettings(MOCK_SETTINGS);
+    const organization = clientAccount?.organization;
+    if (!organization) {
       setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        setError(null);
+        const data = await getClientTeamMembers(organization);
+        if (cancelled) return;
+        const mapped: TeamMember[] = data.map((m: ClientTeamMember) => ({
+          id: m.id,
+          name: m.name,
+          email: m.email,
+          role: m.role,
+          status: m.is_active ? 'Active' : 'Inactive',
+          lastLogin: '—',
+        }));
+        setMembers(mapped);
+      } catch (e) {
+        console.error('[ClientAdminPage] Error:', e);
+        if (!cancelled) setError('Failed to load team members');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [clientAccount?.organization]);
 
   const filteredMembers = members.filter(m =>
     m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -126,7 +142,7 @@ export function ClientAdminPage() {
               <Shield className="w-5 h-5 text-green" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : settings.filter(s => s.enabled).length}</div>
+              <div className="text-2xl font-bold text-text-primary">{settings.filter(s => s.enabled).length}</div>
               <div className="text-xs text-text-muted">Security Features</div>
             </div>
           </div>
@@ -170,8 +186,10 @@ export function ClientAdminPage() {
             </div>
             {loading ? (
               <div className="py-8 text-center text-text-muted text-sm">Loading team members...</div>
+            ) : error ? (
+              <EmptyState title="Failed to load team members" description={error} />
             ) : filteredMembers.length === 0 ? (
-              <div className="py-8 text-center text-text-muted text-sm">No team members found.</div>
+              <EmptyState title="No team members found" description="No team members match your search." />
             ) : (
               <div className="space-y-3">
                 {filteredMembers.map((member) => (
@@ -227,11 +245,8 @@ export function ClientAdminPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading settings...</div>
-            ) : (
-              <div className="space-y-4">
-                {settings.map((setting) => (
+            <div className="space-y-4">
+              {settings.map((setting) => (
                   <div key={setting.id} className="flex items-center justify-between p-4 bg-bg-warm rounded-lg">
                     <div>
                       <div className="font-medium text-text-primary text-sm">{setting.label}</div>
@@ -249,8 +264,7 @@ export function ClientAdminPage() {
                     </button>
                   </div>
                 ))}
-              </div>
-            )}
+            </div>
           </CardContent>
         </Card>
       </div>
