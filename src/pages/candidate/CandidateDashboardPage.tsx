@@ -3,15 +3,23 @@
  * Renders inside AppShell → Outlet. Shows application status cards, upcoming
  * interviews, latest assessment results, and career progress.
  */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Briefcase, Calendar, ClipboardCheck, TrendingUp, ArrowRight, Clock, Video, MapPin, Star } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Progress } from '@/components/ui';
+import {
+  useCandidateApplications,
+  useCandidateInterviews,
+  useCandidateAssessments,
+  useCandidateProfile,
+} from '@/hooks/usePortalData';
+import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface ApplicationStatus {
   id: string;
   company: string;
   role: string;
-  status: 'Under Review' | 'Submitted to Client' | 'Interview Stage' | 'Offer Stage' | 'Placed';
+  status: string;
   progress: number;
   updatedAt: string;
 }
@@ -41,71 +49,116 @@ interface CareerGoal {
   progress: number;
 }
 
-const MOCK_APPLICATIONS: ApplicationStatus[] = [
-  { id: 'a1', company: 'TechCorp', role: 'VP Engineering', status: 'Interview Stage', progress: 60, updatedAt: '2025-01-15' },
-  { id: 'a2', company: 'FinScale', role: 'Chief Financial Officer', status: 'Submitted to Client', progress: 40, updatedAt: '2025-01-14' },
-  { id: 'a3', company: 'DataMesh', role: 'Head of Product', status: 'Under Review', progress: 20, updatedAt: '2025-01-10' },
-];
-
-const MOCK_INTERVIEWS: UpcomingInterview[] = [
-  { id: 'i1', company: 'TechCorp', role: 'VP Engineering', date: 'Jan 22, 2025', time: '10:00 AM', format: 'Video', location: 'Zoom' },
-  { id: 'i2', company: 'CloudPeak', role: 'CTO', date: 'Jan 24, 2025', time: '2:30 PM', format: 'On-site', location: 'Seattle, WA' },
-];
-
-const MOCK_ASSESSMENT: AssessmentResult = {
-  id: 'r1',
-  name: 'Leadership Archetype Assessment',
-  archetype: 'The Architect',
-  score: 87,
-  takenAt: '2025-01-08',
-  dimensions: [
-    { name: 'Strategic Vision', score: 92 },
-    { name: 'Execution', score: 84 },
-    { name: 'Influence', score: 78 },
-    { name: 'Resilience', score: 88 },
-  ],
-};
-
-const MOCK_GOALS: CareerGoal[] = [
-  { id: 'g1', label: 'Complete profile', progress: 100 },
-  { id: 'g2', label: 'Take baseline assessment', progress: 100 },
-  { id: 'g3', label: 'Apply to 3 target roles', progress: 67 },
-  { id: 'g4', label: 'Complete interview prep', progress: 45 },
-];
-
-const STATUS_COLORS: Record<ApplicationStatus['status'], string> = {
+const STATUS_COLORS: Record<string, string> = {
   'Under Review': 'bg-amber/10 text-amber',
   'Submitted to Client': 'bg-blue/10 text-blue',
   'Interview Stage': 'bg-fuchsia-light text-fuchsia',
   'Offer Stage': 'bg-green/10 text-green',
   'Placed': 'bg-green/10 text-green',
+  HIRED: 'bg-green/10 text-green',
+  PLACED: 'bg-green/10 text-green',
+  OFFER: 'bg-green/10 text-green',
+  OFFER_EXTENDED: 'bg-green/10 text-green',
+  INTERVIEW: 'bg-fuchsia-light text-fuchsia',
+  INTERVIEWING: 'bg-fuchsia-light text-fuchsia',
+  CLIENT: 'bg-blue/10 text-blue',
+  CLIENT_REVIEW: 'bg-blue/10 text-blue',
+  SWEEP: 'bg-amber/10 text-amber',
+  ACTIVE: 'bg-blue/10 text-blue',
+  REJECTED: 'bg-text-muted/10 text-text-muted',
 };
 
-export function CandidateDashboardPage() {
-  const [applications, setApplications] = useState<ApplicationStatus[]>([]);
-  const [interviews, setInterviews] = useState<UpcomingInterview[]>([]);
-  const [assessment, setAssessment] = useState<AssessmentResult | null>(null);
-  const [goals, setGoals] = useState<CareerGoal[]>([]);
-  const [loading, setLoading] = useState(true);
+function progressForStatus(status: string | null | undefined): number {
+  const s = (status || '').toUpperCase();
+  if (s === 'HIRED' || s === 'PLACED') return 100;
+  if (s === 'OFFER' || s === 'OFFER_EXTENDED') return 85;
+  if (s === 'INTERVIEW' || s === 'INTERVIEWING') return 60;
+  if (s === 'CLIENT' || s === 'CLIENT_REVIEW') return 40;
+  if (s === 'SWEEP' || s === 'ACTIVE') return 20;
+  if (s === 'REJECTED') return 100;
+  return 30;
+}
 
-  useEffect(() => {
-    // TODO: Replace with real API calls
-    const timer = setTimeout(() => {
-      setApplications(MOCK_APPLICATIONS);
-      setInterviews(MOCK_INTERVIEWS);
-      setAssessment(MOCK_ASSESSMENT);
-      setGoals(MOCK_GOALS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+function formatDateShort(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatTime(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+export function CandidateDashboardPage() {
+  const { data: profile } = useCandidateProfile();
+  const { data: rawApps, loading: appsLoading } = useCandidateApplications();
+  const { data: rawInterviews, loading: interviewsLoading } = useCandidateInterviews();
+  const { data: rawAssessments, loading: assessmentsLoading } = useCandidateAssessments();
+
+  // Derive profile completion from actual data signals (not a hardcoded goal list)
+  const fields = profile
+    ? [
+        !!profile.current_title,
+        !!profile.location || !!profile.country,
+        !!profile.skills && profile.skills.length > 0,
+        !!profile.years_of_experience,
+        !!profile.comp_current,
+        !!profile.headline,
+      ]
+    : [false];
+  const profileCompletion = Math.round((fields.filter(Boolean).length / fields.length) * 100);
+  const goals: CareerGoal[] = fields.map((done, i) => ({
+    id: `g${i}`,
+    label: ['Profile basics', 'Location set', 'Skills added', 'Years of experience', 'Comp disclosed', 'Headline written'][i] || `Field ${i + 1}`,
+    progress: done ? 100 : 0,
+  }));
+
+  // Map Supabase rows to UI shape
+  const applications: ApplicationStatus[] = (rawApps ?? []).map((a) => {
+    const company = a.mandate?.company?.name ?? '—';
+    const role = a.mandate?.title ?? '—';
+    const statusLabel = (a.status || '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    return {
+      id: a.id,
+      company,
+      role,
+      status: statusLabel,
+      progress: progressForStatus(a.status),
+      updatedAt: formatDateShort(a.updated_at),
+    };
+  });
+
+  const interviews: UpcomingInterview[] = (rawInterviews ?? []).map((iv) => ({
+    id: iv.id,
+    company: '—', // title is the event name; mandate join happens in dedicated view
+    role: iv.title || 'Interview',
+    date: formatDateShort(iv.start_time),
+    time: formatTime(iv.start_time),
+    format: iv.location?.toLowerCase().includes('zoom') || iv.location?.toLowerCase().includes('video') ? 'Video' : 'On-site',
+    location: iv.location || 'TBD',
+  }));
+
+  const latestAssessment = (rawAssessments ?? [])[0];
+  const assessment: AssessmentResult | null = latestAssessment
+    ? {
+        id: latestAssessment.id,
+        name: latestAssessment.assessment_type,
+        archetype: latestAssessment.archetype || 'Unclassified',
+        score: latestAssessment.composite_score ?? 0,
+        takenAt: formatDateShort(latestAssessment.created_at),
+        dimensions: Object.entries((latestAssessment.scores as Record<string, number>) || {}).map(([name, score]) => ({ name, score })),
+      }
+    : null;
+
+  const loading = appsLoading || interviewsLoading || assessmentsLoading;
 
   const activeCount = applications.length;
   const interviewCount = interviews.length;
   const assessmentCount = assessment ? 1 : 0;
-  const profileCompletion = goals.length
-    ? Math.round(goals.reduce((sum, g) => sum + g.progress, 0) / goals.length)
-    : 0;
 
   return (
     <div className="space-y-6">
@@ -186,7 +239,7 @@ export function CandidateDashboardPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
                         <span className="font-medium text-text-primary text-sm">{app.role}</span>
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded ${STATUS_COLORS[app.status]}`}>
+                        <span className={`px-2 py-0.5 text-xs font-medium rounded ${STATUS_COLORS[app.status] || 'bg-fuchsia-light text-fuchsia'}`}>
                           {app.status}
                         </span>
                       </div>

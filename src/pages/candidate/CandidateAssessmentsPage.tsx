@@ -3,9 +3,12 @@
  * Renders inside AppShell → Outlet. Shows available assessments to take and
  * completed results, switchable via tabs.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ClipboardCheck, Clock, HelpCircle, BarChart2, Star, Download, Play, ArrowRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Progress } from '@/components/ui';
+import { useCandidateAssessments } from '@/hooks/usePortalData';
+import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 type Tab = 'available' | 'completed';
 
@@ -32,56 +35,38 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'completed', label: 'Completed' },
 ];
 
-const MOCK_AVAILABLE: AvailableAssessment[] = [
+// Available assessments are catalog entries — backed by content/catalog table in future.
+// For now, render as static catalog so candidates see what's offered.
+const STATIC_AVAILABLE: AvailableAssessment[] = [
   { id: 'av1', name: 'Leadership Archetype Assessment', description: 'Discover your core leadership archetype and operating style.', duration: '25 min', questions: 40, category: 'Leadership' },
   { id: 'av2', name: 'Executive Reasoning Test', description: 'Measure strategic reasoning and complex problem-solving.', duration: '35 min', questions: 30, category: 'Cognitive' },
   { id: 'av3', name: 'Cross-Border Readiness Index', description: 'Assess readiness for international and cross-cultural roles.', duration: '20 min', questions: 28, category: 'Career' },
   { id: 'av4', name: 'Influence & Communication Profile', description: 'Map your influence style and stakeholder communication patterns.', duration: '18 min', questions: 24, category: 'Soft Skills' },
 ];
 
-const MOCK_COMPLETED: CompletedAssessment[] = [
-  {
-    id: 'c1',
-    name: 'Leadership Archetype Assessment',
-    archetype: 'The Architect',
-    score: 87,
-    takenAt: '2025-01-08',
-    dimensions: [
-      { name: 'Strategic Vision', score: 92 },
-      { name: 'Execution', score: 84 },
-      { name: 'Influence', score: 78 },
-      { name: 'Resilience', score: 88 },
-    ],
-  },
-  {
-    id: 'c2',
-    name: 'Influence & Communication Profile',
-    archetype: 'The Diplomat',
-    score: 79,
-    takenAt: '2024-12-15',
-    dimensions: [
-      { name: 'Persuasion', score: 82 },
-      { name: 'Active Listening', score: 88 },
-      { name: 'Conflict Resolution', score: 74 },
-    ],
-  },
-];
+function formatDateShort(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
 
 export function CandidateAssessmentsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('available');
-  const [available, setAvailable] = useState<AvailableAssessment[]>([]);
-  const [completed, setCompleted] = useState<CompletedAssessment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: raw, loading } = useCandidateAssessments();
 
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/candidate/assessments
-    const timer = setTimeout(() => {
-      setAvailable(MOCK_AVAILABLE);
-      setCompleted(MOCK_COMPLETED);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  // Available = static catalog (no API backing yet — CMS or assessments table when needed)
+  const available = STATIC_AVAILABLE;
+
+  // Completed = real assessment rows from Supabase (scoped to this candidate via RLS)
+  const completed: CompletedAssessment[] = (raw ?? []).map((a) => ({
+    id: a.id,
+    name: a.assessment_type,
+    archetype: a.archetype || 'Unclassified',
+    score: a.composite_score ?? 0,
+    takenAt: formatDateShort(a.created_at),
+    dimensions: Object.entries((a.scores as Record<string, number>) || {}).map(([name, score]) => ({ name, score })),
+  }));
 
   return (
     <div className="space-y-6">

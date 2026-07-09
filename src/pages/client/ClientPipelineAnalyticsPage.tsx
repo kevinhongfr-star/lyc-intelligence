@@ -1,32 +1,70 @@
 /**
  * ClientPipelineAnalyticsPage — B2B Client Portal pipeline analytics
- * Renders inside AppShell → Outlet.
+ * Renders inside AppShell → Outlet. Funnel data sourced from Supabase via useClientPipelineAnalytics (RLS-scoped).
  */
-import React from 'react';
-import { TrendingUp, Users, Clock, Target, BarChart3 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Progress } from '@/components/ui';
+import React, { useMemo } from 'react';
+import { TrendingUp, Users, Clock, Target } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
+import { useClientPipelineAnalytics, useClientMandates } from '@/hooks/usePortalData';
 
-const STAGES = [
-  { name: 'Sourcing', count: 48, percentage: 100, color: 'bg-blue' },
-  { name: 'Screening', count: 32, percentage: 67, color: 'bg-fuchsia' },
-  { name: 'Shortlisted', count: 15, percentage: 31, color: 'bg-amber' },
-  { name: 'Interview', count: 8, percentage: 17, color: 'bg-lens' },
-  { name: 'Offer', count: 3, percentage: 6, color: 'bg-green' },
-  { name: 'Placed', count: 2, percentage: 4, color: 'bg-green' },
+// Stage display order — matches how LYC teams use the pipeline
+const STAGE_DISPLAY_ORDER: { keys: string[]; label: string; color: string }[] = [
+  { keys: ['SWEEP', 'SOURCING', 'ACTIVE'], label: 'Sourcing', color: 'bg-blue' },
+  { keys: ['SCREEN', 'SCREENING', 'IN_REVIEW'], label: 'Screening', color: 'bg-fuchsia' },
+  { keys: ['SHORTLIST', 'SHORTLISTED', 'TIER1'], label: 'Shortlisted', color: 'bg-amber' },
+  { keys: ['INTERVIEW', 'INTERVIEWING', 'CLIENT'], label: 'Interview', color: 'bg-lens' },
+  { keys: ['OFFER', 'OFFER_EXTENDED'], label: 'Offer', color: 'bg-green' },
+  { keys: ['HIRED', 'PLACED'], label: 'Placed', color: 'bg-green' },
 ];
 
-const TRENDS = [
-  { month: 'Sep', candidates: 12, mandates: 3 },
-  { month: 'Oct', candidates: 18, mandates: 4 },
-  { month: 'Nov', candidates: 24, mandates: 5 },
-  { month: 'Dec', candidates: 22, mandates: 5 },
-  { month: 'Jan', candidates: 30, mandates: 6 },
-];
+function stageCount(byStage: Record<string, number>, keys: string[]): number {
+  return keys.reduce((sum, k) => sum + (byStage[k] || 0), 0);
+}
 
 export function ClientPipelineAnalyticsPage() {
-  const maxCandidates = Math.max(...TRENDS.map(t => t.candidates));
-  const conversionRate = ((2 / 48) * 100).toFixed(1);
-  const avgTimeToPlace = 68;
+  const { data: pipeline, loading: pipelineLoading } = useClientPipelineAnalytics();
+  const { data: mandates } = useClientMandates();
+
+  // Derive funnel from real data
+  const stages = useMemo(() => {
+    const byStage = pipeline?.byStage ?? {};
+    const topCount = Math.max(
+      STAGE_DISPLAY_ORDER[0].keys.reduce((s, k) => s + (byStage[k] || 0), 0),
+      1
+    );
+    return STAGE_DISPLAY_ORDER.map((s) => {
+      const count = stageCount(byStage, s.keys);
+      return { name: s.label, count, percentage: Math.round((count / topCount) * 100), color: s.color };
+    });
+  }, [pipeline]);
+
+  const totalCandidates = pipeline?.total ?? 0;
+  const conversionRate = pipeline ? (pipeline.conversionRate * 100).toFixed(1) : '0.0';
+  // avgTimeToPlace not in current schema — show '—' to be honest
+  const avgTimeToPlace: number | null = null;
+
+  // Monthly trend stub: mandates created per month from updated_at
+  const trends = useMemo(() => {
+    const months: Record<string, { candidates: number; mandates: number }> = {};
+    const now = new Date();
+    for (let i = 4; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = d.toLocaleDateString('en-US', { month: 'short' });
+      months[key] = { candidates: 0, mandates: 0 };
+    }
+    for (const m of mandates ?? []) {
+      const d = new Date(m.updated_at);
+      if (isNaN(d.getTime())) continue;
+      const key = d.toLocaleDateString('en-US', { month: 'short' });
+      if (months[key]) {
+        months[key].mandates += 1;
+        months[key].candidates += m.total_candidates ?? 0;
+      }
+    }
+    return Object.entries(months).map(([month, v]) => ({ month, ...v }));
+  }, [mandates]);
+
+  const maxCandidates = Math.max(...trends.map((t) => t.candidates), 1);
 
   return (
     <div className="space-y-6">
@@ -43,7 +81,7 @@ export function ClientPipelineAnalyticsPage() {
               <Users className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">48</div>
+              <div className="text-2xl font-bold text-text-primary">{pipelineLoading ? '—' : totalCandidates}</div>
               <div className="text-xs text-text-muted">Total Candidates</div>
             </div>
           </div>
@@ -65,7 +103,7 @@ export function ClientPipelineAnalyticsPage() {
               <Clock className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{avgTimeToPlace}d</div>
+              <div className="text-2xl font-bold text-text-primary">{avgTimeToPlace == null ? '—' : `${avgTimeToPlace}d`}</div>
               <div className="text-xs text-text-muted">Avg. Time to Place</div>
             </div>
           </div>
@@ -76,7 +114,7 @@ export function ClientPipelineAnalyticsPage() {
               <TrendingUp className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">+25%</div>
+              <div className="text-2xl font-bold text-text-primary">—</div>
               <div className="text-xs text-text-muted">MoM Growth</div>
             </div>
           </div>
@@ -89,22 +127,28 @@ export function ClientPipelineAnalyticsPage() {
           <CardTitle>Pipeline Funnel</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {STAGES.map((stage) => (
-              <div key={stage.name}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-text-primary">{stage.name}</span>
-                  <span className="text-sm text-text-secondary">{stage.count} ({stage.percentage}%)</span>
+          {pipelineLoading ? (
+            <div className="py-8 text-center text-text-muted text-sm">Loading funnel...</div>
+          ) : totalCandidates === 0 ? (
+            <div className="py-8 text-center text-text-muted text-sm">No pipeline data yet.</div>
+          ) : (
+            <div className="space-y-4">
+              {stages.map((stage) => (
+                <div key={stage.name}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-text-primary">{stage.name}</span>
+                    <span className="text-sm text-text-secondary">{stage.count} ({stage.percentage}%)</span>
+                  </div>
+                  <div className="w-full h-3 bg-bg-warm rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${stage.color} rounded-full transition-all`}
+                      style={{ width: `${stage.percentage}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full h-3 bg-bg-warm rounded-full overflow-hidden">
-                  <div
-                    className={`h-full ${stage.color} rounded-full transition-all`}
-                    style={{ width: `${stage.percentage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -114,24 +158,28 @@ export function ClientPipelineAnalyticsPage() {
           <CardTitle>Monthly Trends</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-end justify-between gap-4 h-48">
-            {TRENDS.map((trend) => (
-              <div key={trend.month} className="flex-1 flex flex-col items-center gap-2">
-                <div className="w-full flex items-end justify-center h-32">
-                  <div
-                    className="w-8 bg-fuchsia rounded-t transition-all hover:bg-fuchsia/80 cursor-pointer relative group"
-                    style={{ height: `${(trend.candidates / maxCandidates) * 100}%` }}
-                  >
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-xs text-text-muted opacity-0 group-hover:opacity-100 transition-opacity">
-                      {trend.candidates}
-                    </span>
+          {trends.every((t) => t.candidates === 0 && t.mandates === 0) ? (
+            <div className="py-8 text-center text-text-muted text-sm">No trend data yet.</div>
+          ) : (
+            <div className="flex items-end justify-between gap-4 h-48">
+              {trends.map((trend) => (
+                <div key={trend.month} className="flex-1 flex flex-col items-center gap-2">
+                  <div className="w-full flex items-end justify-center h-32">
+                    <div
+                      className="w-8 bg-fuchsia rounded-t transition-all hover:bg-fuchsia/80 cursor-pointer relative group"
+                      style={{ height: `${Math.max(2, (trend.candidates / maxCandidates) * 100)}%` }}
+                    >
+                      <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-xs text-text-muted opacity-0 group-hover:opacity-100 transition-opacity">
+                        {trend.candidates}
+                      </span>
+                    </div>
                   </div>
+                  <span className="text-xs text-text-muted">{trend.month}</span>
+                  <span className="text-xs font-medium text-text-secondary">{trend.mandates} mandates</span>
                 </div>
-                <span className="text-xs text-text-muted">{trend.month}</span>
-                <span className="text-xs font-medium text-text-secondary">{trend.mandates} mandates</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
@@ -139,3 +187,4 @@ export function ClientPipelineAnalyticsPage() {
 }
 
 export default ClientPipelineAnalyticsPage;
+

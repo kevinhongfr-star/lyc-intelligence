@@ -1,50 +1,57 @@
 /**
  * ClientDocumentsPage — B2B Client Portal documents & billing
- * Renders inside AppShell → Outlet.
+ * Renders inside AppShell → Outlet. Data sourced from Supabase via useClientDocuments (RLS-scoped).
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FileText, Download, Calendar, RefreshCw, Search } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
+import { Card, Button, Input } from '@/components/ui';
+import { useClientDocuments } from '@/hooks/usePortalData';
 
 interface ClientDocument {
   id: string;
   title: string;
-  type: 'Report' | 'Invoice' | 'Contract' | 'Proposal';
+  type: string;
   date: string;
   size: string;
-  mandateId?: string;
+  mandateId?: string | null;
 }
 
-const MOCK_DOCS: ClientDocument[] = [
-  { id: 'd1', title: 'Talent Deep-Dive — VP Engineering Pipeline', type: 'Report', date: '2025-01-15', size: '2.4 MB', mandateId: 'm1' },
-  { id: 'd2', title: 'Q4 2024 Invoice — TechCorp', type: 'Invoice', date: '2025-01-05', size: '180 KB' },
-  { id: 'd3', title: 'Executive Search Agreement — FinScale', type: 'Contract', date: '2024-12-01', size: '450 KB', mandateId: 'm2' },
-  { id: 'd4', title: 'GRID Report — CTO CloudPeak', type: 'Report', date: '2025-01-12', size: '1.8 MB', mandateId: 'm4' },
-  { id: 'd5', title: 'Proposal — Head of Product DataMesh', type: 'Proposal', date: '2024-12-15', size: '620 KB', mandateId: 'm3' },
-];
+function formatDateShort(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
 
 const typeColors: Record<string, string> = {
   'Report': 'bg-fuchsia/10 text-fuchsia',
+  'REPORT': 'bg-fuchsia/10 text-fuchsia',
   'Invoice': 'bg-amber/10 text-amber',
+  'INVOICE': 'bg-amber/10 text-amber',
   'Contract': 'bg-blue/10 text-blue',
+  'CONTRACT': 'bg-blue/10 text-blue',
   'Proposal': 'bg-green/10 text-green',
+  'PROPOSAL': 'bg-green/10 text-green',
+  'Document': 'bg-fuchsia-light text-fuchsia',
+  'DOCUMENT': 'bg-fuchsia-light text-fuchsia',
+  'PDF': 'bg-fuchsia-light text-fuchsia',
 };
 
 export function ClientDocumentsPage() {
-  const [docs, setDocs] = useState<ClientDocument[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: raw, loading } = useClientDocuments();
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDocs(MOCK_DOCS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const docs: ClientDocument[] = (raw ?? []).map((d) => ({
+    id: d.id,
+    title: d.name,
+    type: d.type,
+    date: formatDateShort(d.created_at),
+    size: '—', // documents table does not track size in current schema
+    mandateId: d.mandate_id,
+  }));
 
-  const filteredDocs = docs.filter(d => {
+  const filteredDocs = docs.filter((d) => {
     const matchesSearch = d.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === 'all' || d.type === typeFilter;
     return matchesSearch && matchesType;
@@ -104,7 +111,7 @@ export function ClientDocumentsPage() {
                   <div className="flex-1">
                     <h3 className="text-sm font-medium text-text-primary">{doc.title}</h3>
                     <div className="flex items-center gap-3 mt-1 text-xs text-text-muted">
-                      <span className={`px-2 py-0.5 rounded ${typeColors[doc.type]}`}>{doc.type}</span>
+                      <span className={`px-2 py-0.5 rounded ${typeColors[doc.type] || 'bg-fuchsia-light text-fuchsia'}`}>{doc.type}</span>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         {doc.date}

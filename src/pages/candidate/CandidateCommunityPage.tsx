@@ -2,7 +2,7 @@
  * CandidateCommunityPage — Candidate Portal community forum
  * Renders inside AppShell → Outlet. Shows forum categories and a list of threads.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, MessageSquare, Users, Clock, Pin, ArrowRight, Plus } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Input, Button } from '@/components/ui';
 
@@ -26,7 +26,9 @@ interface ForumThread {
   excerpt: string;
 }
 
-const MOCK_CATEGORIES: ForumCategory[] = [
+// Community forum is content-driven (curated threads); no backing table yet.
+// A forum/threads table can be wired in a future ticket.
+const STATIC_CATEGORIES: ForumCategory[] = [
   { id: 'cat1', name: 'Career Strategy', description: 'Long-term planning, pivots, and growth paths', threadCount: 142, icon: '🎯' },
   { id: 'cat2', name: 'Interview Tips', description: 'Prep, frameworks, and shared experiences', threadCount: 98, icon: '🎤' },
   { id: 'cat3', name: 'Compensation', description: 'Offers, negotiation, and benchmarks', threadCount: 76, icon: '💰' },
@@ -35,7 +37,7 @@ const MOCK_CATEGORIES: ForumCategory[] = [
   { id: 'cat6', name: 'Community', description: 'Introductions, events, and peer support', threadCount: 41, icon: '🤝' },
 ];
 
-const MOCK_THREADS: ForumThread[] = [
+const STATIC_THREADS: ForumThread[] = [
   { id: 't1', title: 'How to frame a 6-month career gap in executive interviews', author: 'Sarah C.', category: 'Interview Tips', replies: 24, views: 412, lastActivity: '2h ago', pinned: true, excerpt: "After a sabbatical, I'm re-entering the market and wondering how senior leaders frame a gap without underselling..." },
   { id: 't2', title: 'VP Engineering comp benchmarks — Series B fintech, SF', author: 'Michael W.', category: 'Compensation', replies: 18, views: 287, lastActivity: '5h ago', pinned: false, excerpt: 'Got an offer at $380K base + 0.4% equity. Curious how this compares to recent Series B benchmarks...' },
   { id: 't3', title: 'Cross-border move: HK → Singapore, what I learned', author: 'Jia L.', category: 'Career Strategy', replies: 31, views: 540, lastActivity: '1d ago', pinned: false, excerpt: 'Sharing my relocation playbook and the negotiation levers that mattered most for an APAC move...' },
@@ -45,21 +47,10 @@ const MOCK_THREADS: ForumThread[] = [
 ];
 
 export function CandidateCommunityPage() {
-  const [categories, setCategories] = useState<ForumCategory[]>([]);
-  const [threads, setThreads] = useState<ForumThread[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [categories] = useState<ForumCategory[]>(STATIC_CATEGORIES);
+  const [threads] = useState<ForumThread[]>(STATIC_THREADS);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
-
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/candidate/community/threads
-    const timer = setTimeout(() => {
-      setCategories(MOCK_CATEGORIES);
-      setThreads(MOCK_THREADS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const filteredThreads = threads.filter((t) => {
     const matchesSearch =
@@ -88,10 +79,7 @@ export function CandidateCommunityPage() {
       {/* Categories */}
       <div>
         <div className="text-sm font-medium text-text-secondary mb-3">Categories</div>
-        {loading ? (
-          <div className="py-6 text-center text-text-muted text-sm">Loading categories...</div>
-        ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
             <button
               onClick={() => setActiveCategory('all')}
               className={`text-left p-4 border transition-colors ${activeCategory === 'all' ? 'border-fuchsia bg-fuchsia-light' : 'border-border bg-white hover:border-fuchsia'}`}
@@ -118,7 +106,6 @@ export function CandidateCommunityPage() {
               </button>
             ))}
           </div>
-        )}
       </div>
 
       {/* Search */}
@@ -138,9 +125,7 @@ export function CandidateCommunityPage() {
           <CardTitle>Recent Threads</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading threads...</div>
-          ) : sortedThreads.length === 0 ? (
+          {sortedThreads.length === 0 ? (
             <div className="py-8 text-center text-text-muted text-sm">No threads found.</div>
           ) : (
             <div className="space-y-1">

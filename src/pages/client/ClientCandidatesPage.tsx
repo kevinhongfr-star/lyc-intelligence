@@ -1,10 +1,11 @@
 /**
  * ClientCandidatesPage — B2B Client Portal candidate list
- * Renders inside AppShell → Outlet.
+ * Renders inside AppShell → Outlet. Data sourced from Supabase via useClientCandidates (RLS-scoped).
  */
-import React, { useState, useEffect } from 'react';
-import { Search, Star, Mail, Briefcase, MapPin } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Input } from '@/components/ui';
+import React, { useState } from 'react';
+import { Search, Star, Briefcase, MapPin } from 'lucide-react';
+import { Card, Input } from '@/components/ui';
+import { useClientCandidates } from '@/hooks/usePortalData';
 
 interface ClientCandidate {
   id: string;
@@ -12,21 +13,28 @@ interface ClientCandidate {
   title: string;
   company: string;
   location: string;
-  tier: 'S' | 'A' | 'B' | 'C';
-  status: 'New' | 'Screening' | 'Shortlisted' | 'Interview' | 'Offer' | 'Placed';
+  tier: 'S' | 'A' | 'B' | 'C' | string;
+  status: string;
   score: number;
   mandateId: string;
   mandateTitle: string;
 }
 
-const MOCK_CANDIDATES: ClientCandidate[] = [
-  { id: 'c1', name: 'Sarah Chen', title: 'VP Engineering', company: 'Meta', location: 'San Francisco', tier: 'S', status: 'Interview', score: 92, mandateId: 'm1', mandateTitle: 'VP Engineering — TechCorp' },
-  { id: 'c2', name: 'Michael Wong', title: 'CFO', company: 'Stripe', location: 'New York', tier: 'S', status: 'Shortlisted', score: 89, mandateId: 'm2', mandateTitle: 'CFO — FinScale' },
-  { id: 'c3', name: 'Emily Rodriguez', title: 'Head of Product', company: 'Airbnb', location: 'Remote', tier: 'A', status: 'Screening', score: 78, mandateId: 'm1', mandateTitle: 'VP Engineering — TechCorp' },
-  { id: 'c4', name: 'David Kim', title: 'CTO', company: 'Shopify', location: 'Seattle', tier: 'S', status: 'Offer', score: 95, mandateId: 'm4', mandateTitle: 'CTO — CloudPeak' },
-  { id: 'c5', name: 'Jessica Liu', title: 'VP Sales', company: 'HubSpot', location: 'Boston', tier: 'A', status: 'New', score: 72, mandateId: 'm4', mandateTitle: 'CTO — CloudPeak' },
-  { id: 'c6', name: 'Robert Taylor', title: 'VP Engineering', company: 'Google', location: 'San Francisco', tier: 'A', status: 'Shortlisted', score: 81, mandateId: 'm1', mandateTitle: 'VP Engineering — TechCorp' },
-];
+function tierFor(sweepTier: string | null | undefined, score: number | null): 'S' | 'A' | 'B' | 'C' {
+  // If sweep_tier is set, use it; otherwise derive from match_score.
+  const t = (sweepTier || '').toUpperCase();
+  if (t === 'S' || t === 'A' || t === 'B' || t === 'C') return t as 'S' | 'A' | 'B' | 'C';
+  if (score == null) return 'C';
+  if (score >= 90) return 'S';
+  if (score >= 80) return 'A';
+  if (score >= 70) return 'B';
+  return 'C';
+}
+
+function statusLabel(s: string | null | undefined): string {
+  if (!s) return 'New';
+  return s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 const tierColors: Record<string, string> = {
   S: 'bg-fuchsia text-white',
@@ -42,23 +50,35 @@ const statusColors: Record<string, string> = {
   'Interview': 'bg-lens/10 text-lens',
   'Offer': 'bg-green/10 text-green',
   'Placed': 'bg-green/10 text-green',
+  'Sweep': 'bg-blue/10 text-blue',
+  'Active': 'bg-blue/10 text-blue',
+  'Client': 'bg-fuchsia/10 text-fuchsia',
+  'Client Review': 'bg-fuchsia/10 text-fuchsia',
+  'Interviewing': 'bg-lens/10 text-lens',
+  'Offer Extended': 'bg-green/10 text-green',
+  'Hired': 'bg-green/10 text-green',
+  'Rejected': 'bg-text-muted/10 text-text-muted',
 };
 
 export function ClientCandidatesPage() {
-  const [candidates, setCandidates] = useState<ClientCandidate[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: raw, loading } = useClientCandidates();
   const [searchTerm, setSearchTerm] = useState('');
   const [tierFilter, setTierFilter] = useState('all');
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setCandidates(MOCK_CANDIDATES);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const candidates: ClientCandidate[] = (raw ?? []).map((c) => ({
+    id: c.id,
+    name: c.contact?.name ?? '—',
+    title: c.contact?.current_title ?? '—',
+    company: c.contact?.location ?? '—', // contact location, not company — adjust label
+    location: c.contact?.location ?? '—',
+    tier: tierFor(c.sweep_tier, c.match_score),
+    status: statusLabel(c.stage),
+    score: c.match_score ?? c.trident_composite ?? 0,
+    mandateId: c.mandate_id,
+    mandateTitle: c.mandate?.title ?? '—',
+  }));
 
-  const filteredCandidates = candidates.filter(c => {
+  const filteredCandidates = candidates.filter((c) => {
     const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesTier = tierFilter === 'all' || c.tier === tierFilter;
@@ -108,7 +128,7 @@ export function ClientCandidatesPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4 flex-1">
                   {/* Tier badge */}
-                  <div className={`w-10 h-10 rounded-lg ${tierColors[candidate.tier]} flex items-center justify-center font-bold text-sm`}>
+                  <div className={`w-10 h-10 rounded-lg ${tierColors[candidate.tier] || tierColors.C} flex items-center justify-center font-bold text-sm`}>
                     {candidate.tier}
                   </div>
 
@@ -116,7 +136,7 @@ export function ClientCandidatesPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-text-primary text-sm">{candidate.name}</span>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded ${statusColors[candidate.status]}`}>
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded ${statusColors[candidate.status] || 'bg-fuchsia-light text-fuchsia'}`}>
                         {candidate.status}
                       </span>
                     </div>

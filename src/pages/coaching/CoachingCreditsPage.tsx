@@ -2,10 +2,16 @@
  * CoachingCreditsPage — B2C Coaching Portal credits & plans
  * Renders inside AppShell → Outlet. Shows current credit balance, usage
  * history, and available plan tiers.
+ *
+ * Data sources:
+ *   - Credit balance: Supabase credits table via useCoacheeCredits (RLS)
+ *   - Usage history: static (no credit_transactions table in current schema — future ticket)
+ *   - Plan tiers: static (no plan_catalog table — future ticket)
  */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Coins, TrendingUp, Check, ArrowRight, Plus, Receipt } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Progress } from '@/components/ui';
+import { useCoacheeCredits } from '@/hooks/usePortalData';
 
 interface CreditBalance {
   current: number;
@@ -32,14 +38,7 @@ interface PlanTier {
   current?: boolean;
 }
 
-const MOCK_BALANCE: CreditBalance = {
-  current: 18,
-  reserved: 3,
-  expiresAt: '2025-03-31',
-  monthlyResetAt: '2025-02-01',
-};
-
-const MOCK_USAGE: UsageRecord[] = [
+const STATIC_USAGE: UsageRecord[] = [
   { id: 'u1', description: '1:1 Career Strategy Session', amount: -2, date: '2025-01-15', type: 'Session' },
   { id: 'u2', description: 'Monthly credit refresh', amount: 20, date: '2025-01-01', type: 'Top-up' },
   { id: 'u3', description: 'Leadership Assessment (SHIFT)', amount: -3, date: '2024-12-28', type: 'Assessment' },
@@ -48,7 +47,7 @@ const MOCK_USAGE: UsageRecord[] = [
   { id: 'u6', description: 'Credit top-up purchase', amount: 10, date: '2024-12-10', type: 'Top-up' },
 ];
 
-const MOCK_PLANS: PlanTier[] = [
+const STATIC_PLANS: PlanTier[] = [
   {
     id: 'starter',
     name: 'Starter',
@@ -74,25 +73,31 @@ const MOCK_PLANS: PlanTier[] = [
   },
 ];
 
-export function CoachingCreditsPage() {
-  const [balance, setBalance] = useState<CreditBalance | null>(null);
-  const [usage, setUsage] = useState<UsageRecord[]>([]);
-  const [plans, setPlans] = useState<PlanTier[]>([]);
-  const [loading, setLoading] = useState(true);
+function formatDate(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
 
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/coaching/credits
-    const timer = setTimeout(() => {
-      setBalance(MOCK_BALANCE);
-      setUsage(MOCK_USAGE);
-      setPlans(MOCK_PLANS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+export function CoachingCreditsPage() {
+  const { data: creditsData, loading: creditsLoading } = useCoacheeCredits();
+
+  // Map Supabase row to UI shape — defaults to zero balance for new users
+  const balance: CreditBalance = {
+    current: creditsData?.balance ?? 0,
+    reserved: creditsData?.reserved ?? 0,
+    expiresAt: creditsData?.last_daily_reset ? new Date(new Date(creditsData.last_daily_reset).getTime() + 60 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—',
+    monthlyResetAt: creditsData?.last_daily_reset ? new Date(new Date(creditsData.last_daily_reset).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—',
+  };
+
+  const usage = STATIC_USAGE;
+  const plans = STATIC_PLANS;
+  const loading = creditsLoading;
 
   const available = balance ? balance.current - balance.reserved : 0;
-  const usageRatio = balance ? Math.min(100, ((balance.current + 0) / 20) * 100) : 0;
+  // Display ratio against the static "Growth" plan baseline of 20 credits
+  const usageRatio = balance ? Math.min(100, (balance.current / 20) * 100) : 0;
 
   return (
     <div className="space-y-6">

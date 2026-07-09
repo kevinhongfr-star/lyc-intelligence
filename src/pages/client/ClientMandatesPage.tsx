@@ -1,16 +1,17 @@
 /**
  * ClientMandatesPage — B2B Client Portal mandate management
- * Renders inside AppShell → Outlet.
+ * Renders inside AppShell → Outlet. Data sourced from Supabase via useClientMandates (RLS-scoped).
  */
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, Target, Users, Calendar, ArrowRight, Building2 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Input } from '@/components/ui';
+import React, { useState } from 'react';
+import { Search, Calendar, Building2 } from 'lucide-react';
+import { Card, Input } from '@/components/ui';
+import { useClientMandates } from '@/hooks/usePortalData';
 
 interface ClientMandate {
   id: string;
   title: string;
   company: string;
-  status: 'Active' | 'On Hold' | 'Closed';
+  status: string;
   seniority: string;
   location: string;
   candidatesCount: number;
@@ -21,40 +22,55 @@ interface ClientMandate {
   updatedAt: string;
 }
 
-const MOCK_MANDATES: ClientMandate[] = [
-  { id: 'm1', title: 'VP Engineering', company: 'TechCorp', status: 'Active', seniority: 'VP', location: 'San Francisco', candidatesCount: 24, shortlisted: 8, interviewed: 4, progress: 65, startDate: '2024-11-01', updatedAt: '2025-01-15' },
-  { id: 'm2', title: 'Chief Financial Officer', company: 'FinScale', status: 'Active', seniority: 'C-Level', location: 'New York', candidatesCount: 18, shortlisted: 5, interviewed: 2, progress: 40, startDate: '2024-12-01', updatedAt: '2025-01-14' },
-  { id: 'm3', title: 'Head of Product', company: 'DataMesh', status: 'On Hold', seniority: 'Director', location: 'Remote', candidatesCount: 8, shortlisted: 2, interviewed: 0, progress: 20, startDate: '2024-12-15', updatedAt: '2025-01-10' },
-  { id: 'm4', title: 'CTO', company: 'CloudPeak', status: 'Active', seniority: 'C-Level', location: 'Seattle', candidatesCount: 32, shortlisted: 10, interviewed: 6, progress: 80, startDate: '2024-10-01', updatedAt: '2025-01-16' },
-  { id: 'm5', title: 'VP Sales', company: 'GrowthLab', status: 'Closed', seniority: 'VP', location: 'Boston', candidatesCount: 15, shortlisted: 3, interviewed: 2, progress: 100, startDate: '2024-08-01', updatedAt: '2024-12-20' },
-];
+function formatDateShort(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function progressForMandate(m: { total_candidates: number; tier1_count: number; interview_count: number; placed_count: number; shortlisted_count?: number; }): number {
+  const total = Math.max(m.total_candidates, 1);
+  const advanced = m.placed_count * 1.0 + m.interview_count * 0.6 + (m.tier1_count || 0) * 0.2;
+  return Math.min(100, Math.round((advanced / total) * 100));
+}
+
+const statusColors: Record<string, string> = {
+  'Active': 'bg-green/10 text-green',
+  'ACTIVE': 'bg-green/10 text-green',
+  'On Hold': 'bg-amber/10 text-amber',
+  'ON_HOLD': 'bg-amber/10 text-amber',
+  'Paused': 'bg-amber/10 text-amber',
+  'Closed': 'bg-text-muted/10 text-text-muted',
+  'CLOSED': 'bg-text-muted/10 text-text-muted',
+};
 
 export function ClientMandatesPage() {
-  const [mandates, setMandates] = useState<ClientMandate[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: raw, loading } = useClientMandates();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setMandates(MOCK_MANDATES);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const mandates: ClientMandate[] = (raw ?? []).map((m) => ({
+    id: m.id,
+    title: m.title,
+    company: m.company?.name ?? '—',
+    status: m.status || 'Active',
+    seniority: m.company?.industry ?? '—',
+    location: '—', // not joined in this query
+    candidatesCount: m.total_candidates ?? 0,
+    shortlisted: m.tier1_count ?? 0,
+    interviewed: m.interview_count ?? 0,
+    progress: progressForMandate(m),
+    startDate: formatDateShort(m.target_close_date),
+    updatedAt: formatDateShort(m.updated_at),
+  }));
 
-  const filteredMandates = mandates.filter(m => {
+  const filteredMandates = mandates.filter((m) => {
     const matchesSearch = m.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       m.company.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || m.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-
-  const statusColors: Record<string, string> = {
-    'Active': 'bg-green/10 text-green',
-    'On Hold': 'bg-amber/10 text-amber',
-    'Closed': 'bg-text-muted/10 text-text-muted',
-  };
 
   return (
     <div className="space-y-6">
@@ -105,7 +121,7 @@ export function ClientMandatesPage() {
                     <p className="text-xs text-text-muted">{mandate.company} · {mandate.location}</p>
                   </div>
                 </div>
-                <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[mandate.status]}`}>
+                <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[mandate.status] || 'bg-fuchsia-light text-fuchsia'}`}>
                   {mandate.status}
                 </span>
               </div>

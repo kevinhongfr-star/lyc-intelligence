@@ -2,8 +2,13 @@
  * CoachingCoachPage — B2C Coaching Portal coach dashboard
  * Renders inside AppShell → Outlet. Shows coach info, upcoming sessions,
  * session history, and streak tracking.
+ *
+ * Data sources:
+ *   - Upcoming sessions: Supabase events table via useCoacheeUpcomingSessions (RLS)
+ *   - Coach info / streak / history: static content (no coach_assignments table yet —
+ *     future ticket can wire to profiles.role = 'coach' join)
  */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Calendar,
   Video,
@@ -15,6 +20,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
+import { useCoacheeUpcomingSessions } from '@/hooks/usePortalData';
 
 interface CoachInfo {
   name: string;
@@ -47,7 +53,21 @@ interface SessionHistoryItem {
   notes: string;
 }
 
-const MOCK_COACH: CoachInfo = {
+function formatDateShort(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatTime(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+const STATIC_COACH: CoachInfo = {
   name: 'Dr. Amelia Reeves',
   title: 'Executive Career Coach',
   company: 'Former Partner, Spencer Stuart',
@@ -58,13 +78,7 @@ const MOCK_COACH: CoachInfo = {
   bio: 'Amelia has guided 300+ executives through career pivots and C-suite placements. She blends 15 years of executive search with evidence-based coaching frameworks.',
 };
 
-const MOCK_UPCOMING: UpcomingSession[] = [
-  { id: 'u1', title: 'Career Strategy Review', date: '2025-01-22', time: '10:00 AM', durationMin: 60, format: 'Video', status: 'Confirmed' },
-  { id: 'u2', title: 'Interview Prep — CFO Role', date: '2025-01-25', time: '2:30 PM', durationMin: 90, format: 'Video', status: 'Confirmed' },
-  { id: 'u3', title: 'Salary Negotiation Workshop', date: '2025-01-29', time: '4:00 PM', durationMin: 45, format: 'Video', status: 'Pending' },
-];
-
-const MOCK_HISTORY: SessionHistoryItem[] = [
+const STATIC_HISTORY: SessionHistoryItem[] = [
   { id: 'h1', title: 'LinkedIn Profile Optimization', date: '2025-01-15', durationMin: 60, outcome: 'Completed', rating: 5, notes: 'Refined headline and summary; aligned with VP Engineering target.' },
   { id: 'h2', title: 'Target Company Mapping', date: '2025-01-08', durationMin: 75, outcome: 'Completed', rating: 5, notes: 'Built a list of 12 high-fit companies with warm intro paths.' },
   { id: 'h3', title: 'Networking Outreach Drafting', date: '2024-12-20', durationMin: 45, outcome: 'Completed', rating: 4, notes: 'Drafted 8 outreach messages tailored to alumni network.' },
@@ -72,24 +86,24 @@ const MOCK_HISTORY: SessionHistoryItem[] = [
 ];
 
 export function CoachingCoachPage() {
-  const [coach, setCoach] = useState<CoachInfo | null>(null);
-  const [upcoming, setUpcoming] = useState<UpcomingSession[]>([]);
-  const [history, setHistory] = useState<SessionHistoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: rawSessions, loading: sessionsLoading } = useCoacheeUpcomingSessions();
 
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/coaching/coach
-    const timer = setTimeout(() => {
-      setCoach(MOCK_COACH);
-      setUpcoming(MOCK_UPCOMING);
-      setHistory(MOCK_HISTORY);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const coach: CoachInfo = STATIC_COACH;
+  const history: SessionHistoryItem[] = STATIC_HISTORY;
 
+  const upcoming: UpcomingSession[] = (rawSessions ?? []).map((s) => ({
+    id: s.id,
+    title: s.title,
+    date: formatDateShort(s.start_time),
+    time: formatTime(s.start_time),
+    durationMin: 60, // duration_min not in events schema; default to 60
+    format: (s.location || '').toLowerCase().includes('person') ? 'In-Person' : 'Video',
+    status: 'Confirmed',
+  }));
+
+  const loading = sessionsLoading;
   const streakDays = 21;
-  const completedCount = history.filter(h => h.outcome === 'Completed').length;
+  const completedCount = history.filter((h) => h.outcome === 'Completed').length;
   const avgRating =
     history.length > 0
       ? (history.reduce((sum, h) => sum + h.rating, 0) / history.length).toFixed(1)

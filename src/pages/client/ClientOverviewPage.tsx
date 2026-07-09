@@ -1,40 +1,54 @@
 /**
  * ClientOverviewPage — B2B Client Portal landing dashboard
  * Renders inside AppShell → Outlet. Shows mandate summary, pipeline metrics, and recent activity.
+ * Data sourced from Supabase via useClientMandates and useClientActivity (RLS-scoped).
  */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Briefcase, Users, TrendingUp, Clock, ArrowRight, Target } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui';
+import { useClientMandates, useClientActivity, useClientPipelineAnalytics } from '@/hooks/usePortalData';
 
 interface MandateSummary {
   id: string;
   title: string;
-  status: 'Active' | 'On Hold' | 'Closed';
+  status: string;
   candidatesCount: number;
   progress: number;
   updatedAt: string;
 }
 
-const MOCK_MANDATES: MandateSummary[] = [
-  { id: 'm1', title: 'VP Engineering — TechCorp', status: 'Active', candidatesCount: 24, progress: 65, updatedAt: '2025-01-15' },
-  { id: 'm2', title: 'CFO — FinScale', status: 'Active', candidatesCount: 18, progress: 40, updatedAt: '2025-01-14' },
-  { id: 'm3', title: 'Head of Product — DataMesh', status: 'On Hold', candidatesCount: 8, progress: 20, updatedAt: '2025-01-10' },
-];
+function formatDateShort(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function progressForMandate(m: { total_candidates: number; tier1_count: number; tier2_count: number; interview_count: number; placed_count: number; }): number {
+  // Pipeline progress = interview+ tier1 weighted. Simple heuristic without a stored progress %.
+  const total = Math.max(m.total_candidates, 1);
+  const advanced = m.placed_count * 1.0 + m.interview_count * 0.6 + m.tier1_count * 0.2;
+  return Math.min(100, Math.round((advanced / total) * 100));
+}
 
 export function ClientOverviewPage() {
-  const [mandates, setMandates] = useState<MandateSummary[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: rawMandates, loading: mandatesLoading } = useClientMandates();
+  const { data: activity, loading: activityLoading } = useClientActivity(6);
+  const { data: pipeline } = useClientPipelineAnalytics();
+  const placedThisQuarter = pipeline?.byStage['HIRED'] ?? pipeline?.byStage['PLACED'] ?? 0;
 
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/client/mandates
-    const timer = setTimeout(() => {
-      setMandates(MOCK_MANDATES);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const loading = mandatesLoading || activityLoading;
 
-  const activeCount = mandates.filter(m => m.status === 'Active').length;
+  const mandates: MandateSummary[] = (rawMandates ?? []).map((m) => ({
+    id: m.id,
+    title: m.title,
+    status: m.status || 'Active',
+    candidatesCount: m.total_candidates ?? 0,
+    progress: progressForMandate(m),
+    updatedAt: formatDateShort(m.updated_at),
+  }));
+
+  const activeCount = mandates.filter((m) => (m.status || '').toUpperCase() === 'ACTIVE').length;
   const totalCandidates = mandates.reduce((sum, m) => sum + m.candidatesCount, 0);
   const avgProgress = mandates.length
     ? Math.round(mandates.reduce((sum, m) => sum + m.progress, 0) / mandates.length)
@@ -89,8 +103,8 @@ export function ClientOverviewPage() {
               <TrendingUp className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">2</div>
-              <div className="text-xs text-text-muted">Placed This Quarter</div>
+              <div className="text-2xl font-bold text-text-primary">{placedThisQuarter}</div>
+              <div className="text-xs text-text-muted">Placed (All-time)</div>
             </div>
           </div>
         </Card>
@@ -146,23 +160,24 @@ export function ClientOverviewPage() {
           <CardTitle>Recent Activity</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {[
-              { action: 'New candidate added', detail: 'Sarah Chen — VP Engineering', time: '2h ago' },
-              { action: 'Interview scheduled', detail: 'Michael Wong — CFO, FinScale', time: '5h ago' },
-              { action: 'Report generated', detail: 'Talent Deep-Dive: TechCorp pipeline', time: '1d ago' },
-              { action: 'Mandate updated', detail: 'Head of Product — DataMesh put on hold', time: '3d ago' },
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-3 py-2 border-b border-border last:border-b-0">
-                <Clock className="w-4 h-4 text-text-muted mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <span className="text-sm text-text-primary font-medium">{item.action}</span>
-                  <span className="text-sm text-text-secondary ml-2">— {item.detail}</span>
+          {activityLoading ? (
+            <div className="py-8 text-center text-text-muted text-sm">Loading activity...</div>
+          ) : (activity ?? []).length === 0 ? (
+            <div className="py-8 text-center text-text-muted text-sm">No recent activity.</div>
+          ) : (
+            <div className="space-y-3">
+              {(activity ?? []).map((item) => (
+                <div key={item.id} className="flex items-start gap-3 py-2 border-b border-border last:border-b-0">
+                  <Clock className="w-4 h-4 text-text-muted mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <span className="text-sm text-text-primary font-medium">{item.title}</span>
+                    <span className="text-sm text-text-secondary ml-2">— {item.detail}</span>
+                  </div>
+                  <span className="text-xs text-text-muted flex-shrink-0">{formatDateShort(item.timestamp)}</span>
                 </div>
-                <span className="text-xs text-text-muted flex-shrink-0">{item.time}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

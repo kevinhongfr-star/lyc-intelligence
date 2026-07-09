@@ -3,7 +3,7 @@
  * Renders inside AppShell → Outlet. Shows prep tips by category and practice
  * questions with difficulty labels.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Lightbulb, BookOpen, CheckCircle2, ChevronRight, Video, FileText, Brain, Target, Star } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Progress } from '@/components/ui';
 
@@ -28,7 +28,9 @@ interface PrepChecklistItem {
   done: boolean;
 }
 
-const MOCK_TIPS: PrepTip[] = [
+// Interview prep content is instructional — backed by content/CMS in future.
+// For now, render as static catalog so candidates see practice material.
+const STATIC_TIPS: PrepTip[] = [
   {
     id: 'tip1',
     category: 'Behavioral',
@@ -71,7 +73,7 @@ const MOCK_TIPS: PrepTip[] = [
   },
 ];
 
-const MOCK_QUESTIONS: PracticeQuestion[] = [
+const STATIC_QUESTIONS: PracticeQuestion[] = [
   { id: 'q1', question: 'Tell me about a time you led a team through ambiguity.', category: 'Behavioral', difficulty: 'Medium', framework: 'STAR' },
   { id: 'q2', question: 'Describe a strategic decision you made with incomplete data.', category: 'Leadership', difficulty: 'Hard', framework: 'STAR + Trade-offs' },
   { id: 'q3', question: 'Estimate the market size for premium EVs in Southeast Asia.', category: 'Case Study', difficulty: 'Hard', framework: 'Market Sizing' },
@@ -88,31 +90,42 @@ const DIFFICULTY_COLORS: Record<PracticeQuestion['difficulty'], string> = {
   'Hard': 'bg-red/10 text-red',
 };
 
-const MOCK_CHECKLIST: PrepChecklistItem[] = [
-  { id: 'c1', label: 'Research the company and recent news', done: true },
-  { id: 'c2', label: 'Review the role spec and success profile', done: true },
-  { id: 'c3', label: 'Prepare 5 STAR stories with quantified results', done: true },
-  { id: 'c4', label: 'Practice 3 case studies out loud', done: false },
-  { id: 'c5', label: 'Prepare thoughtful questions for the interviewer', done: false },
-  { id: 'c6', label: 'Test video setup and environment', done: false },
-];
+// Checklist state lives in localStorage so progress persists across sessions.
+const CHECKLIST_KEY = 'lyc:interview_prep_checklist';
+
+function loadChecklist(): PrepChecklistItem[] {
+  try {
+    const raw = localStorage.getItem(CHECKLIST_KEY);
+    if (raw) return JSON.parse(raw) as PrepChecklistItem[];
+  } catch {
+    // localStorage unavailable (SSR or quota) — fall through
+  }
+  return [
+    { id: 'c1', label: 'Research the company and recent news', done: false },
+    { id: 'c2', label: 'Review the role spec and success profile', done: false },
+    { id: 'c3', label: 'Prepare 5 STAR stories with quantified results', done: false },
+    { id: 'c4', label: 'Practice 3 case studies out loud', done: false },
+    { id: 'c5', label: 'Prepare thoughtful questions for the interviewer', done: false },
+    { id: 'c6', label: 'Test video setup and environment', done: false },
+  ];
+}
+
+function saveChecklist(items: PrepChecklistItem[]) {
+  try { localStorage.setItem(CHECKLIST_KEY, JSON.stringify(items)); } catch { /* ignore */ }
+}
 
 export function CandidateInterviewPrepPage() {
-  const [tips, setTips] = useState<PrepTip[]>([]);
-  const [questions, setQuestions] = useState<PracticeQuestion[]>([]);
-  const [checklist, setChecklist] = useState<PrepChecklistItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [tips] = useState<PrepTip[]>(STATIC_TIPS);
+  const [questions] = useState<PracticeQuestion[]>(STATIC_QUESTIONS);
+  const [checklist, setChecklist] = useState<PrepChecklistItem[]>(() => loadChecklist());
 
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/candidate/interview-prep
-    const timer = setTimeout(() => {
-      setTips(MOCK_TIPS);
-      setQuestions(MOCK_QUESTIONS);
-      setChecklist(MOCK_CHECKLIST);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const toggleChecklistItem = (id: string) => {
+    setChecklist((prev) => {
+      const next = prev.map((c) => (c.id === id ? { ...c, done: !c.done } : c));
+      saveChecklist(next);
+      return next;
+    });
+  };
 
   const checklistDone = checklist.filter((c) => c.done).length;
   const checklistProgress = checklist.length ? Math.round((checklistDone / checklist.length) * 100) : 0;
@@ -133,25 +146,26 @@ export function CandidateInterviewPrepPage() {
             <CardTitle>Prep Checklist</CardTitle>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-6 text-center text-text-muted text-sm">Loading...</div>
-            ) : (
-              <>
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-text-secondary">{checklistDone}/{checklist.length} complete</span>
-                  <span className="text-fuchsia font-medium">{checklistProgress}%</span>
-                </div>
-                <Progress value={checklistProgress} className="mb-4" />
-                <div className="space-y-2">
-                  {checklist.map((item) => (
-                    <div key={item.id} className="flex items-start gap-2 text-sm">
-                      <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${item.done ? 'text-fuchsia' : 'text-text-muted'}`} />
-                      <span className={item.done ? 'text-text-muted line-through' : 'text-text-primary'}>{item.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+            <>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-text-secondary">{checklistDone}/{checklist.length} complete</span>
+                <span className="text-fuchsia font-medium">{checklistProgress}%</span>
+              </div>
+              <Progress value={checklistProgress} className="mb-4" />
+              <div className="space-y-2">
+                {checklist.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => toggleChecklistItem(item.id)}
+                    className="flex items-start gap-2 text-sm text-left w-full hover:bg-bg-warm transition-colors -mx-2 px-2 py-1"
+                  >
+                    <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${item.done ? 'text-fuchsia' : 'text-text-muted'}`} />
+                    <span className={item.done ? 'text-text-muted line-through' : 'text-text-primary'}>{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </>
           </CardContent>
         </Card>
 
@@ -188,10 +202,7 @@ export function CandidateInterviewPrepPage() {
           <Lightbulb className="w-4 h-4 text-fuchsia" />
           <h2 className="font-serif font-semibold text-lg text-text-primary">Tips by Category</h2>
         </div>
-        {loading ? (
-          <div className="py-6 text-center text-text-muted text-sm">Loading tips...</div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {tips.map((tip) => (
               <Card key={tip.id} className="p-5">
                 <div className="flex items-center gap-2 mb-3">
@@ -209,7 +220,6 @@ export function CandidateInterviewPrepPage() {
               </Card>
             ))}
           </div>
-        )}
       </div>
 
       {/* Practice questions */}
@@ -223,11 +233,8 @@ export function CandidateInterviewPrepPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading questions...</div>
-          ) : (
-            <div className="space-y-1">
-              {questions.map((q) => (
+          <div className="space-y-1">
+            {questions.map((q) => (
                 <div
                   key={q.id}
                   className="flex items-start gap-3 py-3 border-b border-border last:border-b-0 hover:bg-bg-warm transition-colors -mx-4 px-4"
@@ -247,7 +254,6 @@ export function CandidateInterviewPrepPage() {
                 </div>
               ))}
             </div>
-          )}
         </CardContent>
       </Card>
     </div>

@@ -2,9 +2,12 @@
  * CandidateApplicationsPage — Candidate Portal application tracker
  * Renders inside AppShell → Outlet. Lists active applications with status tracking.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, Briefcase, Users, Award, CheckCircle2, Building2, Calendar, MapPin, ArrowRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Input } from '@/components/ui';
+import { useCandidateApplications } from '@/hooks/usePortalData';
+import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 type ApplicationStatus =
   | 'Under Review'
@@ -20,53 +23,83 @@ interface CandidateApplication {
   role: string;
   seniority: string;
   location: string;
-  status: ApplicationStatus;
+  status: string;
   progress: number;
   submittedAt: string;
   updatedAt: string;
   nextStep: string;
 }
 
-const MOCK_APPLICATIONS: CandidateApplication[] = [
-  { id: 'a1', company: 'TechCorp', role: 'VP Engineering', seniority: 'VP', location: 'San Francisco', status: 'Interview Stage', progress: 60, submittedAt: '2025-01-05', updatedAt: '2025-01-15', nextStep: 'Final round interview on Jan 22' },
-  { id: 'a2', company: 'FinScale', role: 'Chief Financial Officer', seniority: 'C-Level', location: 'New York', status: 'Submitted to Client', progress: 40, submittedAt: '2025-01-02', updatedAt: '2025-01-14', nextStep: 'Awaiting client feedback' },
-  { id: 'a3', company: 'DataMesh', role: 'Head of Product', seniority: 'Director', location: 'Remote', status: 'Under Review', progress: 20, submittedAt: '2025-01-09', updatedAt: '2025-01-10', nextStep: 'Initial screening in progress' },
-  { id: 'a4', company: 'CloudPeak', role: 'CTO', seniority: 'C-Level', location: 'Seattle', status: 'Offer Stage', progress: 85, submittedAt: '2024-12-10', updatedAt: '2025-01-16', nextStep: 'Offer under review' },
-  { id: 'a5', company: 'GrowthLab', role: 'VP Sales', seniority: 'VP', location: 'Boston', status: 'Not Selected', progress: 100, submittedAt: '2024-11-01', updatedAt: '2024-12-20', nextStep: 'Closed — role filled' },
-];
+function progressForStatus(status: string | null | undefined): number {
+  const s = (status || '').toUpperCase();
+  if (s === 'HIRED' || s === 'PLACED') return 100;
+  if (s === 'OFFER' || s === 'OFFER_EXTENDED') return 85;
+  if (s === 'INTERVIEW' || s === 'INTERVIEWING') return 60;
+  if (s === 'CLIENT' || s === 'CLIENT_REVIEW') return 40;
+  if (s === 'SWEEP' || s === 'ACTIVE') return 20;
+  if (s === 'REJECTED') return 100;
+  return 30;
+}
 
-const STATUS_COLORS: Record<ApplicationStatus, string> = {
+function formatDateShort(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+const STATUS_COLORS: Record<string, string> = {
   'Under Review': 'bg-amber/10 text-amber',
   'Submitted to Client': 'bg-blue/10 text-blue',
   'Interview Stage': 'bg-fuchsia-light text-fuchsia',
   'Offer Stage': 'bg-green/10 text-green',
   'Placed': 'bg-green/10 text-green',
   'Not Selected': 'bg-text-muted/10 text-text-muted',
+  HIRED: 'bg-green/10 text-green',
+  PLACED: 'bg-green/10 text-green',
+  OFFER: 'bg-green/10 text-green',
+  OFFER_EXTENDED: 'bg-green/10 text-green',
+  INTERVIEW: 'bg-fuchsia-light text-fuchsia',
+  INTERVIEWING: 'bg-fuchsia-light text-fuchsia',
+  CLIENT: 'bg-blue/10 text-blue',
+  CLIENT_REVIEW: 'bg-blue/10 text-blue',
+  SWEEP: 'bg-amber/10 text-amber',
+  ACTIVE: 'bg-blue/10 text-blue',
+  REJECTED: 'bg-text-muted/10 text-text-muted',
 };
 
-const STATUS_OPTIONS: { value: 'all' | ApplicationStatus; label: string }[] = [
+const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: 'all', label: 'All Status' },
   { value: 'Under Review', label: 'Under Review' },
   { value: 'Submitted to Client', label: 'Submitted to Client' },
   { value: 'Interview Stage', label: 'Interview Stage' },
   { value: 'Offer Stage', label: 'Offer Stage' },
+  { value: 'Placed', label: 'Placed' },
   { value: 'Not Selected', label: 'Not Selected' },
 ];
 
 export function CandidateApplicationsPage() {
-  const [applications, setApplications] = useState<CandidateApplication[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: raw, loading } = useCandidateApplications();
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | ApplicationStatus>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/candidate/applications
-    const timer = setTimeout(() => {
-      setApplications(MOCK_APPLICATIONS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const applications: CandidateApplication[] = (raw ?? []).map((a) => {
+    const company = a.mandate?.company?.name ?? '—';
+    const role = a.mandate?.title ?? '—';
+    const statusLabel = (a.status || '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    return {
+      id: a.id,
+      company,
+      role,
+      seniority: a.priority || '—',
+      location: '—', // Mandate.location not joined in this query
+      status: statusLabel,
+      progress: progressForStatus(a.status),
+      submittedAt: formatDateShort(a.created_at),
+      updatedAt: formatDateShort(a.updated_at),
+      nextStep: a.notes || 'In progress',
+    };
+  });
 
   const filtered = applications.filter((a) => {
     const matchesSearch =
@@ -150,7 +183,7 @@ export function CandidateApplicationsPage() {
         </div>
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as 'all' | ApplicationStatus)}
+          onChange={(e) => setStatusFilter(e.target.value)}
           className="px-4 py-2 bg-white border border-border text-sm text-text-primary focus:outline-none focus:border-fuchsia"
         >
           {STATUS_OPTIONS.map((opt) => (
@@ -178,7 +211,7 @@ export function CandidateApplicationsPage() {
                     <p className="text-xs text-text-muted">{app.company} · {app.seniority} · {app.location}</p>
                   </div>
                 </div>
-                <span className={`px-2 py-1 text-xs font-medium rounded ${STATUS_COLORS[app.status]}`}>
+                <span className={`px-2 py-1 text-xs font-medium rounded ${STATUS_COLORS[app.status] || 'bg-fuchsia-light text-fuchsia'}`}>
                   {app.status}
                 </span>
               </div>

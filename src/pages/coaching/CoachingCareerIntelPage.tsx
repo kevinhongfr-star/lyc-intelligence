@@ -2,8 +2,12 @@
  * CoachingCareerIntelPage — B2C Coaching Portal career intelligence
  * Renders inside AppShell → Outlet. Shows skill assessments, market
  * insights, and salary benchmarks.
+ *
+ * Data sources:
+ *   - Skill assessments: derived from Supabase assessments table via useCandidateCareerIntel (RLS)
+ *   - Market insights / salary benchmarks: static (no market_data table in current schema — future ticket)
  */
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import {
   Brain,
   TrendingUp,
@@ -15,6 +19,7 @@ import {
   Award,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Progress } from '@/components/ui';
+import { useCandidateCareerIntel } from '@/hooks/usePortalData';
 
 interface SkillAssessment {
   id: string;
@@ -43,23 +48,14 @@ interface SalaryBenchmark {
   yourCurrent: number;
 }
 
-const MOCK_SKILLS: SkillAssessment[] = [
-  { id: 's1', skill: 'Strategic Leadership', score: 82, benchmark: 71, trend: 'up', category: 'Leadership' },
-  { id: 's2', skill: 'Stakeholder Management', score: 78, benchmark: 74, trend: 'up', category: 'Leadership' },
-  { id: 's3', skill: 'Financial Modeling', score: 65, benchmark: 70, trend: 'flat', category: 'Technical' },
-  { id: 's4', skill: 'Executive Presence', score: 88, benchmark: 69, trend: 'up', category: 'Communication' },
-  { id: 's5', skill: 'Data-Driven Decision Making', score: 72, benchmark: 75, trend: 'down', category: 'Analytical' },
-  { id: 's6', skill: 'Negotiation', score: 80, benchmark: 68, trend: 'up', category: 'Communication' },
-];
-
-const MOCK_INSIGHTS: MarketInsight[] = [
+const STATIC_INSIGHTS: MarketInsight[] = [
   { id: 'm1', role: 'VP Engineering', demandLevel: 'High', openings: 1240, growthRate: '+18% YoY', topLocations: ['San Francisco', 'New York', 'Remote'] },
   { id: 'm2', role: 'CFO', demandLevel: 'Moderate', openings: 480, growthRate: '+6% YoY', topLocations: ['New York', 'Chicago', 'Boston'] },
   { id: 'm3', role: 'Head of Product', demandLevel: 'High', openings: 890, growthRate: '+22% YoY', topLocations: ['San Francisco', 'Seattle', 'Remote'] },
   { id: 'm4', role: 'COO', demandLevel: 'Low', openings: 210, growthRate: '+2% YoY', topLocations: ['New York', 'London', 'Singapore'] },
 ];
 
-const MOCK_SALARIES: SalaryBenchmark[] = [
+const STATIC_SALARIES: SalaryBenchmark[] = [
   { id: 'sal1', role: 'VP Engineering', percentile25: 280000, percentile50: 340000, percentile75: 410000, yourCurrent: 315000 },
   { id: 'sal2', role: 'CFO', percentile25: 320000, percentile50: 390000, percentile75: 475000, yourCurrent: 360000 },
   { id: 'sal3', role: 'Head of Product', percentile25: 250000, percentile50: 305000, percentile75: 370000, yourCurrent: 298000 },
@@ -76,27 +72,38 @@ function formatCurrency(value: number): string {
 }
 
 export function CoachingCareerIntelPage() {
-  const [skills, setSkills] = useState<SkillAssessment[]>([]);
-  const [insights, setInsights] = useState<MarketInsight[]>([]);
-  const [salaries, setSalaries] = useState<SalaryBenchmark[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: intelData, loading: intelLoading } = useCandidateCareerIntel();
+  const insights = STATIC_INSIGHTS;
+  const salaries = STATIC_SALARIES;
+  const loading = intelLoading;
 
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/coaching/career-intel
-    const timer = setTimeout(() => {
-      setSkills(MOCK_SKILLS);
-      setInsights(MOCK_INSIGHTS);
-      setSalaries(MOCK_SALARIES);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  // Derive skill rows from the latest benchmark / log entries
+  const skills: SkillAssessment[] = useMemo(() => {
+    const benchmark = intelData?.benchmarks?.[0] as any;
+    if (!benchmark) return [];
+    const entries: SkillAssessment[] = [];
+    const scores = (benchmark.dimension_scores || benchmark.scores || {}) as Record<string, number>;
+    const peerBench = (benchmark.peer_benchmarks || {}) as Record<string, number>;
+    for (const [skill, score] of Object.entries(scores)) {
+      const numeric = typeof score === 'number' ? score : 0;
+      const peer = peerBench[skill] ?? 70; // default peer baseline
+      entries.push({
+        id: `b-${skill}`,
+        skill: skill.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+        score: numeric,
+        benchmark: peer,
+        trend: numeric > peer ? 'up' : numeric < peer ? 'down' : 'flat',
+        category: benchmark.category || 'General',
+      });
+    }
+    return entries;
+  }, [intelData]);
 
   const avgScore =
     skills.length > 0
       ? Math.round(skills.reduce((sum, s) => sum + s.score, 0) / skills.length)
       : 0;
-  const aboveBenchmark = skills.filter(s => s.score >= s.benchmark).length;
+  const aboveBenchmark = skills.filter((s) => s.score >= s.benchmark).length;
 
   return (
     <div className="space-y-6">
