@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from '@/stores/toastStore';
-import { useNavigate } from 'react-router-dom';
 import { ArrowRight, BarChart3, Shield, Loader2, Upload, Database, FileText, Plus } from 'lucide-react';
 import { JDInput } from '../components/match/JDInput';
 import { CandidateList } from '../components/match/CandidateList';
@@ -10,6 +10,7 @@ import { useAuthStore } from '../stores/authStore';
 import { ContactSelector } from '../components/match/ContactSelector';
 import { MandateSelector } from '../components/match/MandateSelector';
 import { PipelineSaveModal } from '../components/match/PipelineSaveModal';
+import { MinimalFooter } from '../components/MinimalFooter';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -300,8 +301,12 @@ export function MatchPage() {
   // ─── GATE STEP ───
   if (step === 'gate') {
     return (
-      <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-        <div style={{ maxWidth: '480px', width: '100%' }}>
+      <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ maxWidth: '900px', width: '100%', margin: '0 auto', padding: '24px 24px 0' }}>
+          <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', display: 'inline-block', marginBottom: '16px' }}>← Back to home</Link>
+        </div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+          <div style={{ maxWidth: '480px', width: '100%' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
               <BarChart3 style={{ color: DS.accent, width: 32, height: 32 }} />
@@ -339,7 +344,9 @@ export function MatchPage() {
               <span style={{ fontSize: '11px', color: DS.muted }}>Your data is confidential. We never share your JDs or candidate info.</span>
             </div>
           </div>
+          </div>
         </div>
+        <MinimalFooter />
       </div>
     );
   }
@@ -347,8 +354,11 @@ export function MatchPage() {
   // ─── ENGINE STEP ───
   if (step === 'engine') {
     return (
-      <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
-        <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+      <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '24px 24px 0', width: '100%' }}>
+          <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', display: 'inline-block', marginBottom: '16px' }}>← Back to home</Link>
+        </div>
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 24px', width: '100%', flex: 1 }}>
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -498,14 +508,19 @@ export function MatchPage() {
         <MandateSelector open={showMandateSelector} onClose={() => setShowMandateSelector(false)} onSelect={handleMandateSelect} />
 
         <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+        </div>
+        <MinimalFooter />
       </div>
     );
   }
 
   // ─── RESULTS STEP ───
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
-      <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+    <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '24px 24px 0', width: '100%' }}>
+        <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', display: 'inline-block', marginBottom: '16px' }}>← Back to home</Link>
+      </div>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 24px', width: '100%', flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
@@ -537,6 +552,7 @@ export function MatchPage() {
         candidateName={pipelineResult?.candidate_name}
         onSuccess={() => { /* Could refresh state here */ }}
       />
+      <MinimalFooter />
     </div>
   );
 }

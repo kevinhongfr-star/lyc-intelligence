@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Shield } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { MinimalFooter } from '@/components/MinimalFooter';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -74,7 +75,7 @@ export function LoginPage() {
       </nav>
 
       {/* Login Form */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 24px', flex: 1 }}>
         <div style={{ maxWidth: '400px', width: '100%' }}>
 
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
@@ -191,6 +192,7 @@ export function LoginPage() {
         input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; }
         input::placeholder { color: ${DS.muted}; }
       `}</style>
+      <MinimalFooter />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, User, Building } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from '@/stores/toastStore';
+import { MinimalFooter } from '@/components/MinimalFooter';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -64,7 +65,7 @@ export function SignupPage() {
         </div>
       </nav>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', flex: 1 }}>
         <div style={{ maxWidth: '420px', width: '100%' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
@@ -207,6 +208,7 @@ export function SignupPage() {
         input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; }
         input::placeholder { color: ${DS.muted}; }
       `}</style>
+      <MinimalFooter />
     </div>
   );
 }
