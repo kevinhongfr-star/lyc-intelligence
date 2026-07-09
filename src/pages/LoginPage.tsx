@@ -85,7 +85,7 @@ export function LoginPage() {
               Platform Access
             </h1>
             <p style={{ fontSize: '14px', color: DS.muted, lineHeight: 1.6 }}>
-              Executive Search Platform
+              Leadership Intelligence Platform
             </p>
           </div>
 
