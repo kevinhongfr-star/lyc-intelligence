@@ -86,6 +86,13 @@ const CandidateApplicationsPage = lazy(() => import('@/pages/candidate/Candidate
 const CandidateAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAssessmentsPage').then(m => ({ default: m.CandidateAssessmentsPage })));
 const CandidateCommunityPage = lazy(() => import('@/pages/candidate/CandidateCommunityPage').then(m => ({ default: m.CandidateCommunityPage })));
 const CandidateInterviewPrepPage = lazy(() => import('@/pages/candidate/CandidateInterviewPrepPage').then(m => ({ default: m.CandidateInterviewPrepPage })));
+const CandidateOffersPage = lazy(() => import('@/pages/candidate/CandidateOffersPage').then(m => ({ default: m.CandidateOffersPage })));
+const CandidateOpportunitiesPage = lazy(() => import('@/pages/candidate/CandidateOpportunitiesPage').then(m => ({ default: m.CandidateOpportunitiesPage })));
+const CandidateCareerDevPage = lazy(() => import('@/pages/candidate/CandidateCareerDevPage').then(m => ({ default: m.CandidateCareerDevPage })));
+const CandidateNexusCoachPage = lazy(() => import('@/pages/candidate/CandidateNexusCoachPage').then(m => ({ default: m.CandidateNexusCoachPage })));
+const CandidateProfilePage = lazy(() => import('@/pages/candidate/CandidateProfilePage').then(m => ({ default: m.CandidateProfilePage })));
+const CandidateAdvancedAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAdvancedAssessmentsPage').then(m => ({ default: m.CandidateAdvancedAssessmentsPage })));
+const CandidateSettingsPlusPage = lazy(() => import('@/pages/candidate/CandidateSettingsPlusPage').then(m => ({ default: m.CandidateSettingsPlusPage })));
 // ── B2C Coaching Portal pages (EO-5) ──
 const CoachingCoachPage = lazy(() => import('@/pages/coaching/CoachingCoachPage').then(m => ({ default: m.CoachingCoachPage })));
 const CoachingCreditsPage = lazy(() => import('@/pages/coaching/CoachingCreditsPage').then(m => ({ default: m.CoachingCreditsPage })));
@@ -208,16 +215,16 @@ export default function App() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<CandidateDashboardPage />} />
             <Route path="applications" element={<CandidateApplicationsPage />} />
-            <Route path="offers" element={<PlaceholderPage title="Offers & Decisions" />} />
-            <Route path="opportunities" element={<PlaceholderPage title="My Opportunities" />} />
+            <Route path="offers" element={<CandidateOffersPage />} />
+            <Route path="opportunities" element={<CandidateOpportunitiesPage />} />
             <Route path="interview-prep" element={<CandidateInterviewPrepPage />} />
             <Route path="assessments" element={<CandidateAssessmentsPage />} />
-            <Route path="career-dev" element={<PlaceholderPage title="Career Development" />} />
+            <Route path="career-dev" element={<CandidateCareerDevPage />} />
             <Route path="community" element={<CandidateCommunityPage />} />
-            <Route path="nexus-coach" element={<PlaceholderPage title="NEXUS Coach" />} />
-            <Route path="profile" element={<PlaceholderPage title="Candidate Profile" />} />
-            <Route path="advanced-assessments" element={<PlaceholderPage title="Advanced Assessments" />} />
-            <Route path="settings-plus" element={<PlaceholderPage title="Settings+" />} />
+            <Route path="nexus-coach" element={<CandidateNexusCoachPage />} />
+            <Route path="profile" element={<CandidateProfilePage />} />
+            <Route path="advanced-assessments" element={<CandidateAdvancedAssessmentsPage />} />
+            <Route path="settings-plus" element={<CandidateSettingsPlusPage />} />
           </Route>
 
           {/* ── Authenticated user pages (standalone) ── */}
