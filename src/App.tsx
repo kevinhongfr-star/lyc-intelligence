@@ -81,6 +81,11 @@ const CandidateApplicationsPage = lazy(() => import('@/pages/candidate/Candidate
 const CandidateAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAssessmentsPage').then(m => ({ default: m.CandidateAssessmentsPage })));
 const CandidateCommunityPage = lazy(() => import('@/pages/candidate/CandidateCommunityPage').then(m => ({ default: m.CandidateCommunityPage })));
 const CandidateInterviewPrepPage = lazy(() => import('@/pages/candidate/CandidateInterviewPrepPage').then(m => ({ default: m.CandidateInterviewPrepPage })));
+// ── B2C Coaching Portal pages (EO-5) ──
+const CoachingCoachPage = lazy(() => import('@/pages/coaching/CoachingCoachPage').then(m => ({ default: m.CoachingCoachPage })));
+const CoachingCreditsPage = lazy(() => import('@/pages/coaching/CoachingCreditsPage').then(m => ({ default: m.CoachingCreditsPage })));
+const CoachingCareerIntelPage = lazy(() => import('@/pages/coaching/CoachingCareerIntelPage').then(m => ({ default: m.CoachingCareerIntelPage })));
+const CoachingGrowthPage = lazy(() => import('@/pages/coaching/CoachingGrowthPage').then(m => ({ default: m.CoachingGrowthPage })));
 
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
@@ -177,15 +182,15 @@ export default function App() {
           {/* ── B2C Coaching (mockup surface) ── */}
           <Route path="/coaching" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route index element={<Navigate to="coach" replace />} />
-            <Route path="coach" element={<PlaceholderPage title="Coach" />} />
-            <Route path="credits" element={<PlaceholderPage title="Credits & Plans" />} />
+            <Route path="coach" element={<CoachingCoachPage />} />
+            <Route path="credits" element={<CoachingCreditsPage />} />
             <Route path="intelligence" element={<PlaceholderPage title="B2C Intelligence" />} />
-            <Route path="career-intel" element={<PlaceholderPage title="Career Intelligence" />} />
+            <Route path="career-intel" element={<CoachingCareerIntelPage />} />
             <Route path="profile" element={<PlaceholderPage title="Profile & Settings" />} />
             <Route path="chat-features" element={<PlaceholderPage title="Chat Features" />} />
             <Route path="career-services" element={<PlaceholderPage title="Career Services" />} />
             <Route path="engagement" element={<PlaceholderPage title="Engagement" />} />
-            <Route path="growth" element={<PlaceholderPage title="Growth" />} />
+            <Route path="growth" element={<CoachingGrowthPage />} />
           </Route>
 
           {/* ── Candidate Portal (mockup surface) ── */}
