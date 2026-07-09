@@ -1,0 +1,81 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+const DS = {
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
+  accent: '#C108AB',
+  bg: '#0d0a14',
+  border: '#3a2040',
+  text: '#FFFFFF',
+  muted: '#9CA3AF',
+};
+
+export function MinimalFooter() {
+  return (
+    <footer style={{
+      background: DS.bg,
+      borderTop: `1px solid ${DS.border}`,
+      padding: '24px 32px',
+      marginTop: 'auto',
+    }}>
+      <div style={{
+        maxWidth: '900px',
+        margin: '0 auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '24px',
+        flexWrap: 'wrap',
+      }}>
+        <Link to="/" style={{
+          fontFamily: DS.headingFont,
+          fontSize: '14px',
+          fontWeight: 700,
+          color: DS.text,
+          textDecoration: 'none',
+        }}>
+          LYC Intelligence
+        </Link>
+        
+        <div style={{
+          display: 'flex',
+          gap: '24px',
+        }}>
+          <Link to="/" style={{
+            fontFamily: DS.bodyFont,
+            fontSize: '12px',
+            color: DS.muted,
+            textDecoration: 'none',
+          }}>
+            Home
+          </Link>
+          <Link to="/pricing" style={{
+            fontFamily: DS.bodyFont,
+            fontSize: '12px',
+            color: DS.muted,
+            textDecoration: 'none',
+          }}>
+            Pricing
+          </Link>
+          <Link to="/nexus" style={{
+            fontFamily: DS.bodyFont,
+            fontSize: '12px',
+            color: DS.muted,
+            textDecoration: 'none',
+          }}>
+            Nexus
+          </Link>
+        </div>
+        
+        <span style={{
+          fontFamily: DS.bodyFont,
+          fontSize: '11px',
+          color: DS.muted,
+        }}>
+          © 2026 LYC Partners
+        </span>
+      </div>
+    </footer>
+  );
+}

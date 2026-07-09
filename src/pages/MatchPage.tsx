@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/stores/toastStore';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { MinimalFooter } from '../components/MinimalFooter';
 import { ArrowRight, BarChart3, Shield, Loader2, Upload, Database, FileText, Plus } from 'lucide-react';
 import { JDInput } from '../components/match/JDInput';
 import { CandidateList } from '../components/match/CandidateList';
@@ -24,8 +25,8 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
+  radius: '0px',
+  radiusSm: '0px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
   success: '#22C55E',
@@ -208,7 +209,7 @@ export function MatchPage() {
       .section { margin: 20px 0; }
       .section h3 { color: #C108AB; margin-bottom: 8px; }
       .dims { display: flex; gap: 20px; margin: 16px 0; }
-      .dim { flex: 1; text-align: center; padding: 12px; background: #F5F5F5; border-radius: 8px; }
+      .dim { flex: 1; text-align: center; padding: 12px; background: #F5F5F5; border-radius: 0px; }
       .dim-val { font-size: 24px; font-weight: 700; }
       ul { padding-left: 20px; }
       li { margin: 4px 0; }
@@ -302,6 +303,7 @@ export function MatchPage() {
     return (
       <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
         <div style={{ maxWidth: '480px', width: '100%' }}>
+          <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', display: 'inline-block', marginBottom: '16px' }}>← Back to home</Link>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
               <BarChart3 style={{ color: DS.accent, width: 32, height: 32 }} />
@@ -311,23 +313,45 @@ export function MatchPage() {
               AI-Powered Executive Matching
             </h1>
             <p style={{ fontSize: '16px', color: DS.muted, lineHeight: 1.6 }}>
-              Score candidates against job descriptions across 3 dimensions. 
+              Score candidates against job descriptions across 6 leadership dimensions. 
               Get instant insights on experience, skills, and organizational fit.
             </p>
           </div>
 
+          <div style={{ background: DS.bgAlt, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', marginBottom: '24px' }}>
+            <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 600, color: DS.text, margin: '0 0 12px', textAlign: 'center' }}>
+              See how candidates stack up
+            </h3>
+            <p style={{ fontSize: '14px', color: DS.muted, lineHeight: 1.5, margin: '0 0 16px', textAlign: 'center' }}>
+              Your Match Analysis will include a comprehensive score breakdown across 6 leadership dimensions:
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+              {['Experience', 'Skills', 'Fit', 'Leadership', 'Culture', 'Potential'].map((dim) => (
+                <div key={dim} style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '12px', textAlign: 'center' }}>
+                  <div style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.textSecondary, fontWeight: 500 }}>{dim}</div>
+                  <div style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 700, color: DS.accent, marginTop: '4px' }}>--</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px' }}>
             <p style={{ fontSize: '13px', color: DS.muted, marginBottom: '20px', textAlign: 'center' }}>
-              Enter your details to access the Match Engine
+              Get started with your free Match Analysis
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <input placeholder="Full name" value={lead.name} onChange={e => setLead({ ...lead, name: e.target.value })}
                 style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
-              <input placeholder="Work email" type="email" value={lead.email} onChange={e => setLead({ ...lead, email: e.target.value })}
+              <div>
+                <input placeholder="Work email" type="email" value={lead.email} onChange={e => setLead({ ...lead, email: e.target.value })}
+                  style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none', width: '100%', boxSizing: 'border-box' }} />
+                <p style={{ fontSize: '11px', color: DS.muted, marginTop: '6px' }}>
+                  We'll send your detailed Match Analysis results to this email.
+                </p>
+              </div>
+              <input placeholder="Company (optional)" value={lead.company} onChange={e => setLead({ ...lead, company: e.target.value })}
                 style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
-              <input placeholder="Company" value={lead.company} onChange={e => setLead({ ...lead, company: e.target.value })}
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
-              <input placeholder="Job title" value={lead.title} onChange={e => setLead({ ...lead, title: e.target.value })}
+              <input placeholder="Job title (optional)" value={lead.title} onChange={e => setLead({ ...lead, title: e.target.value })}
                 style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
               <button onClick={handleGate} disabled={!lead.name || !lead.email}
                 style={{ padding: '14px', background: DS.accent, color: '#FFFFFF', border: 'none', borderRadius: '0px', fontSize: '15px', fontWeight: 600, cursor: (lead.name && lead.email) ? 'pointer' : 'not-allowed', opacity: (lead.name && lead.email) ? 1 : 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '44px' }}>
@@ -348,7 +372,8 @@ export function MatchPage() {
   if (step === 'engine') {
     return (
       <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
-        <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', display: 'inline-block', marginBottom: '16px' }}>← Back to home</Link>
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -359,7 +384,7 @@ export function MatchPage() {
               </div>
             </div>
             {isFirstBatch && (
-              <div style={{ padding: '8px 16px', background: `${DS.success}15`, border: `1px solid ${DS.success}30`, borderRadius: '20px', fontSize: '13px', color: DS.success, fontWeight: 600 }}>
+              <div style={{ padding: '8px 16px', background: `${DS.success}15`, border: `1px solid ${DS.success}30`, borderRadius: '0px', fontSize: '13px', color: DS.success, fontWeight: 600 }}>
                 First 3 matches free!
               </div>
             )}
@@ -505,7 +530,8 @@ export function MatchPage() {
   // ─── RESULTS STEP ───
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
-      <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+        <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', display: 'inline-block', marginBottom: '16px' }}>← Back to home</Link>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
@@ -537,6 +563,7 @@ export function MatchPage() {
         candidateName={pipelineResult?.candidate_name}
         onSuccess={() => { /* Could refresh state here */ }}
       />
+      <MinimalFooter />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Shield } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { MinimalFooter } from '../components/MinimalFooter';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -16,8 +17,8 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
+  radius: '0px',
+  radiusSm: '0px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
@@ -85,7 +86,7 @@ export function LoginPage() {
               Platform Access
             </h1>
             <p style={{ fontSize: '14px', color: DS.muted, lineHeight: 1.6 }}>
-              Executive Search Platform
+              Leadership Intelligence Platform
             </p>
           </div>
 
@@ -191,6 +192,7 @@ export function LoginPage() {
         input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; }
         input::placeholder { color: ${DS.muted}; }
       `}</style>
+      <MinimalFooter />
     </div>
   );
 }

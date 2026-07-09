@@ -24,8 +24,8 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
+  radius: '0px',
+  radiusSm: '0px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
@@ -33,6 +33,8 @@ const DS = {
 type Step = 'gate' | 'context' | 'dimensions' | 'cross_border' | 'style' | 'goals' | 'results';
 
 const TOTAL_DIMENSION_QUESTIONS = CPD_SCENARIOS.length;
+const STEP_LABELS = ['Background', 'Leadership', 'Cross-Border', 'Style', 'Goals'];
+const stepToIndex: Record<string, number> = { context: 0, dimensions: 1, cross_border: 2, style: 3, goals: 4 };
 
 export interface AssessmentWizardProps {
   prefillEmail?: string;
@@ -177,6 +179,12 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
       )}
       {step === 'dimensions' && (
         <div style={{ padding: '24px' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+            <ProgressBar currentStep="dimensions" />
+            <p style={{ fontSize: '13px', color: DS.muted, marginBottom: '16px' }}>
+              Scenario {currentQuestionIndex + 1} of {TOTAL_DIMENSION_QUESTIONS}
+            </p>
+          </div>
           <ScenarioQuestion
             question={CPD_SCENARIOS[currentQuestionIndex]}
             currentAnswer={state.dimensions[CPD_SCENARIOS[currentQuestionIndex].id]}
@@ -196,6 +204,9 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
       )}
       {step === 'style' && (
         <div style={{ padding: '24px' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+            <ProgressBar currentStep="style" />
+          </div>
           <StyleSelector
             selectedStyle={state.writingStyle}
             onSelect={(style) => {
@@ -316,6 +327,43 @@ function GateStep({ state, setState, onSubmit, error }: any) {
   );
 }
 
+function ProgressBar({ currentStep }: { currentStep: string }) {
+  const currentIndex = stepToIndex[currentStep] ?? 0;
+  
+  return (
+    <div style={{ marginBottom: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+        {STEP_LABELS.map((label, idx) => (
+          <span
+            key={label}
+            style={{
+              fontSize: '11px',
+              fontWeight: idx === currentIndex ? 700 : 400,
+              color: idx <= currentIndex ? DS.accent : DS.muted,
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+            }}
+          >
+            {label}
+          </span>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: '4px', height: '6px', background: DS.bgAlt, borderRadius: '0px' }}>
+        {STEP_LABELS.map((_, idx) => (
+          <div
+            key={idx}
+            style={{
+              flex: 1,
+              background: idx <= currentIndex ? DS.accent : DS.border,
+              borderRadius: '0px',
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ContextStep({ state, setState, onNext }: any) {
   const careerSituations = [
     { id: 'senior_leader', label: 'Senior leader not actively looking' },
@@ -333,6 +381,7 @@ function ContextStep({ state, setState, onNext }: any) {
 
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto', padding: '24px' }}>
+      <ProgressBar currentStep="context" />
       <h2 style={{ fontFamily: DS.headingFont, color: DS.text, fontSize: '24px', marginBottom: '8px' }}>
         Your Professional Context
       </h2>
@@ -405,7 +454,7 @@ function ContextStep({ state, setState, onNext }: any) {
                   padding: '10px 14px',
                   background: state.professionalContext.function === f ? `${DS.accent}20` : DS.card,
                   border: `1px solid ${state.professionalContext.function === f ? DS.accent : DS.border}`,
-                  borderRadius: '20px',
+                  borderRadius: '0px',
                   color: DS.textSecondary,
                   cursor: 'pointer',
                   fontSize: '13px',
@@ -449,8 +498,9 @@ function CrossBorderStep({ state, setState, index, onAnswer }: any) {
 
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto', padding: '24px' }}>
+      <ProgressBar currentStep="cross_border" />
       <p style={{ color: DS.muted, marginBottom: '8px' }}>
-        Cross-Border Readiness: {index + 1}/{CROSS_BORDER_QUESTIONS.length}
+        Question {index + 1} of {CROSS_BORDER_QUESTIONS.length}
       </p>
       <h2 style={{ fontFamily: DS.headingFont, color: DS.text, fontSize: '20px', marginBottom: '24px' }}>
         {question.question}
@@ -503,6 +553,7 @@ function CareerGoalsStep({ state, setState, onComplete }: any) {
 
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto', padding: '24px' }}>
+      <ProgressBar currentStep="goals" />
       <h2 style={{ fontFamily: DS.headingFont, color: DS.text, fontSize: '24px', marginBottom: '8px' }}>
         Career Goals
       </h2>

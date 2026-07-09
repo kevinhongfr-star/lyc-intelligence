@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, User, Building } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from '@/stores/toastStore';
+import { MinimalFooter } from '../components/MinimalFooter';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -16,7 +17,7 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
+  radius: '0px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
 };
 
@@ -207,6 +208,7 @@ export function SignupPage() {
         input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; }
         input::placeholder { color: ${DS.muted}; }
       `}</style>
+      <MinimalFooter />
     </div>
   );
 }
