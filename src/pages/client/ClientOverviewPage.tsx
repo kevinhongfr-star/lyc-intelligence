@@ -3,8 +3,9 @@
  * Renders inside AppShell → Outlet. Shows mandate summary, pipeline metrics, and recent activity.
  */
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Users, TrendingUp, Clock, ArrowRight, Target } from 'lucide-react';
+import { Briefcase, Users, TrendingUp, Clock, ArrowRight, Target, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
 
 interface MandateSummary {
   id: string;
@@ -24,6 +25,7 @@ const MOCK_MANDATES: MandateSummary[] = [
 export function ClientOverviewPage() {
   const [mandates, setMandates] = useState<MandateSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const { clientAccount, profile, isLoading: authLoading } = useTenantContext();
 
   useEffect(() => {
     // TODO: Replace with real API call to /api/client/mandates
@@ -40,12 +42,28 @@ export function ClientOverviewPage() {
     ? Math.round(mandates.reduce((sum, m) => sum + m.progress, 0) / mandates.length)
     : 0;
 
+  const displayName = clientAccount?.name || profile?.name || 'Client User';
+  const organization = clientAccount?.organization || 'Your Organization';
+
   return (
     <div className="space-y-6">
-      {/* Page header */}
+      {/* Page header with user info */}
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Overview</h1>
-        <p className="text-text-secondary text-sm mt-1">Your executive search engagement summary at a glance.</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Overview</h1>
+            <p className="text-text-secondary text-sm mt-1">Your executive search engagement summary at a glance.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{organization}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Metrics cards */}

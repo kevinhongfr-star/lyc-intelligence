@@ -4,8 +4,9 @@
  * interviews, latest assessment results, and career progress.
  */
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Calendar, ClipboardCheck, TrendingUp, ArrowRight, Clock, Video, MapPin, Star } from 'lucide-react';
+import { Briefcase, Calendar, ClipboardCheck, TrendingUp, ArrowRight, Clock, Video, MapPin, Star, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Progress } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
 
 interface ApplicationStatus {
   id: string;
@@ -87,6 +88,7 @@ export function CandidateDashboardPage() {
   const [assessment, setAssessment] = useState<AssessmentResult | null>(null);
   const [goals, setGoals] = useState<CareerGoal[]>([]);
   const [loading, setLoading] = useState(true);
+  const { candidateProfile, profile } = useTenantContext();
 
   useEffect(() => {
     // TODO: Replace with real API calls
@@ -107,12 +109,28 @@ export function CandidateDashboardPage() {
     ? Math.round(goals.reduce((sum, g) => sum + g.progress, 0) / goals.length)
     : 0;
 
+  const displayName = candidateProfile?.name || profile?.name || 'Candidate';
+  const currentTitle = candidateProfile?.current_title || 'Professional';
+
   return (
     <div className="space-y-6">
-      {/* Page header */}
+      {/* Page header with user info */}
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Candidate Dashboard</h1>
-        <p className="text-text-secondary text-sm mt-1">Your career journey at a glance.</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Candidate Dashboard</h1>
+            <p className="text-text-secondary text-sm mt-1">Your career journey at a glance.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{currentTitle}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Status metric cards */}

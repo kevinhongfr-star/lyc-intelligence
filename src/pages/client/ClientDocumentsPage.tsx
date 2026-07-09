@@ -3,8 +3,9 @@
  * Renders inside AppShell → Outlet.
  */
 import React, { useState, useEffect } from 'react';
-import { FileText, Download, Calendar, RefreshCw, Search } from 'lucide-react';
+import { FileText, Download, Calendar, RefreshCw, Search, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
 
 interface ClientDocument {
   id: string;
@@ -35,6 +36,7 @@ export function ClientDocumentsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const { clientAccount, profile } = useTenantContext();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -50,12 +52,28 @@ export function ClientDocumentsPage() {
     return matchesSearch && matchesType;
   });
 
+  const displayName = clientAccount?.name || profile?.name || 'Client User';
+  const organization = clientAccount?.organization || 'Your Organization';
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-serif font-bold text-2xl text-text-primary">Documents & Billing</h1>
-          <p className="text-text-secondary text-sm mt-1">Reports, invoices, contracts, and proposals.</p>
+          <div className="flex items-start justify-between mb-2">
+            <div>
+              <h1 className="font-serif font-bold text-2xl text-text-primary">Documents & Billing</h1>
+              <p className="text-text-secondary text-sm mt-1">Reports, invoices, contracts, and proposals.</p>
+            </div>
+            <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+              <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+                <User className="w-4 h-4 text-fuchsia" />
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-medium text-text-primary">{displayName}</div>
+                <div className="text-xs text-text-muted">{organization}</div>
+              </div>
+            </div>
+          </div>
         </div>
         <Button variant="outline" size="sm">
           <RefreshCw className="w-4 h-4" />

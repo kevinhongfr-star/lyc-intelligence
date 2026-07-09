@@ -3,8 +3,9 @@
  * Renders inside AppShell → Outlet. Shows forum categories and a list of threads.
  */
 import React, { useState, useEffect } from 'react';
-import { Search, MessageSquare, Users, Clock, Pin, ArrowRight, Plus } from 'lucide-react';
+import { Search, MessageSquare, Users, Clock, Pin, ArrowRight, Plus, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Input, Button } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
 
 interface ForumCategory {
   id: string;
@@ -50,6 +51,7 @@ export function CandidateCommunityPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const { candidateProfile, profile } = useTenantContext();
 
   useEffect(() => {
     // TODO: Replace with real API call to /api/candidate/community/threads
@@ -72,17 +74,33 @@ export function CandidateCommunityPage() {
   // Pinned first, then by last activity recency (stable sort on existing order)
   const sortedThreads = [...filteredThreads].sort((a, b) => Number(b.pinned) - Number(a.pinned));
 
+  const displayName = candidateProfile?.name || profile?.name || 'Candidate';
+  const currentTitle = candidateProfile?.current_title || 'Professional';
+
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="font-serif font-bold text-2xl text-text-primary">Community</h1>
-          <p className="text-text-secondary text-sm mt-1">Connect with peers, share insights, and grow together.</p>
+        <div className="flex items-start justify-between w-full">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Community</h1>
+            <p className="text-text-secondary text-sm mt-1">Connect with peers, share insights, and grow together.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+              <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+                <User className="w-4 h-4 text-fuchsia" />
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-medium text-text-primary">{displayName}</div>
+                <div className="text-xs text-text-muted">{currentTitle}</div>
+              </div>
+            </div>
+            <Button size="sm">
+              <Plus className="w-3 h-3" /> New Thread
+            </Button>
+          </div>
         </div>
-        <Button size="sm">
-          <Plus className="w-3 h-3" /> New Thread
-        </Button>
       </div>
 
       {/* Categories */}

@@ -13,8 +13,10 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Award,
+  User,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Progress } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
 
 interface SkillAssessment {
   id: string;
@@ -80,6 +82,7 @@ export function CoachingCareerIntelPage() {
   const [insights, setInsights] = useState<MarketInsight[]>([]);
   const [salaries, setSalaries] = useState<SalaryBenchmark[]>([]);
   const [loading, setLoading] = useState(true);
+  const { profile } = useTenantContext();
 
   useEffect(() => {
     // TODO: Replace with real API call to /api/coaching/career-intel
@@ -98,14 +101,30 @@ export function CoachingCareerIntelPage() {
       : 0;
   const aboveBenchmark = skills.filter(s => s.score >= s.benchmark).length;
 
+  const displayName = profile?.name || 'Coachee';
+  const tier = profile?.tier || 'Professional';
+
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Career Intelligence</h1>
-        <p className="text-text-secondary text-sm mt-1">
-          Data-driven insights into your skills, the market, and compensation benchmarks.
-        </p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Career Intelligence</h1>
+            <p className="text-text-secondary text-sm mt-1">
+              Data-driven insights into your skills, the market, and compensation benchmarks.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{tier}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Top metrics */}

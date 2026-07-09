@@ -3,8 +3,9 @@
  * Renders inside AppShell → Outlet.
  */
 import React, { useState, useEffect } from 'react';
-import { Search, Star, Mail, Briefcase, MapPin } from 'lucide-react';
+import { Search, Star, Mail, Briefcase, MapPin, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Input } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
 
 interface ClientCandidate {
   id: string;
@@ -49,6 +50,7 @@ export function ClientCandidatesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [tierFilter, setTierFilter] = useState('all');
+  const { clientAccount, profile } = useTenantContext();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -65,11 +67,27 @@ export function ClientCandidatesPage() {
     return matchesSearch && matchesTier;
   });
 
+  const displayName = clientAccount?.name || profile?.name || 'Client User';
+  const organization = clientAccount?.organization || 'Your Organization';
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Candidates</h1>
-        <p className="text-text-secondary text-sm mt-1">View and track candidates across all mandates.</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Candidates</h1>
+            <p className="text-text-secondary text-sm mt-1">View and track candidates across all mandates.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{organization}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}

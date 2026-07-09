@@ -4,8 +4,9 @@
  * questions with difficulty labels.
  */
 import React, { useState, useEffect } from 'react';
-import { Lightbulb, BookOpen, CheckCircle2, ChevronRight, Video, FileText, Brain, Target, Star } from 'lucide-react';
+import { Lightbulb, BookOpen, CheckCircle2, ChevronRight, Video, FileText, Brain, Target, Star, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Progress } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
 
 interface PrepTip {
   id: string;
@@ -102,6 +103,7 @@ export function CandidateInterviewPrepPage() {
   const [questions, setQuestions] = useState<PracticeQuestion[]>([]);
   const [checklist, setChecklist] = useState<PrepChecklistItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { candidateProfile, profile } = useTenantContext();
 
   useEffect(() => {
     // TODO: Replace with real API call to /api/candidate/interview-prep
@@ -117,12 +119,28 @@ export function CandidateInterviewPrepPage() {
   const checklistDone = checklist.filter((c) => c.done).length;
   const checklistProgress = checklist.length ? Math.round((checklistDone / checklist.length) * 100) : 0;
 
+  const displayName = candidateProfile?.name || profile?.name || 'Candidate';
+  const currentTitle = candidateProfile?.current_title || 'Professional';
+
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Interview Prep</h1>
-        <p className="text-text-secondary text-sm mt-1">Frameworks, tips, and practice questions to help you perform your best.</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Interview Prep</h1>
+            <p className="text-text-secondary text-sm mt-1">Frameworks, tips, and practice questions to help you perform your best.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{currentTitle}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Prep checklist + resources */}

@@ -4,8 +4,9 @@
  * completed results, switchable via tabs.
  */
 import React, { useState, useEffect } from 'react';
-import { ClipboardCheck, Clock, HelpCircle, BarChart2, Star, Download, Play, ArrowRight } from 'lucide-react';
+import { ClipboardCheck, Clock, HelpCircle, BarChart2, Star, Download, Play, ArrowRight, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Progress } from '@/components/ui';
+import { useTenantContext } from '@/hooks/useTenantContext';
 
 type Tab = 'available' | 'completed';
 
@@ -72,6 +73,7 @@ export function CandidateAssessmentsPage() {
   const [available, setAvailable] = useState<AvailableAssessment[]>([]);
   const [completed, setCompleted] = useState<CompletedAssessment[]>([]);
   const [loading, setLoading] = useState(true);
+  const { candidateProfile, profile } = useTenantContext();
 
   useEffect(() => {
     // TODO: Replace with real API call to /api/candidate/assessments
@@ -83,12 +85,28 @@ export function CandidateAssessmentsPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  const displayName = candidateProfile?.name || profile?.name || 'Candidate';
+  const currentTitle = candidateProfile?.current_title || 'Professional';
+
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Assessments</h1>
-        <p className="text-text-secondary text-sm mt-1">Discover, take, and review your professional assessments.</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="font-serif font-bold text-2xl text-text-primary">Assessments</h1>
+            <p className="text-text-secondary text-sm mt-1">Discover, take, and review your professional assessments.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-bg-warm px-4 py-2 rounded-lg">
+            <div className="w-9 h-9 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <User className="w-4 h-4 text-fuchsia" />
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-text-primary">{displayName}</div>
+              <div className="text-xs text-text-muted">{currentTitle}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Tab navigation */}
