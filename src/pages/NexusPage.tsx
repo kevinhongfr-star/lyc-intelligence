@@ -1,53 +1,77 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Send, Loader2, MessageSquare, Trash2 } from 'lucide-react';
 import { sendChatMessage } from '@/services/coze';
 import { useAuth } from '@/contexts';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { MinimalFooter } from '@/components/MinimalFooter';
 
 interface Message { role: 'user' | 'assistant'; content: string; }
 
+const DS = {
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
+  accent: '#C108AB',
+  accentHover: '#A00790',
+  bgDark: '#0d0a14',
+  bgCard: '#1a1225',
+  bgInput: '#251a30',
+  border: '#3a2040',
+  text: '#FFFFFF',
+  textSecondary: '#E0E0E0',
+  muted: '#9CA3AF',
+  radius: '0px',
+  radiusSm: '0px',
+  shadow: '0 1px 3px rgba(0,0,0,0.3)',
+};
+
+const SUGGESTED_PROMPTS = [
+  'How do I position myself for a China-to-global leadership role?',
+  'What do Asian boards look for in C-suite candidates?',
+  'How should I navigate a cross-border executive transition?',
+  'What makes a strong China-APAC leadership profile?',
+];
+
 const customComponents = {
   table: ({ children }: any) => (
-    <div className="overflow-x-auto my-3">
-      <table className="min-w-full border-collapse border border-gray-700 rounded-none overflow-hidden">
+    <div style={{ overflowX: 'auto', margin: '12px 0' }}>
+      <table style={{ minWidth: '100%', borderCollapse: 'collapse', border: `1px solid ${DS.border}`, borderRadius: DS.radius, overflow: 'hidden' }}>
         {children}
       </table>
     </div>
   ),
   th: ({ children }: any) => (
-    <th className="border border-gray-600 bg-gray-800 px-4 py-3 font-bold text-gray-200 text-left">
+    <th style={{ border: `1px solid ${DS.border}`, background: DS.bgInput, padding: '12px 16px', fontWeight: 700, color: DS.text, textAlign: 'left', fontFamily: DS.bodyFont }}>
       {children}
     </th>
   ),
   td: ({ children }: any) => (
-    <td className="border border-gray-600 px-4 py-3 text-gray-300">
+    <td style={{ border: `1px solid ${DS.border}`, padding: '12px 16px', color: DS.textSecondary, fontFamily: DS.bodyFont }}>
       {children}
     </td>
   ),
   tr: ({ children }: any) => (
-    <tr className="even:bg-gray-900 odd:bg-gray-800">
-      {children}
-    </tr>
+    <tr>{children}</tr>
   ),
   code: ({ inline, className, children, ...props }: any) => {
-    if (inline) return <code className="bg-gray-800 rounded px-1.5 py-0.5 text-xs text-accent" {...props}>{children}</code>;
+    if (inline) return <code style={{ background: DS.bgInput, borderRadius: DS.radius, padding: '2px 6px', fontSize: '12px', color: DS.accent, fontFamily: 'monospace' }} {...props}>{children}</code>;
     return (
-      <pre className="bg-gray-900 rounded-none p-3 overflow-x-auto my-2 text-xs">
+      <pre style={{ background: DS.bgInput, borderRadius: DS.radius, padding: '12px', overflowX: 'auto', margin: '8px 0', fontSize: '12px', fontFamily: 'monospace' }}>
         <code className={className} {...props}>{children}</code>
       </pre>
     );
   },
-  ul: ({ children }: any) => <ul className="list-disc pl-6 space-y-1 text-gray-300 my-2">{children}</ul>,
-  ol: ({ children }: any) => <ol className="list-decimal pl-6 space-y-1 text-gray-300 my-2">{children}</ol>,
-  li: ({ children }: any) => <li className="text-gray-300">{children}</li>,
-  a: ({ href, children }: any) => <a href={href} className="text-accent underline hover:text-purple-400" target="_blank" rel="noopener noreferrer">{children}</a>,
-  p: ({ children }: any) => <p className="text-gray-300 mb-2 last:mb-0">{children}</p>,
-  h1: ({ children }: any) => <h1 className="text-lg font-bold text-white mb-2 mt-3">{children}</h1>,
-  h2: ({ children }: any) => <h2 className="text-base font-bold text-white mb-2 mt-3">{children}</h2>,
-  h3: ({ children }: any) => <h3 className="text-sm font-semibold text-white mb-1 mt-2">{children}</h3>,
-  strong: ({ children }: any) => <strong className="font-semibold text-white">{children}</strong>,
-  em: ({ children }: any) => <em className="italic text-gray-300">{children}</em>,
+  ul: ({ children }: any) => <ul style={{ listStyleType: 'disc', paddingLeft: '24px', color: DS.textSecondary, margin: '8px 0', fontFamily: DS.bodyFont }}>{children}</ul>,
+  ol: ({ children }: any) => <ol style={{ listStyleType: 'decimal', paddingLeft: '24px', color: DS.textSecondary, margin: '8px 0', fontFamily: DS.bodyFont }}>{children}</ol>,
+  li: ({ children }: any) => <li style={{ color: DS.textSecondary, fontFamily: DS.bodyFont }}>{children}</li>,
+  a: ({ href, children }: any) => <a href={href} style={{ color: DS.accent, textDecoration: 'underline' }} target="_blank" rel="noopener noreferrer">{children}</a>,
+  p: ({ children }: any) => <p style={{ color: DS.textSecondary, marginBottom: '8px', fontFamily: DS.bodyFont, fontSize: '14px', lineHeight: 1.6 }}>{children}</p>,
+  h1: ({ children }: any) => <h1 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 700, color: DS.text, marginBottom: '8px', marginTop: '12px' }}>{children}</h1>,
+  h2: ({ children }: any) => <h2 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, marginBottom: '8px', marginTop: '12px' }}>{children}</h2>,
+  h3: ({ children }: any) => <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '4px', marginTop: '8px' }}>{children}</h3>,
+  strong: ({ children }: any) => <strong style={{ fontWeight: 600, color: DS.text, fontFamily: DS.bodyFont }}>{children}</strong>,
+  em: ({ children }: any) => <em style={{ fontStyle: 'italic', color: DS.textSecondary, fontFamily: DS.bodyFont }}>{children}</em>,
 };
 
 export function NexusPage() {
@@ -73,72 +97,149 @@ export function NexusPage() {
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-120px)]">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-2xl font-serif font-bold text-text-primary">Nexus</h1>
-          <p className="text-text-muted text-sm">Your LYC Intelligence assistant — ask about cross-border leadership, career strategy, and executive positioning</p>
+    <div style={{ minHeight: '100vh', background: DS.bgDark, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ maxWidth: '900px', width: '100%', margin: '0 auto', padding: '24px 24px 0' }}>
+        <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', display: 'inline-block', marginBottom: '24px', fontFamily: DS.bodyFont }}>← Back to home</Link>
+      </div>
+
+      <main style={{ maxWidth: '900px', width: '100%', margin: '0 auto', padding: '0 24px 32px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <div style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '8px' }}>
+              LYC INTELLIGENCE
+            </div>
+            <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, margin: '0 0 8px' }}>
+              Nexus
+            </h1>
+            <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: DS.textSecondary, margin: '0 0 6px' }}>
+              Your cross-border leadership advisor
+            </p>
+            <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, margin: 0, maxWidth: '600px', lineHeight: 1.5 }}>
+              Trained on LYC's China-APAC leadership intelligence. Ask about positioning, board readiness, or cross-cultural strategy.
+            </p>
+          </div>
+          {messages.length > 0 && (
+            <button onClick={clearChat} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 16px', background: 'transparent', border: `1px solid ${DS.border}`, borderRadius: DS.radius, color: DS.muted, fontFamily: DS.bodyFont, fontSize: '13px', cursor: 'pointer', minHeight: '44px' }}>
+              <Trash2 style={{ width: 14, height: 14 }} /> Clear
+            </button>
+          )}
         </div>
-        {messages.length > 0 && (
-          <button onClick={clearChat} className="flex items-center gap-1.5 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary rounded-none min-h-[44px]">
-            <Trash2 className="w-3.5 h-3.5" /> Clear
+
+        <div style={{ flex: 1, overflowY: 'auto', background: DS.bgCard, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: '24px', minHeight: '400px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {messages.length === 0 && (
+            <div style={{ color: DS.muted, textAlign: 'center', padding: '48px 16px' }}>
+              <MessageSquare style={{ width: 32, height: 32, margin: '0 auto 12px', opacity: 0.5, color: DS.muted }} />
+              <p style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.textSecondary, margin: '0 0 24px' }}>Nexus is ready</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', maxWidth: '640px', margin: '0 auto' }}>
+                {SUGGESTED_PROMPTS.map(q => (
+                  <button
+                    key={q}
+                    onClick={() => { setInput(q); }}
+                    style={{
+                      padding: '14px 16px',
+                      background: DS.bgInput,
+                      border: `1px solid ${DS.border}`,
+                      borderRadius: DS.radius,
+                      color: DS.textSecondary,
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      fontFamily: DS.bodyFont,
+                      fontSize: '13px',
+                      lineHeight: 1.5,
+                      minHeight: '44px',
+                    }}
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {messages.map((m, i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
+              <div
+                style={{
+                  maxWidth: '85%',
+                  padding: '12px 16px',
+                  background: m.role === 'user' ? DS.accent : DS.bgInput,
+                  border: m.role === 'user' ? 'none' : `1px solid ${DS.border}`,
+                  borderRadius: DS.radius,
+                  color: m.role === 'user' ? '#FFFFFF' : DS.text,
+                  fontFamily: DS.bodyFont,
+                  fontSize: '14px',
+                  lineHeight: 1.6,
+                }}
+              >
+                {m.role === 'assistant' ? (
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={customComponents}
+                  >
+                    {m.content}
+                  </ReactMarkdown>
+                ) : m.content}
+              </div>
+            </div>
+          ))}
+          {loading && (
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <div style={{ padding: '12px 16px', background: DS.bgInput, border: `1px solid ${DS.border}`, borderRadius: DS.radius, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Loader2 style={{ width: 16, height: 16, color: DS.accent, animation: 'spin 1s linear infinite' }} />
+                <span style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted }}>Thinking...</span>
+              </div>
+            </div>
+          )}
+          <div ref={bottomRef} />
+        </div>
+
+        <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+          <input
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
+            placeholder="Ask Nexus about career positioning, cross-border leadership..."
+            style={{
+              flex: 1,
+              padding: '14px 16px',
+              background: DS.bgInput,
+              border: `1px solid ${DS.border}`,
+              borderRadius: DS.radius,
+              color: DS.text,
+              fontFamily: DS.bodyFont,
+              fontSize: '14px',
+              outline: 'none',
+              minHeight: '48px',
+            }}
+          />
+          <button
+            onClick={send}
+            disabled={loading || !input.trim()}
+            style={{
+              padding: '14px 20px',
+              background: DS.accent,
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: DS.radius,
+              fontFamily: DS.bodyFont,
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: (loading || !input.trim()) ? 'not-allowed' : 'pointer',
+              opacity: (loading || !input.trim()) ? 0.5 : 1,
+              minHeight: '48px',
+              minWidth: '48px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Send style={{ width: 16, height: 16 }} />
           </button>
-        )}
-      </div>
+        </div>
+      </main>
 
-      <div className="flex-1 overflow-auto bg-bg-secondary rounded-none border border-bg-tertiary p-4 space-y-4">
-        {messages.length === 0 && (
-          <div className="text-text-muted text-center py-12">
-            <MessageSquare className="w-8 h-8 mx-auto mb-3 opacity-50" />
-            <p className="font-medium mb-2">Nexus is ready</p>
-            <div className="grid grid-cols-2 gap-2 max-w-md mx-auto text-sm">
-              {['How do I position for a cross-border role?', 'What makes a strong leadership profile?', 'What do boards look for in C-suite candidates?', 'How should I prepare for a board interview?'].map(q => (
-                <button key={q} onClick={() => { setInput(q); }} className="p-2 bg-bg-tertiary rounded-none hover:bg-bg-hover text-text-secondary text-left transition-colors">{q}</button>
-              ))}
-            </div>
-          </div>
-        )}
-        {messages.map((m, i) => (
-          <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] rounded-none px-4 py-2.5 text-sm ${m.role === 'user' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-primary'}`}>
-              {m.role === 'assistant' ? (
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={customComponents}
-                >
-                  {m.content}
-                </ReactMarkdown>
-              ) : m.content}
-            </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="flex justify-start">
-            <div className="bg-bg-tertiary rounded-none px-4 py-3 flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-accent" />
-              <span className="text-sm text-text-muted">Thinking...</span>
-            </div>
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
+      <MinimalFooter />
 
-      <div className="flex gap-2 mt-3">
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
-          placeholder="Ask Nexus about career positioning, cross-border leadership..."
-          className="flex-1 px-4 py-3 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent min-h-[44px]"
-        />
-        <button
-          onClick={send}
-          disabled={loading || !input.trim()}
-          className="px-4 py-3 bg-accent hover:bg-accent-light text-white rounded-none min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-50 transition-colors"
-        >
-          <Send className="w-4 h-4" />
-        </button>
-      </div>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
