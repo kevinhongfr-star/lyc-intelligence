@@ -300,25 +300,50 @@ export function MatchPage() {
 
   // ─── GATE STEP ───
   if (step === 'gate') {
+    const dimensions = ['Experience', 'Skills', 'Fit', 'Leadership', 'Trajectory', 'Cross-Border'];
     return (
       <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column' }}>
         <div style={{ maxWidth: '900px', width: '100%', margin: '0 auto', padding: '24px 24px 0' }}>
           <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', display: 'inline-block', marginBottom: '16px' }}>← Back to home</Link>
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-          <div style={{ maxWidth: '480px', width: '100%' }}>
+          <div style={{ maxWidth: '560px', width: '100%' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
               <BarChart3 style={{ color: DS.accent, width: 32, height: 32 }} />
               <span style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, color: DS.text }}>Score Match</span>
             </div>
             <h1 style={{ fontFamily: DS.headingFont, fontSize: '36px', fontWeight: 700, color: DS.text, margin: '0 0 12px' }}>
-              AI-Powered Executive Matching
+              See how candidates stack up
             </h1>
             <p style={{ fontSize: '16px', color: DS.muted, lineHeight: 1.6 }}>
-              Score candidates against job descriptions across 3 dimensions. 
-              Get instant insights on experience, skills, and organizational fit.
+              Score candidates against job descriptions across 6 leadership dimensions.
+              Get instant insights on experience, skills, fit, leadership, trajectory, and cross-border readiness.
             </p>
+          </div>
+
+          {/* Preview card — sample result dimensions */}
+          <div style={{ background: DS.bgAlt, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '20px 24px', marginBottom: '24px' }}>
+            <div style={{ fontFamily: DS.bodyFont, fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: DS.muted, marginBottom: '12px' }}>
+              Your Match Analysis will score
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+              {dimensions.map(d => (
+                <div key={d} style={{
+                  padding: '10px 12px',
+                  background: DS.card,
+                  border: `1px solid ${DS.cardBorder}`,
+                  borderRadius: DS.radius,
+                  fontFamily: DS.bodyFont,
+                  fontSize: '12px',
+                  color: DS.text,
+                  textAlign: 'center',
+                  fontWeight: 500,
+                }}>
+                  {d}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px' }}>
@@ -326,16 +351,19 @@ export function MatchPage() {
               Enter your details to access the Match Engine
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <input placeholder="Full name" value={lead.name} onChange={e => setLead({ ...lead, name: e.target.value })}
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
-              <input placeholder="Work email" type="email" value={lead.email} onChange={e => setLead({ ...lead, email: e.target.value })}
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
-              <input placeholder="Company" value={lead.company} onChange={e => setLead({ ...lead, company: e.target.value })}
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
-              <input placeholder="Job title" value={lead.title} onChange={e => setLead({ ...lead, title: e.target.value })}
-                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none' }} />
+              <input placeholder="Full name *" required value={lead.name} onChange={e => setLead({ ...lead, name: e.target.value })}
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none', minHeight: '44px' }} />
+              <input placeholder="Work email *" type="email" required value={lead.email} onChange={e => setLead({ ...lead, email: e.target.value })}
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none', minHeight: '44px' }} />
+              <p style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted, margin: '-4px 0 4px' }}>
+                We'll send your detailed Match Analysis results to this email.
+              </p>
+              <input placeholder="Company (optional)" value={lead.company} onChange={e => setLead({ ...lead, company: e.target.value })}
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none', minHeight: '44px' }} />
+              <input placeholder="Job title (optional)" value={lead.title} onChange={e => setLead({ ...lead, title: e.target.value })}
+                style={{ padding: '12px 16px', background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', color: DS.text, fontSize: '14px', outline: 'none', minHeight: '44px' }} />
               <button onClick={handleGate} disabled={!lead.name || !lead.email}
-                style={{ padding: '14px', background: DS.accent, color: '#FFFFFF', border: 'none', borderRadius: '0px', fontSize: '15px', fontWeight: 600, cursor: (lead.name && lead.email) ? 'pointer' : 'not-allowed', opacity: (lead.name && lead.email) ? 1 : 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '44px' }}>
+                style={{ padding: '14px', background: DS.accent, color: '#FFFFFF', border: 'none', borderRadius: '0px', fontSize: '15px', fontWeight: 600, cursor: (lead.name && lead.email) ? 'pointer' : 'not-allowed', opacity: (lead.name && lead.email) ? 1 : 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '44px', marginTop: '4px' }}>
                 Access Match Engine <ArrowRight style={{ width: 16, height: 16 }} />
               </button>
             </div>
