@@ -820,6 +820,124 @@ export async function getRecentActivity(limit: number = 20): Promise<any[]> {
   return activities.slice(0, limit);
 }
 
+// ─── Client Activity Feed (scoped to client's mandates) ───
+export interface ClientActivityEvent {
+  id: string;
+  type: 'scoring_run' | 'pipeline_change' | 'contact_update';
+  title: string;
+  detail: string;
+  timestamp: string;
+  contact_id?: string;
+  mandate_id?: string;
+}
+
+export async function fetchClientActivity(clientAccountId: string, limit: number = 20): Promise<ClientActivityEvent[]> {
+  const sb = getSupabase();
+
+  const activities: ClientActivityEvent[] = [];
+  const errors: string[] = [];
+
+  try {
+    const mandateAccessRes = await sb
+      .from('client_mandate_access')
+      .select('mandate_id')
+      .eq('client_account_id', clientAccountId);
+
+    const mandateIds = (mandateAccessRes.data ?? []).map((row: any) => row.mandate_id);
+
+    if (mandateIds.length === 0) {
+      console.warn('[Portal] fetchClientActivity: no mandates found for client');
+      return [];
+    }
+
+    const [scoringRes, pipelineRes, contactRes] = await Promise.allSettled([
+      sb.from('scoring_runs')
+        .select('id, run_type, composite_score, verdict, created_at, contact_id, mandate_id')
+        .in('mandate_id', mandateIds)
+        .order('created_at', { ascending: false })
+        .limit(limit),
+
+      sb.from('candidates_pipeline')
+        .select('id, contact_id, mandate_id, stage, match_score, updated_at')
+        .in('mandate_id', mandateIds)
+        .order('updated_at', { ascending: false })
+        .limit(limit),
+
+      sb.from('contacts')
+        .select('id, name, current_title, updated_at')
+        .in('id', (await sb
+          .from('candidates_pipeline')
+          .select('distinct(contact_id)')
+          .in('mandate_id', mandateIds))
+          .data!.map((row: any) => row.contact_id)
+        )
+        .order('updated_at', { ascending: false })
+        .limit(limit),
+    ]);
+
+    if (scoringRes.status === 'fulfilled') {
+      for (const sr of (scoringRes.value.data ?? [])) {
+        activities.push({
+          type: 'scoring_run',
+          id: sr.id,
+          title: 'Scoring Run Completed',
+          detail: sr.verdict ? `${sr.run_type}: ${sr.verdict}` : `${sr.run_type} score: ${sr.composite_score ?? '—'}`,
+          timestamp: sr.created_at,
+          contact_id: sr.contact_id,
+          mandate_id: sr.mandate_id,
+        });
+      }
+    } else {
+      errors.push('scoring_runs');
+      console.error('[Portal] fetchClientActivity: scoring_runs query failed');
+    }
+
+    if (pipelineRes.status === 'fulfilled') {
+      for (const pl of (pipelineRes.value.data ?? [])) {
+        activities.push({
+          type: 'pipeline_change',
+          id: pl.id,
+          title: 'Pipeline Stage Changed',
+          detail: `Stage: ${pl.stage}${pl.match_score ? ` · Score: ${pl.match_score}` : ''}`,
+          timestamp: pl.updated_at,
+          contact_id: pl.contact_id,
+          mandate_id: pl.mandate_id,
+        });
+      }
+    } else {
+      errors.push('candidates_pipeline');
+      console.error('[Portal] fetchClientActivity: candidates_pipeline query failed');
+    }
+
+    if (contactRes.status === 'fulfilled') {
+      for (const c of (contactRes.value.data ?? [])) {
+        activities.push({
+          type: 'contact_update',
+          id: c.id,
+          title: 'Candidate Profile Updated',
+          detail: `${c.name} — ${c.current_title ?? 'Professional'}`,
+          timestamp: c.updated_at,
+          contact_id: c.id,
+        });
+      }
+    } else {
+      errors.push('contacts');
+      console.error('[Portal] fetchClientActivity: contacts query failed');
+    }
+
+    if (errors.length > 0) {
+      console.warn('[Portal] fetchClientActivity: partial failure, missing:', errors.join(', '));
+    }
+
+  } catch (e) {
+    console.error('[Portal] fetchClientActivity error:', e);
+    return [];
+  }
+
+  activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  return activities.slice(0, limit);
+}
+
 // ─── Company CRUD ───
 export async function createCompany(company: Partial<Company>): Promise<Company | null> {
   const { data, error } = await getSupabase().from('companies')

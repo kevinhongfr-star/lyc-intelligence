@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { Briefcase, Users, TrendingUp, Clock, ArrowRight, Target, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { fetchClientActivity, type ClientActivityEvent } from '@/services/supabaseApi';
 
 interface MandateSummary {
   id: string;
@@ -24,17 +25,38 @@ const MOCK_MANDATES: MandateSummary[] = [
 
 export function ClientOverviewPage() {
   const [mandates, setMandates] = useState<MandateSummary[]>([]);
+  const [activities, setActivities] = useState<ClientActivityEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activityLoading, setActivityLoading] = useState(true);
   const { clientAccount, profile, isLoading: authLoading } = useTenantContext();
 
   useEffect(() => {
-    // TODO: Replace with real API call to /api/client/mandates
     const timer = setTimeout(() => {
       setMandates(MOCK_MANDATES);
       setLoading(false);
     }, 500);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!clientAccount?.id || authLoading) {
+      setActivityLoading(false);
+      return;
+    }
+
+    const fetchActivities = async () => {
+      try {
+        const data = await fetchClientActivity(clientAccount.id);
+        setActivities(data);
+      } catch (e) {
+        console.error('[ClientOverviewPage] Error:', e);
+      } finally {
+        setActivityLoading(false);
+      }
+    };
+
+    fetchActivities();
+  }, [clientAccount?.id, authLoading]);
 
   const activeCount = mandates.filter(m => m.status === 'Active').length;
   const totalCandidates = mandates.reduce((sum, m) => sum + m.candidatesCount, 0);
@@ -165,21 +187,24 @@ export function ClientOverviewPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {[
-              { action: 'New candidate added', detail: 'Sarah Chen — VP Engineering', time: '2h ago' },
-              { action: 'Interview scheduled', detail: 'Michael Wong — CFO, FinScale', time: '5h ago' },
-              { action: 'Report generated', detail: 'Talent Deep-Dive: TechCorp pipeline', time: '1d ago' },
-              { action: 'Mandate updated', detail: 'Head of Product — DataMesh put on hold', time: '3d ago' },
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-3 py-2 border-b border-border last:border-b-0">
-                <Clock className="w-4 h-4 text-text-muted mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <span className="text-sm text-text-primary font-medium">{item.action}</span>
-                  <span className="text-sm text-text-secondary ml-2">— {item.detail}</span>
+            {activityLoading ? (
+              <div className="py-8 text-center text-text-muted text-sm">Loading activity...</div>
+            ) : activities.length === 0 ? (
+              <div className="py-8 text-center text-text-muted text-sm">No recent activity.</div>
+            ) : (
+              activities.map((item) => (
+                <div key={item.id} className="flex items-start gap-3 py-2 border-b border-border last:border-b-0">
+                  <Clock className="w-4 h-4 text-text-muted mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <span className="text-sm text-text-primary font-medium">{item.title}</span>
+                    <span className="text-sm text-text-secondary ml-2">— {item.detail}</span>
+                  </div>
+                  <span className="text-xs text-text-muted">
+                    {new Date(item.timestamp).toLocaleDateString()}
+                  </span>
                 </div>
-                <span className="text-xs text-text-muted flex-shrink-0">{item.time}</span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
