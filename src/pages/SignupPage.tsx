@@ -16,7 +16,7 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
+  radius: '0px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
 };
 

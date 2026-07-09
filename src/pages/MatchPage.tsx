@@ -24,8 +24,8 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
+  radius: '0px',
+  radiusSm: '0px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
   success: '#22C55E',
@@ -208,7 +208,7 @@ export function MatchPage() {
       .section { margin: 20px 0; }
       .section h3 { color: #C108AB; margin-bottom: 8px; }
       .dims { display: flex; gap: 20px; margin: 16px 0; }
-      .dim { flex: 1; text-align: center; padding: 12px; background: #F5F5F5; border-radius: 8px; }
+      .dim { flex: 1; text-align: center; padding: 12px; background: #F5F5F5; border-radius: 0px; }
       .dim-val { font-size: 24px; font-weight: 700; }
       ul { padding-left: 20px; }
       li { margin: 4px 0; }
