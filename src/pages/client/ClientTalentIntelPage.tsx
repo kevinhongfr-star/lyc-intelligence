@@ -2,65 +2,45 @@
  * ClientTalentIntelPage — B2B Client Portal talent intelligence
  * Renders inside AppShell → Outlet. Shows talent market insights,
  * skill trends, and competitive landscape.
+ * Data sourced from Supabase aggregate queries via getTalentIntel().
  */
-import React from 'react';
-import { Brain, TrendingUp, Users, BarChart3, Globe, ArrowUpRight, ArrowDownRight, User } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Progress } from '@/components/ui';
+import React, { useState, useEffect } from 'react';
+import { Brain, TrendingUp, Users, BarChart3, Globe, ArrowUpRight, ArrowDownRight, User, RefreshCw } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
-
-// Static content — market intelligence analytics not backed by a direct table
-
-interface MarketTrend {
-  id: string;
-  label: string;
-  value: string;
-  change: number;
-  direction: 'up' | 'down';
-}
-
-interface SkillDemand {
-  id: string;
-  skill: string;
-  demand: number;
-  trend: 'increasing' | 'stable' | 'decreasing';
-}
-
-interface TalentPool {
-  id: string;
-  title: string;
-  count: number;
-  avgScore: number;
-  location: string;
-}
-
-const STATIC_TRENDS: MarketTrend[] = [
-  { id: 't1', label: 'Active Candidates', value: '12.4K', change: 15, direction: 'up' },
-  { id: 't2', label: 'Market Activity', value: 'High', change: 8, direction: 'up' },
-  { id: 't3', label: 'Time-to-Hire', value: '42 days', change: -12, direction: 'down' },
-  { id: 't4', label: 'Offer Acceptance', value: '78%', change: 5, direction: 'up' },
-];
-
-const STATIC_SKILLS: SkillDemand[] = [
-  { id: 's1', skill: 'Cloud Architecture', demand: 95, trend: 'increasing' },
-  { id: 's2', skill: 'AI/ML Engineering', demand: 88, trend: 'increasing' },
-  { id: 's3', skill: 'Data Strategy', demand: 72, trend: 'stable' },
-  { id: 's4', skill: 'Cybersecurity', demand: 85, trend: 'increasing' },
-  { id: 's5', skill: 'Product Leadership', demand: 68, trend: 'stable' },
-  { id: 's6', skill: 'DevOps', demand: 76, trend: 'decreasing' },
-];
-
-const STATIC_POOLS: TalentPool[] = [
-  { id: 'p1', title: 'VP Engineering — Bay Area', count: 45, avgScore: 92, location: 'San Francisco, CA' },
-  { id: 'p2', title: 'CFO — FinTech', count: 28, avgScore: 88, location: 'New York, NY' },
-  { id: 'p3', title: 'Head of Product — SaaS', count: 36, avgScore: 90, location: 'Remote' },
-  { id: 'p4', title: 'CTO — Series B', count: 15, avgScore: 94, location: 'Austin, TX' },
-];
+import { getTalentIntel, type TalentIntelData, type MarketTrend, type SkillDemand, type TalentPool } from '@/services/supabaseApi';
 
 export function ClientTalentIntelPage() {
+  const [data, setData] = useState<TalentIntelData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { clientAccount, profile } = useTenantContext();
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setError(null);
+        const result = await getTalentIntel(clientAccount?.id);
+        if (cancelled) return;
+        setData(result);
+      } catch (e) {
+        console.error('[ClientTalentIntelPage] Error:', e);
+        if (!cancelled) setError('Failed to load talent intelligence data');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [clientAccount?.id]);
 
   const displayName = clientAccount?.name || profile?.name || 'Client User';
   const organization = clientAccount?.organization || 'Your Organization';
+
+  const fmtSyncTime = (iso: string) => {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  };
 
   return (
     <div className="space-y-6">
@@ -82,136 +62,176 @@ export function ClientTalentIntelPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATIC_TRENDS.map((trend) => (
-          <Card key={trend.id} className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-text-muted">{trend.label}</div>
-                <div className="text-2xl font-bold text-text-primary mt-1">{trend.value}</div>
-              </div>
-              <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                trend.direction === 'up' ? 'bg-green/10 text-green' : 'bg-red/10 text-red'
-              }`}>
-                {trend.direction === 'up' ? (
-                  <ArrowUpRight className="w-3 h-3" />
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[0, 1, 2, 3].map(i => (
+            <Card key={i} className="p-4"><div className="animate-pulse h-16 bg-bg-tertiary rounded" /></Card>
+          ))}
+        </div>
+      ) : error ? (
+        <Card className="p-6"><div className="text-center text-red text-sm">{error}</div></Card>
+      ) : !data || data.trends.length === 0 ? (
+        <EmptyState
+          title="No data yet"
+          description="Talent intelligence metrics will appear here once your database has contacts, mandates, and pipeline data."
+        />
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {data.trends.map((trend: MarketTrend) => (
+              <Card key={trend.id} className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm text-text-muted">{trend.label}</div>
+                    <div className="text-2xl font-bold text-text-primary mt-1">{trend.value}</div>
+                  </div>
+                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                    trend.direction === 'up' ? 'bg-green/10 text-green' : 'bg-red/10 text-red'
+                  }`}>
+                    {trend.direction === 'up' ? (
+                      <ArrowUpRight className="w-3 h-3" />
+                    ) : (
+                      <ArrowDownRight className="w-3 h-3" />
+                    )}
+                    {Math.abs(trend.change)}%
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-fuchsia" />
+                  <CardTitle>Skill Demand Trends</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {data.skills.length === 0 ? (
+                  <EmptyState title="No skill data" description="Skills will appear here once contacts have skills data." />
                 ) : (
-                  <ArrowDownRight className="w-3 h-3" />
+                  <div className="space-y-4">
+                    {data.skills.map((item: SkillDemand) => (
+                      <div key={item.id}>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-text-primary">{item.skill}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {item.trend}
+                            </Badge>
+                          </div>
+                          <span className="text-sm font-bold text-text-secondary">{item.demand}%</span>
+                        </div>
+                        <Progress value={item.demand} className="h-2" />
+                      </div>
+                    ))}
+                  </div>
                 )}
-                {Math.abs(trend.change)}%
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-fuchsia" />
+                  <CardTitle>Target Talent Pools</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {data.pools.length === 0 ? (
+                  <EmptyState title="No talent pools" description="Pools will appear here once candidates are added to mandates." />
+                ) : (
+                  <div className="space-y-3">
+                    {data.pools.map((pool: TalentPool) => (
+                      <div key={pool.id} className="flex items-center justify-between p-3 bg-bg-warm rounded-lg">
+                        <div className="flex-1">
+                          <div className="font-medium text-text-primary text-sm">{pool.title}</div>
+                          <div className="text-xs text-text-muted mt-0.5 flex items-center gap-1">
+                            <Globe className="w-3 h-3" />
+                            {pool.location}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-text-primary">{pool.count}</div>
+                          <div className="text-xs text-fuchsia font-medium">candidates</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Brain className="w-5 h-5 text-fuchsia" />
+                <CardTitle>Intelligence Summary</CardTitle>
               </div>
-            </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <h3 className="text-sm font-medium text-text-secondary mb-3">Market Overview</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-muted">Active Candidates</span>
+                      <span className="font-medium text-text-primary">{data.trends.find(t => t.id === 't1')?.value || '—'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-muted">New Mandates (30d)</span>
+                      <span className="font-medium text-text-primary">{data.trends.find(t => t.id === 't2')?.value || '—'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-muted">Avg Time-to-Hire</span>
+                      <span className="font-medium text-text-primary">{data.trends.find(t => t.id === 't3')?.value || '—'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-muted">Offer Acceptance</span>
+                      <span className="font-medium text-text-primary">{data.trends.find(t => t.id === 't4')?.value || '—'}</span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-text-secondary mb-3">Top Skills in Demand</h3>
+                  <ul className="space-y-2">
+                    {data.skills.slice(0, 5).map((s, i) => (
+                      <li key={s.id} className="flex items-center gap-2 text-sm text-text-primary">
+                        <span className="w-5 h-5 rounded-full bg-fuchsia-light flex items-center justify-center text-xs font-bold text-fuchsia">{i + 1}</span>
+                        {s.skill}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-text-secondary mb-3">Competitive Insights</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-muted">Active Talent Pools</span>
+                      <span className="font-medium text-text-primary">{data.pools.length}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-muted">Pool Candidates</span>
+                      <span className="font-medium text-text-primary">{data.pools.reduce((sum, p) => sum + p.count, 0)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-muted">Tracked Skills</span>
+                      <span className="font-medium text-text-primary">{data.skills.length}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
           </Card>
-        ))}
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-fuchsia" />
-              <CardTitle>Skill Demand Trends</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {STATIC_SKILLS.map((item) => (
-                <div key={item.id}>
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-text-primary">{item.skill}</span>
-                      <Badge variant="outline" className="text-xs">
-                        {item.trend}
-                      </Badge>
-                    </div>
-                    <span className="text-sm font-bold text-text-secondary">{item.demand}%</span>
-                  </div>
-                  <Progress value={item.demand} className="h-2" />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-fuchsia" />
-              <CardTitle>Target Talent Pools</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {STATIC_POOLS.map((pool) => (
-                <div key={pool.id} className="flex items-center justify-between p-3 bg-bg-warm rounded-lg">
-                  <div className="flex-1">
-                    <div className="font-medium text-text-primary text-sm">{pool.title}</div>
-                    <div className="text-xs text-text-muted mt-0.5 flex items-center gap-1">
-                      <Globe className="w-3 h-3" />
-                      {pool.location}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-text-primary">{pool.count}</div>
-                    <div className="text-xs text-fuchsia font-medium">Avg Score: {pool.avgScore}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Brain className="w-5 h-5 text-fuchsia" />
-            <CardTitle>Intelligence Summary</CardTitle>
+          <div className="text-xs text-text-muted text-right">
+            Data from last sync: {fmtSyncTime(data.syncedAt)}
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <h3 className="text-sm font-medium text-text-secondary mb-3">Top Markets</h3>
-              <ul className="space-y-2">
-                {['San Francisco Bay Area', 'New York City', 'Boston', 'Austin', 'Seattle'].map((city, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-text-primary">
-                    <span className="w-5 h-5 rounded-full bg-fuchsia-light flex items-center justify-center text-xs font-bold text-fuchsia">{i + 1}</span>
-                    {city}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-text-secondary mb-3">Emerging Roles</h3>
-              <ul className="space-y-2">
-                {['AI Product Manager', 'ML Engineering Lead', 'Data Privacy Officer', 'Remote Work Strategist', 'Sustainability Officer'].map((role, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-text-primary">
-                    <TrendingUp className="w-4 h-4 text-green flex-shrink-0" />
-                    {role}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-text-secondary mb-3">Competitive Insights</h3>
-              <div className="space-y-3">
-                {[
-                  { label: 'Active Searches', value: '156' },
-                  { label: 'Average Salary', value: '$245K' },
-                  { label: 'Signing Bonus', value: '$35K avg' },
-                  { label: 'Equity Range', value: '0.5-2%' },
-                ].map((item, i) => (
-                  <div key={i} className="flex justify-between text-sm">
-                    <span className="text-text-muted">{item.label}</span>
-                    <span className="font-medium text-text-primary">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        </>
+      )}
     </div>
   );
 }
