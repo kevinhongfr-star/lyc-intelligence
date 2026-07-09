@@ -74,6 +74,11 @@ const ClientPipelineAnalyticsPage = lazy(() => import('@/pages/client/ClientPipe
 const ClientMandatesPage = lazy(() => import('@/pages/client/ClientMandatesPage').then(m => ({ default: m.ClientMandatesPage })));
 const ClientCandidatesPage = lazy(() => import('@/pages/client/ClientCandidatesPage').then(m => ({ default: m.ClientCandidatesPage })));
 const ClientDocumentsPage = lazy(() => import('@/pages/client/ClientDocumentsPage').then(m => ({ default: m.ClientDocumentsPage })));
+const ClientTalentIntelPage = lazy(() => import('@/pages/client/ClientTalentIntelPage').then(m => ({ default: m.ClientTalentIntelPage })));
+const ClientNexusAssistantPage = lazy(() => import('@/pages/client/ClientNexusAssistantPage').then(m => ({ default: m.ClientNexusAssistantPage })));
+const ClientAdminPage = lazy(() => import('@/pages/client/ClientAdminPage').then(m => ({ default: m.ClientAdminPage })));
+const ClientCollaborationPage = lazy(() => import('@/pages/client/ClientCollaborationPage').then(m => ({ default: m.ClientCollaborationPage })));
+const ClientOnboardingPage = lazy(() => import('@/pages/client/ClientOnboardingPage').then(m => ({ default: m.ClientOnboardingPage })));
 
 // ── Candidate Portal pages (EO-4) ──
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
@@ -169,14 +174,14 @@ export default function App() {
             <Route index element={<Navigate to="overview" replace />} />
             <Route path="overview" element={<ClientOverviewPage />} />
             <Route path="pipeline-analytics" element={<ClientPipelineAnalyticsPage />} />
-            <Route path="talent-intel" element={<PlaceholderPage title="Talent Intelligence" />} />
+            <Route path="talent-intel" element={<ClientTalentIntelPage />} />
             <Route path="mandates" element={<ClientMandatesPage />} />
             <Route path="candidates" element={<ClientCandidatesPage />} />
-            <Route path="nexus-assistant" element={<PlaceholderPage title="NEXUS Assistant" />} />
+            <Route path="nexus-assistant" element={<ClientNexusAssistantPage />} />
             <Route path="documents" element={<ClientDocumentsPage />} />
-            <Route path="admin" element={<PlaceholderPage title="Admin & Security" />} />
-            <Route path="collaboration" element={<PlaceholderPage title="Collaboration" />} />
-            <Route path="onboarding" element={<PlaceholderPage title="Onboarding" />} />
+            <Route path="admin" element={<ClientAdminPage />} />
+            <Route path="collaboration" element={<ClientCollaborationPage />} />
+            <Route path="onboarding" element={<ClientOnboardingPage />} />
           </Route>
 
           {/* ── B2C Coaching (mockup surface) ── */}
