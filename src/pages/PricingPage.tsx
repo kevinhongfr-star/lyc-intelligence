@@ -1,6 +1,28 @@
 import React, { useState } from 'react';
-import { Check, Crown, Zap, Shield, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Check, Crown, Zap, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { MinimalFooter } from '@/components/MinimalFooter';
+
+const DS = {
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
+  accent: '#C108AB',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F5F5F5',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
+  radius: '0px',
+  radiusSm: '0px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
+  success: '#22C55E',
+};
 
 interface PricingPageProps {
   onUpgradeSuccess?: () => void;
@@ -19,7 +41,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
       period: '',
       description: 'Free tier with basic access',
       features: [
-        '2 credits per day',
+        '2 Match Analyses per day',
         'Basic chat with Nexus',
         'Career insights',
         'Community forum',
@@ -27,35 +49,31 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
       cta: 'Get Started',
       popular: false,
       icon: Zap,
-      color: 'bg-gray-500',
-      borderColor: 'border-gray-300',
     },
     {
-      id: 'council',
-      name: 'Council',
+      id: 'professional',
+      name: 'Professional',
       price: '$29',
       period: '/month',
       description: 'Premium leadership development',
       features: [
-        '5 credits per day',
+        '5 Match Analyses per day',
         'All SHIFT assessments',
         'Premium insights',
         'Priority support',
         'Unlimited reports',
         'Exclusive content',
       ],
-      cta: 'Upgrade to Council',
+      cta: 'Upgrade to Professional',
       popular: true,
       icon: Crown,
-      color: 'bg-accent',
-      borderColor: 'border-accent',
     },
   ];
 
   const handleUpgrade = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
@@ -69,7 +87,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
       });
 
       const data = await response.json();
-      
+
       if (data.url) {
         window.location.href = data.url;
       } else {
@@ -92,212 +110,298 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
-      {/* Header */}
-      <div className="max-w-6xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-4xl font-bold text-text-primary mb-4">
-          Choose Your Plan
-        </h1>
-        <p className="text-text-muted text-lg max-w-2xl mx-auto">
-          Select the right tier for your leadership journey. Upgrade anytime as your needs grow.
-        </p>
+    <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '24px 24px 0', width: '100%' }}>
+        <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', display: 'inline-block', marginBottom: '16px', fontFamily: DS.bodyFont }}>← Back to home</Link>
       </div>
 
+      {/* Header */}
+      <header style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px 64px', textAlign: 'center', width: '100%' }}>
+        <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 16px' }}>
+          Choose Your Plan
+        </h1>
+        <p style={{ fontFamily: DS.bodyFont, fontSize: '16px', color: DS.muted, lineHeight: 1.6, maxWidth: '560px', margin: '0 auto' }}>
+          Select the right tier for your leadership journey. Upgrade anytime as your needs grow.
+        </p>
+      </header>
+
       {/* Pricing Cards */}
-      <div className="max-w-5xl mx-auto px-4 pb-16">
-        <div className="grid md:grid-cols-2 gap-8">
+      <section style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 64px', width: '100%' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
           {tiers.map((tier) => {
             const Icon = tier.icon;
             const isCurrentTier = profile?.tier === tier.id;
-            
+
             return (
               <div
                 key={tier.id}
-                className={`relative rounded-2xl border-2 ${tier.borderColor} p-8 ${
-                  tier.popular ? 'bg-gradient-to-b from-accent/5 to-white' : 'bg-white'
-                } shadow-lg hover:shadow-xl transition-shadow`}
+                style={{
+                  position: 'relative',
+                  background: DS.card,
+                  border: `2px solid ${tier.popular ? DS.accent : DS.cardBorder}`,
+                  borderRadius: DS.radius,
+                  padding: '32px 24px',
+                  boxShadow: DS.shadowHover,
+                }}
               >
                 {tier.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-accent text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
+                  <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)' }}>
+                    <span style={{
+                      background: DS.accent,
+                      color: '#FFFFFF',
+                      padding: '4px 12px',
+                      borderRadius: DS.radius,
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontFamily: DS.bodyFont,
+                    }}>
+                      <Sparkles style={{ width: 12, height: 12 }} />
                       Most Popular
                     </span>
                   </div>
                 )}
 
                 {isCurrentTier && (
-                  <div className="absolute -top-4 right-4">
-                    <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                  <div style={{ position: 'absolute', top: '-14px', right: '16px' }}>
+                    <span style={{
+                      background: DS.success,
+                      color: '#FFFFFF',
+                      padding: '4px 12px',
+                      borderRadius: DS.radius,
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      fontFamily: DS.bodyFont,
+                    }}>
                       Current Plan
                     </span>
                   </div>
                 )}
 
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-12 h-12 ${tier.color} rounded-none flex items-center justify-center`}>
-                    <Icon className="w-6 h-6 text-white" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    background: tier.popular ? DS.accent : DS.muted,
+                    borderRadius: DS.radius,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <Icon style={{ width: 24, height: 24, color: '#FFFFFF' }} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-text-primary">{tier.name}</h3>
-                    <p className="text-sm text-text-muted">{tier.description}</p>
+                    <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: 0 }}>
+                      {tier.name}
+                    </h3>
+                    <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, margin: '4px 0 0' }}>
+                      {tier.description}
+                    </p>
                   </div>
                 </div>
 
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-text-primary">{tier.price}</span>
+                <div style={{ marginBottom: '24px' }}>
+                  <span style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text }}>
+                    {tier.price}
+                  </span>
                   {tier.period && (
-                    <span className="text-text-muted">{tier.period}</span>
+                    <span style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: DS.muted, marginLeft: '4px' }}>
+                      {tier.period}
+                    </span>
                   )}
                 </div>
 
-                <ul className="space-y-3 mb-8">
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {tier.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-3">
-                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <span className="text-text-secondary">{feature}</span>
+                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontFamily: DS.bodyFont, fontSize: '14px', color: DS.textSecondary }}>
+                      <Check style={{ width: 18, height: 18, color: DS.success, flexShrink: 0 }} />
+                      <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
 
                 <button
-                  onClick={tier.id === 'council' ? handleUpgrade : handleGetStarted}
+                  onClick={tier.id === 'professional' ? handleUpgrade : handleGetStarted}
                   disabled={loading}
-                  className={`w-full py-3 px-6 rounded-none font-medium flex items-center justify-center gap-2 transition-all ${
-                    tier.popular
-                      ? 'bg-accent text-white hover:bg-accent-hover'
-                      : 'bg-bg-tertiary text-text-primary hover:bg-bg-secondary'
-                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  style={{
+                    width: '100%',
+                    padding: '14px 24px',
+                    background: tier.popular ? DS.accent : DS.bgAlt,
+                    color: tier.popular ? '#FFFFFF' : DS.text,
+                    border: 'none',
+                    borderRadius: DS.radius,
+                    fontFamily: DS.bodyFont,
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.5 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    minHeight: '48px',
+                    transition: 'all 0.2s ease',
+                  }}
                 >
                   {loading ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
                       Processing...
                     </>
                   ) : (
                     <>
                       {tier.cta}
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight style={{ width: 16, height: 16 }} />
                     </>
                   )}
                 </button>
 
-                {error && tier.id === 'council' && (
-                  <p className="text-red-500 text-sm mt-3 text-center">{error}</p>
+                {error && tier.id === 'professional' && (
+                  <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: '#EF4444', marginTop: '12px', textAlign: 'center' }}>
+                    {error}
+                  </p>
                 )}
               </div>
             );
           })}
         </div>
-      </div>
+      </section>
 
       {/* Feature Comparison */}
-      <div className="max-w-4xl mx-auto px-4 pb-16">
-        <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
+      <section style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 64px', width: '100%' }}>
+        <h2 style={{ fontFamily: DS.headingFont, fontSize: '24px', fontWeight: 700, color: DS.text, textAlign: 'center', margin: '0 0 32px' }}>
           Feature Comparison
         </h2>
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
-          <table className="w-full">
+        <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: DS.bodyFont }}>
             <thead>
-              <tr className="bg-bg-tertiary">
-                <th className="px-6 py-4 text-left font-medium text-text-secondary">Feature</th>
-                <th className="px-6 py-4 text-center font-medium text-text-secondary">Member</th>
-                <th className="px-6 py-4 text-center font-medium text-accent">Council</th>
+              <tr style={{ background: DS.bgAlt }}>
+                <th style={{ padding: '16px 24px', textAlign: 'left', fontWeight: 600, color: DS.textSecondary, fontSize: '14px' }}>Feature</th>
+                <th style={{ padding: '16px 24px', textAlign: 'center', fontWeight: 600, color: DS.textSecondary, fontSize: '14px' }}>Member</th>
+                <th style={{ padding: '16px 24px', textAlign: 'center', fontWeight: 600, color: DS.accent, fontSize: '14px' }}>Professional</th>
               </tr>
             </thead>
             <tbody>
               {[
-                { feature: 'Daily Credits', member: '2', council: '5' },
-                { feature: 'Nexus Chat', member: 'Basic', council: 'Premium' },
-                { feature: 'SHIFT Assessments', member: '✗', council: '✓' },
-                { feature: 'Career Reports', member: 'Basic', council: 'Unlimited' },
-                { feature: 'Priority Support', member: '✗', council: '✓' },
-                { feature: 'Exclusive Content', member: '✗', council: '✓' },
-                { feature: 'Team Insights', member: '✗', council: '✓' },
+                { feature: 'Daily Match Analyses', member: '2', professional: '5' },
+                { feature: 'Nexus Chat', member: 'Basic', professional: 'Premium' },
+                { feature: 'SHIFT Assessments', member: '✗', professional: '✓' },
+                { feature: 'Career Reports', member: 'Basic', professional: 'Unlimited' },
+                { feature: 'Priority Support', member: '✗', professional: '✓' },
+                { feature: 'Exclusive Content', member: '✗', professional: '✓' },
+                { feature: 'Team Insights', member: '✗', professional: '✓' },
               ].map((row, i) => (
-                <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-bg-tertiary/50'}>
-                  <td className="px-6 py-4 text-text-secondary">{row.feature}</td>
-                  <td className="px-6 py-4 text-center">
-                    {row.member === '✓' ? (
-                      <Check className="w-5 h-5 text-green-500 mx-auto" />
-                    ) : row.member === '✗' ? (
-                      <span className="text-text-muted">—</span>
-                    ) : (
-                      <span className="text-text-primary font-medium">{row.member}</span>
-                    )}
+                <tr key={i} style={{ background: i % 2 === 0 ? DS.card : DS.bgAlt }}>
+                  <td style={{ padding: '16px 24px', color: DS.textSecondary, fontSize: '14px' }}>{row.feature}</td>
+                  <td style={{ padding: '16px 24px', textAlign: 'center', color: DS.text, fontSize: '14px' }}>
+                    {row.member}
                   </td>
-                  <td className="px-6 py-4 text-center">
-                    {row.council === '✓' ? (
-                      <Check className="w-5 h-5 text-accent mx-auto" />
-                    ) : row.council === '✗' ? (
-                      <span className="text-text-muted">—</span>
-                    ) : (
-                      <span className="text-accent font-medium">{row.council}</span>
-                    )}
+                  <td style={{ padding: '16px 24px', textAlign: 'center', color: row.professional === '✓' ? DS.success : DS.accent, fontSize: '14px', fontWeight: 600 }}>
+                    {row.professional}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
 
       {/* FAQ */}
-      <div className="max-w-3xl mx-auto px-4 pb-16">
-        <h2 className="text-2xl font-bold text-text-primary text-center mb-8">Frequently Asked Questions</h2>
-        <div className="space-y-4">
+      <section style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 64px', width: '100%' }}>
+        <h2 style={{ fontFamily: DS.headingFont, fontSize: '24px', fontWeight: 700, color: DS.text, textAlign: 'center', margin: '0 0 32px' }}>
+          Frequently Asked Questions
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {[
             {
               question: 'Can I cancel my subscription at any time?',
-              answer: 'Yes, you can cancel your Council subscription at any time. You will continue to have access until the end of your current billing period.',
+              answer: 'Yes, you can cancel your Professional subscription at any time. You will continue to have access until the end of your current billing period.',
             },
             {
-              question: 'How do credits work?',
-              answer: 'Credits are used for premium features like SHIFT assessments and advanced insights. Member accounts get 2 credits per day, while Council members get 5 credits per day. Unused credits do not roll over.',
+              question: 'How do Match Analyses work?',
+              answer: 'Match Analyses are used for premium features like SHIFT assessments and advanced insights. Member accounts get 2 Match Analyses per day, while Professional members get 5 Match Analyses per day. Unused analyses do not roll over.',
             },
             {
               question: 'Can I upgrade or downgrade my plan?',
-              answer: 'Absolutely! You can upgrade to Council at any time. If you downgrade from Council to Member, your change will take effect at the end of your current billing cycle.',
+              answer: 'Absolutely! You can upgrade to Professional at any time. If you downgrade from Professional to Member, your change will take effect at the end of your current billing cycle.',
             },
             {
               question: 'What payment methods are accepted?',
               answer: 'We accept all major credit cards (Visa, Mastercard, American Express) through Stripe. We also support Apple Pay and Google Pay where available.',
             },
           ].map((faq, i) => (
-            <div key={i} className="bg-white rounded-none border border-border p-6">
-              <h3 className="font-semibold text-text-primary mb-2">{faq.question}</h3>
-              <p className="text-text-muted text-sm">{faq.answer}</p>
+            <div key={i} style={{
+              background: DS.card,
+              border: `1px solid ${DS.cardBorder}`,
+              borderRadius: DS.radius,
+              padding: '24px',
+            }}>
+              <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
+                {faq.question}
+              </h3>
+              <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: DS.muted, margin: 0, lineHeight: 1.6 }}>
+                {faq.answer}
+              </p>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* CTA */}
-      <div className="max-w-4xl mx-auto px-4 pb-16">
-        <div className="bg-gradient-to-r from-accent to-purple-600 rounded-2xl p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">Ready to Elevate Your Leadership?</h2>
-          <p className="mb-6 opacity-90">
-            Join Council today and unlock premium features designed for ambitious leaders.
+      <section style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 64px', width: '100%' }}>
+        <div style={{
+          background: DS.accent,
+          borderRadius: DS.radius,
+          padding: '48px 32px',
+          textAlign: 'center',
+          color: '#FFFFFF',
+        }}>
+          <h2 style={{ fontFamily: DS.headingFont, fontSize: '24px', fontWeight: 700, margin: '0 0 16px', color: '#FFFFFF' }}>
+            Ready to Elevate Your Leadership?
+          </h2>
+          <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', margin: '0 0 24px', opacity: 0.9, lineHeight: 1.6 }}>
+            Join Professional today and unlock premium features designed for ambitious leaders.
           </p>
           <button
             onClick={handleUpgrade}
             disabled={loading}
-            className="bg-white text-accent px-8 py-3 rounded-none font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
+            style={{
+              background: '#FFFFFF',
+              color: DS.accent,
+              border: 'none',
+              borderRadius: DS.radius,
+              padding: '14px 28px',
+              fontFamily: DS.bodyFont,
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.7 : 1,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              minHeight: '48px',
+            }}
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
                 Processing...
               </>
             ) : (
               <>
-                Upgrade to Council
-                <ArrowRight className="w-4 h-4" />
+                Upgrade to Professional
+                <ArrowRight style={{ width: 16, height: 16 }} />
               </>
             )}
           </button>
         </div>
-      </div>
+      </section>
+
+      <MinimalFooter />
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
