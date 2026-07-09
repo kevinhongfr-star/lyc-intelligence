@@ -3,7 +3,7 @@
  * Renders inside AppShell → Outlet. Shows milestones, skill development
  * progress, and achievements.
  */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Trophy,
   Target,
@@ -45,7 +45,8 @@ interface Achievement {
   icon: 'trophy' | 'sparkles' | 'zap';
 }
 
-const MOCK_MILESTONES: Milestone[] = [
+// Static content - growth tracking, no direct database backing
+const STATIC_MILESTONES: Milestone[] = [
   { id: 'ms1', title: 'Complete Career Audit', description: 'Full assessment of strengths, gaps, and target roles.', targetDate: '2024-12-15', status: 'Completed', progress: 100 },
   { id: 'ms2', title: 'Build Target Company List', description: 'Identify and research 12 high-fit target companies.', targetDate: '2025-01-15', status: 'Completed', progress: 100 },
   { id: 'ms3', title: 'Refresh Personal Brand', description: 'Update LinkedIn, resume, and executive bio.', targetDate: '2025-02-01', status: 'In Progress', progress: 65 },
@@ -54,14 +55,14 @@ const MOCK_MILESTONES: Milestone[] = [
   { id: 'ms6', title: 'Negotiate and Accept Offer', description: 'Secure and accept a role above the 75th percentile.', targetDate: '2025-04-30', status: 'Upcoming', progress: 0 },
 ];
 
-const MOCK_SKILLS: SkillTrack[] = [
+const STATIC_SKILLS: SkillTrack[] = [
   { id: 'sk1', skill: 'Executive Communication', currentLevel: 3, targetLevel: 5, weeksRemaining: 6, activitiesDone: 8, activitiesTotal: 14 },
   { id: 'sk2', skill: 'Strategic Storytelling', currentLevel: 2, targetLevel: 4, weeksRemaining: 8, activitiesDone: 5, activitiesTotal: 12 },
   { id: 'sk3', skill: 'Financial Acumen', currentLevel: 3, targetLevel: 4, weeksRemaining: 4, activitiesDone: 9, activitiesTotal: 10 },
   { id: 'sk4', skill: 'Negotiation Tactics', currentLevel: 4, targetLevel: 5, weeksRemaining: 3, activitiesDone: 6, activitiesTotal: 8 },
 ];
 
-const MOCK_ACHIEVEMENTS: Achievement[] = [
+const STATIC_ACHIEVEMENTS: Achievement[] = [
   { id: 'a1', title: 'First Steps', description: 'Completed your initial career assessment.', unlockedAt: '2024-12-13', icon: 'sparkles' },
   { id: 'a2', title: 'Brand Builder', description: 'Refreshed all personal brand assets.', unlockedAt: '2025-01-10', icon: 'zap' },
   { id: 'a3', title: 'Network Navigator', description: 'Completed 5 meaningful networking conversations.', unlockedAt: null, icon: 'trophy' },
@@ -83,22 +84,11 @@ const MILESTONE_STATUS_VARIANT: Record<Milestone['status'], 'success' | 'default
 };
 
 export function CoachingGrowthPage() {
-  const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [skills, setSkills] = useState<SkillTrack[]>([]);
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [loading, setLoading] = useState(true);
   const { profile } = useTenantContext();
 
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/coaching/growth
-    const timer = setTimeout(() => {
-      setMilestones(MOCK_MILESTONES);
-      setSkills(MOCK_SKILLS);
-      setAchievements(MOCK_ACHIEVEMENTS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const milestones = STATIC_MILESTONES;
+  const skills = STATIC_SKILLS;
+  const achievements = STATIC_ACHIEVEMENTS;
 
   const completedMilestones = milestones.filter(m => m.status === 'Completed').length;
   const overallProgress = milestones.length
@@ -139,7 +129,7 @@ export function CoachingGrowthPage() {
             </div>
             <div>
               <div className="text-2xl font-bold text-text-primary">
-                {loading ? '—' : `${completedMilestones}/${milestones.length}`}
+                {`${completedMilestones}/${milestones.length}`}
               </div>
               <div className="text-xs text-text-muted">Milestones Done</div>
             </div>
@@ -151,7 +141,7 @@ export function CoachingGrowthPage() {
               <TrendingUp className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : `${overallProgress}%`}</div>
+              <div className="text-2xl font-bold text-text-primary">{`${overallProgress}%`}</div>
               <div className="text-xs text-text-muted">Overall Progress</div>
             </div>
           </div>
@@ -163,7 +153,7 @@ export function CoachingGrowthPage() {
             </div>
             <div>
               <div className="text-2xl font-bold text-text-primary">
-                {loading ? '—' : `${unlockedAchievements}/${achievements.length}`}
+                {`${unlockedAchievements}/${achievements.length}`}
               </div>
               <div className="text-xs text-text-muted">Achievements</div>
             </div>
@@ -183,9 +173,6 @@ export function CoachingGrowthPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading milestones...</div>
-          ) : (
             <div className="space-y-1">
               {milestones.map((milestone, idx) => {
                 const isLast = idx === milestones.length - 1;
@@ -220,7 +207,6 @@ export function CoachingGrowthPage() {
                 );
               })}
             </div>
-          )}
         </CardContent>
       </Card>
 
@@ -234,9 +220,6 @@ export function CoachingGrowthPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading skills...</div>
-            ) : (
               <div className="space-y-5">
                 {skills.map((skill) => {
                   const levelProgress = (skill.activitiesDone / skill.activitiesTotal) * 100;
@@ -265,7 +248,6 @@ export function CoachingGrowthPage() {
                   );
                 })}
               </div>
-            )}
           </CardContent>
         </Card>
 
@@ -278,9 +260,6 @@ export function CoachingGrowthPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading achievements...</div>
-            ) : (
               <div className="grid grid-cols-2 gap-3">
                 {achievements.map((achievement) => {
                   const unlocked = achievement.unlockedAt !== null;
@@ -314,7 +293,6 @@ export function CoachingGrowthPage() {
                   );
                 })}
               </div>
-            )}
           </CardContent>
         </Card>
       </div>

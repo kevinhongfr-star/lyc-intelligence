@@ -4,8 +4,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Target, Users, Calendar, ArrowRight, Building2, User } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Input } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Input, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getMandates, type Mandate } from '@/services/supabaseApi';
 
 interface ClientMandate {
   id: string;
@@ -22,28 +23,48 @@ interface ClientMandate {
   updatedAt: string;
 }
 
-const MOCK_MANDATES: ClientMandate[] = [
-  { id: 'm1', title: 'VP Engineering', company: 'TechCorp', status: 'Active', seniority: 'VP', location: 'San Francisco', candidatesCount: 24, shortlisted: 8, interviewed: 4, progress: 65, startDate: '2024-11-01', updatedAt: '2025-01-15' },
-  { id: 'm2', title: 'Chief Financial Officer', company: 'FinScale', status: 'Active', seniority: 'C-Level', location: 'New York', candidatesCount: 18, shortlisted: 5, interviewed: 2, progress: 40, startDate: '2024-12-01', updatedAt: '2025-01-14' },
-  { id: 'm3', title: 'Head of Product', company: 'DataMesh', status: 'On Hold', seniority: 'Director', location: 'Remote', candidatesCount: 8, shortlisted: 2, interviewed: 0, progress: 20, startDate: '2024-12-15', updatedAt: '2025-01-10' },
-  { id: 'm4', title: 'CTO', company: 'CloudPeak', status: 'Active', seniority: 'C-Level', location: 'Seattle', candidatesCount: 32, shortlisted: 10, interviewed: 6, progress: 80, startDate: '2024-10-01', updatedAt: '2025-01-16' },
-  { id: 'm5', title: 'VP Sales', company: 'GrowthLab', status: 'Closed', seniority: 'VP', location: 'Boston', candidatesCount: 15, shortlisted: 3, interviewed: 2, progress: 100, startDate: '2024-08-01', updatedAt: '2024-12-20' },
-];
-
 export function ClientMandatesPage() {
   const [mandates, setMandates] = useState<ClientMandate[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const { clientAccount, profile } = useTenantContext();
+  const [error, setError] = useState<string | null>(null);
+  const { clientAccount, profile, isLoading: authLoading } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setMandates(MOCK_MANDATES);
+    if (!profile?.id || authLoading) {
       setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+      return;
+    }
+
+    const loadMandates = async () => {
+      try {
+        const result = await getMandates({ userId: profile.id });
+        const mapped: ClientMandate[] = result.data.map((m: Mandate) => ({
+          id: m.id,
+          title: m.title,
+          company: m.company?.name || 'Unknown Company',
+          status: (m.status === 'active' ? 'Active' : m.status === 'on_hold' ? 'On Hold' : 'Closed') as 'Active' | 'On Hold' | 'Closed',
+          seniority: m.client_first_name || 'Not specified',
+          location: m.company?.city || m.company?.country || 'Not specified',
+          candidatesCount: m.total_candidates ?? 0,
+          shortlisted: m.shortlisted_count ?? 0,
+          interviewed: m.interview_count ?? 0,
+          progress: m.progress ? parseInt(m.progress, 10) : 0,
+          startDate: m.created_at ? new Date(m.created_at).toLocaleDateString() : '',
+          updatedAt: m.updated_at ? new Date(m.updated_at).toLocaleDateString() : '',
+        }));
+        setMandates(mapped);
+      } catch (e) {
+        console.error('[ClientMandatesPage] Error:', e);
+        setError('Failed to load');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMandates();
+  }, [profile?.id, authLoading]);
 
   const filteredMandates = mandates.filter(m => {
     const matchesSearch = m.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -107,8 +128,13 @@ export function ClientMandatesPage() {
       {/* Mandate cards */}
       {loading ? (
         <div className="py-12 text-center text-text-muted text-sm">Loading mandates...</div>
+      ) : error ? (
+        <div className="py-12 text-center text-text-muted text-sm">{error}</div>
       ) : filteredMandates.length === 0 ? (
-        <div className="py-12 text-center text-text-muted text-sm">No mandates found.</div>
+        <EmptyState
+          title="No mandates found"
+          description="Adjust your search or filters to see more results."
+        />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {filteredMandates.map((mandate) => (

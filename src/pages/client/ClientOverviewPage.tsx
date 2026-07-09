@@ -4,9 +4,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Briefcase, Users, TrendingUp, Clock, ArrowRight, Target, User } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
-import { fetchClientActivity, type ClientActivityEvent } from '@/services/supabaseApi';
+import { fetchClientActivity, getMandates, type ClientActivityEvent, type Mandate } from '@/services/supabaseApi';
 
 interface MandateSummary {
   id: string;
@@ -17,26 +17,42 @@ interface MandateSummary {
   updatedAt: string;
 }
 
-const MOCK_MANDATES: MandateSummary[] = [
-  { id: 'm1', title: 'VP Engineering — TechCorp', status: 'Active', candidatesCount: 24, progress: 65, updatedAt: '2025-01-15' },
-  { id: 'm2', title: 'CFO — FinScale', status: 'Active', candidatesCount: 18, progress: 40, updatedAt: '2025-01-14' },
-  { id: 'm3', title: 'Head of Product — DataMesh', status: 'On Hold', candidatesCount: 8, progress: 20, updatedAt: '2025-01-10' },
-];
-
 export function ClientOverviewPage() {
   const [mandates, setMandates] = useState<MandateSummary[]>([]);
   const [activities, setActivities] = useState<ClientActivityEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [activityLoading, setActivityLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { clientAccount, profile, isLoading: authLoading } = useTenantContext();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setMandates(MOCK_MANDATES);
+    if (!profile?.id || authLoading) {
       setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+      return;
+    }
+
+    const loadMandates = async () => {
+      try {
+        const result = await getMandates({ userId: profile.id, status: 'active' });
+        const mapped: MandateSummary[] = result.data.map((m: Mandate) => ({
+          id: m.id,
+          title: m.title,
+          status: (m.status === 'active' ? 'Active' : m.status === 'on_hold' ? 'On Hold' : 'Closed') as 'Active' | 'On Hold' | 'Closed',
+          candidatesCount: m.total_candidates ?? 0,
+          progress: m.progress ? parseInt(m.progress, 10) : 0,
+          updatedAt: m.updated_at ? new Date(m.updated_at).toLocaleDateString() : '',
+        }));
+        setMandates(mapped);
+      } catch (e) {
+        console.error('[ClientOverviewPage] Error:', e);
+        setError('Failed to load');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMandates();
+  }, [profile?.id, authLoading]);
 
   useEffect(() => {
     if (!clientAccount?.id || authLoading) {
@@ -149,8 +165,13 @@ export function ClientOverviewPage() {
         <CardContent>
           {loading ? (
             <div className="py-8 text-center text-text-muted text-sm">Loading mandates...</div>
+          ) : error ? (
+            <div className="py-8 text-center text-text-muted text-sm">{error}</div>
           ) : mandates.length === 0 ? (
-            <div className="py-8 text-center text-text-muted text-sm">No mandates found.</div>
+            <EmptyState
+              title="No active mandates"
+              description="Your active search mandates will appear here."
+            />
           ) : (
             <div className="space-y-4">
               {mandates.map((mandate) => (

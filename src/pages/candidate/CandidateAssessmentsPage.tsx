@@ -4,9 +4,10 @@
  * completed results, switchable via tabs.
  */
 import React, { useState, useEffect } from 'react';
-import { ClipboardCheck, Clock, HelpCircle, BarChart2, Star, Download, Play, ArrowRight, User } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Button, Progress } from '@/components/ui';
+import { ClipboardCheck, Clock, HelpCircle, BarChart2, Star, Download, Play, ArrowRight, User, Search } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, Button, Progress, EmptyState, Input } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getAssessmentCatalog, getAssessmentInvitations } from '@/services/supabaseApi';
 
 type Tab = 'available' | 'completed';
 
@@ -33,57 +34,66 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'completed', label: 'Completed' },
 ];
 
-const MOCK_AVAILABLE: AvailableAssessment[] = [
-  { id: 'av1', name: 'Leadership Archetype Assessment', description: 'Discover your core leadership archetype and operating style.', duration: '25 min', questions: 40, category: 'Leadership' },
-  { id: 'av2', name: 'Executive Reasoning Test', description: 'Measure strategic reasoning and complex problem-solving.', duration: '35 min', questions: 30, category: 'Cognitive' },
-  { id: 'av3', name: 'Cross-Border Readiness Index', description: 'Assess readiness for international and cross-cultural roles.', duration: '20 min', questions: 28, category: 'Career' },
-  { id: 'av4', name: 'Influence & Communication Profile', description: 'Map your influence style and stakeholder communication patterns.', duration: '18 min', questions: 24, category: 'Soft Skills' },
-];
-
-const MOCK_COMPLETED: CompletedAssessment[] = [
-  {
-    id: 'c1',
-    name: 'Leadership Archetype Assessment',
-    archetype: 'The Architect',
-    score: 87,
-    takenAt: '2025-01-08',
-    dimensions: [
-      { name: 'Strategic Vision', score: 92 },
-      { name: 'Execution', score: 84 },
-      { name: 'Influence', score: 78 },
-      { name: 'Resilience', score: 88 },
-    ],
-  },
-  {
-    id: 'c2',
-    name: 'Influence & Communication Profile',
-    archetype: 'The Diplomat',
-    score: 79,
-    takenAt: '2024-12-15',
-    dimensions: [
-      { name: 'Persuasion', score: 82 },
-      { name: 'Active Listening', score: 88 },
-      { name: 'Conflict Resolution', score: 74 },
-    ],
-  },
-];
+const CATEGORY_OPTIONS = ['All Categories', 'Leadership', 'Cognitive', 'Career', 'Soft Skills'];
 
 export function CandidateAssessmentsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('available');
   const [available, setAvailable] = useState<AvailableAssessment[]>([]);
   const [completed, setCompleted] = useState<CompletedAssessment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('All Categories');
   const { candidateProfile, profile } = useTenantContext();
 
   useEffect(() => {
-    // TODO: Replace with real API call to /api/candidate/assessments
-    const timer = setTimeout(() => {
-      setAvailable(MOCK_AVAILABLE);
-      setCompleted(MOCK_COMPLETED);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    async function loadAssessments() {
+      try {
+        const catalog = await getAssessmentCatalog();
+        const mappedAvailable: AvailableAssessment[] = catalog.map((a: any) => ({
+          id: a.id,
+          name: a.title || 'Assessment',
+          description: a.description || '',
+          duration: a.estimated_minutes ? `${a.estimated_minutes} min` : '—',
+          questions: 0,
+          category: a.type || 'General',
+        }));
+        setAvailable(mappedAvailable);
+
+        if (candidateProfile?.id) {
+          try {
+            const invitations = await getAssessmentInvitations(candidateProfile.id);
+            const completedInvitations = invitations.filter((i: any) => i.status === 'completed');
+            const mappedCompleted: CompletedAssessment[] = completedInvitations.map((i: any) => ({
+              id: i.id,
+              name: i.assessment_title || 'Assessment',
+              archetype: 'Completed',
+              score: 0,
+              takenAt: i.invited_at?.split('T')[0] || '',
+              dimensions: [],
+            }));
+            setCompleted(mappedCompleted);
+          } catch (e) {
+            console.error('[CandidateAssessmentsPage] Invitations error:', e);
+          }
+        }
+      } catch (e) {
+        console.error('[CandidateAssessmentsPage] Error:', e);
+        setError('Failed to load assessments');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadAssessments();
+  }, [candidateProfile?.id]);
+
+  const filteredAvailable = available.filter((a) => {
+    const matchesSearch =
+      a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = categoryFilter === 'All Categories' || a.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
 
   const displayName = candidateProfile?.name || profile?.name || 'Candidate';
   const currentTitle = candidateProfile?.current_title || 'Professional';
@@ -134,38 +144,71 @@ export function CandidateAssessmentsPage() {
 
       {loading ? (
         <div className="py-12 text-center text-text-muted text-sm">Loading assessments...</div>
+      ) : error ? (
+        <EmptyState title="Failed to load" description="Could not load assessments. Please try again later." />
       ) : activeTab === 'available' ? (
         /* Available assessments */
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {available.map((a) => (
-            <Card key={a.id} className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center flex-shrink-0">
-                  <ClipboardCheck className="w-5 h-5 text-fuchsia" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-serif font-semibold text-text-primary">{a.name}</h3>
-                    <span className="px-2 py-0.5 text-xs font-medium rounded bg-fuchsia-light text-fuchsia">{a.category}</span>
+        <>
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+              <Input
+                placeholder="Search assessments..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-4 py-2 bg-white border border-border text-sm text-text-primary focus:outline-none focus:border-fuchsia"
+            >
+              {CATEGORY_OPTIONS.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+          {filteredAvailable.length === 0 ? (
+            <EmptyState
+              title={available.length === 0 ? 'No assessments available' : 'No matching assessments'}
+              description={available.length === 0 ? 'Check back soon for new assessments.' : 'Try adjusting your search or category filter.'}
+            />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {filteredAvailable.map((a) => (
+                <Card key={a.id} className="p-5">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center flex-shrink-0">
+                      <ClipboardCheck className="w-5 h-5 text-fuchsia" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-serif font-semibold text-text-primary">{a.name}</h3>
+                        <span className="px-2 py-0.5 text-xs font-medium rounded bg-fuchsia-light text-fuchsia">{a.category}</span>
+                      </div>
+                      <p className="text-sm text-text-secondary mt-1">{a.description}</p>
+                    </div>
                   </div>
-                  <p className="text-sm text-text-secondary mt-1">{a.description}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-xs text-text-muted mb-4">
-                <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> {a.duration}</span>
-                <span className="inline-flex items-center gap-1"><HelpCircle className="w-3 h-3" /> {a.questions} questions</span>
-              </div>
-              <Button size="sm" className="w-full sm:w-auto">
-                <Play className="w-3 h-3" /> Start Assessment
-              </Button>
-            </Card>
-          ))}
-        </div>
+                  <div className="flex items-center gap-4 text-xs text-text-muted mb-4">
+                    <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> {a.duration}</span>
+                    {a.questions > 0 && (
+                      <span className="inline-flex items-center gap-1"><HelpCircle className="w-3 h-3" /> {a.questions} questions</span>
+                    )}
+                  </div>
+                  <Button size="sm" className="w-full sm:w-auto">
+                    <Play className="w-3 h-3" /> Start Assessment
+                  </Button>
+                </Card>
+              ))}
+            </div>
+          )}
+        </>
       ) : (
         /* Completed assessments */
         <div className="space-y-4">
           {completed.length === 0 ? (
-            <div className="py-12 text-center text-text-muted text-sm">No completed assessments yet.</div>
+            <EmptyState title="No completed assessments" description="You haven't completed any assessments yet." />
           ) : (
             completed.map((c) => (
               <Card key={c.id}>
