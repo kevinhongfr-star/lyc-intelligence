@@ -28,6 +28,8 @@
  *   unlimited → no cap
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { buildSystemPrompt, type PortalType } from './lib/nexusPrompts';
+import { fetchUserContext, determinePortalType } from './lib/nexusContext';
 
 export const maxDuration = 30;
 
@@ -105,6 +107,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     history?: Array<{ role: string; content: string }>;
     userId?: string;
     tier?: string;
+    portalType?: string;
     memoryContext?: any[];
     documentContext?: string;
     systemPrompt?: string;
@@ -126,7 +129,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  const systemPrompt = (body.systemPrompt || DEFAULT_SYSTEM_PROMPT).toString();
+  let systemPrompt = DEFAULT_SYSTEM_PROMPT;
+
+  if (body.userId) {
+    try {
+      const detectedType = body.portalType as PortalType | undefined || await determinePortalType(body.userId);
+      const userContext = await fetchUserContext(body.userId, detectedType);
+      systemPrompt = buildSystemPrompt(detectedType, userContext);
+    } catch (e) {
+      console.error('[api/chat] Context fetch error:', e);
+    }
+  }
+
+  if (body.systemPrompt && body.systemPrompt.toString().trim()) {
+    systemPrompt = body.systemPrompt.toString();
+  }
 
   // Compose messages array for DeepSeek
   const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
