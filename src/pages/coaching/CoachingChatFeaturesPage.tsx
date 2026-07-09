@@ -3,10 +3,11 @@
  * Renders inside AppShell → Outlet. Shows available chat features,
  * messaging capabilities, and AI tools.
  */
-import React, { useState } from 'react';
-import { MessageSquare, Sparkles, Mic, Video, Paperclip, Smile, Send, Bot, Wand2, Languages, FileText, User } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
+import React, { useState, useEffect } from 'react';
+import { MessageSquare, Sparkles, Mic, Video, Paperclip, Smile, Send, Bot, Wand2, Languages, FileText, User, Calendar } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getCoacheePastSessions, type CoachingSession } from '@/services/supabaseApi';
 
 interface ChatFeature {
   id: string;
@@ -37,7 +38,29 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export function CoachingChatFeaturesPage() {
   const [filter, setFilter] = useState<'All' | 'AI' | 'Communication' | 'Productivity'>('All');
-  const { profile } = useTenantContext();
+  const [sessions, setSessions] = useState<CoachingSession[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user, profile } = useTenantContext();
+
+  useEffect(() => {
+    if (!user?.id) { setLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getCoacheePastSessions(user.id);
+        if (cancelled) return;
+        setSessions(data.slice(0, 5));
+        setError(null);
+      } catch (e) {
+        console.error('[CoachingChatFeaturesPage] Error:', e);
+        if (!cancelled) setError('Failed to load session history');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const displayName = profile?.name || 'Coachee';
   const tier = profile?.tier || 'Professional';
@@ -137,6 +160,66 @@ export function CoachingChatFeaturesPage() {
           </Card>
         ))}
       </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-fuchsia" />
+            <CardTitle>Recent Coaching Sessions</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="space-y-3">
+              {[0, 1, 2].map(i => (
+                <div key={i} className="animate-pulse h-16 bg-bg-tertiary rounded-lg" />
+              ))}
+            </div>
+          ) : error ? (
+            <div className="py-6 text-center text-red text-sm">{error}</div>
+          ) : sessions.length === 0 ? (
+            <EmptyState
+              title="No coaching sessions yet"
+              description="Your past coaching sessions will appear here."
+            />
+          ) : (
+            <div className="space-y-3">
+              {sessions.map((session) => (
+                <div key={session.id} className="flex items-center justify-between p-3 bg-bg-warm rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center text-fuchsia">
+                      <Video className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-text-primary text-sm">{session.title}</div>
+                      <div className="text-xs text-text-muted">
+                        {new Date(session.scheduled_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })} · {session.duration_min} min · {session.format}
+                      </div>
+                    </div>
+                  </div>
+                  <Badge
+                    className={
+                      session.status === 'completed'
+                        ? 'bg-green/10 text-green'
+                        : session.status === 'cancelled'
+                        ? 'bg-red/10 text-red'
+                        : 'bg-amber/10 text-amber'
+                    }
+                  >
+                    {session.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

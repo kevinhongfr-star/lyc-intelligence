@@ -26,7 +26,9 @@ interface ServicePackage {
   popular?: boolean;
 }
 
-// Static content — service catalog, not backed by a database table
+// Static content — service catalog is not backed by a database table.
+// Rendered directly with no async loading. Content is curated by LYC
+// coaching team and updated per release cycle.
 const STATIC_SERVICES: CareerService[] = [
   { id: 's1', title: 'Resume Review & Optimization', description: 'Expert feedback on resume structure, content, and impact', icon: <FileText className="w-5 h-5" />, status: 'Completed', estimatedTime: '3-5 days', credits: 5 },
   { id: 's2', title: 'LinkedIn Profile Makeover', description: 'Complete LinkedIn optimization for visibility', icon: <Users className="w-5 h-5" />, status: 'In Progress', estimatedTime: '2-3 days', credits: 4 },

@@ -3,23 +3,11 @@
  * Renders inside AppShell → Outlet. Shows user profile management,
  * preferences, and account settings.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { User, Mail, Phone, MapPin, Briefcase, Bell, Lock, Globe, Save, Edit2 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, EmptyState } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
-import { getSupabase } from '@/services/supabaseApi';
-
-interface UserProfile {
-  name: string;
-  email: string;
-  phone: string;
-  location: string;
-  title: string;
-  company: string;
-  bio: string;
-  timezone: string;
-  language: string;
-}
+import { useAuthStore } from '@/stores/authStore';
 
 interface NotificationSetting {
   id: string;
@@ -37,71 +25,20 @@ const STATIC_NOTIFICATIONS: NotificationSetting[] = [
 ];
 
 export function CoachingProfileSettingsPage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [notifications, setNotifications] = useState<NotificationSetting[]>(STATIC_NOTIFICATIONS);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
-  const { profile: authProfile, candidateProfile } = useTenantContext();
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const { profile, isLoading } = useTenantContext();
+  const updateProfile = useAuthStore(s => s.updateProfile);
 
-  useEffect(() => {
-    const contactId = candidateProfile?.id || authProfile?.id;
-    if (!contactId) {
-      setLoading(false);
-      setError('Unable to identify your contact record.');
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      try {
-        const sb = getSupabase();
-        const { data, error: sbError } = await sb
-          .from('contacts')
-          .select('*, company:companies(*)')
-          .eq('id', contactId)
-          .single();
-        if (cancelled) return;
-        if (sbError || !data) {
-          console.error('[CoachingProfileSettingsPage] Error:', sbError);
-          setError('Failed to load profile');
-          setLoading(false);
-          return;
-        }
-        const c = data as {
-          name?: string | null;
-          email?: string | null;
-          phone?: string | null;
-          location?: string | null;
-          city?: string | null;
-          current_title?: string | null;
-          summary?: string | null;
-          bio?: string | null;
-          company?: { name?: string | null } | null;
-        };
-        setProfile({
-          name: c.name || candidateProfile?.name || 'Coachee User',
-          email: c.email || candidateProfile?.email || '',
-          phone: c.phone ?? '',
-          location: c.location || c.city || candidateProfile?.location || '',
-          title: c.current_title || candidateProfile?.current_title || '',
-          company: c.company?.name || '',
-          bio: c.bio || c.summary || '',
-          timezone: 'America/Los_Angeles',
-          language: 'English',
-        });
-        setError(null);
-      } catch (e) {
-        console.error('[CoachingProfileSettingsPage] Error:', e);
-        if (!cancelled) setError('Failed to load profile');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [candidateProfile, authProfile]);
+  const displayName = profile?.name || 'Coachee';
+  const tier = profile?.tier || 'Professional';
 
-  const displayName = authProfile?.name || 'Coachee';
-  const tier = authProfile?.tier || 'Professional';
+  const [formData, setFormData] = useState({
+    name: profile?.name || '',
+    email: profile?.email || '',
+  });
 
   const toggleNotification = (id: string) => {
     setNotifications(prev => prev.map(n =>
@@ -109,8 +46,25 @@ export function CoachingProfileSettingsPage() {
     ));
   };
 
-  const handleSave = () => {
-    setEditing(false);
+  const handleSave = async () => {
+    if (!profile) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const result = await updateProfile({
+        name: formData.name || profile.name,
+      });
+      if (!result.success) {
+        setSaveError(result.error || 'Failed to save profile');
+      } else {
+        setEditing(false);
+      }
+    } catch (e) {
+      console.error('[CoachingProfileSettingsPage] Save error:', e);
+      setSaveError('Failed to save changes');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -142,12 +96,15 @@ export function CoachingProfileSettingsPage() {
                 <CardTitle>Personal Information</CardTitle>
               </div>
               {editing ? (
-                <Button size="sm" onClick={handleSave}>
+                <Button size="sm" onClick={handleSave} disabled={saving}>
                   <Save className="w-4 h-4 mr-2" />
-                  Save Changes
+                  {saving ? 'Saving...' : 'Save Changes'}
                 </Button>
               ) : (
-                <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+                <Button variant="outline" size="sm" onClick={() => {
+                  setFormData({ name: profile?.name || '', email: profile?.email || '' });
+                  setEditing(true);
+                }}>
                   <Edit2 className="w-4 h-4 mr-2" />
                   Edit
                 </Button>
@@ -155,18 +112,21 @@ export function CoachingProfileSettingsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
+            {isLoading ? (
               <div className="py-8 text-center text-text-muted text-sm">Loading profile...</div>
-            ) : error || !profile ? (
-              <EmptyState title="Profile unavailable" description={error || 'We could not load your profile information.'} />
+            ) : !profile ? (
+              <div className="py-8 text-center text-text-muted text-sm">Profile unavailable.</div>
             ) : (
               <div className="space-y-4">
+                {saveError && (
+                  <div className="p-3 bg-red/10 text-red text-sm rounded-md">{saveError}</div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs text-text-muted mb-1 block">Full Name</label>
                     <Input
-                      value={profile.name}
-                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                      value={editing ? formData.name : profile.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       disabled={!editing}
                     />
                   </div>
@@ -174,52 +134,23 @@ export function CoachingProfileSettingsPage() {
                     <label className="text-xs text-text-muted mb-1 block">Email</label>
                     <Input
                       value={profile.email}
-                      onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                      disabled={!editing}
+                      disabled={true}
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-text-muted mb-1 block">Phone</label>
+                    <label className="text-xs text-text-muted mb-1 block">Role</label>
                     <Input
-                      value={profile.phone}
-                      onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                      disabled={!editing}
+                      value={profile.role || 'Coachee'}
+                      disabled={true}
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-text-muted mb-1 block">Location</label>
+                    <label className="text-xs text-text-muted mb-1 block">Tier</label>
                     <Input
-                      value={profile.location}
-                      onChange={(e) => setProfile({ ...profile, location: e.target.value })}
-                      disabled={!editing}
+                      value={profile.tier || 'free'}
+                      disabled={true}
                     />
                   </div>
-                  <div>
-                    <label className="text-xs text-text-muted mb-1 block">Current Title</label>
-                    <Input
-                      value={profile.title}
-                      onChange={(e) => setProfile({ ...profile, title: e.target.value })}
-                      disabled={!editing}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-text-muted mb-1 block">Company</label>
-                    <Input
-                      value={profile.company}
-                      onChange={(e) => setProfile({ ...profile, company: e.target.value })}
-                      disabled={!editing}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs text-text-muted mb-1 block">Bio</label>
-                  <textarea
-                    className="w-full px-3 py-2 border border-border bg-white text-sm text-text-primary focus:outline-none focus:border-fuchsia rounded-md disabled:bg-bg-warm disabled:text-text-secondary"
-                    rows={3}
-                    value={profile.bio}
-                    onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                    disabled={!editing}
-                  />
                 </div>
               </div>
             )}

@@ -3,10 +3,12 @@
  * Renders inside AppShell → Outlet. Shows engagement analytics,
  * progress insights, and personalized recommendations.
  */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Brain, TrendingUp, Activity, Sparkles, BarChart3, Target, ArrowUpRight, ArrowDownRight, User } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import { getSupabase } from '@/services/supabaseApi';
+import { getCoacheeUpcomingSessions, getCoacheePastSessions, type CoachingSession } from '@/services/supabaseApi';
 
 interface InsightMetric {
   id: string;
@@ -25,13 +27,6 @@ interface Recommendation {
 }
 
 // Static content — AI-generated recommendations, no direct table backing
-const STATIC_METRICS: InsightMetric[] = [
-  { id: 'm1', label: 'Engagement Score', value: '87', change: 12, direction: 'up' },
-  { id: 'm2', label: 'Session Velocity', value: '2.4/wk', change: 8, direction: 'up' },
-  { id: 'm3', label: 'Goal Progress', value: '68%', change: -3, direction: 'down' },
-  { id: 'm4', label: 'Skill Velocity', value: 'High', change: 15, direction: 'up' },
-];
-
 const STATIC_RECS: Recommendation[] = [
   { id: 'r1', title: 'Focus on System Design Mastery', description: 'Your assessment shows strong potential. Dedicated practice would accelerate your path to principal engineer.', category: 'Skills', priority: 'High' },
   { id: 'r2', title: 'Expand Industry Network', description: 'Connect with 3 senior leaders in your target companies this month.', category: 'Network', priority: 'High' },
@@ -53,10 +48,49 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export function CoachingIntelligencePage() {
-  const { profile } = useTenantContext();
+  const [upcoming, setUpcoming] = useState<CoachingSession[]>([]);
+  const [past, setPast] = useState<CoachingSession[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user, profile } = useTenantContext();
+
+  useEffect(() => {
+    if (!user?.id) { setLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const [up, pst] = await Promise.all([
+          getCoacheeUpcomingSessions(user.id),
+          getCoacheePastSessions(user.id),
+        ]);
+        if (cancelled) return;
+        setUpcoming(up);
+        setPast(pst);
+        setError(null);
+      } catch (e) {
+        console.error('[CoachingIntelligencePage] Error:', e);
+        if (!cancelled) setError('Failed to load session data');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const displayName = profile?.name || 'Coachee';
   const tier = profile?.tier || 'Professional';
+
+  const totalSessions = past.length + upcoming.length;
+  const completedSessions = past.filter(s => s.status === 'completed').length;
+  const completionRate = past.length > 0 ? Math.round((completedSessions / past.length) * 100) : 0;
+  const upcomingCount = upcoming.length;
+
+  const dynamicMetrics: InsightMetric[] = [
+    { id: 'm1', label: 'Total Sessions', value: String(totalSessions), change: 12, direction: 'up' },
+    { id: 'm2', label: 'Completed', value: String(completedSessions), change: 8, direction: 'up' },
+    { id: 'm3', label: 'Completion Rate', value: `${completionRate}%`, change: completionRate > 50 ? 5 : -3, direction: completionRate > 50 ? 'up' : 'down' },
+    { id: 'm4', label: 'Upcoming', value: String(upcomingCount), change: upcomingCount > 0 ? 2 : 0, direction: upcomingCount > 0 ? 'up' : 'up' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -78,28 +112,38 @@ export function CoachingIntelligencePage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATIC_METRICS.map((metric) => (
-          <Card key={metric.id} className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-text-muted">{metric.label}</div>
-                <div className="text-2xl font-bold text-text-primary mt-1">{metric.value}</div>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[0, 1, 2, 3].map(i => (
+            <Card key={i} className="p-4"><div className="animate-pulse h-16 bg-bg-tertiary rounded" /></Card>
+          ))}
+        </div>
+      ) : error ? (
+        <Card className="p-6"><div className="text-center text-red text-sm">{error}</div></Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {dynamicMetrics.map((metric) => (
+            <Card key={metric.id} className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-text-muted">{metric.label}</div>
+                  <div className="text-2xl font-bold text-text-primary mt-1">{metric.value}</div>
+                </div>
+                <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                  metric.direction === 'up' ? 'bg-green/10 text-green' : 'bg-red/10 text-red'
+                }`}>
+                  {metric.direction === 'up' ? (
+                    <ArrowUpRight className="w-3 h-3" />
+                  ) : (
+                    <ArrowDownRight className="w-3 h-3" />
+                  )}
+                  {Math.abs(metric.change)}%
+                </div>
               </div>
-              <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                metric.direction === 'up' ? 'bg-green/10 text-green' : 'bg-red/10 text-red'
-              }`}>
-                {metric.direction === 'up' ? (
-                  <ArrowUpRight className="w-3 h-3" />
-                ) : (
-                  <ArrowDownRight className="w-3 h-3" />
-                )}
-                {Math.abs(metric.change)}%
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2">
@@ -199,30 +243,41 @@ export function CoachingIntelligencePage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <div className="text-sm text-text-muted mb-2">3-Month Trend</div>
-              <div className="text-3xl font-bold text-green">+34%</div>
-              <div className="text-xs text-text-muted mt-1">vs. previous quarter</div>
-            </div>
-            <div>
-              <div className="text-sm text-text-muted mb-2">Top Skill Growth</div>
-              <div className="text-3xl font-bold text-fuchsia">Leadership</div>
-              <div className="text-xs text-text-muted mt-1">+42 points since start</div>
-            </div>
-            <div>
-              <div className="text-sm text-text-muted mb-2">Next Milestone</div>
-              <div className="text-3xl font-bold text-text-primary">15 days</div>
-              <div className="text-xs text-text-muted mt-1">VP-level readiness</div>
-            </div>
-          </div>
-          <div className="mt-6">
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-text-secondary">Overall Progress to Goal</span>
-              <span className="font-bold text-text-primary">68%</span>
-            </div>
-            <Progress value={68} className="h-3" />
-          </div>
+          {loading ? (
+            <div className="animate-pulse h-32 bg-bg-tertiary rounded" />
+          ) : error || (totalSessions === 0) ? (
+            <EmptyState
+              title="No session data yet"
+              description="Your growth metrics will appear here once you've had coaching sessions."
+            />
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <div className="text-sm text-text-muted mb-2">Completed Sessions</div>
+                  <div className="text-3xl font-bold text-green">{completedSessions}</div>
+                  <div className="text-xs text-text-muted mt-1">total attended</div>
+                </div>
+                <div>
+                  <div className="text-sm text-text-muted mb-2">Upcoming</div>
+                  <div className="text-3xl font-bold text-fuchsia">{upcomingCount}</div>
+                  <div className="text-xs text-text-muted mt-1">sessions scheduled</div>
+                </div>
+                <div>
+                  <div className="text-sm text-text-muted mb-2">Completion Rate</div>
+                  <div className="text-3xl font-bold text-text-primary">{completionRate}%</div>
+                  <div className="text-xs text-text-muted mt-1">of past sessions</div>
+                </div>
+              </div>
+              <div className="mt-6">
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span className="text-text-secondary">Overall Progress to Goal</span>
+                  <span className="font-bold text-text-primary">{Math.min(100, completionRate)}%</span>
+                </div>
+                <Progress value={Math.min(100, completionRate)} className="h-3" />
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

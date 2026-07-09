@@ -4,10 +4,10 @@
  * activity timeline, and participation stats.
  */
 import React, { useState, useEffect } from 'react';
-import { Activity, Calendar, MessageSquare, Target, Award, TrendingUp, Clock, User, Sparkles } from 'lucide-react';
+import { Activity, Calendar, MessageSquare, Target, Award, TrendingUp, Clock, User, Sparkles, Flame } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
-import { getCoachingCredits, type CoachingCreditData } from '@/services/supabaseApi';
+import { getCoachingCredits, type CoachingCreditData, getCoacheeUpcomingSessions, getCoacheePastSessions, type CoachingSession } from '@/services/supabaseApi';
 
 interface ActivityEntry {
   id: string;
@@ -66,6 +66,8 @@ const TREND_COLORS: Record<string, string> = {
 
 export function CoachingEngagementPage() {
   const [credits, setCredits] = useState<CoachingCreditData | null>(null);
+  const [upcoming, setUpcoming] = useState<CoachingSession[]>([]);
+  const [past, setPast] = useState<CoachingSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user, profile } = useTenantContext();
@@ -79,9 +81,15 @@ export function CoachingEngagementPage() {
     let cancelled = false;
     (async () => {
       try {
-        const data = await getCoachingCredits(user.id);
+        const [creditsData, upcomingData, pastData] = await Promise.all([
+          getCoachingCredits(user.id),
+          getCoacheeUpcomingSessions(user.id),
+          getCoacheePastSessions(user.id),
+        ]);
         if (cancelled) return;
-        setCredits(data);
+        setCredits(creditsData);
+        setUpcoming(upcomingData);
+        setPast(pastData);
         setError(null);
       } catch (e) {
         console.error('[CoachingEngagementPage] Error:', e);
@@ -91,22 +99,74 @@ export function CoachingEngagementPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user?.id]);
 
   const displayName = profile?.name || 'Coachee';
   const tier = profile?.tier || 'Professional';
 
-  // Partially wired metrics: credit-related metrics come from real credit data,
-  // the remaining engagement metrics stay static.
+  const totalSessions = past.length + upcoming.length;
+  const completedSessions = past.filter(s => s.status === 'completed').length;
+  const completionRate = past.length > 0 ? Math.round((completedSessions / past.length) * 100) : 0;
+
+  // Compute streak from completed sessions (simple: count consecutive days)
+  const computeStreak = (sessions: CoachingSession[]): number => {
+    const completed = sessions
+      .filter(s => s.status === 'completed')
+      .map(s => new Date(s.scheduled_at).toDateString());
+    const uniqueDays = [...new Set(completed)].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    if (uniqueDays.length === 0) return 0;
+    let streak = 0;
+    const today = new Date();
+    for (let i = 0; i < uniqueDays.length; i++) {
+      const expected = new Date(today);
+      expected.setDate(expected.getDate() - i);
+      if (new Date(uniqueDays[i]).toDateString() === expected.toDateString()) {
+        streak++;
+      } else if (i === 0) {
+        // check yesterday
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        if (new Date(uniqueDays[i]).toDateString() === yesterday.toDateString()) {
+          streak++;
+        } else {
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+    return streak;
+  };
+
+  const streakDays = computeStreak(past);
+
+  const sessionMetrics: EngagementMetric[] = [
+    { id: 's1', label: 'Total Sessions', value: String(totalSessions), score: Math.min(100, totalSessions * 10), trend: totalSessions > 0 ? 'up' : 'stable' },
+    { id: 's2', label: 'Completion Rate', value: `${completionRate}%`, score: completionRate, trend: completionRate > 50 ? 'up' : 'down' },
+  ];
+
   const creditMetrics: EngagementMetric[] = credits
     ? [
         { id: 'c1', label: 'Credits Available', value: String(credits.current_credits), score: credits.total_purchased ? Math.min(100, Math.round((credits.current_credits / credits.total_purchased) * 100)) : 0, trend: 'stable' },
         { id: 'c2', label: 'Credits Used', value: String(credits.used_credits), score: credits.total_purchased ? Math.round((credits.used_credits / credits.total_purchased) * 100) : 0, trend: 'up' },
       ]
     : [];
-  const metrics: EngagementMetric[] = [...creditMetrics, ...STATIC_METRICS];
+
+  const metrics: EngagementMetric[] = [...sessionMetrics, ...creditMetrics, ...STATIC_METRICS];
 
   const overallScore = Math.round(metrics.reduce((sum, m) => sum + m.score, 0) / (metrics.length || 1));
+
+  // Build activity feed from real sessions
+  const sessionActivity: ActivityEntry[] = past.slice(0, 5).map((s, i) => ({
+    id: `sess-${s.id}`,
+    type: 'session' as const,
+    title: s.title,
+    description: `${s.format} session · ${s.duration_min} min`,
+    date: new Date(s.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    duration: `${s.duration_min} min`,
+  }));
+
+  const activity: ActivityEntry[] = sessionActivity.length > 0 ? sessionActivity : STATIC_ACTIVITY;
 
   return (
     <div className="space-y-6">
@@ -182,7 +242,7 @@ export function CoachingEngagementPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {STATIC_ACTIVITY.map((entry) => (
+              {activity.map((entry) => (
                 <div key={entry.id} className="flex items-start gap-3 p-3 bg-bg-warm rounded-lg">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${TYPE_COLORS[entry.type]}`}>
                     {TYPE_ICONS[entry.type]}
@@ -217,37 +277,31 @@ export function CoachingEngagementPage() {
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-text-secondary">Sessions</span>
-                    <span className="font-bold text-text-primary">3 / 4</span>
+                    <span className="text-text-secondary">Sessions Completed</span>
+                    <span className="font-bold text-text-primary">{completedSessions}</span>
                   </div>
-                  <Progress value={75} className="h-2" />
+                  <Progress value={Math.min(100, completedSessions * 25)} className="h-2" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-text-secondary">Messages</span>
-                    <span className="font-bold text-text-primary">12</span>
+                    <span className="text-text-secondary">Upcoming</span>
+                    <span className="font-bold text-text-primary">{upcoming.length}</span>
                   </div>
-                  <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
-                    <div className="h-full bg-blue rounded-full" style={{ width: '60%' }} />
-                  </div>
+                  <Progress value={Math.min(100, upcoming.length * 50)} className="h-2" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-text-secondary">Goals Updated</span>
-                    <span className="font-bold text-text-primary">2</span>
+                    <span className="text-text-secondary">Completion Rate</span>
+                    <span className="font-bold text-text-primary">{completionRate}%</span>
                   </div>
-                  <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
-                    <div className="h-full bg-green rounded-full" style={{ width: '40%' }} />
-                  </div>
+                  <Progress value={completionRate} className="h-2" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-text-secondary">Resources Viewed</span>
-                    <span className="font-bold text-text-primary">8</span>
+                    <span className="text-text-secondary">Streak</span>
+                    <span className="font-bold text-text-primary">{streakDays} days</span>
                   </div>
-                  <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
-                    <div className="h-full bg-amber rounded-full" style={{ width: '80%' }} />
-                  </div>
+                  <Progress value={Math.min(100, streakDays * 5)} className="h-2" />
                 </div>
               </div>
             </CardContent>
@@ -259,12 +313,14 @@ export function CoachingEngagementPage() {
             </CardHeader>
             <CardContent>
               <div className="text-center">
-                <div className="text-5xl font-bold text-fuchsia">21</div>
+                <div className="text-5xl font-bold text-fuchsia">{streakDays}</div>
                 <div className="text-sm text-text-secondary mt-1">days</div>
-                <div className="text-xs text-text-muted mt-2">Keep it up! You're on fire.</div>
-                <Button className="mt-4" size="sm">
-                  Check In Today
-                </Button>
+                <div className="text-xs text-text-muted mt-2">
+                  {streakDays === 0 ? 'No sessions yet. Book your first session!' : streakDays >= 7 ? 'Great consistency!' : 'Keep it up!'}
+                </div>
+                <div className="flex items-center justify-center mt-3">
+                  <Flame className="w-5 h-5 text-amber" />
+                </div>
               </div>
             </CardContent>
           </Card>
