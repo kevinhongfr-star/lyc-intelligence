@@ -28,19 +28,6 @@ interface Education {
   year: string;
 }
 
-// Static content — experience history (could be sourced from contacts.career_history JSON, kept static for now)
-const STATIC_EXPERIENCE: Experience[] = [
-  { id: 'e1', company: 'TechCorp Inc.', role: 'Senior Engineering Manager', startDate: '2021', endDate: 'Present', current: true, description: 'Leading team of 12 engineers across platform and infrastructure.' },
-  { id: 'e2', company: 'CloudScale', role: 'Engineering Manager', startDate: '2018', endDate: '2021', current: false, description: 'Grew team from 3 to 8, led cloud migration project.' },
-  { id: 'e3', company: 'DataSystems', role: 'Senior Software Engineer', startDate: '2015', endDate: '2018', current: false, description: 'Built distributed data processing pipeline.' },
-];
-
-// Static content — education history (could be sourced from contacts.education JSON, kept static for now)
-const STATIC_EDUCATION: Education[] = [
-  { id: 'ed1', school: 'Stanford University', degree: 'MS', field: 'Computer Science', year: '2015' },
-  { id: 'ed2', school: 'UC Berkeley', degree: 'BS', field: 'Computer Science', year: '2013' },
-];
-
 interface ExtendedProfileFields {
   phone?: string | null;
   bio?: string | null;
@@ -53,8 +40,8 @@ export function CandidateProfilePage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editHeadline, setEditHeadline] = useState('');
-  const [experience] = useState(STATIC_EXPERIENCE);
-  const [education] = useState(STATIC_EDUCATION);
+  const [experience, setExperience] = useState<Experience[]>([]);
+  const [education, setEducation] = useState<Education[]>([]);
   const [extended, setExtended] = useState<ExtendedProfileFields>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +60,7 @@ export function CandidateProfilePage() {
         const sb = getSupabase();
         const { data, error: sbError } = await sb
           .from('contacts')
-          .select('phone, summary, company:companies(name)')
+          .select('phone, summary, company:companies(name), career_history, education')
           .eq('id', candidateProfile.id)
           .maybeSingle();
         if (cancelled) return;
@@ -81,12 +68,45 @@ export function CandidateProfilePage() {
           console.error('[CandidateProfilePage] Error:', sbError);
           setError('Failed to load profile');
         } else if (data) {
-          const company = (data as any).company;
+          const d = data as any;
+          const company = d.company;
           setExtended({
-            phone: (data as any).phone ?? null,
-            bio: (data as any).summary ?? null,
+            phone: d.phone ?? null,
+            bio: d.summary ?? null,
             company_name: company?.name ?? null,
           });
+
+          if (d.career_history && Array.isArray(d.career_history)) {
+            setExperience(d.career_history.map((item: any, idx: number) => ({
+              id: `exp-${idx}`,
+              company: item.company || 'Unknown',
+              role: item.role || item.title || 'Position',
+              startDate: item.start_date || item.start_year || '',
+              endDate: item.current ? 'Present' : (item.end_date || item.end_year || ''),
+              current: !!item.current,
+              description: item.description || '',
+            })));
+          } else if (d.company?.name || candidateProfile.current_title) {
+            setExperience([{
+              id: 'exp-current',
+              company: d.company?.name || 'Current Company',
+              role: candidateProfile.current_title || 'Current Role',
+              startDate: '',
+              endDate: 'Present',
+              current: true,
+              description: d.summary || '',
+            }]);
+          }
+
+          if (d.education && Array.isArray(d.education)) {
+            setEducation(d.education.map((item: any, idx: number) => ({
+              id: `edu-${idx}`,
+              school: item.school || item.institution || 'Unknown',
+              degree: item.degree || '',
+              field: item.field || item.major || '',
+              year: item.year || item.graduation_year || '',
+            })));
+          }
         }
       } catch (e) {
         console.error('[CandidateProfilePage] Error:', e);
@@ -106,7 +126,6 @@ export function CandidateProfilePage() {
   const headline = candidateProfile?.headline || 'Senior Engineering Leader | Cloud Architecture | Team Building';
   const phone = extended.phone || '+1 (555) 123-4567';
 
-  // Compute profile strength from available fields
   const profileStrength = (() => {
     let score = 0;
     if (candidateProfile?.name) score += 12;
@@ -117,8 +136,8 @@ export function CandidateProfilePage() {
     if (extended.phone) score += 10;
     if (extended.bio) score += 10;
     if (extended.company_name) score += 10;
-    if (STATIC_EXPERIENCE.length > 0) score += 6;
-    if (STATIC_EDUCATION.length > 0) score += 6;
+    if (experience.length > 0) score += 6;
+    if (education.length > 0) score += 6;
     return Math.min(100, score);
   })();
 

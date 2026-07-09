@@ -26,24 +26,6 @@ interface EngagementMetric {
   trend: 'up' | 'down' | 'stable';
 }
 
-// Activity feed — UI state, not backed by a database table
-const STATIC_ACTIVITY: ActivityEntry[] = [
-  { id: 'a1', type: 'session', title: 'Coaching Session with Sarah', description: 'Career strategy discussion', date: 'Today, 2:00 PM', duration: '45 min' },
-  { id: 'a2', type: 'milestone', title: 'Completed 21-day streak', description: 'Consistent daily check-ins', date: 'Yesterday' },
-  { id: 'a3', type: 'message', title: 'Sent message to coach', description: 'Follow-up on interview prep', date: '2 days ago' },
-  { id: 'a4', type: 'goal', title: 'Goal updated', description: 'VP-level readiness: 68%', date: '3 days ago' },
-  { id: 'a5', type: 'session', title: 'Mock Interview Session', description: 'System design practice', date: '5 days ago', duration: '60 min' },
-];
-
-// Engagement metrics — static baseline; credit-related metrics are wired from
-// real credit data (getCoachingCredits) at render time.
-const STATIC_METRICS: EngagementMetric[] = [
-  { id: 'm1', label: 'Weekly Engagement', value: '87%', score: 87, trend: 'up' },
-  { id: 'm2', label: 'Session Attendance', value: '95%', score: 95, trend: 'up' },
-  { id: 'm3', label: 'Goal Completion', value: '68%', score: 68, trend: 'stable' },
-  { id: 'm4', label: 'Community Participation', value: '42%', score: 42, trend: 'up' },
-];
-
 const TYPE_ICONS: Record<string, React.ReactNode> = {
   session: <Calendar className="w-4 h-4" />,
   message: <MessageSquare className="w-4 h-4" />,
@@ -108,7 +90,6 @@ export function CoachingEngagementPage() {
   const completedSessions = past.filter(s => s.status === 'completed').length;
   const completionRate = past.length > 0 ? Math.round((completedSessions / past.length) * 100) : 0;
 
-  // Compute streak from completed sessions (simple: count consecutive days)
   const computeStreak = (sessions: CoachingSession[]): number => {
     const completed = sessions
       .filter(s => s.status === 'completed')
@@ -123,7 +104,6 @@ export function CoachingEngagementPage() {
       if (new Date(uniqueDays[i]).toDateString() === expected.toDateString()) {
         streak++;
       } else if (i === 0) {
-        // check yesterday
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
         if (new Date(uniqueDays[i]).toDateString() === yesterday.toDateString()) {
@@ -142,8 +122,16 @@ export function CoachingEngagementPage() {
 
   const sessionMetrics: EngagementMetric[] = [
     { id: 's1', label: 'Total Sessions', value: String(totalSessions), score: Math.min(100, totalSessions * 10), trend: totalSessions > 0 ? 'up' : 'stable' },
-    { id: 's2', label: 'Completion Rate', value: `${completionRate}%`, score: completionRate, trend: completionRate > 50 ? 'up' : 'down' },
+    { id: 's2', label: 'Completion Rate', value: `${completionRate}%`, score: completionRate, trend: completionRate > 50 ? 'up' : 'stable' },
   ];
+
+  const streakMetric: EngagementMetric = {
+    id: 'st1',
+    label: 'Engagement Streak',
+    value: `${streakDays} days`,
+    score: Math.min(100, streakDays * 7),
+    trend: streakDays > 0 ? 'up' : 'stable',
+  };
 
   const creditMetrics: EngagementMetric[] = credits
     ? [
@@ -152,12 +140,13 @@ export function CoachingEngagementPage() {
       ]
     : [];
 
-  const metrics: EngagementMetric[] = [...sessionMetrics, ...creditMetrics, ...STATIC_METRICS];
+  const metrics: EngagementMetric[] = [...sessionMetrics, streakMetric, ...creditMetrics];
 
-  const overallScore = Math.round(metrics.reduce((sum, m) => sum + m.score, 0) / (metrics.length || 1));
+  const overallScore = metrics.length
+    ? Math.round(metrics.reduce((sum, m) => sum + m.score, 0) / metrics.length)
+    : 0;
 
-  // Build activity feed from real sessions
-  const sessionActivity: ActivityEntry[] = past.slice(0, 5).map((s, i) => ({
+  const activity: ActivityEntry[] = past.slice(0, 8).map((s) => ({
     id: `sess-${s.id}`,
     type: 'session' as const,
     title: s.title,
@@ -165,8 +154,6 @@ export function CoachingEngagementPage() {
     date: new Date(s.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     duration: `${s.duration_min} min`,
   }));
-
-  const activity: ActivityEntry[] = sessionActivity.length > 0 ? sessionActivity : STATIC_ACTIVITY;
 
   return (
     <div className="space-y-6">
@@ -241,6 +228,14 @@ export function CoachingEngagementPage() {
             </div>
           </CardHeader>
           <CardContent>
+            {loading ? (
+              <div className="py-8 text-center text-text-muted text-sm">Loading activity...</div>
+            ) : activity.length === 0 ? (
+              <EmptyState
+                title="No activity yet"
+                description="Your coaching session activity will appear here."
+              />
+            ) : (
             <div className="space-y-3">
               {activity.map((entry) => (
                 <div key={entry.id} className="flex items-start gap-3 p-3 bg-bg-warm rounded-lg">
@@ -262,6 +257,7 @@ export function CoachingEngagementPage() {
                 </div>
               ))}
             </div>
+            )}
           </CardContent>
         </Card>
 

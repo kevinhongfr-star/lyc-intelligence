@@ -16,6 +16,8 @@ interface NotificationSetting {
   enabled: boolean;
 }
 
+// No DB table — UI notification toggles (stored in local state)
+// TODO: Add notification_preferences JSONB column to profiles table
 const STATIC_NOTIFICATIONS: NotificationSetting[] = [
   { id: 'n1', label: 'Session Reminders', description: 'Get notified 1 hour before coaching sessions', enabled: true },
   { id: 'n2', label: 'Weekly Progress Reports', description: 'Receive weekly progress summary emails', enabled: true },

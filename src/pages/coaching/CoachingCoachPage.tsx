@@ -31,18 +31,6 @@ interface CoachInfo {
   bio: string;
 }
 
-// Static content — coach profile is assigned by admin, not user-queryable
-const STATIC_COACH: CoachInfo = {
-  name: 'Dr. Amelia Reeves',
-  title: 'Executive Career Coach',
-  company: 'Former Partner, Spencer Stuart',
-  avatarInitials: 'AR',
-  rating: 4.9,
-  sessionsCompleted: 327,
-  specialties: ['C-Suite Transitions', 'Interview Strategy', 'Leadership Presence', 'Compensation Negotiation'],
-  bio: 'Amelia has guided 300+ executives through career pivots and C-suite placements. She blends 15 years of executive search with evidence-based coaching frameworks.',
-};
-
 export function CoachingCoachPage() {
   const [upcoming, setUpcoming] = useState<CoachingSession[]>([]);
   const [history, setHistory] = useState<CoachingSession[]>([]);
@@ -73,12 +61,58 @@ export function CoachingCoachPage() {
     fetchSessions();
   }, [user?.id]);
 
-  const streakDays = 21;
   const completedCount = history.filter(h => h.status === 'completed').length;
   const avgRating =
     history.length > 0
       ? (history.reduce((sum, h) => sum + (h.rating || 0), 0) / history.length).toFixed(1)
       : '0.0';
+
+  const computeStreak = (sessions: CoachingSession[]): number => {
+    const completed = sessions
+      .filter(s => s.status === 'completed')
+      .map(s => new Date(s.scheduled_at).toDateString());
+    const uniqueDays = [...new Set(completed)].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    if (uniqueDays.length === 0) return 0;
+    let streak = 0;
+    const today = new Date();
+    for (let i = 0; i < uniqueDays.length; i++) {
+      const expected = new Date(today);
+      expected.setDate(expected.getDate() - i);
+      if (new Date(uniqueDays[i]).toDateString() === expected.toDateString()) {
+        streak++;
+      } else if (i === 0) {
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        if (new Date(uniqueDays[i]).toDateString() === yesterday.toDateString()) {
+          streak++;
+        } else {
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+    return streak;
+  };
+  const streakDays = computeStreak(history);
+
+  // Derive coach from assigned sessions
+  const allSessions = [...upcoming, ...history];
+  const coachId = allSessions[0]?.coach_id || null;
+  const coachInitials = coachId ? 'CO' : '';
+
+  const coach: CoachInfo | null = coachId
+    ? {
+        name: 'Your Coach',
+        title: 'Executive Career Coach',
+        company: 'LYC Intelligence',
+        avatarInitials: coachInitials,
+        rating: Number(avgRating) || 4.9,
+        sessionsCompleted: completedCount,
+        specialties: ['Career Strategy', 'Interview Preparation', 'Leadership Development'],
+        bio: 'Your dedicated coach is here to guide you through your career journey. Check your sessions below for upcoming meetings and past discussions.',
+      }
+    : null;
 
   const displayName = profile?.name || 'Coachee';
   const tier = profile?.tier || 'Professional';
@@ -138,37 +172,42 @@ export function CoachingCoachPage() {
           <CardContent>
             {loading ? (
               <div className="py-8 text-center text-text-muted text-sm">Loading coach...</div>
+            ) : !coach ? (
+              <EmptyState
+                title="No coach assigned yet"
+                description="Once you're matched with a coach, their profile will appear here."
+              />
             ) : (
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 rounded-lg bg-fuchsia-light flex items-center justify-center flex-shrink-0">
-                    <span className="font-serif font-bold text-xl text-fuchsia">{STATIC_COACH.avatarInitials}</span>
+                    <span className="font-serif font-bold text-xl text-fuchsia">{coach.avatarInitials}</span>
                   </div>
                   <div>
-                    <div className="font-serif font-semibold text-text-primary">{STATIC_COACH.name}</div>
-                    <div className="text-xs text-text-secondary">{STATIC_COACH.title}</div>
-                    <div className="text-xs text-text-muted">{STATIC_COACH.company}</div>
+                    <div className="font-serif font-semibold text-text-primary">{coach.name}</div>
+                    <div className="text-xs text-text-secondary">{coach.title}</div>
+                    <div className="text-xs text-text-muted">{coach.company}</div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4 pt-2 border-t border-border">
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 text-amber fill-amber" />
-                    <span className="text-sm font-medium text-text-primary">{STATIC_COACH.rating}</span>
+                    <span className="text-sm font-medium text-text-primary">{coach.rating}</span>
                   </div>
-                  <div className="text-xs text-text-muted">{STATIC_COACH.sessionsCompleted} sessions completed</div>
+                  <div className="text-xs text-text-muted">{coach.sessionsCompleted} sessions completed</div>
                 </div>
 
                 <div>
                   <div className="text-xs font-medium text-text-secondary mb-2">Specialties</div>
                   <div className="flex flex-wrap gap-1.5">
-                    {STATIC_COACH.specialties.map((s) => (
+                    {coach.specialties.map((s) => (
                       <Badge key={s} className="bg-fuchsia-light text-fuchsia">{s}</Badge>
                     ))}
                   </div>
                 </div>
 
-                <p className="text-sm text-text-secondary leading-relaxed">{STATIC_COACH.bio}</p>
+                <p className="text-sm text-text-secondary leading-relaxed">{coach.bio}</p>
 
                 <Button variant="outline" size="sm" className="w-full">
                   <MessageSquare className="w-4 h-4" /> Message Coach

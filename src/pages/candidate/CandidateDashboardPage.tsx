@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Briefcase, Calendar, ClipboardCheck, TrendingUp, ArrowRight, Clock, Video, MapPin, Star, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Progress, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
-import { getOffers, getAssessmentInvitations } from '@/services/supabaseApi';
+import { getOffers, getAssessmentInvitations, getCoacheeUpcomingSessions, getCoacheePastSessions, type AssessmentInvitation, type CoachingSession } from '@/services/supabaseApi';
 
 interface ApplicationStatus {
   id: string;
@@ -43,18 +43,6 @@ interface CareerGoal {
   progress: number;
 }
 
-const STATIC_INTERVIEWS: UpcomingInterview[] = [
-  { id: 'i1', company: 'TechCorp', role: 'VP Engineering', date: 'Jan 22, 2025', time: '10:00 AM', format: 'Video', location: 'Zoom' },
-  { id: 'i2', company: 'CloudPeak', role: 'CTO', date: 'Jan 24, 2025', time: '2:30 PM', format: 'On-site', location: 'Seattle, WA' },
-];
-
-const STATIC_GOALS: CareerGoal[] = [
-  { id: 'g1', label: 'Complete profile', progress: 100 },
-  { id: 'g2', label: 'Take baseline assessment', progress: 100 },
-  { id: 'g3', label: 'Apply to 3 target roles', progress: 67 },
-  { id: 'g4', label: 'Complete interview prep', progress: 45 },
-];
-
 const STATUS_COLORS: Record<ApplicationStatus['status'], string> = {
   'Under Review': 'bg-amber/10 text-amber',
   'Submitted to Client': 'bg-blue/10 text-blue',
@@ -70,12 +58,16 @@ export function CandidateDashboardPage() {
   const [goals, setGoals] = useState<CareerGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { candidateProfile, profile } = useTenantContext();
+  const { candidateProfile, profile, user } = useTenantContext();
 
   useEffect(() => {
     async function loadData() {
       try {
-        const offersResult = await getOffers();
+        const [offersResult, upcomingSessions, pastSessions] = await Promise.all([
+          getOffers(),
+          user?.id ? getCoacheeUpcomingSessions(user.id) : Promise.resolve<CoachingSession[]>([]),
+          user?.id ? getCoacheePastSessions(user.id) : Promise.resolve<CoachingSession[]>([]),
+        ]);
         const offers = Array.isArray(offersResult) ? offersResult : (offersResult as any).data || [];
         const mappedOffers: ApplicationStatus[] = offers.map((o: any) => ({
           id: o.id,
@@ -87,7 +79,22 @@ export function CandidateDashboardPage() {
         }));
         setApplications(mappedOffers);
 
-        setInterviews(STATIC_INTERVIEWS);
+        const interviewSessions = upcomingSessions
+          .filter(s => s.title.toLowerCase().includes('interview') || s.title.toLowerCase().includes('mock'))
+          .slice(0, 3)
+          .map(s => {
+            const dt = new Date(s.scheduled_at);
+            return {
+              id: s.id,
+              company: 'Interview Prep',
+              role: s.title,
+              date: dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              time: dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+              format: s.format === 'video' ? 'Video' : s.format === 'in_person' ? 'On-site' : 'Phone',
+              location: s.format === 'video' ? 'Zoom' : s.format === 'in_person' ? 'Office' : 'Call',
+            };
+          });
+        setInterviews(interviewSessions);
 
         if (candidateProfile?.id) {
           try {
@@ -104,12 +111,18 @@ export function CandidateDashboardPage() {
                 dimensions: [],
               });
             }
+
+            const derivedGoals: CareerGoal[] = [
+              { id: 'g1', label: 'Complete profile', progress: candidateProfile.name ? 100 : 50 },
+              { id: 'g2', label: 'Take baseline assessment', progress: completed.length > 0 ? 100 : invitations.length > 0 ? 30 : 0 },
+              { id: 'g3', label: 'Apply to target roles', progress: Math.min(100, offers.length * 33) },
+              { id: 'g4', label: 'Complete interview prep', progress: Math.min(100, pastSessions.filter(s => s.title.toLowerCase().includes('interview')).length * 25) },
+            ];
+            setGoals(derivedGoals);
           } catch (e) {
             console.error('[CandidateDashboardPage] Assessment error:', e);
           }
         }
-
-        setGoals(STATIC_GOALS);
       } catch (e) {
         console.error('[CandidateDashboardPage] Error:', e);
         setError('Failed to load dashboard');
@@ -118,7 +131,7 @@ export function CandidateDashboardPage() {
       }
     }
     loadData();
-  }, [candidateProfile?.id]);
+  }, [candidateProfile?.id, user?.id]);
 
   const activeCount = applications.length;
   const interviewCount = interviews.length;

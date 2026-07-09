@@ -29,6 +29,8 @@ interface ForumThread {
   excerpt: string;
 }
 
+// TODO: Add community/forum table
+// No DB table — static placeholder content
 const STATIC_CATEGORIES: ForumCategory[] = [
   { id: 'cat1', name: 'Career Strategy', description: 'Long-term planning, pivots, and growth paths', threadCount: 142, icon: '🎯' },
   { id: 'cat2', name: 'Interview Tips', description: 'Prep, frameworks, and shared experiences', threadCount: 98, icon: '🎤' },
@@ -38,6 +40,8 @@ const STATIC_CATEGORIES: ForumCategory[] = [
   { id: 'cat6', name: 'Community', description: 'Introductions, events, and peer support', threadCount: 41, icon: '🤝' },
 ];
 
+// TODO: Add community/forum table
+// No DB table — static placeholder content
 const STATIC_THREADS: ForumThread[] = [
   { id: 't1', title: 'How to frame a 6-month career gap in executive interviews', author: 'Sarah C.', category: 'Interview Tips', replies: 24, views: 412, lastActivity: '2h ago', pinned: true, excerpt: "After a sabbatical, I'm re-entering the market and wondering how senior leaders frame a gap without underselling..." },
   { id: 't2', title: 'VP Engineering comp benchmarks — Series B fintech, SF', author: 'Michael W.', category: 'Compensation', replies: 18, views: 287, lastActivity: '5h ago', pinned: false, excerpt: 'Got an offer at $380K base + 0.4% equity. Curious how this compares to recent Series B benchmarks...' },

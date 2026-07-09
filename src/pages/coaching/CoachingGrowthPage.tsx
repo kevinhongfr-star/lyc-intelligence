@@ -3,7 +3,7 @@
  * Renders inside AppShell → Outlet. Shows milestones, skill development
  * progress, and achievements.
  */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Trophy,
   Target,
@@ -15,8 +15,14 @@ import {
   Zap,
   User,
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
+import {
+  getCoacheePastSessions,
+  getAssessmentInvitations,
+  type CoachingSession,
+  type AssessmentInvitation,
+} from '@/services/supabaseApi';
 
 interface Milestone {
   id: string;
@@ -24,13 +30,13 @@ interface Milestone {
   description: string;
   targetDate: string;
   status: 'Completed' | 'In Progress' | 'Upcoming';
-  progress: number; // 0-100
+  progress: number;
 }
 
 interface SkillTrack {
   id: string;
   skill: string;
-  currentLevel: number; // 1-5
+  currentLevel: number;
   targetLevel: number;
   weeksRemaining: number;
   activitiesDone: number;
@@ -45,32 +51,6 @@ interface Achievement {
   icon: 'trophy' | 'sparkles' | 'zap';
 }
 
-// Static content - growth tracking, no direct database backing
-const STATIC_MILESTONES: Milestone[] = [
-  { id: 'ms1', title: 'Complete Career Audit', description: 'Full assessment of strengths, gaps, and target roles.', targetDate: '2024-12-15', status: 'Completed', progress: 100 },
-  { id: 'ms2', title: 'Build Target Company List', description: 'Identify and research 12 high-fit target companies.', targetDate: '2025-01-15', status: 'Completed', progress: 100 },
-  { id: 'ms3', title: 'Refresh Personal Brand', description: 'Update LinkedIn, resume, and executive bio.', targetDate: '2025-02-01', status: 'In Progress', progress: 65 },
-  { id: 'ms4', title: 'Secure 5 Networking Conversations', description: 'Initiate and complete warm introductions.', targetDate: '2025-02-15', status: 'In Progress', progress: 40 },
-  { id: 'ms5', title: 'Land Target Role Interviews', description: 'Convert outreach into at least 3 first-round interviews.', targetDate: '2025-03-15', status: 'Upcoming', progress: 0 },
-  { id: 'ms6', title: 'Negotiate and Accept Offer', description: 'Secure and accept a role above the 75th percentile.', targetDate: '2025-04-30', status: 'Upcoming', progress: 0 },
-];
-
-const STATIC_SKILLS: SkillTrack[] = [
-  { id: 'sk1', skill: 'Executive Communication', currentLevel: 3, targetLevel: 5, weeksRemaining: 6, activitiesDone: 8, activitiesTotal: 14 },
-  { id: 'sk2', skill: 'Strategic Storytelling', currentLevel: 2, targetLevel: 4, weeksRemaining: 8, activitiesDone: 5, activitiesTotal: 12 },
-  { id: 'sk3', skill: 'Financial Acumen', currentLevel: 3, targetLevel: 4, weeksRemaining: 4, activitiesDone: 9, activitiesTotal: 10 },
-  { id: 'sk4', skill: 'Negotiation Tactics', currentLevel: 4, targetLevel: 5, weeksRemaining: 3, activitiesDone: 6, activitiesTotal: 8 },
-];
-
-const STATIC_ACHIEVEMENTS: Achievement[] = [
-  { id: 'a1', title: 'First Steps', description: 'Completed your initial career assessment.', unlockedAt: '2024-12-13', icon: 'sparkles' },
-  { id: 'a2', title: 'Brand Builder', description: 'Refreshed all personal brand assets.', unlockedAt: '2025-01-10', icon: 'zap' },
-  { id: 'a3', title: 'Network Navigator', description: 'Completed 5 meaningful networking conversations.', unlockedAt: null, icon: 'trophy' },
-  { id: 'a4', title: 'Interview Ready', description: 'Passed a full mock interview with top marks.', unlockedAt: null, icon: 'zap' },
-  { id: 'a5', title: 'Offer Winner', description: 'Secured a job offer above your target percentile.', unlockedAt: null, icon: 'trophy' },
-  { id: 'a6', title: 'Streak Keeper', description: 'Maintained a 21-day coaching streak.', unlockedAt: '2025-01-14', icon: 'sparkles' },
-];
-
 const ACHIEVEMENT_ICONS = {
   trophy: Trophy,
   sparkles: Sparkles,
@@ -84,11 +64,82 @@ const MILESTONE_STATUS_VARIANT: Record<Milestone['status'], 'success' | 'default
 };
 
 export function CoachingGrowthPage() {
-  const { profile } = useTenantContext();
+  const [sessions, setSessions] = useState<CoachingSession[]>([]);
+  const [assessments, setAssessments] = useState<AssessmentInvitation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user, candidateProfile, profile } = useTenantContext();
 
-  const milestones = STATIC_MILESTONES;
-  const skills = STATIC_SKILLS;
-  const achievements = STATIC_ACHIEVEMENTS;
+  useEffect(() => {
+    if (!user?.id && !candidateProfile?.id) { setLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        setError(null);
+        const [sessionData, assessmentData] = await Promise.all([
+          user?.id ? getCoacheePastSessions(user.id) : Promise.resolve<CoachingSession[]>([]),
+          candidateProfile?.id ? getAssessmentInvitations(candidateProfile.id) : Promise.resolve<AssessmentInvitation[]>([]),
+        ]);
+        if (cancelled) return;
+        setSessions(sessionData);
+        setAssessments(assessmentData);
+      } catch (e) {
+        console.error('[CoachingGrowthPage] Error:', e);
+        if (!cancelled) setError('Failed to load growth data');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id, candidateProfile?.id]);
+
+  // Derive milestones from completed sessions + assessments
+  const milestones: Milestone[] = [
+    ...sessions.filter(s => s.status === 'completed').slice(0, 6).map((s, i) => ({
+      id: `milestone-${s.id}`,
+      title: s.title,
+      description: `${s.format} coaching session`,
+      targetDate: new Date(s.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: 'Completed' as const,
+      progress: 100,
+    })),
+    ...assessments.slice(0, 3).map((a, i) => ({
+      id: `assess-${a.id}`,
+      title: a.assessment_title || 'Assessment',
+      description: a.assessment_type || 'Skills assessment',
+      targetDate: new Date(a.invited_at || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: a.status === 'completed' ? 'Completed' as const : a.status === 'viewed' ? 'In Progress' as const : 'Upcoming' as const,
+      progress: a.status === 'completed' ? 100 : a.status === 'viewed' ? 50 : 0,
+    })),
+  ];
+
+  // Derive skill tracks from assessments (score-based levels 1-5)
+  const skills: SkillTrack[] = assessments
+    .filter(a => a.status === 'completed')
+    .slice(0, 4)
+    .map((a, i) => {
+      const score = a.score || 75;
+      const level = Math.min(5, Math.max(1, Math.ceil(score / 20)));
+      return {
+        id: `skill-${a.id}`,
+        skill: a.assessment_title || 'Skill Area',
+        currentLevel: level,
+        targetLevel: 5,
+        weeksRemaining: Math.max(1, 8 - i * 2),
+        activitiesDone: Math.round(score / 10),
+        activitiesTotal: 10,
+      };
+    });
+
+  // Derive achievements from milestones
+  const achievements: Achievement[] = [
+    { id: 'a1', title: 'First Steps', description: 'Completed your initial assessment.', unlockedAt: assessments.length > 0 ? new Date().toISOString().split('T')[0] : null, icon: 'sparkles' },
+    { id: 'a2', title: 'Session Starter', description: 'Completed your first coaching session.', unlockedAt: sessions.some(s => s.status === 'completed') ? new Date(sessions.find(s => s.status === 'completed')!.scheduled_at).toISOString().split('T')[0] : null, icon: 'zap' },
+    { id: 'a3', title: 'Dedicated Learner', description: 'Completed 5+ coaching sessions.', unlockedAt: sessions.filter(s => s.status === 'completed').length >= 5 ? new Date().toISOString().split('T')[0] : null, icon: 'trophy' },
+    { id: 'a4', title: 'Assessment Pro', description: 'Completed all available assessments.', unlockedAt: assessments.length > 0 && assessments.every(a => a.status === 'completed') ? new Date().toISOString().split('T')[0] : null, icon: 'zap' },
+    { id: 'a5', title: 'Milestone Master', description: 'Reached all major milestones.', unlockedAt: null, icon: 'trophy' },
+    { id: 'a6', title: 'Consistent Go-Getter', description: 'Maintained a 21-day engagement streak.', unlockedAt: null, icon: 'sparkles' },
+  ];
 
   const completedMilestones = milestones.filter(m => m.status === 'Completed').length;
   const overallProgress = milestones.length
@@ -96,7 +147,7 @@ export function CoachingGrowthPage() {
     : 0;
   const unlockedAchievements = achievements.filter(a => a.unlockedAt !== null).length;
 
-  const displayName = profile?.name || 'Coachee';
+  const displayName = profile?.name || candidateProfile?.name || 'Coachee';
   const tier = profile?.tier || 'Professional';
 
   return (
@@ -121,6 +172,15 @@ export function CoachingGrowthPage() {
       </div>
 
       {/* Top metrics */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[0, 1, 2].map(i => (
+            <Card key={i} className="p-4"><div className="animate-pulse h-14 bg-bg-tertiary rounded" /></Card>
+          ))}
+        </div>
+      ) : error ? (
+        <Card className="p-6"><div className="text-center text-red text-sm">{error}</div></Card>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
@@ -160,6 +220,7 @@ export function CoachingGrowthPage() {
           </div>
         </Card>
       </div>
+      )}
 
       {/* Milestones timeline */}
       <Card>
@@ -173,6 +234,14 @@ export function CoachingGrowthPage() {
           </div>
         </CardHeader>
         <CardContent>
+            {loading ? (
+              <div className="py-8 text-center text-text-muted text-sm">Loading milestones...</div>
+            ) : milestones.length === 0 ? (
+              <EmptyState
+                title="No milestones yet"
+                description="Complete coaching sessions and assessments to build your milestone timeline."
+              />
+            ) : (
             <div className="space-y-1">
               {milestones.map((milestone, idx) => {
                 const isLast = idx === milestones.length - 1;
@@ -207,6 +276,7 @@ export function CoachingGrowthPage() {
                 );
               })}
             </div>
+            )}
         </CardContent>
       </Card>
 
@@ -220,6 +290,14 @@ export function CoachingGrowthPage() {
             </div>
           </CardHeader>
           <CardContent>
+              {loading ? (
+                <div className="py-8 text-center text-text-muted text-sm">Loading skills...</div>
+              ) : skills.length === 0 ? (
+                <EmptyState
+                  title="No skill data yet"
+                  description="Complete assessments to see your skill development progress."
+                />
+              ) : (
               <div className="space-y-5">
                 {skills.map((skill) => {
                   const levelProgress = (skill.activitiesDone / skill.activitiesTotal) * 100;
@@ -248,6 +326,7 @@ export function CoachingGrowthPage() {
                   );
                 })}
               </div>
+              )}
           </CardContent>
         </Card>
 
@@ -260,6 +339,14 @@ export function CoachingGrowthPage() {
             </div>
           </CardHeader>
           <CardContent>
+              {loading ? (
+                <div className="py-8 text-center text-text-muted text-sm">Loading achievements...</div>
+              ) : achievements.length === 0 ? (
+                <EmptyState
+                  title="No achievements yet"
+                  description="Complete sessions and assessments to unlock achievements."
+                />
+              ) : (
               <div className="grid grid-cols-2 gap-3">
                 {achievements.map((achievement) => {
                   const unlocked = achievement.unlockedAt !== null;
@@ -293,6 +380,7 @@ export function CoachingGrowthPage() {
                   );
                 })}
               </div>
+              )}
           </CardContent>
         </Card>
       </div>

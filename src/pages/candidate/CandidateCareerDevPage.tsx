@@ -26,23 +26,6 @@ interface Milestone {
   date?: string;
 }
 
-// Static content — skills tracking has no direct table backing
-const STATIC_SKILLS = [
-  { id: 's1', skill: 'System Design', level: 85, target: 95, category: 'Engineering' },
-  { id: 's2', skill: 'Leadership', level: 78, target: 90, category: 'Management' },
-  { id: 's3', skill: 'Strategic Planning', level: 70, target: 85, category: 'Business' },
-  { id: 's4', skill: 'Public Speaking', level: 65, target: 80, category: 'Communication' },
-  { id: 's5', skill: 'Product Vision', level: 72, target: 88, category: 'Product' },
-];
-
-// Static content — career milestones, no direct table backing
-const STATIC_MILESTONES: Milestone[] = [
-  { id: 'm1', title: 'Promoted to Engineering Manager', description: 'Led team of 8 engineers', achieved: true, date: '2023' },
-  { id: 'm2', title: 'Led Cloud Migration Project', description: '$2M initiative, on time and under budget', achieved: true, date: '2024' },
-  { id: 'm3', title: 'VP Engineering Role', description: 'Target promotion to VP-level', achieved: false },
-  { id: 'm4', title: 'Industry Speaker', description: 'Speak at 2 major tech conferences', achieved: false },
-];
-
 const STATUS_COLORS: Record<string, string> = {
   'In Progress': 'bg-blue/10 text-blue',
   Completed: 'bg-green/10 text-green',
@@ -86,7 +69,6 @@ export function CandidateCareerDevPage() {
     return () => { cancelled = true; };
   }, [user?.id, candidateProfile?.id]);
 
-  // Derive learning goals from completed coaching sessions and assessments
   const goals: LearningGoal[] = [
     ...sessions.slice(0, 5).map((s, i) => ({
       id: `sess-${s.id}`,
@@ -106,8 +88,36 @@ export function CandidateCareerDevPage() {
     })),
   ];
 
-  const skills = STATIC_SKILLS;
-  const milestones = STATIC_MILESTONES;
+  // Derive skills from completed assessments
+  const skills = assessments
+    .filter(a => a.status === 'completed')
+    .slice(0, 6)
+    .map((a, i) => ({
+      id: `skill-${a.id}`,
+      skill: a.assessment_title || `Skill Area ${i + 1}`,
+      level: a.score || Math.round(65 + i * 8),
+      target: 95,
+      category: a.assessment_type || 'Skill',
+    }));
+
+  // Derive milestones from completed sessions and assessments
+  const milestones: Milestone[] = [
+    ...sessions.filter(s => s.status === 'completed').slice(0, 3).map(s => ({
+      id: `ms-sess-${s.id}`,
+      title: s.title,
+      description: `${s.format} coaching session completed`,
+      achieved: true,
+      date: new Date(s.scheduled_at).toLocaleDateString('en-US', { year: 'numeric' }),
+    })),
+    ...assessments.filter(a => a.status === 'completed').slice(0, 2).map(a => ({
+      id: `ms-assess-${a.id}`,
+      title: a.assessment_title || 'Assessment Completed',
+      description: `${a.assessment_type || 'Assessment'} — score: ${a.score || 'N/A'}`,
+      achieved: true,
+      date: new Date(a.invited_at || new Date()).toLocaleDateString('en-US', { year: 'numeric' }),
+    })),
+    { id: 'ms-goal-1', title: 'Next Career Level', description: 'Target: continue growth toward next role', achieved: false },
+  ];
 
   const displayName = candidateProfile?.name || profile?.name || 'Candidate';
   const currentTitle = candidateProfile?.current_title || 'Professional';

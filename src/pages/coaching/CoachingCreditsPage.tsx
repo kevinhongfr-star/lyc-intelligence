@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Coins, TrendingUp, Check, ArrowRight, Plus, Receipt, User } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Progress, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
-import { getCoachingCredits, type CoachingCreditData } from '@/services/supabaseApi';
+import { getCoachingCredits, type CoachingCreditData, getCoacheePastSessions, getCoacheeUpcomingSessions, type CoachingSession } from '@/services/supabaseApi';
 
 interface CreditBalance {
   current: number;
@@ -34,15 +34,7 @@ interface PlanTier {
   current?: boolean;
 }
 
-const STATIC_USAGE: UsageRecord[] = [
-  { id: 'u1', description: '1:1 Career Strategy Session', amount: -2, date: '2025-01-15', type: 'Session' },
-  { id: 'u2', description: 'Monthly credit refresh', amount: 20, date: '2025-01-01', type: 'Top-up' },
-  { id: 'u3', description: 'Leadership Assessment (SHIFT)', amount: -3, date: '2024-12-28', type: 'Assessment' },
-  { id: 'u4', description: 'Interview Prep Workshop', amount: -2, date: '2024-12-22', type: 'Workshop' },
-  { id: 'u5', description: '1:1 Target Company Mapping', amount: -2, date: '2024-12-13', type: 'Session' },
-  { id: 'u6', description: 'Credit top-up purchase', amount: 10, date: '2024-12-10', type: 'Top-up' },
-];
-
+// No DB table — static pricing content
 const STATIC_PLANS: PlanTier[] = [
   {
     id: 'starter',
@@ -71,30 +63,37 @@ const STATIC_PLANS: PlanTier[] = [
 
 export function CoachingCreditsPage() {
   const [balance, setBalance] = useState<CreditBalance | null>(null);
+  const [pastSessions, setPastSessions] = useState<CoachingSession[]>([]);
+  const [upcomingSessions, setUpcomingSessions] = useState<CoachingSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user, profile } = useTenantContext();
 
-  const usage = STATIC_USAGE;
   const plans = STATIC_PLANS;
 
   useEffect(() => {
     if (!user?.id) { setLoading(false); return; }
 
-    const fetchCredits = async () => {
+    const fetchData = async () => {
       try {
         setError(null);
-        const data = await getCoachingCredits(user.id);
-        if (data) {
+        const [creditData, pastData, upcomingData] = await Promise.all([
+          getCoachingCredits(user.id),
+          getCoacheePastSessions(user.id),
+          getCoacheeUpcomingSessions(user.id),
+        ]);
+        if (creditData) {
           setBalance({
-            current: data.current_credits,
-            reserved: 0,
+            current: creditData.current_credits,
+            reserved: upcomingData.length * 2,
             expiresAt: '',
             monthlyResetAt: '',
           });
         } else {
           setBalance(null);
         }
+        setPastSessions(pastData);
+        setUpcomingSessions(upcomingData);
       } catch (e) {
         console.error('[CoachingCreditsPage] Error:', e);
         setError('Failed to load credits');
@@ -103,8 +102,25 @@ export function CoachingCreditsPage() {
       }
     };
 
-    fetchCredits();
+    fetchData();
   }, [user?.id]);
+
+  const usage: UsageRecord[] = [
+    ...upcomingSessions.slice(0, 3).map(s => ({
+      id: `upcoming-${s.id}`,
+      description: `${s.title} (upcoming)`,
+      amount: -2,
+      date: new Date(s.scheduled_at).toISOString().split('T')[0],
+      type: 'Session' as const,
+    })),
+    ...pastSessions.slice(0, 5).map(s => ({
+      id: `past-${s.id}`,
+      description: s.title,
+      amount: -2,
+      date: new Date(s.scheduled_at).toISOString().split('T')[0],
+      type: 'Session' as const,
+    })),
+  ];
 
   const available = balance ? balance.current - balance.reserved : 0;
   const usageRatio = balance ? Math.min(100, ((balance.current + 0) / 20) * 100) : 0;
