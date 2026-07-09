@@ -91,6 +91,11 @@ const CoachingCoachPage = lazy(() => import('@/pages/coaching/CoachingCoachPage'
 const CoachingCreditsPage = lazy(() => import('@/pages/coaching/CoachingCreditsPage').then(m => ({ default: m.CoachingCreditsPage })));
 const CoachingCareerIntelPage = lazy(() => import('@/pages/coaching/CoachingCareerIntelPage').then(m => ({ default: m.CoachingCareerIntelPage })));
 const CoachingGrowthPage = lazy(() => import('@/pages/coaching/CoachingGrowthPage').then(m => ({ default: m.CoachingGrowthPage })));
+const CoachingIntelligencePage = lazy(() => import('@/pages/coaching/CoachingIntelligencePage').then(m => ({ default: m.CoachingIntelligencePage })));
+const CoachingProfileSettingsPage = lazy(() => import('@/pages/coaching/CoachingProfileSettingsPage').then(m => ({ default: m.CoachingProfileSettingsPage })));
+const CoachingChatFeaturesPage = lazy(() => import('@/pages/coaching/CoachingChatFeaturesPage').then(m => ({ default: m.CoachingChatFeaturesPage })));
+const CoachingCareerServicesPage = lazy(() => import('@/pages/coaching/CoachingCareerServicesPage').then(m => ({ default: m.CoachingCareerServicesPage })));
+const CoachingEngagementPage = lazy(() => import('@/pages/coaching/CoachingEngagementPage').then(m => ({ default: m.CoachingEngagementPage })));
 
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
@@ -189,12 +194,12 @@ export default function App() {
             <Route index element={<Navigate to="coach" replace />} />
             <Route path="coach" element={<CoachingCoachPage />} />
             <Route path="credits" element={<CoachingCreditsPage />} />
-            <Route path="intelligence" element={<PlaceholderPage title="B2C Intelligence" />} />
+            <Route path="intelligence" element={<CoachingIntelligencePage />} />
             <Route path="career-intel" element={<CoachingCareerIntelPage />} />
-            <Route path="profile" element={<PlaceholderPage title="Profile & Settings" />} />
-            <Route path="chat-features" element={<PlaceholderPage title="Chat Features" />} />
-            <Route path="career-services" element={<PlaceholderPage title="Career Services" />} />
-            <Route path="engagement" element={<PlaceholderPage title="Engagement" />} />
+            <Route path="profile" element={<CoachingProfileSettingsPage />} />
+            <Route path="chat-features" element={<CoachingChatFeaturesPage />} />
+            <Route path="career-services" element={<CoachingCareerServicesPage />} />
+            <Route path="engagement" element={<CoachingEngagementPage />} />
             <Route path="growth" element={<CoachingGrowthPage />} />
           </Route>
 
