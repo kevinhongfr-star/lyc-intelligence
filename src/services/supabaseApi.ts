@@ -3652,3 +3652,53 @@ export async function getOpenMandates(limit?: number): Promise<any[]> {
     return [];
   }
 }
+
+// ── Coaching sessions (scoped by user via RLS) ──
+export interface CoachingSession {
+  id: string;
+  coachee_id: string;
+  coach_id: string | null;
+  title: string;
+  scheduled_at: string;
+  duration_min: number;
+  format: 'video' | 'in_person' | 'phone';
+  status: 'scheduled' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
+  notes: string | null;
+  rating: number | null;
+  outcome: 'completed' | 'cancelled' | 'no_show' | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getCoacheeUpcomingSessions(userId: string): Promise<CoachingSession[]> {
+  try {
+    const { data, error } = await getSupabase()
+      .from('coaching_sessions')
+      .select('*')
+      .eq('coachee_id', userId)
+      .gte('scheduled_at', new Date().toISOString())
+      .order('scheduled_at', { ascending: true });
+    if (error) { console.error('[Portal] getCoacheeUpcomingSessions:', error); return []; }
+    return (data || []) as CoachingSession[];
+  } catch (e) {
+    console.error('[Portal] getCoacheeUpcomingSessions error:', e);
+    return [];
+  }
+}
+
+export async function getCoacheePastSessions(userId: string): Promise<CoachingSession[]> {
+  try {
+    const { data, error } = await getSupabase()
+      .from('coaching_sessions')
+      .select('*')
+      .eq('coachee_id', userId)
+      .lt('scheduled_at', new Date().toISOString())
+      .order('scheduled_at', { ascending: false })
+      .limit(20);
+    if (error) { console.error('[Portal] getCoacheePastSessions:', error); return []; }
+    return (data || []) as CoachingSession[];
+  } catch (e) {
+    console.error('[Portal] getCoacheePastSessions error:', e);
+    return [];
+  }
+}
