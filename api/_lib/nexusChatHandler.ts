@@ -17,6 +17,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getUserFromRequest } from './adminAuth.js';
 
 // ── DeepSeek Configuration ──
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
@@ -275,6 +276,12 @@ async function callDeepSeekNonStreaming(
 
 // ── Main Handler ──
 export async function handleNexusChat(req: VercelRequest, res: VercelResponse) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
   const ip = getClientIp(req);
   
   if (!checkRateLimit(ip, 30, 60 * 1000)) {
