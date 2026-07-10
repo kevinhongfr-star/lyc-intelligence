@@ -44,13 +44,13 @@ export function StatCard({
     <div
       onClick={onClick}
       className={`
-        relative overflow-hidden bg-white border border-[#EBEBEB]
+        relative overflow-hidden bg-white border border-[#E5E5E5]
         p-5 transition-all duration-200
         ${onClick ? 'cursor-pointer hover:border-[#D4D4D4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)]' : ''}
       `}
     >
       <div className="flex items-start justify-between mb-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#A3A3A3]">
+        <p className="text-[13px] font-semibold uppercase tracking-[1.5px] text-[#737373]">
           {title}
         </p>
         {Icon && (
@@ -71,11 +71,11 @@ export function StatCard({
             {Math.abs(change)}%
           </div>
         )}
-        <span className="text-xs text-[#A3A3A3]">{subtitle || changeLabel}</span>
+        <span className="text-xs text-[#737373]">{subtitle || changeLabel}</span>
       </div>
 
       {onClick && (
-        <div className="absolute bottom-4 right-4 flex items-center gap-1 text-[11px] font-medium text-[#A3A3A3] opacity-0 hover:opacity-100 transition-opacity">
+        <div className="absolute bottom-4 right-4 flex items-center gap-1 text-[13px] font-medium text-[#737373] opacity-0 hover:opacity-100 transition-opacity">
           View <ChevronRight className="w-3 h-3" />
         </div>
       )}
@@ -124,16 +124,16 @@ export function PipelineFunnel({ funnel, conversions = {}, onStageClick }: Pipel
   const totalCandidates = Object.values(funnel).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="bg-white border border-[#EBEBEB]">
-      <div className="px-6 py-4 border-b border-[#EBEBEB]">
+    <div className="bg-white border border-[#E5E5E5]">
+      <div className="px-6 py-4 border-b border-[#E5E5E5]">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-[15px] text-[#171717]">Pipeline Funnel</h3>
-            <p className="text-xs text-[#A3A3A3] mt-0.5">{totalCandidates} total candidates</p>
+            <p className="text-xs text-[#737373] mt-0.5">{totalCandidates} total candidates</p>
           </div>
           <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[rgba(193,8,171,0.05)]">
             <Activity className="w-3 h-3 text-[#C108AB]" />
-            <span className="text-[11px] font-semibold text-[#C108AB]">Live</span>
+            <span className="text-[13px] font-semibold text-[#C108AB]">Live</span>
           </div>
         </div>
       </div>
@@ -152,7 +152,7 @@ export function PipelineFunnel({ funnel, conversions = {}, onStageClick }: Pipel
                 onClick={() => onStageClick?.(stage)}
                 className={`flex items-center gap-3 ${onStageClick ? 'cursor-pointer' : ''}`}
               >
-                <span className="text-[10px] font-mono font-bold text-[#A3A3A3] w-7 text-right">
+                <span className="text-[14px] font-mono font-bold text-[#737373] w-7 text-right">
                   {formatStageShort(stage)}
                 </span>
                 <div className="flex-1 relative h-8 bg-[#F7F7F7] overflow-hidden">
@@ -165,7 +165,7 @@ export function PipelineFunnel({ funnel, conversions = {}, onStageClick }: Pipel
                     }}
                   />
                   <div className="absolute inset-0 flex items-center px-3">
-                    <span className="text-[11px] font-medium text-white drop-shadow-sm truncate">
+                    <span className="text-[13px] font-medium text-white drop-shadow-sm truncate">
                       {formatStageName(stage)}
                     </span>
                     <span className="ml-auto text-xs font-bold text-white/90 drop-shadow-sm">
@@ -176,8 +176,8 @@ export function PipelineFunnel({ funnel, conversions = {}, onStageClick }: Pipel
               </div>
               {convRate !== null && idx < stages.length - 1 && (
                 <div className="flex items-center gap-2 pl-10 ml-[1.75rem]">
-                  <ChevronRight className="w-3 h-3 text-[#D4D4D4]" />
-                  <span className="text-[10px] font-medium text-[#A3A3A3]">{convRate}% conversion</span>
+                  <ChevronRight className="w-3 h-3 text-[#A3A3A3]" />
+                  <span className="text-[14px] font-medium text-[#737373]">{convRate}% conversion</span>
                 </div>
               )}
             </React.Fragment>
@@ -222,19 +222,19 @@ export function ActivityFeed({ items, onActivityClick }: ActivityFeedProps) {
   };
 
   return (
-    <div className="bg-white border border-[#EBEBEB]">
-      <div className="px-6 py-4 border-b border-[#EBEBEB]">
+    <div className="bg-white border border-[#E5E5E5]">
+      <div className="px-6 py-4 border-b border-[#E5E5E5]">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-[15px] text-[#171717]">Recent Activity</h3>
-          <span className="text-[11px] font-medium text-[#A3A3A3]">{items.length} events</span>
+          <span className="text-[13px] font-medium text-[#737373]">{items.length} events</span>
         </div>
       </div>
 
       <div className="max-h-[360px] overflow-y-auto">
         {items.length === 0 ? (
           <div className="py-12 text-center">
-            <Activity className="w-8 h-8 text-[#D4D4D4] mx-auto mb-2" />
-            <p className="text-sm text-[#A3A3A3]">No recent activity</p>
+            <Activity className="w-8 h-8 text-[#A3A3A3] mx-auto mb-2" />
+            <p className="text-sm text-[#737373]">No recent activity</p>
           </div>
         ) : (
           <div className="divide-y divide-[#F7F7F7]">
@@ -254,9 +254,9 @@ export function ActivityFeed({ items, onActivityClick }: ActivityFeedProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#171717] leading-snug">{item.title}</p>
-                    {item.detail && <p className="text-xs text-[#A3A3A3] mt-0.5 truncate">{item.detail}</p>}
+                    {item.detail && <p className="text-xs text-[#737373] mt-0.5 truncate">{item.detail}</p>}
                   </div>
-                  <span className="text-[10px] text-[#D4D4D4] flex-shrink-0 font-medium mt-0.5 tabular-nums">
+                  <span className="text-[14px] text-[#A3A3A3] flex-shrink-0 font-medium mt-0.5 tabular-nums">
                     {formatTime(item.timestamp)}
                   </span>
                 </div>
@@ -287,8 +287,8 @@ export function KPIScorecard({ kpis }: KPIScorecardProps) {
   };
 
   return (
-    <div className="bg-white border border-[#EBEBEB]">
-      <div className="px-6 py-4 border-b border-[#EBEBEB]">
+    <div className="bg-white border border-[#E5E5E5]">
+      <div className="px-6 py-4 border-b border-[#E5E5E5]">
         <h3 className="font-semibold text-[15px] text-[#171717]">KPI Scorecard</h3>
       </div>
       <div className="px-6 py-4 space-y-5">
@@ -301,15 +301,15 @@ export function KPIScorecard({ kpis }: KPIScorecardProps) {
             <div key={kpi.id} className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Icon className="w-4 h-4 text-[#A3A3A3]" />
+                  <Icon className="w-4 h-4 text-[#737373]" />
                   <span className="text-sm font-medium text-[#171717]">{kpi.name}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold text-[#171717] tabular-nums">
                     {kpi.current_value}
-                    <span className="text-[#A3A3A3] font-normal"> / {kpi.target_value}</span>
+                    <span className="text-[#737373] font-normal"> / {kpi.target_value}</span>
                   </span>
-                  <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide" style={{ background: st.bg, color: st.text }}>
+                  <span className="px-2 py-0.5 text-[14px] font-bold uppercase tracking-wide" style={{ background: st.bg, color: st.text }}>
                     {kpi.status}
                   </span>
                 </div>
@@ -346,18 +346,18 @@ export function MandateHealthGrid({ mandates, onMandateClick }: MandateHealthGri
   };
 
   return (
-    <div className="bg-white border border-[#EBEBEB]">
-      <div className="px-6 py-4 border-b border-[#EBEBEB]">
+    <div className="bg-white border border-[#E5E5E5]">
+      <div className="px-6 py-4 border-b border-[#E5E5E5]">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-[15px] text-[#171717]">Mandate Health</h3>
-          <span className="text-[11px] font-medium text-[#A3A3A3]">{mandates.length} active</span>
+          <span className="text-[13px] font-medium text-[#737373]">{mandates.length} active</span>
         </div>
       </div>
 
       {mandates.length === 0 ? (
         <div className="py-12 text-center">
-          <Target className="w-8 h-8 text-[#D4D4D4] mx-auto mb-2" />
-          <p className="text-sm text-[#A3A3A3]">No active mandates</p>
+          <Target className="w-8 h-8 text-[#A3A3A3] mx-auto mb-2" />
+          <p className="text-sm text-[#737373]">No active mandates</p>
         </div>
       ) : (
         <div className="divide-y divide-[#F7F7F7]">
@@ -371,7 +371,7 @@ export function MandateHealthGrid({ mandates, onMandateClick }: MandateHealthGri
               >
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-[#171717] truncate">{mandate.title}</h4>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-[#A3A3A3]">
+                  <div className="flex items-center gap-2 mt-1 text-xs text-[#737373]">
                     <span>{mandate.phase}</span>
                     <span className="text-[#EBEBEB]">·</span>
                     <span>{mandate.days_in_phase}d in phase</span>
@@ -413,8 +413,8 @@ export function ConsultantLeaderboard({ consultants }: ConsultantLeaderboardProp
   ];
 
   return (
-    <div className="bg-white border border-[#EBEBEB]">
-      <div className="px-6 py-4 border-b border-[#EBEBEB]">
+    <div className="bg-white border border-[#E5E5E5]">
+      <div className="px-6 py-4 border-b border-[#E5E5E5]">
         <h3 className="font-semibold text-[15px] text-[#171717]">Team Leaderboard</h3>
       </div>
       <div className="divide-y divide-[#F7F7F7]">
@@ -422,16 +422,16 @@ export function ConsultantLeaderboard({ consultants }: ConsultantLeaderboardProp
           const rs = RANK_STYLES[idx] || { bg: '#F7F7F7', text: '#A3A3A3' };
           return (
             <div key={c.consultant_id} className="flex items-center gap-4 px-6 py-3.5 hover:bg-[#FAFAFA] transition-colors">
-              <div className="w-6 h-6 flex items-center justify-center text-[11px] font-bold" style={{ background: rs.bg, color: rs.text }}>
+              <div className="w-6 h-6 flex items-center justify-center text-[13px] font-bold" style={{ background: rs.bg, color: rs.text }}>
                 {idx + 1}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-[#171717] truncate">{c.name}</p>
-                <p className="text-xs text-[#A3A3A3]">{c.pipeline_count} candidates · {c.activity_30d.outreach} outreach (30d)</p>
+                <p className="text-xs text-[#737373]">{c.pipeline_count} candidates · {c.activity_30d.outreach} outreach (30d)</p>
               </div>
               <div className="text-right">
                 <p className="text-sm font-bold text-[#16A34A] tabular-nums">{c.engagement_rate}%</p>
-                <p className="text-[10px] text-[#A3A3A3] uppercase tracking-wide">engagement</p>
+                <p className="text-[14px] text-[#737373] uppercase tracking-wide">engagement</p>
               </div>
             </div>
           );
@@ -464,7 +464,7 @@ export function BottleneckAlert({ bottlenecks }: BottleneckAlertProps) {
         <h4 className="text-sm font-bold text-[#171717] mb-2">Pipeline Bottlenecks Detected</h4>
         <div className="space-y-1">
           {bottlenecks.slice(0, 3).map((b, idx) => (
-            <p key={idx} className="text-sm text-[#525252]">
+            <p key={idx} className="text-sm text-[#404040]">
               <span className="font-semibold">{b.stage.replace(/_/g, ' ')}</span>
               {' — '}{b.count} candidates stuck
               {b.avg_days > 0 && ` (avg ${b.avg_days}d)`}

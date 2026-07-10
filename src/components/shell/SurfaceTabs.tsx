@@ -44,7 +44,7 @@ export function SurfaceTabs({ active, onChange }: SurfaceTabsProps) {
   return (
     <>
       {/* Desktop */}
-      <div className="hidden md:flex items-center gap-0 bg-white border-b border-[#EBEBEB] px-5 h-10">
+      <div className="hidden md:flex items-center gap-0 bg-white border-b border-[#E5E5E5] px-5 h-10">
         {SURFACE_TABS.map((tab) => {
           const isActive = active === tab.id;
           return (
@@ -52,11 +52,11 @@ export function SurfaceTabs({ active, onChange }: SurfaceTabsProps) {
               key={tab.id}
               onClick={() => onChange(tab.id)}
               className={`
-                flex items-center gap-1.5 px-3 h-full text-[12px] font-medium
+                flex items-center gap-1.5 px-3 h-full text-[14px] font-medium
                 border-b-[2px] transition-colors
                 ${isActive
                   ? 'text-[#171717] border-[#C108AB]'
-                  : 'text-[#A3A3A3] border-transparent hover:text-[#525252]'
+                  : 'text-[#737373] border-transparent hover:text-[#404040]'
                 }
               `}
             >
@@ -68,22 +68,22 @@ export function SurfaceTabs({ active, onChange }: SurfaceTabsProps) {
       </div>
 
       {/* Mobile */}
-      <div className="md:hidden bg-white border-b border-[#EBEBEB] px-4 py-2 relative" ref={menuRef}>
+      <div className="md:hidden bg-white border-b border-[#E5E5E5] px-4 py-2 relative" ref={menuRef}>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="flex items-center gap-2 px-2 py-1.5 w-full justify-between"
         >
           <div className="flex items-center gap-2">
-            <Menu className="w-4 h-4 text-[#525252]" />
+            <Menu className="w-4 h-4 text-[#404040]" />
             <span className="text-[13px] font-medium text-[#171717]">
               {activeTab?.label || 'Menu'}
             </span>
           </div>
-          {mobileMenuOpen ? <X className="w-4 h-4 text-[#A3A3A3]" /> : null}
+          {mobileMenuOpen ? <X className="w-4 h-4 text-[#737373]" /> : null}
         </button>
 
         {mobileMenuOpen && (
-          <div className="absolute left-4 right-4 top-full mt-1 bg-white border border-[#EBEBEB] shadow-lg overflow-hidden z-50">
+          <div className="absolute left-4 right-4 top-full mt-1 bg-white border border-[#E5E5E5] shadow-lg overflow-hidden z-50">
             {SURFACE_TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -91,7 +91,7 @@ export function SurfaceTabs({ active, onChange }: SurfaceTabsProps) {
                 className={`flex items-center gap-3 w-full px-4 py-3 text-[13px] font-medium transition-colors
                   ${active === tab.id
                     ? 'text-[#C108AB] bg-[#FAFAFA] border-l-2 border-[#C108AB]'
-                    : 'text-[#525252] hover:bg-[#FAFAFA]'
+                    : 'text-[#404040] hover:bg-[#FAFAFA]'
                   }`}
               >
                 {tab.icon}

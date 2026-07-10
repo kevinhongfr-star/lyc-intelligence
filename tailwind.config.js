@@ -91,6 +91,7 @@ export default {
         'glow-cta': 'ctaGlow 2.5s ease-in-out infinite',
         'float': 'dreamyFloat 8s ease-in-out infinite',
         'enter': 'pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fadeIn': 'fadeIn 0.2s ease-out forwards',
       },
       transitionTimingFunction: {
         'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',

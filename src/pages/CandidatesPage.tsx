@@ -115,7 +115,7 @@ export function CandidatesPage() {
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-serif font-bold text-[#171717] tracking-tight">Talent Pool</h1>
-          <p className="text-sm text-[#A3A3A3] mt-1">{count.toLocaleString()} contacts{filtered.length !== count ? ` · ${filtered.length} shown` : ''}</p>
+          <p className="text-sm text-[#737373] mt-1">{count.toLocaleString()} contacts{filtered.length !== count ? ` · ${filtered.length} shown` : ''}</p>
         </div>
         <button
           onClick={() => setShowImportModal(true)}
@@ -133,18 +133,18 @@ export function CandidatesPage() {
       >
         <div className="flex flex-wrap gap-3">
           <div className="relative flex-1 min-w-[240px]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D4D4D4]" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3]" />
             <input
               placeholder="Search by name, title, headline, skills..."
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(0); }}
-              className="w-full pl-11 pr-4 py-2.5 bg-[#FAFAFA] border border-[#EBEBEB] text-sm text-[#171717] placeholder:text-[#D4D4D4] focus:outline-none focus:border-[#C108AB]/40 focus:shadow-[0_0_0_3px_rgba(193,8,171,0.06)] transition-all duration-200"
+              className="w-full pl-11 pr-4 py-2.5 bg-[#FAFAFA] border border-[#E5E5E5] text-sm text-[#171717] placeholder:text-[#A3A3A3] focus:outline-none focus:border-[#C108AB]/40 focus:shadow-[0_0_0_3px_rgba(193,8,171,0.06)] transition-all duration-200"
             />
           </div>
           <select
             value={countryFilter}
             onChange={e => { setCountryFilter(e.target.value); setPage(0); }}
-            className="px-4 py-2.5 bg-[#FAFAFA] border border-[#EBEBEB] text-sm text-[#171717] focus:outline-none focus:border-[#C108AB]/40 min-w-[140px] transition-all duration-200"
+            className="px-4 py-2.5 bg-[#FAFAFA] border border-[#E5E5E5] text-sm text-[#171717] focus:outline-none focus:border-[#C108AB]/40 min-w-[140px] transition-all duration-200"
           >
             <option value="">All Countries</option>
             {countries.map(c => <option key={c} value={c}>{c}</option>)}
@@ -152,7 +152,7 @@ export function CandidatesPage() {
           <select
             value={tierFilter}
             onChange={e => { setTierFilter(e.target.value); setPage(0); }}
-            className="px-4 py-2.5 bg-[#FAFAFA] border border-[#EBEBEB] text-sm text-[#171717] focus:outline-none focus:border-[#C108AB]/40 min-w-[120px] transition-all duration-200"
+            className="px-4 py-2.5 bg-[#FAFAFA] border border-[#E5E5E5] text-sm text-[#171717] focus:outline-none focus:border-[#C108AB]/40 min-w-[120px] transition-all duration-200"
           >
             <option value="">All Tiers</option>
             <option value="S">S — C-Suite Elite</option>
@@ -171,7 +171,7 @@ export function CandidatesPage() {
               className={`px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                 seniorityFilter.includes(s.value)
                   ? 'text-[#C108AB]'
-                  : 'text-[#A3A3A3] hover:text-[#171717]'
+                  : 'text-[#737373] hover:text-[#171717]'
               }`}
               style={{
                 background: seniorityFilter.includes(s.value) ? 'rgba(193,8,171,0.06)' : '#F7F7F7',
@@ -196,15 +196,15 @@ export function CandidatesPage() {
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-6 h-6 animate-spin text-[#C108AB]" />
-          <span className="ml-3 text-sm text-[#A3A3A3]">Loading talent pool...</span>
+          <span className="ml-3 text-sm text-[#737373]">Loading talent pool...</span>
         </div>
       ) : paginated.length === 0 ? (
         <div
           className="bg-white p-16 text-center"
           style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
         >
-          <Users className="w-12 h-12 text-[#D4D4D4] mx-auto mb-3 opacity-50" />
-          <p className="text-[#A3A3A3]">No candidates match your filters</p>
+          <Users className="w-12 h-12 text-[#A3A3A3] mx-auto mb-3 opacity-50" />
+          <p className="text-[#737373]">No candidates match your filters</p>
         </div>
       ) : (
         <div
@@ -215,21 +215,21 @@ export function CandidatesPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#F7F7F7]">
-                  <th onClick={() => toggleSort('name')} className="text-left px-6 py-4 text-[11px] font-bold text-[#A3A3A3] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
+                  <th onClick={() => toggleSort('name')} className="text-left px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
                     <span className="flex items-center gap-1.5">Name <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th className="text-left px-6 py-4 text-[11px] font-bold text-[#A3A3A3] uppercase tracking-[1.5px]">Current Role</th>
-                  <th onClick={() => toggleSort('country')} className="text-left px-6 py-4 text-[11px] font-bold text-[#A3A3A3] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
+                  <th className="text-left px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px]">Current Role</th>
+                  <th onClick={() => toggleSort('country')} className="text-left px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
                     <span className="flex items-center gap-1.5">Location <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th onClick={() => toggleSort('seniority')} className="text-left px-6 py-4 text-[11px] font-bold text-[#A3A3A3] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
+                  <th onClick={() => toggleSort('seniority')} className="text-left px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
                     <span className="flex items-center gap-1.5">Seniority <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th onClick={() => toggleSort('score')} className="text-center px-6 py-4 text-[11px] font-bold text-[#A3A3A3] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
+                  <th onClick={() => toggleSort('score')} className="text-center px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
                     <span className="flex items-center justify-center gap-1.5">Score <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th className="text-center px-6 py-4 text-[11px] font-bold text-[#A3A3A3] uppercase tracking-[1.5px]">Tier</th>
-                  <th className="text-center px-6 py-4 text-[11px] font-bold text-[#A3A3A3] uppercase tracking-[1.5px]">Links</th>
+                  <th className="text-center px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px]">Tier</th>
+                  <th className="text-center px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px]">Links</th>
                 </tr>
               </thead>
               <tbody>
@@ -245,21 +245,21 @@ export function CandidatesPage() {
                       <td className="px-6 py-4">
                         <div>
                           <p className="font-semibold text-[#C108AB] hover:text-[#A50798] transition-colors">{c.name}</p>
-                          {c.headline && <p className="text-[11px] text-[#A3A3A3] truncate max-w-[220px] mt-0.5">{c.headline}</p>}
+                          {c.headline && <p className="text-[13px] text-[#737373] truncate max-w-[220px] mt-0.5">{c.headline}</p>}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <p className="text-[#171717] font-medium truncate max-w-[200px]">{c.current_title || '—'}</p>
-                        <p className="text-[11px] text-[#A3A3A3]">{c.company?.name || c.career_history?.[0]?.company || ''}</p>
+                        <p className="text-[13px] text-[#737373]">{c.company?.name || c.career_history?.[0]?.company || ''}</p>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="flex items-center gap-1.5 text-[#A3A3A3] text-xs">
+                        <span className="flex items-center gap-1.5 text-[#737373] text-xs">
                           <MapPin className="w-3 h-3" />
                           {c.city ? `${c.city}, ${c.country}` : c.country || '—'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-xs text-[#525252] capitalize font-medium">{(c.seniority || '—').replace('_', ' ')}</span>
+                        <span className="text-xs text-[#404040] capitalize font-medium">{(c.seniority || '—').replace('_', ' ')}</span>
                       </td>
                       <td className="px-6 py-4 text-center">
                         <span
@@ -271,7 +271,7 @@ export function CandidatesPage() {
                       </td>
                       <td className="px-6 py-4 text-center">
                         <span
-                          className="inline-block text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide"
+                          className="inline-block text-[14px] font-bold px-2.5 py-1 uppercase tracking-wide"
                           style={{ background: tierStyle.bg, color: tierStyle.text }}
                         >
                           {tier} · {TIER_BADGES[tier]}
@@ -298,7 +298,7 @@ export function CandidatesPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-6 py-4 border-t border-[#F7F7F7]">
-              <p className="text-xs text-[#A3A3A3]">
+              <p className="text-xs text-[#737373]">
                 Showing {page * limit + 1}–{Math.min((page + 1) * limit, filtered.length)} of {filtered.length}
               </p>
               <div className="flex items-center gap-2">
@@ -309,7 +309,7 @@ export function CandidatesPage() {
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="text-xs text-[#A3A3A3] font-medium px-2">{page + 1} / {totalPages}</span>
+                <span className="text-xs text-[#737373] font-medium px-2">{page + 1} / {totalPages}</span>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}

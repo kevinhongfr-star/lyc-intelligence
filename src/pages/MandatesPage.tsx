@@ -41,7 +41,7 @@ export function MandatesPage() {
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-serif font-bold text-[#171717] tracking-tight">Mandates</h1>
-          <p className="text-sm text-[#A3A3A3] mt-1">{count ?? mandates.length} active positions</p>
+          <p className="text-sm text-[#737373] mt-1">{count ?? mandates.length} active positions</p>
         </div>
         <button
           onClick={() => navigate('/platform/mandates/new')}
@@ -55,18 +55,18 @@ export function MandatesPage() {
       {/* Filters */}
       <div className="flex gap-3 flex-wrap">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D4D4D4]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3]" />
           <input
             placeholder="Search mandates..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 bg-white border border-[#EBEBEB] text-sm text-[#171717] placeholder:text-[#D4D4D4] focus:outline-none focus:border-[#C108AB]/40 focus:shadow-[0_0_0_3px_rgba(193,8,171,0.06)] transition-all duration-200"
+            className="w-full pl-11 pr-4 py-2.5 bg-white border border-[#E5E5E5] text-sm text-[#171717] placeholder:text-[#A3A3A3] focus:outline-none focus:border-[#C108AB]/40 focus:shadow-[0_0_0_3px_rgba(193,8,171,0.06)] transition-all duration-200"
           />
         </div>
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="bg-white border border-[#EBEBEB] text-sm text-[#171717] px-4 py-2.5 min-h-[44px] focus:outline-none focus:border-[#C108AB]/40 transition-all duration-200"
+          className="bg-white border border-[#E5E5E5] text-sm text-[#171717] px-4 py-2.5 min-h-[44px] focus:outline-none focus:border-[#C108AB]/40 transition-all duration-200"
         >
           <option value="">All Statuses</option>
           {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
@@ -77,7 +77,7 @@ export function MandatesPage() {
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <Loader2 className="w-6 h-6 animate-spin text-[#C108AB]" />
-          <span className="ml-3 text-sm text-[#A3A3A3]">Loading mandates...</span>
+          <span className="ml-3 text-sm text-[#737373]">Loading mandates...</span>
         </div>
       ) : (
         <div className="space-y-4">
@@ -95,9 +95,9 @@ export function MandatesPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-serif font-bold text-base text-[#171717]">{m.title}</h3>
-                    <ChevronRight className="w-4 h-4 text-[#D4D4D4] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <ChevronRight className="w-4 h-4 text-[#A3A3A3] opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-[#A3A3A3]">
+                  <div className="flex items-center gap-2 text-sm text-[#737373]">
                     <Building2 className="w-3.5 h-3.5" />
                     <span>{m.company?.name ?? 'No client'}</span>
                   </div>
@@ -121,7 +121,7 @@ export function MandatesPage() {
                   return (
                     <div
                       key={s}
-                      className="flex-1 h-8 flex items-center justify-center text-[10px] font-bold transition-all duration-200"
+                      className="flex-1 h-8 flex items-center justify-center text-[14px] font-bold transition-all duration-200"
                       style={{
                         backgroundColor: `${STAGE_CONFIG[s].color}15`,
                         color: STAGE_CONFIG[s].color,
@@ -134,7 +134,7 @@ export function MandatesPage() {
               </div>
 
               {/* Stage legend */}
-              <div className="flex gap-4 text-[10px] text-[#A3A3A3] mb-4">
+              <div className="flex gap-4 text-[14px] text-[#737373] mb-4">
                 {STAGE_ORDER.map(s => (
                   <span key={s} className="flex items-center gap-1">
                     <span className="w-2 h-2" style={{ background: STAGE_CONFIG[s].color }} />

@@ -1,12 +1,11 @@
 /**
- * AppShell — Main layout wrapper for all authenticated surfaces
- * Phase 6: Linear-inspired calm hierarchy + framer-motion page transitions
+ * AppShell — Main layout wrapper
+ * Single header bar (TopBar) + sub-tab navigation
+ * CSS-only transitions, no framer-motion overhead
  */
 import React, { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import { TopBar } from './TopBar';
-import { SurfaceTabs, Surface } from './SurfaceTabs';
+import { TopBar, Surface } from './TopBar';
 import { SubTabs } from './SubTabs';
 import { NexusCommandBar } from '@/components/nexus/NexusCommandBar';
 
@@ -17,17 +16,16 @@ const SURFACES: Record<Surface, { tabs: { path: string; label: string }[] }> = {
       { path: '/app/dashboard', label: 'Dashboard' },
       { path: '/app/pipeline', label: 'Pipeline' },
       { path: '/app/mandates', label: 'Mandates' },
+      { path: '/app/candidates', label: 'Candidates' },
+      { path: '/app/companies', label: 'Companies' },
       { path: '/app/scheduler', label: 'Scheduler' },
-      { path: '/app/intelligence', label: 'Intelligence' },
-      { path: '/app/team', label: 'Team' },
-      { path: '/app/tasks', label: 'Tasks' },
+      { path: '/app/notifications', label: 'Notifications' },
+      { path: '/app/chat', label: 'NEXUS' },
+      { path: '/app/org-intel', label: 'Org Intelligence' },
       { path: '/app/analytics', label: 'Analytics' },
+      { path: '/app/tasks', label: 'Tasks' },
       { path: '/app/compliance', label: 'Compliance' },
-      { path: '/app/nexus-engine', label: 'NEXUS Engine' },
-      { path: '/app/advanced-ops', label: 'Advanced Ops' },
-      { path: '/app/scheduling-plus', label: 'Scheduling+' },
-      { path: '/app/intelligence-plus', label: 'Intelligence+' },
-      { path: '/app/platform-settings', label: 'Platform Settings' },
+      { path: '/app/platform-settings', label: 'Settings' },
     ],
   },
   client: {
@@ -39,9 +37,9 @@ const SURFACES: Record<Surface, { tabs: { path: string; label: string }[] }> = {
       { path: '/client/candidates', label: 'Candidates' },
       { path: '/client/nexus-assistant', label: 'NEXUS Assistant' },
       { path: '/client/documents', label: 'Documents & Billing' },
-      { path: '/client/admin', label: 'Admin & Security' },
       { path: '/client/collaboration', label: 'Collaboration' },
       { path: '/client/onboarding', label: 'Onboarding' },
+      { path: '/client/admin', label: 'Admin & Security' },
     ],
   },
   coaching: {
@@ -69,8 +67,6 @@ const SURFACES: Record<Surface, { tabs: { path: string; label: string }[] }> = {
       { path: '/candidate/community', label: 'Community' },
       { path: '/candidate/nexus-coach', label: 'NEXUS Coach' },
       { path: '/candidate/profile', label: 'Profile & Settings' },
-      { path: '/candidate/advanced-assessments', label: 'Advanced Assessments' },
-      { path: '/candidate/settings-plus', label: 'Settings+' },
     ],
   },
 };
@@ -82,19 +78,6 @@ function getSurfaceFromPath(path: string): Surface {
   if (path.startsWith('/candidate')) return 'candidate';
   return 'internal';
 }
-
-// Page transition variants — subtle fade + slight vertical shift
-const pageVariants = {
-  initial: { opacity: 0, y: 6 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -4 },
-};
-
-const pageTransition = {
-  type: 'tween',
-  ease: [0.16, 1, 0.3, 1],
-  duration: 0.25,
-};
 
 export function AppShell() {
   const location = useLocation();
@@ -114,26 +97,17 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen bg-white font-sans">
-      <TopBar />
-      <SurfaceTabs active={activeSurface} onChange={handleSurfaceChange} />
+      {/* Single unified header */}
+      <TopBar activeSurface={activeSurface} onSurfaceChange={handleSurfaceChange} />
+
+      {/* Sub-navigation for current surface */}
       {currentTabs.length > 0 && (
         <SubTabs tabs={currentTabs} active={activeTab} onTabClick={(path) => navigate(path)} />
       )}
 
-      {/* Main content area with page transitions */}
-      <main className="px-6 md:px-10 pb-24 pt-6 max-w-[1440px] mx-auto">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={location.pathname}
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={pageTransition}
-          >
-            <Outlet />
-          </motion.div>
-        </AnimatePresence>
+      {/* Main content — CSS fade-in only, no framer-motion */}
+      <main className="px-6 md:px-10 pb-24 pt-6 max-w-[1440px] mx-auto animate-fadeIn">
+        <Outlet />
       </main>
 
       <NexusCommandBar isOpen={nexusOpen} onToggle={() => setNexusOpen(!nexusOpen)} />

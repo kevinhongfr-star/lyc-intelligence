@@ -46,7 +46,7 @@ export function ConsultantDashboard() {
     return (
       <div className="flex items-center justify-center py-32">
         <Loader2 className="w-5 h-5 animate-spin text-[#C108AB]" />
-        <span className="ml-3 text-sm text-[#A3A3A3]">Loading...</span>
+        <span className="ml-3 text-sm text-[#737373]">Loading...</span>
       </div>
     );
   }
@@ -58,7 +58,7 @@ export function ConsultantDashboard() {
       {/* Header */}
       <div>
         <h1 className="text-xl font-bold text-[#171717] tracking-tight">Dashboard</h1>
-        <p className="text-sm text-[#A3A3A3] mt-1">Your pipeline and activity overview</p>
+        <p className="text-sm text-[#737373] mt-1">Your pipeline and activity overview</p>
       </div>
 
       {/* Top Stats */}
@@ -81,8 +81,8 @@ export function ConsultantDashboard() {
         </div>
 
         {/* Today's Actions */}
-        <div className="bg-white border border-[#EBEBEB]">
-          <div className="px-5 py-4 border-b border-[#EBEBEB]">
+        <div className="bg-white border border-[#E5E5E5]">
+          <div className="px-5 py-4 border-b border-[#E5E5E5]">
             <h3 className="font-semibold text-[15px] text-[#171717]">Today's Actions</h3>
           </div>
           <div className="divide-y divide-[#F7F7F7]">
@@ -107,7 +107,7 @@ export function ConsultantDashboard() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#171717]">{action.title}</p>
-                  <p className="text-xs text-[#A3A3A3] mt-0.5">{action.detail}</p>
+                  <p className="text-xs text-[#737373] mt-0.5">{action.detail}</p>
                 </div>
               </button>
             ))}
@@ -117,8 +117,8 @@ export function ConsultantDashboard() {
 
       {/* Second Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-1 bg-white border border-[#EBEBEB]">
-          <div className="px-5 py-4 border-b border-[#EBEBEB]">
+        <div className="lg:col-span-1 bg-white border border-[#E5E5E5]">
+          <div className="px-5 py-4 border-b border-[#E5E5E5]">
             <h3 className="font-semibold text-[15px] text-[#171717]">My Performance</h3>
           </div>
           <div className="px-5 py-4 space-y-5">
@@ -131,7 +131,7 @@ export function ConsultantDashboard() {
                     <span className="font-medium text-[#171717]">{kpi.name}</span>
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-[#171717] tabular-nums">
-                        {kpi.current_value}<span className="text-[#A3A3A3] font-normal text-xs">/{kpi.target_value}</span>
+                        {kpi.current_value}<span className="text-[#737373] font-normal text-xs">/{kpi.target_value}</span>
                       </span>
                       <div className="w-2 h-2" style={{ background: barColor }} />
                     </div>

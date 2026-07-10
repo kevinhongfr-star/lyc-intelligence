@@ -53,10 +53,10 @@ export function AppLayout() {
       <aside className={`
         ${sidebarOpen ? 'w-56' : 'w-[52px]'}
         flex flex-col transition-all duration-200 ease-out
-        bg-[#FAFAFA] border-r border-[#EBEBEB]
+        bg-[#FAFAFA] border-r border-[#E5E5E5]
       `}>
         {/* Logo */}
-        <div className="px-4 h-14 flex items-center border-b border-[#EBEBEB]">
+        <div className="px-4 h-14 flex items-center border-b border-[#E5E5E5]">
           <Link to="/" className="flex items-center gap-2.5 no-underline">
             <div className="w-7 h-7 flex items-center justify-center font-serif font-bold text-white text-xs bg-[#C108AB]">
               L
@@ -75,12 +75,12 @@ export function AppLayout() {
             if (item.type === 'divider') {
               return sidebarOpen ? (
                 <div key={i} className="px-4 pt-5 pb-1.5">
-                  <span className="text-[10px] font-semibold uppercase tracking-[2px] text-[#D4D4D4]">
+                  <span className="text-[14px] font-semibold uppercase tracking-[2px] text-[#A3A3A3]">
                     {item.label}
                   </span>
                 </div>
               ) : (
-                <div key={i} className="mx-3 my-3 border-t border-[#EBEBEB]" />
+                <div key={i} className="mx-3 my-3 border-t border-[#E5E5E5]" />
               );
             }
 
@@ -95,8 +95,8 @@ export function AppLayout() {
                   flex items-center gap-2.5 mx-2 my-px px-2.5 py-[7px] text-[13px] font-medium
                   transition-colors duration-150 relative no-underline
                   ${active
-                    ? 'text-[#171717] bg-[#EBEBEB]/60'
-                    : 'text-[#A3A3A3] hover:text-[#525252] hover:bg-[#F7F7F7]'
+                    ? 'text-[#171717] bg-[#E5E5E5]/60'
+                    : 'text-[#737373] hover:text-[#404040] hover:bg-[#F7F7F7]'
                   }
                 `}
               >
@@ -121,7 +121,7 @@ export function AppLayout() {
         </nav>
 
         {/* Footer */}
-        <div className="px-2 py-2 border-t border-[#EBEBEB] space-y-0.5">
+        <div className="px-2 py-2 border-t border-[#E5E5E5] space-y-0.5">
           {sidebarOpen && (
             <div className="px-2 pb-1">
               <CreditDisplay showTier />
@@ -129,14 +129,14 @@ export function AppLayout() {
           )}
           <button
             onClick={logout}
-            className="flex items-center gap-2.5 px-2.5 py-[7px] mx-2 text-[13px] text-[#A3A3A3] hover:text-[#DC2626] w-full transition-colors"
+            className="flex items-center gap-2.5 px-2.5 py-[7px] mx-2 text-[13px] text-[#737373] hover:text-[#DC2626] w-full transition-colors"
           >
             <LogOut className="w-[15px] h-[15px]" />
             {sidebarOpen && <span>Sign Out</span>}
           </button>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="flex items-center gap-2.5 px-2.5 py-[7px] mx-2 text-[13px] text-[#A3A3A3] hover:text-[#525252] w-full transition-colors"
+            className="flex items-center gap-2.5 px-2.5 py-[7px] mx-2 text-[13px] text-[#737373] hover:text-[#404040] w-full transition-colors"
           >
             {sidebarOpen ? <ChevronLeft className="w-[15px] h-[15px]" /> : <ChevronRight className="w-[15px] h-[15px]" />}
             {sidebarOpen && <span>Collapse</span>}

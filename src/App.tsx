@@ -114,7 +114,7 @@ function Loading() {
   return (
     <div className="flex h-screen bg-[#FAFAFA]">
       {/* Sidebar skeleton */}
-      <div className="w-60 bg-white border-r border-[#EBEBEB] p-4 space-y-3 hidden md:block">
+      <div className="w-60 bg-white border-r border-[#E5E5E5] p-4 space-y-3 hidden md:block">
         <div className="h-8 bg-[#F7F7F7] rounded animate-pulse" />
         <div className="space-y-2 mt-6">
           {[...Array(6)].map((_, i) => (
@@ -127,7 +127,7 @@ function Loading() {
         <div className="h-8 bg-[#F7F7F7] rounded w-48 animate-pulse" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-28 bg-white rounded-lg border border-[#EBEBEB] p-4 animate-pulse" style={{ animationDelay: `${i * 150}ms` }}>
+            <div key={i} className="h-28 bg-white rounded-lg border border-[#E5E5E5] p-4 animate-pulse" style={{ animationDelay: `${i * 150}ms` }}>
               <div className="h-4 bg-[#F7F7F7] rounded w-2/3 mb-3" />
               <div className="h-8 bg-[#F7F7F7] rounded w-1/2" />
             </div>
@@ -135,7 +135,7 @@ function Loading() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-40 bg-white rounded-lg border border-[#EBEBEB] p-4 animate-pulse" style={{ animationDelay: `${(i + 3) * 150}ms` }}>
+            <div key={i} className="h-40 bg-white rounded-lg border border-[#E5E5E5] p-4 animate-pulse" style={{ animationDelay: `${(i + 3) * 150}ms` }}>
               <div className="h-4 bg-[#F7F7F7] rounded w-1/3 mb-3" />
               <div className="space-y-2">
                 <div className="h-3 bg-[#F7F7F7] rounded w-full" />

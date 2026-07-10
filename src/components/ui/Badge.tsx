@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
  * Premium Badge — pill-shaped, refined color palette
  */
 const variants = {
-  default: 'bg-[#F7F7F7] text-[#525252]',
+  default: 'bg-[#F7F7F7] text-[#404040]',
   success: 'bg-[rgba(26,125,66,0.08)] text-[#1A7D42]',
   warning: 'bg-[rgba(184,134,11,0.08)] text-[#B8860B]',
   danger: 'bg-[rgba(192,57,43,0.08)] text-[#C0392B]',
@@ -19,7 +19,7 @@ export function Badge({ variant = 'default', children, className }: {
 }) {
   return (
     <span className={cn(
-      'inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide uppercase',
+      'inline-flex items-center px-2.5 py-0.5 rounded-full text-[13px] font-semibold tracking-wide uppercase',
       variants[variant],
       className
     )}>

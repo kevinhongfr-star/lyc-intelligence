@@ -1,6 +1,6 @@
 /**
- * SubTabs — Secondary navigation tabs
- * Clean, minimal, horizontal scroll on mobile
+ * SubTabs — Secondary navigation
+ * Larger text, better contrast, clean underline active state
  */
 import React, { useRef, useEffect } from 'react';
 
@@ -23,7 +23,7 @@ export function SubTabs({ tabs, active, onTabClick }: SubTabsProps) {
   return (
     <>
       {/* Desktop */}
-      <div className="hidden md:flex items-center gap-0 bg-white border-b border-[#EBEBEB] px-5 h-9 overflow-x-auto">
+      <div className="hidden md:flex items-center gap-0 bg-white border-b border-[#E5E5E5] px-5 h-11 overflow-x-auto">
         {tabs.map((tab) => {
           const isActive = active === tab.path || active.startsWith(tab.path + '/');
           return (
@@ -31,11 +31,11 @@ export function SubTabs({ tabs, active, onTabClick }: SubTabsProps) {
               key={tab.path}
               onClick={() => onTabClick(tab.path)}
               className={`
-                px-3 h-full text-[12px] font-medium whitespace-nowrap transition-colors
+                px-4 h-full text-[14px] font-medium whitespace-nowrap transition-colors duration-150
                 border-b-[2px]
                 ${isActive
                   ? 'text-[#171717] border-[#171717]'
-                  : 'text-[#A3A3A3] border-transparent hover:text-[#525252]'
+                  : 'text-[#404040] border-transparent hover:text-[#171717]'
                 }
               `}
             >
@@ -45,11 +45,11 @@ export function SubTabs({ tabs, active, onTabClick }: SubTabsProps) {
         })}
       </div>
 
-      {/* Mobile: horizontal scrollable */}
-      <div className="md:hidden bg-white border-b border-[#EBEBEB]">
+      {/* Mobile: horizontal scroll */}
+      <div className="md:hidden bg-white border-b border-[#E5E5E5]">
         <div
           ref={scrollRef}
-          className="flex overflow-x-auto px-3 py-1.5 gap-1 snap-x snap-mandatory"
+          className="flex overflow-x-auto px-3 py-2 gap-1 snap-x snap-mandatory"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {tabs.map((tab) => {
@@ -60,11 +60,11 @@ export function SubTabs({ tabs, active, onTabClick }: SubTabsProps) {
                 ref={isActive ? activeRef : null}
                 onClick={() => onTabClick(tab.path)}
                 className={`
-                  px-2.5 py-1.5 text-[11px] font-medium whitespace-nowrap snap-start flex-shrink-0
-                  transition-colors
+                  px-3 py-1.5 text-[13px] font-medium whitespace-nowrap snap-start flex-shrink-0
+                  transition-colors duration-150
                   ${isActive
-                    ? 'text-[#171717] bg-[#F7F7F7]'
-                    : 'text-[#A3A3A3]'
+                    ? 'text-[#171717] bg-[#F5F5F5]'
+                    : 'text-[#404040]'
                   }
                 `}
               >
