@@ -171,6 +171,20 @@ export function MandatesPage() {
         </select>
       </div>
 
+      {/* Saved Views */}
+      <div className="flex items-center gap-2 mb-3">
+        <SavedViewsManager
+          currentFilters={{ search, status: statusFilter, priority: priorityFilter }}
+          currentSort={{ field: sortField, direction: sortDir }}
+          onLoadView={(filters, sort) => {
+            if (filters.search !== undefined) setSearch(filters.search);
+            if (filters.status !== undefined) setStatusFilter(filters.status);
+            if (filters.priority !== undefined) setPriorityFilter(filters.priority);
+          }}
+          storageKey="lyc_mandates_views"
+        />
+      </div>
+
       {/* Quick filter chips */}
       <div className="flex gap-2 flex-wrap">
         {STATUS_OPTIONS.map(s => (
