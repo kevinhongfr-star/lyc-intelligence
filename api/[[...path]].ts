@@ -514,6 +514,13 @@ export default async function handler(
         return m.handler(req, res);
       }
 
+      // ── T3 v3 API (Dashboard & Analytics) ──
+      case 'v3': {
+        const m = await import('./_lib/t3DashboardHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
       // ── Scoring (complex sub-routing) ──
       case 'scoring': {
         const sub = pathArr[1] || '';
