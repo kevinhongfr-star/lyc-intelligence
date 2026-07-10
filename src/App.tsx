@@ -112,35 +112,35 @@ const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
 function Loading() {
   return (
-    <div className="flex h-screen bg-[#FAF9F7]">
+    <div className="flex h-screen bg-[#FAFAFA]">
       {/* Sidebar skeleton */}
-      <div className="w-60 bg-white border-r border-[#E8E5E0] p-4 space-y-3 hidden md:block">
-        <div className="h-8 bg-[#F0EDEA] rounded animate-pulse" />
+      <div className="w-60 bg-white border-r border-[#EBEBEB] p-4 space-y-3 hidden md:block">
+        <div className="h-8 bg-[#F7F7F7] rounded animate-pulse" />
         <div className="space-y-2 mt-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-5 bg-[#F0EDEA] rounded animate-pulse" style={{ width: `${60 + Math.random() * 30}%`, animationDelay: `${i * 100}ms` }} />
+            <div key={i} className="h-5 bg-[#F7F7F7] rounded animate-pulse" style={{ width: `${60 + Math.random() * 30}%`, animationDelay: `${i * 100}ms` }} />
           ))}
         </div>
       </div>
       {/* Content skeleton */}
       <div className="flex-1 p-6 space-y-4 overflow-auto">
-        <div className="h-8 bg-[#F0EDEA] rounded w-48 animate-pulse" />
+        <div className="h-8 bg-[#F7F7F7] rounded w-48 animate-pulse" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-28 bg-white rounded-lg border border-[#E8E5E0] p-4 animate-pulse" style={{ animationDelay: `${i * 150}ms` }}>
-              <div className="h-4 bg-[#F0EDEA] rounded w-2/3 mb-3" />
-              <div className="h-8 bg-[#F0EDEA] rounded w-1/2" />
+            <div key={i} className="h-28 bg-white rounded-lg border border-[#EBEBEB] p-4 animate-pulse" style={{ animationDelay: `${i * 150}ms` }}>
+              <div className="h-4 bg-[#F7F7F7] rounded w-2/3 mb-3" />
+              <div className="h-8 bg-[#F7F7F7] rounded w-1/2" />
             </div>
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-40 bg-white rounded-lg border border-[#E8E5E0] p-4 animate-pulse" style={{ animationDelay: `${(i + 3) * 150}ms` }}>
-              <div className="h-4 bg-[#F0EDEA] rounded w-1/3 mb-3" />
+            <div key={i} className="h-40 bg-white rounded-lg border border-[#EBEBEB] p-4 animate-pulse" style={{ animationDelay: `${(i + 3) * 150}ms` }}>
+              <div className="h-4 bg-[#F7F7F7] rounded w-1/3 mb-3" />
               <div className="space-y-2">
-                <div className="h-3 bg-[#F0EDEA] rounded w-full" />
-                <div className="h-3 bg-[#F0EDEA] rounded w-4/5" />
-                <div className="h-3 bg-[#F0EDEA] rounded w-3/5" />
+                <div className="h-3 bg-[#F7F7F7] rounded w-full" />
+                <div className="h-3 bg-[#F7F7F7] rounded w-4/5" />
+                <div className="h-3 bg-[#F7F7F7] rounded w-3/5" />
               </div>
             </div>
           ))}

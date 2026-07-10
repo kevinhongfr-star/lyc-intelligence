@@ -9,9 +9,9 @@ export function Input({ className, ...props }: React.InputHTMLAttributes<HTMLInp
       className={`
         w-full px-4 py-2.5 
         bg-[#FFFFFF] 
-        border border-[#E8E5E0] 
+        border border-[#EBEBEB] 
         text-sm text-[var(--color-text)] 
-        placeholder:text-[#B8B0A6]
+        placeholder:text-[#D4D4D4]
         focus:outline-none 
         focus:border-[#C108AB]/40 
         focus:shadow-[0_0_0_3px_rgba(193,8,171,0.06)]

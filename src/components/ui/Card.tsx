@@ -41,7 +41,7 @@ export function Card({ children, className, interactive = false }: {
 
 export function CardHeader({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`px-6 py-5 border-b border-[#E8E5E0] ${className || ''}`}>
+    <div className={`px-6 py-5 border-b border-[#EBEBEB] ${className || ''}`}>
       {children}
     </div>
   );

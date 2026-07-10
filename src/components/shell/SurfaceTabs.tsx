@@ -1,7 +1,6 @@
 /**
  * SurfaceTabs — 4-surface tab bar (Internal / B2B / B2C / Candidate)
- * Desktop: horizontal tabs with fuchsia accent on active
- * Mobile: hamburger menu with dropdown overlay
+ * Linear-inspired: compact, subtle, content-focused
  */
 import React, { useState, useRef, useEffect } from 'react';
 import { Briefcase, Building2, GraduationCap, User, Menu, X } from 'lucide-react';
@@ -15,10 +14,10 @@ interface SurfaceTab {
 }
 
 const SURFACE_TABS: SurfaceTab[] = [
-  { id: 'internal', label: 'Internal Ops', icon: <Briefcase className="w-4 h-4" /> },
-  { id: 'client', label: 'B2B Client', icon: <Building2 className="w-4 h-4" /> },
-  { id: 'coaching', label: 'B2C Coaching', icon: <GraduationCap className="w-4 h-4" /> },
-  { id: 'candidate', label: 'Candidate', icon: <User className="w-4 h-4" /> },
+  { id: 'internal', label: 'Internal', icon: <Briefcase className="w-3.5 h-3.5" /> },
+  { id: 'client', label: 'Clients', icon: <Building2 className="w-3.5 h-3.5" /> },
+  { id: 'coaching', label: 'Coaching', icon: <GraduationCap className="w-3.5 h-3.5" /> },
+  { id: 'candidate', label: 'Candidates', icon: <User className="w-3.5 h-3.5" /> },
 ];
 
 interface SurfaceTabsProps {
@@ -30,85 +29,70 @@ export function SurfaceTabs({ active, onChange }: SurfaceTabsProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close mobile menu on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setMobileMenuOpen(false);
       }
     };
-    if (mobileMenuOpen) {
-      document.addEventListener('mousedown', handleClick);
-    }
+    if (mobileMenuOpen) document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [mobileMenuOpen]);
 
   const activeTab = SURFACE_TABS.find(t => t.id === active);
 
-  const handleSelect = (surface: Surface) => {
-    onChange(surface);
-    setMobileMenuOpen(false);
-  };
-
   return (
     <>
-      {/* Desktop: horizontal tabs */}
-      <div className="hidden md:block bg-white border-b border-border px-6">
-        <div className="flex gap-1">
-          {SURFACE_TABS.map((tab) => (
+      {/* Desktop */}
+      <div className="hidden md:flex items-center gap-0 bg-white border-b border-[#EBEBEB] px-5 h-10">
+        {SURFACE_TABS.map((tab) => {
+          const isActive = active === tab.id;
+          return (
             <button
               key={tab.id}
               onClick={() => onChange(tab.id)}
               className={`
-                flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors
-                ${active === tab.id
-                  ? 'text-fuchsia border-b-2 border-fuchsia bg-fuchsia-light'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-bg-warm'
+                flex items-center gap-1.5 px-3 h-full text-[12px] font-medium
+                border-b-[2px] transition-colors
+                ${isActive
+                  ? 'text-[#171717] border-[#C108AB]'
+                  : 'text-[#A3A3A3] border-transparent hover:text-[#525252]'
                 }
               `}
             >
               {tab.icon}
               <span>{tab.label}</span>
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
-      {/* Mobile: hamburger + dropdown */}
-      <div className="md:hidden bg-white border-b border-border px-4 py-2 relative" ref={menuRef}>
+      {/* Mobile */}
+      <div className="md:hidden bg-white border-b border-[#EBEBEB] px-4 py-2 relative" ref={menuRef}>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-bg-warm transition-colors w-full justify-between"
-          aria-label="Toggle navigation menu"
+          className="flex items-center gap-2 px-2 py-1.5 w-full justify-between"
         >
           <div className="flex items-center gap-2">
-            <Menu className="w-5 h-5 text-text-secondary" />
-            <span className="text-sm font-medium text-text-primary">
+            <Menu className="w-4 h-4 text-[#525252]" />
+            <span className="text-[13px] font-medium text-[#171717]">
               {activeTab?.label || 'Menu'}
             </span>
           </div>
-          {mobileMenuOpen ? (
-            <X className="w-4 h-4 text-text-muted" />
-          ) : (
-            <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          )}
+          {mobileMenuOpen ? <X className="w-4 h-4 text-[#A3A3A3]" /> : null}
         </button>
 
         {mobileMenuOpen && (
-          <div className="absolute left-4 right-4 top-full mt-1 bg-white rounded-lg shadow-lg border border-border overflow-hidden z-50">
+          <div className="absolute left-4 right-4 top-full mt-1 bg-white border border-[#EBEBEB] shadow-lg overflow-hidden z-50">
             {SURFACE_TABS.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => handleSelect(tab.id)}
-                className={`
-                  flex items-center gap-3 w-full px-4 py-3 text-sm font-medium transition-colors
+                onClick={() => { onChange(tab.id); setMobileMenuOpen(false); }}
+                className={`flex items-center gap-3 w-full px-4 py-3 text-[13px] font-medium transition-colors
                   ${active === tab.id
-                    ? 'text-fuchsia bg-fuchsia-light border-l-2 border-fuchsia'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-warm'
-                  }
-                `}
+                    ? 'text-[#C108AB] bg-[#FAFAFA] border-l-2 border-[#C108AB]'
+                    : 'text-[#525252] hover:bg-[#FAFAFA]'
+                  }`}
               >
                 {tab.icon}
                 <span>{tab.label}</span>

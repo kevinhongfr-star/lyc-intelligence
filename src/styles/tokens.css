@@ -1,61 +1,64 @@
 /**
- * LYC Intelligence — Premium Design Tokens
- * McKinsey meets Soho House — zero border-radius, shadow-based elevation
+ * LYC Intelligence — Premium Design Tokens v2 (Phase 6)
+ * Inspired by: Linear (calm hierarchy), Vercel (restraint), Attio (whitespace)
+ * Key shift: cleaner whites, subtler shadows, more breathing room, motion-first
  */
 
 :root {
-  /* ── Base Palette ── */
+  /* ── Base Palette — cleaner, less warm ── */
   --white: #ffffff;
-  --bg: #FAF9F7;           /* Warm off-white, not cold grey */
-  --bg-warm: #F5F3F0;      /* Warm surface for cards */
-  --bg-elevated: #FFFFFF;   /* Elevated surfaces */
-  --bg-sunken: #F0EDEA;     /* Sunken/recessed areas */
-  --border: #E8E5E0;        /* Warm border */
-  --border-subtle: #F0EDEA; /* Near-invisible border */
+  --bg: #ffffff;              /* Pure white — not beige */
+  --bg-subtle: #FAFAFA;       /* Barely-there surface for sidebar */
+  --bg-sunken: #F7F7F7;       /* Sunken/recessed areas */
+  --bg-hover: #F5F5F5;        /* Hover states */
+  --border: #EBEBEB;           /* Near-invisible border */
+  --border-strong: #E0E0E0;    /* Slightly more visible for emphasis */
 
-  /* ── Text ── */
-  --text-primary: #1A1714;     /* Rich black, not pure #000 */
-  --text-secondary: #4A4541;   /* Warm dark grey */
-  --text-muted: #8C857D;       /* Warm mid-grey */
-  --text-faint: #B8B0A6;       /* Very light warm grey */
+  /* ── Text — slight warmth to avoid sterile feel ── */
+  --text-primary: #171717;     /* Near-black (Vercel-like) */
+  --text-secondary: #525252;   /* Neutral dark grey */
+  --text-muted: #A3A3A3;       /* Mid grey */
+  --text-faint: #D4D4D4;       /* Very light */
 
-  /* ── Brand: Fuchsia ── */
+  /* ── Brand: Fuchsia — used as punctuation, not decoration ── */
   --fuchsia: #C108AB;
   --fuchsia-hover: #A50798;
-  --fuchsia-light: rgba(193, 8, 171, 0.06);
-  --fuchsia-10: rgba(193, 8, 171, 0.10);
-  --fuchsia-20: rgba(193, 8, 171, 0.20);
+  --fuchsia-subtle: rgba(193, 8, 171, 0.04);
+  --fuchsia-10: rgba(193, 8, 171, 0.08);
+  --fuchsia-20: rgba(193, 8, 171, 0.15);
 
-  /* ── Semantic Colors ── */
-  --green: #1A7D42;
-  --green-bg: rgba(26, 125, 66, 0.08);
-  --amber: #B8860B;
-  --amber-bg: rgba(184, 134, 11, 0.08);
-  --red: #C0392B;
-  --red-bg: rgba(192, 57, 43, 0.08);
-  --blue: #2C5282;
-  --blue-bg: rgba(44, 82, 130, 0.08);
+  /* ── Semantic Colors — muted, professional ── */
+  --green: #16A34A;
+  --green-bg: rgba(22, 163, 74, 0.06);
+  --amber: #CA8A04;
+  --amber-bg: rgba(202, 138, 4, 0.06);
+  --red: #DC2626;
+  --red-bg: rgba(220, 38, 38, 0.06);
+  --blue: #2563EB;
+  --blue-bg: rgba(37, 99, 235, 0.06);
 
   /* ── Typography ── */
   --font-serif: 'Libre Baskerville', Georgia, serif;
   --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
 
-  /* ── Shadows (warm tone, multi-level elevation) ── */
-  --shadow-xs: 0 1px 2px rgba(26, 23, 20, 0.04);
-  --shadow-sm: 0 1px 3px rgba(26, 23, 20, 0.06), 0 1px 2px rgba(26, 23, 20, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(26, 23, 20, 0.06), 0 2px 4px -2px rgba(26, 23, 20, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(26, 23, 20, 0.08), 0 4px 6px -4px rgba(26, 23, 20, 0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(26, 23, 20, 0.10), 0 8px 10px -6px rgba(26, 23, 20, 0.04);
-  --shadow-card: 0 1px 3px rgba(26, 23, 20, 0.04), 0 1px 2px rgba(26, 23, 20, 0.06);
-  --shadow-card-hover: 0 12px 24px rgba(26, 23, 20, 0.08), 0 4px 8px rgba(26, 23, 20, 0.04);
-  --shadow-modal: 0 24px 48px rgba(26, 23, 20, 0.12), 0 8px 16px rgba(26, 23, 20, 0.06);
-  --shadow-inner: inset 0 2px 4px rgba(26, 23, 20, 0.04);
+  /* ── Shadows — minimal, layered (Vercel-inspired) ── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-border: 0 0 0 1px var(--border);
+  --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
 
-  /* ── Border Radius (ZERO per brand rule, except badges/pills) ── */
+  /* ── Border Radius ── */
   --radius-none: 0px;
-  --radius-card: 0px;
-  --radius-sm: 0px;
-  --radius-full: 9999px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-pill: 9999px;
 
   /* ── Spacing Scale ── */
   --space-1: 4px;
@@ -72,25 +75,26 @@
   /* ── Transitions ── */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --duration-fast: 150ms;
-  --duration-normal: 250ms;
-  --duration-slow: 400ms;
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 350ms;
+  --duration-page: 400ms;
 }
 
 /* ── Dark Theme ── */
 [data-theme='dark'] {
-  --bg: #0D0A14;
-  --bg-warm: #15111E;
-  --bg-elevated: #1C1728;
-  --bg-sunken: #0A0810;
-  --border: #2A2436;
-  --border-subtle: #1C1728;
-  --text-primary: #F5F3F0;
-  --text-secondary: #B8B0A6;
-  --text-muted: #6B6278;
-  --text-faint: #3D3550;
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-card-hover: 0 12px 24px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.2);
+  --bg: #0A0A0A;
+  --bg-subtle: #111111;
+  --bg-sunken: #0D0D0D;
+  --bg-hover: #1A1A1A;
+  --border: #262626;
+  --border-strong: #333333;
+  --text-primary: #FAFAFA;
+  --text-secondary: #A3A3A3;
+  --text-muted: #737373;
+  --text-faint: #404040;
+  --shadow-card: 0 0 0 1px var(--border);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 body {
@@ -103,19 +107,36 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
 }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+h1 { font-size: 1.5rem; font-weight: 700; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.125rem; }
+
+/* ── Scrollbar — minimal ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 /* ── Selection ── */
 ::selection {
   background: var(--fuchsia-10);
   color: var(--fuchsia);
+}
+
+/* ── Page transition ── */
+.page-enter {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--duration-page) var(--ease-out),
+              transform var(--duration-page) var(--ease-out);
 }

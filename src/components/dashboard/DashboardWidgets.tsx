@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import {
   TrendingUp,
   TrendingDown,
-  Minus,
   Users,
   Target,
   DollarSign,
@@ -12,10 +11,9 @@ import {
   Zap,
   ChevronRight,
   AlertCircle,
-  MessageSquare,
 } from 'lucide-react';
 
-// ─── Premium StatCard ────────────────────────────────────────────────────────
+// ─── StatCard ────────────────────────────────────────────────────────
 interface StatCardProps {
   title: string;
   value: string | number;
@@ -28,96 +26,64 @@ interface StatCardProps {
 }
 
 const COLOR_MAP = {
-  blue:    { bg: 'rgba(44,82,130,0.06)',  icon: '#2C5282', accent: '#2C5282' },
-  green:   { bg: 'rgba(26,125,66,0.06)',  icon: '#1A7D42', accent: '#1A7D42' },
-  amber:   { bg: 'rgba(184,134,11,0.06)', icon: '#B8860B', accent: '#B8860B' },
-  purple:  { bg: 'rgba(139,92,246,0.06)', icon: '#7C3AED', accent: '#7C3AED' },
-  red:     { bg: 'rgba(192,57,43,0.06)',  icon: '#C0392B', accent: '#C0392B' },
-  fuchsia: { bg: 'rgba(193,8,171,0.06)', icon: '#C108AB', accent: '#C108AB' },
+  blue:    { bg: 'rgba(37,99,235,0.05)',  accent: '#2563EB' },
+  green:   { bg: 'rgba(22,163,74,0.05)',  accent: '#16A34A' },
+  amber:   { bg: 'rgba(202,138,4,0.05)',  accent: '#CA8A04' },
+  purple:  { bg: 'rgba(124,58,237,0.05)', accent: '#7C3AED' },
+  red:     { bg: 'rgba(220,38,38,0.05)',   accent: '#DC2626' },
+  fuchsia: { bg: 'rgba(193,8,171,0.05)',  accent: '#C108AB' },
 };
 
 export function StatCard({
-  title,
-  value,
-  change,
-  changeLabel = 'vs last period',
-  icon: Icon,
-  color = 'blue',
-  subtitle,
-  onClick,
+  title, value, change, changeLabel = 'vs last period',
+  icon: Icon, color = 'blue', subtitle, onClick,
 }: StatCardProps) {
-  const [hovered, setHovered] = useState(false);
   const c = COLOR_MAP[color];
 
   return (
     <div
       onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       className={`
-        relative overflow-hidden
-        bg-white
-        transition-all duration-300 ease-out
-        ${onClick ? 'cursor-pointer' : ''}
+        relative overflow-hidden bg-white border border-[#EBEBEB]
+        p-5 transition-all duration-200
+        ${onClick ? 'cursor-pointer hover:border-[#D4D4D4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)]' : ''}
       `}
-      style={{
-        boxShadow: hovered
-          ? '0 12px 24px rgba(26,23,20,0.08), 0 4px 8px rgba(26,23,20,0.04)'
-          : '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)',
-        transform: hovered && onClick ? 'translateY(-2px)' : 'translateY(0)',
-      }}
     >
-      {/* Accent bar top */}
-      <div style={{ height: '3px', background: c.accent, opacity: hovered ? 1 : 0.6, transition: 'opacity 0.3s' }} />
-
-      <div className="px-5 pt-4 pb-5">
-        <div className="flex items-start justify-between mb-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#8C857D]">
-            {title}
-          </p>
-          {Icon && (
-            <div
-              className="w-9 h-9 flex items-center justify-center"
-              style={{ background: c.bg }}
-            >
-              <Icon className="w-4 h-4" style={{ color: c.icon }} />
-            </div>
-          )}
-        </div>
-
-        <p className="text-3xl font-bold text-[#1A1714] tracking-tight leading-none mb-2">
-          {typeof value === 'number' ? value.toLocaleString() : value}
+      <div className="flex items-start justify-between mb-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#A3A3A3]">
+          {title}
         </p>
+        {Icon && (
+          <div className="w-8 h-8 flex items-center justify-center" style={{ background: c.bg }}>
+            <Icon className="w-4 h-4" style={{ color: c.accent }} />
+          </div>
+        )}
+      </div>
 
-        <div className="flex items-center gap-2">
-          {change !== undefined && (
-            <div className={`flex items-center gap-1 text-xs font-medium ${change >= 0 ? 'text-[#1A7D42]' : 'text-[#C0392B]'}`}>
-              {change >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-              {Math.abs(change)}%
-            </div>
-          )}
-          {subtitle && (
-            <span className="text-xs text-[#8C857D]">{subtitle}</span>
-          )}
-          {!subtitle && change !== undefined && (
-            <span className="text-xs text-[#8C857D]">{changeLabel}</span>
-          )}
-        </div>
+      <p className="text-[28px] font-bold text-[#171717] tracking-tight leading-none mb-2">
+        {typeof value === 'number' ? value.toLocaleString() : value}
+      </p>
+
+      <div className="flex items-center gap-2">
+        {change !== undefined && (
+          <div className={`flex items-center gap-1 text-xs font-medium ${change >= 0 ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
+            {change >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+            {Math.abs(change)}%
+          </div>
+        )}
+        <span className="text-xs text-[#A3A3A3]">{subtitle || changeLabel}</span>
       </div>
 
       {onClick && (
-        <div
-          className="absolute bottom-3 right-4 flex items-center gap-1 text-[11px] font-medium transition-opacity duration-200"
-          style={{ opacity: hovered ? 1 : 0, color: c.accent }}
-        >
-          查看详情 <ChevronRight className="w-3 h-3" />
+        <div className="absolute bottom-4 right-4 flex items-center gap-1 text-[11px] font-medium text-[#A3A3A3] opacity-0 hover:opacity-100 transition-opacity">
+          View <ChevronRight className="w-3 h-3" />
         </div>
       )}
     </div>
   );
 }
 
-// ─── Premium Pipeline Funnel ─────────────────────────────────────────────────
+// ─── Pipeline Funnel ─────────────────────────────────────────────────
 interface PipelineFunnelProps {
   funnel: Record<string, number>;
   conversions?: Record<string, number>;
@@ -126,29 +92,16 @@ interface PipelineFunnelProps {
 }
 
 const DEFAULT_STAGES = [
-  'S1_Sourced',
-  'S2_Screened',
-  'S3_Contacted',
-  'S5_Responded',
-  'S7_Interested',
-  'S9_Call_Positive',
-  'S11_Internal_Interview',
-  'S12_Presented',
-  'S16_Offer',
-  'S19_Closed',
+  'S1_Sourced', 'S2_Screened', 'S3_Contacted', 'S5_Responded',
+  'S7_Interested', 'S9_Call_Positive', 'S11_Internal_Interview',
+  'S12_Presented', 'S16_Offer', 'S19_Closed',
 ];
 
 const STAGE_LABELS: Record<string, string> = {
-  S1_Sourced: 'Sourced',
-  S2_Screened: 'Screened',
-  S3_Contacted: 'Contacted',
-  S5_Responded: 'Responded',
-  S7_Interested: 'Interested',
-  S9_Call_Positive: 'Call +',
-  S11_Internal_Interview: 'Internal Int.',
-  S12_Presented: 'Presented',
-  S16_Offer: 'Offer',
-  S19_Closed: 'Closed',
+  S1_Sourced: 'Sourced', S2_Screened: 'Screened', S3_Contacted: 'Contacted',
+  S5_Responded: 'Responded', S7_Interested: 'Interested', S9_Call_Positive: 'Call +',
+  S11_Internal_Interview: 'Internal Int.', S12_Presented: 'Presented',
+  S16_Offer: 'Offer', S19_Closed: 'Closed',
 };
 
 function formatStageShort(stage: string): string {
@@ -171,66 +124,60 @@ export function PipelineFunnel({ funnel, conversions = {}, onStageClick }: Pipel
   const totalCandidates = Object.values(funnel).reduce((a, b) => a + b, 0);
 
   return (
-    <div
-      className="bg-white"
-      style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
-    >
-      <div className="px-6 py-5 border-b border-[#F0EDEA]">
+    <div className="bg-white border border-[#EBEBEB]">
+      <div className="px-6 py-4 border-b border-[#EBEBEB]">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-serif font-bold text-base text-[#1A1714]">Pipeline Funnel</h3>
-            <p className="text-xs text-[#8C857D] mt-0.5">{totalCandidates} total candidates across all stages</p>
+            <h3 className="font-semibold text-[15px] text-[#171717]">Pipeline Funnel</h3>
+            <p className="text-xs text-[#A3A3A3] mt-0.5">{totalCandidates} total candidates</p>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(193,8,171,0.06)]">
-            <Activity className="w-3.5 h-3.5 text-[#C108AB]" />
-            <span className="text-xs font-semibold text-[#C108AB]">Live</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[rgba(193,8,171,0.05)]">
+            <Activity className="w-3 h-3 text-[#C108AB]" />
+            <span className="text-[11px] font-semibold text-[#C108AB]">Live</span>
           </div>
         </div>
       </div>
 
-      <div className="px-6 py-5 space-y-1.5">
+      <div className="px-6 py-4 space-y-1">
         {stages.map((stage, idx) => {
           const count = funnel[stage] || 0;
           const widthPercent = Math.max((count / maxCount) * 100, count > 0 ? 8 : 2);
           const nextStage = stages[idx + 1];
           const convKey = nextStage ? `${stage}_to_${nextStage}` : null;
-          const convRate = convKey && conversions[convKey]
-            ? Math.round(conversions[convKey] * 100)
-            : null;
+          const convRate = convKey && conversions[convKey] ? Math.round(conversions[convKey] * 100) : null;
 
           return (
             <React.Fragment key={stage}>
               <div
                 onClick={() => onStageClick?.(stage)}
-                className={`flex items-center gap-4 group ${onStageClick ? 'cursor-pointer' : ''}`}
+                className={`flex items-center gap-3 ${onStageClick ? 'cursor-pointer' : ''}`}
               >
-                <span className="text-[11px] font-bold text-[#8C857D] w-8 text-right font-mono">
+                <span className="text-[10px] font-mono font-bold text-[#A3A3A3] w-7 text-right">
                   {formatStageShort(stage)}
                 </span>
-                <div className="flex-1 relative h-9 bg-[#F5F3F0] overflow-hidden">
+                <div className="flex-1 relative h-8 bg-[#F7F7F7] overflow-hidden">
                   <div
-                    className="h-full transition-all duration-700 ease-out"
+                    className="h-full transition-all duration-500 ease-out"
                     style={{
                       width: `${widthPercent}%`,
-                      background: `linear-gradient(90deg, ${FUNNEL_COLORS[idx % FUNNEL_COLORS.length]}CC, ${FUNNEL_COLORS[idx % FUNNEL_COLORS.length]})`,
+                      background: FUNNEL_COLORS[idx % FUNNEL_COLORS.length],
+                      opacity: 0.85,
                     }}
                   />
                   <div className="absolute inset-0 flex items-center px-3">
-                    <span className="text-[11px] font-medium text-white drop-shadow-md truncate">
+                    <span className="text-[11px] font-medium text-white drop-shadow-sm truncate">
                       {formatStageName(stage)}
                     </span>
-                    <span className="ml-auto text-xs font-bold text-white/90 drop-shadow-md">
+                    <span className="ml-auto text-xs font-bold text-white/90 drop-shadow-sm">
                       {count}
                     </span>
                   </div>
                 </div>
               </div>
               {convRate !== null && idx < stages.length - 1 && (
-                <div className="flex items-center gap-2 pl-12 ml-[2rem]">
-                  <div className="w-px h-2.5 bg-[#E8E5E0]" />
-                  <span className="text-[10px] font-medium text-[#8C857D]">
-                    {convRate}% conversion
-                  </span>
+                <div className="flex items-center gap-2 pl-10 ml-[1.75rem]">
+                  <ChevronRight className="w-3 h-3 text-[#D4D4D4]" />
+                  <span className="text-[10px] font-medium text-[#A3A3A3]">{convRate}% conversion</span>
                 </div>
               )}
             </React.Fragment>
@@ -241,52 +188,56 @@ export function PipelineFunnel({ funnel, conversions = {}, onStageClick }: Pipel
   );
 }
 
-// ─── Premium Activity Feed ───────────────────────────────────────────────────
+// ─── ActivityFeed ────────────────────────────────────────────────────
+interface ActivityItem {
+  type: string;
+  title: string;
+  detail?: string;
+  timestamp: string;
+}
+
 interface ActivityFeedProps {
-  items: any[];
-  onActivityClick?: (item: any) => void;
+  items: ActivityItem[];
+  onActivityClick?: (item: ActivityItem) => void;
 }
 
 const TYPE_CONFIG: Record<string, { icon: any; color: string; bg: string }> = {
-  outreach:          { icon: MessageSquare, color: '#2C5282', bg: 'rgba(44,82,130,0.06)' },
-  pipeline_change:   { icon: TrendingUp,    color: '#1A7D42', bg: 'rgba(26,125,66,0.06)' },
-  import:            { icon: Zap,           color: '#B8860B', bg: 'rgba(184,134,11,0.06)' },
-  client_feedback:   { icon: Users,         color: '#C108AB', bg: 'rgba(193,8,171,0.06)' },
+  outreach:     { icon: Users,    color: '#2563EB', bg: 'rgba(37,99,235,0.05)' },
+  interview:    { icon: Target,   color: '#7C3AED', bg: 'rgba(124,58,237,0.05)' },
+  placement:    { icon: DollarSign, color: '#16A34A', bg: 'rgba(22,163,74,0.05)' },
+  assessment:   { icon: Activity, color: '#CA8A04', bg: 'rgba(202,138,4,0.05)' },
+  meeting:      { icon: Zap,      color: '#C108AB', bg: 'rgba(193,8,171,0.05)' },
 };
 
 export function ActivityFeed({ items, onActivityClick }: ActivityFeedProps) {
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
+    const diff = Date.now() - date.getTime();
     const mins = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
-    if (mins < 1) return '刚刚';
-    if (mins < 60) return `${mins}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m`;
+    if (hours < 24) return `${hours}h`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   return (
-    <div
-      className="bg-white"
-      style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
-    >
-      <div className="px-6 py-5 border-b border-[#F0EDEA]">
+    <div className="bg-white border border-[#EBEBEB]">
+      <div className="px-6 py-4 border-b border-[#EBEBEB]">
         <div className="flex items-center justify-between">
-          <h3 className="font-serif font-bold text-base text-[#1A1714]">Recent Activity</h3>
-          <span className="text-[11px] font-medium text-[#8C857D]">{items.length} events</span>
+          <h3 className="font-semibold text-[15px] text-[#171717]">Recent Activity</h3>
+          <span className="text-[11px] font-medium text-[#A3A3A3]">{items.length} events</span>
         </div>
       </div>
 
       <div className="max-h-[360px] overflow-y-auto">
         {items.length === 0 ? (
           <div className="py-12 text-center">
-            <Activity className="w-10 h-10 text-[#B8B0A6] mx-auto mb-3" />
-            <p className="text-sm text-[#8C857D]">No recent activity</p>
+            <Activity className="w-8 h-8 text-[#D4D4D4] mx-auto mb-2" />
+            <p className="text-sm text-[#A3A3A3]">No recent activity</p>
           </div>
         ) : (
-          <div className="divide-y divide-[#F5F3F0]">
+          <div className="divide-y divide-[#F7F7F7]">
             {items.slice(0, 20).map((item, idx) => {
               const config = TYPE_CONFIG[item.type] || TYPE_CONFIG.outreach;
               const Icon = config.icon;
@@ -294,23 +245,18 @@ export function ActivityFeed({ items, onActivityClick }: ActivityFeedProps) {
                 <div
                   key={idx}
                   onClick={() => onActivityClick?.(item)}
-                  className={`flex items-start gap-3.5 px-6 py-3.5 transition-colors duration-150 ${
-                    onActivityClick ? 'cursor-pointer hover:bg-[#FAF9F7]' : ''
+                  className={`flex items-start gap-3 px-6 py-3.5 transition-colors duration-150 ${
+                    onActivityClick ? 'cursor-pointer hover:bg-[#FAFAFA]' : ''
                   }`}
                 >
-                  <div
-                    className="w-8 h-8 flex items-center justify-center flex-shrink-0 mt-0.5"
-                    style={{ background: config.bg }}
-                  >
+                  <div className="w-7 h-7 flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: config.bg }}>
                     <Icon className="w-3.5 h-3.5" style={{ color: config.color }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#1A1714] leading-snug">{item.title}</p>
-                    {item.detail && (
-                      <p className="text-xs text-[#8C857D] mt-0.5 truncate">{item.detail}</p>
-                    )}
+                    <p className="text-sm font-medium text-[#171717] leading-snug">{item.title}</p>
+                    {item.detail && <p className="text-xs text-[#A3A3A3] mt-0.5 truncate">{item.detail}</p>}
                   </div>
-                  <span className="text-[10px] text-[#B8B0A6] flex-shrink-0 font-medium mt-0.5">
+                  <span className="text-[10px] text-[#D4D4D4] flex-shrink-0 font-medium mt-0.5 tabular-nums">
                     {formatTime(item.timestamp)}
                   </span>
                 </div>
@@ -323,34 +269,27 @@ export function ActivityFeed({ items, onActivityClick }: ActivityFeedProps) {
   );
 }
 
-// ─── KPI Scorecard ───────────────────────────────────────────────────────────
+// ─── KPI Scorecard ───────────────────────────────────────────────────
 interface KPIScorecardProps {
   kpis: any[];
 }
 
 export function KPIScorecard({ kpis }: KPIScorecardProps) {
   const statusStyles: Record<string, { bg: string; text: string }> = {
-    met:      { bg: 'rgba(26,125,66,0.08)',  text: '#1A7D42' },
-    on_track: { bg: 'rgba(44,82,130,0.08)',  text: '#2C5282' },
-    at_risk:  { bg: 'rgba(184,134,11,0.08)', text: '#B8860B' },
+    met:      { bg: 'rgba(22,163,74,0.06)',  text: '#16A34A' },
+    on_track: { bg: 'rgba(37,99,235,0.06)',  text: '#2563EB' },
+    at_risk:  { bg: 'rgba(202,138,4,0.06)',  text: '#CA8A04' },
   };
 
   const categoryIcons: Record<string, any> = {
-    pipeline: Users,
-    conversion: Target,
-    velocity: Zap,
-    activity: Activity,
-    revenue: DollarSign,
-    quality: TrendingUp,
+    pipeline: Users, conversion: Target, velocity: Zap,
+    activity: Activity, revenue: DollarSign, quality: TrendingUp,
   };
 
   return (
-    <div
-      className="bg-white"
-      style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
-    >
-      <div className="px-6 py-5 border-b border-[#F0EDEA]">
-        <h3 className="font-serif font-bold text-base text-[#1A1714]">KPI Scorecard</h3>
+    <div className="bg-white border border-[#EBEBEB]">
+      <div className="px-6 py-4 border-b border-[#EBEBEB]">
+        <h3 className="font-semibold text-[15px] text-[#171717]">KPI Scorecard</h3>
       </div>
       <div className="px-6 py-4 space-y-5">
         {kpis.slice(0, 6).map(kpi => {
@@ -361,29 +300,26 @@ export function KPIScorecard({ kpis }: KPIScorecardProps) {
           return (
             <div key={kpi.id} className="space-y-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <Icon className="w-4 h-4 text-[#8C857D]" />
-                  <span className="text-sm font-medium text-[#1A1714]">{kpi.name}</span>
+                <div className="flex items-center gap-2">
+                  <Icon className="w-4 h-4 text-[#A3A3A3]" />
+                  <span className="text-sm font-medium text-[#171717]">{kpi.name}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-[#1A1714]">
+                  <span className="text-sm font-bold text-[#171717] tabular-nums">
                     {kpi.current_value}
-                    <span className="text-[#8C857D] font-normal"> / {kpi.target_value}</span>
+                    <span className="text-[#A3A3A3] font-normal"> / {kpi.target_value}</span>
                   </span>
-                  <span
-                    className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
-                    style={{ background: st.bg, color: st.text }}
-                  >
+                  <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide" style={{ background: st.bg, color: st.text }}>
                     {kpi.status}
                   </span>
                 </div>
               </div>
-              <div className="h-1.5 bg-[#F0EDEA] overflow-hidden">
+              <div className="h-1.5 bg-[#F7F7F7] overflow-hidden">
                 <div
-                  className="h-full transition-all duration-700 ease-out"
+                  className="h-full transition-all duration-500 ease-out"
                   style={{
                     width: `${progress}%`,
-                    background: kpi.status === 'met' ? '#1A7D42' : kpi.status === 'on_track' ? '#2C5282' : '#B8860B',
+                    background: kpi.status === 'met' ? '#16A34A' : kpi.status === 'on_track' ? '#2563EB' : '#CA8A04',
                   }}
                 />
               </div>
@@ -395,69 +331,63 @@ export function KPIScorecard({ kpis }: KPIScorecardProps) {
   );
 }
 
-// ─── Mandate Health Grid ─────────────────────────────────────────────────────
+// ─── Mandate Health Grid ─────────────────────────────────────────────
 interface MandateHealthGridProps {
   mandates: any[];
   onMandateClick?: (mandate: any) => void;
 }
 
 export function MandateHealthGrid({ mandates, onMandateClick }: MandateHealthGridProps) {
-  const healthStyles: Record<string, { dot: string; bg: string; text: string }> = {
-    healthy:  { dot: '#1A7D42', bg: 'rgba(26,125,66,0.04)',  text: '#1A7D42' },
-    at_risk:  { dot: '#B8860B', bg: 'rgba(184,134,11,0.04)', text: '#B8860B' },
-    stalled:  { dot: '#EA580C', bg: 'rgba(234,88,12,0.04)',  text: '#EA580C' },
-    critical: { dot: '#C0392B', bg: 'rgba(192,57,43,0.04)',  text: '#C0392B' },
+  const healthStyles: Record<string, { dot: string; text: string }> = {
+    healthy:  { dot: '#16A34A', text: '#16A34A' },
+    at_risk:  { dot: '#CA8A04', text: '#CA8A04' },
+    stalled:  { dot: '#EA580C', text: '#EA580C' },
+    critical: { dot: '#DC2626', text: '#DC2626' },
   };
 
   return (
-    <div
-      className="bg-white"
-      style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
-    >
-      <div className="px-6 py-5 border-b border-[#F0EDEA]">
+    <div className="bg-white border border-[#EBEBEB]">
+      <div className="px-6 py-4 border-b border-[#EBEBEB]">
         <div className="flex items-center justify-between">
-          <h3 className="font-serif font-bold text-base text-[#1A1714]">Mandate Health</h3>
-          <span className="text-[11px] font-medium text-[#8C857D]">{mandates.length} active</span>
+          <h3 className="font-semibold text-[15px] text-[#171717]">Mandate Health</h3>
+          <span className="text-[11px] font-medium text-[#A3A3A3]">{mandates.length} active</span>
         </div>
       </div>
 
       {mandates.length === 0 ? (
         <div className="py-12 text-center">
-          <Target className="w-10 h-10 text-[#B8B0A6] mx-auto mb-3" />
-          <p className="text-sm text-[#8C857D]">No active mandates</p>
+          <Target className="w-8 h-8 text-[#D4D4D4] mx-auto mb-2" />
+          <p className="text-sm text-[#A3A3A3]">No active mandates</p>
         </div>
       ) : (
-        <div className="divide-y divide-[#F5F3F0]">
+        <div className="divide-y divide-[#F7F7F7]">
           {mandates.slice(0, 6).map(mandate => {
             const hs = healthStyles[mandate.health_label] || healthStyles.at_risk;
             return (
               <div
                 key={mandate.mandate_id}
                 onClick={() => onMandateClick?.(mandate)}
-                className="flex items-center justify-between px-6 py-4 hover:bg-[#FAF9F7] transition-colors cursor-pointer"
+                className="flex items-center justify-between px-6 py-4 hover:bg-[#FAFAFA] transition-colors cursor-pointer"
               >
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-semibold text-[#1A1714] truncate">{mandate.title}</h4>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-[#8C857D]">
+                  <h4 className="text-sm font-semibold text-[#171717] truncate">{mandate.title}</h4>
+                  <div className="flex items-center gap-2 mt-1 text-xs text-[#A3A3A3]">
                     <span>{mandate.phase}</span>
-                    <span className="text-[#E8E5E0]">·</span>
+                    <span className="text-[#EBEBEB]">·</span>
                     <span>{mandate.days_in_phase}d in phase</span>
-                    <span className="text-[#E8E5E0]">·</span>
+                    <span className="text-[#EBEBEB]">·</span>
                     <span>{mandate.total_candidates} candidates</span>
                   </div>
                   {mandate.alerts?.length > 0 && (
-                    <p className="text-xs text-[#C0392B] mt-1 flex items-center gap-1">
+                    <p className="text-xs text-[#DC2626] mt-1 flex items-center gap-1">
                       <AlertCircle className="w-3 h-3" />
                       {mandate.alerts[0]}
                     </p>
                   )}
                 </div>
                 <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: hs.dot }} />
-                  <span
-                    className="text-sm font-bold"
-                    style={{ color: hs.text }}
-                  >
+                  <div className="w-2 h-2" style={{ background: hs.dot }} />
+                  <span className="text-sm font-bold tabular-nums" style={{ color: hs.text }}>
                     {mandate.health_score}
                   </span>
                 </div>
@@ -470,46 +400,38 @@ export function MandateHealthGrid({ mandates, onMandateClick }: MandateHealthGri
   );
 }
 
-// ─── Consultant Leaderboard ──────────────────────────────────────────────────
+// ─── Consultant Leaderboard ──────────────────────────────────────────
 interface ConsultantLeaderboardProps {
   consultants: any[];
 }
 
 export function ConsultantLeaderboard({ consultants }: ConsultantLeaderboardProps) {
   const RANK_STYLES = [
-    { bg: 'rgba(184,134,11,0.08)', text: '#B8860B', ring: '#B8860B' },
-    { bg: 'rgba(107,114,128,0.08)', text: '#6B7280', ring: '#6B7280' },
-    { bg: 'rgba(234,88,12,0.08)',  text: '#EA580C', ring: '#EA580C' },
+    { bg: 'rgba(202,138,4,0.06)', text: '#CA8A04' },
+    { bg: 'rgba(107,114,128,0.06)', text: '#6B7280' },
+    { bg: 'rgba(234,88,12,0.06)', text: '#EA580C' },
   ];
 
   return (
-    <div
-      className="bg-white"
-      style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
-    >
-      <div className="px-6 py-5 border-b border-[#F0EDEA]">
-        <h3 className="font-serif font-bold text-base text-[#1A1714]">Team Leaderboard</h3>
+    <div className="bg-white border border-[#EBEBEB]">
+      <div className="px-6 py-4 border-b border-[#EBEBEB]">
+        <h3 className="font-semibold text-[15px] text-[#171717]">Team Leaderboard</h3>
       </div>
-      <div className="divide-y divide-[#F5F3F0]">
+      <div className="divide-y divide-[#F7F7F7]">
         {consultants.map((c, idx) => {
-          const rs = RANK_STYLES[idx] || { bg: '#F0EDEA', text: '#8C857D', ring: '#E8E5E0' };
+          const rs = RANK_STYLES[idx] || { bg: '#F7F7F7', text: '#A3A3A3' };
           return (
-            <div key={c.consultant_id} className="flex items-center gap-4 px-6 py-3.5 hover:bg-[#FAF9F7] transition-colors">
-              <div
-                className="w-7 h-7 flex items-center justify-center text-xs font-bold"
-                style={{ background: rs.bg, color: rs.text }}
-              >
+            <div key={c.consultant_id} className="flex items-center gap-4 px-6 py-3.5 hover:bg-[#FAFAFA] transition-colors">
+              <div className="w-6 h-6 flex items-center justify-center text-[11px] font-bold" style={{ background: rs.bg, color: rs.text }}>
                 {idx + 1}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[#1A1714] truncate">{c.name}</p>
-                <p className="text-xs text-[#8C857D]">
-                  {c.pipeline_count} candidates · {c.activity_30d.outreach} outreach (30d)
-                </p>
+                <p className="text-sm font-semibold text-[#171717] truncate">{c.name}</p>
+                <p className="text-xs text-[#A3A3A3]">{c.pipeline_count} candidates · {c.activity_30d.outreach} outreach (30d)</p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-bold text-[#1A7D42]">{c.engagement_rate}%</p>
-                <p className="text-[10px] text-[#8C857D] uppercase tracking-wide">engagement</p>
+                <p className="text-sm font-bold text-[#16A34A] tabular-nums">{c.engagement_rate}%</p>
+                <p className="text-[10px] text-[#A3A3A3] uppercase tracking-wide">engagement</p>
               </div>
             </div>
           );
@@ -519,7 +441,7 @@ export function ConsultantLeaderboard({ consultants }: ConsultantLeaderboardProp
   );
 }
 
-// ─── Bottleneck Alert ────────────────────────────────────────────────────────
+// ─── Bottleneck Alert ────────────────────────────────────────────────
 interface BottleneckAlertProps {
   bottlenecks: any[];
 }
@@ -528,24 +450,21 @@ export function BottleneckAlert({ bottlenecks }: BottleneckAlertProps) {
   if (bottlenecks.length === 0) return null;
 
   const severityStyles: Record<string, { bg: string; border: string; icon: string }> = {
-    critical: { bg: 'rgba(192,57,43,0.04)',  border: 'rgba(192,57,43,0.2)',  icon: '#C0392B' },
-    warning:  { bg: 'rgba(184,134,11,0.04)', border: 'rgba(184,134,11,0.2)', icon: '#B8860B' },
-    info:     { bg: 'rgba(44,82,130,0.04)',  border: 'rgba(44,82,130,0.2)',  icon: '#2C5282' },
+    critical: { bg: 'rgba(220,38,38,0.03)',  border: 'rgba(220,38,38,0.3)',  icon: '#DC2626' },
+    warning:  { bg: 'rgba(202,138,4,0.03)',  border: 'rgba(202,138,4,0.3)', icon: '#CA8A04' },
+    info:     { bg: 'rgba(37,99,235,0.03)',   border: 'rgba(37,99,235,0.3)', icon: '#2563EB' },
   };
 
   const s = severityStyles[bottlenecks[0].severity] || severityStyles.warning;
 
   return (
-    <div
-      className="flex items-start gap-3 p-5"
-      style={{ background: s.bg, borderLeft: `3px solid ${s.icon}` }}
-    >
-      <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: s.icon }} />
+    <div className="flex items-start gap-3 p-5" style={{ background: s.bg, borderLeft: `2px solid ${s.icon}` }}>
+      <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: s.icon }} />
       <div>
-        <h4 className="text-sm font-bold text-[#1A1714] mb-2">Pipeline Bottlenecks Detected</h4>
+        <h4 className="text-sm font-bold text-[#171717] mb-2">Pipeline Bottlenecks Detected</h4>
         <div className="space-y-1">
           {bottlenecks.slice(0, 3).map((b, idx) => (
-            <p key={idx} className="text-sm text-[#4A4541]">
+            <p key={idx} className="text-sm text-[#525252]">
               <span className="font-semibold">{b.stage.replace(/_/g, ' ')}</span>
               {' — '}{b.count} candidates stuck
               {b.avg_days > 0 && ` (avg ${b.avg_days}d)`}

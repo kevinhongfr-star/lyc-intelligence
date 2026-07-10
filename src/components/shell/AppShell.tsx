@@ -1,9 +1,10 @@
 /**
  * AppShell — Main layout wrapper for all authenticated surfaces
- * Implements the mockup v14 design: TopBar + SurfaceTabs + content area + NEXUS Command Bar
+ * Phase 6: Linear-inspired calm hierarchy + framer-motion page transitions
  */
 import React, { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { TopBar } from './TopBar';
 import { SurfaceTabs, Surface } from './SurfaceTabs';
 import { SubTabs } from './SubTabs';
@@ -74,14 +75,26 @@ const SURFACES: Record<Surface, { tabs: { path: string; label: string }[] }> = {
   },
 };
 
-// Determine active surface from path
 function getSurfaceFromPath(path: string): Surface {
   if (path.startsWith('/app') || path.startsWith('/platform')) return 'internal';
   if (path.startsWith('/client')) return 'client';
   if (path.startsWith('/coaching')) return 'coaching';
   if (path.startsWith('/candidate')) return 'candidate';
-  return 'internal'; // Default
+  return 'internal';
 }
+
+// Page transition variants — subtle fade + slight vertical shift
+const pageVariants = {
+  initial: { opacity: 0, y: 6 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -4 },
+};
+
+const pageTransition = {
+  type: 'tween',
+  ease: [0.16, 1, 0.3, 1],
+  duration: 0.25,
+};
 
 export function AppShell() {
   const location = useLocation();
@@ -89,44 +102,40 @@ export function AppShell() {
   const [activeSurface, setActiveSurface] = useState<Surface>(() => getSurfaceFromPath(location.pathname));
   const [nexusOpen, setNexusOpen] = useState(false);
 
-  // Get current sub-tabs for active surface
   const surfaceConfig = SURFACES[activeSurface];
   const currentTabs = surfaceConfig?.tabs || [];
-
-  // Find active tab
   const activeTab = currentTabs.find(tab => location.pathname === tab.path || location.pathname.startsWith(tab.path + '/'))?.path || currentTabs[0]?.path;
 
-  // Handle surface change
   const handleSurfaceChange = (surface: Surface) => {
     setActiveSurface(surface);
     const firstTab = SURFACES[surface]?.tabs[0]?.path;
     if (firstTab) navigate(firstTab);
   };
 
-  // Handle sub-tab click
-  const handleTabClick = (path: string) => {
-    navigate(path);
-  };
-
   return (
-    <div className="min-h-screen bg-bg font-sans">
-      {/* TopBar — brand + notification + user menu */}
+    <div className="min-h-screen bg-white font-sans">
       <TopBar />
-
-      {/* SurfaceTabs — 4-surface navigation bar */}
       <SurfaceTabs active={activeSurface} onChange={handleSurfaceChange} />
-
-      {/* SubTabs — secondary navigation for current surface */}
       {currentTabs.length > 0 && (
-        <SubTabs tabs={currentTabs} active={activeTab} onTabClick={handleTabClick} />
+        <SubTabs tabs={currentTabs} active={activeTab} onTabClick={(path) => navigate(path)} />
       )}
 
-      {/* Main content area */}
-      <main className="px-4 md:px-6 pb-24 pt-4">
-        <Outlet />
+      {/* Main content area with page transitions */}
+      <main className="px-6 md:px-10 pb-24 pt-6 max-w-[1440px] mx-auto">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
-      {/* NEXUS Command Bar — floating bottom bar */}
       <NexusCommandBar isOpen={nexusOpen} onToggle={() => setNexusOpen(!nexusOpen)} />
     </div>
   );

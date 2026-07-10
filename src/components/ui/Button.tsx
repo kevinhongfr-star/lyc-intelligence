@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils';
  */
 const variants = {
   default: 'bg-[#C108AB] hover:bg-[#A50798] text-white shadow-sm hover:shadow-md',
-  outline: 'border border-[#E8E5E0] text-[var(--color-text)] hover:bg-[#F5F3F0] hover:border-[#C108AB]/30',
-  ghost: 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:bg-[#F0EDEA]',
+  outline: 'border border-[#EBEBEB] text-[var(--color-text)] hover:bg-[#F7F7F7] hover:border-[#C108AB]/30',
+  ghost: 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:bg-[#F7F7F7]',
   success: 'bg-[#1A7D42] hover:bg-[#156B36] text-white shadow-sm hover:shadow-md',
   danger: 'bg-[#C0392B] hover:bg-[#A33025] text-white shadow-sm hover:shadow-md',
 };

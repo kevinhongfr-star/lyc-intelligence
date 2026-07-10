@@ -1,69 +1,55 @@
 /**
- * SubTabs — Reusable sub-tab component for B2B, B2C, Candidate surfaces
- * Desktop: horizontal scrollable tabs
- * Mobile: scrollable horizontal tabs with snap behavior + active indicator
+ * SubTabs — Secondary navigation tabs
+ * Clean, minimal, horizontal scroll on mobile
  */
 import React, { useRef, useEffect } from 'react';
 
-interface SubTab {
-  path: string;
-  label: string;
-}
-
-interface SubTabsProps {
-  tabs: SubTab[];
-  active: string;
-  onTabClick: (path: string) => void;
-}
+interface SubTab { path: string; label: string; }
+interface SubTabsProps { tabs: SubTab[]; active: string; onTabClick: (path: string) => void; }
 
 export function SubTabs({ tabs, active, onTabClick }: SubTabsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLButtonElement>(null);
 
-  // Scroll active tab into view on mount
   useEffect(() => {
     if (activeRef.current && scrollRef.current) {
       const container = scrollRef.current;
       const el = activeRef.current;
-      const elLeft = el.offsetLeft;
-      const elWidth = el.offsetWidth;
-      const containerWidth = container.offsetWidth;
-      const scrollLeft = elLeft - (containerWidth / 2) + (elWidth / 2);
+      const scrollLeft = el.offsetLeft - (container.offsetWidth / 2) + (el.offsetWidth / 2);
       container.scrollTo({ left: Math.max(0, scrollLeft), behavior: 'smooth' });
     }
   }, [active]);
 
   return (
     <>
-      {/* Desktop: horizontal scrollable tabs */}
-      <div className="hidden md:block bg-bg-warm border-b border-border px-6 overflow-x-auto">
-        <div className="flex gap-1 min-w-max">
-          {tabs.map((tab) => {
-            const isActive = active === tab.path || active.startsWith(tab.path + '/');
-            return (
-              <button
-                key={tab.path}
-                onClick={() => onTabClick(tab.path)}
-                className={`
-                  px-4 py-2 text-sm transition-colors whitespace-nowrap
-                  ${isActive
-                    ? 'text-fuchsia font-semibold bg-white rounded-t-md shadow-sm'
-                    : 'text-text-secondary hover:text-text-primary'
-                  }
-                `}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+      {/* Desktop */}
+      <div className="hidden md:flex items-center gap-0 bg-white border-b border-[#EBEBEB] px-5 h-9 overflow-x-auto">
+        {tabs.map((tab) => {
+          const isActive = active === tab.path || active.startsWith(tab.path + '/');
+          return (
+            <button
+              key={tab.path}
+              onClick={() => onTabClick(tab.path)}
+              className={`
+                px-3 h-full text-[12px] font-medium whitespace-nowrap transition-colors
+                border-b-[2px]
+                ${isActive
+                  ? 'text-[#171717] border-[#171717]'
+                  : 'text-[#A3A3A3] border-transparent hover:text-[#525252]'
+                }
+              `}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Mobile: horizontally scrollable with snap + active indicator */}
-      <div className="md:hidden bg-bg-warm border-b border-border">
+      {/* Mobile: horizontal scrollable */}
+      <div className="md:hidden bg-white border-b border-[#EBEBEB]">
         <div
           ref={scrollRef}
-          className="flex overflow-x-auto gap-0 px-2 py-1 snap-x snap-mandatory scrollbar-hide"
+          className="flex overflow-x-auto px-3 py-1.5 gap-1 snap-x snap-mandatory"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {tabs.map((tab) => {
@@ -74,10 +60,11 @@ export function SubTabs({ tabs, active, onTabClick }: SubTabsProps) {
                 ref={isActive ? activeRef : null}
                 onClick={() => onTabClick(tab.path)}
                 className={`
-                  px-3 py-2 text-xs font-medium transition-colors whitespace-nowrap snap-start flex-shrink-0 rounded-md
+                  px-2.5 py-1.5 text-[11px] font-medium whitespace-nowrap snap-start flex-shrink-0
+                  transition-colors
                   ${isActive
-                    ? 'text-fuchsia bg-white shadow-sm'
-                    : 'text-text-secondary'
+                    ? 'text-[#171717] bg-[#F7F7F7]'
+                    : 'text-[#A3A3A3]'
                   }
                 `}
               >

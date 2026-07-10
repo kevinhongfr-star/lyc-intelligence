@@ -11,7 +11,7 @@ const CHANNEL_ICONS: Record<string, { icon: React.ReactNode; bg: string }> = {
 };
 
 function PriorityBadge({ score }: { score: number }) {
-  const color = score >= 85 ? '#C0392B' : score >= 70 ? '#B8860B' : score >= 50 ? '#2C5282' : '#8C857D';
+  const color = score >= 85 ? '#C0392B' : score >= 70 ? '#B8860B' : score >= 50 ? '#2C5282' : '#A3A3A3';
   const label = score >= 85 ? 'Critical' : score >= 70 ? 'High' : score >= 50 ? 'Medium' : 'Low';
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold" style={{ backgroundColor: `${color}15`, color }}>
@@ -66,7 +66,7 @@ export function NotificationsPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-20">
       <Loader2 className="w-6 h-6 animate-spin text-[#C108AB]" />
-      <span className="ml-3 text-sm text-[#8C857D]">Loading action items...</span>
+      <span className="ml-3 text-sm text-[#A3A3A3]">Loading action items...</span>
     </div>
   );
 
@@ -81,18 +81,18 @@ export function NotificationsPage() {
       {/* Header */}
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-[#1A1714] tracking-tight">Action Items</h1>
-          <p className="text-sm text-[#8C857D] mt-1">{pendingCount} pending · {highPriorityCount} high priority</p>
+          <h1 className="text-2xl font-serif font-bold text-[#171717] tracking-tight">Action Items</h1>
+          <p className="text-sm text-[#A3A3A3] mt-1">{pendingCount} pending · {highPriorityCount} high priority</p>
         </div>
-        <div className="flex gap-1 p-1 bg-[#F0EDEA]">
+        <div className="flex gap-1 p-1 bg-[#F7F7F7]">
           {filterBtns.map(btn => (
             <button
               key={btn.key}
               onClick={() => setFilter(btn.key)}
               className={`px-4 py-2 text-xs font-semibold transition-all duration-200 min-h-[36px] ${
                 filter === btn.key
-                  ? 'bg-white text-[#1A1714] shadow-sm'
-                  : 'text-[#8C857D] hover:text-[#1A1714]'
+                  ? 'bg-white text-[#171717] shadow-sm'
+                  : 'text-[#A3A3A3] hover:text-[#171717]'
               }`}
             >
               {btn.label} ({btn.count})
@@ -107,8 +107,8 @@ export function NotificationsPage() {
           className="bg-white p-16 text-center"
           style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
         >
-          <Bell className="w-12 h-12 mx-auto mb-4 text-[#B8B0A6] opacity-40" />
-          <p className="text-[#8C857D] text-sm">No action items match your filter.</p>
+          <Bell className="w-12 h-12 mx-auto mb-4 text-[#D4D4D4] opacity-40" />
+          <p className="text-[#A3A3A3] text-sm">No action items match your filter.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -155,14 +155,14 @@ export function NotificationsPage() {
                     {/* Client name — most important */}
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-[#C108AB] flex-shrink-0" />
-                      <span className="text-sm font-bold text-[#1A1714] truncate">
+                      <span className="text-sm font-bold text-[#171717] truncate">
                         {clientName}
                       </span>
                       {positionTitle && (
                         <>
-                          <span className="text-[#E8E5E0] text-xs">·</span>
-                          <Briefcase className="w-3.5 h-3.5 text-[#8C857D] flex-shrink-0" />
-                          <span className="text-xs text-[#4A4541] truncate">
+                          <span className="text-[#EBEBEB] text-xs">·</span>
+                          <Briefcase className="w-3.5 h-3.5 text-[#A3A3A3] flex-shrink-0" />
+                          <span className="text-xs text-[#525252] truncate">
                             {positionTitle}
                           </span>
                         </>
@@ -179,7 +179,7 @@ export function NotificationsPage() {
                         {n.status}
                       </span>
                       {n.due_date && (
-                        <span className="text-[10px] text-[#8C857D] flex items-center gap-1 font-medium">
+                        <span className="text-[10px] text-[#A3A3A3] flex items-center gap-1 font-medium">
                           <Clock size={9} />
                           Due: {new Date(n.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </span>
@@ -187,22 +187,22 @@ export function NotificationsPage() {
                     </div>
 
                     {/* Description */}
-                    <p className="text-sm text-[#4A4541] leading-relaxed">
+                    <p className="text-sm text-[#525252] leading-relaxed">
                       {n.action_description}
                     </p>
 
                     {/* Commercial rationale */}
                     {n.commercial_rationale && (
-                      <div className="p-3" style={{ background: '#FAF9F7', borderLeft: '2px solid #C108AB' }}>
+                      <div className="p-3" style={{ background: '#FAFAFA', borderLeft: '2px solid #C108AB' }}>
                         <p className="text-[10px] font-bold text-[#C108AB] uppercase tracking-[1.5px] mb-1">Commercial Rationale</p>
-                        <p className="text-[11px] text-[#4A4541] leading-relaxed">{n.commercial_rationale}</p>
+                        <p className="text-[11px] text-[#525252] leading-relaxed">{n.commercial_rationale}</p>
                       </div>
                     )}
                   </div>
 
                   {/* Right side: Actions */}
                   <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                    <ChevronRight className="w-4 h-4 text-[#B8B0A6] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <ChevronRight className="w-4 h-4 text-[#D4D4D4] opacity-0 group-hover:opacity-100 transition-opacity" />
                     {n.status === 'Pending' && (
                       <button
                         onClick={(e) => handleMarkDone(e, n)}

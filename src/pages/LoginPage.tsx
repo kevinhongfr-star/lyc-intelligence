@@ -9,14 +9,14 @@ const DS = {
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A50798',
-  bg: '#FAF9F7',
-  bgAlt: '#F5F3F0',
+  bg: '#FAFAFA',
+  bgAlt: '#F7F7F7',
   card: '#FFFFFF',
-  cardBorder: '#E8E5E0',
-  text: '#1A1714',
-  textSecondary: '#4A4541',
-  muted: '#8C857D',
-  border: '#E8E5E0',
+  cardBorder: '#EBEBEB',
+  text: '#171717',
+  textSecondary: '#525252',
+  muted: '#A3A3A3',
+  border: '#EBEBEB',
   radius: '0px',
   shadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)',
   shadowHover: '0 12px 24px rgba(26,23,20,0.08), 0 4px 8px rgba(26,23,20,0.04)',
@@ -186,7 +186,7 @@ export function LoginPage() {
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 3px rgba(193,8,171,0.06) !important; }
-        input::placeholder { color: #B8B0A6; }
+        input::placeholder { color: #D4D4D4; }
       `}</style>
       <MinimalFooter />
     </div>
