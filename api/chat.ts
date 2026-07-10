@@ -28,8 +28,8 @@
  *   unlimited → no cap
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { buildSystemPrompt, type PortalType } from './_lib/nexusPrompts';
-import { fetchUserContext, determinePortalType } from './_lib/nexusContext';
+import { buildSystemPrompt, type PortalType } from './_lib/nexusPrompts.js';
+import { fetchUserContext, determinePortalType } from './_lib/nexusContext.js';
 
 export const maxDuration = 30;
 
