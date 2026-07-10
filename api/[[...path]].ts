@@ -528,6 +528,13 @@ export default async function handler(
         return m.handler(req, res);
       }
 
+      // ── T5 v5 API (Notifications & Alerting) ──
+      case 'v5': {
+        const m = await import('./_lib/t5NotificationsHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
       // ── T6 v6 API (Data Sync & Integration) ──
       case 'v6': {
         const m = await import('./_lib/t6SyncHandler.js');
