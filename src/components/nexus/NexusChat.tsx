@@ -228,7 +228,9 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
           use_case: null, // Auto-detect by persona
           profile: { title: profile?.title, company: profile?.company },
           tier: profile?.tier || creditTier,
-          stream: false, // Use non-streaming for reliable tag parsing
+          stream: false,
+          userId: user?.id || null,
+          userRole: profile?.role || null,
         }),
         signal: controller.signal,
       });

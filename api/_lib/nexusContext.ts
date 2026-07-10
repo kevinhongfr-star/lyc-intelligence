@@ -286,6 +286,31 @@ async function fetchInternalContext(
       ctx.role = profileData.role;
       ctx.team = profileData.team;
     }
+
+    // Mark as admin for prompt routing
+    ctx.isAdmin = profileData?.role === 'admin';
+
+    // Inject mandate summary for internal users
+    try {
+      const { data: mandates } = await sb
+        .from('mandates')
+        .select('id, position_title, org_id, status, organizations(name)')
+        .in('status', ['kick_off', 'sourcing', 'screening', 'shortlist', 'interview', 'offer'])
+        .order('updated_at', { ascending: false })
+        .limit(20);
+
+      if (mandates && mandates.length > 0) {
+        const summary = mandates.slice(0, 10).map((m: any) => {
+          const client = m.organizations?.name || 'Unknown Client';
+          return `${m.position_title} @ ${client} (${m.status})`;
+        }).join('; ');
+        ctx.activeMandatesSummary = `${mandates.length} active: ${summary}`;
+      } else {
+        ctx.activeMandatesSummary = 'No active mandates currently';
+      }
+    } catch (e) {
+      ctx.activeMandatesSummary = 'Mandate data unavailable';
+    }
   } catch (e) {
     console.error('[nexusContext] Internal context error:', e);
   }
