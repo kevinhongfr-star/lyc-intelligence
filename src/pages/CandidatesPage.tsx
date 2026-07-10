@@ -8,6 +8,7 @@ import type { Contact } from '@/services/supabaseApi';
 import { getSupabase } from '@/services/supabaseApi';
 import { LinkedInImportModal } from '@/components/import/LinkedInImportModal';
 import { SavedViewsManager } from '@/components/search/SavedViewsManager';
+import { ColumnVisibility, useColumnVisibility, type ColumnDef } from '@/components/table/ColumnVisibility';
 import Papa from 'papaparse';
 
 const SENIORITY_OPTIONS = [
@@ -57,6 +58,20 @@ export function CandidatesPage() {
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
   const [showBulkBar, setShowBulkBar] = useState(false);
+
+  const CANDIDATE_COLUMNS: ColumnDef[] = [
+    { key: 'checkbox', label: 'Select', defaultVisible: true },
+    { key: 'name', label: 'Name', defaultVisible: true },
+    { key: 'title', label: 'Title', defaultVisible: true },
+    { key: 'location', label: 'Location', defaultVisible: true },
+    { key: 'score', label: 'Score', defaultVisible: true },
+    { key: 'tier', label: 'Tier', defaultVisible: true },
+    { key: 'seniority', label: 'Seniority', defaultVisible: true },
+    { key: 'source', label: 'Source', defaultVisible: true },
+    { key: 'email', label: 'Email', defaultVisible: false },
+    { key: 'linkedin', label: 'LinkedIn', defaultVisible: false },
+  ];
+  const { visibleColumns: visCols, toggleColumn: toggleCol } = useColumnVisibility('lyc_candidates_columns', CANDIDATE_COLUMNS);
   const limit = 30;
 
   const { data: contacts, count, loading } = useContacts({
@@ -170,6 +185,7 @@ export function CandidatesPage() {
           <p className="text-sm text-[#737373] mt-1">{count.toLocaleString()} contacts in database</p>
         </div>
         <div className="flex gap-2">
+          <ColumnVisibility columns={CANDIDATE_COLUMNS} visibleColumns={visCols} onToggle={toggleCol} storageKey="lyc_candidates_columns" />
           <button onClick={exportCSV} className="px-4 py-2.5 text-sm font-medium text-[#404040] bg-white border border-[#E5E5E5] hover:bg-[#F5F5F5] transition-all flex items-center gap-2">
             <Download className="w-4 h-4" />{selectedIds.size > 0 ? `Export ${selectedIds.size}` : 'Export CSV'}
           </button>
@@ -266,47 +282,49 @@ export function CandidatesPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[#E5E5E5] bg-[#FAFAFA]">
-              <th className="w-10 px-3 py-3">
+              {visCols.has('checkbox') && <th className="w-10 px-3 py-3">
                 <button onClick={toggleSelectAll} className="text-[#A3A3A3] hover:text-[#171717]">
                   {selectedIds.size === paged.length && paged.length > 0 ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
                 </button>
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-[#171717]" onClick={() => handleSort('name')}>
+              </th>}
+              {visCols.has('name') && <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-[#171717]" onClick={() => handleSort('name')}>
                 <span className="flex items-center gap-1">Name <ArrowUpDown className="w-3 h-3" /></span>
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-[#737373]">Title</th>
-              <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-[#171717]" onClick={() => handleSort('country')}>
+              </th>}
+              {visCols.has('title') && <th className="text-left px-4 py-3 font-medium text-[#737373]">Title</th>}
+              {visCols.has('location') && <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-[#171717]" onClick={() => handleSort('country')}>
                 <span className="flex items-center gap-1">Location <ArrowUpDown className="w-3 h-3" /></span>
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-[#171717]" onClick={() => handleSort('score')}>
+              </th>}
+              {visCols.has('score') && <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-[#171717]" onClick={() => handleSort('score')}>
                 <span className="flex items-center gap-1">Score <ArrowUpDown className="w-3 h-3" /></span>
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-[#737373]">Tier</th>
-              <th className="text-left px-4 py-3 font-medium text-[#737373]">Seniority</th>
-              <th className="text-left px-4 py-3 font-medium text-[#737373]">Source</th>
+              </th>}
+              {visCols.has('tier') && <th className="text-left px-4 py-3 font-medium text-[#737373]">Tier</th>}
+              {visCols.has('seniority') && <th className="text-left px-4 py-3 font-medium text-[#737373]">Seniority</th>}
+              {visCols.has('source') && <th className="text-left px-4 py-3 font-medium text-[#737373]">Source</th>}
+              {visCols.has('email') && <th className="text-left px-4 py-3 font-medium text-[#737373]">Email</th>}
+              {visCols.has('linkedin') && <th className="text-left px-4 py-3 font-medium text-[#737373]">LinkedIn</th>}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={8} className="px-4 py-16 text-center"><Loader2 className="w-6 h-6 animate-spin text-[#C108AB] mx-auto mb-3" /><span className="text-sm text-[#737373]">Loading candidates...</span></td></tr>
+              <tr><td colSpan={visCols.size} className="px-4 py-16 text-center"><Loader2 className="w-6 h-6 animate-spin text-[#C108AB] mx-auto mb-3" /><span className="text-sm text-[#737373]">Loading candidates...</span></td></tr>
             ) : paged.length === 0 ? (
-              <tr><td colSpan={8} className="px-4 py-16 text-center text-sm text-[#737373]">No candidates match your filters</td></tr>
+              <tr><td colSpan={visCols.size} className="px-4 py-16 text-center text-sm text-[#737373]">No candidates match your filters</td></tr>
             ) : paged.map((c) => {
               const tier = getTier(c.trident_composite, !!c.cxo_stamp);
               const tierStyle = TIER_STYLES[tier];
               return (
                 <tr key={c.id} className={`border-b border-[#F0F0F0] hover:bg-[#FAFAFA] transition-colors cursor-pointer ${selectedIds.has(c.id) ? 'bg-[#C108AB]/5' : ''}`}
                   onClick={() => navigate(`/app/candidates/${c.id}`)}>
-                  <td className="px-3 py-3" onClick={e => e.stopPropagation()}>
+                  {visCols.has('checkbox') && <td className="px-3 py-3" onClick={e => e.stopPropagation()}>
                     <button onClick={() => toggleSelect(c.id)} className="text-[#A3A3A3] hover:text-[#171717]">
                       {selectedIds.has(c.id) ? <CheckSquare className="w-4 h-4 text-[#C108AB]" /> : <Square className="w-4 h-4" />}
                     </button>
-                  </td>
-                  <td className="px-4 py-3">
+                  </td>}
+                  {visCols.has('name') && <td className="px-4 py-3">
                     <div className="font-medium text-[#171717]">{c.name || '—'}</div>
                     {c.linkedin_url && <a href={c.linkedin_url} target="_blank" className="text-[#0A66C2] hover:underline" onClick={e => e.stopPropagation()}><Linkedin className="w-3 h-3 inline" /></a>}
-                  </td>
-                  <td className="px-4 py-3">
+                  </td>}
+                  {visCols.has('title') && <td className="px-4 py-3">
                     {editingCell?.id === c.id && editingCell.field === 'current_title' ? (
                       <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                         <input value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus className="px-2 py-1 text-sm border border-[#C108AB] focus:outline-none w-full" onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
@@ -319,8 +337,8 @@ export function CandidatesPage() {
                         <Edit3 className="w-3 h-3 inline ml-1 text-[#D4D4D4] opacity-0 group-hover:opacity-100" />
                       </span>
                     )}
-                  </td>
-                  <td className="px-4 py-3">
+                  </td>}
+                  {visCols.has('location') && <td className="px-4 py-3">
                     {editingCell?.id === c.id && editingCell.field === 'location' ? (
                       <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                         <input value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus className="px-2 py-1 text-sm border border-[#C108AB] focus:outline-none w-full" onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
@@ -332,22 +350,24 @@ export function CandidatesPage() {
                         <MapPin className="w-3 h-3 text-[#A3A3A3]" />{c.location || <span className="text-[#A3A3A3]">—</span>}
                       </span>
                     )}
-                  </td>
-                  <td className="px-4 py-3">
+                  </td>}
+                  {visCols.has('score') && <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-12 h-1.5 bg-[#E5E5E5] overflow-hidden">
                         <div className="h-full" style={{ width: `${c.trident_composite ?? 0}%`, backgroundColor: (c.trident_composite ?? 0) >= 80 ? '#1A7D42' : (c.trident_composite ?? 0) >= 60 ? '#C108AB' : '#A3A3A3' }} />
                       </div>
                       <span className="text-[#404040] font-medium tabular-nums">{c.trident_composite ?? '—'}</span>
                     </div>
-                  </td>
-                  <td className="px-4 py-3">
+                  </td>}
+                  {visCols.has('tier') && <td className="px-4 py-3">
                     <span className="inline-flex px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: tierStyle.bg, color: tierStyle.text }}>
                       {tier} · {TIER_BADGES[tier]}
                     </span>
-                  </td>
-                  <td className="px-4 py-3 text-[#404040]">{c.seniority?.replace('_', ' ') || '—'}</td>
-                  <td className="px-4 py-3 text-[#737373] text-xs">{c.source || '—'}</td>
+                  </td>}
+                  {visCols.has('seniority') && <td className="px-4 py-3 text-[#404040]">{c.seniority?.replace('_', ' ') || '—'}</td>}
+                  {visCols.has('source') && <td className="px-4 py-3 text-[#737373] text-xs">{c.source || '—'}</td>}
+                  {visCols.has('email') && <td className="px-4 py-3 text-[#737373] text-xs">{c.email || '—'}</td>}
+                  {visCols.has('linkedin') && <td className="px-4 py-3 text-[#737373] text-xs">{c.linkedin_url ? <a href={c.linkedin_url} target="_blank" className="text-[#0A66C2] hover:underline" onClick={e => e.stopPropagation()}>View</a> : '—'}</td>}
                 </tr>
               );
             })}

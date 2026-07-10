@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui';
 import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
 import { updateMandateStatus, getSupabase } from '@/services/supabaseApi';
 import Papa from 'papaparse';
+import { SavedViewsManager } from '@/components/search/SavedViewsManager';
+import { ColumnVisibility, useColumnVisibility, type ColumnDef } from '@/components/table/ColumnVisibility';
 
 const STATUS_OPTIONS = [
   { value: '1_search', label: 'SWEEP', color: '#00897B' },
@@ -35,7 +37,20 @@ export function MandatesPage() {
   const [saving, setSaving] = useState(false);
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
   const [sortField, setSortField] = useState<string>('priority');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+
+  const MANDATE_COLUMNS: ColumnDef[] = [
+    { key: 'checkbox', label: 'Select', defaultVisible: true },
+    { key: 'title', label: 'Title', defaultVisible: true },
+    { key: 'status', label: 'Status', defaultVisible: true },
+    { key: 'priority', label: 'Priority', defaultVisible: true },
+    { key: 'candidates', label: 'Candidates', defaultVisible: true },
+    { key: 'pipeline', label: 'Pipeline', defaultVisible: true },
+    { key: 'phi', label: 'PHI Score', defaultVisible: true },
+    { key: 'created', label: 'Created', defaultVisible: false },
+    { key: 'fee', label: 'Fee', defaultVisible: false },
+  ];
+  const { visibleColumns: visCols, toggleColumn: toggleCol } = useColumnVisibility('lyc_mandates_columns', MANDATE_COLUMNS);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -143,6 +158,7 @@ export function MandatesPage() {
           <button onClick={exportCSV} className="px-4 py-2.5 text-sm font-medium text-[#404040] bg-white border border-[#E5E5E5] hover:bg-[#F5F5F5] transition-all flex items-center gap-2">
             <Download className="w-4 h-4" />{selectedIds.size > 0 ? `Export ${selectedIds.size}` : 'Export CSV'}
           </button>
+          <ColumnVisibility columns={MANDATE_COLUMNS} visibleColumns={visCols} onToggle={toggleCol} storageKey="lyc_mandates_columns" />
           <button onClick={() => setViewMode(viewMode === 'cards' ? 'table' : 'cards')} className="px-4 py-2.5 text-sm font-medium text-[#404040] bg-white border border-[#E5E5E5] hover:bg-[#F5F5F5] transition-all flex items-center gap-2">
             <Filter className="w-4 h-4" />{viewMode === 'cards' ? 'Table View' : 'Card View'}
           </button>
@@ -224,17 +240,19 @@ export function MandatesPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#E5E5E5] bg-[#FAFAFA]">
-                <th className="w-10 px-3 py-3">
+                {visCols.has('checkbox') && <th className="w-10 px-3 py-3">
                   <button onClick={toggleSelectAll} className="text-[#A3A3A3] hover:text-[#171717]">
                     {selectedIds.size === filtered.length && filtered.length > 0 ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
                   </button>
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-text-primary select-none" onClick={() => handleSort('title')}>Title {sortField === 'title' ? (sortDir === 'asc' ? '↑' : '↓') : ''}</th>
-                <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-text-primary select-none" onClick={() => handleSort('status')}>Status {sortField === 'status' ? (sortDir === 'asc' ? '↑' : '↓') : ''}</th>
-                <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-text-primary select-none" onClick={() => handleSort('priority')}>Priority {sortField === 'priority' ? (sortDir === 'asc' ? '↑' : '↓') : ''}</th>
-                <th className="text-left px-4 py-3 font-medium text-[#737373]">Candidates</th>
-                <th className="text-left px-4 py-3 font-medium text-[#737373]">Pipeline</th>
-                <th className="text-left px-4 py-3 font-medium text-[#737373]">PHI</th>
+                </th>}
+                {visCols.has('title') && <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-text-primary select-none" onClick={() => handleSort('title')}>Title {sortField === 'title' ? (sortDir === 'asc' ? '↑' : '↓') : ''}</th>}
+                {visCols.has('status') && <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-text-primary select-none" onClick={() => handleSort('status')}>Status {sortField === 'status' ? (sortDir === 'asc' ? '↑' : '↓') : ''}</th>}
+                {visCols.has('priority') && <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-text-primary select-none" onClick={() => handleSort('priority')}>Priority {sortField === 'priority' ? (sortDir === 'asc' ? '↑' : '↓') : ''}</th>}
+                {visCols.has('candidates') && <th className="text-left px-4 py-3 font-medium text-[#737373]">Candidates</th>}
+                {visCols.has('pipeline') && <th className="text-left px-4 py-3 font-medium text-[#737373]">Pipeline</th>}
+                {visCols.has('phi') && <th className="text-left px-4 py-3 font-medium text-[#737373]">PHI</th>}
+                {visCols.has('created') && <th className="text-left px-4 py-3 font-medium text-[#737373]">Created</th>}
+                {visCols.has('fee') && <th className="text-left px-4 py-3 font-medium text-[#737373]">Fee</th>}
               </tr>
             </thead>
             <tbody>
@@ -243,24 +261,26 @@ export function MandatesPage() {
                 return (
                   <tr key={m.id} className={`border-b border-[#F0F0F0] hover:bg-[#FAFAFA] transition-colors cursor-pointer ${selectedIds.has(m.id) ? 'bg-[#C108AB]/5' : ''}`}
                     onClick={() => navigate(`/app/mandates/${m.id}`)}>
-                    <td className="px-3 py-3" onClick={e => e.stopPropagation()}>
+                    {visCols.has('checkbox') && <td className="px-3 py-3" onClick={e => e.stopPropagation()}>
                       <button onClick={() => toggleSelect(m.id)} className="text-[#A3A3A3] hover:text-[#171717]">
                         {selectedIds.has(m.id) ? <CheckSquare className="w-4 h-4 text-[#C108AB]" /> : <Square className="w-4 h-4" />}
                       </button>
-                    </td>
-                    <td className="px-4 py-3 font-medium text-[#171717]">{m.title || 'Untitled'}</td>
-                    <td className="px-4 py-3">
+                    </td>}
+                    {visCols.has('title') && <td className="px-4 py-3 font-medium text-[#171717]">{m.title || 'Untitled'}</td>}
+                    {visCols.has('status') && <td className="px-4 py-3">
                       <select value={m.status} onClick={e => e.stopPropagation()} onChange={e => handleStatusChange(m.id, e.target.value, e as any)}
                         className="text-xs font-medium px-2 py-1 border-0 bg-transparent cursor-pointer" style={{ color: statusInfo.color }}>
                         {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                       </select>
-                    </td>
-                    <td className="px-4 py-3">
+                    </td>}
+                    {visCols.has('priority') && <td className="px-4 py-3">
                       {m.priority && <span className="text-xs font-medium px-2 py-0.5" style={{ color: PRIORITY_OPTIONS.find(p => p.value === m.priority)?.color || '#666' }}>{m.priority}</span>}
-                    </td>
-                    <td className="px-4 py-3 text-[#404040]">{m.total_candidates || 0}</td>
-                    <td className="px-4 py-3 text-[#404040]">{m.shortlisted_count || 0} shortlisted</td>
-                    <td className="px-4 py-3">{m.phi_composite != null ? <span className="font-medium tabular-nums">{m.phi_composite}</span> : '—'}</td>
+                    </td>}
+                    {visCols.has('candidates') && <td className="px-4 py-3 text-[#404040]">{m.total_candidates || 0}</td>}
+                    {visCols.has('pipeline') && <td className="px-4 py-3 text-[#404040]">{m.shortlisted_count || 0} shortlisted</td>}
+                    {visCols.has('phi') && <td className="px-4 py-3">{m.phi_composite != null ? <span className="font-medium tabular-nums">{m.phi_composite}</span> : '—'}</td>}
+                    {visCols.has('created') && <td className="px-4 py-3 text-[#737373] text-xs">{m.created_at ? new Date(m.created_at).toLocaleDateString() : '—'}</td>}
+                    {visCols.has('fee') && <td className="px-4 py-3 text-[#404040]">{m.fee_amount ? `$${(m.fee_amount/1000).toFixed(0)}k` : '—'}</td>}
                   </tr>
                 );
               })}
