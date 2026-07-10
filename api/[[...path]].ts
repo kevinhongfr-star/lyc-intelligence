@@ -521,6 +521,13 @@ export default async function handler(
         return m.handler(req, res);
       }
 
+      // ── T4 v4 API (Search & Filter Engine) ──
+      case 'v4': {
+        const m = await import('./_lib/t4SearchHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
       // ── T6 v6 API (Data Sync & Integration) ──
       case 'v6': {
         const m = await import('./_lib/t6SyncHandler.js');
