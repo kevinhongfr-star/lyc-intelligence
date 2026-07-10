@@ -54,7 +54,7 @@ export function LoginPage() {
     setLoading(false);
 
     if (result.success) {
-      navigate('/platform');
+      navigate('/app');
     } else {
       setError(result.error || 'Invalid credentials. Please try again.');
     }

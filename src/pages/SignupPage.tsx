@@ -48,7 +48,7 @@ export function SignupPage() {
 
     if (result.success) {
       toast.success('Account created successfully');
-      navigate('/platform');
+      navigate('/app');
     } else {
       setError(result.error || 'Failed to create account');
     }
