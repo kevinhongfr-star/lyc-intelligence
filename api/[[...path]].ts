@@ -542,6 +542,13 @@ export default async function handler(
         return m.handler(req, res);
       }
 
+      // ── T7 v7 API (Revenue Forecast & Change Detection) ──
+      case 'v7': {
+        const m = await import('./_lib/t7ForecastHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
       // ── Scoring (complex sub-routing) ──
       case 'scoring': {
         const sub = pathArr[1] || '';
