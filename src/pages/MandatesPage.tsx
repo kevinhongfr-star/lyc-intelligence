@@ -34,6 +34,31 @@ export function MandatesPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
+  const [sortField, setSortField] = useState<string>('priority');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir(field === 'priority' ? 'asc' : 'desc');
+    }
+  };
+
+  const PRIORITY_ORDER: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+  const sortedFiltered = [...filtered].sort((a: any, b: any) => {
+    let av: any = a[sortField] ?? '';
+    let bv: any = b[sortField] ?? '';
+    if (sortField === 'priority') {
+      av = PRIORITY_ORDER[av] ?? 99;
+      bv = PRIORITY_ORDER[bv] ?? 99;
+      const cmp = av - bv;
+      return sortDir === 'asc' ? cmp : -cmp;
+    }
+    const cmp = typeof av === 'number' && typeof bv === 'number' ? av - bv : String(av).localeCompare(String(bv));
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
 
   const filtered = useMemo(() => {
     let result = mandates;
@@ -190,9 +215,9 @@ export function MandatesPage() {
                     {selectedIds.size === filtered.length && filtered.length > 0 ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
                   </button>
                 </th>
-                <th className="text-left px-4 py-3 font-medium text-[#737373]">Title</th>
-                <th className="text-left px-4 py-3 font-medium text-[#737373]">Status</th>
-                <th className="text-left px-4 py-3 font-medium text-[#737373]">Priority</th>
+                <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-text-primary select-none" onClick={() => handleSort('title')}>Title {sortField === 'title' ? (sortDir === 'asc' ? '↑' : '↓') : ''}</th>
+                <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-text-primary select-none" onClick={() => handleSort('status')}>Status {sortField === 'status' ? (sortDir === 'asc' ? '↑' : '↓') : ''}</th>
+                <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-text-primary select-none" onClick={() => handleSort('priority')}>Priority {sortField === 'priority' ? (sortDir === 'asc' ? '↑' : '↓') : ''}</th>
                 <th className="text-left px-4 py-3 font-medium text-[#737373]">Candidates</th>
                 <th className="text-left px-4 py-3 font-medium text-[#737373]">Pipeline</th>
                 <th className="text-left px-4 py-3 font-medium text-[#737373]">PHI</th>

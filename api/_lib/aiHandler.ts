@@ -336,6 +336,66 @@ export async function handler(req: VercelRequest, res: VercelResponse): Promise<
       }
     }
 
+    // ─── AI Summary ─────────────────────────────────────────────────────────────
+    if (action === 'summary') {
+      const { entityType, entityId } = req.body || {};
+      if (!entityType || !entityId) {
+        res.status(400).json({ error: 'Missing entityType or entityId' });
+        return;
+      }
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.SUPABASE_URL || '',
+        process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || ''
+      );
+      let contextData = '';
+      let contextLabel = '';
+      if (entityType === 'candidate') {
+        const { data, error } = await supabase.from('contacts').select('id, title, company, location, country, email, linkedin_url, seniority_level, industry, source, score, pipeline_stage, career_history, education, summary, skills, strengths, assessment_notes').eq('id', entityId).maybeSingle();
+        if (error || !data) { res.status(404).json({ error: 'Candidate not found' }); return; }
+        const d = data as any;
+        const career = Array.isArray(d.career_history) ? d.career_history.map((h: any) => (h.role || h.title || 'Role') + ' at ' + (h.company || 'Company') + (h.startDate ? ' (' + h.startDate + (h.endDate ? '-' + h.endDate : '-Present') + ')' : '')).join('\n') : 'No career history';
+        const edu = Array.isArray(d.education) ? d.education.map((e: any) => (e.degree || '') + ' ' + (e.field || '') + ' - ' + (e.school || 'School') + (e.year ? ' (' + e.year + ')' : '')).join('\n') : 'No education data';
+        contextLabel = 'CANDIDATE: ' + (d.title || 'Unknown') + ' at ' + (d.company || 'Unknown');
+        contextData = 'Name/Title: ' + (d.title || 'N/A') + '\nCurrent Company: ' + (d.company || 'N/A') + '\nLocation: ' + ([d.location, d.country].filter(Boolean).join(', ') || 'N/A') + '\nSeniority: ' + (d.seniority_level || 'N/A') + '\nIndustry: ' + (d.industry || 'N/A') + '\nScore: ' + (d.score || 'N/A') + '\nPipeline Stage: ' + (d.pipeline_stage || 'N/A') + '\nSummary: ' + (d.summary || 'No summary') + '\nSkills: ' + (Array.isArray(d.skills) ? d.skills.join(', ') : (d.skills || 'N/A')) + '\nStrengths: ' + (d.strengths || 'N/A') + '\nAssessment Notes: ' + (d.assessment_notes || 'N/A') + '\n\nCareer History:\n' + career + '\n\nEducation:\n' + edu;
+      } else if (entityType === 'mandate') {
+        const { data, error } = await supabase.from('mandates').select('*').eq('id', entityId).maybeSingle();
+        if (error || !data) { res.status(404).json({ error: 'Mandate not found' }); return; }
+        const d = data as any;
+        const { count } = await supabase.from('candidates_pipeline').select('*', { count: 'exact', head: true }).eq('mandate_id', entityId);
+        contextLabel = 'MANDATE: ' + (d.title || 'Unknown');
+        contextData = 'Title: ' + (d.title || 'N/A') + '\nCompany: ' + (d.company || 'N/A') + '\nStatus: ' + (d.status || 'N/A') + '\nSeniority Level: ' + (d.seniority_level || 'N/A') + '\nLocation: ' + (d.location || 'N/A') + '\nIndustry: ' + (d.industry || 'N/A') + '\nKeywords: ' + (d.keywords || 'N/A') + '\nDescription: ' + ((d.description || 'N/A').substring(0, 500)) + '\nFee: ' + (d.fee || 'N/A') + '\nPriority: ' + (d.priority || 'N/A') + '\nCreated: ' + (d.created_at || 'N/A') + '\nCandidates in Pipeline: ' + (count || 0) + '\nHiring Manager: ' + (d.hiring_manager_name || 'N/A') + '\nTeam: ' + (d.team || 'N/A');
+      } else {
+        res.status(400).json({ error: 'Invalid entityType' });
+        return;
+      }
+      const sysPrompt = 'You are a senior executive search analyst at LYC Partners, a Shanghai-based executive search firm. Generate a concise, actionable executive summary for the consultant reviewing this profile. Be specific, data-driven, and highlight what matters for placement decisions. Write in professional English. Max 150 words.\n\nReturn JSON: {"summary": "the summary text", "keyStrengths": ["s1", "s2", "s3"], "riskFlags": ["f1"] or [], "recommendedAction": "one sentence recommendation"}';
+      const usrPrompt = 'Generate an executive summary for this ' + entityType + ':\n\n' + contextData;
+      const result = await callDeepSeek(sysPrompt, usrPrompt, 0.5, 600);
+      if (result.error) { res.status(500).json({ error: result.error }); return; }
+      try {
+        let jsonStr = result.content?.trim() || '';
+        const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || jsonStr.match(/\{[\s\S]*\}/);
+        if (jsonMatch) jsonStr = jsonMatch[1] || jsonMatch[0];
+        const data = JSON.parse(jsonStr);
+        res.status(200).json({
+          success: true,
+          data: {
+            entityType, entityId, contextLabel,
+            summary: data.summary || '',
+            keyStrengths: Array.isArray(data.keyStrengths) ? data.keyStrengths : [],
+            riskFlags: Array.isArray(data.riskFlags) ? data.riskFlags : [],
+            recommendedAction: data.recommendedAction || '',
+          },
+          usage: result.usage,
+        });
+        return;
+      } catch (parseError) {
+        res.status(500).json({ error: 'Failed to parse AI summary response' });
+        return;
+      }
+    }
+
     res.status(404).json({ error: 'Unknown action' });
   } catch (err: any) {
     console.error('[aiHandler]', err);

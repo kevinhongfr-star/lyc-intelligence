@@ -10,6 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent, Button } from '@/components/u
 import { useContact } from '@/hooks/useSupabaseData';
 import type { Contact } from '@/services/supabaseApi';
 import { executeAIAction, type AIAction } from '@/services/aiQuickActions';
+import { AISummaryCard } from '@/components/ai/AISummaryCard';
 
 // ─── Tier helpers ───
 function getTier(score: number | null): { tier: string; color: string } {
@@ -494,7 +495,8 @@ export function ExecutiveProfilePage() {
           {/* 5-Criteria Scoring */}
           <Card>
             <CardContent className="p-5">
-              <ScoringPanel contact={contact} />
+              <AISummaryCard entityType="candidate" entityId={id} />
+        <ScoringPanel contact={contact} />
             </CardContent>
           </Card>
 

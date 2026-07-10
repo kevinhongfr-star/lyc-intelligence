@@ -22,6 +22,7 @@ import { getSuccessProfiles } from '@/services/supabaseApi';
 import type { SuccessProfile } from '@/types';
 import { useState, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
+import { AISummaryCard } from '@/components/ai/AISummaryCard';
 
 // ─── Add Company Form Component ───────────────────────────────────────────
 
@@ -323,6 +324,9 @@ export function MandateDetailPage() {
               </CardContent>
             </Card>
           )}
+
+          {/* AI Executive Summary */}
+          <AISummaryCard entityType="mandate" entityId={mandate.id} />
 
           {/* Mandate Team */}
           <Card>
