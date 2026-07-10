@@ -5,7 +5,7 @@ import {
   errorResponse,
   getServiceSupabase,
   type SamuelPayload,
-} from '../../lib/agentUtils';
+} from '../../_lib/agentUtils';
 
 export const maxDuration = 30;
 
