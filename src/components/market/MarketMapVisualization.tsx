@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Filter, Download, Grid3X3, List, Maximize2, X, ChevronDown, MapPin, Building2 } from 'lucide-react';
 import type { TargetCompany, MarketMapFilters } from '@/types';
-import { jsPDF } from 'jspdf';
+// jsPDF loaded dynamically to reduce bundle size
 
 interface Props {
   companies: TargetCompany[];
@@ -177,6 +177,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
   }
 
   async function handleExportPDF() {
+    const { jsPDF } = await import('jspdf');
     const doc = new jsPDF('landscape', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();

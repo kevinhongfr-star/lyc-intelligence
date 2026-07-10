@@ -1,4 +1,12 @@
-import { jsPDF } from 'jspdf';
+// Dynamic import for jspdf to reduce bundle size
+let jsPDFModule: any = null;
+async function getJsPDF() {
+  if (!jsPDFModule) {
+    const mod = await import('jspdf');
+    jsPDFModule = mod.jsPDF;
+  }
+  return jsPDFModule;
+}
 import type { LENSReportData, LENSReportCandidate } from '@/services/supabaseApi';
 
 const PAGE_WIDTH = 210; // A4 width in mm
@@ -31,7 +39,8 @@ interface RenderParams {
 
 export async function renderLENSReport(params: RenderParams): Promise<string> {
   const { reportData, reportType } = params;
-  const doc = new jsPDF();
+  const JsPDF = await getJsPDF();
+  const doc = new JsPDF();
 
   const generatedDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

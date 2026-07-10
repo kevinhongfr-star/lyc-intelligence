@@ -1,4 +1,4 @@
-import { jsPDF } from 'jspdf';
+// jsPDF loaded dynamically to reduce bundle size
 import type { Mandate, TargetCompany, OrgChartData } from '@/services/supabaseApi';
 
 interface PDFExportParams {
@@ -37,6 +37,7 @@ const getRelevanceColor = (relevance: number): string => {
 
 export async function generateOrgChartPDF(params: PDFExportParams): Promise<void> {
   const { mandate, companies, orgCharts, insights } = params;
+  const { jsPDF } = await import('jspdf');
   const doc = new jsPDF();
 
   const generatedDate = new Date().toLocaleDateString('en-US', {

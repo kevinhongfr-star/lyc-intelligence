@@ -80,40 +80,33 @@ export function DashboardPage() {
     try {
       const sb = getSupabase();
       
-      // Load memories and sessions in parallel
-      await Promise.all([
+      // ALL queries in parallel — memories, sessions, assessment, profile
+      const [_, __, assessmentResult] = await Promise.all([
         loadMemories(user.id),
-        loadRecentSessions(user.id)
+        loadRecentSessions(user.id),
+        sb.from('assessments')
+          .select('id, archetype, composite_score, scores, cross_border_score, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle(),
       ]);
 
-      // Load latest assessment
-      const { data: assessmentData } = await sb
-        .from('assessments')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-
-      if (assessmentData) {
+      if (assessmentResult.data) {
         setAssessment({
-          id: assessmentData.id,
-          archetype: assessmentData.archetype,
-          composite_score: assessmentData.composite_score,
-          dimension_scores: JSON.parse(assessmentData.scores || '{}'),
-          cross_border_score: assessmentData.cross_border_score || 0,
-          created_at: assessmentData.created_at
+          id: assessmentResult.data.id,
+          archetype: assessmentResult.data.archetype,
+          composite_score: assessmentResult.data.composite_score,
+          dimension_scores: (() => { try { return JSON.parse(assessmentResult.data.scores || '{}'); } catch { return {}; } })(),
+          cross_border_score: assessmentResult.data.cross_border_score || 0,
+          created_at: assessmentResult.data.created_at
         });
       }
 
-      // Load profile for credits/streak
       if (profile) {
         setStreak(profile.streak_days || 0);
         setReferralCode(profile.referral_code || '');
       }
-
-      // Generate suggestions based on memories
-      generateSuggestions(memories);
     } catch (e) {
       console.error('[Dashboard] Load error:', e);
     } finally {
