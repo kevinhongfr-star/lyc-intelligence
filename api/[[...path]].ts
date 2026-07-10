@@ -549,6 +549,69 @@ export default async function handler(
         return m.handler(req, res);
       }
 
+      // ── T8 v8 API (Team Capacity & Load Balancer) ──
+      case 'v8': {
+        const m = await import('./_lib/t8CapacityHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T9 v9 API (Communication Engine) ──
+      case 'v9': {
+        const m = await import('./_lib/t9CommunicationHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T10 v10 API (Report Templates & Distribution) ──
+      case 'v10': {
+        const m = await import('./_lib/t10ReportsHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T11 v11 API (Agent Orchestration) ──
+      case 'v11': {
+        const m = await import('./_lib/t11AgentHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T12 v12 API (Scoring Calibration & Intelligence) ──
+      case 'v12': {
+        const m = await import('./_lib/t12IntelligenceHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T13 v13 API (DEX AI Advanced Infrastructure) ──
+      case 'v13': {
+        const m = await import('./_lib/t13AIHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T14 v14 API (Coaching Portal) ──
+      case 'v14': {
+        const m = await import('./_lib/t14CoachingHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T15 v15 API (Candidate Portal) ──
+      case 'v15': {
+        const m = await import('./_lib/t15CandidateHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T16 v16 API (Leader Portal) ──
+      case 'v16': {
+        const m = await import('./_lib/t16LeaderHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
       // ── Scoring (complex sub-routing) ──
       case 'scoring': {
         const sub = pathArr[1] || '';
