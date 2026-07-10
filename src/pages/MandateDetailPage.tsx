@@ -23,6 +23,7 @@ import type { SuccessProfile } from '@/types';
 import { useState, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { AISummaryCard } from '@/components/ai/AISummaryCard';
+import { MandateReportCard } from '@/components/ai/MandateReportCard';
 
 // ─── Add Company Form Component ───────────────────────────────────────────
 
@@ -327,6 +328,9 @@ export function MandateDetailPage() {
 
           {/* AI Executive Summary */}
           <AISummaryCard entityType="mandate" entityId={mandate.id} />
+
+          {/* Mandate Status Report */}
+          <MandateReportCard mandateId={mandate.id} />
 
           {/* Mandate Team */}
           <Card>

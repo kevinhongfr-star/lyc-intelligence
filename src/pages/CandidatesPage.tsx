@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui';
 import type { Contact } from '@/services/supabaseApi';
 import { getSupabase } from '@/services/supabaseApi';
 import { LinkedInImportModal } from '@/components/import/LinkedInImportModal';
+import { SavedViewsManager } from '@/components/search/SavedViewsManager';
 import Papa from 'papaparse';
 
 const SENIORITY_OPTIONS = [
@@ -209,6 +210,22 @@ export function CandidatesPage() {
           <input type="number" min={0} max={100} value={scoreRange[1]} onChange={e => setScoreRange([scoreRange[0], +e.target.value])}
             className="w-14 px-2 py-1.5 border border-[#E5E5E5] text-sm text-center" />
         </div>
+      </div>
+
+      {/* Saved Views */}
+      <div className="flex items-center gap-2">
+        <SavedViewsManager
+          currentFilters={{ search, seniority: seniorityFilter, country: countryFilter, tier: tierFilter, scoreRange }}
+          currentSort={{ field: sortField, direction: sortAsc ? 'asc' : 'desc' }}
+          onLoadView={(filters, sort) => {
+            if (filters.search !== undefined) setSearch(filters.search);
+            if (filters.seniority) setSeniorityFilter(filters.seniority);
+            if (filters.country !== undefined) setCountryFilter(filters.country);
+            if (filters.tier !== undefined) setTierFilter(filters.tier);
+            if (filters.scoreRange) setScoreRange(filters.scoreRange);
+          }}
+          storageKey="lyc_candidates_views"
+        />
       </div>
 
       {/* Quick filter chips */}

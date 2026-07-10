@@ -396,6 +396,50 @@ export async function handler(req: VercelRequest, res: VercelResponse): Promise<
       }
     }
 
+    // ─── Mandate Status Report ─────────────────────────────────────────────────
+    if (action === 'mandate-report') {
+      const { mandateId } = req.body || {};
+      if (!mandateId) { res.status(400).json({ error: 'Missing mandateId' }); return; }
+
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.SUPABASE_URL || '',
+        process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || ''
+      );
+
+      const { data: mandate, error } = await supabase.from('mandates').select('*').eq('id', mandateId).maybeSingle();
+      if (error || !mandate) { res.status(404).json({ error: 'Mandate not found' }); return; }
+      const m = mandate as any;
+
+      // Get pipeline candidates
+      const { data: pipeline } = await supabase.from('candidates_pipeline').select('*, contacts(title, company, location, country, seniority_level, score)').eq('mandate_id', mandateId);
+      const candidates = (pipeline || []) as any[];
+
+      const stageGroups = ['GRID', 'LENS', 'SWEEP', 'CANVA', 'PLACED'].map(stage => {
+        const inStage = candidates.filter(c => c.stage === stage);
+        return { stage, count: inStage.length, candidates: inStage.slice(0, 5).map((c: any) => c.contacts?.title || 'Unknown') };
+      });
+
+      const contextData = 'Mandate: ' + (m.title || 'N/A') + '\nCompany: ' + (m.company || 'N/A') + '\nStatus: ' + (m.status || 'N/A') + '\nSeniority: ' + (m.seniority_level || 'N/A') + '\nLocation: ' + (m.location || 'N/A') + '\nPriority: ' + (m.priority || 'N/A') + '\nCreated: ' + (m.created_at || 'N/A') + '\n\nPipeline Summary:\n' + stageGroups.map(s => s.stage + ': ' + s.count + ' candidates' + (s.candidates.length ? ' (' + s.candidates.join(', ') + ')' : '')).join('\n') + '\n\nTotal Candidates: ' + candidates.length;
+
+      const sysPrompt = 'You are a senior executive search analyst at LYC Partners. Generate a professional mandate status report. Include: (1) Executive Summary (2-3 sentences), (2) Pipeline Health Assessment, (3) Key Risks or Bottlenecks, (4) Recommended Next Actions (3-5 bullet points). Be specific and data-driven. Write in professional English. Max 300 words.\n\nReturn JSON: {"title": "report title", "executiveSummary": "text", "pipelineHealth": "text", "keyRisks": ["risk1", "risk2"], "nextActions": ["action1", "action2", "action3"], "generatedAt": "ISO timestamp"}';
+
+      const result = await callDeepSeek(sysPrompt, 'Generate a mandate status report:\n\n' + contextData, 0.5, 800);
+      if (result.error) { res.status(500).json({ error: result.error }); return; }
+
+      try {
+        let jsonStr = result.content?.trim() || '';
+        const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || jsonStr.match(/\{[\s\S]*\}/);
+        if (jsonMatch) jsonStr = jsonMatch[1] || jsonMatch[0];
+        const data = JSON.parse(jsonStr);
+        res.status(200).json({ success: true, data: { mandateId, ...data, pipeline: stageGroups }, usage: result.usage });
+        return;
+      } catch {
+        res.status(500).json({ error: 'Failed to parse mandate report' });
+        return;
+      }
+    }
+
     res.status(404).json({ error: 'Unknown action' });
   } catch (err: any) {
     console.error('[aiHandler]', err);
