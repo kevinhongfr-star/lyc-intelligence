@@ -612,6 +612,48 @@ export default async function handler(
         return m.handler(req, res);
       }
 
+      // ── T17 v17 API (Meeting Intelligence & Automation) ──
+      case 'v17': {
+        const m = await import('./_lib/t17MeetingHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T18 v18 API (Advanced Search, Dedup & Governance) ──
+      case 'v18': {
+        const m = await import('./_lib/t18SearchGovernanceHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T19 v19 API (Advanced Client Deliverables) ──
+      case 'v19': {
+        const m = await import('./_lib/t19DeliverablesHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T20 v20 API (Strategic Intelligence Suite) ──
+      case 'v20': {
+        const m = await import('./_lib/t20StrategicHandler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T21 v21 API (Coaching Portal Completion) ──
+      case 'v21': {
+        const m = await import('./_lib/t21CoachingP2Handler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
+      // ── T22 v22 API (Candidate Portal Completion) ──
+      case 'v22': {
+        const m = await import('./_lib/t22CandidateP2Handler.js');
+        (req.query as any).path = pathArr.slice(1);
+        return m.handler(req, res);
+      }
+
       // ── Scoring (complex sub-routing) ──
       case 'scoring': {
         const sub = pathArr[1] || '';
