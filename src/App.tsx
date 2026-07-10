@@ -108,7 +108,6 @@ const CoachingEngagementPage = lazy(() => import('@/pages/coaching/CoachingEngag
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const PlaceholderPage = lazy(() => import('@/pages/PlaceholderPage').then(m => ({ default: m.PlaceholderPage })));
 
-const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
 function Loading() {
   return (
@@ -180,7 +179,7 @@ export default function App() {
           <Route path="/pricing" element={<PricingPage />} />
 
           {/* ── Internal Operations (mockup surface) ── */}
-          {ENABLE_PLATFORM && (
+          
             <Route path="/app" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<ConsultantDashboard />} />
@@ -214,7 +213,6 @@ export default function App() {
               <Route path="oversight" element={<AdminRoute><KevinOversightDashboard /></AdminRoute>} />
               <Route path="intelligence" element={<PlaceholderPage title="Intelligence" />} />
             </Route>
-          )}
 
           {/* Backward compat: redirect old /platform/* to /app */}
           <Route path="/platform/*" element={<Navigate to="/app" replace />} />
