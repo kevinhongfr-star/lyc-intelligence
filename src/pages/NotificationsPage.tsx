@@ -1,26 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, AlertTriangle, CheckCircle2, Clock, Loader2, Zap, Mail, Linkedin, Phone, Filter, ExternalLink, TrendingUp, ChevronRight, Building2, Users, Briefcase } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
+import { Badge, Button } from '@/components/ui';
 import { useNotifications } from '@/hooks/useSupabaseData';
 
-const CHANNEL_ICONS: Record<string, React.ReactNode> = {
-  Email: <Mail className="w-3.5 h-3.5 text-blue-400" />,
-  LinkedIn: <Linkedin className="w-3.5 h-3.5 text-sky-400" />,
-  Phone: <Phone className="w-3.5 h-3.5 text-green-400" />,
-};
-
-const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  Pending: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
-  'In Progress': { bg: 'bg-blue-500/10', text: 'text-blue-400' },
-  Completed: { bg: 'bg-green-500/10', text: 'text-green-400' },
+const CHANNEL_ICONS: Record<string, { icon: React.ReactNode; bg: string }> = {
+  Email:   { icon: <Mail className="w-3.5 h-3.5" />, bg: 'rgba(44,82,130,0.08)' },
+  LinkedIn:{ icon: <Linkedin className="w-3.5 h-3.5" />, bg: 'rgba(44,82,130,0.08)' },
+  Phone:   { icon: <Phone className="w-3.5 h-3.5" />, bg: 'rgba(26,125,66,0.08)' },
 };
 
 function PriorityBadge({ score }: { score: number }) {
-  const color = score >= 85 ? '#EF4444' : score >= 70 ? '#F59E0B' : score >= 50 ? '#3B82F6' : '#94A3B8';
+  const color = score >= 85 ? '#C0392B' : score >= 70 ? '#B8860B' : score >= 50 ? '#2C5282' : '#8C857D';
   const label = score >= 85 ? 'Critical' : score >= 70 ? 'High' : score >= 50 ? 'Medium' : 'Low';
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ backgroundColor: `${color}20`, color }}>
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold" style={{ backgroundColor: `${color}15`, color }}>
       <TrendingUp size={9} />
       {label} {score}
     </span>
@@ -41,17 +35,14 @@ export function NotificationsPage() {
   const pendingCount = notifications.filter(n => n.status === 'Pending').length;
   const highPriorityCount = notifications.filter(n => (n.priority_score ?? 0) >= 80 && n.status !== 'Completed').length;
 
-  // Extract client name from notification data
   const getClientName = (n: any) => {
     return n.client_name || n.organization_name || n.company_name || n.mandate?.organizations?.name || n.related_entity?.client || 'Unknown Client';
   };
 
-  // Extract mandate/position title
   const getPositionTitle = (n: any) => {
     return n.position_title || n.mandate?.position_title || n.related_entity?.position || '';
   };
 
-  // Determine navigation target based on notification type
   const getNavigationTarget = (n: any) => {
     if (n.mandate_id) return `/app/mandates/${n.mandate_id}`;
     if (n.candidate_id) return `/app/candidates/${n.candidate_id}`;
@@ -69,118 +60,156 @@ export function NotificationsPage() {
 
   const handleMarkDone = async (e: React.MouseEvent, n: any) => {
     e.stopPropagation();
-    // TODO: Implement mark-as-done via API
     console.log('Mark done:', n.id);
   };
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>;
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <Loader2 className="w-6 h-6 animate-spin text-[#C108AB]" />
+      <span className="ml-3 text-sm text-[#8C857D]">Loading action items...</span>
+    </div>
+  );
+
+  const filterBtns: { key: 'all' | 'pending' | 'high'; label: string; count: number }[] = [
+    { key: 'all', label: 'All', count: notifications.length },
+    { key: 'pending', label: 'Pending', count: pendingCount },
+    { key: 'high', label: 'High Priority', count: highPriorityCount },
+  ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-text-primary">Action Items</h1>
-          <p className="text-text-secondary">{pendingCount} pending · {highPriorityCount} high priority</p>
+          <h1 className="text-2xl font-serif font-bold text-[#1A1714] tracking-tight">Action Items</h1>
+          <p className="text-sm text-[#8C857D] mt-1">{pendingCount} pending · {highPriorityCount} high priority</p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setFilter('all')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${filter === 'all' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>All ({notifications.length})</button>
-          <button onClick={() => setFilter('pending')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${filter === 'pending' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Pending ({pendingCount})</button>
-          <button onClick={() => setFilter('high')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${filter === 'high' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>High Priority ({highPriorityCount})</button>
+        <div className="flex gap-1 p-1 bg-[#F0EDEA]">
+          {filterBtns.map(btn => (
+            <button
+              key={btn.key}
+              onClick={() => setFilter(btn.key)}
+              className={`px-4 py-2 text-xs font-semibold transition-all duration-200 min-h-[36px] ${
+                filter === btn.key
+                  ? 'bg-white text-[#1A1714] shadow-sm'
+                  : 'text-[#8C857D] hover:text-[#1A1714]'
+              }`}
+            >
+              {btn.label} ({btn.count})
+            </button>
+          ))}
         </div>
       </div>
 
+      {/* Notification Cards */}
       {filtered.length === 0 ? (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <Bell className="w-12 h-12 mx-auto mb-4 text-text-muted opacity-30" />
-            <p className="text-text-muted text-sm">No action items match your filter.</p>
-          </CardContent>
-        </Card>
+        <div
+          className="bg-white p-16 text-center"
+          style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
+        >
+          <Bell className="w-12 h-12 mx-auto mb-4 text-[#B8B0A6] opacity-40" />
+          <p className="text-[#8C857D] text-sm">No action items match your filter.</p>
+        </div>
       ) : (
         <div className="space-y-3">
           {filtered.map((n) => {
-            const statusColor = STATUS_COLORS[n.status] || STATUS_COLORS.Pending;
             const clientName = getClientName(n);
             const positionTitle = getPositionTitle(n);
             const navTarget = getNavigationTarget(n);
             const isClickable = !!navTarget;
+            const channelInfo = CHANNEL_ICONS[n.channel];
+
+            const statusStyle =
+              n.status === 'Pending' ? { bg: 'rgba(184,134,11,0.08)', text: '#B8860B' } :
+              n.status === 'In Progress' ? { bg: 'rgba(44,82,130,0.08)', text: '#2C5282' } :
+              { bg: 'rgba(26,125,66,0.08)', text: '#1A7D42' };
 
             return (
               <div
                 key={n.id}
-                onClick={() => handleCardClick(n)}
-                className={`bg-card border border-border p-4 transition-all ${
-                  isClickable 
-                    ? 'cursor-pointer hover:border-accent/40 hover:shadow-md active:scale-[0.995]' 
-                    : ''
+                onClick={() => isClickable && handleCardClick(n)}
+                className={`bg-white p-5 transition-all duration-300 group ${
+                  isClickable ? 'cursor-pointer hover:-translate-y-0.5' : ''
                 }`}
+                style={{
+                  boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)',
+                }}
+                onMouseEnter={e => { if (isClickable) (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 24px rgba(26,23,20,0.08), 0 4px 8px rgba(26,23,20,0.04)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)'; }}
                 role={isClickable ? 'button' : undefined}
                 tabIndex={isClickable ? 0 : undefined}
               >
                 <div className="flex items-start gap-4">
-                  {/* Priority + Channel */}
+                  {/* Left: Priority + Channel */}
                   <div className="flex flex-col items-center gap-2 flex-shrink-0 pt-0.5">
                     <PriorityBadge score={n.priority_score ?? 0} />
-                    {CHANNEL_ICONS[n.channel] || <Zap className="w-3.5 h-3.5 text-text-muted" />}
+                    {channelInfo && (
+                      <div className="w-7 h-7 flex items-center justify-center" style={{ background: channelInfo.bg }}>
+                        {channelInfo.icon}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Content — Client Name FIRST */}
-                  <div className="flex-1 min-w-0 space-y-2">
-                    {/* Row 1: Client name — the most important info */}
+                  {/* Content */}
+                  <div className="flex-1 min-w-0 space-y-2.5">
+                    {/* Client name — most important */}
                     <div className="flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-accent flex-shrink-0" />
-                      <span className="text-sm font-bold text-text-primary truncate">
+                      <Building2 className="w-4 h-4 text-[#C108AB] flex-shrink-0" />
+                      <span className="text-sm font-bold text-[#1A1714] truncate">
                         {clientName}
                       </span>
                       {positionTitle && (
                         <>
-                          <span className="text-text-muted text-xs">·</span>
-                          <Briefcase className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
-                          <span className="text-xs text-text-secondary truncate">
+                          <span className="text-[#E8E5E0] text-xs">·</span>
+                          <Briefcase className="w-3.5 h-3.5 text-[#8C857D] flex-shrink-0" />
+                          <span className="text-xs text-[#4A4541] truncate">
                             {positionTitle}
                           </span>
                         </>
                       )}
                     </div>
 
-                    {/* Row 2: Action + Status + Due */}
+                    {/* Status row */}
                     <div className="flex items-center gap-2 flex-wrap">
                       <Badge variant="default" className="text-[10px]">{n.action_type}</Badge>
-                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusColor.bg} ${statusColor.text}`}>
+                      <span
+                        className="text-[10px] font-semibold px-2 py-0.5"
+                        style={{ background: statusStyle.bg, color: statusStyle.text }}
+                      >
                         {n.status}
                       </span>
                       {n.due_date && (
-                        <span className="text-[10px] text-text-muted flex items-center gap-1">
+                        <span className="text-[10px] text-[#8C857D] flex items-center gap-1 font-medium">
                           <Clock size={9} />
                           Due: {new Date(n.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </span>
                       )}
                     </div>
 
-                    {/* Row 3: Action description */}
-                    <p className="text-sm text-text-primary leading-relaxed">
+                    {/* Description */}
+                    <p className="text-sm text-[#4A4541] leading-relaxed">
                       {n.action_description}
                     </p>
 
-                    {/* Row 4: Commercial rationale (collapsible) */}
+                    {/* Commercial rationale */}
                     {n.commercial_rationale && (
-                      <div className="bg-bg-tertiary/50 rounded-none p-3">
-                        <p className="text-[10px] font-bold text-accent uppercase tracking-wider mb-1">Commercial Rationale</p>
-                        <p className="text-[11px] text-text-secondary leading-relaxed">{n.commercial_rationale}</p>
+                      <div className="p-3" style={{ background: '#FAF9F7', borderLeft: '2px solid #C108AB' }}>
+                        <p className="text-[10px] font-bold text-[#C108AB] uppercase tracking-[1.5px] mb-1">Commercial Rationale</p>
+                        <p className="text-[11px] text-[#4A4541] leading-relaxed">{n.commercial_rationale}</p>
                       </div>
                     )}
                   </div>
 
                   {/* Right side: Actions */}
                   <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                    {isClickable && (
-                      <ChevronRight className="w-4 h-4 text-text-muted" />
-                    )}
+                    <ChevronRight className="w-4 h-4 text-[#B8B0A6] opacity-0 group-hover:opacity-100 transition-opacity" />
                     {n.status === 'Pending' && (
                       <button
-                        onClick={handleMarkDone}
-                        className="text-[10px] px-2 py-1 rounded bg-green-500/10 text-green-500 hover:bg-green-500/20 transition-colors"
+                        onClick={(e) => handleMarkDone(e, n)}
+                        className="text-[10px] font-bold px-2.5 py-1 transition-colors duration-200"
+                        style={{ background: 'rgba(26,125,66,0.08)', color: '#1A7D42' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(26,125,66,0.15)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(26,125,66,0.08)'; }}
                       >
                         ✓ Done
                       </button>

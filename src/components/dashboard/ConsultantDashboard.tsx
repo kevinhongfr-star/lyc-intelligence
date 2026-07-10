@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Users,
   Calendar,
@@ -22,6 +23,7 @@ import {
 import { authFetch } from '@/utils/authFetch';
 
 export function ConsultantDashboard() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [pipelineData, setPipelineData] = useState<any>(null);
   const [velocityData, setVelocityData] = useState<any>(null);
@@ -62,9 +64,9 @@ export function ConsultantDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-16">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-        <span className="ml-3 text-text-muted">Loading your dashboard...</span>
+      <div className="flex items-center justify-center py-32">
+        <Loader2 className="w-6 h-6 animate-spin text-[#C108AB]" />
+        <span className="ml-3 text-sm text-[#8C857D]">Loading dashboard...</span>
       </div>
     );
   }
@@ -72,27 +74,30 @@ export function ConsultantDashboard() {
   const myKPIs = kpisData.filter((k: any) => k.applies_to === 'individual' || k.category === 'activity');
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      {/* ── Header ── */}
+      <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">My Dashboard</h1>
-          <p className="text-text-muted mt-1">Your pipeline and activity overview</p>
+          <h1 className="text-2xl font-serif font-bold text-[#1A1714] tracking-tight">
+            Dashboard
+          </h1>
+          <p className="text-sm text-[#8C857D] mt-1">Your pipeline and activity overview</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-text-muted">
-          <BarChart3 className="w-4 h-4" />
-          <span>Real-time data</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-white" style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04)' }}>
+          <div className="w-1.5 h-1.5 rounded-full bg-[#1A7D42] animate-pulse" />
+          <span className="text-xs font-medium text-[#8C857D]">Live data</span>
         </div>
       </div>
 
-      {/* Top Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ── Top Stats ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
           title="My Candidates"
           value={pipelineData?.summary?.total_active || 0}
           icon={Users}
           color="blue"
           subtitle={`${pipelineData?.summary?.engagement_rate || 0}% engagement`}
+          onClick={() => navigate('/platform/candidates')}
         />
         <StatCard
           title="Engaged"
@@ -100,12 +105,13 @@ export function ConsultantDashboard() {
           icon={Target}
           color="green"
           subtitle="actively in conversation"
+          onClick={() => navigate('/platform/pipeline')}
         />
         <StatCard
           title="This Week"
           value={velocityData?.candidates_advancing_per_week || 0}
           icon={TrendingUp}
-          color="purple"
+          color="fuchsia"
           subtitle="stage advances"
         />
         <StatCard
@@ -117,145 +123,138 @@ export function ConsultantDashboard() {
         />
       </div>
 
-      {/* Main Grid */}
+      {/* ── Main Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Pipeline Funnel */}
         <div className="lg:col-span-2">
           <PipelineFunnel
             funnel={pipelineData?.funnel || {}}
             conversions={pipelineData?.conversions || {}}
+            onStageClick={(stage) => navigate(`/platform/pipeline?stage=${stage}`)}
           />
         </div>
 
         {/* Today's Actions */}
-        <div className="bg-card border border-border rounded-none p-5">
-          <h3 className="font-semibold text-text-primary mb-4">Today's Actions</h3>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-none">
-              <div className="w-10 h-10 rounded-none bg-blue-50 flex items-center justify-center">
-                <Mail className="w-5 h-5 text-blue-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-text-primary">Follow up on emails</p>
-                <p className="text-xs text-text-muted">
-                  {Math.round((pipelineData?.funnel?.S3_Contacted || 0) * 0.3)} candidates need follow-up
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-none">
-              <div className="w-10 h-10 rounded-none bg-green-50 flex items-center justify-center">
-                <MessageCircle className="w-5 h-5 text-green-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-text-primary">WeChat check-ins</p>
-                <p className="text-xs text-text-muted">
-                  {pipelineData?.funnel?.S6_WeChat_Added || 0} candidates to check in with
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-none">
-              <div className="w-10 h-10 rounded-none bg-purple-50 flex items-center justify-center">
-                <Phone className="w-5 h-5 text-purple-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-text-primary">Scheduling calls</p>
-                <p className="text-xs text-text-muted">
-                  {pipelineData?.funnel?.S7_Interested || 0} interested candidates
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-bg-alt rounded-none">
-              <div className="w-10 h-10 rounded-none bg-amber-50 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-amber-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-text-primary">Interviews this week</p>
-                <p className="text-xs text-text-muted">
-                  {(pipelineData?.funnel?.S11_Internal_Interview || 0) +
-                   (pipelineData?.funnel?.S13_Client_Int_Scheduled || 0)} upcoming
-                </p>
-              </div>
-            </div>
+        <div
+          className="bg-white"
+          style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
+        >
+          <div className="px-6 py-5 border-b border-[#F0EDEA]">
+            <h3 className="font-serif font-bold text-base text-[#1A1714]">Today's Actions</h3>
+          </div>
+          <div className="divide-y divide-[#F5F3F0]">
+            {[
+              {
+                icon: Mail,
+                iconColor: '#2C5282',
+                iconBg: 'rgba(44,82,130,0.06)',
+                title: 'Follow up on emails',
+                detail: `${Math.round((pipelineData?.funnel?.S3_Contacted || 0) * 0.3)} candidates need follow-up`,
+                action: () => navigate('/platform/notifications'),
+              },
+              {
+                icon: MessageCircle,
+                iconColor: '#1A7D42',
+                iconBg: 'rgba(26,125,66,0.06)',
+                title: 'WeChat check-ins',
+                detail: `${pipelineData?.funnel?.S6_WeChat_Added || 0} candidates to check in with`,
+                action: () => navigate('/platform/notifications'),
+              },
+              {
+                icon: Phone,
+                iconColor: '#7C3AED',
+                iconBg: 'rgba(124,58,237,0.06)',
+                title: 'Scheduling calls',
+                detail: `${pipelineData?.funnel?.S7_Interested || 0} interested candidates`,
+                action: () => navigate('/platform/scheduler'),
+              },
+              {
+                icon: Calendar,
+                iconColor: '#B8860B',
+                iconBg: 'rgba(184,134,11,0.06)',
+                title: 'Interviews this week',
+                detail: `${(pipelineData?.funnel?.S11_Internal_Interview || 0) + (pipelineData?.funnel?.S13_Client_Int_Scheduled || 0)} upcoming`,
+                action: () => navigate('/platform/scheduler'),
+              },
+            ].map((action, idx) => (
+              <button
+                key={idx}
+                onClick={action.action}
+                className="flex items-center gap-4 px-6 py-4 w-full text-left transition-colors duration-150 hover:bg-[#FAF9F7]"
+                style={{ background: 'transparent' }}
+              >
+                <div
+                  className="w-10 h-10 flex items-center justify-center flex-shrink-0"
+                  style={{ background: action.iconBg }}
+                >
+                  <action.icon className="w-4.5 h-4.5" style={{ color: action.iconColor }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[#1A1714]">{action.title}</p>
+                  <p className="text-xs text-[#8C857D] mt-0.5">{action.detail}</p>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Second Row */}
+      {/* ── Second Row ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Personal KPIs */}
-        <div className="bg-card border border-border rounded-none p-5">
-          <h3 className="font-semibold text-text-primary mb-4">My Performance</h3>
-          <div className="space-y-4">
-            {myKPIs.slice(0, 4).map((kpi: any) => {
-              const progress = Math.min(kpi.progress_percent || 0, 100);
-              const statusColor = kpi.status === 'met'
-                ? 'bg-emerald-500'
-                : kpi.status === 'on_track'
-                ? 'bg-blue-500'
-                : 'bg-amber-500';
+        <div className="lg:col-span-1">
+          <div
+            className="bg-white h-full"
+            style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
+          >
+            <div className="px-6 py-5 border-b border-[#F0EDEA]">
+              <h3 className="font-serif font-bold text-base text-[#1A1714]">My Performance</h3>
+            </div>
+            <div className="px-6 py-4 space-y-5">
+              {myKPIs.slice(0, 4).map((kpi: any) => {
+                const progress = Math.min(kpi.progress_percent || 0, 100);
+                const barColor = kpi.status === 'met' ? '#1A7D42' : kpi.status === 'on_track' ? '#2C5282' : '#B8860B';
+                const statusColor = kpi.status === 'met' ? '#1A7D42' : kpi.status === 'on_track' ? '#2C5282' : '#B8860B';
 
-              return (
-                <div key={kpi.id} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-text-primary">{kpi.name}</span>
-                    <span className="text-text-muted">
-                      {kpi.current_value} / {kpi.target_value}
-                    </span>
+                return (
+                  <div key={kpi.id} className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-[#1A1714]">{kpi.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-[#1A1714]">
+                          {kpi.current_value}
+                          <span className="text-[#8C857D] font-normal text-xs">/{kpi.target_value}</span>
+                        </span>
+                        <span
+                          className="w-2 h-2 rounded-full"
+                          style={{ background: statusColor }}
+                        />
+                      </div>
+                    </div>
+                    <div className="h-1.5 bg-[#F0EDEA] overflow-hidden">
+                      <div
+                        className="h-full transition-all duration-700 ease-out"
+                        style={{ width: `${progress}%`, background: barColor }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-2 bg-bg-alt rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${statusColor} transition-all`}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
 
         {/* Activity Feed */}
         <div className="lg:col-span-2">
-          <ActivityFeed items={activityData} />
-        </div>
-      </div>
-
-      {/* Velocity */}
-      <div className="bg-card border border-border rounded-none p-5">
-        <h3 className="font-semibold text-text-primary mb-4">My Pipeline Velocity</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 bg-bg-alt rounded-none">
-            <TrendingUp className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
-            <p className="text-xl font-bold text-text-primary">
-              {velocityData?.candidates_advancing_per_week || 0}
-            </p>
-            <p className="text-xs text-text-muted">advancing / week</p>
-          </div>
-          <div className="text-center p-4 bg-bg-alt rounded-none">
-            <Clock className="w-5 h-5 text-blue-500 mx-auto mb-2" />
-            <p className="text-xl font-bold text-text-primary">
-              {velocityData?.total_transitions_90d || 0}
-            </p>
-            <p className="text-xs text-text-muted">transitions (90d)</p>
-          </div>
-          <div className="text-center p-4 bg-bg-alt rounded-none">
-            <Target className="w-5 h-5 text-purple-500 mx-auto mb-2" />
-            <p className="text-xl font-bold text-text-primary">
-              {pipelineData?.summary?.advancement_rate || 0}%
-            </p>
-            <p className="text-xs text-text-muted">to S11+ stage</p>
-          </div>
-          <div className="text-center p-4 bg-bg-alt rounded-none">
-            <CheckSquare className="w-5 h-5 text-amber-500 mx-auto mb-2" />
-            <p className="text-xl font-bold text-text-primary">
-              {pipelineData?.summary?.placement_rate || 0}%
-            </p>
-            <p className="text-xs text-text-muted">placement rate</p>
-          </div>
+          <ActivityFeed
+            items={activityData}
+            onActivityClick={(item) => {
+              if (item.mandate_id) navigate(`/platform/mandates/${item.mandate_id}`);
+              else if (item.candidate_id) navigate(`/platform/candidates/${item.candidate_id}`);
+            }}
+          />
         </div>
       </div>
     </div>
   );
 }
-
-export default ConsultantDashboard;

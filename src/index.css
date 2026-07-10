@@ -1,48 +1,58 @@
-/* Build v2026.05.28.4 — Light theme platform fix */
+/* Build v2026.07.10 — Premium design system (Phase 5) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── LYC Design Tokens ── */
+/* ── LYC Design Tokens — Premium Enterprise (Phase 5) ── */
 :root {
   /* Primary Colors */
   --color-primary: #C108AB;
-  --color-primary-hover: #A00790;
-  --color-primary-light: rgba(193, 8, 171, 0.08);
+  --color-primary-hover: #A50798;
+  --color-primary-light: rgba(193, 8, 171, 0.06);
   
-  /* Background Colors */
-  --color-bg: #FFFFFF;
-  --color-bg-warm: #FAF8F5;
-  --color-bg-alt: #F5F5F5;
+  /* Background Colors — warm, not cold */
+  --color-bg: #FAF9F7;
+  --color-bg-warm: #F5F3F0;
+  --color-bg-alt: #F0EDEA;
   --color-card: #FFFFFF;
-  --color-card-border: #E5E5E5;
+  --color-card-border: transparent;
   
-  /* Text Colors */
-  --color-text: #000000;
-  --color-text-secondary: #333333;
-  --color-muted: #666666;
-  --color-border: #E5E5E5;
+  /* Text Colors — rich, not pure black */
+  --color-text: #1A1714;
+  --color-text-secondary: #4A4541;
+  --color-muted: #8C857D;
+  --color-border: #E8E5E0;
   
   /* Accent Colors */
   --color-teal: #00897B;
-  --color-success: #00897B;
-  --color-warning: #F59E0B;
-  --color-error: #DC2626;
+  --color-success: #1A7D42;
+  --color-warning: #B8860B;
+  --color-error: #C0392B;
   
   /* Typography */
   --font-heading: 'Libre Baskerville', Georgia, serif;
   --font-body: 'DM Sans', system-ui, sans-serif;
   
-  /* Spacing */
+  /* Spacing — generous */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
+  --spacing-2xl: 48px;
   
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  /* Shadows — warm, multi-level elevation */
+  --shadow-xs: 0 1px 2px rgba(26, 23, 20, 0.04);
+  --shadow-sm: 0 1px 3px rgba(26, 23, 20, 0.06), 0 1px 2px rgba(26, 23, 20, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(26, 23, 20, 0.06), 0 2px 4px -2px rgba(26, 23, 20, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(26, 23, 20, 0.08), 0 4px 6px -4px rgba(26, 23, 20, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(26, 23, 20, 0.10), 0 8px 10px -6px rgba(26, 23, 20, 0.04);
+  --shadow-card: 0 1px 3px rgba(26, 23, 20, 0.04), 0 1px 2px rgba(26, 23, 20, 0.06);
+  --shadow-card-hover: 0 12px 24px rgba(26, 23, 20, 0.08), 0 4px 8px rgba(26, 23, 20, 0.04);
+  
+  /* Transitions */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   
   /* Brand Rule: Zero Border Radius */
   --radius-none: 0px;

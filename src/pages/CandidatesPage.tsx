@@ -1,9 +1,9 @@
 import { useAuthStore } from '@/stores/authStore';
 import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Users, Loader2, Filter, ChevronLeft, ChevronRight, ArrowUpDown, Linkedin, Globe, Briefcase, Award, Target, Upload } from 'lucide-react';
+import { Search, Users, Loader2, Filter, ChevronLeft, ChevronRight, ArrowUpDown, Linkedin, Globe, Briefcase, Award, Target, Upload, MapPin } from 'lucide-react';
 import { useContacts } from '@/hooks/useSupabaseData';
-import { Badge, Card, CardContent } from '@/components/ui';
+import { Badge } from '@/components/ui';
 import type { Contact } from '@/services/supabaseApi';
 import { LinkedInImportModal } from '@/components/import/LinkedInImportModal';
 
@@ -25,11 +25,18 @@ function getTier(score: number | null, cxo: boolean | null): string {
   return 'C';
 }
 
-const TIER_STYLES: Record<string, string> = {
-  S: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
-  A: 'bg-green-500/15 text-green-500 border-green-500/30',
-  B: 'bg-blue-500/15 text-blue-500 border-blue-500/30',
-  C: 'bg-gray-500/15 text-gray-400 border-gray-500/30',
+const TIER_STYLES: Record<string, { bg: string; text: string }> = {
+  S: { bg: 'rgba(184,134,11,0.08)', text: '#B8860B' },
+  A: { bg: 'rgba(26,125,66,0.08)', text: '#1A7D42' },
+  B: { bg: 'rgba(44,82,130,0.08)', text: '#2C5282' },
+  C: { bg: 'rgba(140,133,125,0.08)', text: '#8C857D' },
+};
+
+const TIER_BADGES: Record<string, string> = {
+  S: 'Elite',
+  A: 'Senior',
+  B: 'Mid-Level',
+  C: 'Emerging',
 };
 
 type SortField = 'name' | 'score' | 'seniority' | 'country';
@@ -47,24 +54,22 @@ export function CandidatesPage() {
   const [showImportModal, setShowImportModal] = useState(false);
   const limit = 30;
 
-  const { data: contacts, count, loading } = useContacts({ userId: profile?.id || undefined,
+  const { data: contacts, count, loading } = useContacts({
+    userId: profile?.id || undefined,
     query: search || undefined,
     seniority: seniorityFilter.length ? seniorityFilter : undefined,
     country: countryFilter || undefined,
-    limit: 200, // fetch more for client-side tier filtering
+    limit: 200,
   });
 
-  // Client-side tier filtering + sorting
   const filtered = useMemo(() => {
     let result = contacts;
     if (tierFilter) {
       result = result.filter(c => getTier(c.trident_composite, !!c.cxo_stamp) === tierFilter);
     }
-    // Client-side country filter (since useContacts only supports one country)
     if (countryFilter) {
       result = result.filter(c => c.country === countryFilter);
     }
-    // Sort
     result = [...result].sort((a, b) => {
       let cmp = 0;
       if (sortField === 'name') cmp = (a.name || '').localeCompare(b.name || '');
@@ -97,17 +102,24 @@ export function CandidatesPage() {
     setPage(0);
   };
 
+  const getScoreColor = (score: number | null) => {
+    if (score === null) return '#8C857D';
+    if (score >= 75) return '#1A7D42';
+    if (score >= 50) return '#2C5282';
+    return '#8C857D';
+  };
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-text-primary">Talent Pool</h1>
-          <p className="text-text-muted">{count.toLocaleString()} contacts{filtered.length !== count ? ` · ${filtered.length} shown` : ''}</p>
+          <h1 className="text-2xl font-serif font-bold text-[#1A1714] tracking-tight">Talent Pool</h1>
+          <p className="text-sm text-[#8C857D] mt-1">{count.toLocaleString()} contacts{filtered.length !== count ? ` · ${filtered.length} shown` : ''}</p>
         </div>
         <button
           onClick={() => setShowImportModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent-hover transition-colors min-h-[44px]"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#C108AB] text-white text-sm font-medium hover:bg-[#A50798] transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
         >
           <Upload className="w-4 h-4" />
           Import from LinkedIn
@@ -115,21 +127,24 @@ export function CandidatesPage() {
       </div>
 
       {/* Search + Filters */}
-      <div className="space-y-3">
+      <div
+        className="bg-white p-5 space-y-4"
+        style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
+      >
         <div className="flex flex-wrap gap-3">
           <div className="relative flex-1 min-w-[240px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8B0A6]" />
             <input
               placeholder="Search by name, title, headline, skills..."
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(0); }}
-              className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
+              className="w-full pl-11 pr-4 py-2.5 bg-[#FAF9F7] border border-[#E8E5E0] text-sm text-[#1A1714] placeholder:text-[#B8B0A6] focus:outline-none focus:border-[#C108AB]/40 focus:shadow-[0_0_0_3px_rgba(193,8,171,0.06)] transition-all duration-200"
             />
           </div>
           <select
             value={countryFilter}
             onChange={e => { setCountryFilter(e.target.value); setPage(0); }}
-            className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent min-w-[140px]"
+            className="px-4 py-2.5 bg-[#FAF9F7] border border-[#E8E5E0] text-sm text-[#1A1714] focus:outline-none focus:border-[#C108AB]/40 min-w-[140px] transition-all duration-200"
           >
             <option value="">All Countries</option>
             {countries.map(c => <option key={c} value={c}>{c}</option>)}
@@ -137,7 +152,7 @@ export function CandidatesPage() {
           <select
             value={tierFilter}
             onChange={e => { setTierFilter(e.target.value); setPage(0); }}
-            className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent min-w-[120px]"
+            className="px-4 py-2.5 bg-[#FAF9F7] border border-[#E8E5E0] text-sm text-[#1A1714] focus:outline-none focus:border-[#C108AB]/40 min-w-[120px] transition-all duration-200"
           >
             <option value="">All Tiers</option>
             <option value="S">S — C-Suite Elite</option>
@@ -148,16 +163,20 @@ export function CandidatesPage() {
         </div>
 
         {/* Seniority chips */}
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {SENIORITY_OPTIONS.map(s => (
             <button
               key={s.value}
               onClick={() => toggleSeniority(s.value)}
-              className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+              className={`px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                 seniorityFilter.includes(s.value)
-                  ? 'bg-accent/15 text-accent border-accent/30'
-                  : 'bg-bg-tertiary text-text-muted border-transparent hover:text-text-primary'
+                  ? 'text-[#C108AB]'
+                  : 'text-[#8C857D] hover:text-[#1A1714]'
               }`}
+              style={{
+                background: seniorityFilter.includes(s.value) ? 'rgba(193,8,171,0.06)' : '#F5F3F0',
+                border: seniorityFilter.includes(s.value) ? '1px solid rgba(193,8,171,0.2)' : '1px solid transparent',
+              }}
             >
               {s.label}
             </button>
@@ -165,7 +184,7 @@ export function CandidatesPage() {
           {(search || seniorityFilter.length || countryFilter || tierFilter) && (
             <button
               onClick={() => { setSearch(''); setSeniorityFilter([]); setCountryFilter(''); setTierFilter(''); setPage(0); }}
-              className="px-2.5 py-1 text-xs text-accent hover:bg-accent/10 rounded-full transition-colors"
+              className="px-3 py-1.5 text-xs font-medium text-[#C108AB] hover:bg-[rgba(193,8,171,0.06)] transition-colors duration-200"
             >
               Clear all
             </button>
@@ -175,83 +194,96 @@ export function CandidatesPage() {
 
       {/* Table */}
       {loading ? (
-        <div className="text-text-muted text-center py-16">
-          <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-          <p>Loading talent pool...</p>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-6 h-6 animate-spin text-[#C108AB]" />
+          <span className="ml-3 text-sm text-[#8C857D]">Loading talent pool...</span>
         </div>
       ) : paginated.length === 0 ? (
-        <div className="text-center py-16">
-          <Users className="w-12 h-12 text-text-muted/40 mx-auto mb-3" />
-          <p className="text-text-muted">No candidates match your filters</p>
+        <div
+          className="bg-white p-16 text-center"
+          style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
+        >
+          <Users className="w-12 h-12 text-[#B8B0A6] mx-auto mb-3 opacity-50" />
+          <p className="text-[#8C857D]">No candidates match your filters</p>
         </div>
       ) : (
-        <div className="bg-bg-secondary rounded-none border border-bg-tertiary overflow-hidden">
+        <div
+          className="bg-white overflow-hidden"
+          style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
+        >
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-bg-tertiary">
-                  <th onClick={() => toggleSort('name')} className="text-left px-4 py-3 text-xs font-medium text-text-muted uppercase tracking-wider cursor-pointer hover:text-text-primary select-none">
-                    <span className="flex items-center gap-1">Name <ArrowUpDown className="w-3 h-3" /></span>
+                <tr className="border-b border-[#F0EDEA]">
+                  <th onClick={() => toggleSort('name')} className="text-left px-6 py-4 text-[11px] font-bold text-[#8C857D] uppercase tracking-[1.5px] cursor-pointer hover:text-[#1A1714] select-none transition-colors">
+                    <span className="flex items-center gap-1.5">Name <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-text-muted uppercase tracking-wider">Current Role</th>
-                  <th onClick={() => toggleSort('country')} className="text-left px-4 py-3 text-xs font-medium text-text-muted uppercase tracking-wider cursor-pointer hover:text-text-primary select-none">
-                    <span className="flex items-center gap-1">Location <ArrowUpDown className="w-3 h-3" /></span>
+                  <th className="text-left px-6 py-4 text-[11px] font-bold text-[#8C857D] uppercase tracking-[1.5px]">Current Role</th>
+                  <th onClick={() => toggleSort('country')} className="text-left px-6 py-4 text-[11px] font-bold text-[#8C857D] uppercase tracking-[1.5px] cursor-pointer hover:text-[#1A1714] select-none transition-colors">
+                    <span className="flex items-center gap-1.5">Location <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th onClick={() => toggleSort('seniority')} className="text-left px-4 py-3 text-xs font-medium text-text-muted uppercase tracking-wider cursor-pointer hover:text-text-primary select-none">
-                    <span className="flex items-center gap-1">Seniority <ArrowUpDown className="w-3 h-3" /></span>
+                  <th onClick={() => toggleSort('seniority')} className="text-left px-6 py-4 text-[11px] font-bold text-[#8C857D] uppercase tracking-[1.5px] cursor-pointer hover:text-[#1A1714] select-none transition-colors">
+                    <span className="flex items-center gap-1.5">Seniority <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th onClick={() => toggleSort('score')} className="text-center px-4 py-3 text-xs font-medium text-text-muted uppercase tracking-wider cursor-pointer hover:text-text-primary select-none">
-                    <span className="flex items-center justify-center gap-1">Score <ArrowUpDown className="w-3 h-3" /></span>
+                  <th onClick={() => toggleSort('score')} className="text-center px-6 py-4 text-[11px] font-bold text-[#8C857D] uppercase tracking-[1.5px] cursor-pointer hover:text-[#1A1714] select-none transition-colors">
+                    <span className="flex items-center justify-center gap-1.5">Score <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-text-muted uppercase tracking-wider">Tier</th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-text-muted uppercase tracking-wider">Links</th>
+                  <th className="text-center px-6 py-4 text-[11px] font-bold text-[#8C857D] uppercase tracking-[1.5px]">Tier</th>
+                  <th className="text-center px-6 py-4 text-[11px] font-bold text-[#8C857D] uppercase tracking-[1.5px]">Links</th>
                 </tr>
               </thead>
               <tbody>
                 {paginated.map(c => {
                   const tier = getTier(c.trident_composite, !!c.cxo_stamp);
+                  const tierStyle = TIER_STYLES[tier];
                   return (
-                    <tr key={c.id} className="border-b border-bg-tertiary/50 hover:bg-bg-tertiary/30 transition-colors cursor-pointer" onClick={() => navigate(`/platform/candidates/${c.id}`)}>
-                      <td className="px-4 py-3">
+                    <tr
+                      key={c.id}
+                      className="border-b border-[#F5F3F0] transition-colors duration-150 cursor-pointer hover:bg-[#FAF9F7]"
+                      onClick={() => navigate(`/platform/candidates/${c.id}`)}
+                    >
+                      <td className="px-6 py-4">
                         <div>
-                          <p className="font-medium text-accent hover:underline">{c.name}</p>
-                          {c.headline && <p className="text-[11px] text-text-muted truncate max-w-[200px]">{c.headline}</p>}
+                          <p className="font-semibold text-[#C108AB] hover:text-[#A50798] transition-colors">{c.name}</p>
+                          {c.headline && <p className="text-[11px] text-[#8C857D] truncate max-w-[220px] mt-0.5">{c.headline}</p>}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
-                        <p className="text-text-primary truncate max-w-[200px]">{c.current_title || '—'}</p>
-                        <p className="text-[11px] text-text-muted">{c.company?.name || c.career_history?.[0]?.company || ''}</p>
+                      <td className="px-6 py-4">
+                        <p className="text-[#1A1714] font-medium truncate max-w-[200px]">{c.current_title || '—'}</p>
+                        <p className="text-[11px] text-[#8C857D]">{c.company?.name || c.career_history?.[0]?.company || ''}</p>
                       </td>
-                      <td className="px-4 py-3">
-                        <span className="flex items-center gap-1 text-text-muted">
-                          <Globe className="w-3 h-3" />
+                      <td className="px-6 py-4">
+                        <span className="flex items-center gap-1.5 text-[#8C857D] text-xs">
+                          <MapPin className="w-3 h-3" />
                           {c.city ? `${c.city}, ${c.country}` : c.country || '—'}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
-                        <span className="text-text-muted capitalize">{(c.seniority || '—').replace('_', ' ')}</span>
+                      <td className="px-6 py-4">
+                        <span className="text-xs text-[#4A4541] capitalize font-medium">{(c.seniority || '—').replace('_', ' ')}</span>
                       </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`font-mono font-bold ${
-                          (c.trident_composite ?? 0) >= 75 ? 'text-green-500' :
-                          (c.trident_composite ?? 0) >= 50 ? 'text-blue-500' :
-                          'text-text-muted'
-                        }`}>
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className="font-mono font-bold text-base"
+                          style={{ color: getScoreColor(c.trident_composite) }}
+                        >
                           {c.trident_composite ?? '—'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded border ${TIER_STYLES[tier]}`}>
-                          {tier}
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className="inline-block text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide"
+                          style={{ background: tierStyle.bg, color: tierStyle.text }}
+                        >
+                          {tier} · {TIER_BADGES[tier]}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-6 py-4 text-center">
                         <div className="flex items-center justify-center gap-2">
                           {c.linkedin_url && (
                             <a href={c.linkedin_url} target="_blank" rel="noopener noreferrer"
-                              className="text-blue-500 hover:text-blue-400" title="LinkedIn"
+                              className="p-1.5 hover:bg-[#F0EDEA] transition-colors" title="LinkedIn"
                               onClick={(e) => e.stopPropagation()}>
-                              <Linkedin className="w-4 h-4" />
+                              <Linkedin className="w-4 h-4 text-[#2C5282]" />
                             </a>
                           )}
                         </div>
@@ -265,23 +297,23 @@ export function CandidatesPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-bg-tertiary">
-              <p className="text-xs text-text-muted">
+            <div className="flex items-center justify-between px-6 py-4 border-t border-[#F0EDEA]">
+              <p className="text-xs text-[#8C857D]">
                 Showing {page * limit + 1}–{Math.min((page + 1) * limit, filtered.length)} of {filtered.length}
               </p>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="p-1.5 rounded bg-bg-tertiary disabled:opacity-40 hover:bg-bg-tertiary/70 transition-colors"
+                  className="p-2 bg-[#F5F3F0] disabled:opacity-30 hover:bg-[#F0EDEA] transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="text-xs text-text-muted">{page + 1} / {totalPages}</span>
+                <span className="text-xs text-[#8C857D] font-medium px-2">{page + 1} / {totalPages}</span>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="p-1.5 rounded bg-bg-tertiary disabled:opacity-40 hover:bg-bg-tertiary/70 transition-colors"
+                  className="p-2 bg-[#F5F3F0] disabled:opacity-30 hover:bg-[#F0EDEA] transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

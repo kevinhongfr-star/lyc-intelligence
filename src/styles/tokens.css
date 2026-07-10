@@ -1,43 +1,96 @@
 /**
- * DEX AI Design Tokens — Mockup v14
- * CSS custom properties for consistent theming
+ * LYC Intelligence — Premium Design Tokens
+ * McKinsey meets Soho House — zero border-radius, shadow-based elevation
  */
 
 :root {
-  /* Base colors */
-  --white: #fff;
-  --bg: #fafafa;
-  --bg-warm: #f7f6f4;
-  --border: #e8e6e3;
-  --text-primary: #1a1a1a;
-  --text-secondary: #555;
-  --text-muted: #999;
+  /* ── Base Palette ── */
+  --white: #ffffff;
+  --bg: #FAF9F7;           /* Warm off-white, not cold grey */
+  --bg-warm: #F5F3F0;      /* Warm surface for cards */
+  --bg-elevated: #FFFFFF;   /* Elevated surfaces */
+  --bg-sunken: #F0EDEA;     /* Sunken/recessed areas */
+  --border: #E8E5E0;        /* Warm border */
+  --border-subtle: #F0EDEA; /* Near-invisible border */
 
-  /* Brand */
+  /* ── Text ── */
+  --text-primary: #1A1714;     /* Rich black, not pure #000 */
+  --text-secondary: #4A4541;   /* Warm dark grey */
+  --text-muted: #8C857D;       /* Warm mid-grey */
+  --text-faint: #B8B0A6;       /* Very light warm grey */
+
+  /* ── Brand: Fuchsia ── */
   --fuchsia: #C108AB;
-  --fuchsia-light: rgba(193,8,171,.08);
-  --fuchsia-10: rgba(193,8,171,.1);
-  --fuchsia-20: rgba(193,8,171,.2);
+  --fuchsia-hover: #A50798;
+  --fuchsia-light: rgba(193, 8, 171, 0.06);
+  --fuchsia-10: rgba(193, 8, 171, 0.10);
+  --fuchsia-20: rgba(193, 8, 171, 0.20);
 
-  /* Semantic */
-  --green: #2d8a4e;
-  --amber: #b8860b;
-  --red: #c0392b;
-  --blue: #2c5282;
+  /* ── Semantic Colors ── */
+  --green: #1A7D42;
+  --green-bg: rgba(26, 125, 66, 0.08);
+  --amber: #B8860B;
+  --amber-bg: rgba(184, 134, 11, 0.08);
+  --red: #C0392B;
+  --red-bg: rgba(192, 57, 43, 0.08);
+  --blue: #2C5282;
+  --blue-bg: rgba(44, 82, 130, 0.08);
 
-  /* Typography */
+  /* ── Typography ── */
   --font-serif: 'Libre Baskerville', Georgia, serif;
   --font-sans: 'DM Sans', system-ui, sans-serif;
 
-  /* Shadows */
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.1);
-  --shadow-modal: 0 8px 32px rgba(0,0,0,0.15);
+  /* ── Shadows (warm tone, multi-level elevation) ── */
+  --shadow-xs: 0 1px 2px rgba(26, 23, 20, 0.04);
+  --shadow-sm: 0 1px 3px rgba(26, 23, 20, 0.06), 0 1px 2px rgba(26, 23, 20, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(26, 23, 20, 0.06), 0 2px 4px -2px rgba(26, 23, 20, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(26, 23, 20, 0.08), 0 4px 6px -4px rgba(26, 23, 20, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(26, 23, 20, 0.10), 0 8px 10px -6px rgba(26, 23, 20, 0.04);
+  --shadow-card: 0 1px 3px rgba(26, 23, 20, 0.04), 0 1px 2px rgba(26, 23, 20, 0.06);
+  --shadow-card-hover: 0 12px 24px rgba(26, 23, 20, 0.08), 0 4px 8px rgba(26, 23, 20, 0.04);
+  --shadow-modal: 0 24px 48px rgba(26, 23, 20, 0.12), 0 8px 16px rgba(26, 23, 20, 0.06);
+  --shadow-inner: inset 0 2px 4px rgba(26, 23, 20, 0.04);
 
-  /* Border radius */
-  --radius-card: 12px;
-  --radius-sm: 8px;
+  /* ── Border Radius (ZERO per brand rule, except badges/pills) ── */
+  --radius-none: 0px;
+  --radius-card: 0px;
+  --radius-sm: 0px;
   --radius-full: 9999px;
+
+  /* ── Spacing Scale ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Transitions ── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+}
+
+/* ── Dark Theme ── */
+[data-theme='dark'] {
+  --bg: #0D0A14;
+  --bg-warm: #15111E;
+  --bg-elevated: #1C1728;
+  --bg-sunken: #0A0810;
+  --border: #2A2436;
+  --border-subtle: #1C1728;
+  --text-primary: #F5F3F0;
+  --text-secondary: #B8B0A6;
+  --text-muted: #6B6278;
+  --text-faint: #3D3550;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 12px 24px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 body {
@@ -45,31 +98,24 @@ body {
   background: var(--bg);
   color: var(--text-primary);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);
   font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* Selection */
+/* ── Selection ── */
 ::selection {
-  background: var(--fuchsia-light);
+  background: var(--fuchsia-10);
   color: var(--fuchsia);
 }
