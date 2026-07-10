@@ -91,17 +91,14 @@ interface PipelineFunnelProps {
   onStageClick?: (stage: string) => void;
 }
 
-const DEFAULT_STAGES = [
-  'S1_Sourced', 'S2_Screened', 'S3_Contacted', 'S5_Responded',
-  'S7_Interested', 'S9_Call_Positive', 'S11_Internal_Interview',
-  'S12_Presented', 'S16_Offer', 'S19_Closed',
-];
+const DEFAULT_STAGES = ['GRID', 'LENS', 'SWEEP', 'CANVA', 'PLACED'];
 
 const STAGE_LABELS: Record<string, string> = {
-  S1_Sourced: 'Sourced', S2_Screened: 'Screened', S3_Contacted: 'Contacted',
-  S5_Responded: 'Responded', S7_Interested: 'Interested', S9_Call_Positive: 'Call +',
-  S11_Internal_Interview: 'Internal Int.', S12_Presented: 'Presented',
-  S16_Offer: 'Offer', S19_Closed: 'Closed',
+  'GRID': 'Grid',
+  'LENS': 'Lens',
+  'SWEEP': 'Sweep',
+  'CANVA': 'Canva',
+  'PLACED': 'Placed',
 };
 
 function formatStageShort(stage: string): string {

@@ -29,51 +29,41 @@ import { getUserFromRequest, getUserRole, isAdmin, isTeamLead } from './adminAut
 
 export const maxDuration = 30;
 
-const PIPELINE_STAGES = [
-  'S1_Sourced',
-  'S2_Screened',
-  'S3_Contacted',
-  'S4_No_Response',
-  'S5_Responded',
-  'S6_WeChat_Added',
-  'S7_Interested',
-  'S8_Not_Interested',
-  'S9_Call_Positive',
-  'S10_Call_Negative',
-  'S11_Internal_Interview',
-  'S12_Presented_to_Client',
-  'S13_Client_Int_Scheduled',
-  'S14_Client_Interviewed',
-  'S15_Client_2nd_Interview',
-  'S16_Offer_Extended',
-  'S17_Offer_Accepted',
-  'S18_Offer_Declined',
-  'S19_Closed',
-];
+// LYC Pipeline Stages (from candidates_pipeline.stage)
+const PIPELINE_STAGES = ['GRID', 'LENS', 'SWEEP', 'CANVA', 'PLACED'];
+
+const STAGE_LABELS: Record<string, string> = {
+  'GRID': 'Grid (Talent Map)',
+  'LENS': 'Lens (Deep Dive)',
+  'SWEEP': 'Sweep (Outreach)',
+  'CANVA': 'Canva (Shortlist)',
+  'PLACED': 'Placed',
+};
 
 function formatStage(stage: string): string {
-  return stage.replace(/_/g, ' ').replace(/^S\d+\s*/, '');
+  return STAGE_LABELS[stage] || stage.replace(/_/g, ' ');
 }
 
 // ── Pipeline Funnel ───────────────────────────────────────────────────
 async function computePipelineFunnel(filters: Record<string, any> = {}) {
   try {
-    const contacts = await selectMany(
-      'contacts',
-      { is_archived: false, ...filters },
+    // Query candidates_pipeline table (actual pipeline data)
+    const pipelineEntries = await selectMany(
+      'candidates_pipeline',
+      {},
       [],
-      1000,
+      2000,
       0,
-      'pipeline_stage'
+      'stage'
     );
 
     const funnel: Record<string, number> = {};
     for (const stage of PIPELINE_STAGES) {
       funnel[stage] = 0;
     }
-    for (const c of contacts || []) {
-      if (c.pipeline_stage) {
-        funnel[c.pipeline_stage] = (funnel[c.pipeline_stage] || 0) + 1;
+    for (const entry of pipelineEntries || []) {
+      if (entry.stage) {
+        funnel[entry.stage] = (funnel[entry.stage] || 0) + 1;
       }
     }
 
@@ -89,20 +79,10 @@ async function computePipelineFunnel(filters: Record<string, any> = {}) {
     }
 
     const totalActive = Object.values(funnel).reduce((a, b) => a + b, 0);
-    const engaged =
-      (funnel['S5_Responded'] || 0) +
-      (funnel['S6_WeChat_Added'] || 0) +
-      (funnel['S7_Interested'] || 0) +
-      (funnel['S9_Call_Positive'] || 0);
-    const advanced =
-      (funnel['S11_Internal_Interview'] || 0) +
-      (funnel['S12_Presented_to_Client'] || 0) +
-      (funnel['S13_Client_Int_Scheduled'] || 0) +
-      (funnel['S14_Client_Interviewed'] || 0) +
-      (funnel['S15_Client_2nd_Interview'] || 0) +
-      (funnel['S16_Offer_Extended'] || 0) +
-      (funnel['S17_Offer_Accepted'] || 0) +
-      (funnel['S19_Closed'] || 0);
+    // Engaged = actively in process (not GRID which is initial mapping)
+    const engaged = (funnel['LENS'] || 0) + (funnel['SWEEP'] || 0) + (funnel['CANVA'] || 0);
+    const advanced = (funnel['CANVA'] || 0) + (funnel['PLACED'] || 0);
+    const closed = funnel['PLACED'] || 0;
 
     return {
       funnel,
@@ -113,10 +93,8 @@ async function computePipelineFunnel(filters: Record<string, any> = {}) {
         engagement_rate: totalActive > 0 ? Math.round((engaged / totalActive) * 100) : 0,
         advanced,
         advancement_rate: totalActive > 0 ? Math.round((advanced / totalActive) * 100) : 0,
-        closed: funnel['S19_Closed'] || 0,
-        placement_rate: totalActive > 0
-          ? Math.round(((funnel['S19_Closed'] || 0) / totalActive) * 100 * 10) / 10
-          : 0,
+        closed,
+        placement_rate: totalActive > 0 ? Math.round((closed / totalActive) * 100 * 10) / 10 : 0,
       },
     };
   } catch (e) {
@@ -218,17 +196,18 @@ async function computeConsultantPerformance() {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const consultant of consultants) {
-      const contacts = await selectMany(
-        'contacts',
-        { assigned_to: consultant.id, is_archived: false },
-        [], 500, 0, 'pipeline_stage'
+      // Query pipeline entries for this consultant's candidates
+      const pipelineEntries = await selectMany(
+        'candidates_pipeline',
+        { consultant_id: consultant.id },
+        [], 2000, 0, 'stage'
       );
 
-      const pipelineCount = contacts?.length || 0;
+      const pipelineCount = pipelineEntries?.length || 0;
       const distribution: Record<string, number> = {};
-      for (const c of contacts || []) {
-        if (c.pipeline_stage) {
-          distribution[c.pipeline_stage] = (distribution[c.pipeline_stage] || 0) + 1;
+      for (const entry of pipelineEntries || []) {
+        if (entry.stage) {
+          distribution[entry.stage] = (distribution[entry.stage] || 0) + 1;
         }
       }
 
@@ -242,12 +221,12 @@ async function computeConsultantPerformance() {
       ).length;
 
       const placements = contacts?.filter((c: any) =>
-        c.pipeline_stage === 'S19_Closed'
+        entry.stage === 'PLACED'
       ).length || 0;
 
       const engaged = contacts?.filter((c: any) =>
-        ['S5_Responded', 'S6_WeChat_Added', 'S7_Interested', 'S9_Call_Positive'].includes(
-          c.pipeline_stage
+        ['LENS', 'SWEEP', 'CANVA'].includes(
+          entry.stage
         )
       ).length || 0;
 
@@ -407,7 +386,7 @@ async function computeRevenuePipeline() {
 
     const closedContacts = await selectMany(
       'contacts',
-      { pipeline_stage: 'S19_Closed' },
+      { stage: 'PLACED' },
       [], 100, 0, 'id, stage_change_date'
     );
     const placementsThisQuarter = closedContacts.filter((c: any) =>
@@ -769,7 +748,7 @@ async function handleGetKPIs(req: VercelRequest, res: VercelResponse) {
         currentValue = Math.round(avgOutreach * 10) / 10;
         break;
       case 'Source to Contact':
-        currentValue = velocity.avg_days_per_transition['S1_Sourced_to_S2_Screened'] || 0;
+        currentValue = velocity.avg_days_per_transition['GRID_to_LENS'] || 0;
         break;
       case 'Offer to Close':
         currentValue = velocity.avg_days_per_transition['S16_Offer_Extended_to_S17_Offer_Accepted'] || 0;

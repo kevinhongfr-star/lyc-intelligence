@@ -87,18 +87,18 @@ export function ConsultantDashboard() {
           </div>
           <div className="divide-y divide-[#F7F7F7]">
             {[
-              { icon: Mail, color: '#2563EB', bg: 'rgba(37,99,235,0.05)', title: 'Follow up on emails',
-                detail: `${Math.round((pipelineData?.funnel?.S3_Contacted || 0) * 0.3)} candidates need follow-up`,
-                action: () => navigate('/app/notifications') },
-              { icon: MessageCircle, color: '#16A34A', bg: 'rgba(22,163,74,0.05)', title: 'WeChat check-ins',
-                detail: `${pipelineData?.funnel?.S6_WeChat_Added || 0} candidates to check in with`,
-                action: () => navigate('/app/notifications') },
-              { icon: Phone, color: '#7C3AED', bg: 'rgba(124,58,237,0.05)', title: 'Scheduling calls',
-                detail: `${pipelineData?.funnel?.S7_Interested || 0} interested candidates`,
-                action: () => navigate('/app/scheduler') },
-              { icon: Calendar, color: '#CA8A04', bg: 'rgba(202,138,4,0.05)', title: 'Interviews this week',
-                detail: `${(pipelineData?.funnel?.S11_Internal_Interview || 0) + (pipelineData?.funnel?.S13_Client_Int_Scheduled || 0)} upcoming`,
-                action: () => navigate('/app/scheduler') },
+              { icon: Mail, color: '#2563EB', bg: 'rgba(37,99,235,0.05)', title: 'Outreach follow-ups',
+                detail: `${pipelineData?.funnel?.SWEEP || 0} candidates in outreach phase`,
+                action: () => navigate('/app/pipeline') },
+              { icon: Target, color: '#16A34A', bg: 'rgba(22,163,74,0.05)', title: 'Deep-dive reviews',
+                detail: `${pipelineData?.funnel?.LENS || 0} candidates in deep-dive`,
+                action: () => navigate('/app/pipeline') },
+              { icon: Users, color: '#7C3AED', bg: 'rgba(124,58,237,0.05)', title: 'Shortlist reviews',
+                detail: `${pipelineData?.funnel?.CANVA || 0} candidates shortlisted`,
+                action: () => navigate('/app/pipeline') },
+              { icon: Calendar, color: '#CA8A04', bg: 'rgba(202,138,4,0.05)', title: 'Placements',
+                detail: `${pipelineData?.funnel?.PLACED || 0} total placed`,
+                action: () => navigate('/app/pipeline') },
             ].map((action, idx) => (
               <button key={idx} onClick={action.action}
                 className="flex items-center gap-3.5 px-5 py-3.5 w-full text-left transition-colors duration-150 hover:bg-[#FAFAFA]">

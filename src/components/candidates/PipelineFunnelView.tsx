@@ -39,14 +39,7 @@ interface MetricsData {
   viable_pool: number;
 }
 
-const STAGE_ORDER = [
-  'S1_Sourced', 'S2_Screened', 'S3_Contacted', 'S4_No_Response',
-  'S5_Responded', 'S6_WeChat_Added', 'S7_Interested', 'S8_Not_Interested',
-  'S9_Call_Positive', 'S10_Call_Negative', 'S11_Internal_Interview',
-  'S12_Presented_to_Client', 'S13_Client_Int_Scheduled', 'S14_Client_Interviewed',
-  'S15_Client_2nd_Interview', 'S16_Offer_Extended', 'S17_Offer_Accepted',
-  'S18_Offer_Declined', 'S19_Closed',
-];
+const STAGE_ORDER = ['GRID', 'LENS', 'SWEEP', 'CANVA', 'PLACED'];
 
 const STAGE_SHORT_LABELS: Record<string, string> = {
   S1_Sourced: 'S1',
@@ -71,31 +64,9 @@ const STAGE_SHORT_LABELS: Record<string, string> = {
 };
 
 const STAGE_COLORS: Record<string, string> = {
-  // Upstream (gray/blue)
-  S1_Sourced: 'bg-gray-400',
-  S2_Screened: 'bg-blue-400',
-  // Contact phase (yellow)
-  S3_Contacted: 'bg-yellow-400',
-  S4_No_Response: 'bg-gray-300',
-  S5_Responded: 'bg-green-400',
-  S6_WeChat_Added: 'bg-purple-400',
-  S7_Interested: 'bg-green-500',
-  // Decline stage (red)
-  S8_Not_Interested: 'bg-red-400',
-  // Interview phase (indigo/cyan)
-  S9_Call_Positive: 'bg-green-500',
-  S10_Call_Negative: 'bg-red-400',
-  S11_Internal_Interview: 'bg-indigo-400',
-  S12_Presented_to_Client: 'bg-cyan-400',
-  S13_Client_Int_Scheduled: 'bg-cyan-500',
-  S14_Client_Interviewed: 'bg-cyan-500',
-  S15_Client_2nd_Interview: 'bg-cyan-600',
-  // Offer phase (emerald)
-  S16_Offer_Extended: 'bg-emerald-400',
-  S17_Offer_Accepted: 'bg-emerald-500',
-  S18_Offer_Declined: 'bg-red-500',
-  // Closed (gray)
-  S19_Closed: 'bg-gray-500',
+  GRID: 'bg-blue-100 text-blue-700', LENS: 'bg-indigo-100 text-indigo-700',
+  SWEEP: 'bg-yellow-100 text-yellow-700', CANVA: 'bg-purple-100 text-purple-700',
+  PLACED: 'bg-green-200 text-green-800',
 };
 
 export function PipelineFunnelView() {

@@ -27,7 +27,7 @@ interface Candidate {
   name: string;
   current_title: string | null;
   company: { id: string; name: string } | null;
-  pipeline_stage: string;
+  stage: string;
   tier: string | null;
   classification: string | null;
   motivation_overall: string;
@@ -124,7 +124,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
       params.set('is_archived', 'false');
 
       if (stageFilter.length > 0) {
-        params.set('pipeline_stage', stageFilter.join(','));
+        params.set('stage', stageFilter.join(','));
       }
       if (motivationFilter) {
         params.set('motivation_overall', motivationFilter);
@@ -289,8 +289,8 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
               </div>
 
               {/* Stage Badge */}
-              <Badge className={`${STAGE_COLORS[candidate.pipeline_stage] || 'bg-gray-100 text-gray-700'} px-2 py-1 text-xs font-medium border`}>
-                {STAGE_LABELS[candidate.pipeline_stage] || candidate.pipeline_stage}
+              <Badge className={`${STAGE_COLORS[candidate.stage] || 'bg-gray-100 text-gray-700'} px-2 py-1 text-xs font-medium border`}>
+                {STAGE_LABELS[candidate.stage] || candidate.stage}
               </Badge>
 
               {/* Motivation Dot */}
