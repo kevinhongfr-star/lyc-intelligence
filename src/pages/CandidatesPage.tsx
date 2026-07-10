@@ -1,11 +1,13 @@
 import { useAuthStore } from '@/stores/authStore';
 import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Users, Loader2, Filter, ChevronLeft, ChevronRight, ArrowUpDown, Linkedin, Globe, Briefcase, Award, Target, Upload, MapPin } from 'lucide-react';
+import { Search, Users, Loader2, Filter, ChevronLeft, ChevronRight, ArrowUpDown, Linkedin, Globe, Briefcase, Award, Target, Upload, MapPin, Download, CheckSquare, Square, Edit3, X, Check, Trash2, MoreHorizontal } from 'lucide-react';
 import { useContacts } from '@/hooks/useSupabaseData';
 import { Badge } from '@/components/ui';
 import type { Contact } from '@/services/supabaseApi';
+import { getSupabase } from '@/services/supabaseApi';
 import { LinkedInImportModal } from '@/components/import/LinkedInImportModal';
+import Papa from 'papaparse';
 
 const SENIORITY_OPTIONS = [
   { value: 'c_suite', label: 'C-Suite' },
@@ -32,14 +34,10 @@ const TIER_STYLES: Record<string, { bg: string; text: string }> = {
   C: { bg: 'rgba(140,133,125,0.08)', text: '#A3A3A3' },
 };
 
-const TIER_BADGES: Record<string, string> = {
-  S: 'Elite',
-  A: 'Senior',
-  B: 'Mid-Level',
-  C: 'Emerging',
-};
+const TIER_BADGES: Record<string, string> = { S: 'Elite', A: 'Senior', B: 'Mid-Level', C: 'Emerging' };
 
 type SortField = 'name' | 'score' | 'seniority' | 'country';
+type EditableField = 'current_title' | 'location' | 'country' | 'seniority';
 
 export function CandidatesPage() {
   const { profile } = useAuthStore();
@@ -48,10 +46,16 @@ export function CandidatesPage() {
   const [seniorityFilter, setSeniorityFilter] = useState<string[]>([]);
   const [countryFilter, setCountryFilter] = useState('');
   const [tierFilter, setTierFilter] = useState('');
+  const [scoreRange, setScoreRange] = useState<[number, number]>([0, 100]);
   const [page, setPage] = useState(0);
   const [sortField, setSortField] = useState<SortField>('score');
   const [sortAsc, setSortAsc] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [editingCell, setEditingCell] = useState<{ id: string; field: EditableField } | null>(null);
+  const [editValue, setEditValue] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [showBulkBar, setShowBulkBar] = useState(false);
   const limit = 30;
 
   const { data: contacts, count, loading } = useContacts({
@@ -64,12 +68,12 @@ export function CandidatesPage() {
 
   const filtered = useMemo(() => {
     let result = contacts;
-    if (tierFilter) {
-      result = result.filter(c => getTier(c.trident_composite, !!c.cxo_stamp) === tierFilter);
-    }
-    if (countryFilter) {
-      result = result.filter(c => c.country === countryFilter);
-    }
+    if (tierFilter) result = result.filter(c => getTier(c.trident_composite, !!c.cxo_stamp) === tierFilter);
+    if (countryFilter) result = result.filter(c => c.country === countryFilter);
+    result = result.filter(c => {
+      const score = c.trident_composite ?? 0;
+      return score >= scoreRange[0] && score <= scoreRange[1];
+    });
     result = [...result].sort((a, b) => {
       let cmp = 0;
       if (sortField === 'name') cmp = (a.name || '').localeCompare(b.name || '');
@@ -81,255 +85,271 @@ export function CandidatesPage() {
       return sortAsc ? cmp : -cmp;
     });
     return result;
-  }, [contacts, tierFilter, countryFilter, sortField, sortAsc]);
+  }, [contacts, tierFilter, countryFilter, scoreRange, sortField, sortAsc]);
 
-  const paginated = filtered.slice(page * limit, (page + 1) * limit);
+  const paged = filtered.slice(page * limit, (page + 1) * limit);
   const totalPages = Math.ceil(filtered.length / limit);
 
+  // Countries for filter
   const countries = useMemo(() => {
     const set = new Set<string>();
     for (const c of contacts) if (c.country) set.add(c.country);
     return Array.from(set).sort();
   }, [contacts]);
 
-  const toggleSort = (field: SortField) => {
+  // ─── Selection ───
+  const toggleSelect = (id: string) => {
+    const next = new Set(selectedIds);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setSelectedIds(next);
+  };
+  const toggleSelectAll = () => {
+    if (selectedIds.size === paged.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(paged.map(c => c.id)));
+  };
+
+  // ─── Inline Editing ───
+  const startEdit = (id: string, field: EditableField, currentValue: string | null) => {
+    setEditingCell({ id, field });
+    setEditValue(currentValue || '');
+  };
+  const cancelEdit = () => { setEditingCell(null); setEditValue(''); };
+  const saveEdit = async () => {
+    if (!editingCell) return;
+    setSaving(true);
+    try {
+      const sb = getSupabase();
+      await sb.from('contacts').update({ [editingCell.field]: editValue || null }).eq('id', editingCell.id);
+      // Update local state
+      const idx = contacts.findIndex(c => c.id === editingCell.id);
+      if (idx >= 0) contacts[idx] = { ...contacts[idx], [editingCell.field]: editValue || null } as Contact;
+    } catch (e) { console.error('Inline edit failed:', e); }
+    setSaving(false);
+    setEditingCell(null);
+  };
+
+  // ─── Bulk Operations ───
+  const bulkDelete = async () => {
+    if (!confirm(`Delete ${selectedIds.size} contacts? This cannot be undone.`)) return;
+    setSaving(true);
+    try {
+      const sb = getSupabase();
+      await sb.from('contacts').delete().in('id', Array.from(selectedIds));
+      setSelectedIds(new Set());
+      window.location.reload();
+    } catch (e) { console.error('Bulk delete failed:', e); }
+    setSaving(false);
+  };
+
+  // ─── CSV Export ───
+  const exportCSV = () => {
+    const data = (selectedIds.size > 0 ? filtered.filter(c => selectedIds.has(c.id)) : filtered).map(c => ({
+      Name: c.name, Title: c.current_title, Company: c.company?.name || '', Location: c.location,
+      Country: c.country, Seniority: c.seniority, Score: c.trident_composite, Tier: getTier(c.trident_composite, !!c.cxo_stamp),
+      Email: c.email, LinkedIn: c.linkedin_url, Source: c.source,
+    }));
+    const csv = Papa.unparse(data);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `candidates_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  };
+
+  const handleSort = (field: SortField) => {
     if (sortField === field) setSortAsc(!sortAsc);
     else { setSortField(field); setSortAsc(false); }
-  };
-
-  const toggleSeniority = (val: string) => {
-    setSeniorityFilter(prev => prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]);
-    setPage(0);
-  };
-
-  const getScoreColor = (score: number | null) => {
-    if (score === null) return '#A3A3A3';
-    if (score >= 75) return '#1A7D42';
-    if (score >= 50) return '#2C5282';
-    return '#A3A3A3';
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-end justify-between flex-wrap gap-4">
+      <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-[#171717] tracking-tight">Talent Pool</h1>
-          <p className="text-sm text-[#737373] mt-1">{count.toLocaleString()} contacts{filtered.length !== count ? ` · ${filtered.length} shown` : ''}</p>
+          <h1 className="text-2xl font-serif font-bold text-[#171717]">Candidates</h1>
+          <p className="text-sm text-[#737373] mt-1">{count.toLocaleString()} contacts in database</p>
         </div>
-        <button
-          onClick={() => setShowImportModal(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#C108AB] text-white text-sm font-medium hover:bg-[#A50798] transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
-        >
-          <Upload className="w-4 h-4" />
-          Import from LinkedIn
-        </button>
-      </div>
-
-      {/* Search + Filters */}
-      <div
-        className="bg-white p-5 space-y-4"
-        style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
-      >
-        <div className="flex flex-wrap gap-3">
-          <div className="relative flex-1 min-w-[240px]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3]" />
-            <input
-              placeholder="Search by name, title, headline, skills..."
-              value={search}
-              onChange={e => { setSearch(e.target.value); setPage(0); }}
-              className="w-full pl-11 pr-4 py-2.5 bg-[#FAFAFA] border border-[#E5E5E5] text-sm text-[#171717] placeholder:text-[#A3A3A3] focus:outline-none focus:border-[#C108AB]/40 focus:shadow-[0_0_0_3px_rgba(193,8,171,0.06)] transition-all duration-200"
-            />
-          </div>
-          <select
-            value={countryFilter}
-            onChange={e => { setCountryFilter(e.target.value); setPage(0); }}
-            className="px-4 py-2.5 bg-[#FAFAFA] border border-[#E5E5E5] text-sm text-[#171717] focus:outline-none focus:border-[#C108AB]/40 min-w-[140px] transition-all duration-200"
-          >
-            <option value="">All Countries</option>
-            {countries.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-          <select
-            value={tierFilter}
-            onChange={e => { setTierFilter(e.target.value); setPage(0); }}
-            className="px-4 py-2.5 bg-[#FAFAFA] border border-[#E5E5E5] text-sm text-[#171717] focus:outline-none focus:border-[#C108AB]/40 min-w-[120px] transition-all duration-200"
-          >
-            <option value="">All Tiers</option>
-            <option value="S">S — C-Suite Elite</option>
-            <option value="A">A — Senior Leader</option>
-            <option value="B">B — Mid-Senior</option>
-            <option value="C">C — Emerging</option>
-          </select>
-        </div>
-
-        {/* Seniority chips */}
-        <div className="flex flex-wrap gap-2">
-          {SENIORITY_OPTIONS.map(s => (
-            <button
-              key={s.value}
-              onClick={() => toggleSeniority(s.value)}
-              className={`px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
-                seniorityFilter.includes(s.value)
-                  ? 'text-[#C108AB]'
-                  : 'text-[#737373] hover:text-[#171717]'
-              }`}
-              style={{
-                background: seniorityFilter.includes(s.value) ? 'rgba(193,8,171,0.06)' : '#F7F7F7',
-                border: seniorityFilter.includes(s.value) ? '1px solid rgba(193,8,171,0.2)' : '1px solid transparent',
-              }}
-            >
-              {s.label}
-            </button>
-          ))}
-          {(search || seniorityFilter.length || countryFilter || tierFilter) && (
-            <button
-              onClick={() => { setSearch(''); setSeniorityFilter([]); setCountryFilter(''); setTierFilter(''); setPage(0); }}
-              className="px-3 py-1.5 text-xs font-medium text-[#C108AB] hover:bg-[rgba(193,8,171,0.06)] transition-colors duration-200"
-            >
-              Clear all
-            </button>
-          )}
+        <div className="flex gap-2">
+          <button onClick={exportCSV} className="px-4 py-2.5 text-sm font-medium text-[#404040] bg-white border border-[#E5E5E5] hover:bg-[#F5F5F5] transition-all flex items-center gap-2">
+            <Download className="w-4 h-4" />{selectedIds.size > 0 ? `Export ${selectedIds.size}` : 'Export CSV'}
+          </button>
+          <button onClick={() => setShowImportModal(true)} className="px-4 py-2.5 text-sm font-medium text-[#404040] bg-white border border-[#E5E5E5] hover:bg-[#F5F5F5] transition-all flex items-center gap-2">
+            <Upload className="w-4 h-4" />Import
+          </button>
+          <button onClick={() => navigate('/app/candidates/new')} className="px-5 py-2.5 bg-[#C108AB] text-white text-sm font-medium hover:bg-[#A50798] transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md active:scale-[0.98]">
+            <Users className="w-4 h-4" />Add Candidate
+          </button>
         </div>
       </div>
 
-      {/* Table */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-[#C108AB]" />
-          <span className="ml-3 text-sm text-[#737373]">Loading talent pool...</span>
+      {/* Filters */}
+      <div className="flex gap-3 flex-wrap items-center">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3]" />
+          <input placeholder="Search name, title, company, skills..." value={search} onChange={e => setSearch(e.target.value)}
+            className="w-full pl-11 pr-4 py-2.5 bg-white border border-[#E5E5E5] text-sm text-[#171717] placeholder:text-[#A3A3A3] focus:outline-none focus:border-[#C108AB]/40 focus:shadow-[0_0_0_3px_rgba(193,8,171,0.06)] transition-all duration-200" />
         </div>
-      ) : paginated.length === 0 ? (
-        <div
-          className="bg-white p-16 text-center"
-          style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
-        >
-          <Users className="w-12 h-12 text-[#A3A3A3] mx-auto mb-3 opacity-50" />
-          <p className="text-[#737373]">No candidates match your filters</p>
+        <select value={countryFilter} onChange={e => setCountryFilter(e.target.value)}
+          className="bg-white border border-[#E5E5E5] text-sm text-[#171717] px-4 py-2.5 min-h-[44px] focus:outline-none focus:border-[#C108AB]/40 transition-all">
+          <option value="">All Countries</option>
+          {countries.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <select value={tierFilter} onChange={e => setTierFilter(e.target.value)}
+          className="bg-white border border-[#E5E5E5] text-sm text-[#171717] px-4 py-2.5 min-h-[44px] focus:outline-none focus:border-[#C108AB]/40 transition-all">
+          <option value="">All Tiers</option>
+          <option value="S">S — Elite</option>
+          <option value="A">A — Senior</option>
+          <option value="B">B — Mid-Level</option>
+          <option value="C">C — Emerging</option>
+        </select>
+        <div className="flex items-center gap-2 text-xs text-[#737373]">
+          <span>Score:</span>
+          <input type="number" min={0} max={100} value={scoreRange[0]} onChange={e => setScoreRange([+e.target.value, scoreRange[1]])}
+            className="w-14 px-2 py-1.5 border border-[#E5E5E5] text-sm text-center" />
+          <span>—</span>
+          <input type="number" min={0} max={100} value={scoreRange[1]} onChange={e => setScoreRange([scoreRange[0], +e.target.value])}
+            className="w-14 px-2 py-1.5 border border-[#E5E5E5] text-sm text-center" />
         </div>
-      ) : (
-        <div
-          className="bg-white overflow-hidden"
-          style={{ boxShadow: '0 1px 3px rgba(26,23,20,0.04), 0 1px 2px rgba(26,23,20,0.06)' }}
-        >
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[#F7F7F7]">
-                  <th onClick={() => toggleSort('name')} className="text-left px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
-                    <span className="flex items-center gap-1.5">Name <ArrowUpDown className="w-3 h-3" /></span>
-                  </th>
-                  <th className="text-left px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px]">Current Role</th>
-                  <th onClick={() => toggleSort('country')} className="text-left px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
-                    <span className="flex items-center gap-1.5">Location <ArrowUpDown className="w-3 h-3" /></span>
-                  </th>
-                  <th onClick={() => toggleSort('seniority')} className="text-left px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
-                    <span className="flex items-center gap-1.5">Seniority <ArrowUpDown className="w-3 h-3" /></span>
-                  </th>
-                  <th onClick={() => toggleSort('score')} className="text-center px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px] cursor-pointer hover:text-[#171717] select-none transition-colors">
-                    <span className="flex items-center justify-center gap-1.5">Score <ArrowUpDown className="w-3 h-3" /></span>
-                  </th>
-                  <th className="text-center px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px]">Tier</th>
-                  <th className="text-center px-6 py-4 text-[13px] font-bold text-[#737373] uppercase tracking-[1.5px]">Links</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginated.map(c => {
-                  const tier = getTier(c.trident_composite, !!c.cxo_stamp);
-                  const tierStyle = TIER_STYLES[tier];
-                  return (
-                    <tr
-                      key={c.id}
-                      className="border-b border-[#F7F7F7] transition-colors duration-150 cursor-pointer hover:bg-[#FAFAFA]"
-                      onClick={() => navigate(`/platform/candidates/${c.id}`)}
-                    >
-                      <td className="px-6 py-4">
-                        <div>
-                          <p className="font-semibold text-[#C108AB] hover:text-[#A50798] transition-colors">{c.name}</p>
-                          {c.headline && <p className="text-[13px] text-[#737373] truncate max-w-[220px] mt-0.5">{c.headline}</p>}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="text-[#171717] font-medium truncate max-w-[200px]">{c.current_title || '—'}</p>
-                        <p className="text-[13px] text-[#737373]">{c.company?.name || c.career_history?.[0]?.company || ''}</p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="flex items-center gap-1.5 text-[#737373] text-xs">
-                          <MapPin className="w-3 h-3" />
-                          {c.city ? `${c.city}, ${c.country}` : c.country || '—'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="text-xs text-[#404040] capitalize font-medium">{(c.seniority || '—').replace('_', ' ')}</span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span
-                          className="font-mono font-bold text-base"
-                          style={{ color: getScoreColor(c.trident_composite) }}
-                        >
-                          {c.trident_composite ?? '—'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span
-                          className="inline-block text-[14px] font-bold px-2.5 py-1 uppercase tracking-wide"
-                          style={{ background: tierStyle.bg, color: tierStyle.text }}
-                        >
-                          {tier} · {TIER_BADGES[tier]}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          {c.linkedin_url && (
-                            <a href={c.linkedin_url} target="_blank" rel="noopener noreferrer"
-                              className="p-1.5 hover:bg-[#F7F7F7] transition-colors" title="LinkedIn"
-                              onClick={(e) => e.stopPropagation()}>
-                              <Linkedin className="w-4 h-4 text-[#2C5282]" />
-                            </a>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+      </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t border-[#F7F7F7]">
-              <p className="text-xs text-[#737373]">
-                Showing {page * limit + 1}–{Math.min((page + 1) * limit, filtered.length)} of {filtered.length}
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPage(p => Math.max(0, p - 1))}
-                  disabled={page === 0}
-                  className="p-2 bg-[#F7F7F7] disabled:opacity-30 hover:bg-[#F7F7F7] transition-colors"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="text-xs text-[#737373] font-medium px-2">{page + 1} / {totalPages}</span>
-                <button
-                  onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-                  disabled={page >= totalPages - 1}
-                  className="p-2 bg-[#F7F7F7] disabled:opacity-30 hover:bg-[#F7F7F7] transition-colors"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
+      {/* Quick filter chips */}
+      <div className="flex gap-2 flex-wrap">
+        {[
+          { label: 'C-Suite Only', action: () => setSeniorityFilter(['c_suite', 'leadership']), active: seniorityFilter.includes('c_suite') },
+          { label: 'VP+', action: () => setSeniorityFilter(['vp']), active: seniorityFilter.includes('vp') },
+          { label: 'Score 80+', action: () => setScoreRange([80, 100]), active: scoreRange[0] === 80 },
+          { label: 'APAC', action: () => { setCountryFilter('China'); }, active: countryFilter === 'China' },
+          { label: 'Clear Filters', action: () => { setSearch(''); setSeniorityFilter([]); setCountryFilter(''); setTierFilter(''); setScoreRange([0,100]); }, active: false },
+        ].map(chip => (
+          <button key={chip.label} onClick={chip.action}
+            className={`px-3 py-1.5 text-xs font-medium border transition-all ${chip.active ? 'bg-[#C108AB]/10 border-[#C108AB]/30 text-[#C108AB]' : 'bg-white border-[#E5E5E5] text-[#737373] hover:border-[#C108AB]/30 hover:text-[#C108AB]'}`}>
+            {chip.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Bulk Action Bar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 px-4 py-3 bg-[#C108AB]/5 border border-[#C108AB]/20">
+          <span className="text-sm font-medium text-[#C108AB]">{selectedIds.size} selected</span>
+          <div className="flex-1" />
+          <button onClick={exportCSV} className="px-3 py-1.5 text-xs font-medium bg-white border border-[#E5E5E5] hover:bg-[#F5F5F5] flex items-center gap-1.5">
+            <Download className="w-3.5 h-3.5" />Export Selected
+          </button>
+          <button onClick={bulkDelete} disabled={saving} className="px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 hover:bg-red-50 flex items-center gap-1.5">
+            <Trash2 className="w-3.5 h-3.5" />Delete
+          </button>
+          <button onClick={() => setSelectedIds(new Set())} className="px-3 py-1.5 text-xs font-medium text-[#737373] hover:text-[#171717]">
+            Clear
+          </button>
         </div>
       )}
 
-      <LinkedInImportModal
-        open={showImportModal}
-        onClose={() => setShowImportModal(false)}
-        onImported={() => {
-          setShowImportModal(false);
-        }}
-      />
+      {/* Table */}
+      <div className="border border-[#E5E5E5] bg-white overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-[#E5E5E5] bg-[#FAFAFA]">
+              <th className="w-10 px-3 py-3">
+                <button onClick={toggleSelectAll} className="text-[#A3A3A3] hover:text-[#171717]">
+                  {selectedIds.size === paged.length && paged.length > 0 ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                </button>
+              </th>
+              <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-[#171717]" onClick={() => handleSort('name')}>
+                <span className="flex items-center gap-1">Name <ArrowUpDown className="w-3 h-3" /></span>
+              </th>
+              <th className="text-left px-4 py-3 font-medium text-[#737373]">Title</th>
+              <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-[#171717]" onClick={() => handleSort('country')}>
+                <span className="flex items-center gap-1">Location <ArrowUpDown className="w-3 h-3" /></span>
+              </th>
+              <th className="text-left px-4 py-3 font-medium text-[#737373] cursor-pointer hover:text-[#171717]" onClick={() => handleSort('score')}>
+                <span className="flex items-center gap-1">Score <ArrowUpDown className="w-3 h-3" /></span>
+              </th>
+              <th className="text-left px-4 py-3 font-medium text-[#737373]">Tier</th>
+              <th className="text-left px-4 py-3 font-medium text-[#737373]">Seniority</th>
+              <th className="text-left px-4 py-3 font-medium text-[#737373]">Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan={8} className="px-4 py-16 text-center"><Loader2 className="w-6 h-6 animate-spin text-[#C108AB] mx-auto mb-3" /><span className="text-sm text-[#737373]">Loading candidates...</span></td></tr>
+            ) : paged.length === 0 ? (
+              <tr><td colSpan={8} className="px-4 py-16 text-center text-sm text-[#737373]">No candidates match your filters</td></tr>
+            ) : paged.map((c) => {
+              const tier = getTier(c.trident_composite, !!c.cxo_stamp);
+              const tierStyle = TIER_STYLES[tier];
+              return (
+                <tr key={c.id} className={`border-b border-[#F0F0F0] hover:bg-[#FAFAFA] transition-colors cursor-pointer ${selectedIds.has(c.id) ? 'bg-[#C108AB]/5' : ''}`}
+                  onClick={() => navigate(`/app/candidates/${c.id}`)}>
+                  <td className="px-3 py-3" onClick={e => e.stopPropagation()}>
+                    <button onClick={() => toggleSelect(c.id)} className="text-[#A3A3A3] hover:text-[#171717]">
+                      {selectedIds.has(c.id) ? <CheckSquare className="w-4 h-4 text-[#C108AB]" /> : <Square className="w-4 h-4" />}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="font-medium text-[#171717]">{c.name || '—'}</div>
+                    {c.linkedin_url && <a href={c.linkedin_url} target="_blank" className="text-[#0A66C2] hover:underline" onClick={e => e.stopPropagation()}><Linkedin className="w-3 h-3 inline" /></a>}
+                  </td>
+                  <td className="px-4 py-3">
+                    {editingCell?.id === c.id && editingCell.field === 'current_title' ? (
+                      <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                        <input value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus className="px-2 py-1 text-sm border border-[#C108AB] focus:outline-none w-full" onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
+                        <button onClick={saveEdit} className="text-green-600 hover:text-green-700"><Check className="w-4 h-4" /></button>
+                        <button onClick={cancelEdit} className="text-[#A3A3A3] hover:text-[#171717]"><X className="w-4 h-4" /></button>
+                      </div>
+                    ) : (
+                      <span className="text-[#404040] cursor-text" onDoubleClick={e => { e.stopPropagation(); startEdit(c.id, 'current_title', c.current_title); }}>
+                        {c.current_title || <span className="text-[#A3A3A3]">—</span>}
+                        <Edit3 className="w-3 h-3 inline ml-1 text-[#D4D4D4] opacity-0 group-hover:opacity-100" />
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {editingCell?.id === c.id && editingCell.field === 'location' ? (
+                      <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                        <input value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus className="px-2 py-1 text-sm border border-[#C108AB] focus:outline-none w-full" onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
+                        <button onClick={saveEdit} className="text-green-600"><Check className="w-4 h-4" /></button>
+                        <button onClick={cancelEdit} className="text-[#A3A3A3]"><X className="w-4 h-4" /></button>
+                      </div>
+                    ) : (
+                      <span className="text-[#404040] cursor-text flex items-center gap-1" onDoubleClick={e => { e.stopPropagation(); startEdit(c.id, 'location', c.location); }}>
+                        <MapPin className="w-3 h-3 text-[#A3A3A3]" />{c.location || <span className="text-[#A3A3A3]">—</span>}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-12 h-1.5 bg-[#E5E5E5] overflow-hidden">
+                        <div className="h-full" style={{ width: `${c.trident_composite ?? 0}%`, backgroundColor: (c.trident_composite ?? 0) >= 80 ? '#1A7D42' : (c.trident_composite ?? 0) >= 60 ? '#C108AB' : '#A3A3A3' }} />
+                      </div>
+                      <span className="text-[#404040] font-medium tabular-nums">{c.trident_composite ?? '—'}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: tierStyle.bg, color: tierStyle.text }}>
+                      {tier} · {TIER_BADGES[tier]}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-[#404040]">{c.seniority?.replace('_', ' ') || '—'}</td>
+                  <td className="px-4 py-3 text-[#737373] text-xs">{c.source || '—'}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-[#737373]">Page {page + 1} of {totalPages} ({filtered.length} results)</span>
+          <div className="flex gap-1">
+            <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="p-2 border border-[#E5E5E5] disabled:opacity-30 hover:bg-[#F5F5F5]"><ChevronLeft className="w-4 h-4" /></button>
+            <button onClick={() => setPage(Math.min(totalPages - 1, page + 1))} disabled={page >= totalPages - 1} className="p-2 border border-[#E5E5E5] disabled:opacity-30 hover:bg-[#F5F5F5]"><ChevronRight className="w-4 h-4" /></button>
+          </div>
+        </div>
+      )}
+
+      {showImportModal && <LinkedInImportModal onClose={() => setShowImportModal(false)} />}
     </div>
   );
 }

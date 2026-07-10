@@ -6,7 +6,8 @@ import React, { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { NexusCommandBar } from '@/components/nexus/NexusCommandBar';
-import { Bell, LogOut, Settings } from 'lucide-react';
+import { GlobalSearch } from '@/components/search/GlobalSearch';
+import { Bell, LogOut, Settings, Search } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 
 export function AppShell() {
@@ -14,6 +15,19 @@ export function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const [nexusOpen, setNexusOpen] = useState(false);
+  const [cmdKOpen, setCmdKOpen] = useState(false);
+
+  // Cmd+K global listener
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCmdKOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const initials = (profile?.full_name || user?.email || 'U')
@@ -52,6 +66,11 @@ export function AppShell() {
 
           {/* Right actions */}
           <div className="flex items-center gap-1">
+            <button onClick={() => setCmdKOpen(true)} className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#737373] bg-[#F5F5F5] border border-[#E5E5E5] hover:bg-[#EBEBEB] transition-colors" title="Search (Cmd+K)">
+              <Search className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Search</span>
+              <kbd className="text-[9px] text-[#A3A3A3] border border-[#D4D4D4] px-1 py-0.5 bg-white">⌘K</kbd>
+            </button>
             <button
               onClick={() => navigate('/app/notifications')}
               className="relative flex items-center justify-center w-8 h-8 text-[#737373] hover:text-[#171717] transition-colors"
@@ -103,6 +122,7 @@ export function AppShell() {
       </div>
 
       <NexusCommandBar isOpen={nexusOpen} onToggle={() => setNexusOpen(!nexusOpen)} />
+      <GlobalSearch isOpen={cmdKOpen} onClose={() => setCmdKOpen(false)} />
     </div>
   );
 }

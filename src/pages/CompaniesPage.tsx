@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Building2, Globe, Loader2, Users, ExternalLink, TrendingUp, Filter } from 'lucide-react';
+import { Search, Building2, Globe, Loader2, Users, ExternalLink, TrendingUp, Filter, Download } from 'lucide-react';
 import { useCompanies } from '@/hooks/useSupabaseData';
+import Papa from 'papaparse';
 import { Card, CardContent, Badge } from '@/components/ui';
 
 const INDUSTRY_OPTIONS = [
@@ -47,6 +48,9 @@ export function CompaniesPage() {
           <h1 className="text-2xl font-serif font-bold text-text-primary">Target Companies</h1>
           <p className="text-text-muted">{count.toLocaleString()} companies in database</p>
         </div>
+        <button onClick={exportCSV} className="px-4 py-2.5 text-sm font-medium text-[#404040] bg-white border border-[#E5E5E5] hover:bg-[#F5F5F5] transition-all flex items-center gap-2">
+          <Download className="w-4 h-4" />Export CSV
+        </button>
       </div>
 
       {/* Filters */}

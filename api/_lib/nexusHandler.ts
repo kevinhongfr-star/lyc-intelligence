@@ -9,6 +9,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as db from './supabaseRest.js';
 import { handleNexusChat } from './nexusChatHandler.js';
+import { nexusConfigHandler } from './nexusConfigHandler.js';
 
 export async function handler(req: VercelRequest, res: VercelResponse) {
   const pathArr = (req.query.path as string[]) || [];
@@ -19,6 +20,11 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
     // ── Nexus Chat (POST only) ──
     if (resource === 'chat' && method === 'POST') {
       return handleNexusChat(req, res);
+    }
+
+    // ── Nexus Config (GET/POST) ──
+    if (resource === 'config') {
+      return nexusConfigHandler(req, res);
     }
 
     // ── NEXUS Commands (POST only) ──

@@ -25,6 +25,31 @@ const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_BASE_URL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1';
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
 
+// ── Runtime Config Fetcher ──
+async function getRuntimeConfig(): Promise<{ temperature: number; max_tokens: number; model: string }> {
+  try {
+    const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
+    const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+    if (!SUPABASE_URL || !SUPABASE_KEY) return { temperature: 0.7, max_tokens: 500, model: DEEPSEEK_MODEL };
+    
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/platform_settings?key=eq.nexus_persona_config&select=value`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+    });
+    if (!resp.ok) return { temperature: 0.7, max_tokens: 500, model: DEEPSEEK_MODEL };
+    const rows = await resp.json();
+    if (!rows || rows.length === 0 || !rows[0].value) return { temperature: 0.7, max_tokens: 500, model: DEEPSEEK_MODEL };
+    const cfg = rows[0].value;
+    return {
+      temperature: Number(cfg.temperature) || 0.7,
+      max_tokens: Number(cfg.max_tokens) || 500,
+      model: cfg.model || DEEPSEEK_MODEL,
+    };
+  } catch {
+    return { temperature: 0.7, max_tokens: 500, model: DEEPSEEK_MODEL };
+  }
+}
+
+
 // ── Rate limiter (in-memory, per-instance) ──
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
@@ -188,11 +213,11 @@ async function callDeepSeekStreaming(
         'Accept': 'text/event-stream',
       },
       body: JSON.stringify({
-        model: DEEPSEEK_MODEL,
+        model: runtimeConfig.model,
         messages,
         stream: true,
-        temperature: options.temperature ?? 0.7,
-        max_tokens: options.maxTokens ?? 500,
+        temperature: options.temperature ?? runtimeConfig.temperature,
+        max_tokens: options.maxTokens ?? runtimeConfig.max_tokens,
       }),
     });
 
@@ -265,11 +290,11 @@ async function callDeepSeekNonStreaming(
         'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: DEEPSEEK_MODEL,
+        model: runtimeConfig.model,
         messages,
         stream: false,
-        temperature: options.temperature ?? 0.7,
-        max_tokens: options.maxTokens ?? 1000,
+        temperature: options.temperature ?? runtimeConfig.temperature,
+        max_tokens: options.maxTokens ?? runtimeConfig.max_tokens * 2,
       }),
     });
 
@@ -291,6 +316,7 @@ async function callDeepSeekNonStreaming(
 
 // ── Main Handler ──
 export async function handleNexusChat(req: VercelRequest, res: VercelResponse) {
+  const runtimeConfig = await getRuntimeConfig();
   const ip = getClientIp(req);
   
   if (!checkRateLimit(ip, 30, 60 * 1000)) {
