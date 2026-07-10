@@ -122,7 +122,7 @@ export function AppShell() {
       )}
 
       {/* Main content area */}
-      <main className="px-6 pb-24 pt-4">
+      <main className="px-4 md:px-6 pb-24 pt-4">
         <Outlet />
       </main>
 

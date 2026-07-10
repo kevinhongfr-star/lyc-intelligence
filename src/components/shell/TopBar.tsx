@@ -43,7 +43,7 @@ export function TopBar() {
   const unreadCount = notifications.length;
 
   return (
-    <header className="sticky top-0 z-sticky bg-white border-b border-border px-6 py-3">
+    <header className="sticky top-0 z-sticky bg-white border-b border-border px-4 md:px-6 py-3">
       <div className="flex items-center justify-between">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-2 group">
