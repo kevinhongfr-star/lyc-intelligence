@@ -1,114 +1,106 @@
 /**
- * AppShell — Main layout wrapper
- * Single header bar (TopBar) + sub-tab navigation
- * CSS-only transitions, no framer-motion overhead
+ * AppShell — Sidebar layout (Notion/Vercel-style)
+ * Left sidebar navigation + main content area
  */
 import React, { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { TopBar, Surface } from './TopBar';
-import { SubTabs } from './SubTabs';
+import { Sidebar } from './Sidebar';
 import { NexusCommandBar } from '@/components/nexus/NexusCommandBar';
-
-// Surface definitions with their sub-tabs
-const SURFACES: Record<Surface, { tabs: { path: string; label: string }[] }> = {
-  internal: {
-    tabs: [
-      { path: '/app/dashboard', label: 'Dashboard' },
-      { path: '/app/pipeline', label: 'Pipeline' },
-      { path: '/app/mandates', label: 'Mandates' },
-      { path: '/app/candidates', label: 'Candidates' },
-      { path: '/app/companies', label: 'Companies' },
-      { path: '/app/scheduler', label: 'Scheduler' },
-      { path: '/app/notifications', label: 'Notifications' },
-      { path: '/app/chat', label: 'NEXUS' },
-      { path: '/app/org-intel', label: 'Org Intelligence' },
-      { path: '/app/analytics', label: 'Analytics' },
-      { path: '/app/tasks', label: 'Tasks' },
-      { path: '/app/compliance', label: 'Compliance' },
-      { path: '/app/platform-settings', label: 'Settings' },
-    ],
-  },
-  client: {
-    tabs: [
-      { path: '/client/overview', label: 'Overview' },
-      { path: '/client/pipeline-analytics', label: 'Pipeline Analytics' },
-      { path: '/client/talent-intel', label: 'Talent Intelligence' },
-      { path: '/client/mandates', label: 'Mandates & Pipeline' },
-      { path: '/client/candidates', label: 'Candidates' },
-      { path: '/client/nexus-assistant', label: 'NEXUS Assistant' },
-      { path: '/client/documents', label: 'Documents & Billing' },
-      { path: '/client/collaboration', label: 'Collaboration' },
-      { path: '/client/onboarding', label: 'Onboarding' },
-      { path: '/client/admin', label: 'Admin & Security' },
-    ],
-  },
-  coaching: {
-    tabs: [
-      { path: '/coaching/coach', label: 'Coach' },
-      { path: '/coaching/credits', label: 'Credits & Plans' },
-      { path: '/coaching/intelligence', label: 'Intelligence' },
-      { path: '/coaching/career-intel', label: 'Career Intelligence' },
-      { path: '/coaching/profile', label: 'Profile & Settings' },
-      { path: '/coaching/chat-features', label: 'Chat Features' },
-      { path: '/coaching/career-services', label: 'Career Services' },
-      { path: '/coaching/engagement', label: 'Engagement' },
-      { path: '/coaching/growth', label: 'Growth' },
-    ],
-  },
-  candidate: {
-    tabs: [
-      { path: '/candidate/dashboard', label: 'Dashboard' },
-      { path: '/candidate/applications', label: 'Applications' },
-      { path: '/candidate/offers', label: 'Offers & Decisions' },
-      { path: '/candidate/opportunities', label: 'My Opportunities' },
-      { path: '/candidate/interview-prep', label: 'Interview Prep' },
-      { path: '/candidate/assessments', label: 'Assessments' },
-      { path: '/candidate/career-dev', label: 'Career Development' },
-      { path: '/candidate/community', label: 'Community' },
-      { path: '/candidate/nexus-coach', label: 'NEXUS Coach' },
-      { path: '/candidate/profile', label: 'Profile & Settings' },
-    ],
-  },
-};
-
-function getSurfaceFromPath(path: string): Surface {
-  if (path.startsWith('/app') || path.startsWith('/platform')) return 'internal';
-  if (path.startsWith('/client')) return 'client';
-  if (path.startsWith('/coaching')) return 'coaching';
-  if (path.startsWith('/candidate')) return 'candidate';
-  return 'internal';
-}
+import { Bell, LogOut, Settings } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
 
 export function AppShell() {
-  const location = useLocation();
+  const { user, profile, logout } = useAuthStore();
   const navigate = useNavigate();
-  const [activeSurface, setActiveSurface] = useState<Surface>(() => getSurfaceFromPath(location.pathname));
+  const location = useLocation();
   const [nexusOpen, setNexusOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  const surfaceConfig = SURFACES[activeSurface];
-  const currentTabs = surfaceConfig?.tabs || [];
-  const activeTab = currentTabs.find(tab => location.pathname === tab.path || location.pathname.startsWith(tab.path + '/'))?.path || currentTabs[0]?.path;
+  const initials = (profile?.full_name || user?.email || 'U')
+    .split(' ')
+    .map((s) => s[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
-  const handleSurfaceChange = (surface: Surface) => {
-    setActiveSurface(surface);
-    const firstTab = SURFACES[surface]?.tabs[0]?.path;
-    if (firstTab) navigate(firstTab);
+  // Get page title from current path
+  const getPageTitle = () => {
+    const path = location.pathname;
+    const segments = path.split('/').filter(Boolean);
+    if (segments.length <= 1) return '';
+    return segments.slice(1).join(' / ')
+      .split('-')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
   };
 
   return (
     <div className="min-h-screen bg-white font-sans">
-      {/* Single unified header */}
-      <TopBar activeSurface={activeSurface} onSurfaceChange={handleSurfaceChange} />
+      {/* Left Sidebar */}
+      <Sidebar />
 
-      {/* Sub-navigation for current surface */}
-      {currentTabs.length > 0 && (
-        <SubTabs tabs={currentTabs} active={activeTab} onTabClick={(path) => navigate(path)} />
-      )}
+      {/* Main content area — offset by sidebar width */}
+      <div className="ml-60">
+        {/* Top bar — minimal, just breadcrumb + user actions */}
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-sm border-b border-[#E5E5E5] h-12 flex items-center px-6 gap-3">
+          {/* Breadcrumb / page title */}
+          <div className="text-sm text-[#737373] font-medium">
+            {getPageTitle()}
+          </div>
 
-      {/* Main content — CSS fade-in only, no framer-motion */}
-      <main className="px-6 md:px-10 pb-24 pt-6 max-w-[1440px] mx-auto animate-fadeIn">
-        <Outlet />
-      </main>
+          <div className="flex-1" />
+
+          {/* Right actions */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => navigate('/app/notifications')}
+              className="relative flex items-center justify-center w-8 h-8 text-[#737373] hover:text-[#171717] transition-colors"
+            >
+              <Bell className="w-4 h-4" />
+            </button>
+
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                onBlur={() => setTimeout(() => setUserMenuOpen(false), 150)}
+                className="flex items-center gap-2 px-2 py-1.5 hover:bg-[#F5F5F5] transition-colors"
+              >
+                <div className="w-6 h-6 flex items-center justify-center text-[10px] font-semibold text-[#404040] bg-[#F0F0F0] border border-[#E5E5E5]">
+                  {initials}
+                </div>
+              </button>
+
+              {userMenuOpen && (
+                <div className="absolute right-0 top-9 w-48 bg-white border border-[#E5E5E5] overflow-hidden z-50 shadow-lg">
+                  <div className="px-3 py-2.5 border-b border-[#E5E5E5]">
+                    <div className="text-sm font-medium text-[#171717]">{profile?.full_name || 'User'}</div>
+                    <div className="text-xs text-[#737373] mt-0.5">{user?.email}</div>
+                  </div>
+                  <div className="py-1">
+                    <button
+                      onClick={() => { navigate('/app/platform-settings'); setUserMenuOpen(false); }}
+                      className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-[#404040] hover:bg-[#F5F5F5]"
+                    >
+                      <Settings className="w-3.5 h-3.5" /> Settings
+                    </button>
+                    <button
+                      onClick={() => logout()}
+                      className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-[#404040] hover:bg-[#F5F5F5]"
+                    >
+                      <LogOut className="w-3.5 h-3.5" /> Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="px-6 md:px-8 pb-24 pt-6 max-w-[1280px] animate-fadeIn">
+          <Outlet />
+        </main>
+      </div>
 
       <NexusCommandBar isOpen={nexusOpen} onToggle={() => setNexusOpen(!nexusOpen)} />
     </div>
