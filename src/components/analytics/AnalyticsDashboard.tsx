@@ -391,21 +391,21 @@ export function AnalyticsDashboard() {
             <div className="text-2xl font-bold text-text-primary">
               {Math.round(qualityMetrics.across_mandates.avg_contact_to_response * 100)}%
             </div>
-            <div className="text-xs text-text-muted">Target: >40%</div>
+            <div className="text-xs text-text-muted">Target: {'\u003E'}40%</div>
           </Card>
           <Card className="p-4">
             <div className="text-sm text-text-muted">Response → Interest</div>
             <div className="text-2xl font-bold text-text-primary">
               {Math.round(qualityMetrics.across_mandates.avg_response_to_interest * 100)}%
             </div>
-            <div className="text-xs text-text-muted">Target: >30%</div>
+            <div className="text-xs text-text-muted">Target: {'\u003E'}30%</div>
           </Card>
           <Card className="p-4">
             <div className="text-sm text-text-muted">Close Rate</div>
             <div className="text-2xl font-bold text-text-primary">
               {Math.round(qualityMetrics.across_mandates.avg_close_rate * 100)}%
             </div>
-            <div className="text-xs text-text-muted">Target: >60%</div>
+            <div className="text-xs text-text-muted">Target: {'\u003E'}60%</div>
           </Card>
         </div>
 

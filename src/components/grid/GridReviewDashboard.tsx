@@ -448,7 +448,7 @@ export function GridReviewDashboard() {
                 <Clock className="w-5 h-5 text-yellow-500" />
               </div>
               <div>
-                <div className="text-sm text-text-muted">S3 >5 days</div>
+                <div className="text-sm text-text-muted">S3 {'\u003E'}5 days</div>
                 <div className="text-xl font-bold text-yellow-500">
                   {qualityMetrics.metrics.stale_candidates.s3_over_5_days}
                 </div>
@@ -460,7 +460,7 @@ export function GridReviewDashboard() {
                 <AlertCircle className="w-5 h-5 text-red-500" />
               </div>
               <div>
-                <div className="text-sm text-text-muted">S7 >10 days</div>
+                <div className="text-sm text-text-muted">S7 {'\u003E'}10 days</div>
                 <div className="text-xl font-bold text-red-500">
                   {qualityMetrics.metrics.stale_candidates.s7_over_10_days}
                 </div>
