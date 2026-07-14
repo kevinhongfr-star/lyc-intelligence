@@ -1,9 +1,4 @@
-// Phase 7.3: Notification Bell Component
-// In-app bell icon with dropdown
-
-'use client';
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Bell,
   BellDot,
@@ -11,99 +6,88 @@ import {
   ChevronRight,
   Check,
   X,
+  Settings,
+  ChevronDown,
+  Trash2,
 } from 'lucide-react';
 import { Badge } from '@/components/ui';
-
-interface Notification {
-  id: string;
-  type: string;
-  title: string;
-  message: string | null;
-  link: string | null;
-  read: boolean;
-  createdAt: string;
-}
+import {
+  Notification,
+  NotificationType,
+  NOTIFICATION_TYPES,
+  NOTIFICATION_CATEGORIES,
+  formatRelativeTime,
+  getNotificationTypeConfig,
+} from '@/services/notifications/notificationService';
 
 interface NotificationBellProps {
   userId: string;
-  /**
-   * Callback when notification is clicked
-   */
   onNotificationClick?: (notification: Notification) => void;
-  /**
-   * Callback to navigate to notifications page
-   */
   onViewAll?: () => void;
+  onSettingsClick?: () => void;
+  notifications?: Notification[];
+  unreadCount?: number;
+  onMarkAsRead?: (id: string) => void;
+  onMarkAllRead?: () => void;
+  onDelete?: (id: string) => void;
+  isLoading?: boolean;
 }
 
-const NOTIFICATION_TYPE_COLORS: Record<string, string> = {
-  feedback_received: 'bg-green-100 text-green-700',
-  candidate_advanced: 'bg-blue-100 text-blue-700',
-  interview_scheduled: 'bg-purple-100 text-purple-700',
-  new_candidate_added: 'bg-teal-100 text-teal-700',
-  report_ready: 'bg-orange-100 text-orange-700',
-  reference_submitted: 'bg-pink-100 text-pink-700',
-  offer_status_changed: 'bg-red-100 text-red-700',
-  milestone_at_risk: 'bg-amber-100 text-amber-700',
-  message_received: 'bg-indigo-100 text-indigo-700',
+const TYPE_COLORS: Record<string, string> = {
+  candidate: 'bg-green-100 text-green-700',
+  pipeline: 'bg-blue-100 text-blue-700',
+  interview: 'bg-purple-100 text-purple-700',
+  reports: 'bg-orange-100 text-orange-700',
+  offer: 'bg-emerald-100 text-emerald-700',
+  sla: 'bg-red-100 text-red-700',
+  communication: 'bg-indigo-100 text-indigo-700',
+  social: 'bg-pink-100 text-pink-700',
+  workflow: 'bg-amber-100 text-amber-700',
+  system: 'bg-gray-100 text-gray-700',
+  billing: 'bg-rose-100 text-rose-700',
+  events: 'bg-violet-100 text-violet-700',
+  coaching: 'bg-teal-100 text-teal-700',
+  intelligence: 'bg-cyan-100 text-cyan-700',
+  ai: 'bg-fuchsia-100 text-fuchsia-700',
 };
 
-const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
-  feedback_received: 'Feedback',
-  candidate_advanced: 'Candidate',
-  interview_scheduled: 'Interview',
-  new_candidate_added: 'New Candidate',
-  report_ready: 'Report',
-  reference_submitted: 'Reference',
-  offer_status_changed: 'Offer',
-  milestone_at_risk: 'Milestone',
-  message_received: 'Message',
-};
-
-export function NotificationBell({ userId, onNotificationClick, onViewAll }: NotificationBellProps) {
+export function NotificationBell({
+  userId,
+  onNotificationClick,
+  onViewAll,
+  onSettingsClick,
+  notifications: externalNotifications,
+  unreadCount: externalUnreadCount,
+  onMarkAsRead,
+  onMarkAllRead,
+  onDelete,
+  isLoading = false,
+}: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'unread'>('all');
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch notifications
-  useEffect(() => {
-    async function fetchNotifications() {
-      if (!isOpen || !userId) return;
+  const notifications = externalNotifications || [];
+  const unreadCount = externalUnreadCount ?? notifications.filter(n => !n.read).length;
 
-      setIsLoading(true);
-
-      try {
-        const response = await fetch(`/api/data/notifications?user_id=${userId}&limit=10`);
-        const result = await response.json();
-
-        if (result.success) {
-          setNotifications(result.data);
-          setUnreadCount(result.data.filter((n: Notification) => !n.read).length);
-        }
-      } catch (err) {
-        console.error('Failed to fetch notifications:', err);
-      } finally {
-        setIsLoading(false);
-      }
+  const filteredNotifications = notifications.filter(n => {
+    if (activeFilter === 'unread' && n.read) return false;
+    if (activeCategory) {
+      const config = getNotificationTypeConfig(n.type);
+      if (config?.category !== activeCategory) return false;
     }
+    return true;
+  });
 
-    fetchNotifications();
-  }, [isOpen, userId]);
+  const handleMarkAsRead = useCallback((id: string) => {
+    onMarkAsRead?.(id);
+  }, [onMarkAsRead]);
 
-  // Mark as read handler
-  const handleMarkAsRead = async (notificationId: string) => {
-    await fetch(`/api/data/notifications/${notificationId}/read`, {
-      method: 'POST',
-    });
+  const handleMarkAllRead = useCallback(() => {
+    onMarkAllRead?.();
+  }, [onMarkAllRead]);
 
-    setNotifications(notifications.map(n =>
-      n.id === notificationId ? { ...n, read: true } : n
-    ));
-    setUnreadCount(Math.max(0, unreadCount - 1));
-  };
-
-  // Handle notification click
   const handleClick = (notification: Notification) => {
     if (!notification.read) {
       handleMarkAsRead(notification.id);
@@ -112,34 +96,22 @@ export function NotificationBell({ userId, onNotificationClick, onViewAll }: Not
     setIsOpen(false);
   };
 
-  // Format time
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const getTypeColor = (type: NotificationType) => {
+    const config = getNotificationTypeConfig(type);
+    return TYPE_COLORS[config?.category || 'system'] || 'bg-gray-100 text-gray-700';
   };
 
-  // Get type config
-  const getTypeConfig = (type: string) => ({
-    color: NOTIFICATION_TYPE_COLORS[type] || 'bg-gray-100 text-gray-700',
-    label: NOTIFICATION_TYPE_LABELS[type] || type.replace('_', ' '),
-  });
+  const getTypeLabel = (type: NotificationType) => {
+    const config = getNotificationTypeConfig(type);
+    return config?.label || type;
+  };
 
   return (
     <div className="relative">
-      {/* Bell Icon */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 hover:bg-bg-alt rounded-full transition-colors"
+        aria-label="Notifications"
       >
         {unreadCount > 0 ? (
           <BellDot className="w-5 h-5 text-text-muted" />
@@ -156,102 +128,203 @@ export function NotificationBell({ userId, onNotificationClick, onViewAll }: Not
         )}
       </button>
 
-      {/* Dropdown */}
       {isOpen && (
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Content */}
-          <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-none shadow-xl z-50 overflow-hidden">
-            {/* Header */}
+          <div className="absolute right-0 top-full mt-2 w-96 bg-card border border-border rounded-none shadow-xl z-50 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <h3 className="font-medium text-text-primary">Notifications</h3>
+              <div className="flex items-center gap-1">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="p-1.5 hover:bg-bg-alt rounded transition-colors text-text-muted hover:text-text-primary"
+                    title="Mark all as read"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                )}
+                {onSettingsClick && (
+                  <button
+                    onClick={() => {
+                      onSettingsClick();
+                      setIsOpen(false);
+                    }}
+                    className="p-1.5 hover:bg-bg-alt rounded transition-colors text-text-muted hover:text-text-primary"
+                    title="Notification settings"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-1.5 hover:bg-bg-alt rounded transition-colors text-text-muted hover:text-text-primary"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 px-4 py-2 border-b border-border overflow-x-auto">
               <button
-                onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-bg-alt rounded transition-colors"
+                onClick={() => setActiveFilter('all')}
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                  activeFilter === 'all'
+                    ? 'bg-primary text-white'
+                    : 'bg-bg-alt text-text-secondary hover:bg-bg-alt/80'
+                }`}
               >
-                <X className="w-4 h-4 text-text-muted" />
+                All
+              </button>
+              <button
+                onClick={() => setActiveFilter('unread')}
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                  activeFilter === 'unread'
+                    ? 'bg-primary text-white'
+                    : 'bg-bg-alt text-text-secondary hover:bg-bg-alt/80'
+                }`}
+              >
+                Unread
+              </button>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors flex items-center gap-1 ${
+                  activeCategory
+                    ? 'bg-primary text-white'
+                    : 'bg-bg-alt text-text-secondary hover:bg-bg-alt/80'
+                }`}
+              >
+                Filter
+                <ChevronDown className={`w-3 h-3 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
               </button>
             </div>
 
-            {/* Content */}
+            {showFilters && (
+              <div className="px-4 py-2 border-b border-border bg-bg-alt/30">
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    onClick={() => setActiveCategory(null)}
+                    className={`px-2 py-0.5 text-xs rounded-full transition-colors ${
+                      activeCategory === null
+                        ? 'bg-primary text-white'
+                        : 'bg-white text-text-secondary hover:bg-bg-alt border border-border'
+                    }`}
+                  >
+                    All types
+                  </button>
+                  {NOTIFICATION_CATEGORIES.map(cat => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setActiveCategory(cat.id)}
+                      className={`px-2 py-0.5 text-xs rounded-full transition-colors ${
+                        activeCategory === cat.id
+                          ? 'bg-primary text-white'
+                          : 'bg-white text-text-secondary hover:bg-bg-alt border border-border'
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="max-h-96 overflow-y-auto">
               {isLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <Clock className="w-5 h-5 text-text-muted animate-spin" />
                 </div>
-              ) : notifications.length === 0 ? (
+              ) : filteredNotifications.length === 0 ? (
                 <div className="text-center py-8">
-                  <Bell className="w-10 h-10 text-text-muted mx-auto" />
-                  <p className="text-text-muted mt-2">No notifications</p>
+                  <Bell className="w-10 h-10 text-text-muted mx-auto mb-2" />
+                  <p className="text-text-muted text-sm">
+                    {activeFilter === 'unread'
+                      ? 'No unread notifications'
+                      : activeCategory
+                      ? `No ${NOTIFICATION_CATEGORIES.find(c => c.id === activeCategory)?.label.toLowerCase()} notifications`
+                      : 'No notifications yet'}
+                  </p>
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {notifications.map(notification => {
-                    const typeConfig = getTypeConfig(notification.type);
+                  {filteredNotifications.slice(0, 20).map(notification => (
+                    <div
+                      key={notification.id}
+                      className={`group px-4 py-3 hover:bg-bg-alt transition-colors cursor-pointer ${
+                        !notification.read ? 'bg-primary/5' : ''
+                      }`}
+                      onClick={() => handleClick(notification)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide ${getTypeColor(notification.type)} flex-shrink-0 mt-0.5`}>
+                          {getTypeLabel(notification.type)}
+                        </span>
 
-                    return (
-                      <button
-                        key={notification.id}
-                        onClick={() => handleClick(notification)}
-                        className={`w-full px-4 py-3 text-left hover:bg-bg-alt transition-colors ${
-                          !notification.read ? 'bg-primary/5' : ''
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          {/* Type indicator */}
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${typeConfig.color} flex-shrink-0 mt-0.5`}>
-                            {typeConfig.label}
-                          </span>
-
-                          {/* Content */}
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-medium ${
-                              notification.read ? 'text-text-secondary' : 'text-text-primary'
-                            }`}>
-                              {notification.title}
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-medium ${
+                            notification.read ? 'text-text-secondary' : 'text-text-primary'
+                          }`}>
+                            {notification.title}
+                          </p>
+                          {notification.message && (
+                            <p className="text-xs text-text-muted mt-0.5 line-clamp-2">
+                              {notification.message}
                             </p>
-                            {notification.message && (
-                              <p className="text-xs text-text-muted mt-0.5 line-clamp-2">
-                                {notification.message}
-                              </p>
-                            )}
-                            <p className="text-xs text-text-muted mt-1">
-                              {formatTime(notification.createdAt)}
-                            </p>
-                          </div>
-
-                          {/* Chevron + Read indicator */}
-                          <div className="flex items-center gap-1">
-                            {!notification.read && (
-                              <div className="w-2 h-2 rounded-full bg-primary" />
-                            )}
-                            <ChevronRight className="w-4 h-4 text-text-muted" />
-                          </div>
+                          )}
+                          <p className="text-[11px] text-text-muted mt-1">
+                            {formatRelativeTime(notification.createdAt)}
+                          </p>
                         </div>
-                      </button>
-                    );
-                  })}
+
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {!notification.read && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMarkAsRead(notification.id);
+                              }}
+                              className="p-1 hover:bg-white rounded text-text-muted hover:text-text-primary"
+                              title="Mark as read"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          {onDelete && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDelete(notification.id);
+                              }}
+                              className="p-1 hover:bg-white rounded text-text-muted hover:text-error"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Footer */}
             {notifications.length > 0 && (
-              <div className="px-4 py-3 border-t border-border">
+              <div className="px-4 py-3 border-t border-border flex items-center justify-between">
                 <button
                   onClick={() => {
                     onViewAll?.();
                     setIsOpen(false);
                   }}
-                  className="w-full text-sm text-primary hover:text-primary/80 transition-colors"
+                  className="text-sm text-primary hover:text-primary/80 font-medium"
                 >
                   View All Notifications
                 </button>
+                <ChevronRight className="w-4 h-4 text-text-muted" />
               </div>
             )}
           </div>

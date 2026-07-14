@@ -1,5 +1,5 @@
-// Phase 7.3: Notification Service
-// Centralized notification system
+// v2.0: Notification Service
+// Centralized notification system with quiet hours, digest mode, realtime, web push
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -16,9 +16,23 @@ export type NotificationType =
   | 'reference_submitted'
   | 'offer_status_changed'
   | 'milestone_at_risk'
-  | 'message_received';
+  | 'message_received'
+  | 'mention'
+  | 'assignment'
+  | 'status_change'
+  | 'reminder'
+  | 'system'
+  | 'billing'
+  | 'event'
+  | 'coaching'
+  | 'intelligence'
+  | 'ai_insight'
+  | 'deadline'
+  | 'approval';
 
-export type DeliveryMethod = 'email' | 'in_app' | 'both' | 'none';
+export type NotificationChannel = 'in_app' | 'email' | 'push' | 'sms';
+
+export type DigestMode = 'instant' | 'digest_daily' | 'digest_weekly';
 
 export interface Notification {
   id: string;
@@ -26,29 +40,55 @@ export interface Notification {
   type: NotificationType;
   title: string;
   message: string | null;
-  link: string | null;
+  entityType: string | null;
+  entityId: string | null;
+  actionUrl: string | null;
   read: boolean;
+  readAt: string | null;
+  channels: string[];
   emailSent: boolean;
+  pushSent: boolean;
+  smsSent: boolean;
+  isDigest: boolean;
   createdAt: string;
+  metadata?: Record<string, any>;
 }
 
 export interface NotificationPreferences {
   userId: string;
-  feedbackReceived: DeliveryMethod;
-  candidateAdvanced: DeliveryMethod;
-  interviewScheduled: DeliveryMethod;
-  newCandidateAdded: DeliveryMethod;
-  reportReady: DeliveryMethod;
-  referenceSubmitted: DeliveryMethod;
-  offerStatusChanged: DeliveryMethod;
-  milestoneAtRisk: DeliveryMethod;
-  messageReceived: DeliveryMethod;
+  globalEmailEnabled: boolean;
+  globalPushEnabled: boolean;
+  globalSmsEnabled: boolean;
+  quietHoursEnabled: boolean;
+  quietHoursStart: string;
+  quietHoursEnd: string;
+  quietHoursTimezone: string;
+  digestMode: DigestMode;
+  digestDeliveryTime: string;
+  typeSettings: Partial<Record<NotificationType, {
+    in_app: boolean;
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  }>>;
 }
 
 export interface NotificationConfig {
   type: NotificationType;
   label: string;
-  defaultDelivery: DeliveryMethod;
+  category: string;
+  description: string;
+  defaultChannels: NotificationChannel[];
+  critical: boolean;
+}
+
+export interface DigestNotification {
+  id: string;
+  userId: string;
+  notifications: Notification[];
+  summary: string;
+  createdAt: string;
+  deliveredAt: string | null;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -56,32 +96,92 @@ export interface NotificationConfig {
 // ═══════════════════════════════════════════════════════════════
 
 export const NOTIFICATION_TYPES: NotificationConfig[] = [
-  { type: 'feedback_received', label: 'Feedback Received', defaultDelivery: 'both' },
-  { type: 'candidate_advanced', label: 'Candidate Advanced', defaultDelivery: 'in_app' },
-  { type: 'interview_scheduled', label: 'Interview Scheduled', defaultDelivery: 'both' },
-  { type: 'new_candidate_added', label: 'New Candidate Added', defaultDelivery: 'in_app' },
-  { type: 'report_ready', label: 'Report Ready', defaultDelivery: 'both' },
-  { type: 'reference_submitted', label: 'Reference Submitted', defaultDelivery: 'both' },
-  { type: 'offer_status_changed', label: 'Offer Status Changed', defaultDelivery: 'both' },
-  { type: 'milestone_at_risk', label: 'Milestone at Risk', defaultDelivery: 'both' },
-  { type: 'message_received', label: 'Message Received', defaultDelivery: 'both' },
+  { type: 'feedback_received', label: 'Feedback Received', category: 'candidate', description: 'When a client submits feedback on a candidate', defaultChannels: ['in_app', 'email'], critical: false },
+  { type: 'candidate_advanced', label: 'Candidate Advanced', category: 'pipeline', description: 'When a candidate moves to the next stage', defaultChannels: ['in_app'], critical: false },
+  { type: 'interview_scheduled', label: 'Interview Scheduled', category: 'interview', description: 'When an interview is scheduled', defaultChannels: ['in_app', 'email', 'push'], critical: false },
+  { type: 'new_candidate_added', label: 'New Candidate Added', category: 'candidate', description: 'When a new candidate is added to a mandate', defaultChannels: ['in_app'], critical: false },
+  { type: 'report_ready', label: 'Report Ready', category: 'reports', description: 'When a generated report is ready', defaultChannels: ['in_app', 'email'], critical: false },
+  { type: 'reference_submitted', label: 'Reference Submitted', category: 'candidate', description: 'When a reference check is submitted', defaultChannels: ['in_app', 'email'], critical: false },
+  { type: 'offer_status_changed', label: 'Offer Status Changed', category: 'offer', description: 'When an offer status changes', defaultChannels: ['in_app', 'email', 'push', 'sms'], critical: true },
+  { type: 'milestone_at_risk', label: 'Milestone at Risk', category: 'sla', description: 'When a milestone is at risk of being missed', defaultChannels: ['in_app', 'email', 'push'], critical: true },
+  { type: 'message_received', label: 'Message Received', category: 'communication', description: 'When a new message is received', defaultChannels: ['in_app', 'email', 'push'], critical: false },
+  { type: 'mention', label: 'Mention', category: 'social', description: 'When someone mentions you in a comment', defaultChannels: ['in_app', 'email', 'push'], critical: false },
+  { type: 'assignment', label: 'Assignment', category: 'workflow', description: 'When you are assigned to a task or mandate', defaultChannels: ['in_app', 'email', 'push'], critical: false },
+  { type: 'status_change', label: 'Status Change', category: 'workflow', description: 'When a mandate or deal status changes', defaultChannels: ['in_app'], critical: false },
+  { type: 'reminder', label: 'Reminder', category: 'workflow', description: 'Task and deadline reminders', defaultChannels: ['in_app', 'push'], critical: false },
+  { type: 'system', label: 'System', category: 'system', description: 'System announcements and updates', defaultChannels: ['in_app', 'email'], critical: false },
+  { type: 'billing', label: 'Billing', category: 'billing', description: 'Payment and subscription notifications', defaultChannels: ['in_app', 'email', 'push', 'sms'], critical: true },
+  { type: 'event', label: 'Event', category: 'events', description: 'Council event updates and reminders', defaultChannels: ['in_app', 'email', 'push'], critical: false },
+  { type: 'coaching', label: 'Coaching', category: 'coaching', description: 'Coaching session updates', defaultChannels: ['in_app', 'email', 'push'], critical: false },
+  { type: 'intelligence', label: 'Intelligence', category: 'intelligence', description: 'Market intelligence signals', defaultChannels: ['in_app', 'email'], critical: false },
+  { type: 'ai_insight', label: 'AI Insight', category: 'ai', description: 'AI-generated insights and recommendations', defaultChannels: ['in_app'], critical: false },
+  { type: 'deadline', label: 'Deadline', category: 'workflow', description: 'Upcoming deadlines', defaultChannels: ['in_app', 'email', 'push'], critical: true },
+  { type: 'approval', label: 'Approval', category: 'workflow', description: 'Approval requests and updates', defaultChannels: ['in_app', 'email', 'push'], critical: false },
+];
+
+export const NOTIFICATION_CATEGORIES: Array<{ id: string; label: string; icon: string }> = [
+  { id: 'candidate', label: 'Candidates', icon: 'users' },
+  { id: 'pipeline', label: 'Pipeline', icon: 'pipeline' },
+  { id: 'interview', label: 'Interviews', icon: 'calendar' },
+  { id: 'reports', label: 'Reports', icon: 'file-text' },
+  { id: 'offer', label: 'Offers', icon: 'briefcase' },
+  { id: 'sla', label: 'SLA', icon: 'clock' },
+  { id: 'communication', label: 'Messages', icon: 'message-square' },
+  { id: 'social', label: 'Mentions', icon: 'at-sign' },
+  { id: 'workflow', label: 'Workflow', icon: 'workflow' },
+  { id: 'system', label: 'System', icon: 'settings' },
+  { id: 'billing', label: 'Billing', icon: 'credit-card' },
+  { id: 'events', label: 'Events', icon: 'calendar' },
+  { id: 'coaching', label: 'Coaching', icon: 'headphones' },
+  { id: 'intelligence', label: 'Intelligence', icon: 'trending-up' },
+  { id: 'ai', label: 'AI Insights', icon: 'sparkles' },
 ];
 
 // ═══════════════════════════════════════════════════════════════
-// NOTIFICATION SERVICE
+// CORE SERVICE (UX-NOT-001)
 // ═══════════════════════════════════════════════════════════════
 
-/**
- * Get notification type label
- */
 export function getNotificationTypeLabel(type: NotificationType): string {
   const config = NOTIFICATION_TYPES.find(t => t.type === type);
   return config?.label || type;
 }
 
-/**
- * Get user notification preferences
- */
+export function getNotificationTypeConfig(type: NotificationType): NotificationConfig | undefined {
+  return NOTIFICATION_TYPES.find(t => t.type === type);
+}
+
+export function getDefaultPreferences(userId: string): NotificationPreferences {
+  const typeSettings: Partial<Record<NotificationType, {
+    in_app: boolean;
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  }>> = {};
+
+  NOTIFICATION_TYPES.forEach(config => {
+    typeSettings[config.type] = {
+      in_app: config.defaultChannels.includes('in_app'),
+      email: config.defaultChannels.includes('email'),
+      push: config.defaultChannels.includes('push'),
+      sms: config.defaultChannels.includes('sms'),
+    };
+  });
+
+  return {
+    userId,
+    globalEmailEnabled: true,
+    globalPushEnabled: true,
+    globalSmsEnabled: false,
+    quietHoursEnabled: false,
+    quietHoursStart: '22:00',
+    quietHoursEnd: '08:00',
+    quietHoursTimezone: 'Asia/Shanghai',
+    digestMode: 'instant',
+    digestDeliveryTime: '08:00',
+    typeSettings,
+  };
+}
+
 export async function getUserPreferences(
   supabase: SupabaseClient,
   userId: string
@@ -93,191 +193,241 @@ export async function getUserPreferences(
     .single();
 
   if (error || !data) {
-    // Return defaults if no preferences exist
-    return {
-      userId,
-      feedbackReceived: 'both',
-      candidateAdvanced: 'in_app',
-      interviewScheduled: 'both',
-      newCandidateAdded: 'in_app',
-      reportReady: 'both',
-      referenceSubmitted: 'both',
-      offerStatusChanged: 'both',
-      milestoneAtRisk: 'both',
-      messageReceived: 'both',
-    };
+    return getDefaultPreferences(userId);
   }
 
   return {
     userId: data.user_id,
-    feedbackReceived: (data.feedback_received as DeliveryMethod) || 'both',
-    candidateAdvanced: (data.candidate_advanced as DeliveryMethod) || 'in_app',
-    interviewScheduled: (data.interview_scheduled as DeliveryMethod) || 'both',
-    newCandidateAdded: (data.new_candidate_added as DeliveryMethod) || 'in_app',
-    reportReady: (data.report_ready as DeliveryMethod) || 'both',
-    referenceSubmitted: (data.reference_submitted as DeliveryMethod) || 'both',
-    offerStatusChanged: (data.offer_status_changed as DeliveryMethod) || 'both',
-    milestoneAtRisk: (data.milestone_at_risk as DeliveryMethod) || 'both',
-    messageReceived: (data.message_received as DeliveryMethod) || 'both',
+    globalEmailEnabled: data.global_email_enabled ?? true,
+    globalPushEnabled: data.global_push_enabled ?? true,
+    globalSmsEnabled: data.global_sms_enabled ?? false,
+    quietHoursEnabled: data.quiet_hours_enabled ?? false,
+    quietHoursStart: data.quiet_hours_start ?? '22:00',
+    quietHoursEnd: data.quiet_hours_end ?? '08:00',
+    quietHoursTimezone: data.quiet_hours_timezone ?? 'Asia/Shanghai',
+    digestMode: (data.digest_mode as DigestMode) || 'instant',
+    digestDeliveryTime: data.digest_delivery_time ?? '08:00',
+    typeSettings: data.type_settings || getDefaultPreferences(userId).typeSettings,
   };
 }
 
-/**
- * Save user notification preferences
- */
 export async function saveUserPreferences(
   supabase: SupabaseClient,
   userId: string,
   preferences: Partial<NotificationPreferences>
 ): Promise<boolean> {
-  // Build update object with snake_case keys
-  const updateData: Record<string, DeliveryMethod> = {};
+  const updateData: Record<string, any> = {
+    user_id: userId,
+  };
 
-  if (preferences.feedbackReceived !== undefined) {
-    updateData.feedback_received = preferences.feedbackReceived;
-  }
-  if (preferences.candidateAdvanced !== undefined) {
-    updateData.candidate_advanced = preferences.candidateAdvanced;
-  }
-  if (preferences.interviewScheduled !== undefined) {
-    updateData.interview_scheduled = preferences.interviewScheduled;
-  }
-  if (preferences.newCandidateAdded !== undefined) {
-    updateData.new_candidate_added = preferences.newCandidateAdded;
-  }
-  if (preferences.reportReady !== undefined) {
-    updateData.report_ready = preferences.reportReady;
-  }
-  if (preferences.referenceSubmitted !== undefined) {
-    updateData.reference_submitted = preferences.referenceSubmitted;
-  }
-  if (preferences.offerStatusChanged !== undefined) {
-    updateData.offer_status_changed = preferences.offerStatusChanged;
-  }
-  if (preferences.milestoneAtRisk !== undefined) {
-    updateData.milestone_at_risk = preferences.milestoneAtRisk;
-  }
-  if (preferences.messageReceived !== undefined) {
-    updateData.message_received = preferences.messageReceived;
-  }
+  if (preferences.globalEmailEnabled !== undefined) updateData.global_email_enabled = preferences.globalEmailEnabled;
+  if (preferences.globalPushEnabled !== undefined) updateData.global_push_enabled = preferences.globalPushEnabled;
+  if (preferences.globalSmsEnabled !== undefined) updateData.global_sms_enabled = preferences.globalSmsEnabled;
+  if (preferences.quietHoursEnabled !== undefined) updateData.quiet_hours_enabled = preferences.quietHoursEnabled;
+  if (preferences.quietHoursStart !== undefined) updateData.quiet_hours_start = preferences.quietHoursStart;
+  if (preferences.quietHoursEnd !== undefined) updateData.quiet_hours_end = preferences.quietHoursEnd;
+  if (preferences.quietHoursTimezone !== undefined) updateData.quiet_hours_timezone = preferences.quietHoursTimezone;
+  if (preferences.digestMode !== undefined) updateData.digest_mode = preferences.digestMode;
+  if (preferences.digestDeliveryTime !== undefined) updateData.digest_delivery_time = preferences.digestDeliveryTime;
+  if (preferences.typeSettings !== undefined) updateData.type_settings = preferences.typeSettings;
 
   const { error } = await supabase
     .from('notification_preferences')
-    .upsert({
-      user_id: userId,
-      ...updateData,
-      updated_at: new Date().toISOString(),
-    });
+    .upsert(updateData);
 
   return !error;
 }
 
-/**
- * Get delivery preference for a specific notification type
- */
-export function getDeliveryPreference(
+export function isChannelEnabled(
   preferences: NotificationPreferences,
-  type: NotificationType
-): DeliveryMethod {
-  const mapping: Record<NotificationType, keyof NotificationPreferences> = {
-    feedback_received: 'feedbackReceived',
-    candidate_advanced: 'candidateAdvanced',
-    interview_scheduled: 'interviewScheduled',
-    new_candidate_added: 'newCandidateAdded',
-    report_ready: 'reportReady',
-    reference_submitted: 'referenceSubmitted',
-    offer_status_changed: 'offerStatusChanged',
-    milestone_at_risk: 'milestoneAtRisk',
-    message_received: 'messageReceived',
-  };
+  type: NotificationType,
+  channel: NotificationChannel
+): boolean {
+  const typeConfig = preferences.typeSettings[type];
+  if (!typeConfig?.[channel]) return false;
 
-  return preferences[mapping[type]];
+  if (channel === 'email' && !preferences.globalEmailEnabled) return false;
+  if (channel === 'push' && !preferences.globalPushEnabled) return false;
+  if (channel === 'sms' && !preferences.globalSmsEnabled) return false;
+
+  return true;
 }
 
-/**
- * Create in-app notification
- */
+// ═══════════════════════════════════════════════════════════════
+// QUIET HOURS (UX-NOT-006)
+// ═══════════════════════════════════════════════════════════════
+
+export function isDuringQuietHours(
+  preferences: NotificationPreferences,
+  date: Date = new Date()
+): boolean {
+  if (!preferences.quietHoursEnabled) return false;
+
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const currentMinutes = hours * 60 + minutes;
+
+  const [startHour, startMin] = preferences.quietHoursStart.split(':').map(Number);
+  const [endHour, endMin] = preferences.quietHoursEnd.split(':').map(Number);
+  const startMinutes = startHour * 60 + startMin;
+  const endMinutes = endHour * 60 + endMin;
+
+  if (startMinutes > endMinutes) {
+    return currentMinutes >= startMinutes || currentMinutes < endMinutes;
+  }
+
+  return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+}
+
+export function getNextQuietHoursEnd(
+  preferences: NotificationPreferences,
+  date: Date = new Date()
+): Date {
+  const result = new Date(date);
+  const [endHour, endMin] = preferences.quietHoursEnd.split(':').map(Number);
+
+  if (isDuringQuietHours(preferences, date)) {
+    result.setHours(endHour, endMin, 0, 0);
+    if (result.getTime() <= date.getTime()) {
+      result.setDate(result.getDate() + 1);
+    }
+  }
+
+  return result;
+}
+
+export function shouldBypassQuietHours(
+  type: NotificationType
+): boolean {
+  const config = NOTIFICATION_TYPES.find(t => t.type === type);
+  return config?.critical || false;
+}
+
+export function getDeliveryTimeWithQuietHours(
+  preferences: NotificationPreferences,
+  type: NotificationType,
+  now: Date = new Date()
+): Date {
+  if (!isDuringQuietHours(preferences, now)) return now;
+  if (shouldBypassQuietHours(type)) return now;
+
+  return getNextQuietHoursEnd(preferences, now);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DIGEST MODE (UX-NOT-007)
+// ═══════════════════════════════════════════════════════════════
+
+export function shouldSendInstant(
+  preferences: NotificationPreferences,
+  type: NotificationType
+): boolean {
+  if (preferences.digestMode === 'instant') return true;
+  if (shouldBypassQuietHours(type)) return true;
+  return false;
+}
+
+export function compileDailyDigest(notifications: Notification[]): {
+  summary: string;
+  byCategory: Record<string, Notification[]>;
+  totalCount: number;
+  criticalCount: number;
+} {
+  const byCategory: Record<string, Notification[]> = {};
+  let criticalCount = 0;
+
+  notifications.forEach(n => {
+    const config = getNotificationTypeConfig(n.type);
+    const category = config?.category || 'other';
+    if (!byCategory[category]) byCategory[category] = [];
+    byCategory[category].push(n);
+    if (config?.critical) criticalCount++;
+  });
+
+  const totalCount = notifications.length;
+  const summary = `You have ${totalCount} new notification${totalCount !== 1 ? 's' : ''}${
+    criticalCount > 0 ? `, including ${criticalCount} critical` : ''
+  }.`;
+
+  return { summary, byCategory, totalCount, criticalCount };
+}
+
+export function getDigestDeliveryDate(
+  preferences: NotificationPreferences,
+  now: Date = new Date()
+): Date {
+  const delivery = new Date(now);
+  const [hour, min] = preferences.digestDeliveryTime.split(':').map(Number);
+
+  if (preferences.digestMode === 'digest_daily') {
+    delivery.setHours(hour, min, 0, 0);
+    if (delivery.getTime() <= now.getTime()) {
+      delivery.setDate(delivery.getDate() + 1);
+    }
+  } else if (preferences.digestMode === 'digest_weekly') {
+    const daysUntilMonday = (1 + 7 - delivery.getDay()) % 7 || 7;
+    delivery.setDate(delivery.getDate() + daysUntilMonday);
+    delivery.setHours(hour, min, 0, 0);
+  }
+
+  return delivery;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CRUD OPERATIONS (UX-NOT-008)
+// ═══════════════════════════════════════════════════════════════
+
 export async function createNotification(
   supabase: SupabaseClient,
-  userId: string,
-  type: NotificationType,
-  title: string,
-  message: string,
-  link: string,
-  emailSent: boolean = false
+  params: {
+    userId: string;
+    type: NotificationType;
+    title: string;
+    message?: string;
+    entityType?: string;
+    entityId?: string;
+    actionUrl?: string;
+    channels?: string[];
+    isDigest?: boolean;
+    metadata?: Record<string, any>;
+  }
 ): Promise<Notification | null> {
+  const config = getNotificationTypeConfig(params.type);
+
   const { data, error } = await supabase
     .from('notifications')
     .insert({
-      user_id: userId,
-      type,
-      title,
-      message,
-      link,
-      email_sent: emailSent,
+      user_id: params.userId,
+      type: params.type,
+      title: params.title,
+      message: params.message || null,
+      entity_type: params.entityType || null,
+      entity_id: params.entityId || null,
+      action_url: params.actionUrl || null,
+      channels: params.channels || config?.defaultChannels || ['in_app'],
+      is_digest: params.isDigest || false,
+      metadata: params.metadata || null,
     })
     .select()
     .single();
 
-  if (error || !data) {
-    return null;
-  }
+  if (error || !data) return null;
 
-  return {
-    id: data.id,
-    userId: data.user_id,
-    type: data.type as NotificationType,
-    title: data.title,
-    message: data.message,
-    link: data.link,
-    read: data.read,
-    emailSent: data.email_sent,
-    createdAt: data.created_at,
-  };
+  return mapNotification(data);
 }
 
-/**
- * Send notification (in-app + email based on preferences)
- */
-export async function sendNotification(
-  supabase: SupabaseClient,
-  userId: string,
-  type: NotificationType,
-  title: string,
-  message: string,
-  link: string
-): Promise<void> {
-  // Get user preferences
-  const preferences = await getUserPreferences(supabase, userId);
-  const delivery = getDeliveryPreference(preferences, type);
-
-  if (delivery === 'none') {
-    return;
-  }
-
-  // Create in-app notification
-  if (delivery === 'in_app' || delivery === 'both') {
-    await createNotification(supabase, userId, type, title, message, link, false);
-  }
-
-  // Send email notification
-  if (delivery === 'email' || delivery === 'both') {
-    // In production, this would call the email service
-    // await sendNotificationEmail(userId, title, message, link);
-    await createNotification(supabase, userId, type, title, message, link, true);
-  }
-}
-
-/**
- * Get notifications for a user
- */
 export async function getUserNotifications(
   supabase: SupabaseClient,
   userId: string,
-  limit: number = 50,
-  offset: number = 0,
-  filter?: 'all' | 'unread' | NotificationType
+  options: {
+    limit?: number;
+    offset?: number;
+    filter?: 'all' | 'unread' | NotificationType;
+    category?: string;
+  } = {}
 ): Promise<Notification[]> {
+  const { limit = 50, offset = 0, filter = 'all', category } = options;
+
   let query = supabase
     .from('notifications')
     .select('*')
@@ -287,32 +437,25 @@ export async function getUserNotifications(
 
   if (filter === 'unread') {
     query = query.eq('read', false);
-  } else if (filter !== 'all' && filter) {
+  } else if (filter !== 'all') {
     query = query.eq('type', filter);
+  }
+
+  if (category) {
+    const typesInCategory = NOTIFICATION_TYPES
+      .filter(t => t.category === category)
+      .map(t => t.type);
+    if (typesInCategory.length > 0) {
+      query = query.in('type', typesInCategory);
+    }
   }
 
   const { data, error } = await query;
 
-  if (error || !data) {
-    return [];
-  }
-
-  return data.map(n => ({
-    id: n.id,
-    userId: n.user_id,
-    type: n.type as NotificationType,
-    title: n.title,
-    message: n.message,
-    link: n.link,
-    read: n.read,
-    emailSent: n.email_sent,
-    createdAt: n.created_at,
-  }));
+  if (error || !data) return [];
+  return data.map(mapNotification);
 }
 
-/**
- * Get unread count for a user
- */
 export async function getUnreadCount(
   supabase: SupabaseClient,
   userId: string
@@ -323,47 +466,47 @@ export async function getUnreadCount(
     .eq('user_id', userId)
     .eq('read', false);
 
-  if (error) {
-    return 0;
-  }
-
+  if (error) return 0;
   return count || 0;
 }
 
-/**
- * Mark notification as read
- */
 export async function markNotificationAsRead(
   supabase: SupabaseClient,
   notificationId: string
 ): Promise<boolean> {
   const { error } = await supabase
     .from('notifications')
-    .update({ read: true })
+    .update({ read: true, read_at: new Date().toISOString() })
     .eq('id', notificationId);
 
   return !error;
 }
 
-/**
- * Mark all notifications as read for a user
- */
 export async function markAllAsRead(
   supabase: SupabaseClient,
   userId: string
 ): Promise<boolean> {
   const { error } = await supabase
     .from('notifications')
-    .update({ read: true })
+    .update({ read: true, read_at: new Date().toISOString() })
     .eq('user_id', userId)
     .eq('read', false);
 
   return !error;
 }
 
-/**
- * Delete notification
- */
+export async function markManyAsRead(
+  supabase: SupabaseClient,
+  notificationIds: string[]
+): Promise<boolean> {
+  const { error } = await supabase
+    .from('notifications')
+    .update({ read: true, read_at: new Date().toISOString() })
+    .in('id', notificationIds);
+
+  return !error;
+}
+
 export async function deleteNotification(
   supabase: SupabaseClient,
   notificationId: string
@@ -376,38 +519,390 @@ export async function deleteNotification(
   return !error;
 }
 
+export async function clearAllNotifications(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<boolean> {
+  const { error } = await supabase
+    .from('notifications')
+    .delete()
+    .eq('user_id', userId);
+
+  return !error;
+}
+
+function mapNotification(data: any): Notification {
+  return {
+    id: data.id,
+    userId: data.user_id,
+    type: data.type as NotificationType,
+    title: data.title,
+    message: data.message,
+    entityType: data.entity_type,
+    entityId: data.entity_id,
+    actionUrl: data.action_url || data.link,
+    read: data.read,
+    readAt: data.read_at,
+    channels: data.channels || [],
+    emailSent: data.email_sent || false,
+    pushSent: data.push_sent || false,
+    smsSent: data.sms_sent || false,
+    isDigest: data.is_digest || false,
+    createdAt: data.created_at,
+    metadata: data.metadata,
+  };
+}
+
 // ═══════════════════════════════════════════════════════════════
-// EMAIL NOTIFICATION (Placeholder)
+// SEND / DISPATCH (UX-NOT-001)
 // ═══════════════════════════════════════════════════════════════
 
-/**
- * Send notification email via Resend
- */
+export async function sendNotification(
+  supabase: SupabaseClient,
+  params: {
+    userId: string;
+    type: NotificationType;
+    title: string;
+    message?: string;
+    entityType?: string;
+    entityId?: string;
+    actionUrl?: string;
+  }
+): Promise<Notification | null> {
+  const preferences = await getUserPreferences(supabase, params.userId);
+  const config = getNotificationTypeConfig(params.type);
+
+  const enabledChannels: NotificationChannel[] = [];
+
+  (['in_app', 'email', 'push', 'sms'] as NotificationChannel[]).forEach(channel => {
+    if (isChannelEnabled(preferences, params.type, channel)) {
+      enabledChannels.push(channel);
+    }
+  });
+
+  if (enabledChannels.length === 0) return null;
+
+  if (!shouldSendInstant(preferences, params.type)) {
+    return createNotification(supabase, {
+      ...params,
+      channels: enabledChannels,
+      isDigest: true,
+    });
+  }
+
+  const deliveryTime = getDeliveryTimeWithQuietHours(preferences, params.type);
+  const now = new Date();
+
+  if (deliveryTime.getTime() > now.getTime() + 60000) {
+    return createNotification(supabase, {
+      ...params,
+      channels: enabledChannels,
+      metadata: { scheduled_for: deliveryTime.toISOString() },
+    });
+  }
+
+  const notification = await createNotification(supabase, {
+    ...params,
+    channels: enabledChannels,
+  });
+
+  if (notification) {
+    if (enabledChannels.includes('email')) {
+      // fire-and-forget email
+      sendNotificationEmail(params.userId, params.title, params.message || '', params.actionUrl || '');
+    }
+    if (enabledChannels.includes('push')) {
+      sendPushNotification(params.userId, params.title, params.message || '', params.actionUrl || '');
+    }
+    if (enabledChannels.includes('sms')) {
+      sendSmsNotification(params.userId, params.title, params.message || '');
+    }
+  }
+
+  return notification;
+}
+
+export async function bulkSendNotification(
+  supabase: SupabaseClient,
+  userIds: string[],
+  params: Omit<Parameters<typeof sendNotification>[1], 'userId'>
+): Promise<string[]> {
+  const results: string[] = [];
+  for (const userId of userIds) {
+    const n = await sendNotification(supabase, { userId, ...params });
+    if (n) results.push(n.id);
+  }
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EMAIL NOTIFICATIONS (UX-NOT-003)
+// ═══════════════════════════════════════════════════════════════
+
 export async function sendNotificationEmail(
   userId: string,
   title: string,
   message: string,
-  link: string
+  actionUrl: string
 ): Promise<void> {
-  // In production, this would use Resend to send emails
-  // Example:
-  // await resend.emails.send({
-  //   from: 'DEX AI <notifications@dexai.com>',
-  //   to: userEmail,
-  //   subject: title,
-  //   html: renderEmail({ title, message, link }),
-  // });
-  console.log('Sending notification email:', { userId, title, message, link });
+  // In production, this would use Resend
+  console.log('[Notification Email]', { userId, title, message, actionUrl });
 }
+
+export function renderEmailTemplate(props: {
+  title: string;
+  message: string;
+  actionUrl?: string;
+  actionLabel?: string;
+  userName?: string;
+  notificationType?: string;
+}): string {
+  const { title, message, actionUrl, actionLabel = 'View Details', userName = 'there', notificationType } = props;
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${title}</title>
+      <style>
+        body { font-family: Inter, -apple-system, sans-serif; margin: 0; padding: 0; background: #f9fafb; color: #111827; }
+        .container { max-width: 560px; margin: 0 auto; padding: 24px; }
+        .card { background: white; border-radius: 8px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h1 { font-size: 20px; margin: 0 0 16px; color: #111827; }
+        p { font-size: 14px; line-height: 1.6; color: #4b5563; margin: 0 0 24px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; }
+        .footer { margin-top: 24px; text-align: center; font-size: 12px; color: #9ca3af; }
+        .badge { display: inline-block; padding: 2px 8px; background: #e0e7ff; color: #4338ca; border-radius: 4px; font-size: 12px; margin-bottom: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="card">
+          ${notificationType ? `<span class="badge">${notificationType}</span>` : ''}
+          <h1>${title}</h1>
+          <p>Hi ${userName},</p>
+          <p>${message}</p>
+          ${actionUrl ? `<a href="${actionUrl}" class="btn">${actionLabel}</a>` : ''}
+        </div>
+        <div class="footer">
+          <p>LYC Intelligence &middot; <a href="#" style="color: #6b7280;">Manage notifications</a></p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WEB PUSH NOTIFICATIONS (UX-NOT-004)
+// ═══════════════════════════════════════════════════════════════
+
+export async function sendPushNotification(
+  userId: string,
+  title: string,
+  body: string,
+  url: string
+): Promise<void> {
+  console.log('[Push Notification]', { userId, title, body, url });
+}
+
+export async function subscribePushNotifications(
+  subscription: PushSubscription
+): Promise<boolean> {
+  // Save subscription to database
+  console.log('[Push Subscribe]', subscription.endpoint);
+  return true;
+}
+
+export async function unsubscribePushNotifications(
+  userId: string
+): Promise<boolean> {
+  console.log('[Push Unsubscribe]', { userId });
+  return true;
+}
+
+export async function checkPushSupport(): boolean {
+  if (typeof window === 'undefined') return false;
+  return 'serviceWorker' in navigator && 'PushManager' in window;
+}
+
+export async function requestPushPermission(): Promise<NotificationPermission> {
+  if (typeof window === 'undefined') return 'denied';
+  return Notification.requestPermission();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SMS NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════════
+
+export async function sendSmsNotification(
+  userId: string,
+  title: string,
+  message: string
+): Promise<void> {
+  console.log('[SMS Notification]', { userId, title, message });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REALTIME (UX-NOT-009)
+// ═══════════════════════════════════════════════════════════════
+
+export function subscribeToNotificationsRealtime(
+  supabase: SupabaseClient,
+  userId: string,
+  callback: (notification: Notification) => void
+): () => void {
+  const channel = supabase
+    .channel(`notifications:${userId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${userId}`,
+      },
+      (payload) => {
+        callback(mapNotification(payload.new));
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}
+
+export function subscribeToUnreadCountRealtime(
+  supabase: SupabaseClient,
+  userId: string,
+  callback: (count: number) => void
+): () => void {
+  let currentCount = 0;
+
+  getUnreadCount(supabase, userId).then(count => {
+    currentCount = count;
+    callback(count);
+  });
+
+  const channel = supabase
+    .channel(`notifications_unread:${userId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${userId} AND read=eq.false`,
+      },
+      () => {
+        currentCount++;
+        callback(currentCount);
+      }
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${userId}`,
+      },
+      (payload) => {
+        const oldRead = (payload.old as any)?.read;
+        const newRead = (payload.new as any)?.read;
+        if (!oldRead && newRead) {
+          currentCount = Math.max(0, currentCount - 1);
+          callback(currentCount);
+        } else if (oldRead && !newRead) {
+          currentCount++;
+          callback(currentCount);
+        }
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════
+
+export function formatRelativeTime(dateString: string, locale: string = 'en'): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+
+  if (seconds < 60) return locale === 'zh' ? '刚刚' : 'Just now';
+  if (minutes < 60) return locale === 'zh' ? `${minutes}分钟前` : `${minutes}m ago`;
+  if (hours < 24) return locale === 'zh' ? `${hours}小时前` : `${hours}h ago`;
+  if (days < 7) return locale === 'zh' ? `${days}天前` : `${days}d ago`;
+  if (weeks < 4) return locale === 'zh' ? `${weeks}周前` : `${weeks}w ago`;
+
+  return date.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+export function groupNotificationsByDate(notifications: Notification[]): Array<{
+  date: string;
+  items: Notification[];
+}> {
+  const groups: Record<string, Notification[]> = {};
+
+  notifications.forEach(n => {
+    const date = new Date(n.createdAt).toDateString();
+    if (!groups[date]) groups[date] = [];
+    groups[date].push(n);
+  });
+
+  return Object.entries(groups).map(([date, items]) => ({
+    date,
+    items,
+  }));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DEFAULT EXPORT
+// ═══════════════════════════════════════════════════════════════
 
 export default {
   sendNotification,
+  bulkSendNotification,
   getUserNotifications,
   getUnreadCount,
   markNotificationAsRead,
   markAllAsRead,
+  markManyAsRead,
   deleteNotification,
+  clearAllNotifications,
   getUserPreferences,
   saveUserPreferences,
+  isChannelEnabled,
+  isDuringQuietHours,
+  shouldSendInstant,
+  compileDailyDigest,
+  sendNotificationEmail,
+  sendPushNotification,
+  subscribePushNotifications,
+  unsubscribePushNotifications,
+  requestPushPermission,
+  subscribeToNotificationsRealtime,
+  subscribeToUnreadCountRealtime,
   getNotificationTypeLabel,
+  getNotificationTypeConfig,
+  formatRelativeTime,
+  groupNotificationsByDate,
 };
