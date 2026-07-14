@@ -1,26 +1,19 @@
 import React from 'react';
-import { useToastStore, type ToastType } from '@/stores/toastStore';
+import { useToastStore, type Toast } from '@/stores/toastStore';
 import { CheckCircle, XCircle, Info, AlertTriangle, X } from 'lucide-react';
 
-const icons: Record<ToastType, React.ReactNode> = {
-  success: <CheckCircle style={{ width: 18, height: 18, color: '#059669' }} />,
-  error: <XCircle style={{ width: 18, height: 18, color: '#DC2626' }} />,
-  info: <Info style={{ width: 18, height: 18, color: '#2563EB' }} />,
-  warning: <AlertTriangle style={{ width: 18, height: 18, color: '#D97706' }} />,
+const icons: Record<Toast['type'], React.ReactNode> = {
+  success: <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />,
+  error: <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />,
+  info: <Info className="w-5 h-5 text-blue-600 flex-shrink-0" />,
+  warning: <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />,
 };
 
-const bgColors: Record<ToastType, string> = {
-  success: '#F0FDF4',
-  error: '#FEF2F2',
-  info: '#EFF6FF',
-  warning: '#FFFBEB',
-};
-
-const borderColors: Record<ToastType, string> = {
-  success: '#BBF7D0',
-  error: '#FECACA',
-  info: '#BFDBFE',
-  warning: '#FDE68A',
+const bgColors: Record<Toast['type'], string> = {
+  success: 'bg-green-50 border-green-200',
+  error: 'bg-red-50 border-red-200',
+  info: 'bg-blue-50 border-blue-200',
+  warning: 'bg-amber-50 border-amber-200',
 };
 
 export function ToastContainer() {
@@ -29,55 +22,45 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 16,
-        right: 16,
-        zIndex: 99999,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
-        maxWidth: 420,
-        pointerEvents: 'none',
-      }}
-    >
+    <div className="fixed top-4 right-4 z-[99999] flex flex-col gap-2 max-w-sm pointer-events-none">
       {toasts.map((t) => (
         <div
           key={t.id}
+          className={`
+            flex items-start gap-3 p-4 border rounded-none
+            shadow-[0_4px_12px_rgba(0,0,0,0.08)]
+            pointer-events-auto
+            ${bgColors[t.type]}
+          `}
           style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 10,
-            padding: '12px 16px',
-            background: bgColors[t.type],
-            border: `1px solid ${borderColors[t.type]}`,
-            borderRadius: 10,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-            fontSize: 14,
-            lineHeight: 1.5,
-            fontFamily: "'DM Sans', system-ui, sans-serif",
-            color: '#1F2937',
-            pointerEvents: 'auto',
             animation: 'toast-slide-in 0.25s ease-out',
           }}
         >
-          <span style={{ flexShrink: 0, marginTop: 1 }}>{icons[t.type]}</span>
-          <span style={{ flex: 1 }}>{t.message}</span>
+          {icons[t.type]}
+
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900">{t.message}</p>
+            {t.description && (
+              <p className="text-xs text-gray-600 mt-1">{t.description}</p>
+            )}
+            {t.action && (
+              <button
+                onClick={() => {
+                  t.action?.onClick();
+                  removeToast(t.id);
+                }}
+                className="text-xs font-medium text-gray-900 underline underline-offset-2 hover:no-underline mt-2"
+              >
+                {t.action.label}
+              </button>
+            )}
+          </div>
+
           <button
             onClick={() => removeToast(t.id)}
-            style={{
-              flexShrink: 0,
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 2,
-              marginTop: -2,
-              marginRight: -4,
-              color: '#9CA3AF',
-            }}
+            className="flex-shrink-0 p-0.5 text-gray-400 hover:text-gray-600 transition-colors -mt-1 -mr-1"
           >
-            <X style={{ width: 14, height: 14 }} />
+            <X className="w-4 h-4" />
           </button>
         </div>
       ))}
@@ -90,3 +73,5 @@ export function ToastContainer() {
     </div>
   );
 }
+
+export default ToastContainer;

@@ -2,17 +2,25 @@ import { create } from 'zustand';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 export interface Toast {
   id: string;
   type: ToastType;
   message: string;
+  description?: string;
   duration?: number;
+  action?: ToastAction;
 }
 
 interface ToastStore {
   toasts: Toast[];
-  addToast: (type: ToastType, message: string, duration?: number) => void;
+  addToast: (toast: Omit<Toast, 'id'>) => string;
   removeToast: (id: string) => void;
+  updateToast: (id: string, updates: Partial<Toast>) => void;
 }
 
 let counter = 0;
@@ -20,23 +28,49 @@ let counter = 0;
 export const useToastStore = create<ToastStore>((set, get) => ({
   toasts: [],
 
-  addToast: (type: ToastType, message: string, duration = 4000) => {
+  addToast: (toast) => {
     const id = `toast-${++counter}-${Date.now()}`;
-    set({ toasts: [...get().toasts, { id, type, message, duration }] });
-    if (duration > 0) {
-      setTimeout(() => get().removeToast(id), duration);
+    const fullToast: Toast = { id, duration: 4000, ...toast };
+    set({ toasts: [...get().toasts, fullToast] });
+    if (fullToast.duration && fullToast.duration > 0) {
+      setTimeout(() => get().removeToast(id), fullToast.duration);
     }
+    return id;
   },
 
   removeToast: (id: string) => {
     set({ toasts: get().toasts.filter(t => t.id !== id) });
   },
+
+  updateToast: (id: string, updates: Partial<Toast>) => {
+    set({
+      toasts: get().toasts.map(t => (t.id === id ? { ...t, ...updates } : t)),
+    });
+  },
 }));
 
-/** Convenience helpers — importable anywhere */
 export const toast = {
-  success: (msg: string, dur?: number) => useToastStore.getState().addToast('success', msg, dur),
-  error: (msg: string, dur?: number) => useToastStore.getState().addToast('error', msg, dur ?? 6000),
-  info: (msg: string, dur?: number) => useToastStore.getState().addToast('info', msg, dur),
-  warning: (msg: string, dur?: number) => useToastStore.getState().addToast('warning', msg, dur),
+  success: (message: string, options?: Partial<Omit<Toast, 'id' | 'type'>>) =>
+    useToastStore.getState().addToast({ type: 'success', message, ...options }),
+
+  error: (message: string, options?: Partial<Omit<Toast, 'id' | 'type'>>) =>
+    useToastStore.getState().addToast({
+      type: 'error',
+      message,
+      duration: 6000,
+      ...options,
+    }),
+
+  info: (message: string, options?: Partial<Omit<Toast, 'id' | 'type'>>) =>
+    useToastStore.getState().addToast({ type: 'info', message, ...options }),
+
+  warning: (message: string, options?: Partial<Omit<Toast, 'id' | 'type'>>) =>
+    useToastStore.getState().addToast({ type: 'warning', message, ...options }),
+
+  dismiss: (id: string) => useToastStore.getState().removeToast(id),
+
+  update: (id: string, updates: Partial<Toast>) =>
+    useToastStore.getState().updateToast(id, updates),
 };
+
+export default useToastStore;
