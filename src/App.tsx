@@ -6,6 +6,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Loader2 } from 'lucide-react';
 import { ToastContainer } from '@/components/ui/ToastContainer';
 import { SkipLink } from '@/components/ui/SkipLink';
+import { I18nProvider } from '@/i18n/I18nContext';
 
 // ── Admin route wrapper ──
 function AdminRoute({ children }: { children: React.ReactNode }) {
@@ -163,6 +164,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
+    <I18nProvider>
     <SkipLink />
     <CreditProvider>
       <ToastContainer />
@@ -276,6 +278,7 @@ export default function App() {
         </Routes>
       </Suspense>
     </CreditProvider>
+    </I18nProvider>
     </ErrorBoundary>
   );
 }
