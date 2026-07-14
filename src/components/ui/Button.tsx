@@ -24,21 +24,33 @@ export function Button({
   size = 'default', 
   children, 
   className, 
+  'aria-label': ariaLabel,
+  'aria-expanded': ariaExpanded,
+  'aria-haspopup': ariaHasPopup,
+  'aria-busy': ariaBusy,
   ...props 
 }: { 
   variant?: keyof typeof variants; 
   size?: keyof typeof sizes; 
   children: React.ReactNode; 
   className?: string;
+  'aria-label'?: string;
+  'aria-expanded'?: boolean;
+  'aria-haspopup'?: boolean | 'dialog' | 'menu' | 'listbox' | 'tree' | 'grid';
+  'aria-busy'?: boolean;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button 
       className={cn(
-        'inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 ease-out min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]',
+        'inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 ease-out min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C108AB] focus-visible:ring-offset-2',
         variants[variant], 
         sizes[size], 
         className
       )} 
+      aria-label={ariaLabel}
+      aria-expanded={ariaExpanded}
+      aria-haspopup={ariaHasPopup}
+      aria-busy={ariaBusy}
       {...props}
     >
       {children}

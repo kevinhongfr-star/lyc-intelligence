@@ -284,11 +284,14 @@ export function DataTable<T extends { id: string }>({
           {searchable && (
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+              <label htmlFor="dt-search" className="sr-only">Search table</label>
               <Input
+                id="dt-search"
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder={searchPlaceholder}
                 className="pl-9"
+                aria-label="Search table"
               />
             </div>
           )}
@@ -429,37 +432,50 @@ export function DataTable<T extends { id: string }>({
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <table className="w-full">
+      <div className="overflow-x-auto" role="region" aria-label="Data table" tabIndex={0}>
+        <table className="w-full" role="grid">
           <thead>
             <tr className="bg-bg-alt border-b border-border">
               {selectable && (
-                <th className="px-4 py-3 w-10">
+                <th className="px-4 py-3 w-10" scope="col">
+                  <label className="sr-only" htmlFor="dt-select-all">Select all rows</label>
                   <input
+                    id="dt-select-all"
                     type="checkbox"
                     checked={allSelected}
                     ref={el => el && (el.indeterminate = someSelected)}
                     onChange={handleSelectAll}
                     className="w-4 h-4"
+                    aria-label={allSelected ? 'Deselect all rows' : 'Select all rows'}
                   />
                 </th>
               )}
               {displayColumns.map(col => (
                 <th
                   key={col.key}
+                  scope="col"
+                  aria-sort={sortState?.key === (col.sortKey || col.key) ? (sortState.direction === 'asc' ? 'ascending' : 'descending') : 'none'}
                   className={`px-4 py-3 text-${col.align || 'left'} text-xxs uppercase tracking-wider font-semibold text-text-muted ${
                     col.sortable !== false && sortable ? 'cursor-pointer hover:bg-bg-alt/80 select-none' : ''
                   }`}
                   style={{ width: col.width }}
                   onClick={() => col.sortable !== false && sortable && handleSort(col.sortKey || col.key)}
+                  onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && col.sortable !== false && sortable) {
+                      e.preventDefault();
+                      handleSort(col.sortKey || col.key);
+                    }
+                  }}
+                  tabIndex={col.sortable !== false && sortable ? 0 : -1}
+                  role="columnheader"
                 >
                   <div className={`flex items-center gap-1 ${col.align === 'right' ? 'justify-end' : col.align === 'center' ? 'justify-center' : ''}`}>
                     {col.header}
                     {col.sortable !== false && sortable && sortState?.key === (col.sortKey || col.key) && (
                       sortState.direction === 'asc' ? (
-                        <ChevronUp className="w-3 h-3" />
+                        <ChevronUp className="w-3 h-3" aria-hidden="true" />
                       ) : (
-                        <ChevronDown className="w-3 h-3" />
+                        <ChevronDown className="w-3 h-3" aria-hidden="true" />
                       )
                     )}
                   </div>
@@ -473,6 +489,7 @@ export function DataTable<T extends { id: string }>({
                 <td
                   colSpan={displayColumns.length + (selectable ? 1 : 0)}
                   className="px-4 py-12 text-center text-text-muted"
+                  role="gridcell"
                 >
                   {emptyMessage}
                 </td>
@@ -482,26 +499,40 @@ export function DataTable<T extends { id: string }>({
                 <tr
                   key={row.id || i}
                   onClick={() => onRowClick?.(row)}
+                  onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && onRowClick) {
+                      e.preventDefault();
+                      onRowClick(row);
+                    }
+                  }}
+                  tabIndex={onRowClick ? 0 : -1}
+                  role="row"
+                  aria-selected={selectedIds.has(row.id)}
                   className={`
                     border-b border-border last:border-b-0
                     ${onRowClick ? 'cursor-pointer hover:bg-bg-alt/50' : ''}
                     ${selectedIds.has(row.id) ? 'bg-primary/5' : ''}
                     ${rowClassName ? rowClassName(row) : ''}
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C108AB]
                   `}
                 >
                   {selectable && (
-                    <td className="px-4 py-3 w-10" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-4 py-3 w-10" onClick={(e) => e.stopPropagation()} role="gridcell">
+                      <label className="sr-only" htmlFor={`dt-select-${row.id}`}>Select row</label>
                       <input
+                        id={`dt-select-${row.id}`}
                         type="checkbox"
                         checked={selectedIds.has(row.id)}
                         onChange={(e) => handleSelectRow(row.id, e as any)}
                         className="w-4 h-4"
+                        aria-label={`Select row ${i + 1}`}
                       />
                     </td>
                   )}
                   {displayColumns.map(col => (
                     <td
                       key={col.key}
+                      role="gridcell"
                       className={`px-4 py-3 text-sm text-text-primary text-${col.align || 'left'}`}
                     >
                       {col.render ? col.render(row) : (row as any)[col.key]}

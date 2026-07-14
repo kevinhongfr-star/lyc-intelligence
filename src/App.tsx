@@ -5,6 +5,7 @@ import { CreditProvider } from '@/contexts/CreditContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Loader2 } from 'lucide-react';
 import { ToastContainer } from '@/components/ui/ToastContainer';
+import { SkipLink } from '@/components/ui/SkipLink';
 
 // ── Admin route wrapper ──
 function AdminRoute({ children }: { children: React.ReactNode }) {
@@ -162,6 +163,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
+    <SkipLink />
     <CreditProvider>
       <ToastContainer />
       <Suspense fallback={<Loading />}>
