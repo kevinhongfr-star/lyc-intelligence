@@ -456,6 +456,23 @@ async function handleCheckoutSessionCompleted(session: any): Promise<void> {
   const packKey = metadata?.pack_key;
   const userId = metadata?.user_id;
   const orgId = metadata?.org_id;
+  const sessionId = session.id;
+
+  // IDEMPOTENCY CHECK: Check if this session was already processed
+  try {
+    const existingTx = await db.selectOne('v2_credit_transactions', {
+      column: 'idempotency_key',
+      value: `stripe_session:${sessionId}`,
+      select: 'id',
+    });
+    
+    if (existingTx) {
+      console.log(`[Stripe] Session ${sessionId} already processed, skipping`);
+      return;
+    }
+  } catch (e) {
+    // Table might not exist yet, continue without idempotency check
+  }
 
   if (mode === 'payment' && packKey && userId) {
     const lineItems = session.line_items?.data || [];
@@ -476,7 +493,7 @@ async function handleCheckoutSessionCompleted(session: any): Promise<void> {
     const purchase: CreditPackPurchase = {
       priceId: priceId || packKey,
       credits,
-      sessionId: session.id,
+      sessionId,
       userId,
       orgId: orgId || null,
     };
