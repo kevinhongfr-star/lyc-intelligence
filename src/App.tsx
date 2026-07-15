@@ -65,6 +65,7 @@ const IntelligencePlusPage = lazy(() => import('@/pages/internal/IntelligencePlu
 const PlatformSettingsPage = lazy(() => import('@/pages/internal/PlatformSettingsPage').then(m => ({ default: m.PlatformSettingsPage })));
 const TeamPage = lazy(() => import('@/pages/internal/TeamPage').then(m => ({ default: m.TeamPage })));
 const TasksPage = lazy(() => import('@/pages/internal/TasksPage').then(m => ({ default: m.TasksPage })));
+const ActivitiesPage = lazy(() => import('@/pages/internal/ActivitiesPage').then(m => ({ default: m.ActivitiesPage })));
 const AnalyticsPage = lazy(() => import('@/pages/internal/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
 const CompliancePage = lazy(() => import('@/pages/internal/CompliancePage').then(m => ({ default: m.CompliancePage })));
 const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage').then(m => ({ default: m.NexusEnginePage })));
@@ -95,6 +96,9 @@ const CandidateNexusCoachPage = lazy(() => import('@/pages/candidate/CandidateNe
 const CandidateProfilePage = lazy(() => import('@/pages/candidate/CandidateProfilePage').then(m => ({ default: m.CandidateProfilePage })));
 const CandidateAdvancedAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAdvancedAssessmentsPage').then(m => ({ default: m.CandidateAdvancedAssessmentsPage })));
 const CandidateSettingsPlusPage = lazy(() => import('@/pages/candidate/CandidateSettingsPlusPage').then(m => ({ default: m.CandidateSettingsPlusPage })));
+const CandidateLandingPage = lazy(() => import('@/pages/candidate/CandidateLandingPage').then(m => ({ default: m.CandidateLandingPage })));
+const BrowseMandatesPage = lazy(() => import('@/pages/candidate/BrowseMandatesPage').then(m => ({ default: m.BrowseMandatesPage })));
+const MandateDetailPublicPage = lazy(() => import('@/pages/candidate/MandateDetailPublicPage').then(m => ({ default: m.MandateDetailPublicPage })));
 // ── B2C Coaching Portal pages (EO-5) ──
 const CoachingCoachPage = lazy(() => import('@/pages/coaching/CoachingCoachPage').then(m => ({ default: m.CoachingCoachPage })));
 const CoachingCreditsPage = lazy(() => import('@/pages/coaching/CoachingCreditsPage').then(m => ({ default: m.CoachingCreditsPage })));
@@ -105,6 +109,30 @@ const CoachingProfileSettingsPage = lazy(() => import('@/pages/coaching/Coaching
 const CoachingChatFeaturesPage = lazy(() => import('@/pages/coaching/CoachingChatFeaturesPage').then(m => ({ default: m.CoachingChatFeaturesPage })));
 const CoachingCareerServicesPage = lazy(() => import('@/pages/coaching/CoachingCareerServicesPage').then(m => ({ default: m.CoachingCareerServicesPage })));
 const CoachingEngagementPage = lazy(() => import('@/pages/coaching/CoachingEngagementPage').then(m => ({ default: m.CoachingEngagementPage })));
+
+// ── Council Portal pages ──
+const CouncilLandingPage = lazy(() => import('@/pages/council/CouncilLandingPage').then(m => ({ default: m.CouncilLandingPage })));
+const CouncilTiersPage = lazy(() => import('@/pages/council/CouncilTiersPage').then(m => ({ default: m.CouncilTiersPage })));
+const DexChatPage = lazy(() => import('@/pages/council/DexChatPage').then(m => ({ default: m.DexChatPage })));
+const CreditStorePage = lazy(() => import('@/pages/council/CreditStorePage').then(m => ({ default: m.CreditStorePage })));
+const CouncilDashboardPage = lazy(() => import('@/pages/council/CouncilDashboardPage').then(m => ({ default: m.CouncilDashboardPage })));
+const CouncilCoachingPage = lazy(() => import('@/pages/council/CouncilCoachingPage').then(m => ({ default: m.CouncilCoachingPage })));
+const CouncilEventDetailPage = lazy(() => import('@/pages/council/CouncilEventDetailPage').then(m => ({ default: m.CouncilEventDetailPage })));
+const CouncilCommunityPage = lazy(() => import('@/pages/council/CouncilCommunityPage').then(m => ({ default: m.CouncilCommunityPage })));
+const CouncilDirectoryPage = lazy(() => import('@/pages/council/CouncilDirectoryPage').then(m => ({ default: m.CouncilDirectoryPage })));
+const CouncilProfilePage = lazy(() => import('@/pages/council/CouncilProfilePage').then(m => ({ default: m.CouncilProfilePage })));
+const CouncilBenefitsPage = lazy(() => import('@/pages/council/CouncilBenefitsPage').then(m => ({ default: m.CouncilBenefitsPage })));
+
+// ── Council Admin pages ──
+const CouncilAdminDashboardPage = lazy(() => import('@/pages/admin/council/CouncilAdminDashboardPage').then(m => ({ default: m.CouncilAdminDashboardPage })));
+const CouncilEventManagerPage = lazy(() => import('@/pages/admin/council/CouncilEventManagerPage').then(m => ({ default: m.CouncilEventManagerPage })));
+const CouncilCoachingManagerPage = lazy(() => import('@/pages/admin/council/CouncilCoachingManagerPage').then(m => ({ default: m.CouncilCoachingManagerPage })));
+const CouncilApplicationsPage = lazy(() => import('@/pages/admin/council/CouncilApplicationsPage').then(m => ({ default: m.CouncilApplicationsPage })));
+
+// ── Intelligence Layer pages ──
+const IntelligenceDashboardPage = lazy(() => import('@/pages/intelligence/IntelligenceDashboardPage').then(m => ({ default: m.IntelligenceDashboardPage })));
+const CompanyIntelligencePage = lazy(() => import('@/pages/intelligence/CompanyIntelligencePage').then(m => ({ default: m.CompanyIntelligencePage })));
+const IntelligenceSourcesPage = lazy(() => import('@/pages/admin/IntelligenceSourcesPage').then(m => ({ default: m.IntelligenceSourcesPage })));
 
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
@@ -182,6 +210,34 @@ export default function App() {
           <Route path="/match" element={<MatchPage />} />
           <Route path="/pricing" element={<PricingPage />} />
 
+          {/* ── Candidate Portal (public pages) ── */}
+          <Route path="/candidates" element={<CandidateLandingPage />} />
+          <Route path="/candidates/mandates" element={<BrowseMandatesPage />} />
+          <Route path="/candidates/mandates/:id" element={<MandateDetailPublicPage />} />
+
+          {/* ── Council Portal (public pages) ── */}
+          <Route path="/council" element={<CouncilLandingPage />} />
+          <Route path="/council/tiers" element={<CouncilTiersPage />} />
+
+          {/* ── Council Member Portal (auth required) ── */}
+          <Route path="/council/dashboard" element={<ProtectedRoute><CouncilDashboardPage /></ProtectedRoute>} />
+          <Route path="/council/coaching" element={<ProtectedRoute><CouncilCoachingPage /></ProtectedRoute>} />
+          <Route path="/council/events/:id" element={<ProtectedRoute><CouncilEventDetailPage /></ProtectedRoute>} />
+          <Route path="/council/community" element={<ProtectedRoute><CouncilCommunityPage /></ProtectedRoute>} />
+          <Route path="/council/directory" element={<ProtectedRoute><CouncilDirectoryPage /></ProtectedRoute>} />
+          <Route path="/council/profile" element={<ProtectedRoute><CouncilProfilePage /></ProtectedRoute>} />
+          <Route path="/council/benefits" element={<ProtectedRoute><CouncilBenefitsPage /></ProtectedRoute>} />
+
+          {/* ── Council Admin (auth + admin required) ── */}
+          <Route path="/admin/council" element={<AdminRoute><CouncilAdminDashboardPage /></AdminRoute>} />
+          <Route path="/admin/council/events" element={<AdminRoute><CouncilEventManagerPage /></AdminRoute>} />
+          <Route path="/admin/council/coaching" element={<AdminRoute><CouncilCoachingManagerPage /></AdminRoute>} />
+          <Route path="/admin/council/applications" element={<AdminRoute><CouncilApplicationsPage /></AdminRoute>} />
+
+          {/* ── DEX AI B2C (auth required) ── */}
+          <Route path="/dex/chat" element={<ProtectedRoute><DexChatPage /></ProtectedRoute>} />
+          <Route path="/dex/credits" element={<ProtectedRoute><CreditStorePage /></ProtectedRoute>} />
+
           {/* ── Internal Operations (mockup surface) ── */}
           
             <Route path="/app" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
@@ -211,11 +267,14 @@ export default function App() {
               <Route path="platform-settings" element={<PlatformSettingsPage />} />
               <Route path="team" element={<TeamPage />} />
               <Route path="tasks" element={<TasksPage />} />
+              <Route path="activities" element={<ActivitiesPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="compliance" element={<CompliancePage />} />
               <Route path="nexus-engine" element={<AdminRoute><NexusEnginePage /></AdminRoute>} />
               <Route path="oversight" element={<AdminRoute><KevinOversightDashboard /></AdminRoute>} />
-              <Route path="intelligence" element={<PlaceholderPage title="Intelligence" />} />
+              <Route path="intelligence" element={<IntelligenceDashboardPage />} />
+              <Route path="intelligence/companies/:id" element={<CompanyIntelligencePage />} />
+              <Route path="admin/intelligence/sources" element={<AdminRoute><IntelligenceSourcesPage /></AdminRoute>} />
             </Route>
 
           {/* Backward compat: redirect old /platform/* to /app */}

@@ -608,8 +608,26 @@ export async function sendNotification(
 
   if (notification) {
     if (enabledChannels.includes('email')) {
-      // fire-and-forget email
-      sendNotificationEmail(params.userId, params.title, params.message || '', params.actionUrl || '');
+      // fire-and-forget email — resolve recipient address and render template
+      void (async () => {
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('id', params.userId)
+            .maybeSingle();
+          if (!profile?.email) return;
+          const html = renderEmailTemplate({
+            title: params.title,
+            message: params.message || '',
+            actionUrl: params.actionUrl,
+            notificationType: params.type,
+          });
+          await sendNotificationEmail(profile.email, { subject: params.title, html });
+        } catch (err) {
+          console.error('[Notification Email] dispatch failed:', err);
+        }
+      })();
     }
     if (enabledChannels.includes('push')) {
       sendPushNotification(params.userId, params.title, params.message || '', params.actionUrl || '');
@@ -640,13 +658,40 @@ export async function bulkSendNotification(
 // ═══════════════════════════════════════════════════════════════
 
 export async function sendNotificationEmail(
-  userId: string,
-  title: string,
-  message: string,
-  actionUrl: string
+  email: string,
+  rendered: { subject: string; html: string }
 ): Promise<void> {
-  // In production, this would use Resend
-  console.log('[Notification Email]', { userId, title, message, actionUrl });
+  try {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !anonKey) {
+      console.warn('[Notification Email] Supabase env vars not configured');
+      return;
+    }
+
+    const response = await fetch(`${supabaseUrl}/functions/v1/email-sender`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${anonKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: email,
+        subject: rendered.subject,
+        html: rendered.html,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(
+        '[Notification Email] email-sender responded with',
+        response.status,
+        await response.text()
+      );
+    }
+  } catch (err) {
+    console.error('[Notification Email] Failed to send:', err);
+  }
 }
 
 export function renderEmailTemplate(props: {
@@ -699,13 +744,75 @@ export function renderEmailTemplate(props: {
 // WEB PUSH NOTIFICATIONS (UX-NOT-004)
 // ═══════════════════════════════════════════════════════════════
 
+/**
+ * Convert a VAPID public key (URL-safe base64) into a Uint8Array suitable
+ * for `pushManager.subscribe({ applicationServerKey })`.
+ *
+ * The return type is pinned to `Uint8Array<ArrayBuffer>` so the result is
+ * assignable to the Push API's `BufferSource` (TS 5.7+ makes `Uint8Array`
+ * generic over its backing buffer).
+ */
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 export async function sendPushNotification(
   userId: string,
   title: string,
   body: string,
   url: string
 ): Promise<void> {
-  console.log('[Push Notification]', { userId, title, body, url });
+  try {
+    if (
+      typeof window === 'undefined' ||
+      !('PushManager' in window) ||
+      !('serviceWorker' in navigator)
+    ) {
+      return;
+    }
+
+    if (typeof Notification === 'undefined' || Notification.permission !== 'granted') {
+      console.warn('[Push Notification] Permission not granted');
+      return;
+    }
+
+    const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+    if (!vapidPublicKey) {
+      console.warn('[Push Notification] VITE_VAPID_PUBLIC_KEY not configured');
+      return;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+
+    // Ensure a push subscription exists, subscribing with the VAPID key if
+    // needed. The subscription is held by the browser; we only ensure it
+    // exists so future server-initiated push delivery is possible.
+    if (!(await registration.pushManager.getSubscription())) {
+      try {
+        await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+        });
+      } catch (subscribeErr) {
+        console.warn('[Push Notification] Could not subscribe:', subscribeErr);
+      }
+    }
+
+    await registration.showNotification(title, {
+      body,
+      data: { url, userId },
+      tag: `notif:${userId}`,
+    });
+  } catch (err) {
+    console.error('[Push Notification] Failed to send:', err);
+  }
 }
 
 export async function subscribePushNotifications(
@@ -742,7 +849,37 @@ export async function sendSmsNotification(
   title: string,
   message: string
 ): Promise<void> {
-  console.log('[SMS Notification]', { userId, title, message });
+  try {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !anonKey) {
+      console.warn('[SMS Notification] Supabase env vars not configured');
+      return;
+    }
+
+    const response = await fetch(`${supabaseUrl}/functions/v1/sms-sender`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${anonKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        title,
+        message,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(
+        '[SMS Notification] sms-sender responded with',
+        response.status,
+        await response.text()
+      );
+    }
+  } catch (err) {
+    console.error('[SMS Notification] Failed to send:', err);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════

@@ -172,3 +172,55 @@ export async function onClientFeedbackReceived(feedback: any, contact: any, mand
     });
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// CROSS-PORTAL ROUTING
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Portals a notification can be routed to. Mirrors the front-end PortalType
+ * ('internal' | 'client' | 'candidate' | 'coaching').
+ */
+export type NotificationPortal = 'internal' | 'client' | 'candidate' | 'coaching';
+
+const CLIENT_ROLES: ReadonlySet<string> = new Set([
+  'client_admin',
+  'client_user',
+]);
+
+/**
+ * Determine which portal a notification should appear in, based on the
+ * recipient's role and the notification type.
+ *
+ * Routing precedence:
+ *  1. Coaching notifications always route to the coaching portal.
+ *  2. System and billing notifications always route to the internal portal.
+ *  3. Client roles (client_admin / client_user) route to the client portal.
+ *  4. Candidate roles route to the candidate portal.
+ *  5. Internal staff (super_admin, admin, team_lead, consultant,
+ *     council_member), B2C members, and unknown roles default to the
+ *     internal portal so the notification is never lost.
+ */
+export function routeNotificationToPortal(
+  role: string,
+  notificationType: string
+): NotificationPortal {
+  // 1. Notification types with a fixed portal, regardless of role.
+  if (notificationType === 'coaching') {
+    return 'coaching';
+  }
+  if (notificationType === 'system' || notificationType === 'billing') {
+    return 'internal';
+  }
+
+  // 2. Role-based routing.
+  if (CLIENT_ROLES.has(role)) {
+    return 'client';
+  }
+  if (role === 'candidate') {
+    return 'candidate';
+  }
+
+  // 3. Internal staff, B2C members, and unknown roles default to internal.
+  return 'internal';
+}
