@@ -196,6 +196,9 @@ export async function handleStripe(req: VercelRequest, res: VercelResponse) {
     if (action === 'checkout-subscription' && req.method === 'POST') {
       return handleSubscriptionCheckout(req, res);
     }
+    if (action === 'checkout-course' && req.method === 'POST') {
+      return handleCourseCheckout(req, res);
+    }
     if (action === 'portal' && req.method === 'GET') {
       return handlePortal(req, res);
     }
@@ -427,6 +430,127 @@ async function handleSubscriptionCheckout(req: VercelRequest, res: VercelRespons
     console.error('[Stripe] Subscription checkout error:', e);
     return res.status(500).json({
       error: 'Failed to create subscription checkout',
+      details: e?.message,
+    });
+  }
+}
+
+async function handleCourseCheckout(req: VercelRequest, res: VercelResponse) {
+  const {
+    courseId,
+    enrollmentType = 'individual',
+    teamEmails = [],
+    discountCode,
+    successUrl,
+    cancelUrl,
+    locale,
+  } = req.body || {};
+
+  if (!courseId) {
+    return res.status(400).json({ error: 'courseId is required' });
+  }
+
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: error || 'Unauthorized' });
+  }
+
+  const currency = getCurrencyFromLocale(locale);
+
+  try {
+    const course = await db.selectOne('lms_courses', {
+      column: 'id',
+      value: courseId,
+      select: 'id, title, slug, price_cny, price_usd, team_price_cny, team_price_usd, team_max_seats',
+    });
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    const isTeam = enrollmentType === 'team';
+    const priceAmount = isTeam
+      ? (currency === 'CNY' ? course.team_price_cny : course.team_price_usd)
+      : (currency === 'CNY' ? course.price_cny : course.price_usd);
+
+    if (!priceAmount) {
+      return res.status(400).json({ error: `Price not available for ${currency}` });
+    }
+
+    const profile = await db.selectOne('profiles', {
+      column: 'id',
+      value: user.id,
+      select: 'id,email,stripe_customer_id,organization_id',
+    });
+
+    let customerId = profile?.stripe_customer_id;
+
+    if (!customerId) {
+      const customer = await stripeApi('POST', '/v1/customers', {
+        email: user.email,
+        metadata: { user_id: user.id },
+      });
+      customerId = customer.id;
+
+      await db.update('profiles', { column: 'id', value: user.id }, {
+        stripe_customer_id: customerId,
+      });
+    }
+
+    const unitAmount = Math.round(priceAmount * 100);
+    const currencyLower = currency.toLowerCase();
+
+    const metadata: Record<string, string> = {
+      user_id: user.id,
+      course_id: courseId,
+      course_title: course.title,
+      course_slug: course.slug,
+      enrollment_type: enrollmentType,
+      currency,
+    };
+    if (isTeam && teamEmails?.length) {
+      metadata.team_emails = JSON.stringify(teamEmails.filter(Boolean));
+      metadata.team_seat_count = String(teamEmails.filter(Boolean).length);
+    }
+    if (discountCode) metadata.discount_code = discountCode;
+    if (profile?.organization_id) metadata.org_id = profile.organization_id;
+
+    const session = await stripeApi('POST', '/v1/checkout/sessions', {
+      customer: customerId,
+      'payment_method_types[0]': 'card',
+      'line_items[0][price_data][currency]': currencyLower,
+      'line_items[0][price_data][product_data][name]': isTeam
+        ? `${course.title} — Team Enrollment`
+        : course.title,
+      'line_items[0][price_data][unit_amount]': String(unitAmount),
+      'line_items[0][quantity]': '1',
+      mode: 'payment',
+      success_url: successUrl || `${req.headers.origin}/academy/my-courses?enrolled=true`,
+      cancel_url: cancelUrl || `${req.headers.origin}/academy/course/${course.slug}?canceled=true`,
+      ...Object.fromEntries(
+        Object.entries(metadata).map(([k, v]) => [`metadata[${k}]`, v])
+      ),
+    });
+
+    if (session.error) {
+      throw new Error(session.error.message);
+    }
+
+    return res.status(200).json({
+      checkoutUrl: session.url,
+      sessionId: session.id,
+      course: {
+        id: courseId,
+        title: course.title,
+        price: priceAmount,
+        currency,
+        enrollmentType,
+      },
+    });
+  } catch (e: any) {
+    console.error('[Stripe] Course checkout error:', e);
+    return res.status(500).json({
+      error: 'Failed to create course checkout',
       details: e?.message,
     });
   }
@@ -667,6 +791,63 @@ async function handleCheckoutSessionCompleted(session: any): Promise<void> {
       console.error('[Stripe] applyCreditPackPurchase failed:', result.error);
     } else {
       console.log(`[Stripe] Credit pack applied to ${result.source}: +${credits} credits`);
+    }
+    return;
+  }
+
+  if (mode === 'payment' && metadata?.course_id && userId) {
+    try {
+      const courseId = metadata.course_id;
+      const enrollmentType = metadata.enrollment_type || 'individual';
+      const teamEmails = metadata.team_emails ? JSON.parse(metadata.team_emails) : [];
+
+      const existing = await db.selectOne('lms_enrollments', {
+        column: 'stripe_session_id',
+        value: sessionId,
+        select: 'id',
+      });
+      if (existing) {
+        console.log(`[Stripe] Course enrollment already exists for session ${sessionId}`);
+        return;
+      }
+
+      const enrollUsers: { userId: string; email: string }[] = [{ userId, email: '' }];
+
+      if (enrollmentType === 'team' && teamEmails.length > 0) {
+        for (const email of teamEmails) {
+          const existingUser = await db.selectOne('profiles', {
+            column: 'email',
+            value: email,
+            select: 'id, email',
+          });
+          if (existingUser && existingUser.id !== userId) {
+            enrollUsers.push({ userId: existingUser.id, email });
+          }
+        }
+      }
+
+      for (const enrollee of enrollUsers) {
+        const alreadyEnrolled = await db.selectOne('lms_enrollments', {
+          column: 'course_id',
+          value: courseId,
+          select: 'id',
+        });
+        if (!alreadyEnrolled) {
+          await db.insert('lms_enrollments', {
+            user_id: enrollee.userId,
+            course_id: courseId,
+            enrollment_type: enrollmentType,
+            status: 'active',
+            progress_percent: 0,
+            enrolled_at: new Date().toISOString(),
+            stripe_session_id: sessionId,
+          });
+        }
+      }
+
+      console.log(`[Stripe] Course enrollment created: course=${courseId}, user=${userId}, type=${enrollmentType}`);
+    } catch (e: any) {
+      console.error('[Stripe] Failed to create course enrollment:', e);
     }
     return;
   }

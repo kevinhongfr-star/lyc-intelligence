@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -11,7 +11,16 @@ import {
   Zap,
   ChevronRight,
   AlertCircle,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  XCircle,
+  ExternalLink,
+  Layers,
+  BarChart3,
+  RefreshCw,
 } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 // ─── StatCard ────────────────────────────────────────────────────────
 interface StatCardProps {
@@ -468,6 +477,507 @@ export function BottleneckAlert({ bottlenecks }: BottleneckAlertProps) {
             </p>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Build Progress Widget (NOTION-008) ──────────────────────────────
+interface BuildProgressWidgetProps {
+  onPhaseClick?: (phase: string) => void;
+}
+
+interface BuildPhaseData {
+  phase: string;
+  total: number;
+  building: number;
+  complete: number;
+  blocked: number;
+  deferred: number;
+}
+
+export function BuildProgressWidget({ onPhaseClick }: BuildProgressWidgetProps) {
+  const [loading, setLoading] = useState(true);
+  const [phaseData, setPhaseData] = useState<BuildPhaseData[]>([]);
+  const [totalComplete, setTotalComplete] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+
+  useEffect(() => {
+    loadBuildData();
+  }, []);
+
+  const loadBuildData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('build_tracker')
+        .select('build_phase, status');
+
+      if (error) throw error;
+
+      const phaseMap = new Map<string, BuildPhaseData>();
+      
+      for (const item of data || []) {
+        if (!phaseMap.has(item.build_phase)) {
+          phaseMap.set(item.build_phase, {
+            phase: item.build_phase,
+            total: 0,
+            building: 0,
+            complete: 0,
+            blocked: 0,
+            deferred: 0,
+          });
+        }
+        const phase = phaseMap.get(item.build_phase)!;
+        phase.total++;
+        if (item.status === 'Building') phase.building++;
+        else if (item.status === 'Complete') phase.complete++;
+        else if (item.status === 'Blocked') phase.blocked++;
+        else if (item.status === 'Deferred') phase.deferred++;
+      }
+
+      const phases = Array.from(phaseMap.values()).sort((a, b) => a.phase.localeCompare(b.phase));
+      setPhaseData(phases);
+      setTotalItems(phases.reduce((sum, p) => sum + p.total, 0));
+      setTotalComplete(phases.reduce((sum, p) => sum + p.complete, 0));
+    } catch (e) {
+      console.error('Failed to load build tracker data:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const overallPercent = totalItems > 0 ? Math.round((totalComplete / totalItems) * 100) : 0;
+
+  if (loading) {
+    return (
+      <div className="bg-white border border-[#E5E5E5] p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-5 bg-[#F0F0F0] w-1/3" />
+          <div className="space-y-2">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-6 bg-[#F5F5F5]" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white border border-[#E5E5E5]">
+      <div className="px-6 py-4 border-b border-[#E5E5E5]">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-[15px] text-[#171717]">365 Build Progress</h3>
+            <p className="text-xs text-[#737373] mt-0.5">
+              {totalComplete} of {totalItems} deliverables complete ({overallPercent}%)
+            </p>
+          </div>
+          <BarChart3 className="w-4 h-4 text-[#737373]" />
+        </div>
+      </div>
+
+      <div className="px-6 py-4 space-y-3">
+        {phaseData.map(phase => {
+          const completePct = phase.total > 0 ? (phase.complete / phase.total) * 100 : 0;
+          const buildingPct = phase.total > 0 ? (phase.building / phase.total) * 100 : 0;
+          const blockedPct = phase.total > 0 ? (phase.blocked / phase.total) * 100 : 0;
+
+          return (
+            <div
+              key={phase.phase}
+              onClick={() => onPhaseClick?.(phase.phase)}
+              className={`space-y-1.5 ${onPhaseClick ? 'cursor-pointer hover:opacity-80' : ''}`}
+            >
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-medium text-[#404040] truncate">{phase.phase}</span>
+                <span className="text-[#737373] tabular-nums">{phase.total}</span>
+              </div>
+              <div className="h-2 flex overflow-hidden">
+                <div className="bg-[#16A34A]" style={{ width: `${completePct}%` }} />
+                <div className="bg-[#CA8A04]" style={{ width: `${buildingPct}%` }} />
+                <div className="bg-[#DC2626]" style={{ width: `${blockedPct}%` }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="px-6 py-3 border-t border-[#F0F0F0] flex items-center gap-4 text-xs">
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 bg-[#16A34A]" />
+          <span className="text-[#737373]">Complete</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 bg-[#CA8A04]" />
+          <span className="text-[#737373]">Building</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 bg-[#DC2626]" />
+          <span className="text-[#737373]">Blocked</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Asset Pipeline Widget (NOTION-009) ──────────────────────────────
+const PHASE_COLORS: Record<string, string> = {
+  'ATTRACT': '#2563EB',
+  'ENGAGE': '#7C3AED',
+  'ASSESS': '#C108AB',
+  'RESOLVE': '#DC2626',
+  'SUSTAIN': '#CA8A04',
+  'PROMOTE': '#16A34A',
+  'OPS': '#6B7280',
+};
+
+const PHASES = ['ATTRACT', 'ENGAGE', 'ASSESS', 'RESOLVE', 'SUSTAIN', 'PROMOTE', 'OPS'];
+
+interface AssetPipelineWidgetProps {
+  onPhaseClick?: (phase: string) => void;
+}
+
+export function AssetPipelineWidget({ onPhaseClick }: AssetPipelineWidgetProps) {
+  const [loading, setLoading] = useState(true);
+  const [phaseCounts, setPhaseCounts] = useState<Record<string, number>>({});
+  const [totalAssets, setTotalAssets] = useState(0);
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
+  const [priorityCounts, setPriorityCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    loadAssetData();
+  }, []);
+
+  const loadAssetData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('assets')
+        .select('notion_phase, status, asset_priority')
+        .not('notion_asset_id', 'is', null);
+
+      if (error) throw error;
+
+      const phases: Record<string, number> = {};
+      const statuses: Record<string, number> = {};
+      const priorities: Record<string, number> = {};
+
+      for (const asset of data || []) {
+        const phase = asset.notion_phase || 'Uncategorized';
+        phases[phase] = (phases[phase] || 0) + 1;
+
+        const status = asset.status || 'unknown';
+        statuses[status] = (statuses[status] || 0) + 1;
+
+        const priority = asset.asset_priority || 'Unprioritized';
+        priorities[priority] = (priorities[priority] || 0) + 1;
+      }
+
+      setPhaseCounts(phases);
+      setStatusCounts(statuses);
+      setPriorityCounts(priorities);
+      setTotalAssets(data?.length || 0);
+    } catch (e) {
+      console.error('Failed to load asset data:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white border border-[#E5E5E5] p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-5 bg-[#F0F0F0] w-1/3" />
+          <div className="h-8 bg-[#F5F5F5]" />
+          <div className="grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-12 bg-[#F5F5F5]" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white border border-[#E5E5E5]">
+      <div className="px-6 py-4 border-b border-[#E5E5E5]">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-[15px] text-[#171717]">Asset Pipeline</h3>
+            <p className="text-xs text-[#737373] mt-0.5">{totalAssets} total assets</p>
+          </div>
+          <Layers className="w-4 h-4 text-[#737373]" />
+        </div>
+      </div>
+
+      <div className="px-6 py-4 space-y-4">
+        <div className="h-3 flex overflow-hidden">
+          {PHASES.map(phase => {
+            const count = phaseCounts[phase] || 0;
+            const pct = totalAssets > 0 ? (count / totalAssets) * 100 : 0;
+            if (pct === 0) return null;
+            return (
+              <div
+                key={phase}
+                onClick={() => onPhaseClick?.(phase)}
+                className={`h-full ${onPhaseClick ? 'cursor-pointer hover:opacity-80' : ''}`}
+                style={{ width: `${pct}%`, background: PHASE_COLORS[phase] || '#6B7280' }}
+                title={`${phase}: ${count}`}
+              />
+            );
+          })}
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {PHASES.map(phase => {
+            const count = phaseCounts[phase] || 0;
+            if (count === 0) return null;
+            return (
+              <div
+                key={phase}
+                onClick={() => onPhaseClick?.(phase)}
+                className={`flex items-center gap-1.5 px-2 py-1 text-xs ${onPhaseClick ? 'cursor-pointer hover:bg-[#F5F5F5]' : ''}`}
+              >
+                <div className="w-2 h-2" style={{ background: PHASE_COLORS[phase] }} />
+                <span className="text-[#404040]">{phase}</span>
+                <span className="text-[#737373] tabular-nums">{count}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 pt-2">
+          <div className="text-xs">
+            <p className="text-[#737373] mb-1">By Status</p>
+            <div className="space-y-1">
+              {Object.entries(statusCounts).map(([status, count]) => (
+                <div key={status} className="flex items-center justify-between">
+                  <span className="text-[#404040] capitalize">{status}</span>
+                  <span className="text-[#737373] tabular-nums">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="text-xs">
+            <p className="text-[#737373] mb-1">By Priority</p>
+            <div className="space-y-1">
+              {Object.entries(priorityCounts).map(([priority, count]) => (
+                <div key={priority} className="flex items-center justify-between">
+                  <span className="text-[#404040]">{priority}</span>
+                  <span className="text-[#737373] tabular-nums">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Sync Health Indicator (NOTION-014) ──────────────────────────────
+interface SyncHealthIndicatorProps {
+  onSyncClick?: () => void;
+}
+
+export function SyncHealthIndicator({ onSyncClick }: SyncHealthIndicatorProps) {
+  const [loading, setLoading] = useState(true);
+  const [syncStatus, setSyncStatus] = useState<Record<string, any>>({});
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    loadSyncStatus();
+  }, []);
+
+  const loadSyncStatus = async () => {
+    try {
+      const { data, error } = await supabase.rpc('get_notion_sync_status');
+      if (error) throw error;
+
+      const statusMap: Record<string, any> = {};
+      for (const item of data || []) {
+        statusMap[item.source_db] = item;
+      }
+      setSyncStatus(statusMap);
+    } catch (e) {
+      console.error('Failed to load sync status:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getHealthInfo = (source: string) => {
+    const status = syncStatus[source];
+    if (!status || !status.last_sync_at) {
+      return { color: '#DC2626', label: 'Never synced', icon: XCircle };
+    }
+
+    const lastSync = new Date(status.last_sync_at);
+    const hoursAgo = (Date.now() - lastSync.getTime()) / (1000 * 60 * 60);
+
+    if (status.last_sync_status === 'failed') {
+      return { color: '#DC2626', label: 'Sync failed', icon: XCircle };
+    }
+    if (hoursAgo > 48) {
+      return { color: '#DC2626', label: `${Math.floor(hoursAgo / 24)}d ago`, icon: AlertTriangle };
+    }
+    if (hoursAgo > 24) {
+      return { color: '#CA8A04', label: `${Math.floor(hoursAgo)}h ago`, icon: Clock };
+    }
+    return { color: '#16A34A', label: formatTimeAgo(hoursAgo), icon: CheckCircle2 };
+  };
+
+  const formatTimeAgo = (hours: number) => {
+    if (hours < 1) return 'Just synced';
+    if (hours < 24) return `${Math.floor(hours)}h ago`;
+    return `${Math.floor(hours / 24)}d ago`;
+  };
+
+  const handleRefresh = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRefreshing(true);
+    await loadSyncStatus();
+    setRefreshing(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 text-xs text-[#737373]">
+        <div className="w-2 h-2 bg-[#D4D4D4] animate-pulse" />
+        <span>Checking sync status...</span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      onClick={onSyncClick}
+      className={`flex items-center gap-3 text-xs ${onSyncClick ? 'cursor-pointer hover:opacity-80' : ''}`}
+    >
+      {['launch_assets', 'build_tracker'].map(source => {
+        const health = getHealthInfo(source);
+        const Icon = health.icon;
+        return (
+          <div key={source} className="flex items-center gap-1.5">
+            <Icon className="w-3 h-3" style={{ color: health.color }} />
+            <span className="text-[#737373]">
+              {source === 'launch_assets' ? 'Assets' : 'Build'}: {health.label}
+            </span>
+          </div>
+        );
+      })}
+      <button
+        onClick={handleRefresh}
+        className="p-1 hover:bg-[#F5F5F5] rounded"
+        title="Refresh status"
+      >
+        <RefreshCw className={`w-3 h-3 text-[#737373] ${refreshing ? 'animate-spin' : ''}`} />
+      </button>
+    </div>
+  );
+}
+
+// ─── Asset Status Donut (NOTION-010) ─────────────────────────────────
+const STATUS_COLORS: Record<string, string> = {
+  idea: '#9CA3AF',
+  draft: '#3B82F6',
+  review: '#F59E0B',
+  approved: '#10B981',
+  archived: '#6B7280',
+};
+
+export function AssetStatusDonut() {
+  const [loading, setLoading] = useState(true);
+  const [statusData, setStatusData] = useState<Record<string, number>>({});
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('assets')
+        .select('status');
+
+      if (error) throw error;
+
+      const counts: Record<string, number> = {};
+      for (const item of data || []) {
+        counts[item.status] = (counts[item.status] || 0) + 1;
+      }
+      setStatusData(counts);
+      setTotal(data?.length || 0);
+    } catch (e) {
+      console.error('Failed to load status data:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white border border-[#E5E5E5] p-6">
+        <div className="animate-pulse space-y-3">
+          <div className="h-5 bg-[#F0F0F0] w-1/3" />
+          <div className="w-24 h-24 mx-auto bg-[#F5F5F5] rounded-full" />
+        </div>
+      </div>
+    );
+  }
+
+  const size = 100;
+  const strokeWidth = 12;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+
+  let offset = 0;
+
+  return (
+    <div className="bg-white border border-[#E5E5E5]">
+      <div className="px-6 py-4 border-b border-[#E5E5E5]">
+        <h3 className="font-semibold text-[15px] text-[#171717]">Asset Status</h3>
+      </div>
+      <div className="px-6 py-4 flex items-center justify-center">
+        <div className="relative">
+          <svg width={size} height={size} className="-rotate-90">
+            {Object.entries(statusData).map(([status, count]) => {
+              const pct = total > 0 ? (count / total) * 100 : 0;
+              const dashLength = (pct / 100) * circumference;
+              const dashOffset = -offset;
+              offset += dashLength;
+
+              return (
+                <circle
+                  key={status}
+                  cx={size / 2}
+                  cy={size / 2}
+                  r={radius}
+                  fill="none"
+                  stroke={STATUS_COLORS[status] || '#9CA3AF'}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={`${dashLength} ${circumference - dashLength}`}
+                  strokeDashoffset={dashOffset}
+                />
+              );
+            })}
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-xl font-bold text-[#171717]">{total}</span>
+          </div>
+        </div>
+      </div>
+      <div className="px-6 pb-4 grid grid-cols-2 gap-2 text-xs">
+        {Object.entries(statusData).map(([status, count]) => (
+          <div key={status} className="flex items-center gap-2">
+            <div className="w-2 h-2" style={{ background: STATUS_COLORS[status] }} />
+            <span className="text-[#404040] capitalize">{status}</span>
+            <span className="ml-auto text-[#737373] tabular-nums">{count}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
