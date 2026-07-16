@@ -138,7 +138,7 @@ async function getAIMatchAnalysis(input: MatchAnalysisInput): Promise<any> {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: 'deepseek-v4-flash',
         messages: [
           { role: 'system', content: 'You are an expert executive search analyst. Return JSON only.' },
           { role: 'user', content: prompt },

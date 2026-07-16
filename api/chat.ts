@@ -35,7 +35,7 @@ export const maxDuration = 30;
 
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
-const DEEPSEEK_MODEL = 'deepseek-chat';
+const DEEPSEEK_MODEL = 'deepseek-v4-flash';
 
 const DEFAULT_SYSTEM_PROMPT = `You are Nexus, LYC Partners' AI-powered cross-border leadership advisor. You are trained on LYC's China-APAC leadership intelligence database. You help executives and board members with:
 - Positioning for China-to-global leadership roles

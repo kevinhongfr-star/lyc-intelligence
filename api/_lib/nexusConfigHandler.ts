@@ -14,7 +14,7 @@ const CONFIG_KEY = 'nexus_persona_config';
 const DEFAULT_CONFIG = {
   temperature: 0.7,
   max_tokens: 500,
-  model: 'deepseek-chat',
+  model: 'deepseek-v4-flash',
   formality: 0.7,
   directness: 0.65,
   terminology: 'professional',

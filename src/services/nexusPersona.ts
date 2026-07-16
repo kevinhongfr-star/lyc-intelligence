@@ -203,7 +203,7 @@ export function getDefaultPersonaConfig(): NexusPersonaConfig {
     systemPrompt: buildNexusSystemPrompt('director'),
     temperature: 0.7,
     maxTokens: 500,
-    model: 'deepseek-chat',
+    model: 'deepseek-v4-flash',
   };
 }
 

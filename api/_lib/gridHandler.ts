@@ -757,7 +757,7 @@ async function callDeepSeekIntelligence(prompt: string): Promise<Record<string, 
       'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'deepseek-chat',
+      model: 'deepseek-v4-flash',
       messages: [
         { role: 'system', content: 'You are a professional talent market analyst. Generate structured JSON intelligence reports.' },
         { role: 'user', content: prompt },

@@ -118,7 +118,7 @@ Return ONLY valid JSON with this exact structure:
         'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: 'deepseek-v4-flash',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `JOB DESCRIPTION:\n${jd}\n\nCANDIDATE CV:\n${cv}` }

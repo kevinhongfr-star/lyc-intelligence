@@ -1003,7 +1003,7 @@ async function callDeepSeekForSHIFT(prompt: string): Promise<{ content: string; 
       'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'deepseek-chat',
+      model: 'deepseek-v4-flash',
       messages: [
         { role: 'system', content: 'You are a leadership development expert. Always respond with valid JSON only, no markdown or prose.' },
         { role: 'user', content: prompt },
@@ -1670,7 +1670,7 @@ export async function handleCandidateAssessmentScoring(
             'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
           },
           body: JSON.stringify({
-            model: 'deepseek-chat',
+            model: 'deepseek-v4-flash',
             messages: [
               {
                 role: 'system',

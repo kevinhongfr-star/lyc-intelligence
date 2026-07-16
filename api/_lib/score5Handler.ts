@@ -76,7 +76,7 @@ export async function handleScore5(req: VercelRequest, res: VercelResponse) {
             output_scores: JSON.stringify(r.dimension_scores),
             composite_score: r.composite_score,
             verdict: JSON.stringify({ reasons: r.match_reasons, risks: r.risk_factors, strategy: r.approach_strategy, sub_scores: r.sub_scores }),
-            model: 'deepseek-chat',
+            model: 'deepseek-v4-flash',
           });
         } catch (e) {
           console.error('[Score5] Failed to save scoring run:', e);
@@ -132,7 +132,7 @@ Return ONLY valid JSON:
         Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: 'deepseek-v4-flash',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 1200,
         temperature: 0.3,

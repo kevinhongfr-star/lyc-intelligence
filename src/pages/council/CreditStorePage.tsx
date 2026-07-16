@@ -41,10 +41,10 @@ const CREDIT_PACKS: CreditPack[] = [
   {
     id: 'starter',
     name: 'Starter',
-    credits: 100,
+    credits: 10,
     price: 9.99,
     priceLabel: '$9.99',
-    perCredit: '$0.100 / credit',
+    perCredit: '$1.00 / credit',
     icon: Zap,
     popular: false,
     highlight: 'Try DEX AI beyond your Executive Introduction',
@@ -53,10 +53,10 @@ const CREDIT_PACKS: CreditPack[] = [
   {
     id: 'professional',
     name: 'Professional',
-    credits: 500,
+    credits: 50,
     price: 39.99,
     priceLabel: '$39.99',
-    perCredit: '$0.080 / credit',
+    perCredit: '$0.80 / credit',
     icon: Rocket,
     popular: true,
     highlight: 'Best for active career strategy work',
@@ -65,10 +65,10 @@ const CREDIT_PACKS: CreditPack[] = [
   {
     id: 'enterprise',
     name: 'Enterprise',
-    credits: 1500,
+    credits: 150,
     price: 99.99,
     priceLabel: '$99.99',
-    perCredit: '$0.067 / credit',
+    perCredit: '$0.67 / credit',
     icon: TrendingUp,
     popular: false,
     highlight: 'For power users and small teams',
@@ -77,10 +77,10 @@ const CREDIT_PACKS: CreditPack[] = [
   {
     id: 'council',
     name: 'Council',
-    credits: 5000,
+    credits: 12,
     price: 179.99,
     priceLabel: '$179.99',
-    perCredit: '$0.036 / credit',
+    perCredit: '$14.99 / credit',
     icon: Crown,
     popular: false,
     highlight: 'Best value — for ongoing advisory',
@@ -103,8 +103,8 @@ const MOCK_TRANSACTIONS: Transaction[] = [
   {
     id: 'tx_001',
     date: '2026-07-12',
-    description: 'Professional Pack — 500 credits',
-    amount: 500,
+    description: 'Professional Pack — 50 credits',
+    amount: 50,
     type: 'purchase',
     status: 'completed',
   },
@@ -127,16 +127,16 @@ const MOCK_TRANSACTIONS: Transaction[] = [
   {
     id: 'tx_004',
     date: '2026-06-29',
-    description: 'Starter Pack — 100 credits',
-    amount: 100,
+    description: 'Starter Pack — 10 credits',
+    amount: 10,
     type: 'purchase',
     status: 'completed',
   },
   {
     id: 'tx_005',
     date: '2026-06-22',
-    description: 'DEX AI chat — 23 messages',
-    amount: -23,
+    description: 'DEX AI chat — 7 messages',
+    amount: -7,
     type: 'usage',
     status: 'completed',
   },
@@ -206,7 +206,7 @@ export function CreditStorePage() {
     let cancelled = false;
     const t1 = setTimeout(() => {
       if (!cancelled) {
-        setBalance(547);
+        setBalance(42);
         setIsLoadingBalance(false);
       }
     }, 400);

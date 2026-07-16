@@ -156,7 +156,7 @@ async function callAgentAI(
       'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
     },
     body: JSON.stringify({
-      model: agentId === 'canvas' ? 'deepseek-chat' : 'deepseek-chat',
+      model: agentId === 'canvas' ? 'deepseek-v4-flash' : 'deepseek-v4-flash',
       messages: [
         { role: 'system', content: getAgentSystemPrompt(agentId) },
         { role: 'user', content: prompt },

@@ -195,7 +195,7 @@ async function handleGenerate(req: VercelRequest, res: VercelResponse) {
     priority_focus_areas: JSON.stringify(overrides.priority_focus_areas || narrative.priority_focus_areas || []),
     executive_summary: overrides.executive_summary || narrative.executive_summary,
     metadata: JSON.stringify({
-      generation_model: 'deepseek-chat',
+      generation_model: 'deepseek-v4-flash',
       trident_imported: true,
     }),
     credits_consumed: 15,
@@ -535,7 +535,7 @@ async function generateCanvasNarrative(profileData: any) {
         'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: 'deepseek-v4-flash',
         messages: [
           {
             role: 'system',
@@ -652,7 +652,7 @@ async function regenerateNarrativeField(profile: any, scorecard: any, contact: a
         'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: 'deepseek-v4-flash',
         messages: [
           {
             role: 'system',

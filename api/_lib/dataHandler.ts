@@ -623,7 +623,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
           output_scores: output_scores ? JSON.stringify(output_scores) : null,
           composite_score: composite_score || null,
           verdict: verdict || null,
-          model: model || 'deepseek-chat',
+          model: model || 'deepseek-v4-flash',
           tokens_used: tokens_used || null,
           duration_ms: duration_ms || null,
           user_id: user_id || null,
@@ -894,7 +894,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
               Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
             },
             body: JSON.stringify({
-              model: 'deepseek-chat',
+              model: 'deepseek-v4-flash',
               messages: [
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: userPrompt },
@@ -1603,7 +1603,7 @@ Return as valid JSON with exactly these keys:
 
         const result = await callLLM({
           prompt,
-          model: 'deepseek-chat',
+          model: 'deepseek-v4-flash',
           temperature: 0.3,
           maxTokens: 800,
         });

@@ -23,7 +23,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 // ── DeepSeek Configuration ──
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_BASE_URL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1';
-const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash';
 
 // ── Runtime Config Fetcher ──
 async function getRuntimeConfig(): Promise<{ temperature: number; max_tokens: number; model: string }> {

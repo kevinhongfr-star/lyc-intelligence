@@ -4,7 +4,7 @@ import { UserCog, Save, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 const DEFAULTS = {
   temperature: 0.7,
   max_tokens: 500,
-  model: 'deepseek-chat',
+  model: 'deepseek-v4-flash',
   formality: 0.7,
   directness: 0.65,
   terminology: 'professional',
@@ -93,7 +93,7 @@ export default function PersonaConfig() {
         <label className="block text-sm font-medium text-text-primary mb-2">Model</label>
         <select value={model} onChange={e => setModel(e.target.value)}
           className="w-full px-3 py-2 text-sm bg-bg-primary border border-bg-tertiary text-text-primary">
-          <option value="deepseek-chat">DeepSeek Chat</option>
+          <option value="deepseek-v4-flash">DeepSeek V4 Flash</option>
           <option value="deepseek-reasoner">DeepSeek Reasoner</option>
         </select>
       </div>

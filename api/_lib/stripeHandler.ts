@@ -40,22 +40,22 @@ interface CreditPack {
 function getCreditPackCatalog(): Record<string, CreditPack> {
   return {
     starter: {
-      credits: 100,
+      credits: 10,
       price: 9.99,
       priceId: process.env.STRIPE_PACK_STARTER || '',
     },
     professional: {
-      credits: 500,
+      credits: 50,
       price: 39.99,
       priceId: process.env.STRIPE_PACK_PROFESSIONAL || '',
     },
     enterprise: {
-      credits: 1500,
+      credits: 150,
       price: 99.99,
       priceId: process.env.STRIPE_PACK_ENTERPRISE || '',
     },
     council: {
-      credits: 5000,
+      credits: 12,
       price: 179.99,
       priceId: process.env.STRIPE_PACK_COUNCIL || '',
     },

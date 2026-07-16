@@ -21,7 +21,7 @@ interface AIRequest {
 const MODEL_CONFIGS = {
   deepseek: {
     url: 'https://api.deepseek.com/v1/chat/completions',
-    model: 'deepseek-chat',
+    model: 'deepseek-v4-flash',
     header: (key: string) => ({ 'Authorization': `Bearer ${key}` }),
   },
   openai: {

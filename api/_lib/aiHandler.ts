@@ -6,23 +6,50 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getUserFromRequest } from './adminAuth.js';
+import { isSupabaseConfigured } from './supabaseRest.js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 const DEEPSEEK_ENDPOINT = 'https://api.deepseek.com/v1/chat/completions';
-const DEEPSEEK_MODEL = 'deepseek-chat';
+const DEEPSEEK_MODEL = 'deepseek-v4-flash';
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
+const SUPABASE_SERVICE_KEY =
+  process.env.SUPABASE_SERVICE_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  '';
 
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + 60000 });
+async function isRateLimited(keyType: string, keyValue: string, endpoint: string, limit: number): Promise<boolean> {
+  if (!isSupabaseConfigured()) {
     return false;
   }
-  if (entry.count >= 5) return true;
-  entry.count++;
-  return false;
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/check_rate_limit`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        p_key_type: keyType,
+        p_key_value: keyValue,
+        p_endpoint: endpoint,
+        p_limit: limit,
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn(`[aiHandler] Rate limit check failed: ${response.status}`);
+      return false;
+    }
+
+    const data = await response.json();
+    return data === true;
+  } catch (err) {
+    console.warn('[aiHandler] Rate limit check error:', err);
+    return false;
+  }
 }
 
 async function callDeepSeek(
@@ -159,7 +186,7 @@ export async function handler(req: VercelRequest, res: VercelResponse): Promise<
 
   // Rate limiting
   const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
-  if (isRateLimited(ip)) {
+  if (await isRateLimited('ip', ip, 'ai-handler', 10)) {
     res.status(429).json({ error: 'Rate limit exceeded' });
     return;
   }

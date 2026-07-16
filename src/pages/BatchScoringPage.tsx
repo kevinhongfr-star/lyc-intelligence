@@ -212,7 +212,7 @@ export function BatchScoringPage() {
           }),
           composite_score: result.composite_score,
           verdict: result.composite_score >= 80 ? 'Strong Fit' : result.composite_score >= 65 ? 'Conditional Fit' : result.composite_score >= 45 ? 'Weak Fit' : 'Reject',
-          model: 'deepseek-chat',
+          model: 'deepseek-v4-flash',
         }),
       });
     } catch (e) {

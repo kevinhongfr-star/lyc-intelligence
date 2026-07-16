@@ -172,7 +172,7 @@ export function MatchPage() {
               dimensions: r.dimension_scores,
             })),
             composite_score: response.results.reduce((sum, r) => sum + r.composite_score, 0) / response.results.length,
-            model: response.model || 'deepseek-chat',
+            model: response.model || 'deepseek-v4-flash',
             tokens_used: response.total_tokens || null,
             duration_ms: Date.now() - startTime,
             user_id: user?.id || null,

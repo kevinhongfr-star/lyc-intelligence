@@ -88,7 +88,7 @@ export const TIER_BOUNDARIES: Record<TierId, { min: number; label: string }> = {
 export const OVERRIDE_MIN_REASON_LENGTH = 30;
 export const LLM_TEMPERATURE = 0.1;
 export const LLM_TIMEOUT_MS = 7_000;
-export const LLM_MODEL: 'deepseek-chat' = 'deepseek-chat';
+export const LLM_MODEL: 'deepseek-v4-flash' = 'deepseek-v4-flash';
 export const LLM_MAX_TOKENS = 200;
 
 export type SubScores = Record<CriterionId, number>;

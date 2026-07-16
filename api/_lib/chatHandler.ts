@@ -257,7 +257,7 @@ ${conversationText}`;
         Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: 'deepseek-v4-flash',
         messages: [{ role: 'user', content: extractionPrompt }],
         max_tokens: 500,
         temperature: 0.3,
@@ -510,7 +510,7 @@ async function tryDeepSeekStreaming(messages: Message[], res: VercelResponse): P
         'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: 'deepseek-v4-flash',
         messages,
         max_tokens: 2048,
         temperature: 0.3,
@@ -580,7 +580,7 @@ async function tryDeepSeekNonStreaming(messages: Message[]): Promise<{ response:
         'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: 'deepseek-v4-flash',
         messages,
         max_tokens: 2048,
         temperature: 0.3,
