@@ -6,16 +6,23 @@
  *   GET  /api/stripe/portal           → Create billing portal session
  *   POST /api/stripe/webhook          → Handle Stripe webhooks
  *   POST /api/stripe/checkout-credit  → Create one-time credit pack checkout
+ *   POST /api/stripe/checkout-subscription → Create subscription checkout (Council tiers)
  * 
  * Env vars required:
  *   STRIPE_SECRET_KEY         — Stripe secret key
  *   STRIPE_WEBHOOK_SECRET     — Webhook signing secret
  *   STRIPE_PRICE_BASIC        — Price ID for basic tier
  *   STRIPE_PRICE_PRO          — Price ID for pro tier
- *   STRIPE_PACK_STARTER       — Credit pack 100 credits
- *   STRIPE_PACK_PROFESSIONAL  — Credit pack 500 credits
- *   STRIPE_PACK_ENTERPRISE    — Credit pack 1500 credits
- *   STRIPE_PACK_COUNCIL       — Credit pack 5000 credits (annual council)
+ *   STRIPE_PACK_STARTER       — Credit pack 10 credits (USD)
+ *   STRIPE_PACK_PROFESSIONAL  — Credit pack 50 credits (USD)
+ *   STRIPE_PACK_ENTERPRISE    — Credit pack 150 credits (USD)
+ *   STRIPE_PACK_STARTER_CNY   — Credit pack 10 credits (CNY)
+ *   STRIPE_PACK_PROFESSIONAL_CNY — Credit pack 50 credits (CNY)
+ *   STRIPE_PACK_ENTERPRISE_CNY — Credit pack 150 credits (CNY)
+ *   STRIPE_COUNCIL_FOUNDING   — Council Founding tier (annual)
+ *   STRIPE_COUNCIL_INDIVIDUAL — Council Individual tier (annual)
+ *   STRIPE_COUNCIL_CORPORATE  — Council Corporate tier (annual)
+ *   STRIPE_COUNCIL_PE_PARTNER — Council PE Partner tier (annual)
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
@@ -31,47 +38,125 @@ interface CreditPack {
   credits: number;
   price: number;
   priceId: string;
+  currency: 'USD' | 'CNY';
 }
 
-/**
- * Credit pack price catalog. Values are Stripe Price IDs, looked up from
- * environment variables so they can be swapped without a code deploy.
- */
-function getCreditPackCatalog(): Record<string, CreditPack> {
+interface SubscriptionTier {
+  id: string;
+  name: string;
+  priceId: string;
+  currency: 'USD' | 'CNY';
+  price: number;
+  councilCreditsPerYear: number;
+  coachingSessionsPerYear: number;
+  dailyDexCredits: number;
+  memberSeats: number;
+}
+
+function getCurrencyFromLocale(locale: string | undefined): 'USD' | 'CNY' {
+  if (!locale) return 'USD';
+  const normalized = locale.toLowerCase();
+  if (normalized.includes('zh') || normalized.includes('cn') || normalized.includes('chinese')) {
+    return 'CNY';
+  }
+  return 'USD';
+}
+
+function getCreditPackCatalog(currency: 'USD' | 'CNY'): Record<string, CreditPack> {
+  const isCNY = currency === 'CNY';
   return {
     starter: {
       credits: 10,
-      price: 9.99,
-      priceId: process.env.STRIPE_PACK_STARTER || '',
+      price: isCNY ? 79 : 9.99,
+      priceId: isCNY ? process.env.STRIPE_PACK_STARTER_CNY || '' : process.env.STRIPE_PACK_STARTER || '',
+      currency,
     },
     professional: {
       credits: 50,
-      price: 39.99,
-      priceId: process.env.STRIPE_PACK_PROFESSIONAL || '',
+      price: isCNY ? 319 : 39.99,
+      priceId: isCNY ? process.env.STRIPE_PACK_PROFESSIONAL_CNY || '' : process.env.STRIPE_PACK_PROFESSIONAL || '',
+      currency,
     },
     enterprise: {
       credits: 150,
-      price: 99.99,
-      priceId: process.env.STRIPE_PACK_ENTERPRISE || '',
-    },
-    council: {
-      credits: 12,
-      price: 179.99,
-      priceId: process.env.STRIPE_PACK_COUNCIL || '',
+      price: isCNY ? 799 : 99.99,
+      priceId: isCNY ? process.env.STRIPE_PACK_ENTERPRISE_CNY || '' : process.env.STRIPE_PACK_ENTERPRISE || '',
+      currency,
     },
   };
 }
 
-/**
- * Reverse lookup: given a Stripe price id, return the matching pack
- * (credits amount) so the webhook handler knows how much to credit.
- */
+function getCouncilSubscriptionTiers(currency: 'USD' | 'CNY'): Record<string, SubscriptionTier> {
+  const isCNY = currency === 'CNY';
+  return {
+    founding: {
+      id: 'founding',
+      name: 'Council Founding',
+      priceId: isCNY ? process.env.STRIPE_COUNCIL_FOUNDING || '' : process.env.STRIPE_COUNCIL_FOUNDING_USD || '',
+      currency,
+      price: isCNY ? 2800 : 350,
+      councilCreditsPerYear: 12,
+      coachingSessionsPerYear: 12,
+      dailyDexCredits: 5,
+      memberSeats: 1,
+    },
+    individual: {
+      id: 'individual',
+      name: 'Council Individual',
+      priceId: isCNY ? process.env.STRIPE_COUNCIL_INDIVIDUAL || '' : process.env.STRIPE_COUNCIL_INDIVIDUAL_USD || '',
+      currency,
+      price: isCNY ? 3800 : 475,
+      councilCreditsPerYear: 12,
+      coachingSessionsPerYear: 12,
+      dailyDexCredits: 5,
+      memberSeats: 1,
+    },
+    corporate: {
+      id: 'corporate',
+      name: 'Council Corporate',
+      priceId: isCNY ? process.env.STRIPE_COUNCIL_CORPORATE || '' : process.env.STRIPE_COUNCIL_CORPORATE_USD || '',
+      currency,
+      price: isCNY ? 12000 : 1500,
+      councilCreditsPerYear: 48,
+      coachingSessionsPerYear: 48,
+      dailyDexCredits: 25,
+      memberSeats: 5,
+    },
+    'pe-partner': {
+      id: 'pe-partner',
+      name: 'Council PE Partner',
+      priceId: isCNY ? process.env.STRIPE_COUNCIL_PE_PARTNER || '' : process.env.STRIPE_COUNCIL_PE_PARTNER_USD || '',
+      currency,
+      price: isCNY ? 25000 : 3125,
+      councilCreditsPerYear: 100,
+      coachingSessionsPerYear: 100,
+      dailyDexCredits: 50,
+      memberSeats: 3,
+    },
+  };
+}
+
 function getPackByPriceId(lookupPriceId: string): CreditPack | null {
-  const catalog = getCreditPackCatalog();
-  for (const key of Object.keys(catalog)) {
-    const pack = catalog[key];
-    if (pack.priceId && pack.priceId === lookupPriceId) {
-      return pack;
+  for (const currency of ['USD', 'CNY'] as const) {
+    const catalog = getCreditPackCatalog(currency);
+    for (const key of Object.keys(catalog)) {
+      const pack = catalog[key];
+      if (pack.priceId && pack.priceId === lookupPriceId) {
+        return pack;
+      }
+    }
+  }
+  return null;
+}
+
+function getSubscriptionTierByPriceId(lookupPriceId: string): SubscriptionTier | null {
+  for (const currency of ['USD', 'CNY'] as const) {
+    const tiers = getCouncilSubscriptionTiers(currency);
+    for (const key of Object.keys(tiers)) {
+      const tier = tiers[key];
+      if (tier.priceId && tier.priceId === lookupPriceId) {
+        return tier;
+      }
     }
   }
   return null;
@@ -108,6 +193,9 @@ export async function handleStripe(req: VercelRequest, res: VercelResponse) {
     if (action === 'checkout-credit' && req.method === 'POST') {
       return handleCreditPackCheckout(req, res);
     }
+    if (action === 'checkout-subscription' && req.method === 'POST') {
+      return handleSubscriptionCheckout(req, res);
+    }
     if (action === 'portal' && req.method === 'GET') {
       return handlePortal(req, res);
     }
@@ -123,7 +211,7 @@ export async function handleStripe(req: VercelRequest, res: VercelResponse) {
 }
 
 async function handleCheckout(req: VercelRequest, res: VercelResponse) {
-  const { priceId, successUrl, cancelUrl } = req.body || {};
+  const { priceId, successUrl, cancelUrl, locale } = req.body || {};
 
   if (!priceId) {
     return res.status(400).json({ error: 'priceId is required' });
@@ -155,15 +243,19 @@ async function handleCheckout(req: VercelRequest, res: VercelResponse) {
       });
     }
 
+    const tier = getSubscriptionTierByPriceId(priceId);
+    const mode = tier ? 'subscription' : 'payment';
+
     const session = await stripeApi('POST', '/v1/checkout/sessions', {
       customer: customerId,
       'payment_method_types[0]': 'card',
       'line_items[0][price]': priceId,
       'line_items[0][quantity]': '1',
-      mode: 'subscription',
+      mode,
       success_url: successUrl || `${req.headers.origin}/dashboard?success=true`,
       cancel_url: cancelUrl || `${req.headers.origin}/settings?canceled=true`,
       'metadata[user_id]': user.id,
+      'metadata[tier_id]': tier?.id || '',
     });
 
     if (session.error) {
@@ -177,16 +269,11 @@ async function handleCheckout(req: VercelRequest, res: VercelResponse) {
   }
 }
 
-/**
- * One-time checkout for a credit pack purchase. Uses mode='payment'
- * (not subscription) and attaches org + user metadata so the webhook can
- * reconcile the balance correctly.
- */
 async function handleCreditPackCheckout(req: VercelRequest, res: VercelResponse) {
-  const { packKey, successUrl, cancelUrl } = req.body || {};
+  const { packKey, successUrl, cancelUrl, locale } = req.body || {};
 
   if (!packKey) {
-    return res.status(400).json({ error: 'packKey is required (starter, professional, enterprise, council)' });
+    return res.status(400).json({ error: 'packKey is required (starter, professional, enterprise)' });
   }
 
   const { user, error } = await getUserFromRequest(req);
@@ -194,14 +281,15 @@ async function handleCreditPackCheckout(req: VercelRequest, res: VercelResponse)
     return res.status(401).json({ error: error || 'Unauthorized' });
   }
 
-  const catalog = getCreditPackCatalog();
+  const currency = getCurrencyFromLocale(locale);
+  const catalog = getCreditPackCatalog(currency);
   const pack = catalog[packKey];
+  
   if (!pack || !pack.priceId) {
-    return res.status(400).json({ error: 'Invalid credit pack' });
+    return res.status(400).json({ error: `Invalid credit pack for ${currency}` });
   }
 
   try {
-    // Look up (or create) a Stripe customer and the user's org id.
     const profile = await db.selectOne('profiles', {
       column: 'id',
       value: user.id,
@@ -227,6 +315,7 @@ async function handleCreditPackCheckout(req: VercelRequest, res: VercelResponse)
       user_id: user.id,
       pack_key: packKey,
       credits: String(pack.credits),
+      currency,
     };
     if (orgId) metadata.org_id = orgId;
 
@@ -250,12 +339,94 @@ async function handleCreditPackCheckout(req: VercelRequest, res: VercelResponse)
     return res.status(200).json({
       url: session.url,
       sessionId: session.id,
-      pack: { key: packKey, credits: pack.credits, price: pack.price },
+      pack: { key: packKey, credits: pack.credits, price: pack.price, currency },
     });
   } catch (e: any) {
     console.error('[Stripe] Credit pack checkout error:', e);
     return res.status(500).json({
       error: 'Failed to create credit pack checkout',
+      details: e?.message,
+    });
+  }
+}
+
+async function handleSubscriptionCheckout(req: VercelRequest, res: VercelResponse) {
+  const { tierId, successUrl, cancelUrl, locale } = req.body || {};
+
+  if (!tierId) {
+    return res.status(400).json({ error: 'tierId is required (founding, individual, corporate, pe-partner)' });
+  }
+
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: error || 'Unauthorized' });
+  }
+
+  const currency = getCurrencyFromLocale(locale);
+  const tiers = getCouncilSubscriptionTiers(currency);
+  const tier = tiers[tierId];
+
+  if (!tier || !tier.priceId) {
+    return res.status(400).json({ error: `Invalid subscription tier for ${currency}` });
+  }
+
+  try {
+    const profile = await db.selectOne('profiles', {
+      column: 'id',
+      value: user.id,
+      select: 'id,email,stripe_customer_id,organization_id',
+    });
+
+    let customerId = profile?.stripe_customer_id;
+
+    if (!customerId) {
+      const customer = await stripeApi('POST', '/v1/customers', {
+        email: user.email,
+        metadata: { user_id: user.id },
+      });
+      customerId = customer.id;
+
+      await db.update('profiles', { column: 'id', value: user.id }, {
+        stripe_customer_id: customerId,
+      });
+    }
+
+    const metadata: Record<string, string> = {
+      user_id: user.id,
+      tier_id: tierId,
+      currency,
+      council_credits: String(tier.councilCreditsPerYear),
+      coaching_sessions: String(tier.coachingSessionsPerYear),
+      daily_dex_credits: String(tier.dailyDexCredits),
+      member_seats: String(tier.memberSeats),
+    };
+
+    const session = await stripeApi('POST', '/v1/checkout/sessions', {
+      customer: customerId,
+      'payment_method_types[0]': 'card',
+      'line_items[0][price]': tier.priceId,
+      'line_items[0][quantity]': '1',
+      mode: 'subscription',
+      success_url: successUrl || `${req.headers.origin}/dashboard?success=true`,
+      cancel_url: cancelUrl || `${req.headers.origin}/council/membership?canceled=true`,
+      ...Object.fromEntries(
+        Object.entries(metadata).map(([k, v]) => [`metadata[${k}]`, v])
+      ),
+    });
+
+    if (session.error) {
+      throw new Error(session.error.message);
+    }
+
+    return res.status(200).json({
+      url: session.url,
+      sessionId: session.id,
+      tier: { id: tierId, name: tier.name, price: tier.price, currency },
+    });
+  } catch (e: any) {
+    console.error('[Stripe] Subscription checkout error:', e);
+    return res.status(500).json({
+      error: 'Failed to create subscription checkout',
       details: e?.message,
     });
   }
@@ -369,7 +540,7 @@ async function handleWebhook(req: VercelRequest, res: VercelResponse) {
 
 async function handleInvoicePaymentSucceeded(invoice: any): Promise<void> {
   const customerId = invoice.customer;
-  const amountPaid = invoice.amount_paid / 100; // Convert cents to dollars
+  const amountPaid = invoice.amount_paid / 100;
 
   const profile = await db.selectOne('profiles', {
     column: 'stripe_customer_id',
@@ -387,11 +558,11 @@ async function handleInvoicePaymentSucceeded(invoice: any): Promise<void> {
       user_id: profile.id,
       amount: 0,
       transaction_type: 'earn_credit',
-      description: `Subscription payment received: $${amountPaid}`,
+      description: `Subscription payment received`,
       stripe_session_id: invoice.id,
     });
 
-    console.log(`[Stripe] Payment logged for user ${profile.id}: $${amountPaid}`);
+    console.log(`[Stripe] Payment logged for user ${profile.id}`);
   } catch (e) {
     console.error('[Stripe] Failed to log payment:', e);
   }
@@ -399,7 +570,6 @@ async function handleInvoicePaymentSucceeded(invoice: any): Promise<void> {
 
 async function handleInvoicePaymentFailed(invoice: any): Promise<void> {
   const customerId = invoice.customer;
-  const paymentIntent = invoice.payment_intent;
 
   const profile = await db.selectOne('profiles', {
     column: 'stripe_customer_id',
@@ -428,10 +598,10 @@ async function handleInvoicePaymentFailed(invoice: any): Promise<void> {
       body: JSON.stringify({
         from: 'LYC Intelligence <support@lycintelligence.com>',
         to: profile.email,
-        subject: 'Payment Failed - Your LYC Intelligence Subscription',
+        subject: 'Payment Failed - Your LYC Intelligence Council Membership',
         html: `<p>Hello,</p>
-          <p>We were unable to process your recent payment for your LYC Intelligence Council subscription.</p>
-          <p>Your subscription has been placed on hold. You have 7 days to update your payment method before your account is downgraded to Member.</p>
+          <p>We were unable to process your recent payment for your LYC Intelligence Council membership.</p>
+          <p>Your membership has been placed on hold. You have 7 days to update your payment method before your account is downgraded to Member.</p>
           <p>Please update your payment details here: https://app.lycintelligence.com/settings/billing</p>
           <p>Thank you,</p>
           <p>The LYC Intelligence Team</p>`,
@@ -443,11 +613,6 @@ async function handleInvoicePaymentFailed(invoice: any): Promise<void> {
   }
 }
 
-/**
- * Handle completed checkout sessions.
- * - mode='payment' with pack_key metadata → apply as credit pack purchase
- * - mode='subscription' → handled by customer.subscription.* events
- */
 async function handleCheckoutSessionCompleted(session: any): Promise<void> {
   if (!session) return;
 
@@ -458,7 +623,6 @@ async function handleCheckoutSessionCompleted(session: any): Promise<void> {
   const orgId = metadata?.org_id;
   const sessionId = session.id;
 
-  // IDEMPOTENCY CHECK: Check if this session was already processed
   try {
     const existingTx = await db.selectOne('v2_credit_transactions', {
       column: 'idempotency_key',
@@ -507,7 +671,7 @@ async function handleCheckoutSessionCompleted(session: any): Promise<void> {
     return;
   }
 
-  console.log('[Stripe] checkout.session.completed (non-pack):', session.id);
+  console.log('[Stripe] checkout.session.completed (subscription):', session.id);
 }
 
 async function handleSubscriptionUpdate(subscription: any) {
@@ -516,10 +680,19 @@ async function handleSubscriptionUpdate(subscription: any) {
   const subscriptionId = subscription.id;
 
   const priceId = subscription.items?.data?.[0]?.price?.id;
+  const tierData = getSubscriptionTierByPriceId(priceId);
+  
   let tier = 'member';
-  if (priceId === process.env.STRIPE_PRICE_COUNCIL) tier = 'council';
-  else if (priceId === process.env.STRIPE_PRICE_PRO) tier = 'pro';
-  else if (priceId === process.env.STRIPE_PRICE_BASIC) tier = 'basic';
+  let councilTier: string | null = null;
+  
+  if (tierData) {
+    tier = `council-${tierData.id}`;
+    councilTier = tierData.id;
+  } else if (priceId === process.env.STRIPE_PRICE_PRO) {
+    tier = 'pro';
+  } else if (priceId === process.env.STRIPE_PRICE_BASIC) {
+    tier = 'basic';
+  }
 
   const profile = await db.selectOne('profiles', {
     column: 'stripe_customer_id',
@@ -539,19 +712,35 @@ async function handleSubscriptionUpdate(subscription: any) {
 
   if (status === 'active') {
     updates.tier = tier;
-    await grantDailyCreditsForTier(profile.id, tier);
+    if (councilTier) {
+      updates.council_tier = councilTier;
+    }
+    await grantDailyCreditsForTier(profile.id, tier, councilTier);
+    await grantAnnualCouncilCredits(profile.id, councilTier);
   } else if (status === 'canceled') {
     updates.tier = 'member';
-    await grantDailyCreditsForTier(profile.id, 'member');
+    updates.council_tier = null;
+    await grantDailyCreditsForTier(profile.id, 'member', null);
   } else if (status === 'past_due') {
     updates.tier = tier;
+    if (councilTier) {
+      updates.council_tier = councilTier;
+    }
   }
 
   await db.update('profiles', { column: 'id', value: profile.id }, updates);
 }
 
-async function grantDailyCreditsForTier(userId: string, tier: string): Promise<void> {
-  const dailyCredits = tier === 'council' ? 5 : 2;
+async function grantDailyCreditsForTier(userId: string, tier: string, councilTier: string | null): Promise<void> {
+  let dailyCredits = 2;
+  let tierLabel = tier;
+
+  if (tier.startsWith('council-')) {
+    const tiers = getCouncilSubscriptionTiers('CNY');
+    const councilData = tiers[councilTier || 'individual'];
+    dailyCredits = councilData?.dailyDexCredits || 5;
+    tierLabel = `council-${councilTier}`;
+  }
   
   try {
     const creditData = await db.selectOne('credits', {
@@ -567,7 +756,7 @@ async function grantDailyCreditsForTier(userId: string, tier: string): Promise<v
       await db.update('credits', { column: 'user_id', value: userId }, {
         balance: newBalance,
         total_earned: newTotalEarned,
-        tier,
+        tier: tierLabel,
         updated_at: new Date().toISOString(),
       });
 
@@ -575,7 +764,7 @@ async function grantDailyCreditsForTier(userId: string, tier: string): Promise<v
         user_id: userId,
         amount: dailyCredits,
         transaction_type: 'earn_credit',
-        description: `Daily credit allocation (${tier} tier)`,
+        description: `Daily DEX AI credits (${tierLabel})`,
       });
     } else {
       await db.insert('credits', {
@@ -583,7 +772,7 @@ async function grantDailyCreditsForTier(userId: string, tier: string): Promise<v
         balance: dailyCredits,
         total_earned: dailyCredits,
         total_spent: 0,
-        tier,
+        tier: tierLabel,
         created_at: new Date().toISOString(),
       });
 
@@ -591,11 +780,45 @@ async function grantDailyCreditsForTier(userId: string, tier: string): Promise<v
         user_id: userId,
         amount: dailyCredits,
         transaction_type: 'earn_credit',
-        description: `Initial credit allocation (${tier} tier)`,
+        description: `Initial DEX AI credits (${tierLabel})`,
       });
     }
   } catch (e) {
     console.error('[Stripe] Failed to grant daily credits:', e);
+  }
+}
+
+async function grantAnnualCouncilCredits(userId: string, councilTier: string | null): Promise<void> {
+  if (!councilTier) return;
+
+  const tiers = getCouncilSubscriptionTiers('CNY');
+  const tierData = tiers[councilTier];
+  
+  if (!tierData) return;
+
+  try {
+    const councilCredits = tierData.councilCreditsPerYear;
+
+    await db.insert('v2_council_credits', {
+      user_id: userId,
+      balance: councilCredits,
+      total_earned: councilCredits,
+      total_spent: 0,
+      tier: councilTier,
+      created_at: new Date().toISOString(),
+    });
+
+    await db.insert('v2_council_transactions', {
+      user_id: userId,
+      amount: councilCredits,
+      transaction_type: 'earn',
+      description: `Annual Council Credits allocation (${councilTier})`,
+      created_at: new Date().toISOString(),
+    });
+
+    console.log(`[Stripe] Council credits granted: ${userId} +${councilCredits} (${councilTier})`);
+  } catch (e) {
+    console.error('[Stripe] Failed to grant Council credits:', e);
   }
 }
 
@@ -612,10 +835,11 @@ async function handleSubscriptionDeleted(subscription: any) {
 
   await db.update('profiles', { column: 'id', value: profile.id }, {
     tier: 'member',
+    council_tier: null,
     stripe_subscription_status: 'canceled',
   });
 
-  await grantDailyCreditsForTier(profile.id, 'member');
+  await grantDailyCreditsForTier(profile.id, 'member', null);
 }
 
 export async function webhookHandler(req: VercelRequest, res: VercelResponse) {

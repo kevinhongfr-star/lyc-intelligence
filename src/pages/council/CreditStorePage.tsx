@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/Button';
  *  - DEX AI is the product name
  */
 
-type PackId = 'starter' | 'professional' | 'enterprise' | 'council';
+type PackId = 'starter' | 'professional' | 'enterprise';
 
 interface CreditPack {
   id: PackId;
@@ -73,18 +73,6 @@ const CREDIT_PACKS: CreditPack[] = [
     popular: false,
     highlight: 'For power users and small teams',
     cta: 'Buy Enterprise',
-  },
-  {
-    id: 'council',
-    name: 'Council',
-    credits: 12,
-    price: 179.99,
-    priceLabel: '$179.99',
-    perCredit: '$14.99 / credit',
-    icon: Crown,
-    popular: false,
-    highlight: 'Best value — for ongoing advisory',
-    cta: 'Buy Council Pack',
   },
 ];
 

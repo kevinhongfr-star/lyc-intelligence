@@ -2,10 +2,9 @@
  * IntelligenceDashboardPage — Signal dashboard (consultant view)
  * Surfaces market signals captured by the Intelligence Layer so consultants
  * can triage, filter and act on executive moves, funding rounds, market shifts.
- * Self-contained: renders mock data on first paint, designed to be wired to
- * /api/intelligence/signals later.
+ * Wired to /api/intelligence/signals for real data.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Activity,
   TrendingUp,
@@ -16,15 +15,16 @@ import {
   Search,
   ChevronDown,
   Download,
+  Check,
+  Clock,
+  Archive,
+  RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
-
-/* ------------------------------------------------------------------ */
-/* Types                                                               */
-/* ------------------------------------------------------------------ */
+import { useAuth } from '@/contexts/AuthContext';
 
 type SignalType =
   | 'executive_movement'
@@ -45,13 +45,13 @@ interface Signal {
   date: string;
   summary: string;
   highPriority: boolean;
+  severity?: string;
+  detected_at?: string;
+  affected_industries?: string[];
+  affected_geographies?: string[];
 }
 
 type FilterKey = 'all' | 'high_priority' | 'new' | 'actioned';
-
-/* ------------------------------------------------------------------ */
-/* Label / color maps                                                  */
-/* ------------------------------------------------------------------ */
 
 const SIGNAL_TYPE_LABELS: Record<SignalType, string> = {
   executive_movement: 'Executive Movement',
@@ -89,105 +89,6 @@ function relevanceTier(score: number): {
   }
   return { label: 'Low', color: 'text-[#737373]', bg: 'bg-[#F7F7F7]' };
 }
-
-/* ------------------------------------------------------------------ */
-/* Mock data                                                           */
-/* ------------------------------------------------------------------ */
-
-const MOCK_SIGNALS: Signal[] = [
-  {
-    id: 'sig_001',
-    type: 'executive_movement',
-    company: 'Northwind Robotics',
-    source: 'LinkedIn',
-    relevance: 92,
-    status: 'new',
-    date: '2026-07-14',
-    summary: 'VP Engineering departed to join a competitor; succession gap flagged.',
-    highPriority: true,
-  },
-  {
-    id: 'sig_002',
-    type: 'funding_round',
-    company: 'Halcyon Bio',
-    source: 'Crunchbase API',
-    relevance: 88,
-    status: 'new',
-    date: '2026-07-13',
-    summary: 'Closed $120M Series D led by Tier-1 investor. Hiring expansion expected.',
-    highPriority: true,
-  },
-  {
-    id: 'sig_003',
-    type: 'market_shift',
-    company: 'Sector: Fintech (APAC)',
-    source: 'RSS · TechCrunch',
-    relevance: 64,
-    status: 'reviewed',
-    date: '2026-07-12',
-    summary: 'Regulatory easing in Singapore opens payments licensing window.',
-    highPriority: false,
-  },
-  {
-    id: 'sig_004',
-    type: 'leadership_change',
-    company: 'Vertex Logistics',
-    source: 'Press Release',
-    relevance: 55,
-    status: 'reviewed',
-    date: '2026-07-11',
-    summary: 'New COO appointed from outside the industry; strategy review likely.',
-    highPriority: false,
-  },
-  {
-    id: 'sig_005',
-    type: 'expansion_news',
-    company: 'Atlas Cloud',
-    source: 'Web Scrape · PR Newswire',
-    relevance: 73,
-    status: 'actioned',
-    date: '2026-07-10',
-    summary: 'Opening EMEA HQ in Berlin; 40+ senior hires planned over 2 quarters.',
-    highPriority: true,
-  },
-  {
-    id: 'sig_006',
-    type: 'funding_round',
-    company: 'Meridian AI',
-    source: 'PitchBook API',
-    relevance: 35,
-    status: 'archived',
-    date: '2026-07-08',
-    summary: 'Small bridge round; limited headcount impact.',
-    highPriority: false,
-  },
-  {
-    id: 'sig_007',
-    type: 'executive_movement',
-    company: 'Quartz Mobility',
-    source: 'Social · X',
-    relevance: 48,
-    status: 'new',
-    date: '2026-07-07',
-    summary: 'Chief Product Officer announced departure on personal network.',
-    highPriority: false,
-  },
-  {
-    id: 'sig_008',
-    type: 'expansion_news',
-    company: 'Borealis Energy',
-    source: 'RSS · Reuters',
-    relevance: 41,
-    status: 'reviewed',
-    date: '2026-07-05',
-    summary: 'New manufacturing facility in Texas; operations leadership hiring.',
-    highPriority: false,
-  },
-];
-
-/* ------------------------------------------------------------------ */
-/* Sub-components                                                      */
-/* ------------------------------------------------------------------ */
 
 function KpiCard({
   icon,
@@ -229,24 +130,61 @@ function TableSkeleton() {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Page                                                                */
-/* ------------------------------------------------------------------ */
-
 export function IntelligenceDashboardPage() {
-  const [loading, setLoading] = useState(false);
-  const [signals, setSignals] = useState<Signal[]>(MOCK_SIGNALS);
+  const { session } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [signals, setSignals] = useState<Signal[]>([]);
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d'>('30d');
+  const [actioningId, setActioningId] = useState<string | null>(null);
 
-  const refresh = () => {
+  const fetchSignals = async () => {
     setLoading(true);
-    // Simulated fetch — replace with /api/intelligence/signals
-    setTimeout(() => {
-      setSignals(MOCK_SIGNALS);
+    try {
+      const token = session?.access_token;
+      const res = await fetch('/api/intelligence/signals', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error('Failed to fetch signals');
+      const data = await res.json();
+      setSignals(data.signals || []);
+    } catch (error) {
+      console.error('Failed to fetch signals:', error);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
+  };
+
+  useEffect(() => {
+    fetchSignals();
+  }, [session]);
+
+  const updateSignalStatus = async (signalId: string, newStatus: SignalStatus) => {
+    setActioningId(signalId);
+    try {
+      const token = session?.access_token;
+      const res = await fetch('/api/intelligence/signals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          id: signalId,
+          status: newStatus,
+        }),
+      });
+      if (res.ok) {
+        setSignals((prev) =>
+          prev.map((s) => (s.id === signalId ? { ...s, status: newStatus } : s))
+        );
+      }
+    } catch (error) {
+      console.error('Failed to update signal:', error);
+    } finally {
+      setActioningId(null);
+    }
   };
 
   const filtered = useMemo(() => {
@@ -284,10 +222,73 @@ export function IntelligenceDashboardPage() {
     { key: 'actioned', label: 'Actioned' },
   ];
 
+  const getActionButtons = (signal: Signal) => {
+    if (actioningId === signal.id) {
+      return (
+        <div className="flex items-center gap-2">
+          <RefreshCw className="h-4 w-4 animate-spin text-[#C108AB]" />
+        </div>
+      );
+    }
+
+    switch (signal.status) {
+      case 'new':
+        return (
+          <div className="flex items-center gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => updateSignalStatus(signal.id, 'reviewed')}
+              className="h-7 px-2 text-[11px]"
+            >
+              <Check className="h-3 w-3" />
+              Mark Reviewed
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => updateSignalStatus(signal.id, 'actioned')}
+              className="h-7 px-2 text-[11px]"
+            >
+              Action
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => updateSignalStatus(signal.id, 'archived')}
+              className="h-7 px-2 text-[11px] text-[#737373]"
+            >
+              <Archive className="h-3 w-3" />
+            </Button>
+          </div>
+        );
+      case 'reviewed':
+        return (
+          <div className="flex items-center gap-1">
+            <Button
+              size="sm"
+              onClick={() => updateSignalStatus(signal.id, 'actioned')}
+              className="h-7 px-2 text-[11px]"
+            >
+              Action
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => updateSignalStatus(signal.id, 'archived')}
+              className="h-7 px-2 text-[11px] text-[#737373]"
+            >
+              <Archive className="h-3 w-3" />
+            </Button>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F7F7F7]">
       <div className="mx-auto max-w-7xl px-6 py-8">
-        {/* ---------- Header ---------- */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#1C1C1C]">Intelligence Dashboard</h1>
@@ -308,14 +309,17 @@ export function IntelligenceDashboardPage() {
               </select>
               <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#A3A3A3]" />
             </div>
-            <Button variant="outline" size="sm" onClick={refresh} aria-label="Refresh signals">
+            <Button variant="outline" size="sm" onClick={fetchSignals}>
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </Button>
+            <Button variant="outline" size="sm" aria-label="Export signals">
               <Download className="h-4 w-4" />
               Export
             </Button>
           </div>
         </div>
 
-        {/* ---------- KPI cards ---------- */}
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard
             icon={<Activity className="h-5 w-5" />}
@@ -343,7 +347,6 @@ export function IntelligenceDashboardPage() {
           />
         </div>
 
-        {/* ---------- Filter bar ---------- */}
         <div className="mt-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-1.5">
             <Filter className="mr-1 h-4 w-4 text-[#737373]" />
@@ -376,7 +379,6 @@ export function IntelligenceDashboardPage() {
           </div>
         </div>
 
-        {/* ---------- Signal feed table ---------- */}
         <div className="mt-4">
           <Card className="overflow-hidden">
             <div className="border-b border-[#E5E5E5] px-6 py-4">
@@ -409,9 +411,10 @@ export function IntelligenceDashboardPage() {
                       <th className="px-6 py-3 font-semibold">Signal Type</th>
                       <th className="px-6 py-3 font-semibold">Company</th>
                       <th className="px-6 py-3 font-semibold">Source</th>
-                      <th className="px-6 py-3 font-semibold">Relevance Score</th>
+                      <th className="px-6 py-3 font-semibold">Relevance</th>
                       <th className="px-6 py-3 font-semibold">Status</th>
                       <th className="px-6 py-3 font-semibold">Date</th>
+                      <th className="px-6 py-3 font-semibold">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -464,12 +467,13 @@ export function IntelligenceDashboardPage() {
                             <Badge variant={status.variant}>{status.label}</Badge>
                           </td>
                           <td className="px-6 py-4 text-sm text-[#525252]">
-                            {new Date(s.date).toLocaleDateString('en-US', {
+                            {new Date(s.date || s.detected_at || Date.now()).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
                               year: 'numeric',
                             })}
                           </td>
+                          <td className="px-6 py-4">{getActionButtons(s)}</td>
                         </tr>
                       );
                     })}
