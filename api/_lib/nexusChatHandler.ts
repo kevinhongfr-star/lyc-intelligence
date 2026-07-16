@@ -19,6 +19,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { checkRateLimit } from './rateLimiter.js';
 
 // ── DeepSeek Configuration ──
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
@@ -47,28 +48,6 @@ async function getRuntimeConfig(): Promise<{ temperature: number; max_tokens: nu
   } catch {
     return { temperature: 0.7, max_tokens: 500, model: DEEPSEEK_MODEL };
   }
-}
-
-
-// ── Rate limiter (in-memory, per-instance) ──
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(key: string, maxRequests: number, windowMs: number): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(key);
-  if (entry && now < entry.resetAt) {
-    if (entry.count >= maxRequests) return false;
-    entry.count++;
-    return true;
-  }
-  rateLimitMap.set(key, { count: 1, resetAt: now + windowMs });
-  return true;
-}
-
-function getClientIp(req: VercelRequest): string {
-  return ((req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()) ||
-    (req.headers['x-real-ip'] as string) ||
-    'unknown';
 }
 
 // ── Seniority Detection ──
@@ -317,9 +296,12 @@ async function callDeepSeekNonStreaming(
 // ── Main Handler ──
 export async function handleNexusChat(req: VercelRequest, res: VercelResponse) {
   const runtimeConfig = await getRuntimeConfig();
-  const ip = getClientIp(req);
+  const ip = ((req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()) ||
+    (req.headers['x-real-ip'] as string) ||
+    'unknown';
   
-  if (!checkRateLimit(ip, 30, 60 * 1000)) {
+  const ok = await checkRateLimit(`nexus:${ip}`, 30, 60 * 1000);
+  if (!ok) {
     res.setHeader('Retry-After', '60');
     return res.status(429).json({ error: 'Rate limit exceeded' });
   }

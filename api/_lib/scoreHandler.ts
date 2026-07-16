@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { insert, isSupabaseConfigured, handleError } from './supabaseRest.js';
+import { checkRateLimit } from './rateLimiter.js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 
@@ -42,24 +43,11 @@ interface ScoreResult {
   approach_strategy: string;
 }
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function isRateLimited(ip: string, limit: number, windowMs: number): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
-    return false;
-  }
-  if (entry.count >= limit) return true;
-  entry.count++;
-  return false;
-}
-
 export async function handleScore(req: VercelRequest, res: VercelResponse) {
   try {
     const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
-    if (isRateLimited(ip, 10, 60 * 1000)) {
+    const ok = await checkRateLimit(`score:${ip}`, 10, 60 * 1000);
+    if (!ok) {
       return res.status(429).json({ error: 'Rate limit exceeded' });
     }
 

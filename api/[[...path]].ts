@@ -48,29 +48,14 @@ import { handler as handleChat } from './_lib/chatHandler.js';
 
 export const maxDuration = 300;
 
-// ── Rate limiter (in-memory, per-serverless-instance) ──
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(key: string, maxRequests: number, windowMs: number): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(key);
-  if (entry && now < entry.resetAt) {
-    if (entry.count >= maxRequests) return false;
-    entry.count++;
-    return true;
-  }
-  rateLimitMap.set(key, { count: 1, resetAt: now + windowMs });
-  return true;
-}
+// ── Rate limiter (persisted, database-backed) ──
+import { checkRateLimit } from './_lib/rateLimiter.js';
 
 function getClientIp(req: VercelRequest): string {
   return ((req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()) ||
     (req.headers['x-real-ip'] as string) ||
     'unknown';
 }
-
-// ── Email rate limiter ──
-const emailRateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 // ── uuid helper ──
 function uuidv4(): string {
@@ -423,7 +408,8 @@ export default async function handler(
     (module === 'stripe' && pathArr[1] === 'webhook') ||
     (module === 'x' && pathArr[1] === 'cron');
 
-  if (!checkRateLimit(ip, isPublic ? 30 : 100, 60000)) {
+  const ok = await checkRateLimit(`api:${ip}`, isPublic ? 30 : 100, 60000);
+  if (!ok) {
     res.setHeader('Retry-After', '60');
     return res.status(429).json({ error: 'Rate limit exceeded' });
   }
@@ -725,14 +711,9 @@ export default async function handler(
         const ip =
           (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
           'unknown';
-        const now = Date.now();
-        const entry = emailRateLimitMap.get(ip);
-        if (entry && now < entry.resetAt && entry.count >= 3)
+        const emailOk = await checkRateLimit(`email:${ip}`, 3, 60000);
+        if (!emailOk)
           return res.status(429).json({ error: 'Rate limit exceeded' });
-        emailRateLimitMap.set(ip, {
-          count: (entry?.count || 0) + 1,
-          resetAt: now + 60000,
-        });
         const result = await sendEmail(type, data);
         return res.status(200).json(result);
       }
@@ -809,14 +790,9 @@ export default async function handler(
           const ip =
             (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
             'unknown';
-          const now = Date.now();
-          const entry = emailRateLimitMap.get(ip);
-          if (entry && now < entry.resetAt && entry.count >= 3)
+          const emailOk = await checkRateLimit(`email:${ip}`, 3, 60000);
+          if (!emailOk)
             return res.status(429).json({ error: 'Rate limit exceeded' });
-          emailRateLimitMap.set(ip, {
-            count: (entry?.count || 0) + 1,
-            resetAt: now + 60000,
-          });
           return res.status(200).json(await sendEmail(type, data));
         }
         if (xModule !== 'cron') {

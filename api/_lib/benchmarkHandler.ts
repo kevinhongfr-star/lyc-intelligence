@@ -4,23 +4,10 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { checkRateLimit } from './rateLimiter.js';
 
 const COZE_API_KEY = process.env.COZE_API_KEY || '';
 const COZE_WORKFLOW_ID = process.env.COZE_BENCHMARK_WORKFLOW_ID || 'benchmark_scoring';
-
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + 60000 });
-    return false;
-  }
-  if (entry.count >= 10) return true;
-  entry.count++;
-  return false;
-}
 
 interface CozeBenchmarkInput {
   assessment_type: string;
@@ -90,7 +77,8 @@ function generateDefaultInsights(input: CozeBenchmarkInput): CozeBenchmarkOutput
 
 export async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
-  if (isRateLimited(ip)) {
+  const ok = await checkRateLimit(`benchmark:${ip}`, 10, 60000);
+  if (!ok) {
     res.status(429).json({ error: 'Rate limit exceeded' });
     return;
   }

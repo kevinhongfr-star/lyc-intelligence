@@ -6,23 +6,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getUserFromRequest } from './adminAuth.js';
 import { PROMPTS, buildPrompt } from './prompts.js';
+import { checkRateLimit } from './rateLimiter.js';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 const DEEPSEEK_ENDPOINT = 'https://api.deepseek.com/v1/chat/completions';
-
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + 60000 });
-    return false;
-  }
-  if (entry.count >= 10) return true;
-  entry.count++;
-  return false;
-}
 
 async function callDeepSeek(
   systemPrompt: string,
@@ -84,7 +71,8 @@ export async function handler(req: VercelRequest, res: VercelResponse): Promise<
   }
 
   const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
-  if (isRateLimited(ip)) {
+  const ok = await checkRateLimit(`ai:${ip}`, 10, 60000);
+  if (!ok) {
     res.status(429).json({ error: 'Rate limit exceeded' });
     return;
   }

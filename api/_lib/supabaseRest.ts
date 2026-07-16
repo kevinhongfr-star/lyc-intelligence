@@ -507,3 +507,34 @@ export async function select(
   }
   return selectMany(table, filterOrOptions, ...rest);
 }
+
+/**
+ * Call a Postgres function (RPC) via Supabase REST API.
+ * 
+ * @param fnName - Function name
+ * @param params - Object with parameter names and values
+ * @returns The function result (parsed JSON)
+ */
+export async function rpc(
+  fnName: string,
+  params: Record<string, any> = {}
+): Promise<any> {
+  const url = `${SUPABASE_URL}/rest/v1/rpc/${encodeURIComponent(fnName)}`;
+  
+  const res = await fetchWithTimeout(url, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    throw new Error(`RPC ${fnName} failed: ${res.status} ${errText}`);
+  }
+
+  const contentType = res.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return res.json();
+  }
+  return res.text();
+}
