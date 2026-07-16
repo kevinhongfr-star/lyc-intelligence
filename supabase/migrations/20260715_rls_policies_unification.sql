@@ -1,17 +1,14 @@
 -- =====================================================
--- Phase 1: RLS Policies Unification
--- Fixes role mismatches and adds comprehensive policies
+-- FIXED Migration #3: RLS Policies Unification
+-- Adapted to match ACTUAL schema (2026-07-16)
+-- Functions in PUBLIC schema (not auth)
+-- Column refs: org_id (not organization_id) on v2_org_memberships
 -- =====================================================
 
--- =====================================================
--- UTILITY FUNCTIONS
--- =====================================================
-
--- Create helper function to check user role
-CREATE OR REPLACE FUNCTION auth.user_has_role(required_roles TEXT[])
+-- 1. Helper functions in PUBLIC schema (not auth)
+CREATE OR REPLACE FUNCTION public.user_has_role(required_roles TEXT[])
 RETURNS BOOLEAN AS $$
 BEGIN
-  -- Check if user's role matches any of the required roles
   RETURN EXISTS (
     SELECT 1 FROM public.v2_user_profiles p
     WHERE p.id = auth.uid()
@@ -20,291 +17,247 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
--- Create helper function to check org membership
-CREATE OR REPLACE FUNCTION auth.user_is_org_member(org_id UUID)
+CREATE OR REPLACE FUNCTION public.user_is_org_member(p_org_id UUID)
 RETURNS BOOLEAN AS $$
 BEGIN
-  -- Super admins have access to all orgs
-  IF auth.user_has_role(ARRAY['super_admin']) THEN
+  IF public.user_has_role(ARRAY['super_admin']) THEN
     RETURN TRUE;
   END IF;
-  
+
   RETURN EXISTS (
     SELECT 1 FROM public.v2_org_memberships om
     WHERE om.user_id = auth.uid()
-    AND om.organization_id = org_id
+    AND om.org_id = p_org_id
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
--- Create helper function to check if user is admin for org
-CREATE OR REPLACE FUNCTION auth.user_is_org_admin(org_id UUID)
+CREATE OR REPLACE FUNCTION public.user_is_org_admin(p_org_id UUID)
 RETURNS BOOLEAN AS $$
 BEGIN
-  -- Super admins have admin access to all orgs
-  IF auth.user_has_role(ARRAY['super_admin']) THEN
+  IF public.user_has_role(ARRAY['super_admin']) THEN
     RETURN TRUE;
   END IF;
-  
+
   RETURN EXISTS (
     SELECT 1 FROM public.v2_org_memberships om
     WHERE om.user_id = auth.uid()
-    AND om.organization_id = org_id
-    AND om.role IN ('admin', 'team_lead')
+    AND om.org_id = p_org_id
+    AND om.role IN ('admin', 'super_admin', 'team_lead')
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
--- =====================================================
--- V2_USER_PROFILES POLICIES
--- =====================================================
+GRANT EXECUTE ON FUNCTION public.user_has_role(TEXT[]) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.user_is_org_member(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.user_is_org_admin(UUID) TO authenticated;
 
+-- 2. V2_USER_PROFILES policies (already has some, drop and recreate)
 ALTER TABLE public.v2_user_profiles ENABLE ROW LEVEL SECURITY;
-
 DROP POLICY IF EXISTS "Users can view own profile" ON public.v2_user_profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.v2_user_profiles;
 DROP POLICY IF EXISTS "Service role full access" ON public.v2_user_profiles;
 DROP POLICY IF EXISTS "Admins can view all profiles" ON public.v2_user_profiles;
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.v2_user_profiles;
 
-CREATE POLICY "Users can view own profile"
+CREATE POLICY "v2_profiles_self_select"
   ON public.v2_user_profiles FOR SELECT
-  USING (auth.uid() = id);
+  TO authenticated
+  USING (user_id = auth.uid() OR id = auth.uid());
 
-CREATE POLICY "Users can update own profile"
+CREATE POLICY "v2_profiles_self_update"
   ON public.v2_user_profiles FOR UPDATE
-  USING (auth.uid() = id);
+  TO authenticated
+  USING (user_id = auth.uid() OR id = auth.uid());
 
-CREATE POLICY "Admins can manage profiles in org"
+CREATE POLICY "v2_profiles_admin_all"
   ON public.v2_user_profiles FOR ALL
+  TO authenticated
   USING (
-    auth.user_is_org_admin(organization_id)
-    OR auth.user_has_role(ARRAY['super_admin'])
+    public.user_has_role(ARRAY['super_admin', 'admin'])
   );
 
--- =====================================================
--- V2_ORGANIZATIONS POLICIES
--- =====================================================
-
+-- 3. V2_ORGANIZATIONS policies
 ALTER TABLE public.v2_organizations ENABLE ROW LEVEL SECURITY;
-
 DROP POLICY IF EXISTS "Users can view their org" ON public.v2_organizations;
 
-CREATE POLICY "Users can view their org"
+CREATE POLICY "v2_orgs_member_select"
   ON public.v2_organizations FOR SELECT
+  TO authenticated
   USING (
-    auth.user_is_org_member(id)
-    OR auth.user_has_role(ARRAY['super_admin'])
+    public.user_is_org_member(id)
+    OR public.user_has_role(ARRAY['super_admin'])
   );
 
-CREATE POLICY "Admins can update their org"
+CREATE POLICY "v2_orgs_admin_update"
   ON public.v2_organizations FOR UPDATE
+  TO authenticated
   USING (
-    auth.user_is_org_admin(id)
-    OR auth.user_has_role(ARRAY['super_admin'])
+    public.user_is_org_admin(id)
+    OR public.user_has_role(ARRAY['super_admin'])
   );
 
--- =====================================================
--- V2_ORG_MEMBERSHIPS POLICIES
--- =====================================================
-
+-- 4. V2_ORG_MEMBERSHIPS policies
 ALTER TABLE public.v2_org_memberships ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view memberships in their org" ON public.v2_org_memberships;
+DROP POLICY IF EXISTS "Admins can manage memberships in their org" ON public.v2_org_memberships;
 
-CREATE POLICY "Users can view memberships in their org"
+CREATE POLICY "v2_memberships_member_select"
   ON public.v2_org_memberships FOR SELECT
+  TO authenticated
   USING (
-    auth.user_is_org_member(organization_id)
-    OR auth.user_has_role(ARRAY['super_admin'])
+    public.user_is_org_member(org_id)
+    OR public.user_has_role(ARRAY['super_admin'])
   );
 
-CREATE POLICY "Admins can manage memberships in their org"
+CREATE POLICY "v2_memberships_admin_all"
   ON public.v2_org_memberships FOR ALL
+  TO authenticated
   USING (
-    auth.user_is_org_admin(organization_id)
-    OR auth.user_has_role(ARRAY['super_admin'])
+    public.user_is_org_admin(org_id)
+    OR public.user_has_role(ARRAY['super_admin'])
   );
 
--- =====================================================
--- MANDATES POLICIES
--- =====================================================
-
+-- 5. MANDATES policies (organization_id column exists)
 ALTER TABLE public.mandates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Consultants can view mandates in their org" ON public.mandates;
+DROP POLICY IF EXISTS "Consultants can create mandates" ON public.mandates;
 
-DROP POLICY IF EXISTS "Users can view mandates in their org" ON public.mandates;
-
-CREATE POLICY "Consultants can view mandates in their org"
+CREATE POLICY "mandates_org_select"
   ON public.mandates FOR SELECT
-  USING (
-    auth.user_is_org_member(organization_id)
-    OR auth.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
-  );
-
-CREATE POLICY "Consultants can create mandates"
-  ON public.mandates FOR INSERT
-  WITH CHECK (
-    auth.user_is_org_member(organization_id)
-    AND auth.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
-  );
-
-CREATE POLICY "Consultants can update mandates in their org"
-  ON public.mandates FOR UPDATE
-  USING (
-    auth.user_is_org_member(organization_id)
-    AND auth.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
-  );
-
-CREATE POLICY "Admins can delete mandates"
-  ON public.mandates FOR DELETE
-  USING (
-    auth.user_is_org_admin(organization_id)
-    OR auth.user_has_role(ARRAY['super_admin'])
-  );
-
--- =====================================================
--- CANDIDATES POLICIES
--- =====================================================
-
-ALTER TABLE public.candidates ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Consultants can view candidates in their org"
-  ON public.candidates FOR SELECT
+  TO authenticated
   USING (
     organization_id IS NULL
-    OR auth.user_is_org_member(organization_id)
-    OR auth.user_has_role(ARRAY['super_admin'])
+    OR public.user_is_org_member(organization_id)
+    OR public.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
   );
 
-CREATE POLICY "Consultants can create candidates"
-  ON public.candidates FOR INSERT
+CREATE POLICY "mandates_consultant_insert"
+  ON public.mandates FOR INSERT
+  TO authenticated
   WITH CHECK (
-    auth.user_is_org_member(organization_id)
-    OR auth.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
+    public.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
   );
 
-CREATE POLICY "Consultants can update candidates"
-  ON public.candidates FOR UPDATE
+CREATE POLICY "mandates_org_update"
+  ON public.mandates FOR UPDATE
+  TO authenticated
   USING (
-    auth.user_is_org_member(organization_id)
-    AND auth.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
+    public.user_is_org_member(organization_id)
+    AND public.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
   );
 
--- =====================================================
--- V2_COMPANIES POLICIES
--- =====================================================
+-- 6. CANDIDATES policies (uses org_id)
+ALTER TABLE public.candidates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Consultants can view candidates in their org" ON public.candidates;
 
+CREATE POLICY "candidates_org_select"
+  ON public.candidates FOR SELECT
+  TO authenticated
+  USING (
+    org_id IS NULL
+    OR public.user_is_org_member(org_id)
+    OR public.user_has_role(ARRAY['super_admin'])
+  );
+
+CREATE POLICY "candidates_consultant_insert"
+  ON public.candidates FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    public.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
+  );
+
+-- 7. V2_COMPANIES policies (uses org_id)
 ALTER TABLE public.v2_companies ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view companies in their org" ON public.v2_companies;
 
-CREATE POLICY "Users can view companies in their org"
+CREATE POLICY "v2_companies_org_select"
   ON public.v2_companies FOR SELECT
+  TO authenticated
   USING (
-    auth.user_is_org_member(organization_id)
-    OR auth.user_has_role(ARRAY['super_admin'])
+    public.user_is_org_member(org_id)
+    OR public.user_has_role(ARRAY['super_admin'])
   );
 
-CREATE POLICY "Consultants can manage companies"
+CREATE POLICY "v2_companies_consultant_all"
   ON public.v2_companies FOR ALL
+  TO authenticated
   USING (
-    auth.user_is_org_member(organization_id)
-    AND auth.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
+    public.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
   );
 
--- =====================================================
--- CREDITS POLICIES
--- =====================================================
-
+-- 8. CREDITS policies
 ALTER TABLE public.credits ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view their own credits" ON public.credits;
+DROP POLICY IF EXISTS "Users can update their own credits" ON public.credits;
 
-CREATE POLICY "Users can view their own credits"
+CREATE POLICY "credits_self_select"
   ON public.credits FOR SELECT
+  TO authenticated
   USING (user_id = auth.uid());
 
-CREATE POLICY "Users can update their own credits"
+CREATE POLICY "credits_self_update"
   ON public.credits FOR UPDATE
+  TO authenticated
   USING (user_id = auth.uid());
 
-CREATE POLICY "Service role full access on credits"
+CREATE POLICY "credits_service_all"
   ON public.credits FOR ALL
-  USING (auth.jwt() ->> 'role' = 'service_role');
+  TO service_role
+  USING (true);
 
--- =====================================================
--- V2_CREDIT_TRANSACTIONS POLICIES
--- =====================================================
-
-ALTER TABLE public.v2_credit_transactions ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view their own transactions"
+-- 9. V2_CREDIT_TRANSACTIONS policies
+CREATE POLICY "v2_credits_self_select"
   ON public.v2_credit_transactions FOR SELECT
-  USING (user_id = auth.uid() OR organization_id IN (
-    SELECT organization_id FROM public.v2_org_memberships WHERE user_id = auth.uid()
-  ));
+  TO authenticated
+  USING (
+    user_id = auth.uid()
+    OR organization_id IN (
+      SELECT org_id FROM public.v2_org_memberships WHERE user_id = auth.uid()
+    )
+  );
 
-CREATE POLICY "Service role can manage transactions"
+CREATE POLICY "v2_credits_service_all"
   ON public.v2_credit_transactions FOR ALL
-  USING (auth.jwt() ->> 'role' = 'service_role');
+  TO service_role
+  USING (true);
 
--- =====================================================
--- NOTIFICATIONS POLICIES
--- =====================================================
-
+-- 10. NOTIFICATIONS policies
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view their own notifications" ON public.notifications;
 
-CREATE POLICY "Users can view their own notifications"
+CREATE POLICY "notifications_self_select"
   ON public.notifications FOR SELECT
+  TO authenticated
   USING (user_id = auth.uid());
 
-CREATE POLICY "Users can update their own notifications"
+CREATE POLICY "notifications_self_update"
   ON public.notifications FOR UPDATE
+  TO authenticated
   USING (user_id = auth.uid());
 
-CREATE POLICY "Users can delete their own notifications"
+CREATE POLICY "notifications_self_delete"
   ON public.notifications FOR DELETE
+  TO authenticated
   USING (user_id = auth.uid());
 
--- =====================================================
--- ROLE_PERMISSIONS POLICIES
--- =====================================================
-
+-- 11. ROLE_PERMISSIONS policies
 ALTER TABLE public.role_permissions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Anyone can view role permissions" ON public.role_permissions;
+DROP POLICY IF EXISTS "Only super admin can manage role permissions" ON public.role_permissions;
 
-CREATE POLICY "Anyone can view role permissions"
+CREATE POLICY "role_perms_public_read"
   ON public.role_permissions FOR SELECT
+  TO authenticated
   USING (TRUE);
 
-CREATE POLICY "Only super admin can manage role permissions"
+CREATE POLICY "role_perms_admin_manage"
   ON public.role_permissions FOR ALL
-  USING (auth.user_has_role(ARRAY['super_admin']));
+  TO authenticated
+  USING (public.user_has_role(ARRAY['super_admin']));
 
--- =====================================================
--- CLIENT PORTAL POLICIES (for client_admin, client_user)
--- =====================================================
-
--- These allow clients to view their company's data
-
-CREATE POLICY "Clients can view their mandate candidates"
-  ON public.mandate_candidates FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.mandates m
-      JOIN public.v2_companies c ON c.id = m.company_id
-      JOIN public.client_accounts ca ON ca.company_id = c.id
-      WHERE m.id = mandate_candidates.mandate_id
-      AND ca.user_id = auth.uid()
-    )
-    OR auth.user_has_role(ARRAY['super_admin', 'admin', 'team_lead', 'consultant'])
-  );
-
--- =====================================================
--- GRANT PERMISSIONS
--- =====================================================
-
+-- 12. Global grants
 GRANT USAGE ON SCHEMA public TO authenticated;
-GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO authenticated;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO authenticated;
-
--- =====================================================
--- TEST QUERIES (smoke tests)
--- =====================================================
-
--- Verify all tables have RLS enabled
--- Run this to check: 
--- SELECT schemaname, tablename FROM pg_tables WHERE schemaname = 'public' AND rowsecurity = false;

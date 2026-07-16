@@ -1,53 +1,46 @@
 -- ============================================================================
--- v2 Data Ingestion Scheduling — pg_cron job for scheduled signal fetching
+-- FIXED Migration #6: Data Ingestion Scheduling — pg_cron jobs
+-- Adapted to use net.http_post() from pg_net extension (2026-07-16)
 -- ============================================================================
 
--- Enable pg_cron extension if not already enabled
-CREATE EXTENSION IF NOT EXISTS pg_cron WITH SCHEMA extensions;
+-- pg_cron extension is already enabled (v1.6.4)
+-- pg_net extension is already enabled (v0.20.0)
 
--- Create a function to trigger the data ingestion edge function
+-- 1. Function to trigger data ingestion via Edge Function
 DROP FUNCTION IF EXISTS public.trigger_data_ingestion();
 CREATE FUNCTION public.trigger_data_ingestion()
 RETURNS void AS $$
 DECLARE
   supabase_url TEXT := current_setting('app.settings.supabase_url', true);
   service_key TEXT := current_setting('app.settings.service_role_key', true);
-  response TEXT;
 BEGIN
   IF supabase_url IS NULL OR service_key IS NULL THEN
-    RAISE WARNING 'Data ingestion skipped: Supabase URL or service key not configured';
+    RAISE WARNING 'Data ingestion skipped: Supabase URL or service key not configured in app.settings';
     RETURN;
   END IF;
 
-  PERFORM http_post(
-    supabase_url || '/functions/v1/data-ingestion',
-    '{}',
-    ARRAY[
-      ('Content-Type', 'application/json'),
-      ('Authorization', 'Bearer ' || service_key)
-    ]::http_header[]
+  -- Use pg_net's http_post (not http_post from http extension)
+  PERFORM net.http_post(
+    url := supabase_url || '/functions/v1/data-ingestion',
+    body := '{}'::jsonb,
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || service_key
+    )
   );
 END;
 $$ LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 
--- Grant execute on the function to the cron job runner
-GRANT EXECUTE ON FUNCTION public.trigger_data_ingestion() TO postgres;
+GRANT EXECUTE ON FUNCTION public.trigger_data_ingestion() TO postgres, authenticated;
 
--- Schedule the data ingestion to run every hour (at minute 0)
+-- 2. Schedule data ingestion every hour
 SELECT cron.schedule(
   'data_ingestion_hourly',
   '0 * * * *',
-  'SELECT public.trigger_data_ingestion();'
+  $$SELECT public.trigger_data_ingestion()$$
 );
 
--- Schedule the data ingestion to run every 15 minutes for more frequent updates
-SELECT cron.schedule(
-  'data_ingestion_quarterly',
-  '*/15 * * * *',
-  'SELECT public.trigger_data_ingestion();'
-);
-
--- Create a function to clean up stale signals (older than 90 days)
+-- 3. Function to clean up stale signals (older than 90 days)
 DROP FUNCTION IF EXISTS public.cleanup_stale_signals();
 CREATE FUNCTION public.cleanup_stale_signals()
 RETURNS INTEGER AS $$
@@ -57,30 +50,30 @@ BEGIN
   DELETE FROM public.intelligence_signals
   WHERE discovered_at < NOW() - INTERVAL '90 days'
     AND deleted_at IS NULL;
-  
+
   GET DIAGNOSTICS deleted_count = ROW_COUNT;
   RETURN deleted_count;
 END;
 $$ LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 
-GRANT EXECUTE ON FUNCTION public.cleanup_stale_signals() TO postgres;
+GRANT EXECUTE ON FUNCTION public.cleanup_stale_signals() TO postgres, authenticated;
 
--- Schedule cleanup to run daily at 2:00 AM
+-- 4. Schedule cleanup daily at 2:00 AM
 SELECT cron.schedule(
   'cleanup_stale_signals_daily',
   '0 2 * * *',
-  'SELECT public.cleanup_stale_signals();'
+  $$SELECT public.cleanup_stale_signals()$$
 );
 
--- Create a function to update source reliability scores based on fetch success rate
+-- 5. Function to update source reliability scores
 DROP FUNCTION IF EXISTS public.update_source_reliability();
 CREATE FUNCTION public.update_source_reliability()
 RETURNS void AS $$
 BEGIN
   UPDATE public.intelligence_sources
-  SET reliability_score = LEAST(1.0, GREATEST(0.0, 
-    reliability_score + 
-    CASE 
+  SET reliability_score = LEAST(1.0, GREATEST(0.0,
+    reliability_score +
+    CASE
       WHEN last_fetched_at IS NOT NULL AND last_fetched_at > NOW() - INTERVAL '2 hours' THEN 0.05
       WHEN last_fetched_at IS NOT NULL AND last_fetched_at > NOW() - INTERVAL '6 hours' THEN 0.02
       WHEN last_fetched_at IS NOT NULL AND last_fetched_at > NOW() - INTERVAL '24 hours' THEN -0.02
@@ -91,11 +84,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 
-GRANT EXECUTE ON FUNCTION public.update_source_reliability() TO postgres;
+GRANT EXECUTE ON FUNCTION public.update_source_reliability() TO postgres, authenticated;
 
--- Schedule reliability updates to run every 6 hours
+-- 6. Schedule reliability updates every 6 hours
 SELECT cron.schedule(
   'update_source_reliability',
   '0 */6 * * *',
-  'SELECT public.update_source_reliability();'
+  $$SELECT public.update_source_reliability()$$
 );
+
+-- 7. Verify cron jobs are scheduled
+SELECT jobid, jobname, schedule, command FROM cron.job ORDER BY jobname;
