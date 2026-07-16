@@ -1,10 +1,9 @@
 /**
  * IntelligenceSourcesPage — Admin CRUD for intelligence ingestion sources.
  * Manage web scrape, API feed, RSS and social sources with schedule (cron)
- * and JSON config. Self-contained with mock data; wire to
- * /api/admin/intelligence/sources for persistence.
+ * and JSON config. Wired to /api/intelligence/sources.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Plus,
   Edit,
@@ -83,61 +82,34 @@ const EMPTY_FORM: SourceForm = {
 };
 
 /* ------------------------------------------------------------------ */
-/* Mock data                                                           */
+/* API helper                                                          */
 /* ------------------------------------------------------------------ */
 
-const MOCK_SOURCES: Source[] = [
-  {
-    id: 'src_001',
-    name: 'TechCrunch RSS',
-    type: 'rss',
-    url: 'https://techcrunch.com/feed/',
-    status: 'active',
-    schedule: '0 */2 * * *',
-    config: '{\n  "categories": ["startups", "ai"],\n  "language": "en"\n}',
-    lastRun: '2026-07-15T08:12:00Z',
-  },
-  {
-    id: 'src_002',
-    name: 'Crunchbase Funding API',
-    type: 'api_feed',
-    url: 'https://api.crunchbase.com/v3.1/funding-rounds',
-    status: 'active',
-    schedule: '0 0 * * *',
-    config: '{\n  "apiKey": "••••••••",\n  "minRound": 50000000\n}',
-    lastRun: '2026-07-15T00:05:00Z',
-  },
-  {
-    id: 'src_003',
-    name: 'LinkedIn Executive Moves',
-    type: 'social',
-    url: 'https://www.linkedin.com/company/',
-    status: 'error',
-    schedule: '0 */6 * * *',
-    config: '{\n  "roles": ["VP", "C-level"],\n  "regions": ["NA", "EU"]\n}',
-    lastRun: '2026-07-14T18:00:00Z',
-  },
-  {
-    id: 'src_004',
-    name: 'Reuters Company Pages',
-    type: 'web_scrape',
-    url: 'https://www.reuters.com/companies/',
-    status: 'paused',
-    schedule: '0 8 * * 1-5',
-    config: '{\n  "selectors": ["#company-news"],\n  "rateLimitMs": 2000\n}',
-    lastRun: '2026-07-10T08:00:00Z',
-  },
-  {
-    id: 'src_005',
-    name: 'PitchBook Feed',
-    type: 'api_feed',
-    url: 'https://api.pitchbook.com/v1/deals',
-    status: 'active',
-    schedule: '0 0 * * 1',
-    config: '{\n  "stages": ["Series A", "Series B", "Series C"]\n}',
-    lastRun: '2026-07-15T07:30:00Z',
-  },
-];
+async function apiCall(path: string, method: string = 'GET', body?: any) {
+  const res = await fetch(`/api/intelligence${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`API ${path} failed: ${res.status}`);
+  return res.json();
+}
+
+/** Map API source row to UI Source */
+function mapApiSource(row: any): Source {
+  const isActive = row.is_active === true;
+  const hasError = row.last_error || (row.reliability_score !== null && row.reliability_score < 0.2);
+  return {
+    id: row.id,
+    name: row.name || 'Untitled',
+    type: (row.source_type as SourceType) || 'rss',
+    url: row.url || row.api_endpoint || '',
+    status: hasError ? 'error' : isActive ? 'active' : 'paused',
+    schedule: `*/${row.refresh_interval_minutes || 60} * * * *`,
+    config: row.metadata ? JSON.stringify(row.metadata, null, 2) : '{}',
+    lastRun: row.last_fetched_at || null,
+  };
+}
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -380,8 +352,8 @@ function DeleteConfirm({
 /* ------------------------------------------------------------------ */
 
 export function IntelligenceSourcesPage() {
-  const [sources, setSources] = useState<Source[]>(MOCK_SOURCES);
-  const [loading, setLoading] = useState(false);
+  const [sources, setSources] = useState<Source[]>([]);
+  const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<SourceType | 'all'>('all');
 
@@ -392,6 +364,24 @@ export function IntelligenceSourcesPage() {
 
   const [deleteTarget, setDeleteTarget] = useState<Source | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // ── Load sources from API ──
+  const loadSources = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiCall('/sources');
+      setSources((data.sources || []).map(mapApiSource));
+    } catch (e) {
+      console.error('Failed to load sources:', e);
+      setSources([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadSources();
+  }, [loadSources]);
 
   const openAdd = () => {
     setEditId(null);
@@ -411,66 +401,93 @@ export function IntelligenceSourcesPage() {
     setModalOpen(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setSubmitting(true);
-    // Simulated persist — replace with POST/PUT /api/admin/intelligence/sources
-    setTimeout(() => {
-      if (editId) {
-        setSources((prev) =>
-          prev.map((s) =>
-            s.id === editId
-              ? { ...s, name: form.name, type: form.type, url: form.url, schedule: form.schedule, config: form.config }
-              : s,
-          ),
-        );
-      } else {
-        const newSource: Source = {
-          id: `src_${Date.now()}`,
-          name: form.name,
-          type: form.type,
-          url: form.url,
-          status: 'paused',
-          schedule: form.schedule,
-          config: form.config,
-          lastRun: null,
-        };
-        setSources((prev) => [newSource, ...prev]);
+    try {
+      let metadata = {};
+      try {
+        metadata = JSON.parse(form.config);
+      } catch {
+        // keep empty if invalid
       }
-      setSubmitting(false);
+      const intervalMatch = form.schedule.match(/\*\/(\d+)/);
+      const interval = intervalMatch ? parseInt(intervalMatch[1]) : 60;
+
+      if (editId) {
+        await apiCall(`/sources/${editId}`, 'PUT', {
+          name: form.name,
+          source_type: form.type,
+          url: form.url,
+          refresh_interval_minutes: interval,
+          metadata,
+        });
+      } else {
+        await apiCall('/sources', 'POST', {
+          name: form.name,
+          source_type: form.type,
+          url: form.url,
+          refresh_interval_minutes: interval,
+          metadata,
+        });
+      }
+      await loadSources();
       setModalOpen(false);
-    }, 400);
+    } catch (e) {
+      console.error('Failed to save source:', e);
+      alert('Failed to save source. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
-    setTimeout(() => {
+    try {
+      await apiCall(`/sources/${deleteTarget.id}`, 'DELETE');
       setSources((prev) => prev.filter((s) => s.id !== deleteTarget.id));
-      setDeleting(false);
       setDeleteTarget(null);
-    }, 400);
+    } catch (e) {
+      console.error('Failed to delete source:', e);
+      alert('Failed to delete source.');
+    } finally {
+      setDeleting(false);
+    }
   };
 
-  const toggleStatus = (src: Source) => {
+  const toggleStatus = async (src: Source) => {
+    const newActive = src.status !== 'active';
+    // Optimistic update
     setSources((prev) =>
       prev.map((s) =>
         s.id === src.id
-          ? { ...s, status: s.status === 'active' ? 'paused' : 'active' }
+          ? { ...s, status: newActive ? 'active' : 'paused' }
           : s,
       ),
     );
-  };
-
-  const runNow = (src: Source) => {
-    setLoading(true);
-    setTimeout(() => {
+    try {
+      await apiCall(`/sources/${src.id}`, 'PUT', { is_active: newActive });
+    } catch (e) {
+      console.error('Failed to toggle source:', e);
+      // Revert on failure
       setSources((prev) =>
         prev.map((s) =>
-          s.id === src.id ? { ...s, lastRun: new Date().toISOString() } : s,
+          s.id === src.id
+            ? { ...s, status: src.status }
+            : s,
         ),
       );
-      setLoading(false);
-    }, 400);
+    }
+  };
+
+  const runNow = async (src: Source) => {
+    try {
+      await apiCall(`/sources/${src.id}/refresh`, 'POST');
+      // Refresh list after a short delay
+      setTimeout(() => loadSources(), 2000);
+    } catch (e) {
+      console.error('Failed to trigger refresh:', e);
+    }
   };
 
   const filtered = useMemo(() => {
@@ -582,8 +599,8 @@ export function IntelligenceSourcesPage() {
                   </thead>
                   <tbody>
                     {filtered.map((s) => {
-                      const TypeIcon = TYPE_META[s.type].icon;
-                      const status = STATUS_META[s.status];
+                      const TypeIcon = TYPE_META[s.type as SourceType].icon;
+                      const status = STATUS_META[s.status as SourceStatus];
                       const isActive = s.status === 'active';
                       return (
                         <tr
@@ -599,7 +616,7 @@ export function IntelligenceSourcesPage() {
                           <td className="px-6 py-4">
                             <span className="inline-flex items-center gap-1.5 text-sm text-[#525252]">
                               <TypeIcon className="h-4 w-4 text-[#737373]" />
-                              {TYPE_META[s.type].label}
+                              {TYPE_META[s.type as SourceType].label}
                             </span>
                           </td>
                           <td className="px-6 py-4">

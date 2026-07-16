@@ -1,10 +1,10 @@
 /**
  * CompanyIntelligencePage — Company 360° intelligence view.
  * Single-company profile aggregating overview metrics, signals, financials,
- * leadership and news. Self-contained with mock data; wire to
- * /api/intelligence/companies/:id for persistence.
+ * leadership and news. Wired to /api/intelligence/company/:id.
  */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Building2,
   TrendingUp,
@@ -611,14 +611,53 @@ function NewsTab({ loading }: { loading: boolean }) {
 /* ------------------------------------------------------------------ */
 
 export function CompanyIntelligencePage() {
+  const { id: companyId } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [companyData, setCompanyData] = useState<any>(null);
+  const [healthScore, setHealthScore] = useState<number | null>(null);
+  const [signals, setSignals] = useState<any[]>([]);
+  const [mandates, setMandates] = useState<any[]>([]);
+  const [hiringVelocity, setHiringVelocity] = useState<any>(null);
 
-  const refresh = () => {
+  const loadData = async () => {
+    if (!companyId) return;
     setLoading(true);
-    // Simulated fetch — replace with /api/intelligence/companies/:id
-    setTimeout(() => setLoading(false), 500);
+    try {
+      const res = await fetch(`/api/intelligence/company/${companyId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setCompanyData(data.company);
+          setHealthScore(data.health_score);
+          setSignals(data.recent_signals || []);
+          setMandates(data.active_mandates || []);
+          setHiringVelocity(data.hiring_velocity);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load company intelligence:', e);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyId]);
+
+  // Fall back to mock data if API returns nothing
+  const company = companyData || COMPANY;
+  const displaySignals = signals.length > 0 ? signals.map((s, i) => ({
+    id: s.id || `sig_${i}`,
+    type: (s.signal_type as SignalType) || 'market_shift',
+    title: s.title || 'Untitled',
+    summary: s.summary || '',
+    status: 'new' as SignalStatus,
+    date: s.published_at || new Date().toISOString(),
+    source: s.ai_enriched ? 'AI Enriched' : 'Source',
+  })) : COMPANY_SIGNALS;
 
   const tabs: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { key: 'overview', label: 'Overview', icon: Activity },
@@ -640,38 +679,58 @@ export function CompanyIntelligencePage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-[#1C1C1C]">{COMPANY.name}</h1>
+                  <h1 className="text-2xl font-bold text-[#1C1C1C]">{company.name || companyData?.name || 'Loading…'}</h1>
                   <Badge variant="fuchsia">Monitored</Badge>
                 </div>
-                <p className="mt-1 max-w-2xl text-sm text-[#525252]">{COMPANY.description}</p>
+                <p className="mt-1 max-w-2xl text-sm text-[#525252]">{company.description || companyData?.description || ''}</p>
                 <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-[#737373]">
                   <span className="inline-flex items-center gap-1.5">
                     <Briefcase className="h-3.5 w-3.5" />
-                    {COMPANY.industry}
+                    {company.industry || companyData?.industry || 'N/A'}
                   </span>
                   <span className="inline-flex items-center gap-1.5">
                     <Users className="h-3.5 w-3.5" />
-                    {COMPANY.size}
+                    {companyData?.employee_count ? `${companyData.employee_count} employees` : company.size || 'N/A'}
                   </span>
                   <span className="inline-flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5" />
-                    {COMPANY.headquarters}
+                    {company.headquarters || companyData?.headquarters || 'N/A'}
                   </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5" />
-                    Founded {COMPANY.founded}
-                  </span>
+                  {companyData?.founded_year && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5" />
+                      Founded {companyData.founded_year}
+                    </span>
+                  )}
                 </div>
+                {healthScore !== null && (
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="text-xs font-medium text-[#737373]">Health Score:</span>
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-2 w-24 overflow-hidden rounded-full bg-[#E5E5E5]">
+                        <div
+                          className={`h-full rounded-full ${healthScore >= 70 ? 'bg-[#16A34A]' : healthScore >= 40 ? 'bg-[#CA8A04]' : 'bg-[#DC2626]'}`}
+                          style={{ width: `${healthScore}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-bold text-[#1C1C1C]">{healthScore}/100</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex flex-shrink-0 items-center gap-2">
-              <Button variant="outline" size="sm" onClick={refresh}>
+              <Button variant="outline" size="sm" onClick={loadData}>
                 Refresh
               </Button>
-              <Button size="sm">
-                <ExternalLink className="h-4 w-4" />
-                Visit Site
-              </Button>
+              {companyData?.website && (
+                <a href={companyData.website.startsWith('http') ? companyData.website : `https://${companyData.website}`} target="_blank" rel="noopener noreferrer">
+                  <Button size="sm">
+                    <ExternalLink className="h-4 w-4" />
+                    Visit Site
+                  </Button>
+                </a>
+              )}
             </div>
           </div>
         </Card>

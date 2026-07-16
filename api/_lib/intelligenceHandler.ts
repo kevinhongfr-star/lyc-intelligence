@@ -1042,6 +1042,347 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ success: true, report });
     }
 
+    // ── INT-API-002: Sources CRUD ─────────────────────────────────────────
+    // GET /api/intelligence/sources
+    if (req.method === 'GET' && resource === 'sources' && !id) {
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+      const activeOnly = url.searchParams.get('active') === 'true';
+      const where: any[] = [];
+      if (activeOnly) where.push({ column: 'is_active', value: true, op: 'eq' });
+      const data = await db.selectMany('intelligence_sources', {
+        select: '*',
+        where: where.length > 0 ? where : undefined,
+        orderBy: { column: 'created_at', ascending: false },
+        limit: 200,
+      });
+      return res.status(200).json({ success: true, sources: data });
+    }
+
+    // POST /api/intelligence/sources
+    if (req.method === 'POST' && resource === 'sources' && !id) {
+      if (!userId || !isAdmin) return res.status(403).json({ error: 'Admin only' });
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+      const source = await db.insert('intelligence_sources', {
+        name: body.name,
+        source_type: body.source_type || 'rss',
+        url: body.url || null,
+        api_endpoint: body.api_endpoint || null,
+        refresh_interval_minutes: body.refresh_interval_minutes || 60,
+        is_active: body.is_active !== false,
+        metadata: body.metadata || {},
+        reliability_score: 0.5,
+      });
+      return res.status(201).json({ success: true, source });
+    }
+
+    // PUT /api/intelligence/sources/:id
+    if (req.method === 'PUT' && resource === 'sources' && id) {
+      if (!userId || !isAdmin) return res.status(403).json({ error: 'Admin only' });
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+      const updates: any = {};
+      for (const k of ['name', 'source_type', 'url', 'api_endpoint', 'refresh_interval_minutes', 'is_active', 'metadata']) {
+        if (body[k] !== undefined) updates[k] = body[k];
+      }
+      const updated = await db.update('intelligence_sources',
+        { column: 'id', value: id },
+        updates
+      );
+      if (!updated || updated.length === 0) return res.status(404).json({ error: 'Source not found' });
+      return res.status(200).json({ success: true, source: updated[0] });
+    }
+
+    // DELETE /api/intelligence/sources/:id
+    if (req.method === 'DELETE' && resource === 'sources' && id) {
+      if (!userId || !isAdmin) return res.status(403).json({ error: 'Admin only' });
+      await db.update('intelligence_sources',
+        { column: 'id', value: id },
+        { is_active: false }
+      );
+      return res.status(200).json({ success: true, message: 'Source deactivated' });
+    }
+
+    // POST /api/intelligence/sources/:id/test
+    if (req.method === 'POST' && resource === 'sources' && id && action === 'test') {
+      if (!userId || !isAdmin) return res.status(403).json({ error: 'Admin only' });
+      const source = await db.selectOne('intelligence_sources', {
+        select: '*',
+        column: 'id',
+        value: id,
+      });
+      if (!source) return res.status(404).json({ error: 'Source not found' });
+
+      try {
+        const testUrl = source.api_endpoint || source.url;
+        if (!testUrl) return res.status(400).json({ error: 'No URL configured' });
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 7000);
+        const testRes = await fetch(testUrl, { signal: controller.signal });
+        clearTimeout(timer);
+        return res.status(200).json({
+          success: true,
+          status: testRes.status,
+          ok: testRes.ok,
+          message: testRes.ok ? 'Source reachable' : `HTTP ${testRes.status}`,
+        });
+      } catch (e: any) {
+        return res.status(200).json({ success: false, ok: false, message: e.message });
+      }
+    }
+
+    // POST /api/intelligence/sources/:id/refresh
+    if (req.method === 'POST' && resource === 'sources' && id && action === 'refresh') {
+      if (!userId || !isConsultant) return res.status(403).json({ error: 'Consultant+ required' });
+      const SUPABASE_URL = process.env.SUPABASE_URL || '';
+      const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || '';
+      if (SUPABASE_URL && SERVICE_KEY) {
+        fetch(`${SUPABASE_URL}/functions/v1/data-ingestion`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source_id: id }),
+        }).catch(() => {});
+      }
+      return res.status(200).json({ success: true, message: 'Refresh triggered' });
+    }
+
+    // ── INT-API-003: Company Intelligence Aggregation ─────────────────────
+    // GET /api/intelligence/company/:id
+    if (req.method === 'GET' && resource === 'company' && id) {
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+      const companyId = id;
+      const [companyData, intelRows, recentSignals, mandates, candidates] = await Promise.all([
+        db.selectOne('companies', { select: 'id, name, industry, headquarters, website, employee_count, founded_year, description', column: 'id', value: companyId }),
+        db.selectMany('company_intelligence', {
+          select: 'data_type, data_value, source, last_updated',
+          where: [{ column: 'company_id', value: companyId }],
+          limit: 50,
+        }),
+        db.selectMany('intelligence_signals', {
+          select: 'id, title, summary, signal_type, impact_level, confidence, relevance_score, published_at, ai_enriched',
+          where: [{ column: 'companies_related', value: companyId, op: 'cs' }],
+          orderBy: { column: 'published_at', ascending: false },
+          limit: 20,
+        }),
+        db.selectMany('mandates', {
+          select: 'id, title, status, priority, created_at',
+          where: [
+            { column: 'company_id', value: companyId },
+            { column: 'status', value: ['active', 'on_hold', 'sourcing'], op: 'in' },
+          ],
+          limit: 10,
+        }),
+        db.selectMany('contacts', {
+          select: 'id, full_name, current_role, pipeline_stage, trident_composite',
+          where: [{ column: 'company_id', value: companyId }],
+          limit: 20,
+        }),
+      ]);
+
+      // Aggregate intelligence rows by data_type
+      const intelByType: Record<string, any> = {};
+      for (const row of intelRows || []) {
+        intelByType[row.data_type] = { ...row.data_value, source: row.source, last_updated: row.last_updated };
+      }
+
+      // Calculate health score (0-100)
+      let healthScore = 50;
+      if (intelByType.headcount_trend) {
+        const growth = intelByType.headcount_trend.growth_pct || 0;
+        healthScore += Math.min(20, growth * 0.5);
+      }
+      if (intelByType.funding_status) {
+        if (intelByType.funding_status.last_round_date) healthScore += 10;
+        if (intelByType.funding_status.total_raised > 0) healthScore += 5;
+      }
+      if ((recentSignals || []).filter(s => s.impact_level === 'critical').length > 0) healthScore -= 15;
+      if ((mandates || []).length > 0) healthScore += 5;
+      healthScore = Math.max(0, Math.min(100, Math.round(healthScore)));
+
+      // Hiring velocity
+      const hiringSignals = (recentSignals || []).filter(s => s.signal_type === 'hiring');
+      const openRoles = intelByType.hiring_velocity?.open_roles || 0;
+
+      return res.status(200).json({
+        success: true,
+        company: companyData,
+        health_score: healthScore,
+        intelligence: intelByType,
+        recent_signals: recentSignals || [],
+        active_mandates: mandates || [],
+        talent_pipeline: {
+          total: (candidates || []).length,
+          submitted: (candidates || []).filter(c => c.pipeline_stage?.includes('Submitted')).length,
+        },
+        hiring_velocity: {
+          open_roles: openRoles,
+          urgent_roles: hiringSignals.filter(s => s.impact_level === 'high' || s.impact_level === 'critical').length,
+        },
+      });
+    }
+
+    // ── INT-API-004: Enrichment Trigger ───────────────────────────────────
+    // POST /api/intelligence/enrich
+    if (req.method === 'POST' && resource === 'enrich') {
+      if (!userId || !isConsultant) return res.status(403).json({ error: 'Consultant+ required' });
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+      const { target_type, target_id, enrichment_types } = body;
+
+      if (!target_type || !target_id) return res.status(400).json({ error: 'target_type and target_id required' });
+
+      const SUPABASE_URL = process.env.SUPABASE_URL || '';
+      const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || '';
+
+      if (SUPABASE_URL && SERVICE_KEY) {
+        fetch(`${SUPABASE_URL}/functions/v1/ai-enrich`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ target_type, target_id, enrichment_types }),
+        }).catch(() => {});
+      }
+
+      return res.status(200).json({ success: true, message: 'Enrichment triggered' });
+    }
+
+    // ── INT-MATCH: Signal-to-Mandate Matching ─────────────────────────────
+    // POST /api/intelligence/match
+    if (req.method === 'POST' && resource === 'match') {
+      if (!userId || !isConsultant) return res.status(403).json({ error: 'Consultant+ required' });
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+      const { signal_id } = body;
+
+      if (!signal_id) return res.status(400).json({ error: 'signal_id required' });
+
+      // Fetch the signal from intelligence_signals
+      const signal = await db.selectOne('intelligence_signals', {
+        select: '*',
+        column: 'id',
+        value: signal_id,
+      });
+      if (!signal) return res.status(404).json({ error: 'Signal not found' });
+
+      const relatedCompanies = signal.companies_related || [];
+      if (relatedCompanies.length === 0) {
+        return res.status(200).json({ success: true, matches: [], message: 'No companies related to this signal' });
+      }
+
+      // Find active mandates at related companies
+      const activeMandates = await db.selectMany('mandates', {
+        select: 'id, title, client_id, company_id, status, priority, industry, location, clients(name)',
+        where: [
+          { column: 'status', value: ['active', 'sourcing', 'on_hold'], op: 'in' },
+        ],
+        limit: 500,
+      });
+
+      const matches: any[] = [];
+      for (const mandate of activeMandates || []) {
+        let score = 0;
+        const reasons: string[] = [];
+
+        // Company match
+        if (relatedCompanies.includes(mandate.company_id)) {
+          score += 0.5;
+          reasons.push('Direct company match');
+        }
+
+        // Industry match
+        if (signal.industries && mandate.industry && signal.industries.includes(mandate.industry)) {
+          score += 0.25;
+          reasons.push(`Industry overlap: ${mandate.industry}`);
+        }
+
+        // Geography match
+        if (signal.geography && mandate.location) {
+          const geoMatch = signal.geography.some((g: string) =>
+            mandate.location.toLowerCase().includes(g.toLowerCase())
+          );
+          if (geoMatch) {
+            score += 0.15;
+            reasons.push('Geography overlap');
+          }
+        }
+
+        // Impact bonus
+        if (signal.impact_level === 'critical') score += 0.1;
+        else if (signal.impact_level === 'high') score += 0.05;
+
+        if (score >= 0.3) {
+          matches.push({
+            mandate_id: mandate.id,
+            mandate_title: mandate.title,
+            client_name: mandate.clients?.name || 'Unknown',
+            company_id: mandate.company_id,
+            score: Math.min(1, score),
+            reasons,
+          });
+        }
+      }
+
+      matches.sort((a, b) => b.score - a.score);
+
+      // Store suggestions
+      for (const match of matches.slice(0, 20)) {
+        await db.insert('intelligence_suggestions', {
+          signal_id,
+          mandate_id: match.mandate_id,
+          match_score: match.score,
+          match_reason: match.reasons.join('; '),
+          status: 'pending',
+        }).catch(() => {});
+      }
+
+      return res.status(200).json({ success: true, matches: matches.slice(0, 20) });
+    }
+
+    // ── INT-API-005: Export Signals ───────────────────────────────────────
+    // GET /api/intelligence/export
+    if (req.method === 'GET' && resource === 'export') {
+      if (!userId || !isConsultant) return res.status(403).json({ error: 'Consultant+ required' });
+      const format = url.searchParams.get('format') || 'csv';
+      const limit = parseInt(url.searchParams.get('limit') || '500');
+
+      const signals = await db.selectMany('intelligence_signals', {
+        select: 'title, summary, signal_type, impact_level, confidence, relevance_score, companies_related, industries, geography, published_at, ai_enriched',
+        orderBy: { column: 'published_at', ascending: false },
+        limit,
+      });
+
+      if (format === 'csv') {
+        const headers = ['Title', 'Type', 'Impact', 'Confidence', 'Relevance', 'Companies', 'Industries', 'Geography', 'Published', 'AI Enriched'];
+        const rows = (signals || []).map((s: any) => [
+          `"${(s.title || '').replace(/"/g, '""')}"`,
+          s.signal_type || '',
+          s.impact_level || '',
+          s.confidence || '',
+          s.relevance_score || '',
+          `"${(s.companies_related || []).join('; ')}"`,
+          `"${(s.industries || []).join('; ')}"`,
+          `"${(s.geography || []).join('; ')}"`,
+          s.published_at || '',
+          s.ai_enriched ? 'Yes' : 'No',
+        ].join(','));
+        const csv = [headers.join(','), ...rows].join('\n');
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="intelligence_signals.csv"');
+        return res.status(200).send(csv);
+      }
+
+      return res.status(200).json({ success: true, signals });
+    }
+
+    // ── INT-DASH: Signal Detail ───────────────────────────────────────────
+    // GET /api/intelligence/signals/:id
+    if (req.method === 'GET' && resource === 'signals' && id) {
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+      const signal = await db.selectOne('intelligence_signals', {
+        select: '*',
+        column: 'id',
+        value: id,
+      });
+      if (!signal) return res.status(404).json({ error: 'Signal not found' });
+      return res.status(200).json({ success: true, signal });
+    }
+
     return res.status(404).json({ error: 'Not found' });
   } catch (error: any) {
     console.error('Intelligence API error:', error);
