@@ -1,6 +1,6 @@
 # LYC Intelligence (DEX AI) — Master Build Plan
 
-**Version:** 3.0 | **Date:** 2026-07-17 | **Author:** NEXUS | **Status:** Living document
+**Version:** 3.1 | **Date:** 2026-07-17 | **Author:** NEXUS | **Status:** Living document
 
 ---
 
@@ -17,7 +17,7 @@
 | 6 | Scale, Polish & Tech Debt | ⚪ READY | — | #16, #25 | 2–3 weeks |
 | GL | Go-Live Prerequisites | ⚪ READY | 2 specs | #26–#32 | 1–2 weeks |
 
-**Total: 35 issues | 20 spec files | 8 phases (including P0) + go-live checklist**
+**Total: 38 issues | 21 spec files | 8 phases (including P0) + go-live checklist**
 
 ---
 
@@ -51,6 +51,10 @@
 | 11 | Council Portal — Admin Management | 05c_Council_Backend | ⚪ Queued |
 | 12 | Internal Portal (Consultant Workspace) | 01_Internal | ⚪ Queued |
 | 15 | Notification System (Cross-Portal) | Spec needed | ⚪ Queued |
+
+| 36 | Email Templates & Notification System | 19_Email_Admin_Analytics | ⚪ Ready |
+| 37 | Platform Admin Console | 19_Email_Admin_Analytics | ⚪ Ready |
+| 38 | Analytics & Event Tracking | 19_Email_Admin_Analytics | ⚪ Ready |
 
 ### Phase 2.5: Diagnostic Intelligence (SHIFT) ⚪
 | # | Title | Spec | Status |
@@ -157,6 +161,7 @@ Phase 6 (Polish + Tech Debt)
 | 16_Portal_Product_Design_Gap_Analysis.md | — | Portal-level UX gap analysis |
 | 17_Design_System_Component_Library_Spec.md | 0 | Complete design system (colors, typography, 17 components, patterns) |
 | 18_Public_Site_And_Activation_Flows_Spec.md | 0 | Marketing site + onboarding wizards + conversion UX |
+| 19_Email_Admin_Analytics_Spec.md | P1 | Email templates, admin console, analytics tracking |
 
 ---
 
@@ -201,6 +206,6 @@ Phase 6 (Polish + Tech Debt)
 - **Vercel:** Production READY (commit `4838cacc90`)
 - **Supabase:** 477 tables, 36 v2_ tables, all migrations run
 - **Trae:** Working on Phase 2 (#8 Intelligence Layer code pushed)
-- **Specs:** 20 spec files covering all phases + go-live
-- **Issues:** 35 total, all open, with spec coverage
+- **Specs:** 21 spec files covering all phases + go-live
+- **Issues:** 38 total, all open, with spec coverage
 - **Blockers:** None blocking Phase 2 continuation
