@@ -1,9 +1,6 @@
 # LYC Intelligence (DEX AI) — Master Build Plan
 
-**Version:** 1.0  
-**Date:** 2026-07-17  
-**Author:** NEXUS (PM)  
-**Status:** Living document — updated as phases complete
+**Version:** 1.1 | **Date:** 2026-07-17 | **Author:** NEXUS | **Status:** Living document
 
 ---
 
@@ -13,166 +10,70 @@
 |-------|------|--------|-------|--------|---------------|
 | 1 | Foundation | ✅ DONE | 7 specs | #1–#7 | Completed |
 | 2 | Intelligence + Council + Internal | 🔄 IN PROGRESS | 5 specs | #8–#12, #15 | 2–3 weeks |
-| 2.5 | Diagnostic Intelligence (SHIFT) | ⚪ NOT STARTED | NEW spec needed | New issues | 2–3 weeks |
-| 3 | Client & Candidate Experience | ⚪ NOT STARTED | 2 specs exist | #13–#14 | 2–3 weeks |
-| 4 | Academy / LMS | 🟡 PARTIAL | LMS pages added | New issues needed | 3–4 weeks |
-| 5 | Intelligence Reports & Content | ⚪ NOT STARTED | Templates exist | New issues needed | 2–3 weeks |
-| 6 | Scale, Polish & Advanced | ⚪ NOT STARTED | 1 spec exists | #16 | 2–3 weeks |
+| 2.5 | Diagnostic Intelligence (SHIFT) | ⚪ READY | 3 specs | #18, #20, #21 | 2–3 weeks |
+| 3 | Client & Candidate Experience | ⚪ READY | 2 specs | #13–#14 | 2–3 weeks |
+| 4 | Academy / LMS | 🟡 PARTIAL | 1 spec | #17, #19 | 3–4 weeks |
+| 5 | Intelligence Reports & Content | ⚪ READY | 1 spec | #22–#24 | 2–3 weeks |
+| 6 | Scale, Polish & Tech Debt | ⚪ READY | — | #16, #25 | 2–3 weeks |
+
+**Total: 25 issues | 18 spec files | 7 phases**
 
 ---
 
-## Phase 1: Foundation ✅ DONE
+## Issue Registry (Complete)
 
-**Specs:** 02 (Supabase), 03 (UX), 08 (Commerce)  
-**What's live:** 477 tables, 9 roles, Stripe (Council + Credits), persisted rate limiting, DeepSeek v4-flash, Vercel production
+### Phase 1: Foundation ✅
+| Issue | Title | Spec | Status |
+|-------|-------|------|--------|
+| #1 | Database Migration & Schema Setup | 02_Supabase | ✅ Closed |
+| #2 | Auth & RBAC System | 02_Supabase | ✅ Closed |
+| #3 | RLS Policies — All 57 Tables | 02_Supabase | ✅ Closed |
+| #4 | Edge Functions & AI Routing | 02_Supabase | ✅ Closed |
+| #5 | UX Design System & Shared Components | 03_UX | ✅ Closed |
+| #6 | Commerce Layer — Stripe Integration | 08_Commerce | ✅ Closed |
+| #7 | Commerce Layer — Credit System | 08_Commerce | ✅ Closed |
 
-**Known debt:**
-- `aiHandler.ts` uses old inline rate limiter (not `rateLimiter.ts`) — low priority
-- Credit pack CNY prices: code ¥79/¥319 vs spec ¥99/¥399 — Kevin to decide
+### Phase 2: Intelligence + Council + Internal 🔄
+| Issue | Title | Spec | Status |
+|-------|-------|------|--------|
+| #8 | Intelligence Layer — Data Pipeline & Signals | 06_Intelligence | 🔄 Code pushed |
+| #9 | Council Portal — Public Pages | 05_Council | ⚪ Queued |
+| #10 | Council Portal — Member Dashboard & Community | 05b_Council_v2 | ⚪ Queued |
+| #11 | Council Portal — Admin Management | 05c_Council_Backend | ⚪ Queued |
+| #12 | Internal Portal (Consultant Workspace) | 01_Internal | ⚪ Queued |
+| #15 | Notification System (Cross-Portal) | ⚠️ Spec needed | ⚪ Queued |
 
----
+### Phase 2.5: Diagnostic Intelligence (SHIFT) ⚪
+| Issue | Title | Spec | Status |
+|-------|-------|------|--------|
+| #18 | SHIFT Composite Data Model (11 tables) | 09_SHIFT_Data_Model | ⚪ Ready |
+| #20 | Online Diagnostic Assessment Engine | 10_Assessment_Engine | ⚪ Ready |
+| #21 | Cohort Analytics Dashboard | 11_Cohort_Analytics | ⚪ Ready |
 
-## Phase 2: Intelligence + Council + Internal Portal 🔄 IN PROGRESS
+### Phase 3: Client & Candidate Experience ⚪
+| Issue | Title | Spec | Status |
+|-------|-------|------|--------|
+| #13 | Client Portal (Company-Facing) | 04_Client_Portal | ⚪ Ready |
+| #14 | Candidate Portal v2.1 | 07_Candidate_Portal_v2 | ⚪ Ready |
 
-### Issue #8: Intelligence Layer — Data Pipeline & Signals
-- **Spec:** `06_Intelligence_Layer_Spec.md` (15 KB)
-- **Scope:** External market signal ingestion, AI enrichment, Company 360° view, signal-to-mandate matching
-- **Status:** Code pushed (commit `4838cacc90`) — intelligenceHandler, ai-enrich edge function, notifications migration
-- **⚠️ GAP:** Covers external signals only. Internal diagnostic data (SHIFT Composite) addressed in Phase 2.5
+### Phase 4: Academy / LMS 🟡
+| Issue | Title | Spec | Status |
+|-------|-------|------|--------|
+| #17 | Academy Admin — Course Content Management | 12_Academy_LMS | 🟡 Pages partial |
+| #19 | Student Dashboard + Community + Development Plans | 12_Academy_LMS | ⚪ Ready |
 
-### Issue #9: Council Portal — Public Pages
-- **Spec:** `05_The_Council_Portal_Spec.md` (29 KB)
-- **Status:** Queued
+### Phase 5: Intelligence Reports & Content ⚪
+| Issue | Title | Spec | Status |
+|-------|-------|------|--------|
+| #22 | Cohort Intelligence Report Auto-Generation | 13_Intelligence_Reports | ⚪ Ready |
+| #23 | Signal Council Monthly Intelligence Briefing | 13_Intelligence_Reports | ⚪ Ready |
+| #24 | APAC Executive Intelligence Report (Quarterly) | 13_Intelligence_Reports | ⚪ Ready |
 
-### Issue #10: Council Portal — Member Dashboard & Community
-- **Spec:** `05b_The_Council_Portal_Spec_v2_Addendum.md` (13 KB)
-- **Should incorporate:** Monthly Briefing template structure
-
-### Issue #11: Council Portal — Admin Management
-- **Spec:** `05c_The_Council_v2_Backend_Wiring.md` (10 KB)
-
-### Issue #12: Internal Portal (Consultant Workspace)
-- **Spec:** `01_Internal_Portal_Spec.md` (10 KB)
-
-### Issue #15: Notification System (Cross-Portal)
-- **Spec:** ⚠️ NO spec exists — NEXUS to write
-
-**Phase 2 Exit Criteria:**
-- [ ] All 6 issues closed
-- [ ] Intelligence Layer ingesting ≥1 real data source
-- [ ] Council Portal accessible to authenticated members
-- [ ] Internal Portal usable by consultants
-
----
-
-## Phase 2.5: Diagnostic Intelligence (SHIFT Composite) ⚪ NOT STARTED
-
-**Why:** LYC's core intelligence is the SHIFT Composite diagnostic system. Our current spec covers external market signals but misses LYC's actual IP.
-
-### 2.5.1 SHIFT Composite Data Model
-- 5 instruments: LEAP (Leadership Archetype), QUEST (Executive Capability + AI Readiness), COACH (Leadership Style + APAC Style IQ), DRIVE (Motivation Architecture), IMPACT (Board Effectiveness)
-- APAC Translation scoring (5 sub-regions: Greater China, SEA, Japan/Korea, ANZ, India)
-- Individual assessment results storage
-- Cohort-level aggregation
-
-### 2.5.2 Online Diagnostic Assessment Engine
-- Assessment UI: question-by-question, 5-point Likert, progress bar, save/resume, timer
-- Pre-assessment briefing, post-assessment teaser insights
-- Results dashboard: composite score, dimension breakdown, benchmark comparison
-- Team/group results: aggregate view, anonymized comparison
-
-### 2.5.3 Cohort Analytics
-- SHIFT Composite score distribution (mean, range, std dev)
-- Instrument-by-instrument cohort analysis
-- Engagement risk distribution
-- Development recommendations engine
-
-**Specs needed:**
-- [ ] `09_SHIFT_Composite_Data_Model_Spec.md`
-- [ ] `10_Online_Diagnostic_Assessment_Spec.md`
-- [ ] `11_Cohort_Analytics_Spec.md`
-
-**Phase 2.5 Exit Criteria:**
-- [ ] SHIFT data model deployed (5 instruments + APAC Translation)
-- [ ] ≥1 diagnostic assessment can be taken online end-to-end
-- [ ] Results dashboard renders composite scores + dimension breakdowns
-- [ ] Cohort aggregation works for 10+ assessments
-
----
-
-## Phase 3: Client & Candidate Experience ⚪ NOT STARTED
-
-### Issue #13: Client Portal (Company-Facing)
-- **Spec:** `04_Client_Portal_Spec.md` (12 KB)
-- **Scope:** 8 pages — Dashboard, Company Profile, Mandates, Candidates, Activity, Billing
-
-### Issue #14: Candidate Portal v2.1
-- **Spec:** `07_Candidate_Portal_Spec_v2.md` (17 KB)
-- **Scope:** Candidate profiles, job matching, application tracking
-
-**Phase 3 Exit Criteria:**
-- [ ] Client portal: companies can view mandates, review candidates, see company intelligence
-- [ ] Candidate portal: candidates can manage profiles, see matching mandates, track applications
-- [ ] Both portals connected to Intelligence Layer data
-
----
-
-## Phase 4: Academy / LMS 🟡 PARTIAL
-
-**Already built (code):** Course Catalog, Course Detail, Lesson Player, Student Dashboard, LMS service
-
-### Still needed:
-- Admin course content management (create/edit, video library, progress tracking, certificates)
-- Student Dashboard full wiring (6 sections: Welcome, Diagnostics, Courses, Development Plan, Community, Recommendations)
-- Community Forum (threads, moderation, events)
-- Certification & Development Plans
-
-**Spec needed:** `12_Academy_LMS_Complete_Spec.md`
-
-**Phase 4 Exit Criteria:**
-- [ ] Admin can create/manage courses
-- [ ] Students can enroll, progress, complete courses
-- [ ] Student dashboard shows all 6 sections
-- [ ] Community forum functional
-
----
-
-## Phase 5: Intelligence Reports & Content Generation ⚪ NOT STARTED
-
-**Source:** 3 Notion templates with full content structure
-
-### 5.1 Cohort Intelligence Report
-- Auto-generate from SHIFT data: Executive Summary → Cohort Profile → Instrument Analysis → APAC Translation → Recommendations
-- Audience: B2B clients
-
-### 5.2 APAC Executive Intelligence Report (Quarterly)
-- 5 themes: Leadership Capability, AI Readiness, Cross-Cultural, APAC Market (5 sub-regions), Leadership Transitions
-- Audience: Signal Council + B2B clients
-
-### 5.3 Signal Council Monthly Intelligence Briefing
-- Format: The Signal → Three Observations → The Question → SHIFT Data → Upcoming
-- AI-drafted for Kevin's review → distribute to members
-
-**Spec needed:** `13_Intelligence_Reports_Spec.md`
-
-**Phase 5 Exit Criteria:**
-- [ ] Report template engine generates PDF from data
-- [ ] Cohort Report auto-populates from SHIFT data
-- [ ] Monthly Briefing AI-draftable for Kevin's review
-- [ ] ≥1 report type distributable through the app
-
----
-
-## Phase 6: Scale, Polish & Advanced ⚪ NOT STARTED
-
-- Issue #16: Performance, Accessibility & Polish (Lighthouse >90, WCAG 2.1 AA)
-- DeepSeek alias migration (Jul 24 deadline)
-- Rate limiter unification
-- Multi-language (EN/ZH)
-- Advanced analytics dashboard
-- API versioning
-- Webhook fix (James, 58+ days)
-- Email integration (MS Graph API)
+### Phase 6: Scale, Polish & Tech Debt ⚪
+| Issue | Title | Spec | Status |
+|-------|-------|------|--------|
+| #16 | Performance, Accessibility & Polish | — | ⚪ Queued |
+| #25 | Technical Debt Backlog & Infrastructure | — | ⚪ Queued |
 
 ---
 
@@ -184,49 +85,83 @@ Phase 1 ✅
     ▼
 Phase 2 (Intelligence + Council)
     │
-    ├──► Phase 2.5 (SHIFT Composite)
-    │        │
-    │        ├──► Phase 5 (Report Generation)
-    │        │
-    │        └──► Phase 4 (Academy — diagnostics integration)
-    │
-    └──► Phase 3 (Client & Candidate Portals)
-             │
-             └──► Phase 4 (Academy — candidate pipeline)
-
-Phase 6 (Polish) ← after all above
+    ├──► Phase 2.5 (SHIFT Composite) ──────► Phase 5 (Reports)
+    │         │                                    │
+    │         └──► Phase 4 (Academy diagnostics)   │
+    │                                              │
+    └──► Phase 3 (Client & Candidate) ─► Phase 4  │
+                                               │   │
+                                               ▼   ▼
+                                          Phase 6 (Polish)
 ```
 
 **Critical path:** Phase 2 → Phase 2.5 → Phase 5  
-**Parallel path:** Phase 2 → Phase 3 → Phase 4
+**Parallel path:** Phase 2 → Phase 3 → Phase 4  
+**Last:** Phase 6 (after all above)
 
 ---
 
-## Spec Coverage
+## Spec File Index
 
-| Phase | Spec Exists | Files | Gap |
-|-------|:-----------:|-------|-----|
-| 1 | ✅ | 02, 03, 08 | None |
-| 2 | ✅ | 01, 05, 05b, 05c, 06 | #15 needs spec |
-| 2.5 | ❌ | — | 3 new specs needed |
-| 3 | ✅ | 04, 07 | None |
-| 4 | 🟡 | LMS code only | Need formal spec |
-| 5 | ❌ | Notion templates | Need spec |
-| 6 | ✅ | Issue #16 | None |
+All specs in `specs/v2/`:
+
+| File | Phase | Size | Content |
+|------|-------|------|---------|
+| 01_Internal_Portal_Spec.md | 2 | 10 KB | Consultant workspace |
+| 02_Supabase_Backend_Architecture.md | 1 | 42 KB | DB, auth, RLS, edge functions |
+| 03_UX_Behavioral_Mechanics.md | 1 | 11 KB | Design system, gamification |
+| 04_Client_Portal_Spec.md | 3 | 12 KB | Company-facing portal |
+| 05_The_Council_Portal_Spec.md | 2 | 29 KB | Council public pages |
+| 05b_The_Council_Portal_Spec_v2_Addendum.md | 2 | 13 KB | Member dashboard + community |
+| 05c_The_Council_v2_Backend_Wiring.md | 2 | 10 KB | Council admin backend |
+| 06_Intelligence_Layer_Spec.md | 2 | 15 KB | Signal pipeline, Company 360° |
+| 07_Candidate_Portal_Spec_v2.md | 3 | 17 KB | Candidate profiles + matching |
+| 08_Commerce_Layer_Spec.md | 1 | 21 KB | Stripe, credits, pricing |
+| 09_SHIFT_Composite_Data_Model_Spec.md | 2.5 | 12 KB | 11 tables, 5 instruments, APAC |
+| 10_Online_Diagnostic_Assessment_Spec.md | 2.5 | 8 KB | Assessment UI + scoring |
+| 11_Cohort_Analytics_Spec.md | 2.5 | 6 KB | Aggregation + visualization |
+| 12_Academy_LMS_Complete_Spec.md | 4 | 10 KB | Courses, students, community, certs |
+| 13_Intelligence_Reports_Spec.md | 5 | 8 KB | 3 report types, AI generation |
+
+**Supporting files:**
+- `specs_index.md` — Spec cross-reference index
+- `trae_build_tickets.md` — Trae's task queue
+- `00_Master_Ticket_Registry.md` — Master ticket registry
+- `master_migration.sql` — Full database migration (57 tables)
+- `LYC_Intelligence_Complete_Specs_and_Tickets.md` — All specs combined
 
 ---
 
-## Immediate Actions (Next 7 Days)
+## Go-Live Readiness Checklist
 
-| # | Action | Owner | Priority |
-|---|--------|-------|----------|
-| 1 | Continue Issue #8 (Intelligence Layer) | Trae | 🔴 |
-| 2 | Write #15 Notification spec | NEXUS | 🔴 |
-| 3 | Credit pack CNY price decision | Kevin | 🟡 |
-| 4 | DeepSeek alias migration check | NEXUS | 🔴 (Jul 24) |
-| 5 | Draft Phase 2.5 SHIFT data model spec | NEXUS | 🟡 |
-| 6 | Continue Issue #9 (Council Public Pages) | Trae | 🟡 |
+### Must Complete (Critical Path)
+- [ ] Phase 2: All 6 issues closed
+- [ ] Phase 2.5: SHIFT data model + assessment + analytics
+- [ ] Phase 5: At least 1 report type generating from real data
+- [ ] aiHandler.ts rateLimiter migration (tech debt)
+- [ ] DeepSeek API alias migration (Jul 24 deadline)
+- [ ] Credit pack pricing resolved
+
+### Should Complete (Full Launch)
+- [ ] Phase 3: Client + Candidate portals
+- [ ] Phase 4: Academy functional with courses
+- [ ] All 25 issues closed
+- [ ] Vercel production deployment stable
+- [ ] WCAG 2.1 AA compliance
+- [ ] Multi-language (EN/ZH) support
+
+### Nice to Have (Post-Launch)
+- [ ] Phase 6 polish items
+- [ ] Advanced analytics dashboard
+- [ ] API versioning
+- [ ] Full cohort comparison features
 
 ---
 
-*Document maintained by NEXUS. Last updated: 2026-07-17.*
+## Current State (2026-07-17)
+
+- **Vercel:** Production deployment READY (commit `4838cacc90`)
+- **Supabase:** 477 tables, 36 v2_ tables, all migrations run
+- **Trae:** Working on Phase 2 issues
+- **Specs:** 15 spec files, 25 issues — complete coverage for all phases
+- **Known blockers:** None blocking Phase 2 continuation
