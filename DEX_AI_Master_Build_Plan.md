@@ -1,6 +1,6 @@
 # LYC Intelligence (DEX AI) — Master Build Plan
 
-**Version:** 2.0 | **Date:** 2026-07-17 | **Author:** NEXUS | **Status:** Living document
+**Version:** 3.0 | **Date:** 2026-07-17 | **Author:** NEXUS | **Status:** Living document
 
 ---
 
@@ -17,11 +17,19 @@
 | 6 | Scale, Polish & Tech Debt | ⚪ READY | — | #16, #25 | 2–3 weeks |
 | GL | Go-Live Prerequisites | ⚪ READY | 2 specs | #26–#32 | 1–2 weeks |
 
-**Total: 32 issues | 17 spec files | 7 phases + go-live checklist**
+**Total: 35 issues | 20 spec files | 8 phases (including P0) + go-live checklist**
 
 ---
 
 ## Complete Issue Registry
+
+
+### Phase 0: Design System & Public Site 🔴 P0
+| # | Title | Spec | Status |
+|---|-------|------|--------|
+| 33 | Design System & Component Library | 17_Design_System | ⚪ Ready |
+| 34 | Public Marketing Site (Homepage, Pricing, Features, FAQ) | 18_Public_Site | ⚪ Ready |
+| 35 | User Activation Flows (Onboarding Wizards) | 18_Public_Site | ⚪ Ready |
 
 ### Phase 1: Foundation ✅
 | # | Title | Spec | Status |
@@ -146,6 +154,9 @@ Phase 6 (Polish + Tech Debt)
 | 13_Intelligence_Reports_Spec.md | 5 | 3 report types, AI generation |
 | 14_Legal_Pages_Compliance_Spec.md | GL | Terms, privacy, GDPR, PIPL |
 | 15_First_Time_Onboarding_Spec.md | GL | B2C, Council, B2B onboarding |
+| 16_Portal_Product_Design_Gap_Analysis.md | — | Portal-level UX gap analysis |
+| 17_Design_System_Component_Library_Spec.md | 0 | Complete design system (colors, typography, 17 components, patterns) |
+| 18_Public_Site_And_Activation_Flows_Spec.md | 0 | Marketing site + onboarding wizards + conversion UX |
 
 ---
 
@@ -190,6 +201,6 @@ Phase 6 (Polish + Tech Debt)
 - **Vercel:** Production READY (commit `4838cacc90`)
 - **Supabase:** 477 tables, 36 v2_ tables, all migrations run
 - **Trae:** Working on Phase 2 (#8 Intelligence Layer code pushed)
-- **Specs:** 17 spec files covering all phases + go-live
-- **Issues:** 32 total, all open, with spec coverage
+- **Specs:** 20 spec files covering all phases + go-live
+- **Issues:** 35 total, all open, with spec coverage
 - **Blockers:** None blocking Phase 2 continuation
