@@ -1,263 +1,226 @@
 /**
- * Analytics Service
- * 
- * Centralized event tracking for the platform.
- * Supports multiple backends: GA4, PostHog, custom events.
+ * Event tracking system — Issue #38: Analytics & Event Tracking
+ *
+ * Client-side analytics hook + event definitions.
+ * Tracks user behavior, feature usage, and conversion events.
+ * Batches events and sends to /api/analytics/track endpoint.
  */
 
-// GA4 script loader
-export function initAnalytics(): void {
-  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
-  if (!measurementId || typeof window === 'undefined') return;
+import { useCallback, useEffect, useRef } from 'react';
 
-  // Load gtag.js
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  document.head.appendChild(script);
+/* ------------------------------------------------------------------ */
+/* Event definitions                                                   */
+/* ------------------------------------------------------------------ */
 
-  // Initialize gtag
-  (window as any).dataLayer = (window as any).dataLayer || [];
-  function gtag(...args: any[]) {
-    (window as any).dataLayer.push(args);
+export type AnalyticsEvent =
+  | { name: 'page_view'; properties: { path: string; referrer?: string; title?: string } }
+  | { name: 'signup_started'; properties: { source?: string } }
+  | { name: 'signup_completed'; properties: { role?: string; source?: string } }
+  | { name: 'login'; properties: { method: 'email' | 'google' | 'linkedin' } }
+  | { name: 'feature_used'; properties: { feature: string; module?: string } }
+  | { name: 'search_performed'; properties: { query?: string; filters?: Record<string, any>; result_count?: number } }
+  | { name: 'profile_viewed'; properties: { profile_type: string; profile_id: string } }
+  | { name: 'mandate_viewed'; properties: { mandate_id: string } }
+  | { name: 'candidate_shortlisted'; properties: { mandate_id: string; candidate_id: string } }
+  | { name: 'feedback_submitted'; properties: { mandate_id: string; feedback_type: string } }
+  | { name: 'interview_scheduled'; properties: { mandate_id: string; candidate_id: string } }
+  | { name: 'course_enrolled'; properties: { course_id: string; course_title?: string } }
+  | { name: 'lesson_completed'; properties: { course_id: string; lesson_id: string } }
+  | { name: 'certificate_earned'; properties: { course_id: string } }
+  | { name: 'payment_completed'; properties: { amount: number; currency: string; product: string } }
+  | { name: 'onboarding_step_completed'; properties: { step: number; total_steps: number } }
+  | { name: 'onboarding_completed'; properties: { duration_seconds?: number } }
+  | { name: 'notification_opened'; properties: { notification_id: string; type: string } }
+  | { name: 'chat_message_sent'; properties: { module: string; message_length?: number } };
+
+/* ------------------------------------------------------------------ */
+/* Event batch config                                                  */
+/* ------------------------------------------------------------------ */
+
+const BATCH_SIZE = 10;
+const BATCH_INTERVAL_MS = 5000;
+const STORAGE_KEY = 'lyc_analytics_queue';
+
+interface QueuedEvent {
+  name: string;
+  properties: Record<string, any>;
+  timestamp: string;
+  session_id: string;
+  anonymous_id?: string;
+}
+
+let sessionId: string | null = null;
+let anonymousId: string | null = null;
+
+function getSessionId(): string {
+  if (sessionId) return sessionId;
+  const existing = sessionStorage.getItem('lyc_session_id');
+  if (existing) {
+    sessionId = existing;
+  } else {
+    sessionId = `sess_${Math.random().toString(36).slice(2, 18)}`;
+    sessionStorage.setItem('lyc_session_id', sessionId);
   }
-  (window as any).gtag = gtag;
-  gtag('js', new Date());
-  gtag('config', measurementId, { send_page_view: false });
+  return sessionId;
 }
 
-type EventCategory = 
-  | 'engagement'
-  | 'conversion'
-  | 'navigation'
-  | 'search'
-  | 'form'
-  | 'error'
-  | 'performance';
-
-type EventAction =
-  | 'page_view'
-  | 'click'
-  | 'submit'
-  | 'search'
-  | 'filter'
-  | 'download'
-  | 'share'
-  | 'signup'
-  | 'login'
-  | 'purchase'
-  | 'error'
-  | 'timing';
-
-interface AnalyticsEvent {
-  category: EventCategory;
-  action: EventAction;
-  label?: string;
-  value?: number;
-  metadata?: Record<string, any>;
+function getAnonymousId(): string {
+  if (anonymousId) return anonymousId;
+  const existing = localStorage.getItem('lyc_anonymous_id');
+  if (existing) {
+    anonymousId = existing;
+  } else {
+    anonymousId = `anon_${Math.random().toString(36).slice(2, 18)}`;
+    localStorage.setItem('lyc_anonymous_id', anonymousId);
+  }
+  return anonymousId;
 }
 
-// Check if analytics is enabled
-const isAnalyticsEnabled = (): boolean => {
-  return typeof window !== 'undefined' && !!(window as any).gtag;
-};
+/* ------------------------------------------------------------------ */
+/* Queue management                                                    */
+/* ------------------------------------------------------------------ */
 
-// Get GA4 measurement ID
-const getMeasurementId = (): string => {
-  return import.meta.env.VITE_GA_MEASUREMENT_ID || '';
-};
-
-/**
- * Track a page view
- */
-export function trackPageView(path: string, title?: string): void {
-  if (!isAnalyticsEnabled()) return;
-
-  (window as any).gtag('config', getMeasurementId(), {
-    page_path: path,
-    page_title: title || document.title,
-  });
-
-  // Also send to custom analytics endpoint if configured
-  sendToCustomAnalytics('page_view', { path, title });
+function loadQueue(): QueuedEvent[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
 }
 
-/**
- * Track a custom event
- */
-export function trackEvent(event: AnalyticsEvent): void {
-  if (!isAnalyticsEnabled()) return;
-
-  (window as any).gtag('event', event.action, {
-    event_category: event.category,
-    event_label: event.label,
-    value: event.value,
-    ...event.metadata,
-  });
-
-  // Also send to custom analytics
-  sendToCustomAnalytics('event', event);
+function saveQueue(queue: QueuedEvent[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
+  } catch {
+    // Storage might be full — drop oldest events
+    if (queue.length > BATCH_SIZE) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(queue.slice(-BATCH_SIZE)));
+      } catch {
+        /* ignore */
+      }
+    }
+  }
 }
 
-/**
- * Track user signup
- */
-export function trackSignup(method: 'email' | 'google' | 'magic_link', tier?: string): void {
-  trackEvent({
-    category: 'conversion',
-    action: 'signup',
-    label: method,
-    metadata: { tier },
-  });
-}
+async function flushQueue(): Promise<void> {
+  const queue = loadQueue();
+  if (queue.length === 0) return;
 
-/**
- * Track login
- */
-export function trackLogin(method: 'email' | 'google' | 'magic_link'): void {
-  trackEvent({
-    category: 'engagement',
-    action: 'login',
-    label: method,
-  });
-}
-
-/**
- * Track credit purchase
- */
-export function trackCreditPurchase(pack: string, amount: number, credits: number): void {
-  trackEvent({
-    category: 'conversion',
-    action: 'purchase',
-    label: pack,
-    value: amount,
-    metadata: { credits },
-  });
-}
-
-/**
- * Track Council application
- */
-export function trackCouncilApplication(tier: string): void {
-  trackEvent({
-    category: 'conversion',
-    action: 'submit',
-    label: `council_application_${tier}`,
-  });
-}
-
-/**
- * Track search
- */
-export function trackSearch(query: string, results: number, source: string): void {
-  trackEvent({
-    category: 'search',
-    action: 'search',
-    label: source,
-    value: results,
-    metadata: { query },
-  });
-}
-
-/**
- * Track error
- */
-export function trackError(errorType: string, message: string, fatal: boolean = false): void {
-  trackEvent({
-    category: 'error',
-    action: 'error',
-    label: errorType,
-    metadata: { message, fatal },
-  });
-}
-
-/**
- * Track performance timing
- */
-export function trackTiming(category: string, variable: string, timeMs: number): void {
-  trackEvent({
-    category: 'performance',
-    action: 'timing',
-    label: `${category}:${variable}`,
-    value: timeMs,
-  });
-}
-
-/**
- * Track DEX AI message
- */
-export function trackDexMessage(messageLength: number, gated: boolean): void {
-  trackEvent({
-    category: 'engagement',
-    action: 'click',
-    label: gated ? 'dex_message_gated' : 'dex_message',
-    value: messageLength,
-  });
-}
-
-/**
- * Track mandate application
- */
-export function trackMandateApplication(mandateId: string): void {
-  trackEvent({
-    category: 'conversion',
-    action: 'submit',
-    label: 'mandate_application',
-    metadata: { mandate_id: mandateId },
-  });
-}
-
-/**
- * Track event RSVP
- */
-export function trackEventRsvp(eventId: string, action: 'rsvp' | 'cancel'): void {
-  trackEvent({
-    category: 'engagement',
-    action: 'click',
-    label: `event_${action}`,
-    metadata: { event_id: eventId },
-  });
-}
-
-// Send to custom analytics endpoint (optional)
-async function sendToCustomAnalytics(type: string, data: any): Promise<void> {
-  const endpoint = import.meta.env.VITE_ANALYTICS_ENDPOINT;
-  if (!endpoint) return;
+  const batch = queue.slice(0, BATCH_SIZE);
+  const remaining = queue.slice(BATCH_SIZE);
 
   try {
-    await fetch(endpoint, {
+    const res = await fetch('/api/analytics/track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type,
-        data,
-        timestamp: new Date().toISOString(),
-        url: window.location.href,
-        referrer: document.referrer,
-      }),
-      keepalive: true, // Ensure request completes even if page unloads
+      credentials: 'include',
+      body: JSON.stringify({ events: batch }),
     });
-  } catch (e) {
-    // Silently fail - don't impact UX
+    if (!res.ok) throw new Error('Track failed');
+    saveQueue(remaining);
+    // Recursively flush if more events remain
+    if (remaining.length >= BATCH_SIZE) {
+      await flushQueue();
+    }
+  } catch {
+    // Put events back in queue for retry
+    saveQueue([...batch, ...remaining]);
   }
 }
 
-// Export a hook for React components
-import { useCallback } from 'react';
+/* ------------------------------------------------------------------ */
+/* Track function                                                       */
+/* ------------------------------------------------------------------ */
+
+export function trackEvent(event: AnalyticsEvent) {
+  const queued: QueuedEvent = {
+    name: event.name,
+    properties: (event as any).properties || {},
+    timestamp: new Date().toISOString(),
+    session_id: getSessionId(),
+    anonymous_id: getAnonymousId(),
+  };
+
+  const queue = loadQueue();
+  queue.push(queued);
+  saveQueue(queue);
+
+  // If we've reached batch size, flush immediately
+  if (queue.length >= BATCH_SIZE) {
+    flushQueue();
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* React hook                                                          */
+/* ------------------------------------------------------------------ */
 
 export function useAnalytics() {
-  return {
-    trackPageView: useCallback(trackPageView, []),
-    trackEvent: useCallback(trackEvent, []),
-    trackSignup: useCallback(trackSignup, []),
-    trackLogin: useCallback(trackLogin, []),
-    trackCreditPurchase: useCallback(trackCreditPurchase, []),
-    trackCouncilApplication: useCallback(trackCouncilApplication, []),
-    trackSearch: useCallback(trackSearch, []),
-    trackError: useCallback(trackError, []),
-    trackTiming: useCallback(trackTiming, []),
-    trackDexMessage: useCallback(trackDexMessage, []),
-    trackMandateApplication: useCallback(trackMandateApplication, []),
-    trackEventRsvp: useCallback(trackEventRsvp, []),
-  };
+  const flushTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Set up periodic flush
+  useEffect(() => {
+    flushTimerRef.current = setInterval(flushQueue, BATCH_INTERVAL_MS);
+    // Flush on page hide
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        flushQueue();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    // Flush on unload
+    const handleBeforeUnload = () => {
+      flushQueue();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      if (flushTimerRef.current) clearInterval(flushTimerRef.current);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  const track = useCallback((event: AnalyticsEvent) => {
+    trackEvent(event);
+  }, []);
+
+  const trackPageView = useCallback((path: string, title?: string) => {
+    trackEvent({
+      name: 'page_view',
+      properties: {
+        path,
+        title,
+        referrer: document.referrer,
+      },
+    });
+  }, []);
+
+  return { track, trackPageView };
+}
+
+/* ------------------------------------------------------------------ */
+/* Page view tracker component (wrap <Routes>)                         */
+/* ------------------------------------------------------------------ */
+
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+
+export function AnalyticsPageTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackEvent({
+      name: 'page_view',
+      properties: {
+        path: location.pathname + location.search,
+        title: document.title,
+        referrer: document.referrer,
+      },
+    });
+  }, [location.pathname, location.search]);
+
+  return null;
 }

@@ -84,8 +84,19 @@ const ClientNexusAssistantPage = lazy(() => import('@/pages/client/ClientNexusAs
 const ClientAdminPage = lazy(() => import('@/pages/client/ClientAdminPage').then(m => ({ default: m.ClientAdminPage })));
 const ClientCollaborationPage = lazy(() => import('@/pages/client/ClientCollaborationPage').then(m => ({ default: m.ClientCollaborationPage })));
 const ClientOnboardingPage = lazy(() => import('@/pages/client/ClientOnboardingPage').then(m => ({ default: m.ClientOnboardingPage })));
+const ClientMandateDetailPage = lazy(() => import('@/pages/client/ClientMandateDetailPage').then(m => ({ default: m.ClientMandateDetailPage })));
 
-// ── Candidate Portal pages (EO-4) ──
+// Admin pages
+const PlatformAdminConsolePage = lazy(() => import('@/pages/admin/PlatformAdminConsolePage').then(m => ({ default: m.PlatformAdminConsolePage })));
+const CohortReportAdminPage = lazy(() => import('@/pages/admin/CohortReportAdminPage').then(m => ({ default: m.CohortReportAdminPage })));
+
+// Legal pages
+const TermsOfServicePage = lazy(() => import('@/pages/legal/TermsOfServicePage').then(m => ({ default: m.TermsOfServicePage })));
+const PrivacyPolicyPage = lazy(() => import('@/pages/legal/PrivacyPolicyPage').then(m => ({ default: m.PrivacyPolicyPage })));
+const CookiePolicyPage = lazy(() => import('@/pages/legal/CookiePolicyPage').then(m => ({ default: m.CookiePolicyPage })));
+
+// LMS pages
+const StudentLmsDashboardPage = lazy(() => import('@/pages/lms/StudentLmsDashboardPage').then(m => ({ default: m.StudentLmsDashboardPage })));
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
 const CandidateApplicationsPage = lazy(() => import('@/pages/candidate/CandidateApplicationsPage').then(m => ({ default: m.CandidateApplicationsPage })));
 const CandidateAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAssessmentsPage').then(m => ({ default: m.CandidateAssessmentsPage })));
@@ -220,6 +231,9 @@ export default function App() {
           <Route path="/b2c" element={<B2CLanding />} />
           <Route path="/nexus" element={<NexusLanding />} />
           <Route path="/match" element={<MatchPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/cookies" element={<CookiePolicyPage />} />
           <Route path="/pricing" element={<PricingPage />} />
 
           {/* ── Candidate Portal (public pages) ── */}
@@ -250,6 +264,12 @@ export default function App() {
           <Route path="/admin/academy" element={<AdminRoute><AcademyAdminPage /></AdminRoute>} />
           <Route path="/admin/academy/courses/:id" element={<AdminRoute><AcademyCourseEditorPage /></AdminRoute>} />
           <Route path="/admin/academy/enrollments" element={<AdminRoute><AcademyEnrollmentsPage /></AdminRoute>} />
+
+          {/* ── Platform Admin Console (auth + admin required) — Issue #37 ── */}
+          <Route path="/admin/console" element={<AdminRoute><PlatformAdminConsolePage /></AdminRoute>} />
+
+          {/* ── Cohort Reports Admin (auth + admin required) — Issue #22 ── */}
+          <Route path="/admin/cohort-reports" element={<AdminRoute><CohortReportAdminPage /></AdminRoute>} />
 
           {/* ── DEX AI B2C (auth required) ── */}
           <Route path="/dex/chat" element={<ProtectedRoute><DexChatPage /></ProtectedRoute>} />
@@ -304,6 +324,7 @@ export default function App() {
             <Route path="pipeline-analytics" element={<ClientPipelineAnalyticsPage />} />
             <Route path="talent-intel" element={<ClientTalentIntelPage />} />
             <Route path="mandates" element={<ClientMandatesPage />} />
+            <Route path="mandates/:id" element={<ClientMandateDetailPage />} />
             <Route path="candidates" element={<ClientCandidatesPage />} />
             <Route path="nexus-assistant" element={<ClientNexusAssistantPage />} />
             <Route path="documents" element={<ClientDocumentsPage />} />
@@ -324,6 +345,12 @@ export default function App() {
             <Route path="career-services" element={<CoachingCareerServicesPage />} />
             <Route path="engagement" element={<CoachingEngagementPage />} />
             <Route path="growth" element={<CoachingGrowthPage />} />
+          </Route>
+
+          {/* ── Student LMS Dashboard (mockup surface) ── */}
+          <Route path="/lms" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<StudentLmsDashboardPage />} />
           </Route>
 
           {/* ── Candidate Portal (mockup surface) ── */}
