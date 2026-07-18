@@ -13,6 +13,12 @@ export { FilterSidebar } from './FilterSidebar';
 export { SearchBar } from './SearchBar';
 export { SavedFilters } from './SavedFilters';
 export { ToastContainer } from './ToastContainer';
+export { Avatar } from './Avatar';
+export { Tooltip } from './Tooltip';
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
+export { Dropdown, DropdownItem, DropdownSeparator } from './Dropdown';
+export { Select } from './Select';
+
 export {
   FormField,
   FormSelect,

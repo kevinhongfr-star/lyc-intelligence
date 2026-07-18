@@ -32,6 +32,8 @@ const B2CLanding = lazy(() => import('@/pages/B2CLanding').then(m => ({ default:
 const NexusLanding = lazy(() => import('@/pages/NexusPage').then(m => ({ default: m.NexusPage })));
 const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m.MatchPage })));
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
+const PublicHomePage = lazy(() => import('@/pages/public/PublicHomePage').then(m => ({ default: m.PublicHomePage })));
+const PublicPricingPage = lazy(() => import('@/pages/public/PublicPricingPage').then(m => ({ default: m.PublicPricingPage })));
 
 // ── Authenticated user pages ──
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
@@ -200,6 +202,8 @@ export default function App() {
         <Routes>
           {/* ── Public pages ── */}
           <Route path="/" element={<Landing />} />
+          <Route path="/home" element={<PublicHomePage />} />
+          <Route path="/pricing-v2" element={<PublicPricingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/signup" element={<SignupPage />} />

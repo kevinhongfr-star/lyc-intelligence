@@ -47,6 +47,9 @@ const handlers: Record<string, () => Promise<any>> = {
   'canvas': () => import('./_lib/canvasHandler.js'),
   'grid': () => import('./_lib/gridReportsGenerateHandler.js').then(m => ({ handler: m.handler })),
   'scoring': () => import('./_lib/scoringComputeHandler.js'),
+  'tasks': () => import('./_lib/tasksHandler.js'),
+  'notifications': () => import('./_lib/notificationsHandler.js'),
+  'assessments': () => import('./_lib/assessmentHandler.js'),
 };
 
 // Modules whose handlers expect the full path (including module name) in req.query.path
