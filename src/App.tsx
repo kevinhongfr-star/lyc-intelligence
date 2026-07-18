@@ -98,6 +98,9 @@ const CandidateNexusCoachPage = lazy(() => import('@/pages/candidate/CandidateNe
 const CandidateProfilePage = lazy(() => import('@/pages/candidate/CandidateProfilePage').then(m => ({ default: m.CandidateProfilePage })));
 const CandidateAdvancedAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAdvancedAssessmentsPage').then(m => ({ default: m.CandidateAdvancedAssessmentsPage })));
 const CandidateSettingsPlusPage = lazy(() => import('@/pages/candidate/CandidateSettingsPlusPage').then(m => ({ default: m.CandidateSettingsPlusPage })));
+const CandidateMessagesPage = lazy(() => import('@/pages/candidate/CandidateMessagesPage').then(m => ({ default: m.CandidateMessagesPage })));
+const CandidateDocumentsPage = lazy(() => import('@/pages/candidate/CandidateDocumentsPage').then(m => ({ default: m.CandidateDocumentsPage })));
+const CohortAnalyticsDashboard = lazy(() => import('@/pages/admin/CohortAnalyticsDashboard').then(m => ({ default: m.CohortAnalyticsDashboard })));
 const CandidateLandingPage = lazy(() => import('@/pages/candidate/CandidateLandingPage').then(m => ({ default: m.CandidateLandingPage })));
 const BrowseMandatesPage = lazy(() => import('@/pages/candidate/BrowseMandatesPage').then(m => ({ default: m.BrowseMandatesPage })));
 const MandateDetailPublicPage = lazy(() => import('@/pages/candidate/MandateDetailPublicPage').then(m => ({ default: m.MandateDetailPublicPage })));
@@ -130,6 +133,11 @@ const CouncilAdminDashboardPage = lazy(() => import('@/pages/admin/council/Counc
 const CouncilEventManagerPage = lazy(() => import('@/pages/admin/council/CouncilEventManagerPage').then(m => ({ default: m.CouncilEventManagerPage })));
 const CouncilCoachingManagerPage = lazy(() => import('@/pages/admin/council/CouncilCoachingManagerPage').then(m => ({ default: m.CouncilCoachingManagerPage })));
 const CouncilApplicationsPage = lazy(() => import('@/pages/admin/council/CouncilApplicationsPage').then(m => ({ default: m.CouncilApplicationsPage })));
+
+// ── Academy Admin pages (Issue #17) ──
+const AcademyAdminPage = lazy(() => import('@/pages/admin/academy/AcademyAdminPage').then(m => ({ default: m.AcademyAdminPage })));
+const AcademyCourseEditorPage = lazy(() => import('@/pages/admin/academy/AcademyCourseEditorPage').then(m => ({ default: m.AcademyCourseEditorPage })));
+const AcademyEnrollmentsPage = lazy(() => import('@/pages/admin/academy/AcademyEnrollmentsPage').then(m => ({ default: m.AcademyEnrollmentsPage })));
 
 // ── Intelligence Layer pages ──
 const IntelligenceDashboardPage = lazy(() => import('@/pages/intelligence/IntelligenceDashboardPage').then(m => ({ default: m.IntelligenceDashboardPage })));
@@ -238,6 +246,11 @@ export default function App() {
           <Route path="/admin/council/coaching" element={<AdminRoute><CouncilCoachingManagerPage /></AdminRoute>} />
           <Route path="/admin/council/applications" element={<AdminRoute><CouncilApplicationsPage /></AdminRoute>} />
 
+          {/* ── Academy Admin (auth + admin required) — Issue #17 ── */}
+          <Route path="/admin/academy" element={<AdminRoute><AcademyAdminPage /></AdminRoute>} />
+          <Route path="/admin/academy/courses/:id" element={<AdminRoute><AcademyCourseEditorPage /></AdminRoute>} />
+          <Route path="/admin/academy/enrollments" element={<AdminRoute><AcademyEnrollmentsPage /></AdminRoute>} />
+
           {/* ── DEX AI B2C (auth required) ── */}
           <Route path="/dex/chat" element={<ProtectedRoute><DexChatPage /></ProtectedRoute>} />
           <Route path="/dex/credits" element={<ProtectedRoute><CreditStorePage /></ProtectedRoute>} />
@@ -328,6 +341,8 @@ export default function App() {
             <Route path="profile" element={<CandidateProfilePage />} />
             <Route path="advanced-assessments" element={<CandidateAdvancedAssessmentsPage />} />
             <Route path="settings-plus" element={<CandidateSettingsPlusPage />} />
+            <Route path="messages" element={<CandidateMessagesPage />} />
+            <Route path="documents" element={<CandidateDocumentsPage />} />
           </Route>
 
           {/* ── Authenticated user pages (standalone) ── */}
