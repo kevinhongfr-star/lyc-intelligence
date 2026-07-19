@@ -10,9 +10,16 @@ import { I18nProvider } from '@/i18n/I18nContext';
 
 // ── Admin route wrapper ──
 function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { user } = useAuthStore();
-  // TODO: Check admin role from user metadata
+  const { user, profile } = useAuthStore();
+  
   if (!user) return <Navigate to="/login" replace />;
+  
+  // Check if user has admin role
+  const adminRoles = ['super_admin', 'lyc_admin', 'admin'];
+  if (!profile?.role || !adminRoles.includes(profile.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
   return <>{children}</>;
 }
 
