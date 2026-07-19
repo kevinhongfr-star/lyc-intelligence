@@ -26,8 +26,8 @@ const handlers: Record<string, () => Promise<any>> = {
   'ai': () => import('./_lib/aiHandler.js'),
   'compensation': () => import('./_lib/compensationHandler.js'),
   'mandates': () => import('./_lib/mandatesHandler.js'),
-  'consultants': () => import('./_lib/mandatesHandler.js'),
-  'admin': () => import('./_lib/mandatesHandler.js'),
+  // NOTE: 'admin' and 'consultants' modules removed — they were incorrectly mapped to mandatesHandler.
+  // TODO: Create dedicated adminHandler.ts and consultantsHandler.ts when needed.
   'analytics': () => import('./_lib/analyticsHandler.js').then(m => ({ handler: m.handleAnalytics })),
   'clients': () => import('./_lib/clientHandler.js'),
   'contacts': () => import('./_lib/communicationsHandler.js'),
@@ -54,12 +54,12 @@ const handlers: Record<string, () => Promise<any>> = {
   'candidate-portal': () => import('./_lib/candidatePortalHandler.js'),
   'academy': () => import('./_lib/academyAdminHandler.js'),
   'client-portal': () => import('./_lib/clientPortalV2Handler.js'),
-  'analytics': () => import('./_lib/analyticsHandler.js'),
   'cohort-reports': () => import('./_lib/cohortReportsHandler.js'),
 };
 
 // Modules whose handlers expect the full path (including module name) in req.query.path
-const FULL_PATH_MODULES = new Set(['mandates', 'consultants', 'admin']);
+// NOTE: 'admin' and 'consultants' removed — they were incorrectly mapped to mandatesHandler.
+const FULL_PATH_MODULES = new Set(['mandates']);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Read module and sub-path from query params (set by vercel.json rewrite)
