@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 /* ------------------------------------------------------------------ */
 /* Layout / Wrapper                                                  */
@@ -14,28 +15,34 @@ import React from 'react';
 export function EmailLayout({
   children,
   previewText = '',
+  unsubscribeUrl = '#',
+  privacyUrl = '/privacy',
+  preferencesUrl = '#',
 }: {
   children: React.ReactNode;
   previewText?: string;
+  unsubscribeUrl?: string;
+  privacyUrl?: string;
+  preferencesUrl?: string;
 }) {
   return (
-    <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif }}>
+    <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
       {/* Preview text for email clients */}
       {previewText && (
         <div style={{ display: 'none', fontSize: '1px', color: '#fff', maxHeight: '0', maxWidth: '0', opacity: '0', overflow: 'hidden' }}>
           {previewText}
         </div>
       )}
-      <table width="100%" cellPadding="0" cellSpacing="0" role="presentation">
+      <table width="100%" cellPadding={0} cellSpacing={0} role="presentation">
         <tbody>
           <tr>
             <td align="center" style={{ backgroundColor: '#FAFAFA', padding: '40px 20px' }}>
-            <table width="600" cellPadding="0" cellSpacing="0" role="presentation" style={{ maxWidth: '600px' }}>
+            <table width="600" cellPadding={0} cellSpacing={0} role="presentation" style={{ maxWidth: '600px' }}>
               <tbody>
                 {/* Header */}
                 <tr>
                   <td style={{ backgroundColor: '#1A1A1A', padding: '24px 32px', borderRadius: '8px 8px 0 0' }}>
-                    <table width="100%" cellPadding="0" cellSpacing="0" role="presentation">
+                    <table width="100%" cellPadding={0} cellSpacing={0} role="presentation">
                       <tbody>
                         <tr>
                           <td style={{ fontSize: '20px', fontWeight: 300, color: '#fff', fontFamily: 'Georgia, serif' }}>
@@ -62,9 +69,9 @@ export function EmailLayout({
                       You are receiving this email because you registered for our services.
                     </p>
                     <p style={{ margin: '8px 0 0 0' }}>
-                      <a href="{{unsubscribe_url}}" style={{ color: '#6B6B6B', textDecoration: 'underline' }}>Unsubscribe</a>
+                      <a href={unsubscribeUrl} style={{ color: '#6B6B6B', textDecoration: 'underline' }}>Unsubscribe</a>
                       {' · '}
-                      <a href="{{privacy_url}}" style={{ color: '#6B6B6B', textDecoration: 'underline' }}>Privacy Policy</a>
+                      <a href={privacyUrl} style={{ color: '#6B6B6B', textDecoration: 'underline' }}>Privacy Policy</a>
                     </p>
                   </td>
                 </tr>
@@ -82,10 +89,10 @@ export function EmailLayout({
 /* Shared components                                                    */
 /* ------------------------------------------------------------------ */
 
-export function EmailHeading({ children, size = 'lg' }: { children: React.ReactNode; size?: 'sm' | 'md' | 'lg' }) {
+export function EmailHeading({ children, size = 'lg', style }: { children: React.ReactNode; size?: 'sm' | 'md' | 'lg'; style?: React.CSSProperties }) {
   const fontSize = size === 'lg' ? '24px' : size === 'md' ? '18px' : '15px';
   return (
-    <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 400, color: '#1A1A1A', fontSize, margin: '0 0 16px 0' }}>
+    <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 400, color: '#1A1A1A', fontSize, margin: '0 0 16px 0', ...style }}>
       {children}
     </h1>
   );
@@ -203,7 +210,7 @@ export function NewCandidateTemplate({
     <EmailLayout previewText={`New candidate: ${candidateName} for ${mandateTitle}`}>
       <EmailHeading>New candidate shortlisted</EmailHeading>
       <p style={{ margin: '0 0 16px 0' }}>
-        We've added <strong>{candidateName}</strong> has been shortlisted for the{' '}
+        <strong>{candidateName}</strong> has been shortlisted for the{' '}
         <strong>{mandateTitle}</strong> role.
       </p>
       <div style={{ backgroundColor: '#FAFAFA', padding: '16px', borderRadius: '6px', marginBottom: '24px' }}>
@@ -269,9 +276,9 @@ export function InterviewScheduledTemplate({
 /* ------------------------------------------------------------------ */
 
 export function MonthlyDigestTemplate({
-  name, articles = [], events = [] }: { name: string; articles?: Array<{ title: string; excerpt: string; url: string }>; events?: Array<{ title: string; date: string; url: string }> }) {
+  name, articles = [], events = [], unsubscribeUrl, preferencesUrl }: { name: string; articles?: Array<{ title: string; excerpt: string; url: string }>; events?: Array<{ title: string; date: string; url: string }>; unsubscribeUrl?: string; preferencesUrl?: string }) {
   return (
-    <EmailLayout previewText="Your monthly intelligence briefing from LYC">
+    <EmailLayout previewText="Your monthly intelligence briefing from LYC" unsubscribeUrl={unsubscribeUrl} preferencesUrl={preferencesUrl}>
       <EmailHeading>Monthly Intelligence Digest</EmailHeading>
       <p style={{ margin: '0 0 24px 0' }}>
         Hi {name}, here's your curated briefing for this month —
@@ -309,9 +316,9 @@ export function MonthlyDigestTemplate({
       <EmailDivider />
       <p style={{ fontSize: '12px', color: '#9B9B9B', margin: 0 }}>
         Don't want these emails?{' '}
-        <a href="{{unsubscribe_url}}" style={{ color: '#6B6B6B', textDecoration: 'underline' }}>Unsubscribe</a>
+        <a href={unsubscribeUrl || '#'} style={{ color: '#6B6B6B', textDecoration: 'underline' }}>Unsubscribe</a>
         {' '}or{' '}
-        <a href="{{preferences_url}}" style={{ color: '#6B6B6B', textDecoration: 'underline' }}>manage preferences</a>.
+        <a href={preferencesUrl || '#'} style={{ color: '#6B6B6B', textDecoration: 'underline' }}>manage preferences</a>.
       </p>
     </EmailLayout>
   );
@@ -376,8 +383,12 @@ export type TemplateName = keyof typeof EMAIL_TEMPLATES;
 /* Render helper (returns HTML string)                               */
 /* ------------------------------------------------------------------ */
 
-export function renderEmailToString(_templateName: TemplateName, _props: Record<string, any>): string {
-  // In production, use ReactDOMServer.renderToStaticMarkup()
-  // This is a placeholder — the actual rendering happens server-side.
-  return '';
+export function renderEmailToString(templateName: TemplateName, props: Record<string, any>): string {
+  const TemplateComponent = EMAIL_TEMPLATES[templateName];
+  if (!TemplateComponent) {
+    console.error(`[renderEmailToString] Unknown template: ${templateName}`);
+    return '';
+  }
+  const element = React.createElement(TemplateComponent as React.ComponentType<any>, props);
+  return ReactDOMServer.renderToStaticMarkup(element);
 }
