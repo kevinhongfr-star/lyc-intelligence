@@ -224,3 +224,21 @@ export function AnalyticsPageTracker() {
 
   return null;
 }
+
+/* ------------------------------------------------------------------ */
+/* Init function (called from main.tsx)                                 */
+/* ------------------------------------------------------------------ */
+
+export function initAnalytics() {
+  // Pre-warm session + anonymous IDs
+  getSessionId();
+  getAnonymousId();
+  // Flush any stale events from previous session
+  flushQueue();
+  // Set up periodic flush
+  setInterval(flushQueue, BATCH_INTERVAL_MS);
+  // Flush on visibility change
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushQueue();
+  });
+}
