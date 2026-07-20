@@ -48,7 +48,7 @@ const handlers: Record<string, () => Promise<any>> = {
   'grid': () => import('./_lib/gridReportsGenerateHandler.js').then(m => ({ handler: m.handler })),
   'scoring': () => import('./_lib/scoringComputeHandler.js'),
   'tasks': () => import('./_lib/tasksHandler.js'),
-  'notifications': () => import('./_lib/notificationsHandler.js'),
+  'notifications': () => import('./_lib/t5NotificationsHandler.js'),
   'assessments': () => import('./_lib/assessmentHandler.js'),
   'cohort': () => import('./_lib/cohortHandler.js'),
   'candidate-portal': () => import('./_lib/candidatePortalHandler.js'),
@@ -64,6 +64,7 @@ const handlers: Record<string, () => Promise<any>> = {
   'document-generation': () => import('./_lib/documentGenerationHandler.js'),
   'dashboard-builder': () => import('./_lib/dashboardBuilderHandler.js'),
   'ai-insights': () => import('./_lib/aiInsightsHandler.js'),
+  'backups': () => import('./_lib/backupHandler.js'),
 };
 
 // Modules whose handlers expect the full path (including module name) in req.query.path

@@ -119,6 +119,14 @@ const DashboardBuilderPage = lazy(() => import('@/pages/admin/DashboardBuilderPa
 // AI-Powered Insights
 const AIInsightsPage = lazy(() => import('@/pages/intelligence/AIInsightsPage').then(m => ({ default: m.AIInsightsPage })));
 
+// Batch 5 — Infrastructure & Operations
+const ShiftDataModelPage = lazy(() => import('@/pages/admin/ShiftDataModelPage').then(m => ({ default: m.ShiftDataModelPage })));
+const ApacQuarterlyReportPage = lazy(() => import('@/pages/intelligence/ApacQuarterlyReportPage').then(m => ({ default: m.ApacQuarterlyReportPage })));
+const SystemHealthPage = lazy(() => import('@/pages/admin/SystemHealthPage').then(m => ({ default: m.SystemHealthPage })));
+const UserActivationFlowsPage = lazy(() => import('@/pages/admin/UserActivationFlowsPage').then(m => ({ default: m.UserActivationFlowsPage })));
+const CandidatePortalV2Page = lazy(() => import('@/pages/candidate/CandidatePortalV2Page').then(m => ({ default: m.CandidatePortalV2Page })));
+const AssessmentEngineAdminPage = lazy(() => import('@/pages/admin/AssessmentEngineAdminPage').then(m => ({ default: m.AssessmentEngineAdminPage })));
+
 // Legal pages
 const TermsOfServicePage = lazy(() => import('@/pages/legal/TermsOfServicePage').then(m => ({ default: m.TermsOfServicePage })));
 const PrivacyPolicyPage = lazy(() => import('@/pages/legal/PrivacyPolicyPage').then(m => ({ default: m.PrivacyPolicyPage })));
@@ -315,8 +323,26 @@ export default function App() {
           {/* ── Dashboard Builder (auth + admin required) — Issue #46 ── */}
           <Route path="/admin/dashboard-builder" element={<AdminRoute><DashboardBuilderPage /></AdminRoute>} />
 
+          {/* ── SHIFT Data Model (auth + admin required) — Issue #18 ── */}
+          <Route path="/admin/shift-data-model" element={<AdminRoute><ShiftDataModelPage /></AdminRoute>} />
+
+          {/* ── Assessment Engine Admin (auth + admin required) — Issue #20 ── */}
+          <Route path="/admin/assessment-engine" element={<AdminRoute><AssessmentEngineAdminPage /></AdminRoute>} />
+
+          {/* ── System Health (auth + admin required) — Issues #26, #28, #31 ── */}
+          <Route path="/admin/system-health" element={<AdminRoute><SystemHealthPage /></AdminRoute>} />
+
+          {/* ── User Activation Flows (auth + admin required) — Issue #35 ── */}
+          <Route path="/admin/activation-flows" element={<AdminRoute><UserActivationFlowsPage /></AdminRoute>} />
+
           {/* ── Signal Council Briefing — Issue #23 ── */}
           <Route path="/council/briefing" element={<ProtectedRoute><SignalCouncilBriefingPage /></ProtectedRoute>} />
+
+          {/* ── APAC Quarterly Report — Issue #24 ── */}
+          <Route path="/intelligence/apac-quarterly" element={<ProtectedRoute><ApacQuarterlyReportPage /></ProtectedRoute>} />
+
+          {/* ── Candidate Portal v2.1 — Issue #14 ── */}
+          <Route path="/candidate/portal-v2" element={<ProtectedRoute><CandidatePortalV2Page /></ProtectedRoute>} />
 
           {/* ── Referral Program — Issue #34 ── */}
           <Route path="/referral" element={<ProtectedRoute><ReferralProgramPage /></ProtectedRoute>} />
