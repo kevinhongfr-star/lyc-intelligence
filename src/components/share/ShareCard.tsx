@@ -82,7 +82,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
               {[
                 { label: 'Strategic Orientation', score: data?.dimension_scores?.strategic_orientation || 0 },
                 { label: 'Cross-border Adaptability', score: data?.dimension_scores?.cross_border_adaptability || 0 },
-                { label: 'Stakeholder Influence', score: data?.dimension_scores?.stakeholder_influence || 0 }
+                { label: 'Mission Alignment', score: data?.dimension_scores?.mission_alignment || 0 }
               ].map((item, i) => (
                 <div key={i} style={{ marginBottom: i < 2 ? '16px' : 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>

@@ -4,9 +4,9 @@ import { DiagnosticPageLayout } from '@/components/diagnostic/DiagnosticPageLayo
 export const DrivePage: React.FC = () => (
   <DiagnosticPageLayout
     instrumentId="drive"
-    title="DRIVE Motivational Profile"
+    title="DRIVE Motivation & Engagement Diagnostic"
     tagline="Understand what truly motivates you — and what's holding you back"
-    description="DRIVE maps your motivational pattern across achievement orientation, autonomy need, recognition seeking, growth appetite, and stability preference."
+    description="DRIVE maps your motivational pattern across intrinsic motivation, relational investment, mission alignment, growth orientation, and sustainability."
     aboutContent={
       <>
         <p>DRIVE goes deeper than surface-level motivation. It reveals the underlying drivers that determine whether you'll thrive or merely survive in your current role.</p>

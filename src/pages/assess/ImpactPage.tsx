@@ -6,7 +6,7 @@ export const ImpactPage: React.FC = () => (
     instrumentId="impact"
     title="IMPACT Board Effectiveness Diagnostic"
     tagline="How effectively do you contribute at the board level?"
-    description="IMPACT measures your board effectiveness across governance mastery, board dynamics, strategic contribution, and risk oversight."
+    description="IMPACT measures your board effectiveness across governance effectiveness, independent judgment, board influence, strategic contribution, and mandate credibility."
     aboutContent={
       <>
         <p>IMPACT is designed for current and aspiring board members. It reveals whether you're operating as a strategic asset or merely fulfilling a governance requirement.</p>

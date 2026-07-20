@@ -4,9 +4,9 @@ import { DiagnosticPageLayout } from '@/components/diagnostic/DiagnosticPageLayo
 export const MosaicPage: React.FC = () => (
   <DiagnosticPageLayout
     instrumentId="mosaic"
-    title="MOSAIC Cultural Intelligence — Organization"
+    title="MOSAIC Cross-Border Team Dynamics"
     tagline="How culturally intelligent is your organization?"
-    description="MOSAIC measures your organization's cultural intelligence across openness, integration maturity, inclusive leadership, and cultural infrastructure."
+    description="MOSAIC measures cross-border team dynamics across institutional trust, relationship velocity, normative flexibility, and conflict resolution."
     aboutContent={
       <>
         <p>MOSAIC is the organizational counterpart to BRIDGE. While BRIDGE measures individual cultural intelligence, MOSAIC assesses how well the organization itself operates across cultures.</p>

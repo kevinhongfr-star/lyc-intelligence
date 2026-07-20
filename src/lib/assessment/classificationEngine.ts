@@ -3,6 +3,9 @@
  * 
  * Takes dimension scores → deterministically maps to one of 62 archetypes.
  * Same input = same output, always. Pure function, no side effects.
+ * 
+ * Dimension IDs aligned to Notion diagnostic specifications (2026-07-21).
+ * Score scale: 0–20 per dimension.
  */
 
 import { InstrumentId, DimensionScore, ArchetypeResult, AssessmentAnswer } from '@/types/assessment';
@@ -13,85 +16,93 @@ import { INSTRUMENTS } from '@/data/instruments';
 // Each instrument has a unique scoring pattern for each archetype
 interface ClassificationPattern {
   archetypeId: string;
-  // Dimension id → expected score range [low, high]
-  // High scores = dimension is strong; Low = dimension is weak
-  dimensionWeights: Record<string, number>; // dimension id → weight (-1 to 1)
+  dimensionWeights: Record<string, number>; // dimension id → weight (0 to 1)
 }
 
 const CLASSIFICATION_PATTERNS: Record<InstrumentId, ClassificationPattern[]> = {
+  // QUEST: Cognitive Complexity, Adaptive Leadership, Stakeholder Intelligence, Mission Alignment, AI Readiness
   quest: [
-    { archetypeId: 'quest-architect', dimensionWeights: { strategic_vision: 0.9, execution_discipline: 0.7, people_development: 0.3, stakeholder_influence: 0.4, adaptive_agility: 0.5 } },
-    { archetypeId: 'quest-catalyst', dimensionWeights: { strategic_vision: 0.7, execution_discipline: 0.3, people_development: 0.8, stakeholder_influence: 0.6, adaptive_agility: 0.9 } },
-    { archetypeId: 'quest-diplomat', dimensionWeights: { strategic_vision: 0.5, execution_discipline: 0.4, people_development: 0.7, stakeholder_influence: 0.95, adaptive_agility: 0.6 } },
-    { archetypeId: 'quest-commander', dimensionWeights: { strategic_vision: 0.7, execution_discipline: 0.9, people_development: 0.5, stakeholder_influence: 0.6, adaptive_agility: 0.4 } },
-    { archetypeId: 'quest-navigator', dimensionWeights: { strategic_vision: 0.95, execution_discipline: 0.5, people_development: 0.4, stakeholder_influence: 0.5, adaptive_agility: 0.8 } },
-    { archetypeId: 'quest-strategist', dimensionWeights: { strategic_vision: 0.9, execution_discipline: 0.6, people_development: 0.3, stakeholder_influence: 0.7, adaptive_agility: 0.5 } },
-    { archetypeId: 'quest-engine', dimensionWeights: { strategic_vision: 0.4, execution_discipline: 0.95, people_development: 0.6, stakeholder_influence: 0.3, adaptive_agility: 0.3 } },
-    { archetypeId: 'quest-entrepreneur', dimensionWeights: { strategic_vision: 0.8, execution_discipline: 0.6, people_development: 0.4, stakeholder_influence: 0.5, adaptive_agility: 0.9 } },
-    { archetypeId: 'quest-specialist', dimensionWeights: { strategic_vision: 0.5, execution_discipline: 0.8, people_development: 0.3, stakeholder_influence: 0.3, adaptive_agility: 0.3 } },
-    { archetypeId: 'quest-seedling', dimensionWeights: { strategic_vision: 0.5, execution_discipline: 0.5, people_development: 0.5, stakeholder_influence: 0.5, adaptive_agility: 0.5 } },
+    { archetypeId: 'quest-architect', dimensionWeights: { cognitive_complexity: 0.95, adaptive_leadership: 0.5, stakeholder_intelligence: 0.4, mission_alignment: 0.6, ai_readiness: 0.5 } },
+    { archetypeId: 'quest-catalyst', dimensionWeights: { cognitive_complexity: 0.7, adaptive_leadership: 0.9, stakeholder_intelligence: 0.6, mission_alignment: 0.7, ai_readiness: 0.6 } },
+    { archetypeId: 'quest-diplomat', dimensionWeights: { cognitive_complexity: 0.5, adaptive_leadership: 0.6, stakeholder_intelligence: 0.95, mission_alignment: 0.7, ai_readiness: 0.4 } },
+    { archetypeId: 'quest-commander', dimensionWeights: { cognitive_complexity: 0.7, adaptive_leadership: 0.4, stakeholder_intelligence: 0.6, mission_alignment: 0.8, ai_readiness: 0.5 } },
+    { archetypeId: 'quest-navigator', dimensionWeights: { cognitive_complexity: 0.95, adaptive_leadership: 0.8, stakeholder_intelligence: 0.5, mission_alignment: 0.6, ai_readiness: 0.7 } },
+    { archetypeId: 'quest-strategist', dimensionWeights: { cognitive_complexity: 0.9, adaptive_leadership: 0.5, stakeholder_intelligence: 0.7, mission_alignment: 0.6, ai_readiness: 0.6 } },
+    { archetypeId: 'quest-engine', dimensionWeights: { cognitive_complexity: 0.4, adaptive_leadership: 0.3, stakeholder_intelligence: 0.3, mission_alignment: 0.7, ai_readiness: 0.4 } },
+    { archetypeId: 'quest-entrepreneur', dimensionWeights: { cognitive_complexity: 0.8, adaptive_leadership: 0.9, stakeholder_intelligence: 0.5, mission_alignment: 0.5, ai_readiness: 0.7 } },
+    { archetypeId: 'quest-specialist', dimensionWeights: { cognitive_complexity: 0.8, adaptive_leadership: 0.3, stakeholder_intelligence: 0.3, mission_alignment: 0.5, ai_readiness: 0.5 } },
+    { archetypeId: 'quest-seedling', dimensionWeights: { cognitive_complexity: 0.5, adaptive_leadership: 0.5, stakeholder_intelligence: 0.5, mission_alignment: 0.5, ai_readiness: 0.5 } },
   ],
+  // DRIVE: Intrinsic Motivation, Relational Investment, Mission Alignment, Growth Orientation, Sustainability
   drive: [
-    { archetypeId: 'drive-achiever', dimensionWeights: { achievement_orientation: 0.95, autonomy_need: 0.6, recognition_seeking: 0.4, growth_appetite: 0.7, stability_preference: 0.3 } },
-    { archetypeId: 'drive-craftsman', dimensionWeights: { achievement_orientation: 0.7, autonomy_need: 0.7, recognition_seeking: 0.2, growth_appetite: 0.6, stability_preference: 0.5 } },
-    { archetypeId: 'drive-champion', dimensionWeights: { achievement_orientation: 0.9, autonomy_need: 0.5, recognition_seeking: 0.8, growth_appetite: 0.8, stability_preference: 0.2 } },
-    { archetypeId: 'drive-explorer', dimensionWeights: { achievement_orientation: 0.5, autonomy_need: 0.8, recognition_seeking: 0.3, growth_appetite: 0.95, stability_preference: 0.1 } },
-    { archetypeId: 'drive-stalwart', dimensionWeights: { achievement_orientation: 0.6, autonomy_need: 0.3, recognition_seeking: 0.3, growth_appetite: 0.2, stability_preference: 0.95 } },
-    { archetypeId: 'drive-restless', dimensionWeights: { achievement_orientation: 0.7, autonomy_need: 0.7, recognition_seeking: 0.5, growth_appetite: 0.9, stability_preference: 0.2 } },
-    { archetypeId: 'drive-golden-handcuffs', dimensionWeights: { achievement_orientation: 0.4, autonomy_need: 0.2, recognition_seeking: 0.6, growth_appetite: 0.2, stability_preference: 0.9 } },
-    { archetypeId: 'drive-drifter', dimensionWeights: { achievement_orientation: 0.3, autonomy_need: 0.4, recognition_seeking: 0.3, growth_appetite: 0.3, stability_preference: 0.5 } },
-    { archetypeId: 'drive-burned-out', dimensionWeights: { achievement_orientation: 0.2, autonomy_need: 0.2, recognition_seeking: 0.2, growth_appetite: 0.1, stability_preference: 0.7 } },
-    { archetypeId: 'drive-frozen-asset', dimensionWeights: { achievement_orientation: 0.6, autonomy_need: 0.5, recognition_seeking: 0.4, growth_appetite: 0.6, stability_preference: 0.4 } },
+    { archetypeId: 'drive-achiever', dimensionWeights: { intrinsic_motivation: 0.95, relational_investment: 0.4, mission_alignment: 0.6, growth_orientation: 0.7, sustainability: 0.5 } },
+    { archetypeId: 'drive-craftsman', dimensionWeights: { intrinsic_motivation: 0.9, relational_investment: 0.3, mission_alignment: 0.4, growth_orientation: 0.5, sustainability: 0.7 } },
+    { archetypeId: 'drive-champion', dimensionWeights: { intrinsic_motivation: 0.7, relational_investment: 0.7, mission_alignment: 0.9, growth_orientation: 0.7, sustainability: 0.5 } },
+    { archetypeId: 'drive-explorer', dimensionWeights: { intrinsic_motivation: 0.7, relational_investment: 0.3, mission_alignment: 0.3, growth_orientation: 0.95, sustainability: 0.3 } },
+    { archetypeId: 'drive-stalwart', dimensionWeights: { intrinsic_motivation: 0.5, relational_investment: 0.7, mission_alignment: 0.6, growth_orientation: 0.2, sustainability: 0.9 } },
+    { archetypeId: 'drive-restless', dimensionWeights: { intrinsic_motivation: 0.6, relational_investment: 0.4, mission_alignment: 0.3, growth_orientation: 0.9, sustainability: 0.2 } },
+    { archetypeId: 'drive-golden-handcuffs', dimensionWeights: { intrinsic_motivation: 0.2, relational_investment: 0.4, mission_alignment: 0.3, growth_orientation: 0.2, sustainability: 0.6 } },
+    { archetypeId: 'drive-drifter', dimensionWeights: { intrinsic_motivation: 0.3, relational_investment: 0.3, mission_alignment: 0.3, growth_orientation: 0.3, sustainability: 0.4 } },
+    { archetypeId: 'drive-burned-out', dimensionWeights: { intrinsic_motivation: 0.2, relational_investment: 0.2, mission_alignment: 0.2, growth_orientation: 0.1, sustainability: 0.1 } },
+    { archetypeId: 'drive-frozen-asset', dimensionWeights: { intrinsic_motivation: 0.4, relational_investment: 0.4, mission_alignment: 0.5, growth_orientation: 0.3, sustainability: 0.5 } },
   ],
+  // IMPACT: Governance Effectiveness, Independent Judgment, Board Influence, Strategic Contribution, Mandate Credibility
   impact: [
-    { archetypeId: 'impact-architect', dimensionWeights: { governance_mastery: 0.9, board_dynamics: 0.6, strategic_contribution: 0.7, risk_oversight: 0.8 } },
-    { archetypeId: 'impact-steward', dimensionWeights: { governance_mastery: 0.7, board_dynamics: 0.5, strategic_contribution: 0.5, risk_oversight: 0.95 } },
-    { archetypeId: 'impact-networker', dimensionWeights: { governance_mastery: 0.4, board_dynamics: 0.9, strategic_contribution: 0.5, risk_oversight: 0.3 } },
-    { archetypeId: 'impact-guardian', dimensionWeights: { governance_mastery: 0.8, board_dynamics: 0.6, strategic_contribution: 0.4, risk_oversight: 0.85 } },
-    { archetypeId: 'impact-visionary', dimensionWeights: { governance_mastery: 0.5, board_dynamics: 0.6, strategic_contribution: 0.95, risk_oversight: 0.4 } },
-    { archetypeId: 'impact-bridge-builder', dimensionWeights: { governance_mastery: 0.6, board_dynamics: 0.9, strategic_contribution: 0.7, risk_oversight: 0.5 } },
-    { archetypeId: 'impact-nominee', dimensionWeights: { governance_mastery: 0.5, board_dynamics: 0.5, strategic_contribution: 0.5, risk_oversight: 0.5 } },
-    { archetypeId: 'impact-passenger', dimensionWeights: { governance_mastery: 0.3, board_dynamics: 0.3, strategic_contribution: 0.2, risk_oversight: 0.3 } },
+    { archetypeId: 'impact-architect', dimensionWeights: { governance_effectiveness: 0.95, independent_judgment: 0.7, board_influence: 0.6, strategic_contribution: 0.7, mandate_credibility: 0.7 } },
+    { archetypeId: 'impact-steward', dimensionWeights: { governance_effectiveness: 0.8, independent_judgment: 0.6, board_influence: 0.4, strategic_contribution: 0.5, mandate_credibility: 0.8 } },
+    { archetypeId: 'impact-networker', dimensionWeights: { governance_effectiveness: 0.4, independent_judgment: 0.5, board_influence: 0.95, strategic_contribution: 0.5, mandate_credibility: 0.7 } },
+    { archetypeId: 'impact-guardian', dimensionWeights: { governance_effectiveness: 0.9, independent_judgment: 0.85, board_influence: 0.5, strategic_contribution: 0.4, mandate_credibility: 0.7 } },
+    { archetypeId: 'impact-visionary', dimensionWeights: { governance_effectiveness: 0.5, independent_judgment: 0.7, board_influence: 0.6, strategic_contribution: 0.95, mandate_credibility: 0.6 } },
+    { archetypeId: 'impact-bridge-builder', dimensionWeights: { governance_effectiveness: 0.6, independent_judgment: 0.5, board_influence: 0.8, strategic_contribution: 0.7, mandate_credibility: 0.7 } },
+    { archetypeId: 'impact-nominee', dimensionWeights: { governance_effectiveness: 0.5, independent_judgment: 0.4, board_influence: 0.5, strategic_contribution: 0.5, mandate_credibility: 0.5 } },
+    { archetypeId: 'impact-passenger', dimensionWeights: { governance_effectiveness: 0.3, independent_judgment: 0.2, board_influence: 0.2, strategic_contribution: 0.3, mandate_credibility: 0.2 } },
   ],
+  // PRISM: Brand Authenticity, Market Visibility, Narrative Clarity, Stakeholder Legibility, APAC Brand Translation
   prism: [
-    { archetypeId: 'prism-authority', dimensionWeights: { brand_clarity: 0.8, narrative_power: 0.6, visibility_strategy: 0.6, authenticity_index: 0.7, market_resonance: 0.7 } },
-    { archetypeId: 'prism-signal', dimensionWeights: { brand_clarity: 0.95, narrative_power: 0.8, visibility_strategy: 0.9, authenticity_index: 0.6, market_resonance: 0.8 } },
-    { archetypeId: 'prism-monument', dimensionWeights: { brand_clarity: 0.6, narrative_power: 0.5, visibility_strategy: 0.5, authenticity_index: 0.5, market_resonance: 0.7 } },
-    { archetypeId: 'prism-chameleon', dimensionWeights: { brand_clarity: 0.4, narrative_power: 0.7, visibility_strategy: 0.6, authenticity_index: 0.3, market_resonance: 0.7 } },
-    { archetypeId: 'prism-amplifier', dimensionWeights: { brand_clarity: 0.5, narrative_power: 0.6, visibility_strategy: 0.3, authenticity_index: 0.8, market_resonance: 0.5 } },
-    { archetypeId: 'prism-operator', dimensionWeights: { brand_clarity: 0.6, narrative_power: 0.4, visibility_strategy: 0.5, authenticity_index: 0.7, market_resonance: 0.6 } },
-    { archetypeId: 'prism-ghost', dimensionWeights: { brand_clarity: 0.2, narrative_power: 0.3, visibility_strategy: 0.2, authenticity_index: 0.5, market_resonance: 0.2 } },
-    { archetypeId: 'prism-mask', dimensionWeights: { brand_clarity: 0.7, narrative_power: 0.8, visibility_strategy: 0.8, authenticity_index: 0.2, market_resonance: 0.6 } },
-    { archetypeId: 'prism-static', dimensionWeights: { brand_clarity: 0.7, narrative_power: 0.5, visibility_strategy: 0.6, authenticity_index: 0.6, market_resonance: 0.4 } },
-    { archetypeId: 'prism-blank-page', dimensionWeights: { brand_clarity: 0.2, narrative_power: 0.3, visibility_strategy: 0.3, authenticity_index: 0.6, market_resonance: 0.2 } },
+    { archetypeId: 'prism-authority', dimensionWeights: { brand_authenticity: 0.9, market_visibility: 0.7, narrative_clarity: 0.7, stakeholder_legibility: 0.8, apac_brand_translation: 0.6 } },
+    { archetypeId: 'prism-signal', dimensionWeights: { brand_authenticity: 0.7, market_visibility: 0.95, narrative_clarity: 0.8, stakeholder_legibility: 0.7, apac_brand_translation: 0.7 } },
+    { archetypeId: 'prism-monument', dimensionWeights: { brand_authenticity: 0.7, market_visibility: 0.5, narrative_clarity: 0.5, stakeholder_legibility: 0.7, apac_brand_translation: 0.6 } },
+    { archetypeId: 'prism-chameleon', dimensionWeights: { brand_authenticity: 0.3, market_visibility: 0.6, narrative_clarity: 0.7, stakeholder_legibility: 0.6, apac_brand_translation: 0.8 } },
+    { archetypeId: 'prism-amplifier', dimensionWeights: { brand_authenticity: 0.7, market_visibility: 0.4, narrative_clarity: 0.6, stakeholder_legibility: 0.5, apac_brand_translation: 0.5 } },
+    { archetypeId: 'prism-operator', dimensionWeights: { brand_authenticity: 0.7, market_visibility: 0.5, narrative_clarity: 0.5, stakeholder_legibility: 0.7, apac_brand_translation: 0.6 } },
+    { archetypeId: 'prism-ghost', dimensionWeights: { brand_authenticity: 0.5, market_visibility: 0.1, narrative_clarity: 0.3, stakeholder_legibility: 0.2, apac_brand_translation: 0.3 } },
+    { archetypeId: 'prism-mask', dimensionWeights: { brand_authenticity: 0.2, market_visibility: 0.8, narrative_clarity: 0.8, stakeholder_legibility: 0.7, apac_brand_translation: 0.6 } },
+    { archetypeId: 'prism-static', dimensionWeights: { brand_authenticity: 0.6, market_visibility: 0.6, narrative_clarity: 0.5, stakeholder_legibility: 0.6, apac_brand_translation: 0.4 } },
+    { archetypeId: 'prism-blank-page', dimensionWeights: { brand_authenticity: 0.4, market_visibility: 0.2, narrative_clarity: 0.2, stakeholder_legibility: 0.2, apac_brand_translation: 0.3 } },
   ],
+  // BRIDGE: HQ Alignment, Local Orchestration, Expectation Translation, Political Navigation, Cultural Fluency
   bridge: [
-    { archetypeId: 'bridge-envoy', dimensionWeights: { cultural_awareness: 0.8, adaptation_capacity: 0.7, communication_flex: 0.9, relationship_depth: 0.7 } },
-    { archetypeId: 'bridge-navigator', dimensionWeights: { cultural_awareness: 0.9, adaptation_capacity: 0.6, communication_flex: 0.6, relationship_depth: 0.5 } },
-    { archetypeId: 'bridge-chameleon', dimensionWeights: { cultural_awareness: 0.8, adaptation_capacity: 0.95, communication_flex: 0.8, relationship_depth: 0.7 } },
-    { archetypeId: 'bridge-anchor', dimensionWeights: { cultural_awareness: 0.7, adaptation_capacity: 0.3, communication_flex: 0.4, relationship_depth: 0.8 } },
-    { archetypeId: 'bridge-sprinter', dimensionWeights: { cultural_awareness: 0.6, adaptation_capacity: 0.5, communication_flex: 0.7, relationship_depth: 0.3 } },
-    { archetypeId: 'bridge-cultural-operator', dimensionWeights: { cultural_awareness: 0.8, adaptation_capacity: 0.5, communication_flex: 0.5, relationship_depth: 0.5 } },
+    { archetypeId: 'bridge-envoy', dimensionWeights: { hq_alignment: 0.7, local_orchestration: 0.7, expectation_translation: 0.9, political_navigation: 0.7, cultural_fluency: 0.8 } },
+    { archetypeId: 'bridge-navigator', dimensionWeights: { hq_alignment: 0.9, local_orchestration: 0.6, expectation_translation: 0.6, political_navigation: 0.7, cultural_fluency: 0.7 } },
+    { archetypeId: 'bridge-chameleon', dimensionWeights: { hq_alignment: 0.5, local_orchestration: 0.7, expectation_translation: 0.7, political_navigation: 0.6, cultural_fluency: 0.95 } },
+    { archetypeId: 'bridge-anchor', dimensionWeights: { hq_alignment: 0.9, local_orchestration: 0.4, expectation_translation: 0.4, political_navigation: 0.5, cultural_fluency: 0.5 } },
+    { archetypeId: 'bridge-sprinter', dimensionWeights: { hq_alignment: 0.6, local_orchestration: 0.5, expectation_translation: 0.7, political_navigation: 0.5, cultural_fluency: 0.6 } },
+    { archetypeId: 'bridge-cultural-operator', dimensionWeights: { hq_alignment: 0.7, local_orchestration: 0.6, expectation_translation: 0.6, political_navigation: 0.5, cultural_fluency: 0.7 } },
   ],
+  // MOSAIC: Institutional Trust, Relationship Velocity, Normative Flexibility, Conflict Resolution
   mosaic: [
-    { archetypeId: 'mosaic-cultural-catalyst', dimensionWeights: { organizational_openness: 0.9, integration_maturity: 0.8, inclusive_leadership: 0.8, cultural_infrastructure: 0.7 } },
-    { archetypeId: 'mosaic-cultural-expert', dimensionWeights: { organizational_openness: 0.7, integration_maturity: 0.5, inclusive_leadership: 0.6, cultural_infrastructure: 0.7 } },
-    { archetypeId: 'mosaic-cultural-leader', dimensionWeights: { organizational_openness: 0.8, integration_maturity: 0.9, inclusive_leadership: 0.9, cultural_infrastructure: 0.9 } },
-    { archetypeId: 'mosaic-cultural-tourist', dimensionWeights: { organizational_openness: 0.5, integration_maturity: 0.3, inclusive_leadership: 0.3, cultural_infrastructure: 0.3 } },
+    { archetypeId: 'mosaic-cultural-catalyst', dimensionWeights: { institutional_trust: 0.8, relationship_velocity: 0.9, normative_flexibility: 0.8, conflict_resolution: 0.7 } },
+    { archetypeId: 'mosaic-cultural-expert', dimensionWeights: { institutional_trust: 0.7, relationship_velocity: 0.5, normative_flexibility: 0.6, conflict_resolution: 0.5 } },
+    { archetypeId: 'mosaic-cultural-leader', dimensionWeights: { institutional_trust: 0.9, relationship_velocity: 0.8, normative_flexibility: 0.9, conflict_resolution: 0.9 } },
+    { archetypeId: 'mosaic-cultural-tourist', dimensionWeights: { institutional_trust: 0.3, relationship_velocity: 0.4, normative_flexibility: 0.3, conflict_resolution: 0.3 } },
   ],
+  // FORGE: Adaptive Learning Orientation, Three Forces Awareness, Development Agency, Bilateral Context Navigation
   forge: [
-    { archetypeId: 'forge-rainmaker', dimensionWeights: { revenue_strategy: 0.6, sales_leadership: 0.7, market_positioning: 0.7, pipeline_mastery: 0.9 } },
-    { archetypeId: 'forge-system-builder', dimensionWeights: { revenue_strategy: 0.7, sales_leadership: 0.6, market_positioning: 0.5, pipeline_mastery: 0.8 } },
-    { archetypeId: 'forge-revenue-architect', dimensionWeights: { revenue_strategy: 0.95, sales_leadership: 0.5, market_positioning: 0.9, pipeline_mastery: 0.6 } },
-    { archetypeId: 'forge-promoted-seller', dimensionWeights: { revenue_strategy: 0.5, sales_leadership: 0.8, market_positioning: 0.5, pipeline_mastery: 0.7 } },
+    { archetypeId: 'forge-rainmaker', dimensionWeights: { adaptive_learning_orientation: 0.5, three_forces_awareness: 0.5, development_agency: 0.6, bilateral_context_navigation: 0.7 } },
+    { archetypeId: 'forge-system-builder', dimensionWeights: { adaptive_learning_orientation: 0.7, three_forces_awareness: 0.6, development_agency: 0.8, bilateral_context_navigation: 0.6 } },
+    { archetypeId: 'forge-revenue-architect', dimensionWeights: { adaptive_learning_orientation: 0.8, three_forces_awareness: 0.9, development_agency: 0.7, bilateral_context_navigation: 0.7 } },
+    { archetypeId: 'forge-promoted-seller', dimensionWeights: { adaptive_learning_orientation: 0.5, three_forces_awareness: 0.4, development_agency: 0.5, bilateral_context_navigation: 0.6 } },
   ],
+  // SPARK: Individual AI Adoption Readiness, Capability Exposure Assessment, Organisational Preparedness
   spark: [
-    { archetypeId: 'spark-ai-champion', dimensionWeights: { ai_vision: 0.9, tech_fluency: 0.8, change_readiness: 0.8, ethics_governance: 0.6 } },
-    { archetypeId: 'spark-skeptical-director', dimensionWeights: { ai_vision: 0.4, tech_fluency: 0.6, change_readiness: 0.3, ethics_governance: 0.7 } },
-    { archetypeId: 'spark-governance-bureaucrat', dimensionWeights: { ai_vision: 0.5, tech_fluency: 0.5, change_readiness: 0.3, ethics_governance: 0.95 } },
-    { archetypeId: 'spark-disengaged-director', dimensionWeights: { ai_vision: 0.2, tech_fluency: 0.2, change_readiness: 0.2, ethics_governance: 0.3 } },
+    { archetypeId: 'spark-ai-champion', dimensionWeights: { individual_ai_adoption_readiness: 0.9, capability_exposure_assessment: 0.8, organisational_preparedness: 0.7 } },
+    { archetypeId: 'spark-skeptical-director', dimensionWeights: { individual_ai_adoption_readiness: 0.3, capability_exposure_assessment: 0.7, organisational_preparedness: 0.5 } },
+    { archetypeId: 'spark-governance-bureaucrat', dimensionWeights: { individual_ai_adoption_readiness: 0.5, capability_exposure_assessment: 0.5, organisational_preparedness: 0.95 } },
+    { archetypeId: 'spark-disengaged-director', dimensionWeights: { individual_ai_adoption_readiness: 0.2, capability_exposure_assessment: 0.2, organisational_preparedness: 0.2 } },
   ],
-  shift: [], // Composite — handled separately
+  // SHIFT: Cross-Boundary Developmental Orientation, Adaptive Coaching Style, Bilateral Developmental Relationship Quality, Coaching Under Bilateral Constraints
+  // No archetypes — score-based composite
+  shift: [],
 };
 
 /**
@@ -103,7 +114,7 @@ export function classifyArchetype(
   instrumentId: InstrumentId,
   dimensionScores: DimensionScore[]
 ): ArchetypeResult {
-  // SHIFT is composite — aggregate from sub-instruments
+  // SHIFT is composite — score-based, no archetype matching
   if (instrumentId === 'shift') {
     return classifyShift(dimensionScores);
   }
@@ -111,10 +122,10 @@ export function classifyArchetype(
   const patterns = CLASSIFICATION_PATTERNS[instrumentId];
   const instrument = INSTRUMENTS[instrumentId];
 
-  // Build score map
+  // Build score map (normalize 0-20 scale to 0-1)
   const scoreMap: Record<string, number> = {};
   dimensionScores.forEach(ds => {
-    scoreMap[ds.dimensionId] = ds.normalizedScore;
+    scoreMap[ds.dimensionId] = ds.normalizedScore / 100;
   });
 
   // Calculate similarity for each archetype pattern
@@ -126,7 +137,7 @@ export function classifyArchetype(
     let totalWeight = 0;
 
     for (const [dimId, weight] of Object.entries(pattern.dimensionWeights)) {
-      const actualScore = (scoreMap[dimId] ?? 50) / 100; // Normalize to 0-1
+      const actualScore = scoreMap[dimId] ?? 0.5; // Default to mid-range
       similarity += weight * actualScore;
       totalWeight += Math.abs(weight);
     }
@@ -163,36 +174,36 @@ export function classifyArchetype(
 }
 
 /**
- * SHIFT composite classification — aggregates from sub-instruments.
+ * SHIFT composite classification — score-basedLeadership Agility Index.
+ * No archetypes — returns band classification.
  */
 function classifyShift(dimensionScores: DimensionScore[]): ArchetypeResult {
-  // For SHIFT, we aggregate scores across all instruments
-  // and create a composite archetype based on the overall profile
   const avgScore = dimensionScores.reduce((sum, ds) => sum + ds.normalizedScore, 0) / (dimensionScores.length || 1);
 
+  // Leadership Agility Index bands (0-20 scale)
   let archetypeId: string;
   let archetypeName: string;
 
-  if (avgScore >= 80) {
-    archetypeId = 'shift-integrated-leader';
-    archetypeName = 'Integrated Leader';
-  } else if (avgScore >= 60) {
-    archetypeId = 'shift-adaptive-specialist';
-    archetypeName = 'Adaptive Specialist';
-  } else if (avgScore >= 40) {
-    archetypeId = 'shift-selective-engager';
-    archetypeName = 'Selective Engager';
+  if (avgScore >= 16) {
+    archetypeId = 'shift-high-agility';
+    archetypeName = 'High Agility';
+  } else if (avgScore >= 12) {
+    archetypeId = 'shift-moderate-agility';
+    archetypeName = 'Moderate Agility';
+  } else if (avgScore >= 8) {
+    archetypeId = 'shift-developing-agility';
+    archetypeName = 'Developing Agility';
   } else {
-    archetypeId = 'shift-development-focus';
-    archetypeName = 'Development Focus';
+    archetypeId = 'shift-foundation-focus';
+    archetypeName = 'Foundation Focus';
   }
 
   return {
     archetypeId,
     archetypeName,
     instrument: 'shift',
-    category: 'Composite Profile',
-    description: `Your SHIFT composite profile reveals an ${archetypeName} pattern across multiple diagnostic dimensions.`,
+    category: 'Coaching Effectiveness',
+    description: `Your SHIFT profile indicates a ${archetypeName} pattern in bilateral coaching effectiveness.`,
     confidence: 0.7,
     isTransitional: false,
   };
@@ -200,6 +211,7 @@ function classifyShift(dimensionScores: DimensionScore[]): ArchetypeResult {
 
 /**
  * Calculate dimension scores from raw answers.
+ * Normalizes to 0-100 for internal use (display in reports uses 0-20).
  */
 export function calculateDimensionScores(
   instrumentId: InstrumentId,
@@ -217,11 +229,12 @@ export function calculateDimensionScores(
     dimensionMap.set(answer.dimensionId, existing);
   }
 
-  // Calculate scores
+  // Calculate scores (normalize to 0-100 for engine, display scales to 0-20)
   return instrument.dimensions.map(dim => {
-    const scores = dimensionMap.get(dim.id) ?? [50];
+    const scores = dimensionMap.get(dim.id) ?? [dim.maxScore / 2];
     const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
-    const normalizedScore = Math.max(0, Math.min(100, avgScore));
+    // Normalize from instrument scale (0-20) to 0-100 for engine
+    const normalizedScore = Math.max(0, Math.min(100, (avgScore / dim.maxScore) * 100));
 
     return {
       dimensionId: dim.id,

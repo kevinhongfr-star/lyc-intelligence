@@ -38,16 +38,16 @@ interface AssessmentRecord {
 const DIMENSION_LABELS: Record<string, string> = {
   strategic_orientation: 'Strategic Orientation',
   cross_border_adaptability: 'Cross-Border Adaptability',
-  stakeholder_influence: 'Stakeholder Influence',
-  execution_discipline: 'Execution Discipline',
+  mission_alignment: 'Mission Alignment',
+  cognitive_complexity: 'Cognitive Complexity',
   leadership_presence: 'Leadership Presence'
 };
 
 const DIMENSION_COLORS: Record<string, string> = {
   strategic_orientation: '#00897B',
   cross_border_adaptability: '#10B981',
-  stakeholder_influence: '#F59E0B',
-  execution_discipline: '#EC4899',
+  mission_alignment: '#F59E0B',
+  cognitive_complexity: '#EC4899',
   leadership_presence: '#C108AB'
 };
 

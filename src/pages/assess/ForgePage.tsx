@@ -4,9 +4,9 @@ import { DiagnosticPageLayout } from '@/components/diagnostic/DiagnosticPageLayo
 export const ForgePage: React.FC = () => (
   <DiagnosticPageLayout
     instrumentId="forge"
-    title="FORGE Revenue Leadership Diagnostic"
+    title="FORGE Executive Agility Diagnostic"
     tagline="Are you building a revenue machine — or just chasing deals?"
-    description="FORGE measures your revenue leadership across strategy, sales leadership, market positioning, and pipeline mastery."
+    description="FORGE measures executive agility across adaptive learning orientation, three forces awareness, development agency, and bilateral context navigation."
     aboutContent={
       <>
         <p>FORGE is built for revenue leaders — CROs, VP Sales, Founders scaling go-to-market. It distinguishes between those who close deals and those who build predictable, scalable revenue engines.</p>

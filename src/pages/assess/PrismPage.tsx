@@ -6,7 +6,7 @@ export const PrismPage: React.FC = () => (
     instrumentId="prism"
     title="PRISM Executive Brand Identity"
     tagline="How the market sees you — and whether it matches who you really are"
-    description="PRISM measures your executive brand across brand clarity, narrative power, visibility strategy, authenticity, and market resonance."
+    description="PRISM measures your executive brand across brand authenticity, market visibility, narrative clarity, stakeholder legibility, and APAC brand translation."
     aboutContent={
       <>
         <p>PRISM reveals the gap between how you intend to be perceived and how you actually show up in the market. Your brand is either an asset or a liability — PRISM tells you which.</p>

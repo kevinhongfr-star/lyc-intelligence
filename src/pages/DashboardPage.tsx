@@ -537,8 +537,8 @@ function formatDimensionName(key: string): string {
   const names: Record<string, string> = {
     strategic_orientation: 'Strategic',
     cross_border_adaptability: 'Cross-Border',
-    stakeholder_influence: 'Stakeholder',
-    execution_discipline: 'Execution',
+    mission_alignment: 'Mission',
+    cognitive_complexity: 'Cognitive',
     leadership_presence: 'Leadership'
   };
   return names[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());

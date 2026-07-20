@@ -4,9 +4,9 @@ import { DiagnosticPageLayout } from '@/components/diagnostic/DiagnosticPageLayo
 export const QuestPage: React.FC = () => (
   <DiagnosticPageLayout
     instrumentId="quest"
-    title="QUEST Leadership Capability Diagnostic"
+    title="QUEST Executive Capability Diagnostic"
     tagline="Discover your leadership archetype across 10 dimensions of executive capability"
-    description="QUEST measures your leadership pattern across strategic vision, people development, execution discipline, stakeholder influence, and adaptive agility."
+    description="QUEST measures your executive capability across cognitive complexity, adaptive leadership, stakeholder intelligence, mission alignment, and AI readiness."
     aboutContent={
       <>
         <p>QUEST is our flagship leadership capability diagnostic. It maps your leadership pattern across five core dimensions that define executive effectiveness in complex organizations.</p>
