@@ -229,3 +229,20 @@ This decision blocks all further assessment-related development and affects the 
 ---
 
 *Next: Continue audit to Page 3 (`/nexus` — NexusPage) after Kevin's direction on assessment spec alignment.*
+
+---
+
+## DECISION RECORD (2026-07-20)
+
+**Kevin's Decision:** Options A + B combined.
+
+**Resolution:** Build a **Conversational Force Exposure Assessment** that:
+- Uses the **Three Forces framework** (36 questions, exposure measurement) from Notion FEA spec — Option A
+- Delivers it as a **conversational dialogue via Nexus**, not a formal wizard — Option B
+- Keeps framework names **invisible to users** — Option B
+- Routes to **diagnostic products** (SHIFT/MOSAIC/BRIDGE) based on force profile — Option A
+- Offers a **60-second micro quiz** entry point + deeper dive option — Option B
+
+**Unified spec:** `docs/specs/ASSESSMENT_UNIFIED_SPEC_v1.md`
+
+**All existing assessment code (CPD) will be rewritten** to match this unified spec.
