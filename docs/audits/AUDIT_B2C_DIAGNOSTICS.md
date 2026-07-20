@@ -3,7 +3,8 @@
 **Audit Date:** 2026-07-20  
 **Auditor:** NEXUS  
 **Scope:** All 13 diagnostic instruments — Notion specs vs code implementation  
-**Related:** `AUDIT_B2C_01_LANDING.md`, `AUDIT_B2C_02_ASSESSMENT.md`, `ASSESSMENT_UNIFIED_SPEC_v1.md`
+**Status:** DECISIONS LOCKED — See §5 Resolutions  
+**Related:** `ASSESSMENT_UNIFIED_SPEC_v1.md`, `AUDIT_B2C_01_LANDING.md`, `AUDIT_B2C_02_ASSESSMENT.md`
 
 ---
 
@@ -57,7 +58,6 @@ Meanwhile, **FEA (Force Exposure Assessment)** — the intended entry-point diag
 | **FORGE** | ✅ | ❌ Uses generic wizard | Via catalog only | ❌ No dedicated flow |
 | **SPARK** | ✅ | ❌ Uses generic wizard | Via catalog only | ❌ No dedicated flow |
 | **TRIDENT** | ❌ NOT in catalog | ✅ `tridentScoring.ts` (108 lines) | ✅ Trident components | ✅ Works (B2B only) |
-| **IMPACT** | ❌ (only SHIFT_IMPACT) | ❌ No standalone | ❌ No standalone UI | ❌ Not built standalone |
 | **CPD** (unspecified) | ❌ Not in catalog | ✅ `assessmentEngine.ts` (416 lines) | ✅ `AssessmentWizard.tsx` | ✅ Works but wrong spec |
 
 ### 1.3 Summary: What Exists vs What's Missing
@@ -107,6 +107,7 @@ This is the **entry-point diagnostic** for the entire B2C funnel. Without it:
 - Dimensions duplicated with conflicting definitions between catalog.ts and shiftAssessmentTypes.ts
 - No benchmarking
 - Framework names visible (shows "LEAP", "QUEST" etc. directly)
+- Sub-assessments not available as standalone products (Kevin decision: they must be)
 
 ---
 
@@ -123,7 +124,9 @@ All five are defined in `catalog.ts` with dimensions, styles, and archetypes, bu
 
 ### 2.4 QUEST / DRIVE / LEAP / IMPACT 🔴 NOT BUILT STANDALONE
 
-Exist only as SHIFT sub-assessments with different dimension definitions than Notion specs. Cannot be sold independently as Master Spec requires ($500-2,000 per diagnostic).
+Exist only as SHIFT sub-assessments with different dimension definitions than Notion specs. Cannot be sold independently as Master Spec requires ($500–2,000 per diagnostic).
+
+**Kevin Decision (2026-07-20):** These MUST be both standalone products AND SHIFT sub-components. Dual-mode.
 
 ---
 
@@ -131,33 +134,40 @@ Exist only as SHIFT sub-assessments with different dimension definitions than No
 
 Properly implemented as B2B search scoring tool. Not in catalog.ts (correct — different purpose). Scores candidates on experience/skills/fit. Has review queue.
 
+**Kevin Decision (2026-07-20):** TRIDENT stays independent. Not part of unified B2C engine.
+
 ---
 
 ## 3. Systemic Architecture Gaps
 
 ### 3.1 No Unified Assessment Engine
-
 Three parallel systems with different data models, scoring logic, and UX patterns. Need single unified engine for all B2C diagnostics.
 
-### 3.2 Question Bank Not Implemented
+**Kevin Decision (2026-07-20):** All B2C diagnostics share ONE unified engine. TRIDENT stays independent.
 
+### 3.2 Question Bank Not Implemented
 `AssessmentTake.tsx` uses 5 generic mock questions for ALL assessments. Notion has full question banks but none imported into codebase.
 
-### 3.3 No Diagnostic Routing
+**Kevin Decision (2026-07-20):** Import Notion banks AS-IS + add conversational wrapper layer. Do not rewrite content.
 
+### 3.3 No Diagnostic Routing
 Content Integration spec requires Nexus to recommend diagnostics based on conversation. No routing logic exists in code.
 
 ### 3.4 No Credit System for Assessments
-
 Credit service exists but not connected to any assessment flow.
 
-### 3.5 No Report Generation Pipeline
+**Kevin Decision (2026-07-20):** Nexus should orient users toward taking assessments using credits. Credit-gated.
 
+### 3.5 No Report Generation Pipeline
 Only SHIFT has a report renderer. No PDF generation for other diagnostics.
 
 ### 3.6 Versioning Conflicts
+DRIVE and IMPACT each have 2 question bank versions in Notion. PRISM has 2 entries.
 
-DRIVE and IMPACT each have 2 question bank versions in Notion. PRISM has 2 entries. QUEST has 2 report templates. Unresolved.
+**Kevin Decision (2026-07-20):** Use the LATEST version.
+- DRIVE → `8d64b8a3` (v2)
+- IMPACT → `40e0ae46` (v2)
+- PRISM → `d142f44a` (v2)
 
 ---
 
@@ -165,37 +175,57 @@ DRIVE and IMPACT each have 2 question bank versions in Notion. PRISM has 2 entri
 
 ### P0 — Must Build Before Go-Live
 
-1. Build FEA engine (entry-point diagnostic)
-2. Unify assessment engine (shared scoring/session/report service)
-3. Import Notion question banks
-4. Build conversational assessment UI
+1. **Unified assessment engine** — session mgmt, question delivery, scoring pipeline, credit integration
+2. **FEA** — import question bank, build conversational wrapper, micro quiz + full assessment
+3. **SHIFT Composite refactor** — migrate existing wizard into unified engine, enable standalone mode for sub-diagnostics
+4. **Diagnostic routing** — Nexus recommends based on FEA results + conversation context
 
 ### P1 — Needed for Monthly Content Calendar
 
-5. BRIDGE diagnostic (Aug 2026)
-6. MOSAIC diagnostic (Sep 2026)
-7. SPARK diagnostic (Oct 2026)
-8. FORGE diagnostic (Nov 2026)
-9. IMPACT diagnostic (Dec 2026)
-10. Diagnostic routing in Nexus
+5. **BRIDGE** diagnostic (Aug 2026)
+6. **MOSAIC** diagnostic (Sep 2026)
+7. **SPARK** diagnostic (Oct 2026)
+8. **FORGE** diagnostic (Nov 2026)
+9. **IMPACT** diagnostic (Dec 2026)
 
 ### P2 — Enhancement
 
-11. Credit system integration
-12. Report generation pipeline
-13. Benchmark database
-14. Resolve version conflicts
-15. Standalone diagnostic pages
+10. Report generation pipeline (narrative + radar chart)
+11. Benchmark database
+12. Standalone diagnostic pages with pricing
+13. QUEST / DRIVE / LEAP / PRISM as standalone products
 
 ---
 
-## 5. Decisions Required from Kevin
+## 5. Decision Resolutions (Kevin 2026-07-20)
 
-1. **Architecture:** All B2C diagnostics share unified engine? TRIDENT stays independent?
-2. **Question banks:** Import Notion banks as-is + add conversational wrappers?
-3. **Standalone vs SHIFT-only:** QUEST/DRIVE/LEAP/IMPACT as both standalone ($500-2K) and SHIFT sub-components?
-4. **Version conflicts:** Which version of DRIVE/IMPACT/PRISM question banks is authoritative?
+| # | Question | Decision | Implication |
+|---|---|---|---|
+| 1 | Unified engine for all B2C diagnostics? | **YES.** TRIDENT stays independent (B2B). | Single codebase for FEA, SHIFT, BRIDGE, MOSAIC, PRISM, FORGE, SPARK, QUEST, DRIVE, LEAP, IMPACT. Shared session/scoring/credit/report infrastructure. |
+| 2 | Question bank strategy? | **Import Notion as-is** + add conversational wrapper layer. | No content rewriting. Wrap each question in Nexus dialogue context. Banks are canonical; wrapper is delivery. |
+| 3 | QUEST/DRIVE/LEAP/IMPACT: standalone or SHIFT-only? | **Both.** Sellable standalone ($500–2K) AND SHIFT sub-components. | Dual-mode: each needs standalone question set + scoring + report, plus SHIFT-compatible interface. Separate credit allocation per mode. |
+| 4 | Version conflicts (DRIVE/IMPACT/PRISM)? | **Latest version wins.** | DRIVE→v2 `8d64b8a3`, IMPACT→v2 `40e0ae46`, PRISM→v2 `d142f44a`. |
+| 5 | Credit model | **Credit-gated.** Nexus orients users toward taking assessments using credits. | Credit check before start, deduction on start (not completion), no refund on abandonment. |
 
 ---
 
-*Next: Continue B2C portal page audit after Kevin's decisions on diagnostic architecture.*
+## 6. Blockers
+
+| # | Blocker | Owner | Impact |
+|---|---|---|---|
+| 1 | **Notion API returns 0 blocks** for all diagnostic pages | Kevin (share pages with N8N integration) | Cannot import question banks until resolved |
+| 2 | **Stripe env vars missing** | Kevin (provide from Stripe Dashboard) | Cannot implement credit pricing |
+| 3 | **DeepSeek API model alias** deprecation July 24 | NEXUS (verify & update) | Must confirm `deepseek-v4-flash` still works |
+
+---
+
+## 7. Next Steps
+
+1. ✅ Decisions locked → `ASSESSMENT_UNIFIED_SPEC_v1.md` created
+2. 🔲 Unblock Notion API access (Kevin action)
+3. 🔲 Create GitHub issues for unified engine build (Trae action)
+4. 🔲 Continue B2C portal page audit (Page 3: `/nexus` NexusPage)
+
+---
+
+*Audit complete. All decisions resolved. Awaiting Notion access to proceed with question bank import.*
