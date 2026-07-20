@@ -1,8 +1,8 @@
 # DEX AI — Master Product & Business Specification
 ## Unifying the B2C Platform and B2B Flywheel
 
-**Version:** 3.0 | **Date:** 2026-07-20 | **Author:** NEXUS
-**Replaces:** `CONTENT_INTEGRATION_AND_AI_LAYER_SPEC.md` v2.1, `SPEC_V2.1_DEEP_DIVE.md` v2.0
+**Version:** 3.1 | **Date:** 2026-07-20 | **Author:** NEXUS
+**Replaces:** `DEX_AI_MASTER_SPEC.md` v3.0, `CONTENT_INTEGRATION_AND_AI_LAYER_SPEC.md` v2.1, `SPEC_V2.1_DEEP_DIVE.md` v2.0
 **Supplements:** Notion content assets (E1.1, C3.1, A5.1, G2.2, D1–D8)
 
 ---
@@ -133,6 +133,74 @@ Nexus learns from every interaction
 - Month 6-12: 65% (embedded phase)
 - Year 2+: 85% (lock-in)
 
+### 1.7 🔴 Nexus Scope Boundary — What We Build vs What We Recommend
+
+**This section is the product firewall.** It defines what Nexus delivers as a product experience versus what it recommends from the external flywheel ecosystem. These two domains must never blur in the user interface.
+
+#### What Nexus Delivers Directly (Product Features)
+
+These are **built into the platform** and exist as Nexus capabilities:
+
+| Capability | Description | In-App Experience |
+|---|---|---|
+| **Conversational AI** | Career & leadership dialogue | Chat interface, natural language |
+| **Invisible Diagnostics** | SHIFT, MOSAIC, BRIDGE etc. run in background | User sees translated insights, never scores |
+| **Journey Intelligence** | Private development tracking | Quarterly reviews, conversational nudges |
+| **Coaching Orchestration** | Match, book, prep, follow-up | In-app booking, pre-session briefs, post-session synthesis |
+| **Peer Matching** | Algorithmic connection to relevant peers | "James Liu is navigating a similar challenge" |
+| **Content Curation** | RAG over 120+ annual content assets | Personalized articles, insights, recommendations |
+| **Market Intelligence** | Compensation data, industry trends, opportunity matching | In-app dashboards, proactive alerts |
+| **Proactive Nudges** | Timely suggestions based on user context | "The roundtable on cross-border teams next Thursday might be relevant" |
+| **Quarterly Development Reviews** | Periodic progress synthesis | Delivered in-conversation by Nexus |
+| **Memory & Context** | 3-tier memory system (working/episodic/semantic) | Nexus "remembers" across sessions |
+
+#### What Nexus Recommends (External Flywheel Services)
+
+These are **real-world services** that exist outside the platform. Nexus can suggest them conversationally, but they are **not product features** — they are external offerings that the user engages with through LYC directly:
+
+| External Service | How Nexus Surfaces It | What Happens Next |
+|---|---|---|
+| **Named Diagnostic Products** (QUEST $500, DRIVE $500, etc.) | "Based on what we've discussed, a deeper assessment might give you more clarity" | User is connected to LYC advisory team |
+| **Webinars** (monthly, themed) | "There's a session on cross-border team dynamics this Thursday" | User registers via LYC event page |
+| **Roundtables** (2x/month, $500-800) | "A small group is discussing exactly this challenge next week" | User is introduced to event coordinator |
+| **Workshops** ($5K-15K/org) | "Your team might benefit from a structured session on this" | User is connected to LYC programme team |
+| **Advisory Programmes** ($15K-50K/org) | "This is the kind of challenge where structured advisory helps" | Warm handoff to LYC advisory |
+| **Council Membership** ($5K-50K/yr) | "There's a peer group that examines exactly these questions" | Invitation process per E1.1 Charter |
+| **External Coaches** | "Based on your theme, I'd recommend talking to [Coach Name]" | User books via coaching marketplace |
+| **Podcast/Speaker Opportunities** | "Your experience would be valuable for our next webinar" | User is connected to content team |
+
+#### The Boundary Rule
+
+```
+IF it's a conversation, insight, or digital experience
+  → Nexus DELIVERS it (built into the product)
+
+IF it's a physical event, organizational engagement, external service, 
+   or involves named diagnostic pricing
+  → Nexus RECOMMENDS it (surfaces conversationally, user engages externally)
+
+Nexus NEVER:
+  ❌ Displays diagnostic product names or prices
+  ❌ Shows a "shop" or "store" for assessments
+  ❌ Lists events as a calendar the user browses alone
+  ❌ Sells anything — it suggests, recommends, and connects
+  ❌ Reveals the flywheel mechanics to the user
+
+Nexus DOES:
+  ✅ Translate diagnostic results into natural language insights
+  ✅ Proactively suggest relevant events/services based on conversation context
+  ✅ Make warm introductions to external coaches, speakers, and peers
+  ✅ Orchestrate the handoff between product experience and real-world services
+  ✅ Remember what it recommended and follow up on outcomes
+```
+
+#### Why This Boundary Matters
+
+1. **User trust:** The moment Nexus feels like a sales funnel, trust evaporates. Recommendations must feel like a knowledgeable friend, not a chatbot pushing products.
+2. **Product clarity:** The engineering team needs to know what to build vs what to integrate. Everything in the "Delivers" column is a sprint item. Everything in the "Recommends" column is an API integration or CRM handoff.
+3. **Business model protection:** The B2B flywheel relies on diagnostics being sold at premium prices. If B2C users see the same diagnostics for free (or as a subscription feature), B2B pricing collapses.
+4. **Nexus identity:** Nexus is a companion, not a storefront. Its value comes from knowing the user deeply and making thoughtful recommendations — not from displaying a menu of services.
+
 ---
 
 ## Part 2: LYC Flywheel (B2B)
@@ -185,94 +253,57 @@ Each webinar generates 5 content pieces: article, newsletter edition, 3 LinkedIn
 ### 2.4 Conversion Stack (6 Tiers)
 
 **Tier 1: Free/Low (Awareness)**
-- Webinar attendance (free), Newsletter subscription (free), Self-assessment teaser (free)
+- Webinar attendance (free), Newsletter subscription (free), Self-assessment archetype (free or $50-100)
 
 **Tier 2: Diagnostic ($500-2,000)**
-- Full diagnostic report with archetype
-- Debrief call (30 min included)
-- Additional debrief session ($500)
+- Full diagnostic with debrief, Organization diagnostic (MOSAIC $500/pax)
 
-| Diagnostic | What It Measures | Price | Upsell Path |
-|---|---|---|---|
-| QUEST | Leadership identity + AI readiness | $500 | Coaching, SHIFT Programme |
-| DRIVE | Engagement risk + retention | $500 | Advisory, Organisation Design |
-| IMPACT | Board effectiveness | $800 | Advisory retainer |
-| PRISM | Brand identity architecture | $500 | Advisory Force 2 |
-| BRIDGE | Cross-border governance | $800 | Cross-Border Programme |
-| MOSAIC | Cross-cultural team dynamics | $500/pax | Workshop, Cross-Border |
-| FORGE | Revenue architecture | $1,000 | FORGE Workshop |
-| SPARK | AI readiness leadership | $500 | AI Leadership Programme |
-| SHIFT Composite | Integrated leadership profile | $1,500 | SHIFT Programme |
+**Tier 3: Roundtable ($500-800/seat)**
+- 2x/month, 20-25 pax, Chatham House Rule, ~24/year, ~$166K/yr
 
-**Tier 3: Roundtable ($500-800)**
-- 2hr facilitated session, 15-25 pax
-- Linked to diagnostic archetype theme
-- 2x/month = 24/year
-- Projected: ~$166K/yr
+**Tier 4: Workshop ($5K-15K/organization)**
+- Half-day or full-day, customized, 20-30/year
 
-**Tier 4: Workshop ($5K-15K per org)**
-- Half-day or full-day, custom delivery
-- Diagnostic + debrief + action planning
-- Projected: 20-30/yr
+**Tier 5: Programme ($15K-50K/organization)**
+- Multi-module, 6-12 weeks, 10-15/year
 
-**Tier 5: Programme ($15K-50K per org)**
-- Multi-module leadership development
-- Includes diagnostic suite + coaching
-- Projected: 10-15/yr
-
-**Tier 6: Council + Advisory ($5K-50K/yr)**
-- Invitation Council membership (inner circle)
-- Advisory retainer (ongoing)
-- Podcast + webinar co-creation
-- Projected: 15-25 members
-
-### 2.5 The Reinforcing Loop
-
-```
-Content → Attracts → Diagnostic Takers
-Diagnostic Takers → Convert to → Roundtable/Programme
-Programme Graduates → Become → Council Members / Speakers
-Council Members → Create → Content
-→ (Loop repeats, each cycle stronger)
-```
-
-Key insight: The output of one cycle becomes the input of the next. Speakers are graduates. Content is co-created with clients. The flywheel accelerates because every customer becomes a potential contributor.
+**Tier 6: Council + Advisory ($5K-50K/year)**
+- Invitation Council: 15-25 members, annual membership, advisory access
 
 ---
 
-## Part 3: The Bridge — B2C → B2B
+## Part 3: The Integration Layer — How B2C and B2B Connect
 
-### 3.1 How the Two Layers Connect
+### 3.1 System Architecture (One Product, Two Layers)
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  DEX AI PLATFORM (B2C)                                         │
-│                                                                  │
-│  Individual professionals interact with Nexus                    │
-│  Diagnostics are INVISIBLE — users see insights, not scores     │
-│  Subscription tiers: Free → Starter → Growth → Elite            │
-│                                                                  │
-│  Elite members with exceptional engagement:                      │
-│  → Flagged for Invitation Council consideration                  │
-│  → Become speakers, content creators, roundtable hosts           │
-│  → Enter the B2B flywheel as high-value participants             │
-└────────────────────────────┬────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│  DEX AI PLATFORM (B2C — THE PRODUCT)                        │
+│                                                              │
+│  Users interact with Nexus only                              │
+│  Diagnostics are INVISIBLE — translated to insights          │
+│  Nexus delivers: conversation, coaching, peer matching,      │
+│                  journey tracking, content curation           │
+│  Nexus recommends: events, diagnostics (B2B), advisory,      │
+│                    council, speaker opportunities             │
+│  Nexus NEVER shows prices, diagnostic names, or a "store"    │
+└────────────────────────────┬────────────────────────────────┘
                              │
                     THE BRIDGE
                              │
-┌────────────────────────────▼────────────────────────────────────┐
-│  LYC FLYWHEEL (B2B)                                             │
-│                                                                  │
-│  Organizations buy diagnostics, workshops, programmes            │
-│  Diagnostics are VISIBLE — named, priced, sold                   │
-│  Conversion stack: Free → Diagnostic → Roundtable →             │
-│                    Workshop → Programme → Council                │
-│                                                                  │
-│  B2B clients who engage deeply:                                  │
-│  → Become Council members                                        │
-│  → Create content for the B2C platform                           │
-│  → Feed the flywheel                                             │
-└─────────────────────────────────────────────────────────────────┘
+┌────────────────────────────▼────────────────────────────────┐
+│  LYC FLYWHEEL (B2B — THE BUSINESS MODEL)                    │
+│                                                              │
+│  Organizations buy diagnostics, workshops, programmes        │
+│  Diagnostics are VISIBLE — named, priced, sold               │
+│  Conversion stack: Free → Diagnostic → Roundtable →         │
+│                    Workshop → Programme → Council            │
+│                                                              │
+│  B2B clients who engage deeply:                              │
+│  → Become Council members                                    │
+│  → Create content for the B2C platform                       │
+│  → Feed the flywheel                                         │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### 3.2 The Invitation Council — The Connection Point
@@ -302,6 +333,39 @@ B2C User takes diagnostic (invisible)
   → Loop continues
 ```
 
+### 3.4 The Recommendation Engine (How Nexus Surfaces Flywheel Services)
+
+This is the technical implementation of §1.7's boundary rule:
+
+```python
+def should_recommend_flywheel_service(user_message, user_context):
+    """
+    Nexus evaluates whether to recommend an external flywheel service.
+    Rules:
+    - Never recommend if user hasn't had at least 3 substantive conversations
+    - Never recommend the same service twice without acknowledged follow-up
+    - Always frame as contextual suggestion, not product listing
+    - Always offer opt-out ("No pressure — just thought it might be relevant")
+    """
+    triggers = {
+        'recurring_theme': user_context.recurring_themes.count >= 3,
+        'coaching_readiness': user_context.coaching_sessions.completed >= 2,
+        'event_proximity': days_until_next_event(user_context.industry) <= 14,
+        'peer_activity': user_context.peer_group.engagement_level > user_context.engagement_level * 1.5,
+        'diagnostic_depth': user_context.conversation_depth_score > 0.7,
+    }
+    
+    service = match_service(user_context, triggers)
+    if service and not recently_recommended(user_context, service):
+        return format_as_natural_suggestion(service, user_context)
+    return None
+```
+
+**Example outputs (what the user actually sees):**
+- "You've mentioned cross-border team challenges three times now. We have a roundtable on exactly this topic next Thursday — small group, senior leaders. Want me to hold a spot?"
+- "Based on what you've been working through with your executive team, a structured diagnostic might give you a shared language. I can connect you with our advisory team if you're curious."
+- "Your peer group is really engaging with the governance shift topic this month. There's a webinar Thursday that might add perspective."
+
 ---
 
 ## Part 4: AI Architecture
@@ -315,6 +379,7 @@ USER INTERFACE (Chat, Dashboard, Email)
     ├── Intent Classifier → Context Assembler → Response Generator (DeepSeek)
     ├── Memory Manager (Working / Episodic / Semantic)
     ├── Capability Router (Assessment API, Coaching API, Event API, etc.)
+    ├── Recommendation Engine (flywheel service surfacing, per §3.4)
     └── Proactive Engine (Trigger detection, priority scoring, delivery)
          │
     DATA LAYER
@@ -323,7 +388,8 @@ USER INTERFACE (Chat, Dashboard, Email)
     ├── Compensation database
     ├── Market intelligence
     ├── Content library (120+ assets from monthly rhythm)
-    └── Peer network graph
+    ├── Peer network graph
+    └── Flywheel service catalog (events, diagnostics, programmes — for recommendation only)
 ```
 
 ### 4.2 Intent Classification
@@ -380,6 +446,11 @@ def assemble_context(user_message, user_id, tier):
         context['company_intelligence'] = db.company_data.get_relevant(user_id)
         context['proactive_alerts'] = db.alerts.get_for_user(user_id)
     
+    # Layer 5: Recommendation context (flywheel service matching)
+    context['recommendation_state'] = get_recommendation_state(user_id)
+    # Includes: last recommended service, recommendation frequency, 
+    # opt-out preferences, trigger scores per service category
+    
     return context
 ```
 
@@ -398,7 +469,7 @@ Specific behavior per intent category (career advisory, coaching booking, etc.)
 Unlocks capabilities based on subscription level. Elite gets proactive alerts, company intel, scenario modeling.
 
 **Layer 5 — Safety & Guardrails (constant):**
-Never reveal other users' data. Never give legal/tax/medical advice. Never fabricate data. Redirect emotional distress to coaching.
+Never reveal other users' data. Never give legal/tax/medical advice. Never fabricate data. Redirect emotional distress to coaching. **Never display diagnostic product names or prices — this is a hard rule per §1.7.**
 
 ### 4.5 Three-Tier Memory System
 
@@ -419,6 +490,7 @@ Never reveal other users' data. Never give legal/tax/medical advice. Never fabri
 | Peer matching | DeepSeek Flash | <2s |
 | Content generation | DeepSeek Pro | <10s |
 | Proactive suggestion | DeepSeek Flash | <1s |
+| Flywheel service recommendation | DeepSeek Flash | <1s |
 
 All compute via DeepSeek API. Coze = orchestration only.
 
@@ -456,7 +528,7 @@ Nexus uses the content library for RAG queries:
 - User asks about leadership development → Nexus references relevant workshop content
 - User asks about cross-border challenges → Nexus surfaces BRIDGE-related content
 
-Content is personalized based on user's diagnostic insights and tier.
+Content is personalized based on user's diagnostic insights and tier. **Nexus references content themes, never diagnostic product names.** ("There's been a lot of thinking this month about how governance structures are shifting" — not "This month features the BRIDGE diagnostic.")
 
 ---
 
@@ -514,13 +586,14 @@ Council → Connection point + highest-value conversions
 - Peer matching algorithm
 - Journey Intelligence dashboard
 - Coaching pre/post-session orchestration
+- **Recommendation engine** (flywheel service surfacing per §3.4)
 
 ### Phase 3: Ecosystem (Weeks 11-14)
 - Event AI (seating algorithm, pre-briefs, post-summaries)
 - Company intelligence integration
 - Opportunity matching with fit scoring
 - Content engine aligned to monthly rhythm
-- B2B flywheel integration (CRM, lead tracking)
+- B2B flywheel integration (CRM handoffs, lead tracking)
 
 ### Phase 4: Advanced (Post-launch)
 - AI-assisted report narrative scaffolding (per C3.1 §6)
@@ -545,7 +618,10 @@ Council → Connection point + highest-value conversions
 | Content Calendar | LinkedIn Content Calendar | G2.2 | ✅ Aligned |
 | 9 Diagnostics | Diagnostic Specifications | D1-D8 | ✅ Aligned |
 | Flywheel | Kevin's Flywheel Document | — | ✅ Integrated |
+| Nexus Scope Boundary | §1.7 (new in v3.1) | — | ✅ Defined |
 
 ---
+
+*v3.1 changelog: Added §1.7 Nexus Scope Boundary (defines what Nexus builds vs recommends); Added §3.4 Recommendation Engine (technical implementation of boundary); Updated §4.1/§4.2/§4.3/§4.4/§5.3 to reference boundary rule; Bumped to v3.1.*
 
 *This is the single source of truth for DEX AI product and business specification. All future development should reference this document.*
