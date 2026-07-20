@@ -66,6 +66,7 @@ const handlers: Record<string, () => Promise<any>> = {
   'ai-insights': () => import('./_lib/aiInsightsHandler.js'),
   'backups': () => import('./_lib/backupHandler.js'),
   'stripe': () => import('./_lib/stripeHandler.js').then(m => ({ handler: m.handleStripe })),
+  'admin': () => import('./_lib/adminAnalyticsHandler.js').then(m => ({ handler: m.handleAdminAnalytics })),
 };
 
 // Modules whose handlers expect the full path (including module name) in req.query.path

@@ -1,50 +1,146 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heading, Paragraph, Container, Card, Badge, Button, Grid, Tabs, Tab, StatCard, Input } from '@/components/design-system';
 import { COLORS, SPACING } from '@/styles/tokens';
+import { supabase } from '@/lib/supabase/client';
 
-const systemStats = [
-  { title: 'Total Users', value: '12,500', change: { value: '+12%', positive: true } },
-  { title: 'Active Organizations', value: '200+', change: { value: '+8%', positive: true } },
-  { title: 'Revenue This Month', value: '$245K', change: { value: '+15%', positive: true } },
-  { title: 'System Uptime', value: '99.9%', change: { value: '0.1%', positive: true } },
-];
+interface SystemStats {
+  totalUsers: number;
+  activeUsers: number;
+  newUsersThisMonth: number;
+  totalOrganizations: number;
+  monthlyRevenue: number;
+  systemUptime: string;
+}
 
-const users = [
-  { id: 'U001', name: 'John Smith', email: 'john@lyc.com', role: 'Admin', status: 'active', lastLogin: '2024-01-20' },
-  { id: 'U002', name: 'Sarah Chen', email: 'sarah@techcorp.com', role: 'Client', status: 'active', lastLogin: '2024-01-19' },
-  { id: 'U003', name: 'Michael Tan', email: 'michael@fintech.com', role: 'Council Member', status: 'active', lastLogin: '2024-01-18' },
-  { id: 'U004', name: 'Emily Wang', email: 'emily@healthcare.com', role: 'Client', status: 'inactive', lastLogin: '2024-01-10' },
-  { id: 'U005', name: 'David Kim', email: 'david@retail.com', role: 'Consultant', status: 'active', lastLogin: '2024-01-20' },
-];
+interface User {
+  id: string;
+  full_name: string;
+  email: string;
+  role: string;
+  organization_id?: string;
+  created_at: string;
+  last_login_at?: string;
+}
 
-const organizations = [
-  { id: 'ORG001', name: 'LYC Intelligence', plan: 'Enterprise', users: 15, status: 'active', createdAt: '2023-01-01' },
-  { id: 'ORG002', name: 'TechCorp Asia', plan: 'Professional', users: 8, status: 'active', createdAt: '2023-06-15' },
-  { id: 'ORG003', name: 'FinTech Startup', plan: 'Starter', users: 3, status: 'active', createdAt: '2023-09-01' },
-  { id: 'ORG004', name: 'Healthcare Global', plan: 'Professional', users: 6, status: 'active', createdAt: '2023-10-15' },
-];
+interface Organization {
+  id: string;
+  name: string;
+  tier: string;
+  status: string;
+  created_at: string;
+  userCount: number;
+}
 
-const revenueData = [
-  { month: 'Jan', recurring: '$85K', oneTime: '$45K', total: '$130K' },
-  { month: 'Feb', recurring: '$92K', oneTime: '$38K', total: '$130K' },
-  { month: 'Mar', recurring: '$98K', oneTime: '$52K', total: '$150K' },
-  { month: 'Apr', recurring: '$105K', oneTime: '$48K', total: '$153K' },
-  { month: 'May', recurring: '$112K', oneTime: '$65K', total: '$177K' },
-  { month: 'Jun', recurring: '$120K', oneTime: '$58K', total: '$178K' },
-];
+interface Activity {
+  id: string;
+  type: string;
+  message: string;
+  actor: string;
+  amount?: number;
+  timestamp: string;
+}
+
+interface RevenueData {
+  month: string;
+  recurring: number;
+  oneTime: number;
+}
+
+interface SystemService {
+  name: string;
+  status: string;
+  latency: number;
+}
 
 export const PlatformAdminConsolePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<SystemStats | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [revenue, setRevenue] = useState<RevenueData[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [systemHealth, setSystemHealth] = useState<{ services: SystemService[]; uptime: string } | null>(null);
+
+  useEffect(() => {
+    fetchAdminData();
+  }, []);
+
+  async function fetchAdminData() {
+    setLoading(true);
+    try {
+      const [statsRes, usersRes, orgsRes, revenueRes, activityRes, healthRes] = await Promise.all([
+        fetch('/api/admin/stats'),
+        fetch('/api/admin/users'),
+        fetch('/api/admin/organizations'),
+        fetch('/api/admin/revenue'),
+        fetch('/api/admin/activity'),
+        fetch('/api/admin/system-health'),
+      ]);
+
+      const [statsJson, usersJson, orgsJson, revenueJson, activityJson, healthJson] = await Promise.all([
+        statsRes.json(),
+        usersRes.json(),
+        orgsRes.json(),
+        revenueRes.json(),
+        activityRes.json(),
+        healthRes.json(),
+      ]);
+
+      if (statsJson.success) setStats(statsJson.data);
+      if (usersJson.success) setUsers(usersJson.users);
+      if (orgsJson.success) setOrganizations(orgsJson.organizations);
+      if (revenueJson.success) setRevenue(revenueJson.revenue);
+      if (activityJson.success) setActivities(activityJson.activities);
+      if (healthJson.success) setSystemHealth(healthJson);
+    } catch (e) {
+      console.error('[PlatformAdminConsole] Failed to fetch admin data:', e);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredOrgs = organizations.filter(org =>
     org.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return 'Never';
+    return new Date(dateStr).toLocaleDateString('en-US');
+  };
+
+  const formatDateTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    if (hours < 1) return 'Just now';
+    if (hours < 24) return `${hours} hours ago`;
+    return date.toLocaleDateString('en-US');
+  };
+
+  const formatCurrency = (amount: number) => {
+    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
+    if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}K`;
+    return `$${amount.toFixed(0)}`;
+  };
+
+  if (loading) {
+    return (
+      <div style={{ backgroundColor: COLORS.bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ width: '48px', height: '48px', border: '4px solid', borderColor: COLORS.border, borderTopColor: COLORS.primary, borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
+          <Heading level={2}>Loading admin data...</Heading>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ backgroundColor: COLORS.bg, minHeight: '100vh' }}>
@@ -55,7 +151,7 @@ export const PlatformAdminConsolePage: React.FC = () => {
               <Heading level={1}>Platform Admin Console</Heading>
               <Paragraph color="textSecondary">System-wide management, analytics, and governance</Paragraph>
             </div>
-            <Button>System Settings</Button>
+            <Button onClick={fetchAdminData}>Refresh Data</Button>
           </div>
         </Container>
       </section>
@@ -84,30 +180,42 @@ export const PlatformAdminConsolePage: React.FC = () => {
             {activeTab === 'dashboard' && (
               <div>
                 <Grid columns={4} gap="6" style={{ marginBottom: `${SPACING[10]}px` }}>
-                  {systemStats.map((stat) => (
-                    <StatCard key={stat.title} {...stat} />
-                  ))}
+                  <StatCard
+                    title="Total Users"
+                    value={stats?.totalUsers.toLocaleString() || '0'}
+                    change={{ value: `+${stats?.newUsersThisMonth || 0} this month`, positive: true }}
+                  />
+                  <StatCard
+                    title="Active Organizations"
+                    value={stats?.totalOrganizations.toLocaleString() || '0'}
+                    change={{ value: '+8%', positive: true }}
+                  />
+                  <StatCard
+                    title="Revenue This Month"
+                    value={formatCurrency(stats?.monthlyRevenue || 0)}
+                    change={{ value: '+15%', positive: true }}
+                  />
+                  <StatCard
+                    title="System Uptime"
+                    value={stats?.systemUptime || '0%'}
+                    change={{ value: '0.1%', positive: true }}
+                  />
                 </Grid>
 
                 <Grid columns={2} gap="6">
                   <Card padding="6">
                     <Heading level={3} style={{ marginBottom: `${SPACING[6]}px` }}>Recent Activity</Heading>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: `${SPACING[4]}px` }}>
-                      {[
-                        { action: 'New user registered', user: 'Lisa Zhang', time: '2 hours ago' },
-                        { action: 'Organization upgraded', org: 'TechCorp Asia', time: '5 hours ago' },
-                        { action: 'Report generated', type: 'Cohort Report', time: '1 day ago' },
-                        { action: 'Payment processed', amount: '$25,000', time: '1 day ago' },
-                      ].map((activity, index) => (
-                        <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      {activities.map((activity) => (
+                        <div key={activity.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
-                            <div style={{ fontWeight: 500 }}>{activity.action}</div>
+                            <div style={{ fontWeight: 500 }}>{activity.message}</div>
                             <div style={{ fontSize: `${SPACING[3]}px`, color: COLORS.textMuted }}>
-                              {activity.user || activity.org || activity.type || activity.amount}
+                              {activity.actor} {activity.amount ? `| ${formatCurrency(activity.amount)}` : ''}
                             </div>
                           </div>
                           <div style={{ fontSize: `${SPACING[3]}px`, color: COLORS.textMuted }}>
-                            {activity.time}
+                            {formatDateTime(activity.timestamp)}
                           </div>
                         </div>
                       ))}
@@ -117,15 +225,15 @@ export const PlatformAdminConsolePage: React.FC = () => {
                   <Card padding="6">
                     <Heading level={3} style={{ marginBottom: `${SPACING[6]}px` }}>Top Organizations</Heading>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: `${SPACING[4]}px` }}>
-                      {organizations.map((org) => (
+                      {organizations.slice(0, 5).map((org) => (
                         <div key={org.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
                             <div style={{ fontWeight: 500 }}>{org.name}</div>
                             <div style={{ fontSize: `${SPACING[3]}px`, color: COLORS.textMuted }}>
-                              {org.plan} | {org.users} users
+                              {org.tier} | {org.userCount} users
                             </div>
                           </div>
-                          <Badge variant="success">{org.status}</Badge>
+                          <Badge variant={org.status === 'active' ? 'success' : 'warning'}>{org.status}</Badge>
                         </div>
                       ))}
                     </div>
@@ -148,18 +256,16 @@ export const PlatformAdminConsolePage: React.FC = () => {
                     <Card key={user.id} padding="6" variant="outline">
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                          <div style={{ fontWeight: 600 }}>{user.name}</div>
+                          <div style={{ fontWeight: 600 }}>{user.full_name || user.email}</div>
                           <div style={{ fontSize: `${SPACING[3]}px`, color: COLORS.textMuted }}>
                             {user.email} | {user.role}
                           </div>
                         </div>
                         <div style={{ display: 'flex', gap: `${SPACING[4]}px`, alignItems: 'center' }}>
                           <div style={{ fontSize: `${SPACING[3]}px`, color: COLORS.textMuted }}>
-                            Last login: {user.lastLogin}
+                            Last login: {formatDate(user.last_login_at)}
                           </div>
-                          <Badge variant={user.status === 'active' ? 'success' : 'warning'}>
-                            {user.status}
-                          </Badge>
+                          <Badge variant="success">active</Badge>
                           <Button size="sm" variant="ghost">View</Button>
                         </div>
                       </div>
@@ -185,13 +291,11 @@ export const PlatformAdminConsolePage: React.FC = () => {
                         <div>
                           <div style={{ fontWeight: 600 }}>{org.name}</div>
                           <div style={{ fontSize: `${SPACING[3]}px`, color: COLORS.textMuted }}>
-                            {org.plan} | {org.users} users | Created: {org.createdAt}
+                            {org.tier} | {org.userCount} users | Created: {formatDate(org.created_at)}
                           </div>
                         </div>
                         <div style={{ display: 'flex', gap: `${SPACING[2]}px` }}>
-                          <Badge variant={org.status === 'active' ? 'success' : 'warning'}>
-                            {org.status}
-                          </Badge>
+                          <Badge variant={org.status === 'active' ? 'success' : 'warning'}>{org.status}</Badge>
                           <Button size="sm">Manage</Button>
                         </div>
                       </div>
@@ -215,12 +319,12 @@ export const PlatformAdminConsolePage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {revenueData.map((row) => (
+                      {revenue.map((row) => (
                         <tr key={row.month} style={{ borderBottom: `1px solid ${COLORS.border}` }}>
                           <td style={{ padding: `${SPACING[4]}px`, fontWeight: 600 }}>{row.month}</td>
-                          <td style={{ padding: `${SPACING[4]}px`, textAlign: 'right', color: COLORS.textSecondary }}>{row.recurring}</td>
-                          <td style={{ padding: `${SPACING[4]}px`, textAlign: 'right', color: COLORS.textSecondary }}>{row.oneTime}</td>
-                          <td style={{ padding: `${SPACING[4]}px`, textAlign: 'right', fontWeight: 600 }}>{row.total}</td>
+                          <td style={{ padding: `${SPACING[4]}px`, textAlign: 'right', color: COLORS.textSecondary }}>{formatCurrency(row.recurring)}</td>
+                          <td style={{ padding: `${SPACING[4]}px`, textAlign: 'right', color: COLORS.textSecondary }}>{formatCurrency(row.oneTime)}</td>
+                          <td style={{ padding: `${SPACING[4]}px`, textAlign: 'right', fontWeight: 600 }}>{formatCurrency(row.recurring + row.oneTime)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -234,19 +338,12 @@ export const PlatformAdminConsolePage: React.FC = () => {
                 <Card padding="6">
                   <Heading level={3} style={{ marginBottom: `${SPACING[6]}px` }}>Server Status</Heading>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: `${SPACING[4]}px` }}>
-                    {[
-                      { name: 'API Server', status: 'healthy', latency: '45ms' },
-                      { name: 'Database', status: 'healthy', latency: '12ms' },
-                      { name: 'Redis Cache', status: 'healthy', latency: '2ms' },
-                      { name: 'CDN', status: 'healthy', latency: '8ms' },
-                    ].map((service) => (
+                    {systemHealth?.services.map((service) => (
                       <div key={service.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ fontWeight: 500 }}>{service.name}</div>
                         <div style={{ display: 'flex', gap: `${SPACING[4]}px` }}>
-                          <span style={{ fontSize: `${SPACING[3]}px`, color: COLORS.textMuted }}>{service.latency}</span>
-                          <Badge variant={service.status === 'healthy' ? 'success' : 'error'}>
-                            {service.status}
-                          </Badge>
+                          <span style={{ fontSize: `${SPACING[3]}px`, color: COLORS.textMuted }}>{service.latency}ms</span>
+                          <Badge variant={service.status === 'healthy' ? 'success' : 'error'}>{service.status}</Badge>
                         </div>
                       </div>
                     ))}
@@ -254,23 +351,20 @@ export const PlatformAdminConsolePage: React.FC = () => {
                 </Card>
 
                 <Card padding="6">
-                  <Heading level={3} style={{ marginBottom: `${SPACING[6]}px` }}>Recent Logs</Heading>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: `${SPACING[3]}px`, fontSize: `${SPACING[3]}px` }}>
-                    {[
-                      { level: 'INFO', message: 'API request completed successfully', time: '2024-01-20 14:30:00' },
-                      { level: 'WARN', message: 'Rate limit approaching for user U001', time: '2024-01-20 14:25:00' },
-                      { level: 'INFO', message: 'Database backup completed', time: '2024-01-20 14:00:00' },
-                      { level: 'ERROR', message: 'Failed to send email notification', time: '2024-01-20 13:45:00' },
-                      { level: 'INFO', message: 'User session created', time: '2024-01-20 13:30:00' },
-                    ].map((log, index) => (
-                      <div key={index} style={{ display: 'flex', gap: `${SPACING[3]}px`, color: COLORS.textSecondary }}>
-                        <Badge variant={log.level === 'ERROR' ? 'error' : log.level === 'WARN' ? 'warning' : 'info'} style={{ textTransform: 'uppercase' }}>
-                          {log.level}
-                        </Badge>
-                        <span>{log.message}</span>
-                        <span style={{ color: COLORS.textMuted }}>{log.time}</span>
-                      </div>
-                    ))}
+                  <Heading level={3} style={{ marginBottom: `${SPACING[6]}px` }}>System Metrics</Heading>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: `${SPACING[4]}px` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontWeight: 500 }}>Uptime</div>
+                      <div style={{ fontSize: `${SPACING[4]}px`, fontWeight: 600, color: COLORS.success }}>{systemHealth?.uptime || 'N/A'}</div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontWeight: 500 }}>Active Users</div>
+                      <div style={{ fontSize: `${SPACING[4]}px`, fontWeight: 600 }}>{stats?.activeUsers.toLocaleString() || '0'}</div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontWeight: 500 }}>Organizations</div>
+                      <div style={{ fontSize: `${SPACING[4]}px`, fontWeight: 600 }}>{stats?.totalOrganizations.toLocaleString() || '0'}</div>
+                    </div>
                   </div>
                 </Card>
               </Grid>
