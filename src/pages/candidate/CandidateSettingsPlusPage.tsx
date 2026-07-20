@@ -3,20 +3,37 @@
  * Renders inside AppShell → Outlet. Shows notification preferences,
  * privacy controls, integrations, and account management.
  */
-import React, { useState, useEffect } from 'react';
-import { Bell, Lock, Globe, Mail, Smartphone, Eye, Trash2, Download, LogOut, User } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Bell, Lock, Globe, Mail, Smartphone, Eye, Trash2, Download, LogOut, User, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
 import { useAuthStore } from '@/stores/authStore';
+import { supabase } from '@/lib/supabase/client';
+import {
+  getUserPreferences,
+  saveUserPreferences,
+  type NotificationPreferences as NotificationPrefs,
+  type NotificationType,
+  type NotificationChannel,
+} from '@/services/notifications/notificationService';
 
-interface NotificationPref {
+/**
+ * Map each candidate-facing toggle to a notification type.
+ * Each toggle controls email/push/sms channels for that type.
+ */
+const CANDIDATE_TOGGLE_CONFIG: Array<{
   id: string;
   label: string;
   description: string;
-  email: boolean;
-  push: boolean;
-  sms: boolean;
-}
+  type: NotificationType;
+}> = [
+  { id: 'n1', label: 'New Opportunities', description: 'Get notified about matched roles', type: 'candidate_advanced' },
+  { id: 'n2', label: 'Application Updates', description: 'Status changes on your applications', type: 'status_change' },
+  { id: 'n3', label: 'Interview Reminders', description: 'Reminders before scheduled interviews', type: 'reminder' },
+  { id: 'n4', label: 'Messages from Recruiters', description: 'Direct messages from search firms', type: 'message_received' },
+  { id: 'n5', label: 'Career Tips', description: 'Weekly career development content', type: 'coaching' },
+  { id: 'n6', label: 'Marketing Emails', description: 'Product updates and promotions', type: 'billing' },
+];
 
 interface Integration {
   id: string;
@@ -26,16 +43,6 @@ interface Integration {
   icon: string;
 }
 
-// Static content — settings UI, notification preferences are client-side state
-const STATIC_NOTIFICATIONS: NotificationPref[] = [
-  { id: 'n1', label: 'New Opportunities', description: 'Get notified about matched roles', email: true, push: true, sms: false },
-  { id: 'n2', label: 'Application Updates', description: 'Status changes on your applications', email: true, push: true, sms: true },
-  { id: 'n3', label: 'Interview Reminders', description: 'Reminders before scheduled interviews', email: true, push: true, sms: true },
-  { id: 'n4', label: 'Messages from Recruiters', description: 'Direct messages from search firms', email: true, push: true, sms: false },
-  { id: 'n5', label: 'Career Tips', description: 'Weekly career development content', email: false, push: false, sms: false },
-  { id: 'n6', label: 'Marketing Emails', description: 'Product updates and promotions', email: false, push: false, sms: false },
-];
-
 const STATIC_INTEGRATIONS: Integration[] = [
   { id: 'i1', name: 'LinkedIn', description: 'Sync your profile and network', connected: true, icon: 'in' },
   { id: 'i2', name: 'Google Calendar', description: 'Sync interviews and sessions', connected: true, icon: 'gc' },
@@ -44,61 +51,90 @@ const STATIC_INTEGRATIONS: Integration[] = [
 ];
 
 export function CandidateSettingsPlusPage() {
-  const [notifications, setNotifications] = useState<NotificationPref[]>(STATIC_NOTIFICATIONS);
+  const [preferences, setPreferences] = useState<NotificationPrefs | null>(null);
+  const [prefsLoading, setPrefsLoading] = useState(true);
+  const [prefsError, setPrefsError] = useState<string | null>(null);
+  const [savingToggleId, setSavingToggleId] = useState<string | null>(null);
   const [integrations, setIntegrations] = useState<Integration[]>(STATIC_INTEGRATIONS);
-  const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
+
   const { candidateProfile, profile, user } = useTenantContext();
   const updateProfile = useAuthStore(s => s.updateProfile);
-
-  // Load notification preferences from profiles metadata on mount
-  useEffect(() => {
-    if (!profile) return;
-    // If profile has notification prefs stored, apply them
-    // For now, we use the static defaults but respect profile.tier for feature gating
-  }, [profile]);
 
   const displayName = candidateProfile?.name || profile?.name || 'Candidate';
   const currentTitle = candidateProfile?.current_title || 'Professional';
   const tier = profile?.tier || 'free';
 
-  const toggleNotification = (id: string, channel: 'email' | 'push' | 'sms') => {
-    setNotifications(prev => prev.map(n =>
-      n.id === id ? { ...n, [channel]: !n[channel] } : n
-    ));
+  useEffect(() => {
+    if (!user?.id) {
+      setPrefsLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setPrefsLoading(true);
+      setPrefsError(null);
+      try {
+        const prefs = await getUserPreferences(supabase, user.id);
+        if (cancelled) return;
+        setPreferences(prefs);
+      } catch (e) {
+        console.error('[CandidateSettingsPlusPage] Failed to load preferences:', e);
+        if (!cancelled) setPrefsError('Failed to load notification preferences');
+      } finally {
+        if (!cancelled) setPrefsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
+
+  const isChannelEnabled = useCallback(
+    (type: NotificationType, channel: NotificationChannel): boolean => {
+      if (!preferences) return false;
+      const settings = preferences.typeSettings[type];
+      return Boolean(settings?.[channel]);
+    },
+    [preferences]
+  );
+
+  const toggleNotificationChannel = async (
+    toggleId: string,
+    type: NotificationType,
+    channel: NotificationChannel
+  ) => {
+    if (!preferences || !user?.id) return;
+
+    const current = preferences.typeSettings[type] || { in_app: false, email: false, push: false, sms: false };
+    const nextSettings = { ...current, [channel]: !current[channel] };
+    const nextPrefs: NotificationPrefs = {
+      ...preferences,
+      typeSettings: { ...preferences.typeSettings, [type]: nextSettings },
+    };
+
+    setPreferences(nextPrefs);
+    setSavingToggleId(`${toggleId}-${channel}`);
+    try {
+      const ok = await saveUserPreferences(supabase, user.id, { typeSettings: nextPrefs.typeSettings });
+      if (!ok) {
+        setPreferences(preferences);
+        setPrefsError('Failed to save notification preference');
+      } else {
+        setSavedMessage('Saved');
+        setTimeout(() => setSavedMessage(null), 2000);
+      }
+    } catch (e) {
+      console.error('[CandidateSettingsPlusPage] Save preference failed:', e);
+      setPreferences(preferences);
+      setPrefsError('Failed to save notification preference');
+    } finally {
+      setSavingToggleId(null);
+    }
   };
 
   const toggleIntegration = (id: string) => {
     setIntegrations(prev => prev.map(i =>
       i.id === id ? { ...i, connected: !i.connected } : i
     ));
-  };
-
-  const handleSavePreferences = async () => {
-    setSaving(true);
-    setSavedMessage(null);
-    try {
-      // Save notification preferences as a JSON field on profiles
-      // The profiles table may not have a notification_prefs column,
-      // so we use updateProfile which handles the update gracefully
-      const prefs = notifications.reduce((acc, n) => {
-        acc[n.id] = { email: n.email, push: n.push, sms: n.sms };
-        return acc;
-      }, {} as Record<string, any>);
-
-      const result = await updateProfile({ icp: JSON.stringify(prefs) } as any);
-      if (result.success) {
-        setSavedMessage('Preferences saved successfully.');
-        setTimeout(() => setSavedMessage(null), 3000);
-      } else {
-        setSavedMessage('Failed to save preferences.');
-      }
-    } catch (e) {
-      console.error('[CandidateSettingsPlusPage] Save error:', e);
-      setSavedMessage('Failed to save preferences.');
-    } finally {
-      setSaving(false);
-    }
   };
 
   return (
@@ -132,65 +168,113 @@ export function CandidateSettingsPlusPage() {
               {savedMessage && (
                 <span className="text-xs text-green">{savedMessage}</span>
               )}
-              <Button size="sm" variant="outline" onClick={handleSavePreferences} disabled={saving}>
-                {saving ? 'Saving...' : 'Save Preferences'}
-              </Button>
+              {preferences && (
+                <Badge variant="outline" className="text-xs">
+                  Digest: {preferences.digestMode.replace('digest_', '')}
+                </Badge>
+              )}
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <div className="grid grid-cols-12 gap-2 text-xs font-medium text-text-muted px-3 py-2">
-              <div className="col-span-6">Preference</div>
-              <div className="col-span-2 text-center">Email</div>
-              <div className="col-span-2 text-center">Push</div>
-              <div className="col-span-2 text-center">SMS</div>
+          {prefsLoading ? (
+            <div className="space-y-3">
+              {[0, 1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="animate-pulse h-14 bg-bg-tertiary rounded-lg" />
+              ))}
             </div>
-            {notifications.map((notif) => (
-              <div key={notif.id} className="grid grid-cols-12 gap-2 items-center p-3 bg-bg-warm rounded-lg">
-                <div className="col-span-6">
-                  <div className="font-medium text-text-primary text-sm">{notif.label}</div>
-                  <div className="text-xs text-text-muted">{notif.description}</div>
-                </div>
-                <div className="col-span-2 text-center">
-                  <button
-                    onClick={() => toggleNotification(notif.id, 'email')}
-                    className={`w-10 h-5 rounded-full transition-colors ${
-                      notif.email ? 'bg-fuchsia' : 'bg-bg-tertiary'
-                    }`}
-                  >
-                    <span className={`block w-4 h-4 rounded-full bg-white transition-transform ${
-                      notif.email ? 'translate-x-5' : 'translate-x-0.5'
-                    }`} />
-                  </button>
-                </div>
-                <div className="col-span-2 text-center">
-                  <button
-                    onClick={() => toggleNotification(notif.id, 'push')}
-                    className={`w-10 h-5 rounded-full transition-colors ${
-                      notif.push ? 'bg-fuchsia' : 'bg-bg-tertiary'
-                    }`}
-                  >
-                    <span className={`block w-4 h-4 rounded-full bg-white transition-transform ${
-                      notif.push ? 'translate-x-5' : 'translate-x-0.5'
-                    }`} />
-                  </button>
-                </div>
-                <div className="col-span-2 text-center">
-                  <button
-                    onClick={() => toggleNotification(notif.id, 'sms')}
-                    className={`w-10 h-5 rounded-full transition-colors ${
-                      notif.sms ? 'bg-fuchsia' : 'bg-bg-tertiary'
-                    }`}
-                  >
-                    <span className={`block w-4 h-4 rounded-full bg-white transition-transform ${
-                      notif.sms ? 'translate-x-5' : 'translate-x-0.5'
-                    }`} />
-                  </button>
-                </div>
+          ) : prefsError ? (
+            <div className="py-6 text-center text-red text-sm">{prefsError}</div>
+          ) : !preferences ? (
+            <div className="py-6 text-center text-text-muted text-sm">
+              Sign in to manage notification preferences.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="grid grid-cols-12 gap-2 text-xs font-medium text-text-muted px-3 py-2">
+                <div className="col-span-6">Preference</div>
+                <div className="col-span-2 text-center">Email</div>
+                <div className="col-span-2 text-center">Push</div>
+                <div className="col-span-2 text-center">SMS</div>
               </div>
-            ))}
-          </div>
+              {CANDIDATE_TOGGLE_CONFIG.map((setting) => {
+                const emailEnabled = isChannelEnabled(setting.type, 'email');
+                const pushEnabled = isChannelEnabled(setting.type, 'push');
+                const smsEnabled = isChannelEnabled(setting.type, 'sms');
+                const savingEmail = savingToggleId === `${setting.id}-email`;
+                const savingPush = savingToggleId === `${setting.id}-push`;
+                const savingSms = savingToggleId === `${setting.id}-sms`;
+                return (
+                  <div key={setting.id} className="grid grid-cols-12 gap-2 items-center p-3 bg-bg-warm rounded-lg">
+                    <div className="col-span-6">
+                      <div className="font-medium text-text-primary text-sm">{setting.label}</div>
+                      <div className="text-xs text-text-muted">{setting.description}</div>
+                    </div>
+                    <div className="col-span-2 text-center">
+                      <button
+                        onClick={() => toggleNotificationChannel(setting.id, setting.type, 'email')}
+                        disabled={savingEmail}
+                        className={`relative w-10 h-5 rounded-full transition-colors disabled:opacity-50 ${
+                          emailEnabled ? 'bg-fuchsia' : 'bg-bg-tertiary'
+                        }`}
+                        aria-pressed={emailEnabled}
+                        aria-label={`${setting.label} email`}
+                      >
+                        {savingEmail ? (
+                          <Loader2 className="absolute top-0.5 left-0.5 w-4 h-4 animate-spin text-white" />
+                        ) : (
+                          <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                            emailEnabled ? 'left-5' : 'left-0.5'
+                          }`} />
+                        )}
+                      </button>
+                    </div>
+                    <div className="col-span-2 text-center">
+                      <button
+                        onClick={() => toggleNotificationChannel(setting.id, setting.type, 'push')}
+                        disabled={savingPush}
+                        className={`relative w-10 h-5 rounded-full transition-colors disabled:opacity-50 ${
+                          pushEnabled ? 'bg-fuchsia' : 'bg-bg-tertiary'
+                        }`}
+                        aria-pressed={pushEnabled}
+                        aria-label={`${setting.label} push`}
+                      >
+                        {savingPush ? (
+                          <Loader2 className="absolute top-0.5 left-0.5 w-4 h-4 animate-spin text-white" />
+                        ) : (
+                          <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                            pushEnabled ? 'left-5' : 'left-0.5'
+                          }`} />
+                        )}
+                      </button>
+                    </div>
+                    <div className="col-span-2 text-center">
+                      <button
+                        onClick={() => toggleNotificationChannel(setting.id, setting.type, 'sms')}
+                        disabled={savingSms}
+                        className={`relative w-10 h-5 rounded-full transition-colors disabled:opacity-50 ${
+                          smsEnabled ? 'bg-fuchsia' : 'bg-bg-tertiary'
+                        }`}
+                        aria-pressed={smsEnabled}
+                        aria-label={`${setting.label} sms`}
+                      >
+                        {savingSms ? (
+                          <Loader2 className="absolute top-0.5 left-0.5 w-4 h-4 animate-spin text-white" />
+                        ) : (
+                          <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                            smsEnabled ? 'left-5' : 'left-0.5'
+                          }`} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+              <p className="text-xs text-text-muted pt-2">
+                Toggles control email/push/sms delivery for each category. Quiet hours and digest mode apply globally.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

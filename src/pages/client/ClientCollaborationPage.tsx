@@ -3,66 +3,58 @@
  * Renders inside AppShell → Outlet. Shows shared projects,
  * team discussions, and document collaboration.
  */
-import React from 'react';
-import { Users, MessageSquare, FileText, Calendar, Share2, CheckCircle2, Circle, User, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, MessageSquare, FileText, Calendar, Share2, CheckCircle2, Circle, User, ArrowRight, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
-
-// Static content — collaboration UI not backed by a direct table
-
-interface CollaborationProject {
-  id: string;
-  title: string;
-  description: string;
-  members: number;
-  progress: number;
-  lastUpdated: string;
-}
-
-interface DiscussionThread {
-  id: string;
-  title: string;
-  author: string;
-  messages: number;
-  lastMessage: string;
-  unread: boolean;
-}
-
-interface SharedDocument {
-  id: string;
-  title: string;
-  type: 'Report' | 'Proposal' | 'Document' | 'Spreadsheet';
-  author: string;
-  date: string;
-  size: string;
-}
-
-const STATIC_PROJECTS: CollaborationProject[] = [
-  { id: 'p1', title: 'Q1 Executive Search', description: 'Enterprise-level leadership recruitment', members: 5, progress: 75, lastUpdated: '2h ago' },
-  { id: 'p2', title: 'TechCorp VP Engineering', description: 'Senior technical leadership role', members: 3, progress: 45, lastUpdated: '5h ago' },
-  { id: 'p3', title: 'FinScale CFO Search', description: 'Financial leadership mandate', members: 4, progress: 90, lastUpdated: '1d ago' },
-  { id: 'p4', title: 'DataMesh Expansion', description: 'Product and engineering roles', members: 6, progress: 30, lastUpdated: '2d ago' },
-];
-
-const STATIC_THREADS: DiscussionThread[] = [
-  { id: 't1', title: 'Candidate Shortlist Review', author: 'Sarah Kim', messages: 12, lastMessage: 'Let me review these profiles...', unread: true },
-  { id: 't2', title: 'Interview Schedule', author: 'Alex Chen', messages: 8, lastMessage: 'Updated calendar invite sent', unread: false },
-  { id: 't3', title: 'Compensation Package', author: 'Michael Wong', messages: 15, lastMessage: 'Feedback received from HR', unread: true },
-  { id: 't4', title: 'Market Analysis Q1', author: 'Emily Davis', messages: 22, lastMessage: 'Final report attached', unread: false },
-];
-
-const STATIC_DOCUMENTS: SharedDocument[] = [
-  { id: 'd1', title: 'Q1 Talent Report 2025', type: 'Report', author: 'DEX AI', date: 'Jan 15, 2025', size: '2.4 MB' },
-  { id: 'd2', title: 'Executive Search Proposal', type: 'Proposal', author: 'Alex Chen', date: 'Jan 12, 2025', size: '850 KB' },
-  { id: 'd3', title: 'Candidate Scorecard', type: 'Spreadsheet', author: 'Sarah Kim', date: 'Jan 10, 2025', size: '120 KB' },
-  { id: 'd4', title: 'Market Intelligence Brief', type: 'Document', author: 'DEX AI', date: 'Jan 8, 2025', size: '560 KB' },
-];
+import {
+  collaborationService,
+  type CollaborationProject,
+  type DiscussionThread,
+  type SharedDocument,
+} from '@/services/collaborationService';
 
 export function ClientCollaborationPage() {
+  const [projects, setProjects] = useState<CollaborationProject[]>([]);
+  const [threads, setThreads] = useState<DiscussionThread[]>([]);
+  const [documents, setDocuments] = useState<SharedDocument[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const { clientAccount, profile } = useTenantContext();
 
   const displayName = clientAccount?.name || profile?.name || 'Client User';
   const organization = clientAccount?.organization || 'Your Organization';
+  const orgId = clientAccount?.org_id || '';
+
+  useEffect(() => {
+    if (!orgId) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [proj, thr, docs] = await Promise.all([
+          collaborationService.getProjects(orgId),
+          collaborationService.getThreads(orgId),
+          collaborationService.getDocuments(orgId),
+        ]);
+        if (cancelled) return;
+        setProjects(proj);
+        setThreads(thr);
+        setDocuments(docs);
+      } catch (e) {
+        console.error('[ClientCollaborationPage] Load error:', e);
+        if (!cancelled) setError('Failed to load collaboration data');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [orgId]);
 
   const typeIcons: Record<string, React.ReactNode> = {
     Report: <FileText className="w-4 h-4 text-blue" />,
@@ -91,172 +83,169 @@ export function ClientCollaborationPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
-              <Users className="w-5 h-5 text-fuchsia" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-text-primary">{STATIC_PROJECTS.length}</div>
-              <div className="text-xs text-text-muted">Active Projects</div>
-            </div>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[0, 1, 2].map(i => (
+            <Card key={i} className="p-4">
+              <div className="animate-pulse h-12 bg-bg-tertiary rounded" />
+            </Card>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="py-8 text-center text-red text-sm">{error}</div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+                  <Users className="w-5 h-5 text-fuchsia" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-text-primary">{projects.length}</div>
+                  <div className="text-xs text-text-muted">Active Projects</div>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-blue/10 flex items-center justify-center">
+                  <MessageSquare className="w-5 h-5 text-blue" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-text-primary">{threads.filter(t => t.unread).length}</div>
+                  <div className="text-xs text-text-muted">Unread Discussions</div>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-green/10 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-green" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-text-primary">{documents.length}</div>
+                  <div className="text-xs text-text-muted">Shared Documents</div>
+                </div>
+              </div>
+            </Card>
           </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue/10 flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-blue" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-text-primary">{STATIC_THREADS.filter(t => t.unread).length}</div>
-              <div className="text-xs text-text-muted">Unread Discussions</div>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green/10 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-green" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-text-primary">{STATIC_DOCUMENTS.length}</div>
-              <div className="text-xs text-text-muted">Shared Documents</div>
-            </div>
-          </div>
-        </Card>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
+          <Card>
+            <CardHeader>
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-fuchsia" />
-                <CardTitle>Collaboration Projects</CardTitle>
+                <CardTitle>Active Projects</CardTitle>
               </div>
-              <Button size="sm">New Project</Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {STATIC_PROJECTS.map((project) => (
-                <div key={project.id} className="flex items-center justify-between p-4 bg-bg-warm rounded-lg hover:shadow-card-hover transition-shadow cursor-pointer">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <span className="font-medium text-text-primary">{project.title}</span>
-                      <Badge variant="outline" className="text-xs">{project.members} members</Badge>
-                    </div>
-                    <div className="text-sm text-text-muted mt-1">{project.description}</div>
-                    <div className="flex items-center gap-4 mt-3">
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between text-xs text-text-muted mb-1">
-                          <span>Progress</span>
-                          <span>{project.progress}%</span>
+            </CardHeader>
+            <CardContent>
+              {projects.length === 0 ? (
+                <div className="py-8 text-center text-text-muted text-sm">No active projects.</div>
+              ) : (
+                <div className="space-y-3">
+                  {projects.map((project) => (
+                    <div key={project.id} className="flex items-center justify-between p-4 bg-bg-warm rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center text-fuchsia">
+                          <Users className="w-5 h-5" />
                         </div>
-                        <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
-                          <div className="h-full bg-fuchsia rounded-full" style={{ width: `${project.progress}%` }} />
+                        <div>
+                          <div className="font-medium text-text-primary text-sm">{project.title}</div>
+                          <div className="text-xs text-text-muted mt-1">{project.description}</div>
+                          <div className="flex items-center gap-3 mt-1">
+                            <span className="text-xs text-text-muted">{project.members} members</span>
+                            <span className="text-xs text-text-muted">Updated {project.lastUpdated}</span>
+                          </div>
                         </div>
                       </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-24 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-fuchsia rounded-full transition-all"
+                            style={{ width: `${project.progress}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-text-muted w-8">{project.progress}%</span>
+                        <ArrowRight className="w-4 h-4 text-text-muted" />
+                      </div>
                     </div>
-                  </div>
-                  <div className="ml-4 text-right">
-                    <div className="text-xs text-text-muted">Updated</div>
-                    <div className="text-sm font-medium text-text-secondary">{project.lastUpdated}</div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-fuchsia" />
-                <CardTitle>Discussions</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {STATIC_THREADS.map((thread) => (
-                  <button key={thread.id} className="w-full text-left p-3 bg-bg-warm rounded-lg hover:bg-fuchsia-light/30 transition-colors">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`font-medium text-sm ${thread.unread ? 'text-text-primary' : 'text-text-secondary'}`}>
-                        {thread.title}
-                      </span>
-                      {thread.unread && (
-                        <span className="w-2 h-2 bg-fuchsia rounded-full" />
-                      )}
-                    </div>
-                    <div className="text-xs text-text-muted">
-                      {thread.author} · {thread.messages} messages
-                    </div>
-                    <div className="text-xs text-text-muted mt-1 truncate">
-                      {thread.lastMessage}
-                    </div>
-                  </button>
-                ))}
-              </div>
+              )}
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-fuchsia" />
+                  <CardTitle>Discussions</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {threads.length === 0 ? (
+                  <div className="py-8 text-center text-text-muted text-sm">No discussions yet.</div>
+                ) : (
+                  <div className="space-y-3">
+                    {threads.slice(0, 4).map((thread) => (
+                      <div key={thread.id} className="flex items-center justify-between p-3 bg-bg-warm rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-fuchsia-light flex items-center justify-center">
+                            <MessageSquare className="w-4 h-4 text-fuchsia" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-text-primary text-sm">{thread.title}</div>
+                            <div className="text-xs text-text-muted">
+                              {thread.author} · {thread.messages} messages
+                            </div>
+                          </div>
+                        </div>
+                        {thread.unread && (
+                          <Badge className="bg-fuchsia/10 text-fuchsia text-xs">New</Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
                 <div className="flex items-center gap-2">
                   <FileText className="w-5 h-5 text-fuchsia" />
-                  <CardTitle>Recent Documents</CardTitle>
+                  <CardTitle>Shared Documents</CardTitle>
                 </div>
-                <button className="text-sm text-fuchsia hover:underline">View All</button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {STATIC_DOCUMENTS.map((doc) => (
-                  <div key={doc.id} className="flex items-center gap-3 p-2 hover:bg-bg-warm rounded-lg cursor-pointer transition-colors">
-                    {typeIcons[doc.type]}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-text-primary truncate">{doc.title}</div>
-                      <div className="text-xs text-text-muted">{doc.author} · {doc.date}</div>
-                    </div>
-                    <div className="text-xs text-text-muted">{doc.size}</div>
+              </CardHeader>
+              <CardContent>
+                {documents.length === 0 ? (
+                  <div className="py-8 text-center text-text-muted text-sm">No shared documents.</div>
+                ) : (
+                  <div className="space-y-3">
+                    {documents.slice(0, 4).map((doc) => (
+                      <div key={doc.id} className="flex items-center justify-between p-3 bg-bg-warm rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-bg-tertiary flex items-center justify-center">
+                            {typeIcons[doc.type] || <FileText className="w-4 h-4" />}
+                          </div>
+                          <div>
+                            <div className="font-medium text-text-primary text-sm">{doc.title}</div>
+                            <div className="text-xs text-text-muted">
+                              {doc.author} · {doc.date} · {doc.size}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="text-xs">{doc.type}</Badge>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-fuchsia" />
-            <CardTitle>Upcoming Events</CardTitle>
+                )}
+              </CardContent>
+            </Card>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[
-              { title: 'Candidate Review', date: 'Today, 2:00 PM', type: 'Meeting', participants: '3' },
-              { title: 'Interview Prep', date: 'Tomorrow, 10:00 AM', type: 'Coaching', participants: '1' },
-              { title: 'Pipeline Sync', date: 'Wed, 1:00 PM', type: 'Meeting', participants: '5' },
-              { title: 'Final Presentation', date: 'Thu, 3:00 PM', type: 'Review', participants: '8' },
-            ].map((event, i) => (
-              <div key={i} className="p-4 bg-bg-warm rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="outline" className="text-xs">{event.type}</Badge>
-                  <span className="text-xs text-text-muted">{event.participants} participants</span>
-                </div>
-                <div className="font-medium text-text-primary text-sm mb-1">{event.title}</div>
-                <div className="text-xs text-text-muted">{event.date}</div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+        </>
+      )}
     </div>
   );
 }
