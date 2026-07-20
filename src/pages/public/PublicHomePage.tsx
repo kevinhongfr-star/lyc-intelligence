@@ -1,255 +1,221 @@
-/**
- * Public Homepage — LYC Intelligence marketing site
- * Spec 18: Public Site & Activation Flows
- */
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Users, Target, BarChart3, Shield, Zap, CheckCircle } from 'lucide-react';
-import { Button, Card, Badge } from '@/components/ui';
+import { Heading, Paragraph, Button, Container, Card, Badge, Grid, Flex, StatCard } from '@/components/design-system';
+import { COLORS, SPACING } from '@/styles/tokens';
 
-const FEATURES = [
+const features = [
   {
-    icon: <Users className="w-6 h-6" />,
-    title: 'Executive Network',
-    description: 'Connect with verified C-suite executives across industries. Peer introductions, not cold outreach.',
+    title: 'AI-Powered Talent Intelligence',
+    description: 'Leverage cutting-edge AI to identify and evaluate executive talent across APAC markets.',
+    icon: '🧠',
   },
   {
-    icon: <Target className="w-6 h-6" />,
-    title: 'Intelligence Platform',
-    description: 'Real-time market signals, company health scores, and AI-powered insights for strategic decisions.',
+    title: 'Strategic Leadership Consulting',
+    description: 'Expert guidance for C-suite placement, succession planning, and leadership development.',
+    icon: '💼',
   },
   {
-    icon: <BarChart3 className="w-6 h-6" />,
-    title: 'Leadership Analytics',
-    description: 'Track your executive career trajectory with SHIFT assessments and personalized development paths.',
+    title: 'Data-Driven Decision Making',
+    description: 'Access comprehensive analytics and insights to inform your hiring strategy.',
+    icon: '📊',
   },
   {
-    icon: <Shield className="w-6 h-6" />,
-    title: 'Confidential & Secure',
-    description: 'Chatham House Rule discussions. Your data stays yours. Enterprise-grade security.',
-  },
-  {
-    icon: <Zap className="w-6 h-6" />,
-    title: 'AI Assistant',
-    description: 'DEX AI helps you navigate opportunities, prepare for interviews, and negotiate offers.',
+    title: 'Candidate Matching Engine',
+    description: 'Advanced algorithms match candidates to mandates based on skills, culture, and potential.',
+    icon: '🔗',
   },
 ];
 
-const TESTIMONIALS = [
+const stats = [
+  { title: 'Clients', value: '200+', change: { value: '15%', positive: true } },
+  { title: 'Placements', value: '1,500+', change: { value: '22%', positive: true } },
+  { title: 'APAC Markets', value: '12', change: { value: 'New', positive: true } },
+  { title: 'Success Rate', value: '94%', change: { value: '3%', positive: true } },
+];
+
+const testimonials = [
   {
-    quote: "LYC Intelligence gave me access to opportunities I never would have found through traditional channels. The peer network alone is worth it.",
+    quote: 'LYC Intelligence transformed our executive hiring process. Their AI insights saved us months of search time.',
     author: 'Sarah Chen',
-    title: 'Former CFO, Tech Unicorn → CEO, Series B Startup',
+    role: 'CHRO, TechCorp Asia',
   },
   {
-    quote: "The intelligence layer helped me time my exit perfectly. Market signals I wouldn't have caught otherwise.",
-    author: 'Michael Torres',
-    title: 'VP Engineering → CTO, Fortune 500',
-  },
-  {
-    quote: "SHIFT showed me my leadership blind spots. The coaching recommendations were spot-on.",
-    author: 'Priya Sharma',
-    title: 'SVP Operations → COO, Growth Stage Company',
+    quote: 'The Signal Council community has been invaluable for networking and staying ahead of market trends.',
+    author: 'Michael Tan',
+    role: 'CEO, FinTech Startup',
   },
 ];
 
-const LOGOS = [
-  'TechCorp', 'FinanceHub', 'GrowthCo', 'DataScale', 'CloudFirst', 'InnovateLabs',
-];
-
-export function PublicHomePage() {
+export const PublicHomePage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-[#E5E5E5]">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#C108AB]" style={{ borderRadius: 0 }} />
-            <span className="font-serif font-bold text-lg text-[#171717]">LYC Intelligence</span>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/features" className="text-sm text-[#737373] hover:text-[#171717] transition-colors">
-              Features
-            </Link>
-            <Link to="/pricing" className="text-sm text-[#737373] hover:text-[#171717] transition-colors">
-              Pricing
-            </Link>
-            <Link to="/council" className="text-sm text-[#737373] hover:text-[#171717] transition-colors">
-              Council
-            </Link>
-            <Link to="/faq" className="text-sm text-[#737373] hover:text-[#171717] transition-colors">
-              FAQ
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link to="/login">
-              <Button variant="ghost" size="sm">Log in</Button>
-            </Link>
-            <Link to="/signup">
-              <Button size="sm">Get Started</Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <section className="pt-32 pb-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="max-w-3xl">
-            <Badge className="mb-4 bg-[#C108AB]/10 text-[#C108AB]">Executive Intelligence Platform</Badge>
-            <h1 className="font-serif font-bold text-5xl md:text-6xl text-[#171717] leading-tight mb-6">
-              The AI-Native Platform for{' '}
-              <span className="text-[#C108AB]">Executive Intelligence</span>
-            </h1>
-            <p className="text-xl text-[#737373] mb-8 max-w-2xl">
-              Connect with top executives, access market intelligence, and make data-driven leadership decisions.
-              Your next career move, powered by AI and human expertise.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link to="/signup">
-                <Button size="lg">
-                  Start for Executive Introduction
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-              <Link to="/book-demo">
-                <Button variant="outline" size="lg">Book a Demo</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
+    <div style={{ backgroundColor: COLORS.bg }}>
+      <section
+        style={{
+          background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%)`,
+          padding: `${SPACING[20]}px 0`,
+          color: COLORS.white,
+          textAlign: 'center',
+        }}
+      >
+        <Container>
+          <Badge
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.2)',
+              color: COLORS.white,
+              marginBottom: `${SPACING[6]}px`,
+            }}
+          >
+            Executive Search & Leadership Intelligence
+          </Badge>
+          <Heading level={1} style={{ fontSize: '4rem', marginBottom: `${SPACING[6]}px` }}>
+            Find Your Next
+            <br />
+            <span style={{ color: '#FFD700' }}>Transformational Leader</span>
+          </Heading>
+          <Paragraph
+            style={{
+              fontSize: '1.25rem',
+              color: 'rgba(255,255,255,0.9)',
+              maxWidth: '600px',
+              margin: '0 auto',
+              marginBottom: `${SPACING[10]}px`,
+            }}
+          >
+            Powered by DEX AI, LYC Intelligence delivers executive talent solutions across APAC
+            with unmatched precision and speed.
+          </Paragraph>
+          <Flex justify="center" gap="6">
+            <Button size="lg" onClick={() => {}}>
+              Book a Demo
+            </Button>
+            <Button size="lg" variant="outline" style={{ borderColor: 'white', color: 'white' }}>
+              Explore Features
+            </Button>
+          </Flex>
+        </Container>
       </section>
 
-      {/* Features */}
-      <section className="py-20 px-6 bg-[#FAFAFA]">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="font-serif font-bold text-3xl text-[#171717] mb-4">
-              Built for Executive Leaders
-            </h2>
-            <p className="text-[#737373] max-w-xl mx-auto">
-              Every feature designed for the unique needs of C-suite and senior executives.
-            </p>
+      <section style={{ padding: `${SPACING[20]}px 0` }}>
+        <Container>
+          <div style={{ textAlign: 'center', marginBottom: `${SPACING[12]}px` }}>
+            <Badge>Trusted by Leading Organizations</Badge>
+            <Heading level={2} style={{ marginTop: `${SPACING[4]}px`, marginBottom: `${SPACING[4]}px` }}>
+              Numbers That Speak
+            </Heading>
+            <Paragraph color="textSecondary">
+              Track record of excellence in executive search and leadership consulting
+            </Paragraph>
           </div>
+          <Grid columns={4} gap="6">
+            {stats.map((stat) => (
+              <StatCard key={stat.title} {...stat} />
+            ))}
+          </Grid>
+        </Container>
+      </section>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {FEATURES.map((feature, i) => (
-              <Card key={i} className="p-6" interactive>
-                <div className="w-12 h-12 bg-[#C108AB]/10 flex items-center justify-center mb-4" style={{ borderRadius: 0 }}>
-                  <div className="text-[#C108AB]">{feature.icon}</div>
+      <section style={{ padding: `${SPACING[20]}px 0`, backgroundColor: COLORS.bgAlt }}>
+        <Container>
+          <div style={{ textAlign: 'center', marginBottom: `${SPACING[12]}px` }}>
+            <Badge>Our Platform</Badge>
+            <Heading level={2} style={{ marginTop: `${SPACING[4]}px`, marginBottom: `${SPACING[4]}px` }}>
+              Powerful Features
+            </Heading>
+            <Paragraph color="textSecondary">
+              Everything you need to source, evaluate, and place top executive talent
+            </Paragraph>
+          </div>
+          <Grid columns={2} gap="6">
+            {features.map((feature) => (
+              <Card key={feature.title} padding="8">
+                <div
+                  style={{
+                    fontSize: '3rem',
+                    marginBottom: `${SPACING[4]}px`,
+                  }}
+                >
+                  {feature.icon}
                 </div>
-                <h3 className="font-semibold text-[#171717] mb-2">{feature.title}</h3>
-                <p className="text-sm text-[#737373]">{feature.description}</p>
+                <Heading level={3} style={{ marginBottom: `${SPACING[3]}px` }}>
+                  {feature.title}
+                </Heading>
+                <Paragraph color="textSecondary">{feature.description}</Paragraph>
               </Card>
             ))}
-          </div>
-        </div>
+          </Grid>
+        </Container>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="font-serif font-bold text-3xl text-[#171717] mb-4">
-              Trusted by Industry Leaders
-            </h2>
+      <section style={{ padding: `${SPACING[20]}px 0` }}>
+        <Container>
+          <div style={{ textAlign: 'center', marginBottom: `${SPACING[12]}px` }}>
+            <Badge>Testimonials</Badge>
+            <Heading level={2} style={{ marginTop: `${SPACING[4]}px`, marginBottom: `${SPACING[4]}px` }}>
+              What Our Clients Say
+            </Heading>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((testimonial, i) => (
-              <Card key={i} className="p-6">
-                <p className="text-[#171717] mb-4 text-sm leading-relaxed">"{testimonial.quote}"</p>
+          <Grid columns={2} gap="6">
+            {testimonials.map((testimonial) => (
+              <Card key={testimonial.author} padding="8" variant="elevated">
+                <div style={{ fontSize: '2rem', marginBottom: `${SPACING[4]}px` }}>"</div>
+                <Paragraph style={{ marginBottom: `${SPACING[6]}px` }}>
+                  {testimonial.quote}
+                </Paragraph>
                 <div>
-                  <p className="font-semibold text-[#171717] text-sm">{testimonial.author}</p>
-                  <p className="text-xs text-[#737373]">{testimonial.title}</p>
+                  <div style={{ fontWeight: 600 }}>{testimonial.author}</div>
+                  <div style={{ fontSize: `${SPACING[3]}px`, color: COLORS.textMuted }}>
+                    {testimonial.role}
+                  </div>
                 </div>
               </Card>
             ))}
-          </div>
-
-          <div className="mt-12 pt-8 border-t border-[#E5E5E5]">
-            <p className="text-center text-xs text-[#A3A3A3] mb-4">Trusted by executives from</p>
-            <div className="flex flex-wrap justify-center gap-8">
-              {LOGOS.map((logo, i) => (
-                <span key={i} className="text-sm font-medium text-[#D4D4D4]">{logo}</span>
-              ))}
-            </div>
-          </div>
-        </div>
+          </Grid>
+        </Container>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 px-6 bg-[#171717]">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-serif font-bold text-3xl text-white mb-4">
-            Ready to Elevate Your Executive Career?
-          </h2>
-          <p className="text-[#A3A3A3] mb-8">
-            Join the network of 2,500+ verified executives. Your first introduction is free.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/signup">
-              <Button size="lg">
-                Get Started Free
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-            <Link to="/pricing">
-              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
-                View Pricing
-              </Button>
-            </Link>
-          </div>
-        </div>
+      <section
+        style={{
+          background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%)`,
+          padding: `${SPACING[20]}px 0`,
+          color: COLORS.white,
+          textAlign: 'center',
+        }}
+      >
+        <Container>
+          <Heading level={2} style={{ marginBottom: `${SPACING[4]}px` }}>
+            Ready to Transform Your Executive Hiring?
+          </Heading>
+          <Paragraph
+            style={{
+              fontSize: '1.125rem',
+              color: 'rgba(255,255,255,0.9)',
+              maxWidth: '500px',
+              margin: '0 auto',
+              marginBottom: `${SPACING[10]}px`,
+            }}
+          >
+            Schedule a demo to see how LYC Intelligence can help you find your next leader.
+          </Paragraph>
+          <Flex justify="center" gap="6">
+            <Button size="lg" onClick={() => {}}>
+              Book a Demo
+            </Button>
+            <Button size="lg" variant="outline" style={{ borderColor: 'white', color: 'white' }}>
+              View Pricing
+            </Button>
+          </Flex>
+        </Container>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-[#E5E5E5]">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 bg-[#C108AB]" style={{ borderRadius: 0 }} />
-                <span className="font-serif font-bold text-[#171717]">LYC Intelligence</span>
-              </div>
-              <p className="text-xs text-[#737373]">
-                Executive intelligence platform by LYC Partners.
-              </p>
+      <footer style={{ padding: `${SPACING[10]}px 0`, backgroundColor: COLORS.text, color: COLORS.white }}>
+        <Container>
+          <Flex justify="between" align="center">
+            <div style={{ fontWeight: 700, fontSize: `${SPACING[6]}px` }}>LYC Intelligence</div>
+            <div style={{ fontSize: `${SPACING[4]}px`, color: 'rgba(255,255,255,0.7)' }}>
+              2024 LYC Intelligence. All rights reserved.
             </div>
-            <div>
-              <h4 className="font-semibold text-[#171717] text-sm mb-3">Product</h4>
-              <div className="space-y-2">
-                <Link to="/features" className="block text-xs text-[#737373] hover:text-[#171717]">Features</Link>
-                <Link to="/pricing" className="block text-xs text-[#737373] hover:text-[#171717]">Pricing</Link>
-                <Link to="/council" className="block text-xs text-[#737373] hover:text-[#171717]">Council</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold text-[#171717] text-sm mb-3">Company</h4>
-              <div className="space-y-2">
-                <Link to="/about" className="block text-xs text-[#737373] hover:text-[#171717]">About</Link>
-                <Link to="/careers" className="block text-xs text-[#737373] hover:text-[#171717]">Careers</Link>
-                <Link to="/contact" className="block text-xs text-[#737373] hover:text-[#171717]">Contact</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold text-[#171717] text-sm mb-3">Legal</h4>
-              <div className="space-y-2">
-                <Link to="/privacy" className="block text-xs text-[#737373] hover:text-[#171717]">Privacy</Link>
-                <Link to="/terms" className="block text-xs text-[#737373] hover:text-[#171717]">Terms</Link>
-                <Link to="/cookies" className="block text-xs text-[#737373] hover:text-[#171717]">Cookies</Link>
-              </div>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-[#E5E5E5] text-center">
-            <p className="text-xs text-[#A3A3A3]">© 2026 LYC Partners. All rights reserved.</p>
-          </div>
-        </div>
+          </Flex>
+        </Container>
       </footer>
     </div>
   );
-}
-
-export default PublicHomePage;
+};
