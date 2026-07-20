@@ -13,6 +13,7 @@ import {
   calculateDaysRemaining,
 } from './engine';
 import type { MandateTimeline, SLAEscalation } from './engine';
+import { sendNotification, type NotificationType } from '@/services/notifications/notificationService';
 
 // ═══════════════════════════════════════════════════════════════
 // ESCALATION SERVICE
@@ -78,6 +79,16 @@ export async function checkMandateEscalations(
 
       if (escalation) {
         escalationsCreated.push(escalation);
+        // Fire-and-forget notification dispatch
+        void sendEscalationNotifications(supabase, {
+          mandate_id: escalation.mandate_id,
+          org_id: escalation.org_id,
+          timeline_id: escalation.timeline_id,
+          escalation_type: escalation.escalation_type,
+          milestone_stage: escalation.milestone_stage,
+          message: escalation.message,
+          notified_roles: escalation.notified_roles,
+        });
       }
     }
   }
@@ -245,27 +256,139 @@ export async function runSLAHealthCheck(
 
 /**
  * Send escalation notifications
+ *
+ * Resolves recipients by combining two strategies:
+ *   1. Look up active assignees on the mandate (account_executive, lead_consultant, etc.)
+ *   2. Look up org members whose role matches the SLA rule's notify_roles list
+ *
+ * Then dispatches an in-app + email notification to each recipient via the
+ * central notification service, which respects per-user preferences, quiet
+ * hours, and digest mode.
  */
 export async function sendEscalationNotifications(
   supabase: SupabaseClient,
   escalation: {
     mandate_id: string;
+    org_id: string;
+    timeline_id: string;
     escalation_type: string;
+    milestone_stage: string;
     message: string;
     notified_roles: string[];
   }
 ): Promise<void> {
-  // In production, this would send notifications via email, in-app, etc.
-  // This is a placeholder implementation.
+  const notificationType = escalationTypeToNotificationType(escalation.escalation_type);
+  const actionUrl = `/admin/mandates/${escalation.mandate_id}?timeline=${escalation.timeline_id}`;
 
-  console.log('Sending escalation notification:', {
-    mandateId: escalation.mandate_id,
-    type: escalation.escalation_type,
-    message: escalation.message,
-    roles: escalation.notified_roles,
-  });
+  const recipientIds = await resolveEscalationRecipients(
+    supabase,
+    escalation.org_id,
+    escalation.mandate_id,
+    escalation.notified_roles
+  );
 
-  // TODO: Integrate with notification service to send actual notifications
+  if (recipientIds.length === 0) {
+    console.warn(
+      '[SLA Escalation] No recipients resolved for escalation',
+      { mandateId: escalation.mandate_id, roles: escalation.notified_roles }
+    );
+    return;
+  }
+
+  const titlePrefix: Record<string, string> = {
+    warning: 'SLA Warning',
+    critical: 'SLA Critical',
+    breach: 'SLA Breach',
+  };
+  const title = `${titlePrefix[escalation.escalation_type] || 'SLA Alert'}: ${escalation.milestone_stage} milestone`;
+
+  await Promise.all(
+    recipientIds.map((userId) =>
+      sendNotification(supabase, {
+        userId,
+        type: notificationType,
+        title,
+        message: escalation.message,
+        entityType: 'mandate',
+        entityId: escalation.mandate_id,
+        actionUrl,
+      }).catch((err) => {
+        console.error('[SLA Escalation] Failed to notify user', { userId, err });
+      })
+    )
+  );
+}
+
+/**
+ * Map SLA escalation severity to a notification type.
+ * `milestone_at_risk` is critical=true (bypasses quiet hours) for warnings and critical alerts.
+ * `deadline` is critical=true for full breaches.
+ */
+function escalationTypeToNotificationType(escalationType: string): NotificationType {
+  if (escalationType === 'breach') return 'deadline';
+  return 'milestone_at_risk';
+}
+
+/**
+ * Resolve the set of user IDs who should receive an escalation notification.
+ *
+ * Combines:
+ *   - Mandate assignees (account_executive, lead_consultant, coordinator_id)
+ *   - Org members with a role in `notify_roles`
+ *
+ * Returns de-duplicated user IDs.
+ */
+async function resolveEscalationRecipients(
+  supabase: SupabaseClient,
+  orgId: string,
+  mandateId: string,
+  notifyRoles: string[]
+): Promise<string[]> {
+  const recipientSet = new Set<string>();
+
+  // 1. Mandate assignees — always notified regardless of role list
+  try {
+    const { data: mandate, error } = await supabase
+      .from('mandates')
+      .select('account_executive_id, lead_consultant_id, coordinator_id, created_by')
+      .eq('id', mandateId)
+      .maybeSingle();
+
+    if (!error && mandate) {
+      [
+        mandate.account_executive_id,
+        mandate.lead_consultant_id,
+        mandate.coordinator_id,
+        mandate.created_by,
+      ].forEach((uid: string | null | undefined) => {
+        if (uid) recipientSet.add(uid);
+      });
+    }
+  } catch (err) {
+    console.error('[SLA Escalation] Failed to load mandate assignees', err);
+  }
+
+  // 2. Org members whose role matches the SLA rule's notify_roles
+  if (notifyRoles.length > 0) {
+    try {
+      const { data: members, error } = await supabase
+        .from('organization_members')
+        .select('user_id, role')
+        .eq('org_id', orgId)
+        .eq('status', 'active')
+        .in('role', notifyRoles);
+
+      if (!error && members) {
+        members.forEach((m: { user_id: string }) => {
+          if (m.user_id) recipientSet.add(m.user_id);
+        });
+      }
+    } catch (err) {
+      console.error('[SLA Escalation] Failed to load org members by role', err);
+    }
+  }
+
+  return Array.from(recipientSet);
 }
 
 export default {

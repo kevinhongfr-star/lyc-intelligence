@@ -3,35 +3,46 @@
  * Renders inside AppShell → Outlet. Shows user profile management,
  * preferences, and account settings.
  */
-import React, { useState } from 'react';
-import { User, Mail, Phone, MapPin, Briefcase, Bell, Lock, Globe, Save, Edit2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { User, Mail, Phone, MapPin, Briefcase, Bell, Lock, Globe, Save, Edit2, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
 import { useAuthStore } from '@/stores/authStore';
+import { supabase } from '@/lib/supabase/client';
+import {
+  getUserPreferences,
+  saveUserPreferences,
+  type NotificationPreferences as NotificationPrefs,
+  type NotificationType,
+} from '@/services/notifications/notificationService';
 
-interface NotificationSetting {
+/**
+ * Each coaching-portal toggle is bound to a notification type from the
+ * central notification service. Toggling flips the in_app channel for
+ * that type, which the rest of the notification pipeline already honors.
+ */
+const COACHING_TOGGLE_CONFIG: Array<{
   id: string;
   label: string;
   description: string;
-  enabled: boolean;
-}
-
-// No DB table — UI notification toggles (stored in local state)
-// TODO: Add notification_preferences JSONB column to profiles table
-const STATIC_NOTIFICATIONS: NotificationSetting[] = [
-  { id: 'n1', label: 'Session Reminders', description: 'Get notified 1 hour before coaching sessions', enabled: true },
-  { id: 'n2', label: 'Weekly Progress Reports', description: 'Receive weekly progress summary emails', enabled: true },
-  { id: 'n3', label: 'New Resources', description: 'Be notified when new resources are added', enabled: false },
-  { id: 'n4', label: 'Coach Messages', description: 'Instant notifications for coach messages', enabled: true },
-  { id: 'n5', label: 'Community Activity', description: 'Updates from your coaching community', enabled: false },
+  type: NotificationType;
+}> = [
+  { id: 'n1', label: 'Session Reminders', description: 'Get notified 1 hour before coaching sessions', type: 'reminder' },
+  { id: 'n2', label: 'Weekly Progress Reports', description: 'Receive weekly progress summary emails', type: 'coaching' },
+  { id: 'n3', label: 'New Resources', description: 'Be notified when new resources are added', type: 'system' },
+  { id: 'n4', label: 'Coach Messages', description: 'Instant notifications for coach messages', type: 'message_received' },
+  { id: 'n5', label: 'Community Activity', description: 'Updates from your coaching community', type: 'mention' },
 ];
 
 export function CoachingProfileSettingsPage() {
-  const [notifications, setNotifications] = useState<NotificationSetting[]>(STATIC_NOTIFICATIONS);
+  const [preferences, setPreferences] = useState<NotificationPrefs | null>(null);
+  const [prefsLoading, setPrefsLoading] = useState(true);
+  const [prefsError, setPrefsError] = useState<string | null>(null);
+  const [savingToggleId, setSavingToggleId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const { profile, isLoading } = useTenantContext();
+  const { user, profile, isLoading } = useTenantContext();
   const updateProfile = useAuthStore(s => s.updateProfile);
 
   const displayName = profile?.name || 'Coachee';
@@ -42,10 +53,64 @@ export function CoachingProfileSettingsPage() {
     email: profile?.email || '',
   });
 
-  const toggleNotification = (id: string) => {
-    setNotifications(prev => prev.map(n =>
-      n.id === id ? { ...n, enabled: !n.enabled } : n
-    ));
+  useEffect(() => {
+    if (!user?.id) {
+      setPrefsLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setPrefsLoading(true);
+      setPrefsError(null);
+      try {
+        const prefs = await getUserPreferences(supabase, user.id);
+        if (cancelled) return;
+        setPreferences(prefs);
+      } catch (e) {
+        console.error('[CoachingProfileSettingsPage] Failed to load preferences:', e);
+        if (!cancelled) setPrefsError('Failed to load notification preferences');
+      } finally {
+        if (!cancelled) setPrefsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
+
+  const isToggleEnabled = useCallback(
+    (type: NotificationType): boolean => {
+      if (!preferences) return false;
+      const settings = preferences.typeSettings[type];
+      return Boolean(settings?.in_app);
+    },
+    [preferences]
+  );
+
+  const toggleNotification = async (toggleId: string, type: NotificationType) => {
+    if (!preferences || !user?.id) return;
+    const current = preferences.typeSettings[type] || { in_app: false, email: false, push: false, sms: false };
+    const nextSettings = { ...current, in_app: !current.in_app };
+
+    const nextPrefs: NotificationPrefs = {
+      ...preferences,
+      typeSettings: { ...preferences.typeSettings, [type]: nextSettings },
+    };
+    // Optimistically update UI
+    setPreferences(nextPrefs);
+    setSavingToggleId(toggleId);
+    try {
+      const ok = await saveUserPreferences(supabase, user.id, { typeSettings: nextPrefs.typeSettings });
+      if (!ok) {
+        // Roll back on failure
+        setPreferences(preferences);
+        setPrefsError('Failed to save notification preference');
+      }
+    } catch (e) {
+      console.error('[CoachingProfileSettingsPage] Save preference failed:', e);
+      setPreferences(preferences);
+      setPrefsError('Failed to save notification preference');
+    } finally {
+      setSavingToggleId(null);
+    }
   };
 
   const handleSave = async () => {
@@ -226,32 +291,67 @@ export function CoachingProfileSettingsPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-fuchsia" />
-            <CardTitle>Notification Settings</CardTitle>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="w-5 h-5 text-fuchsia" />
+              <CardTitle>Notification Settings</CardTitle>
+            </div>
+            {preferences && (
+              <Badge variant="outline" className="text-xs">
+                Digest: {preferences.digestMode.replace('digest_', '')}
+              </Badge>
+            )}
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {notifications.map((setting) => (
-              <div key={setting.id} className="flex items-center justify-between p-4 bg-bg-warm rounded-lg">
-                <div>
-                  <div className="font-medium text-text-primary text-sm">{setting.label}</div>
-                  <div className="text-xs text-text-muted mt-1">{setting.description}</div>
-                </div>
-                <button
-                  onClick={() => toggleNotification(setting.id)}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
-                    setting.enabled ? 'bg-fuchsia' : 'bg-bg-tertiary'
-                  }`}
-                >
-                  <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                    setting.enabled ? 'left-7' : 'left-1'
-                  }`} />
-                </button>
-              </div>
-            ))}
-          </div>
+          {prefsLoading ? (
+            <div className="space-y-3">
+              {[0, 1, 2, 3, 4].map(i => (
+                <div key={i} className="animate-pulse h-16 bg-bg-tertiary rounded-lg" />
+              ))}
+            </div>
+          ) : prefsError ? (
+            <div className="py-6 text-center text-red text-sm">{prefsError}</div>
+          ) : !preferences ? (
+            <div className="py-6 text-center text-text-muted text-sm">
+              Sign in to manage notification preferences.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {COACHING_TOGGLE_CONFIG.map((setting) => {
+                const enabled = isToggleEnabled(setting.type);
+                const isSaving = savingToggleId === setting.id;
+                return (
+                  <div key={setting.id} className="flex items-center justify-between p-4 bg-bg-warm rounded-lg">
+                    <div>
+                      <div className="font-medium text-text-primary text-sm">{setting.label}</div>
+                      <div className="text-xs text-text-muted mt-1">{setting.description}</div>
+                    </div>
+                    <button
+                      onClick={() => toggleNotification(setting.id, setting.type)}
+                      disabled={isSaving}
+                      className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
+                        enabled ? 'bg-fuchsia' : 'bg-bg-tertiary'
+                      }`}
+                      aria-pressed={enabled}
+                      aria-label={`Toggle ${setting.label}`}
+                    >
+                      {isSaving ? (
+                        <Loader2 className="absolute top-1 left-1 w-4 h-4 animate-spin text-white" />
+                      ) : (
+                        <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                          enabled ? 'left-7' : 'left-1'
+                        }`} />
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
+              <p className="text-xs text-text-muted pt-2">
+                These toggles control in-app delivery. Email, push, and quiet-hours defaults are managed centrally and apply on top of these settings.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
