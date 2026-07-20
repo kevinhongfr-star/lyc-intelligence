@@ -55,6 +55,7 @@ const handlers: Record<string, () => Promise<any>> = {
   'academy': () => import('./_lib/academyAdminHandler.js'),
   'client-portal': () => import('./_lib/clientPortalV2Handler.js'),
   'cohort-reports': () => import('./_lib/cohortReportsHandler.js'),
+  'sso': () => import('./_lib/ssoHandler.js'),
 };
 
 // Modules whose handlers expect the full path (including module name) in req.query.path

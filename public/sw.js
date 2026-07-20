@@ -1,339 +1,230 @@
-// DEX AI Platform - Service Worker
-// Phase 6.3: Mobile PWA
+/**
+ * PWA Service Worker — Issue #24: Mobile App Companion
+ * Issue #25: Offline Mode for Field Work
+ *
+ * Handles:
+ * - App shell caching
+ * - API response caching with sync
+ * - Offline fallback pages
+ * - Push notifications
+ */
 
-const CACHE_NAME = 'dex-v1';
-const STATIC_CACHE = 'dex-static-v1';
-const DATA_CACHE = 'dex-data-v1';
+/// <reference lib="webworker" />
 
-// Static assets to cache on install
-const STATIC_ASSETS = [
+const CACHE_NAME = 'lyc-v1';
+const STATIC_CACHE = 'lyc-static-v1';
+const API_CACHE = 'lyc-api-v1';
+const SYNC_QUEUE = 'lyc-sync-queue';
+
+// Resources to cache immediately on install
+const APP_SHELL = [
   '/',
-  '/dashboard',
-  '/mandates',
-  '/pipeline',
-  '/profile',
+  '/app',
+  '/app/dashboard',
+  '/offline',
   '/manifest.json',
+  '/favicon.ico',
+  '/logo192.png',
+  '/logo512.png',
 ];
 
-// API routes to cache with network-first strategy
-const API_ROUTES = [
-  '/api/data/mandate',
-  '/api/data/pipeline',
-  '/api/data/contact',
-];
-
-// Install event - cache static assets
-self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
+// Install event — cache app shell
+self.addEventListener('install', (event: ExtendableEvent) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => {
-        console.log('[SW] Caching static assets');
-        return cache.addAll(STATIC_ASSETS);
-      })
-      .then(() => {
-        console.log('[SW] Skip waiting');
-        return self.skipWaiting();
-      })
+    caches.open(STATIC_CACHE).then((cache) => cache.addAll(APP_SHELL))
   );
+  // Activate immediately
+  (self as any).skipWaiting();
 });
 
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker...');
+// Activate event — clean old caches
+self.addEventListener('activate', (event: ExtendableEvent) => {
   event.waitUntil(
-    caches.keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames
-            .filter((name) => name !== STATIC_CACHE && name !== DATA_CACHE)
-            .map((name) => {
-              console.log('[SW] Deleting old cache:', name);
-              return caches.delete(name);
-            })
-        );
-      })
-      .then(() => {
-        console.log('[SW] Claiming clients');
-        return self.clients.claim();
-      })
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.filter((key) => !key.includes('v1')).map((key) => caches.delete(key))
+      )
+    )
   );
+  // Take control immediately
+  (self as any).clients.claim();
 });
 
-// Fetch event - implement caching strategies
-self.addEventListener('fetch', (event) => {
+// Fetch event — network-first for API, cache-first for static
+self.addEventListener('fetch', (event: FetchEvent) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET requests
-  if (request.method !== 'GET') {
-    return;
-  }
-
-  // Skip chrome-extension and other non-http(s) requests
-  if (!url.protocol.startsWith('http')) {
-    return;
-  }
-
-  // API requests - network first, fallback to cache
+  // API requests — network-first with cache fallback
   if (url.pathname.startsWith('/api/')) {
-    event.respondWith(networkFirstWithCache(request, DATA_CACHE));
+    event.respondWith(networkFirst(request));
     return;
   }
 
-  // Static assets - cache first, fallback to network
-  if (
-    url.pathname.endsWith('.js') ||
-    url.pathname.endsWith('.css') ||
-    url.pathname.endsWith('.png') ||
-    url.pathname.endsWith('.svg') ||
-    url.pathname.endsWith('.ico') ||
-    url.pathname.endsWith('.woff2') ||
-    url.pathname.endsWith('.woff')
-  ) {
-    event.respondWith(cacheFirstWithNetwork(request, STATIC_CACHE));
+  // Static assets — cache-first
+  if (request.method === 'GET') {
+    event.respondWith(cacheFirst(request));
     return;
   }
-
-  // HTML pages - network first with offline fallback
-  if (request.headers.get('accept')?.includes('text/html')) {
-    event.respondWith(networkFirstWithOffline(request, STATIC_CACHE));
-    return;
-  }
-
-  // Default - stale while revalidate
-  event.respondWith(staleWhileRevalidate(request, STATIC_CACHE));
 });
 
-// Network first with cache fallback
-async function networkFirstWithCache(request, cacheName) {
+// Network-first strategy (for API calls)
+async function networkFirst(request: Request): Promise<Response> {
+  const cache = await caches.open(API_CACHE);
+
   try {
-    const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, networkResponse.clone());
+    const response = await fetch(request);
+    // Only cache successful GET responses
+    if (request.method === 'GET' && response.ok) {
+      cache.put(request, response.clone());
     }
-    return networkResponse;
+    return response;
   } catch (error) {
-    console.log('[SW] Network failed, trying cache:', request.url);
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
+    // Network failed — try cache
+    const cached = await cache.match(request);
+    if (cached) {
+      return cached;
     }
-    // Return offline response for API
-    return new Response(
-      JSON.stringify({ error: 'Offline', message: 'You are currently offline' }),
-      {
-        status: 503,
+
+    // For mutations, queue for sync
+    if (request.method !== 'GET') {
+      await queueForSync(request);
+      return new Response(JSON.stringify({ queued: true, offline: true }), {
+        status: 202,
         headers: { 'Content-Type': 'application/json' },
-      }
-    );
+      });
+    }
+
+    // Return offline fallback
+    return new Response(JSON.stringify({ error: 'Offline', cached: false }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
 
-// Cache first with network fallback
-async function cacheFirstWithNetwork(request, cacheName) {
-  const cachedResponse = await caches.match(request);
-  if (cachedResponse) {
-    // Refresh cache in background
-    fetch(request)
-      .then((response) => {
-        if (response.ok) {
-          caches.open(cacheName).then((cache) => cache.put(request, response));
-        }
-      })
-      .catch(() => {});
-    return cachedResponse;
+// Cache-first strategy (for static assets)
+async function cacheFirst(request: Request): Promise<Response> {
+  const cache = await caches.open(STATIC_CACHE);
+  const cached = await cache.match(request);
+  if (cached) {
+    return cached;
   }
 
   try {
-    const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, networkResponse.clone());
+    const response = await fetch(request);
+    if (response.ok) {
+      cache.put(request, response.clone());
     }
-    return networkResponse;
-  } catch (error) {
+    return response;
+  } catch {
+    // Return offline page for navigation requests
+    if (request.mode === 'navigate') {
+      return caches.match('/offline') as Promise<Response>;
+    }
     return new Response('Offline', { status: 503 });
   }
 }
 
-// Network first with offline fallback for HTML
-async function networkFirstWithOffline(request, cacheName) {
-  try {
-    const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  } catch (error) {
-    console.log('[SW] Network failed, trying cache:', request.url);
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-    // Return offline page
-    return caches.match('/');
-  }
-}
-
-// Stale while revalidate
-async function staleWhileRevalidate(request, cacheName) {
-  const cache = await caches.open(cacheName);
-  const cachedResponse = await cache.match(request);
-
-  const fetchPromise = fetch(request)
-    .then((networkResponse) => {
-      if (networkResponse.ok) {
-        cache.put(request, networkResponse.clone());
-      }
-      return networkResponse;
-    })
-    .catch(() => null);
-
-  return cachedResponse || fetchPromise;
-}
-
-// Handle push notifications
-self.addEventListener('push', (event) => {
-  console.log('[SW] Push notification received');
-
-  let data = {
-    title: 'DEX AI Platform',
-    body: 'You have a new notification',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
-    url: '/',
+// Queue mutations for background sync
+async function queueForSync(request: Request): Promise<void> {
+  const body = await request.clone().text();
+  const queueItem = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    url: request.url,
+    method: request.method,
+    headers: Object.fromEntries(request.headers.entries()),
+    body,
+    timestamp: Date.now(),
   };
 
-  try {
-    if (event.data) {
-      data = { ...data, ...event.data.json() };
-    }
-  } catch (e) {
-    console.error('[SW] Error parsing push data:', e);
-  }
-
-  const options = {
-    body: data.body,
-    icon: data.icon,
-    badge: data.badge,
-    data: { url: data.url },
-    vibrate: [100, 50, 100],
-    actions: [
-      { action: 'open', title: 'Open' },
-      { action: 'dismiss', title: 'Dismiss' },
-    ],
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
-  );
-});
-
-// Handle notification click
-self.addEventListener('notificationclick', (event) => {
-  console.log('[SW] Notification clicked:', event.action);
-
-  event.notification.close();
-
-  if (event.action === 'dismiss') {
-    return;
-  }
-
-  const urlToOpen = event.notification.data?.url || '/';
-
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clients) => {
-        // Focus existing window if available
-        for (const client of clients) {
-          if (client.url === urlToOpen && 'focus' in client) {
-            return client.focus();
-          }
-        }
-        // Open new window
-        return self.clients.openWindow(urlToOpen);
-      })
-  );
-});
-
-// Handle background sync for offline actions
-self.addEventListener('sync', (event) => {
-  console.log('[SW] Background sync:', event.tag);
-
-  if (event.tag === 'sync-offline-actions') {
-    event.waitUntil(syncOfflineActions());
-  }
-});
-
-// Sync offline actions when back online
-async function syncOfflineActions() {
-  try {
-    const db = await openOfflineDB();
-    const tx = db.transaction('pendingActions', 'readonly');
-    const store = tx.objectStore('pendingActions');
-    const actions = await store.getAll();
-
-    for (const action of actions) {
-      try {
-        const response = await fetch(action.url, {
-          method: action.method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(action.body),
-        });
-
-        if (response.ok) {
-          // Remove from pending
-          const deleteTx = db.transaction('pendingActions', 'readwrite');
-          const deleteStore = deleteTx.objectStore('pendingActions');
-          await deleteStore.delete(action.id);
-        }
-      } catch (e) {
-        console.error('[SW] Failed to sync action:', action, e);
-      }
-    }
-  } catch (e) {
-    console.error('[SW] Sync failed:', e);
-  }
+  // Store in IndexedDB
+  const db = await openSyncDB();
+  await db.put('syncQueue', queueItem);
 }
 
-// Open IndexedDB for offline actions
-function openOfflineDB() {
+// Open IndexedDB for sync queue
+function openSyncDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('dex-offline', 1);
+    const request = indexedDB.open('lyc-offline', 1);
     request.onerror = () => reject(request.error);
     request.onsuccess = () => resolve(request.result);
-    request.onupgradeneeded = (event) => {
+    request.onupgradeneeded = (event: any) => {
       const db = event.target.result;
-      if (!db.objectStoreNames.contains('pendingActions')) {
-        db.createObjectStore('pendingActions', { keyPath: 'id', autoIncrement: true });
+      if (!db.objectStoreNames.contains('syncQueue')) {
+        db.createObjectStore('syncQueue', { keyPath: 'id' });
       }
     };
   });
 }
 
-// Message handling for cache management
-self.addEventListener('message', (event) => {
-  console.log('[SW] Message received:', event.data);
-
-  if (event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-
-  if (event.data.type === 'CLEAR_CACHE') {
-    event.waitUntil(
-      caches.keys().then((names) => {
-        return Promise.all(names.map((name) => caches.delete(name)));
-      })
-    );
-  }
-
-  if (event.data.type === 'CACHE_URLS') {
-    const urls = event.data.urls;
-    event.waitUntil(
-      caches.open(STATIC_CACHE).then((cache) => cache.addAll(urls))
-    );
+// Background sync event — replay queued mutations
+self.addEventListener('sync', (event: any) => {
+  if (event.tag === 'offline-sync') {
+    event.waitUntil(replaySyncQueue());
   }
 });
+
+async function replaySyncQueue(): Promise<void> {
+  const db = await openSyncDB();
+  const tx = db.transaction('syncQueue', 'readwrite');
+  const store = tx.objectStore('syncQueue');
+  const items = await store.getAll();
+
+  for (const item of items) {
+    try {
+      await fetch(item.url, {
+        method: item.method,
+        headers: item.headers,
+        body: item.body,
+      });
+      // Success — remove from queue
+      store.delete(item.id);
+    } catch {
+      // Still offline — keep in queue
+      console.log('Sync retry failed for', item.id);
+    }
+  }
+}
+
+// Push notification event
+self.addEventListener('push', (event: PushEvent) => {
+  const data = event.data?.json() || {};
+  const title = data.title || 'LYC Intelligence';
+  const options = {
+    body: data.body || '',
+    icon: '/logo192.png',
+    badge: '/badge.png',
+    tag: data.tag,
+    data: data.data,
+    actions: data.actions || [],
+  };
+
+  event.waitUntil(
+    (self as any).registration.showNotification(title, options)
+  );
+});
+
+// Notification click event
+self.addEventListener('notificationclick', (event: NotificationEvent) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/app';
+  event.waitUntil((self as any).clients.openWindow(url));
+});
+
+// Export types for TypeScript
+declare const self: ServiceWorkerGlobalScope;
+interface ExtendableEvent extends Event {
+  waitUntil(promise: Promise<any>): void;
+}
+interface FetchEvent extends Event {
+  request: Request;
+  respondWith(response: Promise<Response> | Response): void;
+}
+interface PushEvent extends Event {
+  data: { json: () => any } | null;
+}
+interface NotificationEvent extends Event {
+  notification: Notification & { data?: { url?: string } };
+  waitUntil(promise: Promise<any>): void;
+}

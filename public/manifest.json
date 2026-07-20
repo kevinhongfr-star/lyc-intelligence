@@ -1,11 +1,11 @@
 {
-  "name": "DEX AI Platform",
-  "short_name": "DEX",
-  "description": "Executive Search Intelligence Platform",
+  "name": "LYC Intelligence Platform",
+  "short_name": "LYC",
+  "description": "Executive Search & Leadership Intelligence Platform",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1e40af",
+  "background_color": "#FAFAFA",
+  "theme_color": "#1A1A1A",
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
@@ -43,24 +43,40 @@
       "name": "Dashboard",
       "short_name": "Dashboard",
       "description": "View your dashboard",
-      "url": "/dashboard",
+      "url": "/app/dashboard",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Mandates",
       "short_name": "Mandates",
       "description": "View open mandates",
-      "url": "/mandates",
+      "url": "/app/mandates",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Pipeline",
       "short_name": "Pipeline",
       "description": "View candidate pipeline",
-      "url": "/pipeline",
+      "url": "/app/pipeline",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Candidates",
+      "short_name": "Candidates",
+      "description": "Browse candidates",
+      "url": "/app/candidates",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Messages",
+      "short_name": "Messages",
+      "description": "View messages",
+      "url": "/app/messages",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ],
   "related_applications": [],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "offline_support": true,
+  "sync_enabled": true
 }

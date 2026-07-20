@@ -92,6 +92,8 @@ const ClientAdminPage = lazy(() => import('@/pages/client/ClientAdminPage').then
 const ClientCollaborationPage = lazy(() => import('@/pages/client/ClientCollaborationPage').then(m => ({ default: m.ClientCollaborationPage })));
 const ClientOnboardingPage = lazy(() => import('@/pages/client/ClientOnboardingPage').then(m => ({ default: m.ClientOnboardingPage })));
 const ClientMandateDetailPage = lazy(() => import('@/pages/client/ClientMandateDetailPage').then(m => ({ default: m.ClientMandateDetailPage })));
+const SignalCouncilBriefingPage = lazy(() => import('@/pages/council/SignalCouncilBriefingPage').then(m => ({ default: m.SignalCouncilBriefingPage })));
+const ReferralProgramPage = lazy(() => import('@/pages/referral/ReferralProgramPage').then(m => ({ default: m.ReferralProgramPage })));
 
 // Admin pages
 const PlatformAdminConsolePage = lazy(() => import('@/pages/admin/PlatformAdminConsolePage').then(m => ({ default: m.PlatformAdminConsolePage })));
@@ -277,6 +279,12 @@ export default function App() {
 
           {/* ── Cohort Reports Admin (auth + admin required) — Issue #22 ── */}
           <Route path="/admin/cohort-reports" element={<AdminRoute><CohortReportAdminPage /></AdminRoute>} />
+
+          {/* ── Signal Council Briefing — Issue #23 ── */}
+          <Route path="/council/briefing" element={<ProtectedRoute><SignalCouncilBriefingPage /></ProtectedRoute>} />
+
+          {/* ── Referral Program — Issue #34 ── */}
+          <Route path="/referral" element={<ProtectedRoute><ReferralProgramPage /></ProtectedRoute>} />
 
           {/* ── DEX AI B2C (auth required) ── */}
           <Route path="/dex/chat" element={<ProtectedRoute><DexChatPage /></ProtectedRoute>} />
