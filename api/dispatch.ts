@@ -56,6 +56,14 @@ const handlers: Record<string, () => Promise<any>> = {
   'client-portal': () => import('./_lib/clientPortalV2Handler.js'),
   'cohort-reports': () => import('./_lib/cohortReportsHandler.js'),
   'sso': () => import('./_lib/ssoHandler.js'),
+  'audit': () => import('./_lib/auditLogHandler.js'),
+  'webhooks': () => import('./_lib/webhookHandler.js'),
+  'lifecycle': () => import('./_lib/lifecycleHandler.js'),
+  'search': () => import('./_lib/searchHandler.js'),
+  'bulk-operations': () => import('./_lib/bulkOperationsHandler.js'),
+  'document-generation': () => import('./_lib/documentGenerationHandler.js'),
+  'dashboard-builder': () => import('./_lib/dashboardBuilderHandler.js'),
+  'ai-insights': () => import('./_lib/aiInsightsHandler.js'),
 };
 
 // Modules whose handlers expect the full path (including module name) in req.query.path

@@ -98,6 +98,26 @@ const ReferralProgramPage = lazy(() => import('@/pages/referral/ReferralProgramP
 // Admin pages
 const PlatformAdminConsolePage = lazy(() => import('@/pages/admin/PlatformAdminConsolePage').then(m => ({ default: m.PlatformAdminConsolePage })));
 const CohortReportAdminPage = lazy(() => import('@/pages/admin/CohortReportAdminPage').then(m => ({ default: m.CohortReportAdminPage })));
+const AuditLogPage = lazy(() => import('@/pages/admin/AuditLogPage').then(m => ({ default: m.AuditLogPage })));
+const DataExportPage = lazy(() => import('@/pages/admin/DataExportPage').then(m => ({ default: m.DataExportPage })));
+
+// Smart Search & Filters
+const SmartSearchPage = lazy(() => import('@/pages/search/SmartSearchPage').then(m => ({ default: m.SmartSearchPage })));
+
+// Candidate Lifecycle
+const CandidateLifecyclePage = lazy(() => import('@/pages/candidate/CandidateLifecyclePage').then(m => ({ default: m.CandidateLifecyclePage })));
+
+// Bulk Import/Export
+const BulkOperationsPage = lazy(() => import('@/pages/admin/BulkOperationsPage').then(m => ({ default: m.BulkOperationsPage })));
+
+// Document Generation
+const DocumentGenerationPage = lazy(() => import('@/pages/admin/DocumentGenerationPage').then(m => ({ default: m.DocumentGenerationPage })));
+
+// Custom Dashboard Builder
+const DashboardBuilderPage = lazy(() => import('@/pages/admin/DashboardBuilderPage').then(m => ({ default: m.DashboardBuilderPage })));
+
+// AI-Powered Insights
+const AIInsightsPage = lazy(() => import('@/pages/intelligence/AIInsightsPage').then(m => ({ default: m.AIInsightsPage })));
 
 // Legal pages
 const TermsOfServicePage = lazy(() => import('@/pages/legal/TermsOfServicePage').then(m => ({ default: m.TermsOfServicePage })));
@@ -280,11 +300,35 @@ export default function App() {
           {/* ── Cohort Reports Admin (auth + admin required) — Issue #22 ── */}
           <Route path="/admin/cohort-reports" element={<AdminRoute><CohortReportAdminPage /></AdminRoute>} />
 
+          {/* ── Audit Log (auth + admin required) — Issue #35 ── */}
+          <Route path="/admin/audit-log" element={<AdminRoute><AuditLogPage /></AdminRoute>} />
+
+          {/* ── Data Export (auth + admin required) — Issue #40 ── */}
+          <Route path="/admin/data-export" element={<AdminRoute><DataExportPage /></AdminRoute>} />
+
+          {/* ── Bulk Operations (auth + admin required) — Issue #44 ── */}
+          <Route path="/admin/bulk-operations" element={<AdminRoute><BulkOperationsPage /></AdminRoute>} />
+
+          {/* ── Document Generation (auth + admin required) — Issue #45 ── */}
+          <Route path="/admin/document-generation" element={<AdminRoute><DocumentGenerationPage /></AdminRoute>} />
+
+          {/* ── Dashboard Builder (auth + admin required) — Issue #46 ── */}
+          <Route path="/admin/dashboard-builder" element={<AdminRoute><DashboardBuilderPage /></AdminRoute>} />
+
           {/* ── Signal Council Briefing — Issue #23 ── */}
           <Route path="/council/briefing" element={<ProtectedRoute><SignalCouncilBriefingPage /></ProtectedRoute>} />
 
           {/* ── Referral Program — Issue #34 ── */}
           <Route path="/referral" element={<ProtectedRoute><ReferralProgramPage /></ProtectedRoute>} />
+
+          {/* ── Smart Search — Issue #42 ── */}
+          <Route path="/search" element={<ProtectedRoute><SmartSearchPage /></ProtectedRoute>} />
+
+          {/* ── AI Insights — Issue #47 ── */}
+          <Route path="/ai-insights" element={<ProtectedRoute><AIInsightsPage /></ProtectedRoute>} />
+
+          {/* ── Candidate Lifecycle — Issue #41 ── */}
+          <Route path="/candidate/lifecycle" element={<ProtectedRoute><CandidateLifecyclePage /></ProtectedRoute>} />
 
           {/* ── DEX AI B2C (auth required) ── */}
           <Route path="/dex/chat" element={<ProtectedRoute><DexChatPage /></ProtectedRoute>} />
