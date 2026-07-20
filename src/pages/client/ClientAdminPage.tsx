@@ -4,10 +4,11 @@
  * permissions, and security settings.
  */
 import React, { useState, useEffect } from 'react';
-import { Shield, Users, Settings, Key, Lock, Activity, User, Edit, Trash2, Check, X } from 'lucide-react';
+import { Shield, Users, Settings, Key, Lock, Activity, User, Edit, Trash2, Check, X, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Input, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
 import { getClientTeamMembers, type ClientTeamMember } from '@/services/supabaseApi';
+import { supabase } from '@/lib/supabase/client';
 
 interface TeamMember {
   id: string;
@@ -25,7 +26,7 @@ interface SecuritySetting {
   enabled: boolean;
 }
 
-const STATIC_SETTINGS: SecuritySetting[] = [
+const DEFAULT_SETTINGS: SecuritySetting[] = [
   { id: 's1', label: 'Two-Factor Authentication', description: 'Require 2FA for all user logins', enabled: true },
   { id: 's2', label: 'Session Timeout', description: 'Auto-logout after 30 minutes of inactivity', enabled: true },
   { id: 's3', label: 'IP Whitelisting', description: 'Restrict access to specific IP ranges', enabled: false },
@@ -36,17 +37,21 @@ const STATIC_SETTINGS: SecuritySetting[] = [
 
 export function ClientAdminPage() {
   const [members, setMembers] = useState<TeamMember[]>([]);
-  const [settings, setSettings] = useState<SecuritySetting[]>(STATIC_SETTINGS);
-  const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState<SecuritySetting[]>(DEFAULT_SETTINGS);
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [membersLoading, setMembersLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const { clientAccount, profile } = useTenantContext();
 
+  const orgId = clientAccount?.org_id || '';
+
   useEffect(() => {
     const organization = clientAccount?.organization;
     if (!organization) {
-      setLoading(false);
+      setMembersLoading(false);
       return;
     }
     let cancelled = false;
@@ -68,21 +73,65 @@ export function ClientAdminPage() {
         console.error('[ClientAdminPage] Error:', e);
         if (!cancelled) setError('Failed to load team members');
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setMembersLoading(false);
       }
     })();
     return () => { cancelled = true; };
   }, [clientAccount?.organization]);
+
+  useEffect(() => {
+    if (!orgId) {
+      setSettingsLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setSettingsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('org_settings')
+          .select('security_settings')
+          .eq('org_id', orgId)
+          .maybeSingle();
+
+        if (!cancelled && !error && data?.security_settings) {
+          const stored = data.security_settings;
+          if (Array.isArray(stored) && stored.length > 0) {
+            setSettings(stored);
+          }
+        }
+      } catch (e) {
+        console.warn('[ClientAdminPage] Failed to load security settings:', e);
+      } finally {
+        if (!cancelled) setSettingsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [orgId]);
 
   const filteredMembers = members.filter(m =>
     m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     m.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const toggleSetting = (id: string) => {
-    setSettings(prev => prev.map(s =>
-      s.id === id ? { ...s, enabled: !s.enabled } : s
-    ));
+  const toggleSetting = async (id: string) => {
+    if (!orgId) return;
+
+    const next = settings.map(s => s.id === id ? { ...s, enabled: !s.enabled } : s);
+    setSettings(next);
+    setSavingId(id);
+
+    try {
+      await supabase
+        .from('org_settings')
+        .upsert({ org_id: orgId, security_settings: next })
+        .eq('org_id', orgId);
+    } catch (e) {
+      console.error('[ClientAdminPage] Save security settings failed:', e);
+      setSettings(prev => prev);
+    } finally {
+      setSavingId(null);
+    }
   };
 
   const displayName = clientAccount?.name || profile?.name || 'Client User';
@@ -131,7 +180,7 @@ export function ClientAdminPage() {
               <Users className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : members.length}</div>
+              <div className="text-2xl font-bold text-text-primary">{membersLoading ? '—' : members.length}</div>
               <div className="text-xs text-text-muted">Team Members</div>
             </div>
           </div>
@@ -184,7 +233,7 @@ export function ClientAdminPage() {
                 className="pl-10"
               />
             </div>
-            {loading ? (
+            {membersLoading ? (
               <div className="py-8 text-center text-text-muted text-sm">Loading team members...</div>
             ) : error ? (
               <EmptyState title="Failed to load team members" description={error} />
@@ -245,8 +294,15 @@ export function ClientAdminPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {settings.map((setting) => (
+            {settingsLoading ? (
+              <div className="space-y-3">
+                {[0, 1, 2, 3, 4, 5].map(i => (
+                  <div key={i} className="animate-pulse h-14 bg-bg-tertiary rounded-lg" />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {settings.map((setting) => (
                   <div key={setting.id} className="flex items-center justify-between p-4 bg-bg-warm rounded-lg">
                     <div>
                       <div className="font-medium text-text-primary text-sm">{setting.label}</div>
@@ -254,17 +310,28 @@ export function ClientAdminPage() {
                     </div>
                     <button
                       onClick={() => toggleSetting(setting.id)}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
+                      disabled={savingId === setting.id}
+                      className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
                         setting.enabled ? 'bg-fuchsia' : 'bg-bg-tertiary'
                       }`}
+                      aria-pressed={setting.enabled}
+                      aria-label={`Toggle ${setting.label}`}
                     >
-                      <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                        setting.enabled ? 'left-7' : 'left-1'
-                      }`} />
+                      {savingId === setting.id ? (
+                        <Loader2 className="absolute top-1 left-1 w-4 h-4 animate-spin text-white" />
+                      ) : (
+                        <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                          setting.enabled ? 'left-7' : 'left-1'
+                        }`} />
+                      )}
                     </button>
                   </div>
                 ))}
-            </div>
+                <p className="text-xs text-text-muted pt-2">
+                  Settings are saved to your organization profile.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

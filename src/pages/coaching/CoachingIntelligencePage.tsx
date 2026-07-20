@@ -1,14 +1,17 @@
 /**
  * CoachingIntelligencePage — B2C Coaching Portal intelligence dashboard
  * Renders inside AppShell → Outlet. Shows engagement analytics,
- * progress insights, and personalized recommendations.
+ * progress insights, and personalized AI-powered recommendations.
  */
 import React, { useState, useEffect } from 'react';
-import { Brain, TrendingUp, Activity, Sparkles, BarChart3, Target, ArrowUpRight, ArrowDownRight, User } from 'lucide-react';
+import { Brain, TrendingUp, Activity, Sparkles, BarChart3, Target, ArrowUpRight, ArrowDownRight, User, RefreshCw } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button, EmptyState } from '@/components/ui';
 import { useTenantContext } from '@/hooks/useTenantContext';
-import { getSupabase } from '@/services/supabaseApi';
 import { getCoacheeUpcomingSessions, getCoacheePastSessions, type CoachingSession } from '@/services/supabaseApi';
+import {
+  intelligenceService,
+  type Recommendation,
+} from '@/services/intelligenceService';
 
 interface InsightMetric {
   id: string;
@@ -17,22 +20,6 @@ interface InsightMetric {
   change: number;
   direction: 'up' | 'down';
 }
-
-interface Recommendation {
-  id: string;
-  title: string;
-  description: string;
-  category: 'Growth' | 'Career' | 'Skills' | 'Network';
-  priority: 'High' | 'Medium' | 'Low';
-}
-
-// Static content — AI-generated recommendations, no direct table backing
-const STATIC_RECS: Recommendation[] = [
-  { id: 'r1', title: 'Focus on System Design Mastery', description: 'Your assessment shows strong potential. Dedicated practice would accelerate your path to principal engineer.', category: 'Skills', priority: 'High' },
-  { id: 'r2', title: 'Expand Industry Network', description: 'Connect with 3 senior leaders in your target companies this month.', category: 'Network', priority: 'High' },
-  { id: 'r3', title: 'Refine Executive Presence', description: 'Practice high-stakes presentations with your coach to strengthen communication.', category: 'Growth', priority: 'Medium' },
-  { id: 'r4', title: 'Update Career Narrative', description: 'Refresh your positioning story to align with VP-level opportunities.', category: 'Career', priority: 'Medium' },
-];
 
 const PRIORITY_COLORS: Record<string, string> = {
   High: 'bg-fuchsia/10 text-fuchsia',
@@ -50,12 +37,14 @@ const CATEGORY_COLORS: Record<string, string> = {
 export function CoachingIntelligencePage() {
   const [upcoming, setUpcoming] = useState<CoachingSession[]>([]);
   const [past, setPast] = useState<CoachingSession[]>([]);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [recsLoading, setRecsLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user, profile } = useTenantContext();
 
   useEffect(() => {
-    if (!user?.id) { setLoading(false); return; }
+    if (!user?.id) { setLoading(false); setRecsLoading(false); return; }
     let cancelled = false;
     (async () => {
       try {
@@ -76,6 +65,39 @@ export function CoachingIntelligencePage() {
     })();
     return () => { cancelled = true; };
   }, [user?.id]);
+
+  useEffect(() => {
+    if (loading || !profile) return;
+    let cancelled = false;
+    (async () => {
+      setRecsLoading(true);
+      try {
+        const context = intelligenceService.extractContext(profile, past, upcoming);
+        const recs = await intelligenceService.generateRecommendations(context);
+        if (cancelled) return;
+        setRecommendations(recs);
+      } catch (e) {
+        console.error('[CoachingIntelligencePage] Failed to generate recommendations:', e);
+      } finally {
+        if (!cancelled) setRecsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [loading, profile, past, upcoming]);
+
+  const refreshRecommendations = async () => {
+    if (!profile) return;
+    setRecsLoading(true);
+    try {
+      const context = intelligenceService.extractContext(profile, past, upcoming);
+      const recs = await intelligenceService.generateRecommendations(context);
+      setRecommendations(recs);
+    } catch (e) {
+      console.error('[CoachingIntelligencePage] Refresh failed:', e);
+    } finally {
+      setRecsLoading(false);
+    }
+  };
 
   const displayName = profile?.name || 'Coachee';
   const tier = profile?.tier || 'Professional';
@@ -152,25 +174,47 @@ export function CoachingIntelligencePage() {
               <Brain className="w-5 h-5 text-fuchsia" />
               <CardTitle>AI Recommendations</CardTitle>
               <Badge variant="outline" className="ml-auto text-xs">Personalized</Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={refreshRecommendations}
+                disabled={recsLoading}
+                className="ml-2"
+              >
+                <RefreshCw className={`w-3 h-3 ${recsLoading ? 'animate-spin' : ''}`} />
+              </Button>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {STATIC_RECS.map((rec) => (
-                <div key={rec.id} className="p-4 bg-bg-warm rounded-lg hover:shadow-card-hover transition-shadow">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-text-primary text-sm">{rec.title}</span>
-                        <Badge className={CATEGORY_COLORS[rec.category]}>{rec.category}</Badge>
+            {recsLoading ? (
+              <div className="space-y-3">
+                {[0, 1, 2, 3].map(i => (
+                  <div key={i} className="animate-pulse h-16 bg-bg-tertiary rounded-lg" />
+                ))}
+              </div>
+            ) : recommendations.length === 0 ? (
+              <EmptyState
+                title="No recommendations yet"
+                description="Complete a few coaching sessions to receive personalized AI recommendations."
+              />
+            ) : (
+              <div className="space-y-3">
+                {recommendations.map((rec) => (
+                  <div key={rec.id} className="p-4 bg-bg-warm rounded-lg hover:shadow-card-hover transition-shadow">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-text-primary text-sm">{rec.title}</span>
+                          <Badge className={CATEGORY_COLORS[rec.category]}>{rec.category}</Badge>
+                        </div>
+                        <div className="text-xs text-text-muted">{rec.description}</div>
                       </div>
-                      <div className="text-xs text-text-muted">{rec.description}</div>
+                      <Badge className={PRIORITY_COLORS[rec.priority]}>{rec.priority}</Badge>
                     </div>
-                    <Badge className={PRIORITY_COLORS[rec.priority]}>{rec.priority}</Badge>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
