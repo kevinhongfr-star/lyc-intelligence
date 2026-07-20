@@ -194,6 +194,40 @@ const IntelligenceSourcesPage = lazy(() => import('@/pages/admin/IntelligenceSou
 
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+
+// ── CD Consolidated Build Plan — Phase 1: Diagnostic Pages ──
+const QuestPage = lazy(() => import("@/pages/assess/QuestPage").then(m => ({ default: m.QuestPage })));
+const DrivePage = lazy(() => import("@/pages/assess/DrivePage").then(m => ({ default: m.DrivePage })));
+const ImpactPage = lazy(() => import("@/pages/assess/ImpactPage").then(m => ({ default: m.ImpactPage })));
+const PrismPage = lazy(() => import("@/pages/assess/PrismPage").then(m => ({ default: m.PrismPage })));
+const MosaicPage = lazy(() => import("@/pages/assess/MosaicPage").then(m => ({ default: m.MosaicPage })));
+const ForgePage = lazy(() => import("@/pages/assess/ForgePage").then(m => ({ default: m.ForgePage })));
+const ShiftPage = lazy(() => import("@/pages/assess/ShiftPage").then(m => ({ default: m.ShiftPage })));
+
+// ── Phase 2: Webinar Engine ──
+const WebinarHubPage = lazy(() => import("@/pages/webinars/WebinarHubPage").then(m => ({ default: m.WebinarHubPage })));
+const WebinarDetailPage = lazy(() => import("@/pages/webinars/WebinarDetailPage").then(m => ({ default: m.WebinarDetailPage })));
+const WebinarRegistrationPage = lazy(() => import("@/pages/webinars/WebinarRegistrationPage").then(m => ({ default: m.WebinarRegistrationPage })));
+
+// ── Phase 3: Content Cascade ──
+const NewsletterHubPage = lazy(() => import("@/pages/insights/NewsletterHubPage").then(m => ({ default: m.NewsletterHubPage })));
+const PodcastHubPage = lazy(() => import("@/pages/insights/PodcastHubPage").then(m => ({ default: m.PodcastHubPage })));
+const QuarterlyBriefPage = lazy(() => import("@/pages/insights/QuarterlyBriefPage").then(m => ({ default: m.QuarterlyBriefPage })));
+
+// ── Phase 4: Premium Products ──
+const RoundtablePage = lazy(() => import("@/pages/roundtable/RoundtablePage").then(m => ({ default: m.RoundtablePage })));
+
+// ── Phase 5: Programmes & Workshops ──
+const AdvisoryPage = lazy(() => import("@/pages/programmes/AdvisoryPage").then(m => ({ default: m.AdvisoryPage })));
+const GovernancePage = lazy(() => import("@/pages/programmes/GovernancePage").then(m => ({ default: m.GovernancePage })));
+const CrossBorderPage = lazy(() => import("@/pages/programmes/CrossBorderPage").then(m => ({ default: m.CrossBorderPage })));
+const AILeadershipPage = lazy(() => import("@/pages/programmes/AILeadershipPage").then(m => ({ default: m.AILeadershipPage })));
+const CoachingPage = lazy(() => import("@/pages/programmes/CoachingPage").then(m => ({ default: m.CoachingPage })));
+const Force1DiscoveryPage = lazy(() => import("@/pages/workshops/Force1DiscoveryPage").then(m => ({ default: m.Force1DiscoveryPage })));
+const TeamCohesionPage = lazy(() => import("@/pages/workshops/TeamCohesionPage").then(m => ({ default: m.TeamCohesionPage })));
+const CareerResiliencePage = lazy(() => import("@/pages/workshops/CareerResiliencePage").then(m => ({ default: m.CareerResiliencePage })));
+const RevenueLeadershipPage = lazy(() => import("@/pages/workshops/RevenueLeadershipPage").then(m => ({ default: m.RevenueLeadershipPage })));
+const ShiftFacilitationPage = lazy(() => import("@/pages/workshops/ShiftFacilitationPage").then(m => ({ default: m.ShiftFacilitationPage })));
 const PlaceholderPage = lazy(() => import('@/pages/PlaceholderPage').then(m => ({ default: m.PlaceholderPage })));
 
 
@@ -464,6 +498,42 @@ export default function App() {
           <Route path="/documents" element={<ProtectedRoute><UserDocumentsPage /></ProtectedRoute>} />
           <Route path="/share/:id" element={<SharePage />} />
 
+
+          {/* ── CD Consolidated: Diagnostic Pages (Phase 1) ── */}
+          <Route path="/assess/quest" element={<QuestPage />} />
+          <Route path="/assess/drive" element={<DrivePage />} />
+          <Route path="/assess/impact" element={<ImpactPage />} />
+          <Route path="/assess/prism" element={<PrismPage />} />
+          <Route path="/assess/mosaic" element={<MosaicPage />} />
+          <Route path="/assess/forge" element={<ForgePage />} />
+          <Route path="/assess/shift" element={<ShiftPage />} />
+
+          {/* ── CD Consolidated: Webinar Engine (Phase 2) ── */}
+          <Route path="/webinars" element={<WebinarHubPage />} />
+          <Route path="/webinars/:slug" element={<WebinarDetailPage />} />
+          <Route path="/webinars/:slug/register" element={<WebinarRegistrationPage />} />
+
+          {/* ── CD Consolidated: Content Cascade (Phase 3) ── */}
+          <Route path="/insights/newsletter" element={<NewsletterHubPage />} />
+          <Route path="/insights/podcast" element={<PodcastHubPage />} />
+          <Route path="/insights/brief" element={<QuarterlyBriefPage />} />
+
+          {/* ── CD Consolidated: Premium Products (Phase 4) ── */}
+          <Route path="/roundtable" element={<RoundtablePage />} />
+
+          {/* ── CD Consolidated: Programmes (Phase 5) ── */}
+          <Route path="/programmes/advisory" element={<AdvisoryPage />} />
+          <Route path="/programmes/governance" element={<GovernancePage />} />
+          <Route path="/programmes/cross-border" element={<CrossBorderPage />} />
+          <Route path="/programmes/ai-leadership" element={<AILeadershipPage />} />
+          <Route path="/programmes/coaching" element={<CoachingPage />} />
+
+          {/* ── CD Consolidated: Workshops (Phase 5) ── */}
+          <Route path="/workshops/force-1-discovery" element={<Force1DiscoveryPage />} />
+          <Route path="/workshops/team-cohesion" element={<TeamCohesionPage />} />
+          <Route path="/workshops/career-resilience" element={<CareerResiliencePage />} />
+          <Route path="/workshops/revenue-leadership" element={<RevenueLeadershipPage />} />
+          <Route path="/workshops/shift-facilitation" element={<ShiftFacilitationPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
