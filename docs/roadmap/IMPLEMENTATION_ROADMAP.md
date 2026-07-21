@@ -879,27 +879,25 @@
 
 ---
 
-## Issue Creation Plan
+## GitHub Issues (Created 2026-07-21)
 
-Each sprint maps to a GitHub epic, with sub-issues for major feature groups:
+| Sprint | Phase | Issue | Link | Labels |
+|--------|-------|-------|------|--------|
+| S0 | Phase 0 | #47 | [#47 — UI Foundation + Security Core](https://github.com/kevinhongfr-star/lyc-intelligence/issues/47) | `phase:0` `sprint:0` `P0` |
+| S1 | Phase 0 | #48 | [#48 — Search & P0 Assessments](https://github.com/kevinhongfr-star/lyc-intelligence/issues/48) | `phase:0` `sprint:1` `P0` |
+| S2 | Phase 1 | #49 | [#49 — Pipeline + Client Portal](https://github.com/kevinhongfr-star/lyc-intelligence/issues/49) | `phase:1` `sprint:2` `P1` |
+| S3 | Phase 1 | #50 | [#50 — Integration + Security](https://github.com/kevinhongfr-star/lyc-intelligence/issues/50) | `phase:1` `sprint:3` `P1` |
+| S4 | Phase 1 | #51 | [#51 — Analytics + AI + Collab](https://github.com/kevinhongfr-star/lyc-intelligence/issues/51) | `phase:1` `sprint:4` `P1` |
+| S5 | Phase 1 | #52 | [#52 — DnD + Dark Mode + P1 ✅](https://github.com/kevinhongfr-star/lyc-intelligence/issues/52) | `phase:1` `sprint:5` `P1` `milestone:p1-complete` |
+| S6 | Phase 2 | #53 | [#53 — AI Intelligence Layer](https://github.com/kevinhongfr-star/lyc-intelligence/issues/53) | `phase:2` `sprint:6` `P2` |
+| S7 | Phase 2 | #54 | [#54 — Assessment + Client Intel](https://github.com/kevinhongfr-star/lyc-intelligence/issues/54) | `phase:2` `sprint:7` `P2` |
+| S8 | Phase 2 | #55 | [#55 — P2 Polish + Compliance](https://github.com/kevinhongfr-star/lyc-intelligence/issues/55) | `phase:2` `sprint:8` `P2` |
+| S9 | Phase 3 | #56 | [#56 — Premium Client Features](https://github.com/kevinhongfr-star/lyc-intelligence/issues/56) | `phase:3` `sprint:9` `P2` |
+| S10 | Phase 3 | #57 | [#57 — Intelligence Completes](https://github.com/kevinhongfr-star/lyc-intelligence/issues/57) | `phase:3` `sprint:10` `P2` |
+| S11 | Phase 4 | #58 | [#58 — P3 Polish + A11y](https://github.com/kevinhongfr-star/lyc-intelligence/issues/58) | `phase:4` `sprint:11` `P3` |
+| S12 | Phase 4 | #59 | [#59 — Launch Readiness](https://github.com/kevinhongfr-star/lyc-intelligence/issues/59) | `phase:4` `sprint:12` `P3` `milestone:launch-ready` |
 
-| Sprint | GitHub Epic Label | Issues |
-|--------|-------------------|--------|
-| S0 | `phase:0-sprint:0-foundation` | 6 sub-issues |
-| S1 | `phase:0-sprint:1-p0-complete` | 6 sub-issues |
-| S2 | `phase:1-sprint:2-pipeline` | 6 sub-issues |
-| S3 | `phase:1-sprint:3-integration` | 6 sub-issues |
-| S4 | `phase:1-sprint:4-analytics` | 6 sub-issues |
-| S5 | `phase:1-sprint:5-p1-complete` | 6 sub-issues |
-| S6 | `phase:2-sprint:6-ai-intelligence` | 6 sub-issues |
-| S7 | `phase:2-sprint:7-assessment-client` | 6 sub-issues |
-| S8 | `phase:2-sprint:8-p2-polish` | 6 sub-issues |
-| S9 | `phase:3-sprint:9-premium-client` | 6 sub-issues |
-| S10 | `phase:3-sprint:10-intelligence` | 6 sub-issues |
-| S11 | `phase:4-sprint:11-p3-polish` | 4 sub-issues |
-| S12 | `phase:4-sprint:12-final` | 4 sub-issues |
-
-**Total: ~78 GitHub issues across 13 sprint epics**
+**13 epics, 500 features, 24 weeks, 5 phases**
 
 ---
 
