@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparison Matrix</title>
+<style>
+@page { size: A4 portrait; margin: 0; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+    color: #0F1115;
+    background: #FFFFFF;
+    font-size: 10.5pt;
+    line-height: 1.6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+.page {
+    width: 210mm; min-height: 297mm;
+    padding: 18mm 20mm 22mm 20mm;
+    position: relative;
+    page-break-after: always;
+    background: #FFFFFF;
+}
+.page:last-child { page-break-after: avoid; }
+
+/* Header bar */
+.doc-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 10px; margin-bottom: 20px;
+    border-bottom: 1px solid #E5E7EB;
+}
+.doc-header .logo { height: 28px; }
+.doc-header .title { font-size: 11pt; font-weight: 700; color: #0F1115; }
+.doc-header .date { font-size: 8.5pt; color: #6B7280; }
+
+/* Footer */
+.doc-footer {
+    position: absolute; bottom: 12mm; left: 20mm; right: 20mm;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 7.5pt; color: #9CA3AF;
+    border-top: 1px solid #E5E7EB; padding-top: 8px;
+}
+
+/* Cover page */
+.cover-page {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    min-height: 260mm; padding-top: 60mm;
+}
+.cover-page .cover-logo { height: 40px; margin-bottom: 40px; }
+.cover-page h1 {
+    font-family: 'Libre Baskerville', Georgia, serif; font-size: 26pt; font-weight: 700;
+    color: #0F1115; margin-bottom: 12px; line-height: 1.2;
+    max-width: 450px;
+}
+.cover-page .subtitle {
+    font-size: 12pt; color: #4B5563; margin-bottom: 30px;
+}
+.cover-page .cover-meta {
+    font-size: 9pt; color: #6B7280; line-height: 1.8;
+}
+.cover-page .cover-meta strong { color: #0F1115; }
+.cover-accent {
+    width: 60px; height: 3px; background: #C108AB;
+    margin: 20px 0;
+}
+
+/* Typography */
+h2 {
+    font-family: 'Libre Baskerville', Georgia, serif; font-size: 16pt; font-weight: 700;
+    color: #0F1115; margin: 24px 0 12px 0;
+}
+h3 {
+    font-size: 12pt; font-weight: 700; color: #0F1115;
+    margin: 18px 0 8px 0;
+}
+h4 {
+    font-size: 10.5pt; font-weight: 600; color: #374151;
+    margin: 14px 0 6px 0;
+}
+p { margin-bottom: 10px; color: #374151; }
+.small { font-size: 8.5pt; color: #6B7280; }
+
+/* Callout */
+.callout {
+    border-top: 2px solid #C108AB;
+    padding: 12px 16px; margin: 16px 0;
+    background: #F3F4F6; border-radius: 0 0 4px 4px;
+    font-size: 9.5pt;
+}
+.callout::before {
+    content: "●"; color: #C108AB; font-size: 8pt;
+    margin-right: 8px;
+}
+
+/* Tables */
+table {
+    width: 100%; border-collapse: collapse;
+    margin: 12px 0; font-size: 9.5pt;
+}
+th {
+    background: #0F1115; color: #FFFFFF;
+    padding: 8px 12px; text-align: left;
+    font-weight: 600; font-size: 8.5pt;
+    text-transform: uppercase; letter-spacing: 0.5px;
+}
+td {
+    padding: 8px 12px; border-bottom: 1px solid #E5E7EB;
+    color: #374151;
+}
+tr:nth-child(even) td { background: #F3F4F6; }
+
+/* Status badges */
+.badge {
+    display: inline-block; padding: 2px 10px;
+    border-radius: 10px; font-size: 8pt; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.3px;
+}
+.badge-success { background: #D1FAE5; color: #065F46; }
+.badge-warning { background: #FEF3C7; color: #92400E; }
+.badge-danger { background: #FEE2E2; color: #991B1B; }
+.badge-info { background: #DBEAFE; color: #1E40AF; }
+.badge-neutral { background: #E5E7EB; color: #4B5563; }
+.badge-fuchsia { background: #FCE7F3; color: #9D174D; }
+
+/* Stat cards */
+.stat-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; margin: 16px 0;
+}
+.stat-card {
+    background: #F3F4F6; border-radius: 6px;
+    padding: 14px 16px; text-align: center;
+}
+.stat-card .stat-value {
+    font-size: 22pt; font-weight: 700; color: #0F1115;
+}
+.stat-card .stat-label {
+    font-size: 8pt; color: #6B7280; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-top: 4px;
+}
+
+/* Bullet lists */
+ul.checklist { list-style: none; padding: 0; }
+ul.checklist li {
+    padding: 4px 0 4px 20px; position: relative;
+    font-size: 9.5pt; color: #374151;
+}
+ul.checklist li::before {
+    content: "●"; color: #C108AB; font-size: 6pt;
+    position: absolute; left: 4px; top: 8px;
+}
+
+/* Two column */
+.two-col {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 20px; margin: 16px 0;
+}
+
+/* Watermarks */
+.watermark-draft {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 72pt; font-weight: 700;
+    color: #9CA3AF; opacity: 0.15;
+    pointer-events: none; z-index: 0;
+}
+.watermark-confidential {
+    position: absolute; top: 10mm; right: 20mm;
+    font-size: 8pt; font-weight: 600;
+    color: #C108AB; text-transform: uppercase;
+    letter-spacing: 1px; z-index: 10;
+}
+
+/* Section divider */
+.section-divider {
+    border: none; border-top: 1px solid #E5E7EB;
+    margin: 24px 0;
+}
+
+/* Action items */
+.action-table td:first-child { font-weight: 600; }
+.action-table .owner { color: #C108AB; font-weight: 600; }
+.action-table .due { color: #6B7280; font-size: 8.5pt; }
+
+/* Progress bar */
+.progress-bar {
+    height: 6px; background: #E5E7EB;
+    border-radius: 3px; overflow: hidden;
+    margin: 4px 0;
+}
+.progress-bar .fill {
+    height: 100%; border-radius: 3px;
+    background: #C108AB;
+}
+
+/* Landscape overrides */
+@media (orientation: landscape) {
+    .page { width: 297mm; min-height: 210mm; padding: 14mm 18mm 18mm 18mm; }
+}
+.landscape-page {
+    width: 297mm; min-height: 210mm;
+    padding: 14mm 18mm 18mm 18mm;
+    page-break-after: always;
+}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="watermark-confidential">CONFIDENTIAL</div>
+
+
+<div class="doc-header">
+    <img src="data:image/png;base64,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" class="logo">
+    <span class="title">Candidate Comparison Matrix</span>
+    <span class="date">2026-09-10</span>
+</div>
+<h2>Chief Technology Officer — Comparative Analysis</h2><table><thead><tr><th></th><th style="text-align:center">Strategic Vision</th><th style="text-align:center">Engineering Leadership</th><th style="text-align:center">Technical Depth</th><th style="text-align:center">Stakeholder Influence</th><th style="text-align:center">Talent Development</th></tr></thead><tbody><tr><td style="font-weight:600">Alex Wang</td><td style="background:#D1FAE5;color:#065F46;text-align:center;font-weight:600">88</td><td style="background:#D1FAE5;color:#065F46;text-align:center;font-weight:600">82</td><td style="background:#DBEAFE;color:#1E40AF;text-align:center;font-weight:600">79</td><td style="background:#D1FAE5;color:#065F46;text-align:center;font-weight:600">85</td><td style="background:#DBEAFE;color:#1E40AF;text-align:center;font-weight:600">74</td></tr><tr><td style="font-weight:600">Lisa Zhang</td><td style="background:#DBEAFE;color:#1E40AF;text-align:center;font-weight:600">76</td><td style="background:#D1FAE5;color:#065F46;text-align:center;font-weight:600">90</td><td style="background:#D1FAE5;color:#065F46;text-align:center;font-weight:600">92</td><td style="background:#DBEAFE;color:#1E40AF;text-align:center;font-weight:600">72</td><td style="background:#DBEAFE;color:#1E40AF;text-align:center;font-weight:600">75</td></tr><tr><td style="font-weight:600">James Chen</td><td style="background:#DBEAFE;color:#1E40AF;text-align:center;font-weight:600">70</td><td style="background:#DBEAFE;color:#1E40AF;text-align:center;font-weight:600">74</td><td style="background:#DBEAFE;color:#1E40AF;text-align:center;font-weight:600">78</td><td style="background:#DBEAFE;color:#1E40AF;text-align:center;font-weight:600">68</td><td style="background:#D1FAE5;color:#065F46;text-align:center;font-weight:600">88</td></tr></tbody></table><h3>Dimension-by-Dimension Analysis</h3><h4>Strategic Vision</h4>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">Alex Wang</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:88.0%;height:100%;background:#C108AB;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">88</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">Lisa Zhang</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:76.0%;height:100%;background:#3B82F6;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">76</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">James Chen</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:70.0%;height:100%;background:#3B82F6;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">70</span>
+</div><h4>Engineering Leadership</h4>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">Lisa Zhang</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:90.0%;height:100%;background:#C108AB;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">90</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">Alex Wang</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:82.0%;height:100%;background:#C108AB;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">82</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">James Chen</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:74.0%;height:100%;background:#3B82F6;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">74</span>
+</div><h4>Technical Depth</h4>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">Lisa Zhang</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:92.0%;height:100%;background:#C108AB;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">92</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">Alex Wang</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:79.0%;height:100%;background:#3B82F6;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">79</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">James Chen</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:78.0%;height:100%;background:#3B82F6;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">78</span>
+</div><h4>Stakeholder Influence</h4>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">Alex Wang</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:85.0%;height:100%;background:#C108AB;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">85</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">Lisa Zhang</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:72.0%;height:100%;background:#3B82F6;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">72</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">James Chen</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:68.0%;height:100%;background:#3B82F6;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">68</span>
+</div><h4>Talent Development</h4>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">James Chen</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:88.0%;height:100%;background:#C108AB;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">88</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">Lisa Zhang</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:75.0%;height:100%;background:#3B82F6;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">75</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:9pt;">
+    <span style="width:100px;color:#4B5563;text-align:right;">Alex Wang</span>
+    <div style="flex:1;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;">
+        <div style="width:74.0%;height:100%;background:#3B82F6;border-radius:4px;"></div>
+    </div>
+    <span style="font-weight:600;width:35px;">74</span>
+</div><h3>LYC Analysis</h3><p>All three candidates bring distinct strengths. Alex Wang leads on strategic and stakeholder dimensions — critical for CTO board exposure. Lisa Zhang has superior technical depth but lower stakeholder scores. James Chen excels in talent development but needs growth in executive presence.</p><div class="callout"><strong>Recommendation:</strong> Proceed with Alex Wang as primary recommendation, Lisa Zhang as strong alternative. James Chen as backup.</div>
+<div class="doc-footer">
+    <span>LYC Partners — Confidential</span>
+    <span>Page 1</span>
+</div>
+</div>
+</body>
+</html>
