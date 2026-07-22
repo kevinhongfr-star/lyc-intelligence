@@ -260,7 +260,7 @@ Phase 7 (Go-Live) → T-701 → T-702 → T-703..T-711 → T-712 → T-713 → T
     ↓
 Phase 8 (Pricing) → Sprint 1 (T-801..804) → Sprint 2 (T-811→T-810→T-805) → Sprint 3 (T-806..809)
     ↓
-Phase 9 (Pipeline) → Sprint 1 (T-901→T-903 + T-911→T-913) → Sprint 2 (T-904→T-907 + T-914) → Sprint 3 (T-908→T-910 + T-916→T-917 + T-915)
+Phase 9 (Pipeline) → Sprint 1 (T-901→T-905 + T-917) → Sprint 2 (T-906→T-909 + T-914 + T-918) → Sprint 3 (T-910→T-913 + T-919→T-920) → Sprint 4 (T-921→T-925) → Sprint 5 (T-926→T-928 + T-915→T-916)
 ```
 
 ---
@@ -268,46 +268,69 @@ Phase 9 (Pipeline) → Sprint 1 (T-901→T-903 + T-911→T-913) → Sprint 2 (T-
 ## Quick Stats
 
 - **Total Phases:** 9 + Go-Live checklist
-- **Total Tickets:** ~110+ (T1–T34 + T-701–T-714 + T-801–T-811 + Phase 0/6)
+- **Total Tickets:** ~138+ (T1–T34 + T-701–T-714 + T-801–T-811 + T-901–T-928 + Phase 0/6)
 - **Total Spec Files:** 20 (specs/v2/) + 13 supporting docs
-- **Estimated Total Effort:** ~1,300–1,700h
-- **Current Status:** Phase 1 done, Phase 2 in progress, Phases 3–8 ready
+- **Estimated Total Effort:** ~1,500–1,900h
+- **Current Status:** Phase 1 done, Phase 2 in progress, Phases 3–9 ready
 
 ---
 
-## Phase 9 — Diagnostic Pipeline Completion (Questions, Email, Sharing & Credits)
+## Phase 9 — Diagnostic Pipeline Completion (Full Stack)
 
-**Scope:** 17 tickets | ~98h | 3 sprints
-**Source:** Diagnostic system audit — closing functional gaps between Phase 7 (report renderers) and Phase 8 (pricing alignment)
-**Principle:** Every completed diagnostic triggers: real questions → scoring → storage → report → email → next-steps → sharing → credit-gated upsell
+**Scope:** 28 tickets | ~208h | 5 sprints
+**Source:** Diagnostic system audit — full pipeline from storage to admin analytics
+**Parts:** A: Data & API | B: Question Sets | C: Results Experience | D: Email | E: Sharing & Certificates | F: Credits & Admin
 
-### Sprint 1 — Question Sets Part 1 + Email Foundation (32h)
+### Part A — Data & API Infrastructure (15h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-901 | QUEST question set (20 scenario questions + scoring) | 6h |
-| T-902 | DRIVE question set (20 scenario questions + scoring) | 6h |
-| T-903 | SHIFT question set (20 scenario questions + scoring) | 6h |
-| T-911 | Email Sending Infrastructure (Resend API + email_log table) | 6h |
-| T-912 | Assessment Completion Email Template + Trigger | 5h |
-| T-913 | "Next Steps" Email Sequence (3-email drip: Day 0/3/7) | 8h |
+| T-901 | Assessment Response Storage Schema (Supabase tables + RLS) | 5h |
+| T-902 | Assessment API Endpoints (start/progress/complete/history) | 6h |
+| T-903 | Save & Resume (progress persistence + auto-save) | 4h |
 
-### Sprint 2 — Question Sets Part 2 + Social Sharing (32h)
+### Part B — Question Sets Per-Instrument (98h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-904 | IMPACT question set (20 scenario questions + scoring) | 6h |
-| T-905 | PRISM question set (20 scenario questions + scoring) | 6h |
-| T-906 | MOSAIC question set (20 scenario questions + scoring) | 6h |
-| T-907 | FORGE question set (20 scenario questions + scoring) | 6h |
-| T-914 | Social Share with Real Assessment Results | 6h |
+| T-904 | QUEST question set (20 scenario questions + scoring) | 6h |
+| T-905 | DRIVE question set (20 scenario questions + scoring) | 6h |
+| T-906 | SHIFT question set (20 scenario questions + scoring) | 6h |
+| T-907 | IMPACT question set (20 scenario questions + scoring) | 6h |
+| T-908 | PRISM question set (20 scenario questions + scoring) | 6h |
+| T-909 | MOSAIC question set (20 scenario questions + scoring) | 6h |
+| T-910 | FORGE question set (20 scenario questions + scoring) | 6h |
+| T-911 | LEAP page + question set (20 questions + archetypes from scratch) | 8h |
+| T-912 | BRIDGE page + question set (20 questions + archetypes from scratch) | 8h |
+| T-913 | SPARK page + question set (20 questions + archetypes from scratch) | 8h |
 
-### Sprint 3 — Missing Pages + Credits + Polish (34h)
+### Part C — Results Experience (22h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-908 | LEAP page + question set (20 questions + archetypes) | 8h |
-| T-909 | BRIDGE page + question set (20 questions + archetypes) | 8h |
-| T-910 | SPARK page + question set (20 questions + archetypes) | 8h |
-| T-916 | Credit-Gated Assessment Access (free teaser → paid report) | 8h |
-| T-917 | Workshop/Webinar → Credit Integration | 6h |
-| T-915 | Shareable Badge / Certificate Image (1200×630 PNG) | 5h |
+| T-914 | Results Dashboard Component (radar chart + dimension breakdown) | 8h |
+| T-915 | PDF Report Generation (branded downloadable PDF) | 8h |
+| T-916 | Retest & Progress Tracking (before/after comparison) | 6h |
+
+### Part D — Email Infrastructure (24h)
+| Ticket | Title | Est. |
+|--------|-------|------|
+| T-917 | Email Sending Infrastructure (Resend API + email_log) | 6h |
+| T-918 | Assessment Completion Email (auto-triggered on submit) | 5h |
+| T-919 | "Next Steps" Email Sequence (3-email drip: Day 0/3/7) | 8h |
+| T-920 | Debrief Booking Flow (Calendly integration + confirmation) | 5h |
+
+### Part E — Social Sharing & Certificates (16h)
+| Ticket | Title | Est. |
+|--------|-------|------|
+| T-921 | Social Share with Real Assessment Results (shareable links) | 6h |
+| T-922 | Shareable Badge Image (1200×630 PNG for LinkedIn) | 5h |
+| T-923 | Completion Certificates (branded PDF + verification page) | 5h |
+
+### Part F — Credits, Admin & Polish (33h)
+| Ticket | Title | Est. |
+|--------|-------|------|
+| T-924 | Credit-Gated Assessment Access (free teaser → paid full report) | 8h |
+| T-925 | Workshop/Webinar → Credit Integration | 6h |
+| T-926 | Admin Dashboard — Submissions & Analytics | 8h |
+| T-927 | In-App Notification Center | 5h |
+| T-928 | Mobile Assessment Optimization | 6h |
 
 **Full spec:** [Phase 9 Tickets](../LYC_Phase9_Diagnostic_Pipeline_Completion_Tickets.md)
