@@ -260,7 +260,7 @@ Phase 7 (Go-Live) → T-701 → T-702 → T-703..T-711 → T-712 → T-713 → T
     ↓
 Phase 8 (Pricing) → Sprint 1 (T-801..804) → Sprint 2 (T-811→T-810→T-805) → Sprint 3 (T-806..809)
     ↓
-Phase 9 (Pipeline) → Sprint 1 (T-901→T-902→T-903) → Sprint 2 (T-904→T-906→T-907) → Sprint 3 (T-905→T-908)
+Phase 9 (Pipeline) → Sprint 1 (T-901→T-903 + T-911→T-913) → Sprint 2 (T-904→T-907 + T-914) → Sprint 3 (T-908→T-910 + T-916→T-917 + T-915)
 ```
 
 ---
@@ -270,35 +270,44 @@ Phase 9 (Pipeline) → Sprint 1 (T-901→T-902→T-903) → Sprint 2 (T-904→T-
 - **Total Phases:** 9 + Go-Live checklist
 - **Total Tickets:** ~110+ (T1–T34 + T-701–T-714 + T-801–T-811 + Phase 0/6)
 - **Total Spec Files:** 20 (specs/v2/) + 13 supporting docs
-- **Estimated Total Effort:** ~1,200–1,600h
+- **Estimated Total Effort:** ~1,300–1,700h
 - **Current Status:** Phase 1 done, Phase 2 in progress, Phases 3–8 ready
 
 ---
 
-## Phase 9 — Diagnostic Pipeline Completion (Email, Sharing & Credits)
+## Phase 9 — Diagnostic Pipeline Completion (Questions, Email, Sharing & Credits)
 
-**Scope:** 8 tickets | ~49h | 3 sprints
+**Scope:** 17 tickets | ~98h | 3 sprints
 **Source:** Diagnostic system audit — closing functional gaps between Phase 7 (report renderers) and Phase 8 (pricing alignment)
-**Principle:** Every completed diagnostic triggers: storage → report → email → next-steps → sharing → credit-gated upsell
+**Principle:** Every completed diagnostic triggers: real questions → scoring → storage → report → email → next-steps → sharing → credit-gated upsell
 
-### Sprint 1 — Email Foundation (19h)
+### Sprint 1 — Question Sets Part 1 + Email Foundation (32h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-901 | Email Sending Infrastructure (Resend API + `email_log` table) | 6h |
-| T-902 | Assessment Completion Email Template + Trigger | 5h |
-| T-903 | "Next Steps" Email Sequence (3-email drip: Day 0/3/7) | 8h |
+| T-901 | QUEST question set (20 scenario questions + scoring) | 6h |
+| T-902 | DRIVE question set (20 scenario questions + scoring) | 6h |
+| T-903 | SHIFT question set (20 scenario questions + scoring) | 6h |
+| T-911 | Email Sending Infrastructure (Resend API + email_log table) | 6h |
+| T-912 | Assessment Completion Email Template + Trigger | 5h |
+| T-913 | "Next Steps" Email Sequence (3-email drip: Day 0/3/7) | 8h |
 
-### Sprint 2 — Sharing & Credits (19h)
+### Sprint 2 — Question Sets Part 2 + Social Sharing (32h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-904 | Social Share with Real Assessment Results | 6h |
-| T-906 | Credit-Gated Assessment Access (free teaser → paid full report) | 8h |
-| T-907 | Workshop/Webinar → Credit Integration | 5h |
+| T-904 | IMPACT question set (20 scenario questions + scoring) | 6h |
+| T-905 | PRISM question set (20 scenario questions + scoring) | 6h |
+| T-906 | MOSAIC question set (20 scenario questions + scoring) | 6h |
+| T-907 | FORGE question set (20 scenario questions + scoring) | 6h |
+| T-914 | Social Share with Real Assessment Results | 6h |
 
-### Sprint 3 — Polish & Missing Pages (11h)
+### Sprint 3 — Missing Pages + Credits + Polish (34h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-905 | Shareable Badge / Certificate Image (1200×630 PNG for LinkedIn) | 5h |
-| T-908 | Build LEAP, BRIDGE, SPARK Diagnostic Pages (3 missing instruments) | 6h |
+| T-908 | LEAP page + question set (20 questions + archetypes) | 8h |
+| T-909 | BRIDGE page + question set (20 questions + archetypes) | 8h |
+| T-910 | SPARK page + question set (20 questions + archetypes) | 8h |
+| T-916 | Credit-Gated Assessment Access (free teaser → paid report) | 8h |
+| T-917 | Workshop/Webinar → Credit Integration | 6h |
+| T-915 | Shareable Badge / Certificate Image (1200×630 PNG) | 5h |
 
 **Full spec:** [Phase 9 Tickets](../LYC_Phase9_Diagnostic_Pipeline_Completion_Tickets.md)
