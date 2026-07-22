@@ -260,7 +260,7 @@ Phase 7 (Go-Live) → T-701 → T-702 → T-703..T-711 → T-712 → T-713 → T
     ↓
 Phase 8 (Pricing) → Sprint 1 (T-801..804) → Sprint 2 (T-811→T-810→T-805) → Sprint 3 (T-806..809)
     ↓
-Phase 9 (Pipeline) → Sprint 1 (T-901→T-905 + T-917) → Sprint 2 (T-906→T-909 + T-914 + T-918) → Sprint 3 (T-910→T-913 + T-919→T-920) → Sprint 4 (T-921→T-925) → Sprint 5 (T-926→T-928 + T-915→T-916)
+Phase 9 (Pipeline) → Sprint 1 (T-901→T-904) → Sprint 2 (T-905→T-906 + T-917) → Sprint 3 (T-907→T-908 + T-914) → Sprint 4 (T-911→T-913) → Sprint 5 (T-909→T-910 + T-915→T-919)
 ```
 
 ---
@@ -268,69 +268,73 @@ Phase 9 (Pipeline) → Sprint 1 (T-901→T-905 + T-917) → Sprint 2 (T-906→T-
 ## Quick Stats
 
 - **Total Phases:** 9 + Go-Live checklist
-- **Total Tickets:** ~138+ (T1–T34 + T-701–T-714 + T-801–T-811 + T-901–T-928 + Phase 0/6)
+- **Total Tickets:** ~129+ (T1–T34 + T-701–T-714 + T-801–T-811 + T-901–T-919 + Phase 0/6)
 - **Total Spec Files:** 20 (specs/v2/) + 13 supporting docs
-- **Estimated Total Effort:** ~1,500–1,900h
+- **Estimated Total Effort:** ~1,400–1,800h
 - **Current Status:** Phase 1 done, Phase 2 in progress, Phases 3–9 ready
 
 ---
 
-## Phase 9 — Diagnostic Pipeline Completion (Full Stack)
+## Phase 9 — Diagnostic Pipeline Completion (Unified Engine)
 
-**Scope:** 28 tickets | ~208h | 5 sprints
-**Source:** Diagnostic system audit — full pipeline from storage to admin analytics
-**Parts:** A: Data & API | B: Question Sets | C: Results Experience | D: Email | E: Sharing & Certificates | F: Credits & Admin
+**Scope:** 19 tickets | ~156h | 5 sprints
+**Authority:** `docs/specs/ASSESSMENT_UNIFIED_SPEC_v1.md` (DECISIONS LOCKED Kevin 2026-07-20)
+**Core principle:** ONE unified conversational engine. NOT a wizard. Questions from Notion (3046 total). Framework invisible to user.
+**Parts:** A: Notion Import | B: Engine Core | C: FEA Build | D: Standalone Diagnostics | E: SHIFT Composite | F: Routing | G: Reports | H: Email | I: Credits/Admin
 
-### Part A — Data & API Infrastructure (15h)
+### Part A — Notion Question Bank Import (12h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-901 | Assessment Response Storage Schema (Supabase tables + RLS) | 5h |
-| T-902 | Assessment API Endpoints (start/progress/complete/history) | 6h |
-| T-903 | Save & Resume (progress persistence + auto-save) | 4h |
+| T-901 | Notion Question Bank Extraction (10 instruments, 3046 questions) | 8h |
+| T-902 | Question Bank Validation & Test Harness | 4h |
 
-### Part B — Question Sets Per-Instrument (98h)
+### Part B — Unified Assessment Engine Core (26h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-904 | QUEST question set (20 scenario questions + scoring) | 6h |
-| T-905 | DRIVE question set (20 scenario questions + scoring) | 6h |
-| T-906 | SHIFT question set (20 scenario questions + scoring) | 6h |
-| T-907 | IMPACT question set (20 scenario questions + scoring) | 6h |
-| T-908 | PRISM question set (20 scenario questions + scoring) | 6h |
-| T-909 | MOSAIC question set (20 scenario questions + scoring) | 6h |
-| T-910 | FORGE question set (20 scenario questions + scoring) | 6h |
-| T-911 | LEAP page + question set (20 questions + archetypes from scratch) | 8h |
-| T-912 | BRIDGE page + question set (20 questions + archetypes from scratch) | 8h |
-| T-913 | SPARK page + question set (20 questions + archetypes from scratch) | 8h |
+| T-903 | Assessment Session Management (Supabase + credit deduction on start) | 8h |
+| T-904 | Scoring Pipeline (dimension scores → pattern → narrative → routing) | 8h |
+| T-905 | Conversational Question Delivery Layer (Nexus chat UI, NOT a wizard) | 10h |
 
-### Part C — Results Experience (22h)
+### Part C — FEA Build (14h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-914 | Results Dashboard Component (radar chart + dimension breakdown) | 8h |
-| T-915 | PDF Report Generation (branded downloadable PDF) | 8h |
-| T-916 | Retest & Progress Tracking (before/after comparison) | 6h |
+| T-906 | FEA Micro Quiz (6-9 questions, FREE, lead capture) | 6h |
+| T-907 | FEA Full Assessment (36 questions, paid, narrative + routing) | 8h |
 
-### Part D — Email Infrastructure (24h)
+### Part D — Standalone Diagnostics (30h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-917 | Email Sending Infrastructure (Resend API + email_log) | 6h |
-| T-918 | Assessment Completion Email (auto-triggered on submit) | 5h |
-| T-919 | "Next Steps" Email Sequence (3-email drip: Day 0/3/7) | 8h |
-| T-920 | Debrief Booking Flow (Calendly integration + confirmation) | 5h |
+| T-908 | BRIDGE — First Standalone Diagnostic (Aug 2026) | 8h |
+| T-909 | MOSAIC + SPARK Standalone (Sep-Oct 2026) | 12h |
+| T-910 | FORGE + PRISM Standalone (Nov 2026+) | 10h |
 
-### Part E — Social Sharing & Certificates (16h)
+### Part E — SHIFT Composite (24h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-921 | Social Share with Real Assessment Results (shareable links) | 6h |
-| T-922 | Shareable Badge Image (1200×630 PNG for LinkedIn) | 5h |
-| T-923 | Completion Certificates (branded PDF + verification page) | 5h |
+| T-911 | SHIFT Sub-Diagnostics (LEAP, QUEST, DRIVE, COACH, IMPACT) | 16h |
+| T-912 | SHIFT Composite Aggregation & Reporting | 8h |
 
-### Part F — Credits, Admin & Polish (33h)
+### Part F — Routing (6h)
 | Ticket | Title | Est. |
 |--------|-------|------|
-| T-924 | Credit-Gated Assessment Access (free teaser → paid full report) | 8h |
-| T-925 | Workshop/Webinar → Credit Integration | 6h |
-| T-926 | Admin Dashboard — Submissions & Analytics | 8h |
-| T-927 | In-App Notification Center | 5h |
-| T-928 | Mobile Assessment Optimization | 6h |
+| T-913 | Diagnostic Routing Engine (FEA → SHIFT/MOSAIC/BRIDGE) | 6h |
+
+### Part G — Reports (14h)
+| Ticket | Title | Est. |
+|--------|-------|------|
+| T-914 | In-App Report Renderer (narrative + radar, no PDF download) | 8h |
+| T-915 | Social Sharing & Completion (links, badges, certificates) | 6h |
+
+### Part H — Email (10h)
+| Ticket | Title | Est. |
+|--------|-------|------|
+| T-916 | Email Infrastructure + Completion Sequence (Resend + drip + debrief) | 10h |
+
+### Part I — Credits, Admin & Mobile (20h)
+| Ticket | Title | Est. |
+|--------|-------|------|
+| T-917 | Credit-Gated Access (deducted on START, no refund) | 6h |
+| T-918 | Admin Dashboard — Submissions & Analytics | 8h |
+| T-919 | Mobile Optimization (conversational UX) | 6h |
 
 **Full spec:** [Phase 9 Tickets](../LYC_Phase9_Diagnostic_Pipeline_Completion_Tickets.md)
