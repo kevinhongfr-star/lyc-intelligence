@@ -18,9 +18,9 @@
 | v2 Spec Documents | 20 |
 | Remediation Specs | 9 |
 | DEX AI Nexus Tickets | 7 |
-| GitHub Epic Issues | 13 (#47–#59) |
-| GitHub Build Issues | 46 (#1–#46) |
-| Total GitHub Issues | 59 |
+| GitHub Epic Issues | 14 (#47–#59, #121) |
+| GitHub Build Issues | 66 (#1–#46, #101–#120) |
+| Total GitHub Issues | 79 |
 | Audit Reports | 14 |
 
 ---
@@ -1092,6 +1092,7 @@
 | [#57](https://github.com/kevinhongfr-star/lyc-intelligence/issues/57) | Sprint 10 | Intelligence Completes | `phase:3, sprint:10, P2` |
 | [#58](https://github.com/kevinhongfr-star/lyc-intelligence/issues/58) | Sprint 11 | P3 Polish + A11y | `phase:4, sprint:11, P3` |
 | [#59](https://github.com/kevinhongfr-star/lyc-intelligence/issues/59) | Sprint 12 | Launch Readiness | `phase:4, sprint:12, P3` |
+| [#121](https://github.com/kevinhongfr-star/lyc-intelligence/issues/121) | Email Engine | Nexus Email Generator Engine | `phase:2, P0` |
 
 ### Build Issues (Component-level)
 
@@ -1100,6 +1101,7 @@
 | #1–#7 | DEX AI Nexus Phase 1 | N1-N7 companion tickets |
 | #13–#32 | Phase 2 — Growth Layer | Core platform build |
 | #33–#46 | Phase 2 — Growth Layer | Extended build tickets |
+| #101–#120 | Email Generator Engine (EPIC #121) | Nexus Email Generator: 20 tickets across 7 modules (Core, Brand Gov, Templates, Quality Gate, Delivery, Integration, Consistency) |
 
 ---
 
@@ -1273,6 +1275,8 @@ Parallel: Remediation (REM_01-09)
 | Remediation (01–09) | `specs/remediation/` |
 | DEX AI Master Spec | `docs/DEX_AI_MASTER_SPEC.md` |
 | Nexus Phase 1 Tickets | `docs/DEX_AI_NEXUS_PHASE1_TICKETS.md` |
+| Email Generator Spec v2.1 | `docs/EMAIL_GENERATOR_SPEC.md` |
+| Email Generator Tickets Index | `docs/EMAIL_GENERATOR_TICKETS_INDEX.md` |
 
 ---
 
