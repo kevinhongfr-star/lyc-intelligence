@@ -351,6 +351,7 @@ Phase 9 (Pipeline) → Sprint 1 (T-901→T-904) → Sprint 2 (T-905→T-906 + T-
 | [WRITING_STYLE_SPEC.md](../writing-specs/WRITING_STYLE_SPEC.md) | 703 | 23KB | **Master writing rules** — double layer principle, banned patterns, tone contexts, progressive disclosure, approved language, quality checklist. Mandatory for all content production. |
 | [BUSINESS_DOCUMENTS_SPECIFICATION.md](../writing-specs/BUSINESS_DOCUMENTS_SPECIFICATION.md) | 3,342 | 86KB | **45 business document types** across 10 lifecycle phases (L1–L10) — proposals, contracts, offer letters, interview prep, etc. HTML/PDF template specs. |
 | [REPORT_DESIGN_SPECIFICATION.md](../writing-specs/REPORT_DESIGN_SPECIFICATION.md) | 1,524 | 68KB | **Platform report visual specs** — color palette (v6), typography, chart specs, layout structure, brand application for all reports/dashboards. |
+| [UNIFIED_CONTENT_RULES.md](../writing-specs/UNIFIED_CONTENT_RULES.md) | 223 | ~8KB | **Single source of truth** — merges Writing Style Spec + brandVoice.ts into unified rules. Includes taxonomy exception (3 mentions/page for concept explanation pages). Created 2026-07-23. |
 
 ### Key Rules Summary (from WRITING_STYLE_SPEC)
 
@@ -359,3 +360,5 @@ Phase 9 (Pipeline) → Sprint 1 (T-901→T-904) → Sprint 2 (T-905→T-906 + T-
 3. **Approved Force Language**: Exact phrasing for Force 1/2/3 (see §6)
 4. **Progressive Disclosure**: Never pitch full stack — one thing per communication
 5. **Quality Checklist**: 9-point check before any asset goes live
+6. **Taxonomy Exception**: Concept explanation pages may mention the concept up to 3 times (progressive disclosure exception)
+7. **Authority**: Writing Style Spec is authoritative. brandVoice.ts retained only for UX microcopy (interface states)
