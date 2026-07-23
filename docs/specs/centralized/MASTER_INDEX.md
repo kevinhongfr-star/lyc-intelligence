@@ -338,3 +338,24 @@ Phase 9 (Pipeline) → Sprint 1 (T-901→T-904) → Sprint 2 (T-905→T-906 + T-
 | T-919 | Mobile Optimization (conversational UX) | 6h |
 
 **Full spec:** [Phase 9 Tickets](../LYC_Phase9_Diagnostic_Pipeline_Completion_Tickets.md)
+
+---
+
+## Writing & Design Specifications
+
+**Source:** Feishu Drive — pulled by NEXUS 2026-07-23  
+**Location:** `docs/specs/writing-specs/`
+
+| Document | Lines | Size | Description |
+|----------|-------|------|-------------|
+| [WRITING_STYLE_SPEC.md](../writing-specs/WRITING_STYLE_SPEC.md) | 703 | 23KB | **Master writing rules** — double layer principle, banned patterns, tone contexts, progressive disclosure, approved language, quality checklist. Mandatory for all content production. |
+| [BUSINESS_DOCUMENTS_SPECIFICATION.md](../writing-specs/BUSINESS_DOCUMENTS_SPECIFICATION.md) | 3,342 | 86KB | **45 business document types** across 10 lifecycle phases (L1–L10) — proposals, contracts, offer letters, interview prep, etc. HTML/PDF template specs. |
+| [REPORT_DESIGN_SPECIFICATION.md](../writing-specs/REPORT_DESIGN_SPECIFICATION.md) | 1,524 | 68KB | **Platform report visual specs** — color palette (v6), typography, chart specs, layout structure, brand application for all reports/dashboards. |
+
+### Key Rules Summary (from WRITING_STYLE_SPEC)
+
+1. **Double Layer Principle**: Surface = facts/data; Depth = emotion (NEVER stated explicitly)
+2. **Banned**: "luxury/premium/boutique", competitor comparisons, "we diagnose", emotional labels, "unprecedented", "game-changer", "help leaders navigate"
+3. **Approved Force Language**: Exact phrasing for Force 1/2/3 (see §6)
+4. **Progressive Disclosure**: Never pitch full stack — one thing per communication
+5. **Quality Checklist**: 9-point check before any asset goes live
