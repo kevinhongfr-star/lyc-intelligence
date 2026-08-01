@@ -4,26 +4,7 @@ import { IconTrident, IconQuest, IconSpark, IconBridge, IconLeap, IconImpact, Ic
 import { Menu, X, Lock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  teal: '#00897B',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  // LYC Brand: Zero border-radius
-  radius: '0px',
-  radiusSm: '0px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-};
+import { COLORS, TYPOGRAPHY, RADII, SHADOWS } from '@/styles/tokens';
 
 const HERO_VIDEO = '/hero-bg.mp4';
 const HERO_POSTER = 'https://www.lyc-partners.ai/images/heroes/hero-boardroom.webp';
@@ -73,17 +54,17 @@ export function Landing() {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg }}>
+    <div style={{ minHeight: '100vh', background: COLORS.bg }}>
       {/* Nav — sticky with backdrop blur */}
-      <nav className="nav-sticky" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <Link to="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>
+      <nav className="nav-sticky" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 32px', borderBottom: `1px solid ${COLORS.border}` }}>
+        <Link to="/" style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '18px', fontWeight: 700, color: COLORS.text, textDecoration: 'none' }}>
           LYC Intelligence
         </Link>
         <div className="nav-links">
           {navLinks.map(l => (
-            <Link key={l.href} to={l.href} style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</Link>
+            <Link key={l.href} to={l.href} style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', color: COLORS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</Link>
           ))}
-          <Link to="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+          <Link to="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: COLORS.primary, color: '#FFFFFF', borderRadius: '0px', fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
             <Lock style={{ width: 14, height: 14 }} />Platform
           </Link>
         </div>
@@ -101,7 +82,7 @@ export function Landing() {
         {navLinks.map(l => (
           <Link key={l.href} to={l.href} onClick={() => setMobileOpen(false)}>{l.label}</Link>
         ))}
-        <Link to="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</Link>
+        <Link to="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '15px', fontWeight: 600, color: COLORS.primary, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</Link>
       </div>
 
       {/* Hero — VIDEO BACKGROUND with dark overlay */}
@@ -147,10 +128,10 @@ export function Landing() {
           <div className="section-label-dark" style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px' }}>
             Leadership Intelligence
           </div>
-          <h1 className="hero-heading" style={{ fontFamily: DS.headingFont, fontSize: '56px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 16px', lineHeight: 1.1 }}>
+          <h1 className="hero-heading" style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '56px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 16px', lineHeight: 1.1 }}>
             Know where you stand.<br />Know where to go.
           </h1>
-          <p className="hero-sub" style={{ fontFamily: DS.bodyFont, fontSize: '17px', color: 'rgba(255,255,255,0.7)', maxWidth: '520px', margin: '0 auto 48px', lineHeight: 1.6 }}>
+          <p className="hero-sub" style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '17px', color: 'rgba(255,255,255,0.7)', maxWidth: '520px', margin: '0 auto 48px', lineHeight: 1.6 }}>
             We help leaders understand their trajectory, organizations identify the right talent, and teams align to accelerate results.
           </p>
 
@@ -160,15 +141,15 @@ export function Landing() {
               className="card-hover"
               to="/b2c"
               style={{
-                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: DS.radius,
+                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: `${RADII.none}px`,
                 padding: '32px 24px', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center',
                 backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', cursor: 'pointer'
               }}
             >
               <div style={{ color: '#C108AB', marginBottom: '16px' }}><IconLeap size={32} color="#C108AB" /></div>
-              <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: '#FFFFFF', margin: '0 0 8px' }}>I'm a leader</h3>
-              <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: 'rgba(255,255,255,0.6)', margin: '0 0 20px', lineHeight: 1.5 }}>Get your leadership archetype, benchmark your profile, and explore opportunities.</p>
-              <span style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: '#C108AB', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', fontWeight: 600, color: '#FFFFFF', margin: '0 0 8px' }}>I'm a leader</h3>
+              <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '14px', color: 'rgba(255,255,255,0.6)', margin: '0 0 20px', lineHeight: 1.5 }}>Get your leadership archetype, benchmark your profile, and explore opportunities.</p>
+              <span style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '15px', color: '#C108AB', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 Get Started <ArrowRight style={{ width: 16, height: 16 }} />
               </span>
             </Link>
@@ -176,15 +157,15 @@ export function Landing() {
               to="/b2b"
               className="card-hover"
               style={{
-                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: DS.radius,
+                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: `${RADII.none}px`,
                 padding: '32px 24px', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center',
                 backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', cursor: 'pointer'
               }}
             >
               <div style={{ color: '#C108AB', marginBottom: '16px' }}><IconBridge size={32} color="#C108AB" /></div>
-              <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: '#FFFFFF', margin: '0 0 8px' }}>I'm hiring</h3>
-              <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: 'rgba(255,255,255,0.6)', margin: '0 0 20px', lineHeight: 1.5 }}>Meet exceptional leaders, score candidates, and build your team.</p>
-              <span style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: '#C108AB', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', fontWeight: 600, color: '#FFFFFF', margin: '0 0 8px' }}>I'm hiring</h3>
+              <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '14px', color: 'rgba(255,255,255,0.6)', margin: '0 0 20px', lineHeight: 1.5 }}>Meet exceptional leaders, score candidates, and build your team.</p>
+              <span style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '15px', color: '#C108AB', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 Get Started <ArrowRight style={{ width: 16, height: 16 }} />
               </span>
             </Link>
@@ -197,8 +178,8 @@ export function Landing() {
         <div style={{ maxWidth: '900px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', textAlign: 'center' }}>
           {stats.map(s => (
             <div key={s.label}>
-              <div style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.accent, lineHeight: 1 }}>{s.value}</div>
-              <div style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted, marginTop: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.label}</div>
+              <div style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '32px', fontWeight: 700, color: COLORS.primary, lineHeight: 1 }}>{s.value}</div>
+              <div style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '12px', color: COLORS.textMuted, marginTop: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -206,21 +187,21 @@ export function Landing() {
 
       {/* Product Cards — branded animated icons */}
       <div className="reveal section-padding" style={{ maxWidth: '900px', margin: '0 auto', padding: '64px 32px' }}>
-        <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '12px', textAlign: 'center' }}>
+        <div className="section-label" style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: COLORS.primary, marginBottom: '12px', textAlign: 'center' }}>
           Our Platform
         </div>
-        <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, textAlign: 'center', margin: '0 auto 40px', maxWidth: '500px' }}>
+        <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '28px', fontWeight: 700, color: COLORS.text, textAlign: 'center', margin: '0 auto 40px', maxWidth: '500px' }}>
           Leadership intelligence, for every stage
         </h2>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           {services.map(p => (
-            <Link key={p.title} to={p.href} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '28px 24px', textDecoration: 'none', display: 'block', boxShadow: DS.shadow }}>
-              <div style={{ color: DS.accent, marginBottom: '16px' }} className={p.animClass}>
-                {p.icon ? <p.icon size={28} color={DS.accent} /> : <div style={{ width: '40px', height: '3px', background: DS.accent, borderRadius: '1px' }} />}
+            <Link key={p.title} to={p.href} className="card-hover" style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.none}px`, padding: '28px 24px', textDecoration: 'none', display: 'block', boxShadow: SHADOWS.sm }}>
+              <div style={{ color: COLORS.primary, marginBottom: '16px' }} className={p.animClass}>
+                {p.icon ? <p.icon size={28} color={COLORS.primary} /> : <div style={{ width: '40px', height: '3px', background: COLORS.primary, borderRadius: '1px' }} />}
               </div>
-              <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>{p.title}</h3>
-              <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, lineHeight: 1.5, margin: '0 0 16px' }}>{p.desc}</p>
-              <span style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.accent, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '16px', fontWeight: 600, color: COLORS.text, margin: '0 0 8px' }}>{p.title}</h3>
+              <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', color: COLORS.textMuted, lineHeight: 1.5, margin: '0 0 16px' }}>{p.desc}</p>
+              <span style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', color: COLORS.primary, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 {p.cta} <ArrowRight style={{ width: 14, height: 14 }} />
               </span>
             </Link>
@@ -236,17 +217,17 @@ export function Landing() {
           <div className="section-label-dark" style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px' }}>
             Get Started
           </div>
-          <h2 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 16px', lineHeight: 1.2 }}>
+          <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '32px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 16px', lineHeight: 1.2 }}>
             Leadership isn't a title —<br />it's a trajectory.
           </h2>
-          <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', maxWidth: '420px', margin: '0 auto 32px', lineHeight: 1.6 }}>
+          <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '15px', color: 'rgba(255,255,255,0.6)', maxWidth: '420px', margin: '0 auto 32px', lineHeight: 1.6 }}>
             See it, shape it, accelerate it. Leadership intelligence starts here.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/b2c" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: '#C108AB', color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <Link to="/b2c" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: '#C108AB', color: '#FFFFFF', borderRadius: '0px', fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               For Leaders <ArrowRight style={{ width: 14, height: 14 }} />
             </Link>
-            <Link to="/b2b" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid rgba(193,8,171,0.5)', color: '#C108AB', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <Link to="/b2b" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid rgba(193,8,171,0.5)', color: '#C108AB', borderRadius: '0px', fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               For Firms
             </Link>
           </div>
@@ -257,8 +238,8 @@ export function Landing() {
       <footer className="footer-dark">
         <div className="footer-grid" style={{ maxWidth: '900px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
           <div>
-            <span style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 700, color: '#FFF' }}>LYC Intelligence</span>
-            <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '12px', lineHeight: 1.5 }}>Career advisory, candidate scoring, and leadership alignment. For leaders at every stage.</p>
+            <span style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '16px', fontWeight: 700, color: '#FFF' }}>LYC Intelligence</span>
+            <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '12px', lineHeight: 1.5 }}>Career advisory, candidate scoring, and leadership alignment. For leaders at every stage.</p>
           </div>
           <div>
             <div className="footer-label">Platform</div>

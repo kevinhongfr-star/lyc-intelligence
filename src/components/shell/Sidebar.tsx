@@ -44,10 +44,13 @@ import {
   BookOpen,
   Globe,
   Sparkles,
+  Activity,
+  Cpu,
+  Mail,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 
-export type Surface = 'internal' | 'client' | 'coaching' | 'candidate';
+export type Surface = 'internal' | 'admin' | 'client' | 'coaching' | 'candidate';
 
 interface NavItem {
   path: string;
@@ -69,6 +72,9 @@ interface SurfaceDef {
 /** Admin/consultant roles that can see ALL surfaces */
 const ADMIN_ROLES = ['admin', 'super_admin', 'lyc_admin', 'consultant', 'team_lead', 'bd_manager', 'recruiter'];
 
+/** Roles restricted to the admin surface (top-level /admin/* routes) */
+const ADMIN_ONLY_ROLES = ['admin', 'super_admin', 'lyc_admin'];
+
 const SURFACES: SurfaceDef[] = [
   {
     id: 'internal',
@@ -89,6 +95,31 @@ const SURFACES: SurfaceDef[] = [
       { path: '/app/tasks', label: 'Tasks', icon: <CheckSquare className="w-4 h-4" /> },
       { path: '/app/compliance', label: 'Compliance', icon: <Shield className="w-4 h-4" /> },
       { path: '/app/platform-settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
+    ],
+  },
+  {
+    id: 'admin',
+    label: 'Admin',
+    icon: <Shield className="w-4 h-4" />,
+    allowedRoles: ADMIN_ONLY_ROLES,
+    items: [
+      { path: '/app/admin/console', label: 'Platform Console', icon: <LayoutDashboard className="w-4 h-4" /> },
+      { path: '/app/admin/users', label: 'Users', icon: <Users className="w-4 h-4" /> },
+      { path: '/app/admin/credits', label: 'Credits', icon: <CreditCard className="w-4 h-4" /> },
+      { path: '/app/admin/audit-log', label: 'Audit Log', icon: <FileCheck className="w-4 h-4" /> },
+      { path: '/app/admin/system-health', label: 'System Health', icon: <Activity className="w-4 h-4" /> },
+      { path: '/app/admin/data-export', label: 'Data Export', icon: <FileText className="w-4 h-4" /> },
+      { path: '/app/admin/bulk-operations', label: 'Bulk Operations', icon: <ClipboardList className="w-4 h-4" /> },
+      { path: '/app/admin/document-generation', label: 'Document Gen', icon: <FileSignature className="w-4 h-4" /> },
+      { path: '/app/admin/dashboard-builder', label: 'Dashboard Builder', icon: <BarChart3 className="w-4 h-4" /> },
+      { path: '/app/admin/shift-data-model', label: 'SHIFT Data Model', icon: <GitBranch className="w-4 h-4" /> },
+      { path: '/app/admin/assessment-engine', label: 'Assessment Engine', icon: <TestTube className="w-4 h-4" /> },
+      { path: '/app/admin/activation-flows', label: 'Activation Flows', icon: <UserCheck className="w-4 h-4" /> },
+      { path: '/app/admin/custom-domains', label: 'Custom Domains', icon: <Globe className="w-4 h-4" /> },
+      { path: '/app/admin/data-contracts', label: 'Data Contracts', icon: <FileText className="w-4 h-4" /> },
+      { path: '/app/admin/ai-orchestration', label: 'AI Orchestration', icon: <Cpu className="w-4 h-4" /> },
+      { path: '/app/admin/email-engine', label: 'Email Engine', icon: <Mail className="w-4 h-4" /> },
+      { path: '/app/admin/cohort-reports', label: 'Cohort Reports', icon: <TrendingUp className="w-4 h-4" /> },
     ],
   },
   {
@@ -150,6 +181,7 @@ const SURFACES: SurfaceDef[] = [
 ];
 
 function getSurfaceFromPath(path: string): Surface {
+  if (path.startsWith('/app/admin') || path.startsWith('/admin')) return 'admin';
   if (path.startsWith('/app') || path.startsWith('/platform')) return 'internal';
   if (path.startsWith('/client')) return 'client';
   if (path.startsWith('/coaching')) return 'coaching';
@@ -180,6 +212,7 @@ export function Sidebar() {
   // All surfaces start expanded if they're the active one, collapsed otherwise
   const [expanded, setExpanded] = useState<Record<Surface, boolean>>(() => ({
     internal: currentSurface === 'internal',
+    admin: currentSurface === 'admin',
     client: currentSurface === 'client',
     coaching: currentSurface === 'coaching',
     candidate: currentSurface === 'candidate',

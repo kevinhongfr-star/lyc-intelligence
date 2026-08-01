@@ -7,23 +7,13 @@ import {
 import { useAuthStore } from '../stores/authStore';
 import { getSupabase } from '../services/supabaseApi';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
+import { COLORS, TYPOGRAPHY } from '@/styles/tokens';
+
+const CUSTOM_DS = {
   bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
+  muted: '#666666',
   text: '#000000',
   textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 interface AssessmentRecord {
@@ -121,16 +111,16 @@ export function ProgressPage() {
 
   const getDeltaIcon = (delta: number | null) => {
     if (delta === null) return null;
-    if (delta > 0) return <TrendingUp style={{ width: 14, height: 14, color: DS.success }} />;
-    if (delta < 0) return <TrendingDown style={{ width: 14, height: 14, color: DS.error }} />;
-    return <Minus style={{ width: 14, height: 14, color: DS.muted }} />;
+    if (delta > 0) return <TrendingUp style={{ width: 14, height: 14, color: COLORS.success }} />;
+    if (delta < 0) return <TrendingDown style={{ width: 14, height: 14, color: COLORS.error }} />;
+    return <Minus style={{ width: 14, height: 14, color: CUSTOM_DS.muted }} />;
   };
 
   const getDeltaColor = (delta: number | null) => {
-    if (delta === null) return DS.muted;
-    if (delta > 0) return DS.success;
-    if (delta < 0) return DS.error;
-    return DS.muted;
+    if (delta === null) return CUSTOM_DS.muted;
+    if (delta > 0) return COLORS.success;
+    if (delta < 0) return COLORS.error;
+    return CUSTOM_DS.muted;
   };
 
   const formatDelta = (delta: number | null) => {
@@ -143,14 +133,14 @@ export function ProgressPage() {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Loader2 style={{ width: 32, height: 32, color: DS.accent, animation: 'spin 1s linear infinite' }} />
+      <div style={{ minHeight: '100vh', background: CUSTOM_DS.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Loader2 style={{ width: 32, height: 32, color: COLORS.primary, animation: 'spin 1s linear infinite' }} />
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg }}>
+    <div style={{ minHeight: '100vh', background: CUSTOM_DS.bg }}>
       {/* Header */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
         <button
@@ -161,7 +151,7 @@ export function ProgressPage() {
             gap: '6px',
             background: 'none',
             border: 'none',
-            color: DS.muted,
+            color: CUSTOM_DS.muted,
             fontSize: '14px',
             cursor: 'pointer',
             marginBottom: '24px'
@@ -173,10 +163,10 @@ export function ProgressPage() {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, marginBottom: '4px' }}>
+            <h1 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '28px', fontWeight: 700, color: CUSTOM_DS.text, marginBottom: '4px' }}>
               Your Progress
             </h1>
-            <p style={{ color: DS.muted, fontSize: '14px' }}>
+            <p style={{ color: CUSTOM_DS.muted, fontSize: '14px' }}>
               Track your growth over time
             </p>
           </div>
@@ -189,7 +179,7 @@ export function ProgressPage() {
                 alignItems: 'center',
                 gap: '8px',
                 padding: '12px 24px',
-                background: DS.accent,
+                background: COLORS.primary,
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '0px',
@@ -205,12 +195,12 @@ export function ProgressPage() {
         </div>
 
         {assessments.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 0', background: DS.card, borderRadius: '0px', border: `1px solid ${DS.cardBorder}` }}>
-            <Target style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
-            <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', color: DS.text, marginBottom: '8px' }}>
+          <div style={{ textAlign: 'center', padding: '80px 0', background: COLORS.white, borderRadius: '0px', border: `1px solid ${COLORS.border}` }}>
+            <Target style={{ width: 48, height: 48, color: CUSTOM_DS.muted, margin: '0 auto 16px' }} />
+            <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', color: CUSTOM_DS.text, marginBottom: '8px' }}>
               No assessments yet
             </h2>
-            <p style={{ color: DS.muted, marginBottom: '24px' }}>
+            <p style={{ color: CUSTOM_DS.muted, marginBottom: '24px' }}>
               Take your first assessment to start tracking your progress
             </p>
             <button
@@ -220,7 +210,7 @@ export function ProgressPage() {
                 alignItems: 'center',
                 gap: '8px',
                 padding: '14px 28px',
-                background: DS.accent,
+                background: COLORS.primary,
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '0px',
@@ -237,8 +227,8 @@ export function ProgressPage() {
             {/* Retake reminder */}
             {!canRetake && daysSinceLastAssessment > 0 && (
               <div style={{
-                background: `${DS.warning}15`,
-                border: `1px solid ${DS.warning}40`,
+                background: `${COLORS.warning}15`,
+                border: `1px solid ${COLORS.warning}40`,
                 borderRadius: '0px',
                 padding: '16px 20px',
                 marginBottom: '24px',
@@ -246,12 +236,12 @@ export function ProgressPage() {
                 alignItems: 'center',
                 gap: '12px'
               }}>
-                <Calendar style={{ width: 20, height: 20, color: DS.warning }} />
+                <Calendar style={{ width: 20, height: 20, color: COLORS.warning }} />
                 <div>
-                  <p style={{ fontSize: '14px', color: DS.text, fontWeight: 500 }}>
+                  <p style={{ fontSize: '14px', color: CUSTOM_DS.text, fontWeight: 500 }}>
                     Assessment available for retake in {90 - daysSinceLastAssessment} days
                   </p>
-                  <p style={{ fontSize: '12px', color: DS.muted }}>
+                  <p style={{ fontSize: '12px', color: CUSTOM_DS.muted }}>
                     For the most accurate progress tracking, we recommend retaking every 90 days
                   </p>
                 </div>
@@ -269,17 +259,17 @@ export function ProgressPage() {
                   }}
                   style={{
                     padding: '10px 16px',
-                    background: selectedAssessment?.id === a.id ? `${DS.accent}20` : DS.card,
-                    border: `1px solid ${selectedAssessment?.id === a.id ? DS.accent : DS.border}`,
+                    background: selectedAssessment?.id === a.id ? `${COLORS.primary}20` : COLORS.white,
+                    border: `1px solid ${selectedAssessment?.id === a.id ? COLORS.primary : COLORS.border}`,
                     borderRadius: '0px',
-                    color: selectedAssessment?.id === a.id ? DS.text : DS.textSecondary,
+                    color: selectedAssessment?.id === a.id ? CUSTOM_DS.text : CUSTOM_DS.textSecondary,
                     fontSize: '13px',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
                 >
                   {new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  {i === 0 && <span style={{ marginLeft: '4px', color: DS.accent }}>(Latest)</span>}
+                  {i === 0 && <span style={{ marginLeft: '4px', color: COLORS.primary }}>(Latest)</span>}
                 </button>
               ))}
             </div>
@@ -289,7 +279,7 @@ export function ProgressPage() {
                 {/* Current Assessment Card */}
                 <div style={{ 
                   background: 'linear-gradient(135deg, rgba(193,8,171,0.15), rgba(99,102,241,0.1))',
-                  border: `1px solid ${DS.accent}40`,
+                  border: `1px solid ${COLORS.primary}40`,
                   borderRadius: '0px',
                   padding: '32px',
                   marginBottom: '24px'
@@ -299,35 +289,35 @@ export function ProgressPage() {
                       width: '64px',
                       height: '64px',
                       borderRadius: '0px',
-                      background: `${DS.accent}20`,
+                      background: `${COLORS.primary}20`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
                     }}>
-                      <Award style={{ width: 32, height: 32, color: DS.accent }} />
+                      <Award style={{ width: 32, height: 32, color: COLORS.primary }} />
                     </div>
                     <div>
-                      <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      <p style={{ fontSize: '12px', color: CUSTOM_DS.muted, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         {new Date(selectedAssessment.created_at).toLocaleDateString('en-US', { 
                           weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
                         })}
                       </p>
-                      <h2 style={{ fontFamily: DS.headingFont, fontSize: '24px', fontWeight: 700, color: DS.text }}>
+                      <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '24px', fontWeight: 700, color: CUSTOM_DS.text }}>
                         {selectedAssessment.archetype}
                       </h2>
                     </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
-                    <div style={{ textAlign: 'center', padding: '20px', background: DS.bg, borderRadius: '0px' }}>
-                      <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>OVERALL SCORE</p>
-                      <p style={{ fontSize: '48px', fontWeight: 800, color: DS.success, lineHeight: 1 }}>
+                    <div style={{ textAlign: 'center', padding: '20px', background: CUSTOM_DS.bg, borderRadius: '0px' }}>
+                      <p style={{ fontSize: '12px', color: CUSTOM_DS.muted, marginBottom: '8px' }}>OVERALL SCORE</p>
+                      <p style={{ fontSize: '48px', fontWeight: 800, color: COLORS.success, lineHeight: 1 }}>
                         {selectedAssessment.composite_score}
                       </p>
                     </div>
-                    <div style={{ textAlign: 'center', padding: '20px', background: DS.bg, borderRadius: '0px' }}>
-                      <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>CROSS-BORDER READINESS</p>
-                      <p style={{ fontSize: '48px', fontWeight: 800, color: DS.accent, lineHeight: 1 }}>
+                    <div style={{ textAlign: 'center', padding: '20px', background: CUSTOM_DS.bg, borderRadius: '0px' }}>
+                      <p style={{ fontSize: '12px', color: CUSTOM_DS.muted, marginBottom: '8px' }}>CROSS-BORDER READINESS</p>
+                      <p style={{ fontSize: '48px', fontWeight: 800, color: COLORS.primary, lineHeight: 1 }}>
                         {selectedAssessment.cross_border_score}
                       </p>
                     </div>
@@ -335,21 +325,21 @@ export function ProgressPage() {
                 </div>
 
                 {/* Dimension Breakdown */}
-                <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '24px', marginBottom: '24px' }}>
-                  <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 600, color: DS.text, marginBottom: '24px' }}>
+                <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: '0px', padding: '24px', marginBottom: '24px' }}>
+                  <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '18px', fontWeight: 600, color: CUSTOM_DS.text, marginBottom: '24px' }}>
                     Dimension Breakdown
                   </h3>
                   
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {Object.entries(selectedAssessment.scores).map(([dim, score]) => {
                       const delta = getScoreDelta(dim);
-                      const color = DIMENSION_COLORS[dim] || DS.accent;
+                      const color = DIMENSION_COLORS[dim] || COLORS.primary;
                       
                       return (
                         <div key={dim}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <span style={{ fontSize: '14px', color: DS.text }}>
+                              <span style={{ fontSize: '14px', color: CUSTOM_DS.text }}>
                                 {DIMENSION_LABELS[dim] || dim}
                               </span>
                               {delta !== null && (
@@ -365,7 +355,7 @@ export function ProgressPage() {
                               {score}%
                             </span>
                           </div>
-                          <div style={{ height: '8px', background: DS.border, borderRadius: '4px', overflow: 'hidden' }}>
+                          <div style={{ height: '8px', background: COLORS.border, borderRadius: '4px', overflow: 'hidden' }}>
                             <div style={{
                               height: '100%',
                               width: `${score}%`,
@@ -382,14 +372,14 @@ export function ProgressPage() {
 
                 {/* Comparison with Previous */}
                 {previousAssessment && (
-                  <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '24px' }}>
-                    <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 600, color: DS.text, marginBottom: '24px' }}>
+                  <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: '0px', padding: '24px' }}>
+                    <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '18px', fontWeight: 600, color: CUSTOM_DS.text, marginBottom: '24px' }}>
                       Progress Since {new Date(previousAssessment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </h3>
                     
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
-                      <div style={{ textAlign: 'center', padding: '16px', background: DS.bg, borderRadius: '0px' }}>
-                        <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>OVERALL</p>
+                      <div style={{ textAlign: 'center', padding: '16px', background: CUSTOM_DS.bg, borderRadius: '0px' }}>
+                        <p style={{ fontSize: '12px', color: CUSTOM_DS.muted, marginBottom: '8px' }}>OVERALL</p>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                           {getDeltaIcon(selectedAssessment.composite_score - previousAssessment.composite_score)}
                           <span style={{ fontSize: '24px', fontWeight: 700, color: getDeltaColor(selectedAssessment.composite_score - previousAssessment.composite_score) }}>
@@ -397,8 +387,8 @@ export function ProgressPage() {
                           </span>
                         </div>
                       </div>
-                      <div style={{ textAlign: 'center', padding: '16px', background: DS.bg, borderRadius: '0px' }}>
-                        <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px' }}>CROSS-BORDER</p>
+                      <div style={{ textAlign: 'center', padding: '16px', background: CUSTOM_DS.bg, borderRadius: '0px' }}>
+                        <p style={{ fontSize: '12px', color: CUSTOM_DS.muted, marginBottom: '8px' }}>CROSS-BORDER</p>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                           {getDeltaIcon(selectedAssessment.cross_border_score - previousAssessment.cross_border_score)}
                           <span style={{ fontSize: '24px', fontWeight: 700, color: getDeltaColor(selectedAssessment.cross_border_score - previousAssessment.cross_border_score) }}>

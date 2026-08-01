@@ -13,23 +13,14 @@ import { useAuthStore } from '../stores/authStore';
 import { toast } from '@/stores/toastStore';
 import { FileText, Trash2, Calendar, ExternalLink, X, Check } from 'lucide-react';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
+import { COLORS, TYPOGRAPHY, RADII } from '@/styles/tokens';
+import { logActivity } from '@/utils/activityLogger';
+
+const CUSTOM_DS = {
   bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
+  muted: '#666666',
   text: '#000000',
   textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 export function DocumentsPage() {
@@ -74,6 +65,13 @@ export function DocumentsPage() {
       const doc = await uploadDocument(file, type as any, user.id);
       if (doc) {
         toast.success('Document uploaded successfully');
+        logActivity({
+          type: 'document_uploaded',
+          entity_type: 'document',
+          entity_id: doc.id,
+          summary: `Uploaded document ${file.name} (${type})`,
+          metadata: { document_id: doc.id, document_type: type, file_name: file.name, file_size_bytes: file.size },
+        });
         await loadDocuments();
       }
     } catch (e: any) {
@@ -106,13 +104,13 @@ export function DocumentsPage() {
 
   if (tier === 'free') {
     return (
-      <div style={{ minHeight: '100vh', background: DS.bg, padding: '48px 24px' }}>
+      <div style={{ minHeight: '100vh', background: CUSTOM_DS.bg, padding: '48px 24px' }}>
         <div style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
-          <FileText style={{ width: 64, height: 64, color: DS.muted, margin: '0 auto 24px' }} />
-          <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', color: DS.text, marginBottom: '12px' }}>
+          <FileText style={{ width: 64, height: 64, color: CUSTOM_DS.muted, margin: '0 auto 24px' }} />
+          <h1 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '32px', color: CUSTOM_DS.text, marginBottom: '12px' }}>
             Document Storage
           </h1>
-          <p style={{ fontSize: '16px', color: DS.muted, marginBottom: '32px' }}>
+          <p style={{ fontSize: '16px', color: CUSTOM_DS.muted, marginBottom: '32px' }}>
             Upgrade to Basic or Pro to upload and analyze your documents.
           </p>
           <button 
@@ -122,7 +120,7 @@ export function DocumentsPage() {
               alignItems: 'center', 
               gap: '8px', 
               padding: '12px 28px', 
-              background: DS.accent, 
+              background: COLORS.primary, 
               color: '#FFFFFF', 
               border: 'none', 
               borderRadius: '10px', 
@@ -139,14 +137,14 @@ export function DocumentsPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
+    <div style={{ minHeight: '100vh', background: CUSTOM_DS.bg, padding: '24px' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
           <div>
-            <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', color: DS.text, marginBottom: '4px' }}>
+            <h1 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '28px', color: CUSTOM_DS.text, marginBottom: '4px' }}>
               Documents
             </h1>
-            <p style={{ fontSize: '14px', color: DS.muted, margin: 0 }}>
+            <p style={{ fontSize: '14px', color: CUSTOM_DS.muted, margin: 0 }}>
               {documents.length} of {tier === 'council' ? 'unlimited' : maxDocs} documents
             </p>
           </div>
@@ -161,20 +159,20 @@ export function DocumentsPage() {
 
         {isLoading ? (
           <div style={{ textAlign: 'center', padding: '48px' }}>
-            <div style={{ fontSize: '14px', color: DS.muted }}>Loading...</div>
+            <div style={{ fontSize: '14px', color: CUSTOM_DS.muted }}>Loading...</div>
           </div>
         ) : documents.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '48px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius }}>
-            <FileText style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
-            <p style={{ fontSize: '14px', color: DS.textSecondary }}>No documents uploaded yet</p>
+          <div style={{ textAlign: 'center', padding: '48px', background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.lg}px` }}>
+            <FileText style={{ width: 48, height: 48, color: CUSTOM_DS.muted, margin: '0 auto 16px' }} />
+            <p style={{ fontSize: '14px', color: CUSTOM_DS.textSecondary }}>No documents uploaded yet</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {documents.map(doc => (
               <div key={doc.id} style={{
                 padding: '16px 20px',
-                background: DS.card,
-                border: `1px solid ${DS.cardBorder}`,
+                background: COLORS.white,
+                border: `1px solid ${COLORS.border}`,
                 borderRadius: '10px',
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -186,21 +184,21 @@ export function DocumentsPage() {
                     width: '40px',
                     height: '40px',
                     borderRadius: '0px',
-                    background: `${DS.accent}20`,
+                    background: `${COLORS.primary}20`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                    <FileText style={{ width: 18, height: 18, color: DS.accent }} />
+                    <FileText style={{ width: 18, height: 18, color: COLORS.primary }} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '15px', fontWeight: 500, color: DS.text }}>{doc.name}</div>
+                    <div style={{ fontSize: '15px', fontWeight: 500, color: CUSTOM_DS.text }}>{doc.name}</div>
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
                       gap: '12px', 
                       fontSize: '12px', 
-                      color: DS.muted, 
+                      color: CUSTOM_DS.muted, 
                       marginTop: '2px' 
                     }}>
                       <span>{DOCUMENT_TYPE_LABELS[doc.type as keyof typeof DOCUMENT_TYPE_LABELS]}</span>
@@ -225,21 +223,21 @@ export function DocumentsPage() {
                       gap: '6px',
                       padding: '8px 14px',
                       background: 'transparent',
-                      border: `1px solid ${DS.cardBorder}`,
+                      border: `1px solid ${COLORS.border}`,
                       borderRadius: '0px',
-                      color: DS.textSecondary,
+                      color: CUSTOM_DS.textSecondary,
                       fontSize: '13px',
                       cursor: 'pointer',
                       textDecoration: 'none',
                       transition: 'all 0.2s ease'
                     }}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.borderColor = DS.accent;
-                      e.currentTarget.style.color = DS.accent;
+                      e.currentTarget.style.borderColor = COLORS.primary;
+                      e.currentTarget.style.color = COLORS.primary;
                     }}
                     onMouseOut={(e) => {
-                      e.currentTarget.style.borderColor = DS.border;
-                      e.currentTarget.style.color = DS.textSecondary;
+                      e.currentTarget.style.borderColor = COLORS.border;
+                      e.currentTarget.style.color = CUSTOM_DS.textSecondary;
                     }}
                   >
                     <ExternalLink style={{ width: 14, height: 14 }} />
@@ -275,9 +273,9 @@ export function DocumentsPage() {
                           gap: '6px',
                           padding: '8px 14px',
                           background: 'transparent',
-                          border: `1px solid ${DS.cardBorder}`,
+                          border: `1px solid ${COLORS.border}`,
                           borderRadius: '0px',
-                          color: DS.textSecondary,
+                          color: CUSTOM_DS.textSecondary,
                           fontSize: '13px',
                           cursor: 'pointer',
                         }}

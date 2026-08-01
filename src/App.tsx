@@ -81,6 +81,33 @@ const CompliancePage = lazy(() => import('@/pages/internal/CompliancePage').then
 const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage').then(m => ({ default: m.NexusEnginePage })));
 const KevinOversightDashboard = lazy(() => import('@/components/kevin/KevinOversightDashboard').then(m => ({ default: m.KevinOversightDashboard })));
 
+// ── Internal Nexus orchestration pages (REM_42/44/46) ──
+const RagLibraryPage = lazy(() => import('@/pages/internal/RagLibraryPage').then(m => ({ default: m.RagLibraryPage })));
+const JourneyDashboardPage = lazy(() => import('@/pages/internal/JourneyDashboardPage').then(m => ({ default: m.JourneyDashboardPage })));
+const NexusMasterPage = lazy(() => import('@/pages/internal/NexusMasterPage').then(m => ({ default: m.NexusMasterPage })));
+
+// ── BD Manager Portal pages (REM_06) ──
+const BDPortal = lazy(() => import('@/components/bd/BDPortal').then(m => ({ default: m.BDPortal })));
+const BDDashboard = lazy(() => import('@/components/bd/BDDashboard').then(m => ({ default: m.BDDashboard })));
+const OpportunityList = lazy(() => import('@/components/bd/PipelineKanban').then(m => ({ default: m.PipelineKanban })));
+const OpportunityDetail = lazy(() => import('@/components/bd/OpportunityDetail').then(m => ({ default: m.OpportunityDetail })));
+const OpportunityForm = lazy(() => import('@/components/bd/OpportunityForm').then(m => ({ default: m.OpportunityForm })));
+const ClientRelationships = lazy(() => import('@/components/bd/ClientRelationships').then(m => ({ default: m.ClientRelationships })));
+const ClientDetail = lazy(() => import('@/components/bd/ClientDetail').then(m => ({ default: m.ClientDetail })));
+const BDForecast = lazy(() => import('@/components/bd/BDForecast').then(m => ({ default: m.BDForecast })));
+const BDMarketIntel = lazy(() => import('@/components/bd/BDMarketIntel').then(m => ({ default: m.BDMarketIntel })));
+
+// ── Team Lead Portal pages (REM_07) ──
+const TeamLeadPortal = lazy(() => import('@/components/team-lead/TeamLeadPortal').then(m => ({ default: m.TeamLeadPortal })));
+const TL_Dashboard = lazy(() => import('@/components/team-lead/TL_Dashboard').then(m => ({ default: m.TL_Dashboard })));
+const TL_Approvals = lazy(() => import('@/components/team-lead/TL_Approvals').then(m => ({ default: m.TL_Approvals })));
+const TL_ApprovalDetail = lazy(() => import('@/components/team-lead/TL_ApprovalDetail').then(m => ({ default: m.TL_ApprovalDetail })));
+const TL_TeamOverview = lazy(() => import('@/components/team-lead/TL_TeamOverview').then(m => ({ default: m.TL_TeamOverview })));
+const TL_MandatePortfolio = lazy(() => import('@/components/team-lead/TL_MandatePortfolio').then(m => ({ default: m.TL_MandatePortfolio })));
+const TL_SLADashboard = lazy(() => import('@/components/team-lead/TL_SLADashboard').then(m => ({ default: m.TL_SLADashboard })));
+const TL_RevenueDashboard = lazy(() => import('@/components/team-lead/TL_RevenueDashboard').then(m => ({ default: m.TL_RevenueDashboard })));
+const TL_ClientOverview = lazy(() => import('@/components/team-lead/TL_ClientOverview').then(m => ({ default: m.TL_ClientOverview })));
+
 // ── B2B Client Portal pages (EO-1) ──
 const ClientOverviewPage = lazy(() => import('@/pages/client/ClientOverviewPage').then(m => ({ default: m.ClientOverviewPage })));
 const ClientPipelineAnalyticsPage = lazy(() => import('@/pages/client/ClientPipelineAnalyticsPage').then(m => ({ default: m.ClientPipelineAnalyticsPage })));
@@ -101,6 +128,14 @@ const PlatformAdminConsolePage = lazy(() => import('@/pages/admin/PlatformAdminC
 const CohortReportAdminPage = lazy(() => import('@/pages/admin/CohortReportAdminPage').then(m => ({ default: m.CohortReportAdminPage })));
 const AuditLogPage = lazy(() => import('@/pages/admin/AuditLogPage').then(m => ({ default: m.AuditLogPage })));
 const DataExportPage = lazy(() => import('@/pages/admin/DataExportPage').then(m => ({ default: m.DataExportPage })));
+const UserManagement = lazy(() => import('@/components/admin/UserManagement').then(m => ({ default: m.UserManagement })));
+const CreditManagement = lazy(() => import('@/components/admin/CreditManagement').then(m => ({ default: m.CreditManagement })));
+
+// ── Admin Nexus/email engine pages (REM_27/97/100/101-120) ──
+const CustomDomainPage = lazy(() => import('@/pages/admin/CustomDomainPage').then(m => ({ default: m.CustomDomainPage })));
+const DataContractsPage = lazy(() => import('@/pages/admin/DataContractsPage').then(m => ({ default: m.DataContractsPage })));
+const AIOrchestrationPage = lazy(() => import('@/pages/admin/AIOrchestrationPage').then(m => ({ default: m.AIOrchestrationPage })));
+const EmailEnginePage = lazy(() => import('@/pages/admin/EmailEnginePage').then(m => ({ default: m.EmailEnginePage })));
 
 // Smart Search & Filters
 const SmartSearchPage = lazy(() => import('@/pages/search/SmartSearchPage').then(m => ({ default: m.SmartSearchPage })));
@@ -354,38 +389,24 @@ export default function App() {
           <Route path="/admin/academy/courses/:id" element={<AdminRoute><AcademyCourseEditorPage /></AdminRoute>} />
           <Route path="/admin/academy/enrollments" element={<AdminRoute><AcademyEnrollmentsPage /></AdminRoute>} />
 
-          {/* ── Platform Admin Console (auth + admin required) — Issue #37 ── */}
-          <Route path="/admin/console" element={<AdminRoute><PlatformAdminConsolePage /></AdminRoute>} />
-
-          {/* ── Cohort Reports Admin (auth + admin required) — Issue #22 ── */}
-          <Route path="/admin/cohort-reports" element={<AdminRoute><CohortReportAdminPage /></AdminRoute>} />
-
-          {/* ── Audit Log (auth + admin required) — Issue #35 ── */}
-          <Route path="/admin/audit-log" element={<AdminRoute><AuditLogPage /></AdminRoute>} />
-
-          {/* ── Data Export (auth + admin required) — Issue #40 ── */}
-          <Route path="/admin/data-export" element={<AdminRoute><DataExportPage /></AdminRoute>} />
-
-          {/* ── Bulk Operations (auth + admin required) — Issue #44 ── */}
-          <Route path="/admin/bulk-operations" element={<AdminRoute><BulkOperationsPage /></AdminRoute>} />
-
-          {/* ── Document Generation (auth + admin required) — Issue #45 ── */}
-          <Route path="/admin/document-generation" element={<AdminRoute><DocumentGenerationPage /></AdminRoute>} />
-
-          {/* ── Dashboard Builder (auth + admin required) — Issue #46 ── */}
-          <Route path="/admin/dashboard-builder" element={<AdminRoute><DashboardBuilderPage /></AdminRoute>} />
-
-          {/* ── SHIFT Data Model (auth + admin required) — Issue #18 ── */}
-          <Route path="/admin/shift-data-model" element={<AdminRoute><ShiftDataModelPage /></AdminRoute>} />
-
-          {/* ── Assessment Engine Admin (auth + admin required) — Issue #20 ── */}
-          <Route path="/admin/assessment-engine" element={<AdminRoute><AssessmentEngineAdminPage /></AdminRoute>} />
-
-          {/* ── System Health (auth + admin required) — Issues #26, #28, #31 ── */}
-          <Route path="/admin/system-health" element={<AdminRoute><SystemHealthPage /></AdminRoute>} />
-
-          {/* ── User Activation Flows (auth + admin required) — Issue #35 ── */}
-          <Route path="/admin/activation-flows" element={<AdminRoute><UserActivationFlowsPage /></AdminRoute>} />
+          {/* Backward-compat redirects: legacy /admin/* → /app/admin/* (now inside AppShell) */}
+          <Route path="/admin/console" element={<Navigate to="/app/admin/console" replace />} />
+          <Route path="/admin/cohort-reports" element={<Navigate to="/app/admin/cohort-reports" replace />} />
+          <Route path="/admin/audit-log" element={<Navigate to="/app/admin/audit-log" replace />} />
+          <Route path="/admin/data-export" element={<Navigate to="/app/admin/data-export" replace />} />
+          <Route path="/admin/bulk-operations" element={<Navigate to="/app/admin/bulk-operations" replace />} />
+          <Route path="/admin/document-generation" element={<Navigate to="/app/admin/document-generation" replace />} />
+          <Route path="/admin/dashboard-builder" element={<Navigate to="/app/admin/dashboard-builder" replace />} />
+          <Route path="/admin/shift-data-model" element={<Navigate to="/app/admin/shift-data-model" replace />} />
+          <Route path="/admin/assessment-engine" element={<Navigate to="/app/admin/assessment-engine" replace />} />
+          <Route path="/admin/system-health" element={<Navigate to="/app/admin/system-health" replace />} />
+          <Route path="/admin/activation-flows" element={<Navigate to="/app/admin/activation-flows" replace />} />
+          <Route path="/admin/users" element={<Navigate to="/app/admin/users" replace />} />
+          <Route path="/admin/credits" element={<Navigate to="/app/admin/credits" replace />} />
+          <Route path="/admin/custom-domains" element={<Navigate to="/app/admin/custom-domains" replace />} />
+          <Route path="/admin/data-contracts" element={<Navigate to="/app/admin/data-contracts" replace />} />
+          <Route path="/admin/ai-orchestration" element={<Navigate to="/app/admin/ai-orchestration" replace />} />
+          <Route path="/admin/email-engine" element={<Navigate to="/app/admin/email-engine" replace />} />
 
           {/* ── Signal Council Briefing — Issue #23 ── */}
           <Route path="/council/briefing" element={<ProtectedRoute><SignalCouncilBriefingPage /></ProtectedRoute>} />
@@ -445,14 +466,66 @@ export default function App() {
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="compliance" element={<CompliancePage />} />
               <Route path="nexus-engine" element={<AdminRoute><NexusEnginePage /></AdminRoute>} />
+              <Route path="rag-library" element={<AdminRoute><RagLibraryPage /></AdminRoute>} />
+              <Route path="journey-dashboard" element={<AdminRoute><JourneyDashboardPage /></AdminRoute>} />
+              <Route path="nexus-master" element={<AdminRoute><NexusMasterPage /></AdminRoute>} />
               <Route path="oversight" element={<AdminRoute><KevinOversightDashboard /></AdminRoute>} />
               <Route path="intelligence" element={<IntelligenceDashboardPage />} />
               <Route path="intelligence/companies/:id" element={<CompanyIntelligencePage />} />
               <Route path="admin/intelligence/sources" element={<AdminRoute><IntelligenceSourcesPage /></AdminRoute>} />
+
+              {/* ── Admin Console pages (REM_09) — rendered inside AppShell so the sidebar's Admin surface is visible ── */}
+              <Route path="admin/console" element={<AdminRoute><PlatformAdminConsolePage /></AdminRoute>} />
+              <Route path="admin/cohort-reports" element={<AdminRoute><CohortReportAdminPage /></AdminRoute>} />
+              <Route path="admin/audit-log" element={<AdminRoute><AuditLogPage /></AdminRoute>} />
+              <Route path="admin/data-export" element={<AdminRoute><DataExportPage /></AdminRoute>} />
+              <Route path="admin/bulk-operations" element={<AdminRoute><BulkOperationsPage /></AdminRoute>} />
+              <Route path="admin/document-generation" element={<AdminRoute><DocumentGenerationPage /></AdminRoute>} />
+              <Route path="admin/dashboard-builder" element={<AdminRoute><DashboardBuilderPage /></AdminRoute>} />
+              <Route path="admin/shift-data-model" element={<AdminRoute><ShiftDataModelPage /></AdminRoute>} />
+              <Route path="admin/assessment-engine" element={<AdminRoute><AssessmentEngineAdminPage /></AdminRoute>} />
+              <Route path="admin/system-health" element={<AdminRoute><SystemHealthPage /></AdminRoute>} />
+              <Route path="admin/activation-flows" element={<AdminRoute><UserActivationFlowsPage /></AdminRoute>} />
+              <Route path="admin/users" element={<AdminRoute><UserManagement /></AdminRoute>} />
+              <Route path="admin/credits" element={<AdminRoute><CreditManagement /></AdminRoute>} />
+              <Route path="admin/custom-domains" element={<AdminRoute><CustomDomainPage /></AdminRoute>} />
+              <Route path="admin/data-contracts" element={<AdminRoute><DataContractsPage /></AdminRoute>} />
+              <Route path="admin/ai-orchestration" element={<AdminRoute><AIOrchestrationPage /></AdminRoute>} />
+              <Route path="admin/email-engine" element={<AdminRoute><EmailEnginePage /></AdminRoute>} />
+              <Route path="admin/cohort-analytics" element={<AdminRoute><CohortAnalyticsDashboard /></AdminRoute>} />
             </Route>
 
           {/* Backward compat: redirect old /platform/* to /app */}
           <Route path="/platform/*" element={<Navigate to="/app" replace />} />
+
+          {/* ── BD Manager Portal (REM_06) ── */}
+          <Route path="/app/bd" element={<RoleRoute allowedRoles={[...ADMIN_ROUTES, 'bd_manager']}><BDPortal /></RoleRoute>}>
+            <Route index element={<BDDashboard />} />
+            <Route path="pipeline" element={<OpportunityList />} />
+            <Route path="opportunities" element={<OpportunityList />} />
+            <Route path="opportunities/new" element={<OpportunityForm onSave={() => {}} onCancel={() => {}} />} />
+            <Route path="opportunities/:id" element={<OpportunityDetail orgId="" opportunityId="" onBack={() => {}} userId="" />} />
+            <Route path="opportunities/:id/edit" element={<OpportunityForm onSave={() => {}} onCancel={() => {}} />} />
+            <Route path="clients" element={<ClientRelationships />} />
+            <Route path="clients/:id" element={<ClientDetail clientId="" />} />
+            <Route path="market-intel" element={<BDMarketIntel />} />
+            <Route path="forecast" element={<BDForecast />} />
+            <Route path="chat" element={<NexusPage />} />
+          </Route>
+
+          {/* ── Team Lead Portal (REM_07) ── */}
+          <Route path="/app/team-lead" element={<RoleRoute allowedRoles={[...ADMIN_ROUTES, 'team_lead']} allowedIcps={['leader']}><TeamLeadPortal /></RoleRoute>}>
+            <Route index element={<TL_Dashboard />} />
+            <Route path="approvals" element={<TL_Approvals />} />
+            <Route path="approvals/:id" element={<TL_ApprovalDetail approvalId="" />} />
+            <Route path="mandates" element={<TL_MandatePortfolio />} />
+            <Route path="mandates/:id" element={<MandateDetailPage />} />
+            <Route path="sla" element={<TL_SLADashboard />} />
+            <Route path="revenue" element={<TL_RevenueDashboard />} />
+            <Route path="team" element={<TL_TeamOverview />} />
+            <Route path="clients" element={<TL_ClientOverview />} />
+            <Route path="chat" element={<NexusPage />} />
+          </Route>
 
           {/* ── B2B Client Portal (mockup surface) ── */}
           <Route path="/client" element={<RoleRoute allowedRoles={[...ADMIN_ROUTES, 'client_admin', 'client_user']} allowedIcps={['client']}><AppShell /></RoleRoute>}>

@@ -24,6 +24,29 @@ function getCalendarGrid(year: number, month: number): (Date | null)[][] {
 function isSameDay(a: Date, b: Date) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
 function formatDate(d: Date) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
+const EVENT_TYPE_OPTIONS = ['All', 'Interview', 'Deadline', 'Meeting', 'Milestone'];
+
+// Seed mandates for the Mandate filter dropdown.
+const MANDATE_FILTER_OPTIONS = [
+  { id: 'm-001', title: 'CTO — Tencent' },
+  { id: 'm-002', title: 'Head of IB — CICC' },
+  { id: 'm-003', title: 'VP Engineering — Sea Limited' },
+  { id: 'm-004', title: 'CFO — Ant Group' },
+];
+
+// CalendarEvent does not yet carry a typed event_type; fall back to deriving
+// one from the title so the Event Type filter is still useful client-side.
+function getEventType(e: CalendarEvent): string {
+  const explicit = (e as any).event_type || (e as any).type;
+  if (typeof explicit === 'string' && explicit.trim()) return explicit.toLowerCase();
+  const title = (e.title || '').toLowerCase();
+  if (title.includes('interview')) return 'interview';
+  if (title.includes('deadline')) return 'deadline';
+  if (title.includes('meeting') || title.includes('call')) return 'meeting';
+  if (title.includes('milestone')) return 'milestone';
+  return '';
+}
+
 export function SchedulerPage() {
   const { data: events, loading, setData: setEvents } = useEvents();
   const today = new Date();
@@ -34,11 +57,27 @@ export function SchedulerPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newEvent, setNewEvent] = useState({ title: '', date: formatDate(today), time: '10:00', location: '' });
+  const [eventTypeFilter, setEventTypeFilter] = useState('All');
+  const [mandateFilter, setMandateFilter] = useState('');
 
   const weeks = useMemo(() => getCalendarGrid(viewYear, viewMonth), [viewYear, viewMonth]);
-  const eventsForDate = (date: Date) => events.filter(e => isSameDay(new Date(e.start_time), date));
+
+  // Client-side filtering — does not change underlying data fetching.
+  const filteredEvents = useMemo(() => {
+    let result = events;
+    if (eventTypeFilter !== 'All') {
+      const want = eventTypeFilter.toLowerCase();
+      result = result.filter(e => getEventType(e) === want);
+    }
+    if (mandateFilter) {
+      result = result.filter(e => e.mandate_id === mandateFilter);
+    }
+    return result;
+  }, [events, eventTypeFilter, mandateFilter]);
+
+  const eventsForDate = (date: Date) => filteredEvents.filter(e => isSameDay(new Date(e.start_time), date));
   const selectedEvents = selectedDate ? eventsForDate(selectedDate) : [];
-  const upcomingEvents = events.filter(e => new Date(e.start_time) >= today).slice(0, 10);
+  const upcomingEvents = filteredEvents.filter(e => new Date(e.start_time) >= today).slice(0, 10);
 
   const prevMonth = () => { if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); } else setViewMonth(viewMonth - 1); };
   const nextMonth = () => { if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); } else setViewMonth(viewMonth + 1); };
@@ -92,6 +131,35 @@ export function SchedulerPage() {
           <button onClick={() => setView('month')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${view === 'month' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Month</button>
           <button onClick={() => setView('agenda')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${view === 'agenda' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Agenda</button>
         </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex gap-3 flex-wrap">
+        <select
+          value={eventTypeFilter}
+          onChange={e => setEventTypeFilter(e.target.value)}
+          aria-label="Event Type filter"
+          className="px-3 py-2 text-sm rounded-none bg-bg-secondary text-text-primary border border-bg-tertiary focus:outline-none focus:border-accent min-h-[44px]"
+        >
+          {EVENT_TYPE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt === 'All' ? 'All Event Types' : opt}</option>)}
+        </select>
+        <select
+          value={mandateFilter}
+          onChange={e => setMandateFilter(e.target.value)}
+          aria-label="Mandate filter"
+          className="px-3 py-2 text-sm rounded-none bg-bg-secondary text-text-primary border border-bg-tertiary focus:outline-none focus:border-accent min-h-[44px]"
+        >
+          <option value="">All Mandates</option>
+          {MANDATE_FILTER_OPTIONS.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
+        </select>
+        {(eventTypeFilter !== 'All' || mandateFilter) && (
+          <button
+            onClick={() => { setEventTypeFilter('All'); setMandateFilter(''); }}
+            className="px-3 py-2 text-sm rounded-none bg-bg-tertiary text-text-muted hover:text-text-primary min-h-[44px]"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
       {view === 'month' ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

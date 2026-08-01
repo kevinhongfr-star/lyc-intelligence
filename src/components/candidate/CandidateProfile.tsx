@@ -499,7 +499,14 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
           <h4 className="font-semibold text-text-primary mb-4">CV Preview</h4>
           <div className="bg-bg-alt rounded-none p-4 text-center">
             <FileText className="w-8 h-8 mx-auto text-text-muted mb-2" />
-            <p className="text-sm text-text-muted">PDF Preview Coming Soon</p>
+            <a
+              href={formData.cv_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-accent hover:underline"
+            >
+              Open CV in new tab
+            </a>
           </div>
         </div>
       )}

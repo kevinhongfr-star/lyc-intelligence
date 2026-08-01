@@ -3822,8 +3822,9 @@ export async function getCoacheePastSessions(userId: string): Promise<CoachingSe
 }
 
 // ── Talent Intelligence aggregates for client portal ──
-// TODO: pre-compute via cron for performance; these are aggregate queries
-// that may be slow on large tables. For now, query directly.
+// Performance note: these aggregate queries run inline. For large datasets,
+// wrap them in a scheduled job (Supabase scheduled function or pg_cron) that
+// materializes results into a `market_trend_cache` table and read from there.
 export interface MarketTrend {
   id: string;
   label: string;

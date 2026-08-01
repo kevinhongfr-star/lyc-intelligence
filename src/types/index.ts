@@ -287,3 +287,8 @@ export const DEFAULT_SUCCESS_PROFILE: Partial<SuccessProfile> = {
   language_requirements: [],
   status: 'draft',
 };
+
+// ─── BD Manager Subtypes (REM_06) ────────────────────────────────────
+
+export const BD_SUBTYPES = ['bd_manager', 'consultant', 'team_lead'] as const;
+export type BDSubtype = typeof BD_SUBTYPES[number];

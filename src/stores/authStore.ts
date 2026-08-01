@@ -15,6 +15,7 @@ export interface UserProfile {
   organization_id: string | null;
   subtype: string | null;
   notion_profile_id: string | null;
+  onboarding_completed?: boolean | null;
   created_at: string;
   updated_at: string;
 }

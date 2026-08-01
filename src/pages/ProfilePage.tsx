@@ -3,24 +3,7 @@ import { User, Briefcase, Target, History, Lightbulb, CreditCard, FileText, Save
 import { useAuthStore, UserProfile } from '@/stores/authStore';
 import { getAssessmentsByEmail } from '@/services/supabaseApi';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-};
+import { COLORS, TYPOGRAPHY, RADII, SHADOWS } from '@/styles/tokens';
 
 type Section = 'identity' | 'goals' | 'assessments' | 'memory' | 'subscription' | 'documents';
 
@@ -94,12 +77,12 @@ export function ProfilePage() {
 
   const renderIdentitySection = () => (
     <div>
-      <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 24px' }}>
+      <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', fontWeight: 600, color: COLORS.text, margin: '0 0 24px' }}>
         Career Identity
       </h2>
       <div style={{ display: 'grid', gap: '20px' }}>
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: COLORS.textSecondary, marginBottom: '8px' }}>
             Full name
           </label>
           <input
@@ -109,10 +92,10 @@ export function ProfilePage() {
             style={{
               width: '100%',
               padding: '12px 16px',
-              background: DS.bg,
-              border: `1px solid ${DS.cardBorder}`,
+              background: COLORS.bg,
+              border: `1px solid ${COLORS.border}`,
               borderRadius: '0px',
-              color: DS.text,
+              color: COLORS.text,
               fontSize: '15px',
               outline: 'none',
               minHeight: '44px',
@@ -121,7 +104,7 @@ export function ProfilePage() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: COLORS.textSecondary, marginBottom: '8px' }}>
               Current title
             </label>
             <input
@@ -132,10 +115,10 @@ export function ProfilePage() {
               style={{
                 width: '100%',
                 padding: '12px 16px',
-                background: DS.bg,
-                border: `1px solid ${DS.cardBorder}`,
+                background: COLORS.bg,
+                border: `1px solid ${COLORS.border}`,
                 borderRadius: '0px',
-                color: DS.text,
+                color: COLORS.text,
                 fontSize: '15px',
                 outline: 'none',
                 minHeight: '44px',
@@ -143,7 +126,7 @@ export function ProfilePage() {
             />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: COLORS.textSecondary, marginBottom: '8px' }}>
               Company
             </label>
             <input
@@ -154,10 +137,10 @@ export function ProfilePage() {
               style={{
                 width: '100%',
                 padding: '12px 16px',
-                background: DS.bg,
-                border: `1px solid ${DS.cardBorder}`,
+                background: COLORS.bg,
+                border: `1px solid ${COLORS.border}`,
                 borderRadius: '0px',
-                color: DS.text,
+                color: COLORS.text,
                 fontSize: '15px',
                 outline: 'none',
                 minHeight: '44px',
@@ -166,7 +149,7 @@ export function ProfilePage() {
           </div>
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: COLORS.textSecondary, marginBottom: '8px' }}>
             Country / Region
           </label>
           <input
@@ -177,10 +160,10 @@ export function ProfilePage() {
             style={{
               width: '100%',
               padding: '12px 16px',
-              background: DS.bg,
-              border: `1px solid ${DS.cardBorder}`,
+              background: COLORS.bg,
+              border: `1px solid ${COLORS.border}`,
               borderRadius: '0px',
-              color: DS.text,
+              color: COLORS.text,
               fontSize: '15px',
               outline: 'none',
               minHeight: '44px',
@@ -193,12 +176,12 @@ export function ProfilePage() {
 
   const renderGoalsSection = () => (
     <div>
-      <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 24px' }}>
+      <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', fontWeight: 600, color: COLORS.text, margin: '0 0 24px' }}>
         Career Goals
       </h2>
       <div style={{ display: 'grid', gap: '20px' }}>
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: COLORS.textSecondary, marginBottom: '8px' }}>
             Short-term goal (6 months)
           </label>
           <textarea
@@ -209,10 +192,10 @@ export function ProfilePage() {
             style={{
               width: '100%',
               padding: '12px 16px',
-              background: DS.bg,
-              border: `1px solid ${DS.cardBorder}`,
+              background: COLORS.bg,
+              border: `1px solid ${COLORS.border}`,
               borderRadius: '0px',
-              color: DS.text,
+              color: COLORS.text,
               fontSize: '15px',
               outline: 'none',
               resize: 'vertical',
@@ -221,7 +204,7 @@ export function ProfilePage() {
           />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: COLORS.textSecondary, marginBottom: '8px' }}>
             Long-term goal (3 years)
           </label>
           <textarea
@@ -232,10 +215,10 @@ export function ProfilePage() {
             style={{
               width: '100%',
               padding: '12px 16px',
-              background: DS.bg,
-              border: `1px solid ${DS.cardBorder}`,
+              background: COLORS.bg,
+              border: `1px solid ${COLORS.border}`,
               borderRadius: '0px',
-              color: DS.text,
+              color: COLORS.text,
               fontSize: '15px',
               outline: 'none',
               resize: 'vertical',
@@ -244,7 +227,7 @@ export function ProfilePage() {
           />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: COLORS.textSecondary, marginBottom: '8px' }}>
             Target geography
           </label>
           <input
@@ -255,10 +238,10 @@ export function ProfilePage() {
             style={{
               width: '100%',
               padding: '12px 16px',
-              background: DS.bg,
-              border: `1px solid ${DS.cardBorder}`,
+              background: COLORS.bg,
+              border: `1px solid ${COLORS.border}`,
               borderRadius: '0px',
-              color: DS.text,
+              color: COLORS.text,
               fontSize: '15px',
               outline: 'none',
               minHeight: '44px',
@@ -271,36 +254,36 @@ export function ProfilePage() {
 
   const renderAssessmentsSection = () => (
     <div>
-      <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 24px' }}>
+      <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', fontWeight: 600, color: COLORS.text, margin: '0 0 24px' }}>
         Assessment History
       </h2>
       {loadingAssessments ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: DS.muted }}>Loading assessments...</div>
+        <div style={{ textAlign: 'center', padding: '40px', color: COLORS.textMuted }}>Loading assessments...</div>
       ) : assessments.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', background: DS.card, borderRadius: DS.radius }}>
-          <History style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
-          <p style={{ fontSize: '15px', color: DS.muted, margin: '0 0 16px' }}>No assessments yet</p>
-          <a href="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: DS.accent, fontSize: '14px', textDecoration: 'none', fontWeight: 500 }}>
+        <div style={{ textAlign: 'center', padding: '40px', background: COLORS.white, borderRadius: `${RADII.lg}px` }}>
+          <History style={{ width: 48, height: 48, color: COLORS.textMuted, margin: '0 auto 16px' }} />
+          <p style={{ fontSize: '15px', color: COLORS.textMuted, margin: '0 0 16px' }}>No assessments yet</p>
+          <a href="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: COLORS.primary, fontSize: '14px', textDecoration: 'none', fontWeight: 500 }}>
             Take your first assessment
           </a>
         </div>
       ) : (
         <div style={{ display: 'grid', gap: '12px' }}>
           {assessments.map((assessment) => (
-            <div key={assessment.id} style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '20px' }}>
+            <div key={assessment.id} style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.lg}px`, padding: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                 <div>
-                  <h3 style={{ fontSize: '15px', fontWeight: 600, color: DS.text, margin: '0 0 4px' }}>{assessment.assessment_type}</h3>
-                  <p style={{ fontSize: '13px', color: DS.muted, margin: 0 }}>
+                  <h3 style={{ fontSize: '15px', fontWeight: 600, color: COLORS.text, margin: '0 0 4px' }}>{assessment.assessment_type}</h3>
+                  <p style={{ fontSize: '13px', color: COLORS.textMuted, margin: 0 }}>
                     {new Date(assessment.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                   </p>
                 </div>
-                <div style={{ background: `${DS.accent}20`, padding: '6px 12px', borderRadius: '0px' }}>
-                  <span style={{ fontSize: '14px', fontWeight: 600, color: DS.accent }}>{assessment.composite_score}</span>
+                <div style={{ background: `${COLORS.primary}20`, padding: '6px 12px', borderRadius: '0px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: COLORS.primary }}>{assessment.composite_score}</span>
                 </div>
               </div>
-              <p style={{ fontSize: '13px', color: DS.textSecondary, margin: 0 }}>
-                Archetype: <strong style={{ color: DS.text }}>{assessment.archetype}</strong>
+              <p style={{ fontSize: '13px', color: COLORS.textSecondary, margin: 0 }}>
+                Archetype: <strong style={{ color: COLORS.text }}>{assessment.archetype}</strong>
               </p>
             </div>
           ))}
@@ -311,15 +294,15 @@ export function ProfilePage() {
 
   const renderMemorySection = () => (
     <div>
-      <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 24px' }}>
+      <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', fontWeight: 600, color: COLORS.text, margin: '0 0 24px' }}>
         Memory Summary
       </h2>
-      <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', textAlign: 'center' }}>
-        <Lightbulb style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
-        <p style={{ fontSize: '15px', color: DS.muted, margin: '0 0 8px' }}>
+      <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.lg}px`, padding: '24px', textAlign: 'center' }}>
+        <Lightbulb style={{ width: 48, height: 48, color: COLORS.textMuted, margin: '0 auto 16px' }} />
+        <p style={{ fontSize: '15px', color: COLORS.textMuted, margin: '0 0 8px' }}>
           Nexus learns about you through your conversations
         </p>
-        <p style={{ fontSize: '13px', color: DS.muted }}>
+        <p style={{ fontSize: '13px', color: COLORS.textMuted }}>
           Key insights from your chats will appear here as Nexus gets to know you better.
         </p>
       </div>
@@ -328,18 +311,18 @@ export function ProfilePage() {
 
   const renderSubscriptionSection = () => (
     <div>
-      <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 24px' }}>
+      <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', fontWeight: 600, color: COLORS.text, margin: '0 0 24px' }}>
         Subscription & Credits
       </h2>
-      <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', marginBottom: '16px' }}>
+      <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.lg}px`, padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
-            <p style={{ fontSize: '13px', color: DS.muted, margin: '0 0 4px' }}>Current Plan</p>
-            <h3 style={{ fontSize: '20px', fontWeight: 600, color: DS.text, margin: 0, textTransform: 'capitalize' }}>{profile?.tier || 'Free'}</h3>
+            <p style={{ fontSize: '13px', color: COLORS.textMuted, margin: '0 0 4px' }}>Current Plan</p>
+            <h3 style={{ fontSize: '20px', fontWeight: 600, color: COLORS.text, margin: 0, textTransform: 'capitalize' }}>{profile?.tier || 'Free'}</h3>
           </div>
           <button style={{
             padding: '10px 20px',
-            background: DS.accent,
+            background: COLORS.primary,
             color: '#FFFFFF',
             border: 'none',
             borderRadius: '0px',
@@ -351,9 +334,9 @@ export function ProfilePage() {
             Upgrade Plan
           </button>
         </div>
-        <div style={{ borderTop: `1px solid ${DS.border}`, paddingTop: '16px' }}>
-          <p style={{ fontSize: '13px', color: DS.muted, margin: '0 0 8px' }}>Credits Available</p>
-          <p style={{ fontSize: '32px', fontWeight: 700, color: DS.text, margin: 0 }}>—</p>
+        <div style={{ borderTop: `1px solid ${COLORS.border}`, paddingTop: '16px' }}>
+          <p style={{ fontSize: '13px', color: COLORS.textMuted, margin: '0 0 8px' }}>Credits Available</p>
+          <p style={{ fontSize: '32px', fontWeight: 700, color: COLORS.text, margin: 0 }}>—</p>
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
@@ -362,10 +345,10 @@ export function ProfilePage() {
           { label: 'Pro', price: '$29.99/mo', features: '50 credits/month' },
           { label: 'Enterprise', price: 'Custom', features: 'Unlimited' },
         ].map((plan) => (
-          <div key={plan.label} style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '16px', textAlign: 'center' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: 600, color: DS.text, margin: '0 0 4px' }}>{plan.label}</h4>
-            <p style={{ fontSize: '12px', color: DS.accent, fontWeight: 600, margin: '0 0 8px' }}>{plan.price}</p>
-            <p style={{ fontSize: '11px', color: DS.muted, margin: 0 }}>{plan.features}</p>
+          <div key={plan.label} style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.lg}px`, padding: '16px', textAlign: 'center' }}>
+            <h4 style={{ fontSize: '14px', fontWeight: 600, color: COLORS.text, margin: '0 0 4px' }}>{plan.label}</h4>
+            <p style={{ fontSize: '12px', color: COLORS.primary, fontWeight: 600, margin: '0 0 8px' }}>{plan.price}</p>
+            <p style={{ fontSize: '11px', color: COLORS.textMuted, margin: 0 }}>{plan.features}</p>
           </div>
         ))}
       </div>
@@ -374,25 +357,25 @@ export function ProfilePage() {
 
   const renderDocumentsSection = () => (
     <div>
-      <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 24px' }}>
+      <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', fontWeight: 600, color: COLORS.text, margin: '0 0 24px' }}>
         Document Library
       </h2>
-      <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', marginBottom: '16px' }}>
+      <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.lg}px`, padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-          <div style={{ width: '48px', height: '48px', background: `${DS.accent}20`, borderRadius: '0px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <FileText style={{ width: 24, height: 24, color: DS.accent }} />
+          <div style={{ width: '48px', height: '48px', background: `${COLORS.primary}20`, borderRadius: '0px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <FileText style={{ width: 24, height: 24, color: COLORS.primary }} />
           </div>
           <div>
-            <h3 style={{ fontSize: '15px', fontWeight: 600, color: DS.text, margin: '0 0 4px' }}>Resume / CV</h3>
-            <p style={{ fontSize: '13px', color: DS.muted, margin: 0 }}>PDF, DOC, or DOCX</p>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: COLORS.text, margin: '0 0 4px' }}>Resume / CV</h3>
+            <p style={{ fontSize: '13px', color: COLORS.textMuted, margin: 0 }}>PDF, DOC, or DOCX</p>
           </div>
         </div>
         <button style={{
           width: '100%',
           padding: '12px',
-          background: DS.bg,
-          color: DS.text,
-          border: `1px solid ${DS.cardBorder}`,
+          background: COLORS.bg,
+          color: COLORS.text,
+          border: `1px solid ${COLORS.border}`,
           borderRadius: '0px',
           fontSize: '14px',
           fontWeight: 500,
@@ -402,14 +385,14 @@ export function ProfilePage() {
           Upload CV
         </button>
       </div>
-      <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px' }}>
+      <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.lg}px`, padding: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-          <div style={{ width: '48px', height: '48px', background: `${DS.accent}20`, borderRadius: '0px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ExternalLink style={{ width: 24, height: 24, color: DS.accent }} />
+          <div style={{ width: '48px', height: '48px', background: `${COLORS.primary}20`, borderRadius: '0px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ExternalLink style={{ width: 24, height: 24, color: COLORS.primary }} />
           </div>
           <div>
-            <h3 style={{ fontSize: '15px', fontWeight: 600, color: DS.text, margin: '0 0 4px' }}>LinkedIn Profile</h3>
-            <p style={{ fontSize: '13px', color: DS.muted, margin: 0 }}>Connect your LinkedIn</p>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: COLORS.text, margin: '0 0 4px' }}>LinkedIn Profile</h3>
+            <p style={{ fontSize: '13px', color: COLORS.textMuted, margin: 0 }}>Connect your LinkedIn</p>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
@@ -421,10 +404,10 @@ export function ProfilePage() {
             style={{
               flex: 1,
               padding: '12px 16px',
-              background: DS.bg,
-              border: `1px solid ${DS.cardBorder}`,
+              background: COLORS.bg,
+              border: `1px solid ${COLORS.border}`,
               borderRadius: '0px',
-              color: DS.text,
+              color: COLORS.text,
               fontSize: '14px',
               outline: 'none',
               minHeight: '44px',
@@ -432,7 +415,7 @@ export function ProfilePage() {
           />
           <button style={{
             padding: '12px 20px',
-            background: DS.accent,
+            background: COLORS.primary,
             color: '#FFFFFF',
             border: 'none',
             borderRadius: '0px',
@@ -449,13 +432,13 @@ export function ProfilePage() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg }}>
+    <div style={{ minHeight: '100vh', background: COLORS.bg }}>
       {/* Header */}
-      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <h1 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text }}>Profile</h1>
+      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${COLORS.border}` }}>
+        <h1 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', fontWeight: 600, color: COLORS.text }}>Profile</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {saveMessage && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: saveMessage.type === 'success' ? DS.success : DS.error }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: saveMessage.type === 'success' ? COLORS.success : COLORS.error }}>
               {saveMessage.type === 'success' ? <CheckCircle2 style={{ width: 18, height: 18 }} /> : <AlertCircle style={{ width: 18, height: 18 }} />}
               {saveMessage.text}
             </div>
@@ -468,7 +451,7 @@ export function ProfilePage() {
               alignItems: 'center',
               gap: '6px',
               padding: '10px 20px',
-              background: DS.accent,
+              background: COLORS.primary,
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '0px',
@@ -498,17 +481,17 @@ export function ProfilePage() {
                   alignItems: 'center',
                   gap: '12px',
                   padding: '14px 16px',
-                  background: activeSection === section.id ? DS.card : 'transparent',
-                  border: `1px solid ${activeSection === section.id ? DS.accent : 'transparent'}`,
+                  background: activeSection === section.id ? COLORS.white : 'transparent',
+                  border: `1px solid ${activeSection === section.id ? COLORS.primary : 'transparent'}`,
                   borderRadius: '0px',
                   cursor: 'pointer',
                   textAlign: 'left',
                   transition: 'all 0.2s',
                 }}
               >
-                <section.icon style={{ width: 20, height: 20, color: activeSection === section.id ? DS.accent : DS.muted }} />
+                <section.icon style={{ width: 20, height: 20, color: activeSection === section.id ? COLORS.primary : COLORS.textMuted }} />
                 <div>
-                  <p style={{ fontSize: '14px', fontWeight: 500, color: activeSection === section.id ? DS.text : DS.textSecondary, margin: 0 }}>{section.title}</p>
+                  <p style={{ fontSize: '14px', fontWeight: 500, color: activeSection === section.id ? COLORS.text : COLORS.textSecondary, margin: 0 }}>{section.title}</p>
                 </div>
               </button>
             ))}
@@ -516,7 +499,7 @@ export function ProfilePage() {
         </div>
 
         {/* Content */}
-        <div style={{ flex: 1, background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px' }}>
+        <div style={{ flex: 1, background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.lg}px`, padding: '32px' }}>
           {activeSection === 'identity' && renderIdentitySection()}
           {activeSection === 'goals' && renderGoalsSection()}
           {activeSection === 'assessments' && renderAssessmentsSection()}
@@ -532,10 +515,10 @@ export function ProfilePage() {
           to { transform: rotate(360deg); }
         }
         input:focus, textarea:focus {
-          border-color: ${DS.accent} !important;
+          border-color: ${COLORS.primary} !important;
         }
         input::placeholder, textarea::placeholder {
-          color: ${DS.muted};
+          color: ${COLORS.textMuted};
         }
       `}</style>
     </div>

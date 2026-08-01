@@ -11,24 +11,7 @@ import { useMemoryStore } from '../stores/memoryStore';
 import { getMemoryContextForUser, formatAssessmentForInjection } from '../services/memoryService';
 import { getSupabase } from '../services/supabaseApi';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-};
+import { COLORS, TYPOGRAPHY, RADII, SHADOWS } from '@/styles/tokens';
 
 interface AssessmentSummary {
   id: string;
@@ -163,33 +146,33 @@ export function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Loader2 style={{ width: 32, height: 32, color: DS.accent, animation: 'spin 1s linear infinite' }} />
+      <div style={{ minHeight: '100vh', background: COLORS.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Loader2 style={{ width: 32, height: 32, color: COLORS.primary, animation: 'spin 1s linear infinite' }} />
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
+    <div style={{ minHeight: '100vh', background: COLORS.bg, padding: '24px' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, marginBottom: '4px' }}>
+            <h1 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '28px', fontWeight: 700, color: COLORS.text, marginBottom: '4px' }}>
               {greeting()}, {profile?.name?.split(' ')[0] || 'there'}
             </h1>
-            <p style={{ color: DS.muted, fontSize: '14px' }}>
+            <p style={{ color: COLORS.textMuted, fontSize: '14px' }}>
               Here's your career intelligence overview
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: DS.card, borderRadius: '0px', border: `1px solid ${DS.cardBorder}` }}>
-              <Calendar style={{ width: 16, height: 16, color: DS.accent }} />
-              <span style={{ fontSize: '14px', color: DS.text }}>{streak} day streak</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: COLORS.white, borderRadius: '0px', border: `1px solid ${COLORS.border}` }}>
+              <Calendar style={{ width: 16, height: 16, color: COLORS.primary }} />
+              <span style={{ fontSize: '14px', color: COLORS.text }}>{streak} day streak</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: DS.card, borderRadius: '0px', border: `1px solid ${DS.cardBorder}` }}>
-              <CreditCard style={{ width: 16, height: 16, color: DS.accent }} />
-              <span style={{ fontSize: '14px', color: DS.text }}>{credits} credits</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: COLORS.white, borderRadius: '0px', border: `1px solid ${COLORS.border}` }}>
+              <CreditCard style={{ width: 16, height: 16, color: COLORS.primary }} />
+              <span style={{ fontSize: '14px', color: COLORS.text }}>{credits} credits</span>
             </div>
           </div>
         </div>
@@ -197,55 +180,55 @@ export function DashboardPage() {
         {/* Row 1: Career Summary Card */}
         <div style={{ 
           background: 'linear-gradient(135deg, rgba(193,8,171,0.15), rgba(99,102,241,0.1))',
-          border: `1px solid ${DS.accent}40`,
+          border: `1px solid ${COLORS.primary}40`,
           borderRadius: '0px',
           padding: '24px',
           marginBottom: '24px'
         }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
             <div>
-              <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <p style={{ fontSize: '12px', color: COLORS.textMuted, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Your Archetype
               </p>
-              <p style={{ fontSize: '20px', fontWeight: 700, color: DS.text }}>
+              <p style={{ fontSize: '20px', fontWeight: 700, color: COLORS.text }}>
                 {assessment?.archetype || 'Not assessed yet'}
               </p>
             </div>
             <div>
-              <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <p style={{ fontSize: '12px', color: COLORS.textMuted, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Last Assessment
               </p>
-              <p style={{ fontSize: '20px', fontWeight: 700, color: DS.text }}>
+              <p style={{ fontSize: '20px', fontWeight: 700, color: COLORS.text }}>
                 {assessment?.created_at 
                   ? new Date(assessment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                   : 'Take your first assessment'}
               </p>
             </div>
             <div>
-              <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <p style={{ fontSize: '12px', color: COLORS.textMuted, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Overall Score
               </p>
-              <p style={{ fontSize: '20px', fontWeight: 700, color: assessment?.composite_score ? DS.success : DS.muted }}>
+              <p style={{ fontSize: '20px', fontWeight: 700, color: assessment?.composite_score ? COLORS.success : COLORS.textMuted }}>
                 {assessment?.composite_score || '—'}/100
               </p>
             </div>
             <div>
-              <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <p style={{ fontSize: '12px', color: COLORS.textMuted, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Next Recommended Action
               </p>
-              <p style={{ fontSize: '14px', color: DS.textSecondary }}>
+              <p style={{ fontSize: '14px', color: COLORS.textSecondary }}>
                 {getNextAction()}
               </p>
             </div>
             {/* Phase 11.2 — Nexus CTA after assessment */}
             {assessment && (
-              <div style={{ background: `${DS.accent}08`, border: `1px solid ${DS.accent}25`, borderRadius: '0px', padding: '20px', marginTop: '16px' }}>
-                <p style={{ color: DS.textSecondary, fontSize: '14px', margin: '0 0 12px', fontFamily: DS.headingFont }}>
+              <div style={{ background: `${COLORS.primary}08`, border: `1px solid ${COLORS.primary}25`, borderRadius: '0px', padding: '20px', marginTop: '16px' }}>
+                <p style={{ color: COLORS.textSecondary, fontSize: '14px', margin: '0 0 12px', fontFamily: TYPOGRAPHY.fontFamily.serif }}>
                   Nexus has context from your assessment. Ask it anything about your results or next steps.
                 </p>
                 <a
                   href={`/nexus?context=dashboard&archetype=${encodeURIComponent(assessment.archetype || '')}`}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', background: DS.accent, color: '#fff', borderRadius: '0px', textDecoration: 'none', fontWeight: 600, fontSize: '13px' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', background: COLORS.primary, color: '#fff', borderRadius: '0px', textDecoration: 'none', fontWeight: 600, fontSize: '13px' }}
                 >
                   Continue with Nexus →
                 </a>
@@ -261,21 +244,21 @@ export function DashboardPage() {
             icon={MessageSquare}
             title="Continue with Nexus"
             description="Get personalized advice based on your profile"
-            color={DS.accent}
+            color={COLORS.primary}
             onClick={() => navigate('/nexus')}
           />
           <ActionCard
             icon={Target}
             title="Run Assessment"
             description="Discover your executive archetype"
-            color={DS.success}
+            color={COLORS.success}
             onClick={() => navigate('/assessment')}
           />
           <ActionCard
             icon={FileText}
             title="Upload CV"
             description="Get AI-powered analysis of your resume"
-            color={DS.warning}
+            color={COLORS.warning}
             onClick={() => navigate('/documents')}
           />
         </div>
@@ -283,8 +266,8 @@ export function DashboardPage() {
         {/* Row 3: Recent Activity */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', marginBottom: '24px' }}>
           {/* Recent Conversations */}
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '20px' }}>
-            <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '16px' }}>
+          <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: '0px', padding: '20px' }}>
+            <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '16px', fontWeight: 600, color: COLORS.text, marginBottom: '16px' }}>
               Recent Conversations
             </h3>
             {recentSessions.length > 0 ? (
@@ -295,49 +278,49 @@ export function DashboardPage() {
                     onClick={() => navigate(`/nexus?session=${session.id}`)}
                     style={{ 
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '12px', background: DS.bg, borderRadius: '0px', cursor: 'pointer',
+                      padding: '12px', background: COLORS.bg, borderRadius: '0px', cursor: 'pointer',
                       transition: 'background 0.2s'
                     }}
                     onMouseOver={(e) => e.currentTarget.style.background = '#1a1a1a'}
-                    onMouseOut={(e) => e.currentTarget.style.background = DS.bg}
+                    onMouseOut={(e) => e.currentTarget.style.background = COLORS.bg}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <MessageSquare style={{ width: 16, height: 16, color: DS.muted }} />
-                      <span style={{ fontSize: '14px', color: DS.text }}>
+                      <MessageSquare style={{ width: 16, height: 16, color: COLORS.textMuted }} />
+                      <span style={{ fontSize: '14px', color: COLORS.text }}>
                         {session.session_title || 'New conversation'}
                       </span>
                     </div>
-                    <span style={{ fontSize: '12px', color: DS.muted }}>
+                    <span style={{ fontSize: '12px', color: COLORS.textMuted }}>
                       {formatDate(session.last_message_at)}
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ color: DS.muted, fontSize: '14px' }}>No conversations yet</p>
+              <p style={{ color: COLORS.textMuted, fontSize: '14px' }}>No conversations yet</p>
             )}
           </div>
 
           {/* Assessment Summary */}
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '20px' }}>
-            <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '16px' }}>
+          <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: '0px', padding: '20px' }}>
+            <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '16px', fontWeight: 600, color: COLORS.text, marginBottom: '16px' }}>
               Assessment Results
             </h3>
             {assessment ? (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <span style={{ fontSize: '14px', color: DS.text }}>{assessment.archetype}</span>
-                  <span style={{ fontSize: '24px', fontWeight: 700, color: DS.success }}>{assessment.composite_score}</span>
+                  <span style={{ fontSize: '14px', color: COLORS.text }}>{assessment.archetype}</span>
+                  <span style={{ fontSize: '24px', fontWeight: 700, color: COLORS.success }}>{assessment.composite_score}</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {Object.entries(assessment.dimension_scores || {}).slice(0, 4).map(([key, value]) => (
                     <div key={key}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '12px', color: DS.textSecondary }}>{formatDimensionName(key)}</span>
-                        <span style={{ fontSize: '12px', color: DS.text }}>{value}%</span>
+                        <span style={{ fontSize: '12px', color: COLORS.textSecondary }}>{formatDimensionName(key)}</span>
+                        <span style={{ fontSize: '12px', color: COLORS.text }}>{value}%</span>
                       </div>
-                      <div style={{ height: '4px', background: DS.border, borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${value}%`, background: DS.accent, borderRadius: '2px' }} />
+                      <div style={{ height: '4px', background: COLORS.border, borderRadius: '2px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${value}%`, background: COLORS.primary, borderRadius: '2px' }} />
                       </div>
                     </div>
                   ))}
@@ -351,7 +334,7 @@ export function DashboardPage() {
                     gap: '6px',
                     background: 'none',
                     border: 'none',
-                    color: DS.accent,
+                    color: COLORS.primary,
                     fontSize: '13px',
                     cursor: 'pointer'
                   }}
@@ -361,13 +344,13 @@ export function DashboardPage() {
               </div>
             ) : (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                <Target style={{ width: 32, height: 32, color: DS.muted, margin: '0 auto 12px' }} />
-                <p style={{ color: DS.muted, fontSize: '14px', marginBottom: '16px' }}>No assessment yet</p>
+                <Target style={{ width: 32, height: 32, color: COLORS.textMuted, margin: '0 auto 12px' }} />
+                <p style={{ color: COLORS.textMuted, fontSize: '14px', marginBottom: '16px' }}>No assessment yet</p>
                 <button
                   onClick={() => navigate('/assessment')}
                   style={{
                     padding: '10px 20px',
-                    background: DS.accent,
+                    background: COLORS.primary,
                     color: '#FFFFFF',
                     border: 'none',
                     borderRadius: '0px',
@@ -384,9 +367,9 @@ export function DashboardPage() {
 
         {/* Row 4: Nexus Suggestions */}
         {suggestions.length > 0 && (
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '20px', marginBottom: '24px' }}>
-            <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Sparkles style={{ width: 18, height: 18, color: DS.accent }} />
+          <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: '0px', padding: '20px', marginBottom: '24px' }}>
+            <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '16px', fontWeight: 600, color: COLORS.text, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Sparkles style={{ width: 18, height: 18, color: COLORS.primary }} />
               Suggested by Nexus
             </h3>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -396,21 +379,21 @@ export function DashboardPage() {
                   onClick={() => navigate(`/nexus?prompt=${encodeURIComponent(suggestion)}`)}
                   style={{
                     padding: '10px 16px',
-                    background: `${DS.accent}15`,
-                    border: `1px solid ${DS.accent}40`,
+                    background: `${COLORS.primary}15`,
+                    border: `1px solid ${COLORS.primary}40`,
                     borderRadius: '0px',
-                    color: DS.text,
+                    color: COLORS.text,
                     fontSize: '13px',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.background = `${DS.accent}25`;
-                    e.currentTarget.style.borderColor = DS.accent;
+                    e.currentTarget.style.background = `${COLORS.primary}25`;
+                    e.currentTarget.style.borderColor = COLORS.primary;
                   }}
                   onMouseOut={(e) => {
-                    e.currentTarget.style.background = `${DS.accent}15`;
-                    e.currentTarget.style.borderColor = `${DS.accent}40`;
+                    e.currentTarget.style.background = `${COLORS.primary}15`;
+                    e.currentTarget.style.borderColor = `${COLORS.primary}40`;
                   }}
                 >
                   {suggestion}
@@ -421,14 +404,14 @@ export function DashboardPage() {
         )}
 
         {/* Row 5: Referral Module */}
-        <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '20px' }}>
+        <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: '0px', padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-            <Gift style={{ width: 24, height: 24, color: DS.success }} />
+            <Gift style={{ width: 24, height: 24, color: COLORS.success }} />
             <div>
-              <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text }}>
+              <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '16px', fontWeight: 600, color: COLORS.text }}>
                 Earn Credits
               </h3>
-              <p style={{ fontSize: '13px', color: DS.muted }}>
+              <p style={{ fontSize: '13px', color: COLORS.textMuted }}>
                 Refer a colleague and both get 5 bonus credits
               </p>
             </div>
@@ -437,11 +420,11 @@ export function DashboardPage() {
             <div style={{ flex: 1, minWidth: '200px' }}>
               <div style={{ 
                 padding: '12px 16px', 
-                background: DS.bg, 
-                border: `1px solid ${DS.cardBorder}`, 
+                background: COLORS.bg, 
+                border: `1px solid ${COLORS.border}`, 
                 borderRadius: '0px',
                 fontSize: '14px',
-                color: DS.text,
+                color: COLORS.text,
                 fontFamily: 'monospace'
               }}>
                 {getReferralLink()}
@@ -454,7 +437,7 @@ export function DashboardPage() {
                 alignItems: 'center',
                 gap: '6px',
                 padding: '12px 20px',
-                background: DS.success,
+                background: COLORS.success,
                 color: '#000000',
                 border: 'none',
                 borderRadius: '0px',
@@ -497,8 +480,8 @@ function ActionCard({ icon: Icon, title, description, color, onClick }: ActionCa
         alignItems: 'flex-start',
         gap: '16px',
         padding: '20px',
-        background: DS.card,
-        border: `1px solid ${DS.cardBorder}`,
+        background: COLORS.white,
+        border: `1px solid ${COLORS.border}`,
         borderRadius: '0px',
         cursor: 'pointer',
         textAlign: 'left',
@@ -509,8 +492,8 @@ function ActionCard({ icon: Icon, title, description, color, onClick }: ActionCa
         e.currentTarget.style.background = '#1a1a1a';
       }}
       onMouseOut={(e) => {
-        e.currentTarget.style.borderColor = DS.border;
-        e.currentTarget.style.background = DS.card;
+        e.currentTarget.style.borderColor = COLORS.border;
+        e.currentTarget.style.background = COLORS.white;
       }}
     >
       <div style={{
@@ -526,8 +509,8 @@ function ActionCard({ icon: Icon, title, description, color, onClick }: ActionCa
         <Icon style={{ width: 22, height: 22, color }} />
       </div>
       <div>
-        <h4 style={{ fontSize: '15px', fontWeight: 600, color: DS.text, marginBottom: '4px' }}>{title}</h4>
-        <p style={{ fontSize: '13px', color: DS.muted }}>{description}</p>
+        <h4 style={{ fontSize: '15px', fontWeight: 600, color: COLORS.text, marginBottom: '4px' }}>{title}</h4>
+        <p style={{ fontSize: '13px', color: COLORS.textMuted }}>{description}</p>
       </div>
     </button>
   );

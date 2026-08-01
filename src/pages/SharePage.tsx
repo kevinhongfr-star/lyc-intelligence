@@ -4,23 +4,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ShareCard } from '../components/share/ShareCard';
 import { getShareCard } from '../services/shareCardService';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
+import { COLORS, TYPOGRAPHY } from '@/styles/tokens';
+
+const CUSTOM_DS = {
   bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
+  muted: '#666666',
   text: '#000000',
   textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
 
 export function SharePage() {
@@ -82,12 +72,12 @@ export function SharePage() {
     return (
       <div style={{ 
         minHeight: '100vh', 
-        background: DS.bg, 
+        background: CUSTOM_DS.bg, 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center' 
       }}>
-        <div style={{ fontSize: '16px', color: DS.muted }}>Loading...</div>
+        <div style={{ fontSize: '16px', color: CUSTOM_DS.muted }}>Loading...</div>
       </div>
     );
   }
@@ -96,7 +86,7 @@ export function SharePage() {
     return (
       <div style={{ 
         minHeight: '100vh', 
-        background: DS.bg, 
+        background: CUSTOM_DS.bg, 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
@@ -104,17 +94,17 @@ export function SharePage() {
         padding: '24px',
         textAlign: 'center'
       }}>
-        <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', color: DS.text, marginBottom: '8px' }}>
+        <h1 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '28px', color: CUSTOM_DS.text, marginBottom: '8px' }}>
           Card not found
         </h1>
-        <p style={{ fontSize: '14px', color: DS.muted, marginBottom: '24px' }}>
+        <p style={{ fontSize: '14px', color: CUSTOM_DS.muted, marginBottom: '24px' }}>
           {error || 'This share card may have expired or been removed'}
         </p>
         <button 
           onClick={() => navigate('/')} 
           style={{
             padding: '10px 20px',
-            background: DS.accent,
+            background: COLORS.primary,
             color: '#FFFFFF',
             border: 'none',
             borderRadius: '0px',
@@ -130,7 +120,7 @@ export function SharePage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg }}>
+    <div style={{ minHeight: '100vh', background: CUSTOM_DS.bg }}>
       <div style={{ 
         maxWidth: '1200px', 
         margin: '0 auto', 
@@ -140,10 +130,10 @@ export function SharePage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ 
-              fontFamily: DS.headingFont, 
+              fontFamily: TYPOGRAPHY.fontFamily.serif, 
               fontSize: '20px', 
               fontWeight: 700, 
-              color: DS.accent 
+              color: COLORS.primary 
             }}>
               LYC Intelligence
             </div>
@@ -153,20 +143,20 @@ export function SharePage() {
             style={{
               padding: '8px 16px',
               background: 'transparent',
-              border: `1px solid ${DS.cardBorder}`,
+              border: `1px solid ${COLORS.border}`,
               borderRadius: '0px',
-              color: DS.textSecondary,
+              color: CUSTOM_DS.textSecondary,
               fontSize: '13px',
               cursor: 'pointer',
               transition: 'all 0.2s ease'
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.borderColor = DS.accent;
-              e.currentTarget.style.color = DS.accent;
+              e.currentTarget.style.borderColor = COLORS.primary;
+              e.currentTarget.style.color = COLORS.primary;
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.borderColor = DS.border;
-              e.currentTarget.style.color = DS.textSecondary;
+              e.currentTarget.style.borderColor = COLORS.border;
+              e.currentTarget.style.color = CUSTOM_DS.textSecondary;
             }}
           >
             Get Your Profile
@@ -175,8 +165,8 @@ export function SharePage() {
 
         {/* Share Card Container */}
         <div style={{ 
-          background: DS.card, 
-          border: `1px solid ${DS.cardBorder}`, 
+          background: COLORS.white, 
+          border: `1px solid ${COLORS.border}`, 
           borderRadius: '0px', 
           overflow: 'hidden' 
         }}>
@@ -194,7 +184,7 @@ export function SharePage() {
           textAlign: 'center', 
           marginTop: '32px' 
         }}>
-          <p style={{ fontSize: '14px', color: DS.muted, marginBottom: '12px' }}>
+          <p style={{ fontSize: '14px', color: CUSTOM_DS.muted, marginBottom: '12px' }}>
             Want your own career intelligence profile?
           </p>
           <button 
@@ -204,7 +194,7 @@ export function SharePage() {
               alignItems: 'center',
               gap: '8px',
               padding: '12px 28px',
-              background: DS.accent,
+              background: COLORS.primary,
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '0px',

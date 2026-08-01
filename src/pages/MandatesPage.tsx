@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Briefcase, ChevronRight, Loader2, CheckCircle, PauseCircle, XCircle, Plus, Building2, Download, CheckSquare, Square, Trash2, ArrowUpDown, Filter } from 'lucide-react';
 import { useMandates } from '@/hooks/useSupabaseData';
+import { useAuthStore } from '@/stores/authStore';
 import { Badge } from '@/components/ui';
 import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
 import { updateMandateStatus, getSupabase } from '@/services/supabaseApi';
@@ -29,9 +30,12 @@ const PRIORITY_OPTIONS = [
 export function MandatesPage() {
   const navigate = useNavigate();
   const { data: mandates, count, loading, error } = useMandates({ limit: 100 });
+  const { profile } = useAuthStore();
+  const currentUserId = profile?.id || 'me';
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
+  const [scopeFilter, setScopeFilter] = useState<'mine' | 'all' | 'shared'>('mine');
   const [updating, setUpdating] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -77,6 +81,20 @@ export function MandatesPage() {
 
   const filtered = useMemo(() => {
     let result = mandates;
+    // NOTE: API-level consultant_id / scope filtering is not yet supported by the
+    // backend. This filters client-side using each mandate's consultant_id field;
+    // wire it to getMandates (e.g. pass a scope/consultant_id param) when the API
+    // supports it.
+    if (scopeFilter === 'mine') {
+      result = result.filter(m => (m as any).consultant_id === currentUserId);
+    } else if (scopeFilter === 'shared') {
+      result = result.filter(m => {
+        const sharedWith = (m as any).shared_with;
+        return Array.isArray(sharedWith)
+          ? sharedWith.includes(currentUserId)
+          : (m as any).consultant_id != null && (m as any).consultant_id !== currentUserId;
+      });
+    }
     if (statusFilter) result = result.filter(m => m.status === statusFilter);
     if (priorityFilter) result = result.filter(m => m.priority === priorityFilter);
     if (search) {
@@ -84,7 +102,7 @@ export function MandatesPage() {
       result = result.filter(m => m.title?.toLowerCase().includes(q) || m.company?.name?.toLowerCase().includes(q));
     }
     return result;
-  }, [mandates, statusFilter, priorityFilter, search]);
+  }, [mandates, statusFilter, priorityFilter, search, scopeFilter, currentUserId]);
 
   const handleStatusChange = async (mandateId: string, newStatus: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -169,7 +187,23 @@ export function MandatesPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 flex-wrap">
+      <div className="flex gap-3 flex-wrap items-center">
+        {/* Scope toggle */}
+        <div className="flex items-center bg-white border border-[#E5E5E5]">
+          {(['mine', 'all', 'shared'] as const).map((scope) => {
+            const labels = { mine: 'My Mandates', all: 'All Mandates', shared: 'Shared with me' };
+            const active = scopeFilter === scope;
+            return (
+              <button
+                key={scope}
+                onClick={() => setScopeFilter(scope)}
+                className={`px-4 py-2.5 text-sm font-medium transition-colors min-h-[44px] ${active ? 'bg-[#C108AB] text-white' : 'text-[#737373] hover:text-[#171717]'}`}
+              >
+                {labels[scope]}
+              </button>
+            );
+          })}
+        </div>
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3]" />
           <input placeholder="Search mandates..." value={search} onChange={e => setSearch(e.target.value)}

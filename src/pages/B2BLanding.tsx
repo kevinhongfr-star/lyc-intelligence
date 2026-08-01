@@ -5,25 +5,7 @@ import { ArrowRight, Menu, X, Lock } from 'lucide-react';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 import { Link } from 'react-router-dom';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  // LYC Brand: Zero border-radius
-  radius: '0px',
-  radiusSm: '0px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-};
+import { COLORS, TYPOGRAPHY, RADII, SHADOWS } from '@/styles/tokens';
 
 export function B2BLanding() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -45,15 +27,15 @@ export function B2BLanding() {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg }}>
+    <div style={{ minHeight: '100vh', background: COLORS.bg }}>
       {/* Nav */}
-      <nav className="nav-sticky" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <Link to="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>LYC Intelligence</Link>
+      <nav className="nav-sticky" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 32px', borderBottom: `1px solid ${COLORS.border}` }}>
+        <Link to="/" style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '18px', fontWeight: 700, color: COLORS.text, textDecoration: 'none' }}>LYC Intelligence</Link>
         <div className="nav-links">
           {navLinks.map(l => (
-            <Link key={l.href} to={l.href} style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</Link>
+            <Link key={l.href} to={l.href} style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', color: COLORS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</Link>
           ))}
-          <Link to="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+          <Link to="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: COLORS.primary, color: '#FFFFFF', borderRadius: '0px', fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
             <Lock style={{ width: 14, height: 14 }} />Platform
           </Link>
         </div>
@@ -65,27 +47,27 @@ export function B2BLanding() {
       <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`}>
         <button className="nav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu"><X style={{ width: 24, height: 24, color: '#000' }} /></button>
         {navLinks.map(l => (<Link key={l.href} to={l.href} onClick={() => setMobileOpen(false)}>{l.label}</Link>))}
-        <Link to="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</Link>
+        <Link to="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '15px', fontWeight: 600, color: COLORS.primary, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</Link>
       </div>
 
       {/* Hero — fuchsia glow */}
       <div className="hero-padding section-padding" style={{ maxWidth: '900px', margin: '0 auto', padding: '96px 32px 60px', textAlign: 'center', position: 'relative' }}>
         <div style={{ position: 'absolute', top: '-80px', left: '50%', transform: 'translateX(-50%)', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(193,8,171,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '16px' }}>
+          <div className="section-label" style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: COLORS.primary, marginBottom: '16px' }}>
             Leadership Intelligence
           </div>
-          <h1 className="hero-heading" style={{ fontFamily: DS.headingFont, fontSize: '48px', fontWeight: 700, color: DS.text, margin: '0 0 16px', lineHeight: 1.1 }}>
+          <h1 className="hero-heading" style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '48px', fontWeight: 700, color: COLORS.text, margin: '0 0 16px', lineHeight: 1.1 }}>
             Find Your Next<br />C-Suite Leader in Hours,<br />Not Months
           </h1>
-          <p className="hero-sub" style={{ fontFamily: DS.bodyFont, fontSize: '17px', color: DS.textSecondary, maxWidth: '560px', margin: '0 auto 32px', lineHeight: 1.6 }}>
+          <p className="hero-sub" style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '17px', color: COLORS.textSecondary, maxWidth: '560px', margin: '0 auto 32px', lineHeight: 1.6 }}>
             Identify the right talent, score candidates with precision, and align your leadership team to accelerate results.
           </p>
           <div className="cta-row" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/match" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <Link to="/match" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: COLORS.primary, color: '#FFF', borderRadius: '0px', fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               Try Match Analysis Free <ArrowRight style={{ width: 16, height: 16 }} />
             </Link>
-            <Link to="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <Link to="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', borderRadius: '0px', fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               Leadership Assessment
             </Link>
           </div>
@@ -97,58 +79,58 @@ export function B2BLanding() {
 
       {/* How It Works — branded icons */}
       <div className="reveal section-padding" style={{ maxWidth: '900px', margin: '0 auto', padding: '64px 32px 40px' }}>
-        <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '8px', textAlign: 'center' }}>
+        <div className="section-label" style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: COLORS.primary, marginBottom: '8px', textAlign: 'center' }}>
           How It Works
         </div>
-        <h2 className="section-heading" style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 400, color: DS.text, textAlign: 'center', margin: '0 0 40px' }}>How Match Analysis Works</h2>
+        <h2 className="section-heading" style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '32px', fontWeight: 400, color: COLORS.text, textAlign: 'center', margin: '0 0 40px' }}>How Match Analysis Works</h2>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
           {[
             { step: '01', icon: IconPrism, title: 'Paste Your JD', desc: 'Drop in the full job description — role, requirements, qualifications, company context.' },
             { step: '02', icon: IconBridge, title: 'Add Candidates', desc: 'Paste CVs, LinkedIn profiles, or resume text for each candidate you want to evaluate.' },
             { step: '03', icon: IconTrident, title: 'Get Match Scores', desc: 'AI scores each candidate on 3 dimensions with verdicts, match reasons, risks, and approach strategy.' },
           ].map(s => (
-            <div key={s.step} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', boxShadow: DS.shadow }}>
-              <div style={{ color: DS.accent, marginBottom: '12px' }}><s.icon size={32} color={DS.accent} /></div>
-              <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '6px' }}>Step {s.step}</div>
-              <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>{s.title}</h3>
-              <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, lineHeight: 1.5, margin: 0 }}>{s.desc}</p>
+            <div key={s.step} className="card-hover" style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.none}px`, padding: '24px', boxShadow: SHADOWS.sm }}>
+              <div style={{ color: COLORS.primary, marginBottom: '12px' }}><s.icon size={32} color={COLORS.primary} /></div>
+              <div className="section-label" style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2.5px', color: COLORS.primary, marginBottom: '6px' }}>Step {s.step}</div>
+              <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '16px', fontWeight: 600, color: COLORS.text, margin: '0 0 8px' }}>{s.title}</h3>
+              <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', color: COLORS.textMuted, lineHeight: 1.5, margin: 0 }}>{s.desc}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Scoring Dimensions */}
-      <div className="reveal" style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 32px', background: DS.bgAlt }}>
-        <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '8px' }}>
+      <div className="reveal" style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 32px', background: COLORS.bgAlt }}>
+        <div className="section-label" style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2.5px', color: COLORS.primary, marginBottom: '8px' }}>
           Scoring Dimensions
         </div>
-        <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px', boxShadow: DS.shadow }}>
-          <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 20px' }}>How Scoring Works</h3>
+        <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.none}px`, padding: '32px', boxShadow: SHADOWS.sm }}>
+          <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', fontWeight: 600, color: COLORS.text, margin: '0 0 20px' }}>How Scoring Works</h3>
           <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
             {[
               { name: 'Experience & Achievements', desc: 'Career trajectory, role progression, quantifiable impact, leadership scope', color: '#000000' },
-              { name: 'Skills & Expertise', desc: 'Technical competencies, functional expertise, cross-border capability, language fit', color: DS.accent },
+              { name: 'Skills & Expertise', desc: 'Technical competencies, functional expertise, cross-border capability, language fit', color: COLORS.primary },
               { name: 'Organizational Fit', desc: 'Culture alignment, stakeholder complexity, transformation readiness, board dynamics', color: '#333333' },
             ].map(d => (
-              <div key={d.name} style={{ background: DS.bgAlt, borderRadius: '0px', padding: '16px' }}>
+              <div key={d.name} style={{ background: COLORS.bgAlt, borderRadius: '0px', padding: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '8px' }}>
                   <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: d.color, flexShrink: 0 }} />
-                  <h4 style={{ fontFamily: DS.bodyFont, fontSize: '14px', fontWeight: 600, color: DS.text, margin: 0 }}>{d.name}</h4>
+                  <h4 style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '14px', fontWeight: 600, color: COLORS.text, margin: 0 }}>{d.name}</h4>
                 </div>
-                <p style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted, lineHeight: 1.4, margin: 0 }}>{d.desc}</p>
+                <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '12px', color: COLORS.textMuted, lineHeight: 1.4, margin: 0 }}>{d.desc}</p>
               </div>
             ))}
           </div>
-          <div style={{ marginTop: '20px', padding: '12px 16px', background: DS.bgAlt, borderRadius: '0px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <IconForge size={14} color={DS.accent} />
-            <span style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted }}>Each candidate receives a match verdict: Strong Fit, Good Fit, or Potential Fit — with detailed reasoning and approach strategy.</span>
+          <div style={{ marginTop: '20px', padding: '12px 16px', background: COLORS.bgAlt, borderRadius: '0px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <IconForge size={14} color={COLORS.primary} />
+            <span style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '12px', color: COLORS.textMuted }}>Each candidate receives a match verdict: Strong Fit, Good Fit, or Potential Fit — with detailed reasoning and approach strategy.</span>
           </div>
         </div>
       </div>
 
       {/* Why Match Analysis — branded icons */}
       <div className="reveal section-padding" style={{ maxWidth: '900px', margin: '0 auto', padding: '64px 32px 40px' }}>
-        <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '8px', textAlign: 'center' }}>
+        <div className="section-label" style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2.5px', color: COLORS.primary, marginBottom: '8px', textAlign: 'center' }}>
           Why Match Analysis
         </div>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
@@ -157,10 +139,10 @@ export function B2BLanding() {
             { icon: IconImpact, title: 'Confidential', desc: 'Your JDs and candidate data stay private. Never shared with third parties.' },
             { icon: IconBridge, title: 'Batch Processing', desc: 'Score multiple candidates against the same JD in one sweep.' },
           ].map(f => (
-            <div key={f.title} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', boxShadow: DS.shadow }}>
-              <div style={{ color: DS.accent, marginBottom: '12px' }}><f.icon size={24} color={DS.accent} /></div>
-              <h3 style={{ fontFamily: DS.headingFont, fontSize: '15px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>{f.title}</h3>
-              <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
+            <div key={f.title} className="card-hover" style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.none}px`, padding: '24px', boxShadow: SHADOWS.sm }}>
+              <div style={{ color: COLORS.primary, marginBottom: '12px' }}><f.icon size={24} color={COLORS.primary} /></div>
+              <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '15px', fontWeight: 600, color: COLORS.text, margin: '0 0 8px' }}>{f.title}</h3>
+              <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', color: COLORS.textMuted, lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
             </div>
           ))}
         </div>
@@ -172,8 +154,8 @@ export function B2BLanding() {
         <div style={{ position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '400px', background: 'radial-gradient(circle, rgba(193,8,171,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '500px', margin: '0 auto' }}>
           <div style={{ width: '48px', height: '3px', background: '#C108AB', margin: '0 auto 16px', borderRadius: '2px' }} />
-          <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 12px' }}>Start matching today</h2>
-          <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px' }}>Leadership isn't a title — it's a trajectory. Find the right one.</p>
+          <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '28px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 12px' }}>Start matching today</h2>
+          <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '15px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px' }}>Leadership isn't a title — it's a trajectory. Find the right one.</p>
           <LeadCaptureForm type="b2b" source="b2b_landing" heading="Get 3 free candidate matches" subheading="Paste a job description, add CVs, get ranked results. No credit card." />
         </div>
       </div>
@@ -182,8 +164,8 @@ export function B2BLanding() {
       <footer className="footer-dark">
         <div className="footer-grid" style={{ maxWidth: '900px', margin: '0 auto', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '32px' }}>
           <div>
-            <span style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 700, color: '#FFF' }}>LYC Intelligence</span>
-            <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '12px', lineHeight: 1.5 }}>Career advisory, candidate scoring, and leadership alignment. For leaders at every stage.</p>
+            <span style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '16px', fontWeight: 700, color: '#FFF' }}>LYC Intelligence</span>
+            <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '12px', lineHeight: 1.5 }}>Career advisory, candidate scoring, and leadership alignment. For leaders at every stage.</p>
           </div>
           <div>
             <div className="footer-label">Platform</div>

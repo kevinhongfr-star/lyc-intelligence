@@ -307,7 +307,7 @@ export function ClientMandateDashboard({ mandateId, onBack }: ClientMandateDashb
               ) : (
                 <Button variant="outline" className="w-full" disabled>
                   <FileText className="w-4 h-4 mr-1" />
-                  Report Coming Soon
+                  GRID Report Pending
                 </Button>
               )}
             </Card>

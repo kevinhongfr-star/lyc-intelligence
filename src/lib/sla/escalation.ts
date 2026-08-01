@@ -38,11 +38,14 @@ export async function checkMandateEscalations(
     return { updated: false, escalationsCreated, timeline: null };
   }
 
-  // Get SLA configuration
+  // Get SLA configuration. Default to executive_search mandate type when the
+  // timeline does not carry an explicit mandate_type (the common case for
+  // executive search engagements).
+  const mandateType = (timeline as { mandate_type?: string }).mandate_type ?? 'executive_search';
   const config = await getSLAConfiguration(
     supabase,
     timeline.org_id,
-    'executive_search' // TODO: Get actual mandate type
+    mandateType,
   );
   if (!config) {
     return { updated: false, escalationsCreated, timeline };

@@ -7,6 +7,7 @@ import { MandateSelector } from '@/components/match/MandateSelector';
 import { ContactSelector } from '@/components/match/ContactSelector';
 import { PipelineSaveModal } from '@/components/match/PipelineSaveModal';
 import { toast } from '@/stores/toastStore';
+import { logActivity } from '@/utils/activityLogger';
 import type { MatchResult } from '@/services/scoringClient';
 
 interface SubScore {
@@ -259,6 +260,14 @@ export function BatchScoringPage() {
 
       setResults(enriched);
       toast.success(`Scored ${enriched.length} candidate${enriched.length !== 1 ? 's' : ''}`);
+
+      logActivity({
+        type: 'batch_scoring_completed',
+        entity_type: mandateId ? 'mandate' : undefined,
+        entity_id: mandateId || undefined,
+        summary: `Scored ${enriched.length} candidate${enriched.length !== 1 ? 's' : ''}${mandateTitle ? ` for ${mandateTitle}` : ''}`,
+        metadata: { candidate_count: enriched.length, mandate_id: mandateId || null },
+      });
 
       // Persist scoring runs (fire and forget)
       enriched.forEach(r => persistScoringRun(r));

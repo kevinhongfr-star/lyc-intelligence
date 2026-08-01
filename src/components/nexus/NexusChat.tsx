@@ -14,24 +14,26 @@ import { DiagnosticProgressBar, parseDiagnosticProgress, DEFAULT_DIAGNOSTIC_DIME
 import { MilestoneBanner, parseMilestones, DEFAULT_MILESTONES } from './MilestoneBanner';
 import { stripTagsForDisplay } from '@/services/nexusPersona';
 
+import { COLORS, TYPOGRAPHY, RADII, SHADOWS } from '@/styles/tokens';
+
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
+  headingFont: TYPOGRAPHY.fontFamily.serif,
+  bodyFont: TYPOGRAPHY.fontFamily.sans,
+  accent: COLORS.primary,
+  accentHover: COLORS.primaryHover,
+  bg: COLORS.bg,
+  bgAlt: COLORS.bgAlt,
+  card: COLORS.white,
+  cardBorder: COLORS.border,
+  text: COLORS.text,
+  textSecondary: COLORS.textSecondary,
+  muted: COLORS.textMuted,
+  border: COLORS.border,
   // LYC Brand: Zero border-radius
-  radius: '0px',
-  radiusSm: '0px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
+  radius: `${RADII.none}px`,
+  radiusSm: `${RADII.none}px`,
+  shadow: SHADOWS.sm,
+  shadowHover: SHADOWS.md,
 };
 
 interface Message {

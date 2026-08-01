@@ -7,10 +7,15 @@ import {
   Loader2, Mail, MessageCircle, Phone,
 } from 'lucide-react';
 import { StatCard, PipelineFunnel, ActivityFeed } from './DashboardWidgets';
+import { TodayFocus } from './TodayFocus';
+import { MyMandateCards } from './MyMandateCards';
+import { ConsultantOnboarding } from './ConsultantOnboarding';
 import { authFetch } from '@/utils/authFetch';
+import { useAuthStore } from '@/stores/authStore';
 
 export function ConsultantDashboard() {
   const navigate = useNavigate();
+  const { profile } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [pipelineData, setPipelineData] = useState<any>(null);
   const [velocityData, setVelocityData] = useState<any>(null);
@@ -18,6 +23,7 @@ export function ConsultantDashboard() {
   const [kpisData, setKpisData] = useState<any[]>([]);
 
   useEffect(() => { loadAllData(); }, []);
+
 
   const loadAllData = async () => {
     setLoading(true);
@@ -41,6 +47,11 @@ export function ConsultantDashboard() {
       setLoading(false);
     }
   };
+
+  // Show the onboarding flow for consultants who haven't completed it yet.
+  if (profile && !profile.onboarding_completed) {
+    return <ConsultantOnboarding />;
+  }
 
   if (loading) {
     return (
@@ -73,6 +84,14 @@ export function ConsultantDashboard() {
           subtitle="total closed won" />
       </div>
 
+      {/* My Active Mandates */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-semibold text-[#171717]">My Active Mandates</h2>
+        </div>
+        <MyMandateCards />
+      </div>
+
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2">
@@ -80,39 +99,8 @@ export function ConsultantDashboard() {
             onStageClick={(stage) => navigate(`/app/pipeline?stage=${stage}`)} />
         </div>
 
-        {/* Today's Actions */}
-        <div className="bg-white border border-[#E5E5E5]">
-          <div className="px-5 py-4 border-b border-[#E5E5E5]">
-            <h3 className="font-semibold text-[15px] text-[#171717]">Today's Actions</h3>
-          </div>
-          <div className="divide-y divide-[#F7F7F7]">
-            {[
-              { icon: Mail, color: '#2563EB', bg: 'rgba(37,99,235,0.05)', title: 'Outreach follow-ups',
-                detail: `${pipelineData?.funnel?.SWEEP || 0} candidates in outreach phase`,
-                action: () => navigate('/app/pipeline') },
-              { icon: Target, color: '#16A34A', bg: 'rgba(22,163,74,0.05)', title: 'Deep-dive reviews',
-                detail: `${pipelineData?.funnel?.LENS || 0} candidates in deep-dive`,
-                action: () => navigate('/app/pipeline') },
-              { icon: Users, color: '#7C3AED', bg: 'rgba(124,58,237,0.05)', title: 'Shortlist reviews',
-                detail: `${pipelineData?.funnel?.CANVA || 0} candidates shortlisted`,
-                action: () => navigate('/app/pipeline') },
-              { icon: Calendar, color: '#CA8A04', bg: 'rgba(202,138,4,0.05)', title: 'Placements',
-                detail: `${pipelineData?.funnel?.PLACED || 0} total placed`,
-                action: () => navigate('/app/pipeline') },
-            ].map((action, idx) => (
-              <button key={idx} onClick={action.action}
-                className="flex items-center gap-3.5 px-5 py-3.5 w-full text-left transition-colors duration-150 hover:bg-[#FAFAFA]">
-                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0" style={{ background: action.bg }}>
-                  <action.icon className="w-4 h-4" style={{ color: action.color }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#171717]">{action.title}</p>
-                  <p className="text-xs text-[#737373] mt-0.5">{action.detail}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Today's Focus */}
+        <TodayFocus />
       </div>
 
       {/* Second Row */}

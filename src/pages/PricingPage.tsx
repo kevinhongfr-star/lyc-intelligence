@@ -4,25 +4,7 @@ import { Check, Crown, Zap, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { MinimalFooter } from '@/components/MinimalFooter';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '0px',
-  radiusSm: '0px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-  success: '#22C55E',
-};
+import { COLORS, TYPOGRAPHY, RADII, SHADOWS } from '@/styles/tokens';
 
 interface PricingPageProps {
   onUpgradeSuccess?: () => void;
@@ -110,17 +92,17 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', background: COLORS.bg, display: 'flex', flexDirection: 'column' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '24px 24px 0', width: '100%' }}>
-        <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', display: 'inline-block', marginBottom: '16px', fontFamily: DS.bodyFont }}>← Back to home</Link>
+        <Link to="/" style={{ fontSize: '13px', color: COLORS.textMuted, textDecoration: 'none', display: 'inline-block', marginBottom: '16px', fontFamily: TYPOGRAPHY.fontFamily.sans }}>← Back to home</Link>
       </div>
 
       {/* Header */}
       <header style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px 64px', textAlign: 'center', width: '100%' }}>
-        <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 16px' }}>
+        <h1 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '32px', fontWeight: 700, color: COLORS.text, margin: '0 0 16px' }}>
           Choose Your Plan
         </h1>
-        <p style={{ fontFamily: DS.bodyFont, fontSize: '16px', color: DS.muted, lineHeight: 1.6, maxWidth: '560px', margin: '0 auto' }}>
+        <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '16px', color: COLORS.textMuted, lineHeight: 1.6, maxWidth: '560px', margin: '0 auto' }}>
           Select the right tier for your leadership journey. Upgrade anytime as your needs grow.
         </p>
       </header>
@@ -137,26 +119,26 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                 key={tier.id}
                 style={{
                   position: 'relative',
-                  background: DS.card,
-                  border: `2px solid ${tier.popular ? DS.accent : DS.cardBorder}`,
-                  borderRadius: DS.radius,
+                  background: COLORS.white,
+                  border: `2px solid ${tier.popular ? COLORS.primary : COLORS.border}`,
+                  borderRadius: `${RADII.none}px`,
                   padding: '32px 24px',
-                  boxShadow: DS.shadowHover,
+                  boxShadow: SHADOWS.md,
                 }}
               >
                 {tier.popular && (
                   <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)' }}>
                     <span style={{
-                      background: DS.accent,
+                      background: COLORS.primary,
                       color: '#FFFFFF',
                       padding: '4px 12px',
-                      borderRadius: DS.radius,
+                      borderRadius: `${RADII.none}px`,
                       fontSize: '12px',
                       fontWeight: 600,
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '4px',
-                      fontFamily: DS.bodyFont,
+                      fontFamily: TYPOGRAPHY.fontFamily.sans,
                     }}>
                       <Sparkles style={{ width: 12, height: 12 }} />
                       Most Popular
@@ -167,13 +149,13 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                 {isCurrentTier && (
                   <div style={{ position: 'absolute', top: '-14px', right: '16px' }}>
                     <span style={{
-                      background: DS.success,
+                      background: COLORS.success,
                       color: '#FFFFFF',
                       padding: '4px 12px',
-                      borderRadius: DS.radius,
+                      borderRadius: `${RADII.none}px`,
                       fontSize: '11px',
                       fontWeight: 600,
-                      fontFamily: DS.bodyFont,
+                      fontFamily: TYPOGRAPHY.fontFamily.sans,
                     }}>
                       Current Plan
                     </span>
@@ -184,8 +166,8 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   <div style={{
                     width: '48px',
                     height: '48px',
-                    background: tier.popular ? DS.accent : DS.muted,
-                    borderRadius: DS.radius,
+                    background: tier.popular ? COLORS.primary : COLORS.textMuted,
+                    borderRadius: `${RADII.none}px`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -193,21 +175,21 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                     <Icon style={{ width: 24, height: 24, color: '#FFFFFF' }} />
                   </div>
                   <div>
-                    <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: 0 }}>
+                    <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '20px', fontWeight: 600, color: COLORS.text, margin: 0 }}>
                       {tier.name}
                     </h3>
-                    <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, margin: '4px 0 0' }}>
+                    <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', color: COLORS.textMuted, margin: '4px 0 0' }}>
                       {tier.description}
                     </p>
                   </div>
                 </div>
 
                 <div style={{ marginBottom: '24px' }}>
-                  <span style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text }}>
+                  <span style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '32px', fontWeight: 700, color: COLORS.text }}>
                     {tier.price}
                   </span>
                   {tier.period && (
-                    <span style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: DS.muted, marginLeft: '4px' }}>
+                    <span style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '14px', color: COLORS.textMuted, marginLeft: '4px' }}>
                       {tier.period}
                     </span>
                   )}
@@ -215,8 +197,8 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
 
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {tier.features.map((feature, i) => (
-                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontFamily: DS.bodyFont, fontSize: '14px', color: DS.textSecondary }}>
-                      <Check style={{ width: 18, height: 18, color: DS.success, flexShrink: 0 }} />
+                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '14px', color: COLORS.textSecondary }}>
+                      <Check style={{ width: 18, height: 18, color: COLORS.success, flexShrink: 0 }} />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -228,11 +210,11 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   style={{
                     width: '100%',
                     padding: '14px 24px',
-                    background: tier.popular ? DS.accent : DS.bgAlt,
-                    color: tier.popular ? '#FFFFFF' : DS.text,
+                    background: tier.popular ? COLORS.primary : COLORS.bgAlt,
+                    color: tier.popular ? '#FFFFFF' : COLORS.text,
                     border: 'none',
-                    borderRadius: DS.radius,
-                    fontFamily: DS.bodyFont,
+                    borderRadius: `${RADII.none}px`,
+                    fontFamily: TYPOGRAPHY.fontFamily.sans,
                     fontSize: '14px',
                     fontWeight: 600,
                     cursor: loading ? 'not-allowed' : 'pointer',
@@ -259,7 +241,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                 </button>
 
                 {error && tier.id === 'professional' && (
-                  <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: '#EF4444', marginTop: '12px', textAlign: 'center' }}>
+                  <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '13px', color: '#EF4444', marginTop: '12px', textAlign: 'center' }}>
                     {error}
                   </p>
                 )}
@@ -271,16 +253,16 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
 
       {/* Feature Comparison */}
       <section style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 64px', width: '100%' }}>
-        <h2 style={{ fontFamily: DS.headingFont, fontSize: '24px', fontWeight: 700, color: DS.text, textAlign: 'center', margin: '0 0 32px' }}>
+        <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '24px', fontWeight: 700, color: COLORS.text, textAlign: 'center', margin: '0 0 32px' }}>
           Feature Comparison
         </h2>
-        <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: DS.bodyFont }}>
+        <div style={{ background: COLORS.white, border: `1px solid ${COLORS.border}`, borderRadius: `${RADII.none}px`, overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: TYPOGRAPHY.fontFamily.sans }}>
             <thead>
-              <tr style={{ background: DS.bgAlt }}>
-                <th style={{ padding: '16px 24px', textAlign: 'left', fontWeight: 600, color: DS.textSecondary, fontSize: '14px' }}>Feature</th>
-                <th style={{ padding: '16px 24px', textAlign: 'center', fontWeight: 600, color: DS.textSecondary, fontSize: '14px' }}>Member</th>
-                <th style={{ padding: '16px 24px', textAlign: 'center', fontWeight: 600, color: DS.accent, fontSize: '14px' }}>Professional</th>
+              <tr style={{ background: COLORS.bgAlt }}>
+                <th style={{ padding: '16px 24px', textAlign: 'left', fontWeight: 600, color: COLORS.textSecondary, fontSize: '14px' }}>Feature</th>
+                <th style={{ padding: '16px 24px', textAlign: 'center', fontWeight: 600, color: COLORS.textSecondary, fontSize: '14px' }}>Member</th>
+                <th style={{ padding: '16px 24px', textAlign: 'center', fontWeight: 600, color: COLORS.primary, fontSize: '14px' }}>Professional</th>
               </tr>
             </thead>
             <tbody>
@@ -293,12 +275,12 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                 { feature: 'Exclusive Content', member: '✗', professional: '✓' },
                 { feature: 'Team Insights', member: '✗', professional: '✓' },
               ].map((row, i) => (
-                <tr key={i} style={{ background: i % 2 === 0 ? DS.card : DS.bgAlt }}>
-                  <td style={{ padding: '16px 24px', color: DS.textSecondary, fontSize: '14px' }}>{row.feature}</td>
-                  <td style={{ padding: '16px 24px', textAlign: 'center', color: DS.text, fontSize: '14px' }}>
+                <tr key={i} style={{ background: i % 2 === 0 ? COLORS.white : COLORS.bgAlt }}>
+                  <td style={{ padding: '16px 24px', color: COLORS.textSecondary, fontSize: '14px' }}>{row.feature}</td>
+                  <td style={{ padding: '16px 24px', textAlign: 'center', color: COLORS.text, fontSize: '14px' }}>
                     {row.member}
                   </td>
-                  <td style={{ padding: '16px 24px', textAlign: 'center', color: row.professional === '✓' ? DS.success : DS.accent, fontSize: '14px', fontWeight: 600 }}>
+                  <td style={{ padding: '16px 24px', textAlign: 'center', color: row.professional === '✓' ? COLORS.success : COLORS.primary, fontSize: '14px', fontWeight: 600 }}>
                     {row.professional}
                   </td>
                 </tr>
@@ -310,7 +292,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
 
       {/* FAQ */}
       <section style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 64px', width: '100%' }}>
-        <h2 style={{ fontFamily: DS.headingFont, fontSize: '24px', fontWeight: 700, color: DS.text, textAlign: 'center', margin: '0 0 32px' }}>
+        <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '24px', fontWeight: 700, color: COLORS.text, textAlign: 'center', margin: '0 0 32px' }}>
           Frequently Asked Questions
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -333,15 +315,15 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
             },
           ].map((faq, i) => (
             <div key={i} style={{
-              background: DS.card,
-              border: `1px solid ${DS.cardBorder}`,
-              borderRadius: DS.radius,
+              background: COLORS.white,
+              border: `1px solid ${COLORS.border}`,
+              borderRadius: `${RADII.none}px`,
               padding: '24px',
             }}>
-              <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
+              <h3 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '16px', fontWeight: 600, color: COLORS.text, margin: '0 0 8px' }}>
                 {faq.question}
               </h3>
-              <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: DS.muted, margin: 0, lineHeight: 1.6 }}>
+              <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '14px', color: COLORS.textMuted, margin: 0, lineHeight: 1.6 }}>
                 {faq.answer}
               </p>
             </div>
@@ -352,16 +334,16 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
       {/* CTA */}
       <section style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 64px', width: '100%' }}>
         <div style={{
-          background: DS.accent,
-          borderRadius: DS.radius,
+          background: COLORS.primary,
+          borderRadius: `${RADII.none}px`,
           padding: '48px 32px',
           textAlign: 'center',
           color: '#FFFFFF',
         }}>
-          <h2 style={{ fontFamily: DS.headingFont, fontSize: '24px', fontWeight: 700, margin: '0 0 16px', color: '#FFFFFF' }}>
+          <h2 style={{ fontFamily: TYPOGRAPHY.fontFamily.serif, fontSize: '24px', fontWeight: 700, margin: '0 0 16px', color: '#FFFFFF' }}>
             Ready to Elevate Your Leadership?
           </h2>
-          <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', margin: '0 0 24px', opacity: 0.9, lineHeight: 1.6 }}>
+          <p style={{ fontFamily: TYPOGRAPHY.fontFamily.sans, fontSize: '15px', margin: '0 0 24px', opacity: 0.9, lineHeight: 1.6 }}>
             Join Professional today and unlock premium features designed for ambitious leaders.
           </p>
           <button
@@ -369,11 +351,11 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
             disabled={loading}
             style={{
               background: '#FFFFFF',
-              color: DS.accent,
+              color: COLORS.primary,
               border: 'none',
-              borderRadius: DS.radius,
+              borderRadius: `${RADII.none}px`,
               padding: '14px 28px',
-              fontFamily: DS.bodyFont,
+              fontFamily: TYPOGRAPHY.fontFamily.sans,
               fontSize: '14px',
               fontWeight: 600,
               cursor: loading ? 'not-allowed' : 'pointer',

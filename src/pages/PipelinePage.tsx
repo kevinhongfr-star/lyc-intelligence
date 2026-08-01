@@ -7,6 +7,7 @@ import { getPipelineByMandate, updatePipelineStage } from '@/services/supabaseAp
 import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
 import type { CandidatePipeline, Mandate } from '@/services/supabaseApi';
 import { LinkedInImportModal } from '@/components/import/LinkedInImportModal';
+import { logActivity } from '@/utils/activityLogger';
 
 const STAGE_COLORS: Record<string, string> = {
   SWEEP: 'border-t-sweep-light',
@@ -59,6 +60,14 @@ export function PipelinePage() {
       // Refresh pipeline
       const data = await getPipelineByMandate(selectedMandate.id);
       setPipeline(data);
+
+      logActivity({
+        type: 'pipeline_update',
+        entity_type: 'mandate',
+        entity_id: selectedMandate.id,
+        summary: `Advanced candidate pipeline ${pipelineId} to ${newStage}${selectedMandate.title ? ` on ${selectedMandate.title}` : ''}`,
+        metadata: { pipeline_id: pipelineId, new_stage: newStage, mandate_id: selectedMandate.id },
+      });
     }
   };
 
