@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts';
+import { useAuthStore } from '@/stores/authStore';
 import {
   Briefcase, Users, Calendar, Bell, Settings, LogOut,
   LayoutDashboard, ChevronLeft, ChevronRight, Building2,
@@ -32,8 +32,8 @@ const NAV_ITEMS = [
 type NavItem = { path?: string; icon?: any; label: string; exact?: boolean; type?: 'divider'; roles?: string[] };
 
 export function AppLayout() {
-  const { user, logout } = useAuth();
-  const userRole = (user as any)?.role || 'user';
+  const { user, signOut } = useAuthStore();
+  const userRole = useAuthStore(s => s.profile?.role) || 'user';
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
@@ -128,7 +128,7 @@ export function AppLayout() {
             </div>
           )}
           <button
-            onClick={logout}
+            onClick={signOut}
             className="flex items-center gap-2.5 px-2.5 py-[7px] mx-2 text-[13px] text-[#737373] hover:text-[#DC2626] w-full transition-colors"
           >
             <LogOut className="w-[15px] h-[15px]" />

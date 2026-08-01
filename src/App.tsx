@@ -23,8 +23,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// ── Landing + Auth ──
-const Landing = lazy(() => import('@/pages/Landing').then(m => ({ default: m.Landing })));
+// ── Auth ──
 const LoginPage = lazy(() => import('@/pages/LoginPage').then(m => ({ default: m.LoginPage })));
 const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
 const SignupPage = lazy(() => import('@/pages/SignupPage').then(m => ({ default: m.SignupPage })));
@@ -41,10 +40,12 @@ const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
 const PublicHomePage = lazy(() => import('@/pages/public/PublicHomePage').then(m => ({ default: m.PublicHomePage })));
 const PublicPricingPage = lazy(() => import('@/pages/public/PublicPricingPage').then(m => ({ default: m.PublicPricingPage })));
+const PublicFeaturesPage = lazy(() => import('@/pages/public/PublicFeaturesPage').then(m => ({ default: m.PublicFeaturesPage })));
+const PublicFaqPage = lazy(() => import('@/pages/public/PublicFaqPage').then(m => ({ default: m.PublicFaqPage })));
+const PublicBookDemoPage = lazy(() => import('@/pages/public/PublicBookDemoPage').then(m => ({ default: m.PublicBookDemoPage })));
 
 // ── Authenticated user pages ──
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
-const DashboardPage = lazy(() => import('@/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const ProgressPage = lazy(() => import('@/pages/ProgressPage').then(m => ({ default: m.ProgressPage })));
 const UserDocumentsPage = lazy(() => import('@/pages/UserDocumentsPage').then(m => ({ default: m.UserDocumentsPage })));
 const SharePage = lazy(() => import('@/pages/SharePage').then(m => ({ default: m.SharePage })));
@@ -244,6 +245,54 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+/** Role-restricted route guard — redirects users to their own portal */
+const ADMIN_ROUTES = ['admin', 'super_admin', 'lyc_admin', 'consultant', 'team_lead', 'bd_manager', 'recruiter'];
+
+function RoleRoute({ children, allowedRoles, allowedIcps, redirectTo }: {
+  children: React.ReactNode;
+  allowedRoles?: string[];
+  allowedIcps?: string[];
+  redirectTo?: string;
+}) {
+  const { user, profile, isLoading } = useAuthStore();
+  if (isLoading) return <Loading />;
+  if (!user) return <Navigate to="/login" replace />;
+
+  const role = profile?.role || 'member';
+  const icp = profile?.icp || '';
+
+  // Admin/consultant roles can access everything
+  if (ADMIN_ROUTES.includes(role)) return <>{children}</>;
+
+  // Check role-based access
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate to={redirectTo || getDefaultRoute(role, icp)} replace />;
+  }
+
+  // Check ICP-based access
+  if (allowedIcps && !allowedIcps.includes(icp)) {
+    return <Navigate to={redirectTo || getDefaultRoute(role, icp)} replace />;
+  }
+
+  return <>{children}</>;
+}
+
+function getDefaultRoute(role: string, icp: string): string {
+  if (icp === 'client' || role === 'client_admin' || role === 'client_user') return '/client/overview';
+  if (icp === 'candidate' || role === 'candidate') return '/candidate/dashboard';
+  if (icp === 'council' || icp === 'b2c' || role === 'council_member' || role === 'member') return '/coaching/coach';
+  return '/app/dashboard';
+}
+
+/** Redirects users to their role-appropriate dashboard */
+function DashboardRedirect() {
+  const { profile, isLoading } = useAuthStore();
+  if (isLoading) return <Loading />;
+  const role = profile?.role || 'member';
+  const icp = profile?.icp || '';
+  return <Navigate to={getDefaultRoute(role, icp)} replace />;
+}
+
 export default function App() {
   const { initialize } = useAuthStore();
   useEffect(() => { initialize(); }, [initialize]);
@@ -257,9 +306,12 @@ export default function App() {
       <Suspense fallback={<Loading />}>
         <Routes>
           {/* ── Public pages ── */}
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<PublicHomePage />} />
           <Route path="/home" element={<PublicHomePage />} />
           <Route path="/pricing-v2" element={<PublicPricingPage />} />
+          <Route path="/features" element={<PublicFeaturesPage />} />
+          <Route path="/faq" element={<PublicFaqPage />} />
+          <Route path="/book-demo" element={<PublicBookDemoPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/signup" element={<SignupPage />} />
@@ -361,8 +413,8 @@ export default function App() {
           <Route path="/dex/credits" element={<ProtectedRoute><CreditStorePage /></ProtectedRoute>} />
 
           {/* ── Internal Operations (mockup surface) ── */}
-          
-            <Route path="/app" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+
+            <Route path="/app" element={<RoleRoute allowedRoles={ADMIN_ROUTES}><AppShell /></RoleRoute>}>
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<ConsultantDashboard />} />
               <Route path="pipeline" element={<PipelinePage />} />
@@ -403,7 +455,7 @@ export default function App() {
           <Route path="/platform/*" element={<Navigate to="/app" replace />} />
 
           {/* ── B2B Client Portal (mockup surface) ── */}
-          <Route path="/client" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+          <Route path="/client" element={<RoleRoute allowedRoles={[...ADMIN_ROUTES, 'client_admin', 'client_user']} allowedIcps={['client']}><AppShell /></RoleRoute>}>
             <Route index element={<Navigate to="overview" replace />} />
             <Route path="overview" element={<ClientOverviewPage />} />
             <Route path="pipeline-analytics" element={<ClientPipelineAnalyticsPage />} />
@@ -419,7 +471,7 @@ export default function App() {
           </Route>
 
           {/* ── B2C Coaching (mockup surface) ── */}
-          <Route path="/coaching" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+          <Route path="/coaching" element={<RoleRoute allowedRoles={[...ADMIN_ROUTES, 'council_member', 'member']} allowedIcps={['council', 'b2c', 'coaching']}><AppShell /></RoleRoute>}>
             <Route index element={<Navigate to="coach" replace />} />
             <Route path="coach" element={<CoachingCoachPage />} />
             <Route path="credits" element={<CoachingCreditsPage />} />
@@ -439,7 +491,7 @@ export default function App() {
           </Route>
 
           {/* ── Candidate Portal (mockup surface) ── */}
-          <Route path="/candidate" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+          <Route path="/candidate" element={<RoleRoute allowedRoles={[...ADMIN_ROUTES, 'candidate']} allowedIcps={['candidate']}><AppShell /></RoleRoute>}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<CandidateDashboardPage />} />
             <Route path="applications" element={<CandidateApplicationsPage />} />
@@ -459,7 +511,7 @@ export default function App() {
 
           {/* ── Authenticated user pages (standalone) ── */}
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardRedirect /></ProtectedRoute>} />
           <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
           <Route path="/documents" element={<ProtectedRoute><UserDocumentsPage /></ProtectedRoute>} />
           <Route path="/share/:id" element={<SharePage />} />

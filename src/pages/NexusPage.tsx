@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Send, Loader2, MessageSquare, Trash2 } from 'lucide-react';
 import { sendChatMessage } from '@/services/coze';
-import { useAuth } from '@/contexts';
+import { useAuthStore } from '@/stores/authStore';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { MinimalFooter } from '@/components/MinimalFooter';
@@ -75,7 +75,7 @@ const customComponents = {
 };
 
 export function NexusPage() {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);

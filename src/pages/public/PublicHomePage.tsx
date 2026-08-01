@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Heading, Paragraph, Button, Container, Card, Badge, Grid, Flex, StatCard } from '@/components/design-system';
 import { COLORS, SPACING } from '@/styles/tokens';
 
@@ -46,6 +47,7 @@ const testimonials = [
 ];
 
 export const PublicHomePage: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div style={{ backgroundColor: COLORS.bg }}>
       <section
@@ -84,10 +86,10 @@ export const PublicHomePage: React.FC = () => {
             with unmatched precision and speed.
           </Paragraph>
           <Flex justify="center" gap="6">
-            <Button size="lg" onClick={() => {}}>
+            <Button size="lg" onClick={() => navigate('/book-demo')}>
               Book a Demo
             </Button>
-            <Button size="lg" variant="outline" style={{ borderColor: 'white', color: 'white' }}>
+            <Button size="lg" variant="outline" style={{ borderColor: 'white', color: 'white' }} onClick={() => navigate('/features')}>
               Explore Features
             </Button>
           </Flex>
@@ -196,10 +198,10 @@ export const PublicHomePage: React.FC = () => {
             Schedule a demo to see how LYC Intelligence can help you find your next leader.
           </Paragraph>
           <Flex justify="center" gap="6">
-            <Button size="lg" onClick={() => {}}>
+            <Button size="lg" onClick={() => navigate('/book-demo')}>
               Book a Demo
             </Button>
-            <Button size="lg" variant="outline" style={{ borderColor: 'white', color: 'white' }}>
+            <Button size="lg" variant="outline" style={{ borderColor: 'white', color: 'white' }} onClick={() => navigate('/pricing-v2')}>
               View Pricing
             </Button>
           </Flex>

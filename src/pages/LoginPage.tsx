@@ -54,7 +54,8 @@ export function LoginPage() {
     setLoading(false);
 
     if (result.success) {
-      navigate('/app');
+      // Redirect to /dashboard which routes users to their role-appropriate portal
+      navigate('/dashboard');
     } else {
       setError(result.error || 'Invalid credentials. Please try again.');
     }

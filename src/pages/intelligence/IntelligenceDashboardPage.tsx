@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 
 type SignalType =
   | 'executive_movement'
@@ -131,7 +131,7 @@ function TableSkeleton() {
 }
 
 export function IntelligenceDashboardPage() {
-  const { session } = useAuth();
+  const { supabase } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [signals, setSignals] = useState<Signal[]>([]);
   const [query, setQuery] = useState('');
@@ -142,6 +142,7 @@ export function IntelligenceDashboardPage() {
   const fetchSignals = async () => {
     setLoading(true);
     try {
+      const { data: { session } } = await supabase?.auth.getSession() ?? { data: { session: null } };
       const token = session?.access_token;
       const res = await fetch('/api/intelligence/signals', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -158,11 +159,12 @@ export function IntelligenceDashboardPage() {
 
   useEffect(() => {
     fetchSignals();
-  }, [session]);
+  }, [supabase]);
 
   const updateSignalStatus = async (signalId: string, newStatus: SignalStatus) => {
     setActioningId(signalId);
     try {
+      const { data: { session } } = await supabase?.auth.getSession() ?? { data: { session: null } };
       const token = session?.access_token;
       const res = await fetch('/api/intelligence/signals', {
         method: 'POST',

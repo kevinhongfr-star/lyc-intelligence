@@ -60,13 +60,21 @@ interface SurfaceDef {
   label: string;
   icon: React.ReactNode;
   items: NavItem[];
+  /** Roles that can see this surface. Undefined = all roles (admin/consultant). */
+  allowedRoles?: string[];
+  /** ICP values that can see this surface. */
+  allowedIcps?: string[];
 }
+
+/** Admin/consultant roles that can see ALL surfaces */
+const ADMIN_ROLES = ['admin', 'super_admin', 'lyc_admin', 'consultant', 'team_lead', 'bd_manager', 'recruiter'];
 
 const SURFACES: SurfaceDef[] = [
   {
     id: 'internal',
     label: 'Internal',
     icon: <Briefcase className="w-4 h-4" />,
+    allowedRoles: ADMIN_ROLES,
     items: [
       { path: '/app/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
       { path: '/app/pipeline', label: 'Pipeline', icon: <GitBranch className="w-4 h-4" /> },
@@ -87,6 +95,8 @@ const SURFACES: SurfaceDef[] = [
     id: 'client',
     label: 'Clients',
     icon: <Building2 className="w-4 h-4" />,
+    allowedRoles: [...ADMIN_ROLES, 'client_admin', 'client_user'],
+    allowedIcps: ['client'],
     items: [
       { path: '/client/overview', label: 'Overview', icon: <LayoutDashboard className="w-4 h-4" /> },
       { path: '/client/pipeline-analytics', label: 'Pipeline Analytics', icon: <TrendingUp className="w-4 h-4" /> },
@@ -104,6 +114,8 @@ const SURFACES: SurfaceDef[] = [
     id: 'coaching',
     label: 'Coaching',
     icon: <GraduationCap className="w-4 h-4" />,
+    allowedRoles: [...ADMIN_ROLES, 'council_member', 'member'],
+    allowedIcps: ['council', 'b2c', 'coaching'],
     items: [
       { path: '/coaching/coach', label: 'Coach', icon: <HelpCircle className="w-4 h-4" /> },
       { path: '/coaching/credits', label: 'Credits & Plans', icon: <Star className="w-4 h-4" /> },
@@ -120,6 +132,8 @@ const SURFACES: SurfaceDef[] = [
     id: 'candidate',
     label: 'Candidates',
     icon: <User className="w-4 h-4" />,
+    allowedRoles: [...ADMIN_ROLES, 'candidate'],
+    allowedIcps: ['candidate'],
     items: [
       { path: '/candidate/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
       { path: '/candidate/applications', label: 'Applications', icon: <FileSignature className="w-4 h-4" /> },
@@ -149,6 +163,20 @@ export function Sidebar() {
   const { profile, user } = useAuthStore();
   const currentSurface = getSurfaceFromPath(location.pathname);
 
+  const userRole = profile?.role || 'member';
+  const userIcp = profile?.icp || '';
+
+  // Filter surfaces based on user role and ICP
+  const visibleSurfaces = SURFACES.filter((surface) => {
+    // Admin/consultant roles see everything
+    if (ADMIN_ROLES.includes(userRole)) return true;
+    // Check role-based access
+    if (surface.allowedRoles?.includes(userRole)) return true;
+    // Check ICP-based access
+    if (surface.allowedIcps?.includes(userIcp)) return true;
+    return false;
+  });
+
   // All surfaces start expanded if they're the active one, collapsed otherwise
   const [expanded, setExpanded] = useState<Record<Surface, boolean>>(() => ({
     internal: currentSurface === 'internal',
@@ -165,7 +193,7 @@ export function Sidebar() {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
-  const initials = (profile?.full_name || user?.email || 'U')
+  const initials = (profile?.name || user?.email || 'U')
     .split(' ')
     .map((s) => s[0])
     .join('')
@@ -184,7 +212,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-3" style={{ scrollbarWidth: 'thin' }}>
-        {SURFACES.map((surface) => {
+        {visibleSurfaces.map((surface) => {
           const isExpanded = expanded[surface.id];
           const isActiveSurface = currentSurface === surface.id;
           const hasActiveChild = surface.items.some((item) => isActivePath(item.path));
@@ -252,7 +280,7 @@ export function Sidebar() {
           </div>
           <div className="min-w-0">
             <div className="text-[13px] font-medium text-[#171717] truncate">
-              {profile?.full_name?.split(' ')[0] || 'User'}
+              {profile?.name?.split(' ')[0] || 'User'}
             </div>
             <div className="text-[11px] text-[#737373] truncate">
               {profile?.role || 'Member'}
