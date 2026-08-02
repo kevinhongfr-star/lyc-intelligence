@@ -12,6 +12,13 @@
  *   GET  /api/team-lead/sla                → SLA status for all mandates
  *   GET  /api/team-lead/revenue            → revenue dashboard
  *   GET  /api/team-lead/clients            → client overview
+ *
+ * Uses existing tables:
+ *   - mandates (for active mandates, SLA, revenue)
+ *   - approval_requests (for approvals workflow)
+ *   - org_memberships (for team members)
+ *   - companies (for client overview)
+ *   - bd_opportunities (for BD pipeline)
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
@@ -41,7 +48,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
     // ── Approvals ──
     if (resource === 'approvals') {
       if (method === 'GET' && !id) return handleApprovalsList(req, res, org_id);
-      if (method === 'GET' && id && subResource === '') return handleApprovalDetail(req, res, id);
+      if (method === 'GET' && id && !subResource) return handleApprovalDetail(req, res, id);
       if (method === 'POST' && id && subResource === 'decide') return handleApprovalDecide(req, res, id, user);
     }
 
@@ -75,9 +82,7 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
 // ─── Dashboard ───────────────────────────────────────────────
 async function handleDashboard(req: VercelRequest, res: VercelResponse, org_id: string) {
   try {
-    // Parallel fetch all dashboard data
     const [mandates, approvals, teamMembers] = await Promise.all([
-      // Active mandates
       org_id
         ? db.selectMany('mandates', {
             select: 'id,title,status,target_fill_date,deadline_date,fee_percentage',
@@ -87,19 +92,17 @@ async function handleDashboard(req: VercelRequest, res: VercelResponse, org_id: 
             ],
           })
         : Promise.resolve([]),
-      // Pending approvals
       org_id
-        ? db.selectMany('tl_approvals', {
-            select: 'id,title,requester_name,type,status,submitted_at',
+        ? db.selectMany('approval_requests', {
+            select: 'id,approval_type,entity_type,request_data,status,requested_at,sla_deadline',
             where: [
               { column: 'org_id', value: org_id },
               { column: 'status', value: 'pending' },
             ],
-            orderBy: { column: 'submitted_at', ascending: false },
+            orderBy: { column: 'requested_at', ascending: false },
             limit: 10,
           })
         : Promise.resolve([]),
-      // Team members with mandate counts
       org_id
         ? db.selectMany('org_memberships', {
             select: 'id,user_id,role',
@@ -111,7 +114,7 @@ async function handleDashboard(req: VercelRequest, res: VercelResponse, org_id: 
         : Promise.resolve([]),
     ]);
 
-    // Calculate SLA compliance
+    // Calculate SLA compliance from mandates
     const now = new Date();
     let slaCompliant = 0;
     let slaTotal = mandates.length;
@@ -133,14 +136,17 @@ async function handleDashboard(req: VercelRequest, res: VercelResponse, org_id: 
 
     const slaCompliance = slaTotal > 0 ? (slaCompliant / slaTotal) * 100 : 100;
 
-    // Calculate team utilization (mandates per member)
+    // Calculate team utilization
     const teamWithMandates: Array<{ id: string; name: string; utilization: number; mandates: number }> = [];
     for (const member of teamMembers as any[]) {
-      // Count mandates assigned to this user
       let mandateCount = 0;
       try {
-        mandateCount = await db.countRows('mandate_candidates', {
-          where: [{ column: 'consultant_id', value: member.user_id }],
+        mandateCount = await db.countRows('mandates', {
+          where: [
+            { column: 'org_id', value: org_id },
+            { column: 'created_by', value: member.user_id },
+            { column: 'status', value: 'active' },
+          ],
         });
       } catch {
         mandateCount = 0;
@@ -158,6 +164,17 @@ async function handleDashboard(req: VercelRequest, res: VercelResponse, org_id: 
       ? teamWithMandates.reduce((sum, t) => sum + t.utilization, 0) / teamWithMandates.length
       : 0;
 
+    // Map approval_requests to the format TL_Dashboard expects
+    const pending = (approvals as any[]).map((a) => {
+      const rd = a.request_data || {};
+      return {
+        id: a.id,
+        title: rd.title || `${a.approval_type || a.entity_type || 'Request'}`,
+        requester: rd.requester_name || 'Unknown',
+        type: a.approval_type || a.entity_type || 'general',
+      };
+    });
+
     return res.status(200).json({
       success: true,
       data: {
@@ -166,17 +183,11 @@ async function handleDashboard(req: VercelRequest, res: VercelResponse, org_id: 
         sla_compliance: Math.round(slaCompliance),
         team_utilization: Math.round(teamUtilization),
         team: teamWithMandates,
-        pending: (approvals as any[]).map((a) => ({
-          id: a.id,
-          title: a.title,
-          requester: a.requester_name || 'Unknown',
-          type: a.type || 'general',
-        })),
+        pending,
         sla: slaItems.sort((a, b) => a.remaining_days - b.remaining_days),
       },
     });
   } catch (err: any) {
-    // Graceful fallback — return empty dashboard instead of crashing
     console.error('[teamLeadHandler/dashboard]', err);
     return res.status(200).json({
       success: true,
@@ -237,27 +248,49 @@ async function handleApprovalsList(req: VercelRequest, res: VercelResponse, org_
   const { status, type, limit = '50' } = req.query as Record<string, string>;
   const filters: any[] = [{ column: 'org_id', value: org_id }];
   if (status) filters.push({ column: 'status', value: status });
-  if (type) filters.push({ column: 'type', value: type });
+  if (type) filters.push({ column: 'approval_type', value: type });
 
-  const rows = await db.selectMany('tl_approvals', {
+  const rows = await db.selectMany('approval_requests', {
     select: '*',
     where: filters,
-    orderBy: { column: 'submitted_at', ascending: false },
+    orderBy: { column: 'requested_at', ascending: false },
     limit: parseInt(limit),
   });
 
-  return res.status(200).json({ success: true, approvals: rows });
+  // Enrich with parsed request_data
+  const enriched = (rows as any[]).map((a) => ({
+    ...a,
+    title: a.request_data?.title || `${a.approval_type || a.entity_type || 'Request'}`,
+    requester_name: a.request_data?.requester_name || null,
+    amount: a.request_data?.amount || null,
+    details: a.request_data?.details || null,
+  }));
+
+  return res.status(200).json({ success: true, approvals: enriched });
 }
 
 // ─── Approval Detail ─────────────────────────────────────────
 async function handleApprovalDetail(req: VercelRequest, res: VercelResponse, id: string) {
-  const approval = await db.selectOne('tl_approvals', {
+  const approval = await db.selectOne('approval_requests', {
     select: '*',
     where: [{ column: 'id', value: id }],
   });
 
   if (!approval) return res.status(404).json({ error: 'Approval not found' });
-  return res.status(200).json({ success: true, approval });
+
+  const a = approval as any;
+  const rd = a.request_data || {};
+
+  return res.status(200).json({
+    success: true,
+    approval: {
+      ...a,
+      title: rd.title || `${a.approval_type || 'Request'}`,
+      requester_name: rd.requester_name || null,
+      amount: rd.amount || null,
+      details: rd.details || null,
+    },
+  });
 }
 
 // ─── Approval Decision ───────────────────────────────────────
@@ -269,11 +302,11 @@ async function handleApprovalDecide(req: VercelRequest, res: VercelResponse, id:
     return res.status(400).json({ error: 'decision must be approved or rejected' });
   }
 
-  const result = await db.update('tl_approvals', {
-    status: decision,
-    decided_by: user?.id || null,
+  const result = await db.update('approval_requests', {
+    status: decision === 'approved' ? 'approved' : 'rejected',
+    final_decision: decision,
+    final_comment: note || null,
     decided_at: new Date().toISOString(),
-    decision_note: note || null,
     updated_at: new Date().toISOString(),
   }, id);
 
@@ -284,7 +317,7 @@ async function handleApprovalDecide(req: VercelRequest, res: VercelResponse, id:
 async function handleMandates(req: VercelRequest, res: VercelResponse, org_id: string) {
   if (!org_id) return res.status(400).json({ error: 'org_id required' });
 
-  const { status, team, limit = '100' } = req.query as Record<string, string>;
+  const { status, limit = '100' } = req.query as Record<string, string>;
   const filters: any[] = [{ column: 'org_id', value: org_id }];
   if (status) filters.push({ column: 'status', value: status });
 
@@ -295,7 +328,6 @@ async function handleMandates(req: VercelRequest, res: VercelResponse, org_id: s
     limit: parseInt(limit),
   });
 
-  // Enrich with SLA info
   const now = new Date();
   const enriched = (rows as any[]).map((m) => {
     const deadline = m.deadline_date || m.target_fill_date;
@@ -307,11 +339,7 @@ async function handleMandates(req: VercelRequest, res: VercelResponse, org_id: s
       : daysRemaining <= 7 ? 'at_risk'
       : 'on_track';
 
-    return {
-      ...m,
-      days_remaining: daysRemaining,
-      sla_status: slaStatus,
-    };
+    return { ...m, days_remaining: daysRemaining, sla_status: slaStatus };
   });
 
   return res.status(200).json({ success: true, mandates: enriched });
@@ -339,24 +367,16 @@ async function handleSLA(req: VercelRequest, res: VercelResponse, org_id: string
       : 999;
     const status = daysRemaining < 0 ? 'breached' : daysRemaining <= 7 ? 'at_risk' : 'on_track';
     if (status !== 'breached') compliant++;
-
-    return {
-      id: m.id,
-      mandate: m.title,
-      status,
-      remaining_days: daysRemaining,
-      priority: m.priority,
-    };
+    return { id: m.id, mandate: m.title, status, remaining_days: daysRemaining, priority: m.priority };
   });
 
-  const total = items.length;
   return res.status(200).json({
     success: true,
     sla: items,
     summary: {
-      total,
+      total: items.length,
       compliant,
-      compliance_rate: total > 0 ? Math.round((compliant / total) * 100) : 100,
+      compliance_rate: items.length > 0 ? Math.round((compliant / items.length) * 100) : 100,
       breached: items.filter(i => i.status === 'breached').length,
       at_risk: items.filter(i => i.status === 'at_risk').length,
     },
@@ -367,7 +387,6 @@ async function handleSLA(req: VercelRequest, res: VercelResponse, org_id: string
 async function handleRevenue(req: VercelRequest, res: VercelResponse, org_id: string) {
   if (!org_id) return res.status(400).json({ error: 'org_id required' });
 
-  // Aggregate fees from mandates
   const mandates = await db.selectMany('mandates', {
     select: 'id,title,status,fee_percentage,fee_min,salary_min,salary_max',
     where: [{ column: 'org_id', value: org_id }],
@@ -380,11 +399,7 @@ async function handleRevenue(req: VercelRequest, res: VercelResponse, org_id: st
   for (const m of mandates as any[]) {
     const estimatedFee = m.fee_min || ((m.salary_max || m.salary_min || 100000) * (m.fee_percentage || 20) / 100);
     totalPipelineValue += estimatedFee;
-
-    if (m.status === 'filled' || m.status === 'completed') {
-      totalCollected += estimatedFee;
-    }
-
+    if (m.status === 'filled' || m.status === 'completed') totalCollected += estimatedFee;
     byStatus[m.status] = (byStatus[m.status] || 0) + 1;
   }
 
@@ -409,7 +424,6 @@ async function handleClients(req: VercelRequest, res: VercelResponse, org_id: st
     orderBy: { column: 'name', ascending: true },
   });
 
-  // For each company, count active mandates
   const enriched: any[] = [];
   for (const c of companies as any[]) {
     let activeMandates = 0;
