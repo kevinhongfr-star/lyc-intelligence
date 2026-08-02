@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MessageSquare, ChevronRight, Clock, ThumbsUp } from 'lucide-react';
 import { MOCK_FORUM_THREADS, type ForumThread } from '@/mocks/advancedFeatures';
 import { Badge } from '@/components/ui';
-import { CandidateThreadView } from './CandidateThreadView';
+import CandidateThreadView from './CandidateThreadView';
 
 const CANDIDATE_CATEGORIES = ['All', 'Job Search', 'Interview Tips', 'Industry Q&A'];
 

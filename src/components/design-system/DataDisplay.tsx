@@ -1,16 +1,33 @@
 import React from 'react';
 import { COLORS, SPACING, RADII } from '@/styles/tokens';
 
-interface BadgeProps {
+type SpacingInput = keyof typeof SPACING | number | (string & {});
+
+const spacingPx = (val: SpacingInput | undefined): number | undefined => {
+  if (val === undefined) return undefined;
+  if (typeof val === 'number') {
+    return SPACING[val] ?? val;
+  }
+  return SPACING[val] ?? parseInt(val, 10);
+};
+
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode;
   variant?: 'default' | 'success' | 'warning' | 'error' | 'info';
   className?: string;
+  mb?: SpacingInput;
+  mt?: SpacingInput;
+  style?: React.CSSProperties;
 }
 
 export const Badge: React.FC<BadgeProps> = ({ 
   children, 
   variant = 'default',
-  className = '' 
+  className = '',
+  mb,
+  mt,
+  style,
+  ...rest
 }) => {
   const variants: Record<string, {
     backgroundColor: string;
@@ -38,7 +55,9 @@ export const Badge: React.FC<BadgeProps> = ({
     },
   };
 
-  const style = variants[variant];
+  const v = variants[variant];
+  const marginBottom = spacingPx(mb);
+  const marginTop = spacingPx(mt);
 
   return (
     <span
@@ -49,35 +68,52 @@ export const Badge: React.FC<BadgeProps> = ({
         padding: `${SPACING[1]}px ${SPACING[3]}px`,
         fontSize: `${SPACING[3]}px`,
         fontWeight: 600,
-        backgroundColor: style.backgroundColor,
-        color: style.color,
+        backgroundColor: v.backgroundColor,
+        color: v.color,
         borderRadius: `${RADII.pill}px`,
         textTransform: 'uppercase',
         letterSpacing: '0.05em',
+        ...(marginBottom !== undefined ? { marginBottom: `${marginBottom}px` } : {}),
+        ...(marginTop !== undefined ? { marginTop: `${marginTop}px` } : {}),
+        ...style,
       }}
+      {...rest}
     >
       {children}
     </span>
   );
 };
 
-interface ProgressProps {
+interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   value: number;
   max?: number;
   label?: string;
   className?: string;
+  mb?: SpacingInput;
+  mt?: SpacingInput;
+  style?: React.CSSProperties;
 }
 
 export const Progress: React.FC<ProgressProps> = ({ 
   value, 
   max = 100,
   label,
-  className = '' 
+  className = '',
+  mb,
+  mt,
+  style,
+  ...rest
 }) => {
   const percentage = Math.min((value / max) * 100, 100);
+  const marginBottom = spacingPx(mb);
+  const marginTop = spacingPx(mt);
 
   return (
-    <div className={className}>
+    <div className={className} style={{
+      ...(marginBottom !== undefined ? { marginBottom: `${marginBottom}px` } : {}),
+      ...(marginTop !== undefined ? { marginTop: `${marginTop}px` } : {}),
+      ...style,
+    }} {...rest}>
       {label && (
         <div
           style={{
@@ -114,18 +150,21 @@ export const Progress: React.FC<ProgressProps> = ({
   );
 };
 
-interface AvatarProps {
+interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   name?: string;
   src?: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const Avatar: React.FC<AvatarProps> = ({ 
   name, 
   src, 
   size = 'md',
-  className = '' 
+  className = '',
+  style,
+  ...rest
 }) => {
   const sizes: Record<string, string> = {
     sm: `${SPACING[8]}px`,
@@ -153,7 +192,9 @@ export const Avatar: React.FC<AvatarProps> = ({
         fontWeight: 600,
         overflow: 'hidden',
         flexShrink: 0,
+        ...style,
       }}
+      {...rest}
     >
       {src ? (
         <img
@@ -168,18 +209,21 @@ export const Avatar: React.FC<AvatarProps> = ({
   );
 };
 
-interface TagProps {
+interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode;
   removable?: boolean;
   onRemove?: () => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const Tag: React.FC<TagProps> = ({ 
   children, 
   removable = false,
   onRemove,
-  className = '' 
+  className = '',
+  style,
+  ...rest
 }) => (
   <span
     className={className}
@@ -193,7 +237,9 @@ export const Tag: React.FC<TagProps> = ({
       color: COLORS.textSecondary,
       border: `1px solid ${COLORS.border}`,
       borderRadius: `${RADII.pill}px`,
+      ...style,
     }}
+    {...rest}
   >
     {children}
     {removable && onRemove && (

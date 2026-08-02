@@ -52,6 +52,10 @@ export const COLORS = {
   tier3: '#6B7280',  // No
   tier4: '#EF4444',  // Strong No
   
+  // Hover states
+  bgHover: '#EDEDED',
+  cardHover: '#F5F5F5',
+  
   // Methodology colors
   trident: '#3B82F6',
   shift: '#8B5CF6',
@@ -60,11 +64,29 @@ export const COLORS = {
   canvas: '#EC4899',
   wave: '#10B981',
   benchmark: '#6366F1',
+
+  // Brand palette (scales for reports, gradients, tiering)
+  brandScale: {
+    50: '#FDF2FC',
+    100: '#FBE2F8',
+    200: '#F7BFF1',
+    300: '#F08BE5',
+    400: '#E44FD5',
+    500: '#C108AB',
+    600: '#A2088E',
+    700: '#850974',
+    800: '#6C0D60',
+    900: '#5A0E51',
+  },
+  textScale: {
+    base: '#1C1C1C',
+    muted: '#999999',
+  },
 } as const;
 
 export type ColorKey = keyof typeof COLORS;
 
-export const SPACING = {
+const SPACING_NUMERIC = {
   px: 1,
   0: 0,
   0.5: 2,
@@ -88,6 +110,34 @@ export const SPACING = {
   28: 112,
   32: 128,
 } as const;
+
+type SpacingValue = (typeof SPACING_NUMERIC)[keyof typeof SPACING_NUMERIC];
+
+// Allow both string ("4") and number (4) key access
+const SPACING_BASE: Record<string | number, SpacingValue> = SPACING_NUMERIC as unknown as Record<string | number, SpacingValue>;
+SPACING_BASE['0'] = SPACING_NUMERIC[0];
+SPACING_BASE['0.5'] = SPACING_NUMERIC[0.5];
+SPACING_BASE['1'] = SPACING_NUMERIC[1];
+SPACING_BASE['1.5'] = SPACING_NUMERIC[1.5];
+SPACING_BASE['2'] = SPACING_NUMERIC[2];
+SPACING_BASE['2.5'] = SPACING_NUMERIC[2.5];
+SPACING_BASE['3'] = SPACING_NUMERIC[3];
+SPACING_BASE['4'] = SPACING_NUMERIC[4];
+SPACING_BASE['5'] = SPACING_NUMERIC[5];
+SPACING_BASE['6'] = SPACING_NUMERIC[6];
+SPACING_BASE['7'] = SPACING_NUMERIC[7];
+SPACING_BASE['8'] = SPACING_NUMERIC[8];
+SPACING_BASE['9'] = SPACING_NUMERIC[9];
+SPACING_BASE['10'] = SPACING_NUMERIC[10];
+SPACING_BASE['12'] = SPACING_NUMERIC[12];
+SPACING_BASE['14'] = SPACING_NUMERIC[14];
+SPACING_BASE['16'] = SPACING_NUMERIC[16];
+SPACING_BASE['20'] = SPACING_NUMERIC[20];
+SPACING_BASE['24'] = SPACING_NUMERIC[24];
+SPACING_BASE['28'] = SPACING_NUMERIC[28];
+SPACING_BASE['32'] = SPACING_NUMERIC[32];
+
+export const SPACING = SPACING_BASE;
 
 export type SpacingKey = keyof typeof SPACING;
 
@@ -139,6 +189,7 @@ export const RADII = {
   '2xl': 24,
   '3xl': 32,
   full: 9999,
+  pill: 9999,
   card: 16,
   button: 0, // Sharp buttons per design
 } as const;
@@ -153,6 +204,7 @@ export const SHADOWS = {
   lg: '0 8px 24px rgba(28, 28, 28, 0.12)',
   xl: '0 16px 48px rgba(28, 28, 28, 0.16)',
   card: '0 4px 24px rgba(28, 28, 28, 0.06)',
+  cardHover: '0 8px 32px rgba(28, 28, 28, 0.12)',
   modal: '0 8px 32px rgba(28, 28, 28, 0.2)',
   button: '0 4px 12px rgba(193, 8, 171, 0.25)',
 } as const;
@@ -260,6 +312,55 @@ export const DURATION = {
   slower: 500,
 } as const;
 
+// ── T01: Report Engine tokens (EPIC #60, v6 report foundation) ──
+export const REPORT_TOKENS = {
+  brand: COLORS.primary,
+  accent: COLORS.shift,
+  background: COLORS.white,
+  ink: '#0A0A0A',
+  inkMuted: COLORS.textMuted,
+  border: COLORS.border,
+  paperSize: 'A4',
+  marginMm: 18,
+  headerHeight: 72,
+  footerHeight: 48,
+  watermark: 'LYC Intelligence · Confidential',
+  primaryFont: TYPOGRAPHY.fontFamily.sans,
+  displayFont: TYPOGRAPHY.fontFamily.serif,
+  monoFont: TYPOGRAPHY.fontFamily.mono,
+  scoreBarHeight: 8,
+  borderRadius: RADII.lg,
+  sectionSpacing: SPACING[6],
+  brands: {
+    LYC: {
+      logoPath: '/favicon.ico',
+      tagline: 'Building Leadership That Works Across Borders',
+      primary: COLORS.primary,
+      secondary: COLORS.shift,
+      pageBg: COLORS.white,
+      footerText: '© LYC Partners · Confidential',
+    },
+    CO_BRANDED: {
+      logoPath: '/favicon.ico',
+      tagline: 'LYC × Client Co-Branded Report',
+      primary: COLORS.primary,
+      secondary: COLORS.info,
+      pageBg: COLORS.white,
+      footerText: '© LYC Partners & Client · Confidential',
+    },
+    WHITE_LABEL: {
+      logoPath: '',
+      tagline: '',
+      primary: '#1C1C1C',
+      secondary: '#666666',
+      pageBg: COLORS.white,
+      footerText: '',
+    },
+  },
+} as const;
+
+export type ReportBrandKey = keyof typeof REPORT_TOKENS.brands;
+
 export default {
   COLORS,
   SPACING,
@@ -272,4 +373,5 @@ export default {
   DURATION,
   METHODOLOGY_COLORS,
   PIPELINE_COLORS,
+  REPORT_TOKENS,
 };

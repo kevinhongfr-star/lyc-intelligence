@@ -14,7 +14,7 @@ const TABS = [
 
 type TabKey = typeof TABS[number]['key'];
 
-export default function CompliancePage() {
+export function CompliancePage() {
   const [activeTab, setActiveTab] = useState<TabKey>('audit');
 
   return (
@@ -55,3 +55,6 @@ export default function CompliancePage() {
     </div>
   );
 }
+
+export default CompliancePage;
+

@@ -17,6 +17,7 @@ const sizes = {
   sm: 'px-3 py-1.5 text-xs',
   default: 'px-5 py-2.5 text-sm',
   lg: 'px-8 py-3.5 text-base',
+  icon: 'w-10 h-10 p-0 text-sm',
 };
 
 export function Button({ 

@@ -200,6 +200,9 @@ interface ActivityItem {
   title: string;
   detail?: string;
   timestamp: string;
+  mandate_id?: string;
+  candidate_id?: string;
+  id?: string;
 }
 
 interface ActivityFeedProps {

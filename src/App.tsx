@@ -149,6 +149,29 @@ const BulkOperationsPage = lazy(() => import('@/pages/admin/BulkOperationsPage')
 // Document Generation
 const DocumentGenerationPage = lazy(() => import('@/pages/admin/DocumentGenerationPage').then(m => ({ default: m.DocumentGenerationPage })));
 
+// ── EPIC #60 Report Engine (Batch A) pages: #60-#69 T01-T10 ──
+const ReportEnginePage = lazy(() => import('@/pages/admin/ReportEnginePage').then(m => ({ default: m.ReportEnginePage })));
+
+// ── Batch B: #70-#79 T11-T20 PDF, Registry, Python, QA ──
+const TemplateRegistryPage = lazy(() => import('@/pages/admin/TemplateRegistryPage').then(m => ({ default: m.TemplateRegistryPage })));
+
+// ── Batch C: #80-#89 T21-T25 Portal Doc Views + T26-T30 Delivery + Email ──
+const PortalDocumentViewsPage = lazy(() => import('@/pages/admin/PortalDocumentViewsPage').then(m => ({ default: m.PortalDocumentViewsPage })));
+const EmailDeliveryPage = lazy(() => import('@/pages/admin/EmailDeliveryPage').then(m => ({ default: m.EmailDeliveryPage })));
+// T22 Consultant Workspace Documents + T25 Assessment Portal shell
+const ConsultantDocumentsPage = lazy(() => import('@/pages/internal/ConsultantDocumentsPage').then(m => ({ default: m.ConsultantDocumentsPage })));
+const AssessmentPortalPage = lazy(() => import('@/pages/assessment/AssessmentPortalPage').then(m => ({ default: m.AssessmentPortalPage })));
+
+// ── Batch D: #90-#99 T31-T39 Interactive + AI + Dynamic Visuals + Permissions + UAT ──
+const AdvancedPlatformPage = lazy(() => import('@/pages/admin/AdvancedPlatformPage').then(m => ({ default: m.AdvancedPlatformPage })));
+
+// ── Nexus Batch F: #39 N1 Conversation, #40 N2 Memory, #41 N3 Context, #43 N5 Proactive ──
+const NexusConversationPage = lazy(() => import('@/pages/internal/NexusConversationPage').then(m => ({ default: m.NexusConversationPage })));
+const NexusUserContextPage = lazy(() => import('@/pages/internal/NexusUserContextPage').then(m => ({ default: m.NexusUserContextPage })));
+const ProactiveSuggestionPage = lazy(() => import('@/pages/internal/ProactiveSuggestionPage').then(m => ({ default: m.ProactiveSuggestionPage })));
+// Issue #40 (N2): 3-tier Memory System page
+const NexusMemoryPage = lazy(() => import('@/pages/internal/NexusMemoryPage').then(m => ({ default: m.NexusMemoryPage })));
+
 // Custom Dashboard Builder
 const DashboardBuilderPage = lazy(() => import('@/pages/admin/DashboardBuilderPage').then(m => ({ default: m.DashboardBuilderPage })));
 
@@ -493,6 +516,21 @@ export default function App() {
               <Route path="admin/ai-orchestration" element={<AdminRoute><AIOrchestrationPage /></AdminRoute>} />
               <Route path="admin/email-engine" element={<AdminRoute><EmailEnginePage /></AdminRoute>} />
               <Route path="admin/cohort-analytics" element={<AdminRoute><CohortAnalyticsDashboard /></AdminRoute>} />
+              {/* ── Report Engine EPIC #60 (T01-T20, tickets #60-#79) ── */}
+              <Route path="admin/report-engine" element={<AdminRoute><ReportEnginePage /></AdminRoute>} />
+              <Route path="admin/template-registry" element={<AdminRoute><TemplateRegistryPage /></AdminRoute>} />
+              {/* ── Portal Doc Views + Delivery (tickets #80-#89 T21-T30) ── */}
+              <Route path="admin/portal-documents" element={<AdminRoute><PortalDocumentViewsPage /></AdminRoute>} />
+              <Route path="admin/email-delivery" element={<AdminRoute><EmailDeliveryPage /></AdminRoute>} />
+              {/* ── T31-T39: Interactive, AI Content, Dynamic, Permissions, UAT, T38 Schema, T39 Visuals (#90-#99) ── */}
+              <Route path="admin/advanced-platform" element={<AdminRoute><AdvancedPlatformPage /></AdminRoute>} />
+              {/* ── Internal Nexus pages (#39 N1, #40 N2, #41 N3, #43 N5) ── */}
+              <Route path="nexus-conversation" element={<AdminRoute><NexusConversationPage /></AdminRoute>} />
+              <Route path="nexus-memory" element={<AdminRoute><NexusMemoryPage /></AdminRoute>} />
+              <Route path="nexus-context" element={<AdminRoute><NexusUserContextPage /></AdminRoute>} />
+              <Route path="nexus-suggestions" element={<AdminRoute><ProactiveSuggestionPage /></AdminRoute>} />
+              {/* T22: Consultant Workspace Documents (Issue #82) */}
+              <Route path="documents" element={<ConsultantDocumentsPage />} />
             </Route>
 
           {/* Backward compat: redirect old /platform/* to /app */}
@@ -561,6 +599,13 @@ export default function App() {
           <Route path="/lms" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<StudentLmsDashboardPage />} />
+          </Route>
+
+          {/* ── Assessment Portal UI Shell — T25 Issue #85 ── */}
+          <Route path="/assessment-hub" element={<RoleRoute allowedRoles={[...ADMIN_ROUTES, 'consultant', 'candidate', 'client_user', 'client_admin']}><AppShell /></RoleRoute>}>
+            <Route index element={<AssessmentPortalPage />} />
+            <Route path=":assessmentId/report" element={<AssessmentPortalPage />} />
+            <Route path=":assessmentId/launch" element={<AssessmentPortalPage />} />
           </Route>
 
           {/* ── Candidate Portal (mockup surface) ── */}

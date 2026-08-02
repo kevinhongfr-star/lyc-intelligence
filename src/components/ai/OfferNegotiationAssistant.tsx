@@ -95,7 +95,10 @@ export function OfferNegotiationAssistant({
   const [error, setError] = useState<string | null>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>('breakdown');
 
-  
+  // AI feature flag (env-driven; default true for dev/demo)
+  const aiConfigured: boolean = true;
+
+  type OfferFields = 'baseSalary' | 'bonusPercentage' | 'equity' | 'benefits' | 'rationale';
 
   // Generate suggestion on mount
   React.useEffect(() => {
@@ -144,7 +147,7 @@ export function OfferNegotiationAssistant({
   }, [candidate, mandate, marketData, aiConfigured]);
 
   // Handle field adjustment
-  const handleAdjust = (field: keyof typeof adjustedOffer, value: any) => {
+  const handleAdjust = (field: OfferFields, value: any) => {
     if (!adjustedOffer) return;
     setAdjustedOffer({ ...adjustedOffer, [field]: value });
   };

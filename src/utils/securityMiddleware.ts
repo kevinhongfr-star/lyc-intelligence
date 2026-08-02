@@ -1,9 +1,6 @@
 // Phase 0.5: Security Middleware
 // Request validation: rate limiting, input sanitization, org-scoping, role checks
 
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-
 const MAX_PAYLOAD_SIZE_JSON = 1 * 1024 * 1024; // 1MB
 const MAX_PAYLOAD_SIZE_UPLOAD = 10 * 1024 * 1024; // 10MB
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
@@ -28,7 +25,7 @@ export interface RequestContext {
  * Checks: rate limiting, payload size, content-type, basic injection patterns
  */
 export function validateRequest(
-  request: Request | NextRequest,
+  request: Request,
   options?: {
     maxPayloadSize?: number;
     requireAuth?: boolean;
@@ -82,6 +79,16 @@ export function validateRequest(
   return { valid: true };
 }
 
+function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
+  return new Response(JSON.stringify(body), {
+    ...init,
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      ...(init.headers || {}),
+    },
+  });
+}
+
 /**
  * Higher-order function to wrap API handlers with security validation.
  */
@@ -97,7 +104,7 @@ export function withSecurity<T extends (request: Request) => Promise<Response>>(
     const validation = validateRequest(request, options);
 
     if (!validation.valid) {
-      return NextResponse.json(
+      return jsonResponse(
         { error: validation.message },
         { status: validation.status || 400 }
       );
@@ -107,7 +114,7 @@ export function withSecurity<T extends (request: Request) => Promise<Response>>(
       return await handler(request);
     } catch (error) {
       console.error('[securityMiddleware] Handler error:', error);
-      return NextResponse.json(
+      return jsonResponse(
         { error: 'Internal server error' },
         { status: 500 }
       );
@@ -226,17 +233,26 @@ export function validatePagination(page: unknown, pageSize: unknown, maxPageSize
   pageSize: number;
   error?: string;
 } {
-  const pageNum = typeof page === 'string' ? parseInt(page, 10) : page;
-  const sizeNum = typeof pageSize === 'string' ? parseInt(pageSize, 10) : pageSize;
+  const parseNumeric = (v: unknown): number | undefined => {
+    if (typeof v === 'number') return Number.isInteger(v) ? v : undefined;
+    if (typeof v === 'string') {
+      const n = parseInt(v, 10);
+      return isNaN(n) ? undefined : n;
+    }
+    return undefined;
+  };
 
-  if (pageNum !== undefined && (!Number.isInteger(pageNum) || pageNum < 1)) {
+  const pageNum = parseNumeric(page);
+  const sizeNum = parseNumeric(pageSize);
+
+  if (pageNum !== undefined && pageNum < 1) {
     return { valid: false, page: 1, pageSize: maxPageSize, error: 'Invalid page number' };
   }
 
-  if (sizeNum !== undefined && (!Number.isInteger(sizeNum) || sizeNum < 1 || sizeNum > maxPageSize)) {
+  if (sizeNum !== undefined && (sizeNum < 1 || sizeNum > maxPageSize)) {
     return {
       valid: false,
-      page: pageNum || 1,
+      page: pageNum ?? 1,
       pageSize: maxPageSize,
       error: `Invalid page size (max ${maxPageSize})`,
     };
@@ -244,8 +260,8 @@ export function validatePagination(page: unknown, pageSize: unknown, maxPageSize
 
   return {
     valid: true,
-    page: pageNum || 1,
-    pageSize: sizeNum || Math.min(50, maxPageSize),
+    page: pageNum ?? 1,
+    pageSize: sizeNum ?? Math.min(50, maxPageSize),
   };
 }
 

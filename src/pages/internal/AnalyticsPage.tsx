@@ -14,7 +14,7 @@ const TABS = [
 
 type TabKey = typeof TABS[number]['key'];
 
-export default function AnalyticsPage() {
+export function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('leaderboard');
 
   return (
@@ -55,3 +55,6 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+
+export default AnalyticsPage;
+

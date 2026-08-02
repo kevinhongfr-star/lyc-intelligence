@@ -14,7 +14,7 @@ const TABS = [
 
 type TabId = typeof TABS[number]['id'];
 
-export default function PlatformSettingsPage() {
+export function PlatformSettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>('rbac');
 
   const renderContent = () => {
@@ -65,3 +65,6 @@ export default function PlatformSettingsPage() {
     </div>
   );
 }
+
+export default PlatformSettingsPage;
+

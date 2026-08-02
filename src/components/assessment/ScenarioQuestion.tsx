@@ -1,5 +1,5 @@
 import React from 'react';
-import { CPDScenario } from '../../services/assessmentEngine';
+import type { ScenarioQuestion as ScenarioQuestionType, DimensionAnswer } from '../../services/assessmentEngine';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -21,7 +21,7 @@ const DS = {
 };
 
 export interface ScenarioQuestionProps {
-  question: CPDScenario;
+  question: ScenarioQuestionType;
   currentAnswer?: number; // selected answer score
   onAnswer: (score: number) => void;
   questionNumber: number;
@@ -46,7 +46,7 @@ export function ScenarioQuestion({ question, currentAnswer, onAnswer, questionNu
       </h3>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {question.answers.map((option, idx) => (
+        {question.answers.map((option: DimensionAnswer, idx: number) => (
           <button
             key={idx}
             onClick={() => onAnswer(option.score)}

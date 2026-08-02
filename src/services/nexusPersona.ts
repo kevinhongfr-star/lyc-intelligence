@@ -87,14 +87,14 @@ export function getToneCalibration(level: SeniorityLevel): {
   strategic_depth: number;
   terminology: 'executive' | 'professional' | 'accessible';
 } {
-  const calibrations = {
+  const calibrations: Record<SeniorityLevel, { formality: number; directness: number; strategic_depth: number; terminology: 'professional' | 'executive' | 'accessible' }> = {
     c_suite: { formality: 0.9, directness: 0.85, strategic_depth: 0.95, terminology: 'executive' },
     vp: { formality: 0.8, directness: 0.75, strategic_depth: 0.85, terminology: 'executive' },
     director: { formality: 0.7, directness: 0.65, strategic_depth: 0.7, terminology: 'professional' },
     manager: { formality: 0.6, directness: 0.55, strategic_depth: 0.5, terminology: 'accessible' },
     individual: { formality: 0.5, directness: 0.5, strategic_depth: 0.4, terminology: 'accessible' },
   };
-  
+
   return calibrations[level];
 }
 
@@ -108,7 +108,7 @@ export function buildNexusSystemPrompt(
   memoryContext?: string
 ): string {
   const tone = getToneCalibration(seniority);
-  const terminologyLevel = tone.formality === 'executive' ? 'executive-level' : 
+  const terminologyLevel = tone.terminology === 'executive' ? 'executive-level' :
                            tone.terminology === 'professional' ? 'professional' : 'accessible';
   
   return `You are Nexus, the executive advisory AI for LYC Partners.

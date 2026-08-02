@@ -240,7 +240,27 @@ export async function getPipelineByMandate(mandateId: string): Promise<Record<st
 
 // ─── Events / Documents / Notifications ───
 export interface CalendarEvent { id: string; mandate_id: string | null; contact_id: string | null; title: string; start_time: string; end_time: string | null; location: string | null; status: string; created_at: string; }
-export interface Document { id: string; mandate_id: string | null; contact_id: string | null; name: string; type: string; visibility: string; created_at: string; }
+export interface Document {
+  id: string;
+  mandate_id: string | null;
+  contact_id: string | null;
+  name: string;
+  type: string;
+  visibility: string;
+  created_at: string;
+  // Extended fields used by portal document center views (safe optional extras)
+  updated_at?: string | null;
+  created_by?: string | null;
+  updated_by?: string | null;
+  file_url?: string | null;
+  file_size?: number | null;
+  mime_type?: string | null;
+  version?: string | null;
+  parent_id?: string | null;
+  status?: string | null;
+  owner_user_id?: string | null;
+  tags?: string[] | null;
+}
 
 export async function getEvents(): Promise<CalendarEvent[]> { const { data, error } = await getSupabase().from('events').select('*').order('start_time'); return error ? [] : (data as CalendarEvent[]) ?? []; }
 export async function getDocuments(): Promise<Document[]> { const { data, error } = await getSupabase().from('documents').select('*').order('created_at', { ascending: false }); return error ? [] : (data as Document[]) ?? []; }
@@ -965,7 +985,7 @@ export async function saveMandateIntake(mandateId: string, intakeData: unknown):
 }
 
 export async function generateIntakeQuestions(
-  mandate: Pick<Mandate, 'title' | 'keywords' | 'location' | 'intake_data'>
+  mandate: { title: string; keywords?: string | null; location?: string | null; intake_data?: unknown }
 ): Promise<string[]> {
   try {
     const existingIntake = (mandate.intake_data as any) || {};
@@ -1020,7 +1040,7 @@ export function isIntakeComplete(mandate: Mandate | null | undefined): boolean {
 export async function saveSuccessProfile(mandateId: string, profileData: unknown): Promise<boolean> {
   const { error } = await getSupabase()
     .from('success_profiles')
-    .upsert({ ...profileData, mandate_id: mandateId })
+    .upsert({ ...(profileData as Record<string, unknown>), mandate_id: mandateId })
     .select();
   if (error) { console.error('[Supabase] saveSuccessProfile:', error); return false; }
   return true;
@@ -1807,26 +1827,10 @@ export interface LENSReportData {
   share_url?: string;
 }
 
-export interface CandidatePipeline {
-  id: string;
-  mandate_id: string;
-  contact_id: string;
-  contact?: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    current_title: string;
-    company?: { name: string; industry: string };
-    location: string;
-  };
-  stage: string;
-  match_score: number | null;
-  trident_composite: string | null;
-  verdict: 'proceed' | 'hold' | 'pass' | null;
-  scoring_output: any;
-  analysis: any;
-  created_at: string;
-}
+// CandidatePipeline is declared above (around line 106).
+// Additional fields are merged via declaration merging via TS interface merging:
+// - The earlier declaration has the core and query fields, this module re-opens nothing.
+// (Duplicate interface removed to resolve "subsequent property declarations" strict errors.)
 
 export async function generateLENSReport(
   mandateId: string,
@@ -3412,7 +3416,7 @@ export async function getCombinedScore(
   // Check for existing override
   // In production, this would check the prediction_logs or scoring_runs
 
-  const usesMlpScore = mlResult && !mlResult.uses_fallback && mlResult.score !== null;
+  const usesMlpScore = !!(mlResult && !mlResult.uses_fallback && mlResult.score !== null);
   const mlScore = mlResult?.score ?? ruleBasedScore;
 
   return {

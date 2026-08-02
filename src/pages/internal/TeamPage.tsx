@@ -12,7 +12,7 @@ const TABS = [
 
 type TabId = typeof TABS[number]['id'];
 
-export default function TeamPage() {
+export function TeamPage() {
   const [activeTab, setActiveTab] = useState<TabId>('team-list');
 
   const renderContent = () => {
@@ -61,3 +61,6 @@ export default function TeamPage() {
     </div>
   );
 }
+
+export default TeamPage;
+

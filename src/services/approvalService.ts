@@ -365,7 +365,7 @@ export async function approveStep(
     .select('step_order')
     .eq('request_id', requestId);
 
-  const maxStep = Math.max(...(allSteps?.map((s: ApprovalStepRecord) => s.step_order) ?? [0]));
+  const maxStep = Math.max(...(allSteps?.map((s: { step_order: number }) => s.step_order) ?? [0]));
 
   if (stepOrder >= maxStep) {
     // All steps approved

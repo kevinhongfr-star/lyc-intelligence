@@ -28,6 +28,8 @@ const DS = {
   radiusSm: '0px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
+  error: '#C0392B',
+  success: '#1A7D42',
 };
 
 type Step = 'gate' | 'context' | 'dimensions' | 'cross_border' | 'style' | 'goals' | 'results';

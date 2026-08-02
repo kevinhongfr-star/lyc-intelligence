@@ -125,7 +125,7 @@ class PushNotificationService {
       // Subscribe to push
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey),
+        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey) as BufferSource,
       });
 
       this.subscription = subscription;
@@ -194,7 +194,7 @@ class PushNotificationService {
     try {
       const registration = await navigator.serviceWorker.ready;
       const pushManager = registration.pushManager;
-      return pushManager.supportedContentEncodings?.includes('aes128gcm') ?? false;
+      return (pushManager as any).supportedContentEncodings?.includes('aes128gcm') ?? false;
     } catch {
       return false;
     }
@@ -265,7 +265,7 @@ class PushNotificationService {
           { action: 'open', title: 'Open' },
           { action: 'dismiss', title: 'Dismiss' },
         ],
-      });
+      } as NotificationOptions);
     } catch (error) {
       console.error('[Push] Show notification failed:', error);
     }

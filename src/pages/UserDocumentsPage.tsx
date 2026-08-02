@@ -24,6 +24,7 @@ const CUSTOM_DS = {
 };
 
 export function DocumentsPage() {
+
   const navigate = useNavigate();
   const { user, profile } = useAuthStore();
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -320,3 +321,6 @@ export function DocumentsPage() {
     </div>
   );
 }
+
+export const UserDocumentsPage = DocumentsPage;
+

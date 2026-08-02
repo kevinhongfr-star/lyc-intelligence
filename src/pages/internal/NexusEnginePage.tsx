@@ -16,7 +16,7 @@ const TABS = [
 
 type TabKey = typeof TABS[number]['key'];
 
-export default function NexusEnginePage() {
+export function NexusEnginePage() {
   const [activeTab, setActiveTab] = useState<TabKey>('persona');
 
   return (
@@ -58,3 +58,6 @@ export default function NexusEnginePage() {
     </div>
   );
 }
+
+export default NexusEnginePage;
+

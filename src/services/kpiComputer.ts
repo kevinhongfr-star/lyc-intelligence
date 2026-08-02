@@ -389,7 +389,7 @@ async function computeTimeToHire(
 
     const days: number[] = [];
 
-    for (const offer of data as Array<{
+    for (const offer of data as unknown as Array<{
       accepted_at: string;
       mandates: { created_at: string } | null;
     }>) {

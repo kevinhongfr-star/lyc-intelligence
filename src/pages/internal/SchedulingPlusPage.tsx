@@ -8,7 +8,7 @@ import InterviewTemplates from '@/components/internal/InterviewTemplates';
 const tabs = ['Calendar Sync', 'Scheduler', 'Scorecards', 'Templates'] as const;
 type Tab = typeof tabs[number];
 
-export default function SchedulingPlusPage() {
+export function SchedulingPlusPage() {
   const [activeTab, setActiveTab] = useState<Tab>('Calendar Sync');
 
   return (
@@ -49,3 +49,6 @@ export default function SchedulingPlusPage() {
     </div>
   );
 }
+
+export default SchedulingPlusPage;
+

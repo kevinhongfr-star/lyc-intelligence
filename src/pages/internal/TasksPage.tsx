@@ -12,7 +12,7 @@ const TABS = [
 
 type TabId = typeof TABS[number]['id'];
 
-export default function TasksPage() {
+export function TasksPage() {
   const [activeTab, setActiveTab] = useState<TabId>('board');
 
   const renderContent = () => {
@@ -61,3 +61,6 @@ export default function TasksPage() {
     </div>
   );
 }
+
+export default TasksPage;
+

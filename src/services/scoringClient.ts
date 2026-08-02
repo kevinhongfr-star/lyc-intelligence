@@ -39,6 +39,12 @@ export interface MatchResult {
     C4: number;
     C5: number;
   };
+  // Backward-compat aliases used by legacy UI
+  verdict?: 'Strong Yes' | 'Yes' | 'No' | 'Strong No' | string;
+  d1?: number;
+  d2?: number;
+  d3?: number;
+  composite?: number;
 }
 
 export interface ScoringResponse {

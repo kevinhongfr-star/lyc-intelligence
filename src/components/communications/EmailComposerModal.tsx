@@ -5,7 +5,7 @@ import {
   X,
   Send,
   Paperclip,
-  Template,
+  FileText as Template,
   Eye,
   Loader2,
   Mail,

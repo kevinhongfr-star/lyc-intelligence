@@ -8,7 +8,7 @@ import OpsAlertPanel from '@/components/internal/OpsAlertPanel';
 const tabs = ['Execution Logs', 'Rule Audit', 'System Health', 'Alerts'] as const;
 type Tab = typeof tabs[number];
 
-export default function AdvancedOpsPage() {
+export function AdvancedOpsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('Execution Logs');
 
   return (
@@ -49,3 +49,6 @@ export default function AdvancedOpsPage() {
     </div>
   );
 }
+
+export default AdvancedOpsPage;
+

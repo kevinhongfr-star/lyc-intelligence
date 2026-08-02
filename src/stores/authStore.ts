@@ -9,7 +9,7 @@ export interface UserProfile {
   email: string;
   name: string;
   role: string | null;
-  tier: 'free' | 'pro' | 'council' | 'enterprise';
+  tier: 'free' | 'pro' | 'council' | 'enterprise' | 'member';
   icp: string | null;
   active_surface: string | null;
   organization_id: string | null;
@@ -18,6 +18,22 @@ export interface UserProfile {
   onboarding_completed?: boolean | null;
   created_at: string;
   updated_at: string;
+  // Extended fields used by billing/credits/nexus UIs
+  credits?: number;
+  credits_used?: number;
+  credits_expires_at?: string | null;
+  stripe_subscription_status?: 'active' | 'canceled' | 'past_due' | 'trialing' | 'incomplete' | 'unpaid' | null | string;
+  stripe_customer_id?: string | null;
+  stripe_subscription_id?: string | null;
+  title?: string | null;
+  company?: string | null;
+  avatar_url?: string | null;
+  phone?: string | null;
+  linkedin_url?: string | null;
+  bio?: string | null;
+  organization_name?: string | null;
+  timezone?: string;
+  locale?: string;
 }
 
 interface AuthStore {

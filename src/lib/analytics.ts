@@ -242,3 +242,18 @@ export function initAnalytics() {
     if (document.visibilityState === 'hidden') flushQueue();
   });
 }
+
+/**
+ * Standalone page view tracker (used outside React components)
+ */
+export function trackPageView(path: string, title?: string, description?: string) {
+  trackEvent({
+    name: 'page_view',
+    properties: {
+      path,
+      title,
+      description,
+      referrer: document.referrer,
+    },
+  });
+}

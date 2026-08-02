@@ -1,12 +1,23 @@
 import React from 'react';
 import { COLORS, SPACING, RADII, TRANSITIONS } from '@/styles/tokens';
 
-interface NavItemProps {
+type SpacingInput = keyof typeof SPACING | number | (string & {});
+
+const spacingPx = (val: SpacingInput | undefined): number | undefined => {
+  if (val === undefined) return undefined;
+  if (typeof val === 'number') {
+    return SPACING[val] ?? val;
+  }
+  return SPACING[val] ?? parseInt(val, 10);
+};
+
+interface NavItemProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
   href?: string;
   active?: boolean;
   onClick?: () => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const NavItem: React.FC<NavItemProps> = ({ 
@@ -15,8 +26,10 @@ export const NavItem: React.FC<NavItemProps> = ({
   active = false,
   onClick,
   className = '',
+  style,
+  ...rest
 }) => {
-  const Component = href ? 'a' : 'button';
+  const Component: any = href ? 'a' : 'button';
 
   return (
     <Component
@@ -37,41 +50,47 @@ export const NavItem: React.FC<NavItemProps> = ({
         cursor: 'pointer',
         border: 'none',
         transition: TRANSITIONS.all,
+        ...style,
       }}
-      onMouseEnter={(e) => {
+      onMouseEnter={(e: any) => {
         e.currentTarget.style.backgroundColor = COLORS.bgHover;
       }}
-      onMouseLeave={(e) => {
+      onMouseLeave={(e: any) => {
         e.currentTarget.style.backgroundColor = active ? COLORS.primaryLight : 'transparent';
       }}
+      {...rest}
     >
       {children}
     </Component>
   );
 };
 
-interface TabsProps {
+interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export const Tabs: React.FC<TabsProps> = ({ children, className = '' }) => (
+export const Tabs: React.FC<TabsProps> = ({ children, className = '', style, ...rest }) => (
   <div
     className={className}
     style={{
       display: 'flex',
       borderBottom: `1px solid ${COLORS.border}`,
+      ...style,
     }}
+    {...rest}
   >
     {children}
   </div>
 );
 
-interface TabProps {
+interface TabProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   active?: boolean;
   onClick?: () => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const Tab: React.FC<TabProps> = ({ 
@@ -79,6 +98,8 @@ export const Tab: React.FC<TabProps> = ({
   active = false,
   onClick,
   className = '',
+  style,
+  ...rest
 }) => (
   <button
     onClick={onClick}
@@ -94,6 +115,7 @@ export const Tab: React.FC<TabProps> = ({
       cursor: 'pointer',
       transition: TRANSITIONS.all,
       marginBottom: '-1px',
+      ...style,
     }}
     onMouseEnter={(e) => {
       e.currentTarget.style.color = COLORS.primary;
@@ -101,17 +123,19 @@ export const Tab: React.FC<TabProps> = ({
     onMouseLeave={(e) => {
       e.currentTarget.style.color = active ? COLORS.primary : COLORS.textSecondary;
     }}
+    {...rest}
   >
     {children}
   </button>
 );
 
-interface BreadcrumbProps {
+interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
   items: { label: string; href?: string }[];
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => (
+export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '', style, ...rest }) => (
   <nav
     className={className}
     style={{
@@ -120,7 +144,9 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' })
       gap: `${SPACING[2]}px`,
       fontSize: `${SPACING[4]}px`,
       color: COLORS.textMuted,
+      ...style,
     }}
+    {...rest}
   >
     {items.map((item, index) => (
       <React.Fragment key={index}>

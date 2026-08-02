@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { toast } from '@/stores/toastStore';
 import { 
   ArrowRight, Shield, Loader2, RefreshCw, Paperclip, 
-  Crown, MessageSquare, Plus, CreditCard, Menu, X, Sparkles
+  Crown, MessageSquare, Plus, CreditCard, Menu, X, Sparkles, Trophy as Award
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditService';

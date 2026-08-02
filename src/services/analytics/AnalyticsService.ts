@@ -267,19 +267,21 @@ export async function getTimeToFillAnalytics(
   // Calculate time-to-fill for each placed candidate
   const timeToFills: Array<{ days: number; mandateId: string; mandateTitle: string; clientName: string; consultantId: string; consultantName: string }> = [];
 
-  placedCandidates?.forEach(candidate => {
-    if (candidate.mandate?.created_at && candidate.created_at) {
-      const mandateCreated = new Date(candidate.mandate.created_at);
+  placedCandidates?.forEach(candidateRaw => {
+    const candidate = candidateRaw as any;
+    const mandate = Array.isArray(candidate.mandate) ? candidate.mandate[0] : candidate.mandate;
+    if (mandate?.created_at && candidate.created_at) {
+      const mandateCreated = new Date(mandate.created_at);
       const candidateCreated = new Date(candidate.created_at);
       const daysToFill = Math.ceil((candidateCreated.getTime() - mandateCreated.getTime()) / (1000 * 60 * 60 * 24));
 
       timeToFills.push({
         days: daysToFill,
-        mandateId: candidate.mandate.id,
-        mandateTitle: candidate.mandate.title || 'Unknown',
-        clientName: (candidate.mandate.client as any)?.company_name || 'Unknown',
-        consultantId: (candidate.consultant as any)?.id || 'unknown',
-        consultantName: (candidate.consultant as any)?.name || 'Unknown',
+        mandateId: mandate?.id || 'unknown',
+        mandateTitle: mandate?.title || 'Unknown',
+        clientName: Array.isArray(mandate?.client) ? mandate?.client[0]?.company_name : mandate?.client?.company_name || 'Unknown',
+        consultantId: candidate.consultant?.id || candidate.consultant_id || 'unknown',
+        consultantName: candidate.consultant?.name || 'Unknown',
       });
     }
   });
@@ -577,9 +579,11 @@ export async function getConsultantPerformance(
 
     if (p.match_score) perf.matchScores.push(p.match_score);
 
-    if (p.mandate?.created_at && p.created_at) {
+    const pAny = p as any;
+    const pMandate = Array.isArray(pAny.mandate) ? pAny.mandate[0] : pAny.mandate;
+    if (pMandate?.created_at && pAny.created_at) {
       const days = Math.ceil(
-        (new Date(p.created_at).getTime() - new Date(p.mandate.created_at).getTime()) / (1000 * 60 * 60 * 24)
+        (new Date(pAny.created_at).getTime() - new Date(pMandate.created_at).getTime()) / (1000 * 60 * 60 * 24)
       );
       perf.timeToFills.push(days);
     }

@@ -8,7 +8,7 @@ import SignalFeed from '@/components/internal/SignalFeed';
 const tabs = ['GRID', 'Market Maps', 'Talent Density', 'Signal Feed'] as const;
 type Tab = typeof tabs[number];
 
-export default function IntelligencePlusPage() {
+export function IntelligencePlusPage() {
   const [activeTab, setActiveTab] = useState<Tab>('GRID');
 
   return (
@@ -49,3 +49,6 @@ export default function IntelligencePlusPage() {
     </div>
   );
 }
+
+export default IntelligencePlusPage;
+

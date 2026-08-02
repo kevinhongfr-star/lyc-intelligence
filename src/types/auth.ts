@@ -177,6 +177,22 @@ export interface UserProfile {
   locale?: string;
   created_at: string;
   updated_at: string;
+  // Extended profile fields used across portals
+  title?: string | null;
+  company?: string | null;
+  stripe_subscription_status?: 'active' | 'canceled' | 'past_due' | 'trialing' | 'incomplete' | 'unpaid' | null | string;
+  stripe_customer_id?: string | null;
+  stripe_subscription_id?: string | null;
+  phone?: string | null;
+  linkedin_url?: string | null;
+  bio?: string | null;
+  // Credit & usage fields used by billing/credits components
+  credits?: number;
+  credits_used?: number;
+  credits_expires_at?: string | null;
+  // Additional fields used by various profile UIs
+  status?: 'active' | 'inactive' | 'pending' | string;
+  last_login_at?: string | null;
 }
 
 // Auth session with JWT claims

@@ -1,18 +1,35 @@
 import React from 'react';
 import { COLORS, SPACING, RADII, SHADOWS, TRANSITIONS } from '@/styles/tokens';
 
-interface CardProps {
+type SpacingInput = keyof typeof SPACING | number | (string & {});
+
+const spacingPx = (val: SpacingInput | undefined): number | undefined => {
+  if (val === undefined) return undefined;
+  if (typeof val === 'number') {
+    return SPACING[val] ?? val;
+  }
+  return SPACING[val] ?? parseInt(val, 10);
+};
+
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   variant?: 'default' | 'elevated' | 'outline';
-  padding?: keyof typeof SPACING;
+  padding?: SpacingInput;
   className?: string;
+  mb?: SpacingInput;
+  mt?: SpacingInput;
+  style?: React.CSSProperties;
 }
 
 export const Card: React.FC<CardProps> = ({ 
   children, 
   variant = 'default', 
   padding = '6',
-  className = '' 
+  className = '',
+  mb,
+  mt,
+  style,
+  ...rest
 }) => {
   const variants: Record<string, {
     backgroundColor: string;
@@ -36,84 +53,99 @@ export const Card: React.FC<CardProps> = ({
     },
   };
 
-  const style = variants[variant];
+  const v = variants[variant];
+  const paddingPx = spacingPx(padding);
+  const marginBottom = spacingPx(mb);
+  const marginTop = spacingPx(mt);
 
   return (
     <div
       className={className}
       style={{
-        backgroundColor: style.backgroundColor,
-        border: `1px solid ${style.borderColor}`,
+        backgroundColor: v.backgroundColor,
+        border: `1px solid ${v.borderColor}`,
         borderRadius: `${RADII.card}px`,
-        boxShadow: style.shadow,
-        padding: `${SPACING[padding]}px`,
+        boxShadow: v.shadow,
+        padding: `${paddingPx}px`,
         transition: TRANSITIONS.all,
+        ...(marginBottom !== undefined ? { marginBottom: `${marginBottom}px` } : {}),
+        ...(marginTop !== undefined ? { marginTop: `${marginTop}px` } : {}),
+        ...style,
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = SHADOWS.cardHover || SHADOWS.lg;
+        e.currentTarget.style.boxShadow = SHADOWS.cardHover;
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = style.shadow;
+        e.currentTarget.style.boxShadow = v.shadow;
       }}
+      {...rest}
     >
       {children}
     </div>
   );
 };
 
-interface CardHeaderProps {
+interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export const CardHeader: React.FC<CardHeaderProps> = ({ children, className = '' }) => (
+export const CardHeader: React.FC<CardHeaderProps> = ({ children, className = '', style, ...rest }) => (
   <div
     className={className}
     style={{
       paddingBottom: `${SPACING[4]}px`,
       marginBottom: `${SPACING[4]}px`,
       borderBottom: `1px solid ${COLORS.border}`,
+      ...style,
     }}
+    {...rest}
   >
     {children}
   </div>
 );
 
-interface CardBodyProps {
+interface CardBodyProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export const CardBody: React.FC<CardBodyProps> = ({ children, className = '' }) => (
-  <div className={className}>
+export const CardBody: React.FC<CardBodyProps> = ({ children, className = '', style, ...rest }) => (
+  <div className={className} style={style} {...rest}>
     {children}
   </div>
 );
 
-interface CardFooterProps {
+interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export const CardFooter: React.FC<CardFooterProps> = ({ children, className = '' }) => (
+export const CardFooter: React.FC<CardFooterProps> = ({ children, className = '', style, ...rest }) => (
   <div
     className={className}
     style={{
       paddingTop: `${SPACING[4]}px`,
       marginTop: `${SPACING[4]}px`,
       borderTop: `1px solid ${COLORS.border}`,
+      ...style,
     }}
+    {...rest}
   >
     {children}
   </div>
 );
 
-interface StatCardProps {
+interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   value: string | number;
   change?: { value: string | number; positive?: boolean };
   icon?: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const StatCard: React.FC<StatCardProps> = ({ 
@@ -121,9 +153,11 @@ export const StatCard: React.FC<StatCardProps> = ({
   value, 
   change, 
   icon,
-  className = '' 
+  className = '',
+  style,
+  ...rest
 }) => (
-  <Card className={className}>
+  <Card className={className} style={style} {...rest}>
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <div>
         <div

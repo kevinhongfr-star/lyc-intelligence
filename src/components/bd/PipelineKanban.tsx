@@ -21,7 +21,7 @@ import { getDaysInStage } from '@/services/bdStageTransition';
 import { cn } from '@/lib/utils';
 
 interface PipelineKanbanProps {
-  orgId: string;
+  orgId?: string;
   onSelectOpportunity?: (opp: BDOpportunity) => void;
   onCreateOpportunity?: () => void;
 }
@@ -55,7 +55,7 @@ const STAGE_HEADER_COLORS: Record<string, string> = {
   deferred: 'bg-gray-100 text-gray-500',
 };
 
-export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity }: PipelineKanbanProps) {
+export function PipelineKanban({ orgId = '', onSelectOpportunity, onCreateOpportunity }: PipelineKanbanProps) {
   const [kanbanData, setKanbanData] = useState<KanbanData | null>(null);
   const [loading, setLoading] = useState(true);
   const [draggedItem, setDraggedItem] = useState<BDOpportunity | null>(null);

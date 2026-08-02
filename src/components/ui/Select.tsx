@@ -6,11 +6,14 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
 
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange' | 'value'> {
   label?: string;
   error?: string;
-  options: { value: string; label: string }[];
+  options?: { value: string; label: string }[];
   placeholder?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  onChange?: React.ChangeEventHandler<HTMLSelectElement>;
 }
 
 export function Select({
@@ -20,9 +23,18 @@ export function Select({
   placeholder,
   className,
   id,
+  value,
+  onValueChange,
+  onChange,
+  children,
   ...props
 }: SelectProps) {
   const selectId = id || `select-${Math.random().toString(36).slice(2, 9)}`;
+
+  const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
+    onChange?.(e);
+    onValueChange?.(e.target.value);
+  };
 
   return (
     <div className="w-full">
@@ -46,6 +58,8 @@ export function Select({
             className
           )}
           style={{ borderRadius: 0 }}
+          value={value}
+          onChange={handleChange}
           {...props}
         >
           {placeholder && (
@@ -53,11 +67,12 @@ export function Select({
               {placeholder}
             </option>
           )}
-          {options.map((option) => (
+          {options?.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
+          {!options && children}
         </select>
         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#737373] pointer-events-none" />
       </div>

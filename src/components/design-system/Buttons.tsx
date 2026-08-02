@@ -1,13 +1,26 @@
 import React from 'react';
 import { COLORS, SPACING, RADII, SHADOWS, TRANSITIONS } from '@/styles/tokens';
 
-interface ButtonProps {
+type SpacingInput = keyof typeof SPACING | number | (string & {});
+
+const spacingPx = (val: SpacingInput | undefined): number | undefined => {
+  if (val === undefined) return undefined;
+  if (typeof val === 'number') {
+    return SPACING[val] ?? val;
+  }
+  return SPACING[val] ?? parseInt(val, 10);
+};
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   className?: string;
   onClick?: () => void;
+  mb?: SpacingInput;
+  mt?: SpacingInput;
+  style?: React.CSSProperties;
 }
 
 export const Button: React.FC<ButtonProps> = ({ 
@@ -17,6 +30,10 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   className = '',
   onClick,
+  mb,
+  mt,
+  style,
+  ...rest
 }) => {
   const sizes: Record<string, { padding: string; fontSize: string }> = {
     sm: { padding: `${SPACING[2]}px ${SPACING[3]}px`, fontSize: `${SPACING[3]}px` },
@@ -74,7 +91,9 @@ export const Button: React.FC<ButtonProps> = ({
     },
   };
 
-  const style = variants[variant];
+  const v = variants[variant];
+  const marginBottom = spacingPx(mb);
+  const marginTop = spacingPx(mt);
 
   return (
     <button
@@ -83,11 +102,11 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={disabled}
       style={{
         ...sizes[size],
-        backgroundColor: disabled ? COLORS.border : style.backgroundColor,
-        color: disabled ? COLORS.textMuted : style.color,
-        border: `1px solid ${style.borderColor}`,
+        backgroundColor: disabled ? COLORS.border : v.backgroundColor,
+        color: disabled ? COLORS.textMuted : v.color,
+        border: `1px solid ${v.borderColor}`,
         borderRadius: `${RADII.button}px`,
-        boxShadow: disabled ? SHADOWS.none : style.shadow,
+        boxShadow: disabled ? SHADOWS.none : v.shadow,
         transition: TRANSITIONS.all,
         fontWeight: 600,
         cursor: disabled ? 'not-allowed' : 'pointer',
@@ -95,26 +114,30 @@ export const Button: React.FC<ButtonProps> = ({
         alignItems: 'center',
         justifyContent: 'center',
         gap: `${SPACING[2]}px`,
+        ...(marginBottom !== undefined ? { marginBottom: `${marginBottom}px` } : {}),
+        ...(marginTop !== undefined ? { marginTop: `${marginTop}px` } : {}),
+        ...style,
       }}
       onMouseEnter={(e) => {
         if (!disabled) {
-          e.currentTarget.style.backgroundColor = style.hoverBackgroundColor;
-          e.currentTarget.style.color = style.hoverColor;
+          e.currentTarget.style.backgroundColor = v.hoverBackgroundColor;
+          e.currentTarget.style.color = v.hoverColor;
         }
       }}
       onMouseLeave={(e) => {
         if (!disabled) {
-          e.currentTarget.style.backgroundColor = style.backgroundColor;
-          e.currentTarget.style.color = style.color;
+          e.currentTarget.style.backgroundColor = v.backgroundColor;
+          e.currentTarget.style.color = v.color;
         }
       }}
+      {...rest}
     >
       {children}
     </button>
   );
 };
 
-interface IconButtonProps {
+interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
@@ -122,6 +145,7 @@ interface IconButtonProps {
   className?: string;
   onClick?: () => void;
   ariaLabel?: string;
+  style?: React.CSSProperties;
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({ 
@@ -132,6 +156,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
   className = '',
   onClick,
   ariaLabel,
+  style,
+  ...rest
 }) => {
   const sizes: Record<string, string> = {
     sm: `${SPACING[6]}px`,
@@ -161,7 +187,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
     },
   };
 
-  const style = variants[variant];
+  const v = variants[variant];
 
   return (
     <button
@@ -172,8 +198,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
       style={{
         width: sizes[size],
         height: sizes[size],
-        backgroundColor: disabled ? COLORS.border : style.backgroundColor,
-        color: disabled ? COLORS.textMuted : style.color,
+        backgroundColor: disabled ? COLORS.border : v.backgroundColor,
+        color: disabled ? COLORS.textMuted : v.color,
         border: 'none',
         borderRadius: `${RADII.md}px`,
         transition: TRANSITIONS.all,
@@ -181,17 +207,19 @@ export const IconButton: React.FC<IconButtonProps> = ({
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
+        ...style,
       }}
       onMouseEnter={(e) => {
         if (!disabled) {
-          e.currentTarget.style.backgroundColor = style.hoverBackgroundColor;
+          e.currentTarget.style.backgroundColor = v.hoverBackgroundColor;
         }
       }}
       onMouseLeave={(e) => {
         if (!disabled) {
-          e.currentTarget.style.backgroundColor = style.backgroundColor;
+          e.currentTarget.style.backgroundColor = v.backgroundColor;
         }
       }}
+      {...rest}
     >
       {children}
     </button>

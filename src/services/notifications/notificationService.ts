@@ -830,7 +830,7 @@ export async function unsubscribePushNotifications(
   return true;
 }
 
-export async function checkPushSupport(): boolean {
+export function checkPushSupport(): boolean {
   if (typeof window === 'undefined') return false;
   return 'serviceWorker' in navigator && 'PushManager' in window;
 }

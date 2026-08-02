@@ -30,6 +30,7 @@ interface TimelineItem {
   has_attachments?: boolean;
   interaction_type?: string;
   id: string;
+  thread_id?: string;
 }
 
 interface CommunicationTimelineProps {

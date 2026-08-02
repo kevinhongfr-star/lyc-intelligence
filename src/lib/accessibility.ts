@@ -117,11 +117,12 @@ export function VisuallyHidden({
   children: React.ReactNode;
   as?: any;
 } & React.HTMLAttributes<any>) {
-  return (
-    <Component
-      {...props}
-      className="sr-only"
-      style={{
+  return React.createElement(
+    Component as any,
+    {
+      ...props,
+      className: 'sr-only',
+      style: {
         position: 'absolute',
         width: '1px',
         height: '1px',
@@ -131,10 +132,9 @@ export function VisuallyHidden({
         clip: 'rect(0, 0, 0, 0)',
         whiteSpace: 'nowrap',
         border: 0,
-      }}
-    >
-      {children}
-    </Component>
+      },
+    },
+    children
   );
 }
 
