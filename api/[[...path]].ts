@@ -734,6 +734,7 @@ export default async function handler(
 
       // ── Direct sub-module dispatchers (frontend calls /api/{module}/* directly) ──
       case 'bd':
+      case 'team-lead':
       case 'compensation':
       case 'approvals':
       case 'automation':
@@ -754,6 +755,7 @@ export default async function handler(
         const _subMod = pathArr[0];
         const _subHandlers: Record<string, () => Promise<any>> = {
           'bd': () => import('./_lib/bdHandler.js'),
+          'team-lead': () => import('./_lib/teamLeadHandler.js'),
           'compensation': () => import('./_lib/compensationHandler.js'),
           'approvals': () => import('./_lib/approvalsHandler.js'),
           'automation': () => import('./_lib/automationHandler.js'),
@@ -809,6 +811,7 @@ export default async function handler(
         }
         const xHandlers: Record<string, () => Promise<any>> = {
           'bd': () => import('./_lib/bdHandler.js'),
+          'team-lead': () => import('./_lib/teamLeadHandler.js'),
           'compensation': () => import('./_lib/compensationHandler.js'),
           'approvals': () => import('./_lib/approvalsHandler.js'),
           'automation': () => import('./_lib/automationHandler.js'),
