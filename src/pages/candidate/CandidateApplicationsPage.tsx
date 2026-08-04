@@ -1,92 +1,114 @@
 /**
- * CandidateApplicationsPage — Candidate Portal application tracker
- * Renders inside AppShell → Outlet. Lists active applications with status tracking.
+ * CandidateApplicationsPage — Candidate Portal application tracker (S1-T04)
+ *
+ * Wired to live Supabase data via getCandidateApplications().
+ * Lists all applications with stage, match score, and last updated date.
  */
-import React, { useState, useEffect } from 'react';
-import { Search, Briefcase, Users, Award, CheckCircle2, Building2, Calendar, MapPin, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Search, Briefcase, Users, Award, CheckCircle2, Building2, Calendar, MapPin, ArrowRight, Loader2, DollarSign } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Input } from '@/components/ui';
+import { getCandidateApplications, CandidateApplication } from '@/services/supabaseApi';
 
-type ApplicationStatus =
-  | 'Under Review'
-  | 'Submitted to Client'
-  | 'Interview Stage'
-  | 'Offer Stage'
-  | 'Placed'
-  | 'Not Selected';
+// ── Helpers ──
 
-interface CandidateApplication {
-  id: string;
-  company: string;
-  role: string;
-  seniority: string;
-  location: string;
-  status: ApplicationStatus;
-  progress: number;
-  submittedAt: string;
-  updatedAt: string;
-  nextStep: string;
+function fmtDate(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  try {
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch {
+    return iso;
+  }
 }
 
-const MOCK_APPLICATIONS: CandidateApplication[] = [
-  { id: 'a1', company: 'TechCorp', role: 'VP Engineering', seniority: 'VP', location: 'San Francisco', status: 'Interview Stage', progress: 60, submittedAt: '2025-01-05', updatedAt: '2025-01-15', nextStep: 'Final round interview on Jan 22' },
-  { id: 'a2', company: 'FinScale', role: 'Chief Financial Officer', seniority: 'C-Level', location: 'New York', status: 'Submitted to Client', progress: 40, submittedAt: '2025-01-02', updatedAt: '2025-01-14', nextStep: 'Awaiting client feedback' },
-  { id: 'a3', company: 'DataMesh', role: 'Head of Product', seniority: 'Director', location: 'Remote', status: 'Under Review', progress: 20, submittedAt: '2025-01-09', updatedAt: '2025-01-10', nextStep: 'Initial screening in progress' },
-  { id: 'a4', company: 'CloudPeak', role: 'CTO', seniority: 'C-Level', location: 'Seattle', status: 'Offer Stage', progress: 85, submittedAt: '2024-12-10', updatedAt: '2025-01-16', nextStep: 'Offer under review' },
-  { id: 'a5', company: 'GrowthLab', role: 'VP Sales', seniority: 'VP', location: 'Boston', status: 'Not Selected', progress: 100, submittedAt: '2024-11-01', updatedAt: '2024-12-20', nextStep: 'Closed — role filled' },
-];
-
-const STATUS_COLORS: Record<ApplicationStatus, string> = {
-  'Under Review': 'bg-amber/10 text-amber',
-  'Submitted to Client': 'bg-blue/10 text-blue',
-  'Interview Stage': 'bg-fuchsia-light text-fuchsia',
-  'Offer Stage': 'bg-green/10 text-green',
-  'Placed': 'bg-green/10 text-green',
-  'Not Selected': 'bg-text-muted/10 text-text-muted',
+const STAGE_ORDER: Record<string, number> = {
+  'Sourcing': 10, 'Screening': 20, 'Assessment': 30, 'Shortlist': 40,
+  'Interview': 50, 'Final Interview': 60, 'Offer': 70, 'Placed': 80,
 };
 
-const STATUS_OPTIONS: { value: 'all' | ApplicationStatus; label: string }[] = [
-  { value: 'all', label: 'All Status' },
-  { value: 'Under Review', label: 'Under Review' },
-  { value: 'Submitted to Client', label: 'Submitted to Client' },
-  { value: 'Interview Stage', label: 'Interview Stage' },
-  { value: 'Offer Stage', label: 'Offer Stage' },
-  { value: 'Not Selected', label: 'Not Selected' },
-];
+function stageProgress(stage: string | null | undefined): number {
+  if (!stage) return 0;
+  return STAGE_ORDER[stage] ?? 0;
+}
+
+const STAGE_COLORS: Record<string, string> = {
+  'Sourcing': 'bg-gray-100 text-gray-600',
+  'Screening': 'bg-amber-100 text-amber-700',
+  'Assessment': 'bg-blue-100 text-blue-700',
+  'Shortlist': 'bg-fuchsia-100 text-fuchsia-700',
+  'Interview': 'bg-indigo-100 text-indigo-700',
+  'Final Interview': 'bg-violet-100 text-violet-700',
+  'Offer': 'bg-green-100 text-green-700',
+  'Placed': 'bg-green-100 text-green-700',
+  'Not Selected': 'bg-red-100 text-red-700',
+};
+
+// ── Component ──
 
 export function CandidateApplicationsPage() {
   const [applications, setApplications] = useState<CandidateApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | ApplicationStatus>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  useEffect(() => {
-    // TODO: Replace with real API call to /api/candidate/applications
-    const timer = setTimeout(() => {
-      setApplications(MOCK_APPLICATIONS);
+  const loadApplications = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getCandidateApplications();
+      setApplications(data);
+    } catch (e) {
+      console.error('[CandidateApplications] load error:', e);
+    } finally {
       setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    }
   }, []);
 
+  useEffect(() => {
+    loadApplications();
+  }, [loadApplications]);
+
+  // Get unique stages for filter dropdown
+  const stageOptions = React.useMemo(() => {
+    const stages = new Set(applications.map(a => a.stage).filter(Boolean));
+    return ['all', ...Array.from(stages).sort()];
+  }, [applications]);
+
   const filtered = applications.filter((a) => {
+    const title = a.mandate?.title ?? '';
+    const company = a.mandate?.company?.name ?? a.client_name ?? '';
     const matchesSearch =
-      a.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.company.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || a.status === statusFilter;
+      title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      company.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || a.stage === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const activeCount = applications.filter((a) => !['Placed', 'Not Selected'].includes(a.status)).length;
-  const interviewCount = applications.filter((a) => a.status === 'Interview Stage').length;
-  const offerCount = applications.filter((a) => a.status === 'Offer Stage').length;
+  const activeCount = applications.filter((a) =>
+    !['Placed', 'Not Selected'].includes(a.stage ?? '')
+  ).length;
+  const interviewCount = applications.filter((a) =>
+    a.stage?.toLowerCase().includes('interview')
+  ).length;
+  const offerCount = applications.filter((a) =>
+    a.stage?.toLowerCase().includes('offer')
+  ).length;
   const totalCount = applications.length;
 
   return (
     <div className="space-y-6">
       {/* Page header */}
-      <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Applications</h1>
-        <p className="text-text-secondary text-sm mt-1">Track the roles you've been submitted to and their status.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-serif font-bold text-2xl text-text-primary">Applications</h1>
+          <p className="text-text-secondary text-sm mt-1">Track the roles you've been submitted to and their status.</p>
+        </div>
+        <button
+          onClick={loadApplications}
+          disabled={loading}
+          className="text-sm text-fuchsia hover:underline flex items-center gap-1"
+        >
+          {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+          Refresh
+        </button>
       </div>
 
       {/* Summary metric cards */}
@@ -150,57 +172,85 @@ export function CandidateApplicationsPage() {
         </div>
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as 'all' | ApplicationStatus)}
+          onChange={(e) => setStatusFilter(e.target.value)}
           className="px-4 py-2 bg-white border border-border text-sm text-text-primary focus:outline-none focus:border-fuchsia"
         >
-          {STATUS_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          {stageOptions.map((s) => (
+            <option key={s} value={s}>{s === 'all' ? 'All Stages' : s}</option>
           ))}
         </select>
       </div>
 
       {/* Application list */}
       {loading ? (
-        <div className="py-12 text-center text-text-muted text-sm">Loading applications...</div>
+        <div className="py-12 text-center text-text-muted text-sm flex items-center justify-center gap-2">
+          <Loader2 className="w-4 h-4 animate-spin" /> Loading applications...
+        </div>
       ) : filtered.length === 0 ? (
-        <div className="py-12 text-center text-text-muted text-sm">No applications found.</div>
+        <div className="py-12 text-center text-text-muted text-sm">
+          {applications.length === 0
+            ? 'No applications yet. Your consultant will submit you to relevant positions.'
+            : 'No applications match your filters.'}
+        </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {filtered.map((app) => (
-            <Card key={app.id} className="p-5 hover:shadow-card-hover transition-shadow cursor-pointer">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
-                    <Building2 className="w-5 h-5 text-fuchsia" />
+          {filtered.map((app) => {
+            const progress = stageProgress(app.stage);
+            const title = app.mandate?.title ?? '—';
+            const company = app.mandate?.company?.name ?? app.client_name ?? '—';
+            const location = app.mandate?.location ?? '';
+            const comp = app.mandate?.compensation_range ?? '';
+            return (
+              <Card key={app.id} className="p-5 hover:shadow-card-hover transition-shadow">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+                      <Building2 className="w-5 h-5 text-fuchsia" />
+                    </div>
+                    <div>
+                      <h3 className="font-serif font-semibold text-text-primary">{title}</h3>
+                      <p className="text-xs text-text-muted">
+                        {company}
+                        {location ? ` · ${location}` : ''}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-serif font-semibold text-text-primary">{app.role}</h3>
-                    <p className="text-xs text-text-muted">{app.company} · {app.seniority} · {app.location}</p>
+                  <span className={`px-2 py-1 text-xs font-medium rounded ${STAGE_COLORS[app.stage ?? ''] ?? 'bg-gray-100 text-gray-600'}`}>
+                    {app.stage ?? '—'}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex-1 h-2 bg-bg-warm rounded-full overflow-hidden">
+                    <div className="h-full bg-fuchsia rounded-full transition-all" style={{ width: `${progress}%` }} />
                   </div>
+                  <span className="text-xs font-medium text-text-secondary">{progress}%</span>
                 </div>
-                <span className={`px-2 py-1 text-xs font-medium rounded ${STATUS_COLORS[app.status]}`}>
-                  {app.status}
-                </span>
-              </div>
 
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex-1 h-2 bg-bg-warm rounded-full overflow-hidden">
-                  <div className="h-full bg-fuchsia rounded-full transition-all" style={{ width: `${app.progress}%` }} />
+                {app.match_score != null && (
+                  <div className="flex items-center gap-2 text-xs text-text-secondary mb-3">
+                    <Award className="w-3 h-3 text-fuchsia flex-shrink-0" />
+                    <span>Match Score: <strong>{app.match_score}</strong></span>
+                    {app.trident_composite != null && (
+                      <span className="text-text-muted">· Trident: {app.trident_composite}</span>
+                    )}
+                  </div>
+                )}
+
+                {comp && (
+                  <div className="flex items-center gap-2 text-xs text-text-muted mb-3">
+                    <DollarSign className="w-3 h-3" />
+                    <span>{comp}</span>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 text-xs text-text-muted">
+                  <Calendar className="w-3 h-3" />
+                  Applied {fmtDate(app.applied_date)} · Updated {fmtDate(app.updated_at)}
                 </div>
-                <span className="text-xs font-medium text-text-secondary">{app.progress}%</span>
-              </div>
-
-              <div className="flex items-start gap-2 text-xs text-text-secondary mb-3">
-                <ArrowRight className="w-3 h-3 mt-0.5 text-fuchsia flex-shrink-0" />
-                <span>{app.nextStep}</span>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs text-text-muted">
-                <Calendar className="w-3 h-3" />
-                Submitted {app.submittedAt} · Updated {app.updatedAt}
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>
