@@ -1,29 +1,35 @@
 /**
- * CandidateDashboardPage — Candidate Portal landing dashboard
- * Renders inside AppShell → Outlet. Shows application status cards, upcoming
- * interviews, latest assessment results, and career progress.
+ * CandidateDashboardPage — Candidate Portal landing dashboard (S1-T03)
+ *
+ * Wired to live Supabase data:
+ *   - v_pipeline_rankings view → pipeline rankings with tier badge + score
+ *   - getCandidateApplications() → application status cards
+ *   - getCandidateProfile() → profile completion metrics
+ *
+ * Renders inside AppShell → Outlet.
  */
-import React, { useState, useEffect } from 'react';
-import { Briefcase, Calendar, ClipboardCheck, TrendingUp, ArrowRight, Clock, Video, MapPin, Star } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Briefcase, Calendar, ClipboardCheck, TrendingUp, ArrowRight, Clock, Video, MapPin, Star, Trophy, Award, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Progress } from '@/components/ui';
+import { TierBadge, Tier } from '@/components/ui/TierBadge';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/stores/authStore';
+import { getCandidateApplications, getCandidateProfile, CandidateApplication, CandidateProfile } from '@/services/supabaseApi';
 
-interface ApplicationStatus {
-  id: string;
-  company: string;
-  role: string;
-  status: 'Under Review' | 'Submitted to Client' | 'Interview Stage' | 'Offer Stage' | 'Placed';
-  progress: number;
-  updatedAt: string;
-}
+// ── Types ──
 
-interface UpcomingInterview {
+interface PipelineRanking {
   id: string;
-  company: string;
-  role: string;
-  date: string;
-  time: string;
-  format: string;
-  location: string;
+  mandate_id: string | null;
+  candidate_id: string | null;
+  mandate_title: string | null;
+  company_name: string | null;
+  pipeline_stage: string | null;
+  weighted_score: number | null;
+  tier: Tier | null;
+  rank: number | null;
+  consultant_name: string | null;
+  scored_at: string | null;
 }
 
 interface AssessmentResult {
@@ -35,85 +41,128 @@ interface AssessmentResult {
   dimensions: { name: string; score: number }[];
 }
 
-interface CareerGoal {
-  id: string;
-  label: string;
-  progress: number;
+// ── Helpers ──
+
+function fmtDate(iso: string | null): string {
+  if (!iso) return '—';
+  try {
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch {
+    return iso;
+  }
 }
 
-const MOCK_APPLICATIONS: ApplicationStatus[] = [
-  { id: 'a1', company: 'TechCorp', role: 'VP Engineering', status: 'Interview Stage', progress: 60, updatedAt: '2025-01-15' },
-  { id: 'a2', company: 'FinScale', role: 'Chief Financial Officer', status: 'Submitted to Client', progress: 40, updatedAt: '2025-01-14' },
-  { id: 'a3', company: 'DataMesh', role: 'Head of Product', status: 'Under Review', progress: 20, updatedAt: '2025-01-10' },
-];
-
-const MOCK_INTERVIEWS: UpcomingInterview[] = [
-  { id: 'i1', company: 'TechCorp', role: 'VP Engineering', date: 'Jan 22, 2025', time: '10:00 AM', format: 'Video', location: 'Zoom' },
-  { id: 'i2', company: 'CloudPeak', role: 'CTO', date: 'Jan 24, 2025', time: '2:30 PM', format: 'On-site', location: 'Seattle, WA' },
-];
-
-const MOCK_ASSESSMENT: AssessmentResult = {
-  id: 'r1',
-  name: 'Leadership Archetype Assessment',
-  archetype: 'The Architect',
-  score: 87,
-  takenAt: '2025-01-08',
-  dimensions: [
-    { name: 'Strategic Vision', score: 92 },
-    { name: 'Execution', score: 84 },
-    { name: 'Influence', score: 78 },
-    { name: 'Resilience', score: 88 },
-  ],
+const STAGE_ORDER: Record<string, number> = {
+  'Sourcing': 10, 'Screening': 20, 'Assessment': 30, 'Shortlist': 40,
+  'Interview': 50, 'Final Interview': 60, 'Offer': 70, 'Placed': 80,
 };
 
-const MOCK_GOALS: CareerGoal[] = [
-  { id: 'g1', label: 'Complete profile', progress: 100 },
-  { id: 'g2', label: 'Take baseline assessment', progress: 100 },
-  { id: 'g3', label: 'Apply to 3 target roles', progress: 67 },
-  { id: 'g4', label: 'Complete interview prep', progress: 45 },
-];
+function stageProgress(stage: string | null): number {
+  if (!stage) return 0;
+  return STAGE_ORDER[stage] ?? 0;
+}
 
-const STATUS_COLORS: Record<ApplicationStatus['status'], string> = {
-  'Under Review': 'bg-amber/10 text-amber',
-  'Submitted to Client': 'bg-blue/10 text-blue',
-  'Interview Stage': 'bg-fuchsia-light text-fuchsia',
-  'Offer Stage': 'bg-green/10 text-green',
-  'Placed': 'bg-green/10 text-green',
+const STAGE_COLORS: Record<string, string> = {
+  'Sourcing': 'bg-gray-100 text-gray-600',
+  'Screening': 'bg-amber-100 text-amber-700',
+  'Assessment': 'bg-blue-100 text-blue-700',
+  'Shortlist': 'bg-fuchsia-100 text-fuchsia-700',
+  'Interview': 'bg-indigo-100 text-indigo-700',
+  'Final Interview': 'bg-violet-100 text-violet-700',
+  'Offer': 'bg-green-100 text-green-700',
+  'Placed': 'bg-green-100 text-green-700',
 };
+
+// ── Component ──
 
 export function CandidateDashboardPage() {
-  const [applications, setApplications] = useState<ApplicationStatus[]>([]);
-  const [interviews, setInterviews] = useState<UpcomingInterview[]>([]);
-  const [assessment, setAssessment] = useState<AssessmentResult | null>(null);
-  const [goals, setGoals] = useState<CareerGoal[]>([]);
+  const { user } = useAuthStore();
+  const [rankings, setRankings] = useState<PipelineRanking[]>([]);
+  const [applications, setApplications] = useState<CandidateApplication[]>([]);
+  const [profile, setProfile] = useState<CandidateProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const loadData = useCallback(async () => {
+    if (!user?.id) { setLoading(false); return; }
+    setLoading(true);
+    setError('');
+
+    try {
+      // Fetch pipeline rankings, applications, and profile in parallel
+      const [rankingsRes, apps, prof] = await Promise.all([
+        supabase
+          .from('v_pipeline_rankings')
+          .select('*')
+          .eq('candidate_id', user.id)
+          .order('rank', { ascending: true, nullsFirst: false })
+          .limit(50),
+        getCandidateApplications(),
+        getCandidateProfile(),
+      ]);
+
+      if (rankingsRes.error) {
+        console.warn('[CandidateDashboard] v_pipeline_rankings query error:', rankingsRes.error.message);
+      } else {
+        setRankings((rankingsRes.data as PipelineRanking[]) ?? []);
+      }
+
+      setApplications(apps);
+      setProfile(prof);
+    } catch (e: any) {
+      console.error('[CandidateDashboard] load error:', e);
+      setError('Unable to load dashboard data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.id]);
 
   useEffect(() => {
-    // TODO: Replace with real API calls
-    const timer = setTimeout(() => {
-      setApplications(MOCK_APPLICATIONS);
-      setInterviews(MOCK_INTERVIEWS);
-      setAssessment(MOCK_ASSESSMENT);
-      setGoals(MOCK_GOALS);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    loadData();
+  }, [loadData]);
+
+  // ── Derived metrics ──
 
   const activeCount = applications.length;
-  const interviewCount = interviews.length;
-  const assessmentCount = assessment ? 1 : 0;
-  const profileCompletion = goals.length
-    ? Math.round(goals.reduce((sum, g) => sum + g.progress, 0) / goals.length)
+  const rankedCount = rankings.filter(r => r.tier && r.tier !== 'Unranked').length;
+  const topRank = rankings.length > 0 ? rankings[0] : null;
+
+  // Profile completion: check which fields are filled
+  const profileFields = profile
+    ? [
+        profile.name, profile.current_title, profile.current_company,
+        profile.linkedin_url, profile.city, profile.years_experience,
+        profile.industries?.length, profile.skills?.length,
+      ]
+    : [];
+  const filledFields = profileFields.filter(f => f !== null && f !== undefined && f !== '' && f !== 0).length;
+  const profileCompletion = profileFields.length > 0
+    ? Math.round((filledFields / profileFields.length) * 100)
     : 0;
 
   return (
     <div className="space-y-6">
       {/* Page header */}
-      <div>
-        <h1 className="font-serif font-bold text-2xl text-text-primary">Candidate Dashboard</h1>
-        <p className="text-text-secondary text-sm mt-1">Your career journey at a glance.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-serif font-bold text-2xl text-text-primary">Candidate Dashboard</h1>
+          <p className="text-text-secondary text-sm mt-1">Your career journey at a glance.</p>
+        </div>
+        <button
+          onClick={loadData}
+          disabled={loading}
+          className="text-sm text-fuchsia hover:underline flex items-center gap-1"
+        >
+          {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+          Refresh
+        </button>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
 
       {/* Status metric cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -131,22 +180,24 @@ export function CandidateDashboardPage() {
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-fuchsia" />
+              <Trophy className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : interviewCount}</div>
-              <div className="text-xs text-text-muted">Upcoming Interviews</div>
+              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : rankedCount}</div>
+              <div className="text-xs text-text-muted">Ranked Positions</div>
             </div>
           </div>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
-              <ClipboardCheck className="w-5 h-5 text-fuchsia" />
+              <Award className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-text-primary">{loading ? '—' : assessmentCount}</div>
-              <div className="text-xs text-text-muted">Assessments Completed</div>
+              <div className="text-2xl font-bold text-text-primary">
+                {loading ? '—' : topRank?.tier ? topRank.tier : '—'}
+              </div>
+              <div className="text-xs text-text-muted">Top Tier</div>
             </div>
           </div>
         </Card>
@@ -163,75 +214,161 @@ export function CandidateDashboardPage() {
         </Card>
       </div>
 
+      {/* Pipeline Rankings — the critical v_pipeline_rankings view */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Your Pipeline Rankings</CardTitle>
+            <span className="text-xs text-text-muted">
+              {rankings.length} position{rankings.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="py-8 text-center text-text-muted text-sm flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" /> Loading rankings...
+            </div>
+          ) : rankings.length === 0 ? (
+            <div className="py-8 text-center text-text-muted text-sm">
+              You have no active pipeline rankings yet. Rankings appear when you're being considered for a position.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left">
+                    <th className="py-2 pr-4 font-medium text-text-muted">Rank</th>
+                    <th className="py-2 pr-4 font-medium text-text-muted">Position</th>
+                    <th className="py-2 pr-4 font-medium text-text-muted">Company</th>
+                    <th className="py-2 pr-4 font-medium text-text-muted">Stage</th>
+                    <th className="py-2 pr-4 font-medium text-text-muted">Tier</th>
+                    <th className="py-2 pr-4 font-medium text-text-muted text-right">Score</th>
+                    <th className="py-2 pr-4 font-medium text-text-muted">Updated</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rankings.map((r) => (
+                    <tr key={r.id} className="border-b border-border last:border-b-0 hover:bg-bg-warm/50">
+                      <td className="py-3 pr-4">
+                        {r.rank ? <span className="font-semibold text-text-primary">#{r.rank}</span> : '—'}
+                      </td>
+                      <td className="py-3 pr-4 font-medium text-text-primary">
+                        {r.mandate_title ?? '—'}
+                      </td>
+                      <td className="py-3 pr-4 text-text-secondary">
+                        {r.company_name ?? '—'}
+                      </td>
+                      <td className="py-3 pr-4">
+                        <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded ${STAGE_COLORS[r.pipeline_stage ?? ''] ?? 'bg-gray-100 text-gray-600'}`}>
+                          {r.pipeline_stage ?? '—'}
+                        </span>
+                      </td>
+                      <td className="py-3 pr-4">
+                        <TierBadge tier={r.tier} size="sm" />
+                      </td>
+                      <td className="py-3 pr-4 text-right font-semibold text-text-primary">
+                        {r.weighted_score != null ? r.weighted_score.toFixed(1) : '—'}
+                      </td>
+                      <td className="py-3 pr-4 text-xs text-text-muted">
+                        {fmtDate(r.scored_at)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Application status */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Application Status</CardTitle>
-              <button className="text-sm text-fuchsia hover:underline flex items-center gap-1">
-                View all <ArrowRight className="w-3 h-3" />
-              </button>
             </div>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading applications...</div>
+              <div className="py-8 text-center text-text-muted text-sm flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Loading applications...
+              </div>
             ) : applications.length === 0 ? (
               <div className="py-8 text-center text-text-muted text-sm">No active applications yet.</div>
             ) : (
               <div className="space-y-4">
-                {applications.map((app) => (
-                  <div key={app.id} className="flex items-center justify-between py-3 border-b border-border last:border-b-0">
-                    <div className="flex-1">
+                {applications.slice(0, 5).map((app) => {
+                  const progress = stageProgress(app.stage);
+                  return (
+                    <div key={app.id} className="flex items-center justify-between py-3 border-b border-border last:border-b-0">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <span className="font-medium text-text-primary text-sm">
+                            {app.mandate?.title ?? app.client_name}
+                          </span>
+                          <span className={`px-2 py-0.5 text-xs font-medium rounded ${STAGE_COLORS[app.stage] ?? 'bg-gray-100 text-gray-600'}`}>
+                            {app.stage}
+                          </span>
+                        </div>
+                        <div className="text-xs text-text-muted mt-1">
+                          {app.mandate?.company?.name ?? app.client_name} · Updated {fmtDate(app.updated_at)}
+                        </div>
+                      </div>
                       <div className="flex items-center gap-3">
-                        <span className="font-medium text-text-primary text-sm">{app.role}</span>
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded ${STATUS_COLORS[app.status]}`}>
-                          {app.status}
-                        </span>
-                      </div>
-                      <div className="text-xs text-text-muted mt-1">
-                        {app.company} · Updated {app.updatedAt}
+                        {app.match_score != null && (
+                          <span className="text-xs font-medium text-text-secondary">
+                            Score: {app.match_score}
+                          </span>
+                        )}
+                        <div className="w-20 h-2 bg-bg-warm rounded-full overflow-hidden">
+                          <div className="h-full bg-fuchsia rounded-full transition-all" style={{ width: `${progress}%` }} />
+                        </div>
+                        <span className="text-xs font-medium text-text-secondary w-8 text-right">{progress}%</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-20 h-2 bg-bg-warm rounded-full overflow-hidden">
-                        <div className="h-full bg-fuchsia rounded-full transition-all" style={{ width: `${app.progress}%` }} />
-                      </div>
-                      <span className="text-xs font-medium text-text-secondary w-8 text-right">{app.progress}%</span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Upcoming interviews */}
+        {/* Profile completion */}
         <Card>
           <CardHeader>
-            <CardTitle>Upcoming Interviews</CardTitle>
+            <CardTitle>Profile Completion</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="py-8 text-center text-text-muted text-sm">Loading interviews...</div>
-            ) : interviews.length === 0 ? (
-              <div className="py-8 text-center text-text-muted text-sm">No interviews scheduled.</div>
+              <div className="py-8 text-center text-text-muted text-sm flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Loading profile...
+              </div>
+            ) : !profile ? (
+              <div className="py-8 text-center text-text-muted text-sm">
+                Complete your profile to improve your match quality.
+              </div>
             ) : (
               <div className="space-y-4">
-                {interviews.map((iv) => (
-                  <div key={iv.id} className="flex items-start gap-3 py-3 border-b border-border last:border-b-0">
-                    <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center flex-shrink-0">
-                      {iv.format === 'Video' ? <Video className="w-5 h-5 text-fuchsia" /> : <MapPin className="w-5 h-5 text-fuchsia" />}
+                {[
+                  { label: 'Name', filled: !!profile.name },
+                  { label: 'Current Title', filled: !!profile.current_title },
+                  { label: 'Current Company', filled: !!profile.current_company },
+                  { label: 'LinkedIn URL', filled: !!profile.linkedin_url },
+                  { label: 'Location', filled: !!profile.city },
+                  { label: 'Years of Experience', filled: !!profile.years_experience },
+                  { label: 'Industries', filled: (profile.industries?.length ?? 0) > 0 },
+                  { label: 'Skills', filled: (profile.skills?.length ?? 0) > 0 },
+                ].map((item) => (
+                  <div key={item.label}>
+                    <div className="flex items-center justify-between text-sm mb-1">
+                      <span className="text-text-primary">{item.label}</span>
+                      <span className={item.filled ? 'text-green-600 font-medium' : 'text-text-muted'}>
+                        {item.filled ? 'Complete' : 'Missing'}
+                      </span>
                     </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-text-primary text-sm">{iv.role} — {iv.company}</div>
-                      <div className="text-xs text-text-muted mt-1 flex items-center gap-3 flex-wrap">
-                        <span className="inline-flex items-center gap-1"><Calendar className="w-3 h-3" /> {iv.date}</span>
-                        <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> {iv.time}</span>
-                        <span>{iv.format} · {iv.location}</span>
-                      </div>
-                    </div>
+                    <Progress value={item.filled ? 100 : 0} />
                   </div>
                 ))}
               </div>
@@ -239,63 +376,6 @@ export function CandidateDashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Assessment results */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Latest Assessment Results</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading || !assessment ? (
-            <div className="py-8 text-center text-text-muted text-sm">{loading ? 'Loading results...' : 'No assessments taken yet.'}</div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="flex flex-col items-center justify-center text-center bg-fuchsia-light rounded-lg p-6">
-                <Star className="w-8 h-8 text-fuchsia mb-2" />
-                <div className="text-xs text-text-muted uppercase tracking-wide">Your Archetype</div>
-                <div className="font-serif font-bold text-xl text-text-primary mt-1">{assessment.archetype}</div>
-                <div className="text-sm text-text-secondary mt-2">{assessment.score}/100 overall</div>
-              </div>
-              <div className="lg:col-span-2 space-y-3">
-                {assessment.dimensions.map((dim) => (
-                  <div key={dim.name}>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span className="text-text-primary">{dim.name}</span>
-                      <span className="text-text-secondary font-medium">{dim.score}</span>
-                    </div>
-                    <Progress value={dim.score} />
-                  </div>
-                ))}
-                <div className="text-xs text-text-muted pt-2">Taken on {assessment.takenAt}</div>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Career progress */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Career Progress</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="py-8 text-center text-text-muted text-sm">Loading progress...</div>
-          ) : (
-            <div className="space-y-4">
-              {goals.map((goal) => (
-                <div key={goal.id}>
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-text-primary">{goal.label}</span>
-                    <span className="text-text-secondary font-medium">{goal.progress}%</span>
-                  </div>
-                  <Progress value={goal.progress} />
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }
