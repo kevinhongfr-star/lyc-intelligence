@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@sentry/react": "^10.69.0",
+    "@sentry/vite-plugin": "^5.4.0",
     "@supabase/supabase-js": "^2.45.0",
     "@tailwindcss/typography": "^0.5.19",
     "framer-motion": "^11.3.0",

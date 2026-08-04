@@ -616,7 +616,8 @@ export default async function handler(
       case 'nexus':
       case 'benchmark':
       case 'shift':
-      case 'ai': {
+      case 'ai':
+      case 'user': {
         const { user: _u, error: _e } = await getUserFromRequest(req);
         if (_e || !_u) return res.status(401).json({ error: 'Unauthorized', success: false });
         (req as any).__authenticatedUser = _u;
@@ -637,6 +638,7 @@ export default async function handler(
           'benchmark': () => import('./_lib/benchmarkHandler.js'),
           'shift': () => import('./_lib/shiftHandler.js'),
           'ai': () => import('./_lib/aiFeaturesHandler.js'),
+          'user': () => import('./_lib/userHandler.js'),
         };
         const _loader = _subHandlers[_subMod];
         if (!_loader) return res.status(404).json({ error: `Unknown module: ${_subMod}` });
@@ -698,6 +700,7 @@ export default async function handler(
           'benchmark': () => import('./_lib/benchmarkHandler.js'),
           'shift': () => import('./_lib/shiftHandler.js'),
           'ai': () => import('./_lib/aiFeaturesHandler.js'),
+          'user': () => import('./_lib/userHandler.js'),
         };
         const loader = xHandlers[xModule];
         if (!loader)
