@@ -18,7 +18,7 @@ const DS = {
 };
 
 export function ResetPasswordPage() {
-  const { supabase } = useAuthStore();
+  const { resetPassword } = useAuthStore();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -26,20 +26,17 @@ export function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !supabase) return;
+    if (!email.trim()) return;
 
     setLoading(true);
     setError('');
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/login`
-      });
-      if (error) throw error;
+    const result = await resetPassword(email.trim());
+    setLoading(false);
+
+    if (result.success) {
       setSent(true);
-    } catch (e: any) {
-      setError(e.message || 'Failed to send reset link');
-    } finally {
-      setLoading(false);
+    } else {
+      setError(result.error || 'Failed to send reset link');
     }
   };
 
