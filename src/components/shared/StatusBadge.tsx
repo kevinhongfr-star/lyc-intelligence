@@ -15,7 +15,7 @@ const STATUS_COLORS: Record<StatusVariant, { bg: string; text: string }> = {
   active: { bg: 'bg-green/10', text: 'text-green' },
   pending: { bg: 'bg-amber/10', text: 'text-amber' },
   completed: { bg: 'bg-blue/10', text: 'text-blue' },
-  at-risk: { bg: 'bg-amber/10', text: 'text-amber' },
+  'at-risk': { bg: 'bg-amber/10', text: 'text-amber' },
   critical: { bg: 'bg-red/10', text: 'text-red' },
   paused: { bg: 'bg-text-muted/10', text: 'text-text-muted' },
   rejected: { bg: 'bg-red/10', text: 'text-red' },

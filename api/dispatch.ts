@@ -43,6 +43,7 @@ const handlers: Record<string, () => Promise<any>> = {
   'rbac': () => import('./_lib/rbacHandler.js').then(m => ({ handler: m.handleRbac })),
   'credits': () => import('./_lib/creditsHandler.js'),
   'enrichment': () => import('./_lib/enrichmentHandler.js'),
+  'user': () => import('./_lib/userHandler.js'),
   'career': () => import('./_lib/careerIntelligenceHandler.js').then(m => ({ handler: m.default })),
   'canvas': () => import('./_lib/canvasHandler.js'),
   'grid': () => import('./_lib/gridReportsGenerateHandler.js').then(m => ({ handler: m.handler })),

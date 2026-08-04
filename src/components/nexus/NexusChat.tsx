@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { toast } from '@/stores/toastStore';
-import { 
-  ArrowRight, Shield, Loader2, RefreshCw, Paperclip, 
-  Crown, MessageSquare, Plus, CreditCard, Menu, X, Sparkles
+import {
+  ArrowRight, Shield, Loader2, RefreshCw, Paperclip,
+  Crown, MessageSquare, Plus, CreditCard, Menu, X, Sparkles, Zap
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditService';
@@ -12,6 +12,7 @@ import { CareerInsight } from './CareerInsight';
 import { CouncilUpsell } from './CouncilUpsell';
 import { DiagnosticProgressBar, parseDiagnosticProgress, DEFAULT_DIAGNOSTIC_DIMENSIONS } from './DiagnosticProgressBar';
 import { MilestoneBanner, parseMilestones, DEFAULT_MILESTONES } from './MilestoneBanner';
+import { ProactiveSuggestionsPanel } from './ProactiveSuggestionsPanel';
 import { stripTagsForDisplay } from '@/services/nexusPersona';
 
 const DS = {
@@ -82,6 +83,32 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
   const [messageCount, setMessageCount] = useState(0);
   const [pendingApproval, setPendingApproval] = useState(false);
   const [streamingContent, setStreamingContent] = useState<string | null>(null);
+
+  // S7-T01: intent router + token/budget tracking
+  const [lastIntent, setLastIntent] = useState<string | null>(null);
+  const [lastIntentLabel, setLastIntentLabel] = useState<string | null>(null);
+  const [budgetStatus, setBudgetStatus] = useState<{
+    spent_cny: number; budget_cny: number; remaining_cny: number; utilization_pct: number;
+  } | null>(null);
+  const [lastUsageTokens, setLastUsageTokens] = useState<number | null>(null);
+
+  // S7-T02: retrieved-memory indicator
+  const [retrievedMemories, setRetrievedMemories] = useState<number | null>(null);
+
+  // S7-T03: enriched user context (tier, credits, active mandates)
+  const [userContextMeta, setUserContextMeta] = useState<{
+    tier: string;
+    seniority: string;
+    credit_balance: number | null;
+    active_mandates: number;
+    conversation_count: number;
+  } | null>(null);
+
+  // S7-T04: retrieved content citations from the RAG content library.
+  // Reset to null when a new turn starts so stale citations don't linger.
+  const [citations, setCitations] = useState<
+    Array<{ title: string; source: string | null; category: string; score: number }> | null
+  >(null);
   
   // Diagnostic tracking state
   const [diagnosticProgress, setDiagnosticProgress] = useState(0);
@@ -204,7 +231,8 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
   }, [messages, user?.id, sessionId, messageCount]);
 
   const getContextWindow = useCallback(() => {
-    return messages.slice(-10);
+    // S7-T02: working memory window = last 20 messages (per spec).
+    return messages.slice(-20);
   }, [messages]);
 
   const sendMessage = async (userMsg: string) => {
@@ -262,13 +290,28 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     }
   };
 
-  const handleResponse = (data: { response: string; suggested_prompts?: string[]; diagnostic_tags?: string[]; milestone_tags?: string[]; seniority?: string }) => {
+  const handleResponse = (data: { response: string; suggested_prompts?: string[]; diagnostic_tags?: string[]; milestone_tags?: string[]; seniority?: string; intent?: string; intent_label?: string; intent_confidence?: number; usage?: { total_tokens?: number; cost_cny?: number }; budget?: { spent_cny: number; budget_cny: number; remaining_cny: number; utilization_pct: number } | null; retrieved_memories?: number; user_context?: { tier: string; seniority: string; credit_balance: number | null; active_mandates: number; conversation_count: number }; citations?: Array<{ title: string; source: string | null; category: string; score: number }> }) => {
     // Strip diagnostic/milestone tags for display
     const displayContent = stripTagsForDisplay(data.response);
     setMessages(prev => [...prev, { role: 'assistant', content: displayContent }]);
     setSuggestedPrompts(data.suggested_prompts || suggestedPrompts);
     setAiState('idle');
     setStreamingContent(null);
+
+    // S7-T01: surface intent + usage metadata
+    if (data.intent) setLastIntent(data.intent);
+    if (data.intent_label) setLastIntentLabel(data.intent_label);
+    if (data.budget) setBudgetStatus(data.budget);
+    if (data.usage?.total_tokens !== undefined) setLastUsageTokens(data.usage.total_tokens);
+
+    // S7-T02: surface retrieved-memory count
+    if (data.retrieved_memories !== undefined) setRetrievedMemories(data.retrieved_memories);
+
+    // S7-T03: surface enriched user context (tier, credits, active mandates)
+    if (data.user_context) setUserContextMeta(data.user_context);
+
+    // S7-T04: surface retrieved content citations from the RAG library.
+    setCitations(Array.isArray(data.citations) && data.citations.length > 0 ? data.citations : null);
     
     // Parse diagnostic progress from raw response (before stripping)
     const diagnostic = parseDiagnosticProgress(data.response);
@@ -517,6 +560,62 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                   <span className="text-sm font-medium text-amber-700">Council</span>
                 </div>
               )}
+              {/* S7-T01: intent badge + budget usage */}
+              {lastIntentLabel && (
+                <div
+                  title={`Intent: ${lastIntentLabel} (${lastIntent})`}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#F3F0FF] rounded-full"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#7C3AED]" />
+                  <span className="text-xs font-medium text-[#6D28D9]">{lastIntentLabel}</span>
+                </div>
+              )}
+              {budgetStatus && (
+                <div
+                  title={`Daily Nexus budget: ¥${budgetStatus.spent_cny.toFixed(2)} / ¥${budgetStatus.budget_cny.toFixed(2)} (${budgetStatus.utilization_pct.toFixed(0)}%)`}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100 rounded-full"
+                >
+                  <Zap className="w-3.5 h-3.5 text-gray-600" />
+                  <span className="text-xs font-medium text-gray-700">
+                    ¥{budgetStatus.spent_cny.toFixed(1)}/{budgetStatus.budget_cny.toFixed(0)}
+                    {lastUsageTokens !== null && ` · ${lastUsageTokens}t`}
+                  </span>
+                </div>
+              )}
+              {/* S7-T03: tier badge + credit balance + active mandates */}
+              {userContextMeta && (
+                <div
+                  title={`Tier: ${userContextMeta.tier} | Seniority: ${userContextMeta.seniority}${userContextMeta.credit_balance !== null ? ` | Credits: ${userContextMeta.credit_balance}` : ''}${userContextMeta.active_mandates > 0 ? ` | Active mandates: ${userContextMeta.active_mandates}` : ''} | Conversations: ${userContextMeta.conversation_count}`}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#FFF7ED] rounded-full"
+                >
+                  <Crown className="w-3.5 h-3.5 text-[#C2410C]" />
+                  <span className="text-xs font-medium text-[#9A3412] capitalize">{userContextMeta.tier}</span>
+                  {userContextMeta.credit_balance !== null && (
+                    <span className="text-xs text-[#9A3412]">· {userContextMeta.credit_balance}cr</span>
+                  )}
+                  {userContextMeta.active_mandates > 0 && (
+                    <span className="text-xs text-[#9A3412]">· {userContextMeta.active_mandates} mandate{userContextMeta.active_mandates === 1 ? '' : 's'}</span>
+                  )}
+                </div>
+              )}
+              {retrievedMemories !== null && retrievedMemories > 0 && (
+                <div
+                  title={`Nexus retrieved ${retrievedMemories} relevant memor${retrievedMemories === 1 ? 'y' : 'ies'} from past conversations`}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#ECFDF5] rounded-full"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#059669]" />
+                  <span className="text-xs font-medium text-[#047857]">{retrievedMemories} memor{retrievedMemories === 1 ? 'y' : 'ies'}</span>
+                </div>
+              )}
+              {citations && citations.length > 0 && (
+                <div
+                  title={`Grounded on ${citations.length} source${citations.length === 1 ? '' : 's'} from the LYC content library:\n${citations.map((c, i) => `[${i + 1}] ${c.title}${c.source ? ` — ${c.source}` : ''} (${(c.score * 100).toFixed(0)}%)`).join('\n')}`}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#EFF6FF] rounded-full"
+                >
+                  <Shield className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span className="text-xs font-medium text-[#1D4ED8]">{citations.length} source{citations.length === 1 ? '' : 's'}</span>
+                </div>
+              )}
               <a href="/b2b" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Firms</a>
               <a href="/b2c" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Leaders</a>
               <a href="/match" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Score Match</a>
@@ -534,6 +633,11 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>Nexus</h1>
               <p style={{ fontSize: '14px', color: DS.muted }}>Know where you stand. Know where to go.</p>
             </div>
+          )}
+
+          {/* Proactive Suggestions Panel — S7-T05 (only when authenticated) */}
+          {user?.id && (
+            <ProactiveSuggestionsPanel />
           )}
 
           {/* Diagnostic Progress Bar — shows when diagnostic started */}

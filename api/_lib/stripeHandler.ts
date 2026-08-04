@@ -6,6 +6,7 @@
  *   GET  /api/stripe/portal           → Create billing portal session
  *   POST /api/stripe/webhook          → Handle Stripe webhooks
  *   POST /api/stripe/checkout-credit  → Create one-time credit pack checkout
+ *   POST /api/stripe/update-tier      → Manually update a user's tier + grant daily credits
  * 
  * Env vars required:
  *   STRIPE_SECRET_KEY         — Stripe secret key
@@ -110,6 +111,9 @@ export async function handleStripe(req: VercelRequest, res: VercelResponse) {
     }
     if (action === 'portal' && req.method === 'GET') {
       return handlePortal(req, res);
+    }
+    if (action === 'update-tier' && req.method === 'POST') {
+      return handleUpdateTier(req, res);
     }
     if (action === 'webhook' && req.method === 'POST') {
       return handleWebhook(req, res);
@@ -280,7 +284,7 @@ async function handlePortal(req: VercelRequest, res: VercelResponse) {
 
     const session = await stripeApi('POST', '/v1/billing_portal/sessions', {
       customer: profile.stripe_customer_id,
-      return_url: `${req.headers.origin}/settings`,
+      return_url: `${req.headers.origin}/account/billing`,
     });
 
     if (session.error) {
@@ -291,6 +295,59 @@ async function handlePortal(req: VercelRequest, res: VercelResponse) {
   } catch (e: any) {
     console.error('[Stripe] Portal error:', e);
     return res.status(500).json({ error: 'Failed to create portal session', details: e?.message });
+  }
+}
+
+/**
+ * Manually update a user's tier. Called by creditService.updateUserTier.
+ * Auth-gated: the caller must be the user being updated (or an admin).
+ * Updates `profiles.tier` and grants the daily credit allocation for the
+ * new tier so the change is immediately usable.
+ */
+async function handleUpdateTier(req: VercelRequest, res: VercelResponse) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) {
+    return res.status(401).json({ error: error || 'Unauthorized' });
+  }
+
+  const { userId, tier } = req.body || {};
+  if (!userId || !tier) {
+    return res.status(400).json({ error: 'userId and tier are required' });
+  }
+
+  const ALLOWED_TIERS = ['member', 'basic', 'pro', 'council', 'enterprise', 'free'];
+  if (!ALLOWED_TIERS.includes(tier)) {
+    return res.status(400).json({ error: `Invalid tier. Allowed: ${ALLOWED_TIERS.join(', ')}` });
+  }
+
+  // Users may only update their own tier unless they are an admin.
+  const callerRole = user.role;
+  const isAdmin = callerRole === 'super_admin' || callerRole === 'lyc_admin';
+  if (userId !== user.id && !isAdmin) {
+    return res.status(403).json({ error: 'Forbidden: can only update your own tier' });
+  }
+
+  try {
+    await db.update('profiles', { column: 'id', value: userId }, {
+      tier,
+      updated_at: new Date().toISOString(),
+    });
+
+    await grantDailyCreditsForTier(userId, tier);
+
+    return res.status(200).json({
+      success: true,
+      userId,
+      tier,
+      message: `Tier updated to ${tier} and daily credits granted.`,
+    });
+  } catch (e: any) {
+    console.error('[Stripe] update-tier error:', e);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to update tier',
+      details: e?.message,
+    });
   }
 }
 

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Calendar, History, Plus, ArrowRight, Loader2, Crown, Zap, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { CreditCard, Calendar, History, Plus, ArrowRight, Loader2, Crown, Zap, TrendingUp, TrendingDown, AlertCircle, Sparkles, MessageSquare } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditService';
+import { authFetch } from '@/utils/authFetch';
 
 interface CreditTransaction {
   id: string;
@@ -29,11 +31,22 @@ export function BillingDashboard() {
   const [loading, setLoading] = useState(true);
   const [loadingPack, setLoadingPack] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'credits' | 'debits'>('all');
+  // S7-T07: Nexus usage stats for the billing dashboard.
+  const [nexusUsage, setNexusUsage] = useState<{
+    total_messages: number;
+    total_cost_cny: number;
+    today_cost_cny: number;
+    today_messages: number;
+    daily_budget_cny: number;
+    total_conversations: number;
+    intent_distribution: Array<{ intent: string; count: number; total_cost_cny: number }>;
+  } | null>(null);
 
   const creditPacks: CreditPack[] = [
     { key: 'starter', name: 'Starter Pack', credits: 100, price: 9.99 },
     { key: 'professional', name: 'Professional Pack', credits: 500, price: 39.99 },
     { key: 'enterprise', name: 'Enterprise Pack', credits: 1500, price: 99.99 },
+    { key: 'council', name: 'Council Pack', credits: 5000, price: 179.99 },
   ];
 
   useEffect(() => {
@@ -69,9 +82,7 @@ export function BillingDashboard() {
         setSubscriptionStatus('none');
       }
 
-      const txResponse = await fetch(`/api/data/credit-transactions?user_id=${user.id}&limit=30`, {
-        credentials: 'include',
-      });
+      const txResponse = await authFetch(`/api/data/credit-transactions?user_id=${user.id}&limit=30`);
       if (txResponse.ok) {
         const txData = await txResponse.json();
         setTransactions(txData.data || []);
@@ -85,21 +96,20 @@ export function BillingDashboard() {
 
   const handleBuyCredits = async (packKey: string) => {
     setLoadingPack(packKey);
-    
+
     try {
-      const response = await fetch('/api/stripe/checkout-credit', {
+      const response = await authFetch('/api/stripe/checkout-credit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           packKey,
-          successUrl: `${window.location.origin}/settings/billing?success=true`,
-          cancelUrl: `${window.location.origin}/settings/billing`,
+          successUrl: `${window.location.origin}/account/billing?success=true`,
+          cancelUrl: `${window.location.origin}/account/billing?canceled=true`,
         }),
       });
 
       const data = await response.json();
-      
+
       if (data.url) {
         window.location.href = data.url;
       } else {
@@ -114,11 +124,10 @@ export function BillingDashboard() {
 
   const handleManageSubscription = async () => {
     try {
-      const response = await fetch('/api/stripe/portal', {
+      const response = await authFetch('/api/stripe/portal', {
         method: 'GET',
-        credentials: 'include',
       });
-      
+
       const data = await response.json();
       if (data.url) {
         window.location.href = data.url;
@@ -240,7 +249,7 @@ export function BillingDashboard() {
         {/* Credit Packs */}
         <div className="bg-white rounded-2xl p-6 border border-border mb-8">
           <h2 className="text-lg font-semibold text-text-primary mb-4">Buy Additional Credits</h2>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {creditPacks.map((pack) => (
               <div key={pack.key} className="border border-border rounded-none p-4 hover:border-accent/50 transition-colors">
                 <div className="flex items-center gap-2 mb-2">

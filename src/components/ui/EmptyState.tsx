@@ -6,12 +6,13 @@ interface EmptyStateProps {
   description?: string;
   actionLabel?: string;
   onAction?: () => void;
+  icon?: React.ReactNode;
 }
 
-export function EmptyState({ title, description, actionLabel, onAction }: EmptyStateProps) {
+export function EmptyState({ title, description, actionLabel, onAction, icon }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6">
-      <Inbox className="w-12 h-12 text-text-muted" />
+      {icon ?? <Inbox className="w-12 h-12 text-text-muted" />}
       <h3 className="mt-4 text-lg font-serif text-text-primary">{title}</h3>
       {description && (
         <p className="mt-2 text-sm text-text-muted text-center max-w-sm">{description}</p>

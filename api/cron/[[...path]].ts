@@ -8,6 +8,7 @@ import { handleCheckUnopenedReports } from '../_lib/cron/checkUnopenedReports.js
 import { handleComputeAnalytics } from '../_lib/cron/computeAnalytics.js';
 import { handleDetectSignals } from '../_lib/cron/detectSignals.js';
 import { handleGenerateBenchmarks } from '../_lib/cron/generateBenchmarks.js';
+import { handleGenerateProactiveSuggestions } from '../_lib/cron/generateProactiveSuggestions.js';
 import { handleGenerateQuarterlyReports } from '../_lib/cron/generateQuarterlyReports.js';
 import { handleProcessEmailQueue } from '../_lib/cron/processEmailQueue.js';
 import { handleProcessNurture } from '../_lib/cron/processNurture.js';
@@ -22,6 +23,7 @@ const cronHandlers: Record<string, () => Promise<any>> = {
   'compute-analytics': handleComputeAnalytics,
   'detect-signals': handleDetectSignals,
   'generate-benchmarks': handleGenerateBenchmarks,
+  'generate-proactive-suggestions': handleGenerateProactiveSuggestions,
   'generate-quarterly-reports': handleGenerateQuarterlyReports,
   'process-email-queue': handleProcessEmailQueue,
   'process-nurture': handleProcessNurture,

@@ -108,7 +108,7 @@ export function buildNexusSystemPrompt(
   memoryContext?: string
 ): string {
   const tone = getToneCalibration(seniority);
-  const terminologyLevel = tone.terminality === 'executive' ? 'executive-level' : 
+  const terminologyLevel = tone.terminology === 'executive' ? 'executive-level' :
                            tone.terminology === 'professional' ? 'professional' : 'accessible';
   
   return `You are Nexus, the executive advisory AI for LYC Partners.

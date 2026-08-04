@@ -156,9 +156,54 @@ async function handleSpend(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
+  const result = await deductCredits(userId, Number(amount), action, referenceId);
+
+  if (!result.success) {
+    if (result.error === 'Credits record not found') {
+      return res.status(404).json(result);
+    }
+    if (result.error === 'Insufficient credits') {
+      return res.status(400).json(result);
+    }
+    return res.status(400).json(result);
+  }
+
+  return res.status(200).json(result);
+}
+
+/**
+ * Server-side credit deduction — callable from other handlers (e.g. Nexus chat)
+ * without an HTTP round-trip. Deducts from the org balance first if the user
+ * belongs to an organization, then falls back to the user's personal balance.
+ *
+ * Returns:
+ *   - On success: { success: true, newBalance, amountSpent, source: 'org'|'user' }
+ *   - On insufficient balance: { success: false, error: 'Insufficient credits',
+ *       currentBalance, required }
+ *   - On missing record: { success: false, error: 'Credits record not found' }
+ *   - On invalid input: { success: false, error: '<reason>' }
+ */
+export async function deductCredits(
+  userId: string,
+  amount: number,
+  action: string,
+  referenceId?: string,
+): Promise<{
+  success: boolean;
+  error?: string;
+  newBalance?: number;
+  amountSpent?: number;
+  source?: 'org' | 'user';
+  currentBalance?: number;
+  required?: number;
+}> {
+  if (!userId || !amount || !action) {
+    return { success: false, error: 'Missing required fields: userId, amount, action' };
+  }
+
   const spendAmount = Number(amount);
-  if (spendAmount <= 0) {
-    return res.status(400).json({ error: 'Amount must be positive' });
+  if (!(spendAmount > 0)) {
+    return { success: false, error: 'Amount must be positive' };
   }
 
   // 1. Try to deduct from organization balance first (if user has org)
@@ -178,12 +223,12 @@ async function handleSpend(req: VercelRequest, res: VercelResponse) {
           reference_id: referenceId || null,
         });
 
-        return res.status(200).json({
+        return {
           success: true,
           newBalance: newOrgBalance,
           amountSpent: spendAmount,
           source: 'org',
-        });
+        };
       }
     } catch (e) {
       console.error('[Credits] Org deduction failed, falling back to user:', e);
@@ -198,16 +243,16 @@ async function handleSpend(req: VercelRequest, res: VercelResponse) {
   });
 
   if (!creditData) {
-    return res.status(404).json({ error: 'Credits record not found', success: false });
+    return { success: false, error: 'Credits record not found' };
   }
 
   if (Number(creditData.balance) < spendAmount) {
-    return res.status(400).json({
-      error: 'Insufficient credits',
+    return {
       success: false,
-      currentBalance: creditData.balance,
+      error: 'Insufficient credits',
+      currentBalance: Number(creditData.balance),
       required: spendAmount,
-    });
+    };
   }
 
   const newBalance = Number(creditData.balance) - spendAmount;
@@ -224,12 +269,12 @@ async function handleSpend(req: VercelRequest, res: VercelResponse) {
     reference_id: referenceId || null,
   });
 
-  return res.status(200).json({
+  return {
     success: true,
     newBalance,
     amountSpent: spendAmount,
     source: 'user',
-  });
+  };
 }
 
 /**

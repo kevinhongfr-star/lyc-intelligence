@@ -9,12 +9,17 @@ export interface UserProfile {
   email: string;
   name: string;
   role: string | null;
-  tier: 'free' | 'pro' | 'council' | 'enterprise';
+  tier: 'free' | 'member' | 'basic' | 'pro' | 'council' | 'enterprise';
   icp: string | null;
   active_surface: string | null;
   organization_id: string | null;
   subtype: string | null;
   notion_profile_id: string | null;
+  onboarded_at: string | null;
+  // Stripe / billing (S6-T01 / S6-T03)
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  stripe_subscription_status: string | null;
   created_at: string;
   updated_at: string;
 }

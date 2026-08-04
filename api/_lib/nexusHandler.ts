@@ -9,16 +9,54 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as db from './supabaseRest.js';
 import { handleNexusChat } from './nexusChatHandler.js';
+import { handleIntentClassify } from './nexusIntentRouter.js';
+import { handleNexusMemory } from './nexusMemoryHandler.js';
+import { handleNexusRag } from './nexusRagHandler.js';
+import { handleNexusSuggestions } from './nexusProactiveHandler.js';
+import { handleNexusJourney } from './nexusJourneyHandler.js';
+import { handleNexusUsage } from './nexusUsageHandler.js';
 
 export async function handler(req: VercelRequest, res: VercelResponse) {
   const pathArr = (req.query.path as string[]) || [];
-  const resource = pathArr[0] || ''; // 'chat', 'commands', or 'webhook'
+  const resource = pathArr[0] || ''; // 'chat', 'commands', 'webhook', 'intent', 'memory'
   const method = req.method || 'POST';
 
   try {
     // ── Nexus Chat (POST only) ──
     if (resource === 'chat' && method === 'POST') {
       return handleNexusChat(req, res);
+    }
+
+    // ── Intent Classification (S7-T01) — POST /api/nexus/intent ──
+    // Lightweight endpoint for client-side intent pre-classification or debugging.
+    if (resource === 'intent' && method === 'POST') {
+      return handleIntentClassify(req, res);
+    }
+
+    // ── Memory System (S7-T02) — /api/nexus/memory[/extract|/summarize|/decay] ──
+    if (resource === 'memory') {
+      return handleNexusMemory(req, res);
+    }
+
+    // ── RAG Content Library (S7-T04) — /api/nexus/rag[/:id|/search] ──
+    // Admin CRUD for content documents + chunk search for retrieval.
+    if (resource === 'rag') {
+      return handleNexusRag(req, res);
+    }
+
+    // ── Proactive Suggestions (S7-T05) — /api/nexus/suggestions[/:id/dismiss|/act|/generate] ──
+    if (resource === 'suggestions') {
+      return handleNexusSuggestions(req, res);
+    }
+
+    // ── Journey Dashboard (S7-T06) — /api/nexus/journey[/summary] ──
+    if (resource === 'journey') {
+      return handleNexusJourney(req, res);
+    }
+
+    // ── Nexus Usage (S7-T07) — /api/nexus/usage (billing dashboard source) ──
+    if (resource === 'usage') {
+      return handleNexusUsage(req, res);
     }
 
     // ── NEXUS Commands (POST only) ──

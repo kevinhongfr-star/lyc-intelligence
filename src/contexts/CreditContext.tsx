@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { getSupabase } from '@/services/supabaseApi';
+import { useAuthStore } from '@/stores/authStore';
 
 export type CreditTier = 'free' | 'basic' | 'pro' | 'enterprise';
 
@@ -37,10 +38,14 @@ const defaultCredit: CreditInfo = {
 const CreditContext = createContext<CreditContextType | undefined>(undefined);
 
 export function CreditProvider({ children, userId }: { children: React.ReactNode; userId?: string }) {
+  // Fall back to the authenticated user's id so the credit system works app-wide
+  // without every call site needing to pass userId explicitly.
+  const authUserId = useAuthStore(s => s.user?.id);
+  const effectiveUserId = userId ?? authUserId;
   const [credit, setCredit] = useState<CreditInfo>(defaultCredit);
 
   const refreshCredits = useCallback(async () => {
-    if (!userId) {
+    if (!effectiveUserId) {
       setCredit({ ...defaultCredit, isLoading: false });
       return;
     }
@@ -52,13 +57,13 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
       const { data, error } = await supabase
         .from('credits')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', effectiveUserId)
         .single();
 
       if (error || !data) {
         const { data: newData, error: insertError } = await supabase
           .from('credits')
-          .insert({ user_id: userId, balance: 5, tier: 'free', total_earned: 5, total_spent: 0 })
+          .insert({ user_id: effectiveUserId, balance: 5, tier: 'free', total_earned: 5, total_spent: 0 })
           .select()
           .single();
 
@@ -79,7 +84,7 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
           await supabase
             .from('credits')
             .update({ balance: 5, updated_at: new Date().toISOString() })
-            .eq('user_id', userId);
+            .eq('user_id', effectiveUserId);
         }
 
         setCredit({
@@ -94,10 +99,10 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
       console.error('[CreditContext] Error:', error);
       setCredit({ ...defaultCredit, isLoading: false });
     }
-  }, [userId]);
+  }, [effectiveUserId]);
 
   const deductCredit = async (amount: number, description: string): Promise<boolean> => {
-    if (!userId || credit.balance < amount) return false;
+    if (!effectiveUserId || credit.balance < amount) return false;
 
     try {
       const supabase = getSupabase();
@@ -110,10 +115,10 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
           total_spent: credit.totalSpent + amount,
           updated_at: new Date().toISOString(),
         })
-        .eq('user_id', userId);
+        .eq('user_id', effectiveUserId);
 
       await supabase.from('credit_transactions').insert({
-        user_id: userId,
+        user_id: effectiveUserId,
         amount: -amount,
         type: 'spend',
         description,

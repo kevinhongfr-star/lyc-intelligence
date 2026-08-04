@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Check, Crown, Zap, Shield, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
+import { Check, Crown, Zap, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { authFetch } from '@/utils/authFetch';
 
 interface PricingPageProps {
   onUpgradeSuccess?: () => void;
@@ -55,23 +56,27 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
   const handleUpgrade = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      const response = await fetch('/api/stripe/checkout', {
+      const priceId = import.meta.env.VITE_STRIPE_PRICE_COUNCIL as string | undefined;
+      if (!priceId) {
+        throw new Error('Council plan is not configured yet. Please contact support.');
+      }
+      const response = await authFetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
-          priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_COUNCIL || '',
-          successUrl: `${window.location.origin}/settings?upgraded=true`,
-          cancelUrl: `${window.location.origin}/pricing`,
+          priceId,
+          successUrl: `${window.location.origin}/account/billing?upgraded=true`,
+          cancelUrl: `${window.location.origin}/pricing?canceled=true`,
         }),
       });
 
       const data = await response.json();
-      
+
       if (data.url) {
         window.location.href = data.url;
+        onUpgradeSuccess?.();
       } else {
         throw new Error(data.error || 'Failed to create checkout session');
       }
@@ -85,7 +90,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
 
   const handleGetStarted = () => {
     if (!user) {
-      window.location.href = '/auth/signin';
+      window.location.href = '/login';
     } else {
       window.location.href = '/dashboard';
     }

@@ -66,6 +66,40 @@ export async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    // ── Credit transactions (S6-T02) ──
+    // GET /api/data/credit-transactions?user_id=X&limit=30
+    // Returns the authenticated user's credit transaction history.
+    if (resource === 'credit-transactions') {
+      if (method !== 'GET') {
+        return res.status(405).json({ error: 'Method not allowed' });
+      }
+      // Resolve the target user: callers may pass ?user_id= for self,
+      // otherwise default to the authenticated user.
+      const queryUserId = (req.query.user_id as string) || authUserId;
+      if (!queryUserId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      // Non-admins may only read their own transactions.
+      const isAdminRole = userRole === 'super_admin' || userRole === 'lyc_admin';
+      if (!isAdminRole && queryUserId !== authUserId) {
+        return res.status(403).json({ error: 'Forbidden: can only view your own transactions' });
+      }
+      const limit = Math.min(Number(req.query.limit) || 30, 500);
+
+      try {
+        const data = await db.selectMany('credit_transactions', {
+          select: 'id,amount,transaction_type,description,reference_id,stripe_session_id,created_at',
+          where: [{ column: 'user_id', value: queryUserId }],
+          orderBy: { column: 'created_at', ascending: false },
+          limit,
+        }, 10000);
+        return res.status(200).json({ data: data || [], count: (data || []).length });
+      } catch (e: any) {
+        console.error('[dataHandler] credit-transactions error:', e);
+        return res.status(200).json({ data: [], count: 0, error: e?.message });
+      }
+    }
+
     // ── Pipeline CRUD ──
     if (resource === 'pipeline') {
       if (method === 'POST' && !id) {

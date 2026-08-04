@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { CreditProvider } from '@/contexts/CreditContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { CookieConsent } from '@/components/CookieConsent';
+import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import { Loader2 } from 'lucide-react';
 import { ToastContainer } from '@/components/ui/ToastContainer';
 
@@ -66,6 +68,8 @@ const TasksPage = lazy(() => import('@/pages/internal/TasksPage').then(m => ({ d
 const AnalyticsPage = lazy(() => import('@/pages/internal/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
 const CompliancePage = lazy(() => import('@/pages/internal/CompliancePage').then(m => ({ default: m.CompliancePage })));
 const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage').then(m => ({ default: m.NexusEnginePage })));
+const AdminRankingDashboard = lazy(() => import('@/pages/internal/AdminRankingDashboard').then(m => ({ default: m.AdminRankingDashboard })));
+const ScoringConfigPage = lazy(() => import('@/pages/internal/ScoringConfigPage').then(m => ({ default: m.ScoringConfigPage })));
 const KevinOversightDashboard = lazy(() => import('@/components/kevin/KevinOversightDashboard').then(m => ({ default: m.KevinOversightDashboard })));
 
 // ── Candidate Portal pages (EO-4) ──
@@ -74,6 +78,29 @@ const CandidateApplicationsPage = lazy(() => import('@/pages/candidate/Candidate
 const CandidateAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAssessmentsPage').then(m => ({ default: m.CandidateAssessmentsPage })));
 const CandidateCommunityPage = lazy(() => import('@/pages/candidate/CandidateCommunityPage').then(m => ({ default: m.CandidateCommunityPage })));
 const CandidateInterviewPrepPage = lazy(() => import('@/pages/candidate/CandidateInterviewPrepPage').then(m => ({ default: m.CandidateInterviewPrepPage })));
+
+// ── B2B Client Portal pages (EO-1 / SPRINT 3) ──
+const ClientOverviewPage = lazy(() => import('@/pages/client/ClientOverviewPage').then(m => ({ default: m.ClientOverviewPage })));
+const ClientMandatesPage = lazy(() => import('@/pages/client/ClientMandatesPage').then(m => ({ default: m.ClientMandatesPage })));
+
+// ── DEX AI B2C Portal pages (EO-5 / SPRINT 2) ──
+const DexLandingPage = lazy(() => import('@/pages/dex/DexLandingPage').then(m => ({ default: m.DexLandingPage })));
+const DexChatPage = lazy(() => import('@/pages/dex/DexChatPage').then(m => ({ default: m.DexChatPage })));
+const DexAssessPage = lazy(() => import('@/pages/dex/DexAssessPage').then(m => ({ default: m.DexAssessPage })));
+const DexPlanPage = lazy(() => import('@/pages/dex/DexPlanPage').then(m => ({ default: m.DexPlanPage })));
+const DexBookPage = lazy(() => import('@/pages/dex/DexBookPage').then(m => ({ default: m.DexBookPage })));
+const DexJourneyPage = lazy(() => import('@/pages/dex/DexJourneyPage').then(m => ({ default: m.DexJourneyPage })));
+const CreditStorePage = lazy(() => import('@/pages/dex/CreditStorePage').then(m => ({ default: m.CreditStorePage })));
+
+// ── Legal pages (S4-T03) ──
+const TermsPage = lazy(() => import('@/pages/LegalPages').then(m => ({ default: m.TermsPage })));
+const PrivacyPage = lazy(() => import('@/pages/LegalPages').then(m => ({ default: m.PrivacyPage })));
+const CookiesPage = lazy(() => import('@/pages/LegalPages').then(m => ({ default: m.CookiesPage })));
+
+// ── Billing dashboard (S6-T05) ──
+const BillingDashboard = lazy(() => import('@/components/billing/BillingDashboard').then(m => ({ default: m.BillingDashboard })));
+// ── Revenue analytics (S6-T06) ──
+const RevenueAnalyticsPage = lazy(() => import('@/components/internal/RevenueAnalytics').then(m => ({ default: m.default })));
 
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
@@ -98,6 +125,8 @@ export default function App() {
     <ErrorBoundary>
     <CreditProvider>
       <ToastContainer />
+      <CookieConsent />
+      <OnboardingWizard />
       <Suspense fallback={<Loading />}>
         <Routes>
           {/* ── Public pages ── */}
@@ -111,6 +140,20 @@ export default function App() {
           <Route path="/nexus" element={<NexusLanding />} />
           <Route path="/match" element={<MatchPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+
+          {/* ── Legal pages (S4-T03) ── */}
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/cookies" element={<CookiesPage />} />
+
+          {/* ── DEX AI B2C Portal (EO-5 / SPRINT 2) ── */}
+          <Route path="/dex" element={<DexLandingPage />} />
+          <Route path="/dex/chat" element={<ProtectedRoute><DexChatPage /></ProtectedRoute>} />
+          <Route path="/dex/assess" element={<ProtectedRoute><DexAssessPage /></ProtectedRoute>} />
+          <Route path="/dex/plan" element={<ProtectedRoute><DexPlanPage /></ProtectedRoute>} />
+          <Route path="/dex/book" element={<ProtectedRoute><DexBookPage /></ProtectedRoute>} />
+          <Route path="/dex/journey" element={<ProtectedRoute><DexJourneyPage /></ProtectedRoute>} />
+          <Route path="/dex/credits" element={<ProtectedRoute><CreditStorePage /></ProtectedRoute>} />
 
           {/* ── Internal Operations (mockup surface) ── */}
           {ENABLE_PLATFORM && (
@@ -144,7 +187,11 @@ export default function App() {
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="compliance" element={<CompliancePage />} />
               <Route path="nexus-engine" element={<AdminRoute><NexusEnginePage /></AdminRoute>} />
+              <Route path="rankings" element={<AdminRoute><AdminRankingDashboard /></AdminRoute>} />
+              <Route path="scoring" element={<AdminRoute><ScoringConfigPage /></AdminRoute>} />
               <Route path="oversight" element={<AdminRoute><KevinOversightDashboard /></AdminRoute>} />
+              {/* Revenue analytics (S6-T06) */}
+              <Route path="revenue" element={<AdminRoute><RevenueAnalyticsPage /></AdminRoute>} />
               <Route path="intelligence" element={<PlaceholderPage title="Intelligence" />} />
             </Route>
           )}
@@ -152,13 +199,13 @@ export default function App() {
           {/* Backward compat: redirect old /platform/* to /app */}
           <Route path="/platform/*" element={<Navigate to="/app" replace />} />
 
-          {/* ── B2B Client Portal (mockup surface) ── */}
+          {/* ── B2B Client Portal (real implementation — SPRINT 3 / EO_1) ── */}
           <Route path="/client" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route index element={<Navigate to="overview" replace />} />
-            <Route path="overview" element={<PlaceholderPage title="B2B Overview" />} />
+            <Route path="overview" element={<ClientOverviewPage />} />
+            <Route path="mandates" element={<ClientMandatesPage />} />
             <Route path="pipeline-analytics" element={<PlaceholderPage title="Pipeline Analytics" />} />
             <Route path="talent-intel" element={<PlaceholderPage title="Talent Intelligence" />} />
-            <Route path="mandates" element={<PlaceholderPage title="B2B Mandates" />} />
             <Route path="candidates" element={<PlaceholderPage title="B2B Candidates" />} />
             <Route path="nexus-assistant" element={<PlaceholderPage title="NEXUS Assistant" />} />
             <Route path="documents" element={<PlaceholderPage title="Documents & Billing" />} />
@@ -203,6 +250,8 @@ export default function App() {
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
           <Route path="/documents" element={<ProtectedRoute><UserDocumentsPage /></ProtectedRoute>} />
+          {/* Billing dashboard (S6-T05) */}
+          <Route path="/account/billing" element={<ProtectedRoute><BillingDashboard /></ProtectedRoute>} />
           <Route path="/share/:id" element={<SharePage />} />
 
           <Route path="*" element={<NotFoundPage />} />

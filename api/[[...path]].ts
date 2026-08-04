@@ -436,6 +436,17 @@ export default async function handler(
         if (sub === 'client-accounts') return handleAdminClientAccounts(req, res);
         if (sub === 'rbac') return handleAdminRbac(req, res);
         if (sub === 'payments') { (req.query as any).path = ['admin', ...pathArr.slice(1)]; return handleMandates(req, res); }
+        if (sub === 'revenue') {
+          // Admin-only revenue analytics (S6-T06).
+          const { user: _ru, error: _re } = await getUserFromRequest(req);
+          if (_re || !_ru) return res.status(401).json({ error: 'Unauthorized', success: false });
+          const _rRole = _ru.role;
+          if (_rRole !== 'super_admin' && _rRole !== 'lyc_admin') {
+            return res.status(403).json({ error: 'Admin access required', success: false });
+          }
+          const _revMod = await import('./_lib/revenueHandler.js');
+          return _revMod.handleRevenue(req, res);
+        }
         if (sub === 'org-intelligence') {
           const key = pathArr.slice(2).join('/');
           if (key.startsWith('companies'))
