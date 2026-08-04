@@ -1,18 +1,22 @@
 /**
  * clientPortalService — B2B Client Portal data access (SPRINT 3 / EO_1)
  *
- * Queries the live Supabase tables/views directly, scoped to the logged-in
- * client's company. The client's company is resolved from `client_accounts`
- * (by user_id) with a fallback to `profiles.organization_id`.
+ * S3-T06 security rewrite: All calls now go through server-enforced ACL
+ * endpoints at /api/client/* — never the Supabase client directly.
+ * Server gates:
+ *   - client_accounts.auth_user_id + active + not expired
+ *   - client_mandate_access table (mandate-by-mandate ACL)
+ *   - mandates.client_visible
+ *   - contacts.client_presented
  *
- * Live objects used:
- *   - client_accounts   (8 active client accounts)
- *   - mandates          (7,449 mandates; filtered by company)
- *   - v_pipeline_rankings (ranked candidates per mandate, Gold/Silver/Bronze)
- *   - candidates_pipeline (385 rows, 9 pipeline stages)
- *   - consultants       (4 consultants)
+ * Endpoints used:
+ *   GET /api/client/company                 → resolveClientCompany
+ *   GET /api/client/mandates                → fetchClientMandates
+ *   GET /api/client/shortlist?mandate_id=X  → fetchMandateShortlist
+ *   GET /api/client/pipeline-counts[&mandate_id=X]
+ *                                             → fetchPipelineStageCounts
  */
-import { getSupabase } from './supabaseApi';
+import { authFetch } from '@/utils/authFetch';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -69,184 +73,145 @@ export interface PipelineStageCount {
   count: number;
 }
 
-// ─── Company resolution ─────────────────────────────────────────────────────
+// ─── Company resolution (S3-T06 gated server) ──────────────────────────────
 
 /**
- * Resolve the client's company_id. Tries `client_accounts` first (joined with
- * companies for the name), then falls back to `profiles.organization_id`.
+ * Resolve the client's company through the server ACL
+ * (`client_accounts.auth_user_id`, active, not expired), with a graceful
+ * fallback to `profiles.organization_id` for non-client users.
  */
 export async function resolveClientCompany(
-  userId: string,
-  fallbackOrgId?: string | null,
+  _userId: string,
+  _fallbackOrgId?: string | null,
 ): Promise<{ companyId: string | null; companyName: string | null; account: ClientAccount | null }> {
-  const sb = getSupabase();
   try {
-    const { data, error } = await sb
-      .from('client_accounts')
-      .select(`
-        id, user_id, company_id, role, status,
-        contact_name, contact_email,
-        company:companies(id, name)
-      `)
-      .eq('user_id', userId)
-      .limit(1)
-      .maybeSingle();
-
-    if (error) {
-      console.warn('[clientPortalService] resolveClientCompany query failed:', error.message);
-    } else if (data) {
-      const row = data as any;
-      const company = Array.isArray(row.company) ? row.company[0] : row.company;
-      return {
-        companyId: row.company_id ?? company?.id ?? fallbackOrgId ?? null,
-        companyName: company?.name ?? null,
-        account: {
-          id: row.id,
-          user_id: row.user_id,
-          company_id: row.company_id,
-          company_name: company?.name ?? null,
-          contact_name: row.contact_name,
-          contact_email: row.contact_email,
-          role: row.role,
-          status: row.status,
-        },
-      };
+    const r = await authFetch('/api/client/company');
+    if (!r.ok) {
+      console.warn('[clientPortalService] resolveClientCompany HTTP', r.status);
+      return { companyId: null, companyName: null, account: null };
     }
+    const payload = await r.json().catch(() => ({}));
+    if (!payload?.success) {
+      return { companyId: null, companyName: null, account: null };
+    }
+    return {
+      companyId: payload.companyId ?? null,
+      companyName: payload.companyName ?? null,
+      account: payload.account ?? null,
+    };
   } catch (e) {
     console.warn('[clientPortalService] resolveClientCompany error:', e);
+    return { companyId: null, companyName: null, account: null };
   }
-  return { companyId: fallbackOrgId ?? null, companyName: null, account: null };
 }
 
-// ─── Mandates ───────────────────────────────────────────────────────────────
+// ─── Mandates (S3-T06 gated server) ─────────────────────────────────────────
 
 /**
- * Fetch mandates for a client's company, with consultant info joined.
- * `companyId` maps to `mandates.client_id`.
+ * Fetch mandates accessible to this client account via
+ * `client_mandate_access` + `mandates.client_visible`. Maps legacy server
+ * response fields into the ClientMandate shape used by our React pages.
  */
-export async function fetchClientMandates(companyId: string): Promise<ClientMandate[]> {
-  const sb = getSupabase();
+export async function fetchClientMandates(
+  _companyId: string, // passed for API-compat; server resolves from auth + ACL
+): Promise<ClientMandate[]> {
   try {
-    const { data, error } = await sb
-      .from('mandates')
-      .select(`
-        id, title, status, priority, client_id,
-        jd_description, search_definition, skills_requirements, keywords,
-        created_at, updated_at,
-        company:companies(name, industry),
-        consultant:consultant_id(id, name, email, role)
-      `)
-      .eq('client_id', companyId)
-      .order('updated_at', { ascending: false, nullsFirst: false });
-
-    if (error) {
-      console.warn('[clientPortalService] fetchClientMandates query failed:', error.message);
+    const r = await authFetch('/api/client/mandates');
+    if (!r.ok) {
+      console.warn('[clientPortalService] fetchClientMandates HTTP', r.status);
       return [];
     }
-    return ((data as any[]) ?? []).map(row => {
-      const company = Array.isArray(row.company) ? row.company[0] : row.company;
-      const consultant = Array.isArray(row.consultant) ? row.consultant[0] : row.consultant;
-      return {
-        id: row.id,
-        title: row.title,
-        status: row.status,
-        priority: row.priority,
-        client_id: row.client_id,
-        jd_description: row.jd_description,
-        search_definition: row.search_definition,
-        skills_requirements: row.skills_requirements,
-        keywords: row.keywords,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-        company_name: company?.name ?? null,
-        company_industry: company?.industry ?? null,
-        consultant_id: consultant?.id ?? null,
-        consultant_name: consultant?.name ?? null,
-        consultant_email: consultant?.email ?? null,
-        consultant_role: consultant?.role ?? null,
-      } as ClientMandate;
-    });
+    const payload = await r.json().catch(() => ({}));
+    const list: any[] = Array.isArray(payload?.mandates) ? payload.mandates : [];
+    return list.map(row => ({
+      id: row.mandate_id ?? row.id,
+      title: row.title ?? '',
+      status: row.status ?? null,
+      priority: row.priority ?? null,
+      client_id: row.client_id ?? null,
+      jd_description: row.client_summary ?? row.jd_description ?? null,
+      search_definition: null,
+      skills_requirements: Array.isArray(row.skills_requirements)
+        ? row.skills_requirements
+        : null,
+      keywords: null,
+      created_at: row.created_at ?? null,
+      updated_at: row.last_activity_at ?? row.updated_at ?? null,
+      company_name: row.company_name ?? null,
+      company_industry: row.company_industry ?? null,
+      consultant_id: row.lead_consultant_id ?? null,
+      consultant_name: row.lead_consultant_name ?? null,
+      consultant_email: null,
+      consultant_role: null,
+    }));
   } catch (e) {
     console.warn('[clientPortalService] fetchClientMandates error:', e);
     return [];
   }
 }
 
-// ─── Pipeline rankings (shortlist) ──────────────────────────────────────────
+// ─── Pipeline rankings / shortlist (S3-T06 gated server) ───────────────────
 
 /**
- * Fetch ranked candidates for a specific mandate from `v_pipeline_rankings`.
- * Returns candidates sorted by rank ascending (best first).
+ * Ranked candidates for a mandate (Gold/Silver/Bronze). Server returns only
+ * `client_presented` candidates for mandates the caller has ACL access to.
  */
 export async function fetchMandateShortlist(mandateId: string): Promise<PipelineRanking[]> {
-  const sb = getSupabase();
   try {
-    const { data, error } = await sb
-      .from('v_pipeline_rankings')
-      .select('*')
-      .eq('mandate_id', mandateId)
-      .order('rank', { ascending: true, nullsFirst: false });
-
-    if (error) {
-      console.warn('[clientPortalService] fetchMandateShortlist query failed:', error.message);
+    const r = await authFetch(`/api/client/shortlist?mandate_id=${encodeURIComponent(mandateId)}`);
+    if (!r.ok) {
+      console.warn('[clientPortalService] fetchMandateShortlist HTTP', r.status);
       return [];
     }
-    return ((data as any[]) ?? []).map(row => ({
+    const payload = await r.json().catch(() => ({}));
+    const list: any[] = Array.isArray(payload?.shortlist) ? payload.shortlist : [];
+    return list.map(row => ({
       id: row.id,
-      mandate_id: row.mandate_id,
-      candidate_id: row.candidate_id,
-      candidate_name: row.candidate_name ?? row.name ?? null,
-      current_title: row.current_title ?? null,
+      mandate_id: row.mandate_id ?? mandateId,
+      candidate_id: row.candidate_id ?? row.contact_id ?? row.id,
+      candidate_name: row.candidate_name ?? row.full_name ?? null,
+      current_title: row.current_title ?? row.title ?? null,
       current_company: row.current_company ?? row.company_name ?? null,
       pipeline_stage: row.pipeline_stage ?? row.stage ?? null,
-      weighted_score: row.weighted_score ?? row.score ?? null,
+      weighted_score: row.weighted_score ?? row.composite_score ?? null,
       tier: (row.tier as Tier) ?? null,
       rank: row.rank ?? null,
       consultant_name: row.consultant_name ?? null,
-      scored_at: row.scored_at ?? null,
-    } as PipelineRanking));
+      scored_at: row.scored_at ?? row.client_presented_at ?? null,
+    }));
   } catch (e) {
     console.warn('[clientPortalService] fetchMandateShortlist error:', e);
     return [];
   }
 }
 
-// ─── Pipeline stage distribution ────────────────────────────────────────────
+// ─── Pipeline stage distribution (S3-T06 gated server) ─────────────────────
 
 /**
- * Fetch the distribution of candidates across pipeline stages for a mandate
- * (or all mandates for a company). Read-only Kanban column counts.
+ * Aggregate candidates into stage counts, filtered by mandate_id or (if
+ * `mandateId` is undefined) all mandates the caller has ACL access to,
+ * across the passed company scope. Server gate ensures no cross-company leaks.
  */
 export async function fetchPipelineStageCounts(
   mandateId?: string,
-  companyId?: string,
+  _companyId?: string, // server resolves scope from ACL
 ): Promise<PipelineStageCount[]> {
-  const sb = getSupabase();
+  const qs = mandateId ? `?mandate_id=${encodeURIComponent(mandateId)}` : '';
   try {
-    let q = sb.from('candidates_pipeline').select('stage');
-    if (mandateId) {
-      q = q.eq('mandate_id', mandateId);
-    } else if (companyId) {
-      q = q.eq('mandate.client_id', companyId);
-    }
-    const { data, error } = await q;
-    if (error) {
-      console.warn('[clientPortalService] fetchPipelineStageCounts query failed:', error.message);
+    const r = await authFetch(`/api/client/pipeline-counts${qs}`);
+    if (!r.ok) {
+      console.warn('[clientPortalService] fetchPipelineStageCounts HTTP', r.status);
       return [];
     }
-    const counts: Record<string, number> = {};
-    for (const row of (data as any[]) ?? []) {
-      const stage = row.stage ?? 'Unknown';
-      counts[stage] = (counts[stage] ?? 0) + 1;
-    }
-    return Object.entries(counts).map(([stage, count]) => ({ stage, count }));
+    const payload = await r.json().catch(() => ({}));
+    return Array.isArray(payload?.stage_counts) ? payload.stage_counts : [];
   } catch (e) {
     console.warn('[clientPortalService] fetchPipelineStageCounts error:', e);
     return [];
   }
 }
 
-// ─── Tier badge helpers ─────────────────────────────────────────────────────
+// ─── Tier + stage helpers (unchanged) ───────────────────────────────────────
 
 export const PIPELINE_STAGES = [
   'New', 'Sourcing', 'Screening', 'Shortlisted', 'Presented', 'Interview', 'Offer', 'Hired',

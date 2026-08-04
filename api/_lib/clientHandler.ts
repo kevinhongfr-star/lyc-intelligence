@@ -41,6 +41,9 @@ export async function handleClient(req: VercelRequest, res: VercelResponse) {
     if (resource === 'auth' && req.method === 'POST') return handleClientAuth(req, res);
     if (resource === 'mandates' && req.method === 'GET') return handleClientMandates(req, res);
     if (resource === 'mandate' && id && req.method === 'GET') return handleClientMandate(req, res, id);
+    if (resource === 'shortlist' && req.method === 'GET') return handleClientShortlist(req, res);
+    if (resource === 'pipeline-counts' && req.method === 'GET') return handleClientPipelineCounts(req, res);
+    if (resource === 'company' && req.method === 'GET') return handleClientCompany(req, res);
     if (resource === 'candidate' && id && subResource === 'pdf' && req.method === 'GET') return handleCandidatePDF(req, res, id);
     if (resource === 'feedback' && req.method === 'POST') return handleClientFeedback(req, res);
     if (resource === 'feedback' && req.method === 'GET') return handleListFeedback(req, res);
@@ -399,6 +402,207 @@ async function handleMarkNotificationRead(req: VercelRequest, res: VercelRespons
     await update('client_notifications', id, { read: true });
 
     return res.json({ success: true });
+  } catch (err: any) {
+    return res.status(403).json({ success: false, error: err.message });
+  }
+}
+
+// ── Client Company (S3-T06) ───────────────────────────────────────────
+// Resolve the company for a client user — used by ClientOverviewPage.
+// Uses server-side ACL (client_accounts.auth_user_id, active + not expired).
+async function handleClientCompany(req: VercelRequest, res: VercelResponse) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+  try {
+    const account = await selectOne('client_accounts', {
+      column: 'auth_user_id', value: user.id, select: '*',
+    }, 10000);
+
+    if (!account || !account.is_active) {
+      // Graceful fallback: try profiles.organization_id (non-client users who
+      // log in to view client data). RLS is enforced downstream by mandate ACL.
+      const profile = await selectOne('profiles', {
+        column: 'id', value: user.id, select: 'organization_id',
+      }, 10000);
+      const orgId = profile?.organization_id || null;
+      let companyName = null;
+      if (orgId) {
+        const org = await selectOne('companies', {
+          column: 'id', value: orgId, select: 'name',
+        }, 10000);
+        companyName = org?.name || null;
+      }
+      return res.json({
+        success: true,
+        companyId: orgId,
+        companyName,
+        account: null,
+      });
+    }
+
+    if (account.access_expires && new Date(account.access_expires) < new Date()) {
+      return res.status(403).json({ success: false, error: 'Access expired' });
+    }
+
+    let companyName = account.company_name || null;
+    let companyId = account.company_id || null;
+    if (companyId && !companyName) {
+      const org = await selectOne('companies', {
+        column: 'id', value: companyId, select: 'name',
+      }, 10000);
+      companyName = org?.name || null;
+    }
+
+    return res.json({
+      success: true,
+      companyId,
+      companyName,
+      account: {
+        id: account.id,
+        user_id: account.auth_user_id || null,
+        company_id: account.company_id || null,
+        company_name: companyName,
+        contact_name: account.contact_name || null,
+        contact_email: account.contact_email || null,
+        role: account.role || 'client_user',
+        status: account.is_active ? 'active' : 'inactive',
+      },
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+// ── Client Pipeline Stage Counts (S3-T06) ──────────────────────────────
+// Stage distribution for a mandate (or all accessible mandates for the user).
+async function handleClientPipelineCounts(req: VercelRequest, res: VercelResponse) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+  try {
+    const { account } = await verifyClientAccess(user.id);
+    const mandateId = (req.query.mandate_id as string) || (req.query.mandateId as string) || undefined;
+
+    // Get accessible mandate IDs via ACL
+    const accessRecords = await selectMany('client_mandate_access', {
+      client_account_id: account.id,
+    }, [], 200, 0, 'mandate_id');
+    const allowedMandateIds = accessRecords
+      .map((r: any) => r.mandate_id)
+      .filter(Boolean);
+
+    if (mandateId && !allowedMandateIds.includes(mandateId)) {
+      return res.status(403).json({ success: false, error: 'No access to this mandate' });
+    }
+
+    const finalMandateIds = mandateId ? [mandateId] : allowedMandateIds;
+    const countsByStage: Record<string, number> = {};
+
+    if (finalMandateIds.length > 0) {
+      // Batch fetch candidates per allowed mandate IDs (Supabase REST doesn't
+      // support multi-column WHERE IN via selectOne/selectMany directly, so
+      // query per mandate and aggregate). Aggregate is bounded (≤200 mandates).
+      const allStages: string[] = [];
+      for (const mid of finalMandateIds) {
+        const rows = await selectMany('contacts',
+          { mandate_id: mid },
+          [],
+          500, 0,
+          'pipeline_stage'
+        ).catch(() => []);
+        for (const r of rows as any[]) {
+          if (r.pipeline_stage) allStages.push(r.pipeline_stage);
+        }
+      }
+      for (const s of allStages) {
+        countsByStage[s] = (countsByStage[s] || 0) + 1;
+      }
+    }
+
+    const stageCounts = Object.entries(countsByStage).map(([stage, count]) => ({ stage, count }));
+    return res.json({ success: true, stage_counts: stageCounts });
+  } catch (err: any) {
+    return res.status(403).json({ success: false, error: err.message });
+  }
+}
+
+// ── Client Shortlist (S3-T06) ──────────────────────────────────────────
+// Ranked Gold/Silver/Bronze shortlist for a mandate. Uses the mandate
+// access ACL + only client_presented candidates, mirroring the mandate
+// dashboard server-side logic.
+async function handleClientShortlist(req: VercelRequest, res: VercelResponse) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+  const mandateId = (req.query.mandate_id as string) || (req.query.mandateId as string) || '';
+  if (!mandateId) return res.status(400).json({ success: false, error: 'mandate_id is required' });
+
+  try {
+    const { account } = await verifyClientAccess(user.id, mandateId);
+
+    // Confirm mandate is client_visible (double guard)
+    const mandate = await selectOne('mandates', { column: 'id', value: mandateId, select: 'client_visible,lead_consultant_id' }, 10000);
+    if (!mandate || !mandate.client_visible) {
+      return res.status(404).json({ success: false, error: 'Mandate not found or not visible' });
+    }
+
+    const consultant = mandate.lead_consultant_id
+      ? await selectOne('profiles', { column: 'id', value: mandate.lead_consultant_id, select: 'full_name' }, 10000)
+      : null;
+
+    const presented = await selectMany('contacts', {
+      mandate_id: mandateId,
+      client_presented: true,
+    }, ['updated_at DESC'], 200, 0, '*');
+
+    // Build tier + score from available fields. Uses trident_composite
+    // (standard LYC score) plus canvas_grade for a combined ranking.
+    const rows: any[] = (presented || []).map((c: any, i: number) => {
+      const score = Number(c.trident_composite ?? c.composite_score ?? 0);
+      let tier: 'Gold' | 'Silver' | 'Bronze' | 'Unranked' = 'Unranked';
+      if (c.canvas_grade === 'S' || score >= 85) tier = 'Gold';
+      else if (c.canvas_grade === 'A' || score >= 65) tier = 'Silver';
+      else if (c.canvas_grade === 'B' || score >= 45) tier = 'Bronze';
+      // Override with any explicit tier tag
+      if (c.tier === 'Gold' || c.tier === 'Silver' || c.tier === 'Bronze') tier = c.tier as any;
+
+      // Compute presentation stage label (map internal S1..S19 → user friendly)
+      const internal = String(c.pipeline_stage || '');
+      let stage = internal;
+      if (/Sourced|S1_/i.test(internal)) stage = 'Sourcing';
+      else if (/Screened|S2_/i.test(internal)) stage = 'Screening';
+      else if (/Presented|Shortlist|S12/i.test(internal)) stage = 'Shortlisted';
+      else if (/Client.*Int|Interview|S13/i.test(internal)) stage = 'Interview';
+      else if (/Offer|S16/i.test(internal)) stage = 'Offer';
+      else if (/Closed|Placed|S19/i.test(internal)) stage = 'Hired';
+
+      return {
+        id: c.id,
+        mandate_id: mandateId,
+        candidate_id: c.id,
+        candidate_name: c.full_name || null,
+        current_title: c.title || c.current_title || null,
+        current_company: c.company_name || c.current_company || null,
+        pipeline_stage: stage,
+        weighted_score: score || null,
+        tier,
+        rank: 0, // set below after sort
+        consultant_name: consultant?.full_name || null,
+        scored_at: c.updated_at || c.created_at || null,
+      };
+    });
+
+    // Sort rows by tier first (Gold → Silver → Bronze → Unranked), then by score desc
+    const tierOrder: Record<string, number> = { Gold: 0, Silver: 1, Bronze: 2, Unranked: 3 };
+    rows.sort((a, b) => {
+      const d = tierOrder[a.tier] - tierOrder[b.tier];
+      if (d !== 0) return d;
+      return (b.weighted_score ?? -1) - (a.weighted_score ?? -1);
+    });
+    rows.forEach((r, idx) => { r.rank = idx + 1; });
+
+    return res.json({ success: true, shortlist: rows });
   } catch (err: any) {
     return res.status(403).json({ success: false, error: err.message });
   }
