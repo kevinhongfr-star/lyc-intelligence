@@ -78,6 +78,7 @@ const CandidateApplicationsPage = lazy(() => import('@/pages/candidate/Candidate
 const CandidateAssessmentsPage = lazy(() => import('@/pages/candidate/CandidateAssessmentsPage').then(m => ({ default: m.CandidateAssessmentsPage })));
 const CandidateCommunityPage = lazy(() => import('@/pages/candidate/CandidateCommunityPage').then(m => ({ default: m.CandidateCommunityPage })));
 const CandidateInterviewPrepPage = lazy(() => import('@/pages/candidate/CandidateInterviewPrepPage').then(m => ({ default: m.CandidateInterviewPrepPage })));
+const CandidateOpportunitiesPage = lazy(() => import('@/pages/candidate/CandidateOpportunitiesPage').then(m => ({ default: m.CandidateOpportunitiesPage })));
 
 // ── B2B Client Portal pages (EO-1 / SPRINT 3) ──
 const ClientOverviewPage = lazy(() => import('@/pages/client/ClientOverviewPage').then(m => ({ default: m.ClientOverviewPage })));
@@ -235,7 +236,7 @@ export default function App() {
             <Route path="dashboard" element={<CandidateDashboardPage />} />
             <Route path="applications" element={<CandidateApplicationsPage />} />
             <Route path="offers" element={<PlaceholderPage title="Offers & Decisions" />} />
-            <Route path="opportunities" element={<PlaceholderPage title="My Opportunities" />} />
+            <Route path="opportunities" element={<CandidateOpportunitiesPage />} />
             <Route path="interview-prep" element={<CandidateInterviewPrepPage />} />
             <Route path="assessments" element={<CandidateAssessmentsPage />} />
             <Route path="career-dev" element={<PlaceholderPage title="Career Development" />} />
