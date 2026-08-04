@@ -1,6 +1,20 @@
 /**
- * Supabase module barrel export
- * Re-exports the client-side supabase instance for use throughout the app
+ * Supabase module barrel export (S1-T01)
+ * Re-exports the canonical client, auth helpers, and configuration flag.
  */
 
-export { supabase } from './client';
+export { supabase, isSupabaseConfigured } from './client';
+export type { AuthResult } from './auth';
+export {
+  signInWithPassword,
+  signInWithMagicLink,
+  signUp,
+  signOut,
+  resetPassword,
+  updatePassword,
+  getSession,
+  getCurrentUserId,
+  onAuthStateChange,
+  loadProfile,
+  updateProfile,
+} from './auth';

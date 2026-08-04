@@ -1,8 +1,6 @@
 import { create } from 'zustand';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string);
+import { SupabaseClient } from '@supabase/supabase-js';
+import { supabase as canonicalSupabase, isSupabaseConfigured } from '@/lib/supabase/client';
 
 export interface UserProfile {
   id: string;
@@ -34,6 +32,7 @@ interface AuthStore {
   signInWithPassword: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signUp: (email: string, password: string, icp: string, name: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   loadProfile: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ success: boolean; error?: string }>;
   generateReferralCode: () => string;
@@ -47,19 +46,15 @@ const generateReferralCode = () => {
 };
 
 const createMemberCredits = async (userId: string) => {
-  const supabase = createClient(
-    import.meta.env.VITE_SUPABASE_URL as string,
-    (import.meta.env.VITE_SUPABASE_KEY as string) || (import.meta.env.VITE_SUPABASE_ANON_KEY as string)
-  );
-  
+  if (!isSupabaseConfigured) return;
   try {
-    const { error } = await supabase.from('credits').insert({
+    const { error } = await canonicalSupabase.from('credits').insert({
       user_id: userId,
       balance: 2,
       daily_balance: 2,
       last_daily_reset: new Date().toISOString(),
     });
-    
+
     if (error) {
       console.warn('[AuthStore] Credits creation error:', error);
     }
@@ -72,7 +67,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   profile: null,
   isLoading: true,
-  supabase: SUPABASE_URL && SUPABASE_KEY ? createClient(SUPABASE_URL, SUPABASE_KEY) : null,
+  supabase: isSupabaseConfigured ? canonicalSupabase : null,
 
   initialize: async () => {
     const { supabase } = get();
@@ -197,6 +192,21 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     const { supabase } = get();
     if (supabase) await supabase.auth.signOut();
     set({ user: null, profile: null });
+  },
+
+  resetPassword: async (email: string) => {
+    const { supabase } = get();
+    if (!supabase) return { success: false, error: 'Supabase not configured' };
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: e.message || 'Failed to send reset email' };
+    }
   },
 
   loadProfile: async () => {
