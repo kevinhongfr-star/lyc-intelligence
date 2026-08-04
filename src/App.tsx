@@ -82,6 +82,7 @@ const CandidateInterviewPrepPage = lazy(() => import('@/pages/candidate/Candidat
 // ── B2B Client Portal pages (EO-1 / SPRINT 3) ──
 const ClientOverviewPage = lazy(() => import('@/pages/client/ClientOverviewPage').then(m => ({ default: m.ClientOverviewPage })));
 const ClientMandatesPage = lazy(() => import('@/pages/client/ClientMandatesPage').then(m => ({ default: m.ClientMandatesPage })));
+const ClientDocumentsPage = lazy(() => import('@/pages/client/ClientDocumentsPage').then(m => ({ default: m.ClientDocumentsPage })));
 
 // ── DEX AI B2C Portal pages (EO-5 / SPRINT 2) ──
 const DexLandingPage = lazy(() => import('@/pages/dex/DexLandingPage').then(m => ({ default: m.DexLandingPage })));
@@ -208,7 +209,7 @@ export default function App() {
             <Route path="talent-intel" element={<PlaceholderPage title="Talent Intelligence" />} />
             <Route path="candidates" element={<PlaceholderPage title="B2B Candidates" />} />
             <Route path="nexus-assistant" element={<PlaceholderPage title="NEXUS Assistant" />} />
-            <Route path="documents" element={<PlaceholderPage title="Documents & Billing" />} />
+            <Route path="documents" element={<ClientDocumentsPage />} />
             <Route path="admin" element={<PlaceholderPage title="Admin & Security" />} />
             <Route path="collaboration" element={<PlaceholderPage title="Collaboration" />} />
             <Route path="onboarding" element={<PlaceholderPage title="Onboarding" />} />
