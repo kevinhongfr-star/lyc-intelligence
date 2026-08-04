@@ -14,6 +14,7 @@ import { Card, CardHeader, CardTitle, CardContent, Progress } from '@/components
 import { TierBadge, Tier } from '@/components/ui/TierBadge';
 import { supabase } from '@/lib/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
+import { useMultiTableRealtimeRefresh } from '@/hooks/useRealtime';
 import { getCandidateApplications, getCandidateProfile, CandidateApplication, CandidateProfile } from '@/services/supabaseApi';
 
 // ── Types ──
@@ -120,6 +121,17 @@ export function CandidateDashboardPage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // ── Realtime: auto-refresh when underlying tables change (S1-T07) ──
+  useMultiTableRealtimeRefresh(
+    [
+      { table: 'contacts', filter: user?.id ? `id=eq.${user.id}` : undefined },
+      { table: 'mandates' },
+      { table: 'scoring_config' },
+    ],
+    loadData,
+    { enabled: !!user?.id },
+  );
 
   // ── Derived metrics ──
 
