@@ -58,6 +58,13 @@ import { select, selectOne, insert, update, deleteRows, countRows } from '../_li
 import { logAuditEvent, getClientIp, getUserAgent } from '../_lib/v1/audit.js';
 import { logInfo, logError, logWarn } from '../_lib/v1/logging.js';
 import { getCache, setCache, deleteCachePrefix } from '../_lib/v1/cache.js';
+import {
+  handleAuthLogin,
+  handleAuthSignup,
+  handleAuthLogout,
+  handleAuthMe,
+  handleAuthResetPassword,
+} from '../_lib/v1/authEndpoints.js';
 
 export const maxDuration = 60;
 
@@ -428,6 +435,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     // ─── Public endpoints ──────────────────────────────────────────
     if (resource === 'health') {
       return await handleHealth(req, res);
+    }
+
+    // ─── Auth endpoints (public, stricter rate limit) ─────────────
+    // login / signup / reset-password / logout are unauthenticated.
+    // /auth/me self-resolves the caller from the cookie and returns 401
+    // when there is none (the client useAuth hook treats 401 as "no user").
+    if (resource === 'auth') {
+      const sub = segments[1] ?? '';
+
+      // Stricter per-IP limit — auth endpoints are the main abuse surface.
+      const authKey = `auth:${getClientIp(req)}`;
+      const authRl = authLimiter(authKey);
+      if (!authRl.allowed) {
+        return sendTooManyRequests(res, Math.ceil(authRl.retryAfterMs / 1000));
+      }
+
+      if (sub === 'login' && req.method === 'POST') return await handleAuthLogin(req, res);
+      if (sub === 'signup' && req.method === 'POST') return await handleAuthSignup(req, res);
+      if (sub === 'logout' && req.method === 'POST') return await handleAuthLogout(req, res);
+      if (sub === 'me' && req.method === 'GET') return await handleAuthMe(req, res);
+      if (sub === 'reset-password' && req.method === 'POST')
+        return await handleAuthResetPassword(req, res);
+
+      return sendNotFound(res, 'Auth endpoint');
     }
 
     // ─── Rate limit (all authenticated endpoints) ─────────────────
