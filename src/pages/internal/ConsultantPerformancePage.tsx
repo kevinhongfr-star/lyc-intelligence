@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, Badge } from '@/components/ui';
 import { useMultiTableRealtimeRefresh } from '@/hooks/useRealtime';
-import { getSupabase } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 
 // ── Recharts ────────────────────────────────────────────────────────────────
 import {
@@ -89,12 +89,11 @@ export function ConsultantPerformancePage() {
     setLoading(true);
     setError(null);
     try {
-      const sb = getSupabase();
       // Fetch consultants + mandates + candidates in parallel (scoped by org via RLS).
       const [cRes, mRes, pRes] = await Promise.all([
-        sb.from('consultants').select('id, first_name, last_name, email, consultant_code').limit(200),
-        sb.from('mandates').select('id, title, status, created_at, closed_at, lead_consultant_id, placed_count, shortlisted_count, interview_count, total_candidates, phi_sla_behind, client_name').limit(500),
-        sb.from('candidates_pipeline').select('id, mandate_id, contact_id, stage, weighted_score, placed_at, updated_at').limit(3000),
+        supabase.from('consultants').select('id, first_name, last_name, email, consultant_code').limit(200),
+        supabase.from('mandates').select('id, title, status, created_at, closed_at, lead_consultant_id, placed_count, shortlisted_count, interview_count, total_candidates, phi_sla_behind, client_name').limit(500),
+        supabase.from('candidates_pipeline').select('id, mandate_id, contact_id, stage, weighted_score, placed_at, updated_at').limit(3000),
       ]);
 
       if (cRes.error) throw new Error(`consultants: ${cRes.error.message}`);

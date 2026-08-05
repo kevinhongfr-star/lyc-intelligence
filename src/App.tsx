@@ -66,6 +66,7 @@ const PlatformSettingsPage = lazy(() => import('@/pages/internal/PlatformSetting
 const TeamPage = lazy(() => import('@/pages/internal/TeamPage').then(m => ({ default: m.TeamPage })));
 const TasksPage = lazy(() => import('@/pages/internal/TasksPage').then(m => ({ default: m.TasksPage })));
 const AnalyticsPage = lazy(() => import('@/pages/internal/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
+const ConsultantPerformancePage = lazy(() => import('@/pages/internal/ConsultantPerformancePage').then(m => ({ default: m.ConsultantPerformancePage })));
 const CompliancePage = lazy(() => import('@/pages/internal/CompliancePage').then(m => ({ default: m.CompliancePage })));
 const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage').then(m => ({ default: m.NexusEnginePage })));
 const AdminRankingDashboard = lazy(() => import('@/pages/internal/AdminRankingDashboard').then(m => ({ default: m.AdminRankingDashboard })));
@@ -188,6 +189,7 @@ export default function App() {
               <Route path="team" element={<TeamPage />} />
               <Route path="tasks" element={<TasksPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
+              <Route path="consultants" element={<AdminRoute><ConsultantPerformancePage /></AdminRoute>} />
               <Route path="compliance" element={<CompliancePage />} />
               <Route path="nexus-engine" element={<AdminRoute><NexusEnginePage /></AdminRoute>} />
               <Route path="rankings" element={<AdminRoute><AdminRankingDashboard /></AdminRoute>} />
