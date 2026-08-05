@@ -84,6 +84,7 @@ const CandidateOpportunitiesPage = lazy(() => import('@/pages/candidate/Candidat
 const ClientOverviewPage = lazy(() => import('@/pages/client/ClientOverviewPage').then(m => ({ default: m.ClientOverviewPage })));
 const ClientMandatesPage = lazy(() => import('@/pages/client/ClientMandatesPage').then(m => ({ default: m.ClientMandatesPage })));
 const ClientDocumentsPage = lazy(() => import('@/pages/client/ClientDocumentsPage').then(m => ({ default: m.ClientDocumentsPage })));
+const ClientPipelineAnalyticsPage = lazy(() => import('@/pages/client/ClientPipelineAnalyticsPage').then(m => ({ default: m.ClientPipelineAnalyticsPage })));
 
 // ── DEX AI B2C Portal pages (EO-5 / SPRINT 2) ──
 const DexLandingPage = lazy(() => import('@/pages/dex/DexLandingPage').then(m => ({ default: m.DexLandingPage })));
@@ -206,7 +207,7 @@ export default function App() {
             <Route index element={<Navigate to="overview" replace />} />
             <Route path="overview" element={<ClientOverviewPage />} />
             <Route path="mandates" element={<ClientMandatesPage />} />
-            <Route path="pipeline-analytics" element={<PlaceholderPage title="Pipeline Analytics" />} />
+            <Route path="pipeline-analytics" element={<ClientPipelineAnalyticsPage />} />
             <Route path="talent-intel" element={<PlaceholderPage title="Talent Intelligence" />} />
             <Route path="candidates" element={<PlaceholderPage title="B2B Candidates" />} />
             <Route path="nexus-assistant" element={<PlaceholderPage title="NEXUS Assistant" />} />
