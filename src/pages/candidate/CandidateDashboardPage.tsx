@@ -9,13 +9,17 @@
  * Renders inside AppShell → Outlet.
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { Briefcase, Calendar, ClipboardCheck, TrendingUp, ArrowRight, Clock, Video, MapPin, Star, Trophy, Award, Loader2 } from 'lucide-react';
+import { Briefcase, Calendar, ClipboardCheck, TrendingUp, ArrowRight, Clock, Video, MapPin, Star, Trophy, Award, Loader2, BarChart3, PieChart } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Progress } from '@/components/ui';
 import { TierBadge, Tier } from '@/components/ui/TierBadge';
 import { supabase } from '@/lib/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
 import { useMultiTableRealtimeRefresh } from '@/hooks/useRealtime';
 import { getCandidateApplications, getCandidateProfile, CandidateApplication, CandidateProfile } from '@/services/supabaseApi';
+import {
+  PieChart as RePieChart, Pie, Cell, Tooltip as RTooltip, ResponsiveContainer, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+} from 'recharts';
 
 // ── Types ──
 
@@ -139,6 +143,36 @@ export function CandidateDashboardPage() {
   const rankedCount = rankings.filter(r => r.tier && r.tier !== 'Unranked').length;
   const topRank = rankings.length > 0 ? rankings[0] : null;
 
+  // Tier distribution for donut chart (S1-T15)
+  const tierDistribution = React.useMemo(() => {
+    const counts: Record<string, number> = { Gold: 0, Silver: 0, Bronze: 0, Unranked: 0 };
+    for (const r of rankings) {
+      const t = (r.tier ?? 'Unranked') as string;
+      if (counts[t] !== undefined) counts[t] += 1; else counts['Unranked'] += 1;
+    }
+    return (['Gold', 'Silver', 'Bronze', 'Unranked'] as const)
+      .map(tier => ({ tier, count: counts[tier] }))
+      .filter(t => t.count > 0);
+  }, [rankings]);
+
+  // Score trend data for bar chart (S1-T15)
+  const scoreTrend = React.useMemo(() => {
+    return rankings
+      .filter(r => r.weighted_score != null)
+      .slice(0, 15)
+      .map(r => ({
+        name: (r.mandate_title ?? '—').length > 18
+          ? (r.mandate_title ?? '—').slice(0, 17) + '…'
+          : (r.mandate_title ?? '—'),
+        score: Math.round((r.weighted_score ?? 0) * 10) / 10,
+        tier: r.tier ?? 'Unranked',
+      }));
+  }, [rankings]);
+
+  const TIER_COLORS: Record<string, string> = {
+    Gold: '#f59e0b', Silver: '#94a3b8', Bronze: '#b45309', Unranked: '#cbd5e1',
+  };
+
   // Profile completion: check which fields are filled
   const profileFields = profile
     ? [
@@ -225,6 +259,88 @@ export function CandidateDashboardPage() {
           </div>
         </Card>
       </div>
+
+      {/* ── Score/Tier visualizations (S1-T15) ─────────────────────────── */}
+      {rankings.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Tier Distribution Donut */}
+          {tierDistribution.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <PieChart className="w-4 h-4 text-fuchsia" />
+                  <CardTitle>Your Tier Distribution</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[240px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RePieChart>
+                      <Pie
+                        data={tierDistribution}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={85}
+                        paddingAngle={2}
+                        dataKey="count"
+                        nameKey="tier"
+                        label={({ tier, percent }) =>
+                          `${tier} ${Math.round((percent ?? 0) * 100)}%`
+                        }
+                        labelLine={false}
+                      >
+                        {tierDistribution.map((entry, idx) => (
+                          <Cell key={idx} fill={TIER_COLORS[entry.tier] ?? '#cbd5e1'} />
+                        ))}
+                      </Pie>
+                      <RTooltip />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
+                    </RePieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Score Trend Bar Chart */}
+          {scoreTrend.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-fuchsia" />
+                  <CardTitle>Score by Position</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[240px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={scoreTrend} margin={{ top: 5, right: 10, bottom: 40, left: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fontSize: 10, fill: '#666' }}
+                        angle={-25}
+                        textAnchor="end"
+                        height={60}
+                      />
+                      <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#666' }} />
+                      <RTooltip
+                        contentStyle={{ border: '1px solid #e5e7eb', borderRadius: 0, fontSize: 12 }}
+                      />
+                      <Bar dataKey="score" name="Score" radius={[4, 4, 0, 0]}>
+                        {scoreTrend.map((entry, idx) => (
+                          <Cell key={idx} fill={TIER_COLORS[entry.tier] ?? '#C108AB'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
 
       {/* Pipeline Rankings — the critical v_pipeline_rankings view */}
       <Card>
