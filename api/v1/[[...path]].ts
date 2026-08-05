@@ -65,6 +65,7 @@ import {
   handleAuthMe,
   handleAuthResetPassword,
 } from '../_lib/v1/authEndpoints.js';
+import { handleB2c } from '../_lib/v1/b2c/routes.js';
 
 export const maxDuration = 60;
 
@@ -459,6 +460,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
         return await handleAuthResetPassword(req, res);
 
       return sendNotFound(res, 'Auth endpoint');
+    }
+
+    // ─── B2C portal endpoints (per-route auth + rate limits) ────────
+    // handleB2c applies its own auth (via b2cRoute → resolveUser), its
+    // own strict per-group rate limits, and its own audit events. It
+    // gates user_type === 'b2c' by default, so internal users can NOT
+    // accidentally access b2c data.
+    if (resource === 'b2c') {
+      return await handleB2c(req, res);
     }
 
     // ─── Rate limit (all authenticated endpoints) ─────────────────
