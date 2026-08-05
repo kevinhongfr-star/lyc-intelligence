@@ -6,6 +6,11 @@
 import React, { useState, useEffect } from 'react';
 import { ClipboardCheck, Clock, HelpCircle, BarChart2, Star, Download, Play, ArrowRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Progress } from '@/components/ui';
+import { TierBadge } from '@/components/ui/TierBadge';
+import {
+  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  Radar, Legend, Tooltip as RTooltip, ResponsiveContainer,
+} from 'recharts';
 
 type Tab = 'available' | 'completed';
 
@@ -149,7 +154,9 @@ export function CandidateAssessmentsPage() {
           {completed.length === 0 ? (
             <div className="py-12 text-center text-text-muted text-sm">No completed assessments yet.</div>
           ) : (
-            completed.map((c) => (
+            completed.map((c) => {
+              const tier = c.score >= 85 ? 'Gold' : c.score >= 70 ? 'Silver' : c.score >= 55 ? 'Bronze' : 'Unranked';
+              return (
               <Card key={c.id}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -158,6 +165,7 @@ export function CandidateAssessmentsPage() {
                       <p className="text-xs text-text-muted mt-1">Completed on {c.takenAt}</p>
                     </div>
                     <div className="flex items-center gap-3">
+                      <TierBadge tier={tier} size="md" />
                       <div className="text-right">
                         <div className="text-xs text-text-muted">Overall Score</div>
                         <div className="text-lg font-bold text-fuchsia">{c.score}/100</div>
@@ -170,15 +178,44 @@ export function CandidateAssessmentsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Archetype display */}
                     <div className="flex flex-col items-center justify-center text-center bg-fuchsia-light rounded-lg p-6">
                       <Star className="w-8 h-8 text-fuchsia mb-2" />
                       <div className="text-xs text-text-muted uppercase tracking-wide">Archetype</div>
                       <div className="font-serif font-bold text-xl text-text-primary mt-1">{c.archetype}</div>
+                      <div className="mt-3">
+                        <TierBadge tier={tier} size="sm" />
+                      </div>
                       <button className="text-sm text-fuchsia hover:underline flex items-center gap-1 mt-3">
                         View details <ArrowRight className="w-3 h-3" />
                       </button>
                     </div>
-                    <div className="lg:col-span-2 space-y-3">
+                    {/* Radar chart for dimension breakdown */}
+                    <div className="lg:col-span-1">
+                      <div className="text-xs text-text-muted mb-2 flex items-center gap-1">
+                        <BarChart2 className="w-3 h-3" /> Dimension Radar
+                      </div>
+                      <ResponsiveContainer width="100%" height={220}>
+                        <RadarChart outerRadius={75} data={c.dimensions}>
+                          <PolarGrid stroke="#e5e7eb" />
+                          <PolarAngleAxis dataKey="name" tick={{ fontSize: 10, fill: '#666' }} />
+                          <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 9 }} />
+                          <Radar
+                            name="Score"
+                            dataKey="score"
+                            stroke="#C108AB"
+                            fill="#C108AB"
+                            fillOpacity={0.35}
+                          />
+                          <RTooltip
+                            contentStyle={{ border: '1px solid #e5e7eb', borderRadius: 0, fontSize: 12 }}
+                          />
+                        </RadarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    {/* Dimension bars (kept for detailed readout) */}
+                    <div className="lg:col-span-1 space-y-3">
+                      <div className="text-xs text-text-muted mb-2">Score Breakdown</div>
                       {c.dimensions.map((dim) => (
                         <div key={dim.name}>
                           <div className="flex items-center justify-between text-sm mb-1">
@@ -195,7 +232,8 @@ export function CandidateAssessmentsPage() {
                   </div>
                 </CardContent>
               </Card>
-            ))
+              );
+            })
           )}
         </div>
       )}
