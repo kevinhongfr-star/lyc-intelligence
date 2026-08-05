@@ -230,3 +230,121 @@ export const TIER_EMOJI: Record<Tier, string> = {
   Bronze: '🥉',
   Unranked: '—',
 };
+
+// ─── Dashboard chart helpers (S1-T11 / S1-T12 / S1-T13) ─────────────────────
+
+export interface TierDistributionRow {
+  tier: Tier;
+  count: number;
+}
+
+export interface MandateStatRow {
+  mandate_id: string;
+  mandate_title: string;
+  company_name: string | null;
+  total_candidates: number;
+  avg_score: number;
+  gold_count: number;
+  silver_count: number;
+  bronze_count: number;
+  unranked_count: number;
+}
+
+export interface HeatmapCell {
+  mandate_id: string;
+  stage: string;
+  count: number;
+}
+
+export interface HeatmapData {
+  stages: string[];
+  mandates: {
+    id: string;
+    title: string;
+    company_name: string | null;
+    total: number;
+  }[];
+  rows: HeatmapCell[];
+  totals_by_mandate: Record<string, number>;
+  totals_by_stage: Record<string, number>;
+  max_cell: number;
+  total_candidates: number;
+}
+
+/**
+ * Tier distribution for all candidates visible to the client (across
+ * ACL-accessible mandates, client_presented flag enforced server-side).
+ * Used by ClientOverviewPage tier-distribution donut chart.
+ */
+export async function fetchTierDistribution(): Promise<TierDistributionRow[]> {
+  try {
+    const r = await authFetch('/api/client/tier-distribution');
+    if (!r.ok) {
+      console.warn('[clientPortalService] fetchTierDistribution HTTP', r.status);
+      return [];
+    }
+    const payload = await r.json().catch(() => ({}));
+    const rows: any[] = Array.isArray(payload?.distribution) ? payload.distribution : [];
+    return rows.map(r => ({
+      tier: (r.tier as Tier) ?? 'Unranked',
+      count: Number(r.count ?? 0),
+    }));
+  } catch (e) {
+    console.warn('[clientPortalService] fetchTierDistribution error:', e);
+    return [];
+  }
+}
+
+/**
+ * Per-mandate aggregate stats (totals, tier counts, avg score) across the
+ * mandates the client account has ACL access to. Used for mandate-rankings
+ * top-N list and the Client Portal mandate horizontal stacked bar chart.
+ */
+export async function fetchMandateStats(limit = 10): Promise<MandateStatRow[]> {
+  try {
+    const r = await authFetch(`/api/client/mandate-stats?limit=${limit}`);
+    if (!r.ok) {
+      console.warn('[clientPortalService] fetchMandateStats HTTP', r.status);
+      return [];
+    }
+    const payload = await r.json().catch(() => ({}));
+    const rows: any[] = Array.isArray(payload?.stats) ? payload.stats : [];
+    return rows.map(r => ({
+      mandate_id: r.mandate_id ?? '',
+      mandate_title: r.mandate_title ?? r.title ?? '',
+      company_name: r.company_name ?? null,
+      total_candidates: Number(r.total_candidates ?? 0),
+      avg_score: Number(r.avg_score ?? 0),
+      gold_count: Number(r.gold_count ?? 0),
+      silver_count: Number(r.silver_count ?? 0),
+      bronze_count: Number(r.bronze_count ?? 0),
+      unranked_count: Number(r.unranked_count ?? 0),
+    }));
+  } catch (e) {
+    console.warn('[clientPortalService] fetchMandateStats error:', e);
+    return [];
+  }
+}
+
+/**
+ * Candidate × Stage × Mandate heatmap matrix.
+ *
+ * Returns a mandates × stages grid with cell values = candidate count in
+ * that (mandate, stage) pair, plus totals and a max_cell for intensity
+ * normalization. Used by CandidateStageHeatmap component.
+ */
+export async function fetchHeatmap(limit = 30): Promise<HeatmapData | null> {
+  try {
+    const r = await authFetch(`/api/client/heatmap?limit=${limit}`);
+    if (!r.ok) {
+      console.warn('[clientPortalService] fetchHeatmap HTTP', r.status);
+      return null;
+    }
+    const payload = await r.json().catch(() => ({}));
+    if (!payload?.success) return null;
+    return payload as HeatmapData & { success: boolean };
+  } catch (e) {
+    console.warn('[clientPortalService] fetchHeatmap error:', e);
+    return null;
+  }
+}

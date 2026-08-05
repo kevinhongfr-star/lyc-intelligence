@@ -7,18 +7,33 @@
  *
  * Renders inside AppShell → Outlet (the /client surface).
  */
-import React, { useEffect, useMemo, useState } from 'react';
-import { Briefcase, Users, TrendingUp, Mail, ChevronRight, AlertCircle, Building2 } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Briefcase, Users, TrendingUp, Mail, ChevronRight, AlertCircle, Building2,
+  BarChart3, PieChart, Trophy,
+} from 'lucide-react';
 import { Card, CardContent, Button, Badge, EmptyState } from '@/components/ui';
+import { TierBadge } from '@/components/ui/TierBadge';
 import { useAuthStore } from '@/stores/authStore';
+import { useMultiTableRealtimeRefresh } from '@/hooks/useRealtime';
 import {
   resolveClientCompany,
   fetchClientMandates,
   fetchPipelineStageCounts,
+  fetchTierDistribution,
+  fetchMandateStats,
   type ClientMandate,
   type PipelineStageCount,
+  type TierDistributionRow,
+  type MandateStatRow,
   PIPELINE_STAGES,
 } from '@/services/clientPortalService';
+
+// ── Recharts (already declared in package.json) ────────────────────────────
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip,
+  ResponsiveContainer, Legend, Cell, PieChart, Pie,
+} from 'recharts';
 
 const STATUS_COLORS: Record<string, string> = {
   active: 'bg-green-100 text-green-700',
@@ -46,10 +61,46 @@ export function ClientOverviewPage() {
 
   const [mandates, setMandates] = useState<ClientMandate[]>([]);
   const [stageCounts, setStageCounts] = useState<PipelineStageCount[]>([]);
+  const [tierDistribution, setTierDistribution] = useState<TierDistributionRow[]>([]);
+  const [mandateStats, setMandateStats] = useState<MandateStatRow[]>([]);
   const [companyName, setCompanyName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [noCompany, setNoCompany] = useState(false);
+
+  const loadData = useCallback(async () => {
+    let cancelled = false;
+    if (!user?.id) { setLoading(false); return; }
+    try {
+      setError(null);
+      const { companyId, companyName: cn } = await resolveClientCompany(user.id, profile?.organization_id);
+      if (cancelled) return;
+
+      if (!companyId) {
+        setNoCompany(true);
+        setLoading(false);
+        return;
+      }
+      setCompanyName(cn);
+
+      const [m, sc, td, ms] = await Promise.all([
+        fetchClientMandates(companyId),
+        fetchPipelineStageCounts(undefined, companyId),
+        fetchTierDistribution(),
+        fetchMandateStats(10),
+      ]);
+      if (cancelled) return;
+      setMandates(m);
+      setStageCounts(sc);
+      setTierDistribution(td);
+      setMandateStats(ms);
+    } catch (e) {
+      console.warn('[ClientOverviewPage] error:', e);
+      if (!cancelled) setError('Failed to load your dashboard. Please try again.');
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+  }, [user?.id, profile?.organization_id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -67,13 +118,17 @@ export function ClientOverviewPage() {
         }
         setCompanyName(cn);
 
-        const [m, sc] = await Promise.all([
+        const [m, sc, td, ms] = await Promise.all([
           fetchClientMandates(companyId),
           fetchPipelineStageCounts(undefined, companyId),
+          fetchTierDistribution(),
+          fetchMandateStats(10),
         ]);
         if (cancelled) return;
         setMandates(m);
         setStageCounts(sc);
+        setTierDistribution(td);
+        setMandateStats(ms);
       } catch (e) {
         console.warn('[ClientOverviewPage] error:', e);
         if (!cancelled) setError('Failed to load your dashboard. Please try again.');
@@ -83,6 +138,21 @@ export function ClientOverviewPage() {
     })();
     return () => { cancelled = true; };
   }, [user?.id, profile?.organization_id]);
+
+  useMultiTableRealtimeRefresh(
+    [
+      { table: 'contacts' },
+      { table: 'mandates' },
+      { table: 'scoring_config' },
+      { table: 'client_accounts' },
+    ],
+    () => {
+      console.debug('[ClientOverviewPage] realtime: refreshing data');
+      setLoading(true);
+      loadData();
+    },
+    { enabled: !!user?.id, debounceMs: 750 },
+  );
 
   const activeMandates = useMemo(
     () => mandates.filter(m => {
@@ -176,7 +246,164 @@ export function ClientOverviewPage() {
         </Card>
       </div>
 
-      {/* Pipeline distribution */}
+      {/* ── Charts row ─────────────────────────────────────────────────── */}
+      <div className="grid lg:grid-cols-2 gap-4">
+        {/* Pipeline stages bar chart */}
+        {stageCounts.length > 0 && (
+          <Card>
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="w-4 h-4 text-fuchsia" />
+                <h3 className="font-medium text-text-primary">Pipeline Stages</h3>
+              </div>
+              <div className="h-[260px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={PIPELINE_STAGES.map(stage => ({
+                      stage,
+                      count: stageMap[stage] ?? 0,
+                    })).filter(r => r.count > 0 || true)}
+                    margin={{ top: 10, right: 10, bottom: 20, left: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis
+                      dataKey="stage"
+                      tick={{ fontSize: 11, fill: '#666' }}
+                      angle={-20}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis tick={{ fontSize: 11, fill: '#666' }} allowDecimals={false} />
+                    <RTooltip
+                      contentStyle={{
+                        border: '1px solid #e5e7eb',
+                        borderRadius: 0,
+                        fontSize: 12,
+                      }}
+                    />
+                    <Bar dataKey="count" name="Candidates" radius={[4, 4, 0, 0]}>
+                      <Cell fill="#C108AB" />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Tier distribution donut */}
+        {tierDistribution.length > 0 && (
+          <Card>
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <PieChart className="w-4 h-4 text-fuchsia" />
+                <h3 className="font-medium text-text-primary">Tier Distribution</h3>
+              </div>
+              <div className="h-[260px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={tierDistribution.filter(t => t.count > 0)}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={90}
+                      paddingAngle={2}
+                      dataKey="count"
+                      nameKey="tier"
+                      label={({ tier, percent }) =>
+                        `${tier}  ${Math.round((percent ?? 0) * 100)}%`
+                      }
+                      labelLine={false}
+                    >
+                      {tierDistribution.map((entry, idx) => {
+                        const c: Record<string, string> = {
+                          Gold: '#f59e0b',
+                          Silver: '#94a3b8',
+                          Bronze: '#b45309',
+                          Unranked: '#cbd5e1',
+                        };
+                        return <Cell key={idx} fill={c[entry.tier] ?? '#cbd5e1'} />;
+                      })}
+                    </Pie>
+                    <RTooltip />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Mandate rankings — stacked tier horizontal bars + top 10 mandate list */}
+      {mandateStats.length > 0 && (
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy className="w-4 h-4 text-fuchsia" />
+              <h3 className="font-medium text-text-primary">Mandate Rankings — Top {mandateStats.length}</h3>
+            </div>
+            <div className="space-y-3">
+              {mandateStats.map((m, idx) => {
+                const total = m.total_candidates || 1;
+                const label = `${m.company_name ? m.company_name + ' — ' : ''}${m.mandate_title}`;
+                return (
+                  <div key={m.mandate_id}>
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="flex items-center gap-2 text-text-primary">
+                        <span className="text-text-muted">#{idx + 1}</span>
+                        <span className="font-medium truncate max-w-[70%]">{label}</span>
+                      </span>
+                      <span className="flex items-center gap-2 text-text-muted">
+                        <TierBadge tier={'Gold'} size="sm" showEmoji={false} className="!border-0" /> {m.gold_count}
+                        <TierBadge tier={'Silver'} size="sm" showEmoji={false} className="!border-0" /> {m.silver_count}
+                        <TierBadge tier={'Bronze'} size="sm" showEmoji={false} className="!border-0" /> {m.bronze_count}
+                        · Avg <b className="text-text-primary">{m.avg_score}</b> · <b className="text-text-primary">{m.total_candidates}</b>
+                      </span>
+                    </div>
+                    <div className="h-2.5 bg-bg-warm flex overflow-hidden">
+                      <div
+                        className="h-full"
+                        style={{
+                          width: `${(m.gold_count / total) * 100}%`,
+                          background: 'linear-gradient(135deg,#FFD700,#FFA500)',
+                        }}
+                        title={`Gold ${m.gold_count}`}
+                      />
+                      <div
+                        className="h-full"
+                        style={{
+                          width: `${(m.silver_count / total) * 100}%`,
+                          background: 'linear-gradient(135deg,#C0C0C0,#808080)',
+                        }}
+                        title={`Silver ${m.silver_count}`}
+                      />
+                      <div
+                        className="h-full"
+                        style={{
+                          width: `${(m.bronze_count / total) * 100}%`,
+                          background: 'linear-gradient(135deg,#CD7F32,#8B4513)',
+                        }}
+                        title={`Bronze ${m.bronze_count}`}
+                      />
+                      {m.unranked_count > 0 && (
+                        <div
+                          className="h-full bg-stone-200"
+                          style={{ width: `${(m.unranked_count / total) * 100}%` }}
+                          title={`Unranked ${m.unranked_count}`}
+                        />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Pipeline distribution (legacy inline bars, kept below charts for quick glance) */}
       {stageCounts.length > 0 && (
         <Card>
           <CardContent className="p-5">

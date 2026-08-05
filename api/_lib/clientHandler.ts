@@ -10,6 +10,9 @@
  *   GET  /api/client/feedback?mandate_id=        — List feedback
  *   GET  /api/client/notifications               — Client notifications
  *   PATCH /api/client/notifications/:id/read     — Mark notification as read
+ *   GET  /api/client/tier-distribution           — Tier counts (Gold/Silver/Bronze/Unranked) — S1-T11
+ *   GET  /api/client/mandate-stats[?limit=N]     — Per-mandate aggregate dashboard stats — S1-T11
+ *   GET  /api/client/heatmap[?limit=N]           — Mandate × Stage candidate heatmap — S1-T12
  *
  * Key security: Clients see ONLY approved profiles with NO internal scores
  */
@@ -49,6 +52,11 @@ export async function handleClient(req: VercelRequest, res: VercelResponse) {
     if (resource === 'feedback' && req.method === 'GET') return handleListFeedback(req, res);
     if (resource === 'notifications' && req.method === 'GET') return handleClientNotifications(req, res);
     if (resource === 'notifications' && id && req.method === 'PATCH') return handleMarkNotificationRead(req, res, id);
+
+    // ── S1-T11 / S1-T12 dashboard analytics endpoints ───────────────────
+    if (resource === 'tier-distribution' && req.method === 'GET') return handleClientTierDistribution(req, res);
+    if (resource === 'mandate-stats' && req.method === 'GET') return handleClientMandateStats(req, res);
+    if (resource === 'heatmap' && req.method === 'GET') return handleClientHeatmap(req, res);
 
     return res.status(404).json({ success: false, error: 'Client route not found' });
   } catch (err) {
@@ -605,5 +613,280 @@ async function handleClientShortlist(req: VercelRequest, res: VercelResponse) {
     return res.json({ success: true, shortlist: rows });
   } catch (err: any) {
     return res.status(403).json({ success: false, error: err.message });
+  }
+}
+
+// ─── Helpers shared across the 3 analytics endpoints ────────────────────────
+
+const PRESENTATION_STAGE_MAP: Record<string, string> = {
+  'New': 'New', 'Sourcing': 'Sourcing', 'Screening': 'Screening',
+  'Shortlist': 'Shortlisted', 'Shortlisted': 'Shortlisted',
+  'Presented': 'Presented', 'Interview': 'Interview',
+  'Final Interview': 'Final Interview', 'Offer': 'Offer', 'Placed': 'Hired', 'Hired': 'Hired',
+};
+function normalizeStage(s: string | null | undefined): string {
+  if (!s) return 'New';
+  if (PRESENTATION_STAGE_MAP[s]) return PRESENTATION_STAGE_MAP[s];
+  const internal = String(s);
+  if (/Sourced|S1_/i.test(internal)) return 'Sourcing';
+  if (/Screened|S2_/i.test(internal)) return 'Screening';
+  if (/Presented|Shortlist|S12/i.test(internal)) return 'Shortlisted';
+  if (/Client.*Int|Interview|S13/i.test(internal)) return 'Interview';
+  if (/Offer|S16/i.test(internal)) return 'Offer';
+  if (/Closed|Placed|S19/i.test(internal)) return 'Hired';
+  return internal;
+}
+function scoreToTier(score: number | null, grade: any, explicitTier: any): 'Gold' | 'Silver' | 'Bronze' | 'Unranked' {
+  if (explicitTier === 'Gold' || explicitTier === 'Silver' || explicitTier === 'Bronze') return explicitTier;
+  const s = Number(score ?? 0);
+  if (grade === 'S' || s >= 85) return 'Gold';
+  if (grade === 'A' || s >= 65) return 'Silver';
+  if (grade === 'B' || s >= 45) return 'Bronze';
+  return 'Unranked';
+}
+
+/**
+ * Load client-accessible mandate IDs via client_mandate_access ACL, then
+ * pull all client_presented contacts across those mandates with tier+stage
+ * precomputed.  Reused by all three dashboard analytics endpoints so
+ * mandate ACL is enforced consistently and server-side aggregation is
+ * done from a single in-memory dataset.
+ */
+async function loadClientPresentedContacts(userId: string) {
+  const { account } = await verifyClientAccess(userId);
+  const access = await selectMany('client_mandate_access', {
+    client_account_id: account.id,
+  }, [], 500, 0, 'mandate_id');
+  const mandateIds = (access || []).map((r: any) => r.mandate_id).filter(Boolean);
+
+  // Pull mandate details for labelling (title + company_name)
+  const mandateMeta = new Map<string, { id: string; title: string; company_name: string | null }>();
+  for (const mid of mandateIds) {
+    const m = await selectOne('mandates', {
+      column: 'id', value: mid, select: 'id,title,client_name,company_name,client_visible',
+    }, 10000).catch(() => null);
+    if (m && m.client_visible !== false) {
+      mandateMeta.set(mid, {
+        id: mid,
+        title: m.title || 'Untitled Mandate',
+        company_name: m.company_name || m.client_name || null,
+      });
+    }
+  }
+
+  // Pull contacts per mandate (bounded by ACL ≤ 500 mandates × 500 contacts each)
+  const presented: Array<{
+    mandate_id: string;
+    contact_id: string;
+    stage: string;
+    tier: 'Gold' | 'Silver' | 'Bronze' | 'Unranked';
+    score: number;
+  }> = [];
+  for (const mid of Array.from(mandateMeta.keys())) {
+    const rows = await selectMany('contacts', {
+      mandate_id: mid,
+      client_presented: true,
+    }, [], 500, 0, '*').catch(() => []);
+    for (const r of rows as any[]) {
+      const score = Number(r.trident_composite ?? r.composite_score ?? r.weighted_score ?? 0);
+      presented.push({
+        mandate_id: mid,
+        contact_id: r.id,
+        stage: normalizeStage(r.pipeline_stage),
+        tier: scoreToTier(score, r.canvas_grade, r.tier),
+        score,
+      });
+    }
+  }
+
+  return {
+    account,
+    mandateIds: Array.from(mandateMeta.keys()),
+    mandateMeta,
+    presented,
+  };
+}
+
+// ── Tier Distribution (S1-T11) ──────────────────────────────────────────────
+async function handleClientTierDistribution(req: VercelRequest, res: VercelResponse) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+  try {
+    const { presented } = await loadClientPresentedContacts(user.id);
+
+    // Dedupe candidates per tier.  A candidate may appear in multiple
+    // mandates; credit the highest tier they reach across all mandates
+    // (Gold wins over Silver wins over Bronze wins over Unranked).
+    const tierRank: Record<string, number> = { Gold: 0, Silver: 1, Bronze: 2, Unranked: 3 };
+    const best: Record<string, 'Gold' | 'Silver' | 'Bronze' | 'Unranked'> = {};
+    for (const row of presented) {
+      const prev = best[row.contact_id] ?? 'Unranked';
+      best[row.contact_id] = tierRank[row.tier] < tierRank[prev] ? row.tier : prev;
+    }
+
+    const counts: Record<string, number> = { Gold: 0, Silver: 0, Bronze: 0, Unranked: 0 };
+    for (const t of Object.values(best)) counts[t] = (counts[t] ?? 0) + 1;
+
+    const distribution = (['Gold', 'Silver', 'Bronze', 'Unranked'] as const)
+      .map(tier => ({ tier, count: counts[tier] ?? 0 }));
+
+    return res.json({ success: true, distribution });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+// ── Per-mandate Stats (S1-T11) ─────────────────────────────────────────────
+async function handleClientMandateStats(req: VercelRequest, res: VercelResponse) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+  const limit = Math.max(1, Math.min(50, Number(req.query.limit ?? 20)));
+
+  try {
+    const { mandateMeta, presented } = await loadClientPresentedContacts(user.id);
+
+    // Aggregate per mandate
+    type Acc = {
+      mandate_id: string;
+      mandate_title: string;
+      company_name: string | null;
+      total_candidates: number;
+      scores: number[];
+      gold_count: number;
+      silver_count: number;
+      bronze_count: number;
+      unranked_count: number;
+    };
+    const byMandate = new Map<string, Acc>();
+
+    for (const mid of mandateMeta.keys()) {
+      const meta = mandateMeta.get(mid)!;
+      byMandate.set(mid, {
+        mandate_id: mid,
+        mandate_title: meta.title,
+        company_name: meta.company_name,
+        total_candidates: 0,
+        scores: [],
+        gold_count: 0, silver_count: 0, bronze_count: 0, unranked_count: 0,
+      });
+    }
+
+    // Dedup candidates per mandate → single count + single tier
+    const seen = new Set<string>(); // key = mandate_id|contact_id
+    for (const row of presented) {
+      const key = `${row.mandate_id}|${row.contact_id}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const acc = byMandate.get(row.mandate_id);
+      if (!acc) continue;
+      acc.total_candidates += 1;
+      acc.scores.push(row.score);
+      if (row.tier === 'Gold') acc.gold_count += 1;
+      else if (row.tier === 'Silver') acc.silver_count += 1;
+      else if (row.tier === 'Bronze') acc.bronze_count += 1;
+      else acc.unranked_count += 1;
+    }
+
+    const stats = Array.from(byMandate.values())
+      .map(a => {
+        const avg = a.scores.length > 0
+          ? Math.round((a.scores.reduce((s, v) => s + v, 0) / a.scores.length) * 10) / 10
+          : 0;
+        return {
+          mandate_id: a.mandate_id,
+          mandate_title: a.mandate_title,
+          company_name: a.company_name,
+          total_candidates: a.total_candidates,
+          avg_score: avg,
+          gold_count: a.gold_count,
+          silver_count: a.silver_count,
+          bronze_count: a.bronze_count,
+          unranked_count: a.unranked_count,
+        };
+      })
+      .sort((a, b) => b.total_candidates - a.total_candidates || b.avg_score - a.avg_score)
+      .slice(0, limit);
+
+    return res.json({ success: true, stats });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+// ── Mandate × Stage Heatmap (S1-T12) ───────────────────────────────────────
+async function handleClientHeatmap(req: VercelRequest, res: VercelResponse) {
+  const { user, error } = await getUserFromRequest(req);
+  if (error || !user) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+  const limit = Math.max(5, Math.min(50, Number(req.query.limit ?? 30)));
+
+  try {
+    const STAGES = ['New', 'Sourcing', 'Screening', 'Shortlisted', 'Presented', 'Interview', 'Offer', 'Hired'];
+    const { mandateMeta, presented } = await loadClientPresentedContacts(user.id);
+
+    // Count unique candidates per (mandate, stage). Since contacts can have
+    // one current_stage, dedup is via (mandate_id, contact_id, stage) but
+    // the same candidate rarely appears twice under the same stage.
+    const cellKey = new Map<string, Set<string>>(); // key = mid|stage → set of contact_ids
+
+    for (const row of presented) {
+      const k = `${row.mandate_id}|${row.stage}`;
+      if (!cellKey.has(k)) cellKey.set(k, new Set());
+      cellKey.get(k)!.add(row.contact_id);
+    }
+
+    // Mandate rows → ordered by total candidates desc
+    const mandateTotals = new Map<string, number>();
+    for (const mid of mandateMeta.keys()) {
+      let total = 0;
+      for (const stage of STAGES) {
+        total += cellKey.get(`${mid}|${stage}`)?.size ?? 0;
+      }
+      mandateTotals.set(mid, total);
+    }
+
+    const orderedMandateIds = Array.from(mandateMeta.keys())
+      .sort((a, b) => (mandateTotals.get(b) ?? 0) - (mandateTotals.get(a) ?? 0))
+      .slice(0, limit);
+
+    const mandates = orderedMandateIds.map(mid => {
+      const meta = mandateMeta.get(mid)!;
+      return { id: mid, title: meta.title, company_name: meta.company_name, total: mandateTotals.get(mid) ?? 0 };
+    });
+
+    // Build flat rows + totals_by_x + max_cell
+    const rows: Array<{ mandate_id: string; stage: string; count: number }> = [];
+    const totals_by_mandate: Record<string, number> = {};
+    const totals_by_stage: Record<string, number> = {};
+    let max_cell = 0;
+
+    for (const mid of orderedMandateIds) {
+      let mTotal = 0;
+      for (const stage of STAGES) {
+        const count = cellKey.get(`${mid}|${stage}`)?.size ?? 0;
+        rows.push({ mandate_id: mid, stage, count });
+        mTotal += count;
+        totals_by_stage[stage] = (totals_by_stage[stage] ?? 0) + count;
+        if (count > max_cell) max_cell = count;
+      }
+      totals_by_mandate[mid] = mTotal;
+    }
+
+    const total_candidates = Object.values(totals_by_stage).reduce((s, v) => s + v, 0);
+
+    return res.json({
+      success: true,
+      stages: STAGES,
+      mandates,
+      rows,
+      totals_by_mandate,
+      totals_by_stage,
+      max_cell,
+      total_candidates,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
   }
 }
