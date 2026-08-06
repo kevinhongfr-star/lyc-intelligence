@@ -661,3 +661,260 @@ async function handleSubscriptionDeleted(subscription: any) {
 export async function webhookHandler(req: VercelRequest, res: VercelResponse) {
   return handleStripe(req, res);
 }
+
+// ─── Extended Stripe integration (Phase 5.5) ───────────────────────
+
+import { TIER_CONFIG, type TierKey } from './tierConfig.js';
+
+const STRIPE_API_BASE = 'https://api.stripe.com';
+
+export const STRIPE_PRODUCT_IDS: Record<TierKey, string> = {
+  explorer: process.env.STRIPE_PRODUCT_EXPLORER || '',
+  starter: process.env.STRIPE_PRODUCT_STARTER || '',
+  pro: process.env.STRIPE_PRODUCT_PRO || '',
+  executive: process.env.STRIPE_PRODUCT_EXECUTIVE || '',
+  council: process.env.STRIPE_PRODUCT_COUNCIL || '',
+};
+
+export const STRIPE_PRICE_IDS: Record<TierKey, Record<'monthly' | 'annual', string>> = {
+  explorer: {
+    monthly: process.env.STRIPE_PRICE_EXPLORER_MONTHLY || '',
+    annual: process.env.STRIPE_PRICE_EXPLORER_ANNUAL || '',
+  },
+  starter: {
+    monthly: process.env.STRIPE_PRICE_STARTER_MONTHLY || '',
+    annual: process.env.STRIPE_PRICE_STARTER_ANNUAL || '',
+  },
+  pro: {
+    monthly: process.env.STRIPE_PRICE_PRO_MONTHLY || '',
+    annual: process.env.STRIPE_PRICE_PRO_ANNUAL || '',
+  },
+  executive: {
+    monthly: process.env.STRIPE_PRICE_EXECUTIVE_MONTHLY || '',
+    annual: process.env.STRIPE_PRICE_EXECUTIVE_ANNUAL || '',
+  },
+  council: {
+    monthly: process.env.STRIPE_PRICE_COUNCIL_MONTHLY || '',
+    annual: process.env.STRIPE_PRICE_COUNCIL_ANNUAL || '',
+  },
+};
+
+export type BillingCycle = 'monthly' | 'annual';
+
+async function stripeApiRaw(method: string, path: string, body?: Record<string, unknown>): Promise<any> {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+    'Content-Type': 'application/x-www-form-urlencoded',
+  };
+  const res = await fetch(`${STRIPE_API_BASE}${path}`, {
+    method,
+    headers,
+    body: body ? new URLSearchParams(body as any).toString() : undefined,
+  });
+  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(json.message || `Stripe API error: ${res.status}`);
+  }
+  return json;
+}
+
+export async function createCheckoutSession(
+  orgId: string,
+  tier: TierKey,
+  billingCycle: BillingCycle = 'monthly'
+): Promise<{ url: string; sessionId: string }> {
+  const priceId = STRIPE_PRICE_IDS[tier]?.[billingCycle];
+  if (!priceId) {
+    throw new Error(`No Stripe price ID configured for tier "${tier}" (${billingCycle})`);
+  }
+
+  const session = await stripeApiRaw('POST', '/v1/checkout/sessions', {
+    'payment_method_types[0]': 'card',
+    'line_items[0][price]': priceId,
+    'line_items[0][quantity]': '1',
+    mode: 'subscription',
+    'metadata[org_id]': orgId,
+    'metadata[tier]': tier,
+    'metadata[billing_cycle]': billingCycle,
+    success_url: `${process.env.APP_URL || 'http://localhost:3000'}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.APP_URL || 'http://localhost:3000'}/billing/canceled`,
+    allow_promotion_codes: 'true',
+  });
+
+  return { url: session.url, sessionId: session.id };
+}
+
+export async function handleStripeWebhook(event: any): Promise<void> {
+  if (!event || !event.type) {
+    throw new Error('Invalid webhook event');
+  }
+
+  switch (event.type) {
+    case 'customer.subscription.created':
+    case 'customer.subscription.updated':
+      await processSubscriptionEvent(event.data.object, event.type);
+      break;
+    case 'customer.subscription.deleted':
+      await processSubscriptionDeleted(event.data.object);
+      break;
+    case 'invoice.payment_failed':
+      await processPaymentFailed(event.data.object);
+      break;
+    case 'invoice.payment_succeeded':
+      await processPaymentSucceeded(event.data.object);
+      break;
+    default:
+      break;
+  }
+}
+
+async function processSubscriptionEvent(subscription: any, eventType: string): Promise<void> {
+  const customerId = subscription.customer;
+  const priceId = subscription.items?.data?.[0]?.price?.id;
+
+  let tier: TierKey = 'explorer';
+  for (const [tierKey, prices] of Object.entries(STRIPE_PRICE_IDS)) {
+    if (prices.monthly === priceId || prices.annual === priceId) {
+      tier = tierKey as TierKey;
+      break;
+    }
+  }
+
+  const profile = await db.selectOne('profiles', {
+    column: 'stripe_customer_id',
+    value: customerId,
+    select: 'id',
+  });
+
+  if (!profile) return;
+
+  const updates: Record<string, unknown> = {
+    stripe_subscription_status: subscription.status,
+    stripe_subscription_id: subscription.id,
+    tier: subscription.status === 'active' ? tier : 'explorer',
+  };
+
+  await db.update('profiles', { column: 'id', value: profile.id }, updates);
+}
+
+async function processSubscriptionDeleted(subscription: any): Promise<void> {
+  const customerId = subscription.customer;
+  const profile = await db.selectOne('profiles', {
+    column: 'stripe_customer_id',
+    value: customerId,
+    select: 'id',
+  });
+  if (!profile) return;
+
+  await db.update('profiles', { column: 'id', value: profile.id }, {
+    tier: 'explorer',
+    stripe_subscription_status: 'canceled',
+  });
+}
+
+async function processPaymentFailed(invoice: any): Promise<void> {
+  const customerId = invoice.customer;
+  const profile = await db.selectOne('profiles', {
+    column: 'stripe_customer_id',
+    value: customerId,
+    select: 'id',
+  });
+  if (!profile) return;
+
+  await db.update('profiles', { column: 'id', value: profile.id }, {
+    stripe_subscription_status: 'past_due',
+  });
+}
+
+async function processPaymentSucceeded(invoice: any): Promise<void> {
+  const customerId = invoice.customer;
+  const profile = await db.selectOne('profiles', {
+    column: 'stripe_customer_id',
+    value: customerId,
+    select: 'id',
+  });
+  if (!profile) return;
+
+  await db.insert('credit_transactions', {
+    user_id: profile.id,
+    amount: 0,
+    transaction_type: 'earn_credit',
+    description: `Subscription payment received: $${(invoice.amount_paid || 0) / 100}`,
+    stripe_session_id: invoice.id,
+  });
+}
+
+export async function cancelSubscription(subscriptionId: string): Promise<{ canceled: boolean; proratedAmount?: number }> {
+  const subscription = await stripeApiRaw('GET', `/v1/subscriptions/${subscriptionId}`);
+
+  const canceled = await stripeApiRaw('DELETE', `/v1/subscriptions/${subscriptionId}`);
+
+  return {
+    canceled: canceled.status === 'canceled',
+    proratedAmount: canceled.proration_date ? undefined : undefined,
+  };
+}
+
+export async function upgradeSubscription(subscriptionId: string, newTier: TierKey): Promise<{ upgraded: boolean; newPriceId?: string }> {
+  const subscription = await stripeApiRaw('GET', `/v1/subscriptions/${subscriptionId}`);
+  const currentItemId = subscription.items?.data?.[0]?.id;
+
+  const newPriceId = STRIPE_PRICE_IDS[newTier]?.monthly;
+  if (!newPriceId) {
+    throw new Error(`No Stripe monthly price ID for tier "${newTier}"`);
+  }
+
+  const updated = await stripeApiRaw('POST', `/v1/subscriptions/${subscriptionId}`, {
+    'items[0][id]': currentItemId,
+    'items[0][price]': newPriceId,
+    proration_behavior: 'prorate',
+  });
+
+  return {
+    upgraded: updated.status === 'active' || updated.status === 'past_due',
+    newPriceId,
+  };
+}
+
+export async function getSubscriptionStatus(customerId: string): Promise<{
+  status: string;
+  tier: TierKey;
+  subscriptionId: string | null;
+  currentPeriodEnd: number | null;
+  cancelAtPeriodEnd: boolean;
+}> {
+  const subscriptions = await stripeApiRaw('GET', `/v1/subscriptions`, {
+    customer: customerId,
+    status: 'all',
+    limit: '1',
+  });
+
+  if (!subscriptions.data || subscriptions.data.length === 0) {
+    return {
+      status: 'none',
+      tier: 'explorer',
+      subscriptionId: null,
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+    };
+  }
+
+  const sub = subscriptions.data[0];
+  const priceId = sub.items?.data?.[0]?.price?.id;
+
+  let tier: TierKey = 'explorer';
+  for (const [tierKey, prices] of Object.entries(STRIPE_PRICE_IDS)) {
+    if (prices.monthly === priceId || prices.annual === priceId) {
+      tier = tierKey as TierKey;
+      break;
+    }
+  }
+
+  return {
+    status: sub.status,
+    tier,
+    subscriptionId: sub.id,
+    currentPeriodEnd: sub.current_period_end || null,
+    cancelAtPeriodEnd: sub.cancel_at_period_end || false,
+  };
+}
