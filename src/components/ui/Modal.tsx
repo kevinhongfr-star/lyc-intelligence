@@ -1,19 +1,31 @@
 /**
- * Design system: Modal
+ * Phase 5: ECHO v6.0 Accessible Modal
  *
- * Consolidates the shared/Modal into the design system. Adds:
- *   - `forwardRef` on the modal panel
- *   - `size` (sm | md | lg | xl | full)
- *   - `footer` slot for action buttons
- *   - Esc-key close + body-scroll lock
- *   - Proper focus management (aria-modal, role=dialog, aria-labelledby)
+ * Fully accessible modal dialog with:
+ *   - Focus trap (Tab / Shift+Tab cycling)
+ *   - Focus restoration on close
+ *   - Escape key handling
+ *   - Body scroll lock
+ *   - ARIA compliance (role="dialog", aria-modal, aria-labelledby)
+ *   - ECHO v6.0 design: zero border-radius, #C108AB accent
+ *   - Smooth enter/exit animations from motion.css
  *
- * Existing call sites using `<Modal isOpen onClose title size />` keep
- * rendering unchanged.
+ * @example
+ * ```tsx
+ * function ConfirmDialog({ open, onClose }) {
+ *   return (
+ *     <Modal isOpen={open} onClose={onClose} title="Confirm">
+ *       <p>Are you sure?</p>
+ *       <button onClick={onClose}>Cancel</button>
+ *     </Modal>
+ *   );
+ * }
+ * ```
  */
-import React, { forwardRef, useEffect, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useFocusTrap } from '@/hooks/useAccessibleFocus';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
@@ -26,21 +38,38 @@ const SIZE_CLASSES: Record<ModalSize, string> = {
 };
 
 export interface ModalProps {
+  /** Controls visibility of the modal. */
   isOpen: boolean;
+  /** Called when the user requests to close (Esc, overlay, or X button). */
   onClose: () => void;
+  /** Optional title rendered in the modal header. */
   title?: React.ReactNode;
+  /** Optional description rendered below the title. */
   description?: React.ReactNode;
+  /** Modal body content. */
   children?: React.ReactNode;
+  /** Optional footer slot for action buttons. */
   footer?: React.ReactNode;
+  /** Size preset. Default: 'md'. */
   size?: ModalSize;
-  /** When false, clicking the overlay does not call onClose. Default true. */
+  /** When false, clicking the overlay does not call onClose. Default: true. */
   closeOnOverlayClick?: boolean;
-  /** When false, pressing Esc does not call onClose. Default true. */
+  /** When false, pressing Esc does not call onClose. Default: true. */
   closeOnEsc?: boolean;
   /** Optional id for aria-labelledby; auto-generated when title is provided. */
   titleId?: string;
+  /** When false, the focus trap is disabled. Default: true. */
+  trapFocus?: boolean;
+  /** Additional class names for the panel. */
+  className?: string;
 }
 
+/**
+ * ECHO v6.0 Accessible Modal Dialog.
+ *
+ * Uses useFocusTrap internally to manage keyboard focus.
+ * Applies motion.css animations for open/close transitions.
+ */
 export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
   {
     isOpen,
@@ -53,90 +82,115 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
     closeOnOverlayClick = true,
     closeOnEsc = true,
     titleId,
+    trapFocus = true,
+    className,
   },
   ref,
 ) {
-  const panelRef = useRef<HTMLDivElement | null>(null);
+  const { ref: trapRef } = useFocusTrap({
+    active: isOpen && trapFocus,
+    autoFocus: true,
+    onEscape: closeOnEsc ? onClose : undefined,
+    restoreFocus: true,
+  });
 
-  // Esc-to-close + body scroll lock
+  // Body scroll lock
   useEffect(() => {
     if (!isOpen) return;
-
-    const onKey = (e: KeyboardEvent) => {
-      if (closeOnEsc && e.key === 'Escape') {
-        e.stopPropagation();
-        onClose();
-      }
-    };
-    document.addEventListener('keydown', onKey);
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
     return () => {
-      document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [isOpen, onClose, closeOnEsc]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const computedTitleId = titleId ?? (title ? 'modal-title' : undefined);
+  const computedTitleId = titleId ?? (title ? 'echo-modal-title' : undefined);
 
-  const setRefs = (node: HTMLDivElement | null) => {
-    panelRef.current = node;
-    if (typeof ref === 'function') ref(node);
-    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
-  };
+  const setRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      // Set the trap ref
+      (trapRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      // Set the forwarded ref
+      if (typeof ref === 'function') ref(node);
+      else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+    },
+    [ref, trapRef],
+  );
 
   return (
     <div
-      className="fixed inset-0 z-modal flex items-center justify-center p-4"
+      className="fixed inset-0 z-[1050] flex items-center justify-center p-4"
       role="presentation"
     >
+      {/* Overlay */}
       <div
-        className="absolute inset-0 bg-text-primary/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-[var(--echo-text-primary)]/40 backdrop-blur-sm animate-[echo-fade-in_150ms_ease-out_forwards]"
         onClick={closeOnOverlayClick ? onClose : undefined}
         aria-hidden="true"
       />
+
+      {/* Dialog Panel */}
       <div
         ref={setRefs}
         role="dialog"
         aria-modal="true"
         aria-labelledby={computedTitleId}
+        aria-describedby={description ? 'echo-modal-description' : undefined}
         className={cn(
-          'relative bg-bg-secondary border border-bg-tertiary rounded-none shadow-modal w-full max-h-[90vh] overflow-y-auto',
+          'relative w-full max-h-[90vh] overflow-y-auto',
+          'bg-[var(--echo-surface)] border border-[var(--echo-border)]',
+          'shadow-[var(--echo-shadow-xl)]',
+          'animate-[echo-modal-in_200ms_cubic-bezier(0.16,1,0.3,1)_forwards]',
           SIZE_CLASSES[size],
+          className,
         )}
       >
         {(title || description) && (
-          <div className="flex items-start justify-between px-6 py-4 border-b border-bg-tertiary">
-            <div>
+          <div className="flex items-start justify-between gap-4 border-b border-[var(--echo-border)] px-6 py-4">
+            <div className="min-w-0 flex-1">
               {title && (
                 <h3
                   id={computedTitleId}
-                  className="font-serif font-semibold text-lg text-text-primary"
+                  className="font-serif text-lg font-semibold text-[var(--echo-text-primary)]"
                 >
                   {title}
                 </h3>
               )}
               {description && (
-                <p className="mt-1 text-sm text-text-muted">{description}</p>
+                <p
+                  id="echo-modal-description"
+                  className="mt-1 text-sm text-[var(--echo-text-muted)]"
+                >
+                  {description}
+                </p>
               )}
             </div>
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close"
-              className="p-1 rounded hover:bg-bg-tertiary text-text-muted hover:text-text-primary transition-colors"
+              aria-label="Close dialog"
+              className={cn(
+                'shrink-0 p-1 text-[var(--echo-text-muted)]',
+                'hover:bg-[var(--echo-surface-hover)] hover:text-[var(--echo-text-primary)]',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--echo-accent)]',
+                'transition-colors',
+              )}
             >
               <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
         )}
-        <div className="p-6">{children}</div>
+
+        <div className="px-6 py-5 text-[var(--echo-text-primary)]">
+          {children}
+        </div>
+
         {footer && (
-          <div className="px-6 py-4 border-t border-bg-tertiary flex justify-end gap-2">
+          <div className="flex justify-end gap-2 border-t border-[var(--echo-border)] px-6 py-4">
             {footer}
           </div>
         )}

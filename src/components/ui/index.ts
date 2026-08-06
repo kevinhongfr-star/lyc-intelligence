@@ -60,6 +60,13 @@ export type { ProgressProps, ProgressVariant, ProgressSize } from './Progress';
 export { ToastProvider, useToast, toast } from './Toast';
 export type { ToastHelpers, ToastType } from './Toast';
 
+// Phase 5: Design Excellence — ECHO v6.0
+export { ThemeToggle } from './ThemeToggle';
+export type { ThemeToggleProps } from './ThemeToggle';
+
+export { LoadingSpinner } from './LoadingSpinner';
+export type { LoadingSpinnerProps, SpinnerSize, SpinnerVariant } from './LoadingSpinner';
+
 // Existing specialized components (kept for backwards compat)
 export { UpgradeBanner } from './UpgradeBanner';
 export { CreditDisplay } from './CreditDisplay';

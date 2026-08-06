@@ -522,6 +522,10 @@ html {
 }
 
 
+/* ── Phase 5: ECHO v6.0 Design Excellence ── */
+@import './styles/motion.css';
+@import './styles/dark-mode.css';
+
 /* ── LYC Brand Keyframe Animations ── */
 
 /* CTA Glow — signature fuchsia pulse on primary buttons */

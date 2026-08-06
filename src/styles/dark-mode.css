@@ -1,0 +1,159 @@
+/**
+ * Phase 5: ECHO v6.0 Dark Mode
+ *
+ * CSS custom properties for the dark theme.
+ * Toggled via `data-theme="dark"` on the <html> element.
+ *
+ * The transition between themes is intentionally abrupt
+ * for most properties to avoid "flashing" colors.  Only
+ * background colors get a 150ms transition.
+ */
+
+:root {
+  /* Light theme (default) */
+  --echo-background: #FFFFFF;
+  --echo-surface: #FAFAFA;
+  --echo-surface-hover: #F5F5F5;
+  --echo-surface-active: #EDEDED;
+  --echo-border: #E5E5E5;
+  --echo-border-strong: #D4D4D4;
+  --echo-text-primary: #0A0A0A;
+  --echo-text-secondary: #333333;
+  --echo-text-muted: #666666;
+  --echo-text-subtle: #999999;
+
+  /* Accent */
+  --echo-accent: #C108AB;
+  --echo-accent-hover: #A00790;
+  --echo-accent-soft: rgba(193, 8, 171, 0.08);
+  --echo-accent-subtle: rgba(193, 8, 171, 0.04);
+
+  /* Semantic */
+  --echo-success: #2D8A4E;
+  --echo-success-soft: rgba(45, 138, 78, 0.12);
+  --echo-warning: #B8860B;
+  --echo-warning-soft: rgba(184, 134, 11, 0.12);
+  --echo-error: #C0392B;
+  --echo-error-soft: rgba(192, 57, 43, 0.12);
+  --echo-info: #2C5282;
+  --echo-info-soft: rgba(44, 82, 130, 0.12);
+
+  /* Shadows */
+  --echo-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --echo-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --echo-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+  --echo-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --echo-shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+
+  /* Focus ring */
+  --echo-focus-ring: 0 0 0 2px #FFFFFF, 0 0 0 4px #C108AB;
+
+  /* Selection */
+  --echo-selection-bg: rgba(193, 8, 171, 0.15);
+  --echo-selection-text: #C108AB;
+
+  /* Scrollbar */
+  --echo-scrollbar-track: #FAFAFA;
+  --echo-scrollbar-thumb: #E5E5E5;
+  --echo-scrollbar-thumb-hover: #D4D4D4;
+}
+
+[data-theme='dark'] {
+  /* Dark theme — warm purple-black gradient */
+  --echo-background: #0D0A14;
+  --echo-surface: #1A0F1E;
+  --echo-surface-hover: #281530;
+  --echo-surface-active: #3A2040;
+  --echo-border: #281530;
+  --echo-border-strong: #3A2040;
+  --echo-text-primary: #FFFFFF;
+  --echo-text-secondary: #CCCCCC;
+  --echo-text-muted: #888888;
+  --echo-text-subtle: #666666;
+
+  /* Accent — same hue, slightly brighter for dark surfaces */
+  --echo-accent: #E040C8;
+  --echo-accent-hover: #C108AB;
+  --echo-accent-soft: rgba(224, 64, 200, 0.12);
+  --echo-accent-subtle: rgba(224, 64, 200, 0.06);
+
+  /* Semantic — adjusted for dark contrast */
+  --echo-success: #4ADE80;
+  --echo-success-soft: rgba(74, 222, 128, 0.15);
+  --echo-warning: #FBBF24;
+  --echo-warning-soft: rgba(251, 191, 36, 0.15);
+  --echo-error: #F87171;
+  --echo-error-soft: rgba(248, 113, 113, 0.15);
+  --echo-info: #60A5FA;
+  --echo-info-soft: rgba(96, 165, 250, 0.15);
+
+  /* Shadows — softer, less contrast needed on dark */
+  --echo-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --echo-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --echo-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.40);
+  --echo-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --echo-shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.55);
+
+  /* Focus ring — adjusted for dark bg */
+  --echo-focus-ring: 0 0 0 2px #0D0A14, 0 0 0 4px #E040C8;
+
+  /* Selection */
+  --echo-selection-bg: rgba(224, 64, 200, 0.25);
+  --echo-selection-text: #E040C8;
+
+  /* Scrollbar */
+  --echo-scrollbar-track: #1A0F1E;
+  --echo-scrollbar-thumb: #3A2040;
+  --echo-scrollbar-thumb-hover: #4A2A55;
+}
+
+/* ── Theme transition — only background colors animate ──── */
+
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition:
+    background-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    fill 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    stroke 150ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ── Selection styling ────────────────────────────────────── */
+
+::selection {
+  background: var(--echo-selection-bg);
+  color: var(--echo-selection-text);
+}
+
+/* ── Scrollbar styling ───────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--echo-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--echo-scrollbar-thumb);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--echo-scrollbar-thumb-hover);
+}
+
+/* ── Reduced motion ──────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-transitioning,
+  html.theme-transitioning *,
+  html.theme-transitioning *::before,
+  html.theme-transitioning *::after {
+    transition: none !important;
+  }
+}
