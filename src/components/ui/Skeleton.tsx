@@ -96,7 +96,7 @@ function AvatarSkeleton({ animation, className }: { animation: SkeletonAnimation
 
 export function Skeleton({
   variant = 'block',
-  animation = 'shimmer',
+  animation = 'pulse',
   circle = false,
   rows,
   width,
