@@ -13,10 +13,6 @@
 
 // ── Type Scale (12-step) ───────────────────────────────────────
 
-/**
- * 12-step type scale with per-role font-size, line-height,
- * letter-spacing, and font-weight pairings.
- */
 export const TYPE_SCALE = {
   font: {
     sans: "'DM Sans', system-ui, -apple-system, sans-serif",
@@ -103,10 +99,6 @@ export type TypeScaleRole = keyof typeof TYPE_SCALE.scale;
 
 // ── Density Presets ────────────────────────────────────────────
 
-/**
- * Three density modes that adjust padding, line-height, and icon size
- * across the entire UI. Driven by user preference.
- */
 export const DENSITY_PRESETS = {
   comfortable: {
     padding: {
@@ -153,9 +145,6 @@ export type DensityMode = keyof typeof DENSITY_PRESETS;
 
 // ── Spacing (8 px base scale) ──────────────────────────────────
 
-/**
- * 8px-based spacing scale. Values in pixels.
- */
 export const SPACING = {
   '4': '4px',
   '8': '8px',
@@ -172,10 +161,6 @@ export type SpacingKey = keyof typeof SPACING;
 
 // ── Semantic Color Scales (10-step: 50–900) ────────────────────
 
-/**
- * 10-step color scales for each semantic family.
- * Step 50 is lightest, 900 is darkest.
- */
 export const SEMANTIC_COLORS = {
   primary: {
     50:  '#FDF4FC',
@@ -256,10 +241,6 @@ export type SemanticColorStep = keyof (typeof SEMANTIC_COLORS)[SemanticColorFami
 
 // ── Semantic Token Layer (Light) ───────────────────────────────
 
-/**
- * Maps semantic intent to concrete color values.
- * Light theme defaults. Dark theme has its own DARK_MODE_SEMANTIC.
- */
 export const SEMANTIC_TOKENS = {
   bg: {
     page: '#FFFFFF',
@@ -297,10 +278,6 @@ export const SEMANTIC_TOKENS = {
 
 // ── Dark Mode Semantic Tokens ──────────────────────────────────
 
-/**
- * Independent dark theme tokens — not a simple inversion.
- * Warm purple-black gradient matches the ECHO brand aesthetic.
- */
 export const DARK_MODE_SEMANTIC = {
   bg: {
     page: '#0D0A14',
@@ -338,9 +315,6 @@ export const DARK_MODE_SEMANTIC = {
 
 // ── Alpha Channel Tokens ───────────────────────────────────────
 
-/**
- * Pre-defined alpha channels for overlays, shadows, and glass-morphism.
- */
 export const ALPHA_CHANNELS = {
   overlay: {
     light: 'rgba(0, 0, 0, 0.5)',
@@ -377,20 +351,6 @@ export const ALPHA_CHANNELS = {
 
 // ── Motion Tokens ──────────────────────────────────────────────
 
-/**
- * Motion system: duration tiers and easing functions.
- *
- * Duration tiers:
- *   micro   — 80–120ms  (focus, hover, small state changes)
- *   standard — 200–300ms (page transitions, expand/collapse)
- *   complex — 400–600ms (modal entrances, full-screen transitions)
- *
- * Easing system:
- *   standard  — ease-out (most transitions)
- *   enter     — ease-out-back (objects entering the screen)
- *   exit      — ease-in (objects leaving the screen)
- *   emphasize — ease-in-out (important, attention-grabbing motion)
- */
 export const MOTION = {
   duration: {
     micro: {
@@ -419,12 +379,71 @@ export const MOTION = {
 export type MotionDurationTier = keyof typeof MOTION.duration;
 export type MotionEasingName = keyof typeof MOTION.easing;
 
+// ── Shadow Tokens ─────────────────────────────────────────────
+
+export const SHADOWS = {
+  none: 'none',
+  xs: '0 1px 2px rgba(0, 0, 0, 0.04)',
+  sm: '0 1px 3px rgba(0, 0, 0, 0.08)',
+  md: '0 4px 12px rgba(0, 0, 0, 0.1)',
+  lg: '0 8px 24px rgba(0, 0, 0, 0.12)',
+  xl: '0 16px 48px rgba(0, 0, 0, 0.16)',
+  '2xl': '0 24px 64px rgba(0, 0, 0, 0.2)',
+  accent: '0 0 0 3px rgba(193, 8, 171, 0.25)',
+} as const;
+
+export type ShadowKey = keyof typeof SHADOWS;
+
+// ── Z-Index Tokens ──────────────────────────────────────────────
+
+export const Z_INDEX = {
+  hide: -1,
+  base: 0,
+  dropdown: 1000,
+  sticky: 1020,
+  fixed: 1030,
+  modalBackdrop: 1040,
+  modal: 1050,
+  popover: 1060,
+  tooltip: 1070,
+  toast: 1080,
+} as const;
+
+export type ZIndexKey = keyof typeof Z_INDEX;
+
+// ── Breakpoints ────────────────────────────────────────────────
+
+export const BREAKPOINTS = {
+  sm: 640,
+  md: 768,
+  lg: 1024,
+  xl: 1280,
+  '2xl': 1536,
+} as const;
+
+export type BreakpointKey = keyof typeof BREAKPOINTS;
+
+// ── Opacity Scale ──────────────────────────────────────────────
+
+export const OPACITY = {
+  0: 0,
+  5: 0.05,
+  8: 0.08,
+  10: 0.1,
+  12: 0.12,
+  15: 0.15,
+  20: 0.2,
+  25: 0.25,
+  40: 0.4,
+  50: 0.5,
+  60: 0.6,
+  75: 0.75,
+  80: 0.8,
+  100: 1,
+} as const;
+
 // ── Legacy Exports (backward compat) ──────────────────────────
 
-/**
- * @deprecated Use TYPE_SCALE, SPACING, SEMANTIC_COLORS, etc. directly.
- * Kept for backward compatibility with existing component imports.
- */
 export const COLORS = {
   accent: '#C108AB',
   accentHover: '#A00790',
@@ -468,61 +487,6 @@ export const COLORS = {
 } as const;
 
 export type ColorKey = keyof typeof COLORS;
-
-export const SHADOWS = {
-  none: 'none',
-  xs: '0 1px 2px rgba(0, 0, 0, 0.04)',
-  sm: '0 1px 3px rgba(0, 0, 0, 0.08)',
-  md: '0 4px 12px rgba(0, 0, 0, 0.1)',
-  lg: '0 8px 24px rgba(0, 0, 0, 0.12)',
-  xl: '0 16px 48px rgba(0, 0, 0, 0.16)',
-  '2xl': '0 24px 64px rgba(0, 0, 0, 0.2)',
-  accent: '0 0 0 3px rgba(193, 8, 171, 0.25)',
-} as const;
-
-export type ShadowKey = keyof typeof SHADOWS;
-
-export const Z_INDEX = {
-  hide: -1,
-  base: 0,
-  dropdown: 1000,
-  sticky: 1020,
-  fixed: 1030,
-  modalBackdrop: 1040,
-  modal: 1050,
-  popover: 1060,
-  tooltip: 1070,
-  toast: 1080,
-} as const;
-
-export type ZIndexKey = keyof typeof Z_INDEX;
-
-export const BREAKPOINTS = {
-  sm: 640,
-  md: 768,
-  lg: 1024,
-  xl: 1280,
-  '2xl': 1536,
-} as const;
-
-export type BreakpointKey = keyof typeof BREAKPOINTS;
-
-export const OPACITY = {
-  0: 0,
-  5: 0.05,
-  8: 0.08,
-  10: 0.1,
-  12: 0.12,
-  15: 0.15,
-  20: 0.2,
-  25: 0.25,
-  40: 0.4,
-  50: 0.5,
-  60: 0.6,
-  75: 0.75,
-  80: 0.8,
-  100: 1,
-} as const;
 
 export type SpacingKeyLegacy = string;
 
