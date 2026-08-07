@@ -74,6 +74,8 @@ const ScoringConfigPage = lazy(() => import('@/pages/internal/ScoringConfigPage'
 const KevinOversightDashboard = lazy(() => import('@/components/kevin/KevinOversightDashboard').then(m => ({ default: m.KevinOversightDashboard })));
 const ReportsPage = lazy(() => import('@/pages/ReportsPage').then(m => ({ default: m.ReportsPage })));
 const ReportDetailPage = lazy(() => import('@/pages/ReportDetailPage').then(m => ({ default: m.ReportDetailPage })));
+// ── Phase 7.5 Coaching Excellence (Coach route only) ──
+const CoachingPage = lazy(() => import('@/pages/CoachingPage').then(m => ({ default: m.CoachingPage })));
 
 // ── Candidate Portal pages (EO-4) ──
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
@@ -256,7 +258,8 @@ export default function App() {
           {/* ── B2C Coaching (mockup surface) ── */}
           <Route path="/coaching" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route index element={<Navigate to="coach" replace />} />
-            <Route path="coach" element={<PlaceholderPage title="Coach" />} />
+            {/* Phase 7.5 — primary coach route (integrated) */}
+            <Route path="coach" element={<CoachingPage />} />
             <Route path="credits" element={<PlaceholderPage title="Credits & Plans" />} />
             <Route path="intelligence" element={<PlaceholderPage title="B2C Intelligence" />} />
             <Route path="career-intel" element={<PlaceholderPage title="Career Intelligence" />} />
