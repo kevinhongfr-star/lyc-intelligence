@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>LYC Brand Rollout — Day 2 Status</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;700&family=DM+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root {
+  --ink: #0F1115; --fuchsia: #C108AB; --off: #F5F5F3; --white: #FFFFFF;
+  --g50: #F8F9FA; --g100: #F0F1F3; --g200: #E0E2E6; --g300: #C8CBD0;
+  --g500: #8A8F9A; --g700: #4A4E57; --g800: #2A2D35; --navy: #2C3E6B;
+  --green: #1E8449; --yellow: #D4AC0D; --red: #C0392B; --blue: #2874A6;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+@page { size: A4 portrait; margin: 0; }
+body { font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.7; color: var(--ink); background: var(--white); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 210mm; min-height: 297mm; padding: 36px 40px; page-break-after: always; position: relative; }
+.page-dark { background: var(--ink); color: var(--white); }
+.page-alt { background: var(--off); }
+h1 { font-family: 'Crimson Pro', serif; font-size: 28px; font-weight: 700; line-height: 1.25; margin-bottom: 12px; }
+h2 { font-family: 'Crimson Pro', serif; font-size: 18px; font-weight: 700; line-height: 1.3; margin-bottom: 10px; }
+h3 { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--g700); margin-bottom: 8px; }
+.page-dark h3 { color: var(--g300); }
+.section-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--g500); margin-bottom: 6px; }
+.page-dark .section-label { color: var(--g300); }
+.card { background: var(--g100); border-radius: 6px; padding: 16px 18px; }
+.page-dark .card { background: rgba(255,255,255,0.06); }
+.stat-number { font-family: 'Crimson Pro', serif; font-size: 32px; font-weight: 700; color: var(--fuchsia); line-height: 1; }
+.stat-label { font-size: 11px; color: var(--g500); margin-top: 4px; }
+.tag { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+.tag-pending { background: var(--g200); color: var(--g700); }
+.tag-inprogress { background: #FEF3C7; color: #92400E; }
+.tag-done { background: #D1FAE5; color: #065F46; }
+.tag-blocked { background: #FEE2E2; color: #991B1B; }
+.tag-critical { background: var(--fuchsia); color: white; }
+.progress-bar { height: 6px; background: var(--g200); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--fuchsia); border-radius: 3px; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--g500); padding: 6px 8px; border-bottom: 1px solid var(--g200); font-weight: 500; }
+td { padding: 8px; border-bottom: 1px solid var(--g100); vertical-align: top; }
+tr.kevin-row td { background: #FFFBEB; }
+.footer { position: absolute; bottom: 30px; left: 40px; right: 40px; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--g500); display: flex; justify-content: space-between; }
+.page-dark .footer { color: var(--g500); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+.check-list { list-style: none; }
+.check-list li { padding: 4px 0 4px 24px; position: relative; font-size: 12px; }
+.check-list li::before { content: "□"; position: absolute; left: 0; color: var(--g500); font-size: 14px; }
+.check-list li.done::before { content: "✓"; color: var(--green); }
+.check-list li.kevin { background: #FFFBEB; border-radius: 4px; margin: 2px 0; padding-left: 24px; }
+.divider { height: 1px; background: var(--g200); margin: 16px 0; }
+.page-dark .divider { background: rgba(255,255,255,0.1); }
+.callout { background: var(--g100); border-radius: 6px; padding: 14px 18px; }
+.page-dark .callout { background: rgba(255,255,255,0.06); }
+.fuchsia-text { color: var(--fuchsia); }
+</style></head><body>
+<div class="page page-dark">
+  <div class="section-label">LYC BRAND ROLLOUT — DAILY STATUS</div>
+  <h1 style="color: white;">Day 2 / 7 · August 7, 2026</h1>
+  <div style="font-size: 14px; color: var(--g300); margin-bottom: 24px;">
+    Day 1 foundation tasks in motion — Day 2 deliverables ramping up
+  </div>
+  
+  <div class="grid-4" style="margin-bottom: 24px;">
+    <div class="stat-box">
+      <div class="stat-number">33</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">3</div>
+      <div class="stat-label">Complete</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">12</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">2</div>
+      <div class="stat-label" style="color: #FCA5A5;">Blocked</div>
+    </div>
+  </div>
+  
+  <div style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+      <span class="section-label">OVERALL PROGRESS</span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--g300);">9%</span>
+    </div>
+    <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px;">
+      <div style="height: 100%; width: 9%; background: var(--fuchsia); border-radius: 4px;"></div>
+    </div>
+  </div>
+  
+  <div class="grid-2" style="margin-bottom: 20px;">
+    <div class="card" style="background: rgba(255,255,255,0.06);">
+      <div class="section-label">⭐ KEVIN — TODAY</div>
+      <ul class="check-list" style="color: white;">
+        <li style="color: var(--g200);">Set up Teams webinar, share link</li><li style="color: var(--g200);">Review + approve website copy + design</li><li style="color: var(--g200);">Review + approve LinkedIn profile copy</li><li style="color: var(--g200);">Review + approve deck v2</li>
+      </ul>
+    </div>
+    <div class="card" style="background: rgba(255,255,255,0.06);">
+      <div class="section-label">🚨 BLOCKERS</div>
+      <ul class="check-list" style="color: white;">
+        <li style="color: #FCA5A5;">Teams webinar link needed from you by Aug 8</li><li style="color: #FCA5A5;">Lark-cli auth resets every session (fixed via Python API)</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="card" style="background: rgba(255,255,255,0.06); margin-bottom: 20px;">
+    <div class="section-label">📅 WEBINAR #1 — MAIN TRACKED ITEM</div>
+    <h2 style="color: white; font-size: 15px; margin-bottom: 8px;">Your China Leaders Are Not in Your Global Succession Plan</h2>
+    <div style="font-size: 12px; color: var(--g300); margin-bottom: 10px;">
+      Aug 19, 2026 · 10:00 AM HKT · 12 days out
+    </div>
+    <div class="grid-3" style="gap: 10px;">
+      <div>
+        <div style="font-family: 'Crimson Pro', serif; font-size: 22px; color: var(--fuchsia); font-weight: 700;">0</div>
+        <div style="font-size: 10px; color: var(--g400, #9CA3AF);">Done</div>
+      </div>
+      <div>
+        <div style="font-family: 'Crimson Pro', serif; font-size: 22px; color: #FDE68A; font-weight: 700;">3</div>
+        <div style="font-size: 10px; color: var(--g400, #9CA3AF);">Active</div>
+      </div>
+      <div>
+        <div style="font-family: 'Crimson Pro', serif; font-size: 22px; color: #FCA5A5; font-weight: 700;">1</div>
+        <div style="font-size: 10px; color: var(--g400, #9CA3AF);">Blocked on you</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card" style="background: rgba(255,255,255,0.06);">
+    <div class="section-label">📋 TODAY'S FOCUS — ALL AGENTS</div>
+    <div class="grid-2" style="gap: 8px;">
+      <div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">ECHO</span> — Website core copy — all main pages</div><div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">Valentina</span> — Website core page designs</div><div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">Akira</span> — Site map + assessment naming audit</div><div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">LENS</span> — KPI Day 0 baseline snapshot</div><div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">Emily</span> — Brand constitution + checklist final</div><div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">James</span> — NEXUS endorsed brand audit prep</div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2</span>
+    <span>Emily · Brand Steward</span>
+  </div>
+</div>
+</body></html>
