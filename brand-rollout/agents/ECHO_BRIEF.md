@@ -34,6 +34,12 @@ You own the words. Every piece of LYC customer-facing copy must pass the brand c
 - [ ] **LinkedIn profiles — Kevin + Jaelyn + Claire + Joyce — new headline + About section**
   - Deliverable: Individual profile copy for each partner (headline, About section, experience bullet updates)
   - Each profile should position the person within "leadership intelligence" framing
+  - **Voice & Angle Framework (write profiles against this split):**
+    - **Kevin** — Principal voice. Sharp, calm, peer-to-peer, contrarian insight, no fluff. Angle: the "China gap" thesis — why global companies systematically misread China leadership, succession, and talent systems. Platform: Long-form LinkedIn articles + webinar keynote + board-level conversations. Authority: founder / strategic thinker.
+    - **Claire Jin** — Consumer & Luxury practice lead. Angle: luxury & consumer leadership in China — brand building, China market entry, retail transformation. Voice: more commercial, client-facing, case-study grounded. Platform: LinkedIn posts on luxury/consumer leadership trends, client case studies.
+    - **Joyce Wang** — Board & CEO practice. Angle: C-suite and board-level search — what great China CEOs look like, board composition, succession. Voice: precise, process-driven, candidate- and market-insight focused. Platform: LinkedIn data-driven posts, market observations, candidate benchmarking.
+    - **Jaelyn Zhan** — C-suite functional practice. Angle: functional leadership — CFO, COO, CHRO patterns in China, cross-border executive integration. Voice: more tactical, execution-focused, hands-on search insights. Platform: LinkedIn operational leadership posts, hiring playbooks.
+  - **One engine, many voices:** All four share the same positioning framework (leadership intelligence, 3-layer model, taxonomy rule) but each writes from their practice area. Kevin sets the strategic thesis; partners reinforce it with market evidence and client work examples from their sectors.
 
 ### Day 3 (Aug 8) — System Assets
 - [ ] **Service decks — all 3 service line decks rewritten with taxonomy rule**
