@@ -17,6 +17,7 @@ const SURFACES: Record<Surface, { tabs: { path: string; label: string }[] }> = {
       { path: '/app/pipeline', label: 'Pipeline' },
       { path: '/app/mandates', label: 'Mandates' },
       { path: '/app/scheduler', label: 'Scheduler' },
+      { path: '/app/reports', label: 'Reports' },
       { path: '/app/intelligence', label: 'Intelligence' },
       { path: '/app/team', label: 'Team' },
       { path: '/app/tasks', label: 'Tasks' },

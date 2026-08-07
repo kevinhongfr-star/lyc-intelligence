@@ -72,6 +72,8 @@ const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage').th
 const AdminRankingDashboard = lazy(() => import('@/pages/internal/AdminRankingDashboard').then(m => ({ default: m.AdminRankingDashboard })));
 const ScoringConfigPage = lazy(() => import('@/pages/internal/ScoringConfigPage').then(m => ({ default: m.ScoringConfigPage })));
 const KevinOversightDashboard = lazy(() => import('@/components/kevin/KevinOversightDashboard').then(m => ({ default: m.KevinOversightDashboard })));
+const ReportsPage = lazy(() => import('@/pages/ReportsPage').then(m => ({ default: m.ReportsPage })));
+const ReportDetailPage = lazy(() => import('@/pages/ReportDetailPage').then(m => ({ default: m.ReportDetailPage })));
 
 // ── Candidate Portal pages (EO-4) ──
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
@@ -218,6 +220,9 @@ export default function App() {
               {/* Revenue analytics (S6-T06) */}
               <Route path="revenue" element={<AdminRoute><RevenueAnalyticsPage /></AdminRoute>} />
               <Route path="intelligence" element={<PlaceholderPage title="Intelligence" />} />
+              {/* Phase 7 — Reports & Documents */}
+              <Route path="reports" element={<ReportsPage />} />
+              <Route path="reports/:id" element={<ReportDetailPage />} />
             </Route>
           )}
 
