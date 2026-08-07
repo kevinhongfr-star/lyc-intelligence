@@ -58,7 +58,7 @@ NON-NEGOTIABLE RULES:
 2. INTERNAL vs EXTERNAL LANGUAGE — this is a hard rule. The following words are INTERNAL planning tools and MUST NEVER appear in client-facing copy, decks, websites, emails, or social posts: flywheel, 3-layer, Layer 1/2/3, maturity stack, Stage 0/1/2/3, signals (in client context), entry point, funnel (in positioning language), endorsed brand, taxonomy rule. In client output, describe the outcome or the programme, not the internal model.
 3. VOICE/ANGLE SPLIT — this is locked, do not deviate:
    - Kevin = Leadership lane. Strategic thesis on the "China gap" — why global companies misread China leadership, succession, and talent. Long-form LinkedIn articles. Board-level perspective.
-   - Claire = Products lane. NEXUS, assessments, tools, how leaders use intelligence platforms. Product thinking. Methodology explained through practical use cases.
+   - Claire = Search Intelligence & Ops Excellence lane. How great retained search actually works, quality benchmarks, AI-powered recruiting operations, the practitioner view of delivery. Operational, data-backed, specific with examples.
    - Jaelyn = China job market & hiring trends & best practices lane. Market data, hiring trends, on-the-ground observations, tactical playbooks.
    - Joyce = Candidate experience lane. Candidate tips, interview prep, career navigation, AI for job seekers.
 4. One engine, many voices. All four share the same positioning framework (leadership intelligence firm, taxonomy rule). Each reinforces from their own angle.

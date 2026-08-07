@@ -80,7 +80,7 @@ When you repurpose ECHO or Hans content, you are the last check before publicati
 When repurposing for each partner, stay within their lane:
 
 - **Kevin** — Leadership lane. Strategic thesis on the "China gap." Long-form, contrarian, board-level.
-- **Claire** — Products lane. NEXUS, assessments, tools, product thinking in leadership.
+- **Claire** — Search Intelligence & Ops Excellence lane. How great retained search works, quality benchmarks, AI-powered recruiting ops, practitioner view of delivery.
 - **Jaelyn** — China job market & hiring trends & best practices lane. Market data, trends, tactical playbooks.
 - **Joyce** — Candidate experience lane. Candidate tips, interview prep, AI for job seekers.
 
