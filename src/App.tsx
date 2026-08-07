@@ -87,6 +87,14 @@ const ClientMandatesPage = lazy(() => import('@/pages/client/ClientMandatesPage'
 const ClientDocumentsPage = lazy(() => import('@/pages/client/ClientDocumentsPage').then(m => ({ default: m.ClientDocumentsPage })));
 const ClientPipelineAnalyticsPage = lazy(() => import('@/pages/client/ClientPipelineAnalyticsPage').then(m => ({ default: m.ClientPipelineAnalyticsPage })));
 
+// ── Phase 8 Client Portal ──
+const ClientShell = lazy(() => import('@/components/client/ClientShell').then(m => ({ default: m.ClientShell })));
+const ClientDashboard = lazy(() => import('@/pages/client/ClientDashboard').then(m => ({ default: m.ClientDashboard })));
+const CandidatePipeline = lazy(() => import('@/pages/client/CandidatePipeline').then(m => ({ default: m.CandidatePipeline })));
+const CandidateReview = lazy(() => import('@/pages/client/CandidateReview').then(m => ({ default: m.CandidateReview })));
+const ClientWorkflows = lazy(() => import('@/pages/client/ClientWorkflows').then(m => ({ default: m.ClientWorkflows })));
+const ClientEngagement = lazy(() => import('@/pages/client/ClientEngagement').then(m => ({ default: m.ClientEngagement })));
+
 // ── DEX AI B2C Portal pages (EO-5 / SPRINT 2) ──
 const DexLandingPage = lazy(() => import('@/pages/dex/DexLandingPage').then(m => ({ default: m.DexLandingPage })));
 const DexChatPage = lazy(() => import('@/pages/dex/DexChatPage').then(m => ({ default: m.DexChatPage })));
@@ -109,6 +117,18 @@ const RevenueAnalyticsPage = lazy(() => import('@/components/internal/RevenueAna
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const PlaceholderPage = lazy(() => import('@/pages/PlaceholderPage').then(m => ({ default: m.PlaceholderPage })));
+
+// ── Admin Portal pages (Phase 4) ──
+const AdminShell = lazy(() => import('@/components/admin/AdminShell').then(m => ({ default: m.default })));
+const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard').then(m => ({ default: m.default })));
+const AdminUsers = lazy(() => import('@/pages/admin/AdminUsers').then(m => ({ default: m.default })));
+const AdminOrganizations = lazy(() => import('@/pages/admin/AdminOrganizations').then(m => ({ default: m.default })));
+const AdminAnalytics = lazy(() => import('@/pages/admin/AdminAnalytics').then(m => ({ default: m.default })));
+const AdminBilling = lazy(() => import('@/pages/admin/AdminBilling').then(m => ({ default: m.default })));
+const AdminConfig = lazy(() => import('@/pages/admin/AdminConfig').then(m => ({ default: m.default })));
+const ContentModeration = lazy(() => import('@/components/admin/ContentModeration').then(m => ({ default: m.default })));
+const AuditLog = lazy(() => import('@/components/admin/AuditLog').then(m => ({ default: m.default })));
+const RolePermissions = lazy(() => import('@/components/admin/RolePermissions').then(m => ({ default: m.default })));
 
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
@@ -219,6 +239,15 @@ export default function App() {
             <Route path="onboarding" element={<PlaceholderPage title="Onboarding" />} />
           </Route>
 
+          {/* ── Phase 8 Client Portal ── */}
+          <Route path="/client-portal" element={<ProtectedRoute><ClientShell /></ProtectedRoute>}>
+            <Route index element={<ClientDashboard />} />
+            <Route path="pipeline" element={<CandidatePipeline />} />
+            <Route path="reviews" element={<CandidateReview />} />
+            <Route path="workflows" element={<ClientWorkflows />} />
+            <Route path="engagement" element={<ClientEngagement />} />
+          </Route>
+
           {/* ── B2C Coaching (mockup surface) ── */}
           <Route path="/coaching" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route index element={<Navigate to="coach" replace />} />
@@ -231,6 +260,19 @@ export default function App() {
             <Route path="career-services" element={<PlaceholderPage title="Career Services" />} />
             <Route path="engagement" element={<PlaceholderPage title="Engagement" />} />
             <Route path="growth" element={<PlaceholderPage title="Growth" />} />
+          </Route>
+
+          {/* ── Admin Portal (Phase 4) ── */}
+          <Route path="/admin" element={<AdminRoute><AdminShell /></AdminRoute>}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="organizations" element={<AdminOrganizations />} />
+            <Route path="moderation" element={<ContentModeration />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="billing" element={<AdminBilling />} />
+            <Route path="audit" element={<AuditLog />} />
+            <Route path="config" element={<AdminConfig />} />
+            <Route path="rbac" element={<RolePermissions />} />
           </Route>
 
           {/* ── Candidate Portal (mockup surface) ── */}
