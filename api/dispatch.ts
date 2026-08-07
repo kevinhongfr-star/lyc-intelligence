@@ -50,6 +50,9 @@ const handlers: Record<string, () => Promise<any>> = {
   'scoring': () => import('./_lib/scoringComputeHandler.js'),
   'reports': () => import('./_lib/reportsHandler.js').then(m => ({ handler: m.handleReports })),
   'coaching': () => import('./_lib/coachingHandler.js').then(m => ({ handler: m.handleCoaching })),
+  'client-portal': () => import('./_lib/clientPortalHandler.js').then(m => ({ handler: m.handleClientPortal })),
+  'client-workflow': () => import('./_lib/clientWorkflowEngine.js').then(m => ({ handler: m.handleClientWorkflow })),
+  'client-engagement': () => import('./_lib/clientEngagementHandler.js').then(m => ({ handler: m.handleClientEngagement })),
 };
 
 // Modules whose handlers expect the full path (including module name) in req.query.path
