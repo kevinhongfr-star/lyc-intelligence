@@ -1,140 +1,155 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>LYC Brand Rollout — Day 2 Status</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LYC Brand Rollout — Day 2 Status</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;700&family=DM+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
-:root {
-  --ink: #0F1115; --fuchsia: #C108AB; --off: #F5F5F3; --white: #FFFFFF;
-  --g50: #F8F9FA; --g100: #F0F1F3; --g200: #E0E2E6; --g300: #C8CBD0;
-  --g500: #8A8F9A; --g700: #4A4E57; --g800: #2A2D35; --navy: #2C3E6B;
-  --green: #1E8449; --yellow: #D4AC0D; --red: #C0392B; --blue: #2874A6;
-}
 * { margin: 0; padding: 0; box-sizing: border-box; }
-@page { size: A4 portrait; margin: 0; }
-body { font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.7; color: var(--ink); background: var(--white); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-.page { width: 210mm; min-height: 297mm; padding: 36px 40px; page-break-after: always; position: relative; }
-.page-dark { background: var(--ink); color: var(--white); }
-.page-alt { background: var(--off); }
-h1 { font-family: 'Crimson Pro', serif; font-size: 28px; font-weight: 700; line-height: 1.25; margin-bottom: 12px; }
-h2 { font-family: 'Crimson Pro', serif; font-size: 18px; font-weight: 700; line-height: 1.3; margin-bottom: 10px; }
-h3 { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--g700); margin-bottom: 8px; }
-.page-dark h3 { color: var(--g300); }
-.section-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--g500); margin-bottom: 6px; }
-.page-dark .section-label { color: var(--g300); }
-.card { background: var(--g100); border-radius: 6px; padding: 16px 18px; }
-.page-dark .card { background: rgba(255,255,255,0.06); }
-.stat-number { font-family: 'Crimson Pro', serif; font-size: 32px; font-weight: 700; color: var(--fuchsia); line-height: 1; }
-.stat-label { font-size: 11px; color: var(--g500); margin-top: 4px; }
-.tag { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
-.tag-pending { background: var(--g200); color: var(--g700); }
-.tag-inprogress { background: #FEF3C7; color: #92400E; }
-.tag-done { background: #D1FAE5; color: #065F46; }
-.tag-blocked { background: #FEE2E2; color: #991B1B; }
-.tag-critical { background: var(--fuchsia); color: white; }
-.progress-bar { height: 6px; background: var(--g200); border-radius: 3px; overflow: hidden; }
-.progress-fill { height: 100%; background: var(--fuchsia); border-radius: 3px; }
-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--g500); padding: 6px 8px; border-bottom: 1px solid var(--g200); font-weight: 500; }
-td { padding: 8px; border-bottom: 1px solid var(--g100); vertical-align: top; }
-tr.kevin-row td { background: #FFFBEB; }
-.footer { position: absolute; bottom: 30px; left: 40px; right: 40px; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--g500); display: flex; justify-content: space-between; }
-.page-dark .footer { color: var(--g500); }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
-.check-list { list-style: none; }
-.check-list li { padding: 4px 0 4px 24px; position: relative; font-size: 12px; }
-.check-list li::before { content: "□"; position: absolute; left: 0; color: var(--g500); font-size: 14px; }
-.check-list li.done::before { content: "✓"; color: var(--green); }
-.check-list li.kevin { background: #FFFBEB; border-radius: 4px; margin: 2px 0; padding-left: 24px; }
-.divider { height: 1px; background: var(--g200); margin: 16px 0; }
-.page-dark .divider { background: rgba(255,255,255,0.1); }
-.callout { background: var(--g100); border-radius: 6px; padding: 14px 18px; }
-.page-dark .callout { background: rgba(255,255,255,0.06); }
-.fuchsia-text { color: var(--fuchsia); }
-</style></head><body>
-<div class="page page-dark">
-  <div class="section-label">LYC BRAND ROLLOUT — DAILY STATUS</div>
-  <h1 style="color: white;">Day 2 / 7 · August 7, 2026</h1>
-  <div style="font-size: 14px; color: var(--g300); margin-bottom: 24px;">
-    Day 1 foundation tasks in motion — Day 2 deliverables ramping up
-  </div>
-  
-  <div class="grid-4" style="margin-bottom: 24px;">
-    <div class="stat-box">
-      <div class="stat-number">43</div>
-      <div class="stat-label">Total Tasks</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-number">3</div>
-      <div class="stat-label">Complete</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-number">13</div>
-      <div class="stat-label">In Progress</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-number">3</div>
-      <div class="stat-label" style="color: #FCA5A5;">Blocked</div>
-    </div>
-  </div>
-  
-  <div style="margin-bottom: 24px;">
-    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-      <span class="section-label">OVERALL PROGRESS</span>
-      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--g300);">6%</span>
-    </div>
-    <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px;">
-      <div style="height: 100%; width: 6%; background: var(--fuchsia); border-radius: 4px;"></div>
-    </div>
-  </div>
-  
-  <div class="grid-2" style="margin-bottom: 20px;">
-    <div class="card" style="background: rgba(255,255,255,0.06);">
-      <div class="section-label">⭐ KEVIN — TODAY</div>
-      <ul class="check-list" style="color: white;">
-        <li style="color: var(--g200);">Set up Teams webinar, share link</li><li style="color: var(--g200);">Review + approve website copy + design</li><li style="color: var(--g200);">Review + approve LinkedIn profile copy</li><li style="color: var(--g200);">Review + approve deck v2</li>
-      </ul>
-    </div>
-    <div class="card" style="background: rgba(255,255,255,0.06);">
-      <div class="section-label">🚨 BLOCKERS</div>
-      <ul class="check-list" style="color: white;">
-        <li style="color: #FCA5A5;">Teams webinar link needed from you by Aug 8</li><li style="color: #FCA5A5;">Lark-cli auth resets every session (fixed via Python API)</li><li style="color: #FCA5A5;">NEXUS board strategy comm — waiting on board schedule</li>
-      </ul>
-    </div>
-  </div>
-  
-  <div class="card" style="background: rgba(255,255,255,0.06); margin-bottom: 20px;">
-    <div class="section-label">📅 WEBINAR #1 — MAIN TRACKED ITEM</div>
-    <h2 style="color: white; font-size: 15px; margin-bottom: 8px;">Your China Leaders Are Not in Your Global Succession Plan</h2>
-    <div style="font-size: 12px; color: var(--g300); margin-bottom: 10px;">
-      Aug 19, 2026 · 10:00 AM HKT · 12 days out
-    </div>
-    <div class="grid-3" style="gap: 10px;">
-      <div>
-        <div style="font-family: 'Crimson Pro', serif; font-size: 22px; color: var(--fuchsia); font-weight: 700;">0</div>
-        <div style="font-size: 10px; color: var(--g400, #9CA3AF);">Done</div>
-      </div>
-      <div>
-        <div style="font-family: 'Crimson Pro', serif; font-size: 22px; color: #FDE68A; font-weight: 700;">3</div>
-        <div style="font-size: 10px; color: var(--g400, #9CA3AF);">Active</div>
-      </div>
-      <div>
-        <div style="font-family: 'Crimson Pro', serif; font-size: 22px; color: #FCA5A5; font-weight: 700;">1</div>
-        <div style="font-size: 10px; color: var(--g400, #9CA3AF);">Blocked on you</div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="card" style="background: rgba(255,255,255,0.06);">
-    <div class="section-label">📋 TODAY'S FOCUS — ALL AGENTS</div>
-    <div class="grid-2" style="gap: 8px;">
-      <div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">ECHO</span> — Website core copy — all main pages</div><div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">Valentina</span> — Website core page designs</div><div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">Akira</span> — Site map + assessment naming audit</div><div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">LENS</span> — KPI Day 0 baseline snapshot</div><div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">Emily</span> — Brand constitution + checklist final</div><div style="font-size: 11px; color: var(--g200);"><span style="color: var(--fuchsia); font-weight: 600;">James</span> — NEXUS endorsed brand audit prep</div>
-    </div>
-  </div>
-  
-  <div class="footer">
-    <span>LYC BRAND ROLLOUT · DAY 2</span>
-    <span>Emily · Brand Steward</span>
-  </div>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1a1a2e; padding: 24px; }
+.container { max-width: 1000px; margin: 0 auto; }
+.header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 32px; border-radius: 12px; margin-bottom: 20px; }
+.header h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+.header .subtitle { opacity: 0.8; font-size: 14px; }
+.header .date { margin-top: 8px; font-size: 13px; opacity: 0.6; }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+.stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.stat-card .label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.stat-card .value { font-size: 28px; font-weight: 700; }
+.stat-card .delta { font-size: 12px; margin-top: 4px; }
+.delta.up { color: #059669; }
+.delta.down { color: #dc2626; }
+
+.section { background: white; border-radius: 10px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.section h2 { font-size: 18px; margin-bottom: 16px; color: #1a1a2e; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+
+.agent-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.agent-card { padding: 14px; border-radius: 8px; border: 1px solid #e5e7eb; }
+.agent-card .name { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+.agent-card .role { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+.agent-card .status-bar { height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+.agent-card .status-fill { height: 100%; border-radius: 3px; }
+.agent-card .status-text { font-size: 11px; color: #6b7280; }
+
+.bg-green { background: #10b981; }
+.bg-blue { background: #3b82f6; }
+.bg-yellow { background: #f59e0b; }
+.bg-red { background: #ef4444; }
+.bg-purple { background: #8b5cf6; }
+.bg-pink { background: #ec4899; }
+
+.kevin-tasks { list-style: none; }
+.kevin-tasks li { padding: 10px 12px; border-left: 3px solid #f59e0b; background: #fffbeb; margin-bottom: 8px; border-radius: 0 6px 6px 0; font-size: 13px; }
+.kevin-tasks li.critical { border-left-color: #dc2626; background: #fef2f2; }
+.kevin-tasks li .deadline { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+.webinar-status { text-align: center; padding: 20px; }
+.webinar-status .days { font-size: 48px; font-weight: 800; color: #1a1a2e; }
+.webinar-status .label { font-size: 14px; color: #6b7280; margin-top: -4px; }
+.webinar-status .title { font-size: 16px; font-weight: 600; margin-top: 12px; color: #1a1a2e; }
+
+.milestone { display: flex; align-items: center; margin-bottom: 10px; font-size: 13px; }
+.milestone .dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
+.milestone .text { flex: 1; }
+.milestone .date { color: #6b7280; font-size: 12px; }
+
+.voice-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.voice-card { padding: 12px; border-radius: 8px; text-align: center; }
+.voice-card .person { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+.voice-card .lane { font-size: 11px; opacity: 0.9; }
+
+.method-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
+.method-item { padding: 10px 8px; border-radius: 6px; text-align: center; font-size: 11px; background: #f0f9ff; border: 1px solid #bae6fd; }
+.method-item .num { font-weight: 700; color: #0369a1; font-size: 16px; display: block; margin-bottom: 2px; }
+
+.footer { text-align: center; font-size: 11px; color: #9ca3af; margin-top: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+<h1>LYC Brand Rollout — Day 2</h1>
+<div class="subtitle">6-Phase Brand Strategy Audit + 1 Week Rollout Sprint</div>
+<div class="date">Friday, August 7, 2026 — 12:00 HKT</div>
 </div>
-</body></html>
+
+<div class="stats">
+<div class="stat-card"><div class="label">Overall Progress</div><div class="value">32%</div><div class="delta up">+8% from Day 1</div></div>
+<div class="stat-card"><div class="label">Agents Active</div><div class="value">6/8</div><div class="delta up">ECHO + LENS live</div></div>
+<div class="stat-card"><div class="label">Kevin Tasks</div><div class="value">7</div><div class="delta down">1 BLOCKING</div></div>
+<div class="stat-card"><div class="label">Days to Webinar</div><div class="value">12</div><div class="delta">Aug 19 — critical path</div></div>
+</div>
+
+<div class="section">
+<h2>🚀 Webinar #1 — Critical Path</h2>
+<div class="webinar-status">
+<div class="days">12</div>
+<div class="label">DAYS UNTIL GO-LIVE</div>
+<div class="title">"Your China Leaders Are Not in Your Global Succession Plan"</div>
+</div>
+<div class="milestone"><div class="dot bg-red"></div><div class="text"><strong>Teams webinar setup + share link</strong> — Kevin</div><div class="date">Aug 8 (TOMORROW)</div></div>
+<div class="milestone"><div class="dot bg-yellow"></div><div class="text">Landing page + registration flow</div><div class="date">Aug 12</div></div>
+<div class="milestone"><div class="dot bg-blue"></div><div class="text">Promo content across 4 LinkedIn accounts</div><div class="date">Aug 12-18</div></div>
+<div class="milestone"><div class="dot bg-green"></div><div class="text">Webinar delivery</div><div class="date">Aug 19</div></div>
+</div>
+
+<div class="section">
+<h2>🎯 Partner Voice & Angle Split — LOCKED</h2>
+<div class="voice-grid">
+<div class="voice-card" style="background: #1a1a2e; color: white;"><div class="person">Kevin</div><div class="lane">Leadership — "China gap" thesis, strategic essays</div></div>
+<div class="voice-card" style="background: #3b82f6; color: white;"><div class="person">Claire</div><div class="lane">Products — NEXUS, assessments, tools</div></div>
+<div class="voice-card" style="background: #8b5cf6; color: white;"><div class="person">Jaelyn</div><div class="lane">China Job Market — hiring trends & best practices</div></div>
+<div class="voice-card" style="background: #ec4899; color: white;"><div class="person">Joyce</div><div class="lane">Candidate Experience — tips, AI, interview prep</div></div>
+</div>
+<p style="font-size:12px; color:#6b7280; margin-top:10px; font-style:italic;">One engine, many voices. Shared thesis, different entry points. ECHO writes 4 LinkedIn profiles against this framework.</p>
+</div>
+
+<div class="section">
+<h2>📐 Comms Methodology — Integrated</h2>
+<p style="font-size:13px; color:#4b5563; margin-bottom:14px;">Sheet 9 from Unified Strategy Tracker now embedded in the rollout framework.</p>
+<div class="method-grid">
+<div class="method-item"><span class="num">1</span>Taxonomy Principle</div>
+<div class="method-item"><span class="num">2</span>Decision Gates</div>
+<div class="method-item"><span class="num">3</span>Anti-Positioning First</div>
+<div class="method-item"><span class="num">4</span>One Engine, Many Voices</div>
+<div class="method-item"><span class="num">5</span>Product Never Speaks First</div>
+</div>
+<div style="font-size:12px; color:#6b7280;">
+<strong>6-Phase Model applied to LYC rollout:</strong> Phase 1 (Brand Strategy) → Phase 2 (Messaging) → Phase 3 (Launch) → Phase 4 (Ecosystem & KPIs) [in progress] → Phase 5-6 (Optional)
+</div>
+</div>
+
+<div class="section">
+<h2>🤖 Agent Status — Day 2</h2>
+<div class="agent-grid">
+<div class="agent-card"><div class="name">ECHO</div><div class="role">Content Strategy & Voice Architecture</div><div class="status-bar"><div class="status-fill bg-blue" style="width:40%"></div></div><div class="status-text">Day 2: LinkedIn profiles + voice architecture</div></div>
+<div class="agent-card"><div class="name">LENS</div><div class="role">Audience Research & Market Intelligence</div><div class="status-bar"><div class="status-fill bg-green" style="width:50%"></div></div><div class="status-text">Day 2: Audience segmentation + KPI baseline</div></div>
+<div class="agent-card"><div class="name">VALENTINA</div><div class="role">Webinar Producer</div><div class="status-bar"><div class="status-fill bg-yellow" style="width:15%"></div></div><div class="status-text">Blocked: waiting on Teams link</div></div>
+<div class="agent-card"><div class="name">FORGE</div><div class="role">Asset & Design Production</div><div class="status-bar"><div class="status-fill bg-red" style="width:5%"></div></div><div class="status-text">Day 1: Brand assets & visual system</div></div>
+<div class="agent-card"><div class="name">PULSE</div><div class="role">Channel & Distribution</div><div class="status-bar"><div class="status-fill bg-purple" style="width:10%"></div></div><div class="status-text">Phase 3-4: Distribution strategy</div></div>
+<div class="agent-card"><div class="name">SIGNAL</div><div class="role">PR & Media Relations</div><div class="status-bar"><div class="status-fill bg-pink" style="width:10%"></div></div><div class="status-text">Phase 3: Media outreach strategy</div></div>
+<div class="agent-card"><div class="name">LUMEN</div><div class="role">Landing Page & Conversion</div><div class="status-bar"><div class="status-fill bg-red" style="width:5%"></div></div><div class="status-text">Phase 3: Landing page build</div></div>
+<div class="agent-card"><div class="name">NEXUS</div><div class="role">Product Integration</div><div class="status-bar"><div class="status-fill bg-blue" style="width:25%"></div></div><div class="status-text">Board strategy comms + product positioning</div></div>
+</div>
+</div>
+
+<div class="section">
+<h2>⚠️ Kevin Action Items</h2>
+<ul class="kevin-tasks">
+<li class="critical"><strong>Set up Teams webinar and share link</strong> — BLOCKING Valentina, landing page, registration<div class="deadline">Deadline: Aug 8 (Tomorrow)</div></li>
+<li><strong>Review & approve voice architecture</strong> — ECHO LinkedIn profiles based on Kevin/Claire/Jaelyn/Joyce split<div class="deadline">Due: Aug 8</div></li>
+<li><strong>Approve Phase 2 (Messaging) decision gate</strong> — Lock audience segments and content pillars<div class="deadline">Due: Aug 9</div></li>
+<li><strong>Send agent kickoff notifications</strong> — 8 templates ready for copy-paste<div class="deadline">Due: Whenever you're ready</div></li>
+<li><strong>NEXUS Board strategy comms kickoff</strong> — 10 tasks waiting on board schedule<div class="deadline">TBD</div></li>
+</ul>
+</div>
+
+<div class="footer">
+LYC Brand Rollout • Day 2 Status • Generated by Emily • Aug 7, 2026
+</div>
+
+</div>
+</body>
+</html>
