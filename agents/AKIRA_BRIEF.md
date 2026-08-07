@@ -1,7 +1,7 @@
 # AKIRA — Brand Rollout Brief
 
-**Agent:** AKIRA (Technical Lead)
-**Domain:** Website implementation, NEXUS integration, technical architecture, site structure
+**Agent:** Akira (Diagnostics and Assessments)
+**Domain:** Assessment methodology, diagnostic frameworks, scoring logic, report design, evaluation systems
 **Rollout Period:** August 6–12, 2026 (7 days)
 **Brand Steward:** Emily
 **Final Review:** Kevin Hong
@@ -10,60 +10,57 @@
 
 ## YOUR MISSION
 
-Implement the brand refresh across all technical surfaces — website, navigation architecture, and integration points. The structure must reflect the three-layer flywheel. Navigation must lead with outcomes, not internal taxonomy.
+Design and refine the diagnostic and assessment engines that power the intelligence layer. You own the methodology inside every assessment — the frameworks, the scoring, the insights, the report outputs. James (NEXUS product) implements them on the platform; you design what gets implemented.
 
-You own how the brand is built. Every URL, every nav item, every page flow must reinforce the new positioning.
+You own the diagnostic intelligence. Every assessment, every scoring model, every insight output — yours.
 
 ---
 
 ## YOUR TASKS BY DAY
 
-### Day 1 (Aug 6) — Foundation
+### Days 1-2 (Aug 6-7) — Audit & Inventory
 - [ ] Read Brand Constitution + Brand Checklist fully
-- [ ] **Website technical architecture plan**
-  - Deliverable: Site map + page inventory for all main dropdown pages
-  - Must reflect 3-layer flywheel structure in navigation
-  - Apply taxonomy rule to all page titles and URL slugs (outcomes-based, not framework-based)
-- [ ] **Assessment naming audit — list all assessments, propose functional names**
-  - Deliverable: Spreadsheet: current name → new functional name → framework name (Level 3)
-  - Work with James on NEXUS side names
+- [ ] **Assessment inventory & audit**
+  - Deliverable: Complete list of all assessments, what they measure, current naming, current output format
+  - Framework mapping: which assessments use which frameworks, which frameworks are "behind the curtain"
+- [ ] **Functional naming proposal**
+  - Deliverable: Spreadsheet: current name → new functional name → framework name (Level 3, "powered by")
+  - User-facing names must be outcomes-based, not methodology-based (taxonomy rule)
+  - Work with James on NEXUS implementation plan
+- [ ] **Diagnostic framework audit**
+  - Deliverable: How rigorous is each assessment? What are the gaps? Where can we tighten the methodology?
 
-### Day 2 (Aug 7) — Website Core
-- [ ] **Website: full implementation of all core pages**
-  - Deliverable: Staging site with updated pages
-  - Pages: homepage, hero, services (3 sub-pages), about, contact, all main dropdown pages
-  - Collab with ECHO (copy) and Valentina (design)
-- [ ] Navigation structure updated to reflect flywheel architecture
+### Day 3 (Aug 8) — Report & Output Redesign
+- [ ] **Assessment report template redesign**
+  - Deliverable: New report format that leads with outcomes and insights, not methodology
+  - All assessment reports must follow: Insight → Evidence → Recommendation → "Powered by [Framework]"
+  - Taxonomy rule applies to every section heading, every chart label, every finding
+- [ ] **CPI (China Leadership Pipeline Assessment) diagnostic review**
+  - Deliverable: Full review of CPI — methodology, scoring, report output, question set
+  - CPI is the flagship assessment for webinar #1 — it must be tight
 
-### Day 3 (Aug 8) — System Assets
-- [ ] **Assessment functional names — technical prep for NEXUS implementation**
-  - Deliverable: Implementation spec for renaming all assessments
-  - Framework names move to "powered by" attribution
-  - Collab with James on NEXUS side
+### Day 4-5 (Aug 9-10) — CPI Deep Dive
+- [ ] **CPI assessment — full diagnostic redesign pass**
+  - Deliverable: Updated CPI with new positioning language, outcomes-first reporting, proper framework attribution
+  - Work with James on NEXUS implementation, with ECHO on copy
+- [ ] **Assessment funnel design**
+  - Deliverable: How assessments flow into programmes and advisory — the diagnostic-to-recommendation engine
+  - What signals from assessments indicate readiness for Layer 2 (programmes) or Layer 3 (search/advisory)?
+- [ ] **Maturity stack triggers — diagnostic logic**
+  - Deliverable: What assessment results trigger which content/programme recommendations?
+  - Work with James on NEXUS trigger implementation
 
-### Day 4 (Aug 9) — NEXUS + Integrations
-- [ ] **Reverse flywheel integrations — plan and spec**
-  - Deliverable: Technical spec for:
-    1. Search candidate assessments flow (Layer 3 → Layer 1)
-    2. Advisory team diagnostics flow (Layer 3 → Layer 1)
-  - How candidates/clients get into NEXUS, how data flows back
-  - Collab with James
-
-### Day 5 (Aug 10) — Reach + Technical Polish
-- [ ] SEO meta updates — all pages updated with new positioning keywords
-- [ ] Redirect plan — any URL slug changes from framework-named to outcome-named
-- [ ] Performance check on staging site
-
-### Day 6 (Aug 11) — QA
-- [ ] **Website QA — all pages, all links, all copy**
-  - Deliverable: Bug list + fixes
-  - Collab with Emily on content audit
-- [ ] Final staging review pass
+### Day 6 (Aug 11) — QA & Testing
+- [ ] **CPI full QA — methodology, scoring, report, user flow**
+  - Deliverable: Test run of CPI from start to finish, verify scoring and output
+- [ ] **All assessments — functional naming and taxonomy compliance check**
+  - Deliverable: Every assessment user-facing surface passes the brand checklist
+- [ ] Address any audit findings
 
 ### Day 7 (Aug 12) — Go Live
-- [ ] **Website goes live**
-  - Deliverable: Production site live with all updated pages
-- [ ] Post-launch check: all pages render, all links work, all CTAs functional
+- [ ] **CPI assessment live for Webinar #1**
+  - Deliverable: CPI fully live, tested, integrated with the website registration flow
+- [ ] All assessment updates pushed live (via James/NEXUS)
 - [ ] Confirmation: all Akira-owned deliverables complete
 
 ---
@@ -72,14 +69,15 @@ You own how the brand is built. Every URL, every nav item, every page flow must 
 
 **Event:** "Your China Leaders Are Not in Your Global Succession Plan"
 **Date:** August 19, 2026
-**Your Deadline:** Aug 12 — Registration page must go live on the website
+**Your Deadline:** Aug 12 — CPI assessment live and tested
 
-- [ ] Registration page implementation on LYC website
-- [ ] Teams integration for webinar registration
-- [ ] Assessment CTA flow — webinar → assessment → results
-- [ ] Collab with Valentina (design) and James (NEXUS assessment)
+- [ ] CPI (China Leadership Pipeline Assessment) — flagship deliverable for webinar #1
+- [ ] Diagnostic flow, scoring logic, and report output must be locked and tested by Aug 12
+- [ ] Post-assessment CTA logic: what recommendation do people get based on their score?
+- [ ] Work with James on NEXUS implementation, with Valentina on website integration
+- [ ] Webinar Q&A — prepare 3-5 deep-dive assessment questions and answers
 
-**Critical path:** The webinar registration page MUST be live Aug 12. It's the first customer-facing showcase of the new brand.
+**Critical path:** The CPI assessment is the primary CTA of the webinar. It must be live, tested, and beautiful on Aug 12.
 
 ---
 
@@ -87,7 +85,9 @@ You own how the brand is built. Every URL, every nav item, every page flow must 
 
 1. `BRAND_CONSTITUTION.md` — read fully before starting
 2. `BRAND_CHECKLIST.md` — keep open while you work
-3. ECHO v6 brand specs for technical implementation reference
+3. Comms methodology — especially the taxonomy principle
+4. James brief — understand NEXUS platform constraints and capabilities
+5. Existing assessment frameworks — start with CPI
 
 ---
 
@@ -102,7 +102,7 @@ Update the Master Tracker "Brand Rollout" sheet status column when you complete 
 
 ## ESCALATION
 
-Technical blockers → Emily (Brand Steward)
-Content questions → ECHO (for copy) / Valentina (for design)
-Final architecture decisions → Kevin Hong
+Methodology questions → Kevin Hong
+Brand interpretation → Emily (Brand Steward)
+Platform implementation → James
 Blocked waiting on other agents → Emily

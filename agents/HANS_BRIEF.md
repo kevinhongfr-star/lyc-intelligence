@@ -1,7 +1,7 @@
 # HANS — Brand Rollout Brief
 
-**Agent:** Hans (Research & Board Briefs)
-**Domain:** Board Briefs, research content, long-form analysis
+**Agent:** Hans (Research Paper)
+**Domain:** Primary research — research paper, data gathering, analysis, deep-dive reports
 **Rollout Period:** August 6–12, 2026 (7 days)
 **Brand Steward:** Emily
 **Final Review:** Kevin Hong
@@ -10,37 +10,54 @@
 
 ## YOUR MISSION
 
-Update the Board Brief template and research output format to align with the new brand positioning. Research is Layer 1 content — it proves our intelligence and feeds the top of the flywheel.
+Produce the flagship research paper that proves LYC's intelligence capability. This is Layer 1 content at its deepest — original research, data-driven analysis, actionable insights. Your work sits at the top of the flywheel: research → insights → content → programmes → search.
 
-You own the depth. Every research piece must demonstrate "leadership intelligence" in action.
+You own the primary research. Every data point, every analysis, every insight — yours.
 
 ---
 
 ## YOUR TASKS BY DAY
 
-### Days 1-2 (Aug 6-7) — Audit & Plan
+### Days 1-2 (Aug 6-7) — Scope & Methodology
 - [ ] Read Brand Constitution + Brand Checklist fully
-- [ ] Audit current Board Brief template — identify what needs updating
-- [ ] Plan: which published briefs need header/footer updates
+- [ ] **Research paper scope & outline**
+  - Deliverable: Full paper outline — title, sections, argument structure, data needed
+  - The paper should demonstrate our intelligence capability: original data, sharp analysis, actionable insights for China leadership teams
+  - Working angle: the "China gap" — why global companies systematically misread China leadership, succession, and talent
+- [ ] **Research methodology**
+  - Deliverable: Methodology section — data sources, sample, analysis framework
+  - Work with Probe on market data gathering
+- [ ] **Data gathering plan**
+  - Deliverable: List of all data sources needed, who/what to contact, timeline
 
-### Day 3 (Aug 8) — Template Update
-- [ ] **Board Brief template — updated cover + footer + "about LYC" box**
-  - Deliverable: Board Brief template v2
-  - Collab with Valentina on design
-  - Must reflect: new positioning, 3-layer flywheel, taxonomy rule
-  - "About LYC" box: 2-3 sentences that say "leadership intelligence firm" + 3-layer value prop
+### Day 3-4 (Aug 8-9) — Research & Data
+- [ ] **Data gathering phase**
+  - Deliverable: All raw data collected, organized, cleaned
+  - Sources: market data, internal LYC data, survey data (if applicable), public reports
+- [ ] **Analysis phase**
+  - Deliverable: Key findings + supporting data
+  - 5-7 core findings, each with data backing
+- [ ] **"About LYC" box template**
+  - Deliverable: Standard "About LYC" box for all research assets
+  - Must say "leadership intelligence firm" + 3-layer value prop in 2-3 sentences
 
-### Days 4-5 (Aug 9-10) — Back Catalog
-- [ ] Update cover/footer on active Board Briefs
-- [ ] Ensure all research outputs position LYC as intelligence firm, not search firm
-- [ ] Align framing: research is proof of our intelligence capability
+### Day 5-6 (Aug 10-11) — Writing
+- [ ] **Research paper — first full draft**
+  - Deliverable: Complete first draft (target: 3,000-5,000 words)
+  - Structure: Executive summary → Problem → Data → Analysis → Findings → Implications → About LYC
+- [ ] **Data verification**
+  - Deliverable: All claims sourced and verified
+  - Footnotes, citations, data appendix
+- [ ] **Visualization plan**
+  - Deliverable: List of charts/tables needed in the paper
+  - Work with Valentina on design if needed
 
-### Day 6 (Aug 11) — QA
-- [ ] Review updated templates and briefs
-- [ ] Address any audit findings from Emily
-
-### Day 7 (Aug 12) — Go Live
-- [ ] New template officially adopted for all future Board Briefs
+### Day 7 (Aug 12) — Final Draft
+- [ ] **Research paper — final draft ready for Kevin review**
+  - Deliverable: Polished final draft, ready for Kevin's edit and approval
+- [ ] **Research paper teaser/abstract**
+  - Deliverable: 300-word abstract + key findings summary
+  - Carl will repurpose this for social; ECHO will use it for landing pages
 - [ ] Confirmation: all Hans-owned deliverables complete
 
 ---
@@ -49,11 +66,12 @@ You own the depth. Every research piece must demonstrate "leadership intelligenc
 
 **Event:** "Your China Leaders Are Not in Your Global Succession Plan"
 **Date:** August 19, 2026
-**Your Deadline:** Aug 14 — Research data points verified
+**Your Deadline:** Aug 14 — All data points verified and sourced
 
-- [ ] Verify webinar deck data points
-- [ ] Prepare Q&A data backup
-- [ ] Post-webinar research brief outline
+- [ ] Verify webinar deck data points — every claim must have a source
+- [ ] Prepare Q&A data backup — 10-15 anticipated questions with data-backed answers
+- [ ] Research paper teaser for webinar promotion (the paper is the "value beyond the webinar")
+- [ ] Post-webinar research brief outline — what's the follow-up research piece attendees get?
 
 ---
 
@@ -61,7 +79,9 @@ You own the depth. Every research piece must demonstrate "leadership intelligenc
 
 1. `BRAND_CONSTITUTION.md` — read fully before starting
 2. `BRAND_CHECKLIST.md` — keep open while you work
-3. Existing Board Brief template — understand what needs changing
+3. Probe's competitive/market scan — use as context and data source
+4. ECHO brief — understand how your research feeds content
+5. Brand strategy document (full Phase 1-6) — positioning source of truth
 
 ---
 
@@ -77,5 +97,6 @@ Update the Master Tracker "Brand Rollout" sheet status column when you complete 
 ## ESCALATION
 
 Brand interpretation questions → Emily (Brand Steward)
-Design questions → Valentina
-Research scope decisions → Kevin Hong
+Research scope & methodology decisions → Kevin Hong
+Data access → Emily
+Blocked waiting on other agents → Emily
