@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<title>LYC Brand Rollout — Day 2 Full Report v4 (8 Agents · Probe Dropped · Internal/External Language Rule Locked)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;700&family=DM+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root {
+  --ink: #0F1115; --fuchsia: #C108AB; --off: #F5F5F3; --white: #FFFFFF;
+  --g50: #F8F9FA; --g100: #F0F1F3; --g200: #E0E2E6; --g300: #C8CBD0;
+  --g500: #8A8F9A; --g700: #4A4E57; --g800: #2A2D35; --navy: #2C3E6B;
+  --green: #1E8449; --yellow: #D4AC0D; --red: #C0392B; --blue: #2874A6;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+@page { size: A4 portrait; margin: 0; }
+body { font-family: 'DM Sans', sans-serif; font-size: 12px; line-height: 1.6; color: var(--ink); background: var(--white); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 210mm; min-height: 297mm; padding: 32px 36px; page-break-after: always; position: relative; }
+.page-dark { background: var(--ink); color: var(--white); }
+.page-alt { background: var(--off); }
+h1 { font-family: 'Crimson Pro', serif; font-size: 26px; font-weight: 700; line-height: 1.25; margin-bottom: 10px; }
+h2 { font-family: 'Crimson Pro', serif; font-size: 16px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; }
+h3 { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--g700); margin-bottom: 6px; }
+.page-dark h3 { color: var(--g300); }
+.section-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--g500); margin-bottom: 4px; }
+.page-dark .section-label { color: var(--g300); }
+.card { background: var(--g100); border-radius: 6px; padding: 14px 16px; }
+.page-dark .card { background: rgba(255,255,255,0.06); }
+.stat-number { font-family: 'Crimson Pro', serif; font-size: 28px; font-weight: 700; color: var(--fuchsia); line-height: 1; }
+.stat-label { font-size: 10px; color: var(--g500); margin-top: 3px; }
+.tag { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 9px; padding: 2px 7px; border-radius: 4px; font-weight: 500; }
+.tag-pending { background: var(--g200); color: var(--g700); }
+.tag-inprogress { background: #FEF3C7; color: #92400E; }
+.tag-done { background: #D1FAE5; color: #065F46; }
+.tag-blocked { background: #FEE2E2; color: #991B1B; }
+.tag-critical { background: var(--fuchsia); color: white; }
+.tag-high { background: #FEE2E2; color: #991B1B; }
+.tag-medium { background: #FEF3C7; color: #92400E; }
+.tag-low { background: #D1FAE5; color: #065F46; }
+.progress-bar { height: 6px; background: var(--g200); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--fuchsia); border-radius: 3px; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; }
+th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--g500); padding: 5px 7px; border-bottom: 1px solid var(--g200); font-weight: 500; }
+td { padding: 6px 7px; border-bottom: 1px solid var(--g100); vertical-align: top; }
+tr.kevin-row td { background: #FFFBEB; }
+.footer { position: absolute; bottom: 24px; left: 36px; right: 36px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; color: var(--g500); display: flex; justify-content: space-between; }
+.page-dark .footer { color: var(--g500); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+.divider { height: 1px; background: var(--g200); margin: 14px 0; }
+.page-dark .divider { background: rgba(255,255,255,0.1); }
+.callout { background: var(--g100); border-radius: 6px; padding: 12px 16px; }
+.page-dark .callout { background: rgba(255,255,255,0.06); }
+.fuchsia-text { color: var(--fuchsia); }
+.agent-card { background: var(--white); border: 1px solid var(--g200); border-radius: 6px; padding: 12px 14px; }
+.agent-name { font-family: 'Crimson Pro', serif; font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.agent-role { font-size: 10px; color: var(--g500); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.agent-owns { font-size: 11px; margin-bottom: 6px; line-height: 1.5; }
+.agent-deadline { font-size: 10px; color: var(--g700); font-family: 'IBM Plex Mono', monospace; }
+.voice-person { padding: 8px 10px; border-left: 3px solid var(--fuchsia); background: var(--g50); margin-bottom: 6px; border-radius: 0 4px 4px 0; }
+.voice-person .name { font-weight: 700; font-size: 12px; }
+.voice-person .lane { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; color: var(--g500); letter-spacing: 0.5px; }
+.voice-person .angle { font-size: 11px; color: var(--g700); margin-top: 2px; line-height: 1.5; }
+</style>
+</head><body>
+
+<div class="page page-dark">
+  <div class="section-label">LYC BRAND ROLLOUT</div>
+  <h1 style="color: white; font-size: 32px;">Day 2 Full Status Report</h1>
+  <h2 style="color: var(--g300); font-weight: 400; font-family: 'DM Sans';">August 7, 2026 · 7-Day Rollout · Brand Steward: Emily</h2>
+  
+  <div class="divider" style="margin: 28px 0;"></div>
+  
+  <div class="grid-4" style="margin-bottom: 24px;">
+    <div>
+      <div style="font-family: 'Crimson Pro', serif; font-size: 40px; font-weight: 700; color: var(--fuchsia);">8</div>
+      <div style="font-size: 11px; color: var(--g400, #9CA3AF);">Agent Teams</div>
+    </div>
+    <div>
+      <div style="font-family: 'Crimson Pro', serif; font-size: 40px; font-weight: 700; color: #6EE7B7;">4</div>
+      <div style="font-size: 11px; color: var(--g400, #9CA3AF);">Infrastructure Layers</div>
+    </div>
+    <div>
+      <div style="font-family: 'Crimson Pro', serif; font-size: 40px; font-weight: 700; color: #FDE68A;">9</div>
+      <div style="font-size: 11px; color: var(--g400, #9CA3AF);">Kickoff Pending</div>
+    </div>
+    <div>
+      <div style="font-family: 'Crimson Pro', serif; font-size: 40px; font-weight: 700; color: #FCA5A5;">2</div>
+      <div style="font-size: 11px; color: var(--g400, #9CA3AF);">Blocked on Kevin</div>
+    </div>
+  </div>
+  
+  <div class="callout" style="background: rgba(255,255,255,0.06);">
+    <div class="section-label">EXECUTIVE SUMMARY</div>
+    <h2 style="color: white;">Rollout ready to launch — waiting on kickoff messages</h2>
+    <p style="color: var(--g300); line-height: 1.7; font-size: 12px;">
+      Brand strategy is locked. All 9 agent briefs (including newly added Probe) are rewritten with correct role mapping and live on GitHub. Agent responsibilities were fully realigned today per the corrected org model. Comms methodology (Sheet 9) has been integrated into the framework. Voice/angle split for all 4 partners is confirmed. The only thing holding execution back is you sending the kickoff messages.
+    </p>
+  </div>
+  
+  <div class="callout" style="background: rgba(193,8,171,0.15); margin-top: 14px;">
+    <div class="section-label" style="color: #F9A8D4;">TOP PRIORITY RIGHT NOW</div>
+    <h2 style="color: white; font-size: 15px;">Send kickoff messages to all 9 agent teams</h2>
+    <p style="color: var(--g300); font-size: 11px; line-height: 1.6;">
+      Agent roles were fully realigned today. Every day of delay pushes the Day 7 launch. Templates and briefs are ready — copy/paste and send.
+    </p>
+  </div>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2 FULL REPORT</span>
+    <span>Page 1 / 11</span>
+  </div>
+</div>
+
+
+<div class="page">
+  <div class="section-label">YOUR ACTION ITEMS</div>
+  <h1>What Kevin Needs to Do</h1>
+  <p style="color: var(--g500); margin-bottom: 16px; font-size: 11px;">
+    All tasks requiring your personal attention. Sorted by urgency.
+  </p>
+  
+  <table>
+    <thead>
+      <tr><th style="width: 30%;">Task</th><th>Why It Matters</th><th style="width: 15%;">Deadline</th><th style="width: 10%;">Priority</th></tr>
+    </thead>
+    <tbody>
+      <tr class="kevin-row">
+        <td><strong>Send kickoff messages to all 9 agents</strong><br><span style="color: var(--g500); font-size: 10px;">Corrected mapping — all briefs and templates rewritten today</span></td>
+        <td>Nothing moves until teams get their briefs. Already 1 day behind.</td>
+        <td>Today (ASAP)</td>
+        <td><span class="tag tag-critical">CRITICAL</span></td>
+      </tr>
+      <tr class="kevin-row">
+        <td><strong>Set up Teams webinar + share link</strong><br><span style="color: var(--g500); font-size: 10px;">"Your China Leaders Are Not in Your Global Succession Plan"</span></td>
+        <td>Blocks Valentina (website), James (NEXUS product), and the entire registration pipeline. Registration page must go live Aug 12.</td>
+        <td>Aug 8 (tomorrow)</td>
+        <td><span class="tag tag-critical">CRITICAL</span></td>
+      </tr>
+      <tr class="kevin-row">
+        <td><strong>NEXUS board strategy communication</strong><br><span style="color: var(--g500); font-size: 10px;">10 tasks across SEC/Governance, EXEC/Alignment, Risk</span></td>
+        <td>Board-level decisions needed on strategy direction, team comms, investor comms, external announcement timeline.</td>
+        <td>TBD</td>
+        <td><span class="tag tag-high">HIGH</span></td>
+      </tr>
+      <tr class="kevin-row">
+        <td><strong>Review ECHO Day 1-2 output</strong><br><span style="color: var(--g500); font-size: 10px;">Website copy + LinkedIn profiles</span></td>
+        <td>Everything downstream (Valentina design, Akira build, Carl publishing) depends on approved copy.</td>
+        <td>Aug 8-9</td>
+        <td><span class="tag tag-high">HIGH</span></td>
+      </tr>
+      <tr>
+        <td><strong>Approve website design direction</strong><br><span style="color: var(--g500); font-size: 10px;">Valentina's hero + services mockup</span></td>
+        <td>Locks in visual direction for the rest of the site.</td>
+        <td>Aug 8</td>
+        <td><span class="tag tag-medium">MEDIUM</span></td>
+      </tr>
+      <tr>
+        <td><strong>Review Board Brief template v2</strong><br><span style="color: var(--g500); font-size: 10px;">Hans deliverable</span></td>
+        <td>Board-facing assets need your sign-off.</td>
+        <td>Aug 9</td>
+        <td><span class="tag tag-medium">MEDIUM</span></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <div class="divider"></div>
+  
+  <h2>Critical Path Timeline</h2>
+  <div style="position: relative; padding-left: 20px; border-left: 2px solid var(--fuchsia);">
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight: 700; font-size: 11px;">Aug 7 — TODAY</div>
+      <div style="font-size: 10px; color: var(--g500);">Kickoff messages sent · Day 2 tasks in flight</div>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight: 700; font-size: 11px;">Aug 8 — TOMORROW <span class="tag tag-critical">BLOCKING</span></div>
+      <div style="font-size: 10px; color: var(--g500);">Teams webinar link from Kevin → unblocks Valentina/Akira/James</div>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight: 700; font-size: 11px;">Aug 9-11</div>
+      <div style="font-size: 10px; color: var(--g500);">NEXUS integration · social content · templates · QA</div>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <div style="font-weight: 700; font-size: 11px;">Aug 12 — GO LIVE DAY <span class="tag tag-critical">MILESTONE</span></div>
+      <div style="font-size: 10px; color: var(--g500);">Website live · profiles live · webinar registration open · KPI dashboard live</div>
+    </div>
+    <div>
+      <div style="font-weight: 700; font-size: 11px;">Aug 14</div>
+      <div style="font-size: 10px; color: var(--g500);">Webinar deck + outreach sequence finalized</div>
+    </div>
+    <div>
+      <div style="font-weight: 700; font-size: 11px;">Aug 19 — WEBNINAR #1</div>
+      <div style="font-size: 10px; color: var(--g500);">"Your China Leaders Are Not in Your Global Succession Plan" · 10AM HKT</div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2 FULL REPORT</span>
+    <span>Page 2 / 11</span>
+  </div>
+</div>
+
+
+<div class="page page-alt">
+  <div class="section-label">TEAM DISTRIBUTION — PART 1/2</div>
+  
+  <h1>Agent Delegation Plan (Corrected)</h1>
+  
+  <p style="color: var(--g500); margin-bottom: 14px; font-size: 11px;">
+    What each team owns — corrected mapping. The earlier assignment was wrong; roles have been fully realigned.
+  </p>
+  
+  <div class="grid-2">
+    <div class="agent-card">
+      <div class="agent-name">ECHO</div>
+      <div class="agent-role">Marketing · Business · Training · Webinar · Podcast · Content Materials & Templates</div>
+      <div class="agent-owns">
+        <strong>Owns:</strong> All content production — marketing copy, business materials, training content, webinar assets, podcast production, templates of every kind. The content engine that supplies everyone else.
+      </div>
+      <div style="margin: 8px 0;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--g700); margin-bottom: 4px;">KEY RULES:</div>
+        <div style="font-size: 10px; color: var(--g500); line-height: 1.5;">
+          • Taxonomy rule: outcomes lead, methods follow<br>
+          • Voice/angle split locked — 4 lanes, 4 voices<br>
+          • You produce; Carl publishes; Maria outreaches
+        </div>
+      </div>
+      <div class="agent-deadline">
+        <strong>Nearest:</strong> Website copy + content inventory (TODAY) · Core templates (Aug 8) · Webinar deck (Aug 14)
+      </div>
+      <div style="margin-top: 6px;"><span class="tag tag-critical">PRIORITY: HIGH</span></div>
+    </div>
+    
+    <div class="agent-card">
+      <div class="agent-name">Valentina</div>
+      <div class="agent-role">Website — End-to-End</div>
+      <div class="agent-owns">
+        <strong>Owns:</strong> The entire website — design, build, implementation, and go-live. Single owner, full accountability from IA to production.
+      </div>
+      <div style="margin: 8px 0;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--g700); margin-bottom: 4px;">KEY RULES:</div>
+        <div style="font-size: 10px; color: var(--g500); line-height: 1.5;">
+          • ECHO v6 visual system stays; positioning/IA changes<br>
+          • Three value areas reflected in nav, URLs, and page structure<br>
+          • Akira does NOT build the website — he does diagnostics
+        </div>
+      </div>
+      <div class="agent-deadline">
+        <strong>Nearest:</strong> IA + site map + hero (TODAY) · All pages on staging (Aug 9) · Website LIVE (Aug 12)
+      </div>
+      <div style="margin-top: 6px;"><span class="tag tag-critical">PRIORITY: HIGH</span></div>
+    </div>
+    
+    <div class="agent-card">
+      <div class="agent-name">Akira</div>
+      <div class="agent-role">Diagnostics & Assessments</div>
+      <div class="agent-owns">
+        <strong>Owns:</strong> Assessment methodology — the frameworks, scoring logic, report design, diagnostic engines. James implements on NEXUS; Akira designs the intelligence.
+      </div>
+      <div style="margin: 8px 0;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--g700); margin-bottom: 4px;">KEY RULES:</div>
+        <div style="font-size: 10px; color: var(--g500); line-height: 1.5;">
+          • Functional user-facing names; framework = "powered by"<br>
+          • Reports lead with outcomes, not methodology<br>
+          • CPI assessment = flagship, on webinar critical path
+        </div>
+      </div>
+      <div class="agent-deadline">
+        <strong>Nearest:</strong> Assessment inventory + naming (TODAY) · CPI redesign (Aug 9-10) · CPI live (Aug 12) ⭐
+      </div>
+      <div style="margin-top: 6px;"><span class="tag tag-critical">PRIORITY: HIGH</span></div>
+    </div>
+    
+    <div class="agent-card">
+      <div class="agent-name">James + NEXUS</div>
+      <div class="agent-role">Product</div>
+      <div class="agent-owns">
+        <strong>Owns:</strong> NEXUS product — platform, user flows, in-app experience, integrations, assessment delivery. Implements what Akira designs.
+      </div>
+      <div style="margin: 8px 0;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--g700); margin-bottom: 4px;">KEY RULES:</div>
+        <div style="font-size: 10px; color: var(--g500); line-height: 1.5;">
+          • "NEXUS by LYC" — endorsed product brand, clear LYC parentage<br>
+          • In-app content invites drive user progression through engagement levels<br>
+          • Product owner, not just brand alignment
+        </div>
+      </div>
+      <div class="agent-deadline">
+        <strong>Nearest:</strong> NEXUS audit (TODAY) · Assessment renaming (Aug 8) · CPI live (Aug 12) ⭐
+      </div>
+      <div style="margin-top: 6px;"><span class="tag tag-high">PRIORITY: HIGH</span></div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2 FULL REPORT</span>
+    <span>Page 3 / 11</span>
+  </div>
+</div>
+
+
+<div class="page page-alt">
+  <div class="section-label">TEAM DISTRIBUTION — PART 2/2</div>
+  
+  <h1>Agent Delegation Plan (cont.)</h1>
+  
+  <p style="color: var(--g500); margin-bottom: 14px; font-size: 11px;">
+    The remaining 4 teams + Emily. Probe (market signals scan) is a post-launch BAU capability, not in the 7-day rollout.
+  </p>
+  
+  <div class="grid-2">
+    <div class="agent-card">
+      <div class="agent-name">LENS</div>
+      <div class="agent-role">Audience & Signals Matching</div>
+      <div class="agent-owns">
+        <strong>Owns:</strong> Audience strategy — segmentation, signal mapping, content-audience matching, who gets what and when. Measurement is a byproduct, not the main thing.
+      </div>
+      <div style="margin: 8px 0;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--g700); margin-bottom: 4px;">KEY RULES:</div>
+        <div style="font-size: 10px; color: var(--g500); line-height: 1.5;">
+          • 3-5 core audience segments with engagement signals<br>
+          • Signal map: who's ready for research, programmes, or advisory<br>
+          • Feeds Maria (outreach) and Carl (social/repurposing)
+        </div>
+      </div>
+      <div class="agent-deadline">
+        <strong>Nearest:</strong> Audience segmentation (TODAY) · Webinar audience (Aug 8) · KPI dashboard (Aug 11)
+      </div>
+      <div style="margin-top: 6px;"><span class="tag tag-critical">PRIORITY: HIGHEST</span></div>
+    </div>
+    
+    <div class="agent-card">
+      <div class="agent-name">Hans</div>
+      <div class="agent-role">Research Paper</div>
+      <div class="agent-owns">
+        <strong>Owns:</strong> Primary research — the flagship research paper that proves intelligence capability. Data gathering, analysis, writing. Our deepest leadership intelligence publication.
+      </div>
+      <div style="margin: 8px 0;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--g700); margin-bottom: 4px;">KEY RULES:</div>
+        <div style="font-size: 10px; color: var(--g500); line-height: 1.5;">
+          • Research paper = flagship asset, proof of intelligence capability<br>
+          • "About LYC" = "leadership intelligence firm" + three value areas<br>
+          • You do primary research; Carl repurposes it; ECHO templates it
+        </div>
+      </div>
+      <div class="agent-deadline">
+        <strong>Nearest:</strong> Scope & outline (TODAY) · First full draft (Aug 10-11) · Final draft (Aug 12)
+      </div>
+      <div style="margin-top: 6px;"><span class="tag tag-high">PRIORITY: HIGH</span></div>
+    </div>
+    
+    <div class="agent-card">
+      <div class="agent-name">Carl</div>
+      <div class="agent-role">Repurposing & Social Media Asset</div>
+      <div class="agent-owns">
+        <strong>Owns:</strong> Content repurposing engine — one piece of content becomes 10+ social assets. Also owns publishing: LinkedIn, newsletter, distribution.
+      </div>
+      <div style="margin: 8px 0;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--g700); margin-bottom: 4px;">KEY RULES:</div>
+        <div style="font-size: 10px; color: var(--g500); line-height: 1.5;">
+          • You repurpose what ECHO and Hans produce<br>
+          • 4 partners, 4 content lanes (locked)<br>
+          • Social assets = primary deliverable
+        </div>
+      </div>
+      <div class="agent-deadline">
+        <strong>Nearest:</strong> Repurposing framework (TODAY) · First batch of assets (Aug 10) · Profiles live + newsletter (Aug 12)
+      </div>
+      <div style="margin-top: 6px;"><span class="tag tag-medium">PRIORITY: MEDIUM</span></div>
+    </div>
+    
+    <div class="agent-card">
+      <div class="agent-name">Maria</div>
+      <div class="agent-role">Outreach</div>
+      <div class="agent-owns">
+        <strong>Owns:</strong> Outbound — cold email, partner/referral materials, external profiles, direct outreach. LENS gives you segments; ECHO gives you materials.
+      </div>
+      <div style="margin: 8px 0;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--g700); margin-bottom: 4px;">KEY RULES:</div>
+        <div style="font-size: 10px; color: var(--g500); line-height: 1.5;">
+          • Lead with outcomes, not services<br>
+          • Signal "leadership intelligence firm" in every touchpoint<br>
+          • You execute outreach; you don't build audience lists
+        </div>
+      </div>
+      <div class="agent-deadline">
+        <strong>Nearest:</strong> Template audit (TODAY) · Core templates (Aug 8) · Webinar outreach (Aug 14)
+      </div>
+      <div style="margin-top: 6px;"><span class="tag tag-medium">PRIORITY: MEDIUM</span></div>
+    </div>
+    
+    <div class="agent-card" style="border-color: var(--fuchsia); background: #FDF2FC;">
+      <div class="agent-name" style="color: var(--fuchsia);">Emily</div>
+      <div class="agent-role" style="color: #9D174D;">Exec Assistant · Coordinator · Strategist</div>
+      <div class="agent-owns">
+        <strong>Owns:</strong> Brand stewardship, coordination, master tracking, quality assurance, blocker removal. Keeps all 8 streams aligned.
+      </div>
+      <div style="margin: 8px 0;">
+        <div style="font-size: 10px; font-weight: 700; color: #9D174D; margin-bottom: 4px;">NOTE:</div>
+        <div style="font-size: 10px; color: var(--g500); line-height: 1.5;">
+          • Updates master tracker, Notion, daily status page<br>
+          • Flags blockers to Kevin daily<br>
+          • Final brand consistency gate
+        </div>
+      </div>
+      <div class="agent-deadline">
+        <strong>Cadence:</strong> Daily status updates · Weekly full review
+      </div>
+    </div>
+  </div>
+  
+  <div class="divider"></div>
+  
+  <div class="callout">
+    <h3>Recommended Kickoff Order</h3>
+    <table>
+      <tr><td style="width: 20px; font-weight: 700; color: var(--fuchsia);">1</td><td><strong>LENS</strong> — audience segmentation feeds Maria + Carl + webinar, already 1 day late</td></tr>
+      <tr><td style="font-weight: 700; color: var(--fuchsia);">2</td><td><strong>ECHO</strong> — content engine, everything downstream depends on their output</td></tr>
+      <tr><td style="font-weight: 700; color: var(--fuchsia);">3</td><td><strong>Valentina</strong> — website is Day 7 showcase, starts immediately</td></tr>
+      <tr><td style="font-weight: 700; color: var(--fuchsia);">4</td><td><strong>Akira + James</strong> — CPI assessment on webinar critical path (diagnostic + product)</td></tr>
+      <tr><td style="font-weight: 700; color: var(--fuchsia);">5</td><td><strong>Hans</strong> — research paper is longer cycle, but data verification needed for webinar</td></tr>
+      <tr><td style="font-weight: 700; color: var(--fuchsia);">6</td><td><strong>Carl</strong> — downstream of ECHO, but Day 7 publishing is firm</td></tr>
+      <tr><td style="font-weight: 700; color: var(--fuchsia);">7</td><td><strong>Maria</strong> — outreach templates, Aug 14 webinar sequence</td></tr>
+    </table>
+  </div>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2 FULL REPORT</span>
+    <span>Page 4 / 11</span>
+  </div>
+</div>
+
+
+<div class="page">
+  <div class="section-label">VOICE & ANGLE FRAMEWORK</div>
+  <h1>Partner Voice Split — Locked</h1>
+  <p style="color: var(--g500); margin-bottom: 16px; font-size: 11px;">
+    One engine, many voices. All four share the same positioning framework (leadership intelligence firm, taxonomy rule, three value areas). Each owns a distinct content lane and reinforces the thesis from their angle.
+  </p>
+  
+  <div class="voice-person" style="border-left-color: var(--fuchsia);">
+    <div class="name">Kevin Hong</div>
+    <div class="lane">Leadership Lane</div>
+    <div class="angle">
+      Strategic thesis on the "China gap" — why global companies systematically misread China leadership, succession, and talent systems.
+      Board-level perspective. Long-form LinkedIn articles. Webinar keynote. Sets the strategic thesis that everyone else reinforces.
+    </div>
+  </div>
+  
+  <div class="voice-person" style="border-left-color: var(--navy);">
+    <div class="name">Claire</div>
+    <div class="lane">Products Lane</div>
+    <div class="angle">
+      NEXUS, assessments, tools, how leaders use intelligence platforms. Product thinking in leadership work.
+      Methodology explained through practical use cases. Shows not tells.
+    </div>
+  </div>
+  
+  <div class="voice-person" style="border-left-color: var(--green);">
+    <div class="name">Jaelyn</div>
+    <div class="lane">China Job Market & Hiring Trends & Best Practices Lane</div>
+    <div class="angle">
+      What's happening on the ground in China's executive hiring market. Data on hiring trends. Best practices and tactical playbooks.
+      Market-observant and grounded. Proves we know the market from the inside.
+    </div>
+  </div>
+  
+  <div class="voice-person" style="border-left-color: #B45309;">
+    <div class="name">Joyce</div>
+    <div class="lane">Candidate Experience Lane</div>
+    <div class="angle">
+      Candidate tips, interview prep, career navigation, how to use AI as a job seeker.
+      Supportive, insider knowledge, candidate-empowering. Shows the human side of the intelligence stack.
+    </div>
+  </div>
+  
+  <div class="divider"></div>
+  
+  <div class="callout">
+    <h3>How the Lanes Work Together</h3>
+    <table>
+      <tr><th style="width: 20%;">Layer</th><th>Kevin</th><th>Claire</th><th>Jaelyn</th><th>Joyce</th></tr>
+      <tr>
+        <td><strong>Thesis</strong></td>
+        <td>Sets the "China gap" strategic frame</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>Proof</strong></td>
+        <td>—</td>
+        <td>Platform proof</td>
+        <td>Market proof</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>Value</strong></td>
+        <td>—</td>
+        <td>Tools that deliver insight</td>
+        <td>Tactical playbooks</td>
+        <td>Candidate empowerment</td>
+      </tr>
+      <tr>
+        <td><strong>Platform</strong></td>
+        <td>Long-form LinkedIn, webinars, boards</td>
+        <td>Product posts, how-tos</td>
+        <td>Market data, trends</td>
+        <td>Candidate tips, AI guides</td>
+      </tr>
+    </table>
+  </div>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2 FULL REPORT</span>
+    <span>Page 5 / 11</span>
+  </div>
+</div>
+
+
+<div class="page page-alt">
+  <div class="section-label">COMMS METHODOLOGY</div>
+  <h1>5 Core Principles</h1>
+  <p style="color: var(--g500); margin-bottom: 14px; font-size: 11px;">
+    From Sheet 9 of the Unified Strategy Tracker. Applied across the entire brand rollout.
+  </p>
+  
+  <div style="margin-bottom: 12px;">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <span style="font-family: 'Crimson Pro', serif; font-size: 22px; font-weight: 700; color: var(--fuchsia);">01</span>
+      <h2 style="margin: 0; font-size: 14px;">Taxonomy Principle</h2>
+    </div>
+    <p style="font-size: 11px; color: var(--g700); padding-left: 32px; line-height: 1.6;">
+      Outcomes lead, methods follow, framework names recede. Every customer-facing asset must lead with what people get, not what we do or what we call our tools internally.
+    </p>
+  </div>
+  
+  <div style="margin-bottom: 12px;">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <span style="font-family: 'Crimson Pro', serif; font-size: 22px; font-weight: 700; color: var(--fuchsia);">02</span>
+      <h2 style="margin: 0; font-size: 14px;">Decision Gates, Not Revisions</h2>
+    </div>
+    <p style="font-size: 11px; color: var(--g700); padding-left: 32px; line-height: 1.6;">
+      Each phase has a clear gate. Once a gate is passed and locked, we don't reopen it. This prevents endless circular revisions. Phase 1 (strategy) must be locked before Phase 2 (messaging) starts in earnest.
+    </p>
+  </div>
+  
+  <div style="margin-bottom: 12px;">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <span style="font-family: 'Crimson Pro', serif; font-size: 22px; font-weight: 700; color: var(--fuchsia);">03</span>
+      <h2 style="margin: 0; font-size: 14px;">Anti-Positioning First</h2>
+    </div>
+    <p style="font-size: 11px; color: var(--g700); padding-left: 32px; line-height: 1.6;">
+      Define what we're NOT before we define what we are. The market needs to understand who we're displacing and why old models fail, before they can understand our new model.
+    </p>
+  </div>
+  
+  <div style="margin-bottom: 12px;">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <span style="font-family: 'Crimson Pro', serif; font-size: 22px; font-weight: 700; color: var(--fuchsia);">04</span>
+      <h2 style="margin: 0; font-size: 14px;">One Engine, Many Voices</h2>
+    </div>
+    <p style="font-size: 11px; color: var(--g700); padding-left: 32px; line-height: 1.6;">
+      Shared positioning framework, multiple distinct voices. Each partner reinforces the same thesis from their own angle. The brand is the sum of all voices, not just one person's output.
+    </p>
+  </div>
+  
+  <div style="margin-bottom: 12px;">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <span style="font-family: 'Crimson Pro', serif; font-size: 22px; font-weight: 700; color: var(--fuchsia);">05</span>
+      <h2 style="margin: 0; font-size: 14px;">The Product Never Speaks First</h2>
+    </div>
+    <p style="font-size: 11px; color: var(--g700); padding-left: 32px; line-height: 1.6;">
+      Intelligence and insight lead. Products and tools follow as evidence and delivery mechanisms. NEXUS is never the hero of the story — the insight is.
+    </p>
+  </div>
+  
+  <div class="divider"></div>
+  
+  <h2>6 Common Pitfalls to Avoid</h2>
+  <table>
+    <tr><td style="width: 20px; color: var(--red);">✗</td><td>Skipping Phase 1 — jumping straight to content without positioning</td></tr>
+    <tr><td style="color: var(--red);">✗</td><td>Doing everything in one meeting — strategy + messaging + creative all at once</td></tr>
+    <tr><td style="color: var(--red);">✗</td><td>Revisiting locked decisions — circular revisions kill momentum</td></tr>
+    <tr><td style="color: var(--red);">✗</td><td>Leading with taxonomy — internal jargon before customer outcomes</td></tr>
+    <tr><td style="color: var(--red);">✗</td><td>Forgetting anti-positioning — no contrast = no differentiation</td></tr>
+    <tr><td style="color: var(--red);">✗</td><td>No North Star metric — you can't prove it worked if you didn't baseline</td></tr>
+  </table>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2 FULL REPORT</span>
+    <span>Page 6 / 11</span>
+  </div>
+</div>
+
+
+<div class="page">
+  <div class="section-label">WEBINAR #1 TRACKER</div>
+  <h1>"Your China Leaders Are Not in Your Global Succession Plan"</h1>
+  <p style="color: var(--g500); margin-bottom: 14px; font-size: 11px;">
+    August 19, 2026 · 10:00 AM HKT · Microsoft Teams · Registration opens Aug 12
+  </p>
+  
+  <div class="grid-3" style="margin-bottom: 16px;">
+    <div class="card">
+      <div class="stat-number">11</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="card">
+      <div class="stat-number" style="color: #FCA5A5;">1</div>
+      <div class="stat-label">Blocked on Kevin</div>
+    </div>
+    <div class="card">
+      <div class="stat-number" style="color: #FDE68A;">1</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+  </div>
+  
+  <table>
+    <thead>
+      <tr><th>Task</th><th>Owner</th><th>Deadline</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr class="kevin-row">
+        <td><strong>Set up Teams webinar + share link</strong></td>
+        <td>Kevin</td>
+        <td>Aug 8</td>
+        <td><span class="tag tag-blocked">BLOCKED</span></td>
+      </tr>
+      <tr>
+        <td>Webinar deck (copy)</td>
+        <td>ECHO</td>
+        <td>Aug 14</td>
+        <td><span class="tag tag-pending">PENDING</span></td>
+      </tr>
+      <tr>
+        <td>Webinar deck (design)</td>
+        <td>Valentina</td>
+        <td>Aug 14</td>
+        <td><span class="tag tag-pending">PENDING</span></td>
+      </tr>
+      <tr>
+        <td>Registration page (design)</td>
+        <td>Valentina</td>
+        <td>Aug 11</td>
+        <td><span class="tag tag-pending">PENDING</span></td>
+      </tr>
+      <tr>
+        <td>Registration page (build + Teams integration)</td>
+        <td>Akira</td>
+        <td>Aug 12</td>
+        <td><span class="tag tag-blocked">BLOCKED</span></td>
+      </tr>
+      <tr>
+        <td>China Leadership Pipeline Assessment (CPI)</td>
+        <td>James</td>
+        <td>Aug 12</td>
+        <td><span class="tag tag-pending">PENDING</span></td>
+      </tr>
+      <tr>
+        <td>Landing page copy</td>
+        <td>ECHO</td>
+        <td>Aug 10</td>
+        <td><span class="tag tag-pending">PENDING</span></td>
+      </tr>
+      <tr>
+        <td>Audience segmentation + targeting</td>
+        <td>LENS</td>
+        <td>Aug 8</td>
+        <td><span class="tag tag-pending">PENDING</span></td>
+      </tr>
+      <tr>
+        <td>Data verification for all claims</td>
+        <td>Hans</td>
+        <td>Aug 12</td>
+        <td><span class="tag tag-pending">PENDING</span></td>
+      </tr>
+      <tr>
+        <td>Promo content (social + newsletter)</td>
+        <td>Carl</td>
+        <td>Aug 12</td>
+        <td><span class="tag tag-pending">PENDING</span></td>
+      </tr>
+      <tr>
+        <td>Outreach sequence</td>
+        <td>Maria</td>
+        <td>Aug 14</td>
+        <td><span class="tag tag-pending">PENDING</span></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <div class="callout" style="margin-top: 14px; background: #FEF2F2;">
+    <h3 style="color: var(--red);">CRITICAL PATH DEPENDENCY</h3>
+    <p style="font-size: 11px; color: var(--g700); line-height: 1.6;">
+      Kevin's Teams link → Akira registration page build → James CPI integration → Carl promo launch → Maria outreach
+      <br><br>
+      Every day of delay on the Teams link pushes everything downstream. Deadline to unblock: <strong>Aug 8 (tomorrow)</strong>.
+    </p>
+  </div>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2 FULL REPORT</span>
+    <span>Page 7 / 11</span>
+  </div>
+</div>
+
+
+<div class="page page-alt">
+  <div class="section-label">NEXUS BOARD STRATEGY COMM</div>
+  <h1>Board Communication Tracker</h1>
+  <p style="color: var(--g500); margin-bottom: 14px; font-size: 11px;">
+    10 tasks across 3 categories. All waiting on board schedule.
+  </p>
+  
+  <div class="grid-3" style="margin-bottom: 16px;">
+    <div class="card">
+      <div class="stat-number">10</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="card">
+      <div class="stat-number" style="color: #FDE68A;">1</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+    <div class="card">
+      <div class="stat-number" style="color: var(--g300);">9</div>
+      <div class="stat-label">Waiting on Board</div>
+    </div>
+  </div>
+  
+  <h2>SEC / Governance (5 tasks)</h2>
+  <table>
+    <thead>
+      <tr><th>Task</th><th>Deadline</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Board deck — NEXUS strategy update</td><td>TBD</td><td><span class="tag tag-pending">PENDING</span></td></tr>
+      <tr><td>Board resolution — investment approval</td><td>TBD</td><td><span class="tag tag-pending">PENDING</span></td></tr>
+      <tr><td>Shareholder communication plan</td><td>TBD</td><td><span class="tag tag-pending">PENDING</span></td></tr>
+      <tr><td>Legal review — structure changes</td><td>TBD</td><td><span class="tag tag-pending">PENDING</span></td></tr>
+      <tr><td>Cap table impact analysis</td><td>TBD</td><td><span class="tag tag-pending">PENDING</span></td></tr>
+    </tbody>
+  </table>
+  
+  <div class="divider"></div>
+  
+  <h2>EXEC / Alignment (3 tasks)</h2>
+  <table>
+    <thead>
+      <tr><th>Task</th><th>Deadline</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Team all-hands announcement prep</td><td>TBD</td><td><span class="tag tag-inprogress">IN PROGRESS</span></td></tr>
+      <tr><td>Partner alignment session</td><td>TBD</td><td><span class="tag tag-pending">PENDING</span></td></tr>
+      <tr><td>Client communication plan</td><td>TBD</td><td><span class="tag tag-pending">PENDING</span></td></tr>
+    </tbody>
+  </table>
+  
+  <div class="divider"></div>
+  
+  <h2>Risk (2 tasks)</h2>
+  <table>
+    <thead>
+      <tr><th>Task</th><th>Deadline</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Risk register — NEXUS strategic risks</td><td>TBD</td><td><span class="tag tag-pending">PENDING</span></td></tr>
+      <tr><td>Competitive response scenario plan</td><td>TBD</td><td><span class="tag tag-pending">PENDING</span></td></tr>
+    </tbody>
+  </table>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2 FULL REPORT</span>
+    <span>Page 8 / 11</span>
+  </div>
+</div>
+
+
+<div class="page">
+  <div class="section-label">INFRASTRUCTURE & SYSTEMS</div>
+  <h1>What's Already Set Up</h1>
+  <p style="color: var(--g500); margin-bottom: 14px; font-size: 11px;">
+    All rollout infrastructure is in place. Execution is the only thing left.
+  </p>
+  
+  <div class="grid-2">
+    <div class="card">
+      <h3>Strategy & Framework</h3>
+      <ul class="check-list">
+        <li class="done">Brand Constitution v1 (locked)</li>
+        <li class="done">Brand Checklist</li>
+        <li class="done">Comms Methodology (Sheet 9 integrated)</li>
+        <li class="done">Voice/angle split (4 partners, locked)</li>
+        <li class="done">6-Phase model (Phase 1 complete)</li>
+      </ul>
+    </div>
+    
+    <div class="card">
+      <h3>Agent Briefs</h3>
+      <ul class="check-list">
+        <li class="done">ECHO — Content Engine</li>
+        <li class="done">Valentina — Design Lead</li>
+        <li class="done">Akira — Technical Lead</li>
+        <li class="done">LENS — Data & Analytics</li>
+        <li class="done">James — NEXUS Platform</li>
+        <li class="done">Carl — Social & Newsletter</li>
+        <li class="done">Maria — Outreach & Partnerships</li>
+        <li class="done">Hans — Research & Board Briefs</li>
+      </ul>
+    </div>
+    
+    <div class="card">
+      <h3>Systems & Tracking</h3>
+      <ul class="check-list">
+        <li class="done">Master Asset Tracker v4 (12 sheets)</li>
+        <li class="done">Webinar #1 tracker (separate sheet)</li>
+        <li class="done">NEXUS Board Strategy Comm tracker</li>
+        <li class="done">GitHub repo — all files live</li>
+        <li class="done">Notion Brand Rollout page</li>
+        <li class="done">Daily status (1-pager + 10-pager)</li>
+      </ul>
+    </div>
+    
+    <div class="card">
+      <h3>Notification Templates</h3>
+      <ul class="check-list">
+        <li class="done">All 8 kickoff messages written</li>
+        <li class="done">Voice/angle split clarified</li>
+        <li class="done">Agent ownership explicitly stated</li>
+        <li class="done">Nearest deadlines called out</li>
+        <li>→ <strong>Waiting on Kevin to send</strong></li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="divider"></div>
+  
+  <h2>Key Resources & Links</h2>
+  <table>
+    <tr><th style="width: 25%;">Resource</th><th>Location</th></tr>
+    <tr><td>GitHub Repo</td><td>github.com/kevinhongfr-star/lyc-intelligence</td></tr>
+    <tr><td>Brand Rollout Directory</td><td>brand-rollout/ (on GitHub)</td></tr>
+    <tr><td>Master Tracker</td><td>brand-rollout/LYC_Master_Asset_Tracker_v4.xlsx</td></tr>
+    <tr><td>Notification Templates</td><td>brand-rollout/NOTIFICATION_TEMPLATES.md</td></tr>
+    <tr><td>Comms Methodology</td><td>brand-rollout/COMMS_METHODOLOGY.md</td></tr>
+    <tr><td>Notion</td><td>LYC/NEXUS — Master System Documentation → Brand Rollout</td></tr>
+    <tr><td>1-Pager (live)</td><td>HTML preview on GitHub</td></tr>
+  </table>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2 FULL REPORT</span>
+    <span>Page 9 / 11</span>
+  </div>
+</div>
+
+
+<div class="page page-dark">
+  <div class="section-label">BRAND RULE — LOCKED</div>
+  
+  <h1 style="color: white;">Internal vs External Language</h1>
+  
+  <p style="color: var(--g300); margin-bottom: 18px; font-size: 12px; line-height: 1.7;">
+    The single most common brand failure. Every agent must pass this test: if a prospect reads your output and asks "what's the flywheel?" — you failed.
+  </p>
+  
+  <div class="grid-2" style="gap: 16px; margin-bottom: 18px;">
+    <div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--g300); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">⚠ NEVER SAY EXTERNALLY</div>
+      <div style="background: rgba(255,255,255,0.06); border-radius: 6px; padding: 12px 14px; font-size: 11px; line-height: 1.8;">
+        <div>• flywheel</div>
+        <div>• 3-layer model / Layer 1 / 2 / 3</div>
+        <div>• maturity stack / stages / Stage 0–3</div>
+        <div>• signals / signal matching (client context)</div>
+        <div>• entry point / funnel (as positioning)</div>
+        <div>• endorsed brand / brand architecture</div>
+        <div>• taxonomy rule (cite externally)</div>
+        <div>• anti-positioning</div>
+      </div>
+    </div>
+    
+    <div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6EE7B7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">✓ SAY INSTEAD</div>
+      <div style="background: rgba(255,255,255,0.06); border-radius: 6px; padding: 12px 14px; font-size: 11px; line-height: 1.8;">
+        <div>• describe the value or the programme</div>
+        <div>• Research & Intelligence / Programmes &amp; Advisory / Executive Search</div>
+        <div>• describe where someone is in their understanding</div>
+        <div>• "what we're seeing" / market indicators / trends</div>
+        <div>• "start here" / "first step" / name the offer</div>
+        <div>• "NEXUS by LYC" (just state it)</div>
+        <div>• (the rule is applied, never mentioned)</div>
+        <div>• (internal strategy, never cited)</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="divider"></div>
+  
+  <h2 style="color: white;">The Test</h2>
+  
+  <div style="color: var(--g300); font-size: 12px; line-height: 1.7; margin-bottom: 14px;">
+    If a prospect, client, or LinkedIn reader would need to understand our internal operating model to understand the value — you failed.<br><br>
+    They should understand: <strong style="color: white;">what we do, why it matters, and what's the next step</strong>. Nothing about our internal architecture.
+  </div>
+  
+  <div style="background: rgba(193,8,171,0.15); border-left: 3px solid var(--fuchsia); border-radius: 0 6px 6px 0; padding: 12px 16px;">
+    <div style="font-weight: 700; font-size: 12px; color: white; margin-bottom: 4px;">Every agent has this rule in their brief.</div>
+    <div style="font-size: 11px; color: var(--g300); line-height: 1.6;">Emily audits every deliverable before it goes out. Carl and Maria are the final gatekeepers — everything they publish is public-facing and must be 100% clean.</div>
+  </div>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2 FULL REPORT</span>
+    <span>Page 10 / 11</span>
+  </div>
+</div>
+
+
+<div class="page page-dark">
+  <div class="section-label">NEXT STEPS</div>
+  <h1 style="color: white;">What Happens Now</h1>
+  
+  <div class="divider" style="margin: 20px 0;"></div>
+  
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    <div style="display: flex; gap: 14px; align-items: flex-start;">
+      <div style="font-family: 'Crimson Pro', serif; font-size: 32px; font-weight: 700; color: var(--fuchsia); min-width: 40px;">1</div>
+      <div>
+        <h2 style="color: white; font-size: 15px;">You send kickoff messages</h2>
+        <p style="color: var(--g300); font-size: 11px; line-height: 1.6;">
+          Copy/paste from NOTIFICATION_TEMPLATES.md to all 9 agent teams. Start with Probe and LENS — they have zero dependencies and feed everyone else.
+        </p>
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 14px; align-items: flex-start;">
+      <div style="font-family: 'Crimson Pro', serif; font-size: 32px; font-weight: 700; color: var(--fuchsia); min-width: 40px;">2</div>
+      <div>
+        <h2 style="color: white; font-size: 15px;">You set up Teams webinar</h2>
+        <p style="color: var(--g300); font-size: 11px; line-height: 1.6;">
+          Create the webinar in Teams and share the registration link. This unblocks Valentina (website), James (NEXUS), and the entire registration pipeline. Deadline: tomorrow.
+        </p>
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 14px; align-items: flex-start;">
+      <div style="font-family: 'Crimson Pro', serif; font-size: 32px; font-weight: 700; color: var(--fuchsia); min-width: 40px;">3</div>
+      <div>
+        <h2 style="color: white; font-size: 15px;">Agents deliver Day 2-3 work</h2>
+        <p style="color: var(--g300); font-size: 11px; line-height: 1.6;">
+          ECHO: content materials + website copy. Valentina: website build. Akira: CPI diagnostic design. James: NEXUS product implementation. LENS: audience segments + baseline. Hans: research paper.
+        </p>
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 14px; align-items: flex-start;">
+      <div style="font-family: 'Crimson Pro', serif; font-size: 32px; font-weight: 700; color: var(--fuchsia); min-width: 40px;">4</div>
+      <div>
+        <h2 style="color: white; font-size: 15px;">I track everything</h2>
+        <p style="color: var(--g300); font-size: 11px; line-height: 1.6;">
+          Emily monitors all 9 streams, updates master tracker + Notion + daily status, flags blockers to you daily, and ensures brand consistency.
+        </p>
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 14px; align-items: flex-start;">
+      <div style="font-family: 'Crimson Pro', serif; font-size: 32px; font-weight: 700; color: var(--fuchsia); min-width: 40px;">5</div>
+      <div>
+        <h2 style="color: white; font-size: 15px;">You review key outputs</h2>
+        <p style="color: var(--g300); font-size: 11px; line-height: 1.6;">
+          Website copy direction, design mockups, Board Brief template, webinar deck. Everything lands on your desk for approval before going live.
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="divider" style="margin: 20px 0;"></div>
+  
+  <div class="callout" style="background: rgba(193,8,171,0.15);">
+    <h3 style="color: #F9A8D4;">BOTTOM LINE</h3>
+    <p style="color: white; font-size: 12px; line-height: 1.7;">
+      The brand strategy is locked. The briefs are written. The systems are set up. The only thing between us and execution is you pressing "send" on 9 kickoff messages (corrected mapping) and setting up the Teams webinar. Everything else I manage.
+    </p>
+  </div>
+  
+  <div class="footer">
+    <span>LYC BRAND ROLLOUT · DAY 2 FULL REPORT</span>
+    <span>Page 11 / 11</span>
+  </div>
+</div>
+
+</body></html>

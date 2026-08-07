@@ -1,7 +1,7 @@
 # LENS — Brand Rollout Brief
 
 **Agent:** LENS (Audience and Signals Matching)
-**Domain:** Audience strategy, segmentation, signal mapping, content-audience matching, measurement
+**Domain:** Audience strategy, segmentation, signal mapping, content-to-audience matching, KPI measurement
 **Rollout Period:** August 6–12, 2026 (7 days)
 **Brand Steward:** Emily
 **Final Review:** Kevin Hong
@@ -10,135 +10,99 @@
 
 ## YOUR MISSION
 
-Build the audience intelligence that drives everything. Who are we targeting? How do we segment them? What signals indicate where someone is in the maturity stack? How do we match the right content to the right person at the right time? Measurement and KPI tracking are part of what you do, but they're the dashboard — the real work is the audience strategy.
+You own audience strategy and signals matching — who we target, how we segment them, which signals indicate readiness, how we match content to audience stage. You are not KPI dashboards (that's a byproduct). You own the audience intelligence that drives everything downstream: who gets what, when, and why.
 
-You own who gets what, when, and why. Every segment, every signal, every content match — yours.
+Your output feeds:
+- Maria (outreach) — target segments and lists
+- Carl (social/repurposing) — audience insights for content targeting
+- ECHO (content) — audience-informed messaging angles
+- The webinar team — who to invite and how
+
+---
+
+## IMPORTANT: YOUR WORK IS INTERNAL — BUT IT SHAPES EXTERNAL OUTPUT
+
+You produce internal models and maps. That's fine — internal work uses internal language.
+
+**The rule:** When your audience work gets translated into outward-facing materials (by ECHO, Carl, or Maria), the internal stage names and framework labels must be replaced with value descriptions.
+
+- Internal: "Stage 1 audiences get Layer 2 content invites"
+- External: "Leaders who've completed the assessment receive an invitation to a leadership briefing"
+
+You don't need to write the external language — that's ECHO's job. But when you hand off audience segments and content recommendations, **label clearly which parts are internal only** and flag that the downstream agent must translate before publishing.
 
 ---
 
 ## YOUR TASKS BY DAY
 
-### Day 1 (Aug 6) — Foundation & Baseline
+### Day 1-2 (Aug 6-7) — Foundation (ALREADY 1 DAY LATE — PRIORITIZE)
 - [ ] Read Brand Constitution + Brand Checklist fully
-- [ ] **Audience segmentation model**
-  - Deliverable: 3-5 core audience segments for the new positioning
-  - For each segment: who they are, what they care about, where they are in the maturity stack, what content they need
-  - Segments should map to the 3-layer flywheel: who enters at Layer 1, who is ready for Layer 2, who is ready for Layer 3
-- [ ] **Day 0 KPI baseline snapshot**
-  - Deliverable: Baseline numbers for all core metrics
-  - Sources: website analytics, LinkedIn, NEXUS analytics, webinar platform, revenue data
-  - This is the benchmark — everything gets compared to this
+- [ ] Read the Internal vs External Language guidance (above)
+- [ ] **Audience segmentation model — 3-5 core segments**
+  - Deliverable: Defined segments with: who they are, what they care about, what signals indicate they're a fit
+  - Segments should map to the three value areas (Research & Intelligence / Programmes & Advisory / Executive Search)
+  - Include: size estimate, priority ranking, where to find them
+- [ ] **Webinar #1 target audience list + segmentation**
+  - Deliverable: Who do we invite? Which segments? Prioritized.
+  - Feeds directly into Maria's outreach and Carl's promo targeting
+  - DEADLINE: Aug 8 (tomorrow)
 
-### Day 2 (Aug 7) — Signal Mapping
-- [ ] **Signal map — maturity stack stages**
-  - Deliverable: What behaviors and signals indicate someone is at Stage 0, 1, 2, or 3?
-  - Digital signals: pages visited, content downloaded, assessments taken, email engagement
-  - Offline signals: programme participation, search inquiries, advisory conversations
-  - This map drives what content ECHO produces and what triggers James builds in NEXUS
-- [ ] **Content-audience match framework**
-  - Deliverable: For each audience segment × each maturity stage → what content do they get?
-  - This is the matching engine between audience and content
+### Day 3 (Aug 8) — Signal Mapping
+- [ ] **Content-to-audience matching map**
+  - Deliverable: What content goes to which audience segment, at which engagement level
+  - Map by content type (research, webinar, programme, advisory conversation) not by internal layer names
+  - This becomes the master reference for ECHO, Carl, and Maria
+- [ ] Webinar audience segmentation finalized and handed to Maria + Carl
 
-### Day 3 (Aug 8) — Webinar Audience
-- [ ] **Webinar #1 target audience — segmented and prioritized**
-  - Deliverable: Target list breakdown for webinar #1
-  - Who are the primary targets? Secondary? Tertiary?
-  - By segment, by seniority, by industry, by company type
-  - This feeds Maria's outreach and Carl's social promotion
-- [ ] **Registration funnel tracking setup**
-  - Deliverable: Tracking plan for webinar registration funnel
-  - What metrics? What UTMs? What attribution?
+### Day 4-5 (Aug 9-10) — Measurement Setup
+- [ ] **KPI baseline — current state across all channels**
+  - Deliverable: Baseline metrics: web traffic, social engagement, email list size, assessment completion rate, webinar registration rate
+  - Targets for each KPI post-rollout
+- [ ] **Tracking plan**
+  - What do we measure? Where? How?
+  - UTM strategy for the rollout and webinar campaign
+- [ ] Signal map for content engagement — what behaviors indicate someone is ready for the next conversation?
 
-### Day 4-5 (Aug 9-10) — Measurement & Optimization
-- [ ] **Maturity stack conversion tracking**
-  - Deliverable: Tracking plan for Stage 0→1, 1→2, 2→3 conversion
-  - How do we measure each stage transition? What are the leading indicators?
-- [ ] **NEXUS user baseline + analytics config**
-  - Deliverable: Current NEXUS user baseline (sign-up sources, conversion rates, assessment completion)
-  - Analytics setup for tracking maturity stack progression inside NEXUS
-  - Work with James on implementation
-- [ ] **UTM parameter framework**
-  - Deliverable: Complete UTM framework for all rollout-related traffic
-  - Campaign naming convention, source/medium standards, content variants
-  - This needs to be adopted by ECHO, Carl, Maria, Valentina
+### Day 6 (Aug 11) — Dashboard Go-Live
+- [ ] **KPI dashboard live with baseline + targets**
+  - All key metrics tracked
+  - Webinar funnel set up for tracking
+- [ ] Audience segmentation model v1 finalized and circulated
+- [ ] Content-to-audience matching map finalized and circulated
 
-### Day 6 (Aug 11) — Dashboard
-- [ ] **KPI dashboard — set up with Day 0 baseline + targets**
-  - Deliverable: Dashboard live, baseline data entered, targets configured
-  - 3 tiers: Positioning Signal, Engagement & Maturity, Revenue Impact
-  - ~15 metrics total
-- [ ] **Data QA — verify all tracking is working**
-  - Deliverable: QA report — all tracking verified
-- [ ] **Signal quality review**
-  - Deliverable: Which signals are high-quality? Which are noisy? What's missing?
-
-### Day 7 (Aug 12) — Go Live
-- [ ] **KPI dashboard — Day 0 baseline snapshot locked**
-  - Deliverable: Baseline saved for future comparison
-- [ ] Go-live monitoring setup
-- [ ] **Audience playbook v1 — handoff to all teams**
-  - Deliverable: One-page audience playbook — segments, signals, content matches
-  - Distribute to ECHO, Carl, Maria, James
-- [ ] Confirmation: all LENS-owned deliverables complete
+### Day 7 (Aug 12) — Go Live & Monitoring
+- [ ] Dashboard live and monitoring
+- [ ] All audience deliverables handed off to downstream agents
+- [ ] Post-launch tracking plan in place
+- [ ] Confirmation: all handoffs are clear which parts are internal-only
 
 ---
 
-## KPI DASHBOARD — 15 METRICS, 3 TIERS
-
-### Tier 1 — Positioning Signal Metrics
-Can we see the new positioning showing up in the market?
-1. Website services page dwell time (+25% target)
-2. "Leadership intelligence" branded search volume (first appearances, then +50%)
-3. LinkedIn company page follower growth (+15%/quarter)
-4. Kevin LinkedIn profile views / post reach (+20% from baseline)
-5. NEXUS sign-ups from LYC properties (+40% from baseline)
-
-### Tier 2 — Engagement & Maturity Metrics
-Is the flywheel spinning?
-6. Maturity stack Stage 0→1 conversion rate (+30%)
-7. Maturity stack Stage 1→2 conversion rate (+25%)
-8. NEXUS assessment completion rate (+15%)
-9. Webinar registration rate (+20% from baseline)
-10. Content engagement rate (newsletter open/click, podcast download) (+20%)
-
-### Tier 3 — Revenue Impact Metrics
-Does it translate to business?
-11. Programme sign-ups from NEXUS users (+25%)
-12. Search/retained leads from programme participants (+20%)
-13. Average deal size — Layer 2 → Layer 3 graduates (stable or up)
-14. Revenue per content asset (CAC-style, reverse) — trend
-15. Client lifetime value — flywheel entrants vs direct (higher target)
-
-**Review cadence:** Monthly. First review: September 12 (4 weeks post-launch).
-
----
-
-## WEBINAR #1 TRACK — RUNNING IN PARALLEL
+## WEBINAR #1 TRACK
 
 **Event:** "Your China Leaders Are Not in Your Global Succession Plan"
 **Date:** August 19, 2026
-**Your Deadline:** Aug 8 — Audience segmentation delivered
+**Your Deadline:** Aug 8 — target audience segments delivered
 
-- [ ] Audience list segmentation by priority + channel
-- [ ] Registration funnel tracking setup
-- [ ] Post-webinar data analysis plan
-- [ ] Work with Maria on outreach list targeting, with Carl on social audience targeting
+- [ ] Webinar target audience segments and prioritization (Aug 8)
+- [ ] Registration funnel tracking setup (by Aug 10)
+- [ ] Audience sources: cold list, warm network, partner lists, social
+- [ ] Funnel KPI targets: registration rate, attendance rate, post-webinar engagement
 
 ---
 
 ## WHAT TO READ FIRST
 
 1. `BRAND_CONSTITUTION.md` — read fully before starting
-2. `BRAND_CHECKLIST.md` — reference for understanding positioning goals
-3. Comms methodology — understand the flywheel and maturity stack
-4. KPI section above — this is the measurement framework
-5. Probe's market scan — use for signal source ideas
+2. `BRAND_CHECKLIST.md` — keep open while you work
+3. Internal vs External Language guidance (above)
+4. Existing audience data, CRM segments, and marketing analytics
 
 ---
 
 ## DELIVERABLES LOCATION
 
-Upload all deliverables to the Feishu drive folder:
+Upload all completed work to the Feishu drive folder:
 **LYC Content Tracker & Specs > Brand Rollout > LENS**
 
 Update the Master Tracker "Brand Rollout" sheet status column when you complete each task.
@@ -147,6 +111,7 @@ Update the Master Tracker "Brand Rollout" sheet status column when you complete 
 
 ## ESCALATION
 
-Data access issues → Emily (Brand Steward)
-Audience strategy decisions → Kevin Hong
-Blocked waiting on other agents → Emily
+Audience strategy or brand interpretation questions → Emily (Brand Steward)
+Final segment definitions or targeting calls → Kevin Hong
+Blocked on data access → flag to Emily
+Need input from ECHO/Maria/Carl → coordinate through Emily
