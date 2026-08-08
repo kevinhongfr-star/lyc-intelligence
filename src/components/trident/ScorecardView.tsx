@@ -72,14 +72,14 @@ export function ScorecardView({ scorecardId, onEdit, onSendForReview }: Scorecar
   const loadScorecard = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/trident/scorecard/${scorecardId}`);
+      const response = await fetch(`/api/x/trident/scorecard/${scorecardId}`);
       const data = await response.json();
       if (data.success) {
         setScorecard(data.scorecard);
         setContact(data.contact);
         // Load score history for this contact
         if (data.contact) {
-          const historyRes = await fetch(`/api/trident/scorecards?contact_id=${data.contact.id}`);
+          const historyRes = await fetch(`/api/x/trident/scorecards?contact_id=${data.contact.id}`);
           const historyData = await historyRes.json();
           if (historyData.success) {
             setScoreHistory(historyData.data || []);

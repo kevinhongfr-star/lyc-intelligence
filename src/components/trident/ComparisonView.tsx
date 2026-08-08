@@ -42,7 +42,7 @@ export function ComparisonView({ mandateId, onCandidateClick }: ComparisonViewPr
   const loadComparison = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/trident/compare?mandate_id=${mandateId}`);
+      const response = await fetch(`/api/x/trident/compare?mandate_id=${mandateId}`);
       const data = await response.json();
       if (data.success) {
         setCandidates(data.candidates);

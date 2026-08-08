@@ -136,7 +136,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
         params.set('search', searchQuery);
       }
 
-      const res = await fetch(`/api/candidates?${params.toString()}`);
+      const res = await fetch(`/api/x/candidates?${params.toString()}`);
       const data = await res.json();
       if (data.success) {
         setCandidates(data.data || []);

@@ -78,6 +78,9 @@ const ReportDetailPage = lazy(() => import('@/pages/ReportDetailPage').then(m =>
 const CoachingPage = lazy(() => import('@/pages/CoachingPage').then(m => ({ default: m.CoachingPage })));
 // ── Phase 9 GRID Market Mapping ──
 const GridPage = lazy(() => import('@/pages/GridPage'));
+// ── Phase 10 TRIDENT + CANVAS ──
+const TridentPage = lazy(() => import('@/pages/TridentPage'));
+const CanvasPage = lazy(() => import('@/pages/CanvasPage'));
 
 // ── Candidate Portal pages (EO-4) ──
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
@@ -199,6 +202,8 @@ export default function App() {
               <Route path="candidates" element={<CandidatesPage />} />
               <Route path="candidates/:id" element={<ExecutiveProfilePage />} />
               <Route path="candidates/:id/report" element={<CandidateReportPage />} />
+              <Route path="trident" element={<TridentPage />} />
+              <Route path="canvas" element={<CanvasPage />} />
               <Route path="companies" element={<CompaniesPage />} />
               <Route path="batch-scoring" element={<BatchScoringPage />} />
               <Route path="metrix" element={<MetrixPage />} />

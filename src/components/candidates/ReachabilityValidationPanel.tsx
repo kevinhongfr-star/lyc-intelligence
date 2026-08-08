@@ -71,7 +71,7 @@ export function ReachabilityValidationPanel({ contactId, currentReachability, on
     setError(null);
 
     try {
-      const res = await fetch(`/api/candidates/${contactId}/reachability`, {
+      const res = await fetch(`/api/x/candidates/${contactId}/reachability`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

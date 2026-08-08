@@ -53,8 +53,8 @@ export function KevinReviewQueue({ onScorecardClick, onProfileClick }: KevinRevi
     setLoading(true);
     try {
       const [tridentRes, canvasRes] = await Promise.all([
-        fetch('/api/trident/review-queue'),
-        fetch('/api/canvas/review-queue'),
+        fetch('/api/x/trident/review-queue'),
+        fetch('/api/x/canvas/review-queue'),
       ]);
 
       const tridentData = await tridentRes.json();

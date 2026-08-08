@@ -67,7 +67,7 @@ export function MotivationScreeningPanel({ contactId, currentMotivation, onSubmi
     setError(null);
 
     try {
-      const res = await fetch(`/api/candidates/${contactId}/motivation`, {
+      const res = await fetch(`/api/x/candidates/${contactId}/motivation`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

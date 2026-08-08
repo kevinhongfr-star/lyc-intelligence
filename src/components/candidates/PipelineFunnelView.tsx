@@ -110,14 +110,14 @@ export function PipelineFunnelView() {
       setError(null);
       try {
         // Fetch funnel
-        const funnelRes = await fetch('/api/candidates/pipeline/funnel');
+        const funnelRes = await fetch('/api/x/candidates/pipeline/funnel');
         const funnelJson = await funnelRes.json();
         if (funnelJson.success) {
           setFunnelData(funnelJson.data);
         }
 
         // Fetch metrics
-        const metricsRes = await fetch('/api/candidates/pipeline/metrics');
+        const metricsRes = await fetch('/api/x/candidates/pipeline/metrics');
         const metricsJson = await metricsRes.json();
         if (metricsJson.success) {
           setMetricsData(metricsJson.data);

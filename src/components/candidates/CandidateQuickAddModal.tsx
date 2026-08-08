@@ -54,7 +54,7 @@ export function CandidateQuickAddModal({ isOpen, onClose, onSuccess }: Candidate
     setError(null);
 
     try {
-      const res = await fetch('/api/candidates', {
+      const res = await fetch('/api/x/candidates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

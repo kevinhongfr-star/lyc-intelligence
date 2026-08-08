@@ -38,7 +38,7 @@ export function CanvasScoringPanel({ scorecardId, contactId, mandateId, onGenera
 
   async function fetchPrefill() {
     try {
-      const res = await authFetch(`/api/canvas/prefill`, {
+      const res = await authFetch(`/api/x/canvas/prefill`, {
         method: 'POST',
         body: JSON.stringify({ scorecard_id: scorecardId }),
       });
@@ -93,7 +93,7 @@ export function CanvasScoringPanel({ scorecardId, contactId, mandateId, onGenera
   async function handleGenerate() {
     setGenerating(true);
     try {
-      const res = await authFetch(`/api/canvas/generate`, {
+      const res = await authFetch(`/api/x/canvas/generate`, {
         method: 'POST',
         body: JSON.stringify({
           contact_id: contactId,

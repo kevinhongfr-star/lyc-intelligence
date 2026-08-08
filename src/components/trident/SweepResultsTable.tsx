@@ -70,7 +70,7 @@ export function SweepResultsTable({ mandateId, contactIds, onComplete }: SweepRe
     }, 100);
 
     try {
-      const response = await fetch('/api/trident/sweep', {
+      const response = await fetch('/api/x/trident/sweep', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -106,7 +106,7 @@ export function SweepResultsTable({ mandateId, contactIds, onComplete }: SweepRe
     try {
       for (const suggestion of aiSuggestions) {
         if (suggestion.error || !suggestion.suggested_d1) continue;
-        await fetch('/api/trident/score', {
+        await fetch('/api/x/trident/score', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

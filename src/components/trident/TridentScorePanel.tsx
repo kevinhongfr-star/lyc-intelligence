@@ -54,7 +54,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
   const runPreflight = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/trident/preflight', {
+      const response = await fetch('/api/x/trident/preflight', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contact_id: contactId, mandate_id: mandateId }),
@@ -84,7 +84,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
 
     setSaving(true);
     try {
-      const response = await fetch('/api/trident/score', {
+      const response = await fetch('/api/x/trident/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

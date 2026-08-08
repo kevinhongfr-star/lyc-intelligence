@@ -50,7 +50,7 @@ export function CanvasNarrativeEditor({ profile, onSave }: CanvasNarrativeEditor
   async function handleRegenerateField(fieldKey: string) {
     setRegeneratingField(fieldKey);
     try {
-      const res = await authFetch(`/api/canvas/regenerate-field`, {
+      const res = await authFetch(`/api/x/canvas/regenerate-field`, {
         method: 'POST',
         body: JSON.stringify({ profile_id: profile.id, field: fieldKey }),
       });
@@ -68,7 +68,7 @@ export function CanvasNarrativeEditor({ profile, onSave }: CanvasNarrativeEditor
   async function handleSave() {
     setSaving(true);
     try {
-      const res = await authFetch(`/api/canvas/profile/${profile.id}`, {
+      const res = await authFetch(`/api/x/canvas/profile/${profile.id}`, {
         method: 'PATCH',
         body: JSON.stringify(fields),
       });
@@ -86,7 +86,7 @@ export function CanvasNarrativeEditor({ profile, onSave }: CanvasNarrativeEditor
 
   async function handleExportPDF(format: 'standard' | 't2_full') {
     try {
-      const res = await authFetch(`/api/canvas/export-pdf`, {
+      const res = await authFetch(`/api/x/canvas/export-pdf`, {
         method: 'POST',
         body: JSON.stringify({ profile_id: profile.id, format }),
       });
