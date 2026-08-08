@@ -38,8 +38,9 @@ export function B2CLanding() {
   }, [mobileOpen]);
 
   const navLinks = [
-    { href: '/b2b', label: 'For Firms' },
-    { href: '/nexus', label: 'Nexus' },
+    { label: 'NEXUS', href: '/nexus' },
+    { label: 'For Business', href: '/b2b' },
+    { label: 'Pricing', href: '/pricing' },
   ];
 
   return (
@@ -80,8 +81,8 @@ export function B2CLanding() {
             Understand your trajectory. Benchmark your leadership. Discover opportunities that match where you're headed.
           </p>
           <div className="cta-row" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/assessment" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
-              Free Assessment <ArrowRight style={{ width: 16, height: 16 }} />
+            <a href="/china-leadership-pipeline" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+              Complimentary Assessment <ArrowRight style={{ width: 16, height: 16 }} />
             </a>
             <a href="/nexus" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               Consult Nexus
@@ -101,7 +102,7 @@ export function B2CLanding() {
         <h2 className="section-heading" style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 400, color: DS.text, textAlign: 'center', margin: '0 0 40px' }}>Your Assessment Includes</h2>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
           {[
-            { icon: IconImpact, title: 'Leadership Archetype', desc: "Discover whether you're a Strategist, Operator, Catalyst, or Builder — with personalized insights for your career trajectory." },
+            { icon: IconImpact, title: 'Leadership Profile', desc: "Discover whether you're a Strategist, Operator, Catalyst, or Builder — with personalized insights for your career trajectory." },
             { icon: IconLeap, title: 'Market Benchmark', desc: 'See how you compare across executive markets. Understand your positioning and unlock opportunities that match your trajectory.' },
             { icon: IconTrident, title: 'Career Benchmark', desc: 'Get benchmarked across Experience, Skills, and Organizational Fit — see exactly how you compare to what top firms look for in C-suite candidates.' },
           ].map(f => (
@@ -125,7 +126,7 @@ export function B2CLanding() {
             {[
               { step: '1', title: 'Enter your details', desc: 'Name, email, title, country — so we can personalize your report.' },
               { step: '2', title: 'Rate yourself', desc: '10 questions across leadership dimensions. Takes under 10 minutes.' },
-              { step: '3', title: 'Get your results', desc: 'Instant archetype + scores + downloadable PDF report.' },
+              { step: '3', title: 'Get your results', desc: 'Instant leadership profile + scores + downloadable PDF report.' },
             ].map((s, i) => (
               <div key={s.step} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', marginBottom: i < 2 ? '20px' : 0 }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, fontSize: '14px', fontWeight: 700, color: DS.accent, flexShrink: 0 }}>
@@ -158,7 +159,7 @@ export function B2CLanding() {
           <div style={{ color: '#C108AB', marginBottom: '12px' }}><IconSpark size={24} color="#C108AB" /></div>
           <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 12px' }}>Ready to find out?</h2>
           <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px' }}>Leadership isn't a title — it's a trajectory. See it, shape it, accelerate it.</p>
-          <LeadCaptureForm type="b2c" source="b2c_landing" heading="Get your free leadership profile" subheading="8 minutes. Archetype, benchmarks, and your 90-day priorities." />
+          <LeadCaptureForm type="b2c" source="b2c_landing" heading="Get your complimentary leadership profile" subheading="8 minutes. Leadership profile, benchmarks, and your 90-day priorities." />
         </div>
       </div>
 
@@ -173,7 +174,7 @@ export function B2CLanding() {
             <div className="footer-label">Platform</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <a href="/match">Match Analysis</a>
-              <a href="/assessment">Assessment</a>
+              <a href="/china-leadership-pipeline">Pipeline Diagnostic</a>
               <a href="/nexus">Nexus</a>
             </div>
           </div>

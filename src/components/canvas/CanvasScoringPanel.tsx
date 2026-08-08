@@ -126,7 +126,7 @@ export function CanvasScoringPanel({ scorecardId, contactId, mandateId, onGenera
       <div className="w-1/4 bg-gray-50 rounded-none p-6 overflow-y-auto">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-blue-600" />
-          <h3 className="font-semibold text-gray-800">TRIDENT Summary</h3>
+          <h3 className="font-semibold text-gray-800">Match Analysis Summary</h3>
         </div>
         {tridentSummary && (
           <div className="space-y-3">
@@ -167,7 +167,7 @@ export function CanvasScoringPanel({ scorecardId, contactId, mandateId, onGenera
       </div>
 
       <div className="flex-1 bg-white rounded-none p-6 overflow-y-auto">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">CANVAS 6 Dimensions</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-6">Scorecard Builder 6 Dimensions</h2>
         <div className="grid grid-cols-2 gap-6">
           {dimensions.map((dim) => (
             <Card key={dim.key} className="p-4">
@@ -209,7 +209,7 @@ export function CanvasScoringPanel({ scorecardId, contactId, mandateId, onGenera
       <div className="w-1/4 bg-gray-50 rounded-none p-6 flex flex-col items-center justify-center">
         <div className="text-center">
           <div className="text-5xl font-bold text-gray-800 mb-1">{composite.toFixed(1)}</div>
-          <div className="text-gray-500 mb-4">CANVAS Composite</div>
+          <div className="text-gray-500 mb-4">Scorecard Builder Composite</div>
           <Badge className={`text-xl px-4 py-2 ${gradeColors[grade]} text-white font-bold`}>
             Grade {grade}
           </Badge>
@@ -222,7 +222,7 @@ export function CanvasScoringPanel({ scorecardId, contactId, mandateId, onGenera
           </div>
         </div>
         <div className="mt-6 w-full space-y-2">
-          <div className="text-xs text-gray-600 font-medium">TRIDENT → CANVAS MAPPING</div>
+          <div className="text-xs text-gray-600 font-medium">Match Analysis → Scorecard Builder Mapping</div>
           <div className="text-xs text-gray-500 space-y-1">
             <div>D1 → Strategic Thinking</div>
             <div>D2 → Communication, Team Leadership</div>

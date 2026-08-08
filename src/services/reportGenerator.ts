@@ -50,7 +50,7 @@ export async function generatePDF(assessmentType: AssessmentType, result: { scor
     doc.setTextColor(255, 255, 255); 
     doc.setFontSize(13); 
     doc.setFont('helvetica', 'bold');
-    doc.text(`Your Archetype: ${result.archetype}`, margin + 10, y + 12);
+    doc.text(`Your Leadership Profile: ${result.archetype}`, margin + 10, y + 12);
     y += 30; 
   }
   

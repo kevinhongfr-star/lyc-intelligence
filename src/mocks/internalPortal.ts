@@ -7,7 +7,7 @@
 // ═══════════════════════════════════════════
 
 export const MOCK_EXECUTION_LOGS = [
-  { id: 'el1', agent: 'TRIDENT Scorer', action: 'Score Candidate', target: 'Sarah Chen', status: 'completed', duration: '2.3s', timestamp: '2026-01-22 14:32:01' },
+  { id: 'el1', agent: 'Match Analysis Scorer', action: 'Score Candidate', target: 'Sarah Chen', status: 'completed', duration: '2.3s', timestamp: '2026-01-22 14:32:01' },
   { id: 'el2', agent: 'Signal Processor', action: 'Ingest LinkedIn Data', target: '5 contacts', status: 'completed', duration: '8.1s', timestamp: '2026-01-22 14:28:15' },
   { id: 'el3', agent: 'Org Analyzer', action: 'Health Assessment', target: 'Lygon Group', status: 'running', duration: '12.4s', timestamp: '2026-01-22 14:25:00' },
   { id: 'el4', agent: 'Report Generator', action: 'LENS Report', target: 'James Park', status: 'failed', duration: '0.8s', timestamp: '2026-01-22 14:20:33' },

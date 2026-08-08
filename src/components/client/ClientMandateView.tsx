@@ -151,7 +151,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
         {(() => {
           const statusInfo = {
             '1_search': { label: 'Active Search', color: '#00897B' },
-            '2_call': { label: 'Canvas', color: '#F59E0B' },
+            '2_call': { label: 'Scorecard Builder', color: '#F59E0B' },
             '3_deliver': { label: 'Deliver', color: '#10B981' },
             'on_hold': { label: 'On Hold', color: '#F59E0B' },
             'won': { label: 'Won', color: '#22C55E' },

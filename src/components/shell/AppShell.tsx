@@ -17,8 +17,8 @@ const SURFACES: Record<Surface, { tabs: { path: string; label: string }[] }> = {
       { path: '/app/pipeline', label: 'Pipeline' },
       { path: '/app/mandates', label: 'Mandates' },
       { path: '/app/candidates', label: 'Candidates' },
-      { path: '/app/trident', label: 'TRIDENT' },
-      { path: '/app/canvas', label: 'CANVAS' },
+      { path: '/app/trident', label: 'Match Analysis' },
+      { path: '/app/canvas', label: 'Scorecard Builder' },
       { path: '/app/shift', label: 'SHIFT Suite' },
       { path: '/app/scheduler', label: 'Scheduler' },
       { path: '/app/reports', label: 'Reports' },
@@ -50,8 +50,8 @@ const SURFACES: Record<Surface, { tabs: { path: string; label: string }[] }> = {
   },
   coaching: {
     tabs: [
-      { path: '/coaching/coach', label: 'Coach' },
-      { path: '/coaching/cpi', label: 'CPI Assessment' },
+      { path: '/coaching/coach', label: 'NEXUS Chat' },
+      { path: '/coaching/cpi', label: 'Pipeline Diagnostic' },
       { path: '/coaching/credits', label: 'Credits & Plans' },
       { path: '/coaching/intelligence', label: 'Intelligence' },
       { path: '/coaching/career-intel', label: 'Career Intelligence' },

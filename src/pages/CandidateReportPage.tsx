@@ -96,7 +96,7 @@ export function CandidateReportPage() {
               <p className="text-sm font-bold mt-0.5" style={{ color: tier.color }}>Tier {tier.tier}</p>
             </div>
             <div>
-              <p className="text-[9px] uppercase tracking-wider text-gray-400 font-sans font-bold">Trident Score</p>
+              <p className="text-[9px] uppercase tracking-wider text-gray-400 font-sans font-bold">Match Analysis Score</p>
               <p className="text-sm font-bold mt-0.5">{contact.trident_composite ?? '—'}</p>
             </div>
             <div>

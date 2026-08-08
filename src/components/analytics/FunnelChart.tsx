@@ -46,7 +46,7 @@ export function FunnelChart({
               <BarChart3 className="w-6 h-6 text-accent" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-text-primary">Candidate Funnel</h2>
+              <h2 className="text-lg font-semibold text-text-primary">Candidate Progression</h2>
               <p className="text-sm text-text-muted">Conversion rates by pipeline stage</p>
             </div>
           </div>

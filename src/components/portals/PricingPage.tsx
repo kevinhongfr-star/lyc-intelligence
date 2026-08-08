@@ -56,11 +56,11 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
       .catch(() => {
         if (mounted) {
           setTiers([
-            { key: 'explorer', name: 'Explorer', priceMonthly: 0, priceAnnual: 0, features: ['Basic chat', '2 credits/day'] },
+            { key: 'explorer', name: 'Executive Introduction', priceMonthly: 0, priceAnnual: 0, features: ['Basic chat', '2 credits/day'] },
             { key: 'starter', name: 'Starter', priceMonthly: 29, priceAnnual: 290, features: ['Unlimited chat', 'All assessments', 'PDF export'] },
             { key: 'pro', name: 'Pro', priceMonthly: 99, priceAnnual: 990, features: ['Everything in Starter', 'Peer matching', 'Deliverables'] },
             { key: 'executive', name: 'Executive', priceMonthly: 299, priceAnnual: 2990, features: ['Everything in Pro', 'Executive reviews', 'Events'] },
-            { key: 'council', name: 'Council', priceMonthly: 999, priceAnnual: 9990, features: ['Everything in Executive', 'Live sessions', 'Workshops'] },
+            { key: 'council', name: 'Executive Access', priceMonthly: 999, priceAnnual: 9990, features: ['Everything in Executive', 'Live sessions', 'Workshops'] },
           ]);
         }
       })
@@ -122,7 +122,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
             Unlock Your Leadership Potential
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: '#666' }}>
-            From free exploration to executive council, pick the tier that matches your ambitions.
+            From Executive Introduction to Enterprise, pick the tier that matches your ambitions.
           </p>
 
           {/* Cycle toggle */}
@@ -222,7 +222,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                         className="text-3xl font-bold"
                         style={{ color: '#000' }}
                       >
-                        Free
+                        Executive Introduction
                       </span>
                     ) : (
                       <div className="flex items-baseline gap-1">
@@ -318,7 +318,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                 <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#333' }}>
                   Feature
                 </th>
-                {['Explorer', 'Starter', 'Pro', 'Executive', 'Council'].map((n) => (
+                {['Executive Introduction', 'Starter', 'Pro', 'Executive', 'Executive Access'].map((n) => (
                   <th
                     key={n}
                     className="px-6 py-4 text-center text-sm font-semibold"

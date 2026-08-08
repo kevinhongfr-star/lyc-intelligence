@@ -136,7 +136,7 @@ export function OnePagerTab() {
       a.href = url; a.download = filename;
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(url);
-      setGenMsg(`GRID PDF generated (${slideCount} slides) — report ${reportId.slice(0, 8)}`);
+      setGenMsg(`Market Intelligence PDF generated (${slideCount} slides) — report ${reportId.slice(0, 8)}`);
       await fetchAll();
     } catch (caughtErr) {
       setError((caughtErr as Error).message);
@@ -210,7 +210,7 @@ export function OnePagerTab() {
               sub={avgComposite != null ? `avg ${avgComposite}/100` : 'no data'}
             />
             <StatCard
-              label="Last GRID PDF"
+              label="Last Market Intelligence PDF"
               value={reports[0] ? new Date(reports[0].generated_at).toLocaleDateString() : '—'}
               icon={<Clock className="w-4 h-4" />}
               sub={reports[0]?.slide_count ? `${reports[0].slide_count} slides` : 'none yet'}
@@ -219,7 +219,7 @@ export function OnePagerTab() {
 
           {/* Generate button */}
           <div className="border border-bg-hover rounded-none p-4 bg-bg-secondary/30">
-            <h3 className="text-sm font-medium text-text-primary mb-2">Generate GRID PDF</h3>
+            <h3 className="text-sm font-medium text-text-primary mb-2">Generate Market Intelligence PDF</h3>
             <p className="text-sm text-text-muted mb-3">
               Produces a 5-slide deck: company overview, org structure, talent pool stats,
               evaluation outcomes, source quality.
@@ -231,7 +231,7 @@ export function OnePagerTab() {
                 className="px-4 py-2 bg-accent text-white rounded-none hover:bg-accent-light disabled:opacity-50 flex items-center gap-2"
               >
                 {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-                {generating ? 'Generating…' : 'Generate GRID PDF'}
+                {generating ? 'Generating…' : 'Generate Market Intelligence PDF'}
               </button>
               {genMsg && (
                 <div className="text-sm text-green-700">{genMsg}</div>

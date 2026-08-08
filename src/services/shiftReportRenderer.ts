@@ -436,7 +436,7 @@ export function generateSHIFTReportHTML(
     </div>
     
     <div class="section">
-      <div class="section-title">Your Archetype: ${analysis.archetype}</div>
+      <div class="section-title">Your Leadership Profile: ${analysis.archetype}</div>
       <p style="color: #333; margin-bottom: 16px;">${archetype.description}</p>
       
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">

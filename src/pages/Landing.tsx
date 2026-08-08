@@ -52,15 +52,14 @@ export function Landing() {
   }, [mobileOpen]);
 
   const navLinks = [
-    { href: '/match', label: 'Match Analysis' },
-    { href: '/b2b', label: 'For Firms' },
-    { href: '/b2c', label: 'For Leaders' },
-    { href: '/nexus', label: 'Nexus' },
+    { label: 'NEXUS', href: '/nexus' },
+    { label: 'For Business', href: '/b2b' },
+    { label: 'Pricing', href: '/pricing' },
   ];
 
   const services = [
-    { icon: IconTrident, animClass: 'anim-trident', title: 'Match Analysis', desc: 'AI-powered JD-CV matching engine. Score candidates instantly against role requirements.', href: '/match', cta: 'Try Free' },
-    { icon: IconImpact, animClass: 'anim-impact', title: 'Leadership Assessment', desc: 'Discover your archetype. Benchmark against global executives across 47 markets.', href: '/assessment', cta: 'Take Assessment' },
+    { icon: IconTrident, animClass: 'anim-trident', title: 'Match Analysis', desc: 'AI-powered JD-CV matching engine. Score candidates instantly against role requirements.', href: '/match', cta: 'Start — Executive Introduction' },
+    { icon: IconImpact, animClass: 'anim-impact', title: 'Leadership Assessment', desc: 'Discover your leadership profile. Benchmark against global executives across 47 markets.', href: '/china-leadership-pipeline', cta: 'Take Assessment' },
     { icon: IconCompass, animClass: 'anim-compass', title: 'Nexus', desc: 'Executive advisory on career positioning, talent scoring, and leadership alignment.', href: '/nexus', cta: 'Consult' },
   ];
 
@@ -166,7 +165,7 @@ export function Landing() {
             >
               <div style={{ color: '#C108AB', marginBottom: '16px' }}><IconLeap size={32} color="#C108AB" /></div>
               <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: '#FFFFFF', margin: '0 0 8px' }}>I'm a leader</h3>
-              <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: 'rgba(255,255,255,0.6)', margin: '0 0 20px', lineHeight: 1.5 }}>Get your leadership archetype, benchmark your profile, and explore opportunities.</p>
+              <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: 'rgba(255,255,255,0.6)', margin: '0 0 20px', lineHeight: 1.5 }}>Get your leadership profile, benchmark your profile, and explore opportunities.</p>
               <span style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: '#C108AB', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 Get Started <ArrowRight style={{ width: 16, height: 16 }} />
               </span>
@@ -263,7 +262,7 @@ export function Landing() {
             <div className="footer-label">Platform</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <a href="/match">Match Analysis</a>
-              <a href="/assessment">Assessment</a>
+              <a href="/china-leadership-pipeline">Pipeline Diagnostic</a>
               <a href="/nexus">Nexus</a>
             </div>
           </div>

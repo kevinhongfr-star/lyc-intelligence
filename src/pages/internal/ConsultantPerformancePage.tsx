@@ -323,7 +323,7 @@ export function ConsultantPerformancePage() {
       <div>
         <h1 className="font-serif font-bold text-2xl text-text-primary">Consultant Performance</h1>
         <p className="text-text-secondary text-sm mt-1">
-          Workload, fill-rate funnel, and SLA compliance for the delivery team.
+          Workload, fill-rate progression, and SLA compliance for the delivery team.
         </p>
       </div>
 
@@ -407,7 +407,7 @@ export function ConsultantPerformancePage() {
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-4">
               <Trophy className="w-4 h-4 text-fuchsia" />
-              <h3 className="font-medium text-text-primary">Fill-Rate Funnel per Consultant</h3>
+              <h3 className="font-medium text-text-primary">Fill-Rate Progression per Consultant</h3>
             </div>
             <div className="h-[320px]">
               <ResponsiveContainer width="100%" height="100%">

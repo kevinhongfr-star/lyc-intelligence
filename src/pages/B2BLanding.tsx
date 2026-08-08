@@ -38,9 +38,9 @@ export function B2BLanding() {
   }, [mobileOpen]);
 
   const navLinks = [
-    { href: '/match', label: 'Match Analysis' },
-    { href: '/b2c', label: 'For Leaders' },
-    { href: '/nexus', label: 'Nexus' },
+    { label: 'NEXUS', href: '/nexus' },
+    { label: 'For Business', href: '/b2b' },
+    { label: 'Pricing', href: '/pricing' },
   ];
 
   return (
@@ -82,9 +82,9 @@ export function B2BLanding() {
           </p>
           <div className="cta-row" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="/match" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
-              Try Match Analysis Free <ArrowRight style={{ width: 16, height: 16 }} />
+              Start — Executive Introduction <ArrowRight style={{ width: 16, height: 16 }} />
             </a>
-            <a href="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <a href="/china-leadership-pipeline" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               Leadership Assessment
             </a>
           </div>
@@ -173,7 +173,7 @@ export function B2BLanding() {
           <div style={{ width: '48px', height: '3px', background: '#C108AB', margin: '0 auto 16px', borderRadius: '2px' }} />
           <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 12px' }}>Start matching today</h2>
           <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px' }}>Leadership isn't a title — it's a trajectory. Find the right one.</p>
-          <LeadCaptureForm type="b2b" source="b2b_landing" heading="Get 3 free candidate matches" subheading="Paste a job description, add CVs, get ranked results. No credit card." />
+          <LeadCaptureForm type="b2b" source="b2b_landing" heading="Get 3 complimentary candidate matches" subheading="Paste a job description, add CVs, get ranked results. No credit card." />
         </div>
       </div>
 
@@ -188,7 +188,7 @@ export function B2BLanding() {
             <div className="footer-label">Platform</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <a href="/match">Match Analysis</a>
-              <a href="/assessment">Assessment</a>
+              <a href="/china-leadership-pipeline">Pipeline Diagnostic</a>
               <a href="/nexus">Nexus</a>
             </div>
           </div>

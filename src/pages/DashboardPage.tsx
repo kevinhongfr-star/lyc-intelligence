@@ -212,7 +212,7 @@ export function DashboardPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
             <div>
               <p style={{ fontSize: '12px', color: DS.muted, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Your Archetype
+                Your Leadership Profile
               </p>
               <p style={{ fontSize: '20px', fontWeight: 700, color: DS.text }}>
                 {assessment?.archetype || 'Not assessed yet'}
@@ -274,7 +274,7 @@ export function DashboardPage() {
           <ActionCard
             icon={Target}
             title="Run Assessment"
-            description="Discover your executive archetype"
+            description="Discover your executive leadership profile"
             color={DS.success}
             onClick={() => navigate('/assessment')}
           />

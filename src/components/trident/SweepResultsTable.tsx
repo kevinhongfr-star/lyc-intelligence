@@ -169,7 +169,7 @@ export function SweepResultsTable({ mandateId, contactIds, onComplete }: SweepRe
     return (
       <Card className="p-8 text-center">
         <Sparkles className="w-12 h-12 mx-auto mb-3 text-accent animate-pulse" />
-        <p className="text-text-primary font-medium">Running TRIDENT SWEEP...</p>
+        <p className="text-text-primary font-medium">Running Match Analysis SWEEP...</p>
         <p className="text-sm text-text-muted mt-2">Processing {contactIds.length} candidates via DeepSeek AI</p>
         <p className="text-xs text-text-muted mt-1">Elapsed: {(elapsedMs / 1000).toFixed(1)}s</p>
         <Progress value={Math.min((elapsedMs / 110000) * 100, 100)} className="h-1 mt-3" />
@@ -182,7 +182,7 @@ export function SweepResultsTable({ mandateId, contactIds, onComplete }: SweepRe
       <Card className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-text-primary">TRIDENT SWEEP Results</h3>
+            <h3 className="text-lg font-semibold text-text-primary">Match Analysis SWEEP Results</h3>
             <p className="text-sm text-text-muted">
               {aiSuggestions.length} scored | {haltedContacts.length} halted | {warnCount} flagged
             </p>

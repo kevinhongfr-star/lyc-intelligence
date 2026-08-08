@@ -68,7 +68,7 @@ export function ScoringRunsPage() {
       {loading ? (
         <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>
       ) : runs.length === 0 ? (
-        <Card><CardContent className="p-8 text-center text-text-muted">No scoring runs recorded yet. Run a TRIDENT or PHI evaluation to see audit entries here.</CardContent></Card>
+        <Card><CardContent className="p-8 text-center text-text-muted">No scoring runs recorded yet. Run a Match Analysis or PHI evaluation to see audit entries here.</CardContent></Card>
       ) : (
         <div className="space-y-2">
           {runs.map(run => (

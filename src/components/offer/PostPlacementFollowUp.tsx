@@ -344,7 +344,7 @@ Hope you're settling in well at ${clientName}! It's been ${months} month${type =
 
 How's the transition going? Any support you need from our side?
 
-Feel free to reach out if you have any questions or just want to catch up.
+Please reach out if you have any questions or just want to catch up.
 
 Best,
 ${consultantName}

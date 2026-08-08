@@ -38,8 +38,8 @@ export const CREDIT_COSTS: Record<ActionType, number> = {
 
 export const ACTION_LABELS: Record<ActionType, string> = {
   assessment: 'Assessment (CPD)',
-  match_single: 'TRIDENT Match (1 candidate)',
-  match_batch: 'TRIDENT Batch (5 candidates)',
+  match_single: 'Match Analysis (1 candidate)',
+  match_batch: 'Match Analysis Batch (5 candidates)',
   linkedin_audit: 'LinkedIn Profile Audit',
   cv_optimization: 'CV Optimization',
   pdf_report: 'Branded PDF Report',

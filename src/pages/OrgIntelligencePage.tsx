@@ -33,7 +33,7 @@ const TABS: TabDef[] = [
   { id: 'talent-pool',  label: 'Talent Pool',  icon: <Users className="w-4 h-4" />,          description: 'Individuals in the org tree per company' },
   { id: 'evaluations',  label: 'Evaluations',  icon: <ClipboardCheck className="w-4 h-4" />, description: 'Active evaluation runs and outcomes' },
   { id: 'scoring',      label: 'Scoring',      icon: <BarChart3 className="w-4 h-4" />,      description: 'Platform-wide 5-criteria scoring overview' },
-  { id: 'one-pager',    label: 'One-Pager',    icon: <FileText className="w-4 h-4" />,       description: 'Per-company summary + GRID PDF generator' },
+  { id: 'one-pager',    label: 'One-Pager',    icon: <FileText className="w-4 h-4" />,       description: 'Per-company summary + Market Intelligence PDF generator' },
 ];
 
 export function OrgIntelligencePage() {

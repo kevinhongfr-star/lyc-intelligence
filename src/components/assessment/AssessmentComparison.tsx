@@ -121,7 +121,7 @@ export default function AssessmentComparison() {
           {/* TRIDENT dimension comparison */}
           <div className="bg-bg-primary border border-bg-tertiary p-5" style={{ borderRadius: 0 }}>
             <h3 className="font-serif font-semibold text-text-primary mb-4">
-              TRIDENT Dimensions
+              Match Analysis Dimensions
             </h3>
             <div className="space-y-4">
               {TRIDENT_DIMENSIONS.map((dim) => (

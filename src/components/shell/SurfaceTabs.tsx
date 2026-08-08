@@ -18,7 +18,7 @@ const SURFACE_TABS: SurfaceTab[] = [
   { id: 'client', label: 'B2B Client', icon: <Building2 className="w-4 h-4" /> },
   { id: 'coaching', label: 'B2C Coaching', icon: <GraduationCap className="w-4 h-4" /> },
   { id: 'candidate', label: 'Candidate', icon: <User className="w-4 h-4" /> },
-  { id: 'grid', label: 'GRID', icon: <Grid3x3 className="w-4 h-4" /> },
+  { id: 'grid', label: 'Market Intelligence', icon: <Grid3x3 className="w-4 h-4" /> },
 ];
 
 interface SurfaceTabsProps {

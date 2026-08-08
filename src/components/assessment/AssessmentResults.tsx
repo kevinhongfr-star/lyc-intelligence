@@ -36,7 +36,7 @@ export default function AssessmentResults({ onBack, onShare, onRetake }: Assessm
       <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
         <h3 className="font-serif font-semibold text-text-primary mb-1 flex items-center gap-2">
           <Award className="w-5 h-5 text-accent" />
-          TRIDENT Leadership Assessment
+          Match Analysis Leadership Assessment
         </h3>
         <div className="flex items-center gap-4 mb-5">
           <span className="text-3xl font-bold text-text-primary">{trident.overall}</span>
@@ -74,7 +74,7 @@ export default function AssessmentResults({ onBack, onShare, onRetake }: Assessm
         <h3 className="font-serif font-semibold text-text-primary mb-4">Percentile Rankings</h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-bg-primary p-4 border border-bg-tertiary" style={{ borderRadius: 0 }}>
-            <p className="text-sm text-text-muted">TRIDENT</p>
+            <p className="text-sm text-text-muted">Match Analysis</p>
             <p className="text-2xl font-bold text-accent">92nd</p>
             <p className="text-xs text-text-muted">percentile</p>
           </div>

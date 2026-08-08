@@ -21,7 +21,7 @@ const TEMPLATE_COLORS: Record<string, string> = {
   'Insight Report': '#C108AB',
   'Career Plan Report': '#9A0688',
   'Executive Summary': '#C108AB',
-  'TRIDENT Report': '#C108AB',
+  'Match Analysis Report': '#C108AB',
 };
 
 export function ReportViewer({ report, onClose, onExport, onEdit }: ReportViewerProps) {

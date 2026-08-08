@@ -34,7 +34,7 @@ export function UpgradeBanner({ type = 'empty', message, onDismiss }: UpgradeBan
 
   const getDefaultMessage = () => {
     if (type === 'empty') {
-      return "You've used all your free credits. Upgrade for unlimited access.";
+      return "You've used all your complimentary credits. Upgrade for unlimited access.";
     }
     if (type === 'low') {
       return `Only ${credit.balance} credits left. Upgrade to never run out.`;

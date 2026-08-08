@@ -30,7 +30,7 @@ export const TIERS = [
     features: [
       '50 credits/month',
       'Unlimited assessment retries',
-      '20 TRIDENT matches/month',
+      '20 Match Analysis matches/month',
       '3 document uploads',
       '90-day memory persistence',
       'Standard AI model'
@@ -50,7 +50,7 @@ export const TIERS = [
     features: [
       '200 credits/month',
       'Unlimited assessment retries',
-      'Unlimited TRIDENT matches',
+      'Unlimited Match Analysis matches',
       '10 document uploads',
       'Permanent memory',
       'Priority AI model',

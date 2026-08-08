@@ -193,7 +193,7 @@ export function formatTransactionDescription(type: string, amount: number): stri
     earn_action: `${prefix}${amount} Action completed`,
     earn_purchase: `${prefix}${amount} Credits purchased`,
     spend_assessment: `${amount} Assessment`,
-    spend_match: `${amount} TRIDENT match`,
+    spend_match: `${amount} Match Analysis match`,
     spend_pdf: `${amount} PDF report`,
     spend_document: `${amount} Document upload`,
     spend_linkedin: `${amount} LinkedIn audit`,

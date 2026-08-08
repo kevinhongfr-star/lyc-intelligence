@@ -142,7 +142,7 @@ export default function HiringFunnel() {
       );
     } catch (e: any) {
       console.warn('[HiringFunnel] load error:', e);
-      setError(e?.message || 'Failed to load funnel data.');
+      setError(e?.message || 'Failed to load progression data.');
     } finally {
       setLoading(false);
     }
@@ -174,7 +174,7 @@ export default function HiringFunnel() {
   const fillRate = totalCandidates > 0 ? Math.round((hiredCount / totalCandidates) * 100) : 0;
 
   if (loading && funnel.length === 0) {
-    return <div className="py-12 text-center text-text-muted text-sm">Loading hiring funnel…</div>;
+    return <div className="py-12 text-center text-text-muted text-sm">Loading hiring progression…</div>;
   }
 
   return (
@@ -195,7 +195,7 @@ export default function HiringFunnel() {
         </div>
         <div className="bg-bg-primary border border-bg-tertiary p-4">
           <div className="flex items-center gap-2 text-text-muted text-xs mb-1">
-            <Activity className="w-3.5 h-3.5" /> Top of Funnel
+            <Activity className="w-3.5 h-3.5" /> Top of Pipeline
           </div>
           <div className="text-2xl font-bold text-text-primary">{funnel[0]?.count ?? 0}</div>
         </div>
@@ -217,7 +217,7 @@ export default function HiringFunnel() {
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Funnel BarChart */}
         <div className="bg-bg-primary border border-bg-tertiary p-5">
-          <h3 className="font-medium text-text-primary mb-4">Stage Funnel</h3>
+          <h3 className="font-medium text-text-primary mb-4">Stage Progression</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart

@@ -12,10 +12,10 @@ export function DexLandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="bg-[#1A1A2E] text-white">
+      <section className="bg-white text-gray-900">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[rgba(193,8,171,0.18)] text-[#F0A6E8] text-xs font-semibold uppercase tracking-wide mb-5">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 text-teal-600 text-xs font-semibold uppercase tracking-wide mb-5">
               <Sparkles className="w-3 h-3" />
               Executive Introduction · 5 Complimentary Messages
             </div>
@@ -25,7 +25,7 @@ export function DexLandingPage() {
             >
               AI-powered executive advisory for China-APAC leaders
             </h1>
-            <p className="text-base md:text-lg text-[#B8B8C8] leading-relaxed mb-8 max-w-2xl">
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8 max-w-2xl">
               DEX AI is your always-on advisor for career strategy, compensation benchmarking, and
               cross-border transitions — trained on LYC Partners' placement intelligence across 7,400+
               executive mandates.
@@ -37,7 +37,7 @@ export function DexLandingPage() {
                 </Button>
               </a>
               <a href="/dex/assess">
-                <Button size="lg" variant="outline" className="border-[#3A3A52] text-white hover:bg-[#252540]">
+                <Button size="lg" variant="outline" className="border-gray-300 text-gray-900 hover:bg-gray-100">
                   Take the Assessment
                 </Button>
               </a>

@@ -142,7 +142,7 @@ export function KevinReviewQueue({ onScorecardClick, onProfileClick }: KevinRevi
             Kevin's Review Queue
           </h2>
           <p className="text-sm text-text-muted">
-            {totalPending} pending review{totalPending !== 1 ? 's' : ''} • {tridentCount} TRIDENT + {canvasCount} CANVAS • SLA: 24 hours
+            {totalPending} pending review{totalPending !== 1 ? 's' : ''} • {tridentCount} Match Analysis + {canvasCount} Scorecard Builder • SLA: 24 hours
           </p>
         </div>
         <Button variant="outline" onClick={loadQueue}>
@@ -153,8 +153,8 @@ export function KevinReviewQueue({ onScorecardClick, onProfileClick }: KevinRevi
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="all">All ({totalPending})</TabsTrigger>
-          <TabsTrigger value="trident">TRIDENT ({tridentCount})</TabsTrigger>
-          <TabsTrigger value="canvas">CANVAS ({canvasCount})</TabsTrigger>
+          <TabsTrigger value="trident">Match Analysis ({tridentCount})</TabsTrigger>
+          <TabsTrigger value="canvas">Scorecard Builder ({canvasCount})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all">
@@ -221,7 +221,7 @@ export function KevinReviewQueue({ onScorecardClick, onProfileClick }: KevinRevi
                       ) : (
                         <Sparkles className="w-3 h-3 mr-1" />
                       )}
-                      {item.type === 'trident' ? 'TRIDENT' : 'CANVAS'}
+                      {item.type === 'trident' ? 'Match Analysis' : 'Scorecard Builder'}
                     </Badge>
                     {item.type === 'trident' && item.preflight_flags && item.preflight_flags.length > 0 && (
                       <Badge variant="warning" className="text-xs">
@@ -265,7 +265,7 @@ export function KevinReviewQueue({ onScorecardClick, onProfileClick }: KevinRevi
                   </>
                 ) : (
                   <div className="text-center">
-                    <div className="text-sm text-text-muted">CANVAS Grade</div>
+                    <div className="text-sm text-text-muted">Scorecard Builder Grade</div>
                     <Badge className={`text-white text-xl px-4 py-2 ${getGradeColor(item.canvas_grade)}`}>
                       {item.canvas_grade}
                     </Badge>

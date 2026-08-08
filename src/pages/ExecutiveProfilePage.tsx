@@ -364,7 +364,7 @@ export function ExecutiveProfilePage() {
                 {contact.trident_composite != null && (
                   <div className="text-center">
                     <div className="text-lg font-bold font-mono text-text-primary">{contact.trident_composite}</div>
-                    <div className="text-[9px] text-text-muted uppercase tracking-wider">Trident</div>
+                    <div className="text-[9px] text-text-muted uppercase tracking-wider">Match Analysis</div>
                   </div>
                 )}
                 {contact.trident_d1 != null && (

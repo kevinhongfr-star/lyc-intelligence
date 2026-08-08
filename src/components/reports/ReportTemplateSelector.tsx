@@ -17,7 +17,7 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'Intelligence & Insights': <Lightbulb className="w-5 h-5" />,
   'Career Planning': <Briefcase className="w-5 h-5" />,
   'Executive Briefing': <Building2 className="w-5 h-5" />,
-  'TRIDENT Scoring': <Target className="w-5 h-5" />,
+  'Match Analysis': <Target className="w-5 h-5" />,
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -28,7 +28,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Intelligence & Insights': '#C108AB',
   'Career Planning': '#9A0688',
   'Executive Briefing': '#C108AB',
-  'TRIDENT Scoring': '#C108AB',
+  'Match Analysis': '#C108AB',
 };
 
 import { Users } from 'lucide-react';

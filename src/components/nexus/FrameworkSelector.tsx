@@ -63,7 +63,7 @@ export interface FrameworkSelectorProps {
 const DEFAULT_FRAMEWORKS: Framework[] = [
   {
     id: 'trident',
-    name: 'TRIDENT',
+    name: 'Match Analysis',
     description:
       'Structured assessment across 3 dimensions: diagnosis, gap analysis, and action planning.',
     useCases: ['Career transitions', 'Performance reviews', 'Development planning'],
@@ -81,7 +81,7 @@ const DEFAULT_FRAMEWORKS: Framework[] = [
   },
   {
     id: 'canvas',
-    name: 'CANVAS',
+    name: 'Scorecard Builder',
     description:
       'Visual thinking framework for mapping out a complete situation across multiple dimensions.',
     useCases: ['Strategic planning', 'Problem solving', 'Team alignment'],

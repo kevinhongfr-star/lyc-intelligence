@@ -144,7 +144,7 @@ export function DexAssessPage() {
               className="text-3xl font-bold text-[#1A1A2E] mb-2"
               style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
             >
-              Your Leadership Archetype
+              Your Leadership Profile
             </h1>
             <div className="text-fuchsia font-semibold text-xl">{result.archetype.name}</div>
           </div>

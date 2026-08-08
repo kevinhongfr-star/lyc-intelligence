@@ -331,7 +331,7 @@ export function GRIDInteractiveView({
     return (
       <div className="bg-card rounded-none border border-card-border p-8 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-accent" />
-        <span className="ml-3 text-text-muted">Loading GRID data...</span>
+        <span className="ml-3 text-text-muted">Loading Market Intelligence data...</span>
       </div>
     );
   }
@@ -342,7 +342,7 @@ export function GRIDInteractiveView({
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-4">
           <h3 className="text-lg font-semibold text-text-primary">
-            GRID Market Map
+            Market Intelligence Map
           </h3>
           <Badge variant="default">
             {summaryStats.totalCompanies} companies

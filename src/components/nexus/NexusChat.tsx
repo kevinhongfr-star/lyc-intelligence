@@ -894,7 +894,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 }}
                 className="w-full py-3 px-4 bg-accent text-white rounded-none font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
               >
-                Start 14-Day Free Trial
+                Start 14-Day Complimentary Trial
                 <ArrowRight className="w-4 h-4" />
               </button>
 

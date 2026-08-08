@@ -142,7 +142,7 @@ export function GridReviewDashboard() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-text-primary">GRID Weekly Review</h2>
+            <h2 className="text-xl font-semibold text-text-primary">Market Intelligence Weekly Review</h2>
             <p className="text-sm text-text-muted mt-1">Weekly review dashboard for team leads</p>
           </div>
           <div className="flex items-center gap-3">
@@ -303,7 +303,7 @@ export function GridReviewDashboard() {
             </Button>
             <div>
               <h2 className="text-xl font-semibold text-text-primary">{qualityMetrics.mandate_title}</h2>
-              <p className="text-sm text-text-muted">GRID Mapping Detail View</p>
+              <p className="text-sm text-text-muted">Market Intelligence Mapping Detail View</p>
             </div>
           </div>
           <Button onClick={() => loadDailyGrid(selectedMapping)}>

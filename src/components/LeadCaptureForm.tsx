@@ -160,7 +160,7 @@ export function LeadCaptureForm({
         margin: '0 0 8px',
         textAlign: 'center',
       }}>
-        {heading || (type === 'b2b' ? 'Schedule Your Demo' : 'Start Your Free Assessment')}
+        {heading || (type === 'b2b' ? 'Schedule Your Demo' : 'Start Your Complimentary Assessment')}
       </h3>
       <p style={{
         fontFamily: DS.bodyFont,
@@ -170,8 +170,8 @@ export function LeadCaptureForm({
         textAlign: 'center',
       }}>
         {subheading || (type === 'b2b'
-          ? 'Get 3 free Match Analysis results when you book a demo'
-          : 'Get your personalized leadership archetype in 10 minutes')}
+          ? 'Get 3 complimentary Match Analysis results when you book a demo'
+          : 'Get your personalized leadership profile in 10 minutes')}
       </p>
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -371,8 +371,8 @@ export function LeadCaptureForm({
           margin: 0,
         }}>
           {type === 'b2b'
-            ? 'No credit card required. Free consultation included.'
-            : 'Free assessment. No credit card required.'}
+            ? 'No credit card required. Complimentary consultation included.'
+            : 'Complimentary assessment. No credit card required.'}
         </p>
       </form>
 

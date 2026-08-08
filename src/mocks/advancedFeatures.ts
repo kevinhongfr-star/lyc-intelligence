@@ -228,7 +228,7 @@ export interface Assessment {
 }
 
 export const MOCK_ASSESSMENTS: Assessment[] = [
-  { id: 'as1', name: 'TRIDENT Leadership Assessment', type: 'leadership', description: 'Comprehensive 5-dimension leadership assessment covering Vision, Execution, Influence, Learning, and Resilience.', estimatedTime: '45 min', questionCount: 40, status: 'completed', lastTaken: '2026-01-15', score: 8.7, percentile: 92 },
+  { id: 'as1', name: 'Match Analysis Leadership Assessment', type: 'leadership', description: 'Comprehensive 5-dimension leadership assessment covering Vision, Execution, Influence, Learning, and Resilience.', estimatedTime: '45 min', questionCount: 40, status: 'completed', lastTaken: '2026-01-15', score: 8.7, percentile: 92 },
   { id: 'as2', name: 'Cognitive Style Profile', type: 'cognitive', description: 'Map your thinking style: analytical, strategic, creative, or practical. Understand how you process information and make decisions.', estimatedTime: '25 min', questionCount: 30, status: 'completed', lastTaken: '2026-01-10', score: 78, percentile: 85 },
   { id: 'as3', name: 'Executive Personality Index', type: 'personality', description: 'Based on the Big Five model, tailored for executive contexts. Measures openness, conscientiousness, extraversion, agreeableness, and stability under pressure.', estimatedTime: '30 min', questionCount: 50, status: 'available' },
   { id: 'as4', name: 'Cross-Cultural Intelligence (CQ)', type: 'skills', description: 'Assess your cultural intelligence across four dimensions: CQ Drive, CQ Knowledge, CQ Strategy, CQ Action.', estimatedTime: '20 min', questionCount: 25, status: 'available' },

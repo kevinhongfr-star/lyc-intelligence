@@ -251,7 +251,7 @@ export function LENSReportGenerator({
                 <span className="ml-2 text-text-primary">{candidate.stage}</span>
               </div>
               <div>
-                <span className="text-text-muted">TRIDENT:</span>
+                <span className="text-text-muted">Match Analysis:</span>
                 <span className="ml-2 text-text-primary">{candidate.trident_composite || 'N/A'}</span>
               </div>
             </div>

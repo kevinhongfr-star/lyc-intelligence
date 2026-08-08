@@ -117,7 +117,7 @@ export function CanvasNarrativeEditor({ profile, onSave }: CanvasNarrativeEditor
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">CANVAS Narrative</h2>
+          <h2 className="text-xl font-bold text-gray-800">Scorecard Builder Narrative</h2>
           <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />

@@ -37,13 +37,13 @@ const STATUS_CONFIG: Record<EnrichmentStatus, {
     label: 'Scored',
     variant: 'warning',
     icon: <Sparkles className="w-3 h-3" />,
-    description: 'TRIDENT scoring complete',
+    description: 'Match Analysis scoring complete',
   },
   narrated: {
     label: 'Narrated',
     variant: 'success',
     icon: <CheckCircle2 className="w-3 h-3" />,
-    description: 'CANVAS narration complete',
+    description: 'Scorecard Builder narration complete',
   },
   complete: {
     label: 'Complete',

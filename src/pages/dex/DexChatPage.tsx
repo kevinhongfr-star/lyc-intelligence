@@ -145,11 +145,11 @@ export function DexChatPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#1A1A2E] text-white">
+    <div className="flex flex-col h-screen bg-white text-gray-900">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-[#2A2A45] flex-shrink-0">
+      <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-gray-200 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <a href="/dex" className="text-[#B8B8C8] hover:text-white">
+          <a href="/dex" className="text-gray-500 hover:text-gray-900">
             <ArrowLeft className="w-4 h-4" />
           </a>
           <div className="flex items-center gap-2">
@@ -158,18 +158,18 @@ export function DexChatPage() {
             </div>
             <div>
               <div className="font-semibold text-sm">DEX AI</div>
-              <div className="text-[10px] text-[#8A8AA0]">Executive Advisory</div>
+              <div className="text-[10px] text-gray-400">Executive Advisory</div>
             </div>
           </div>
         </div>
         {/* Credit / intro status */}
         <div className="flex items-center gap-2 text-xs">
           {gateState === 'intro' ? (
-            <span className="px-2.5 py-1 bg-[rgba(193,8,171,0.18)] text-[#F0A6E8] font-medium">
+            <span className="px-2.5 py-1 bg-fuchsia-50 text-fuchsia-600 font-medium">
               {remainingIntro} complimentary messages left
             </span>
           ) : (
-            <span className="px-2.5 py-1 bg-[#252540] text-[#B8B8C8] font-medium flex items-center gap-1">
+            <span className="px-2.5 py-1 bg-gray-100 text-gray-500 font-medium flex items-center gap-1">
               <Zap className="w-3 h-3 text-fuchsia" /> {credit.balance} credits
             </span>
           )}
@@ -190,7 +190,7 @@ export function DexChatPage() {
               >
                 Welcome to your Executive Introduction
               </h2>
-              <p className="text-sm text-[#8A8AA0] max-w-md mx-auto">
+              <p className="text-sm text-gray-400 max-w-md mx-auto">
                 Ask me anything about your career trajectory, compensation, or next move. Your first
                 5 messages are complimentary.
               </p>
@@ -205,7 +205,7 @@ export function DexChatPage() {
                 className={`max-w-[80%] px-4 py-3 text-sm leading-relaxed ${
                   m.role === 'user'
                     ? 'bg-fuchsia text-white'
-                    : 'bg-[#252540] text-[#E8E8F0]'
+                    : 'bg-gray-100 text-gray-700'
                 }`}
               >
                 {m.content}
@@ -214,7 +214,7 @@ export function DexChatPage() {
           ))}
           {sending && (
             <div className="flex justify-start">
-              <div className="bg-[#252540] px-4 py-3 text-sm text-[#8A8AA0] flex items-center gap-2">
+              <div className="bg-gray-100 px-4 py-3 text-sm text-gray-400 flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" /> DEX AI is thinking…
               </div>
             </div>
@@ -224,8 +224,8 @@ export function DexChatPage() {
 
       {/* Hard gate banner */}
       {showHardGate && (
-        <div className="px-4 md:px-6 py-3 bg-[rgba(193,8,171,0.15)] border-t border-fuchsia/30 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm text-[#F0A6E8]">
+        <div className="px-4 md:px-6 py-3 bg-fuchsia-50 border-t border-fuchsia/30 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm text-fuchsia-600">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             You are out of credits. Get more to continue the conversation.
           </div>
@@ -236,7 +236,7 @@ export function DexChatPage() {
       )}
 
       {/* Input */}
-      <div className="border-t border-[#2A2A45] px-4 md:px-6 py-4 flex-shrink-0">
+      <div className="border-t border-gray-200 px-4 md:px-6 py-4 flex-shrink-0">
         <div className="max-w-3xl mx-auto flex items-end gap-3">
           <textarea
             value={input}
@@ -244,14 +244,14 @@ export function DexChatPage() {
             onKeyDown={handleKeyDown}
             rows={1}
             placeholder="Ask DEX AI about your career, compensation, or next move…"
-            className="flex-1 bg-[#252540] text-white text-sm px-4 py-3 resize-none focus:outline-none focus:ring-1 focus:ring-fuchsia placeholder:text-[#6A6A80] min-h-[48px] max-h-40"
+            className="flex-1 bg-white text-gray-900 text-sm px-4 py-3 resize-none border border-gray-200 focus:outline-none focus:ring-1 focus:ring-fuchsia placeholder:text-gray-400 min-h-[48px] max-h-40"
             disabled={sending}
           />
           <Button onClick={handleSend} disabled={sending || !input.trim()} className="flex-shrink-0">
             <Send className="w-4 h-4" />
           </Button>
         </div>
-        <p className="text-[10px] text-[#6A6A80] text-center mt-2">
+        <p className="text-[10px] text-gray-400 text-center mt-2">
           DEX AI provides advisory guidance, not legal or financial advice.
         </p>
       </div>

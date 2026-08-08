@@ -112,7 +112,7 @@ export function SettingsPage() {
                   { key: 'mandateStatus' as const, label: 'Mandate status changes', desc: 'Get notified when mandates move between stages' },
                   { key: 'candidateMatches' as const, label: 'New candidate matches', desc: 'Alert when high-match candidates are identified' },
                   { key: 'phiAlerts' as const, label: 'PHI health alerts', desc: 'Red/Amber mandate health warnings' },
-                  { key: 'scoringComplete' as const, label: 'Scoring run completed', desc: 'When batch TRIDENT evaluations finish' },
+                  { key: 'scoringComplete' as const, label: 'Scoring run completed', desc: 'When batch Match Analysis evaluations finish' },
                 ].map(pref => (
                   <div key={pref.key} className="flex items-center justify-between p-3 bg-bg-tertiary rounded-none">
                     <div><p className="text-sm text-text-primary">{pref.label}</p><p className="text-xs text-text-muted">{pref.desc}</p></div>

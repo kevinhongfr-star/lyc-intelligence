@@ -39,7 +39,7 @@ const TIER_NAMES: Record<TierKey, string> = {
 };
 
 const TIER_PRICES: Record<TierKey, string> = {
-  explorer: 'Free',
+  explorer: 'Executive Introduction',
   starter: '$29/mo',
   pro: '$99/mo',
   executive: '$299/mo',

@@ -51,7 +51,7 @@ const SIGNAL_TYPE_CONFIG: Record<string, { icon: React.ReactNode; color: string;
   upload:          { icon: <Upload className="w-4 h-4" />, color: 'text-teal-600 bg-teal-50', label: 'Upload' },
   linkedin:        { icon: <Linkedin className="w-4 h-4" />, color: 'text-sky-600 bg-sky-50', label: 'LinkedIn' },
   outreach:        { icon: <Mail className="w-4 h-4" />, color: 'text-indigo-600 bg-indigo-50', label: 'Outreach' },
-  grid_report:     { icon: <Grid3x3 className="w-4 h-4" />, color: 'text-cyan-600 bg-cyan-50', label: 'GRID Report' },
+  grid_report:     { icon: <Grid3x3 className="w-4 h-4" />, color: 'text-cyan-600 bg-cyan-50', label: 'Market Intelligence Report' },
   mandate_phase:   { icon: <TrendingUp className="w-4 h-4" />, color: 'text-orange-600 bg-orange-50', label: 'Mandate Phase' },
   enrichment_advance: { icon: <Sparkles className="w-4 h-4" />, color: 'text-violet-600 bg-violet-50', label: 'Enrichment' },
 };

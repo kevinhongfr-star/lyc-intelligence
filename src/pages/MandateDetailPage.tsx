@@ -79,7 +79,7 @@ function AddCompanyForm({ mandateId, onCompanyAdded }: { mandateId: string; onCo
 const STATUS_OPTIONS = [
   { value: '1_search', label: 'SWEEP', color: '#00897B' },
   { value: '2_call', label: 'CANVA', color: '#F59E0B' },
-  { value: '3_deliver', label: 'GRID/LENS', color: '#10B981' },
+  { value: '3_deliver', label: 'Market Intelligence/LENS', color: '#10B981' },
   { value: 'won', label: 'Won', color: '#10B981' },
   { value: 'on_hold', label: 'On Hold', color: '#F59E0B' },
   { value: 'lost', label: 'Lost', color: '#EF4444' },
@@ -203,7 +203,7 @@ export function MandateDetailPage() {
             </Button>
           </Link>
           <Link to="/platform/pipeline">
-            <Button variant="outline" size="sm"><Eye className="w-4 h-4" />GRID View</Button>
+            <Button variant="outline" size="sm"><Eye className="w-4 h-4" />Market Intelligence View</Button>
           </Link>
         </div>
       </div>

@@ -116,7 +116,7 @@ export function PipelineFunnel({ funnel, conversions = {} }: PipelineFunnelProps
   return (
     <div className="bg-card border border-border rounded-none p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-text-primary">Pipeline Funnel</h3>
+        <h3 className="font-semibold text-text-primary">Pipeline Progression</h3>
         <span className="text-sm text-text-muted">
           {Object.values(funnel).reduce((a, b) => a + b, 0)} total candidates
         </span>

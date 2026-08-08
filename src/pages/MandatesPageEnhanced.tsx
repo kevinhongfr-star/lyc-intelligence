@@ -14,7 +14,7 @@ import type { Mandate } from '@/services/supabaseApi';
 const STATUS_OPTIONS = [
   { value: '', label: 'All Statuses' },
   { value: '1_search', label: 'Active Search', color: '#00897B' },
-  { value: '2_call', label: 'Canvas', color: '#F59E0B' },
+  { value: '2_call', label: 'Scorecard Builder', color: '#F59E0B' },
   { value: '3_deliver', label: 'Deliver', color: '#10B981' },
   { value: 'on_hold', label: 'On Hold', color: '#F59E0B' },
   { value: 'won', label: 'Won', color: '#22C55E' },

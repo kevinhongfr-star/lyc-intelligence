@@ -5,11 +5,11 @@ import MarketMaps from '@/components/internal/MarketMaps';
 import TalentDensityExplorer from '@/components/internal/TalentDensityExplorer';
 import SignalFeed from '@/components/internal/SignalFeed';
 
-const tabs = ['GRID', 'Market Maps', 'Talent Density', 'Signal Feed'] as const;
+const tabs = ['Market Intelligence', 'Market Maps', 'Talent Density', 'Signal Feed'] as const;
 type Tab = typeof tabs[number];
 
 export default function IntelligencePlusPage() {
-  const [activeTab, setActiveTab] = useState<Tab>('GRID');
+  const [activeTab, setActiveTab] = useState<Tab>('Market Intelligence');
 
   return (
     <div className="min-h-screen bg-bg-secondary">
@@ -40,7 +40,7 @@ export default function IntelligencePlusPage() {
         </div>
 
         <div>
-          {activeTab === 'GRID' && <GRIDInteractive />}
+          {activeTab === 'Market Intelligence' && <GRIDInteractive />}
           {activeTab === 'Market Maps' && <MarketMaps />}
           {activeTab === 'Talent Density' && <TalentDensityExplorer />}
           {activeTab === 'Signal Feed' && <SignalFeed />}

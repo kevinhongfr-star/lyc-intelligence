@@ -247,7 +247,7 @@ export function LensExportPage() {
       {!showConfidential && (
         <div className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded-none">
           <Shield className="w-4 h-4 text-green-400 flex-shrink-0" />
-          <p className="text-xs text-green-400">Client-safe view — TRIDENT formulas, weights, run IDs, and internal stage names are hidden.</p>
+          <p className="text-xs text-green-400">Client-safe view — Match Analysis formulas, weights, run IDs, and internal stage names are hidden.</p>
         </div>
       )}
 

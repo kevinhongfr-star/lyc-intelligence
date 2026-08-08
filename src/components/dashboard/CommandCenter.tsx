@@ -7,7 +7,7 @@ import type { PHIResult } from '@/services/phiScoring';
 import type { Mandate } from '@/services/supabaseApi';
 import { STAGE_ORDER, STAGE_CONFIG } from '@/types/mandate';
 
-const STATUS_LABELS: Record<string, string> = { '1_search': 'SWEEP', '2_call': 'CANVA', '3_deliver': 'GRID/LENS', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
+const STATUS_LABELS: Record<string, string> = { '1_search': 'SWEEP', '2_call': 'CANVA', '3_deliver': 'Market Intelligence/LENS', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
 const FILTER_OPTIONS = [
   { key: 'all' as const, label: 'All' },
   { key: 'RED' as const, label: 'Red' },

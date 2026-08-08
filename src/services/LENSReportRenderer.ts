@@ -650,7 +650,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     y += 12;
 
     // Table rows
-    const dimensions = ['Match Score', 'Experience', 'Skills', 'Fit', 'TRIDENT', 'Verdict'];
+    const dimensions = ['Match Score', 'Experience', 'Skills', 'Fit', 'Match Analysis', 'Verdict'];
     
     dimensions.forEach(dim => {
       doc.setFillColor(248, 249, 250);
@@ -667,7 +667,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
           drawScoreBadge(cellX, y, c.match_score, '');
         } else if (dim === 'Verdict') {
           drawVerdictBadge(cellX + 5, y + 1, c.verdict);
-        } else if (dim === 'TRIDENT') {
+        } else if (dim === 'Match Analysis') {
           doc.text(c.trident || 'N/A', cellX + 5, y + 7);
         } else {
           const dims = c.dimensions || { experience: 0, skills: 0, fit: 0 };

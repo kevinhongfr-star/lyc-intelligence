@@ -232,7 +232,7 @@ export function CandidateApplicationsPage() {
                     <Award className="w-3 h-3 text-fuchsia flex-shrink-0" />
                     <span>Match Score: <strong>{app.match_score}</strong></span>
                     {app.trident_composite != null && (
-                      <span className="text-text-muted">· Trident: {app.trident_composite}</span>
+                      <span className="text-text-muted">· Match Analysis: {app.trident_composite}</span>
                     )}
                   </div>
                 )}

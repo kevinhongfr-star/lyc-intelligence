@@ -12,9 +12,9 @@ export function CouncilUpsell({ trigger, messageCount, onUpgrade }: CouncilUpsel
     switch (trigger) {
       case 'trial':
         return {
-          title: 'You\'re on the Free Trial',
+          title: 'You\'re on the Complimentary Trial',
           description: `You've sent ${messageCount} messages. Upgrade to Council for 5 credits/day + premium insights.`,
-          highlight: 'Start your 14-day free trial',
+          highlight: 'Start your 14-day complimentary trial',
         };
       case 'insight':
         return {

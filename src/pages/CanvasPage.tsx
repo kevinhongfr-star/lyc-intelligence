@@ -5,7 +5,7 @@ export default function CanvasPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">CANVAS Executive Narrative</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Scorecard Builder Executive Narrative</h1>
         <p className="text-sm text-slate-500 mt-1">
           Behavioral scoring + AI-generated executive profiles for stakeholder review.
         </p>

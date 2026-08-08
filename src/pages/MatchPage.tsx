@@ -360,7 +360,7 @@ export function MatchPage() {
             </div>
             {isFirstBatch && (
               <div style={{ padding: '8px 16px', background: `${DS.success}15`, border: `1px solid ${DS.success}30`, borderRadius: '20px', fontSize: '13px', color: DS.success, fontWeight: 600 }}>
-                First 3 matches free!
+                First 3 matches complimentary!
               </div>
             )}
           </div>
@@ -458,7 +458,7 @@ export function MatchPage() {
                 {validCandidates.length > 0 && (
                   <p style={{ fontSize: '12px', color: DS.muted, margin: 0 }}>
                     {isFirstBatch ? (
-                      <span style={{ color: DS.success }}>Free (first 3 matches)</span>
+                      <span style={{ color: DS.success }}>Complimentary (first 3 matches)</span>
                     ) : (
                       <>Cost: <strong>{creditCost.credits} credits</strong>
                         {userCredits < creditCost.credits && <span style={{ color: DS.warning, marginLeft: '8px' }}>(You have {userCredits})</span>}

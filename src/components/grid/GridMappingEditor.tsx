@@ -608,7 +608,7 @@ export function GridMappingEditor() {
     return (
       <div className="bg-card rounded-none border border-card-border p-8 flex items-center justify-center">
         <RefreshCw className="w-8 h-8 animate-spin text-accent" />
-        <span className="ml-3 text-text-muted">Loading GRID mapping...</span>
+        <span className="ml-3 text-text-muted">Loading Market Intelligence mapping...</span>
       </div>
     );
   }
@@ -621,7 +621,7 @@ export function GridMappingEditor() {
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-4">
             <h3 className="text-lg font-semibold text-text-primary">
-              {mapping?.mandate?.title || 'GRID Mapping'}
+              {mapping?.mandate?.title || 'Market Intelligence Mapping'}
             </h3>
             <Badge variant={mapping?.status === 'complete' ? 'success' : mapping?.status === 'in_progress' ? 'warning' : 'default'}>
               {mapping?.status}

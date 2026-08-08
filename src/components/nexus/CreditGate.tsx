@@ -99,7 +99,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
               </h3>
               <p className="text-text-muted text-sm">
                 {result.balance === 0 
-                  ? 'Your free trial has ended. Upgrade to Council for unlimited insights.'
+                  ? 'Your complimentary trial has ended. Upgrade to Executive Access for unlimited insights.'
                   : `You have ${result.balance} credit${result.balance === 1 ? '' : 's'} remaining.`
                 }
               </p>

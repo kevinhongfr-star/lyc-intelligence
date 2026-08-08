@@ -28,7 +28,7 @@ interface OrgRow {
 }
 
 const PLAN_TIERS = [
-  { value: 'free', label: 'Free', seats: 3, color: 'bg-gray-100 text-gray-700' },
+  { value: 'free', label: 'Executive Introduction', seats: 3, color: 'bg-gray-100 text-gray-700' },
   { value: 'starter', label: 'Starter', seats: 10, color: 'bg-blue-100 text-blue-700' },
   { value: 'growth', label: 'Growth', seats: 50, color: 'bg-fuchsia/10 text-fuchsia' },
   { value: 'enterprise', label: 'Enterprise', seats: 500, color: 'bg-purple-100 text-purple-700' },

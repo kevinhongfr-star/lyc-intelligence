@@ -7,7 +7,7 @@ import RevenueAnalytics from '@/components/internal/RevenueAnalytics';
 
 const TABS = [
   { key: 'leaderboard', label: 'Leaderboard', icon: Award },
-  { key: 'funnel', label: 'Funnel', icon: Filter },
+  { key: 'funnel', label: 'Progression', icon: Filter },
   { key: 'quality', label: 'Quality', icon: BarChart3 },
   { key: 'revenue', label: 'Revenue', icon: DollarSign },
 ] as const;

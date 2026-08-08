@@ -365,7 +365,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
             )}
             {selectedApp.trident_composite && (
               <div>
-                <div className="text-text-muted">TRIDENT Score</div>
+                <div className="text-text-muted">Match Analysis Score</div>
                 <div className="font-medium text-text-primary">{selectedApp.trident_composite}</div>
               </div>
             )}

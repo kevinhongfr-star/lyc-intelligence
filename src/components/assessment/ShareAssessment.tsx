@@ -100,7 +100,7 @@ export default function ShareAssessment() {
       <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
         <h3 className="font-serif font-semibold text-text-primary mb-4">Preview</h3>
         <div className="bg-bg-secondary border border-bg-tertiary p-4" style={{ borderRadius: 0 }}>
-          <h4 className="font-semibold text-text-primary mb-3">TRIDENT Leadership Assessment</h4>
+          <h4 className="font-semibold text-text-primary mb-3">Match Analysis Leadership Assessment</h4>
           {includeScores && (
             <div className="mb-2">
               <span className="text-sm text-text-muted">Overall Score: </span>

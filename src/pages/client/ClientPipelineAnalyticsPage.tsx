@@ -185,7 +185,7 @@ export function ClientPipelineAnalyticsPage() {
       <div>
         <h1 className="font-serif font-bold text-2xl text-text-primary">Pipeline Analytics</h1>
         <p className="text-text-secondary text-sm mt-1">
-          Candidate-stage heatmap, funnel, conversion, and velocity across your mandates.
+          Candidate-stage heatmap, progression, conversion, and velocity across your mandates.
         </p>
       </div>
 
@@ -238,7 +238,7 @@ export function ClientPipelineAnalyticsPage() {
       <div className="grid lg:grid-cols-2 gap-4">
         <Card>
           <CardContent className="p-5">
-            <h3 className="font-medium text-text-primary mb-4">Stage Funnel</h3>
+            <h3 className="font-medium text-text-primary mb-4">Stage Progression</h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart

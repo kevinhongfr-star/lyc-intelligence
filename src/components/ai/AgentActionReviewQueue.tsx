@@ -44,9 +44,9 @@ interface AgentActionReviewQueueProps {
 }
 
 const AGENT_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  trident:  { label: 'TRIDENT', color: 'text-cyan-700 bg-cyan-50 border-cyan-200', icon: <Bot className="w-4 h-4" /> },
-  canvas:   { label: 'CANVAS', color: 'text-violet-700 bg-violet-50 border-violet-200', icon: <Bot className="w-4 h-4" /> },
-  grid:     { label: 'GRID', color: 'text-emerald-700 bg-emerald-50 border-emerald-200', icon: <Bot className="w-4 h-4" /> },
+  trident:  { label: 'Match Analysis', color: 'text-cyan-700 bg-cyan-50 border-cyan-200', icon: <Bot className="w-4 h-4" /> },
+  canvas:   { label: 'Scorecard Builder', color: 'text-violet-700 bg-violet-50 border-violet-200', icon: <Bot className="w-4 h-4" /> },
+  grid:     { label: 'Market Intelligence', color: 'text-emerald-700 bg-emerald-50 border-emerald-200', icon: <Bot className="w-4 h-4" /> },
   sweep:    { label: 'SWEEP', color: 'text-amber-700 bg-amber-50 border-amber-200', icon: <Bot className="w-4 h-4" /> },
   alessio:  { label: 'ALESSIO', color: 'text-pink-700 bg-pink-50 border-pink-200', icon: <Bot className="w-4 h-4" /> },
 };

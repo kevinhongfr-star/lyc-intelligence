@@ -244,7 +244,7 @@ function getMockTemplates(): ReportTemplateInfo[] {
     { id: 'insight-report', name: 'Insight Report', description: 'Data-driven intelligence insights', category: 'Intelligence & Insights' },
     { id: 'career-plan-report', name: 'Career Plan Report', description: 'Individualized career development plan', category: 'Career Planning' },
     { id: 'executive-summary', name: 'Executive Summary', description: 'Concise executive brief', category: 'Executive Briefing' },
-    { id: 'trident-report', name: 'Trident Report', description: 'Three-dimensional scoring analysis', category: 'TRIDENT Scoring' },
+    { id: 'trident-report', name: 'Match Analysis Report', description: 'Three-dimensional scoring analysis', category: 'Match Analysis' },
   ];
 }
 
@@ -278,7 +278,7 @@ function getMockReport(id: string): ReportData {
 function getMockReports(): ReportData[] {
   return [
     getMockReport('r1'),
-    { ...getMockReport('r2'), templateId: 'trident-report', templateName: 'Trident Report', title: 'TRIDENT Score Report' },
+    { ...getMockReport('r2'), templateId: 'trident-report', templateName: 'Match Analysis Report', title: 'Match Analysis Score Report' },
     { ...getMockReport('r3'), templateId: 'executive-summary', templateName: 'Executive Summary', title: 'Executive Briefing' },
   ];
 }

@@ -576,7 +576,7 @@ function IntelligenceHub() {
             </div>
 
             <div className="bg-card border border-border rounded-none p-5">
-              <h3 className="font-semibold text-text-primary mb-4">Report Funnel</h3>
+              <h3 className="font-semibold text-text-primary mb-4">Report Progression</h3>
               <div className="space-y-3">
                 {[
                   { label: 'Generated', value: oversight?.reports_this_month?.generated || 0, color: 'bg-blue-500' },

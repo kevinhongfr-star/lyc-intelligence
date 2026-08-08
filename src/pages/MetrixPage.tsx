@@ -72,7 +72,7 @@ function Sparkline({ data, color = '#C108AB', width = 200, height = 40 }: { data
   );
 }
 
-const STATUS_LABELS: Record<string, string> = { '1_search': 'SWEEP', '2_call': 'CANVA', '3_deliver': 'GRID/LENS', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
+const STATUS_LABELS: Record<string, string> = { '1_search': 'SWEEP', '2_call': 'CANVA', '3_deliver': 'Market Intelligence/LENS', 'won': 'Won', 'on_hold': 'On Hold', 'lost': 'Lost', 'completed': 'Completed' };
 
 export function MetrixPage() {
   const { data: mandates, count, loading } = useMandates({ limit: 500 });
@@ -171,7 +171,7 @@ export function MetrixPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
-          <CardHeader><CardTitle>Pipeline Funnel</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Pipeline Progression</CardTitle></CardHeader>
           <CardContent><BarChart data={analytics.funnelData} color="#00897B" /></CardContent>
         </Card>
         <Card>

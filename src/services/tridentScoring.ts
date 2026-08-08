@@ -76,7 +76,7 @@ export function getCreditCost(candidateCount: number, isFirstBatch: boolean): {
   description: string;
 } {
   if (isFirstBatch) {
-    return { credits: 0, description: 'First 3 matches free' };
+    return { credits: 0, description: 'First 3 matches complimentary' };
   }
 
   if (candidateCount >= 5) {

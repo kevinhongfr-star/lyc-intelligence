@@ -171,7 +171,9 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path="/assessment" element={<AssessmentPage />} />
+          <Route path="/assessment" element={<Navigate to="/china-leadership-pipeline" replace />} />
+          <Route path="/cpi" element={<Navigate to="/china-leadership-pipeline" replace />} />
+          <Route path="/china-leadership-pipeline" element={<AssessmentPage />} />
           <Route path="/b2b" element={<B2BLanding />} />
           <Route path="/b2c" element={<B2CLanding />} />
           <Route path="/nexus" element={<NexusLanding />} />

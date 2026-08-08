@@ -300,7 +300,7 @@ export function ProfilePage() {
                 </div>
               </div>
               <p style={{ fontSize: '13px', color: DS.textSecondary, margin: 0 }}>
-                Archetype: <strong style={{ color: DS.text }}>{assessment.archetype}</strong>
+                Leadership Profile: <strong style={{ color: DS.text }}>{assessment.archetype}</strong>
               </p>
             </div>
           ))}
@@ -335,7 +335,7 @@ export function ProfilePage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
             <p style={{ fontSize: '13px', color: DS.muted, margin: '0 0 4px' }}>Current Plan</p>
-            <h3 style={{ fontSize: '20px', fontWeight: 600, color: DS.text, margin: 0, textTransform: 'capitalize' }}>{profile?.tier || 'Free'}</h3>
+            <h3 style={{ fontSize: '20px', fontWeight: 600, color: DS.text, margin: 0, textTransform: 'capitalize' }}>{profile?.tier || 'Executive Introduction'}</h3>
           </div>
           <button style={{
             padding: '10px 20px',

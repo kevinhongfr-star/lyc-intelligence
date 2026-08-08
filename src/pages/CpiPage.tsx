@@ -128,7 +128,7 @@ export default function CpiPage() {
       // Fallback: download as .html file
       const a = document.createElement('a');
       a.href = url;
-      a.download = `CPI_Report_${Date.now()}.html`;
+      a.download = `Pipeline_Diagnostic_Report_${Date.now()}.html`;
       a.click();
     }
     setTimeout(() => URL.revokeObjectURL(url), 5000);
@@ -142,7 +142,7 @@ export default function CpiPage() {
           onClick={() => setMode('landing')}
           className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to CPI Overview
+          <ArrowLeft className="w-4 h-4" /> Back to Pipeline Diagnostic
         </button>
         <AssessmentWizard
           prefillEmail={user?.email}
@@ -178,7 +178,7 @@ export default function CpiPage() {
         <h1 className="text-2xl font-bold text-slate-900">China Leadership Pipeline Diagnostic</h1>
         <p className="text-sm text-slate-500 mt-1 max-w-2xl">
           A comprehensive executive leadership assessment measuring five critical dimensions of leadership
-          capability for cross-border and China-focused roles. Identify your leadership archetype and receive
+          capability for cross-border and China-focused roles. Identify your leadership profile and receive
           a personalized development narrative.
         </p>
       </div>
@@ -203,7 +203,7 @@ export default function CpiPage() {
 
       {/* Dimension overview */}
       <div>
-        <h2 className="text-lg font-semibold text-slate-900 mb-3">What CPI Measures</h2>
+        <h2 className="text-lg font-semibold text-slate-900 mb-3">What the Diagnostic Measures</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {DIMENSION_DISPLAY.map(({ id, icon: Icon, color }) => {
             const info = DIMENSION_INFO[id];
@@ -227,9 +227,9 @@ export default function CpiPage() {
 
       {/* Archetype preview */}
       <div>
-        <h2 className="text-lg font-semibold text-slate-900 mb-3">Your Leadership Archetype</h2>
+        <h2 className="text-lg font-semibold text-slate-900 mb-3">Your Leadership Profile</h2>
         <p className="text-sm text-slate-500 mb-4">
-          Based on your dimension scores and cross-border readiness, CPI identifies one of six leadership archetypes.
+          Based on your dimension scores and cross-border readiness, the diagnostic identifies one of six leadership profiles.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {Object.values(ARCHETYPE_INFO).map((arch) => (
@@ -251,7 +251,7 @@ export default function CpiPage() {
           </div>
         ) : history.length === 0 ? (
           <p className="text-sm text-slate-400">
-            No CPI assessments yet. Start your first diagnostic above.
+            No assessments yet. Start your first diagnostic above.
           </p>
         ) : (
           <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">

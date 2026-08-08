@@ -15,10 +15,10 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
   const tiers = [
     {
       id: 'member',
-      name: 'Member',
+      name: 'Executive Introduction',
       price: '$0',
       period: '',
-      description: 'Free tier with basic access',
+      description: 'Executive Introduction — complimentary access to get started',
       features: [
         '2 credits per day',
         'Basic chat with Nexus',
@@ -33,10 +33,10 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
     },
     {
       id: 'council',
-      name: 'Council',
+      name: 'Executive Access',
       price: '$29',
       period: '/month',
-      description: 'Premium leadership development',
+      description: 'Full executive access with premium capabilities',
       features: [
         '5 credits per day',
         'All SHIFT assessments',
@@ -45,7 +45,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
         'Unlimited reports',
         'Exclusive content',
       ],
-      cta: 'Upgrade to Council',
+      cta: 'Upgrade to Executive Access',
       popular: true,
       icon: Crown,
       color: 'bg-accent',
@@ -60,7 +60,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
     try {
       const priceId = import.meta.env.VITE_STRIPE_PRICE_COUNCIL as string | undefined;
       if (!priceId) {
-        throw new Error('Council plan is not configured yet. Please contact support.');
+        throw new Error('Executive Access plan is not configured yet. Please contact support.');
       }
       const response = await authFetch('/api/stripe/checkout', {
         method: 'POST',
@@ -118,7 +118,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
             return (
               <div
                 key={tier.id}
-                className={`relative rounded-2xl border-2 ${tier.borderColor} p-8 ${
+                className={`relative rounded-none border-2 ${tier.borderColor} p-8 ${
                   tier.popular ? 'bg-gradient-to-b from-accent/5 to-white' : 'bg-white'
                 } shadow-lg hover:shadow-xl transition-shadow`}
               >
@@ -201,13 +201,13 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
         <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
           Feature Comparison
         </h2>
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-white rounded-none border border-border overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="bg-bg-tertiary">
                 <th className="px-6 py-4 text-left font-medium text-text-secondary">Feature</th>
-                <th className="px-6 py-4 text-center font-medium text-text-secondary">Member</th>
-                <th className="px-6 py-4 text-center font-medium text-accent">Council</th>
+                <th className="px-6 py-4 text-center font-medium text-text-secondary">Executive Introduction</th>
+                <th className="px-6 py-4 text-center font-medium text-accent">Executive Access</th>
               </tr>
             </thead>
             <tbody>
@@ -254,15 +254,15 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
           {[
             {
               question: 'Can I cancel my subscription at any time?',
-              answer: 'Yes, you can cancel your Council subscription at any time. You will continue to have access until the end of your current billing period.',
+              answer: 'Yes, you can cancel your Executive Access subscription at any time. You will continue to have access until the end of your current billing period.',
             },
             {
               question: 'How do credits work?',
-              answer: 'Credits are used for premium features like SHIFT assessments and advanced insights. Member accounts get 2 credits per day, while Council members get 5 credits per day. Unused credits do not roll over.',
+              answer: 'Credits are used for premium features like SHIFT assessments and advanced insights. Executive Introduction accounts get 2 credits per day, while Executive Access members get 5 credits per day. Unused credits do not roll over.',
             },
             {
               question: 'Can I upgrade or downgrade my plan?',
-              answer: 'Absolutely! You can upgrade to Council at any time. If you downgrade from Council to Member, your change will take effect at the end of your current billing cycle.',
+              answer: 'Absolutely! You can upgrade to Executive Access at any time. If you downgrade from Executive Access to Executive Introduction, your change will take effect at the end of your current billing cycle.',
             },
             {
               question: 'What payment methods are accepted?',
@@ -279,10 +279,10 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
 
       {/* CTA */}
       <div className="max-w-4xl mx-auto px-4 pb-16">
-        <div className="bg-gradient-to-r from-accent to-purple-600 rounded-2xl p-8 text-center text-white">
+        <div className="bg-gradient-to-r from-accent to-purple-600 rounded-none p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Ready to Elevate Your Leadership?</h2>
           <p className="mb-6 opacity-90">
-            Join Council today and unlock premium features designed for ambitious leaders.
+            Join Executive Access today and unlock premium features designed for ambitious leaders.
           </p>
           <button
             onClick={handleUpgrade}
@@ -296,7 +296,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
               </>
             ) : (
               <>
-                Upgrade to Council
+                Upgrade to Executive Access
                 <ArrowRight className="w-4 h-4" />
               </>
             )}

@@ -38,7 +38,7 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 const MOCK_AVAILABLE: AvailableAssessment[] = [
-  { id: 'av1', name: 'Leadership Archetype Assessment', description: 'Discover your core leadership archetype and operating style.', duration: '25 min', questions: 40, category: 'Leadership' },
+  { id: 'av1', name: 'Leadership Profile Assessment', description: 'Discover your core leadership profile and operating style.', duration: '25 min', questions: 40, category: 'Leadership' },
   { id: 'av2', name: 'Executive Reasoning Test', description: 'Measure strategic reasoning and complex problem-solving.', duration: '35 min', questions: 30, category: 'Cognitive' },
   { id: 'av3', name: 'Cross-Border Readiness Index', description: 'Assess readiness for international and cross-cultural roles.', duration: '20 min', questions: 28, category: 'Career' },
   { id: 'av4', name: 'Influence & Communication Profile', description: 'Map your influence style and stakeholder communication patterns.', duration: '18 min', questions: 24, category: 'Soft Skills' },
@@ -47,7 +47,7 @@ const MOCK_AVAILABLE: AvailableAssessment[] = [
 const MOCK_COMPLETED: CompletedAssessment[] = [
   {
     id: 'c1',
-    name: 'Leadership Archetype Assessment',
+    name: 'Leadership Profile Assessment',
     archetype: 'The Architect',
     score: 87,
     takenAt: '2025-01-08',
@@ -181,7 +181,7 @@ export function CandidateAssessmentsPage() {
                     {/* Archetype display */}
                     <div className="flex flex-col items-center justify-center text-center bg-fuchsia-light rounded-lg p-6">
                       <Star className="w-8 h-8 text-fuchsia mb-2" />
-                      <div className="text-xs text-text-muted uppercase tracking-wide">Archetype</div>
+                      <div className="text-xs text-text-muted uppercase tracking-wide">Leadership Profile</div>
                       <div className="font-serif font-bold text-xl text-text-primary mt-1">{c.archetype}</div>
                       <div className="mt-3">
                         <TierBadge tier={tier} size="sm" />
