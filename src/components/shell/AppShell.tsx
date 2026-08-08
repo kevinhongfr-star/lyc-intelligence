@@ -51,6 +51,7 @@ const SURFACES: Record<Surface, { tabs: { path: string; label: string }[] }> = {
   coaching: {
     tabs: [
       { path: '/coaching/coach', label: 'Coach' },
+      { path: '/coaching/cpi', label: 'CPI Assessment' },
       { path: '/coaching/credits', label: 'Credits & Plans' },
       { path: '/coaching/intelligence', label: 'Intelligence' },
       { path: '/coaching/career-intel', label: 'Career Intelligence' },

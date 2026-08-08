@@ -83,6 +83,8 @@ const TridentPage = lazy(() => import('@/pages/TridentPage'));
 const CanvasPage = lazy(() => import('@/pages/CanvasPage'));
 // ── Phase 11 SHIFT Suite ──
 const ShiftPage = lazy(() => import('@/pages/ShiftPage'));
+// ── Phase 12 CPI Portal Integration ──
+const CpiPage = lazy(() => import('@/pages/CpiPage'));
 
 // ── Candidate Portal pages (EO-4) ──
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
@@ -270,6 +272,8 @@ export default function App() {
             <Route index element={<Navigate to="coach" replace />} />
             {/* Phase 7.5 — primary coach route (integrated) */}
             <Route path="coach" element={<CoachingPage />} />
+            {/* Phase 12 — CPI Assessment (portal-integrated) */}
+            <Route path="cpi" element={<CpiPage />} />
             <Route path="credits" element={<PlaceholderPage title="Credits & Plans" />} />
             <Route path="intelligence" element={<PlaceholderPage title="B2C Intelligence" />} />
             <Route path="career-intel" element={<PlaceholderPage title="Career Intelligence" />} />
