@@ -76,6 +76,8 @@ const ReportsPage = lazy(() => import('@/pages/ReportsPage').then(m => ({ defaul
 const ReportDetailPage = lazy(() => import('@/pages/ReportDetailPage').then(m => ({ default: m.ReportDetailPage })));
 // ── Phase 7.5 Coaching Excellence (Coach route only) ──
 const CoachingPage = lazy(() => import('@/pages/CoachingPage').then(m => ({ default: m.CoachingPage })));
+// ── Phase 9 GRID Market Mapping ──
+const GridPage = lazy(() => import('@/pages/GridPage'));
 
 // ── Candidate Portal pages (EO-4) ──
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
@@ -268,6 +270,12 @@ export default function App() {
             <Route path="career-services" element={<PlaceholderPage title="Career Services" />} />
             <Route path="engagement" element={<PlaceholderPage title="Engagement" />} />
             <Route path="growth" element={<PlaceholderPage title="Growth" />} />
+          </Route>
+
+          {/* ── Phase 9 GRID Market Mapping ── */}
+          <Route path="/grid" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+            <Route index element={<GridPage />} />
+            <Route path="review" element={<GridPage />} />
           </Route>
 
           {/* ── Admin Portal (Phase 4) ── */}

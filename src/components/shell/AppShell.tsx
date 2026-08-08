@@ -68,9 +68,15 @@ const SURFACES: Record<Surface, { tabs: { path: string; label: string }[] }> = {
       { path: '/candidate/career-dev', label: 'Career Development' },
       { path: '/candidate/community', label: 'Community' },
       { path: '/candidate/nexus-coach', label: 'NEXUS Coach' },
-      { path: '/candidate/profile', label: 'Profile & Settings' },
+      { path: '/candidate/profile', label: 'Candidate Profile' },
       { path: '/candidate/advanced-assessments', label: 'Advanced Assessments' },
       { path: '/candidate/settings-plus', label: 'Settings+' },
+    ],
+  },
+  grid: {
+    tabs: [
+      { path: '/grid', label: 'Market Mapping' },
+      { path: '/grid/review', label: 'Review Dashboard' },
     ],
   },
 };
@@ -81,6 +87,7 @@ function getSurfaceFromPath(path: string): Surface {
   if (path.startsWith('/client')) return 'client';
   if (path.startsWith('/coaching')) return 'coaching';
   if (path.startsWith('/candidate')) return 'candidate';
+  if (path.startsWith('/grid')) return 'grid';
   return 'internal'; // Default
 }
 

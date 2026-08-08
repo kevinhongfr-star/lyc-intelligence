@@ -3,9 +3,9 @@
  * Mockup v14 style: horizontal tabs with fuchsia accent on active
  */
 import React from 'react';
-import { Briefcase, Building2, GraduationCap, User } from 'lucide-react';
+import { Briefcase, Building2, GraduationCap, User, Grid3x3 } from 'lucide-react';
 
-export type Surface = 'internal' | 'client' | 'coaching' | 'candidate';
+export type Surface = 'internal' | 'client' | 'coaching' | 'candidate' | 'grid';
 
 interface SurfaceTab {
   id: Surface;
@@ -18,6 +18,7 @@ const SURFACE_TABS: SurfaceTab[] = [
   { id: 'client', label: 'B2B Client', icon: <Building2 className="w-4 h-4" /> },
   { id: 'coaching', label: 'B2C Coaching', icon: <GraduationCap className="w-4 h-4" /> },
   { id: 'candidate', label: 'Candidate', icon: <User className="w-4 h-4" /> },
+  { id: 'grid', label: 'GRID', icon: <Grid3x3 className="w-4 h-4" /> },
 ];
 
 interface SurfaceTabsProps {

@@ -165,9 +165,9 @@ export async function handleGrid(req: VercelRequest, res: VercelResponse) {
         if (req.method === 'GET') return handleListFunctions(req, res, subResource);
       }
       if (subResource && subSubResource === 'entries') {
+        if (pathArr[3] === 'bulk' && req.method === 'POST') return handleBulkAddEntries(req, res, subResource);
         if (req.method === 'POST') return handleAddEntry(req, res, subResource);
         if (req.method === 'GET') return handleListEntries(req, res, subResource);
-        if (pathArr[3] === 'bulk' && req.method === 'POST') return handleBulkAddEntries(req, res, subResource);
       }
     }
 
