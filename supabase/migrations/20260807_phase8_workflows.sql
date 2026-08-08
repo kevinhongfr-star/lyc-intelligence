@@ -233,3 +233,53 @@ CREATE POLICY "Client can read own document views"
   USING (client_account_id IN (
     SELECT id FROM public.client_accounts WHERE auth_user_id = auth.uid()
   ));
+
+-- ════════════════════════════════════════════════════════════════════
+-- 10. Client Interview Assignments (portal-facing interview slots)
+-- Queries: clientPortalHandler L656 (selectMany by client_account_id,
+--   order by scheduled_at), L679/L705/L740 (selectOne by id with ownership
+--   check), L724 (update by id → feedback_submitted=true),
+--   L751 (update by id → status/scheduled_at for confirm)
+-- ════════════════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS public.client_interview_assignments (
+  id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+  client_account_id       UUID NOT NULL REFERENCES public.client_accounts(id) ON DELETE CASCADE,
+  mandate_id              UUID REFERENCES public.mandates(id) ON DELETE SET NULL,
+  interview_id            UUID,
+  candidate_id            UUID NOT NULL REFERENCES public.contacts(id) ON DELETE CASCADE,
+  interviewer_name        TEXT,
+  interview_round         TEXT,
+  scheduled_at            TIMESTAMPTZ,
+  duration_minutes        INTEGER NOT NULL DEFAULT 60,
+  status                  TEXT NOT NULL DEFAULT 'invited',
+  feedback_submitted      BOOLEAN NOT NULL DEFAULT FALSE,
+  join_link               TEXT,
+  notes                   TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_cia_account_scheduled
+  ON public.client_interview_assignments(client_account_id, scheduled_at DESC);
+CREATE INDEX IF NOT EXISTS idx_cia_candidate
+  ON public.client_interview_assignments(candidate_id);
+CREATE INDEX IF NOT EXISTS idx_cia_status
+  ON public.client_interview_assignments(status)
+  WHERE status IN ('invited', 'confirmed');
+
+ALTER TABLE public.client_interview_assignments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Client can read own interview assignments"
+  ON public.client_interview_assignments FOR SELECT
+  USING (client_account_id IN (
+    SELECT id FROM public.client_accounts WHERE auth_user_id = auth.uid()
+  ));
+
+CREATE POLICY "Client can update own interview assignments (feedback/confirm)"
+  ON public.client_interview_assignments FOR UPDATE
+  USING (client_account_id IN (
+    SELECT id FROM public.client_accounts WHERE auth_user_id = auth.uid()
+  ))
+  WITH CHECK (client_account_id IN (
+    SELECT id FROM public.client_accounts WHERE auth_user_id = auth.uid()
+  ));

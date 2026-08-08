@@ -112,7 +112,7 @@ export function ClientDashboard() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-text-primary">Active Mandates</h2>
             <button
-              onClick={() => navigate('/client/pipeline')}
+              onClick={() => navigate('/client-portal/pipeline')}
               className="text-xs font-medium flex items-center gap-1"
               style={{ color: '#C108AB' }}
             >
@@ -132,7 +132,7 @@ export function ClientDashboard() {
                 <div
                   key={m.id}
                   className="bg-white border border-bg-tertiary p-4 hover:border-[#C108AB] transition-colors cursor-pointer"
-                  onClick={() => navigate(`/client/pipeline?mandate=${m.id}`)}
+                  onClick={() => navigate(`/client-portal/pipeline?mandate=${m.id}`)}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -203,7 +203,7 @@ export function ClientDashboard() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-bg-tertiary">
           <button
-            onClick={() => navigate('/client/pipeline')}
+            onClick={() => navigate('/client-portal/pipeline')}
             className="p-4 text-left hover:bg-bg-secondary transition-colors"
           >
             <GitBranch className="w-5 h-5 mb-2" style={{ color: '#C108AB' }} />
@@ -211,7 +211,7 @@ export function ClientDashboard() {
             <div className="text-xs text-text-muted">View candidate pipeline</div>
           </button>
           <button
-            onClick={() => navigate('/client/reviews')}
+            onClick={() => navigate('/client-portal/reviews')}
             className="p-4 text-left hover:bg-bg-secondary transition-colors"
           >
             <ClipboardCheck className="w-5 h-5 mb-2" style={{ color: '#C108AB' }} />
@@ -219,7 +219,7 @@ export function ClientDashboard() {
             <div className="text-xs text-text-muted">Review and score candidates</div>
           </button>
           <button
-            onClick={() => navigate('/client/workflows')}
+            onClick={() => navigate('/client-portal/workflows')}
             className="p-4 text-left hover:bg-bg-secondary transition-colors"
           >
             <Activity className="w-5 h-5 mb-2" style={{ color: '#C108AB' }} />
@@ -227,7 +227,7 @@ export function ClientDashboard() {
             <div className="text-xs text-text-muted">Build approval chains</div>
           </button>
           <button
-            onClick={() => navigate('/client/engagement')}
+            onClick={() => navigate('/client-portal/engagement')}
             className="p-4 text-left hover:bg-bg-secondary transition-colors"
           >
             <BarChart3 className="w-5 h-5 mb-2" style={{ color: '#C108AB' }} />

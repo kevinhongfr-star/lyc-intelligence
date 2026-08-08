@@ -25,11 +25,11 @@ import { useAuthStore } from '@/stores/authStore';
 import { fetchNotifications } from '@/services/clientService';
 
 const NAV_ITEMS = [
-  { path: '/client', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { path: '/client/pipeline', label: 'Candidate Pipeline', icon: GitBranch },
-  { path: '/client/reviews', label: 'Reviews & Feedback', icon: ClipboardCheck },
-  { path: '/client/workflows', label: 'Workflows', icon: Workflow },
-  { path: '/client/engagement', label: 'Engagement', icon: BarChart3 },
+  { path: '/client-portal', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { path: '/client-portal/pipeline', label: 'Candidate Pipeline', icon: GitBranch },
+  { path: '/client-portal/reviews', label: 'Reviews & Feedback', icon: ClipboardCheck },
+  { path: '/client-portal/workflows', label: 'Workflows', icon: Workflow },
+  { path: '/client-portal/engagement', label: 'Engagement', icon: BarChart3 },
 ];
 
 export function ClientShell() {
@@ -135,7 +135,7 @@ export function ClientShell() {
           <div className="flex items-center gap-3">
             <button
               className="relative p-2 text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
-              onClick={() => navigate('/client/notifications')}
+              onClick={() => navigate('/client-portal/notifications')}
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (

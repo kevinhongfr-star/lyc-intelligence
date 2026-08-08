@@ -51,7 +51,7 @@ export function CandidatePipeline() {
         return [...prev, c];
       });
     } else {
-      navigate(`/client/reviews?candidate=${c.id}&mandate=${selectedMandate}`);
+      navigate(`/client-portal/reviews?candidate=${c.id}&mandate=${selectedMandate}`);
     }
   };
 

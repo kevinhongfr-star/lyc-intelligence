@@ -64,7 +64,7 @@ export function CandidateCard({ candidate, mandateId, onQuickReview, className =
 
         <div className="flex items-center gap-2 mt-4 pt-3 border-t border-bg-tertiary">
           <Link
-            to={`/client/reviews?candidate=${candidate.id}&mandate=${mandateId}`}
+            to={`/client-portal/reviews?candidate=${candidate.id}&mandate=${mandateId}`}
             className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
             style={{ background: '#C108AB' }}
           >
