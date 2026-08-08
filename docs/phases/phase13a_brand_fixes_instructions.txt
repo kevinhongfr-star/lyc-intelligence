@@ -1,0 +1,231 @@
+PHASE 13A — BRAND FIXES (NO DESIGN DEPENDENCY)
+PRIORITY: CRITICAL — Go-Live Blocker
+Branch: feature/eo4-b2c-portal-phase6
+Built on: Phase 12 (CPI v2.0) PASS — commit 8d485ea
+
+========================================================
+IMPORTANT — WHAT THIS PHASE IS (AND ISN'T)
+========================================================
+
+This is Phase 13A — all the brand compliance fixes that don't need
+design approval. Pure content/naming/URL changes. No new page layouts,
+no new components, no creative design work.
+
+The landing page rebuilds (NEXUS marketing page, main landing refresh,
+DEX AI credibility page) are Phase 13B — those wait for design team
+mocks. Don't build those yet.
+
+========================================================
+CORE RULES
+========================================================
+
+NEXUS = the product
+LYC Intelligence = the brand
+DEX AI = the engine (attribution only, "Powered by DEX AI")
+
+No "free" — use tier names or "complimentary"
+No internal codenames in user-facing UI
+No "CPI" in user-facing copy or URLs
+
+========================================================
+DELIVERABLE 1 — "FREE" LANGUAGE REMOVAL (TICKET-03, P0)
+========================================================
+
+Scope: ALL user-facing copy across all pages and components
+
+Rules:
+- "Free Assessment" → "Complimentary Assessment"
+- "Try Free" → "Start — Executive Introduction"
+- "free tier" → "Executive Introduction" (use the tier name)
+- "Get free X" → "Get complimentary X" or use tier name
+- Any other "free" / "Free" / "FREE" in user-facing copy → replace appropriately
+
+Action:
+1. Search entire src/ directory for: free, Free, FREE
+2. For each match, determine if it's user-facing copy
+3. If yes → replace with brand-compliant terminology
+4. If no (variable names, comments, code logic) → leave it
+5. Verify: case-insensitive grep on user-facing files = zero matches
+
+Be thorough. Check: buttons, headlines, body copy, form placeholders,
+tooltip text, error messages, success messages, email templates,
+meta tags, page titles — everything the user sees.
+
+========================================================
+DELIVERABLE 2 — INTERNAL TERMINOLOGY LEAK SCAN (TICKET-15, P0)
+========================================================
+
+Scope: ALL user-facing UI (public pages + portal + authenticated surfaces)
+
+INTERNAL TERM → USER-FACING REPLACEMENT
+CPI → China Leadership Pipeline Diagnostic
+TRIDENT → Match Analysis
+GRID → Market Intelligence
+CANVAS → Scorecard Builder
+flywheel → remove / rephrase (it's an internal architecture term)
+Layer 1 / Layer 2 / Layer 3 → remove / rephrase (internal architecture)
+archetype (in user context) → leadership profile / leadership type
+funnel (in product/user context) → pathway / journey / progression
+
+Action:
+1. Full codebase scan for these terms
+2. Check ALL user-facing surfaces: nav labels, page titles, headings,
+   body copy, buttons, form labels, error messages, tooltips, breadcrumbs
+3. Replace each with user-facing equivalent
+4. EXCEPTIONS (leave as-is):
+   - Variable names, API routes, database fields, code comments
+   - Internal-only admin surfaces (but prefer consistency if easy)
+   - CSS class names (obviously)
+
+========================================================
+DELIVERABLE 3 — NAV NAMING CLEANUP (TICKET-05, P1)
+========================================================
+
+Only change DISPLAY LABELS. Do NOT change routes or URLs.
+
+PUBLIC HEADER NAV (all landing pages):
+- Update nav to: NEXUS (→ /nexus), For Business (→ /b2b), Pricing (→ /pricing)
+- Logo → /
+- Note: /nexus currently renders chat — that's OK for now, the link
+  just goes there. We'll replace the page content in Phase 13B.
+
+B2C COACHING PORTAL SIDEBAR (/coaching):
+- Coach → NEXUS Chat
+- CPI Assessment → Pipeline Diagnostic
+- Credits → Credits (OK, not a codename)
+- Intelligence → Intelligence (OK)
+- Career Intel → Career Intel (OK)
+- Profile → Profile (OK)
+
+INTERNAL OPS NAV (/app/*):
+- TRIDENT → Match Analysis
+- CANVAS → Scorecard Builder
+- GRID → Market Intelligence
+- SHIFT → SHIFT Suite (already a product name, OK)
+
+Also update:
+- Footer links across all landing pages
+- Any breadcrumbs
+- Page titles / meta tags / document.title
+
+========================================================
+DELIVERABLE 4 — CPI URL BRANDING (TICKET-09, P1)
+========================================================
+
+- Create /china-leadership-pipeline route for the assessment entry
+  (reuses the existing assessment component — just a new route name)
+- /assessment → 301 redirect to /china-leadership-pipeline
+- /cpi → 301 redirect to /china-leadership-pipeline
+- All user-facing copy: "CPI" → "China Leadership Pipeline Diagnostic"
+- B2C coaching portal route /coaching/cpi can stay as internal route,
+  but its nav label changes to "Pipeline Diagnostic" (Deliverable 3)
+- Update all links that point to /assessment or /cpi
+
+========================================================
+DELIVERABLE 5 — PRICING TIER NAMING STANDARDIZATION (TICKET-10 partial)
+========================================================
+
+File: src/pages/PricingPage.tsx
+Route: /pricing
+
+Standardize tier names:
+1. Executive Introduction (free tier — use this exact name)
+2. Executive Access (paid individual)
+3. Enterprise (B2B)
+
+Required fixes:
+- All "Free" → "Executive Introduction" (use the tier name, never "free")
+- Tier names must match exactly
+- Feature lists reframed around NEXUS capabilities
+- CTAs use brand-compliant language
+- Keep whatever paywall/integration already exists — just rename
+
+========================================================
+DELIVERABLE 6 — DEX AI DARK NAVY → LYC LIGHT (TICKET-01 partial)
+========================================================
+
+Current state: /dex and all /dex/* pages use a dark navy design system
+that's completely different from LYC. This is not approved.
+
+Fix: Basic design system swap — convert the DEX AI pages from dark navy
+to LYC light design system. This is NOT a full page redesign (that's 13B).
+This is just fixing colors, typography, and base component styles so it
+doesn't look like a different product.
+
+What to change:
+- Background: dark navy (#1A1A2E etc.) → white / light gray
+- Text: light text → dark text
+- Typography: match LYC system (Libre Baskerville headings, DM Sans body)
+- Border radius: rounded → 0px
+- Button styles: match LYC landing page buttons
+- Card styles: match LYC design
+- Header and footer: use the same components as other landing pages
+- Accent: use teal/cyan (#0D9488) as the DEX AI accent color instead of
+  whatever the dark navy theme uses
+
+What NOT to change:
+- Page structure / layout / section order
+- Content / copy (unless it has "free" or codenames — fix those)
+- Routing (that's 13B)
+
+Goal: someone navigating from / to /dex shouldn't feel like they left
+the same product. Visual consistency, not redesign.
+
+========================================================
+DELIVERABLE 7 — ZERO REGRESSIONS
+========================================================
+
+Before you call this done:
+1. All Phase 7-12 modules still registered in dispatch.ts
+2. All existing test files still run and pass
+3. No existing pages broken by URL changes
+4. Auth still works on all authenticated routes
+5. API endpoints all still reachable
+6. No broken links across the site
+7. Run the test suite — all tests pass
+
+If any tests break due to legitimate renaming, update the tests.
+
+========================================================
+BRAND TERMINOLOGY CHEAT SHEET
+========================================================
+
+DO SAY:
+- NEXUS (the product)
+- LYC Intelligence (the brand)
+- "Powered by DEX AI" (engine attribution)
+- Executive Introduction (free tier name)
+- Complimentary Assessment
+- China Leadership Pipeline Diagnostic
+- Match Analysis
+- Market Intelligence
+- Scorecard Builder
+- SHIFT Suite
+
+DON'T SAY (user-facing):
+- "DEX AI" as a product to buy
+- "free" (use the tier name or "complimentary")
+- CPI
+- TRIDENT
+- GRID
+- CANVAS
+- flywheel, Layer 1/2/3, funnel
+- dark navy DEX AI design system
+
+========================================================
+DONE CRITERIA
+========================================================
+
+When finished, confirm:
+1. Zero "free" in user-facing copy
+2. Zero internal codenames (TRIDENT/GRID/CANVAS/CPI) in user-facing labels
+3. All nav labels updated per mapping
+4. /china-leadership-pipeline works, /assessment and /cpi redirect
+5. Pricing tiers named correctly
+6. DEX AI pages use LYC light design system (no dark navy)
+7. All Phase 7-12 functionality still works
+8. All existing tests pass
+9. No broken links
+
+Note: NEXUS marketing page, main landing refresh, and full DEX AI page
+redesign are NOT in this phase — those are Phase 13B, waiting for design.
