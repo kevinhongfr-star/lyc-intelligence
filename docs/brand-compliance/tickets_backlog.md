@@ -3,7 +3,8 @@
 **Source Audit:** brand_compliance_landing_page_audit.md
 **Branch:** feature/eo4-b2c-portal-phase6
 **Created:** 2026-08-08
-**Total Tickets:** 14 (4 P0 + 6 P1 + 4 P2)
+**Total Tickets:** 15 (5 P0 + 6 P1 + 4 P2)
+**Design Team Review:** 2026-08-08 — All 5 blocking decisions resolved + TICKET-15 added (P0)
 
 ---
 
@@ -40,9 +41,13 @@ The page feels like a different product from a different company.
 - Header and footer are identical to main landing pages
 - Visual consistency score: no obvious "different product" feeling when navigating from `/` → `/dex`
 
-**Blocking Questions for Design Team:**
-- Is DEX AI supposed to be a sub-brand with its own visual identity, or should it match LYC Intelligence main brand 1:1?
-- If sub-brand: what's the approved differentiation (color? accent? layout?)
+**Design Team Decision (2026-08-08): RESOLVED**
+- Model: **Endorsed sub-brand** — base on full LYC Intelligence design system (typography, spacing, layout, components)
+- Single differentiator: DEX AI accent color (teal/cyan family) + "Powered by DEX AI" mark
+- **NOT** the current dark-navy standalone system — reads as separate company product
+- Dark navy variant: **Not approved**
+- DEX AI visual identity assets being finalized by brand design — spec coming within 24h
+- DEX AI appears as "Powered by DEX AI" attribution, not as a hero-level brand
 
 ---
 
@@ -75,9 +80,15 @@ The page feels like a different product from a different company.
 - In-app chat at `/app/chat` continues to work
 - NEXUS landing page matches LYC design system
 
-**Blocking Questions for Design/Brand Team:**
-- What is NEXUS's positioning vs. DEX AI? (Are they the same? Different products? Complementary?)
-- What's the right URL structure: `/nexus/chat` or keep chat in `/dex/chat`?
+**Design Team Decision (2026-08-08): RESOLVED**
+- NEXUS = the product (AI advisor / chat interface) — user-facing product name
+- DEX AI = the endorsed sub-brand (underlying intelligence engine) — trust/credibility layer
+- URL structure:
+  - `/nexus` → NEXUS marketing page (hero → what it does → how it works → CTA)
+  - `/nexus/chat` → the actual chat interface
+  - `/dex-ai` → DEX AI technology/credibility page (architecture, trust signals)
+- NEXUS marketing page carries "Powered by DEX AI" badge — not framed as two separate products
+- DEX AI must never read as "another product to purchase" — it's the engine, not the product
 
 ---
 
@@ -101,8 +112,16 @@ Multiple CTAs and copy use the word "free", which is explicitly forbidden by ECH
 | B2C Landing (`/b2c`) | Lead capture form | "Get your free leadership profile" | "Get your complimentary leadership profile" |
 | [Audit other pages] | — | — | — |
 
+**Status:** NOT BLOCKED — can start immediately
+
+**Design Team Confirmation (2026-08-08):**
+- Agreed P0, easiest fix — no decision dependency
+- All "Free Assessment" → "Complimentary Assessment"
+- "Try Free" → "Start — Executive Introduction"
+- Use tier name (Executive Introduction), never "free tier" framing
+
 **Scope:**
-- [ ] Main Landing.tsx — fix "Try Free" CTA on Match Analysis card
+- [ ] Main Landing.tsx — fix "Try Free" CTA on Match Analysis card → "Start — Executive Introduction"
 - [ ] B2CLanding.tsx — fix "Take Free Assessment" hero CTA
 - [ ] B2CLanding.tsx — fix "Get your free leadership profile" lead capture
 - [ ] Audit ALL other public pages (B2B, match, pricing, assessment) for "free" / "Free" / "FREE"
@@ -144,10 +163,14 @@ Per Akira's naming framework, there should be a 3-level system:
 - Navigation labels use Level 1 user-facing names (no Level 3 code names in user-facing UI)
 - "Powered by" attribution used where appropriate for Level 2
 
-**Blocking Questions for Brand/Design Team:**
-- What is the final product hierarchy? (LYC Intelligence = brand? DEX AI = platform? NEXUS = chat advisor product? SHIFT Suite = assessment product?)
-- Which internal code names (TRIDENT, CANVAS, GRID, etc.) get user-facing names, and what are they?
-- Should all products live under LYC Intelligence brand, or is DEX AI a separate brand?
+**Design Team Decision (2026-08-08): RESOLVED**
+
+Official user-facing hierarchy:
+- **Level 1 — Brand:** LYC Intelligence
+- **Level 2 — Products:** NEXUS | SHIFT Suite | China Leadership Pipeline Diagnostic | Market Intelligence | Match Analysis
+- **Level 3 — Engine:** DEX AI = the intelligence layer behind all products (not a separate product to buy)
+- Tier names: Executive Introduction / Executive Access / Enterprise
+- Critical rule: DEX AI must never read as "another product to purchase" — it's the engine, not the product
 
 ---
 
@@ -183,8 +206,14 @@ Internal code names (TRIDENT, CANVAS, GRID) are used as navigation labels in aut
 - All labels use approved Level 1 product names
 - Routes can keep internal names (SEO doesn't matter for authenticated routes)
 
-**Blocking Questions:**
-- What are the approved Level 1 names for TRIDENT, CANVAS, GRID, SHIFT? (Refer to Akira's Assessment Inventory doc)
+**Design Team Decision (2026-08-08): RESOLVED**
+
+Full nav mapping:
+- TRIDENT → Match Analysis (confirmed — already the product name)
+- GRID → Market Intelligence
+- CANVAS → Scorecard Builder
+- SHIFT → SHIFT Suite (keeps the product name, no codename issue)
+- Rule: all Level 3 framework codenames are banned from user-facing UI entirely
 
 ---
 
@@ -284,8 +313,13 @@ The CPI (China Leadership Pipeline Diagnostic) assessment lives at the generic r
 - Meta tags (title, description) reflect CPI product name
 - Existing `/assessment` links either redirect or are updated
 
-**Blocking Question:**
-- What is the canonical public name and URL for the CPI assessment?
+**Design Team Decision (2026-08-08): RESOLVED**
+
+- Public name: **China Leadership Pipeline Diagnostic**
+- URL: `/china-leadership-pipeline` (primary, recommended)
+- Alternative: `/pipeline-assessment` if primary is too long for routing preferences
+- Rule: "CPI" three letters **never** appear anywhere user-facing (URL, page title, body copy, buttons, email subjects) — purely internal shorthand
+- Current `/cpi` and `/assessment` paths should 301 redirect to the public URL
 
 ---
 
@@ -411,23 +445,61 @@ Audit noted that MatchPage uses internal framework icon code names (Prism, Bridg
 
 ---
 
+---
+
+### TICKET-15: Internal Terminology Leak Scan — All Surfaces
+
+**Priority:** P0
+**Surface:** All 14 surfaces (public + portal)
+**Type:** Copy / Brand Compliance
+**Effort:** M
+
+**Problem:**
+Internal planning terminology is leaking into customer-facing surfaces. Words like "flywheel," "Layer 1/2/3," "archetype" codenames, "CPI" abbreviation, "funnel architecture" — these are internal planning terms that must never appear on customer-facing surfaces. Added as P0 by design team review.
+
+**Terms to scan for:**
+- "flywheel" (any context)
+- "Layer 1" / "Layer 2" / "Layer 3" (architecture references)
+- "CPI" (three-letter abbreviation — should use "China Leadership Pipeline Diagnostic" instead)
+- Internal archetype codenames (Strategic Architect, Cross-Border Catalyst, etc. — verify if these are user-facing or internal)
+- "funnel" / "maturity stack" in customer context
+- Any other internal framework jargon
+
+**Scope:**
+- [ ] Full scan of all 8 public landing pages for internal terminology
+- [ ] Full scan of all 6 portal surfaces for user-facing internal terminology
+- [ ] Scan meta tags, page titles, alt text, email templates
+- [ ] Replace each instance with user-facing equivalent
+- [ ] Document all replacements found (for audit trail)
+
+**Acceptance Criteria:**
+- Zero internal planning/architecture terminology visible to end users
+- All user-facing copy uses Level 1 product names and plain language
+- "CPI" does not appear in any user-facing URL, page, or copy
+
+---
 ## Summary
 
 | Priority | Count | Tickets |
 |----------|-------|---------|
-| P0 (Critical) | 4 | TICKET-01, TICKET-02, TICKET-03, TICKET-04 |
+| P0 (Critical) | 5 | TICKET-01, TICKET-02, TICKET-03, TICKET-04, TICKET-15 |
 | P1 (Important) | 6 | TICKET-05, TICKET-06, TICKET-07, TICKET-08, TICKET-09, TICKET-10 |
 | P2 (Minor) | 4 | TICKET-11, TICKET-12, TICKET-13, TICKET-14 |
-| **Total** | **14** | |
+| **Total** | **15** | |
 
 ## Dependencies & Blockers
 
-Several tickets are blocked on brand/design team decisions:
+**Status (2026-08-08): All 5 blocking design decisions RESOLVED by brand team review.**
 
-- **TICKET-01 (DEX AI design system):** Need decision on whether DEX AI is sub-brand or matches main brand 1:1
-- **TICKET-02 (NEXUS landing page):** Need positioning clarification — NEXUS vs DEX AI relationship
-- **TICKET-04 (Product hierarchy):** Need final product taxonomy + naming decisions
-- **TICKET-05 (Nav naming):** Need Level 1 names for TRIDENT, CANVAS, GRID, SHIFT
-- **TICKET-09 (CPI route):** Need canonical product name + URL
+All P0 tickets are now actionable. Remaining dependencies:
 
-**Recommendation:** Run a 30-min sync with brand/design team to resolve the 5 blocking questions above, then all tickets become actionable. TICKET-03 (remove "free") can start immediately — no dependencies.
+- **TICKET-01 (DEX AI design system):** Waiting on final DEX AI visual spec from brand design (target: within 24h). Base system alignment can start immediately — teal/cyan accent and "Powered by DEX AI" mark to be added when spec arrives.
+- **TICKET-15 (Internal terminology scan):** Full scan needed — no external dependencies, can start immediately.
+- **TICKET-03 (Remove "free"):** No dependencies — can start immediately.
+
+**Ready for implementation:**
+- P0: TICKET-01 (base DS), TICKET-02, TICKET-03, TICKET-04, TICKET-15
+- P1: TICKET-05, TICKET-06, TICKET-07, TICKET-08, TICKET-09, TICKET-10
+- P2: TICKET-11, TICKET-12, TICKET-13, TICKET-14
+
+**Reference:** Full design team response — Feishu doc: https://l5f5m43wr.feishu.cn/docx/LmQxd3mVjowqS2xS934cL4iEnQh
