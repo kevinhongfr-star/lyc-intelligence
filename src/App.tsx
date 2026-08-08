@@ -81,6 +81,8 @@ const GridPage = lazy(() => import('@/pages/GridPage'));
 // ── Phase 10 TRIDENT + CANVAS ──
 const TridentPage = lazy(() => import('@/pages/TridentPage'));
 const CanvasPage = lazy(() => import('@/pages/CanvasPage'));
+// ── Phase 11 SHIFT Suite ──
+const ShiftPage = lazy(() => import('@/pages/ShiftPage'));
 
 // ── Candidate Portal pages (EO-4) ──
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
@@ -204,6 +206,7 @@ export default function App() {
               <Route path="candidates/:id/report" element={<CandidateReportPage />} />
               <Route path="trident" element={<TridentPage />} />
               <Route path="canvas" element={<CanvasPage />} />
+              <Route path="shift" element={<ShiftPage />} />
               <Route path="companies" element={<CompaniesPage />} />
               <Route path="batch-scoring" element={<BatchScoringPage />} />
               <Route path="metrix" element={<MetrixPage />} />

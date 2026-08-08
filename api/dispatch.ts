@@ -22,7 +22,7 @@ const handlers: Record<string, () => Promise<any>> = {
   'kpis': () => import('./_lib/kpisHandler.js'),
   'nexus': () => import('./_lib/nexusHandler.js'),
   'benchmark': () => import('./_lib/benchmarkHandler.js'),
-  'shift': () => import('./_lib/shiftHandler.js'),
+  'shift': () => import('./_lib/shiftHandler.js').then(m => ({ handler: m.handleShift })),
   'ai': () => import('./_lib/aiHandler.js'),
   'compensation': () => import('./_lib/compensationHandler.js'),
   'mandates': () => import('./_lib/mandatesHandler.js'),
