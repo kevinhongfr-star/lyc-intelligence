@@ -30,6 +30,7 @@ const AssessmentPage = lazy(() => import('@/pages/AssessmentPage').then(m => ({ 
 const B2BLanding = lazy(() => import('@/pages/B2BLanding').then(m => ({ default: m.B2BLanding })));
 const B2CLanding = lazy(() => import('@/pages/B2CLanding').then(m => ({ default: m.B2CLanding })));
 const NexusLanding = lazy(() => import('@/pages/NexusLanding').then(m => ({ default: m.NexusLanding })));
+const DexAiPage = lazy(() => import('@/pages/DexAiPage').then(m => ({ default: m.DexAiPage })));
 const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m.MatchPage })));
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
 
@@ -186,8 +187,9 @@ export default function App() {
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/cookies" element={<CookiesPage />} />
 
-          {/* ── DEX AI B2C Portal (EO-5 / SPRINT 2) ── */}
-          <Route path="/dex" element={<DexLandingPage />} />
+          {/* ── DEX AI credibility page + deprecated route redirect ── */}
+          <Route path="/dex-ai" element={<DexAiPage />} />
+          <Route path="/dex" element={<Navigate to="/dex-ai" replace />} />
           <Route path="/dex/chat" element={<ProtectedRoute><DexChatPage /></ProtectedRoute>} />
           <Route path="/dex/assess" element={<ProtectedRoute><DexAssessPage /></ProtectedRoute>} />
           <Route path="/dex/plan" element={<ProtectedRoute><DexPlanPage /></ProtectedRoute>} />

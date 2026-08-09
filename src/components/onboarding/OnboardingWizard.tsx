@@ -50,7 +50,7 @@ const ROLES: RoleOption[] = [
     label: 'Council Member',
     icon: <Users className="w-5 h-5" />,
     blurb: 'Access DEX AI advisory, peer connections, and exclusive events.',
-    cta: { label: 'Start with DEX AI', href: '/dex' },
+    cta: { label: 'Start with DEX AI', href: '/dex-ai' },
   },
   {
     id: 'consultant',

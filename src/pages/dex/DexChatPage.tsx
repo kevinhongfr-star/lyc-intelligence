@@ -149,7 +149,7 @@ export function DexChatPage() {
       {/* Header */}
       <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-gray-200 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <a href="/dex" className="text-gray-500 hover:text-gray-900">
+          <a href="/dex-ai" className="text-gray-500 hover:text-gray-900">
             <ArrowLeft className="w-4 h-4" />
           </a>
           <div className="flex items-center gap-2">

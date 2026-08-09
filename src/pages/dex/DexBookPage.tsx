@@ -134,7 +134,7 @@ export function DexBookPage() {
           </Card>
           <div className="flex flex-wrap gap-3 justify-center">
             <a href="/dex/chat"><Button>Continue with DEX AI</Button></a>
-            <a href="/dex"><Button variant="outline">Back to DEX</Button></a>
+            <a href="/dex-ai"><Button variant="outline">Back to DEX</Button></a>
           </div>
         </div>
       </div>
@@ -145,7 +145,7 @@ export function DexBookPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 md:px-6 py-12">
-        <a href="/dex" className="flex items-center gap-1 text-sm text-gray-500 hover:text-fuchsia mb-6">
+        <a href="/dex-ai" className="flex items-center gap-1 text-sm text-gray-500 hover:text-fuchsia mb-6">
           <ArrowLeft className="w-4 h-4" /> Back to DEX
         </a>
 
