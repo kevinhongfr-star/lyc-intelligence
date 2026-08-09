@@ -74,7 +74,6 @@ export function ResultsPanel({
       <div style={{
         background: `${DS.accent}15`,
         border: `1px solid ${DS.accent}40`,
-        borderRadius: DS.radius,
         padding: '32px',
         marginBottom: '24px',
         textAlign: 'center'
@@ -109,7 +108,6 @@ export function ResultsPanel({
       <div style={{
         background: DS.card,
         border: `1px solid ${DS.cardBorder}`,
-        borderRadius: DS.radius,
         padding: '24px',
         marginBottom: '24px',
         textAlign: 'center'
@@ -134,7 +132,6 @@ export function ResultsPanel({
       <div style={{
         background: DS.card,
         border: `1px solid ${DS.cardBorder}`,
-        borderRadius: DS.radius,
         padding: '24px',
         marginBottom: '24px'
       }}>
@@ -172,14 +169,12 @@ export function ResultsPanel({
                   width: '100%',
                   height: '8px',
                   background: DS.bg,
-                  borderRadius: '4px',
                   overflow: 'hidden'
                 }}>
                   <div style={{
                     height: '100%',
                     width: `${score}%`,
                     background: getScoreColor(score),
-                    borderRadius: '4px',
                     transition: 'width 0.3s ease'
                   }} />
                 </div>
@@ -193,7 +188,6 @@ export function ResultsPanel({
       <div style={{
         background: DS.card,
         border: `1px solid ${DS.cardBorder}`,
-        borderRadius: DS.radius,
         padding: '24px',
         marginBottom: '24px'
       }}>
@@ -219,7 +213,6 @@ export function ResultsPanel({
         <div style={{
           background: DS.card,
           border: `1px solid ${DS.cardBorder}`,
-          borderRadius: DS.radius,
           padding: '20px'
         }}>
           <h4 style={{
@@ -239,7 +232,6 @@ export function ResultsPanel({
         <div style={{
           background: DS.card,
           border: `1px solid ${DS.cardBorder}`,
-          borderRadius: DS.radius,
           padding: '20px'
         }}>
           <h4 style={{
@@ -268,7 +260,6 @@ export function ResultsPanel({
           background: DS.accent,
           color: '#FFFFFF',
           border: 'none',
-          borderRadius: DS.radius,
           fontSize: '16px',
           fontWeight: 600,
           cursor: isGeneratingPDF ? 'not-allowed' : 'pointer',
@@ -284,22 +275,21 @@ export function ResultsPanel({
         <div style={{
           background: 'rgba(193,8,171,0.08)',
           border: '1px solid rgba(193,8,171,0.25)',
-          borderRadius: '0px',
           padding: '20px 24px',
           marginTop: '24px',
         }}>
           <p style={{ color: DS.text, fontSize: '15px', lineHeight: 1.6, margin: '0 0 16px', fontFamily: DS.headingFont }}>
             Your biggest development area is <strong style={{ color: DS.accent }}>shown in your dimension scores</strong>.
             {compositeScore >= 70
-              ? ' Given your strong overall positioning, this is the gap worth closing first.'
-              : ' Combined with developing scores, this is where to focus your next 90 days.'}
+              ? 'Given your strong overall positioning, this is the gap worth closing first.'
+              : 'Combined with developing scores, this is where to focus your next 90 days.'}
           </p>
           <a
             href={`/nexus?context=assessment&archetype=${encodeURIComponent(archetype)}&score=${compositeScore}`}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
               padding: '10px 20px', background: DS.accent, color: '#fff',
-              borderRadius: '0px', textDecoration: 'none', fontWeight: 600, fontSize: '14px'
+               textDecoration: 'none', fontWeight: 600, fontSize: '14px'
             }}
           >
             Build your 90-day plan with Nexus →

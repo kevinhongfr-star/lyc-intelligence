@@ -92,16 +92,16 @@ export function formatMemoryForInjection(memories: Memory[]): string {
   const sections: string[] = [];
 
   if (byType.goal?.length) {
-    sections.push(`**Career Goals:**\n${byType.goal.map(m => `- ${m.content}`).join('\n')}`);
+    sections.push(`**Career Goals:**\n${byType.goal.map(m =>`- ${m.content}`).join('\n')}`);
   }
   if (byType.pain_point?.length) {
-    sections.push(`**Challenges/Areas to Develop:**\n${byType.pain_point.map(m => `- ${m.content}`).join('\n')}`);
+    sections.push(`**Challenges/Areas to Develop:**\n${byType.pain_point.map(m =>`- ${m.content}`).join('\n')}`);
   }
   if (byType.strength?.length) {
-    sections.push(`**Identified Strengths:**\n${byType.strength.map(m => `- ${m.content}`).join('\n')}`);
+    sections.push(`**Identified Strengths:**\n${byType.strength.map(m =>`- ${m.content}`).join('\n')}`);
   }
   if (byType.insight?.length) {
-    sections.push(`**Key Insights:**\n${byType.insight.map(m => `- ${m.content}`).join('\n')}`);
+    sections.push(`**Key Insights:**\n${byType.insight.map(m =>`- ${m.content}`).join('\n')}`);
   }
 
   return sections.length > 0 
@@ -120,13 +120,9 @@ export function formatAssessmentForInjection(assessment: AssessmentScore | null)
 
   const dimensions = Object.entries(assessment.dimension_scores || {})
     .map(([key, value]) => `${key}: ${value}`)
-    .join(', ');
+    .join(',');
 
-  return `**Current Assessment Profile (as of ${date}):**
-- Archetype: ${assessment.archetype}
-- Overall Score: ${assessment.composite_score}/100
-- Cross-Border Readiness: ${assessment.cross_border_score}/100
-- Dimension Scores: ${dimensions || 'N/A'}`;
+  return `**Current Assessment Profile (as of ${date}):** - Archetype: ${assessment.archetype} - Overall Score: ${assessment.composite_score}/100 - Cross-Border Readiness: ${assessment.cross_border_score}/100 - Dimension Scores: ${dimensions || 'N/A'}`;
 }
 
 export async function extractGoalFromText(text: string): Promise<string | null> {

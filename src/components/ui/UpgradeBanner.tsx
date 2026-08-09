@@ -71,7 +71,6 @@ export function UpgradeBanner({ type = 'empty', message, onDismiss }: UpgradeBan
             padding: '8px 16px',
             background: DS.accent,
             color: '#FFFFFF',
-            borderRadius: DS.radius,
             fontSize: '13px',
             fontWeight: 600,
             textDecoration: 'none',

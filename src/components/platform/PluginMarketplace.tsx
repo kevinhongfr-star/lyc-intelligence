@@ -66,13 +66,13 @@ export function PluginMarketplace() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search plugins..."
-              className="w-full pl-8 pr-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+              className="w-full pl-8 pr-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
             />
           </div>
           <select
             value={filter}
             onChange={e => setFilter(e.target.value as any)}
-            className="px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+            className="px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
           >
             <option value="all">All</option>
             <option value="official">Official</option>

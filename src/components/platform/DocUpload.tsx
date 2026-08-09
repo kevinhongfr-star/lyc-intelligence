@@ -36,7 +36,7 @@ export function DocUpload({ onUploadComplete }: DocUploadProps) {
 
     const ext = file.name.split('.').pop()?.toLowerCase();
     if (!ext || !ACCEPTED_TYPES.includes(ext)) {
-      setError(`Unsupported file type: .${ext}. Accepted: ${ACCEPTED_TYPES.join(', ')}`);
+      setError(`Unsupported file type: .${ext}. Accepted: ${ACCEPTED_TYPES.join(',')}`);
       return;
     }
 
@@ -102,7 +102,7 @@ export function DocUpload({ onUploadComplete }: DocUploadProps) {
           <Upload className={`w-12 h-12 mx-auto mb-4 ${isDragging ? 'text-accent' : 'text-text-muted'}`} />
           <p className="text-text-primary font-medium mb-2">Drop files here or click to browse</p>
           <p className="text-text-muted text-sm mb-4">
-            Supports {ACCEPTED_TYPES.map(t => `.${t}`).join(', ')} up to 25MB
+            Supports {ACCEPTED_TYPES.map(t => `.${t}`).join(',')} up to 25MB
           </p>
           <label>
             <input type="file" accept={ACCEPTED_TYPES.map(t => `.${t}`).join(',')} multiple className="hidden" onChange={onChange} />
@@ -118,7 +118,7 @@ export function DocUpload({ onUploadComplete }: DocUploadProps) {
               <span className="text-text-secondary">Uploading...</span>
               <span className="text-text-secondary">{Math.round(progress)}%</span>
             </div>
-            <div className="w-full h-2 bg-bg-tertiary rounded-none">
+            <div className="w-full h-2 bg-bg-tertiary">
               <div className="h-full bg-accent transition-all duration-200" style={{ width: `${progress}%` }} />
             </div>
           </div>
@@ -136,7 +136,7 @@ export function DocUpload({ onUploadComplete }: DocUploadProps) {
             <CheckCircle2 className="w-4 h-4" />
             <span className="text-sm">
               Uploaded: <strong>{completed.filename}</strong>
-              {' '}— {completed.extracted_length.toLocaleString()} characters extracted
+              {''}— {completed.extracted_length.toLocaleString()} characters extracted
             </span>
           </div>
         )}

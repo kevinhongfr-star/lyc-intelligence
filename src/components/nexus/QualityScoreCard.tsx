@@ -118,7 +118,7 @@ export function QualityScoreCard({
   return (
     <div
       className={cn('border border-[#E5E5E5] bg-white', className)}
-      style={{ borderRadius: 0 }}
+      style={{ }}
     >
       <div
         style={{

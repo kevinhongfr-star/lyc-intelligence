@@ -18,7 +18,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
   return (
     <div
       ref={ref}
-      className={`bg-bg-secondary border border-bg-tertiary rounded-none ${className || ''}`}
+      className={`bg-bg-secondary border border-bg-tertiary ${className || ''}`}
       {...rest}
     >
       {children}

@@ -167,7 +167,7 @@ export function CandidateOpportunitiesPage() {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+                    <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center">
                       <Briefcase className="w-5 h-5 text-fuchsia" />
                     </div>
                     <div>
@@ -175,11 +175,11 @@ export function CandidateOpportunitiesPage() {
                       <p className="text-xs text-text-muted flex items-center gap-1">
                         <Building2 className="w-3 h-3" />
                         {m.company?.name ?? '—'}
-                        {m.company?.industry ? ` · ${m.company.industry}` : ''}
+                        {m.company?.industry ? `· ${m.company.industry}` : ''}
                       </p>
                     </div>
                   </div>
-                  <span className={`px-2 py-1 text-xs font-medium rounded whitespace-nowrap ${STATUS_COLORS[statusLabel] ?? 'bg-gray-100 text-gray-600'}`}>
+                  <span className={`px-2 py-1 text-xs font-medium whitespace-nowrap ${STATUS_COLORS[statusLabel] ?? 'bg-gray-100 text-gray-600'}`}>
                     {statusLabel}
                   </span>
                 </div>
@@ -193,7 +193,7 @@ export function CandidateOpportunitiesPage() {
                 {skills.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-3">
                     {skills.slice(0, 4).map((s, i) => (
-                      <span key={i} className="px-2 py-0.5 text-xs bg-bg-warm text-text-secondary rounded">
+                      <span key={i} className="px-2 py-0.5 text-xs bg-bg-warm text-text-secondary">
                         {s}
                       </span>
                     ))}
@@ -211,7 +211,7 @@ export function CandidateOpportunitiesPage() {
                     Posted {fmtDate(m.created_at)}
                   </span>
                   {m.priority && (
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded ${
+                    <span className={`px-2 py-0.5 text-xs font-medium ${
                       m.priority === 'high' ? 'bg-red-100 text-red-700' :
                       m.priority === 'medium' ? 'bg-amber-100 text-amber-700' :
                       'bg-gray-100 text-gray-600'

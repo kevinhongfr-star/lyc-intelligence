@@ -90,6 +90,34 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/DMSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Libre Baskerville';
+  src: url('/fonts/LibreBaskerville-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/IBMPlexMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/IBMPlexMono-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
 
 * { box-sizing: border-box; }
 
@@ -97,6 +125,7 @@
   /* ── LYC Brand Design System ── */
   --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
   --font-serif: 'Libre Baskerville', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
   --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -405,7 +434,6 @@ html {
   width: 48px;
   height: 3px;
   background: #C108AB;
-  border-radius: 2px;
   margin: 0 auto 48px;
 }
 
@@ -435,7 +463,6 @@ html {
 .nexus-pulse-dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
   background: #C108AB;
   animation: nexusPulse 2s ease-in-out infinite;
   display: inline-block;
@@ -493,7 +520,6 @@ html {
   background: linear-gradient(90deg, #F5F5F5 25%, #E5E5E5 50%, #F5F5F5 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
-  border-radius: 8px;
 }
 
 

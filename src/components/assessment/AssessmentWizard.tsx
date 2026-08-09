@@ -157,7 +157,6 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
           margin: '24px auto',
           background: `${DS.error}20`,
           border: `1px solid ${DS.error}40`,
-          borderRadius: DS.radius,
           padding: '12px 16px',
           display: 'flex',
           alignItems: 'center',
@@ -213,7 +212,6 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
               padding: '16px',
               fontSize: '16px',
               fontWeight: 600,
-              borderRadius: '0px',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
@@ -271,7 +269,7 @@ function GateStep({ state, setState, onSubmit, error }: any) {
             value={state.gate.name}
             onChange={(e) => setState(prev => ({ ...prev, gate: { ...prev.gate, name: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text,  fontSize: '15px'
             }}
             placeholder="Your full name"
           />
@@ -285,7 +283,7 @@ function GateStep({ state, setState, onSubmit, error }: any) {
             value={state.gate.email}
             onChange={(e) => setState(prev => ({ ...prev, gate: { ...prev.gate, email: e.target.value } }))}
             style={{
-              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text, borderRadius: '0px', fontSize: '15px'
+              width: '100%', padding: '14px', border: `1px solid ${DS.cardBorder}`, background: DS.card, color: DS.text,  fontSize: '15px'
             }}
             placeholder="you@company.com"
           />
@@ -300,7 +298,6 @@ function GateStep({ state, setState, onSubmit, error }: any) {
             padding: '16px',
             fontSize: '16px',
             fontWeight: 'bold',
-            borderRadius: '0px',
             border: 'none',
             cursor: 'pointer',
             display: 'flex',
@@ -353,7 +350,6 @@ function ContextStep({ state, setState, onNext }: any) {
                   padding: '12px',
                   background: state.professionalContext.situation === s.id ? `${DS.accent}20` : DS.card,
                   border: `1px solid ${state.professionalContext.situation === s.id ? DS.accent : DS.border}`,
-                  borderRadius: DS.radius,
                   color: DS.textSecondary,
                   cursor: 'pointer',
                   textAlign: 'left',
@@ -379,7 +375,6 @@ function ContextStep({ state, setState, onNext }: any) {
                   padding: '12px',
                   background: state.professionalContext.geography === g.id ? `${DS.accent}20` : DS.card,
                   border: `1px solid ${state.professionalContext.geography === g.id ? DS.accent : DS.border}`,
-                  borderRadius: DS.radius,
                   color: DS.textSecondary,
                   cursor: 'pointer',
                   textAlign: 'left',
@@ -405,7 +400,6 @@ function ContextStep({ state, setState, onNext }: any) {
                   padding: '10px 14px',
                   background: state.professionalContext.function === f ? `${DS.accent}20` : DS.card,
                   border: `1px solid ${state.professionalContext.function === f ? DS.accent : DS.border}`,
-                  borderRadius: '20px',
                   color: DS.textSecondary,
                   cursor: 'pointer',
                   fontSize: '13px',
@@ -426,7 +420,6 @@ function ContextStep({ state, setState, onNext }: any) {
             padding: '16px',
             fontSize: '16px',
             fontWeight: 'bold',
-            borderRadius: DS.radius,
             border: 'none',
             cursor: 'pointer',
             display: 'flex',
@@ -465,7 +458,6 @@ function CrossBorderStep({ state, setState, index, onAnswer }: any) {
               padding: '16px',
               background: currentScore === opt.score ? `${DS.accent}20` : DS.card,
               border: `1px solid ${currentScore === opt.score ? DS.accent : DS.border}`,
-              borderRadius: DS.radius,
               color: DS.textSecondary,
               textAlign: 'left',
               fontSize: '15px',
@@ -518,7 +510,6 @@ function CareerGoalsStep({ state, setState, onComplete }: any) {
               padding: '14px 16px',
               background: selected.includes(g) ? `${DS.accent}20` : DS.card,
               border: `1px solid ${selected.includes(g) ? DS.accent : DS.border}`,
-              borderRadius: DS.radius,
               color: DS.textSecondary,
               cursor: 'pointer',
               textAlign: 'left',
@@ -538,7 +529,6 @@ function CareerGoalsStep({ state, setState, onComplete }: any) {
           padding: '16px',
           fontSize: '16px',
           fontWeight: 600,
-          borderRadius: DS.radius,
           border: 'none',
           cursor: 'pointer',
           display: 'flex',

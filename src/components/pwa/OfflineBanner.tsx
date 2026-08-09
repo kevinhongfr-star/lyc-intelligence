@@ -99,7 +99,7 @@ export function OfflineBanner({
               <button
                 onClick={handleRetry}
                 disabled={isRetrying}
-                className="flex items-center gap-1 px-3 py-1 bg-amber-600 text-white rounded-full text-sm font-medium hover:bg-amber-700 transition-colors disabled:opacity-50"
+                className="flex items-center gap-1 px-3 py-1 bg-amber-600 text-white text-sm font-medium hover:bg-amber-700 transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${isRetrying ? 'animate-spin' : ''}`} />
                 {isRetrying ? 'Retrying...' : 'Retry'}
@@ -108,7 +108,7 @@ export function OfflineBanner({
 
             <button
               onClick={handleDismiss}
-              className="p-1 hover:bg-amber-600/30 rounded transition-colors"
+              className="p-1 hover:bg-amber-600/30 transition-colors"
               aria-label="Dismiss"
             >
               <X className="w-4 h-4" />

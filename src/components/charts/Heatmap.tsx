@@ -68,14 +68,14 @@ export function Heatmap({
             title={cell.label || `${cell.value}`}
             className={cn(
               'transition-transform duration-150 hover:scale-110 cursor-pointer',
-              variant === 'calendar' ? 'rounded-none' : '',
+              variant === 'calendar' ? '' : '',
             )}
             style={{
               width: cellSize,
               height: cellSize,
               backgroundColor: getColor(cell.value),
             }}
-            aria-label={`${cell.label || `Cell ${i + 1}`}: ${cell.value}`}
+            aria-label={`${cell.label ||`Cell ${i + 1}`}: ${cell.value}`}
           />
         ))}
       </div>

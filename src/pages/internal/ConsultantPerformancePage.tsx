@@ -393,7 +393,7 @@ export function ConsultantPerformancePage() {
                     height={60}
                   />
                   <YAxis tick={{ fontSize: 11, fill: '#666' }} allowDecimals={false} />
-                  <RTooltip contentStyle={{ border: '1px solid #e5e7eb', borderRadius: 0, fontSize: 12 }} />
+                  <RTooltip contentStyle={{ border: '1px solid #e5e7eb',  fontSize: 12 }} />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
                   <Bar dataKey="mandates" name="Mandates" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="candidates" name="Candidates" fill="#C108AB" radius={[4, 4, 0, 0]} />
@@ -419,7 +419,7 @@ export function ConsultantPerformancePage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
                   <XAxis type="number" tick={{ fontSize: 11, fill: '#666' }} allowDecimals={false} />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#666' }} width={90} />
-                  <RTooltip contentStyle={{ border: '1px solid #e5e7eb', borderRadius: 0, fontSize: 12 }} />
+                  <RTooltip contentStyle={{ border: '1px solid #e5e7eb',  fontSize: 12 }} />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
                   <Bar dataKey="Shortlisted" stackId="a" fill="#eab308" />
                   <Bar dataKey="Interview" stackId="a" fill="#8b5cf6" />
@@ -492,7 +492,7 @@ export function ConsultantPerformancePage() {
                     height={60}
                   />
                   <YAxis tick={{ fontSize: 11, fill: '#666' }} allowDecimals={false} />
-                  <RTooltip contentStyle={{ border: '1px solid #e5e7eb', borderRadius: 0, fontSize: 12 }} />
+                  <RTooltip contentStyle={{ border: '1px solid #e5e7eb',  fontSize: 12 }} />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
                   <Line
                     type="monotone"

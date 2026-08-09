@@ -36,7 +36,6 @@ const btnBase: React.CSSProperties = {
   fontWeight: 500,
   textDecoration: 'none',
   border: `1px solid ${INK}`,
-  borderRadius: 0,
   transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
   fontFamily: "'DM Sans', system-ui, sans-serif",
   cursor: 'pointer',
@@ -116,7 +115,7 @@ function Nav() {
             </li>
           ))}
         </ul>
-        <Link to="/nexus#start" style={{ padding: '10px 20px', background: ACCENT, color: WHITE, fontSize: 13, fontWeight: 500, textDecoration: 'none', borderRadius: 0, transition: 'opacity 200ms ease', minHeight: 40, display: 'inline-flex', alignItems: 'center' }}
+        <Link to="/nexus#start" style={{ padding: '10px 20px', background: ACCENT, color: WHITE, fontSize: 13, fontWeight: 500, textDecoration: 'none',  transition: 'opacity 200ms ease', minHeight: 40, display: 'inline-flex', alignItems: 'center' }}
           onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
           onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}>
           Get Started
@@ -152,12 +151,7 @@ function Nav() {
           </div>
         </>
       )}
-      <style>{`
-        @media (max-width: 768px) {
-          .nav-links-desktop { display: none !important; }
-          .nav-toggle-btn { display: flex !important; }
-        }
-      `}</style>
+      <style>{`@media (max-width: 768px) { .nav-links-desktop { display: none !important; } .nav-toggle-btn { display: flex !important; } }`}</style>
     </nav>
   );
 }
@@ -374,7 +368,7 @@ function FinalCTA() {
       <div style={containerStyle}>
         <span style={{ ...monoStyle, color: ACCENT, marginBottom: 20, display: 'block' }}>Ready when you are</span>
         <h2 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", color: WHITE, maxWidth: 640, margin: '0 auto 20px', fontSize: 42, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em' }}>
-          Leadership isn't a title.<br /><em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 400 }}>It's a trajectory.</em>
+          Leadership isn't a title.<br /><em style={{ fontStyle:'italic', color: ACCENT, fontWeight: 400 }}>It's a trajectory.</em>
         </h2>
         <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 520, margin: '0 auto 36px', fontSize: 17, lineHeight: 1.6 }}>Start with the Executive Introduction. About 15 minutes. Personalized insights. No credit card required.</p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -460,24 +454,7 @@ export function Landing() {
         <FinalCTA />
       </main>
       <Footer />
-      <style>{`
-        .lr-reveal {
-          opacity: 0;
-          transform: translateY(24px);
-          transition: opacity 350ms cubic-bezier(0.16,1,0.3,1), transform 350ms cubic-bezier(0.16,1,0.3,1);
-        }
-        .lr-reveal.lr-visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        @media (max-width: 768px) {
-          .grid-responsive-2 { grid-template-columns: 1fr !important; }
-          .grid-responsive { grid-template-columns: 1fr !important; }
-          .b2b-teaser-inner { flex-direction: column !important; text-align: center; align-items: center; }
-          .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
-          .lr-reveal { opacity: 1; transform: none; transition: none; }
-        }
-      `}</style>
+      <style>{`.lr-reveal { opacity: 0; transform: translateY(24px); transition: opacity 350ms cubic-bezier(0.16,1,0.3,1), transform 350ms cubic-bezier(0.16,1,0.3,1); } .lr-reveal.lr-visible { opacity: 1; transform: translateY(0); } @media (max-width: 768px) { .grid-responsive-2 { grid-template-columns: 1fr !important; } .grid-responsive { grid-template-columns: 1fr !important; } .b2b-teaser-inner { flex-direction: column !important; text-align: center; align-items: center; } .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; } .lr-reveal { opacity: 1; transform: none; transition: none; } }`}</style>
     </div>
   );
 }

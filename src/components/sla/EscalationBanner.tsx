@@ -120,12 +120,12 @@ export function EscalationBanner({ orgId, onViewEscalations }: EscalationBannerP
   }
 
   return (
-    <div className={`${bannerConfig.bg} border-l-4 ${bannerConfig.border} rounded-r-lg overflow-hidden`}>
+    <div className={`${bannerConfig.bg} border-l-4 ${bannerConfig.border} overflow-hidden`}>
       {/* Banner Header */}
       <div className="flex items-center justify-between px-4 py-3 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <div className="flex items-center gap-3">
           {isLoading ? (
-            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-current border-t-transparent animate-spin" />
           ) : (
             <>
               {activeEscalations.length > 0 ? (
@@ -166,7 +166,7 @@ export function EscalationBanner({ orgId, onViewEscalations }: EscalationBannerP
             return (
               <div
                 key={escalation.id}
-                className={`p-3 rounded-none ${config.bg}`}
+                className={`p-3 ${config.bg}`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">

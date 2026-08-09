@@ -67,7 +67,6 @@ export function StyleSelector({ selectedStyle, onSelect }: StyleSelectorProps) {
               padding: '20px',
               background: selectedStyle === style.id ? `${DS.accent}20` : DS.card,
               border: `1px solid ${selectedStyle === style.id ? DS.accent : DS.border}`,
-              borderRadius: DS.radius,
               cursor: 'pointer',
               textAlign: 'left',
               transition: 'all 0.2s',

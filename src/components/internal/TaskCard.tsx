@@ -31,7 +31,7 @@ export default function TaskCard({ task }: TaskCardProps) {
   return (
     <div
       className="bg-bg-primary border border-bg-tertiary p-3 hover:bg-bg-secondary transition-colors"
-      style={{ borderRadius: 0 }}
+      style={{ }}
     >
       <div className="flex items-start gap-2">
         <GripVertical className="w-4 h-4 text-text-muted flex-shrink-0 mt-0.5 cursor-grab" />
@@ -46,13 +46,13 @@ export default function TaskCard({ task }: TaskCardProps) {
           <div className="flex items-center gap-1.5 flex-wrap">
             <span
               className={`inline-flex items-center px-1.5 py-0.5 text-xs font-medium ${priorityStyles[task.priority] || priorityStyles.low}`}
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               {task.priority}
             </span>
             <span
               className={`inline-flex items-center px-1.5 py-0.5 text-xs font-medium ${sourceStyles[task.source] || sourceStyles.manual}`}
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               {task.source}
             </span>

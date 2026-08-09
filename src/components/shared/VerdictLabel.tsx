@@ -19,7 +19,7 @@ const VERDICT_STYLES: Record<Verdict, { bg: string; text: string; label: string 
 export function VerdictLabel({ verdict }: VerdictLabelProps) {
   const style = VERDICT_STYLES[verdict];
   return (
-    <span className={`${style.bg} ${style.text} px-3 py-1 rounded-full text-xs font-semibold`}>
+    <span className={`${style.bg} ${style.text} px-3 py-1 text-xs font-semibold`}>
       {style.label}
     </span>
   );

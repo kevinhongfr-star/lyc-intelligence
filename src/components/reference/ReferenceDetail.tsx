@@ -190,7 +190,7 @@ export function ReferenceDetail({ referenceRequestId, onBack }: ReferenceDetailP
             Back
           </button>
         )}
-        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${statusConfig.color}`}>
+        <span className={`px-3 py-1 text-sm font-medium border ${statusConfig.color}`}>
           <StatusIcon className="w-4 h-4 inline mr-1" />
           {statusConfig.label}
         </span>
@@ -199,7 +199,7 @@ export function ReferenceDetail({ referenceRequestId, onBack }: ReferenceDetailP
       {/* Referee Info */}
       <Card className="p-6">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+          <div className="w-12 h-12 bg-primary/10 flex items-center justify-center">
             <User className="w-6 h-6 text-primary" />
           </div>
           <div className="flex-1">
@@ -218,7 +218,7 @@ export function ReferenceDetail({ referenceRequestId, onBack }: ReferenceDetailP
                 </p>
               )}
               <p className="text-sm text-text-muted">
-                {request.relationship.replace('_', ' ')} for {request.candidateName}
+                {request.relationship.replace('_', '')} for {request.candidateName}
               </p>
             </div>
           </div>
@@ -256,7 +256,7 @@ export function ReferenceDetail({ referenceRequestId, onBack }: ReferenceDetailP
           <Card className="p-4 text-center">
             {recommendation && (
               <>
-                <div className={`w-10 h-10 rounded-full mx-auto flex items-center justify-center ${
+                <div className={`w-10 h-10 mx-auto flex items-center justify-center ${
                   recommendation === 'positive'
                     ? 'bg-green-100'
                     : recommendation === 'negative'

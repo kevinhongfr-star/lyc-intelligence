@@ -59,7 +59,7 @@ export async function fetchRecentSessions(userId: string, limit: number = 5): Pr
     const lastAssistantMessage = messages?.find(m => m.role === 'assistant')?.content || '';
 
     // Extract key topics (simple keyword extraction)
-    const keyTopics = extractTopics(lastUserMessage + ' ' + lastAssistantMessage);
+    const keyTopics = extractTopics(lastUserMessage + '' + lastAssistantMessage);
     const actionItems = extractActionItems(lastAssistantMessage);
 
     summaries.push({
@@ -116,10 +116,10 @@ function buildContinuityMessage(session: SessionSummary, userName?: string, tota
   const greeting = userName ? `Welcome back, ${userName}.` : 'Welcome back.';
   
   if (totalSessions && totalSessions > 1) {
-    return `${greeting} This is session ${totalSessions + 1} together. Last time we discussed ${session.keyTopics.slice(0, 2).join(' and ')}. ${session.actionItems.length > 0 ? `You had ${session.actionItems.length} action items to follow up on.` : ''} What would you like to work on today?`;
+    return `${greeting} This is session ${totalSessions + 1} together. Last time we discussed ${session.keyTopics.slice(0, 2).join('and')}. ${session.actionItems.length > 0 ?`You had ${session.actionItems.length} action items to follow up on.`: ''} What would you like to work on today?`;
   }
 
-  return `${greeting} Last time we were exploring ${session.keyTopics[0] || 'your situation'}. ${session.diagnosticProgress > 0 ? `We completed ${session.diagnosticProgress}/5 diagnostic dimensions.` : ''} Where would you like to pick up?`;
+  return `${greeting} Last time we were exploring ${session.keyTopics[0] || 'your situation'}. ${session.diagnosticProgress > 0 ?`We completed ${session.diagnosticProgress}/5 diagnostic dimensions.`: ''} Where would you like to pick up?`;
 }
 
 /**
@@ -204,19 +204,19 @@ export function buildMemoryContextString(context: MemoryContext): string {
   let memoryStr = `Previous session summary:\n`;
   
   if (context.lastSession) {
-    memoryStr += `- Last discussed: ${context.lastSession.keyTopics.join(', ') || 'general topics'}\n`;
+    memoryStr += `- Last discussed: ${context.lastSession.keyTopics.join(',') || 'general topics'}\n`;
     memoryStr += `- Diagnostic progress: ${context.lastSession.diagnosticProgress}/5 dimensions\n`;
     
     if (context.lastSession.actionItems.length > 0) {
       memoryStr += `- Previous action items:\n`;
       for (const action of context.lastSession.actionItems) {
-        memoryStr += `  * ${action}\n`;
+        memoryStr += `* ${action}\n`;
       }
     }
   }
 
   if (context.recurringTopics.length > 0) {
-    memoryStr += `- Recurring themes: ${context.recurringTopics.join(', ')}\n`;
+    memoryStr += `- Recurring themes: ${context.recurringTopics.join(',')}\n`;
   }
 
   memoryStr += `- Total sessions together: ${context.totalSessions}\n`;

@@ -190,7 +190,7 @@ export function ReportsPage() {
             onSelect={setSelectedTemplate}
           />
 
-          <div className="bg-bg rounded-none border border-border p-4">
+          <div className="bg-bg border border-border p-4">
             <div className="flex items-center gap-2 mb-4">
               <Layout className="w-5 h-5 text-[#C108AB]" />
               <h2 className="text-lg font-semibold text-text-primary">Generate Report</h2>
@@ -239,7 +239,7 @@ export function ReportsPage() {
       )}
 
       {activeView === 'schedules' && (
-        <div className="bg-bg rounded-none border border-border">
+        <div className="bg-bg border border-border">
           <div className="p-4 border-b border-border flex items-center justify-between">
             <h2 className="text-lg font-semibold text-text-primary">Scheduled Reports</h2>
             <Button size="sm" onClick={() => setShowScheduleModal(true)}>
@@ -291,7 +291,7 @@ export function ReportsPage() {
 
 function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
   return (
-    <div className="bg-bg rounded-none border border-border p-4">
+    <div className="bg-bg border border-border p-4">
       <div className="flex items-center gap-3">
         <div className="p-2" style={{ color }}>
           {icon}

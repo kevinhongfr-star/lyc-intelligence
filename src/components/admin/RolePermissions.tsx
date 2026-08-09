@@ -100,7 +100,7 @@ const RolePermissions: React.FC = () => {
         return [...prev, { id: 'new', role, resource, action, allowed: !currentAllowed }];
       });
     } catch (err) {
-      alert('Failed to update permission: ' + (err as Error).message);
+      alert('Failed to update permission:' + (err as Error).message);
     } finally {
       setSaving(null);
     }
@@ -114,7 +114,7 @@ const RolePermissions: React.FC = () => {
       setNewOverride({ user_id: '', resource: 'users', action: 'read', allowed: true, reason: '' });
       loadData();
     } catch (err) {
-      alert('Failed to create override: ' + (err as Error).message);
+      alert('Failed to create override:' + (err as Error).message);
     }
   }
 
@@ -123,7 +123,7 @@ const RolePermissions: React.FC = () => {
       await adminService.rbac.deleteOverride(id);
       loadData();
     } catch (err) {
-      alert('Failed to delete: ' + (err as Error).message);
+      alert('Failed to delete:' + (err as Error).message);
     }
   }
 
@@ -204,7 +204,7 @@ const RolePermissions: React.FC = () => {
                   {RESOURCES.map(resource => (
                     <tr key={resource} className="border-t border-border hover:bg-bg-warm">
                       <td className="px-4 py-3 font-medium text-text-primary">
-                        {resource.replace(/_/g, ' ')}
+                        {resource.replace(/_/g, '')}
                       </td>
                       {ACTIONS.map(action => {
                         const perm = getPermission(selectedRole, resource, action);

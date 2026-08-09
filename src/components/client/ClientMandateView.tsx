@@ -121,7 +121,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
     return (
       <div className="text-center py-12">
         <p className="text-text-muted">Mandate not found</p>
-        <button onClick={onBack} className="mt-4 px-4 py-2 bg-accent text-white rounded-none">
+        <button onClick={onBack} className="mt-4 px-4 py-2 bg-accent text-white">
           Back to Mandates
         </button>
       </div>
@@ -134,7 +134,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
       <div className="flex items-center gap-4">
         <button
           onClick={onBack}
-          className="p-2 hover:bg-bg-tertiary rounded-none transition-colors"
+          className="p-2 hover:bg-bg-tertiary transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-text-secondary" />
         </button>
@@ -161,7 +161,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
           
           return (
             <span 
-              className="px-2 py-1 text-xs font-medium rounded"
+              className="px-2 py-1 text-xs font-medium"
               style={{ backgroundColor: `${statusInfo.color}20`, color: statusInfo.color }}
             >
               {statusInfo.label}
@@ -181,7 +181,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
       </div>
 
       {/* Pipeline Kanban (Read-only) */}
-      <div className="bg-bg-secondary rounded-none p-6">
+      <div className="bg-bg-secondary p-6">
         <h2 className="text-lg font-semibold text-text-primary mb-4">Candidate Pipeline</h2>
         
         {/* Phase Grouped Layout */}
@@ -204,7 +204,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
                   return (
                     <div
                       key={stageName}
-                      className="w-48 flex-shrink-0 bg-white rounded-none border border-bg-tertiary"
+                      className="w-48 flex-shrink-0 bg-white border border-bg-tertiary"
                     >
                       {/* Stage Header */}
                       <div 
@@ -214,7 +214,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <div 
-                              className="w-2 h-2 rounded-full"
+                              className="w-2 h-2"
                               style={{ backgroundColor: stageConfig.color }}
                             />
                             <span className="text-xs font-medium text-text-primary">
@@ -240,12 +240,12 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
                             <div
                               key={candidate.id}
                               onClick={() => setSelectedCandidate(candidate)}
-                              className="bg-bg-primary border border-bg-tertiary rounded-none p-3 cursor-pointer hover:shadow-md transition-shadow"
+                              className="bg-bg-primary border border-bg-tertiary p-3 cursor-pointer hover:shadow-md transition-shadow"
                             >
                               {/* Header */}
                               <div className="flex items-start gap-2 mb-2">
                                 <div 
-                                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                                  className="w-8 h-8 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
                                   style={{ backgroundColor: stageConfig.color }}
                                 >
                                   {candidate.contact?.name?.[0] ?? '?'}
@@ -269,7 +269,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
                               {/* Verdict Badge */}
                               <div className="flex items-center gap-2 mb-2">
                                 <span 
-                                  className="px-2 py-0.5 rounded text-xs font-medium"
+                                  className="px-2 py-0.5 text-xs font-medium"
                                   style={{ backgroundColor: verdict.bgColor, color: verdict.color }}
                                 >
                                   {verdict.label} Fit
@@ -285,7 +285,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
                               {isAdmin && stageName === 'client_approved' && !feedback && (
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setShowFeedback(true); }}
-                                  className="w-full py-1.5 bg-accent text-white rounded text-xs font-medium hover:bg-accent/90"
+                                  className="w-full py-1.5 bg-accent text-white text-xs font-medium hover:bg-accent/90"
                                 >
                                   Provide Feedback
                                 </button>
@@ -306,11 +306,11 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
       {/* Candidate Detail Modal */}
       {selectedCandidate && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white max-w-lg w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="px-6 py-4 border-b border-bg-tertiary flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+                <div className="w-12 h-12 bg-accent/10 flex items-center justify-center">
                   <User className="w-6 h-6 text-accent" />
                 </div>
                 <div>
@@ -322,7 +322,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
               </div>
               <button
                 onClick={() => setSelectedCandidate(null)}
-                className="p-2 hover:bg-bg-tertiary rounded-none"
+                className="p-2 hover:bg-bg-tertiary"
               >
                 <XCircle className="w-5 h-5 text-text-muted" />
               </button>
@@ -332,7 +332,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
             <div className="p-6 space-y-4">
               {/* Match Strength */}
               {selectedCandidate.trident_composite && (
-                <div className="bg-bg-secondary rounded-none p-4">
+                <div className="bg-bg-secondary p-4">
                   <p className="text-sm text-text-muted mb-2">Match Strength</p>
                   <div className="flex items-center gap-3">
                     <span 
@@ -342,9 +342,9 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
                       {getVerdictFromScore(selectedCandidate.trident_composite).label}
                     </span>
                     <div className="flex-1">
-                      <div className="w-full h-2 bg-bg-tertiary rounded-full overflow-hidden">
+                      <div className="w-full h-2 bg-bg-tertiary overflow-hidden">
                         <div 
-                          className="h-full rounded-full"
+                          className="h-full"
                           style={{ 
                             width: `${selectedCandidate.trident_composite}%`,
                             backgroundColor: getScoreColor(selectedCandidate.trident_composite)
@@ -397,7 +397,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
               {/* Feedback */}
               {selectedCandidate.client_feedback && (
                 <div 
-                  className="rounded-none p-4"
+                  className="p-4"
                   style={{ 
                     backgroundColor: selectedCandidate.client_feedback.decision === 'approved' ? '#22C55E10' :
                                    selectedCandidate.client_feedback.decision === 'rejected' ? '#EF444410' : '#EAB30810'
@@ -431,7 +431,7 @@ export function ClientMandateView({ mandateId, onBack }: ClientMandateViewProps)
               {isAdmin && !selectedCandidate.client_feedback && (
                 <button
                   onClick={() => setShowFeedback(true)}
-                  className="w-full py-3 bg-accent text-white rounded-none font-medium hover:bg-accent/90"
+                  className="w-full py-3 bg-accent text-white font-medium hover:bg-accent/90"
                 >
                   Provide Feedback
                 </button>

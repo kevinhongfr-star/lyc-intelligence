@@ -221,7 +221,7 @@ export function GridMappingEditor() {
     ];
 
     return (
-      <div className="bg-card rounded-none border border-card-border p-4 mb-4">
+      <div className="bg-card border border-card-border p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-medium text-text-primary">Minimum Standards (M1-M7)</h3>
           <Badge variant={standards.m7_last_update?.status === 'green' ? 'success' : 'warning'}>
@@ -233,7 +233,7 @@ export function GridMappingEditor() {
             const metric = standards[key];
             return (
               <div key={key} className="text-center">
-                <div className={`w-3 h-3 rounded-full mx-auto mb-1 ${getStatusColor(metric?.status || 'red')}`} />
+                <div className={`w-3 h-3 mx-auto mb-1 ${getStatusColor(metric?.status || 'red')}`} />
                 <div className="text-xs text-text-muted">{label}</div>
                 <div className="text-xs font-medium text-text-primary">
                   {metric?.count ?? metric?.pct ?? '-'}
@@ -274,10 +274,10 @@ export function GridMappingEditor() {
                   <Badge variant="default">{sector.segments.length} segments</Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="p-1 hover:bg-bg-alt rounded">
+                  <button className="p-1 hover:bg-bg-alt">
                     <Edit2 className="w-4 h-4 text-text-muted" />
                   </button>
-                  <button className="p-1 hover:bg-bg-alt rounded">
+                  <button className="p-1 hover:bg-bg-alt">
                     <Trash2 className="w-4 h-4 text-text-muted" />
                   </button>
                 </div>
@@ -373,7 +373,7 @@ export function GridMappingEditor() {
           <h4 className="font-medium text-text-primary mb-3">Add Company</h4>
           <div className="space-y-3">
             <Input placeholder="Company name" />
-            <select className="w-full px-3 py-2 bg-bg border border-border rounded-none">
+            <select className="w-full px-3 py-2 bg-bg border border-border">
               <option value="">Select sector</option>
               {sectors.map(s => <option key={s.id} value={s.id}>{s.sector_name}</option>)}
             </select>
@@ -451,7 +451,7 @@ export function GridMappingEditor() {
             <Card key={entry.id} className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${getPriorityColor(entry.priority)}`} />
+                  <div className={`w-3 h-3 ${getPriorityColor(entry.priority)}`} />
                   <div>
                     <div className="font-medium text-text-primary">{entry.contact?.name || 'Unknown'}</div>
                     <div className="text-sm text-text-muted">{entry.contact?.current_title || '-'}</div>
@@ -500,7 +500,7 @@ export function GridMappingEditor() {
                 </div>
                 <div className="flex items-center gap-4 text-sm">
                   <span className="text-text-muted">Reason:</span>
-                  <select className="px-3 py-1 bg-bg border border-border rounded-none text-sm">
+                  <select className="px-3 py-1 bg-bg border border-border text-sm">
                     <option value="">Select reason</option>
                     <option value="not_interested">Not interested</option>
                     <option value="not_found">Not found</option>
@@ -606,7 +606,7 @@ export function GridMappingEditor() {
 
   if (loading) {
     return (
-      <div className="bg-card rounded-none border border-card-border p-8 flex items-center justify-center">
+      <div className="bg-card border border-card-border p-8 flex items-center justify-center">
         <RefreshCw className="w-8 h-8 animate-spin text-accent" />
         <span className="ml-3 text-text-muted">Loading Market Intelligence mapping...</span>
       </div>
@@ -617,7 +617,7 @@ export function GridMappingEditor() {
     <div className="space-y-4">
       {mapping && <StandardsBar />}
 
-      <div className="bg-card rounded-none border border-card-border overflow-hidden">
+      <div className="bg-card border border-card-border overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-4">
             <h3 className="text-lg font-semibold text-text-primary">

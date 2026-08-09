@@ -115,7 +115,7 @@ export function CandidateApplicationsPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+            <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center">
               <Briefcase className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
@@ -126,7 +126,7 @@ export function CandidateApplicationsPage() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+            <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center">
               <Users className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
@@ -137,7 +137,7 @@ export function CandidateApplicationsPage() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+            <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center">
               <Award className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
@@ -148,7 +148,7 @@ export function CandidateApplicationsPage() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+            <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
@@ -204,25 +204,25 @@ export function CandidateApplicationsPage() {
               <Card key={app.id} className="p-5 hover:shadow-card-hover transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+                    <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center">
                       <Building2 className="w-5 h-5 text-fuchsia" />
                     </div>
                     <div>
                       <h3 className="font-serif font-semibold text-text-primary">{title}</h3>
                       <p className="text-xs text-text-muted">
                         {company}
-                        {location ? ` · ${location}` : ''}
+                        {location ? `· ${location}` : ''}
                       </p>
                     </div>
                   </div>
-                  <span className={`px-2 py-1 text-xs font-medium rounded ${STAGE_COLORS[app.stage ?? ''] ?? 'bg-gray-100 text-gray-600'}`}>
+                  <span className={`px-2 py-1 text-xs font-medium ${STAGE_COLORS[app.stage ?? ''] ?? 'bg-gray-100 text-gray-600'}`}>
                     {app.stage ?? '—'}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex-1 h-2 bg-bg-warm rounded-full overflow-hidden">
-                    <div className="h-full bg-fuchsia rounded-full transition-all" style={{ width: `${progress}%` }} />
+                  <div className="flex-1 h-2 bg-bg-warm overflow-hidden">
+                    <div className="h-full bg-fuchsia transition-all" style={{ width: `${progress}%` }} />
                   </div>
                   <span className="text-xs font-medium text-text-secondary">{progress}%</span>
                 </div>

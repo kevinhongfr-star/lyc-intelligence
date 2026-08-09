@@ -24,7 +24,6 @@ export function ShareCard({ type, data, className = '' }: Props) {
     height: '630px',
     background: DS.bg,
     padding: '48px',
-    borderRadius: DS.radius,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -62,7 +61,6 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 background: `${DS.accent}20`, 
                 color: DS.accent, 
                 fontWeight: 700, 
-                borderRadius: '0px', 
                 fontSize: '14px' 
               }}>
                 LYC Intelligence
@@ -89,12 +87,11 @@ export function ShareCard({ type, data, className = '' }: Props) {
                     <span style={{ fontSize: '14px', color: DS.textSecondary }}>{item.label}</span>
                     <span style={{ fontSize: '14px', fontWeight: 700, color: DS.text }}>{item.score}%</span>
                   </div>
-                  <div style={{ height: '10px', background: '#1a1a1a', borderRadius: '5px', overflow: 'hidden' }}>
+                  <div style={{ height: '10px', background: '#1a1a1a',  overflow: 'hidden' }}>
                     <div style={{ 
                       height: '100%', 
                       width: `${item.score}%`, 
                       background: item.score >= 70 ? DS.success : item.score >= 50 ? DS.warning : DS.accent, 
-                      borderRadius: '5px' 
                     }} />
                   </div>
                 </div>
@@ -108,7 +105,6 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 background: `${DS.success}20`, 
                 color: DS.success, 
                 fontWeight: 700, 
-                borderRadius: '0px',
                 fontSize: '14px'
               }}>
                 {data?.cross_border_readiness?.label || 'Advanced'} — {data?.cross_border_readiness?.score || 80}/100
@@ -149,7 +145,6 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 background: `${DS.accent}20`, 
                 color: DS.accent, 
                 fontWeight: 700, 
-                borderRadius: '0px', 
                 fontSize: '14px' 
               }}>
                 LYC Intelligence
@@ -171,7 +166,6 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 color: data?.composite_score >= 70 ? DS.success : DS.warning, 
                 fontSize: '18px', 
                 fontWeight: 700, 
-                borderRadius: '10px'
               }}>
                 {data?.verdict || 'Strong Primary'}
               </div>
@@ -216,7 +210,6 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 background: `${DS.accent}20`, 
                 color: DS.accent, 
                 fontWeight: 700, 
-                borderRadius: '0px', 
                 fontSize: '14px' 
               }}>
                 LYC Intelligence
@@ -243,11 +236,11 @@ export function ShareCard({ type, data, className = '' }: Props) {
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '8px' }}>
-                        <div style={{ flex: 1, height: '12px', background: '#1a1a1a', borderRadius: '0px', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${item.old}%`, background: '#333333', borderRadius: '0px' }} />
+                        <div style={{ flex: 1, height: '12px', background: '#1a1a1a',  overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${item.old}%`, background: '#333333' }} />
                         </div>
-                        <div style={{ flex: 1, height: '12px', background: '#1a1a1a', borderRadius: '0px', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${item.new}%`, background: DS.success, borderRadius: '0px' }} />
+                        <div style={{ flex: 1, height: '12px', background: '#1a1a1a',  overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${item.new}%`, background: DS.success }} />
                         </div>
                       </div>
                     </div>
@@ -260,7 +253,6 @@ export function ShareCard({ type, data, className = '' }: Props) {
                   padding: '20px', 
                   background: `${DS.success}15`, 
                   border: `1px solid ${DS.success}30`, 
-                  borderRadius: '0px' 
                 }}>
                   <div style={{ fontSize: '14px', color: DS.textSecondary, marginBottom: '4px' }}>Cross-border Readiness</div>
                   <div style={{ fontSize: '16px', fontWeight: 700, color: DS.success }}>

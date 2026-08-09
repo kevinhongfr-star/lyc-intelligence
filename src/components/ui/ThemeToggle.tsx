@@ -9,9 +9,7 @@
  * Active segment is highlighted with the #C108AB accent.
  *
  * @example
- * ```tsx
- * <ThemeToggle />
- * ```
+ * ```tsx * <ThemeToggle /> *```
  */
 import React from 'react';
 import { Monitor, Moon, Sun } from 'lucide-react';
@@ -46,7 +44,7 @@ export function ThemeToggle({ className, size = 'md' }: ThemeToggleProps) {
       role="radiogroup"
       aria-label="Theme preference"
       className={cn(
-        'inline-flex items-center rounded-none border border-[var(--echo-border)] bg-[var(--echo-surface)]',
+        'inline-flex items-center border border-[var(--echo-border)] bg-[var(--echo-surface)]',
         sizeClasses,
         className,
       )}

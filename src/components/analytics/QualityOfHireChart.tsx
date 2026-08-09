@@ -36,11 +36,11 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
   }, [probationPassed, probationFailed]);
 
   return (
-    <div className="bg-card border border-card-border rounded-none overflow-hidden">
+    <div className="bg-card border border-card-border overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+          <div className="w-12 h-12 bg-green-100 flex items-center justify-center">
             <Award className="w-6 h-6 text-green-600" />
           </div>
           <div>
@@ -51,19 +51,19 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-4 gap-4">
-          <div className="p-4 bg-bg-alt rounded-none text-center">
+          <div className="p-4 bg-bg-alt text-center">
             <div className="text-2xl font-bold text-green-600">{probationPassRate}%</div>
             <div className="text-sm text-text-muted">Probation Pass Rate</div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-none text-center">
+          <div className="p-4 bg-bg-alt text-center">
             <div className="text-2xl font-bold text-text-primary">{totalPlacements}</div>
             <div className="text-sm text-text-muted">Total Placements</div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-none text-center">
+          <div className="p-4 bg-bg-alt text-center">
             <div className="text-2xl font-bold text-blue-600">{avgMatchScore}</div>
             <div className="text-sm text-text-muted">Avg Match Score</div>
           </div>
-          <div className="p-4 bg-bg-alt rounded-none text-center">
+          <div className="p-4 bg-bg-alt text-center">
             <div className="text-2xl font-bold text-purple-600">{retention6Month}%</div>
             <div className="text-sm text-text-muted">6-Month Retention</div>
           </div>
@@ -122,11 +122,11 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
             {/* Legend */}
             <div className="flex items-center gap-6 mt-4">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <div className="w-3 h-3 bg-green-500" />
                 <span className="text-sm text-text-muted">Passed ({probationPassed})</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <div className="w-3 h-3 bg-red-500" />
                 <span className="text-sm text-text-muted">Failed ({probationFailed})</span>
               </div>
             </div>
@@ -137,7 +137,7 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
             <h3 className="font-semibold text-text-primary mb-4">Detailed Breakdown</h3>
             <div className="space-y-4">
               {/* Passed */}
-              <div className="p-4 bg-green-50 border border-green-200 rounded-none">
+              <div className="p-4 bg-green-50 border border-green-200">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -145,16 +145,16 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
                   </div>
                   <span className="text-xl font-bold text-green-600">{probationPassed}</span>
                 </div>
-                <div className="h-2 bg-green-200 rounded-full overflow-hidden">
+                <div className="h-2 bg-green-200 overflow-hidden">
                   <div
-                    className="h-full bg-green-500 rounded-full transition-all duration-500"
+                    className="h-full bg-green-500 transition-all duration-500"
                     style={{ width: `${totalPlacements > 0 ? (probationPassed / totalPlacements) * 100 : 0}%` }}
                   />
                 </div>
               </div>
 
               {/* Failed */}
-              <div className="p-4 bg-red-50 border border-red-200 rounded-none">
+              <div className="p-4 bg-red-50 border border-red-200">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <XCircle className="w-5 h-5 text-red-600" />
@@ -162,16 +162,16 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
                   </div>
                   <span className="text-xl font-bold text-red-600">{probationFailed}</span>
                 </div>
-                <div className="h-2 bg-red-200 rounded-full overflow-hidden">
+                <div className="h-2 bg-red-200 overflow-hidden">
                   <div
-                    className="h-full bg-red-500 rounded-full transition-all duration-500"
+                    className="h-full bg-red-500 transition-all duration-500"
                     style={{ width: `${totalPlacements > 0 ? (probationFailed / totalPlacements) * 100 : 0}%` }}
                   />
                 </div>
               </div>
 
               {/* Pending */}
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-none">
+              <div className="p-4 bg-yellow-50 border border-yellow-200">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-yellow-600" />
@@ -179,9 +179,9 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
                   </div>
                   <span className="text-xl font-bold text-yellow-600">{probationPending}</span>
                 </div>
-                <div className="h-2 bg-yellow-200 rounded-full overflow-hidden">
+                <div className="h-2 bg-yellow-200 overflow-hidden">
                   <div
-                    className="h-full bg-yellow-500 rounded-full transition-all duration-500"
+                    className="h-full bg-yellow-500 transition-all duration-500"
                     style={{ width: `${totalPlacements > 0 ? (probationPending / totalPlacements) * 100 : 0}%` }}
                   />
                 </div>
@@ -193,7 +193,7 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
         {/* Additional Metrics */}
         <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-card-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-blue-100 flex items-center justify-center">
               <Target className="w-5 h-5 text-blue-600" />
             </div>
             <div>
@@ -203,7 +203,7 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-green-100 flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-green-600" />
             </div>
             <div>
@@ -213,7 +213,7 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-purple-100 flex items-center justify-center">
               <Users className="w-5 h-5 text-purple-600" />
             </div>
             <div>
@@ -231,9 +231,9 @@ export function QualityOfHireChart({ metrics }: QualityOfHireChartProps) {
 export function QualityStatsCards({ metrics }: { metrics: QualityOfHireMetrics }) {
   return (
     <div className="grid grid-cols-4 gap-4">
-      <div className="bg-card border border-green-200 rounded-none p-4 bg-green-50">
+      <div className="bg-card border border-green-200 p-4 bg-green-50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+          <div className="w-10 h-10 bg-green-100 flex items-center justify-center">
             <CheckCircle2 className="w-5 h-5 text-green-600" />
           </div>
           <div>
@@ -243,9 +243,9 @@ export function QualityStatsCards({ metrics }: { metrics: QualityOfHireMetrics }
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-none p-4">
+      <div className="bg-card border border-card-border p-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+          <div className="w-10 h-10 bg-blue-100 flex items-center justify-center">
             <Target className="w-5 h-5 text-blue-600" />
           </div>
           <div>
@@ -255,9 +255,9 @@ export function QualityStatsCards({ metrics }: { metrics: QualityOfHireMetrics }
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-none p-4">
+      <div className="bg-card border border-card-border p-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+          <div className="w-10 h-10 bg-purple-100 flex items-center justify-center">
             <TrendingUp className="w-5 h-5 text-purple-600" />
           </div>
           <div>
@@ -267,9 +267,9 @@ export function QualityStatsCards({ metrics }: { metrics: QualityOfHireMetrics }
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-none p-4">
+      <div className="bg-card border border-card-border p-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+          <div className="w-10 h-10 bg-orange-100 flex items-center justify-center">
             <Award className="w-5 h-5 text-orange-600" />
           </div>
           <div>

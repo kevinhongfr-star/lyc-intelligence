@@ -21,7 +21,7 @@ interface NotificationDropdownProps {
 
 export function NotificationDropdown({ notifications, onClose, onDismiss }: NotificationDropdownProps) {
   return (
-    <div className="absolute right-0 top-12 w-80 bg-white rounded-card shadow-modal border border-border overflow-hidden z-popover">
+    <div className="absolute right-0 top-12 w-80 bg-white shadow-modal border border-border overflow-hidden z-popover">
       <div className="px-4 py-3 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Bell className="w-4 h-4 text-fuchsia" />
@@ -41,7 +41,7 @@ export function NotificationDropdown({ notifications, onClose, onDismiss }: Noti
             <div key={notif.id} className="px-4 py-3 border-b border-border last:border-b-0 hover:bg-bg-warm group">
               <div className="flex items-start gap-3">
                 {notif.unread && (
-                  <div className="w-2 h-2 rounded-full bg-fuchsia mt-1.5 flex-shrink-0" />
+                  <div className="w-2 h-2 bg-fuchsia mt-1.5 flex-shrink-0" />
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-text-primary">{notif.title}</div>

@@ -99,7 +99,7 @@ const UsersTable: React.FC = () => {
       setInviteRole('consultant');
       loadUsers();
     } catch (err) {
-      alert('Failed to invite user: ' + (err as Error).message);
+      alert('Failed to invite user:' + (err as Error).message);
     } finally {
       setActionLoading(null);
     }
@@ -111,7 +111,7 @@ const UsersTable: React.FC = () => {
       await adminService.users.deactivate(id);
       loadUsers();
     } catch (err) {
-      alert('Failed to deactivate: ' + (err as Error).message);
+      alert('Failed to deactivate:' + (err as Error).message);
     } finally {
       setActionLoading(null);
       setMenuOpenId(null);
@@ -124,7 +124,7 @@ const UsersTable: React.FC = () => {
       await adminService.users.reactivate(id);
       loadUsers();
     } catch (err) {
-      alert('Failed to reactivate: ' + (err as Error).message);
+      alert('Failed to reactivate:' + (err as Error).message);
     } finally {
       setActionLoading(null);
       setMenuOpenId(null);
@@ -138,7 +138,7 @@ const UsersTable: React.FC = () => {
       const result = await adminService.users.resetPassword(id);
       alert(result.message);
     } catch (err) {
-      alert('Failed to reset password: ' + (err as Error).message);
+      alert('Failed to reset password:' + (err as Error).message);
     } finally {
       setActionLoading(null);
       setMenuOpenId(null);
@@ -152,7 +152,7 @@ const UsersTable: React.FC = () => {
       await adminService.users.delete(id);
       loadUsers();
     } catch (err) {
-      alert('Failed to delete: ' + (err as Error).message);
+      alert('Failed to delete:' + (err as Error).message);
     } finally {
       setActionLoading(null);
       setMenuOpenId(null);
@@ -165,7 +165,7 @@ const UsersTable: React.FC = () => {
       await adminService.users.update(id, { role: newRole });
       loadUsers();
     } catch (err) {
-      alert('Failed to update role: ' + (err as Error).message);
+      alert('Failed to update role:' + (err as Error).message);
     } finally {
       setActionLoading(null);
     }

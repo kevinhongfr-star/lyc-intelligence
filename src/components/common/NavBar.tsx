@@ -82,7 +82,6 @@ export function NavBar() {
           padding: '6px 12px',
           background: DS.card,
           border: `1px solid ${DS.cardBorder}`,
-          borderRadius: '20px',
         }}>
           <CreditCard style={{ width: 14, height: 14, color: DS.accent }} />
           <span style={{ fontSize: '13px', fontWeight: 600, color: DS.text }}>—</span>
@@ -99,7 +98,6 @@ export function NavBar() {
               padding: '8px 12px',
               background: DS.card,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '0px',
               cursor: 'pointer',
               minHeight: '40px',
             }}
@@ -107,7 +105,6 @@ export function NavBar() {
             <div style={{
               width: '32px',
               height: '32px',
-              borderRadius: '50%',
               background: DS.accent,
               display: 'flex',
               alignItems: 'center',
@@ -138,7 +135,6 @@ export function NavBar() {
                 width: '220px',
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '0px',
                 padding: '8px',
                 zIndex: 100,
                 boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
@@ -158,7 +154,6 @@ export function NavBar() {
                     padding: '10px 12px',
                     color: DS.textSecondary,
                     textDecoration: 'none',
-                    borderRadius: '0px',
                     fontSize: '14px',
                     transition: 'background 0.2s',
                   }}
@@ -179,7 +174,6 @@ export function NavBar() {
                     padding: '10px 12px',
                     color: DS.textSecondary,
                     textDecoration: 'none',
-                    borderRadius: '0px',
                     fontSize: '14px',
                     transition: 'background 0.2s',
                   }}
@@ -200,7 +194,6 @@ export function NavBar() {
                     padding: '10px 12px',
                     color: DS.textSecondary,
                     textDecoration: 'none',
-                    borderRadius: '0px',
                     fontSize: '14px',
                     transition: 'background 0.2s',
                   }}
@@ -224,7 +217,6 @@ export function NavBar() {
                       border: 'none',
                       color: DS.error,
                       cursor: 'pointer',
-                      borderRadius: '0px',
                       fontSize: '14px',
                       textAlign: 'left',
                       transition: 'background 0.2s',
@@ -289,16 +281,7 @@ export function NavBar() {
         </div>
       )}
 
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-nav, .user-name-desktop {
-            display: none !important;
-          }
-          .mobile-menu-toggle {
-            display: block !important;
-          }
-        }
-      `}</style>
+      <style>{`@media (max-width: 768px) { .desktop-nav, .user-name-desktop { display: none !important; } .mobile-menu-toggle { display: block !important; } }`}</style>
     </nav>
   );
 }

@@ -101,7 +101,7 @@ export function CSVUploader() {
     // Server-side required columns check (client-side mirror for fast feedback)
     const missing = REQUIRED_COLUMNS.filter((c) => !parsed.header.includes(c));
     if (missing.length > 0) {
-      setError(`Missing required column(s): ${missing.join(', ')}. Server will reject.`);
+      setError(`Missing required column(s): ${missing.join(',')}. Server will reject.`);
     }
     setPreview(parsed);
   }, []);
@@ -169,14 +169,9 @@ export function CSVUploader() {
         onDragLeave={() => setIsDragging(false)}
         onDrop={onDrop}
         onClick={() => inputRef.current?.click()}
-        className={`
-          cursor-pointer border-2 border-dashed rounded-none p-8
-          flex flex-col items-center justify-center text-center
-          transition-colors
-          ${isDragging
+        className={`cursor-pointer border-2 border-dashed p-8 flex flex-col items-center justify-center text-center transition-colors ${isDragging
             ? 'border-accent bg-accent-5'
-            : 'border-bg-hover hover:border-text-muted hover:bg-bg-secondary'}
-        `}
+            : 'border-bg-hover hover:border-text-muted hover:bg-bg-secondary'}`}
         role="button"
         tabIndex={0}
       >
@@ -200,7 +195,7 @@ export function CSVUploader() {
 
       {/* Preview */}
       {preview && preview.header.length > 0 && (
-        <div className="border border-bg-hover rounded-none overflow-hidden">
+        <div className="border border-bg-hover overflow-hidden">
           <div className="px-3 py-2 bg-bg-secondary text-sm font-medium flex items-center gap-2">
             <FileText className="w-4 h-4" />
             Preview (first {preview.rows.length} of data rows)
@@ -212,10 +207,7 @@ export function CSVUploader() {
                   {preview.header.map((h, i) => (
                     <th
                       key={i}
-                      className={`
-                        px-3 py-2 text-left font-medium
-                        ${REQUIRED_COLUMNS.includes(h) ? 'text-accent' : 'text-text-secondary'}
-                      `}
+                      className={`px-3 py-2 text-left font-medium ${REQUIRED_COLUMNS.includes(h) ? 'text-accent' : 'text-text-secondary'}`}
                     >
                       {h}
                       {REQUIRED_COLUMNS.includes(h) && (
@@ -250,7 +242,7 @@ export function CSVUploader() {
           <button
             onClick={onSubmit}
             disabled={uploading}
-            className="px-4 py-2 bg-accent text-white rounded-none font-medium
+            className="px-4 py-2 bg-accent text-white font-medium
                        hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed
                        flex items-center gap-2"
           >
@@ -278,7 +270,7 @@ export function CSVUploader() {
 
       {/* Error */}
       {error && (
-        <div className="border border-red-200 bg-red-50 text-red-800 rounded-none p-3 flex items-start gap-2">
+        <div className="border border-red-200 bg-red-50 text-red-800 p-3 flex items-start gap-2">
           <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <div className="text-sm">{error}</div>
         </div>
@@ -286,7 +278,7 @@ export function CSVUploader() {
 
       {/* Success summary */}
       {response?.success && (
-        <div className="border border-green-200 bg-green-50 text-green-800 rounded-none p-3 space-y-2">
+        <div className="border border-green-200 bg-green-50 text-green-800 p-3 space-y-2">
           <div className="flex items-center gap-2 font-medium">
             <CheckCircle2 className="w-5 h-5" />
             Upload complete — {response.inserted} of {response.total} rows inserted

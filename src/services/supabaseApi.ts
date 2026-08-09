@@ -544,11 +544,7 @@ export async function getMandateSolutions(mandateId: string): Promise<Array<{
 }>> {
   const { data, error } = await getSupabase()
     .from('mandate_solutions')
-    .select(`
-      *,
-      defined_by:profiles!defined_by(id, name),
-      approved_by:profiles!approved_by(id, name)
-    `)
+    .select(`*, defined_by:profiles!defined_by(id, name), approved_by:profiles!approved_by(id, name)`)
     .eq('mandate_id', mandateId)
     .order('created_at');
   

@@ -51,7 +51,7 @@ export default function AssessmentCatalog() {
                 ? 'bg-accent text-white'
                 : 'text-text-muted hover:bg-bg-tertiary'
             }`}
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             {tab.label}
           </button>
@@ -67,7 +67,7 @@ export default function AssessmentCatalog() {
               key={assessment.id}
               onClick={() => setSelectedAssessment(assessment)}
               className="text-left bg-bg-primary border border-bg-tertiary p-5 hover:bg-bg-secondary transition-colors"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-center justify-between mb-3">
                 <Badge variant="default" className="uppercase text-[10px] tracking-wider">

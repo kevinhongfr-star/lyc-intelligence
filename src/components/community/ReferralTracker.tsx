@@ -35,7 +35,7 @@ function ReferralTracker() {
           <div
             key={stat.label}
             className="bg-bg-secondary border border-bg-tertiary p-4 text-center"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <p className="text-2xl font-bold text-text-primary">{stat.value}</p>
             <p className="text-xs text-text-muted mt-1">{stat.label}</p>
@@ -44,7 +44,7 @@ function ReferralTracker() {
       </div>
 
       {/* Referral link */}
-      <div className="bg-bg-secondary border border-bg-tertiary p-4" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-secondary border border-bg-tertiary p-4" style={{ }}>
         <div className="flex items-center gap-2 mb-2">
           <Award style={{ width: 16, height: 16, color: '#C108AB' }} />
           <h4 className="text-sm font-medium text-text-primary">Your Referral Link</h4>
@@ -54,13 +54,12 @@ function ReferralTracker() {
             readOnly
             value={REFERRAL_LINK}
             className="flex-1 border border-bg-tertiary bg-bg-primary text-text-primary text-sm px-3 py-2"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           />
           <button
             onClick={handleCopy}
             className="px-4 text-sm font-medium text-white inline-flex items-center gap-1.5"
             style={{
-              borderRadius: 0,
               background: '#C108AB',
               border: 'none',
               cursor: 'pointer',
@@ -80,7 +79,7 @@ function ReferralTracker() {
             <div
               key={ref.id}
               className="bg-bg-secondary border border-bg-tertiary px-4 py-3 flex items-center justify-between"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div>
                 <p className="text-sm font-medium text-text-primary">{ref.name}</p>
@@ -89,7 +88,6 @@ function ReferralTracker() {
               <span
                 className="px-2 py-0.5 text-xs font-medium"
                 style={{
-                  borderRadius: 0,
                   background: ref.status === 'successful' ? '#16A34A15' : '#D9770600',
                   color: ref.status === 'successful' ? '#16A34A' : '#D97706',
                   border: ref.status === 'successful' ? '1px solid #16A34A30' : '1px solid #D9770630',

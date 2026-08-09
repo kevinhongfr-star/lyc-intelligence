@@ -62,7 +62,7 @@ export default function AssessmentTake({ assessment, onComplete }: AssessmentTak
   return (
     <div className="space-y-6">
       {/* Header: timer + progress */}
-      <div className="bg-bg-primary border border-bg-tertiary p-4" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-4" style={{ }}>
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-serif font-semibold text-text-primary">{assessment.name}</h2>
           <div className="flex items-center gap-1 text-sm text-text-muted">
@@ -78,7 +78,7 @@ export default function AssessmentTake({ assessment, onComplete }: AssessmentTak
       </div>
 
       {/* Question */}
-      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
         <p className="text-text-primary text-lg font-medium mb-6">
           {currentQuestion.text}
         </p>
@@ -94,13 +94,13 @@ export default function AssessmentTake({ assessment, onComplete }: AssessmentTak
                     ? 'border-accent bg-accent/10 text-text-primary'
                     : 'border-bg-tertiary hover:bg-bg-secondary text-text-secondary'
                 }`}
-                style={{ borderRadius: 0 }}
+                style={{ }}
               >
                 <div
                   className={`w-5 h-5 border-2 flex items-center justify-center flex-shrink-0 ${
                     isSelected ? 'border-accent bg-accent' : 'border-bg-tertiary'
                   }`}
-                  style={{ borderRadius: 0 }}
+                  style={{ }}
                 >
                   {isSelected && <CheckCircle className="w-3 h-3 text-white" />}
                 </div>
@@ -118,7 +118,7 @@ export default function AssessmentTake({ assessment, onComplete }: AssessmentTak
           size="default"
           onClick={handlePrevious}
           disabled={currentIndex === 0}
-          style={{ borderRadius: 0 }}
+          style={{ }}
           className="flex items-center gap-1"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -131,7 +131,7 @@ export default function AssessmentTake({ assessment, onComplete }: AssessmentTak
             size="default"
             onClick={handleSubmit}
             disabled={Object.keys(answers).length < totalQuestions}
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             Submit
           </Button>
@@ -140,7 +140,7 @@ export default function AssessmentTake({ assessment, onComplete }: AssessmentTak
             variant="default"
             size="default"
             onClick={handleNext}
-            style={{ borderRadius: 0 }}
+            style={{ }}
             className="flex items-center gap-1"
           >
             Next

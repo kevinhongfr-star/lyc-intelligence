@@ -24,7 +24,7 @@ export default function BookingFlow({ service, onClose }: BookingFlowProps) {
   }
 
   return (
-    <div className="bg-bg-primary border border-bg-tertiary max-w-lg mx-auto" style={{ borderRadius: 0 }}>
+    <div className="bg-bg-primary border border-bg-tertiary max-w-lg mx-auto" style={{ }}>
       {/* Step indicator */}
       <div className="flex items-center gap-2 p-4 border-b border-bg-tertiary">
         {[1, 2, 3].map((s) => (
@@ -37,7 +37,7 @@ export default function BookingFlow({ service, onClose }: BookingFlowProps) {
                     ? 'bg-[#C108AB]/20 text-[#C108AB]'
                     : 'bg-bg-tertiary text-text-muted'
               }`}
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               {s}
             </span>
@@ -61,7 +61,7 @@ export default function BookingFlow({ service, onClose }: BookingFlowProps) {
               <div className="flex items-center gap-1">
                 <span
                   className="w-6 h-6 flex items-center justify-center text-xs font-bold text-white"
-                  style={{ borderRadius: 0, backgroundColor: service.provider.avatarColor }}
+                  style={{  backgroundColor: service.provider.avatarColor }}
                 >
                   {service.provider.name.charAt(0)}
                 </span>
@@ -93,7 +93,7 @@ export default function BookingFlow({ service, onClose }: BookingFlowProps) {
                       ? 'border-[#C108AB] bg-accent-5'
                       : 'border-bg-tertiary hover:border-text-muted'
                   }`}
-                  style={{ borderRadius: 0 }}
+                  style={{ }}
                 >
                   <input
                     type="radio"
@@ -114,7 +114,7 @@ export default function BookingFlow({ service, onClose }: BookingFlowProps) {
         {step === 3 && (
           <div className="space-y-3">
             <h3 className="font-serif text-lg font-semibold text-text-primary">Booking Summary</h3>
-            <div className="border border-bg-tertiary p-4 space-y-2" style={{ borderRadius: 0 }}>
+            <div className="border border-bg-tertiary p-4 space-y-2" style={{ }}>
               <div className="flex justify-between text-sm">
                 <span className="text-text-muted">Service</span>
                 <span className="text-text-primary font-medium">{service.name}</span>
@@ -160,7 +160,7 @@ export default function BookingFlow({ service, onClose }: BookingFlowProps) {
             onClick={() => setStep((s) => s + 1)}
             disabled={!canNext}
             className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-[#C108AB] hover:bg-[#A00790] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             Next
             <ChevronRight className="w-4 h-4" />
@@ -169,7 +169,7 @@ export default function BookingFlow({ service, onClose }: BookingFlowProps) {
           <button
             onClick={handleConfirm}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#C108AB] hover:bg-[#A00790] transition-colors"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <CreditCard className="w-4 h-4" />
             Confirm & Pay {service.priceCredits} Credits

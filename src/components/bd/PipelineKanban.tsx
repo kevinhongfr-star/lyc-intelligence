@@ -161,7 +161,7 @@ export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity
           <div>
             <h2 className="font-serif font-semibold text-lg text-text-primary">BD Pipeline</h2>
             <p className="text-sm text-text-muted">
-              {kanbanData.total_opportunities} opportunities •{' '}
+              {kanbanData.total_opportunities} opportunities •{''}
               {formatCurrency(kanbanData.total_pipeline_value)} pipeline value
             </p>
           </div>
@@ -185,7 +185,7 @@ export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity
               key={stage}
               className={cn(
                 'flex-shrink-0 w-72 flex flex-col',
-                'rounded-none',
+                '',
                 isDragOver && 'ring-2 ring-accent ring-offset-2'
               )}
               onDragOver={(e) => handleDragOver(e, stage)}
@@ -195,7 +195,7 @@ export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity
               {/* Column Header */}
               <div
                 className={cn(
-                  'px-3 py-2 rounded-t-lg font-medium text-sm flex items-center justify-between',
+                  'px-3 py-2 font-medium text-sm flex items-center justify-between',
                   STAGE_HEADER_COLORS[stage] || 'bg-bg-secondary text-text-primary'
                 )}
               >
@@ -208,7 +208,7 @@ export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity
               {/* Column Body */}
               <div
                 className={cn(
-                  'flex-1 min-h-[200px] bg-bg-secondary rounded-b-lg p-2 space-y-2',
+                  'flex-1 min-h-[200px] bg-bg-secondary p-2 space-y-2',
                   `border-l-2 border-r-2 border-b-2`,
                   STAGE_COLORS[stage] || 'border-bg-hover'
                 )}
@@ -230,7 +230,7 @@ export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity
                         onDragEnd={handleDragEnd}
                         onClick={() => onSelectOpportunity?.(opp)}
                         className={cn(
-                          'p-3 bg-bg-base rounded-none cursor-pointer',
+                          'p-3 bg-bg-base cursor-pointer',
                           'hover:bg-bg-hover transition-colors',
                           'border border-bg-hover',
                           isDragging && 'opacity-50'
@@ -270,7 +270,7 @@ export function PipelineKanban({ orgId, onSelectOpportunity, onCreateOpportunity
 
                 {/* Drop zone indicator */}
                 {isDragOver && draggedItem && draggedItem.stage !== stage && (
-                  <div className="border-2 border-dashed border-accent rounded-none p-4 text-center text-xs text-accent">
+                  <div className="border-2 border-dashed border-accent p-4 text-center text-xs text-accent">
                     Drop to move here
                   </div>
                 )}

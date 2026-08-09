@@ -131,7 +131,7 @@ export function NotificationBell({ userId, onNotificationClick, onViewAll }: Not
   // Get type config
   const getTypeConfig = (type: string) => ({
     color: NOTIFICATION_TYPE_COLORS[type] || 'bg-gray-100 text-gray-700',
-    label: NOTIFICATION_TYPE_LABELS[type] || type.replace('_', ' '),
+    label: NOTIFICATION_TYPE_LABELS[type] || type.replace('_', ''),
   });
 
   return (
@@ -139,7 +139,7 @@ export function NotificationBell({ userId, onNotificationClick, onViewAll }: Not
       {/* Bell Icon */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 hover:bg-bg-alt rounded-full transition-colors"
+        className="relative p-2 hover:bg-bg-alt transition-colors"
       >
         {unreadCount > 0 ? (
           <BellDot className="w-5 h-5 text-text-muted" />
@@ -166,13 +166,13 @@ export function NotificationBell({ userId, onNotificationClick, onViewAll }: Not
           />
 
           {/* Content */}
-          <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-none shadow-xl z-50 overflow-hidden">
+          <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border shadow-xl z-50 overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <h3 className="font-medium text-text-primary">Notifications</h3>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-bg-alt rounded transition-colors"
+                className="p-1 hover:bg-bg-alt transition-colors"
               >
                 <X className="w-4 h-4 text-text-muted" />
               </button>
@@ -204,7 +204,7 @@ export function NotificationBell({ userId, onNotificationClick, onViewAll }: Not
                       >
                         <div className="flex items-start gap-3">
                           {/* Type indicator */}
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${typeConfig.color} flex-shrink-0 mt-0.5`}>
+                          <span className={`px-2 py-1 text-xs font-medium ${typeConfig.color} flex-shrink-0 mt-0.5`}>
                             {typeConfig.label}
                           </span>
 
@@ -228,7 +228,7 @@ export function NotificationBell({ userId, onNotificationClick, onViewAll }: Not
                           {/* Chevron + Read indicator */}
                           <div className="flex items-center gap-1">
                             {!notification.read && (
-                              <div className="w-2 h-2 rounded-full bg-primary" />
+                              <div className="w-2 h-2 bg-primary" />
                             )}
                             <ChevronRight className="w-4 h-4 text-text-muted" />
                           </div>

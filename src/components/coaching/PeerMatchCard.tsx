@@ -57,7 +57,7 @@ export function PeerMatchCard({
   const style = QUALITY_STYLES[quality] ?? QUALITY_STYLES.fair;
 
   const getInitials = (name: string) => name
-    .split(' ')
+    .split('')
     .map(n => n.charAt(0))
     .join('')
     .toUpperCase()

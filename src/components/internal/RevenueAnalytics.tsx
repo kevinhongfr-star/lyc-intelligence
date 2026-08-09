@@ -159,7 +159,7 @@ export default function RevenueAnalytics() {
               <YAxis tick={{ fontSize: 11 }} stroke="#9ca3af" />
               <Tooltip
                 formatter={(v: any) => fmtMoney(Number(v))}
-                contentStyle={{ fontSize: 12, borderRadius: 0 }}
+                contentStyle={{ fontSize: 12 }}
               />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               <Bar dataKey="Credit Packs" stackId="r" fill="#C108AB" />

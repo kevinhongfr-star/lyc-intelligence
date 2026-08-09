@@ -34,13 +34,10 @@ export function SurfaceTabs({ active, onChange }: SurfaceTabsProps) {
           <button
             key={tab.id}
             onClick={() => onChange(tab.id)}
-            className={`
-              flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors
-              ${active === tab.id
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${active === tab.id
                 ? 'text-fuchsia border-b-2 border-fuchsia bg-fuchsia-light'
                 : 'text-text-secondary hover:text-text-primary hover:bg-bg-warm'
-              }
-            `}
+              }`}
           >
             {tab.icon}
             <span>{tab.label}</span>

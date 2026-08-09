@@ -83,7 +83,7 @@ export function OutreachTimeline({ candidateId, mandateId, candidateName }: Prop
             <div key={a.id || idx} className="relative pl-6">
               {/* Dot on timeline */}
               <div
-                className="absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 border-white"
+                className="absolute -left-[9px] top-1 w-4 h-4 border-2 border-white"
                 style={{ backgroundColor: color }}
               />
               <div className="flex items-start justify-between gap-2">
@@ -97,7 +97,7 @@ export function OutreachTimeline({ candidateId, mandateId, candidateName }: Prop
                 <div className="flex items-center gap-2">
                   {outcome && (
                     <span
-                      className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                      className="text-[10px] px-1.5 py-0.5 font-medium"
                       style={{ background: outcome.bg, color: outcome.text }}
                     >
                       {outcome.label}
@@ -117,7 +117,7 @@ export function OutreachTimeline({ candidateId, mandateId, candidateName }: Prop
               {a.next_action && (
                 <p className="text-[10px] text-blue-600 mt-0.5">
                   → {a.next_action}
-                  {a.next_action_date && ` by ${new Date(a.next_action_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                  {a.next_action_date && `by ${new Date(a.next_action_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
                 </p>
               )}
             </div>

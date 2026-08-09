@@ -95,7 +95,7 @@ export function MandatesAtRisk({ mandates, loading, onMandateClick, onViewAll }:
 
   if (loading) {
     return (
-      <div className="bg-card border border-card-border rounded-none p-6">
+      <div className="bg-card border border-card-border p-6">
         <div className="flex items-center justify-center py-12">
           <Loader2 className="w-8 h-8 text-accent animate-spin" />
         </div>
@@ -104,12 +104,12 @@ export function MandatesAtRisk({ mandates, loading, onMandateClick, onViewAll }:
   }
 
   return (
-    <div className="bg-card border border-card-border rounded-none overflow-hidden">
+    <div className="bg-card border border-card-border overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-card-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+            <div className={`w-10 h-10 flex items-center justify-center ${
               stats.overdue > 0 ? 'bg-red-100' : stats.atRisk > 0 ? 'bg-orange-100' : 'bg-green-100'
             }`}>
               {stats.overdue > 0 ? (
@@ -161,7 +161,7 @@ export function MandatesAtRisk({ mandates, loading, onMandateClick, onViewAll }:
       <div className="divide-y divide-card-border max-h-96 overflow-y-auto">
         {sortedMandates.length === 0 ? (
           <div className="p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-green-100 flex items-center justify-center mx-auto mb-4">
               <TrendingUp className="w-8 h-8 text-green-600" />
             </div>
             <p className="text-text-primary font-medium">All mandates on track!</p>
@@ -183,7 +183,7 @@ export function MandatesAtRisk({ mandates, loading, onMandateClick, onViewAll }:
               >
                 <div className="flex items-start gap-3">
                   {/* Status Icon */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  <div className={`w-8 h-8 flex items-center justify-center flex-shrink-0 ${
                     isOverdue ? 'bg-red-100' : 'bg-orange-100'
                   }`}>
                     {isOverdue ? (

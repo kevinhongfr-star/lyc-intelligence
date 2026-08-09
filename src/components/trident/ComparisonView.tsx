@@ -160,7 +160,7 @@ export function ComparisonView({ mandateId, onCandidateClick }: ComparisonViewPr
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as typeof filter)}
-            className="px-2 py-1 bg-bg border border-border rounded text-sm"
+            className="px-2 py-1 bg-bg border border-border text-sm"
           >
             <option value="all">All Segments</option>
             <option value="A">Segment A</option>
@@ -171,7 +171,7 @@ export function ComparisonView({ mandateId, onCandidateClick }: ComparisonViewPr
           <select
             value={verdictFilter}
             onChange={(e) => setVerdictFilter(e.target.value)}
-            className="px-2 py-1 bg-bg border border-border rounded text-sm"
+            className="px-2 py-1 bg-bg border border-border text-sm"
           >
             <option value="all">All Verdicts</option>
             {uniqueVerdicts.map(v => (
@@ -182,7 +182,7 @@ export function ComparisonView({ mandateId, onCandidateClick }: ComparisonViewPr
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-2 py-1 bg-bg border border-border rounded text-sm"
+            className="px-2 py-1 bg-bg border border-border text-sm"
           >
             <option value="all">All Statuses</option>
             {uniqueStatuses.map(s => (
@@ -195,7 +195,7 @@ export function ComparisonView({ mandateId, onCandidateClick }: ComparisonViewPr
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="px-2 py-1 bg-bg border border-border rounded text-sm"
+              className="px-2 py-1 bg-bg border border-border text-sm"
             >
               <option value="composite">Composite</option>
               <option value="name">Name</option>
@@ -252,7 +252,7 @@ export function ComparisonView({ mandateId, onCandidateClick }: ComparisonViewPr
                     </Badge>
                   </td>
                   <td className="p-3 text-center">
-                    <span className={`inline-block px-2 py-1 rounded text-sm font-bold ${getSegmentColor(candidate.segment)}`}>
+                    <span className={`inline-block px-2 py-1 text-sm font-bold ${getSegmentColor(candidate.segment)}`}>
                       {candidate.segment}
                     </span>
                   </td>

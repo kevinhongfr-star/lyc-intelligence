@@ -180,13 +180,13 @@ export function WorkshopAssessment({ token }: { token: string }) {
       {phase === 'welcome' && (
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="max-w-md w-full text-center">
-            <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-accent/10 flex items-center justify-center mx-auto mb-6">
               <span className="text-3xl font-bold text-accent">{workshop.assessment_type[0]}</span>
             </div>
             <h1 className="text-2xl font-bold text-text-primary mb-2">{workshop.title}</h1>
             <p className="text-text-muted mb-6">{ASSESSMENT_CATALOG[workshop.assessment_type as keyof typeof ASSESSMENT_CATALOG]?.b2cName}</p>
             
-            <div className="bg-bg-secondary rounded-none p-6 mb-6 text-left">
+            <div className="bg-bg-secondary p-6 mb-6 text-left">
               <h3 className="font-semibold text-text-primary mb-4">What to expect:</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
@@ -233,9 +233,9 @@ export function WorkshopAssessment({ token }: { token: string }) {
             </div>
             
             {/* Progress Bar */}
-            <div className="w-full h-2 bg-bg-tertiary rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-bg-tertiary overflow-hidden">
               <div 
-                className="h-full bg-accent rounded-full transition-all duration-300"
+                className="h-full bg-accent transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -246,7 +246,7 @@ export function WorkshopAssessment({ token }: { token: string }) {
             <div className="mt-6">
               {/* Dimension Badge */}
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full bg-accent" />
+                <div className="w-2 h-2 bg-accent" />
                 <span className="text-sm font-medium text-accent">
                   {currentQuestion.dimension.name}
                 </span>
@@ -269,7 +269,7 @@ export function WorkshopAssessment({ token }: { token: string }) {
                       <button
                         key={num}
                         onClick={() => handleAnswer(num)}
-                        className={`aspect-square rounded-none flex items-center justify-center text-lg font-bold transition-all ${
+                        className={`aspect-square flex items-center justify-center text-lg font-bold transition-all ${
                           responses[currentQuestion.id] === num
                             ? 'bg-accent text-white shadow-lg'
                             : 'bg-bg-secondary text-text-secondary hover:bg-accent/10'
@@ -292,14 +292,14 @@ export function WorkshopAssessment({ token }: { token: string }) {
                     <button
                       key={index}
                       onClick={() => handleAnswer(option)}
-                      className={`w-full p-4 rounded-none border text-left transition-all ${
+                      className={`w-full p-4 border text-left transition-all ${
                         responses[currentQuestion.id] === option
                           ? 'border-accent bg-accent/5'
                           : 'border-bg-tertiary hover:border-accent/50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        <div className={`w-5 h-5 border-2 flex items-center justify-center ${
                           responses[currentQuestion.id] === option
                             ? 'border-accent bg-accent'
                             : 'border-text-muted'
@@ -351,13 +351,13 @@ export function WorkshopAssessment({ token }: { token: string }) {
       {phase === 'completion' && (
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="max-w-md w-full text-center">
-            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-green-100 flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
             <h1 className="text-2xl font-bold text-text-primary mb-2">Thank You!</h1>
             <p className="text-text-muted mb-6">Your assessment has been submitted successfully.</p>
 
-            <div className="bg-bg-secondary rounded-none p-6 mb-6">
+            <div className="bg-bg-secondary p-6 mb-6">
               <h3 className="font-semibold text-text-primary mb-4">Your Results</h3>
               {showSummary ? (
                 <div className="space-y-4">

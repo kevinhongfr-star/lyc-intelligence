@@ -165,7 +165,7 @@ export function formatFilters(filters: SearchFilters): string[] {
   if (filters.location) parts.push(`Location: ${filters.location}`);
   if (filters.industry) parts.push(`Industry: ${filters.industry}`);
   if (filters.skills && filters.skills.length > 0) {
-    parts.push(`Skills: ${filters.skills.join(', ')}`);
+    parts.push(`Skills: ${filters.skills.join(',')}`);
   }
   if (filters.experience_years) {
     const { min, max } = filters.experience_years;
@@ -174,7 +174,7 @@ export function formatFilters(filters: SearchFilters): string[] {
     else if (max) parts.push(`Experience: up to ${max} years`);
   }
   if (filters.seniority && filters.seniority.length > 0) {
-    parts.push(`Seniority: ${filters.seniority.join(', ')}`);
+    parts.push(`Seniority: ${filters.seniority.join(',')}`);
   }
 
   return parts.length > 0 ? parts : ['No specific filters'];

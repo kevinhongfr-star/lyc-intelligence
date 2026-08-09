@@ -118,12 +118,12 @@ export function ClientHome() {
     return (
       <PageContainer>
         <div className="animate-pulse space-y-4">
-          <div className="h-16 bg-bg-alt rounded-none" />
+          <div className="h-16 bg-bg-alt" />
           <div className="grid grid-cols-2 gap-3">
-            <div className="h-20 bg-bg-alt rounded-none" />
-            <div className="h-20 bg-bg-alt rounded-none" />
+            <div className="h-20 bg-bg-alt" />
+            <div className="h-20 bg-bg-alt" />
           </div>
-          <div className="h-32 bg-bg-alt rounded-none" />
+          <div className="h-32 bg-bg-alt" />
         </div>
       </PageContainer>
     );
@@ -138,15 +138,15 @@ export function ClientHome() {
           <p className="text-text-muted">Your search dashboard</p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="relative p-2 rounded-full hover:bg-bg-alt transition-colors">
+          <button className="relative p-2 hover:bg-bg-alt transition-colors">
             <Bell className="w-6 h-6 text-text-muted" />
             {pendingFeedback.length > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500" />
             )}
           </button>
           <Link
             href="/client/profile"
-            className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"
+            className="w-10 h-10 bg-primary/10 flex items-center justify-center"
           >
             <span className="text-primary font-semibold">C</span>
           </Link>
@@ -192,7 +192,7 @@ export function ClientHome() {
                 Action Required
               </h2>
             </div>
-            <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+            <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium">
               {pendingFeedback.length} pending
             </span>
           </div>
@@ -213,7 +213,7 @@ export function ClientHome() {
                   </div>
                   <div className="flex flex-col items-end gap-2">
                     <span
-                      className={`px-2 py-1 text-xs font-medium rounded ${
+                      className={`px-2 py-1 text-xs font-medium ${
                         item.actionType === 'approve'
                           ? 'bg-green-100 text-green-700'
                           : item.actionType === 'reject'
@@ -231,11 +231,11 @@ export function ClientHome() {
                   </div>
                 </div>
                 <div className="flex gap-2 mt-3">
-                  <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white rounded-none text-sm font-medium hover:bg-green-700 transition-colors">
+                  <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors">
                     <ThumbsUp className="w-4 h-4" />
                     Approve
                   </button>
-                  <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-600 text-white rounded-none text-sm font-medium hover:bg-red-700 transition-colors">
+                  <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors">
                     <ThumbsDown className="w-4 h-4" />
                     Reject
                   </button>
@@ -269,7 +269,7 @@ export function ClientHome() {
               rightContent={
                 <div className="flex flex-col items-end gap-1">
                   <span
-                    className={`px-2 py-0.5 text-xs font-medium rounded ${
+                    className={`px-2 py-0.5 text-xs font-medium ${
                       mandate.status === 'at_risk'
                         ? 'bg-red-100 text-red-700'
                         : mandate.status === 'on_track'
@@ -300,9 +300,9 @@ export function ClientHome() {
         <div className="grid grid-cols-2 gap-3">
           <Link
             href="/client/pipeline"
-            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-none hover:bg-bg-alt transition-colors"
+            className="flex items-center gap-3 p-4 bg-card border border-card-border hover:bg-bg-alt transition-colors"
           >
-            <div className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
               <Users className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -312,9 +312,9 @@ export function ClientHome() {
           </Link>
           <Link
             href="/client/feedback"
-            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-none hover:bg-bg-alt transition-colors"
+            className="flex items-center gap-3 p-4 bg-card border border-card-border hover:bg-bg-alt transition-colors"
           >
-            <div className="w-10 h-10 rounded-none bg-amber-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-amber-100 flex items-center justify-center">
               <ThumbsUp className="w-5 h-5 text-amber-600" />
             </div>
             <div>
@@ -331,7 +331,7 @@ export function ClientHome() {
         <Card>
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-green-100 flex items-center justify-center flex-shrink-0">
                 <CheckCircle2 className="w-4 h-4 text-green-600" />
               </div>
               <div>
@@ -342,7 +342,7 @@ export function ClientHome() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-blue-100 flex items-center justify-center flex-shrink-0">
                 <Calendar className="w-4 h-4 text-blue-600" />
               </div>
               <div>
@@ -353,7 +353,7 @@ export function ClientHome() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-purple-100 flex items-center justify-center flex-shrink-0">
                 <Users className="w-4 h-4 text-purple-600" />
               </div>
               <div>

@@ -148,7 +148,7 @@ export function CalendarSync() {
               type="date"
               value={selectedDate}
               onChange={e => setSelectedDate(e.target.value)}
-              className="px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+              className="px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
             />
             <span className="text-xs text-text-muted">{slots.length} available slots</span>
           </div>

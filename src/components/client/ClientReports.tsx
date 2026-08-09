@@ -99,7 +99,7 @@ export function ClientReports() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-accent border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -112,14 +112,14 @@ export function ClientReports() {
           <h1 className="text-2xl font-serif font-bold text-text-primary">Client Reports</h1>
           <p className="text-text-muted">Track your mandate progress and candidate quality</p>
         </div>
-        <button className="px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent/90 flex items-center gap-2">
+        <button className="px-4 py-2 bg-accent text-white text-sm font-medium hover:bg-accent/90 flex items-center gap-2">
           <Download className="w-4 h-4" />
           Export PDF
         </button>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 bg-bg-secondary p-1 rounded-none">
+      <div className="flex gap-1 bg-bg-secondary p-1">
         {[
           { id: 'pipeline' as const, label: 'Pipeline Summary', icon: BarChart3 },
           { id: 'time' as const, label: 'Time-to-Shortlist', icon: Clock },
@@ -128,7 +128,7 @@ export function ClientReports() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-none text-sm font-medium transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all ${
               activeTab === tab.id
                 ? 'bg-white text-text-primary shadow-sm'
                 : 'text-text-muted hover:text-text-primary'
@@ -141,13 +141,13 @@ export function ClientReports() {
       </div>
 
       {/* Reports Content */}
-      <div className="bg-bg-secondary rounded-none p-6">
+      <div className="bg-bg-secondary p-6">
         {/* Pipeline Summary */}
         {activeTab === 'pipeline' && (
           <div className="space-y-6">
             {/* Summary Cards */}
             <div className="grid grid-cols-4 gap-4">
-              <div className="bg-white rounded-none p-4 shadow-sm">
+              <div className="bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-text-muted">Total Candidates</p>
@@ -159,7 +159,7 @@ export function ClientReports() {
                 </div>
               </div>
               
-              <div className="bg-white rounded-none p-4 shadow-sm">
+              <div className="bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-text-muted">Active Mandates</p>
@@ -169,7 +169,7 @@ export function ClientReports() {
                 </div>
               </div>
               
-              <div className="bg-white rounded-none p-4 shadow-sm">
+              <div className="bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-text-muted">Shortlisted</p>
@@ -181,7 +181,7 @@ export function ClientReports() {
                 </div>
               </div>
               
-              <div className="bg-white rounded-none p-4 shadow-sm">
+              <div className="bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-text-muted">Placed</p>
@@ -195,7 +195,7 @@ export function ClientReports() {
             </div>
 
             {/* Conversion Funnel */}
-            <div className="bg-white rounded-none p-6 shadow-sm">
+            <div className="bg-white p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-text-primary mb-4">Conversion Funnel</h3>
               <div className="space-y-4">
                 {[
@@ -212,9 +212,9 @@ export function ClientReports() {
                       <span className="text-sm font-medium text-text-primary">{item.stage}</span>
                       <span className="text-sm text-text-muted">{item.count}%</span>
                     </div>
-                    <div className="w-full h-3 bg-bg-tertiary rounded-full overflow-hidden">
+                    <div className="w-full h-3 bg-bg-tertiary overflow-hidden">
                       <div 
-                        className="h-full rounded-full transition-all duration-500"
+                        className="h-full transition-all duration-500"
                         style={{ 
                           width: `${item.count}%`,
                           backgroundColor: item.color,
@@ -228,16 +228,16 @@ export function ClientReports() {
             </div>
 
             {/* Stage Distribution */}
-            <div className="bg-white rounded-none p-6 shadow-sm">
+            <div className="bg-white p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-text-primary mb-4">Candidates by Stage</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {Object.entries(pipelineStats?.by_stage || {}).map(([stage, count]) => (
                   <div 
                     key={stage}
-                    className="text-center p-4 bg-bg-secondary rounded-none"
+                    className="text-center p-4 bg-bg-secondary"
                   >
                     <p className="text-2xl font-bold text-text-primary">{count}</p>
-                    <p className="text-xs text-text-muted capitalize">{stage.replace('_', ' ')}</p>
+                    <p className="text-xs text-text-muted capitalize">{stage.replace('_', '')}</p>
                   </div>
                 ))}
               </div>
@@ -250,7 +250,7 @@ export function ClientReports() {
           <div className="space-y-6">
             {/* Time Metrics */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-none p-6 shadow-sm">
+              <div className="bg-white p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
                   <Clock className="w-6 h-6 text-accent" />
                   <h3 className="text-lg font-semibold text-text-primary">Time to Shortlist</h3>
@@ -265,9 +265,9 @@ export function ClientReports() {
                     <span className="text-sm text-text-muted">Target: {timeMetrics.targetTimeToShortlist} days</span>
                   </div>
                   <div className="mt-4 w-full">
-                    <div className="w-full h-4 bg-bg-tertiary rounded-full overflow-hidden">
+                    <div className="w-full h-4 bg-bg-tertiary overflow-hidden">
                       <div 
-                        className={`h-full rounded-full ${
+                        className={`h-full ${
                           timeMetrics.avgTimeToShortlist <= timeMetrics.targetTimeToShortlist 
                             ? 'bg-green-500' 
                             : 'bg-amber-500'
@@ -281,7 +281,7 @@ export function ClientReports() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-none p-6 shadow-sm">
+              <div className="bg-white p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
                   <Calendar className="w-6 h-6 text-accent" />
                   <h3 className="text-lg font-semibold text-text-primary">Time to Presentation</h3>
@@ -296,9 +296,9 @@ export function ClientReports() {
                     <span className="text-sm text-text-muted">Target: {timeMetrics.targetTimeToPresentation} days</span>
                   </div>
                   <div className="mt-4 w-full">
-                    <div className="w-full h-4 bg-bg-tertiary rounded-full overflow-hidden">
+                    <div className="w-full h-4 bg-bg-tertiary overflow-hidden">
                       <div 
-                        className={`h-full rounded-full ${
+                        className={`h-full ${
                           timeMetrics.avgTimeToPresentation <= timeMetrics.targetTimeToPresentation 
                             ? 'bg-green-500' 
                             : 'bg-amber-500'
@@ -314,12 +314,12 @@ export function ClientReports() {
             </div>
 
             {/* Benchmark Comparison */}
-            <div className="bg-white rounded-none p-6 shadow-sm">
+            <div className="bg-white p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-text-primary mb-4">Benchmark Comparison</h3>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-bg-secondary rounded-none">
+                <div className="flex items-center justify-between p-4 bg-bg-secondary">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                    <div className="w-10 h-10 bg-green-100 flex items-center justify-center">
                       <CheckCircle2 className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
@@ -335,9 +335,9 @@ export function ClientReports() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-bg-secondary rounded-none">
+                <div className="flex items-center justify-between p-4 bg-bg-secondary">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                    <div className="w-10 h-10 bg-amber-100 flex items-center justify-center">
                       <TrendingUp className="w-5 h-5 text-amber-600" />
                     </div>
                     <div>
@@ -362,7 +362,7 @@ export function ClientReports() {
           <div className="space-y-6">
             {/* Quality Metrics */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white rounded-none p-6 shadow-sm">
+              <div className="bg-white p-6 shadow-sm">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-text-primary mb-2">
                     {qualityMetrics.approvalRate}%
@@ -371,7 +371,7 @@ export function ClientReports() {
                 </div>
               </div>
               
-              <div className="bg-white rounded-none p-6 shadow-sm">
+              <div className="bg-white p-6 shadow-sm">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-text-primary mb-2">
                     {qualityMetrics.totalCandidates}
@@ -380,7 +380,7 @@ export function ClientReports() {
                 </div>
               </div>
               
-              <div className="bg-white rounded-none p-6 shadow-sm">
+              <div className="bg-white p-6 shadow-sm">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-text-primary mb-2">
                     {mandates.reduce((sum, m) => sum + (m.placed_count || 0), 0)}
@@ -391,7 +391,7 @@ export function ClientReports() {
             </div>
 
             {/* Score Distribution */}
-            <div className="bg-white rounded-none p-6 shadow-sm">
+            <div className="bg-white p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-text-primary mb-4">Match Score Distribution</h3>
               <div className="flex items-center justify-around py-8">
                 {[
@@ -405,7 +405,7 @@ export function ClientReports() {
                   return (
                     <div key={item.label} className="text-center">
                       <div 
-                        className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold mx-auto mb-2"
+                        className="w-20 h-20 flex items-center justify-center text-white font-bold mx-auto mb-2"
                         style={{ backgroundColor: item.color }}
                       >
                         {item.count}
@@ -419,11 +419,11 @@ export function ClientReports() {
             </div>
 
             {/* Mandate Performance */}
-            <div className="bg-white rounded-none p-6 shadow-sm">
+            <div className="bg-white p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-text-primary mb-4">Mandate Performance</h3>
               <div className="space-y-3">
                 {mandates.slice(0, 5).map((mandate) => (
-                  <div key={mandate.id} className="flex items-center justify-between p-3 bg-bg-secondary rounded-none">
+                  <div key={mandate.id} className="flex items-center justify-between p-3 bg-bg-secondary">
                     <div className="flex-1">
                       <p className="font-medium text-text-primary">{mandate.title}</p>
                       <p className="text-xs text-text-muted">{mandate.total_candidates} candidates</p>

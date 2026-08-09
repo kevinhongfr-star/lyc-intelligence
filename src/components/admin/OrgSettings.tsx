@@ -65,7 +65,7 @@ const OrgSettings: React.FC = () => {
       setEditingOrg(null);
       loadOrgs();
     } catch (err) {
-      alert('Failed to save: ' + (err as Error).message);
+      alert('Failed to save:' + (err as Error).message);
     }
   }
 
@@ -74,7 +74,7 @@ const OrgSettings: React.FC = () => {
       await adminService.organizations.suspend(orgId);
       loadOrgs();
     } catch (err) {
-      alert('Failed to suspend: ' + (err as Error).message);
+      alert('Failed to suspend:' + (err as Error).message);
     }
   }
 
@@ -83,7 +83,7 @@ const OrgSettings: React.FC = () => {
       await adminService.organizations.reactivate(orgId);
       loadOrgs();
     } catch (err) {
-      alert('Failed to reactivate: ' + (err as Error).message);
+      alert('Failed to reactivate:' + (err as Error).message);
     }
   }
 
@@ -92,7 +92,7 @@ const OrgSettings: React.FC = () => {
       await adminService.organizations.changePlan(orgId, { plan });
       loadOrgs();
     } catch (err) {
-      alert('Failed to change plan: ' + (err as Error).message);
+      alert('Failed to change plan:' + (err as Error).message);
     }
   }
 
@@ -108,7 +108,7 @@ const OrgSettings: React.FC = () => {
       setNewOrg({ name: '', plan: 'free', billing_email: '' });
       loadOrgs();
     } catch (err) {
-      alert('Failed to create: ' + (err as Error).message);
+      alert('Failed to create:' + (err as Error).message);
     }
   }
 

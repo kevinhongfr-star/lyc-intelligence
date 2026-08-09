@@ -29,7 +29,7 @@ export function CareerInsight({ messageCount, conversationHistory, onUpgrade }: 
 
   const generateInsight = (history: { role: string; content: string }[]): Insight => {
     const userMessages = history.filter(m => m.role === 'user').map(m => m.content.toLowerCase());
-    const recentContent = userMessages.slice(-5).join(' ');
+    const recentContent = userMessages.slice(-5).join('');
 
     const topics = [
       { keywords: ['career', 'growth', 'promotion', 'advancement'], topic: 'career growth' },
@@ -128,9 +128,9 @@ export function CareerInsight({ messageCount, conversationHistory, onUpgrade }: 
   if (!show || !insight) return null;
 
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-none p-4 mb-4">
+    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 p-4 mb-4">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 bg-amber-100 flex items-center justify-center flex-shrink-0">
           <Lightbulb className="w-5 h-5 text-amber-600" />
         </div>
         <div className="flex-1">

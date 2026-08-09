@@ -140,7 +140,7 @@ export function PartnerSLADashboard({ orgId }: SLADashboardProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-blue-100 flex items-center justify-center">
               <Activity className="w-5 h-5 text-blue-600" />
             </div>
             <div>
@@ -152,7 +152,7 @@ export function PartnerSLADashboard({ orgId }: SLADashboardProps) {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-green-100 flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5 text-green-600" />
             </div>
             <div>
@@ -164,7 +164,7 @@ export function PartnerSLADashboard({ orgId }: SLADashboardProps) {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-amber-100 flex items-center justify-center">
               <AlertCircle className="w-5 h-5 text-amber-600" />
             </div>
             <div>
@@ -176,7 +176,7 @@ export function PartnerSLADashboard({ orgId }: SLADashboardProps) {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-red-100 flex items-center justify-center">
               <XCircle className="w-5 h-5 text-red-600" />
             </div>
             <div>
@@ -229,10 +229,10 @@ export function PartnerSLADashboard({ orgId }: SLADashboardProps) {
               return (
                 <div
                   key={timeline.id}
-                  className="flex items-center gap-4 p-4 bg-bg-alt rounded-none hover:bg-bg-base transition-colors cursor-pointer"
+                  className="flex items-center gap-4 p-4 bg-bg-alt hover:bg-bg-base transition-colors cursor-pointer"
                 >
                   {/* Status */}
-                  <div className={`w-10 h-10 rounded-full ${healthConfig.bg} flex items-center justify-center`}>
+                  <div className={`w-10 h-10 ${healthConfig.bg} flex items-center justify-center`}>
                     <HealthIcon className={`w-5 h-5 ${healthConfig.color}`} />
                   </div>
 
@@ -242,13 +242,13 @@ export function PartnerSLADashboard({ orgId }: SLADashboardProps) {
                       <span className="font-medium text-text-primary">
                         Mandate {timeline.mandate_id.slice(0, 8)}
                       </span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${healthConfig.bg} ${healthConfig.color}`}>
+                      <span className={`px-2 py-0.5 text-xs font-medium ${healthConfig.bg} ${healthConfig.color}`}>
                         {healthConfig.label}
                       </span>
                     </div>
                     <div className="flex items-center gap-4 mt-1">
                       <span className="text-sm text-text-muted">
-                        Current: {timeline.current_stage.replace('_', ' ')}
+                        Current: {timeline.current_stage.replace('_', '')}
                       </span>
                       <span className="text-sm text-text-muted">
                         Progress: {timeline.overall_progress_pct}%

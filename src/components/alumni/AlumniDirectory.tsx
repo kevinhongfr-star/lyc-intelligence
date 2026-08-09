@@ -106,7 +106,7 @@ export function AlumniDirectory({ orgId, onSelectAlumni }: AlumniDirectoryProps)
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 rounded-none border border-border bg-bg-base text-sm"
+            className="px-4 py-2 border border-border bg-bg-base text-sm"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -134,7 +134,7 @@ export function AlumniDirectory({ orgId, onSelectAlumni }: AlumniDirectoryProps)
             <button
               key={tag}
               onClick={() => toggleTag(tag)}
-              className={`px-3 py-1 rounded-full text-sm flex items-center gap-1 transition-colors ${
+              className={`px-3 py-1 text-sm flex items-center gap-1 transition-colors ${
                 selectedTags.includes(tag)
                   ? 'bg-primary text-white'
                   : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -151,7 +151,7 @@ export function AlumniDirectory({ orgId, onSelectAlumni }: AlumniDirectoryProps)
       {/* Alumni List */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent animate-spin" />
         </div>
       ) : alumniList.length === 0 ? (
         <div className="text-center py-12">
@@ -167,13 +167,13 @@ export function AlumniDirectory({ orgId, onSelectAlumni }: AlumniDirectoryProps)
               onClick={() => onSelectAlumni?.(alumni)}
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold">
                   {alumni.company_name.charAt(0)}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-text-primary">{alumni.company_name}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs ${STATUS_CONFIG[alumni.alumni_status]?.color || 'bg-gray-100 text-gray-700'}`}>
+                    <span className={`px-2 py-0.5 text-xs ${STATUS_CONFIG[alumni.alumni_status]?.color || 'bg-gray-100 text-gray-700'}`}>
                       {STATUS_CONFIG[alumni.alumni_status]?.label || alumni.alumni_status}
                     </span>
                   </div>
@@ -192,13 +192,13 @@ export function AlumniDirectory({ orgId, onSelectAlumni }: AlumniDirectoryProps)
                       {alumni.tags.slice(0, 3).map(tag => (
                         <span
                           key={tag}
-                          className="px-2 py-0.5 bg-bg-alt rounded text-xs text-text-muted"
+                          className="px-2 py-0.5 bg-bg-alt text-xs text-text-muted"
                         >
                           {tag}
                         </span>
                       ))}
                       {alumni.tags.length > 3 && (
-                        <span className="px-2 py-0.5 bg-bg-alt rounded text-xs text-text-muted">
+                        <span className="px-2 py-0.5 bg-bg-alt text-xs text-text-muted">
                           +{alumni.tags.length - 3}
                         </span>
                       )}

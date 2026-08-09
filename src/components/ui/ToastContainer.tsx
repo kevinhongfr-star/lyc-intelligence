@@ -52,7 +52,6 @@ export function ToastContainer() {
             padding: '12px 16px',
             background: bgColors[t.type],
             border: `1px solid ${borderColors[t.type]}`,
-            borderRadius: 10,
             boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             fontSize: 14,
             lineHeight: 1.5,
@@ -81,12 +80,7 @@ export function ToastContainer() {
           </button>
         </div>
       ))}
-      <style>{`
-        @keyframes toast-slide-in {
-          from { opacity: 0; transform: translateX(40px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-      `}</style>
+      <style>{`@keyframes toast-slide-in { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }`}</style>
     </div>
   );
 }

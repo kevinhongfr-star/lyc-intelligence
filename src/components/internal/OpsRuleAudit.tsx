@@ -21,7 +21,7 @@ export default function OpsRuleAudit() {
         <div
           key={rule.id}
           className="border border-bg-tertiary bg-bg-primary p-4 hover:shadow-sm transition-shadow"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 space-y-2">
@@ -49,13 +49,12 @@ export default function OpsRuleAudit() {
                   <span className="text-text-muted">Success Rate</span>
                   <span className="font-medium text-text-primary">{rule.successRate}%</span>
                 </div>
-                <div className="h-2 bg-bg-tertiary" style={{ borderRadius: 0 }}>
+                <div className="h-2 bg-bg-tertiary" style={{ }}>
                   <div
                     className="h-full transition-all"
                     style={{
                       width: `${rule.successRate}%`,
                       backgroundColor: rule.successRate >= 95 ? '#16A34A' : rule.successRate >= 85 ? '#F59E0B' : '#DC2626',
-                      borderRadius: 0,
                     }}
                   />
                 </div>
@@ -69,7 +68,7 @@ export default function OpsRuleAudit() {
                   ? 'border-amber-300 text-amber-700 hover:bg-amber-500/10'
                   : 'border-green-300 text-green-700 hover:bg-green-500/10'
               }`}
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               {rule.status === 'active' ? (
                 <><Pause className="w-3 h-3" /> Pause</>

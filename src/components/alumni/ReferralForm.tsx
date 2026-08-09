@@ -81,7 +81,7 @@ export function ReferralForm({ alumniId, orgId, onSuccess }: ReferralFormProps) 
   if (isSubmitted) {
     return (
       <Card className="p-8 text-center">
-        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+        <div className="w-16 h-16 bg-green-100 flex items-center justify-center mx-auto">
           <CheckCircle2 className="w-8 h-8 text-green-600" />
         </div>
         <h4 className="font-semibold text-text-primary mt-4">Referral Submitted!</h4>
@@ -98,7 +98,7 @@ export function ReferralForm({ alumniId, orgId, onSuccess }: ReferralFormProps) 
   return (
     <Card className="p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center">
+        <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
           <UserPlus className="w-5 h-5 text-primary" />
         </div>
         <div>

@@ -73,7 +73,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-accent border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -81,7 +81,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
   if (!result?.allowed && showModal) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl">
+        <div className="bg-white max-w-md w-full overflow-hidden shadow-2xl">
           <button
             onClick={onCancel}
             className="absolute top-4 right-4 p-2 text-text-muted hover:text-text-primary transition-colors"
@@ -91,7 +91,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
 
           <div className="p-6">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-accent/10 flex items-center justify-center mx-auto mb-4">
                 <Zap className="w-8 h-8 text-accent" />
               </div>
               <h3 className="text-xl font-bold text-text-primary mb-2">
@@ -108,7 +108,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
             <div className="space-y-4">
               <button
                 onClick={onUpgrade}
-                className="w-full py-3 px-4 bg-accent text-white rounded-none font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 bg-accent text-white font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
               >
                 <Crown className="w-5 h-5" />
                 Upgrade to Council
@@ -116,7 +116,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
 
               <button
                 onClick={onCancel}
-                className="w-full py-3 px-4 bg-bg-tertiary text-text-primary rounded-none font-medium hover:bg-bg-secondary transition-colors"
+                className="w-full py-3 px-4 bg-bg-tertiary text-text-primary font-medium hover:bg-bg-secondary transition-colors"
               >
                 Maybe Later
               </button>
@@ -130,19 +130,19 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
             </h4>
             <ul className="space-y-2 text-sm text-text-muted">
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-accent rounded-full" />
+                <span className="w-1.5 h-1.5 bg-accent" />
                 5 credits per day
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-accent rounded-full" />
+                <span className="w-1.5 h-1.5 bg-accent" />
                 SHIFT career assessments
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-accent rounded-full" />
+                <span className="w-1.5 h-1.5 bg-accent" />
                 Personalized coaching
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-accent rounded-full" />
+                <span className="w-1.5 h-1.5 bg-accent" />
                 Priority support
               </li>
             </ul>

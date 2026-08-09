@@ -20,7 +20,7 @@ export default function ChatbotAnalytics() {
             <div
               key={s.label}
               className="bg-bg-primary border border-bg-tertiary p-4"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-center gap-2 mb-2">
                 <Icon className="w-4 h-4" style={{ color: '#C108AB' }} />
@@ -32,7 +32,7 @@ export default function ChatbotAnalytics() {
         })}
       </div>
 
-      <div className="bg-bg-primary border border-bg-tertiary p-4" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-4" style={{ }}>
         <div className="flex items-center gap-2 mb-3">
           <Zap className="w-4 h-4" style={{ color: '#C108AB' }} />
           <span className="text-sm font-medium text-text-primary">Top Topics</span>
@@ -42,7 +42,7 @@ export default function ChatbotAnalytics() {
             <span
               key={topic}
               className="px-3 py-1 text-sm font-medium border border-bg-tertiary text-text-primary"
-              style={{ borderRadius: 0, backgroundColor: '#C108AB10', borderColor: '#C108AB30', color: '#C108AB' }}
+              style={{  backgroundColor: '#C108AB10', borderColor: '#C108AB30', color: '#C108AB' }}
             >
               {topic}
             </span>

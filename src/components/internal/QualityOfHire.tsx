@@ -19,17 +19,17 @@ export default function QualityOfHire() {
           <div
             key={m.label}
             className="bg-bg-primary border border-bg-tertiary p-4"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <div className="flex items-center gap-2 mb-3">
               <Icon className="w-4 h-4" style={{ color: '#C108AB' }} />
               <span className="text-xs font-medium text-text-muted uppercase tracking-wide">{m.label}</span>
             </div>
             <p className="text-2xl font-bold text-text-primary mb-3">{m.value}</p>
-            <div className="w-full h-2 bg-bg-secondary" style={{ borderRadius: 0 }}>
+            <div className="w-full h-2 bg-bg-secondary" style={{ }}>
               <div
                 className="h-full"
-                style={{ width: `${m.pct}%`, backgroundColor: '#C108AB', borderRadius: 0 }}
+                style={{ width: `${m.pct}%`, backgroundColor: '#C108AB' }}
               />
             </div>
           </div>

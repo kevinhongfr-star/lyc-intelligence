@@ -199,7 +199,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
               placeholder="Search by name, company, title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm rounded-none border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="w-full pl-9 pr-4 py-2 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
           </div>
 
@@ -211,7 +211,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
               const selected = Array.from(e.target.selectedOptions, opt => opt.value);
               setStageFilter(selected);
             }}
-            className="px-3 py-2 text-sm rounded-none border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="px-3 py-2 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
           >
             {Object.entries(STAGE_LABELS).map(([stage, label]) => (
               <option key={stage} value={stage}>{label}</option>
@@ -222,7 +222,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
           <select
             value={motivationFilter || ''}
             onChange={(e) => setMotivationFilter(e.target.value || null)}
-            className="px-3 py-2 text-sm rounded-none border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="px-3 py-2 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
           >
             <option value="">All Motivation</option>
             <option value="GREEN">GREEN</option>
@@ -235,7 +235,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
           <select
             value={tierFilter || ''}
             onChange={(e) => setTierFilter(e.target.value || null)}
-            className="px-3 py-2 text-sm rounded-none border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="px-3 py-2 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
           >
             <option value="">All Tiers</option>
             <option value="A">Tier A</option>
@@ -260,10 +260,10 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
             <div
               key={candidate.id}
               onClick={() => onSelectCandidate?.(candidate.id)}
-              className="flex items-center gap-4 p-4 rounded-none bg-bg-secondary border border-bg-tertiary hover:border-border-focus hover:shadow-sm cursor-pointer transition-all"
+              className="flex items-center gap-4 p-4 bg-bg-secondary border border-bg-tertiary hover:border-border-focus hover:shadow-sm cursor-pointer transition-all"
             >
               {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-bg-tertiary flex items-center justify-center text-text-secondary">
+              <div className="w-10 h-10 bg-bg-tertiary flex items-center justify-center text-text-secondary">
                 <User className="w-5 h-5" />
               </div>
 
@@ -272,7 +272,7 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-text-primary truncate">{candidate.name}</span>
                   {candidate.tier && (
-                    <span className={`px-1.5 py-0.5 rounded text-xs font-semibold ${TIER_COLORS[candidate.tier] || 'bg-gray-100 text-gray-700'}`}>
+                    <span className={`px-1.5 py-0.5 text-xs font-semibold ${TIER_COLORS[candidate.tier] || 'bg-gray-100 text-gray-700'}`}>
                       {candidate.tier}
                     </span>
                   )}
@@ -295,9 +295,9 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
 
               {/* Motivation Dot */}
               <div className="relative group">
-                <div className={`w-3 h-3 rounded-full ${MOTIVATION_COLORS[candidate.motivation_overall] || 'bg-gray-400'}`} />
+                <div className={`w-3 h-3 ${MOTIVATION_COLORS[candidate.motivation_overall] || 'bg-gray-400'}`} />
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-50">
-                  <div className="bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                  <div className="bg-gray-900 text-white text-xs px-2 py-1 whitespace-nowrap">
                     Motivation: {candidate.motivation_overall || 'UNKNOWN'}
                   </div>
                 </div>
@@ -314,9 +314,9 @@ export function CandidateListPage({ onCreateNew, onSelectCandidate }: CandidateL
               {/* Confidence */}
               <div className="w-16 text-right">
                 <div className="text-xs text-text-secondary">{candidate.data_confidence}%</div>
-                <div className="w-full h-1 bg-gray-200 rounded mt-1">
+                <div className="w-full h-1 bg-gray-200 mt-1">
                   <div
-                    className="h-full bg-primary rounded"
+                    className="h-full bg-primary"
                     style={{ width: `${candidate.data_confidence}%` }}
                   />
                 </div>

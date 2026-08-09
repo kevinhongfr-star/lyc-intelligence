@@ -63,7 +63,7 @@ export function ResetPasswordPage() {
           </div>
 
           {sent ? (
-            <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: DS.radius, padding: '32px', textAlign: 'center' }}>
+            <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0',  padding: '32px', textAlign: 'center' }}>
               <CheckCircle style={{ width: 48, height: 48, color: '#16A34A', margin: '0 auto 16px' }} />
               <p style={{ fontSize: '15px', color: '#166534', fontFamily: DS.bodyFont }}>
                 If an account exists for <strong>{email}</strong>, you'll receive a reset link shortly.
@@ -73,7 +73,7 @@ export function ResetPasswordPage() {
               </Link>
             </div>
           ) : (
-            <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px' }}>
+            <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '32px' }}>
               <form onSubmit={handleSubmit}>
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
@@ -89,7 +89,7 @@ export function ResetPasswordPage() {
                       required
                       style={{
                         width: '100%', padding: '12px 16px 12px 44px',
-                        background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px',
+                        background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
                         color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
                         fontFamily: DS.bodyFont,
                       }}
@@ -98,7 +98,7 @@ export function ResetPasswordPage() {
                 </div>
 
                 {error && (
-                  <div style={{ padding: '12px 16px', background: '#FEF2F2', borderRadius: '0px', color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
+                  <div style={{ padding: '12px 16px', background: '#FEF2F2',  color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
                     {error}
                   </div>
                 )}
@@ -109,7 +109,7 @@ export function ResetPasswordPage() {
                   style={{
                     width: '100%', padding: '14px',
                     background: DS.accent, color: '#FFFFFF',
-                    border: 'none', borderRadius: '0px',
+                    border: 'none', 
                     fontSize: '15px', fontWeight: 600,
                     cursor: loading ? 'not-allowed' : 'pointer',
                     opacity: loading ? 0.7 : 1,
@@ -125,10 +125,7 @@ export function ResetPasswordPage() {
         </div>
       </div>
 
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; }
-      `}</style>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; }`}</style>
     </div>
   );
 }

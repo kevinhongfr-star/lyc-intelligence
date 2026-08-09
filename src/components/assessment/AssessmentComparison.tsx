@@ -22,16 +22,16 @@ function ComparisonBar({ label, leftValue, rightValue, max = 10 }: { label: stri
         </div>
       </div>
       <div className="flex gap-1">
-        <div className="flex-1 h-3 bg-bg-tertiary overflow-hidden" style={{ borderRadius: 0 }}>
+        <div className="flex-1 h-3 bg-bg-tertiary overflow-hidden" style={{ }}>
           <div
             className="h-full bg-accent transition-all duration-500"
-            style={{ width: `${(leftValue / max) * 100}%`, borderRadius: 0 }}
+            style={{ width: `${(leftValue / max) * 100}%` }}
           />
         </div>
-        <div className="flex-1 h-3 bg-bg-tertiary overflow-hidden" style={{ borderRadius: 0 }}>
+        <div className="flex-1 h-3 bg-bg-tertiary overflow-hidden" style={{ }}>
           <div
             className="h-full bg-teal transition-all duration-500"
-            style={{ width: `${(rightValue / max) * 100}%`, borderRadius: 0 }}
+            style={{ width: `${(rightValue / max) * 100}%` }}
           />
         </div>
       </div>
@@ -65,7 +65,7 @@ export default function AssessmentComparison() {
             value={leftId}
             onChange={(e) => setLeftId(e.target.value)}
             className="w-full border border-bg-tertiary bg-bg-primary px-3 py-2 text-sm text-text-primary"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             {completedAssessments.map((a) => (
               <option key={a.id} value={a.id}>
@@ -80,7 +80,7 @@ export default function AssessmentComparison() {
             value={rightId}
             onChange={(e) => setRightId(e.target.value)}
             className="w-full border border-bg-tertiary bg-bg-primary px-3 py-2 text-sm text-text-primary"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             {completedAssessments.map((a) => (
               <option key={a.id} value={a.id}>
@@ -94,7 +94,7 @@ export default function AssessmentComparison() {
       {/* Comparison table */}
       {leftAssessment && rightAssessment && (
         <>
-          <div className="bg-bg-primary border border-bg-tertiary p-5" style={{ borderRadius: 0 }}>
+          <div className="bg-bg-primary border border-bg-tertiary p-5" style={{ }}>
             <h3 className="font-serif font-semibold text-text-primary mb-4 flex items-center gap-2">
               <BarChart2 className="w-5 h-5 text-accent" />
               Overview
@@ -119,7 +119,7 @@ export default function AssessmentComparison() {
           </div>
 
           {/* TRIDENT dimension comparison */}
-          <div className="bg-bg-primary border border-bg-tertiary p-5" style={{ borderRadius: 0 }}>
+          <div className="bg-bg-primary border border-bg-tertiary p-5" style={{ }}>
             <h3 className="font-serif font-semibold text-text-primary mb-4">
               Match Analysis Dimensions
             </h3>

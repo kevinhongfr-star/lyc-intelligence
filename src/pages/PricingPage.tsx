@@ -118,13 +118,13 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
             return (
               <div
                 key={tier.id}
-                className={`relative rounded-none border-2 ${tier.borderColor} p-8 ${
+                className={`relative border-2 ${tier.borderColor} p-8 ${
                   tier.popular ? 'bg-gradient-to-b from-accent/5 to-white' : 'bg-white'
                 } shadow-lg hover:shadow-xl transition-shadow`}
               >
                 {tier.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-accent text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                    <span className="bg-accent text-white px-4 py-1 text-sm font-medium flex items-center gap-1">
                       <Sparkles className="w-3 h-3" />
                       Most Popular
                     </span>
@@ -133,14 +133,14 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
 
                 {isCurrentTier && (
                   <div className="absolute -top-4 right-4">
-                    <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    <span className="bg-green-500 text-white px-3 py-1 text-xs font-medium">
                       Current Plan
                     </span>
                   </div>
                 )}
 
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-12 h-12 ${tier.color} rounded-none flex items-center justify-center`}>
+                  <div className={`w-12 h-12 ${tier.color} flex items-center justify-center`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -168,7 +168,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                 <button
                   onClick={tier.id === 'council' ? handleUpgrade : handleGetStarted}
                   disabled={loading}
-                  className={`w-full py-3 px-6 rounded-none font-medium flex items-center justify-center gap-2 transition-all ${
+                  className={`w-full py-3 px-6 font-medium flex items-center justify-center gap-2 transition-all ${
                     tier.popular
                       ? 'bg-accent text-white hover:bg-accent-hover'
                       : 'bg-bg-tertiary text-text-primary hover:bg-bg-secondary'
@@ -201,7 +201,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
         <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
           Feature Comparison
         </h2>
-        <div className="bg-white rounded-none border border-border overflow-hidden">
+        <div className="bg-white border border-border overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="bg-bg-tertiary">
@@ -269,7 +269,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
               answer: 'We accept all major credit cards (Visa, Mastercard, American Express) through Stripe. We also support Apple Pay and Google Pay where available.',
             },
           ].map((faq, i) => (
-            <div key={i} className="bg-white rounded-none border border-border p-6">
+            <div key={i} className="bg-white border border-border p-6">
               <h3 className="font-semibold text-text-primary mb-2">{faq.question}</h3>
               <p className="text-text-muted text-sm">{faq.answer}</p>
             </div>
@@ -279,7 +279,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
 
       {/* CTA */}
       <div className="max-w-4xl mx-auto px-4 pb-16">
-        <div className="bg-gradient-to-r from-accent to-purple-600 rounded-none p-8 text-center text-white">
+        <div className="bg-gradient-to-r from-accent to-purple-600 p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Ready to Elevate Your Leadership?</h2>
           <p className="mb-6 opacity-90">
             Join Executive Access today and unlock premium features designed for ambitious leaders.
@@ -287,7 +287,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
           <button
             onClick={handleUpgrade}
             disabled={loading}
-            className="bg-white text-accent px-8 py-3 rounded-none font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
+            className="bg-white text-accent px-8 py-3 font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
           >
             {loading ? (
               <>

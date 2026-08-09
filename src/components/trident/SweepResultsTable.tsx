@@ -198,15 +198,15 @@ export function SweepResultsTable({ mandateId, contactIds, onComplete }: SweepRe
         </div>
 
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="p-3 bg-green-50 rounded-none">
+          <div className="p-3 bg-green-50">
             <div className="text-sm text-green-600">Pass</div>
             <div className="text-2xl font-bold text-green-700">{passCount}</div>
           </div>
-          <div className="p-3 bg-yellow-50 rounded-none">
+          <div className="p-3 bg-yellow-50">
             <div className="text-sm text-yellow-600">Warnings</div>
             <div className="text-2xl font-bold text-yellow-700">{warnCount}</div>
           </div>
-          <div className="p-3 bg-red-50 rounded-none">
+          <div className="p-3 bg-red-50">
             <div className="text-sm text-red-600">Halt</div>
             <div className="text-2xl font-bold text-red-700">{haltCount}</div>
           </div>
@@ -218,7 +218,7 @@ export function SweepResultsTable({ mandateId, contactIds, onComplete }: SweepRe
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value as typeof filter)}
-              className="px-2 py-1 bg-bg border border-border rounded text-sm"
+              className="px-2 py-1 bg-bg border border-border text-sm"
             >
               <option value="all">All Segments</option>
               <option value="A">Segment A (8+)</option>
@@ -233,7 +233,7 @@ export function SweepResultsTable({ mandateId, contactIds, onComplete }: SweepRe
               placeholder="Search by name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 px-2 py-1 bg-bg border border-border rounded text-sm"
+              className="flex-1 px-2 py-1 bg-bg border border-border text-sm"
             />
           </div>
         </div>
@@ -281,7 +281,7 @@ export function SweepResultsTable({ mandateId, contactIds, onComplete }: SweepRe
                           step="0.1"
                           value={suggestion.suggested_d1 || 7}
                           onChange={(e) => updateSuggestion(suggestion.contact_id, 'suggested_d1', parseFloat(e.target.value))}
-                          className="w-16 px-1 py-0.5 text-center bg-bg border border-border rounded text-sm"
+                          className="w-16 px-1 py-0.5 text-center bg-bg border border-border text-sm"
                           onBlur={() => setEditingId(null)}
                           autoFocus
                         />

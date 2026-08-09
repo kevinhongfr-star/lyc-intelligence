@@ -220,7 +220,7 @@ export function QuestionSetBuilder({
         {[1, 2, 3].map(level => (
           <div
             key={level}
-            className={`w-1.5 h-1.5 rounded-full ${
+            className={`w-1.5 h-1.5 ${
               level <= difficulty ? 'bg-primary' : 'bg-gray-300'
             }`}
           />
@@ -250,7 +250,7 @@ export function QuestionSetBuilder({
             {existingSet ? 'Edit Question Set' : 'Create Question Set'}
           </h2>
           {onCancel && (
-            <button onClick={onCancel} className="p-1 hover:bg-bg-alt rounded transition-colors">
+            <button onClick={onCancel} className="p-1 hover:bg-bg-alt transition-colors">
               <X className="w-5 h-5 text-text-muted" />
             </button>
           )}
@@ -266,7 +266,7 @@ export function QuestionSetBuilder({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary"
               placeholder="e.g., Executive Leadership Assessment"
             />
           </div>
@@ -278,7 +278,7 @@ export function QuestionSetBuilder({
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary resize-none"
               rows={2}
               placeholder="Describe the purpose of this question set..."
             />
@@ -289,7 +289,7 @@ export function QuestionSetBuilder({
               type="checkbox"
               checked={isShared}
               onChange={(e) => setIsShared(e.target.checked)}
-              className="w-4 h-4 rounded border-border"
+              className="w-4 h-4 border-border"
             />
             <label className="text-sm text-text-secondary">
               Share with organization
@@ -314,7 +314,7 @@ export function QuestionSetBuilder({
           </div>
 
           {selectedQuestions.length === 0 ? (
-            <div className="text-center py-8 bg-bg-alt rounded-none">
+            <div className="text-center py-8 bg-bg-alt">
               <p className="text-text-muted">No questions added yet</p>
               <Button
                 variant="outline"
@@ -330,7 +330,7 @@ export function QuestionSetBuilder({
               {selectedQuestions.map((question, index) => (
                 <div
                   key={question.id}
-                  className="flex items-center gap-3 p-3 bg-bg-alt rounded-none"
+                  className="flex items-center gap-3 p-3 bg-bg-alt"
                 >
                   {/* Drag handle + order */}
                   <div className="flex items-center gap-2 flex-shrink-0">
@@ -346,8 +346,8 @@ export function QuestionSetBuilder({
                       {question.questionText}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getCompetencyColor(question.competency)}`}>
-                        {question.competency.replace('_', ' ')}
+                      <span className={`px-2 py-0.5 text-xs font-medium ${getCompetencyColor(question.competency)}`}>
+                        {question.competency.replace('_', '')}
                       </span>
                       {renderDifficulty(question.difficulty)}
                     </div>
@@ -358,20 +358,20 @@ export function QuestionSetBuilder({
                     <button
                       onClick={() => handleMoveQuestion(index, 'up')}
                       disabled={index === 0}
-                      className="p-1 hover:bg-bg-base rounded disabled:opacity-50"
+                      className="p-1 hover:bg-bg-base disabled:opacity-50"
                     >
                       <ChevronRight className="w-4 h-4 rotate-[-90deg] text-text-muted" />
                     </button>
                     <button
                       onClick={() => handleMoveQuestion(index, 'down')}
                       disabled={index === selectedQuestions.length - 1}
-                      className="p-1 hover:bg-bg-base rounded disabled:opacity-50"
+                      className="p-1 hover:bg-bg-base disabled:opacity-50"
                     >
                       <ChevronRight className="w-4 h-4 rotate-[90deg] text-text-muted" />
                     </button>
                     <button
                       onClick={() => handleRemoveQuestion(question.id)}
-                      className="p-1 hover:bg-red-50 rounded"
+                      className="p-1 hover:bg-red-50"
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
@@ -384,13 +384,13 @@ export function QuestionSetBuilder({
 
         {/* Question Picker */}
         {showQuestionPicker && (
-          <div className="border border-border rounded-none p-4 bg-card">
+          <div className="border border-border p-4 bg-card">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium text-text-primary">Available Questions</h4>
                 <button
                   onClick={() => setShowQuestionPicker(false)}
-                  className="p-1 hover:bg-bg-alt rounded"
+                  className="p-1 hover:bg-bg-alt"
                 >
                   <X className="w-4 h-4 text-text-muted" />
                 </button>
@@ -404,7 +404,7 @@ export function QuestionSetBuilder({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search questions..."
-                  className="w-full pl-9 pr-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+                  className="w-full pl-9 pr-3 py-2 border border-border bg-bg-base text-text-primary"
                 />
               </div>
 
@@ -419,15 +419,15 @@ export function QuestionSetBuilder({
                     <button
                       key={question.id}
                       onClick={() => handleAddQuestion(question)}
-                      className="w-full flex items-center gap-3 p-2 hover:bg-bg-alt rounded-none transition-colors text-left"
+                      className="w-full flex items-center gap-3 p-2 hover:bg-bg-alt transition-colors text-left"
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-text-primary line-clamp-1">
                           {question.questionText}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getCompetencyColor(question.competency)}`}>
-                            {question.competency.replace('_', ' ')}
+                          <span className={`px-2 py-0.5 text-xs font-medium ${getCompetencyColor(question.competency)}`}>
+                            {question.competency.replace('_', '')}
                           </span>
                           {renderDifficulty(question.difficulty)}
                         </div>
@@ -443,7 +443,7 @@ export function QuestionSetBuilder({
 
         {/* Error */}
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-700">
             <AlertCircle className="w-5 h-5" />
             <span className="text-sm">{error}</span>
           </div>
@@ -549,7 +549,7 @@ export function QuestionSetList({
               <p className="font-medium text-text-primary">{set.name}</p>
               <p className="text-sm text-text-muted mt-1">
                 {set.questionIds.length} questions
-                {set.isShared && ' • Shared'}
+                {set.isShared && '• Shared'}
               </p>
             </div>
             <Button

@@ -28,7 +28,7 @@ export default function OpsAlertPanel() {
           value={severityFilter}
           onChange={e => setSeverityFilter(e.target.value)}
           className="border border-bg-tertiary bg-bg-primary text-text-primary text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#C108AB]/40"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <option value="all">All Severities</option>
           <option value="critical">Critical</option>
@@ -45,7 +45,7 @@ export default function OpsAlertPanel() {
             <div
               key={alert.id}
               className={`border border-bg-tertiary bg-bg-primary p-4 flex items-center gap-4 ${alert.acknowledged ? 'opacity-60' : ''}`}
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className={`flex-shrink-0 p-2 ${cfg.bg}`}>
                 <Icon className={`w-4 h-4 ${cfg.color}`} />
@@ -63,7 +63,7 @@ export default function OpsAlertPanel() {
                 <button
                   onClick={() => acknowledge(alert.id)}
                   className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-bg-tertiary text-text-secondary hover:bg-bg-secondary transition-colors"
-                  style={{ borderRadius: 0 }}
+                  style={{ }}
                 >
                   <Check className="w-3 h-3" />
                   Acknowledge

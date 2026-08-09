@@ -52,16 +52,16 @@ function MentorMatching() {
             <div
               key={mentor.id}
               className="border border-bg-tertiary bg-bg-secondary p-5"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               {/* Avatar + name */}
               <div className="flex items-center gap-3 mb-3">
                 <div
                   className="w-10 h-10 flex items-center justify-center text-white text-sm font-bold"
-                  style={{ borderRadius: 0, backgroundColor: mentor.avatarColor }}
+                  style={{  backgroundColor: mentor.avatarColor }}
                 >
                   {mentor.name
-                    .split(' ')
+                    .split('')
                     .map((n) => n[0])
                     .join('')}
                 </div>
@@ -79,7 +79,7 @@ function MentorMatching() {
                   <span
                     key={spec}
                     className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-bg-tertiary text-text-secondary"
-                    style={{ borderRadius: 0 }}
+                    style={{ }}
                   >
                     {spec}
                   </span>
@@ -111,7 +111,6 @@ function MentorMatching() {
                 onClick={() => requestMentorship(mentor.id)}
                 className="w-full px-4 py-2 text-sm font-medium transition-colors inline-flex items-center justify-center gap-2"
                 style={{
-                  borderRadius: 0,
                   backgroundColor: isRequested ? '#C108AB' : 'transparent',
                   color: isRequested ? '#ffffff' : '#C108AB',
                   border: isRequested ? '1px solid #C108AB' : '1px solid #C108AB',

@@ -34,7 +34,7 @@ export default function MarketMaps() {
         <button
           onClick={() => setSortAsc(prev => !prev)}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-bg-tertiary text-text-secondary hover:bg-bg-secondary transition-colors"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <ArrowUpDown className="w-3 h-3" />
           Sort by Demand ({sortAsc ? 'Low first' : 'High first'})
@@ -46,7 +46,7 @@ export default function MarketMaps() {
           <div
             key={map.region}
             className="border border-bg-tertiary bg-bg-primary p-4 flex items-center gap-6"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">

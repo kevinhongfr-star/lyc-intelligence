@@ -23,7 +23,7 @@ export default function TaskTemplates() {
             <div
               key={template.id}
               className="bg-bg-primary border border-bg-tertiary"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <button
                 onClick={() => toggleExpand(template.id)}
@@ -47,7 +47,7 @@ export default function TaskTemplates() {
                       <li key={index} className="flex items-center gap-3">
                         <span
                           className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium bg-accent-10 text-accent flex-shrink-0"
-                          style={{ borderRadius: 0 }}
+                          style={{ }}
                         >
                           {index + 1}
                         </span>
@@ -58,7 +58,7 @@ export default function TaskTemplates() {
                   <div className="mt-4 flex justify-end">
                     <button
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-accent text-white hover:bg-accent-light transition-colors"
-                      style={{ borderRadius: 0 }}
+                      style={{ }}
                     >
                       <Copy className="w-3 h-3" />
                       Use Template

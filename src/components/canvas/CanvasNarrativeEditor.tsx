@@ -147,7 +147,7 @@ export function CanvasNarrativeEditor({ profile, onSave }: CanvasNarrativeEditor
                   className="text-gray-500 hover:text-blue-600"
                 >
                   {regeneratingField === field.key ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-blue-600"></div>
                   ) : (
                     <RefreshCw className="w-4 h-4" />
                   )}
@@ -197,7 +197,7 @@ export function CanvasNarrativeEditor({ profile, onSave }: CanvasNarrativeEditor
         <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
           {saving ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              <div className="animate-spin h-4 w-4 border-b-2 border-white mr-2"></div>
               Saving...
             </>
           ) : (

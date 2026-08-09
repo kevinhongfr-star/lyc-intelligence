@@ -49,13 +49,13 @@ export function MandateTimeline({ milestones, currentStage, progress, daysRemain
         <div>
           <h3 className="font-semibold text-text-primary">Timeline Progress</h3>
           <div className="flex items-center gap-2 mt-1">
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+            <span className={`px-2 py-1 text-xs font-medium ${
               healthStatus === 'on_track' ? 'bg-green-100 text-green-700' :
               healthStatus === 'at_risk' ? 'bg-amber-100 text-amber-700' :
               healthStatus === 'breached' ? 'bg-red-100 text-red-700' :
               'bg-gray-100 text-gray-700'
             }`}>
-              {healthStatus.replace('_', ' ')}
+              {healthStatus.replace('_', '')}
             </span>
             {daysRemaining !== null && (
               <span className="text-sm text-text-muted">
@@ -71,9 +71,9 @@ export function MandateTimeline({ milestones, currentStage, progress, daysRemain
       </div>
 
       {/* Progress Bar */}
-      <div className="relative h-2 bg-bg-alt rounded-full overflow-hidden mb-8">
+      <div className="relative h-2 bg-bg-alt overflow-hidden mb-8">
         <div
-          className={`h-full rounded-full transition-all duration-500 ${
+          className={`h-full transition-all duration-500 ${
             healthStatus === 'on_track' ? 'bg-green-500' :
             healthStatus === 'at_risk' ? 'bg-amber-500' :
             'bg-red-500'
@@ -97,7 +97,7 @@ export function MandateTimeline({ milestones, currentStage, progress, daysRemain
             return (
               <div key={milestone.stage} className="flex gap-4 relative">
                 {/* Status Icon */}
-                <div className={`relative z-10 w-12 h-12 rounded-full ${config.bg} flex items-center justify-center ${
+                <div className={`relative z-10 w-12 h-12 ${config.bg} flex items-center justify-center ${
                   isCurrentStage ? 'ring-2 ring-primary ring-offset-2' : ''
                 }`}>
                   <StatusIcon className={`w-6 h-6 ${config.color}`} />
@@ -108,7 +108,7 @@ export function MandateTimeline({ milestones, currentStage, progress, daysRemain
                   <div className="flex items-center justify-between">
                     <div>
                       <p className={`font-medium ${isCurrentStage ? 'text-primary' : 'text-text-primary'}`}>
-                        {milestone.stage.replace('_', ' ')}
+                        {milestone.stage.replace('_', '')}
                       </p>
                       <p className="text-xs text-text-muted mt-0.5">{config.label}</p>
                     </div>
@@ -124,7 +124,7 @@ export function MandateTimeline({ milestones, currentStage, progress, daysRemain
 
                   {/* Progress indicator between stages */}
                   {index < milestones.length - 1 && (
-                    <div className={`mt-3 h-1 rounded-full ${
+                    <div className={`mt-3 h-1 ${
                       milestone.status === 'completed' ? 'bg-green-500' : 'bg-gray-200'
                     }`} />
                   )}

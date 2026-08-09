@@ -66,9 +66,9 @@ export function LinkedInProfileSection({
 
   if (!hasData) {
     return (
-      <div className="bg-card border border-border rounded-none p-6">
+      <div className="bg-card border border-border p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-none bg-blue-50 flex items-center justify-center">
+          <div className="w-10 h-10 bg-blue-50 flex items-center justify-center">
             <Linkedin className="w-5 h-5 text-blue-600" />
           </div>
           <div>
@@ -84,14 +84,14 @@ export function LinkedInProfileSection({
   }
 
   return (
-    <div className="bg-card border border-border rounded-none overflow-hidden">
+    <div className="bg-card border border-border overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full px-6 py-4 flex items-center justify-between hover:bg-bg-alt/30 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-none bg-blue-50 flex items-center justify-center">
+          <div className="w-10 h-10 bg-blue-50 flex items-center justify-center">
             <Linkedin className="w-5 h-5 text-blue-600" />
           </div>
           <div className="text-left">
@@ -108,7 +108,7 @@ export function LinkedInProfileSection({
               target="_blank"
               rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
-              className="p-2 hover:bg-bg-alt rounded-none text-text-muted hover:text-primary"
+              className="p-2 hover:bg-bg-alt text-text-muted hover:text-primary"
               title="Open LinkedIn"
             >
               <ExternalLink className="w-4 h-4" />
@@ -193,7 +193,7 @@ export function LinkedInProfileSection({
                 {data.skills.slice(0, 20).map((skill: string, idx: number) => (
                   <span
                     key={idx}
-                    className="px-2 py-0.5 bg-bg-alt rounded text-xs text-text-secondary"
+                    className="px-2 py-0.5 bg-bg-alt text-xs text-text-secondary"
                   >
                     {skill}
                   </span>
@@ -230,14 +230,14 @@ export function LinkedInProfileSection({
                 <div className="mt-3 space-y-4 pl-6">
                   {data.experience.map((exp: any, idx: number) => (
                     <div key={idx} className="relative">
-                      <div className="absolute -left-6 top-1.5 w-2 h-2 rounded-full bg-primary" />
+                      <div className="absolute -left-6 top-1.5 w-2 h-2 bg-primary" />
                       <div className="font-medium text-text-primary text-sm">
                         {exp.title}
                       </div>
                       <div className="text-sm text-text-secondary">{exp.company}</div>
                       <div className="text-xs text-text-muted mt-0.5">
                         {exp.start} — {exp.end || 'Present'}
-                        {exp.duration && ` • ${exp.duration}`}
+                        {exp.duration && `• ${exp.duration}`}
                       </div>
                       {exp.description && (
                         <p className="text-xs text-text-muted mt-2 whitespace-pre-line">
@@ -303,10 +303,10 @@ export function LinkedInProfileSection({
                 {data.languages.map((lang: any, idx: number) => (
                   <span
                     key={idx}
-                    className="px-2 py-0.5 bg-bg-alt rounded text-xs text-text-secondary"
+                    className="px-2 py-0.5 bg-bg-alt text-xs text-text-secondary"
                   >
                     {lang.language || lang}
-                    {lang.proficiency && ` (${lang.proficiency})`}
+                    {lang.proficiency && `(${lang.proficiency})`}
                   </span>
                 ))}
               </div>

@@ -307,7 +307,7 @@ export function QuestionDetail({
             <textarea
               value={editForm.questionText}
               onChange={(e) => setEditForm({ ...editForm, questionText: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary resize-none"
               rows={3}
             />
           </div>
@@ -320,7 +320,7 @@ export function QuestionDetail({
               <select
                 value={editForm.competency}
                 onChange={(e) => setEditForm({ ...editForm, competency: e.target.value })}
-                className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+                className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary"
               >
                 {COMPETENCIES.map(c => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -334,7 +334,7 @@ export function QuestionDetail({
               <select
                 value={editForm.difficulty}
                 onChange={(e) => setEditForm({ ...editForm, difficulty: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+                className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary"
               >
                 {[1, 2, 3].map(d => (
                   <option key={d} value={d}>{DIFFICULTY_LABELS[d]}</option>
@@ -350,7 +350,7 @@ export function QuestionDetail({
             <textarea
               value={editForm.expectedAnswer}
               onChange={(e) => setEditForm({ ...editForm, expectedAnswer: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary resize-none"
               rows={3}
             />
           </div>
@@ -362,13 +362,13 @@ export function QuestionDetail({
             <textarea
               value={editForm.followUpQuestion}
               onChange={(e) => setEditForm({ ...editForm, followUpQuestion: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary resize-none"
               rows={2}
             />
           </div>
 
           {saveError && (
-            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
+            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-700">
               <AlertCircle className="w-5 h-5" />
               <span className="text-sm">{saveError}</span>
             </div>
@@ -411,7 +411,7 @@ export function QuestionDetail({
             <textarea
               value={editForm.questionText}
               onChange={(e) => setEditForm({ ...editForm, questionText: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary resize-none"
               rows={3}
             />
           </div>
@@ -424,7 +424,7 @@ export function QuestionDetail({
               <select
                 value={editForm.competency}
                 onChange={(e) => setEditForm({ ...editForm, competency: e.target.value })}
-                className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+                className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary"
               >
                 {COMPETENCIES.map(c => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -438,7 +438,7 @@ export function QuestionDetail({
               <select
                 value={editForm.difficulty}
                 onChange={(e) => setEditForm({ ...editForm, difficulty: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+                className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary"
               >
                 {[1, 2, 3].map(d => (
                   <option key={d} value={d}>{DIFFICULTY_LABELS[d]}</option>
@@ -454,7 +454,7 @@ export function QuestionDetail({
             <textarea
               value={editForm.expectedAnswer}
               onChange={(e) => setEditForm({ ...editForm, expectedAnswer: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary resize-none"
               rows={3}
             />
           </div>
@@ -466,13 +466,13 @@ export function QuestionDetail({
             <textarea
               value={editForm.followUpQuestion}
               onChange={(e) => setEditForm({ ...editForm, followUpQuestion: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary resize-none"
               rows={2}
             />
           </div>
 
           {saveError && (
-            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
+            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-700">
               <AlertCircle className="w-5 h-5" />
               <span className="text-sm">{saveError}</span>
             </div>
@@ -513,7 +513,7 @@ export function QuestionDetail({
           )}
           <button
             onClick={handleStar}
-            className="p-2 hover:bg-amber-50 rounded transition-colors"
+            className="p-2 hover:bg-amber-50 transition-colors"
           >
             <Star className={`w-5 h-5 ${isStarred ? 'text-amber-500 fill-current' : 'text-text-muted'}`} />
           </button>
@@ -529,14 +529,14 @@ export function QuestionDetail({
               {question.questionText}
             </h2>
             <div className="flex items-center gap-3 mt-3">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${compConfig.color}`}>
+              <span className={`px-3 py-1 text-sm font-medium ${compConfig.color}`}>
                 {compConfig.label}
               </span>
               <div className="flex items-center gap-1">
                 {[1, 2, 3].map(level => (
                   <div
                     key={level}
-                    className={`w-3 h-3 rounded-full ${
+                    className={`w-3 h-3 ${
                       level <= question.difficulty ? 'bg-primary' : 'bg-gray-300'
                     }`}
                   />
@@ -553,7 +553,7 @@ export function QuestionDetail({
 
           {/* Expected Answer */}
           {question.expectedAnswer && (
-            <div className="bg-green-50 border border-green-200 rounded-none p-4">
+            <div className="bg-green-50 border border-green-200 p-4">
               <h3 className="text-sm font-medium text-green-800 mb-2">
                 What to Listen For
               </h3>
@@ -565,7 +565,7 @@ export function QuestionDetail({
 
           {/* Follow-up Question */}
           {question.followUpQuestion && (
-            <div className="bg-blue-50 border border-blue-200 rounded-none p-4">
+            <div className="bg-blue-50 border border-blue-200 p-4">
               <h3 className="text-sm font-medium text-blue-800 mb-2">
                 Follow-up Question
               </h3>

@@ -36,7 +36,7 @@ export function CandidateCard({ candidate, mandateId, onQuickReview, className =
               </h3>
               <p className="text-xs text-text-muted truncate">
                 {candidate.title}
-                {candidate.company_name && ` at ${candidate.company_name}`}
+                {candidate.company_name && `at ${candidate.company_name}`}
               </p>
             </div>
           </div>

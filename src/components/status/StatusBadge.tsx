@@ -53,7 +53,7 @@ export function StatusBadge({
     return (
       <span
         className={cn(
-          'inline-flex items-center gap-1 font-medium border rounded-none',
+          'inline-flex items-center gap-1 font-medium border',
           c.text,
           sizeClass,
           className,
@@ -70,7 +70,7 @@ export function StatusBadge({
     return (
       <span
         className={cn(
-          'inline-flex items-center gap-1 font-medium border rounded-none',
+          'inline-flex items-center gap-1 font-medium border',
           SOFT_COLOR_MAP[color],
           sizeClass,
           className,
@@ -87,7 +87,7 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 font-medium rounded-none',
+        'inline-flex items-center gap-1 font-medium',
         c.bg,
         c.text,
         sizeClass,

@@ -12,7 +12,7 @@ export default function PersonaConfig() {
   const [milestoneTracking, setMilestoneTracking] = useState(MOCK_PERSONA_CONFIG.milestoneTracking);
 
   return (
-    <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+    <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
       <div className="flex items-center gap-2 mb-6">
         <UserCog className="w-5 h-5" style={{ color: '#C108AB' }} />
         <h3 className="font-serif text-lg font-bold text-text-primary">Persona Configuration</h3>
@@ -70,7 +70,7 @@ export default function PersonaConfig() {
             value={terminology}
             onChange={(e) => setTerminology(e.target.value)}
             className="w-full px-3 py-2 text-sm bg-bg-primary border border-bg-tertiary text-text-primary"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <option value="executive">Executive</option>
             <option value="professional">Professional</option>
@@ -88,7 +88,7 @@ export default function PersonaConfig() {
             value={wordLimit}
             onChange={(e) => setWordLimit(parseInt(e.target.value, 10))}
             className="w-full px-3 py-2 text-sm bg-bg-primary border border-bg-tertiary text-text-primary"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           />
         </div>
 
@@ -104,14 +104,12 @@ export default function PersonaConfig() {
                 className="w-10 h-5 relative transition-colors"
                 style={{
                   backgroundColor: diagnosticProtocol ? '#C108AB' : '#d1d5db',
-                  borderRadius: 0,
                 }}
               >
                 <div
                   className="absolute top-0.5 w-4 h-4 bg-white transition-all"
                   style={{
                     left: diagnosticProtocol ? '22px' : '2px',
-                    borderRadius: 0,
                   }}
                 />
               </div>
@@ -124,7 +122,7 @@ export default function PersonaConfig() {
               value={confidentialityLevel}
               onChange={(e) => setConfidentialityLevel(e.target.value)}
               className="px-3 py-1 text-sm bg-bg-primary border border-bg-tertiary text-text-primary"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <option value="strict">Strict</option>
               <option value="standard">Standard</option>
@@ -142,14 +140,12 @@ export default function PersonaConfig() {
                 className="w-10 h-5 relative transition-colors"
                 style={{
                   backgroundColor: milestoneTracking ? '#C108AB' : '#d1d5db',
-                  borderRadius: 0,
                 }}
               >
                 <div
                   className="absolute top-0.5 w-4 h-4 bg-white transition-all"
                   style={{
                     left: milestoneTracking ? '22px' : '2px',
-                    borderRadius: 0,
                   }}
                 />
               </div>
@@ -161,7 +157,7 @@ export default function PersonaConfig() {
         <div className="pt-4 border-t border-bg-tertiary">
           <button
             className="flex items-center gap-2 px-6 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ backgroundColor: '#C108AB', borderRadius: 0 }}
+            style={{ backgroundColor: '#C108AB' }}
           >
             <Save className="w-4 h-4" />
             Save Configuration

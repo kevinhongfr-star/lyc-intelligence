@@ -86,7 +86,7 @@ export function CandidateStageHeatmap({ data, loading, error }: Props) {
         </div>
         <div className="flex items-center gap-2 text-[10px] text-text-muted">
           <span>Low</span>
-          <div className="flex h-3 w-40 border border-bg-tertiary" style={{ borderRadius: 0 }}>
+          <div className="flex h-3 w-40 border border-bg-tertiary" style={{ }}>
             {Array.from({ length: 10 }).map((_, i) => (
               <div
                 key={i}
@@ -194,7 +194,7 @@ export function CandidateStageHeatmap({ data, loading, error }: Props) {
       </div>
 
       <div className="text-[10px] text-text-muted">
-        Stages: {data.stages.join(' · ')}. {data.mandates.length} mandates.
+        Stages: {data.stages.join('·')}. {data.mandates.length} mandates.
       </div>
     </div>
   );

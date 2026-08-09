@@ -90,7 +90,7 @@ export function ClientMandateDashboard({ mandateId, onBack }: ClientMandateDashb
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -136,7 +136,7 @@ export function ClientMandateDashboard({ mandateId, onBack }: ClientMandateDashb
             <h2 className="text-2xl font-bold text-gray-800">{mandate.title}</h2>
             <div className="flex items-center gap-4 text-sm text-gray-500">
               <span className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${mandate.status === 'Active' ? 'bg-green-500' : mandate.status === 'On Hold' ? 'bg-yellow-500' : 'bg-gray-400'}`}></span>
+                <span className={`w-2 h-2 ${mandate.status === 'Active' ? 'bg-green-500' : mandate.status === 'On Hold' ? 'bg-yellow-500' : 'bg-gray-400'}`}></span>
                 {mandate.status}
               </span>
               <span><Users className="w-4 h-4 inline mr-1" />{mandate.lead_consultant_name}</span>
@@ -163,10 +163,10 @@ export function ClientMandateDashboard({ mandateId, onBack }: ClientMandateDashb
                 {mandate.pipeline?.stages.map((stage: any) => (
                   <div key={stage.stage} className="flex-1 text-center">
                     <div className="relative mb-2">
-                      <div className={`w-full h-16 rounded-none ${getStageColor(stage.stage)} bg-opacity-20 flex items-center justify-center`}>
+                      <div className={`w-full h-16 ${getStageColor(stage.stage)} bg-opacity-20 flex items-center justify-center`}>
                         <span className="text-xl font-bold text-gray-800">{stage.count}</span>
                       </div>
-                      <div className={`absolute -top-1 -right-1 w-4 h-4 rounded-full ${getStageColor(stage.stage)}`}></div>
+                      <div className={`absolute -top-1 -right-1 w-4 h-4 ${getStageColor(stage.stage)}`}></div>
                     </div>
                     <div className="text-xs text-gray-600">{stage.label}</div>
                   </div>
@@ -194,12 +194,12 @@ export function ClientMandateDashboard({ mandateId, onBack }: ClientMandateDashb
                     return (
                       <div
                         key={candidate.contact_id}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-none hover:bg-gray-100 transition-colors"
+                        className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                          <div className="w-12 h-12 bg-gray-200 flex items-center justify-center">
                             {candidate.photo_url ? (
-                              <img src={candidate.photo_url} alt="" className="w-full h-full rounded-full object-cover" />
+                              <img src={candidate.photo_url} alt="" className="w-full h-full object-cover" />
                             ) : (
                               <Users className="w-6 h-6 text-gray-400" />
                             )}
@@ -269,15 +269,15 @@ export function ClientMandateDashboard({ mandateId, onBack }: ClientMandateDashb
                   <div key={index} className="flex items-start gap-4">
                     <div className="flex-shrink-0">
                       {event.status === 'completed' ? (
-                        <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                        <div className="w-6 h-6 bg-green-500 flex items-center justify-center">
                           <CheckCircle className="w-4 h-4 text-white" />
                         </div>
                       ) : event.status === 'upcoming' ? (
-                        <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
+                        <div className="w-6 h-6 bg-blue-500 flex items-center justify-center">
                           <span className="text-white text-xs">!</span>
                         </div>
                       ) : (
-                        <div className="w-6 h-6 rounded-full bg-gray-300"></div>
+                        <div className="w-6 h-6 bg-gray-300"></div>
                       )}
                     </div>
                     <div className="flex-1">

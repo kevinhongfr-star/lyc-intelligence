@@ -51,7 +51,7 @@ function LegalLayout({ title, icon, intro, sections, lastUpdated, actions }: {
         </div>
         {actions}
         <div className="mt-12 pt-6 border-t border-gray-100 text-xs text-gray-400">
-          LYC Partners Shanghai · For questions about this policy, contact{' '}
+          LYC Partners Shanghai · For questions about this policy, contact{''}
           <a href="mailto:legal@lyc-intelligence.app" className="text-fuchsia hover:underline">legal@lyc-intelligence.app</a>
         </div>
       </div>
@@ -286,9 +286,9 @@ function PrivacyActionsPanel() {
         <div className="flex items-start gap-2">
           <AlertCircle className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
           <span>
-            To download your personal data or request account deletion, please{' '}
-            <a href="/login" className="text-fuchsia hover:underline font-medium">sign in</a>{' '}
-            first. You may also email{' '}
+            To download your personal data or request account deletion, please{''}
+            <a href="/login" className="text-fuchsia hover:underline font-medium">sign in</a>{''}
+            first. You may also email{''}
             <a href="mailto:privacy@lyc-intelligence.app" className="text-fuchsia hover:underline">privacy@lyc-intelligence.app</a>.
           </span>
         </div>

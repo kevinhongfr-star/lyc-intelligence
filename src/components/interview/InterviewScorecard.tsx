@@ -160,9 +160,9 @@ export function InterviewScorecard({
       </div>
 
       {/* Interview Info */}
-      <div className="bg-card border border-card-border rounded-none p-6 mb-6">
+      <div className="bg-card border border-card-border p-6 mb-6">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+          <div className="w-12 h-12 bg-accent/10 flex items-center justify-center">
             <User className="w-6 h-6 text-accent" />
           </div>
           <div className="flex-1">
@@ -188,7 +188,7 @@ export function InterviewScorecard({
       </div>
 
       {/* Competency Scores */}
-      <div className="bg-card border border-card-border rounded-none p-6 mb-6">
+      <div className="bg-card border border-card-border p-6 mb-6">
         <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
           <Star className="w-5 h-5 text-accent" />
           Competency Scores
@@ -203,7 +203,7 @@ export function InterviewScorecard({
                   <p className="font-medium text-text-primary">{competency.name}</p>
                   <p className="text-sm text-text-muted">{competency.description}</p>
                 </div>
-                <div className={`w-12 h-12 rounded-full ${getScoreBgColor(formData.competency_scores[competency.id])} flex items-center justify-center`}>
+                <div className={`w-12 h-12 ${getScoreBgColor(formData.competency_scores[competency.id])} flex items-center justify-center`}>
                   <span className={`text-xl font-bold ${getScoreColor(formData.competency_scores[competency.id])}`}>
                     {formData.competency_scores[competency.id]}
                   </span>
@@ -214,7 +214,7 @@ export function InterviewScorecard({
                   <button
                     key={num}
                     onClick={() => handleCompetencyChange(competency.id, num)}
-                    className={`flex-1 h-10 rounded-none text-sm font-medium transition-all ${
+                    className={`flex-1 h-10 text-sm font-medium transition-all ${
                       formData.competency_scores[competency.id] === num
                         ? 'bg-accent text-white'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -230,7 +230,7 @@ export function InterviewScorecard({
       </div>
 
       {/* Overall Score */}
-      <div className="bg-card border border-card-border rounded-none p-6 mb-6">
+      <div className="bg-card border border-card-border p-6 mb-6">
         <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
           <Star className="w-5 h-5 text-accent" />
           Overall Score
@@ -244,7 +244,7 @@ export function InterviewScorecard({
                 <button
                   key={num}
                   onClick={() => handleOverallScoreChange(num)}
-                  className={`w-10 h-10 rounded-none text-sm font-medium transition-all ${
+                  className={`w-10 h-10 text-sm font-medium transition-all ${
                     formData.overall_score === num
                       ? 'bg-accent text-white'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -255,7 +255,7 @@ export function InterviewScorecard({
               ))}
             </div>
           </div>
-          <div className={`w-20 h-20 rounded-full ${getScoreBgColor(formData.overall_score)} flex items-center justify-center`}>
+          <div className={`w-20 h-20 ${getScoreBgColor(formData.overall_score)} flex items-center justify-center`}>
             <span className={`text-3xl font-bold ${getScoreColor(formData.overall_score)}`}>
               {formData.overall_score}
             </span>
@@ -266,7 +266,7 @@ export function InterviewScorecard({
       {/* Qualitative Feedback */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Strengths */}
-        <div className="bg-card border border-card-border rounded-none p-6">
+        <div className="bg-card border border-card-border p-6">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-500" />
             Strengths
@@ -276,7 +276,7 @@ export function InterviewScorecard({
             value={formData.strengths}
             onChange={e => setFormData(prev => ({ ...prev, strengths: e.target.value }))}
             rows={5}
-            className={`w-full p-3 rounded-none border ${errors.strengths ? 'border-red-500' : 'border-gray-200'} focus:outline-none focus:border-accent resize-none`}
+            className={`w-full p-3 border ${errors.strengths ? 'border-red-500' : 'border-gray-200'} focus:outline-none focus:border-accent resize-none`}
             placeholder="List the candidate's key strengths and positive attributes..."
           />
           {errors.strengths && (
@@ -285,7 +285,7 @@ export function InterviewScorecard({
         </div>
 
         {/* Concerns */}
-        <div className="bg-card border border-card-border rounded-none p-6">
+        <div className="bg-card border border-card-border p-6">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-amber-500" />
             Concerns
@@ -295,14 +295,14 @@ export function InterviewScorecard({
             value={formData.concerns}
             onChange={e => setFormData(prev => ({ ...prev, concerns: e.target.value }))}
             rows={5}
-            className="w-full p-3 rounded-none border border-gray-200 focus:outline-none focus:border-accent resize-none"
+            className="w-full p-3 border border-gray-200 focus:outline-none focus:border-accent resize-none"
             placeholder="List any concerns or areas where the candidate could improve..."
           />
         </div>
       </div>
 
       {/* Recommendation */}
-      <div className="bg-card border border-card-border rounded-none p-6 mb-6">
+      <div className="bg-card border border-card-border p-6 mb-6">
         <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-accent" />
           Recommendation
@@ -314,7 +314,7 @@ export function InterviewScorecard({
             <button
               key={option.value}
               onClick={() => setFormData(prev => ({ ...prev, recommendation: option.value }))}
-              className={`p-4 rounded-none border-2 text-left transition-all ${
+              className={`p-4 border-2 text-left transition-all ${
                 formData.recommendation === option.value
                   ? 'border-accent bg-accent/10'
                   : 'border-gray-200 hover:border-gray-300'
@@ -324,9 +324,9 @@ export function InterviewScorecard({
                 {formData.recommendation === option.value ? (
                   <CheckCircle2 className="w-5 h-5 text-accent" />
                 ) : (
-                  <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
+                  <div className="w-5 h-5 border-2 border-gray-300" />
                 )}
-                <span className={`font-medium ${option.color.split(' ')[1]}`}>
+                <span className={`font-medium ${option.color.split('')[1]}`}>
                   {option.label}
                 </span>
               </div>

@@ -145,12 +145,12 @@ export function ConsultantHome() {
     return (
       <PageContainer>
         <div className="animate-pulse space-y-4">
-          <div className="h-16 bg-bg-alt rounded-none" />
+          <div className="h-16 bg-bg-alt" />
           <div className="grid grid-cols-2 gap-3">
-            <div className="h-20 bg-bg-alt rounded-none" />
-            <div className="h-20 bg-bg-alt rounded-none" />
+            <div className="h-20 bg-bg-alt" />
+            <div className="h-20 bg-bg-alt" />
           </div>
-          <div className="h-32 bg-bg-alt rounded-none" />
+          <div className="h-32 bg-bg-alt" />
         </div>
       </PageContainer>
     );
@@ -165,13 +165,13 @@ export function ConsultantHome() {
           <p className="text-text-muted">Welcome back</p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="relative p-2 rounded-full hover:bg-bg-alt transition-colors">
+          <button className="relative p-2 hover:bg-bg-alt transition-colors">
             <Bell className="w-6 h-6 text-text-muted" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500" />
           </button>
           <Link
             href="/settings"
-            className="p-2 rounded-full hover:bg-bg-alt transition-colors"
+            className="p-2 hover:bg-bg-alt transition-colors"
           >
             <span className="text-text-muted">Settings</span>
           </Link>
@@ -237,7 +237,7 @@ export function ConsultantHome() {
                     </p>
                     <p className="text-xs text-red-600 mt-1">{mandate.issue}</p>
                   </div>
-                  <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded">
+                  <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium">
                     {mandate.daysAtRisk}d overdue
                   </span>
                 </div>
@@ -288,9 +288,9 @@ export function ConsultantHome() {
         <div className="grid grid-cols-2 gap-3">
           <Link
             href="/pipeline"
-            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-none hover:bg-bg-alt transition-colors"
+            className="flex items-center gap-3 p-4 bg-card border border-card-border hover:bg-bg-alt transition-colors"
           >
-            <div className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
               <Users className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -300,9 +300,9 @@ export function ConsultantHome() {
           </Link>
           <Link
             href="/scoring"
-            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-none hover:bg-bg-alt transition-colors"
+            className="flex items-center gap-3 p-4 bg-card border border-card-border hover:bg-bg-alt transition-colors"
           >
-            <div className="w-10 h-10 rounded-none bg-green-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-green-100 flex items-center justify-center">
               <Target className="w-5 h-5 text-green-600" />
             </div>
             <div>

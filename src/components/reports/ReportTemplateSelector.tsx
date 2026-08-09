@@ -46,7 +46,7 @@ export function ReportTemplateSelector({ templates, selectedId, onSelect }: Repo
   const filteredGrouped = groupByCategory(filteredTemplates);
 
   return (
-    <div className="bg-bg rounded-none border border-border">
+    <div className="bg-bg border border-border">
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -58,7 +58,7 @@ export function ReportTemplateSelector({ templates, selectedId, onSelect }: Repo
         <div className="relative mt-3">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input
-            className="w-full pl-10 pr-4 py-2 bg-bg-alt border border-border text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB] rounded-none"
+            className="w-full pl-10 pr-4 py-2 bg-bg-alt border border-border text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB]"
             placeholder="Search templates..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -93,7 +93,7 @@ export function ReportTemplateSelector({ templates, selectedId, onSelect }: Repo
                     }`}
                   >
                     <div
-                      className="p-2 rounded-none"
+                      className="p-2"
                       style={{ color: CATEGORY_COLORS[template.category] || '#C108AB' }}
                     >
                       {CATEGORY_ICONS[template.category] || <FileText className="w-5 h-5" />}

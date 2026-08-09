@@ -41,12 +41,7 @@ export function PageTransition({
         animation: `echo-page-in ${duration} cubic-bezier(0.16, 1, 0.3, 1) forwards`,
       }}
     >
-      <style>{`
-        @keyframes echo-page-in {
-          from { opacity: 0; transform: ${offset}; }
-          to { opacity: 1; transform: translate(0, 0); }
-        }
-      `}</style>
+      <style>{`@keyframes echo-page-in { from { opacity: 0; transform: ${offset}; } to { opacity: 1; transform: translate(0, 0); } }`}</style>
       {children}
     </div>
   );

@@ -23,13 +23,10 @@ export function SubTabs({ tabs, active, onTabClick }: SubTabsProps) {
           <button
             key={tab.path}
             onClick={() => onTabClick(tab.path)}
-            className={`
-              px-4 py-2 text-sm transition-colors whitespace-nowrap
-              ${active === tab.path || active.startsWith(tab.path + '/')
-                ? 'text-fuchsia font-semibold bg-white rounded-t-md shadow-sm'
+            className={`px-4 py-2 text-sm transition-colors whitespace-nowrap ${active === tab.path || active.startsWith(tab.path + '/')
+                ? 'text-fuchsia font-semibold bg-white shadow-sm'
                 : 'text-text-secondary hover:text-text-primary'
-              }
-            `}
+              }`}
           >
             {tab.label}
           </button>

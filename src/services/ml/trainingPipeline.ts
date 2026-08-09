@@ -500,29 +500,7 @@ export async function runTrainingPipeline(
     // Positive samples: placed candidates
     const { data: placements, error: placementsError } = await supabase
       .from('candidates_pipeline')
-      .select(`
-        *,
-        contacts:candidate_id(
-          id,
-          years_experience,
-          current_company,
-          current_title,
-          current_industry,
-          skills,
-          disc_profile
-        ),
-        mandates:mandate_id(
-          id,
-          seniority_level,
-          team_size,
-          compensation_min,
-          compensation_max,
-          required_skills,
-          preferred_industries,
-          success_profile_disc,
-          client_geography
-        )
-      `)
+      .select(`*, contacts:candidate_id( id, years_experience, current_company, current_title, current_industry, skills, disc_profile ), mandates:mandate_id( id, seniority_level, team_size, compensation_min, compensation_max, required_skills, preferred_industries, success_profile_disc, client_geography )`)
       .in('stage', ['offer_accepted', 'onboarded', 'probation_passed']);
     
     if (placementsError) throw placementsError;
@@ -530,29 +508,7 @@ export async function runTrainingPipeline(
     // Negative samples: rejected after interview
     const { data: rejections, error: rejectionsError } = await supabase
       .from('candidates_pipeline')
-      .select(`
-        *,
-        contacts:candidate_id(
-          id,
-          years_experience,
-          current_company,
-          current_title,
-          current_industry,
-          skills,
-          disc_profile
-        ),
-        mandates:mandate_id(
-          id,
-          seniority_level,
-          team_size,
-          compensation_min,
-          compensation_max,
-          required_skills,
-          preferred_industries,
-          success_profile_disc,
-          client_geography
-        )
-      `)
+      .select(`*, contacts:candidate_id( id, years_experience, current_company, current_title, current_industry, skills, disc_profile ), mandates:mandate_id( id, seniority_level, team_size, compensation_min, compensation_max, required_skills, preferred_industries, success_profile_disc, client_geography )`)
       .in('stage', ['rejected', 'withdrawn'])
       .gte('stage_order', 6);
     

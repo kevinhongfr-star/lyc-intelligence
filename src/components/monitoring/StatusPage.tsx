@@ -71,7 +71,7 @@ export function StatusPage() {
             <div key={inc.id} className="p-3 mb-2 bg-yellow-50 border border-yellow-400" data-testid={`incident-${inc.id}`}>
               <div className="font-medium">{inc.title}</div>
               <div className="text-sm text-gray-600">
-                Severity: {inc.severity} · Status: {inc.status} · Affects: {inc.affected_systems.join(', ')}
+                Severity: {inc.severity} · Status: {inc.status} · Affects: {inc.affected_systems.join(',')}
               </div>
             </div>
           ))}

@@ -219,7 +219,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
         {onBack && (
           <button
             onClick={onBack}
-            className="p-2 hover:bg-bg-secondary rounded-none transition-colors"
+            className="p-2 hover:bg-bg-secondary transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-text-secondary" />
           </button>
@@ -243,7 +243,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
           </div>
           <p className="text-sm text-text-muted">
             {opportunity.primary_contact_name}
-            {opportunity.primary_contact_title && ` • ${opportunity.primary_contact_title}`}
+            {opportunity.primary_contact_title && `• ${opportunity.primary_contact_title}`}
           </p>
         </div>
 
@@ -258,12 +258,12 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
           </Button>
 
           {showStageMenu && (
-            <div className="absolute right-0 mt-2 w-48 bg-bg-base border border-bg-hover rounded-none shadow-lg z-10">
+            <div className="absolute right-0 mt-2 w-48 bg-bg-base border border-bg-hover shadow-lg z-10">
               {validNextStages.map((stage) => (
                 <button
                   key={stage}
                   onClick={() => handleStageTransition(stage)}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-bg-secondary transition-colors first:rounded-t-lg last:rounded-b-lg"
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-bg-secondary transition-colors"
                 >
                   {STAGE_LABELS[stage]}
                 </button>
@@ -470,7 +470,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
             <div className="space-y-4">
               {activities.map((activity) => (
                 <div key={activity.id} className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-bg-secondary flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-bg-secondary flex items-center justify-center flex-shrink-0">
                     <Clock className="w-4 h-4 text-text-muted" />
                   </div>
                   <div className="flex-1">
@@ -519,7 +519,7 @@ export function OpportunityDetail({ orgId, opportunityId, onBack, userId }: Oppo
               {proposals.map((proposal) => (
                 <div
                   key={proposal.id}
-                  className="p-4 bg-bg-secondary rounded-none hover:bg-bg-hover transition-colors cursor-pointer"
+                  className="p-4 bg-bg-secondary hover:bg-bg-hover transition-colors cursor-pointer"
                 >
                   <div className="flex items-center justify-between">
                     <div>

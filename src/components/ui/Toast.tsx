@@ -11,16 +11,7 @@
  * motion.css animations, and full ARIA compliance.
  *
  * @example
- * ```tsx
- * // Root setup
- * <ToastProvider>
- *   <App />
- * </ToastProvider>
- *
- * // In any component
- * const toast = useToast();
- * toast.success('Saved successfully');
- * ```
+ * ```tsx * // Root setup * <ToastProvider> * <App /> * </ToastProvider> * * // In any component * const toast = useToast(); * toast.success('Saved successfully'); *```
  */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { CheckCircle, XCircle, Info, AlertTriangle, X } from 'lucide-react';
@@ -181,15 +172,7 @@ function ToastItem({ id, type, message, duration, onDismiss }: ToastItemProps) {
  * Provider — mounts the toast viewport. Place near the root once.
  *
  * @example
- * ```tsx
- * function App() {
- *   return (
- *     <ToastProvider>
- *       <YourApp />
- *     </ToastProvider>
- *   );
- * }
- * ```
+ * ```tsx * function App() { * return ( * <ToastProvider> * <YourApp /> * </ToastProvider> * ); * } *```
  */
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const { toasts, addToast, removeToast } = useToastStore();

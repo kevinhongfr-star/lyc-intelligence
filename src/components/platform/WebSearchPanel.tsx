@@ -69,7 +69,7 @@ export function WebSearchPanel({ onSearch }: WebSearchPanelProps) {
             onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && performSearch()}
             placeholder="Search the web..."
-            className="flex-1 px-3 py-2 border border-border bg-bg text-text-primary text-sm focus:outline-none focus:border-accent rounded-none"
+            className="flex-1 px-3 py-2 border border-border bg-bg text-text-primary text-sm focus:outline-none focus:border-accent"
           />
           <Button onClick={performSearch} loading={loading}>
             <Search className="w-4 h-4" />

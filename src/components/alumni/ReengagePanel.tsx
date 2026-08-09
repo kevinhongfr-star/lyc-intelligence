@@ -232,7 +232,7 @@ export function ReengagePanel({ orgId }: ReengagePanelProps) {
       {/* Campaign List */}
       {isLoading ? (
         <div className="flex items-center justify-center py-8">
-          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent animate-spin" />
         </div>
       ) : campaigns.length === 0 ? (
         <Card className="p-8 text-center">
@@ -255,20 +255,20 @@ export function ReengagePanel({ orgId }: ReengagePanelProps) {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-none bg-bg-alt flex items-center justify-center">
+                  <div className="w-10 h-10 bg-bg-alt flex items-center justify-center">
                     <Mail className="w-5 h-5 text-text-muted" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-text-primary">{campaign.campaign_name}</span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs ${STATUS_CONFIG[campaign.status].color}`}>
+                      <span className={`px-2 py-0.5 text-xs ${STATUS_CONFIG[campaign.status].color}`}>
                         {STATUS_CONFIG[campaign.status].label}
                       </span>
                     </div>
                     <div className="flex items-center gap-4 mt-1 text-sm text-text-muted">
                       <span className="flex items-center gap-1">
                         <Target className="w-4 h-4" />
-                        {campaign.campaign_type.replace('_', ' ')}
+                        {campaign.campaign_type.replace('_', '')}
                       </span>
                       {campaign.send_date && (
                         <span className="flex items-center gap-1">
@@ -303,7 +303,7 @@ export function ReengagePanel({ orgId }: ReengagePanelProps) {
                       <label className="text-sm font-medium text-text-muted">Target Tags</label>
                       <div className="flex flex-wrap gap-2 mt-1">
                         {campaign.target_tags.map(tag => (
-                          <span key={tag} className="px-2 py-1 bg-bg-alt rounded-full text-sm">
+                          <span key={tag} className="px-2 py-1 bg-bg-alt text-sm">
                             {tag}
                           </span>
                         ))}

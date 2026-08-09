@@ -105,28 +105,28 @@ export function SavedSearchForm({ currentFilters, onSave, onCancel }: SavedSearc
           </label>
         </div>
 
-        <div className="p-3 bg-bg-alt rounded-none">
+        <div className="p-3 bg-bg-alt">
           <label className="text-sm font-medium text-text-muted">Current Filters</label>
           <div className="mt-2 flex flex-wrap gap-2">
             {currentFilters.title && (
-              <span className="px-2 py-1 bg-bg-base rounded text-xs">Title: {currentFilters.title}</span>
+              <span className="px-2 py-1 bg-bg-base text-xs">Title: {currentFilters.title}</span>
             )}
             {currentFilters.location && (
-              <span className="px-2 py-1 bg-bg-base rounded text-xs">Location: {currentFilters.location}</span>
+              <span className="px-2 py-1 bg-bg-base text-xs">Location: {currentFilters.location}</span>
             )}
             {currentFilters.industry && (
-              <span className="px-2 py-1 bg-bg-base rounded text-xs">Industry: {currentFilters.industry}</span>
+              <span className="px-2 py-1 bg-bg-base text-xs">Industry: {currentFilters.industry}</span>
             )}
             {currentFilters.skills && currentFilters.skills.length > 0 && (
-              <span className="px-2 py-1 bg-bg-base rounded text-xs">Skills: {currentFilters.skills.length}</span>
+              <span className="px-2 py-1 bg-bg-base text-xs">Skills: {currentFilters.skills.length}</span>
             )}
             {currentFilters.experience_years && (
-              <span className="px-2 py-1 bg-bg-base rounded text-xs">
+              <span className="px-2 py-1 bg-bg-base text-xs">
                 Experience: {currentFilters.experience_years.min}-{currentFilters.experience_years.max}
               </span>
             )}
             {!Object.keys(currentFilters).length && (
-              <span className="px-2 py-1 bg-bg-base rounded text-xs text-text-muted">No filters</span>
+              <span className="px-2 py-1 bg-bg-base text-xs text-text-muted">No filters</span>
             )}
           </div>
         </div>

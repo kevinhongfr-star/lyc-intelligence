@@ -41,7 +41,6 @@ export function CreditBadge({ showBalance = true, size = 'md' }: CreditBadgeProp
         padding,
         background: colors.bg,
         border: `1px solid ${colors.border}`,
-        borderRadius: '20px',
         cursor: 'pointer',
         transition: 'all 0.2s ease'
       }}
@@ -64,7 +63,6 @@ export function CreditBadge({ showBalance = true, size = 'md' }: CreditBadgeProp
           padding: '2px 6px',
           background: DS.accent,
           color: '#FFF',
-          borderRadius: '10px',
           textTransform: 'uppercase'
         }}>
           {tier}

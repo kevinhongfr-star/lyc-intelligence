@@ -132,7 +132,7 @@ export function CandidateQuickAddModal({ isOpen, onClose, onSuccess }: Candidate
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Zhang Wei"
-                    className="w-full px-3 py-2 mt-1 text-sm rounded border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="w-full px-3 py-2 mt-1 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                 </div>
 
@@ -147,7 +147,7 @@ export function CandidateQuickAddModal({ isOpen, onClose, onSuccess }: Candidate
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="TechCorp"
-                    className="w-full px-3 py-2 mt-1 text-sm rounded border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="w-full px-3 py-2 mt-1 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                 </div>
 
@@ -162,7 +162,7 @@ export function CandidateQuickAddModal({ isOpen, onClose, onSuccess }: Candidate
                     value={currentTitle}
                     onChange={(e) => setCurrentTitle(e.target.value)}
                     placeholder="VP Engineering"
-                    className="w-full px-3 py-2 mt-1 text-sm rounded border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="w-full px-3 py-2 mt-1 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                 </div>
 
@@ -172,7 +172,7 @@ export function CandidateQuickAddModal({ isOpen, onClose, onSuccess }: Candidate
                   <select
                     value={source}
                     onChange={(e) => setSource(e.target.value)}
-                    className="w-full px-3 py-2 mt-1 text-sm rounded border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="w-full px-3 py-2 mt-1 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     {SOURCES.map((s) => (
                       <option key={s} value={s}>{s}</option>
@@ -191,7 +191,7 @@ export function CandidateQuickAddModal({ isOpen, onClose, onSuccess }: Candidate
                     value={linkedinUrl}
                     onChange={(e) => setLinkedinUrl(e.target.value)}
                     placeholder="https://linkedin.com/in/..."
-                    className="w-full px-3 py-2 mt-1 text-sm rounded border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="w-full px-3 py-2 mt-1 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                 </div>
 
@@ -207,7 +207,7 @@ export function CandidateQuickAddModal({ isOpen, onClose, onSuccess }: Candidate
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       placeholder="Shanghai"
-                      className="w-full px-3 py-2 mt-1 text-sm rounded border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      className="w-full px-3 py-2 mt-1 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
                   <div className="flex-1">
@@ -217,7 +217,7 @@ export function CandidateQuickAddModal({ isOpen, onClose, onSuccess }: Candidate
                       value={country}
                       onChange={(e) => setCountry(e.target.value)}
                       placeholder="China"
-                      className="w-full px-3 py-2 mt-1 text-sm rounded border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      className="w-full px-3 py-2 mt-1 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
                 </div>
@@ -229,7 +229,7 @@ export function CandidateQuickAddModal({ isOpen, onClose, onSuccess }: Candidate
                     <select
                       value={tier || ''}
                       onChange={(e) => setTier(e.target.value || null)}
-                      className="w-full px-3 py-2 mt-1 text-sm rounded border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      className="w-full px-3 py-2 mt-1 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
                     >
                       <option value="">None</option>
                       <option value="A">A</option>
@@ -242,7 +242,7 @@ export function CandidateQuickAddModal({ isOpen, onClose, onSuccess }: Candidate
                     <select
                       value={classification || ''}
                       onChange={(e) => setClassification(e.target.value || null)}
-                      className="w-full px-3 py-2 mt-1 text-sm rounded border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      className="w-full px-3 py-2 mt-1 text-sm border border-bg-tertiary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
                     >
                       <option value="">None</option>
                       {CLASSIFICATIONS.filter(Boolean).map((c) => (

@@ -186,7 +186,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 padding: '12px 16px',
                 background: DS.bgAlt,
                 border: `1px solid ${errors.candidate ? '#EF4444' : DS.cardBorder}`,
-                borderRadius: '0px',
                 textAlign: 'left',
                 cursor: 'pointer',
                 display: 'flex',
@@ -209,7 +208,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 marginTop: '4px',
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '0px',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                 zIndex: 10,
                 maxHeight: '240px',
@@ -244,11 +242,10 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                     <span style={{
                       fontSize: '11px',
                       padding: '2px 8px',
-                      borderRadius: '4px',
                       background: '#E5E7EB',
                       color: DS.textSecondary,
                     }}>
-                      {c.stage.replace('_', ' ')}
+                      {c.stage.replace('_', '')}
                     </span>
                   </div>
                 ))}
@@ -274,7 +271,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 padding: '12px 16px',
                 background: DS.bgAlt,
                 border: `1px solid ${errors.round ? '#EF4444' : DS.cardBorder}`,
-                borderRadius: '0px',
                 textAlign: 'left',
                 cursor: 'pointer',
                 display: 'flex',
@@ -295,7 +291,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 marginTop: '4px',
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '0px',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                 zIndex: 10,
               }}>
@@ -350,7 +345,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 padding: '12px 16px',
                 background: DS.bgAlt,
                 border: `1px solid ${errors.date ? '#EF4444' : DS.cardBorder}`,
-                borderRadius: '0px',
                 fontSize: '14px',
                 boxSizing: 'border-box',
               }}
@@ -372,7 +366,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 padding: '12px 16px',
                 background: DS.bgAlt,
                 border: `1px solid ${errors.time ? '#EF4444' : DS.cardBorder}`,
-                borderRadius: '0px',
                 fontSize: '14px',
                 boxSizing: 'border-box',
               }}
@@ -397,7 +390,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 padding: '12px 16px',
                 background: DS.bgAlt,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '0px',
                 textAlign: 'left',
                 cursor: 'pointer',
                 display: 'flex',
@@ -418,7 +410,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 marginTop: '4px',
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '0px',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                 zIndex: 10,
               }}>
@@ -470,7 +461,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
               padding: '12px 16px',
               background: DS.bgAlt,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '0px',
               fontSize: '14px',
               boxSizing: 'border-box',
             }}
@@ -492,7 +482,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
               padding: '12px 16px',
               background: DS.bgAlt,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '0px',
               fontSize: '14px',
               boxSizing: 'border-box',
             }}
@@ -513,7 +502,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 padding: '12px 16px',
                 background: DS.bgAlt,
                 border: `1px solid ${errors.panel ? '#EF4444' : DS.cardBorder}`,
-                borderRadius: '0px',
                 textAlign: 'left',
                 cursor: 'pointer',
                 display: 'flex',
@@ -538,7 +526,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 marginTop: '4px',
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '0px',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                 zIndex: 10,
                 maxHeight: '240px',
@@ -587,7 +574,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                       padding: '4px 12px',
                       background: `${DS.accent}10`,
                       color: DS.accent,
-                      borderRadius: '20px',
                       fontSize: '12px',
                       display: 'flex',
                       alignItems: 'center',
@@ -616,7 +602,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
           justifyContent: 'space-between',
           padding: '16px',
           background: DS.bgAlt,
-          borderRadius: '0px',
           marginBottom: '20px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -632,7 +617,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
             style={{
               width: '48px',
               height: '28px',
-              borderRadius: '14px',
               background: sendInvite ? DS.accent : DS.cardBorder,
               position: 'relative',
               cursor: 'pointer',
@@ -644,7 +628,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 width: '24px',
                 height: '24px',
                 background: 'white',
-                borderRadius: '50%',
                 position: 'absolute',
                 top: '2px',
                 left: sendInvite ? '22px' : '2px',
@@ -670,7 +653,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
               padding: '12px 16px',
               background: DS.bgAlt,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '0px',
               fontSize: '14px',
               boxSizing: 'border-box',
               resize: 'vertical',
@@ -683,7 +665,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
           <div style={{
             background: '#FEF3C7',
             border: '1px solid #FCD34D',
-            borderRadius: '0px',
             padding: '16px',
             marginBottom: '24px',
           }}>
@@ -706,7 +687,7 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
                 {meetingLink && <><strong>Link:</strong> {meetingLink}</>}
               </div>
               <div style={{ marginTop: '8px' }}>
-                Panel: {selectedPanelists.map(p => p.name).join(', ')}
+                Panel: {selectedPanelists.map(p => p.name).join(',')}
               </div>
               <div style={{ marginTop: '12px' }}>
                 Please confirm your availability by replying to this email.
@@ -729,7 +710,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
               padding: '12px 24px',
               background: DS.bgAlt,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '0px',
               fontSize: '14px',
               fontWeight: 600,
               cursor: 'pointer',
@@ -746,7 +726,6 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
               padding: '12px 24px',
               background: DS.accent,
               border: 'none',
-              borderRadius: '0px',
               fontSize: '14px',
               fontWeight: 600,
               cursor: submitting ? 'not-allowed' : 'pointer',

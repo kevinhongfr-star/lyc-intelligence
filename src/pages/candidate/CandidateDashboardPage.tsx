@@ -205,7 +205,7 @@ export function CandidateDashboardPage() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded">
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3">
           {error}
         </div>
       )}
@@ -214,7 +214,7 @@ export function CandidateDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+            <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center">
               <Briefcase className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
@@ -225,7 +225,7 @@ export function CandidateDashboardPage() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+            <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center">
               <Trophy className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
@@ -236,7 +236,7 @@ export function CandidateDashboardPage() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+            <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center">
               <Award className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
@@ -249,7 +249,7 @@ export function CandidateDashboardPage() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center">
+            <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-fuchsia" />
             </div>
             <div>
@@ -326,7 +326,7 @@ export function CandidateDashboardPage() {
                       />
                       <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#666' }} />
                       <RTooltip
-                        contentStyle={{ border: '1px solid #e5e7eb', borderRadius: 0, fontSize: 12 }}
+                        contentStyle={{ border: '1px solid #e5e7eb',  fontSize: 12 }}
                       />
                       <Bar dataKey="score" name="Score" radius={[4, 4, 0, 0]}>
                         {scoreTrend.map((entry, idx) => (
@@ -388,7 +388,7 @@ export function CandidateDashboardPage() {
                         {r.company_name ?? '—'}
                       </td>
                       <td className="py-3 pr-4">
-                        <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded ${STAGE_COLORS[r.pipeline_stage ?? ''] ?? 'bg-gray-100 text-gray-600'}`}>
+                        <span className={`inline-block px-2 py-0.5 text-xs font-medium ${STAGE_COLORS[r.pipeline_stage ?? ''] ?? 'bg-gray-100 text-gray-600'}`}>
                           {r.pipeline_stage ?? '—'}
                         </span>
                       </td>
@@ -436,7 +436,7 @@ export function CandidateDashboardPage() {
                           <span className="font-medium text-text-primary text-sm">
                             {app.mandate?.title ?? app.client_name}
                           </span>
-                          <span className={`px-2 py-0.5 text-xs font-medium rounded ${STAGE_COLORS[app.stage] ?? 'bg-gray-100 text-gray-600'}`}>
+                          <span className={`px-2 py-0.5 text-xs font-medium ${STAGE_COLORS[app.stage] ?? 'bg-gray-100 text-gray-600'}`}>
                             {app.stage}
                           </span>
                         </div>
@@ -450,8 +450,8 @@ export function CandidateDashboardPage() {
                             Score: {app.match_score}
                           </span>
                         )}
-                        <div className="w-20 h-2 bg-bg-warm rounded-full overflow-hidden">
-                          <div className="h-full bg-fuchsia rounded-full transition-all" style={{ width: `${progress}%` }} />
+                        <div className="w-20 h-2 bg-bg-warm overflow-hidden">
+                          <div className="h-full bg-fuchsia transition-all" style={{ width: `${progress}%` }} />
                         </div>
                         <span className="text-xs font-medium text-text-secondary w-8 text-right">{progress}%</span>
                       </div>

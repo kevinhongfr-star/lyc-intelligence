@@ -55,15 +55,12 @@ export function HealthCard({ iconType, value, label, sublabel, barPercent, barTy
   return (
     <div 
       onClick={onClick}
-      className={`
-        bg-white rounded-card shadow-card border ${CARD_BORDER[barType]} p-4 cursor-pointer
-        hover:shadow-card-hover transition-all
-      `}
+      className={`bg-white shadow-card border ${CARD_BORDER[barType]} p-4 cursor-pointer hover:shadow-card-hover transition-all`}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${BAR_COLORS[barType].replace('bg-', 'bg-')}/10 ${BAR_COLORS[barType]}`}>
+          <div className={`w-10 h-10 flex items-center justify-center ${BAR_COLORS[barType].replace('bg-', 'bg-')}/10 ${BAR_COLORS[barType]}`}>
             {ICON_MAP[iconType]}
           </div>
           <div>
@@ -76,9 +73,9 @@ export function HealthCard({ iconType, value, label, sublabel, barPercent, barTy
 
       {/* Progress Bar */}
       <div className="mb-3">
-        <div className="w-full h-2 bg-bg-warm rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-bg-warm overflow-hidden">
           <div 
-            className={`h-full rounded-full ${BAR_COLORS[barType]} transition-all`}
+            className={`h-full ${BAR_COLORS[barType]} transition-all`}
             style={{ width: `${barPercent}%` }}
           />
         </div>
@@ -89,7 +86,7 @@ export function HealthCard({ iconType, value, label, sublabel, barPercent, barTy
         {sparklineData.map((v, i) => (
           <div
             key={i}
-            className={`flex-1 rounded-sm ${SPARK_COLORS[barType]}`}
+            className={`flex-1 ${SPARK_COLORS[barType]}`}
             style={{ height: `${(v / maxSpark) * 100}%`, minHeight: '2px' }}
           />
         ))}

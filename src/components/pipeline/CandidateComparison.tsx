@@ -113,7 +113,7 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-none p-8">
+        <div className="bg-white p-8">
           <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto" />
           <p className="text-text-muted mt-4">Loading candidates...</p>
         </div>
@@ -124,9 +124,9 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
   if (error || candidates.length === 0) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-none p-8 max-w-md">
+        <div className="bg-white p-8 max-w-md">
           <p className="text-red-500 mb-4">{error || 'No candidates to compare'}</p>
-          <button onClick={onClose} className="px-4 py-2 bg-accent text-white rounded-none">
+          <button onClick={onClose} className="px-4 py-2 bg-accent text-white">
             Close
           </button>
         </div>
@@ -143,7 +143,7 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+      <div className="bg-white max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b border-bg-tertiary flex items-center justify-between">
           <div>
@@ -155,12 +155,12 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
           <div className="flex items-center gap-2">
             <button
               onClick={exportToCSV}
-              className="px-4 py-2 bg-bg-tertiary text-text-primary rounded-none text-sm font-medium hover:bg-bg-secondary flex items-center gap-2"
+              className="px-4 py-2 bg-bg-tertiary text-text-primary text-sm font-medium hover:bg-bg-secondary flex items-center gap-2"
             >
               <Download className="w-4 h-4" />
               Export CSV
             </button>
-            <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-none">
+            <button onClick={onClose} className="p-2 hover:bg-bg-tertiary">
               <X className="w-5 h-5 text-text-muted" />
             </button>
           </div>
@@ -181,7 +181,7 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
                     <th key={c.contact.id} className="px-4 py-3 text-center min-w-[180px]">
                       <div className="flex flex-col items-center gap-2">
                         <div 
-                          className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold"
+                          className="w-12 h-12 flex items-center justify-center text-white text-lg font-bold"
                           style={{ backgroundColor: getScoreColor(c.overall_score) }}
                         >
                           {c.contact.name?.[0] ?? '?'}
@@ -194,7 +194,7 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
                         </div>
                         <span
                           style={{ backgroundColor: verdictInfo.color }}
-                          className="px-2 py-0.5 text-xs font-medium text-white rounded"
+                          className="px-2 py-0.5 text-xs font-medium text-white"
                         >
                           {verdictInfo.label}
                         </span>
@@ -243,16 +243,16 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
                         <td key={c.contact.id} className="px-4 py-4 text-center">
                           <div className="flex flex-col items-center gap-2">
                             <div 
-                              className={`text-2xl font-bold ${isBest ? 'ring-2 ring-green-500 rounded-none px-2' : ''}`}
+                              className={`text-2xl font-bold ${isBest ? 'ring-2 ring-green-500 px-2' : ''}`}
                               style={{ color: scoreColor }}
                             >
                               {score}
                             </div>
                             <div 
-                              className="w-24 h-2 bg-bg-tertiary rounded-full overflow-hidden"
+                              className="w-24 h-2 bg-bg-tertiary overflow-hidden"
                             >
                               <div 
-                                className="h-full rounded-full"
+                                className="h-full"
                                 style={{ width: `${score}%`, backgroundColor: scoreColor }}
                               />
                             </div>
@@ -307,7 +307,7 @@ export function CandidateComparison({ candidateIds, onClose, onRemoveCandidate }
                 </td>
                 {sortedCandidates.map((c) => (
                   <td key={c.contact.id} className="px-4 py-4 text-center text-sm text-text-secondary">
-                    {[c.contact.city, c.contact.country].filter(Boolean).join(', ') || 'N/A'}
+                    {[c.contact.city, c.contact.country].filter(Boolean).join(',') || 'N/A'}
                   </td>
                 ))}
               </tr>

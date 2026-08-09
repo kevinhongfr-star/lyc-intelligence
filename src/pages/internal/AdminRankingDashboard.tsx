@@ -192,7 +192,7 @@ export function AdminRankingDashboard() {
     URL.revokeObjectURL(url);
   };
 
-  const sortArrow = (key: SortKey) => (sortKey === key ? (sortDir === 'asc' ? ' ↑' : ' ↓') : '');
+  const sortArrow = (key: SortKey) => (sortKey === key ? (sortDir === 'asc' ? '↑' : '↓') : '');
 
   if (loading) {
     return <div className="py-12 text-center text-text-muted text-sm">Loading rankings…</div>;
@@ -381,7 +381,7 @@ function ScoreBreakdownModal({ row, onClose }: { row: RankingRow; onClose: () =>
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg bg-white rounded-lg shadow-xl overflow-hidden"
+        className="w-full max-w-lg bg-white shadow-xl overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -394,7 +394,7 @@ function ScoreBreakdownModal({ row, onClose }: { row: RankingRow; onClose: () =>
               <TierBadge tier={row.tier} size="sm" />
             </div>
             <p className="text-xs text-gray-500">
-              {row.mandate_title ?? '—'}{row.company_name ? ` · ${row.company_name}` : ''}
+              {row.mandate_title ?? '—'}{row.company_name ? `· ${row.company_name}` : ''}
             </p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1" aria-label="Close">
@@ -424,9 +424,9 @@ function ScoreBreakdownModal({ row, onClose }: { row: RankingRow; onClose: () =>
               <span className="text-xs font-medium text-gray-600">Tier position</span>
               <span className="text-xs text-gray-400">Gold ≥ 200 · Silver ≥ 100 · Bronze ≥ 50</span>
             </div>
-            <div className="relative h-3 bg-gray-100 rounded-full overflow-hidden">
+            <div className="relative h-3 bg-gray-100 overflow-hidden">
               <div
-                className="absolute top-0 left-0 h-full bg-fuchsia rounded-full"
+                className="absolute top-0 left-0 h-full bg-fuchsia"
                 style={{ width: `${Math.min((score / maxScale) * 100, 100)}%` }}
               />
               {/* threshold markers */}
@@ -453,9 +453,9 @@ function ScoreBreakdownModal({ row, onClose }: { row: RankingRow; onClose: () =>
                 return (
                   <div key={stage} className="flex items-center gap-3 text-sm">
                     <span className="w-24 text-gray-600">{stage}</span>
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 bg-gray-100 overflow-hidden">
                       <div
-                        className="h-full bg-fuchsia/70 rounded-full"
+                        className="h-full bg-fuchsia/70"
                         style={{ width: `${Math.min((w / 100) * 100, 100)}%` }}
                       />
                     </div>
@@ -467,12 +467,12 @@ function ScoreBreakdownModal({ row, onClose }: { row: RankingRow; onClose: () =>
           </div>
 
           {/* Tier assignment explanation */}
-          <div className="p-3 bg-gray-50 rounded-md text-xs text-gray-500 leading-relaxed">
+          <div className="p-3 bg-gray-50 text-xs text-gray-500 leading-relaxed">
             Tier is assigned by total weighted score across the candidate's mandate pipeline:
-            {' '}
+            {''}
             {TIER_THRESHOLDS.filter(t => score >= t.min).length > 0 && (
               <span>
-                score <strong className="text-[#1A1A2E]">{score}</strong> qualifies as{' '}
+                score <strong className="text-[#1A1A2E]">{score}</strong> qualifies as{''}
                 <strong className="text-[#1A1A2E]">{row.tier ?? 'Unranked'}</strong>.
               </span>
             )}

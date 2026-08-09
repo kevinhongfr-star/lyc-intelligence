@@ -56,7 +56,6 @@ export function ScenarioQuestion({ question, currentAnswer, onAnswer, questionNu
               padding: '18px 20px',
               background: currentAnswer === option.score ? `${DS.accent}20` : DS.card,
               border: `1px solid ${currentAnswer === option.score ? DS.accent : DS.border}`,
-              borderRadius: DS.radius,
               color: DS.text,
               fontSize: '15px',
               fontWeight: currentAnswer === option.score ? 600 : 400,
@@ -75,7 +74,6 @@ export function ScenarioQuestion({ question, currentAnswer, onAnswer, questionNu
               height: '32px',
               background: currentAnswer === option.score ? DS.accent : DS.bg,
               color: '#000000',
-              borderRadius: '50%',
               marginRight: '16px',
               fontWeight: 'bold',
               fontSize: '14px'

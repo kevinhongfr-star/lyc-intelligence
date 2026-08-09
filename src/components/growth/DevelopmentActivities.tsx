@@ -39,7 +39,6 @@ function DevelopmentActivities() {
             onClick={() => setActiveTab(tab)}
             className="px-4 py-2 text-sm font-medium transition-colors"
             style={{
-              borderRadius: 0,
               backgroundColor: activeTab === tab ? '#C108AB' : 'transparent',
               color: activeTab === tab ? '#ffffff' : '#666666',
             }}
@@ -57,7 +56,7 @@ function DevelopmentActivities() {
             <div
               key={activity.id}
               className="border border-bg-tertiary bg-bg-secondary p-4"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -66,7 +65,7 @@ function DevelopmentActivities() {
                 </div>
                 <span
                   className="inline-flex items-center px-2 py-0.5 text-xs font-medium"
-                  style={{ borderRadius: 0, backgroundColor: colors.bg, color: colors.text }}
+                  style={{  backgroundColor: colors.bg, color: colors.text }}
                 >
                   {activity.type.charAt(0).toUpperCase() + activity.type.slice(1)}
                 </span>
@@ -86,7 +85,7 @@ function DevelopmentActivities() {
                 <button
                   onClick={() => toggleCompleted(activity.id)}
                   className="inline-flex items-center gap-2 text-sm cursor-pointer"
-                  style={{ borderRadius: 0 }}
+                  style={{ }}
                 >
                   {activity.completed ? (
                     <>

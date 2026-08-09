@@ -13,7 +13,7 @@ export default function ConsentManager() {
   }, [filterType]);
 
   return (
-    <div className="bg-bg-primary border border-bg-tertiary" style={{ borderRadius: 0 }}>
+    <div className="bg-bg-primary border border-bg-tertiary" style={{ }}>
       <div className="p-4 border-b border-bg-tertiary bg-bg-secondary flex items-center gap-3">
         <Shield className="w-4 h-4 text-text-muted" />
         <span className="text-sm text-text-muted">Filter by type:</span>
@@ -21,7 +21,7 @@ export default function ConsentManager() {
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
           className="px-3 py-2 text-sm bg-bg-primary border border-bg-tertiary text-text-primary"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <option value="all">All Types</option>
           {uniqueTypes.map((t) => (
@@ -50,7 +50,6 @@ export default function ConsentManager() {
                   <span
                     className="inline-block px-2 py-0.5 text-xs font-semibold"
                     style={{
-                      borderRadius: 0,
                       backgroundColor: entry.granted ? '#22c55e20' : '#ef444420',
                       color: entry.granted ? '#16a34a' : '#dc2626',
                     }}

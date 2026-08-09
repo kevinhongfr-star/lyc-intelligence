@@ -114,7 +114,7 @@ export function ReportViewer({ report, onClose, onExport, onEdit }: ReportViewer
       <div className="flex items-center justify-between p-4 border-b border-border bg-bg-alt">
         <div className="flex items-center gap-3">
           {onClose && (
-            <button onClick={onClose} className="p-2 hover:bg-bg rounded-none">
+            <button onClick={onClose} className="p-2 hover:bg-bg">
               <ChevronLeft className="w-5 h-5 text-text-muted" />
             </button>
           )}
@@ -129,14 +129,14 @@ export function ReportViewer({ report, onClose, onExport, onEdit }: ReportViewer
 
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 mr-2">
-            <button onClick={handleZoomOut} className="p-2 hover:bg-bg rounded-none" aria-label="Zoom out">
+            <button onClick={handleZoomOut} className="p-2 hover:bg-bg" aria-label="Zoom out">
               <ZoomOut className="w-4 h-4 text-text-muted" />
             </button>
             <span className="text-sm text-text-muted w-12 text-center">{Math.round(zoom * 100)}%</span>
-            <button onClick={handleZoomIn} className="p-2 hover:bg-bg rounded-none" aria-label="Zoom in">
+            <button onClick={handleZoomIn} className="p-2 hover:bg-bg" aria-label="Zoom in">
               <ZoomIn className="w-4 h-4 text-text-muted" />
             </button>
-            <button onClick={handleResetZoom} className="p-2 hover:bg-bg rounded-none" aria-label="Reset zoom">
+            <button onClick={handleResetZoom} className="p-2 hover:bg-bg" aria-label="Reset zoom">
               <RotateCw className="w-4 h-4 text-text-muted" />
             </button>
           </div>

@@ -106,7 +106,7 @@ export function ProactiveSuggestionsPanel() {
             <div
               key={s.id}
               className="flex items-start gap-3 p-3 bg-white border border-[#E5E5E5]"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center ${meta.tint}`}>
                 <Icon className="w-4 h-4" />

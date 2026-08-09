@@ -98,7 +98,7 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
               },
             },
             verdict: result.composite_score >= 75 ? 'strong_fit' : result.composite_score >= 50 ? 'moderate_fit' : 'weak_fit',
-            ai_summary: result.approach_strategy || result.match_reasons?.join(' ') || 'No analysis available',
+            ai_summary: result.approach_strategy || result.match_reasons?.join('') || 'No analysis available',
             match_reasons: result.match_reasons,
             risk_factors: result.risk_factors,
             approach_strategy: result.approach_strategy,
@@ -164,7 +164,7 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-none p-8">
+        <div className="bg-white p-8">
           <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto" />
           <p className="text-text-muted mt-4">Loading scorecard...</p>
         </div>
@@ -175,9 +175,9 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
   if (error || !scorecard) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-none p-8 max-w-md">
+        <div className="bg-white p-8 max-w-md">
           <p className="text-red-500 mb-4">{error || 'Failed to load scorecard'}</p>
-          <button onClick={onClose} className="px-4 py-2 bg-accent text-white rounded-none">
+          <button onClick={onClose} className="px-4 py-2 bg-accent text-white">
             Close
           </button>
         </div>
@@ -190,11 +190,11 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+      <div className="bg-white max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="px-6 py-4 border-b border-bg-tertiary flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+            <div className="w-10 h-10 bg-accent/10 flex items-center justify-center">
               <Brain className="w-5 h-5 text-accent" />
             </div>
             <div>
@@ -202,7 +202,7 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
               <p className="text-sm text-text-muted">AI-Generated Candidate Analysis</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-none">
+          <button onClick={onClose} className="p-2 hover:bg-bg-tertiary">
             <X className="w-5 h-5 text-text-muted" />
           </button>
         </div>
@@ -224,7 +224,7 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
             </div>
             <span
               style={{ backgroundColor: verdictInfo.color }}
-              className="px-4 py-2 text-sm font-semibold text-white rounded-none"
+              className="px-4 py-2 text-sm font-semibold text-white"
             >
               {verdictInfo.label}
             </span>
@@ -240,7 +240,7 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
             return (
               <div 
                 key={key}
-                className="border border-bg-tertiary rounded-none overflow-hidden"
+                className="border border-bg-tertiary overflow-hidden"
               >
                 <button
                   onClick={() => toggleDimension(key)}
@@ -256,10 +256,10 @@ export function MatchScorecardView({ candidateId, mandateId, onClose, jdDescript
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
                       <div 
-                        className="w-16 h-2 bg-bg-tertiary rounded-full overflow-hidden"
+                        className="w-16 h-2 bg-bg-tertiary overflow-hidden"
                       >
                         <div 
-                          className="h-full rounded-full transition-all"
+                          className="h-full transition-all"
                           style={{ width: `${dim.score}%`, backgroundColor: dimColor }}
                         />
                       </div>

@@ -34,7 +34,6 @@ function PeerConnections() {
             onClick={() => setActiveIndustry(ind)}
             className="px-4 py-2 text-sm font-medium transition-colors"
             style={{
-              borderRadius: 0,
               borderBottom: activeIndustry === ind ? '2px solid #C108AB' : '2px solid transparent',
               color: activeIndustry === ind ? '#C108AB' : '#666666',
               background: 'none',
@@ -54,13 +53,13 @@ function PeerConnections() {
             <div
               key={peer.id}
               className="bg-bg-secondary border border-bg-tertiary p-4"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-start gap-3">
                 {/* Avatar dot */}
                 <span
                   className="shrink-0 w-10 h-10 flex items-center justify-center text-white text-sm font-semibold"
-                  style={{ borderRadius: 0, background: peer.avatarColor }}
+                  style={{  background: peer.avatarColor }}
                 >
                   {peer.name.charAt(0)}
                 </span>
@@ -81,7 +80,6 @@ function PeerConnections() {
                   onClick={() => toggleConnect(peer.id)}
                   className="shrink-0 px-3 py-1.5 text-xs font-medium"
                   style={{
-                    borderRadius: 0,
                     background: isPending ? '#E5E5E5' : '#C108AB',
                     color: isPending ? '#666666' : '#FFFFFF',
                     border: 'none',

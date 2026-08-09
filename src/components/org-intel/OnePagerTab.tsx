@@ -156,7 +156,7 @@ export function OnePagerTab() {
           <Loader2 className="w-4 h-4 animate-spin" /> Loading company data…
         </div>
       ) : error ? (
-        <div className="text-sm text-red-600 py-4 border border-red-200 bg-red-50 rounded-none p-3">
+        <div className="text-sm text-red-600 py-4 border border-red-200 bg-red-50 p-3">
           <AlertTriangle className="w-4 h-4 inline mr-1" /> {error}
         </div>
       ) : !company ? (
@@ -164,14 +164,14 @@ export function OnePagerTab() {
       ) : (
         <>
           {/* Company overview */}
-          <div className="border border-bg-hover rounded-none p-4 space-y-2">
+          <div className="border border-bg-hover p-4 space-y-2">
             <div className="flex items-start gap-2">
               <Building2 className="w-5 h-5 text-accent mt-0.5" />
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-medium text-text-primary">{company.name}</h2>
                   {company.is_comparator && (
-                    <span className="text-xs bg-accent/10 text-accent border border-accent/20 rounded px-1.5 py-0.5">
+                    <span className="text-xs bg-accent/10 text-accent border border-accent/20 px-1.5 py-0.5">
                       COMPARATOR
                     </span>
                   )}
@@ -180,7 +180,7 @@ export function OnePagerTab() {
                   )}
                 </div>
                 <div className="text-sm text-text-muted mt-1">
-                  {[company.sector, company.hq_city, company.country].filter(Boolean).join(' · ')}
+                  {[company.sector, company.hq_city, company.country].filter(Boolean).join('·')}
                 </div>
                 {company.brief_description && (
                   <p className="text-sm text-text-secondary mt-2">{company.brief_description}</p>
@@ -218,7 +218,7 @@ export function OnePagerTab() {
           </div>
 
           {/* Generate button */}
-          <div className="border border-bg-hover rounded-none p-4 bg-bg-secondary/30">
+          <div className="border border-bg-hover p-4 bg-bg-secondary/30">
             <h3 className="text-sm font-medium text-text-primary mb-2">Generate Market Intelligence PDF</h3>
             <p className="text-sm text-text-muted mb-3">
               Produces a 5-slide deck: company overview, org structure, talent pool stats,
@@ -228,7 +228,7 @@ export function OnePagerTab() {
               <button
                 onClick={generatePdf}
                 disabled={generating}
-                className="px-4 py-2 bg-accent text-white rounded-none hover:bg-accent-light disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 bg-accent text-white hover:bg-accent-light disabled:opacity-50 flex items-center gap-2"
               >
                 {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
                 {generating ? 'Generating…' : 'Generate Market Intelligence PDF'}
@@ -241,7 +241,7 @@ export function OnePagerTab() {
 
           {/* Past reports */}
           {reports.length > 0 && (
-            <div className="border border-bg-hover rounded-none p-4">
+            <div className="border border-bg-hover p-4">
               <h3 className="text-sm font-medium text-text-primary mb-3">Past reports ({reports.length})</h3>
               <div className="space-y-1">
                 {reports.map((r) => (
@@ -250,7 +250,7 @@ export function OnePagerTab() {
                     <span className="flex-1 truncate text-text-primary">{r.title}</span>
                     <span className="text-xs text-text-muted">{r.slide_count ?? '—'} slides</span>
                     <span className="text-xs text-text-muted">{new Date(r.generated_at).toLocaleDateString()}</span>
-                    <span className={`text-xs px-1.5 py-0.5 rounded ${r.status === 'completed' ? 'bg-green-50 text-green-700 border border-green-200' : r.status === 'failed' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-bg-secondary text-text-muted'}`}>
+                    <span className={`text-xs px-1.5 py-0.5 ${r.status === 'completed' ? 'bg-green-50 text-green-700 border border-green-200' : r.status === 'failed' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-bg-secondary text-text-muted'}`}>
                       {r.status}
                     </span>
                   </div>
@@ -266,7 +266,7 @@ export function OnePagerTab() {
 
 function StatCard({ label, value, icon, sub }: { label: string; value: number | string; icon?: React.ReactNode; sub?: string }) {
   return (
-    <div className="border border-bg-hover rounded-none p-3">
+    <div className="border border-bg-hover p-3">
       <div className="flex items-center gap-1 text-xs text-text-muted">
         {icon}
         {label}
@@ -279,7 +279,7 @@ function StatCard({ label, value, icon, sub }: { label: string; value: number | 
 
 function EmptyHint({ title }: { title: string }) {
   return (
-    <div className="border-2 border-dashed border-bg-hover rounded-none p-8 text-center">
+    <div className="border-2 border-dashed border-bg-hover p-8 text-center">
       <FileText className="w-6 h-6 text-text-muted mx-auto mb-2" />
       <p className="text-text-primary font-medium">{title}</p>
     </div>

@@ -114,7 +114,7 @@ export function OnboardingWizard() {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-lg bg-white rounded-lg shadow-xl overflow-hidden">
+      <div className="w-full max-w-lg bg-white shadow-xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ export function OnboardingWizard() {
             {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
               <div
                 key={i}
-                className={`h-1 flex-1 rounded-full ${i <= step ? 'bg-fuchsia' : 'bg-gray-200'}`}
+                className={`h-1 flex-1 ${i <= step ? 'bg-fuchsia' : 'bg-gray-200'}`}
               />
             ))}
           </div>
@@ -159,7 +159,7 @@ export function OnboardingWizard() {
                     key={r.id}
                     type="button"
                     onClick={() => setRole(r.id)}
-                    className={`text-left p-4 border rounded-md transition-colors ${
+                    className={`text-left p-4 border transition-colors ${
                       role === r.id
                         ? 'border-fuchsia bg-fuchsia/5'
                         : 'border-gray-200 hover:border-gray-300'
@@ -204,7 +204,7 @@ export function OnboardingWizard() {
               <p className="text-sm text-gray-500 mb-4">Here are the three things you'll use most.</p>
               <div className="space-y-3">
                 {TOUR_HIGHLIGHTS.map((h, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 border border-gray-100 rounded-md bg-gray-50">
+                  <div key={i} className="flex items-start gap-3 p-3 border border-gray-100 bg-gray-50">
                     <span className="flex-shrink-0 mt-0.5">{h.icon}</span>
                     <div>
                       <div className="font-medium text-sm text-[#1A1A2E]">{h.title}</div>
@@ -218,7 +218,7 @@ export function OnboardingWizard() {
 
           {step === 3 && selectedRole && (
             <div className="text-center py-4">
-              <div className="w-14 h-14 bg-fuchsia/10 text-fuchsia flex items-center justify-center mx-auto mb-4 rounded-full">
+              <div className="w-14 h-14 bg-fuchsia/10 text-fuchsia flex items-center justify-center mx-auto mb-4">
                 {selectedRole.icon}
               </div>
               <h2 className="text-lg font-semibold text-[#1A1A2E] mb-1">You're all set!</h2>

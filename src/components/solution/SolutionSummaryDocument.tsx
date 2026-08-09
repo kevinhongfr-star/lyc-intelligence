@@ -67,7 +67,7 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
   if (solutions.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mx-auto mb-4">
           <FileText className="w-8 h-8 text-gray-400" />
         </div>
         <h3 className="text-xl font-semibold text-text-primary mb-2">No Approved Solutions</h3>
@@ -87,14 +87,14 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
         <div className="flex gap-2">
           <button
             onClick={handlePrint}
-            className="px-4 py-2 bg-bg-tertiary text-text-primary rounded-none text-sm font-medium hover:bg-bg-secondary flex items-center gap-2"
+            className="px-4 py-2 bg-bg-tertiary text-text-primary text-sm font-medium hover:bg-bg-secondary flex items-center gap-2"
           >
             <Printer className="w-4 h-4" />
             Print
           </button>
           <button
             onClick={handleDownload}
-            className="px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent/90 flex items-center gap-2"
+            className="px-4 py-2 bg-accent text-white text-sm font-medium hover:bg-accent/90 flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
             Download PDF
@@ -103,7 +103,7 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
       </div>
 
       {/* Document */}
-      <div className={`bg-white rounded-none shadow-lg overflow-hidden ${isPrinting ? 'print-container' : ''}`}>
+      <div className={`bg-white shadow-lg overflow-hidden ${isPrinting ? 'print-container' : ''}`}>
         {/* Header */}
         <div className="bg-gradient-to-r from-accent to-purple-600 text-white p-8">
           <div className="flex items-center justify-between">
@@ -152,13 +152,13 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
                 const config = SOLUTION_TYPES[solution.solution_type as SolutionType];
                 
                 return (
-                  <div key={solution.id} className="border border-bg-tertiary rounded-none overflow-hidden">
+                  <div key={solution.id} className="border border-bg-tertiary overflow-hidden">
                     <div 
                       className="px-4 py-3"
                       style={{ backgroundColor: index % 2 === 0 ? '#f8fafc' : '#ffffff' }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-none bg-accent/10 flex items-center text-accent">
+                        <div className="w-10 h-10 bg-accent/10 flex items-center text-accent">
                           {config?.icon}
                         </div>
                         <div className="flex-1">
@@ -182,7 +182,7 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
                         {solution.solution_detail?.key_roles && (
                           <div>
                             <span className="text-text-muted block mb-1">Key Roles</span>
-                            <span className="text-text-primary">{solution.solution_detail.key_roles.join(', ')}</span>
+                            <span className="text-text-primary">{solution.solution_detail.key_roles.join(',')}</span>
                           </div>
                         )}
                         {solution.solution_detail?.timeline && (
@@ -200,7 +200,7 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
                         {solution.solution_detail?.competencies && (
                           <div>
                             <span className="text-text-muted block mb-1">Competencies</span>
-                            <span className="text-text-primary">{solution.solution_detail.competencies.join(', ')}</span>
+                            <span className="text-text-primary">{solution.solution_detail.competencies.join(',')}</span>
                           </div>
                         )}
                         {solution.solution_detail?.team_name && (
@@ -218,13 +218,13 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
                         {solution.solution_detail?.focus_areas && (
                           <div>
                             <span className="text-text-muted block mb-1">Focus Areas</span>
-                            <span className="text-text-primary">{solution.solution_detail.focus_areas.join(', ')}</span>
+                            <span className="text-text-primary">{solution.solution_detail.focus_areas.join(',')}</span>
                           </div>
                         )}
                         {solution.solution_detail?.org_units && (
                           <div>
                             <span className="text-text-muted block mb-1">Org Units</span>
-                            <span className="text-text-primary">{solution.solution_detail.org_units.join(', ')}</span>
+                            <span className="text-text-primary">{solution.solution_detail.org_units.join(',')}</span>
                           </div>
                         )}
                         {solution.solution_detail?.target_density && (
@@ -236,7 +236,7 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
                         {solution.solution_detail?.roles && (
                           <div>
                             <span className="text-text-muted block mb-1">Roles</span>
-                            <span className="text-text-primary">{solution.solution_detail.roles.join(', ')}</span>
+                            <span className="text-text-primary">{solution.solution_detail.roles.join(',')}</span>
                           </div>
                         )}
                       </div>
@@ -252,7 +252,7 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
             <h3 className="text-lg font-semibold text-text-primary mb-4">Linked Assessments</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {solutions.filter(s => s.linked_assessment_type).map(solution => (
-                <div key={solution.id} className="bg-accent/5 rounded-none p-4">
+                <div key={solution.id} className="bg-accent/5 p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Award className="w-4 h-4 text-accent" />
                     <span className="font-medium text-text-primary">
@@ -294,26 +294,7 @@ export function SolutionSummaryDocument({ mandate }: SolutionSummaryDocumentProp
       </div>
 
       {/* Print styles */}
-      <style>{`
-        @media print {
-          .print-container {
-            box-shadow: none;
-            margin: 0;
-            width: 100%;
-          }
-          body * {
-            visibility: hidden;
-          }
-          .print-container, .print-container * {
-            visibility: visible;
-          }
-          .print-container {
-            position: absolute;
-            left: 0;
-            top: 0;
-          }
-        }
-      `}</style>
+      <style>{`@media print { .print-container { box-shadow: none; margin: 0; width: 100%; } body * { visibility: hidden; } .print-container, .print-container * { visibility: visible; } .print-container { position: absolute; left: 0; top: 0; } }`}</style>
     </div>
   );
 }

@@ -151,7 +151,7 @@ export async function listCalendarEvents(start?: string, end?: string): Promise<
     const params = new URLSearchParams();
     if (start) params.set('start', start);
     if (end) params.set('end', end);
-    return await authFetchJSON(`/api/calendar/events${params.toString() ? `?${params}` : ''}`);
+    return await authFetchJSON(`/api/calendar/events${params.toString() ?`?${params}`: ''}`);
   } catch (err: any) {
     return { success: false, error: err.message };
   }
@@ -162,7 +162,7 @@ export async function getCalendarAvailability(date?: string, durationMinutes?: n
     const params = new URLSearchParams();
     if (date) params.set('date', date);
     if (durationMinutes) params.set('duration_minutes', String(durationMinutes));
-    return await authFetchJSON(`/api/calendar/availability${params.toString() ? `?${params}` : ''}`);
+    return await authFetchJSON(`/api/calendar/availability${params.toString() ?`?${params}`: ''}`);
   } catch (err: any) {
     return { success: false, error: err.message };
   }

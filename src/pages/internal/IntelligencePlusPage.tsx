@@ -29,7 +29,7 @@ export default function IntelligencePlusPage() {
                   ? 'text-[#C108AB]'
                   : 'text-text-muted hover:text-text-primary'
               }`}
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               {tab}
               {activeTab === tab && (

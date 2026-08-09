@@ -123,7 +123,7 @@ export function ReportDetailPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => window.location.href = '/reports'}
-            className="p-2 hover:bg-bg rounded-none"
+            className="p-2 hover:bg-bg"
           >
             <ArrowLeft className="w-5 h-5 text-text-muted" />
           </button>

@@ -191,18 +191,7 @@ export async function predictMatchScore(
     // 1. Get candidate data
     const { data: candidate, error: candidateError } = await supabase
       .from('contacts')
-      .select(`
-        id,
-        years_experience,
-        current_company,
-        current_title,
-        current_industry,
-        target_industries,
-        target_geographies,
-        skills,
-        disc_profile,
-        education_level
-      `)
+      .select(`id, years_experience, current_company, current_title, current_industry, target_industries, target_geographies, skills, disc_profile, education_level`)
       .eq('id', candidateId)
       .single();
     
@@ -214,20 +203,7 @@ export async function predictMatchScore(
     // 2. Get mandate data
     const { data: mandate, error: mandateError } = await supabase
       .from('mandates')
-      .select(`
-        id,
-        title,
-        seniority_level,
-        team_size,
-        compensation_min,
-        compensation_max,
-        required_skills,
-        preferred_skills,
-        required_industries,
-        target_company_tiers,
-        success_profile_disc,
-        client_geography
-      `)
+      .select(`id, title, seniority_level, team_size, compensation_min, compensation_max, required_skills, preferred_skills, required_industries, target_company_tiers, success_profile_disc, client_geography`)
       .eq('id', mandateId)
       .single();
     

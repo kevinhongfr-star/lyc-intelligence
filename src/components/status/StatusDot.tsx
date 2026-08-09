@@ -41,13 +41,13 @@ export function StatusDot({ status, label, showPulse = false, size = 'md', class
           className={cn(
             sizeMap[size],
             STATUS_COLORS[status],
-            'rounded-full',
+            '',
             showPulse && 'animate-ping absolute opacity-75',
           )}
           aria-hidden="true"
         />
         <span
-          className={cn(sizeMap[size], STATUS_COLORS[status], 'rounded-full relative')}
+          className={cn(sizeMap[size], STATUS_COLORS[status], 'relative')}
           aria-hidden="true"
         />
       </span>
@@ -72,13 +72,13 @@ export function StatusPill({ status, label, size = 'md', className }: StatusPill
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-none font-medium',
+        'inline-flex items-center gap-1.5 font-medium',
         STATUS_SOFT[status],
         sizeClasses[size],
         className,
       )}
     >
-      <span className={cn('w-1.5 h-1.5 rounded-full', STATUS_COLORS[status])} aria-hidden="true" />
+      <span className={cn('w-1.5 h-1.5', STATUS_COLORS[status])} aria-hidden="true" />
       {label}
     </span>
   );

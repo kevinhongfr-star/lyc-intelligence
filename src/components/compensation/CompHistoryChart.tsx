@@ -40,8 +40,8 @@ export function CompHistoryChart({
     return (
       <Card className="p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-5 bg-bg-secondary rounded w-1/3" />
-          <div className="h-48 bg-bg-secondary rounded" />
+          <div className="h-5 bg-bg-secondary w-1/3" />
+          <div className="h-48 bg-bg-secondary" />
         </div>
       </Card>
     );
@@ -90,7 +90,7 @@ export function CompHistoryChart({
         const y = yScale(d[key]);
         return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
       })
-      .join(' ');
+      .join('');
   };
 
   // Generate area between p25 and p75
@@ -101,7 +101,7 @@ export function CompHistoryChart({
         const y = yScale(d.p75);
         return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
       })
-      .join(' ');
+      .join('');
 
     const bottomPath = [...data]
       .reverse()
@@ -110,7 +110,7 @@ export function CompHistoryChart({
         const y = yScale(d.p25);
         return `L ${x} ${y}`;
       })
-      .join(' ');
+      .join('');
 
     return `${topPath} ${bottomPath} Z`;
   };
@@ -259,7 +259,7 @@ export function CompHistoryChart({
       <div className="flex items-center justify-center gap-2 mt-3 text-xs text-text-muted">
         <span>Sample sizes range:</span>
         <span className="font-medium">
-          {Math.min(...data.map((d) => d.sampleSize))} -{' '}
+          {Math.min(...data.map((d) => d.sampleSize))} -{''}
           {Math.max(...data.map((d) => d.sampleSize))}
         </span>
       </div>

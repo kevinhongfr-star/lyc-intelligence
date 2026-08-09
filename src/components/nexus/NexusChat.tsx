@@ -500,7 +500,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             <X className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-accent/10 flex items-center justify-center">
               <MessageSquare className="w-5 h-5 text-accent" />
             </div>
             <div>
@@ -512,7 +512,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
 
         <button
           onClick={createNewSession}
-          className="w-full m-4 px-4 py-3 bg-accent text-white rounded-none font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
+          className="w-full m-4 px-4 py-3 bg-accent text-white font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
         >
           <Plus className="w-4 h-4" />
           New Chat
@@ -522,7 +522,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
           {sessions.map(session => (
             <button
               key={session.id}
-              className={`w-full text-left px-3 py-3 rounded-none hover:bg-bg-tertiary transition-colors ${
+              className={`w-full text-left px-3 py-3 hover:bg-bg-tertiary transition-colors ${
                 session.id === sessionId ? 'bg-accent/10' : ''
               }`}
             >
@@ -549,13 +549,13 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             </div>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
               {user && creditTier === 'free' && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-accent/10 rounded-full">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-accent/10">
                   <CreditCard className="w-4 h-4 text-accent" />
                   <span className="text-sm font-medium text-accent">{creditBalance} credits</span>
                 </div>
               )}
               {creditTier !== 'free' && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 rounded-full">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-100">
                   <Crown className="w-4 h-4 text-amber-600" />
                   <span className="text-sm font-medium text-amber-700">Council</span>
                 </div>
@@ -564,7 +564,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               {lastIntentLabel && (
                 <div
                   title={`Intent: ${lastIntentLabel} (${lastIntent})`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#F3F0FF] rounded-full"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#F3F0FF]"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#7C3AED]" />
                   <span className="text-xs font-medium text-[#6D28D9]">{lastIntentLabel}</span>
@@ -573,20 +573,20 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               {budgetStatus && (
                 <div
                   title={`Daily Nexus budget: ¥${budgetStatus.spent_cny.toFixed(2)} / ¥${budgetStatus.budget_cny.toFixed(2)} (${budgetStatus.utilization_pct.toFixed(0)}%)`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100 rounded-full"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100"
                 >
                   <Zap className="w-3.5 h-3.5 text-gray-600" />
                   <span className="text-xs font-medium text-gray-700">
                     ¥{budgetStatus.spent_cny.toFixed(1)}/{budgetStatus.budget_cny.toFixed(0)}
-                    {lastUsageTokens !== null && ` · ${lastUsageTokens}t`}
+                    {lastUsageTokens !== null && `· ${lastUsageTokens}t`}
                   </span>
                 </div>
               )}
               {/* S7-T03: tier badge + credit balance + active mandates */}
               {userContextMeta && (
                 <div
-                  title={`Tier: ${userContextMeta.tier} | Seniority: ${userContextMeta.seniority}${userContextMeta.credit_balance !== null ? ` | Credits: ${userContextMeta.credit_balance}` : ''}${userContextMeta.active_mandates > 0 ? ` | Active mandates: ${userContextMeta.active_mandates}` : ''} | Conversations: ${userContextMeta.conversation_count}`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#FFF7ED] rounded-full"
+                  title={`Tier: ${userContextMeta.tier} | Seniority: ${userContextMeta.seniority}${userContextMeta.credit_balance !== null ?` | Credits: ${userContextMeta.credit_balance}`: ''}${userContextMeta.active_mandates > 0 ?` | Active mandates: ${userContextMeta.active_mandates}`: ''} | Conversations: ${userContextMeta.conversation_count}`}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#FFF7ED]"
                 >
                   <Crown className="w-3.5 h-3.5 text-[#C2410C]" />
                   <span className="text-xs font-medium text-[#9A3412] capitalize">{userContextMeta.tier}</span>
@@ -601,7 +601,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               {retrievedMemories !== null && retrievedMemories > 0 && (
                 <div
                   title={`Nexus retrieved ${retrievedMemories} relevant memor${retrievedMemories === 1 ? 'y' : 'ies'} from past conversations`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#ECFDF5] rounded-full"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#ECFDF5]"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#059669]" />
                   <span className="text-xs font-medium text-[#047857]">{retrievedMemories} memor{retrievedMemories === 1 ? 'y' : 'ies'}</span>
@@ -609,8 +609,8 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               )}
               {citations && citations.length > 0 && (
                 <div
-                  title={`Grounded on ${citations.length} source${citations.length === 1 ? '' : 's'} from the LYC content library:\n${citations.map((c, i) => `[${i + 1}] ${c.title}${c.source ? ` — ${c.source}` : ''} (${(c.score * 100).toFixed(0)}%)`).join('\n')}`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#EFF6FF] rounded-full"
+                  title={`Grounded on ${citations.length} source${citations.length === 1 ? '' : 's'} from the LYC content library:\n${citations.map((c, i) =>`[${i + 1}] ${c.title}${c.source ? `— ${c.source}` : ''} (${(c.score * 100).toFixed(0)}%)`).join('\n')}`}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#EFF6FF]"
                 >
                   <Shield className="w-3.5 h-3.5 text-[#2563EB]" />
                   <span className="text-xs font-medium text-[#1D4ED8]">{citations.length} source{citations.length === 1 ? '' : 's'}</span>
@@ -626,7 +626,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
         <div style={{ flex: 1, maxWidth: '800px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', padding: '0 24px' }}>
           {showHeader && (
             <div style={{ textAlign: 'center', padding: '32px 0 20px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: `${DS.accent}15`, borderRadius: '20px', marginBottom: '12px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: `${DS.accent}15`,  marginBottom: '12px' }}>
                 <span className="nexus-pulse-dot" />
                 <span style={{ fontSize: '12px', color: DS.accent, fontWeight: 600 }}>Nexus</span>
               </div>
@@ -670,7 +670,6 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                     padding: '14px 18px',
                     background: m.role === 'user' ? DS.accent : DS.card,
                     border: m.role === 'user' ? 'none' : `1px solid ${DS.cardBorder}`,
-                    borderRadius: m.role === 'user' ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
                     color: m.role === 'user' ? '#FFFFFF' : DS.text,
                     fontSize: '14px',
                     lineHeight: '1.6',
@@ -690,7 +689,6 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                   padding: '14px 18px',
                   background: DS.card,
                   border: `1px solid ${DS.cardBorder}`,
-                  borderRadius: '12px 12px 12px 4px',
                   color: DS.text,
                   fontSize: '14px',
                   lineHeight: '1.6',
@@ -716,14 +714,14 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             />
 
             {aiState === 'thinking' && !streamingContent && (
-              <div style={{ alignSelf: 'flex-start', padding: '12px 16px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '12px 12px 12px 4px', color: DS.muted, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ alignSelf: 'flex-start', padding: '12px 16px', background: DS.card, border: `1px solid ${DS.cardBorder}`,  color: DS.muted, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
                 Thinking...
               </div>
             )}
 
             {aiState === 'error' && (
-              <div style={{ alignSelf: 'flex-start', width: '100%', maxWidth: '400px', background: 'rgba(193, 8, 171, 0.1)', border: '1px solid rgba(193, 8, 171, 0.3)', borderRadius: '0px', padding: '16px' }}>
+              <div style={{ alignSelf: 'flex-start', width: '100%', maxWidth: '400px', background: 'rgba(193, 8, 171, 0.1)', border: '1px solid rgba(193, 8, 171, 0.3)',  padding: '16px' }}>
                 <p style={{ fontSize: '13px', color: DS.textSecondary, marginBottom: '12px' }}>
                   Oops, something went wrong. Want to try again?
                 </p>
@@ -737,7 +735,6 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                     background: DS.accent,
                     color: '#FFFFFF',
                     border: 'none',
-                    borderRadius: '0px',
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -759,7 +756,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 <button
                   key={i}
                   onClick={() => handlePromptSelect(prompt)}
-                  className="px-3 py-1.5 bg-bg-tertiary hover:bg-bg-secondary text-text-muted hover:text-text-primary text-xs rounded-full transition-colors"
+                  className="px-3 py-1.5 bg-bg-tertiary hover:bg-bg-secondary text-text-muted hover:text-text-primary text-xs transition-colors"
                 >
                   {prompt}
                 </button>
@@ -778,7 +775,6 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 padding: '14px 16px',
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '0px',
                 color: DS.text,
                 fontSize: '14px',
                 outline: 'none',
@@ -793,7 +789,6 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 padding: '14px',
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '0px',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.5 : 1,
                 minHeight: '44px',
@@ -816,7 +811,6 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 background: DS.accent,
                 color: '#FFFFFF',
                 border: 'none',
-                borderRadius: '0px',
                 cursor: (loading || !input.trim()) ? 'not-allowed' : 'pointer',
                 opacity: (loading || !input.trim()) ? 0.5 : 1,
                 minHeight: '44px',
@@ -844,10 +838,10 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
 
       {showUpgradeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl">
+          <div className="bg-white max-w-lg w-full overflow-hidden shadow-2xl">
             <div className="bg-gradient-to-r from-accent to-purple-600 p-6 text-white">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-white/20 flex items-center justify-center">
                   <Crown className="w-6 h-6" />
                 </div>
                 <div>
@@ -892,7 +886,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                   setShowUpgradeModal(false);
                   window.open('/pricing', '_blank');
                 }}
-                className="w-full py-3 px-4 bg-accent text-white rounded-none font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 bg-accent text-white font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
               >
                 Start 14-Day Complimentary Trial
                 <ArrowRight className="w-4 h-4" />
@@ -900,7 +894,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
 
               <button
                 onClick={() => setShowUpgradeModal(false)}
-                className="w-full mt-3 py-3 px-4 bg-bg-tertiary text-text-primary rounded-none font-medium hover:bg-bg-secondary transition-colors"
+                className="w-full mt-3 py-3 px-4 bg-bg-tertiary text-text-primary font-medium hover:bg-bg-secondary transition-colors"
               >
                 Maybe Later
               </button>

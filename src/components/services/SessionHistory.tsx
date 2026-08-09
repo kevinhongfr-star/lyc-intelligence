@@ -16,7 +16,7 @@ export default function SessionHistory() {
               <div
                 key={session.id}
                 className="bg-bg-primary border border-bg-tertiary p-4 flex items-start gap-4"
-                style={{ borderRadius: 0 }}
+                style={{ }}
               >
                 <div className="flex-shrink-0 w-12 text-center">
                   <div className="text-xs text-text-muted uppercase">
@@ -46,7 +46,7 @@ export default function SessionHistory() {
                       ? 'bg-green-50 text-green-700'
                       : 'bg-amber-50 text-amber-700'
                   }`}
-                  style={{ borderRadius: 0 }}
+                  style={{ }}
                 >
                   {session.status}
                 </span>
@@ -67,7 +67,7 @@ export default function SessionHistory() {
               <div
                 key={session.id}
                 className="bg-bg-primary border border-bg-tertiary p-4"
-                style={{ borderRadius: 0 }}
+                style={{ }}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">

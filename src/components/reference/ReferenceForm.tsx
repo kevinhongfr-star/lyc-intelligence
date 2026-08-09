@@ -246,7 +246,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
     return (
       <div className="min-h-screen bg-bg-base flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 bg-amber-100 flex items-center justify-center mx-auto">
             <Clock className="w-8 h-8 text-amber-600" />
           </div>
           <h1 className="text-2xl font-bold text-text-primary mt-4">
@@ -265,7 +265,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
     return (
       <div className="min-h-screen bg-bg-base flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 bg-red-100 flex items-center justify-center mx-auto">
             <AlertCircle className="w-8 h-8 text-red-600" />
           </div>
           <h1 className="text-2xl font-bold text-text-primary mt-4">
@@ -284,7 +284,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
     return (
       <div className="min-h-screen bg-bg-base flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 bg-green-100 flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
           <h1 className="text-2xl font-bold text-text-primary mt-4">
@@ -301,7 +301,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
   // Render form
   const question = REFERENCE_QUESTIONS[currentQuestion];
   const response = responses.get(question.number);
-  const candidateName = request?.candidateName?.split(' ')[0] || 'the candidate';
+  const candidateName = request?.candidateName?.split('')[0] || 'the candidate';
   const questionText = question.text.replace('{candidate}', candidateName);
 
   return (
@@ -320,7 +320,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
           </div>
 
           {/* Progress bar */}
-          <div className="mt-3 h-2 bg-bg-alt rounded-full overflow-hidden">
+          <div className="mt-3 h-2 bg-bg-alt overflow-hidden">
             <div
               className="h-full bg-primary transition-all"
               style={{ width: `${((currentQuestion + 1) / REFERENCE_QUESTIONS.length) * 100}%` }}
@@ -331,7 +331,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
 
       {/* Question */}
       <div className="max-w-xl mx-auto px-4 py-8">
-        <div className="bg-card rounded-none border border-border p-6">
+        <div className="bg-card border border-border p-6">
           <h2 className="text-lg font-medium text-text-primary mb-6">
             {questionText}
           </h2>
@@ -344,7 +344,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
                   <button
                     key={value}
                     onClick={() => handleResponse(question.number, { rating: value })}
-                    className={`w-14 h-14 rounded-none border-2 font-semibold transition-all ${
+                    className={`w-14 h-14 border-2 font-semibold transition-all ${
                       response?.rating === value
                         ? 'border-primary bg-primary text-white'
                         : 'border-border hover:border-primary/50 text-text-muted'
@@ -377,11 +377,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
                       responseText: option.label,
                     })
                   }
-                  className={`flex-1 py-4 rounded-none border-2 font-medium transition-all ${
-                    response?.responseText === option.label
-                      ? `border-${option.color}-500 bg-${option.color}-50 text-${option.color}-700`
-                      : 'border-border hover:border-primary/50 text-text-muted'
-                  }`}
+                  className={`flex-1 py-4 border-2 font-medium transition-all ${ response?.responseText === option.label ?`border-${option.color}-500 bg-${option.color}-50 text-${option.color}-700`: 'border-border hover:border-primary/50 text-text-muted' }`}
                 >
                   {option.label}
                 </button>
@@ -396,7 +392,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
               onChange={(e) =>
                 handleResponse(question.number, { responseText: e.target.value })
               }
-              className="w-full px-4 py-3 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+              className="w-full px-4 py-3 border border-border bg-bg-base text-text-primary resize-none"
               rows={5}
               placeholder="Please share your thoughts..."
             />
@@ -410,7 +406,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
                 onChange={(e) =>
                   handleResponse(question.number, { responseText: e.target.value })
                 }
-                className="w-full px-4 py-3 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+                className="w-full px-4 py-3 border border-border bg-bg-base text-text-primary resize-none"
                 rows={3}
                 placeholder="Optional: Add more detail..."
               />
@@ -433,7 +429,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
             <button
               onClick={() => setCurrentQuestion(currentQuestion + 1)}
               disabled={question.required && !isCurrentAnswered()}
-              className="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-none font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-2 bg-primary text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
               <ChevronRight className="w-5 h-5" />
@@ -442,7 +438,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
             <button
               onClick={handleSubmit}
               disabled={!canSubmit() || isSubmitting}
-              className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-none font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>
@@ -473,7 +469,7 @@ export function ReferenceForm({ token }: ReferenceFormProps) {
                 <button
                   key={q.number}
                   onClick={() => setCurrentQuestion(idx)}
-                  className={`w-8 h-8 rounded-none text-sm font-medium transition-colors ${
+                  className={`w-8 h-8 text-sm font-medium transition-colors ${
                     idx === currentQuestion
                       ? 'bg-primary text-white'
                       : isAnswered

@@ -51,7 +51,7 @@ export function SettingsPage() {
         <div className="space-y-1">
           {sections.map(s => (
             <button key={s.key} onClick={() => setActiveSection(s.key)}
-              className={`flex items-center gap-3 w-full px-3 py-3 text-sm rounded-none min-h-[44px] ${activeSection === s.key ? 'bg-accent/10 text-accent' : 'text-text-muted hover:bg-bg-tertiary'}`}>
+              className={`flex items-center gap-3 w-full px-3 py-3 text-sm min-h-[44px] ${activeSection === s.key ? 'bg-accent/10 text-accent' : 'text-text-muted hover:bg-bg-tertiary'}`}>
               <s.icon className="w-4 h-4" />{s.label}
             </button>
           ))}
@@ -66,12 +66,12 @@ export function SettingsPage() {
                   <p className="text-sm font-medium text-text-primary mb-3">Theme</p>
                   <div className="flex gap-3">
                     <button onClick={() => setTheme('dark')}
-                      className={`w-20 h-24 rounded-none bg-[#0A0A0A] border-2 flex flex-col items-center justify-center transition-colors ${theme === 'dark' ? 'border-accent' : 'border-bg-tertiary'}`}>
+                      className={`w-20 h-24 bg-[#0A0A0A] border-2 flex flex-col items-center justify-center transition-colors ${theme === 'dark' ? 'border-accent' : 'border-bg-tertiary'}`}>
                       <Moon className="w-5 h-5 text-white mb-2" />
                       <span className="text-[10px] text-white">Dark</span>
                     </button>
                     <button onClick={() => setTheme('light')}
-                      className={`w-20 h-24 rounded-none bg-white border-2 flex flex-col items-center justify-center transition-colors ${theme === 'light' ? 'border-accent' : 'border-bg-tertiary'}`}>
+                      className={`w-20 h-24 bg-white border-2 flex flex-col items-center justify-center transition-colors ${theme === 'light' ? 'border-accent' : 'border-bg-tertiary'}`}>
                       <Sun className="w-5 h-5 text-gray-800 mb-2" />
                       <span className="text-[10px] text-gray-800">Light</span>
                     </button>
@@ -82,7 +82,7 @@ export function SettingsPage() {
                   <div className="flex gap-3">
                     {ACCENT_COLORS.map(c => (
                       <button key={c.value} onClick={() => setAccent(c.value)}
-                        className={`w-10 h-10 rounded-full border-2 transition-colors ${accent === c.value ? 'border-accent scale-110' : 'border-bg-tertiary opacity-60 hover:opacity-100'}`}
+                        className={`w-10 h-10 border-2 transition-colors ${accent === c.value ? 'border-accent scale-110' : 'border-bg-tertiary opacity-60 hover:opacity-100'}`}
                         style={{ backgroundColor: c.value }}
                         title={c.name}
                       />
@@ -114,11 +114,11 @@ export function SettingsPage() {
                   { key: 'phiAlerts' as const, label: 'PHI health alerts', desc: 'Red/Amber mandate health warnings' },
                   { key: 'scoringComplete' as const, label: 'Scoring run completed', desc: 'When batch Match Analysis evaluations finish' },
                 ].map(pref => (
-                  <div key={pref.key} className="flex items-center justify-between p-3 bg-bg-tertiary rounded-none">
+                  <div key={pref.key} className="flex items-center justify-between p-3 bg-bg-tertiary">
                     <div><p className="text-sm text-text-primary">{pref.label}</p><p className="text-xs text-text-muted">{pref.desc}</p></div>
                     <button onClick={() => setNotifications(p => ({ ...p, [pref.key]: !p[pref.key] }))}
-                      className={`w-10 h-6 rounded-full relative cursor-pointer transition-colors ${notifications[pref.key] ? 'bg-accent' : 'bg-bg-hover'}`}>
-                      <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${notifications[pref.key] ? 'right-1' : 'left-1'}`} />
+                      className={`w-10 h-6 relative cursor-pointer transition-colors ${notifications[pref.key] ? 'bg-accent' : 'bg-bg-hover'}`}>
+                      <div className={`w-4 h-4 bg-white absolute top-1 transition-all ${notifications[pref.key] ? 'right-1' : 'left-1'}`} />
                     </button>
                   </div>
                 ))}
@@ -130,12 +130,12 @@ export function SettingsPage() {
             <Card>
               <CardHeader><CardTitle>Security</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 bg-bg-tertiary rounded-none">
+                <div className="p-4 bg-bg-tertiary">
                   <p className="text-sm font-medium text-text-primary">Two-Factor Authentication</p>
                   <p className="text-xs text-text-muted mt-1">Add an extra layer of security to your account</p>
                   <Button variant="outline" size="sm" className="mt-3">Enable 2FA</Button>
                 </div>
-                <div className="p-4 bg-bg-tertiary rounded-none">
+                <div className="p-4 bg-bg-tertiary">
                   <p className="text-sm font-medium text-text-primary">Active Sessions</p>
                   <p className="text-xs text-text-muted mt-1">Current session: {user?.email ?? 'Unknown'}</p>
                 </div>

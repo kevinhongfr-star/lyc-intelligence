@@ -126,7 +126,6 @@ export function LeadCaptureForm({
       <div style={{
         background: DS.card,
         border: `1px solid ${DS.cardBorder}`,
-        borderRadius: DS.radius,
         padding: '32px',
         textAlign: 'center',
         boxShadow: DS.shadow,
@@ -148,7 +147,6 @@ export function LeadCaptureForm({
     <div style={{
       background: DS.card,
       border: `1px solid ${DS.cardBorder}`,
-      borderRadius: DS.radius,
       padding: '32px',
       boxShadow: DS.shadow,
     }}>
@@ -186,7 +184,6 @@ export function LeadCaptureForm({
               padding: '14px 16px',
               background: '#FFFFFF',
               border: '1px solid #E5E5E5',
-              borderRadius: '0px',
               color: '#000000',
               fontFamily: DS.bodyFont,
               fontSize: '14px',
@@ -210,7 +207,6 @@ export function LeadCaptureForm({
               padding: '14px 16px',
               background: '#FFFFFF',
               border: '1px solid #E5E5E5',
-              borderRadius: '0px',
               color: '#000000',
               fontFamily: DS.bodyFont,
               fontSize: '14px',
@@ -233,7 +229,6 @@ export function LeadCaptureForm({
                   padding: '14px 16px',
                   background: '#FFFFFF',
                   border: '1px solid #E5E5E5',
-                  borderRadius: '0px',
                   color: '#000000',
                   fontFamily: DS.bodyFont,
                   fontSize: '14px',
@@ -253,7 +248,6 @@ export function LeadCaptureForm({
                   padding: '14px 16px',
                   background: '#FFFFFF',
                   border: '1px solid #E5E5E5',
-                  borderRadius: '0px',
                   color: '#000000',
                   fontFamily: DS.bodyFont,
                   fontSize: '14px',
@@ -278,7 +272,6 @@ export function LeadCaptureForm({
                   padding: '14px 16px',
                   background: '#FFFFFF',
                   border: '1px solid #E5E5E5',
-                  borderRadius: '0px',
                   color: '#000000',
                   fontFamily: DS.bodyFont,
                   fontSize: '14px',
@@ -298,7 +291,6 @@ export function LeadCaptureForm({
                   padding: '14px 16px',
                   background: '#FFFFFF',
                   border: '1px solid #E5E5E5',
-                  borderRadius: '0px',
                   color: '#000000',
                   fontFamily: DS.bodyFont,
                   fontSize: '14px',
@@ -317,7 +309,6 @@ export function LeadCaptureForm({
             gap: '8px',
             padding: '12px 16px',
             background: `${DS.error}15`,
-            borderRadius: '0px',
             color: DS.error,
             fontFamily: DS.bodyFont,
             fontSize: '13px',
@@ -336,7 +327,6 @@ export function LeadCaptureForm({
             background: DS.accent,
             color: '#FFFFFF',
             border: 'none',
-            borderRadius: '0px',
             fontFamily: DS.bodyFont,
             fontSize: '15px',
             fontWeight: 600,
@@ -376,18 +366,7 @@ export function LeadCaptureForm({
         </p>
       </form>
 
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        input:focus {
-          border-color: #C108AB !important;
-        }
-        input::placeholder {
-          color: #666666;
-        }
-      `}</style>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } input:focus { border-color: #C108AB !important; } input::placeholder { color: #666666; }`}</style>
     </div>
   );
 }

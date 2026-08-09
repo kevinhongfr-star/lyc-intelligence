@@ -150,11 +150,11 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
       <div className={cn('max-w-3xl mx-auto p-6', className)}>
         <div
           className="h-48 animate-pulse mb-6"
-          style={{ background: '#F5F5F5', borderRadius: 0 }}
+          style={{ background: '#F5F5F5' }}
         />
         <div
           className="h-64 animate-pulse"
-          style={{ background: '#F5F5F5', borderRadius: 0 }}
+          style={{ background: '#F5F5F5' }}
         />
       </div>
     );
@@ -174,7 +174,6 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
             background: `${ACCENT}10`,
             border: `1px solid ${ACCENT}40`,
             color: ACCENT,
-            borderRadius: 0,
           }}
         >
           <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
@@ -190,7 +189,6 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
             background: '#FEE2E2',
             border: '1px solid #EF4444',
             color: '#991B1B',
-            borderRadius: 0,
           }}
         >
           <AlertTriangle className="w-5 h-5 flex-shrink-0" />
@@ -201,7 +199,7 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
       {/* Current plan card */}
       <div
         className="bg-white p-6"
-        style={{ border: '1px solid #E5E5E5', borderRadius: 0 }}
+        style={{ border: '1px solid #E5E5E5' }}
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -225,7 +223,6 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
             style={{
               background: isActive ? '#D1FAE5' : isPastDue ? '#FEF3C7' : '#F5F5F5',
               color: isActive ? '#065F46' : isPastDue ? '#92400E' : '#666',
-              borderRadius: 0,
             }}
           >
             {isActive ? (
@@ -245,7 +242,6 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
             style={{
               background: `${ACCENT}08`,
               border: `1px solid ${ACCENT}20`,
-              borderRadius: 0,
             }}
           >
             <p className="text-xs opacity-60" style={{ color: '#666' }}>Plan</p>
@@ -258,7 +254,6 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
             style={{
               background: `${ACCENT}08`,
               border: `1px solid ${ACCENT}20`,
-              borderRadius: 0,
             }}
           >
             <p className="text-xs opacity-60" style={{ color: '#666' }}>
@@ -273,7 +268,6 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
             style={{
               background: `${ACCENT}08`,
               border: `1px solid ${ACCENT}20`,
-              borderRadius: 0,
             }}
           >
             <p className="text-xs opacity-60" style={{ color: '#666' }}>Status</p>
@@ -297,7 +291,6 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
                 background: 'white',
                 border: '1px solid #E5E5E5',
                 color: '#666',
-                borderRadius: 0,
               }}
             >
               {cancelling ? (
@@ -321,7 +314,6 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
             style={{
               background: ACCENT,
               color: 'white',
-              borderRadius: 0,
             }}
           >
             {upgrading === 'executive' ? (
@@ -337,7 +329,7 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
       {/* Payment method */}
       <div
         className="bg-white p-6"
-        style={{ border: '1px solid #E5E5E5', borderRadius: 0 }}
+        style={{ border: '1px solid #E5E5E5' }}
       >
         <div className="flex items-center gap-3 mb-4">
           <CreditCard className="w-5 h-5" style={{ color: ACCENT }} />
@@ -351,7 +343,6 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
           style={{
             background: `${ACCENT}08`,
             border: `1px solid ${ACCENT}20`,
-            borderRadius: 0,
           }}
         >
           <div>
@@ -376,7 +367,7 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
       {/* Invoice history */}
       <div
         className="bg-white p-6"
-        style={{ border: '1px solid #E5E5E5', borderRadius: 0 }}
+        style={{ border: '1px solid #E5E5E5' }}
       >
         <div className="flex items-center gap-3 mb-4">
           <Receipt className="w-5 h-5" style={{ color: ACCENT }} />
@@ -402,7 +393,6 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
                     className="w-8 h-8 flex items-center justify-center"
                     style={{
                       background: `${ACCENT}10`,
-                      borderRadius: 0,
                     }}
                   >
                     <Calendar className="w-4 h-4" style={{ color: ACCENT }} />
@@ -448,7 +438,7 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
       {/* FAQ */}
       <div
         className="bg-white p-6"
-        style={{ border: '1px solid #E5E5E5', borderRadius: 0 }}
+        style={{ border: '1px solid #E5E5E5' }}
       >
         <h2 className="text-lg font-bold mb-4" style={{ color: '#000' }}>
           Frequently Asked Questions

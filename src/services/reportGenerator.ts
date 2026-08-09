@@ -122,7 +122,7 @@ export async function generatePDF(assessmentType: AssessmentType, result: { scor
   // Footer
   doc.setFontSize(9);
   doc.setTextColor(100, 100, 100);
-  doc.text('© ' + new Date().getFullYear() + ' LYC Partners • Confidential', margin, 290);
+  doc.text('©' + new Date().getFullYear() + 'LYC Partners • Confidential', margin, 290);
   
   doc.save(`LYC_${assessmentType}_Report.pdf`);
 }

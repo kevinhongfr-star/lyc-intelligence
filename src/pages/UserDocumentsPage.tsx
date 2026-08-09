@@ -77,7 +77,7 @@ export function DocumentsPage() {
         await loadDocuments();
       }
     } catch (e: any) {
-      toast.error('Failed to upload document: ' + (e.message || 'Unknown error'));
+      toast.error('Failed to upload document:' + (e.message || 'Unknown error'));
     } finally {
       setIsUploading(false);
     }
@@ -125,7 +125,6 @@ export function DocumentsPage() {
               background: DS.accent, 
               color: '#FFFFFF', 
               border: 'none', 
-              borderRadius: '10px', 
               fontSize: '15px', 
               fontWeight: 600, 
               cursor: 'pointer'
@@ -164,7 +163,7 @@ export function DocumentsPage() {
             <div style={{ fontSize: '14px', color: DS.muted }}>Loading...</div>
           </div>
         ) : documents.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '48px', background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius }}>
+          <div style={{ textAlign: 'center', padding: '48px', background: DS.card, border: `1px solid ${DS.cardBorder}` }}>
             <FileText style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
             <p style={{ fontSize: '14px', color: DS.textSecondary }}>No documents uploaded yet</p>
           </div>
@@ -175,7 +174,6 @@ export function DocumentsPage() {
                 padding: '16px 20px',
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '10px',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -185,7 +183,6 @@ export function DocumentsPage() {
                   <div style={{
                     width: '40px',
                     height: '40px',
-                    borderRadius: '0px',
                     background: `${DS.accent}20`,
                     display: 'flex',
                     alignItems: 'center',
@@ -226,7 +223,6 @@ export function DocumentsPage() {
                       padding: '8px 14px',
                       background: 'transparent',
                       border: `1px solid ${DS.cardBorder}`,
-                      borderRadius: '0px',
                       color: DS.textSecondary,
                       fontSize: '13px',
                       cursor: 'pointer',
@@ -257,7 +253,6 @@ export function DocumentsPage() {
                           padding: '8px 14px',
                           background: '#DC2626',
                           border: 'none',
-                          borderRadius: '0px',
                           color: '#FFFFFF',
                           fontSize: '13px',
                           fontWeight: 500,
@@ -276,7 +271,6 @@ export function DocumentsPage() {
                           padding: '8px 14px',
                           background: 'transparent',
                           border: `1px solid ${DS.cardBorder}`,
-                          borderRadius: '0px',
                           color: DS.textSecondary,
                           fontSize: '13px',
                           cursor: 'pointer',
@@ -296,7 +290,6 @@ export function DocumentsPage() {
                         padding: '8px 14px',
                         background: 'transparent',
                         border: '1px solid #333333',
-                        borderRadius: '0px',
                         color: '#EF4444',
                         fontSize: '13px',
                         cursor: 'pointer',

@@ -183,13 +183,13 @@ export function ApprovalDetail({ requestId, approverId, onClose, onActionComplet
           <FileText className="w-6 h-6 text-primary" />
           <div>
             <h2 className="font-semibold text-text-primary">
-              {request.approval_type.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+              {request.approval_type.replace(/_/g, '').replace(/\b\w/g, (l: string) => l.toUpperCase())}
             </h2>
             <p className="text-sm text-text-muted">
               {request.entity_type} • {request.entity_id.slice(0, 8)}
             </p>
           </div>
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${STATUS_COLORS[request.status]}`}>
+          <span className={`px-3 py-1 text-sm font-medium ${STATUS_COLORS[request.status]}`}>
             {STATUS_LABELS[request.status]}
           </span>
         </div>
@@ -200,7 +200,7 @@ export function ApprovalDetail({ requestId, approverId, onClose, onActionComplet
 
       {/* SLA Deadline */}
       {request.sla_deadline && (
-        <div className="mb-6 p-4 bg-bg-alt rounded-none">
+        <div className="mb-6 p-4 bg-bg-alt">
           <div className="flex items-center gap-2 text-sm">
             <Calendar className="w-4 h-4 text-text-muted" />
             <span className="text-text-muted">SLA Deadline: </span>
@@ -228,7 +228,7 @@ export function ApprovalDetail({ requestId, approverId, onClose, onActionComplet
             return (
               <div key={step.id} className="flex gap-4">
                 <div className="flex flex-col items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  <div className={`w-10 h-10 flex items-center justify-center ${
                     isCurrentStep ? 'bg-primary/10 ring-2 ring-primary' : 'bg-bg-alt'
                   }`}>
                     {getStepIcon(step.status)}
@@ -249,7 +249,7 @@ export function ApprovalDetail({ requestId, approverId, onClose, onActionComplet
                         </span>
                       )}
                     </div>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[step.status]}`}>
+                    <span className={`px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[step.status]}`}>
                       {STATUS_LABELS[step.status]}
                     </span>
                   </div>
@@ -259,7 +259,7 @@ export function ApprovalDetail({ requestId, approverId, onClose, onActionComplet
                     </div>
                   )}
                   {step.comment && (
-                    <div className="mt-2 p-2 bg-bg-alt rounded text-sm text-text-primary">
+                    <div className="mt-2 p-2 bg-bg-alt text-sm text-text-primary">
                       <div className="flex items-center gap-2">
                         <MessageSquare className="w-4 h-4 text-text-muted" />
                         {step.comment}
@@ -319,7 +319,7 @@ export function ApprovalDetail({ requestId, approverId, onClose, onActionComplet
           <div className="mt-4 space-y-3">
             {audit.map((entry) => (
               <div key={entry.id} className="flex gap-3 text-sm">
-                <div className="w-2 h-2 mt-1.5 rounded-full bg-text-muted flex-shrink-0" />
+                <div className="w-2 h-2 mt-1.5 bg-text-muted flex-shrink-0" />
                 <div>
                   <div className="text-text-primary">
                     {ACTION_LABELS[entry.action] || entry.action}

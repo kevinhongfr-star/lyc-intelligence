@@ -41,13 +41,13 @@ function CriterionBar({ criteriaKey, score, rationale }: { criteriaKey: string; 
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: meta.color }} />
+          <div className="w-2 h-2" style={{ backgroundColor: meta.color }} />
           <span className="text-sm font-medium text-text-primary">{meta.label}</span>
         </div>
         <span className="text-sm font-bold font-mono" style={{ color: meta.color }}>{score}</span>
       </div>
-      <div className="h-2.5 bg-bg-tertiary rounded-full overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${score}%`, backgroundColor: meta.color }} />
+      <div className="h-2.5 bg-bg-tertiary overflow-hidden">
+        <div className="h-full transition-all duration-700 ease-out" style={{ width: `${score}%`, backgroundColor: meta.color }} />
       </div>
       <p className="text-[11px] text-text-muted leading-relaxed">{rationale}</p>
     </div>
@@ -64,7 +64,7 @@ function ScoreCard({ result, rank, onSave }: { result: ScoreResult; rank: number
       <CardContent className="p-5">
         <div className="flex items-start justify-between mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold" style={{ backgroundColor: `${tierColors[tier]}20`, color: tierColors[tier] }}>
+            <div className="w-10 h-10 flex items-center justify-center text-lg font-bold" style={{ backgroundColor: `${tierColors[tier]}20`, color: tierColors[tier] }}>
               #{rank}
             </div>
             <div>
@@ -75,14 +75,14 @@ function ScoreCard({ result, rank, onSave }: { result: ScoreResult; rank: number
                 </Badge>
                 <span className="text-2xl font-bold font-mono text-text-primary">{result.composite_score}</span>
                 <span className="text-xs text-text-muted">/100</span>
-                {result.contact_id && <span className="text-[10px] text-text-muted bg-bg-tertiary px-1.5 py-0.5 rounded">DB</span>}
+                {result.contact_id && <span className="text-[10px] text-text-muted bg-bg-tertiary px-1.5 py-0.5">DB</span>}
               </div>
             </div>
           </div>
           {onSave && (
             <button
               onClick={onSave}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-accent/10 text-accent rounded-none hover:bg-accent/20 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
             >
               <Save className="w-3 h-3" />
               Save to Pipeline
@@ -96,12 +96,12 @@ function ScoreCard({ result, rank, onSave }: { result: ScoreResult; rank: number
           ))}
         </div>
 
-        <div className="flex items-end gap-1.5 h-16 mb-5 p-3 bg-bg-tertiary rounded-none">
+        <div className="flex items-end gap-1.5 h-16 mb-5 p-3 bg-bg-tertiary">
           {Object.entries(result.dimension_scores).map(([key, score]) => {
             const meta = CRITERIA_META[key];
             return (
               <div key={key} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full rounded-t transition-all duration-500" style={{ height: `${score * 0.56}px`, backgroundColor: meta?.color || '#94A3B8' }} />
+                <div className="w-full transition-all duration-500" style={{ height: `${score * 0.56}px`, backgroundColor: meta?.color || '#94A3B8' }} />
                 <span className="text-[9px] text-text-muted">{meta?.shortLabel || key}</span>
               </div>
             );
@@ -139,7 +139,7 @@ function ScoreCard({ result, rank, onSave }: { result: ScoreResult; rank: number
         )}
 
         {result.approach_strategy && (
-          <div className="p-3 bg-accent/5 rounded-none border border-accent/10">
+          <div className="p-3 bg-accent/5 border border-accent/10">
             <h4 className="text-xs font-medium text-accent uppercase tracking-wider mb-1 flex items-center gap-1">
               <ArrowRight className="w-3 h-3" /> Approach Strategy
             </h4>
@@ -297,13 +297,13 @@ export function BatchScoringPage() {
               <div className="flex gap-1">
                 <button
                   onClick={() => setJdMode('paste')}
-                  className={`px-2.5 py-1 text-xs rounded-none transition-colors ${jdMode === 'paste' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted hover:text-text-primary'}`}
+                  className={`px-2.5 py-1 text-xs transition-colors ${jdMode === 'paste' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted hover:text-text-primary'}`}
                 >
                   <FileText className="w-3 h-3 inline mr-1" />Paste
                 </button>
                 <button
                   onClick={() => setJdMode('db')}
-                  className={`px-2.5 py-1 text-xs rounded-none transition-colors ${jdMode === 'db' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted hover:text-text-primary'}`}
+                  className={`px-2.5 py-1 text-xs transition-colors ${jdMode === 'db' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted hover:text-text-primary'}`}
                 >
                   <Database className="w-3 h-3 inline mr-1" />From DB
                 </button>
@@ -316,12 +316,12 @@ export function BatchScoringPage() {
                 value={jd}
                 onChange={e => setJd(e.target.value)}
                 placeholder="Paste the job description or mandate brief here..."
-                className="w-full h-48 p-3 bg-bg-tertiary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted resize-none focus:outline-none focus:border-accent"
+                className="w-full h-48 p-3 bg-bg-tertiary border border-bg-tertiary text-sm text-text-primary placeholder:text-text-muted resize-none focus:outline-none focus:border-accent"
               />
             ) : (
               <div>
                 {mandateId ? (
-                  <div className="p-4 bg-bg-tertiary rounded-none border border-accent/20">
+                  <div className="p-4 bg-bg-tertiary border border-accent/20">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-text-primary">{mandateTitle}</span>
                       <button onClick={() => setShowMandateSelector(true)} className="text-xs text-accent hover:underline">Change</button>
@@ -330,13 +330,13 @@ export function BatchScoringPage() {
                       value={jd}
                       onChange={e => setJd(e.target.value)}
                       placeholder="Edit JD text..."
-                      className="w-full h-32 p-3 bg-white border border-bg-tertiary rounded-none text-sm text-text-primary resize-none focus:outline-none focus:border-accent"
+                      className="w-full h-32 p-3 bg-white border border-bg-tertiary text-sm text-text-primary resize-none focus:outline-none focus:border-accent"
                     />
                   </div>
                 ) : (
                   <button
                     onClick={() => setShowMandateSelector(true)}
-                    className="w-full p-6 border-2 border-dashed border-bg-tertiary rounded-none text-center text-sm text-text-muted hover:border-accent hover:text-accent transition-colors"
+                    className="w-full p-6 border-2 border-dashed border-bg-tertiary text-center text-sm text-text-muted hover:border-accent hover:text-accent transition-colors"
                   >
                     <Database className="w-6 h-6 mx-auto mb-2 opacity-50" />
                     Select a mandate from the database
@@ -354,7 +354,7 @@ export function BatchScoringPage() {
               <CardTitle className="flex items-center gap-2"><Zap className="w-4 h-4 text-accent" />Candidates ({selectedIds.length})</CardTitle>
               <button
                 onClick={() => setShowContactSelector(true)}
-                className="px-2.5 py-1 text-xs bg-accent/10 text-accent rounded-none hover:bg-accent/20 transition-colors"
+                className="px-2.5 py-1 text-xs bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
               >
                 <Database className="w-3 h-3 inline mr-1" />Select from DB
               </button>
@@ -364,7 +364,7 @@ export function BatchScoringPage() {
             {selectedFromDb.size > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {Array.from(selectedFromDb.values()).map(c => (
-                  <span key={c.contact_id} className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-accent/10 text-accent rounded-full">
+                  <span key={c.contact_id} className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-accent/10 text-accent">
                     {c.name}
                     <button onClick={() => {
                       const newMap = new Map(selectedFromDb);
@@ -380,13 +380,13 @@ export function BatchScoringPage() {
               placeholder="Or search candidates..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full px-3 py-2 bg-bg-tertiary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
+              className="w-full px-3 py-2 bg-bg-tertiary border border-bg-tertiary text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
             />
             <div className="h-32 overflow-y-auto space-y-1">
               {contactsLoading ? (
                 <div className="text-center py-4"><Loader2 className="w-4 h-4 animate-spin text-text-muted mx-auto" /></div>
               ) : contacts.map(c => (
-                <label key={c.id} className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${selectedIds.includes(c.id) ? 'bg-accent/10' : 'hover:bg-bg-tertiary'}`}>
+                <label key={c.id} className={`flex items-center gap-2 p-2 cursor-pointer transition-colors ${selectedIds.includes(c.id) ? 'bg-accent/10' : 'hover:bg-bg-tertiary'}`}>
                   <input type="checkbox" checked={selectedIds.includes(c.id)} onChange={() => toggleCandidate(c.id)} className="accent-accent" />
                   <div className="min-w-0">
                     <p className="text-sm text-text-primary truncate">{c.name}</p>
@@ -407,7 +407,7 @@ export function BatchScoringPage() {
         <button
           onClick={runScoring}
           disabled={loading || !jd.trim() || selectedIds.length === 0}
-          className="px-6 py-3 bg-accent text-white rounded-none font-medium text-sm disabled:opacity-40 hover:bg-accent/90 transition-colors flex items-center gap-2"
+          className="px-6 py-3 bg-accent text-white font-medium text-sm disabled:opacity-40 hover:bg-accent/90 transition-colors flex items-center gap-2"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <BarChart3 className="w-4 h-4" />}
           {loading ? 'Scoring...' : `Score ${selectedIds.length} Candidate${selectedIds.length !== 1 ? 's' : ''}`}

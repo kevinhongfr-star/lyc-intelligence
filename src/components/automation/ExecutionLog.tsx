@@ -33,7 +33,7 @@ interface RuleExecution {
   executed_at: string;
 }
 
-const selectClassName = 'w-full px-3 py-2 bg-bg-tertiary border border-bg-hover rounded-none text-sm text-text-primary focus:outline-none focus:border-accent';
+const selectClassName = 'w-full px-3 py-2 bg-bg-tertiary border border-bg-hover text-sm text-text-primary focus:outline-none focus:border-accent';
 
 export function ExecutionLog({ orgId, ruleId, limit = 50 }: ExecutionLogProps) {
   const [executions, setExecutions] = useState<RuleExecution[]>([]);
@@ -146,7 +146,7 @@ export function ExecutionLog({ orgId, ruleId, limit = 50 }: ExecutionLogProps) {
           {executions.map((exec) => (
             <div
               key={exec.id}
-              className="p-3 bg-bg-secondary rounded-none"
+              className="p-3 bg-bg-secondary"
             >
               <div
                 className="flex items-center justify-between cursor-pointer"
@@ -184,7 +184,7 @@ export function ExecutionLog({ orgId, ruleId, limit = 50 }: ExecutionLogProps) {
               {expandedId === exec.id && (
                 <div className="mt-3 pt-3 border-t border-bg-hover">
                   {exec.error_message && (
-                    <div className="mb-3 p-2 bg-red-500/10 rounded text-sm text-red-600">
+                    <div className="mb-3 p-2 bg-red-500/10 text-sm text-red-600">
                       Error: {exec.error_message}
                     </div>
                   )}
@@ -209,7 +209,7 @@ export function ExecutionLog({ orgId, ruleId, limit = 50 }: ExecutionLogProps) {
                       <div className="text-xs font-medium text-text-muted mb-1">
                         Trigger Data
                       </div>
-                      <pre className="text-xs bg-bg-base p-2 rounded overflow-x-auto">
+                      <pre className="text-xs bg-bg-base p-2 overflow-x-auto">
                         {JSON.stringify(exec.trigger_data, null, 2)}
                       </pre>
                     </div>

@@ -82,12 +82,12 @@ export function AppLayout() {
                 {item.icon && <item.icon size={16} className="flex-shrink-0" />}
                 {sidebarOpen && <span className="flex-1">{item.label}</span>}
                 {sidebarOpen && isAlerts && pendingCount > 0 && (
-                  <span className="ml-auto flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold">
+                  <span className="ml-auto flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold">
                     {pendingCount}
                   </span>
                 )}
                 {!sidebarOpen && isAlerts && pendingCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[8px] font-bold flex items-center justify-center">
                     {pendingCount}
                   </span>
                 )}

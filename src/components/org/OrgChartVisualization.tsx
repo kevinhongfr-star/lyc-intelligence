@@ -338,7 +338,7 @@ export function OrgChartVisualization({
 
     return (
       <div
-        className="absolute bg-card rounded-none border border-card-border p-4 shadow-lg z-10"
+        className="absolute bg-card border border-card-border p-4 shadow-lg z-10"
         style={{
           left: '50%',
           top: '20px',
@@ -348,7 +348,7 @@ export function OrgChartVisualization({
       >
         <div className="flex items-center gap-2 mb-2">
           <div 
-            className="w-3 h-3 rounded-full"
+            className="w-3 h-3"
             style={{ backgroundColor: getRelevanceColor(hoveredNode.talent_relevance) }}
           />
           <span className="font-semibold text-text-primary">{hoveredNode.name}</span>
@@ -372,7 +372,7 @@ export function OrgChartVisualization({
   };
 
   return (
-    <div className="bg-card rounded-none border border-card-border overflow-hidden">
+    <div className="bg-card border border-card-border overflow-hidden">
       {/* Header with filters */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-4">
@@ -386,10 +386,10 @@ export function OrgChartVisualization({
 
         <div className="flex items-center gap-3">
           {/* Zoom controls */}
-          <div className="flex items-center gap-2 bg-bg-alt rounded-none px-2 py-1">
+          <div className="flex items-center gap-2 bg-bg-alt px-2 py-1">
             <button
               onClick={() => setZoom(z => Math.max(0.5, z - 0.1))}
-              className="p-1 hover:bg-bg rounded text-text-muted"
+              className="p-1 hover:bg-bg text-text-muted"
             >
               −
             </button>
@@ -398,7 +398,7 @@ export function OrgChartVisualization({
             </span>
             <button
               onClick={() => setZoom(z => Math.min(2, z + 0.1))}
-              className="p-1 hover:bg-bg rounded text-text-muted"
+              className="p-1 hover:bg-bg text-text-muted"
             >
               +
             </button>
@@ -431,7 +431,7 @@ export function OrgChartVisualization({
               <select
                 value={selectedFilters.department}
                 onChange={(e) => setSelectedFilters(prev => ({ ...prev, department: e.target.value }))}
-                className="w-full px-3 py-2 bg-bg border border-border rounded-none text-text-primary"
+                className="w-full px-3 py-2 bg-bg border border-border text-text-primary"
               >
                 <option value="">All Departments</option>
                 {departments.map(d => (
@@ -448,7 +448,7 @@ export function OrgChartVisualization({
               <select
                 value={selectedFilters.location}
                 onChange={(e) => setSelectedFilters(prev => ({ ...prev, location: e.target.value }))}
-                className="w-full px-3 py-2 bg-bg border border-border rounded-none text-text-primary"
+                className="w-full px-3 py-2 bg-bg border border-border text-text-primary"
               >
                 <option value="">All Locations</option>
                 {locations.map(l => (
@@ -467,7 +467,7 @@ export function OrgChartVisualization({
                   <button
                     key={level}
                     onClick={() => setSelectedFilters(prev => ({ ...prev, minRelevance: level }))}
-                    className={`w-8 h-8 rounded border flex items-center justify-center ${
+                    className={`w-8 h-8 border flex items-center justify-center ${
                       selectedFilters.minRelevance === level
                         ? 'border-accent bg-accent/10'
                         : 'border-border'
@@ -488,7 +488,7 @@ export function OrgChartVisualization({
                   <button
                     key={level}
                     onClick={() => setSelectedFilters(prev => ({ ...prev, maxRelevance: level }))}
-                    className={`w-8 h-8 rounded border flex items-center justify-center ${
+                    className={`w-8 h-8 border flex items-center justify-center ${
                       selectedFilters.maxRelevance === level
                         ? 'border-accent bg-accent/10'
                         : 'border-border'
@@ -555,15 +555,15 @@ export function OrgChartVisualization({
       {/* Legend */}
       <div className="flex items-center justify-center gap-6 p-4 bg-bg-alt border-t border-border">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-green-500" />
+          <div className="w-3 h-3 bg-green-500" />
           <span className="text-sm text-text-muted">High relevance (4-5)</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-yellow-500" />
+          <div className="w-3 h-3 bg-yellow-500" />
           <span className="text-sm text-text-muted">Moderate (3)</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-gray-400" />
+          <div className="w-3 h-3 bg-gray-400" />
           <span className="text-sm text-text-muted">Low (1-2)</span>
         </div>
       </div>

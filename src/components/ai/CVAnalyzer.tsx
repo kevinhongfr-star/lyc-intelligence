@@ -97,23 +97,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // This is a placeholder - in production, use actual PDF/DOCX parsing
-    return `
-      John Smith
-      Chief Technology Officer
-      TechCorp Inc.
-      15 years of experience in technology leadership
-
-      Education:
-      - MBA, Stanford University, 2010
-      - BS Computer Science, MIT, 2005
-
-      Skills: Leadership, Strategy, Cloud Architecture, Team Building, Digital Transformation
-
-      Career Highlights:
-      - Led digital transformation at Fortune 500 company
-      - Built engineering teams from 10 to 200+
-      - Delivered $50M cost savings through cloud migration
-    `;
+    return `John Smith Chief Technology Officer TechCorp Inc. 15 years of experience in technology leadership Education: - MBA, Stanford University, 2010 - BS Computer Science, MIT, 2005 Skills: Leadership, Strategy, Cloud Architecture, Team Building, Digital Transformation Career Highlights: - Led digital transformation at Fortune 500 company - Built engineering teams from 10 to 200+ - Delivered $50M cost savings through cloud migration`;
   };
 
   // Analyze CV
@@ -172,7 +156,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
   const renderUpload = () => (
     <div className="space-y-4">
       <div
-        className={`border-2 border-dashed rounded-none p-8 text-center transition-colors ${
+        className={`border-2 border-dashed p-8 text-center transition-colors ${
           dragActive
             ? 'border-primary bg-primary/5'
             : 'border-border hover:border-primary/50'
@@ -195,7 +179,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
           htmlFor="cv-upload"
           className="cursor-pointer flex flex-col items-center gap-3"
         >
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+          <div className="w-16 h-16 bg-primary/10 flex items-center justify-center">
             {file ? (
               <FileText className="w-8 h-8 text-primary" />
             ) : (
@@ -217,7 +201,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
+        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-700">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <p className="text-sm">{error}</p>
         </div>
@@ -246,7 +230,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
   // Render analyzing step
   const renderAnalyzing = () => (
     <div className="flex flex-col items-center justify-center py-12 space-y-4">
-      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+      <div className="w-16 h-16 bg-primary/10 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
       <div className="text-center">
@@ -289,7 +273,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
               type="text"
               value={editedData.name || ''}
               onChange={(e) => handleFieldEdit('name', e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary"
             />
           </div>
           <div>
@@ -300,7 +284,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
               type="text"
               value={editedData.currentTitle || ''}
               onChange={(e) => handleFieldEdit('currentTitle', e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary"
             />
           </div>
           <div>
@@ -311,7 +295,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
               type="text"
               value={editedData.currentCompany || ''}
               onChange={(e) => handleFieldEdit('currentCompany', e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary"
             />
           </div>
           <div>
@@ -322,7 +306,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
               type="number"
               value={editedData.yearsExperience || ''}
               onChange={(e) => handleFieldEdit('yearsExperience', parseInt(e.target.value) || null)}
-              className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+              className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary"
             />
           </div>
         </div>
@@ -336,7 +320,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
             {editedData.keySkills.map((skill, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"
+                className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm"
               >
                 {skill}
                 <button
@@ -369,7 +353,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
                     newHighlights[idx] = e.target.value;
                     handleFieldEdit('careerHighlights', newHighlights);
                   }}
-                  className="flex-1 px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+                  className="flex-1 px-3 py-2 border border-border bg-bg-base text-text-primary resize-none"
                   rows={2}
                 />
               </li>
@@ -379,7 +363,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
 
         {/* Red Flags */}
         {editedData.potentialRedFlags && editedData.potentialRedFlags.length > 0 && (
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-none">
+          <div className="p-4 bg-amber-50 border border-amber-200">
             <div className="flex items-center gap-2 mb-2">
               <AlertCircle className="w-5 h-5 text-amber-600" />
               <h4 className="font-medium text-amber-800">Potential Red Flags</h4>
@@ -393,7 +377,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
         )}
 
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-700">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <p className="text-sm">{error}</p>
           </div>
@@ -440,7 +424,7 @@ export function CVAnalyzer({ onSave, onCancel, modal = false }: CVAnalyzerProps)
           </h2>
           <button
             onClick={onCancel}
-            className="p-1 hover:bg-bg-alt rounded transition-colors"
+            className="p-1 hover:bg-bg-alt transition-colors"
           >
             <X className="w-5 h-5 text-text-muted" />
           </button>

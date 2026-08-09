@@ -152,7 +152,7 @@ export function DashboardPage() {
       await navigator.clipboard.writeText(link);
       toast.success('Referral link copied!');
     } catch {
-      toast.warning('Could not copy. Please copy manually: ' + link);
+      toast.warning('Could not copy. Please copy manually:' + link);
     }
   };
 
@@ -183,18 +183,18 @@ export function DashboardPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: DS.text, marginBottom: '4px' }}>
-              {greeting()}, {profile?.name?.split(' ')[0] || 'there'}
+              {greeting()}, {profile?.name?.split('')[0] || 'there'}
             </h1>
             <p style={{ color: DS.muted, fontSize: '14px' }}>
               Here's your career intelligence overview
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: DS.card, borderRadius: '0px', border: `1px solid ${DS.cardBorder}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: DS.card,  border: `1px solid ${DS.cardBorder}` }}>
               <Calendar style={{ width: 16, height: 16, color: DS.accent }} />
               <span style={{ fontSize: '14px', color: DS.text }}>{streak} day streak</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: DS.card, borderRadius: '0px', border: `1px solid ${DS.cardBorder}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: DS.card,  border: `1px solid ${DS.cardBorder}` }}>
               <CreditCard style={{ width: 16, height: 16, color: DS.accent }} />
               <span style={{ fontSize: '14px', color: DS.text }}>{credits} credits</span>
             </div>
@@ -205,7 +205,6 @@ export function DashboardPage() {
         <div style={{ 
           background: 'linear-gradient(135deg, rgba(193,8,171,0.15), rgba(99,102,241,0.1))',
           border: `1px solid ${DS.accent}40`,
-          borderRadius: '0px',
           padding: '24px',
           marginBottom: '24px'
         }}>
@@ -246,13 +245,13 @@ export function DashboardPage() {
             </div>
             {/* Phase 11.2 — Nexus CTA after assessment */}
             {assessment && (
-              <div style={{ background: `${DS.accent}08`, border: `1px solid ${DS.accent}25`, borderRadius: '0px', padding: '20px', marginTop: '16px' }}>
+              <div style={{ background: `${DS.accent}08`, border: `1px solid ${DS.accent}25`,  padding: '20px', marginTop: '16px' }}>
                 <p style={{ color: DS.textSecondary, fontSize: '14px', margin: '0 0 12px', fontFamily: DS.headingFont }}>
                   Nexus has context from your assessment. Ask it anything about your results or next steps.
                 </p>
                 <a
                   href={`/nexus?context=dashboard&archetype=${encodeURIComponent(assessment.archetype || '')}`}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', background: DS.accent, color: '#fff', borderRadius: '0px', textDecoration: 'none', fontWeight: 600, fontSize: '13px' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', background: DS.accent, color: '#fff',  textDecoration: 'none', fontWeight: 600, fontSize: '13px' }}
                 >
                   Continue with Nexus →
                 </a>
@@ -290,7 +289,7 @@ export function DashboardPage() {
         {/* Row 3: Recent Activity */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', marginBottom: '24px' }}>
           {/* Recent Conversations */}
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '20px' }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '20px' }}>
             <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '16px' }}>
               Recent Conversations
             </h3>
@@ -302,7 +301,7 @@ export function DashboardPage() {
                     onClick={() => navigate(`/nexus?session=${session.id}`)}
                     style={{ 
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '12px', background: DS.bg, borderRadius: '0px', cursor: 'pointer',
+                      padding: '12px', background: DS.bg,  cursor: 'pointer',
                       transition: 'background 0.2s'
                     }}
                     onMouseOver={(e) => e.currentTarget.style.background = '#1a1a1a'}
@@ -326,7 +325,7 @@ export function DashboardPage() {
           </div>
 
           {/* Assessment Summary */}
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '20px' }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '20px' }}>
             <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '16px' }}>
               Assessment Results
             </h3>
@@ -343,8 +342,8 @@ export function DashboardPage() {
                         <span style={{ fontSize: '12px', color: DS.textSecondary }}>{formatDimensionName(key)}</span>
                         <span style={{ fontSize: '12px', color: DS.text }}>{value}%</span>
                       </div>
-                      <div style={{ height: '4px', background: DS.border, borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${value}%`, background: DS.accent, borderRadius: '2px' }} />
+                      <div style={{ height: '4px', background: DS.border,  overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${value}%`, background: DS.accent }} />
                       </div>
                     </div>
                   ))}
@@ -377,7 +376,6 @@ export function DashboardPage() {
                     background: DS.accent,
                     color: '#FFFFFF',
                     border: 'none',
-                    borderRadius: '0px',
                     fontSize: '14px',
                     cursor: 'pointer'
                   }}
@@ -391,7 +389,7 @@ export function DashboardPage() {
 
         {/* Row 4: Nexus Suggestions */}
         {suggestions.length > 0 && (
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '20px', marginBottom: '24px' }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '20px', marginBottom: '24px' }}>
             <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Sparkles style={{ width: 18, height: 18, color: DS.accent }} />
               Suggested by Nexus
@@ -405,7 +403,6 @@ export function DashboardPage() {
                     padding: '10px 16px',
                     background: `${DS.accent}15`,
                     border: `1px solid ${DS.accent}40`,
-                    borderRadius: '0px',
                     color: DS.text,
                     fontSize: '13px',
                     cursor: 'pointer',
@@ -428,7 +425,7 @@ export function DashboardPage() {
         )}
 
         {/* Row 5: Referral Module */}
-        <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', padding: '20px' }}>
+        <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
             <Gift style={{ width: 24, height: 24, color: DS.success }} />
             <div>
@@ -446,7 +443,6 @@ export function DashboardPage() {
                 padding: '12px 16px', 
                 background: DS.bg, 
                 border: `1px solid ${DS.cardBorder}`, 
-                borderRadius: '0px',
                 fontSize: '14px',
                 color: DS.text,
                 fontFamily: 'monospace'
@@ -464,7 +460,6 @@ export function DashboardPage() {
                 background: DS.success,
                 color: '#000000',
                 border: 'none',
-                borderRadius: '0px',
                 fontSize: '14px',
                 fontWeight: 600,
                 cursor: 'pointer'
@@ -477,12 +472,7 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
@@ -506,7 +496,6 @@ function ActionCard({ icon: Icon, title, description, color, onClick }: ActionCa
         padding: '20px',
         background: DS.card,
         border: `1px solid ${DS.cardBorder}`,
-        borderRadius: '0px',
         cursor: 'pointer',
         textAlign: 'left',
         transition: 'all 0.2s'
@@ -523,7 +512,6 @@ function ActionCard({ icon: Icon, title, description, color, onClick }: ActionCa
       <div style={{
         width: '44px',
         height: '44px',
-        borderRadius: '10px',
         background: `${color}20`,
         display: 'flex',
         alignItems: 'center',
@@ -548,7 +536,7 @@ function formatDimensionName(key: string): string {
     execution_discipline: 'Execution',
     leadership_presence: 'Leadership'
   };
-  return names[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return names[key] || key.replace(/_/g, '').replace(/\b\w/g, l => l.toUpperCase());
 }
 
 function getNextAction(): string {

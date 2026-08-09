@@ -90,7 +90,7 @@ export function CoachingSessionView({
           </div>
           <div>
             <div className="text-sm font-semibold text-[#1a1a1a]">
-              {focus.replace('-', ' ')} Session
+              {focus.replace('-', '')} Session
             </div>
             <div className="text-xs text-[#555]">{methodology} Framework</div>
           </div>

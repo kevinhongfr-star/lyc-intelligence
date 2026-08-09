@@ -58,12 +58,11 @@ function GrowthTimeline() {
                   <CheckCircle className="w-4 h-4" style={{ color: '#C108AB' }} />
                 </div>
 
-                <div className="border border-bg-tertiary bg-bg-secondary p-4" style={{ borderRadius: 0 }}>
+                <div className="border border-bg-tertiary bg-bg-secondary p-4" style={{ }}>
                   <div className="flex items-center gap-2 mb-1">
                     <span
                       className="inline-flex items-center px-2 py-0.5 text-xs font-medium"
                       style={{
-                        borderRadius: 0,
                         backgroundColor:
                           entry.type === 'milestone'
                             ? 'rgba(193,8,171,0.15)'

@@ -36,7 +36,7 @@ export default function TaskBoard() {
                 <span className="text-sm font-medium text-text-primary">{col.label}</span>
                 <span
                   className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium bg-bg-tertiary text-text-muted"
-                  style={{ borderRadius: 0 }}
+                  style={{ }}
                 >
                   {columnTasks.length}
                 </span>

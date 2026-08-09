@@ -5,7 +5,7 @@ export default function ErrorPage() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-bg-primary px-6">
       <h1
         className="text-8xl font-serif font-bold text-text-primary"
-        style={{ borderRadius: 0 }}
+        style={{ }}
       >
         500
       </h1>
@@ -17,7 +17,7 @@ export default function ErrorPage() {
         <button
           onClick={() => window.location.reload()}
           className="px-6 py-2 text-white font-medium hover:opacity-90 transition-opacity"
-          style={{ backgroundColor: '#C108AB', borderRadius: 0 }}
+          style={{ backgroundColor: '#C108AB' }}
         >
           Try Again
         </button>

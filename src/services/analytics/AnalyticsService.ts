@@ -118,16 +118,7 @@ export async function getFunnelAnalytics(
   // Get all candidates in the pipeline for the organization within date range
   const { data: candidates, error } = await supabase
     .from('candidates_pipeline')
-    .select(`
-      id,
-      stage,
-      created_at,
-      mandate:mandate_id(
-        id,
-        created_at,
-        organization_id
-      )
-    `)
+    .select(`id, stage, created_at, mandate:mandate_id( id, created_at, organization_id )`)
     .eq('mandate.organization_id', orgId)
     .gte('created_at', dateRange.start)
     .lte('created_at', dateRange.end);
@@ -229,26 +220,7 @@ export async function getTimeToFillAnalytics(
   // Get all placed candidates with mandate info
   const { data: placedCandidates, error } = await supabase
     .from('candidates_pipeline')
-    .select(`
-      id,
-      stage,
-      created_at,
-      match_score,
-      mandate:mandate_id(
-        id,
-        title,
-        created_at,
-        organization_id,
-        client:client_id(
-          id,
-          company_name
-        )
-      ),
-      consultant:consultant_id(
-        id,
-        name
-      )
-    `)
+    .select(`id, stage, created_at, match_score, mandate:mandate_id( id, title, created_at, organization_id, client:client_id( id, company_name ) ), consultant:consultant_id( id, name )`)
     .eq('mandate.organization_id', orgId)
     .in('stage', ['offer_accepted', 'onboarded', 'probation_passed'])
     .gte('created_at', dateRange.start)
@@ -382,15 +354,7 @@ export async function getQualityOfHireMetrics(
   // Get placed candidates with probation info
   const { data: placedCandidates, error } = await supabase
     .from('candidates_pipeline')
-    .select(`
-      id,
-      probation_status,
-      match_score,
-      created_at,
-      mandate:mandate_id(
-        organization_id
-      )
-    `)
+    .select(`id, probation_status, match_score, created_at, mandate:mandate_id( organization_id )`)
     .eq('mandate.organization_id', orgId)
     .in('stage', ['offer_accepted', 'onboarded', 'probation_passed'])
     .gte('created_at', dateRange.start)
@@ -469,12 +433,7 @@ export async function getConsultantPerformance(
   // Get all consultants with their metrics
   const { data: consultants, error } = await supabase
     .from('profiles')
-    .select(`
-      id,
-      name,
-      email,
-      role
-    `)
+    .select(`id, name, email, role`)
     .eq('organization_id', orgId)
     .in('role', ['consultant', 'lyc_admin']);
 
@@ -486,18 +445,7 @@ export async function getConsultantPerformance(
   // Get placements by consultant
   const { data: placements, error: placementsError } = await supabase
     .from('candidates_pipeline')
-    .select(`
-      id,
-      created_at,
-      match_score,
-      consultant:consultant_id(
-        id
-      ),
-      mandate:mandate_id(
-        organization_id,
-        created_at
-      )
-    `)
+    .select(`id, created_at, match_score, consultant:consultant_id( id ), mandate:mandate_id( organization_id, created_at )`)
     .eq('mandate.organization_id', orgId)
     .in('stage', ['offer_accepted', 'onboarded', 'probation_passed']);
 
@@ -520,15 +468,7 @@ export async function getConsultantPerformance(
   // Get candidates in pipeline
   const { data: pipelineCandidates, error: pipelineError } = await supabase
     .from('candidates_pipeline')
-    .select(`
-      id,
-      consultant:consultant_id(
-        id
-      ),
-      mandate:mandate_id(
-        organization_id
-      )
-    `)
+    .select(`id, consultant:consultant_id( id ), mandate:mandate_id( organization_id )`)
     .eq('mandate.organization_id', orgId);
 
   if (pipelineError) {

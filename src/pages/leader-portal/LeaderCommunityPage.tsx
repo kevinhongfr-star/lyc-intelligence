@@ -39,7 +39,6 @@ function LeaderCommunityPage() {
                 onClick={() => setActiveTab(tab.key)}
                 className="inline-flex items-center gap-2 px-5 py-3 text-sm font-medium transition-colors"
                 style={{
-                  borderRadius: 0,
                   borderBottom: isActive ? '2px solid #C108AB' : '2px solid transparent',
                   color: isActive ? '#C108AB' : '#666666',
                   background: 'none',

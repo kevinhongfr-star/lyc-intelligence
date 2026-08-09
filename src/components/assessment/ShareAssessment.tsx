@@ -36,7 +36,7 @@ export default function ShareAssessment() {
   return (
     <div className="space-y-6">
       {/* Toggle sections */}
-      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
         <h3 className="font-serif font-semibold text-text-primary mb-4 flex items-center gap-2">
           <Share2 className="w-5 h-5 text-accent" />
           Share Settings
@@ -76,7 +76,7 @@ export default function ShareAssessment() {
       </div>
 
       {/* Expiration */}
-      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
         <h3 className="font-serif font-semibold text-text-primary mb-4">Link Expiration</h3>
         <div className="flex gap-2">
           {EXPIRATION_OPTIONS.map((opt) => (
@@ -88,7 +88,7 @@ export default function ShareAssessment() {
                   ? 'bg-accent text-white'
                   : 'bg-bg-secondary text-text-muted hover:bg-bg-tertiary'
               }`}
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               {opt.label}
             </button>
@@ -97,9 +97,9 @@ export default function ShareAssessment() {
       </div>
 
       {/* Preview */}
-      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
         <h3 className="font-serif font-semibold text-text-primary mb-4">Preview</h3>
-        <div className="bg-bg-secondary border border-bg-tertiary p-4" style={{ borderRadius: 0 }}>
+        <div className="bg-bg-secondary border border-bg-tertiary p-4" style={{ }}>
           <h4 className="font-semibold text-text-primary mb-3">Match Analysis Leadership Assessment</h4>
           {includeScores && (
             <div className="mb-2">
@@ -130,7 +130,7 @@ export default function ShareAssessment() {
       </div>
 
       {/* Link + Copy */}
-      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
         <h3 className="font-serif font-semibold text-text-primary mb-4">Shareable Link</h3>
         <div className="flex gap-2">
           <input
@@ -138,13 +138,13 @@ export default function ShareAssessment() {
             readOnly
             value={shareLink}
             className="flex-1 bg-bg-secondary border border-bg-tertiary px-3 py-2 text-sm text-text-muted font-mono"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           />
           <Button
             variant={copied ? 'success' : 'default'}
             size="default"
             onClick={handleCopy}
-            style={{ borderRadius: 0 }}
+            style={{ }}
             className="flex items-center gap-2"
           >
             {copied ? (

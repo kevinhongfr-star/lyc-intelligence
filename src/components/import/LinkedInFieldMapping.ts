@@ -284,7 +284,7 @@ export function splitFullName(fullName: string): { first_name: string; last_name
   if (parts.length === 1) return { first_name: parts[0], last_name: '' };
   if (parts.length === 2) return { first_name: parts[0], last_name: parts[1] };
   // More than 2 parts: first part = first name, rest = last name
-  return { first_name: parts[0], last_name: parts.slice(1).join(' ') };
+  return { first_name: parts[0], last_name: parts.slice(1).join('') };
 }
 
 /**

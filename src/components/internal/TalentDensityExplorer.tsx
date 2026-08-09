@@ -38,7 +38,7 @@ export default function TalentDensityExplorer() {
           value={roleFilter}
           onChange={e => setRoleFilter(e.target.value)}
           className="border border-bg-tertiary bg-bg-primary text-text-primary text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#C108AB]/40"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <option value="all">All Roles</option>
           <option value="cto">CTO</option>
@@ -49,7 +49,7 @@ export default function TalentDensityExplorer() {
           value={industryFilter}
           onChange={e => setIndustryFilter(e.target.value)}
           className="border border-bg-tertiary bg-bg-primary text-text-primary text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#C108AB]/40"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <option value="all">All Industries</option>
           <option value="tech">Technology</option>
@@ -60,7 +60,7 @@ export default function TalentDensityExplorer() {
           value={locationFilter}
           onChange={e => setLocationFilter(e.target.value)}
           className="border border-bg-tertiary bg-bg-primary text-text-primary text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#C108AB]/40"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <option value="all">All Locations</option>
           <option value="Singapore">Singapore</option>
@@ -78,7 +78,7 @@ export default function TalentDensityExplorer() {
             <div
               key={loc.location}
               className="border border-bg-tertiary bg-bg-primary p-4"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-center gap-2 mb-3">
                 <MapPin className="w-4 h-4 text-[#C108AB]" />
@@ -90,8 +90,8 @@ export default function TalentDensityExplorer() {
                   <span className="text-text-muted">Talent Density</span>
                   <span className={`font-medium ${cfg.text}`}>{loc.density}</span>
                 </div>
-                <div className="h-2 bg-bg-tertiary" style={{ borderRadius: 0 }}>
-                  <div className={`h-full ${cfg.bar} transition-all`} style={{ width: cfg.width, borderRadius: 0 }} />
+                <div className="h-2 bg-bg-tertiary" style={{ }}>
+                  <div className={`h-full ${cfg.bar} transition-all`} style={{ width: cfg.width }} />
                 </div>
               </div>
 

@@ -24,7 +24,7 @@ export default function PromptEditor() {
   };
 
   return (
-    <div className="bg-bg-primary border border-bg-tertiary" style={{ borderRadius: 0 }}>
+    <div className="bg-bg-primary border border-bg-tertiary" style={{ }}>
       <div className="p-4 border-b border-bg-tertiary bg-bg-secondary flex items-center gap-2">
         <FileCode2 className="w-5 h-5" style={{ color: '#C108AB' }} />
         <span className="text-sm font-medium text-text-primary">Prompt Templates</span>
@@ -61,14 +61,12 @@ export default function PromptEditor() {
                     className="w-10 h-5 relative transition-colors"
                     style={{
                       backgroundColor: activeStates[prompt.id] ? '#C108AB' : '#d1d5db',
-                      borderRadius: 0,
                     }}
                   >
                     <div
                       className="absolute top-0.5 w-4 h-4 bg-white transition-all"
                       style={{
                         left: activeStates[prompt.id] ? '22px' : '2px',
-                        borderRadius: 0,
                       }}
                     />
                   </div>
@@ -82,12 +80,12 @@ export default function PromptEditor() {
                     onChange={(e) => updateText(prompt.id, e.target.value)}
                     rows={6}
                     className="w-full px-3 py-2 text-sm bg-bg-secondary border border-bg-tertiary text-text-primary font-mono resize-y"
-                    style={{ borderRadius: 0 }}
+                    style={{ }}
                   />
                   <div className="mt-2 flex justify-end">
                     <button
                       className="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold text-white"
-                      style={{ backgroundColor: '#C108AB', borderRadius: 0 }}
+                      style={{ backgroundColor: '#C108AB' }}
                     >
                       <Save className="w-3 h-3" />
                       Save

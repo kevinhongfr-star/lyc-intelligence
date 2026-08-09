@@ -33,7 +33,7 @@ export default function IntegrationSettings() {
             <div
               key={integration.id}
               className="bg-bg-primary border border-bg-tertiary p-4"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
@@ -45,7 +45,7 @@ export default function IntegrationSettings() {
                           ? 'bg-tier-1Bg text-tier-1'
                           : 'bg-bg-tertiary text-text-muted'
                       }`}
-                      style={{ borderRadius: 0 }}
+                      style={{ }}
                     >
                       {currentStatus}
                     </span>
@@ -63,7 +63,7 @@ export default function IntegrationSettings() {
                       ? 'border-red-300 text-red-600 hover:bg-red-50'
                       : 'border-tier-1 text-tier-1 hover:bg-tier-1Bg'
                   }`}
-                  style={{ borderRadius: 0 }}
+                  style={{ }}
                 >
                   {isConnected ? (
                     <>

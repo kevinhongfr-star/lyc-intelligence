@@ -18,8 +18,8 @@ import type {
 import { DEFAULT_INTAKE } from '@/types';
 
 const rowStyle = 'grid grid-cols-12 gap-2 items-start p-2 border-b last:border-b-0';
-const addBtnStyle = 'mt-2 px-3 py-1.5 text-sm bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100';
-const delBtnStyle = 'text-red-500 hover:text-red-700 text-xs px-2 py-1 border border-red-200 rounded';
+const addBtnStyle = 'mt-2 px-3 py-1.5 text-sm bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100';
+const delBtnStyle = 'text-red-500 hover:text-red-700 text-xs px-2 py-1 border border-red-200';
 
 interface Props {
   mandate: Mandate;
@@ -163,7 +163,7 @@ export function MandateIntakeForm({ mandate, onSaved }: Props) {
               onChange={(e) => updatePain(i, { pain: e.target.value })}
             />
             <select
-              className="col-span-3 border border-slate-200 rounded px-2 py-1.5 text-sm bg-white"
+              className="col-span-3 border border-slate-200 px-2 py-1.5 text-sm bg-white"
               value={p.severity}
               onChange={(e) => updatePain(i, { severity: e.target.value as PainSeverity })}
             >
@@ -203,7 +203,7 @@ export function MandateIntakeForm({ mandate, onSaved }: Props) {
               onChange={(e) => updateFriction(i, { issue: e.target.value })}
             />
             <select
-              className="col-span-3 border border-slate-200 rounded px-2 py-1.5 text-sm bg-white"
+              className="col-span-3 border border-slate-200 px-2 py-1.5 text-sm bg-white"
               value={p.area}
               onChange={(e) => updateFriction(i, { area: e.target.value as FrictionArea })}
             >
@@ -249,7 +249,7 @@ export function MandateIntakeForm({ mandate, onSaved }: Props) {
               onChange={(e) => updateLeadership(i, { why: e.target.value })}
             />
             <select
-              className="col-span-3 border border-slate-200 rounded px-2 py-1.5 text-sm bg-white"
+              className="col-span-3 border border-slate-200 px-2 py-1.5 text-sm bg-white"
               value={p.priority}
               onChange={(e) => updateLeadership(i, { priority: e.target.value as LeadershipPriority })}
             >
@@ -341,7 +341,7 @@ export function MandateIntakeForm({ mandate, onSaved }: Props) {
           <div>
             <label className="text-xs font-medium text-slate-600">Client interview notes</label>
             <textarea
-              className="mt-1 w-full border border-slate-200 rounded px-2 py-1.5 text-sm min-h-[100px] bg-white"
+              className="mt-1 w-full border border-slate-200 px-2 py-1.5 text-sm min-h-[100px] bg-white"
               placeholder="Summary of the client intake conversation"
               value={intake.client_interview_notes ?? ''}
               onChange={(e) => setIntake({ ...intake, client_interview_notes: e.target.value })}

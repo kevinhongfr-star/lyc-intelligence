@@ -95,7 +95,7 @@ export function ReportList({ reports, loading, onView, onEdit, onDelete, onExpor
 
   if (loading) {
     return (
-      <div className="bg-bg rounded-none border border-border p-8 flex items-center justify-center">
+      <div className="bg-bg border border-border p-8 flex items-center justify-center">
         <Loader2 className="w-6 h-6 animate-spin text-[#C108AB]" />
         <span className="ml-3 text-text-muted">Loading reports...</span>
       </div>
@@ -103,7 +103,7 @@ export function ReportList({ reports, loading, onView, onEdit, onDelete, onExpor
   }
 
   return (
-    <div className="bg-bg rounded-none border border-border">
+    <div className="bg-bg border border-border">
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-text-primary">Generated Reports</h2>
@@ -114,7 +114,7 @@ export function ReportList({ reports, loading, onView, onEdit, onDelete, onExpor
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
             <input
-              className="w-full pl-10 pr-4 py-2 bg-bg-alt border border-border text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB] rounded-none"
+              className="w-full pl-10 pr-4 py-2 bg-bg-alt border border-border text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB]"
               placeholder="Search reports..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -122,7 +122,7 @@ export function ReportList({ reports, loading, onView, onEdit, onDelete, onExpor
           </div>
 
           <select
-            className="bg-bg-alt border border-border px-3 py-2 text-sm text-text-primary rounded-none"
+            className="bg-bg-alt border border-border px-3 py-2 text-sm text-text-primary"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
           >
@@ -133,7 +133,7 @@ export function ReportList({ reports, loading, onView, onEdit, onDelete, onExpor
           </select>
 
           <select
-            className="bg-bg-alt border border-border px-3 py-2 text-sm text-text-primary rounded-none"
+            className="bg-bg-alt border border-border px-3 py-2 text-sm text-text-primary"
             value={templateFilter}
             onChange={(e) => setTemplateFilter(e.target.value)}
           >
@@ -214,7 +214,7 @@ export function ReportList({ reports, loading, onView, onEdit, onDelete, onExpor
                         {onView && (
                           <button
                             onClick={() => onView(report)}
-                            className="p-2 hover:bg-bg rounded-none"
+                            className="p-2 hover:bg-bg"
                             title="View"
                           >
                             <Eye className="w-4 h-4 text-text-muted" />
@@ -223,7 +223,7 @@ export function ReportList({ reports, loading, onView, onEdit, onDelete, onExpor
                         {onEdit && report.status === 'completed' && (
                           <button
                             onClick={() => onEdit(report)}
-                            className="p-2 hover:bg-bg rounded-none"
+                            className="p-2 hover:bg-bg"
                             title="Edit"
                           >
                             <Edit3 className="w-4 h-4 text-text-muted" />
@@ -231,7 +231,7 @@ export function ReportList({ reports, loading, onView, onEdit, onDelete, onExpor
                         )}
                         <button
                           onClick={() => setMenuOpenId(menuOpenId === report.id ? null : report.id)}
-                          className="p-2 hover:bg-bg rounded-none"
+                          className="p-2 hover:bg-bg"
                           title="More"
                         >
                           <MoreVertical className="w-4 h-4 text-text-muted" />

@@ -58,7 +58,7 @@ export function TierBadge({ tier, size = 'md', showEmoji = true, className }: Ti
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 border rounded-none whitespace-nowrap',
+        'inline-flex items-center gap-1 border whitespace-nowrap',
         sizeClasses,
         TIER_STYLES[resolvedTier],
         className,

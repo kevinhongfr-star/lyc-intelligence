@@ -16,14 +16,14 @@ function ThreadView({ thread, onBack }: ThreadViewProps) {
       <button
         onClick={onBack}
         className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors"
-        style={{ borderRadius: 0, background: 'none', border: 'none', cursor: 'pointer' }}
+        style={{  background: 'none', border: 'none', cursor: 'pointer' }}
       >
         <ArrowLeft style={{ width: 16, height: 16 }} />
         Back to threads
       </button>
 
       {/* Thread header */}
-      <div className="bg-bg-secondary border border-bg-tertiary p-5" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-secondary border border-bg-tertiary p-5" style={{ }}>
         <h2 className="font-serif font-semibold text-xl text-text-primary">{thread.title}</h2>
         <div className="flex items-center gap-2 mt-2">
           <span className="text-sm font-medium text-text-primary">{thread.author}</span>
@@ -31,7 +31,7 @@ function ThreadView({ thread, onBack }: ThreadViewProps) {
           {thread.isExpert && (
             <span
               className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold text-white"
-              style={{ borderRadius: 0, background: '#C108AB' }}
+              style={{  background: '#C108AB' }}
             >
               <Star style={{ width: 10, height: 10 }} />
               Expert
@@ -47,7 +47,7 @@ function ThreadView({ thread, onBack }: ThreadViewProps) {
           </span>
           <span
             className="px-2 py-0.5 text-xs font-medium bg-bg-tertiary text-text-muted"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             {thread.category}
           </span>
@@ -64,7 +64,7 @@ function ThreadView({ thread, onBack }: ThreadViewProps) {
             <div
               key={idx}
               className="bg-bg-secondary border border-bg-tertiary p-4"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-text-primary">{comment.author}</span>
@@ -72,7 +72,7 @@ function ThreadView({ thread, onBack }: ThreadViewProps) {
                 {comment.isExpert && (
                   <span
                     className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold text-white"
-                    style={{ borderRadius: 0, background: '#C108AB' }}
+                    style={{  background: '#C108AB' }}
                   >
                     <Star style={{ width: 10, height: 10 }} />
                     Expert
@@ -91,20 +91,20 @@ function ThreadView({ thread, onBack }: ThreadViewProps) {
       </div>
 
       {/* Reply input */}
-      <div className="bg-bg-secondary border border-bg-tertiary p-4" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-secondary border border-bg-tertiary p-4" style={{ }}>
         <h4 className="text-sm font-medium text-text-primary mb-2">Write a reply</h4>
         <textarea
           value={replyText}
           onChange={(e) => setReplyText(e.target.value)}
           placeholder="Share your thoughts..."
           className="w-full border border-bg-tertiary bg-bg-primary text-text-primary text-sm p-3 resize-none focus:outline-none"
-          style={{ borderRadius: 0, minHeight: 80 }}
+          style={{  minHeight: 80 }}
           rows={3}
         />
         <div className="flex justify-end mt-2">
           <button
             className="px-4 py-2 text-sm font-medium text-white"
-            style={{ borderRadius: 0, background: '#C108AB', border: 'none', cursor: 'pointer' }}
+            style={{  background: '#C108AB', border: 'none', cursor: 'pointer' }}
           >
             Submit
           </button>

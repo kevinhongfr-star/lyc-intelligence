@@ -38,7 +38,7 @@ export function ScoreBadge({ score, tier, size = 'md' }: ScoreBadgeProps) {
   const sizeClass = SIZE_CLASSES[size];
 
   return (
-    <div className={`${colors.bg} ${colors.text} rounded-lg ${sizeClass} flex items-center justify-center font-bold`}>
+    <div className={`${colors.bg} ${colors.text} ${sizeClass} flex items-center justify-center font-bold`}>
       {Math.round(score)}
     </div>
   );

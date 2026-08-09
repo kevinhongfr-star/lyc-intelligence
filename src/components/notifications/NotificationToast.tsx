@@ -99,7 +99,7 @@ function ToastItem({ notification, onDismiss }: {
 
   return (
     <div
-      className={`${config.bg} ${config.border} border border-border rounded-none shadow-lg overflow-hidden transition-all duration-300 ${
+      className={`${config.bg} ${config.border} border border-border shadow-lg overflow-hidden transition-all duration-300 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
       }`}
     >
@@ -114,7 +114,7 @@ function ToastItem({ notification, onDismiss }: {
           </div>
           <button
             onClick={handleClose}
-            className="p-1 hover:bg-bg-alt rounded transition-colors flex-shrink-0"
+            className="p-1 hover:bg-bg-alt transition-colors flex-shrink-0"
           >
             <X className="w-4 h-4 text-text-muted" />
           </button>

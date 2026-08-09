@@ -87,7 +87,7 @@ const AuditLog: React.FC = () => {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      alert('Export failed: ' + (err as Error).message);
+      alert('Export failed:' + (err as Error).message);
     }
   }
 
@@ -128,7 +128,7 @@ const AuditLog: React.FC = () => {
           <div className="bg-white border border-border p-4">
             <p className="text-xs text-text-muted uppercase tracking-wider">Most Common</p>
             <p className="text-lg font-serif font-semibold truncate">
-              {stats.most_common_actions?.[0]?.action?.replace(/_/g, ' ') || '—'}
+              {stats.most_common_actions?.[0]?.action?.replace(/_/g, '') || '—'}
             </p>
           </div>
         </div>

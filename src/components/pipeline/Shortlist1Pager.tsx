@@ -55,7 +55,7 @@ function LYCViewCallout({ candidate }: { candidate: ShortlistCandidate }) {
   if (!candidate.flags?.length && !candidate.approachStrategy) return null;
 
   return (
-    <div className="bg-[#1A1A1A]/5 border border-[#1A1A1A]/10 rounded p-3 mt-3">
+    <div className="bg-[#1A1A1A]/5 border border-[#1A1A1A]/10 p-3 mt-3">
       <div className="flex items-center gap-2 mb-2">
         <Shield size={12} className="text-[#C108AB]" />
         <span className="text-[10px] font-semibold text-[#C108AB] uppercase tracking-wider">
@@ -66,7 +66,7 @@ function LYCViewCallout({ candidate }: { candidate: ShortlistCandidate }) {
       {candidate.flags && candidate.flags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-2">
           {candidate.flags.map((flag, i) => (
-            <span key={i} className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#EF4444]/10 rounded text-[9px] text-[#EF4444]">
+            <span key={i} className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#EF4444]/10 text-[9px] text-[#EF4444]">
               <AlertTriangle size={8} />
               {flag}
             </span>
@@ -97,7 +97,7 @@ function PreFlightChecks({ candidate }: { candidate: ShortlistCandidate }) {
         <span
           key={i}
           className={cn(
-            'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium',
+            'inline-flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-medium',
             check.pass ? 'bg-[#00C853]/10 text-[#00C853]' : 'bg-[#EF4444]/10 text-[#EF4444]'
           )}
         >
@@ -132,7 +132,7 @@ function AIQuickActions({ candidateId, onAction }: AIQuickActionsProps) {
           <button
             key={action.key}
             onClick={() => onAction(action.key, candidateId)}
-            className="flex items-center gap-1 px-2 py-1.5 rounded text-[10px] font-medium border border-[#E5E5E5] hover:border-[#1A1A1A] hover:bg-[#1A1A1A]/5 transition-all"
+            className="flex items-center gap-1 px-2 py-1.5 text-[10px] font-medium border border-[#E5E5E5] hover:border-[#1A1A1A] hover:bg-[#1A1A1A]/5 transition-all"
             style={{ color: action.color }}
           >
             <Icon size={12} />
@@ -160,9 +160,9 @@ function DimensionMatrix({ trident, viewMode }: { trident: MatchResult; viewMode
       {dims.map(dim => (
         <div key={dim.key} className="flex items-center gap-3">
           <span className="text-[10px] text-[#8A8A8A] w-28 shrink-0">{dim.label}</span>
-          <div className="flex-1 h-2 bg-[#F7F7F5] rounded-full overflow-hidden">
+          <div className="flex-1 h-2 bg-[#F7F7F5] overflow-hidden">
             <div
-              className="h-full rounded-full transition-all"
+              className="h-full transition-all"
               style={{ width: `${dim.value * 10}%`, background: colors[dim.key] }}
             />
           </div>
@@ -222,7 +222,7 @@ export function Shortlist1Pager({
         {onExport && (
           <button
             onClick={onExport}
-            className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] text-white rounded text-sm hover:bg-[#333] transition-colors"
+            className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] text-white text-sm hover:bg-[#333] transition-colors"
           >
             <Download size={14} />
             Export
@@ -231,7 +231,7 @@ export function Shortlist1Pager({
       </div>
 
       {/* Ranking Table */}
-      <div className="bg-white border border-[#E5E5E5] rounded-none overflow-hidden">
+      <div className="bg-white border border-[#E5E5E5] overflow-hidden">
         {/* Table Header */}
         <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-[#F7F7F5] border-b border-[#E5E5E5] text-[10px] text-[#8A8A8A] uppercase tracking-wider">
           <div className="col-span-1">#</div>
@@ -255,7 +255,7 @@ export function Shortlist1Pager({
               >
                 <div className="col-span-1 flex items-center">
                   <span className={cn(
-                    'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold',
+                    'w-6 h-6 flex items-center justify-center text-[10px] font-bold',
                     idx === 0 ? 'bg-[#C108AB]/10 text-[#C108AB]' :
                     idx === 1 ? 'bg-[#FFB300]/10 text-[#FFB300]' :
                     'bg-[#8A8A8A]/10 text-[#8A8A8A]'
@@ -342,14 +342,14 @@ export function Shortlist1Pager({
 
       {/* Empty State */}
       {sorted.length === 0 && (
-        <div className="bg-white border border-[#E5E5E5] rounded-none p-8 text-center">
+        <div className="bg-white border border-[#E5E5E5] p-8 text-center">
           <p className="text-[#8A8A8A]">No candidates shortlisted yet.</p>
         </div>
       )}
 
       {/* Client Safety Warning (internal only) */}
       {viewMode === 'internal' && sorted.length > 0 && (
-        <div className="bg-[#C108AB]/5 border border-[#C108AB]/20 rounded p-3 flex items-start gap-2">
+        <div className="bg-[#C108AB]/5 border border-[#C108AB]/20 p-3 flex items-start gap-2">
           <Shield size={14} className="text-[#C108AB] mt-0.5 shrink-0" />
           <div>
             <p className="text-xs font-medium text-[#C108AB]">Client Safety Layer Active</p>

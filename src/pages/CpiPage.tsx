@@ -150,13 +150,13 @@ export default function CpiPage() {
           onComplete={handleComplete}
         />
         {persisting && (
-          <div className="fixed bottom-6 right-6 bg-white border border-slate-200 rounded-lg shadow-lg px-4 py-3 flex items-center gap-2 z-50">
+          <div className="fixed bottom-6 right-6 bg-white border border-slate-200 shadow-lg px-4 py-3 flex items-center gap-2 z-50">
             <Loader2 className="w-4 h-4 animate-spin text-fuchsia-600" />
             <span className="text-sm text-slate-600">Saving your results…</span>
           </div>
         )}
         {lastResult && !persisting && (
-          <div className="fixed bottom-6 right-6 bg-white border border-slate-200 rounded-lg shadow-lg px-4 py-3 flex items-center gap-3 z-50">
+          <div className="fixed bottom-6 right-6 bg-white border border-slate-200 shadow-lg px-4 py-3 flex items-center gap-3 z-50">
             <span className="text-sm text-slate-600">Results saved</span>
             <button
               onClick={handleDownloadReport}
@@ -184,7 +184,7 @@ export default function CpiPage() {
       </div>
 
       {/* Start CTA */}
-      <div className="bg-gradient-to-r from-fuchsia-600 to-purple-700 rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-r from-fuchsia-600 to-purple-700 p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold">Ready to assess your leadership pipeline readiness?</h2>
@@ -194,7 +194,7 @@ export default function CpiPage() {
           </div>
           <button
             onClick={() => setMode('assessment')}
-            className="bg-white text-fuchsia-700 px-6 py-3 rounded-lg font-semibold text-sm hover:bg-fuchsia-50 transition-colors flex items-center gap-2 whitespace-nowrap"
+            className="bg-white text-fuchsia-700 px-6 py-3 font-semibold text-sm hover:bg-fuchsia-50 transition-colors flex items-center gap-2 whitespace-nowrap"
           >
             Start Assessment <ChevronRight className="w-4 h-4" />
           </button>
@@ -208,9 +208,9 @@ export default function CpiPage() {
           {DIMENSION_DISPLAY.map(({ id, icon: Icon, color }) => {
             const info = DIMENSION_INFO[id];
             return (
-              <div key={id} className="bg-white rounded-xl border border-slate-200 p-5">
+              <div key={id} className="bg-white border border-slate-200 p-5">
                 <div className="flex items-start gap-3">
-                  <div className={`${color} w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                  <div className={`${color} w-9 h-9 flex items-center justify-center flex-shrink-0`}>
                     <Icon className="w-4 h-4 text-white" />
                   </div>
                   <div>
@@ -233,7 +233,7 @@ export default function CpiPage() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {Object.values(ARCHETYPE_INFO).map((arch) => (
-            <div key={arch.name} className="bg-white rounded-xl border border-slate-200 p-4">
+            <div key={arch.name} className="bg-white border border-slate-200 p-4">
               <h3 className="font-semibold text-slate-900 text-sm">{arch.name}</h3>
               <p className="text-xs text-fuchsia-600 italic mt-1">{arch.tagline}</p>
               <p className="text-xs text-slate-500 mt-2">{arch.description}</p>
@@ -254,18 +254,18 @@ export default function CpiPage() {
             No assessments yet. Start your first diagnostic above.
           </p>
         ) : (
-          <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
+          <div className="bg-white border border-slate-200 divide-y divide-slate-100">
             {history.map((r) => (
               <div key={r.id} className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center">
+                  <div className="w-11 h-11 bg-slate-100 flex items-center justify-center">
                     <span className="text-sm font-bold text-slate-600">{r.composite_score}</span>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-900">{r.assessment_name}</p>
                     <p className="text-xs text-slate-400">
                       {r.tier_label}
-                      {r.metadata?.archetype ? ` · ${r.metadata.archetype}` : ''}
+                      {r.metadata?.archetype ? `· ${r.metadata.archetype}` : ''}
                     </p>
                   </div>
                 </div>

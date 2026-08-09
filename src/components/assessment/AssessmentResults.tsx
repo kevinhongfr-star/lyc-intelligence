@@ -17,10 +17,10 @@ function DimensionBar({ label, value, max = 10 }: { label: string; value: number
         <span className="font-medium text-text-primary">{label}</span>
         <span className="text-text-muted">{value}/{max}</span>
       </div>
-      <div className="h-3 bg-bg-tertiary overflow-hidden" style={{ borderRadius: 0 }}>
+      <div className="h-3 bg-bg-tertiary overflow-hidden" style={{ }}>
         <div
           className="h-full bg-accent transition-all duration-500"
-          style={{ width: `${pct}%`, borderRadius: 0 }}
+          style={{ width: `${pct}%` }}
         />
       </div>
     </div>
@@ -33,7 +33,7 @@ export default function AssessmentResults({ onBack, onShare, onRetake }: Assessm
   return (
     <div className="space-y-6">
       {/* TRIDENT Results */}
-      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
         <h3 className="font-serif font-semibold text-text-primary mb-1 flex items-center gap-2">
           <Award className="w-5 h-5 text-accent" />
           Match Analysis Leadership Assessment
@@ -50,7 +50,7 @@ export default function AssessmentResults({ onBack, onShare, onRetake }: Assessm
       </div>
 
       {/* Cognitive Results */}
-      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
         <h3 className="font-serif font-semibold text-text-primary mb-1 flex items-center gap-2">
           <BarChart2 className="w-5 h-5 text-accent" />
           Cognitive Style Profile
@@ -70,15 +70,15 @@ export default function AssessmentResults({ onBack, onShare, onRetake }: Assessm
       </div>
 
       {/* Percentile display */}
-      <div className="bg-accent/5 border border-accent/20 p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-accent/5 border border-accent/20 p-6" style={{ }}>
         <h3 className="font-serif font-semibold text-text-primary mb-4">Percentile Rankings</h3>
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-bg-primary p-4 border border-bg-tertiary" style={{ borderRadius: 0 }}>
+          <div className="bg-bg-primary p-4 border border-bg-tertiary" style={{ }}>
             <p className="text-sm text-text-muted">Match Analysis</p>
             <p className="text-2xl font-bold text-accent">92nd</p>
             <p className="text-xs text-text-muted">percentile</p>
           </div>
-          <div className="bg-bg-primary p-4 border border-bg-tertiary" style={{ borderRadius: 0 }}>
+          <div className="bg-bg-primary p-4 border border-bg-tertiary" style={{ }}>
             <p className="text-sm text-text-muted">Cognitive</p>
             <p className="text-2xl font-bold text-accent">85th</p>
             <p className="text-xs text-text-muted">percentile</p>
@@ -92,7 +92,7 @@ export default function AssessmentResults({ onBack, onShare, onRetake }: Assessm
           variant="default"
           size="default"
           onClick={onShare}
-          style={{ borderRadius: 0 }}
+          style={{ }}
           className="flex items-center gap-2"
         >
           <Share2 className="w-4 h-4" />
@@ -102,7 +102,7 @@ export default function AssessmentResults({ onBack, onShare, onRetake }: Assessm
           variant="outline"
           size="default"
           onClick={onRetake}
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           Retake
         </Button>
@@ -110,7 +110,7 @@ export default function AssessmentResults({ onBack, onShare, onRetake }: Assessm
           variant="ghost"
           size="default"
           onClick={onBack}
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           Back to Catalog
         </Button>

@@ -22,7 +22,7 @@ const TREND_STYLES: Record<TrendType, { icon: React.ReactNode; bg: string; text:
 export function TemporalBadge({ type, value }: TemporalBadgeProps) {
   const style = TREND_STYLES[type];
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${style.bg} ${style.text} text-xxs font-semibold`}>
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 ${style.bg} ${style.text} text-xxs font-semibold`}>
       {style.icon}
       {value}
     </span>

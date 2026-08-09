@@ -57,13 +57,13 @@ export function CompaniesPage() {
             placeholder="Search companies by name or industry..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(0); }}
-            className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
+            className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
           />
         </div>
         <select
           value={industry}
           onChange={e => { setIndustry(e.target.value); setPage(0); }}
-          className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent min-w-[160px]"
+          className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary text-sm text-text-primary focus:outline-none focus:border-accent min-w-[160px]"
         >
           <option value="">All Industries</option>
           {INDUSTRY_OPTIONS.map(i => <option key={i} value={i}>{i}</option>)}
@@ -71,7 +71,7 @@ export function CompaniesPage() {
         <select
           value={country}
           onChange={e => { setCountry(e.target.value); setPage(0); }}
-          className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent min-w-[140px]"
+          className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary text-sm text-text-primary focus:outline-none focus:border-accent min-w-[140px]"
         >
           <option value="">All Countries</option>
           {countries.map(c => <option key={c} value={c ?? ''}>{c}</option>)}
@@ -79,7 +79,7 @@ export function CompaniesPage() {
         {(search || industry || country) && (
           <button
             onClick={() => { setSearch(''); setIndustry(''); setCountry(''); setPage(0); }}
-            className="px-3 py-2.5 text-sm text-accent hover:bg-accent/10 rounded-none transition-colors"
+            className="px-3 py-2.5 text-sm text-accent hover:bg-accent/10 transition-colors"
           >
             Clear filters
           </button>
@@ -107,7 +107,7 @@ export function CompaniesPage() {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-none bg-accent/10 flex items-center justify-center">
+                      <div className="w-10 h-10 bg-accent/10 flex items-center justify-center">
                         <Building2 className="w-5 h-5 text-accent" />
                       </div>
                       <div>
@@ -116,7 +116,7 @@ export function CompaniesPage() {
                       </div>
                     </div>
                     {company.stain_tier && (
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${STAIN_COLORS[company.stain_tier] || 'text-text-muted bg-bg-tertiary'}`}>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 ${STAIN_COLORS[company.stain_tier] || 'text-text-muted bg-bg-tertiary'}`}>
                         {company.stain_tier}
                       </span>
                     )}
@@ -124,15 +124,15 @@ export function CompaniesPage() {
 
                   {/* Metrics */}
                   <div className="grid grid-cols-3 gap-2 mb-3">
-                    <div className="text-center p-2 bg-bg-tertiary rounded">
+                    <div className="text-center p-2 bg-bg-tertiary">
                       <p className="text-lg font-bold text-text-primary">{company.total_contacts || 0}</p>
                       <p className="text-[10px] text-text-muted">Contacts</p>
                     </div>
-                    <div className="text-center p-2 bg-bg-tertiary rounded">
+                    <div className="text-center p-2 bg-bg-tertiary">
                       <p className="text-lg font-bold text-text-primary">{company.active_mandates || 0}</p>
                       <p className="text-[10px] text-text-muted">Mandates</p>
                     </div>
-                    <div className="text-center p-2 bg-bg-tertiary rounded">
+                    <div className="text-center p-2 bg-bg-tertiary">
                       <p className="text-lg font-bold text-text-primary">{company.engagement_score || 0}</p>
                       <p className="text-[10px] text-text-muted">Engagement</p>
                     </div>
@@ -141,17 +141,17 @@ export function CompaniesPage() {
                   {/* Details */}
                   <div className="flex flex-wrap gap-1.5 text-[11px] text-text-muted">
                     {company.country && (
-                      <span className="flex items-center gap-1 px-1.5 py-0.5 bg-bg-tertiary rounded">
+                      <span className="flex items-center gap-1 px-1.5 py-0.5 bg-bg-tertiary">
                         <Globe className="w-3 h-3" />{company.country}
                       </span>
                     )}
                     {company.headcount_range && (
-                      <span className="flex items-center gap-1 px-1.5 py-0.5 bg-bg-tertiary rounded">
+                      <span className="flex items-center gap-1 px-1.5 py-0.5 bg-bg-tertiary">
                         <Users className="w-3 h-3" />{company.headcount_range}
                       </span>
                     )}
                     {company.stain_group && (
-                      <span className="px-1.5 py-0.5 bg-bg-tertiary rounded">{company.stain_group}</span>
+                      <span className="px-1.5 py-0.5 bg-bg-tertiary">{company.stain_group}</span>
                     )}
                   </div>
 
@@ -183,7 +183,7 @@ export function CompaniesPage() {
               <button
                 onClick={() => setPage(p => Math.max(0, p - 1))}
                 disabled={page === 0}
-                className="px-3 py-1.5 text-sm bg-bg-secondary border border-bg-tertiary rounded disabled:opacity-40 hover:border-accent transition-colors"
+                className="px-3 py-1.5 text-sm bg-bg-secondary border border-bg-tertiary disabled:opacity-40 hover:border-accent transition-colors"
               >
                 Previous
               </button>
@@ -193,7 +193,7 @@ export function CompaniesPage() {
               <button
                 onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                 disabled={page >= totalPages - 1}
-                className="px-3 py-1.5 text-sm bg-bg-secondary border border-bg-tertiary rounded disabled:opacity-40 hover:border-accent transition-colors"
+                className="px-3 py-1.5 text-sm bg-bg-secondary border border-bg-tertiary disabled:opacity-40 hover:border-accent transition-colors"
               >
                 Next
               </button>

@@ -139,10 +139,10 @@ export function SignalList({ contactId, limit = 50 }: SignalListProps) {
         return (
           <div
             key={signal.id}
-            className="flex items-start gap-3 p-3 rounded-none bg-bg-secondary border border-bg-tertiary hover:border-border-focus transition-colors"
+            className="flex items-start gap-3 p-3 bg-bg-secondary border border-bg-tertiary hover:border-border-focus transition-colors"
           >
             {/* Icon */}
-            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${config.color}`}>
+            <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center ${config.color}`}>
               {config.icon}
             </div>
 
@@ -176,7 +176,7 @@ export function SignalList({ contactId, limit = 50 }: SignalListProps) {
               {signal.insights && Object.keys(signal.insights).length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
                   {Object.entries(signal.insights).slice(0, 3).map(([key, value]) => (
-                    <span key={key} className="text-xs px-2 py-0.5 rounded bg-bg-tertiary text-text-secondary">
+                    <span key={key} className="text-xs px-2 py-0.5 bg-bg-tertiary text-text-secondary">
                       {key}: {String(value).substring(0, 30)}
                     </span>
                   ))}

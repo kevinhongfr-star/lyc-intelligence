@@ -35,7 +35,7 @@ export default function TeamList() {
             <div
               key={member.id}
               className="bg-bg-primary border border-bg-tertiary"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <button
                 onClick={() => toggleExpand(member.id)}
@@ -49,17 +49,17 @@ export default function TeamList() {
                   )}
                   <div
                     className="w-3 h-3 flex-shrink-0"
-                    style={{ borderRadius: 0, backgroundColor: member.avatarColor }}
+                    style={{  backgroundColor: member.avatarColor }}
                   />
                   <span className="font-medium text-text-primary">{member.name}</span>
                   <span
                     className={`inline-flex items-center px-2 py-0.5 text-xs font-medium ${roleBadgeColor(member.role)}`}
-                    style={{ borderRadius: 0 }}
+                    style={{ }}
                   >
                     {member.role}
                   </span>
                   <div className="flex items-center gap-1 ml-2">
-                    <div className={`w-2 h-2 ${statusColor(member.status)}`} style={{ borderRadius: 0 }} />
+                    <div className={`w-2 h-2 ${statusColor(member.status)}`} style={{ }} />
                     <span className="text-xs text-text-muted">{member.status}</span>
                   </div>
                 </div>

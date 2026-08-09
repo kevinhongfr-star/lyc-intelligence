@@ -116,14 +116,14 @@ function getScoreLabel(score: number): string {
 function ScoreBar({ score, showLabel = true }: { score: number; showLabel?: boolean }) {
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+      <div className="flex-1 h-2 bg-slate-100 overflow-hidden">
         <div
-          className={`h-full transition-all ${getScoreColor(score).split(' ')[1].replace('100', '500')}`}
+          className={`h-full transition-all ${getScoreColor(score).split('')[1].replace('100', '500')}`}
           style={{ width: `${Math.max(score, 2)}%` }}
         />
       </div>
       <div className="flex items-center gap-1 min-w-[60px]">
-        <span className={`text-xs font-bold ${getScoreColor(score).split(' ')[0]}`}>{score}</span>
+        <span className={`text-xs font-bold ${getScoreColor(score).split('')[0]}`}>{score}</span>
         {showLabel && (
           <span className="text-xs text-text-muted">{getScoreLabel(score)}</span>
         )}
@@ -202,7 +202,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
     <div className="space-y-4">
       {/* Header stats */}
       <div className="grid grid-cols-4 gap-3">
-        <div className="bg-bg-secondary border border-border rounded-none p-4">
+        <div className="bg-bg-secondary border border-border p-4">
           <div className="flex items-center gap-2 text-text-muted mb-1">
             <Trophy className="w-4 h-4" />
             <span className="text-xs font-medium">Top Company</span>
@@ -217,7 +217,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
           )}
         </div>
 
-        <div className="bg-bg-secondary border border-border rounded-none p-4">
+        <div className="bg-bg-secondary border border-border p-4">
           <div className="flex items-center gap-2 text-text-muted mb-1">
             <TrendingUp className="w-4 h-4" />
             <span className="text-xs font-medium">Average Score</span>
@@ -226,7 +226,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
           <p className="text-xs text-text-muted">{getScoreLabel(avgScore)} fit</p>
         </div>
 
-        <div className="bg-bg-secondary border border-border rounded-none p-4">
+        <div className="bg-bg-secondary border border-border p-4">
           <div className="flex items-center gap-2 text-text-muted mb-1">
             <Star className="w-4 h-4" />
             <span className="text-xs font-medium">Excellent (80+)</span>
@@ -237,7 +237,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
           <p className="text-xs text-text-muted">companies</p>
         </div>
 
-        <div className="bg-bg-secondary border border-border rounded-none p-4">
+        <div className="bg-bg-secondary border border-border p-4">
           <div className="flex items-center gap-2 text-text-muted mb-1">
             <Trophy className="w-4 h-4" />
             <span className="text-xs font-medium">Total Companies</span>
@@ -249,14 +249,14 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
 
       {/* Podium for top 3 */}
       {topCompanies.length >= 3 && (
-        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white">
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 text-white">
           <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wide mb-4 text-center">
             Top 3 Target Companies
           </h3>
           <div className="flex items-end justify-center gap-4">
             {/* 2nd place */}
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-slate-400 flex items-center justify-center text-lg font-bold text-white mb-2">
+              <div className="w-16 h-16 bg-slate-400 flex items-center justify-center text-lg font-bold text-white mb-2">
                 {topCompanies[1].name?.slice(0, 2).toUpperCase() || '??'}
               </div>
               <p className="text-sm font-medium text-white/80 text-center max-w-[100px] truncate">
@@ -268,7 +268,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
 
             {/* 1st place */}
             <div className="flex flex-col items-center">
-              <div className="w-20 h-20 rounded-full bg-amber-500 flex items-center justify-center text-xl font-bold text-white mb-2 ring-4 ring-amber-400">
+              <div className="w-20 h-20 bg-amber-500 flex items-center justify-center text-xl font-bold text-white mb-2 ring-4 ring-amber-400">
                 {topCompanies[0].name?.slice(0, 2).toUpperCase() || '??'}
               </div>
               <p className="text-sm font-semibold text-white text-center max-w-[120px] truncate">
@@ -280,7 +280,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
 
             {/* 3rd place */}
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-amber-700 flex items-center justify-center text-lg font-bold text-white mb-2">
+              <div className="w-16 h-16 bg-amber-700 flex items-center justify-center text-lg font-bold text-white mb-2">
                 {topCompanies[2].name?.slice(0, 2).toUpperCase() || '??'}
               </div>
               <p className="text-sm font-medium text-white/80 text-center max-w-[100px] truncate">
@@ -294,7 +294,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
       )}
 
       {/* Rankings table */}
-      <div className="bg-bg-secondary border border-border rounded-none overflow-hidden">
+      <div className="bg-bg-secondary border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -341,7 +341,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
               {companiesWithScores.map((company, index) => (
                 <tr key={company.id} className="border-b border-border hover:bg-slate-50/50">
                   <td className="px-4 py-3 text-center">
-                    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
+                    <span className={`inline-flex items-center justify-center w-6 h-6 text-xs font-bold ${
                       index === 0 ? 'bg-amber-100 text-amber-800' :
                       index === 1 ? 'bg-slate-200 text-slate-700' :
                       index === 2 ? 'bg-orange-100 text-orange-800' :
@@ -380,18 +380,18 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
                           onChange={(e) => setNotesValue(e.target.value)}
                           placeholder="Add ranking notes..."
                           rows={2}
-                          className="w-full text-sm bg-white border border-border rounded-none px-2 py-1 resize-none"
+                          className="w-full text-sm bg-white border border-border px-2 py-1 resize-none"
                         />
                         <div className="flex gap-1">
                           <button
                             onClick={() => handleSaveNotes(company)}
-                            className="p-1 text-emerald-600 hover:bg-emerald-50 rounded"
+                            className="p-1 text-emerald-600 hover:bg-emerald-50"
                           >
                             <Save className="w-4 h-4" />
                           </button>
                           <button
                             onClick={handleCancelEditNotes}
-                            className="p-1 text-slate-400 hover:bg-slate-100 rounded"
+                            className="p-1 text-slate-400 hover:bg-slate-100"
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -404,7 +404,7 @@ export function CompanyRanking({ companies, successProfile, mandateId, onRanksCh
                         </span>
                         <button
                           onClick={() => handleStartEditNotes(company)}
-                          className="p-1 text-slate-400 hover:text-accent hover:bg-slate-100 rounded flex-shrink-0"
+                          className="p-1 text-slate-400 hover:text-accent hover:bg-slate-100 flex-shrink-0"
                         >
                           <Edit3 className="w-3 h-3" />
                         </button>

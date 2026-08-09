@@ -168,7 +168,7 @@ export function OfferApproval({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+          <div className="w-12 h-12 bg-accent/10 flex items-center justify-center">
             <Briefcase className="w-6 h-6 text-accent" />
           </div>
           <div>
@@ -179,12 +179,12 @@ export function OfferApproval({
           </div>
         </div>
         <Badge className={getStatusColor(offer.status)}>
-          {offer.status.replace(/_/g, ' ')}
+          {offer.status.replace(/_/g, '')}
         </Badge>
       </div>
 
       {/* Approval Progress */}
-      <div className="bg-card border border-card-border rounded-none p-6 mb-6">
+      <div className="bg-card border border-card-border p-6 mb-6">
         <h2 className="font-semibold text-text-primary mb-4">Approval Progress</h2>
         <div className="flex items-center">
           {STATUS_STEPS.map((step, idx) => {
@@ -197,7 +197,7 @@ export function OfferApproval({
               <React.Fragment key={step.key}>
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    className={`w-10 h-10 flex items-center justify-center ${
                       isCompleted
                         ? 'bg-green-500 text-white'
                         : isCurrent
@@ -234,13 +234,13 @@ export function OfferApproval({
       </div>
 
       {/* Offer Details */}
-      <div className="bg-card border border-card-border rounded-none p-6 mb-6">
+      <div className="bg-card border border-card-border p-6 mb-6">
         <h2 className="font-semibold text-text-primary mb-4">Offer Details</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Candidate */}
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-blue-100 flex items-center justify-center">
               <User className="w-5 h-5 text-blue-600" />
             </div>
             <div>
@@ -252,7 +252,7 @@ export function OfferApproval({
 
           {/* Client */}
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-purple-100 flex items-center justify-center">
               <Building2 className="w-5 h-5 text-purple-600" />
             </div>
             <div>
@@ -263,7 +263,7 @@ export function OfferApproval({
 
           {/* Position */}
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+            <div className="w-10 h-10 bg-accent/10 flex items-center justify-center">
               <Briefcase className="w-5 h-5 text-accent" />
             </div>
             <div>
@@ -274,7 +274,7 @@ export function OfferApproval({
 
           {/* Start Date */}
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-green-100 flex items-center justify-center">
               <Calendar className="w-5 h-5 text-green-600" />
             </div>
             <div>
@@ -285,7 +285,7 @@ export function OfferApproval({
         </div>
 
         {/* Compensation */}
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-none">
+        <div className="mt-6 p-4 bg-green-50 border border-green-200">
           <div className="flex items-center gap-2 mb-3">
             <DollarSign className="w-5 h-5 text-green-600" />
             <span className="font-semibold text-green-800">Compensation Package</span>
@@ -336,7 +336,7 @@ export function OfferApproval({
 
         {/* Conditions */}
         {offer.conditions && (
-          <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-none">
+          <div className="mt-4 p-4 bg-gray-50 border border-gray-200">
             <div className="flex items-center gap-2 mb-2">
               <FileText className="w-5 h-5 text-gray-600" />
               <span className="font-semibold text-gray-800">Conditions</span>
@@ -349,7 +349,7 @@ export function OfferApproval({
 
         {/* Cover Letter */}
         {offer.cover_letter && (
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-none">
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200">
             <p className="text-sm font-medium text-blue-800 mb-2">Additional Notes</p>
             <p className="text-sm text-blue-700 whitespace-pre-line">
               {offer.cover_letter}
@@ -367,29 +367,29 @@ export function OfferApproval({
       {/* Approval Notes History */}
       {(offer.partner_approval_notes || offer.client_approval_notes || 
         offer.partner_rejection_reason || offer.client_rejection_reason) && (
-        <div className="bg-card border border-card-border rounded-none p-6 mb-6">
+        <div className="bg-card border border-card-border p-6 mb-6">
           <h2 className="font-semibold text-text-primary mb-4">Approval History</h2>
           <div className="space-y-3">
             {offer.partner_approval_notes && (
-              <div className="p-3 bg-yellow-50 rounded-none">
+              <div className="p-3 bg-yellow-50">
                 <p className="text-sm font-medium text-yellow-800">Partner Notes</p>
                 <p className="text-sm text-yellow-700">{offer.partner_approval_notes}</p>
               </div>
             )}
             {offer.partner_rejection_reason && (
-              <div className="p-3 bg-red-50 rounded-none">
+              <div className="p-3 bg-red-50">
                 <p className="text-sm font-medium text-red-800">Partner Rejection Reason</p>
                 <p className="text-sm text-red-700">{offer.partner_rejection_reason}</p>
               </div>
             )}
             {offer.client_approval_notes && (
-              <div className="p-3 bg-blue-50 rounded-none">
+              <div className="p-3 bg-blue-50">
                 <p className="text-sm font-medium text-blue-800">Client Notes</p>
                 <p className="text-sm text-blue-700">{offer.client_approval_notes}</p>
               </div>
             )}
             {offer.client_rejection_reason && (
-              <div className="p-3 bg-red-50 rounded-none">
+              <div className="p-3 bg-red-50">
                 <p className="text-sm font-medium text-red-800">Client Rejection Reason</p>
                 <p className="text-sm text-red-700">{offer.client_rejection_reason}</p>
               </div>
@@ -449,7 +449,7 @@ export function OfferApproval({
 
       {/* Approval Notes Modal */}
       {canApprove() && (
-        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-none">
+        <div className="mt-4 p-4 bg-blue-50 border border-blue-200">
           <label className="block text-sm font-medium text-blue-800 mb-2">
             Approval Notes (optional)
           </label>
@@ -458,7 +458,7 @@ export function OfferApproval({
             onChange={(e) => setApprovalNotes(e.target.value)}
             placeholder="Add any notes for the next approver..."
             rows={2}
-            className="w-full px-4 py-2 bg-white border border-blue-200 rounded-none text-text-primary resize-none"
+            className="w-full px-4 py-2 bg-white border border-blue-200 text-text-primary resize-none"
           />
         </div>
       )}
@@ -466,7 +466,7 @@ export function OfferApproval({
       {/* Reject Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-none p-6 max-w-md w-full mx-4">
+          <div className="bg-card p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-text-primary mb-4">
               Reject Offer
             </h3>
@@ -478,7 +478,7 @@ export function OfferApproval({
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Enter rejection reason..."
               rows={4}
-              className="w-full px-4 py-2 bg-bg-alt border border-card-border rounded-none text-text-primary resize-none mb-4"
+              className="w-full px-4 py-2 bg-bg-alt border border-card-border text-text-primary resize-none mb-4"
             />
             <div className="flex justify-end gap-3">
               <Button

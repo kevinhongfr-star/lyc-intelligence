@@ -120,11 +120,11 @@ export default function UpcomingSessions() {
                     ? 'bg-accent-10 text-text-primary font-medium'
                     : 'text-text-secondary hover:bg-bg-secondary'
               }`}
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               {day}
               {hasSession && !isSelected && (
-                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#C108AB]" style={{ borderRadius: 0 }} />
+                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#C108AB]" style={{ }} />
               )}
             </button>
           );
@@ -147,7 +147,7 @@ export default function UpcomingSessions() {
               <div
                 key={s.id}
                 className="p-3 bg-bg-secondary flex items-center justify-between"
-                style={{ borderRadius: 0 }}
+                style={{ }}
               >
                 <div>
                   <p className="text-sm font-medium text-text-primary">{s.serviceName}</p>
@@ -161,7 +161,7 @@ export default function UpcomingSessions() {
                       ? 'bg-green-50 text-green-700'
                       : 'bg-amber-50 text-amber-700'
                   }`}
-                  style={{ borderRadius: 0 }}
+                  style={{ }}
                 >
                   {s.status}
                 </span>

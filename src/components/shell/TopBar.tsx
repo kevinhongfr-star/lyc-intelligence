@@ -61,11 +61,11 @@ export function TopBar() {
           <div ref={notifRef} className="relative">
             <button
               onClick={() => setNotifOpen(!notifOpen)}
-              className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-bg-warm transition-colors relative"
+              className="flex items-center justify-center w-10 h-10 hover:bg-bg-warm transition-colors relative"
             >
               <Bell className="w-5 h-5 text-text-secondary" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red text-white text-xxs font-bold flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red text-white text-xxs font-bold flex items-center justify-center">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
@@ -73,7 +73,7 @@ export function TopBar() {
 
             {/* Notification Dropdown */}
             {notifOpen && (
-              <div className="absolute right-0 top-12 w-80 bg-white rounded-card shadow-modal border border-border overflow-hidden">
+              <div className="absolute right-0 top-12 w-80 bg-white shadow-modal border border-border overflow-hidden">
                 <div className="px-4 py-3 border-b border-border flex items-center justify-between">
                   <span className="font-semibold text-text-primary">Notifications</span>
                   <Link to="/app/notifications" className="text-xxs text-fuchsia hover:underline">
@@ -104,9 +104,9 @@ export function TopBar() {
           <div ref={dropdownRef} className="relative">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-bg-warm transition-colors"
+              className="flex items-center gap-2 px-3 py-2 hover:bg-bg-warm transition-colors"
             >
-              <div className="w-8 h-8 rounded-full bg-fuchsia-light flex items-center justify-center">
+              <div className="w-8 h-8 bg-fuchsia-light flex items-center justify-center">
                 <User className="w-4 h-4 text-fuchsia" />
               </div>
               <span className="text-sm font-medium text-text-primary">
@@ -117,7 +117,7 @@ export function TopBar() {
 
             {/* User Dropdown */}
             {dropdownOpen && (
-              <div className="absolute right-0 top-12 w-56 bg-white rounded-card shadow-modal border border-border overflow-hidden">
+              <div className="absolute right-0 top-12 w-56 bg-white shadow-modal border border-border overflow-hidden">
                 <div className="px-4 py-3 border-b border-border">
                   <div className="text-sm font-semibold text-text-primary">
                     {profile?.full_name || 'User'}

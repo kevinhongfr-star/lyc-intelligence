@@ -181,7 +181,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
       </div>
 
       {error && (
-        <div className="p-4 bg-red-500/10 rounded-none flex items-center gap-3">
+        <div className="p-4 bg-red-500/10 flex items-center gap-3">
           <AlertCircle className="w-5 h-5 text-red-500" />
           <span className="text-red-500">{error}</span>
         </div>
@@ -192,7 +192,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
         {NOTIFICATION_TYPES.map(({ key, label, description, icon: Icon, color }) => (
           <div 
             key={key}
-            className={`bg-card rounded-none border p-5 transition-all ${
+            className={`bg-card border p-5 transition-all ${
               preferences[key].enabled 
                 ? 'border-card-border' 
                 : 'border-border opacity-60'
@@ -200,7 +200,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className={`p-3 rounded-none ${getIconColor(color)}`}>
+                <div className={`p-3 ${getIconColor(color)}`}>
                   <Icon className="w-6 h-6" />
                 </div>
                 <div>
@@ -217,7 +217,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
                   onChange={() => toggleType(key)}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-border rounded-full peer peer-checked:bg-accent peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
+                <div className="w-11 h-6 bg-border peer peer-checked:bg-accent peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:h-5 after:w-5 after:transition-all" />
               </label>
             </div>
 
@@ -225,7 +225,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
             {preferences[key].enabled && (
               <div className="pl-[72px] space-y-3">
                 {/* Email toggle */}
-                <label className="flex items-center justify-between p-3 bg-bg-alt rounded-none cursor-pointer hover:bg-bg transition-colors">
+                <label className="flex items-center justify-between p-3 bg-bg-alt cursor-pointer hover:bg-bg transition-colors">
                   <div className="flex items-center gap-3">
                     <Mail className="w-5 h-5 text-text-muted" />
                     <div>
@@ -237,12 +237,12 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
                     type="checkbox"
                     checked={preferences[key].email}
                     onChange={(e) => updatePreference(key, 'email', e.target.checked)}
-                    className="w-5 h-5 text-accent rounded"
+                    className="w-5 h-5 text-accent"
                   />
                 </label>
 
                 {/* In-app toggle */}
-                <label className="flex items-center justify-between p-3 bg-bg-alt rounded-none cursor-pointer hover:bg-bg transition-colors">
+                <label className="flex items-center justify-between p-3 bg-bg-alt cursor-pointer hover:bg-bg transition-colors">
                   <div className="flex items-center gap-3">
                     <Bell className="w-5 h-5 text-text-muted" />
                     <div>
@@ -254,20 +254,20 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
                     type="checkbox"
                     checked={preferences[key].in_app}
                     onChange={(e) => updatePreference(key, 'in_app', e.target.checked)}
-                    className="w-5 h-5 text-accent rounded"
+                    className="w-5 h-5 text-accent"
                   />
                 </label>
 
                 {/* Frequency selector for career insights */}
                 {key === 'career_insight' && (
-                  <div className="p-3 bg-bg-alt rounded-none">
+                  <div className="p-3 bg-bg-alt">
                     <div className="text-sm font-medium text-text-primary mb-2">Email Frequency</div>
                     <div className="flex gap-2">
                       {(['immediate', 'daily', 'weekly'] as const).map(freq => (
                         <button
                           key={freq}
                           onClick={() => updatePreference(key, 'frequency', freq)}
-                          className={`px-3 py-1.5 rounded-none text-sm font-medium transition-all ${
+                          className={`px-3 py-1.5 text-sm font-medium transition-all ${
                             preferences[key].frequency === freq
                               ? 'bg-accent text-white'
                               : 'bg-bg text-text-muted hover:text-text-primary'
@@ -286,9 +286,9 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
       </div>
 
       {/* Email digest section */}
-      <div className="bg-card rounded-none border border-card-border p-5">
+      <div className="bg-card border border-card-border p-5">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 rounded-none bg-accent/10 text-accent">
+          <div className="p-3 bg-accent/10 text-accent">
             <Mail className="w-6 h-6" />
           </div>
           <div>
@@ -301,7 +301,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
           <label className="flex items-center gap-3 mb-3">
             <input
               type="checkbox"
-              className="w-5 h-5 text-accent rounded"
+              className="w-5 h-5 text-accent"
               defaultChecked
             />
             <span className="text-sm text-text-primary">Enable email digest</span>
@@ -311,7 +311,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
             {['Immediate', 'Daily', 'Weekly'].map(freq => (
               <button
                 key={freq}
-                className="px-3 py-1.5 rounded-none text-sm font-medium bg-bg-alt text-text-muted hover:text-text-primary transition-colors"
+                className="px-3 py-1.5 text-sm font-medium bg-bg-alt text-text-muted hover:text-text-primary transition-colors"
               >
                 {freq}
               </button>
@@ -321,9 +321,9 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
       </div>
 
       {/* Quiet hours */}
-      <div className="bg-card rounded-none border border-card-border p-5">
+      <div className="bg-card border border-card-border p-5">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 rounded-none bg-gray-500/10 text-gray-500">
+          <div className="p-3 bg-gray-500/10 text-gray-500">
             <Bell className="w-6 h-6" />
           </div>
           <div>
@@ -336,7 +336,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
           <label className="flex items-center gap-3 mb-3">
             <input
               type="checkbox"
-              className="w-5 h-5 text-accent rounded"
+              className="w-5 h-5 text-accent"
             />
             <span className="text-sm text-text-primary">Enable quiet hours</span>
           </label>
@@ -347,7 +347,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
               <input
                 type="time"
                 defaultValue="22:00"
-                className="px-3 py-2 bg-bg border border-border rounded-none text-text-primary"
+                className="px-3 py-2 bg-bg border border-border text-text-primary"
               />
             </div>
             <div>
@@ -355,7 +355,7 @@ export function NotificationSettings({ candidateId }: NotificationSettingsProps)
               <input
                 type="time"
                 defaultValue="08:00"
-                className="px-3 py-2 bg-bg border border-border rounded-none text-text-primary"
+                className="px-3 py-2 bg-bg border border-border text-text-primary"
               />
             </div>
           </div>

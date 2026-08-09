@@ -448,10 +448,7 @@ export async function getMyPendingApprovals(
 ): Promise<ApprovalRequest[]> {
   const { data: steps } = await supabase
     .from('approval_step_records')
-    .select(`
-      request_id,
-      approval_requests!inner(*)
-    `)
+    .select(`request_id, approval_requests!inner(*)`)
     .eq('approver_id', userId)
     .eq('status', 'pending')
     .eq('approval_requests.org_id', orgId)

@@ -24,7 +24,7 @@ function ScopeBar({ mandate }: { mandate: Mandate }) {
     { label: 'Candidates', value: String(mandate.total_candidates) },
   ];
   return (
-    <div className="flex border border-bg-tertiary rounded-none overflow-hidden">
+    <div className="flex border border-bg-tertiary overflow-hidden">
       {cells.map((c, i) => (
         <div key={i} className={`flex-1 p-3 ${i < cells.length - 1 ? 'border-r border-bg-tertiary' : ''}`}>
           <p className="text-[10px] text-text-muted uppercase tracking-wider">{c.label}</p>
@@ -47,11 +47,11 @@ function LensCandidateCard({ candidate }: { candidate: CandidatePipeline }) {
   const keyMatch = candidate.key_match_reasons || candidate.match_reasons || '';
 
   return (
-    <div className="bg-bg-secondary border border-bg-tertiary rounded-none p-4">
+    <div className="bg-bg-secondary border border-bg-tertiary p-4">
       <div className="flex items-start justify-between mb-2">
         <div>
           <h4 className="text-sm font-medium text-text-primary">{name}</h4>
-          <p className="text-xs text-text-muted">{title}{company ? ` at ${company}` : ''}</p>
+          <p className="text-xs text-text-muted">{title}{company ? `at ${company}` : ''}</p>
         </div>
         <Badge variant={v.color === '#34D399' ? 'success' : v.color === '#FBBF24' ? 'warning' : 'danger'}>{v.label}</Badge>
       </div>
@@ -66,14 +66,14 @@ function LensCandidateCard({ candidate }: { candidate: CandidatePipeline }) {
               <span className="text-text-muted">{dim.label}</span>
               <span className="text-text-secondary">{dim.value != null ? `${Math.round(dim.value)}%` : 'N/A'}</span>
             </div>
-            <div className="w-full h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
-              <div className="h-full rounded-full" style={{ width: `${Math.min(100, dim.value ?? 0)}%`, backgroundColor: v.color }} />
+            <div className="w-full h-1.5 bg-bg-tertiary overflow-hidden">
+              <div className="h-full" style={{ width: `${Math.min(100, dim.value ?? 0)}%`, backgroundColor: v.color }} />
             </div>
           </div>
         ))}
       </div>
       {composite != null && <div className="mt-2 text-xs text-text-muted">Composite: <span className="text-text-primary font-medium">{composite.toFixed(1)}</span></div>}
-      {keyMatch && <div className="mt-2 p-2 bg-bg-tertiary rounded text-xs text-text-secondary">{typeof keyMatch === 'string' ? keyMatch : JSON.stringify(keyMatch)}</div>}
+      {keyMatch && <div className="mt-2 p-2 bg-bg-tertiary text-xs text-text-secondary">{typeof keyMatch === 'string' ? keyMatch : JSON.stringify(keyMatch)}</div>}
       {candidate.approach_strategy && <div className="mt-2 text-xs text-text-muted"><strong className="text-text-secondary">Approach:</strong> {candidate.approach_strategy}</div>}
     </div>
   );
@@ -110,7 +110,7 @@ export function LensExportPage() {
       'SHORTLIST SUMMARY:',
       ...sortedPipeline.slice(0, 10).map((c, i) => {
         const v = clientVerdict(c.sweep_tier);
-        return `${i + 1}. ${c.contact?.name || 'Unknown'} — ${c.contact?.current_title || 'N/A'} ${c.contact?.company?.name ? 'at ' + c.contact?.company?.name : ''} [${v.label}]${c.trident_composite != null ? ` — Composite: ${c.trident_composite.toFixed(1)}` : ''}`;
+        return `${i + 1}. ${c.contact?.name || 'Unknown'} — ${c.contact?.current_title || 'N/A'} ${c.contact?.company?.name ? 'at' + c.contact?.company?.name : ''} [${v.label}]${c.trident_composite != null ?` — Composite: ${c.trident_composite.toFixed(1)}`: ''}`;
       }),
       '',
       sortedPipeline.length > 10 ? `... and ${sortedPipeline.length - 10} more candidates in the full report.` : '',
@@ -152,7 +152,7 @@ export function LensExportPage() {
         doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(255, 255, 255);
         doc.text(name, margin, y); y += 5;
         doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(160, 160, 178);
-        doc.text(`${c.contact?.current_title || ''} ${c.contact?.company?.name ? 'at ' + c.contact?.company?.name : ''}`, margin, y); y += 4;
+        doc.text(`${c.contact?.current_title || ''} ${c.contact?.company?.name ? 'at' + c.contact?.company?.name : ''}`, margin, y); y += 4;
         doc.setTextColor(v.color === '#34D399' ? 52 : v.color === '#FBBF24' ? 251 : 248, v.color === '#34D399' ? 211 : v.color === '#FBBF24' ? 191 : 113, v.color === '#34D399' ? 153 : v.color === '#FBBF24' ? 36 : 113);
         doc.text(`Verdict: ${v.label}`, margin, y); y += 4;
         if (c.trident_composite != null) {
@@ -197,7 +197,7 @@ export function LensExportPage() {
     });
     setSending(false);
     if (result.success) { setSent(true); setTimeout(() => setSent(false), 3000); }
-    else { toast.error('Failed to send: ' + (result.error || 'Unknown error')); }
+    else { toast.error('Failed to send:' + (result.error || 'Unknown error')); }
   }
 
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>;
@@ -245,7 +245,7 @@ export function LensExportPage() {
       </div>
 
       {!showConfidential && (
-        <div className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded-none">
+        <div className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/20">
           <Shield className="w-4 h-4 text-green-400 flex-shrink-0" />
           <p className="text-xs text-green-400">Client-safe view — Match Analysis formulas, weights, run IDs, and internal stage names are hidden.</p>
         </div>
@@ -276,7 +276,7 @@ export function LensExportPage() {
               <label className="text-xs text-text-muted mb-1 block">Client Email (optional)</label>
               <Input placeholder="client@company.com" value={emailTo} onChange={e => setEmailTo(e.target.value)} />
             </div>
-            <pre className="bg-bg-tertiary p-4 rounded-none text-sm text-text-secondary whitespace-pre-wrap overflow-auto max-h-96 font-sans">{emailDraft}</pre>
+            <pre className="bg-bg-tertiary p-4 text-sm text-text-secondary whitespace-pre-wrap overflow-auto max-h-96 font-sans">{emailDraft}</pre>
           </CardContent>
         </Card>
       )}

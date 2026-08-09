@@ -21,7 +21,7 @@ function SkillGapAnalysis() {
       <h2 className="font-serif text-xl text-text-primary">Skill Gap Analysis</h2>
 
       {/* Top 3 Development Areas */}
-      <div className="border border-bg-tertiary bg-bg-secondary p-5" style={{ borderRadius: 0 }}>
+      <div className="border border-bg-tertiary bg-bg-secondary p-5" style={{ }}>
         <div className="flex items-center gap-2 mb-3">
           <TrendingUp className="w-4 h-4" style={{ color: '#C108AB' }} />
           <h3 className="font-serif text-base text-text-primary">Top 3 Development Areas</h3>
@@ -29,7 +29,7 @@ function SkillGapAnalysis() {
         <ol className="list-decimal list-inside space-y-1.5">
           {topGaps.map((skill) => (
             <li key={skill.name} className="text-sm text-text-primary">
-              {skill.name}{' '}
+              {skill.name}{''}
               <span className="text-text-muted">
                 (gap: +{skill.gap})
               </span>
@@ -45,7 +45,7 @@ function SkillGapAnalysis() {
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-sm font-medium text-text-primary">{skill.name}</span>
               <span className="text-xs text-text-muted">
-                {skill.current}/{skill.target}{' '}
+                {skill.current}/{skill.target}{''}
                 <span
                   className="font-medium"
                   style={{ color: skill.gap > 15 ? '#C108AB' : '#666666' }}
@@ -60,12 +60,12 @@ function SkillGapAnalysis() {
               {/* Target bar (background / dashed outline) */}
               <div
                 className="absolute inset-0 border-2 border-dashed border-bg-tertiary bg-transparent"
-                style={{ borderRadius: 0 }}
+                style={{ }}
               />
               {/* Target fill (gray) */}
               <div
                 className="absolute top-0 left-0 h-full bg-bg-tertiary/40"
-                style={{ width: `${skill.target}%`, borderRadius: 0 }}
+                style={{ width: `${skill.target}%` }}
               />
               {/* Current fill (fuchsia) */}
               <div
@@ -73,7 +73,6 @@ function SkillGapAnalysis() {
                 style={{
                   width: `${skill.current}%`,
                   backgroundColor: '#C108AB',
-                  borderRadius: 0,
                 }}
               />
             </div>

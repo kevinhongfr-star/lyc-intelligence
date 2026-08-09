@@ -85,7 +85,7 @@ const SystemConfigPanel: React.FC = () => {
       setNewConfig({ key: '', value: '', description: '', scope: 'global' });
       loadData();
     } catch (err) {
-      alert('Failed to create config: ' + (err as Error).message);
+      alert('Failed to create config:' + (err as Error).message);
     } finally {
       setSaving(false);
     }
@@ -98,7 +98,7 @@ const SystemConfigPanel: React.FC = () => {
       setSavedId(id);
       setTimeout(() => setSavedId(null), 1500);
     } catch (err) {
-      alert('Failed to update: ' + (err as Error).message);
+      alert('Failed to update:' + (err as Error).message);
     } finally {
       setSaving(false);
     }
@@ -118,7 +118,7 @@ const SystemConfigPanel: React.FC = () => {
       setNewFlag({ key: '', name: '', description: '', rollout: 100 });
       loadData();
     } catch (err) {
-      alert('Failed to create flag: ' + (err as Error).message);
+      alert('Failed to create flag:' + (err as Error).message);
     } finally {
       setSaving(false);
     }
@@ -129,7 +129,7 @@ const SystemConfigPanel: React.FC = () => {
       await adminService.featureFlags.update(key, { is_enabled: !currentEnabled });
       loadData();
     } catch (err) {
-      alert('Failed to toggle: ' + (err as Error).message);
+      alert('Failed to toggle:' + (err as Error).message);
     }
   }
 
@@ -138,7 +138,7 @@ const SystemConfigPanel: React.FC = () => {
       await adminService.featureFlags.update(key, { rollout_percentage: percentage });
       loadData();
     } catch (err) {
-      alert('Failed to update rollout: ' + (err as Error).message);
+      alert('Failed to update rollout:' + (err as Error).message);
     }
   }
 

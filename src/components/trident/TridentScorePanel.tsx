@@ -182,7 +182,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
         step="0.1"
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full h-2 bg-bg-alt rounded-none appearance-none cursor-pointer"
+        className="w-full h-2 bg-bg-alt appearance-none cursor-pointer"
       />
       <div className="flex items-center justify-between text-xs text-text-muted">
         <span>1.0</span>
@@ -194,7 +194,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
           <button
             key={c}
             onClick={() => onConfidenceChange(c)}
-            className={`px-2 py-1 text-xs rounded ${
+            className={`px-2 py-1 text-xs ${
               confidence === c ? 'bg-accent text-white' : 'bg-bg-alt text-text-muted'
             }`}
           >
@@ -265,7 +265,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
                   {value === 'PASS' && <CheckCircle className="w-3 h-3 text-green-500" />}
                   {value === 'WARN' && <AlertCircle className="w-3 h-3 text-yellow-500" />}
                   {value === 'HALT' && <X className="w-3 h-3 text-red-500" />}
-                  <span className="text-text-muted">{key.replace(/_/g, ' ')}</span>
+                  <span className="text-text-muted">{key.replace(/_/g, '')}</span>
                 </div>
               ))}
             </div>
@@ -303,7 +303,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
           <div className="grid grid-cols-4 gap-2">
             {(['sector_expertise', 'analytical_depth', 'industry_knowledge', 'technical_fluency'] as const).map(key => (
               <div key={key}>
-                <label className="text-xs text-text-muted">{key.replace(/_/g, ' ')}</label>
+                <label className="text-xs text-text-muted">{key.replace(/_/g, '')}</label>
                 <input
                   type="number"
                   min="1.0"
@@ -311,7 +311,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
                   step="0.1"
                   value={d1Sub[key] || ''}
                   onChange={(e) => setD1Sub({ ...d1Sub, [key]: parseFloat(e.target.value) || undefined })}
-                  className="w-full px-2 py-1 text-sm bg-bg border border-border rounded"
+                  className="w-full px-2 py-1 text-sm bg-bg border border-border"
                 />
               </div>
             ))}
@@ -339,7 +339,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
           <div className="grid grid-cols-4 gap-2">
             {(['outcomes', 'stakeholder_impact', 'execution', 'leadership'] as const).map(key => (
               <div key={key}>
-                <label className="text-xs text-text-muted">{key.replace(/_/g, ' ')}</label>
+                <label className="text-xs text-text-muted">{key.replace(/_/g, '')}</label>
                 <input
                   type="number"
                   min="1.0"
@@ -347,7 +347,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
                   step="0.1"
                   value={d2Sub[key] || ''}
                   onChange={(e) => setD2Sub({ ...d2Sub, [key]: parseFloat(e.target.value) || undefined })}
-                  className="w-full px-2 py-1 text-sm bg-bg border border-border rounded"
+                  className="w-full px-2 py-1 text-sm bg-bg border border-border"
                 />
               </div>
             ))}
@@ -375,7 +375,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
           <div className="grid grid-cols-4 gap-2">
             {(['resilience', 'ambition', 'cultural_adaptability', 'learning_agility'] as const).map(key => (
               <div key={key}>
-                <label className="text-xs text-text-muted">{key.replace(/_/g, ' ')}</label>
+                <label className="text-xs text-text-muted">{key.replace(/_/g, '')}</label>
                 <input
                   type="number"
                   min="1.0"
@@ -383,7 +383,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
                   step="0.1"
                   value={d3Sub[key] || ''}
                   onChange={(e) => setD3Sub({ ...d3Sub, [key]: parseFloat(e.target.value) || undefined })}
-                  className="w-full px-2 py-1 text-sm bg-bg border border-border rounded"
+                  className="w-full px-2 py-1 text-sm bg-bg border border-border"
                 />
               </div>
             ))}

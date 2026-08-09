@@ -20,14 +20,14 @@ interface DataTableProps<T> {
 export function DataTable<T extends { id?: string }>({ columns, data, onRowClick, emptyMessage }: DataTableProps<T>) {
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-card shadow-card border border-border p-6 text-center text-text-muted">
+      <div className="bg-white shadow-card border border-border p-6 text-center text-text-muted">
         {emptyMessage || 'No data available'}
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-card shadow-card border border-border overflow-hidden">
+    <div className="bg-white shadow-card border border-border overflow-hidden">
       <table className="w-full">
         <thead>
           <tr className="bg-bg-warm border-b border-border">
@@ -43,10 +43,7 @@ export function DataTable<T extends { id?: string }>({ columns, data, onRowClick
             <tr 
               key={row.id || i}
               onClick={() => onRowClick?.(row)}
-              className={`
-                border-b border-border last:border-b-0
-                ${onRowClick ? 'cursor-pointer hover:bg-fuchsia-light' : ''}
-              `}
+              className={`border-b border-border last:border-b-0 ${onRowClick ? 'cursor-pointer hover:bg-fuchsia-light' : ''}`}
             >
               {columns.map((col) => (
                 <td key={col.key} className="px-4 py-3 text-sm text-text-primary">

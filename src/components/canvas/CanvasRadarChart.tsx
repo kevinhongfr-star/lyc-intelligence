@@ -45,13 +45,13 @@ export function CanvasRadarChart({ scores }: CanvasRadarChartProps) {
   }
 
   const dataPoints = values.map((v, i) => getPoint(i, v, radius));
-  const dataPath = dataPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+  const dataPath = dataPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join('') + 'Z';
 
   const gridLines = [];
   for (let level = 1; level <= 5; level++) {
     const levelRadius = (level / 5) * radius;
     const points = Array.from({ length: numSides }, (_, i) => getPoint(i, 10, levelRadius));
-    gridLines.push(points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z');
+    gridLines.push(points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join('') + 'Z');
   }
 
   const axisLines = Array.from({ length: numSides }, (_, i) => {

@@ -718,13 +718,7 @@ export const SEED_QUESTIONS_COUNT = SEED_QUESTIONS.length;
 // Function to insert seed questions into database
 export async function insertSeedQuestions(db: any): Promise<void> {
   for (const question of SEED_QUESTIONS) {
-    await db.query(`
-      INSERT INTO questions (
-        question_text, competency, difficulty, expected_answer,
-        follow_up_question, is_system, usage_count
-      ) VALUES ($1, $2, $3, $4, $5, $6, 0)
-      ON CONFLICT DO NOTHING
-    `, [
+    await db.query(`INSERT INTO questions ( question_text, competency, difficulty, expected_answer, follow_up_question, is_system, usage_count ) VALUES ($1, $2, $3, $4, $5, $6, 0) ON CONFLICT DO NOTHING`, [
       question.question_text,
       question.competency,
       question.difficulty,

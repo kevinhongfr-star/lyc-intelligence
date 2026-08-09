@@ -75,7 +75,7 @@ export function SignupPage() {
             </p>
           </div>
 
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px', boxShadow: DS.shadow }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '32px', boxShadow: DS.shadow }}>
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
@@ -91,7 +91,7 @@ export function SignupPage() {
                     autoComplete="name"
                     style={{
                       width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px',
+                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
                       color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
                       fontFamily: DS.bodyFont, boxSizing: 'border-box',
                     }}
@@ -113,7 +113,7 @@ export function SignupPage() {
                     autoComplete="email"
                     style={{
                       width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px',
+                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
                       color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
                       fontFamily: DS.bodyFont, boxSizing: 'border-box',
                     }}
@@ -135,7 +135,7 @@ export function SignupPage() {
                     autoComplete="new-password"
                     style={{
                       width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px',
+                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
                       color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
                       fontFamily: DS.bodyFont, boxSizing: 'border-box',
                     }}
@@ -157,7 +157,7 @@ export function SignupPage() {
                     autoComplete="new-password"
                     style={{
                       width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px',
+                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
                       color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
                       fontFamily: DS.bodyFont, boxSizing: 'border-box',
                     }}
@@ -166,7 +166,7 @@ export function SignupPage() {
               </div>
 
               {error && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: '#FEF2F2', borderRadius: '0px', color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: '#FEF2F2',  color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
                   <AlertCircle style={{ width: 18, height: 18, flexShrink: 0 }} />
                   {error}
                 </div>
@@ -178,7 +178,7 @@ export function SignupPage() {
                 style={{
                   width: '100%', padding: '14px',
                   background: DS.accent, color: '#FFFFFF',
-                  border: 'none', borderRadius: '0px',
+                  border: 'none', 
                   fontSize: '15px', fontWeight: 600,
                   cursor: loading ? 'not-allowed' : 'pointer',
                   opacity: loading ? 0.7 : 1,
@@ -202,11 +202,7 @@ export function SignupPage() {
         </div>
       </div>
 
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; }
-        input::placeholder { color: ${DS.muted}; }
-      `}</style>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; } input::placeholder { color: ${DS.muted}; }`}</style>
     </div>
   );
 }

@@ -17,19 +17,7 @@ export async function escalateOverdueApprovals(
 
   const { data: overdueSteps, error } = await supabase
     .from('approval_step_records')
-    .select(`
-      id,
-      request_id,
-      step_order,
-      approver_id,
-      org_id,
-      created_at,
-      approval_requests:approval_requests(
-        sla_deadline,
-        workflow_id,
-        approval_type
-      )
-    `)
+    .select(`id, request_id, step_order, approver_id, org_id, created_at, approval_requests:approval_requests( sla_deadline, workflow_id, approval_type )`)
     .eq('status', 'pending')
     .lte('created_at', twentyFourHoursAgo);
 
@@ -166,15 +154,7 @@ export async function sendSlaWarnings(
 
   const { data: approachingSteps, error } = await supabase
     .from('approval_step_records')
-    .select(`
-      id,
-      approver_id,
-      request_id,
-      org_id,
-      approval_requests:approval_requests(
-        sla_deadline
-      )
-    `)
+    .select(`id, approver_id, request_id, org_id, approval_requests:approval_requests( sla_deadline )`)
     .eq('status', 'pending')
     .lte('approval_requests.sla_deadline', twelveHoursFromNow)
     .gte('approval_requests.sla_deadline', now);

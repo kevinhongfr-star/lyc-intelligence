@@ -74,13 +74,13 @@ export function ScheduleReportModal({ templates, onClose, onSchedule }: Schedule
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-bg rounded-none border border-border w-full max-w-lg max-h-[90vh] overflow-auto">
+      <div className="bg-bg border border-border w-full max-w-lg max-h-[90vh] overflow-auto">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-[#C108AB]" />
             <h2 className="text-lg font-semibold text-text-primary">Schedule Report</h2>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-bg-alt rounded-none">
+          <button onClick={onClose} className="p-2 hover:bg-bg-alt">
             <X className="w-5 h-5 text-text-muted" />
           </button>
         </div>
@@ -89,7 +89,7 @@ export function ScheduleReportModal({ templates, onClose, onSchedule }: Schedule
           <div>
             <label className="block text-sm font-medium text-text-primary mb-2">Report Template</label>
             <select
-              className="w-full bg-bg border border-border p-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB] rounded-none"
+              className="w-full bg-bg border border-border p-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB]"
               value={templateId}
               onChange={(e) => setTemplateId(e.target.value)}
             >
@@ -146,7 +146,7 @@ export function ScheduleReportModal({ templates, onClose, onSchedule }: Schedule
           <div>
             <label className="block text-sm font-medium text-text-primary mb-2">Context (JSON)</label>
             <textarea
-              className="w-full bg-bg-alt border border-border p-3 text-sm text-text-primary font-mono focus:outline-none focus:ring-1 focus:ring-[#C108AB] min-h-[80px] rounded-none"
+              className="w-full bg-bg-alt border border-border p-3 text-sm text-text-primary font-mono focus:outline-none focus:ring-1 focus:ring-[#C108AB] min-h-[80px]"
               value={contextJson}
               onChange={(e) => setContextJson(e.target.value)}
               placeholder='{"mandateId": "xxx", "data": {...}}'
@@ -159,7 +159,7 @@ export function ScheduleReportModal({ templates, onClose, onSchedule }: Schedule
                 type="checkbox"
                 checked={emailEnabled}
                 onChange={(e) => setEmailEnabled(e.target.checked)}
-                className="w-4 h-4 rounded-none border-border"
+                className="w-4 h-4 border-border"
               />
               <Mail className="w-4 h-4 text-text-muted" />
               <span className="text-sm text-text-primary">Email on Generation</span>

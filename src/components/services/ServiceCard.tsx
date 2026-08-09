@@ -14,12 +14,12 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
   return (
     <div
       className="bg-bg-primary border border-bg-tertiary p-5 flex flex-col gap-3"
-      style={{ borderRadius: 0 }}
+      style={{ }}
     >
       {/* Header: category badge + name */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <span className="inline-block px-2 py-0.5 text-xs font-medium bg-accent-10 text-accent mb-2" style={{ borderRadius: 0 }}>
+          <span className="inline-block px-2 py-0.5 text-xs font-medium bg-accent-10 text-accent mb-2" style={{ }}>
             {service.category}
           </span>
           <h3 className="font-serif font-semibold text-base text-text-primary leading-snug">
@@ -35,7 +35,7 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
       <div className="flex items-center gap-2">
         <span
           className="w-6 h-6 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white"
-          style={{ borderRadius: 0, backgroundColor: service.provider.avatarColor }}
+          style={{  backgroundColor: service.provider.avatarColor }}
         >
           {service.provider.name.charAt(0)}
         </span>
@@ -77,7 +77,7 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
         <button
           onClick={() => onBook(service)}
           className="px-4 py-2 text-sm font-medium text-white bg-[#C108AB] hover:bg-[#A00790] transition-colors"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           Book Now
         </button>

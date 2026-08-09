@@ -27,7 +27,7 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
   const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-xxs' : 'px-3 py-1 text-xs';
 
   return (
-    <span className={`${colors.bg} ${colors.text} rounded-full font-semibold ${sizeClasses}`}>
+    <span className={`${colors.bg} ${colors.text} font-semibold ${sizeClasses}`}>
       {status}
     </span>
   );

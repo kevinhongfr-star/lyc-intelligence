@@ -45,18 +45,18 @@ export function CommandCenter() {
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex gap-2">
           {FILTER_OPTIONS.map(opt => (
-            <button key={opt.key} onClick={() => setStatusFilter(opt.key)} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${statusFilter === opt.key ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>
+            <button key={opt.key} onClick={() => setStatusFilter(opt.key)} className={`px-3 py-2 text-sm min-h-[44px] ${statusFilter === opt.key ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>
               {opt.label} {opt.key !== 'all' ? (counts[opt.key] ?? 0) : enriched.length}
             </button>
           ))}
         </div>
-        <button onClick={() => setSortBy(sortBy === 'phi' ? 'age' : 'phi')} className="flex items-center gap-1 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary rounded-none min-h-[44px]"><ArrowUpDown className="w-3 h-3" />Sort: {sortBy === 'phi' ? 'PHI Score' : 'Age'}</button>
+        <button onClick={() => setSortBy(sortBy === 'phi' ? 'age' : 'phi')} className="flex items-center gap-1 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary min-h-[44px]"><ArrowUpDown className="w-3 h-3" />Sort: {sortBy === 'phi' ? 'PHI Score' : 'Age'}</button>
       </div>
 
       {loading ? <div className="text-text-muted text-center py-12">Loading mandates...</div> : filtered.length === 0 ? <div className="text-text-muted text-center py-12">No mandates found</div> : (
         <div className="space-y-2">
           {filtered.map(m => (
-            <div key={m.id} className="bg-bg-secondary border border-bg-tertiary rounded-none p-4">
+            <div key={m.id} className="bg-bg-secondary border border-bg-tertiary p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-text-primary truncate">{m.title}</h3>
@@ -71,14 +71,14 @@ export function CommandCenter() {
               <div className="flex gap-4 text-xs text-text-muted">
                 {Object.entries(m.phi.dimensions).map(([k, v]) => (
                   <span key={k} className="flex items-center gap-1">
-                    <span className={`inline-block w-2 h-2 rounded-full ${v === 3 ? 'bg-red-400' : v === 2 ? 'bg-amber-400' : 'bg-green-400'}`} />
+                    <span className={`inline-block w-2 h-2 ${v === 3 ? 'bg-red-400' : v === 2 ? 'bg-amber-400' : 'bg-green-400'}`} />
                     {k.slice(0, 3).toUpperCase()}: {v}
                   </span>
                 ))}
                 <span>Priority: {m.phi.actionPriority}</span>
               </div>
               <div className="flex gap-1 mt-2">
-                {STAGE_ORDER.map(s => { const c = s === 'SWEEP' ? m.tier1_count : s === 'CANVA' ? m.tier2_count : s === 'GRID' ? m.shortlisted_count : s === 'LENS' ? m.interview_count : m.placed_count; return <div key={s} className="flex-1 h-6 rounded flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{c}</div>; })}
+                {STAGE_ORDER.map(s => { const c = s === 'SWEEP' ? m.tier1_count : s === 'CANVA' ? m.tier2_count : s === 'GRID' ? m.shortlisted_count : s === 'LENS' ? m.interview_count : m.placed_count; return <div key={s} className="flex-1 h-6 flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{c}</div>; })}
               </div>
             </div>
           ))}

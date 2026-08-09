@@ -85,7 +85,7 @@ function ChartSkeleton({ animation, className }: { animation: SkeletonAnimation;
 function AvatarSkeleton({ animation, className }: { animation: SkeletonAnimation; className?: string }) {
   return (
     <div className="flex items-center gap-3" aria-hidden="true">
-      <div className={cn('w-10 h-10 rounded-full bg-bg-tertiary', ANIMATION_CLASS[animation])} />
+      <div className={cn('w-10 h-10 bg-bg-tertiary', ANIMATION_CLASS[animation])} />
       <div className="flex-1 space-y-2">
         <div className={cn('h-3 w-24 bg-bg-tertiary', ANIMATION_CLASS[animation])} />
         <div className={cn('h-2 w-16 bg-bg-tertiary', ANIMATION_CLASS[animation])} />
@@ -119,7 +119,7 @@ export function Skeleton({
     if (circle) {
       return (
         <div
-          className={cn('bg-bg-tertiary rounded-full', ANIMATION_CLASS[animation], className)}
+          className={cn('bg-bg-tertiary', ANIMATION_CLASS[animation], className)}
           style={{ width: width ?? '2.5rem', height: height ?? '2.5rem', ...style }}
           aria-hidden="true"
           {...rest}

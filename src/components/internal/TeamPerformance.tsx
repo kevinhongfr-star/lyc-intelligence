@@ -24,7 +24,7 @@ export default function TeamPerformance() {
             <div
               key={kpi.label}
               className="bg-bg-primary border border-bg-tertiary p-4"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-center gap-3">
                 <Icon className={`w-5 h-5 ${kpi.color}`} />
@@ -51,10 +51,10 @@ export default function TeamPerformance() {
                   <span className="text-sm font-medium text-text-primary">{member.name}</span>
                   <span className="text-sm text-text-muted">{member.revenue}</span>
                 </div>
-                <div className="h-2 bg-bg-tertiary" style={{ borderRadius: 0 }}>
+                <div className="h-2 bg-bg-tertiary" style={{ }}>
                   <div
                     className="h-full bg-accent transition-all duration-500"
-                    style={{ width: `${percentage}%`, borderRadius: 0 }}
+                    style={{ width: `${percentage}%` }}
                   />
                 </div>
               </div>

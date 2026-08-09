@@ -57,7 +57,6 @@ function LeaderGrowthPage() {
                 onClick={() => setActiveTab(tab.key)}
                 className="inline-flex items-center gap-2 px-5 py-3 text-sm font-medium transition-colors border-b-2"
                 style={{
-                  borderRadius: 0,
                   borderColor: isActive ? '#C108AB' : 'transparent',
                   color: isActive ? '#C108AB' : '#666666',
                   backgroundColor: isActive ? 'rgba(193,8,171,0.05)' : 'transparent',

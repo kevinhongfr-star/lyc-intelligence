@@ -104,7 +104,7 @@ export function SavedSearchList({ orgId, userId, onSelectSearch, onEditSearch }:
           placeholder="Search saved searches..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 rounded-none border border-border bg-bg-base text-sm"
+          className="w-full pl-10 pr-4 py-2 border border-border bg-bg-base text-sm"
         />
       </div>
 
@@ -130,7 +130,7 @@ export function SavedSearchList({ orgId, userId, onSelectSearch, onEditSearch }:
                 {/* Status Indicator */}
                 <button
                   onClick={() => handleToggleActive(search)}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                  className={`w-8 h-8 flex items-center justify-center transition-colors ${
                     search.is_active ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
                   }`}
                 >

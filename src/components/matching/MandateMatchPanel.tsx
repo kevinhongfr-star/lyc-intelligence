@@ -140,7 +140,7 @@ export function MandateMatchPanel({ mandateId, mandateTitle, onCandidateClick }:
   };
 
   return (
-    <div className="bg-card border border-border rounded-none overflow-hidden">
+    <div className="bg-card border border-border overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-border">
         <div className="flex items-center justify-between">
@@ -179,7 +179,7 @@ export function MandateMatchPanel({ mandateId, mandateTitle, onCandidateClick }:
         </div>
 
         {runStatus && (
-          <div className="mt-3 flex items-center gap-2 text-sm text-primary bg-primary/5 rounded-none px-3 py-2">
+          <div className="mt-3 flex items-center gap-2 text-sm text-primary bg-primary/5 px-3 py-2">
             <Zap className="w-4 h-4 animate-pulse" />
             {runStatus}
           </div>
@@ -210,7 +210,7 @@ export function MandateMatchPanel({ mandateId, mandateTitle, onCandidateClick }:
           <select
             value={gradeFilter}
             onChange={e => setGradeFilter(e.target.value as GradeFilter)}
-            className="px-2 py-1 text-sm rounded-none bg-bg-base border border-border text-text-primary"
+            className="px-2 py-1 text-sm bg-bg-base border border-border text-text-primary"
           >
             <option value="all">All Grades</option>
             <option value="EXCEPTIONAL">Exceptional</option>
@@ -226,7 +226,7 @@ export function MandateMatchPanel({ mandateId, mandateTitle, onCandidateClick }:
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value as SortBy)}
-            className="px-2 py-1 text-sm rounded-none bg-bg-base border border-border text-text-primary"
+            className="px-2 py-1 text-sm bg-bg-base border border-border text-text-primary"
           >
             <option value="match_score">Overall Score</option>
             <option value="trident_component">TRIDENT Fit</option>
@@ -240,7 +240,7 @@ export function MandateMatchPanel({ mandateId, mandateTitle, onCandidateClick }:
             type="checkbox"
             checked={includeStale}
             onChange={e => setIncludeStale(e.target.checked)}
-            className="rounded"
+            className=""
           />
           Include stale
         </label>
@@ -278,7 +278,7 @@ export function MandateMatchPanel({ mandateId, mandateTitle, onCandidateClick }:
                 >
                   <div className="flex items-start gap-4">
                     {/* Rank */}
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-bg-alt flex items-center justify-center font-semibold text-text-muted text-sm">
+                    <div className="flex-shrink-0 w-8 h-8 bg-bg-alt flex items-center justify-center font-semibold text-text-muted text-sm">
                       #{filteredMatches.indexOf(match) + 1}
                     </div>
 
@@ -288,14 +288,14 @@ export function MandateMatchPanel({ mandateId, mandateTitle, onCandidateClick }:
                         <h4 className="font-medium text-text-primary truncate">{name}</h4>
                         <MatchQualityBadge score={match.match_score} grade={match.match_grade} size="sm" />
                         {match.is_stale && (
-                          <span className="px-2 py-0.5 text-xs bg-amber-100 text-amber-700 rounded-full flex items-center gap-1">
+                          <span className="px-2 py-0.5 text-xs bg-amber-100 text-amber-700 flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             Stale
                           </span>
                         )}
                       </div>
                       <p className="text-sm text-text-muted truncate">
-                        {title}{company ? ` at ${company}` : ''}
+                        {title}{company ? `at ${company}` : ''}
                       </p>
 
                       {/* Score bar */}

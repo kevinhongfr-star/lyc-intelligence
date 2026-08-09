@@ -107,7 +107,7 @@ export function ApiKeyManager() {
                   value={newKeyName}
                   onChange={e => setNewKeyName(e.target.value)}
                   placeholder="e.g., Production Integration"
-                  className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+                  className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
                 />
               </div>
               <div>

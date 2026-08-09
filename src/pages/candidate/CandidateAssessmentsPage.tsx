@@ -106,7 +106,6 @@ export function CandidateAssessmentsPage() {
               onClick={() => setActiveTab(tab.id)}
               className="inline-flex items-center gap-2 px-5 py-3 text-sm font-medium transition-colors"
               style={{
-                borderRadius: 0,
                 borderBottom: isActive ? '2px solid #C108AB' : '2px solid transparent',
                 color: isActive ? '#C108AB' : '#999999',
                 background: 'none',
@@ -127,13 +126,13 @@ export function CandidateAssessmentsPage() {
           {available.map((a) => (
             <Card key={a.id} className="p-5">
               <div className="flex items-start gap-3 mb-3">
-                <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center flex-shrink-0">
                   <ClipboardCheck className="w-5 h-5 text-fuchsia" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-serif font-semibold text-text-primary">{a.name}</h3>
-                    <span className="px-2 py-0.5 text-xs font-medium rounded bg-fuchsia-light text-fuchsia">{a.category}</span>
+                    <span className="px-2 py-0.5 text-xs font-medium bg-fuchsia-light text-fuchsia">{a.category}</span>
                   </div>
                   <p className="text-sm text-text-secondary mt-1">{a.description}</p>
                 </div>
@@ -179,7 +178,7 @@ export function CandidateAssessmentsPage() {
                 <CardContent>
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Archetype display */}
-                    <div className="flex flex-col items-center justify-center text-center bg-fuchsia-light rounded-lg p-6">
+                    <div className="flex flex-col items-center justify-center text-center bg-fuchsia-light p-6">
                       <Star className="w-8 h-8 text-fuchsia mb-2" />
                       <div className="text-xs text-text-muted uppercase tracking-wide">Leadership Profile</div>
                       <div className="font-serif font-bold text-xl text-text-primary mt-1">{c.archetype}</div>
@@ -208,7 +207,7 @@ export function CandidateAssessmentsPage() {
                             fillOpacity={0.35}
                           />
                           <RTooltip
-                            contentStyle={{ border: '1px solid #e5e7eb', borderRadius: 0, fontSize: 12 }}
+                            contentStyle={{ border: '1px solid #e5e7eb',  fontSize: 12 }}
                           />
                         </RadarChart>
                       </ResponsiveContainer>

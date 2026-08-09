@@ -93,7 +93,7 @@ export function DiagnosticPanel({
   return (
     <div
       className={cn('border border-[#E5E5E5] bg-white', className)}
-      style={{ borderRadius: 0 }}
+      style={{ }}
     >
       <div
         style={{
@@ -241,7 +241,6 @@ export function DiagnosticPanel({
                       cursor: 'pointer',
                       textTransform: 'uppercase',
                       letterSpacing: '0.5px',
-                      borderRadius: 0,
                       transition: 'all 0.2s ease',
                     }}
                   >
@@ -301,7 +300,6 @@ export function DiagnosticPanel({
                 fontWeight: 600,
                 fontFamily: DS.bodyFont,
                 cursor: 'pointer',
-                borderRadius: 0,
                 transition: 'background 0.2s ease',
               }}
               onMouseEnter={(e) => {
@@ -341,12 +339,7 @@ export function DiagnosticPanel({
         )}
       </div>
 
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.6; }
-        }
-      `}</style>
+      <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }`}</style>
     </div>
   );
 }

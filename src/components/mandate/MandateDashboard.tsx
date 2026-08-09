@@ -160,7 +160,7 @@ export function MandateDashboard() {
   };
 
   const PipelineCard = ({ label, count, icon }: { label: string; count: number; icon: React.ReactNode }) => (
-    <div className="bg-bg-alt rounded-none p-3 text-center">
+    <div className="bg-bg-alt p-3 text-center">
       <div className="flex items-center justify-center mb-1">{icon}</div>
       <div className="text-2xl font-bold text-text-primary">{count}</div>
       <div className="text-xs text-text-muted">{label}</div>
@@ -198,12 +198,12 @@ export function MandateDashboard() {
     <div className="space-y-2">
       {timeline.map((entry, i) => (
         <div key={i} className="flex items-center gap-3">
-          <div className={`w-3 h-3 rounded-full ${getPhaseColor(entry.phase)}`} />
+          <div className={`w-3 h-3 ${getPhaseColor(entry.phase)}`} />
           <div className="flex-1">
             <div className="text-sm font-medium text-text-primary capitalize">{entry.phase}</div>
             <div className="text-xs text-text-muted">
               {new Date(entry.entered_at).toLocaleDateString()}
-              {entry.exited_at && ` - ${new Date(entry.exited_at).toLocaleDateString()}`}
+              {entry.exited_at && `- ${new Date(entry.exited_at).toLocaleDateString()}`}
             </div>
           </div>
           {i < timeline.length - 1 && (
@@ -308,7 +308,7 @@ export function MandateDashboard() {
         <div className="grid grid-cols-4 gap-4">
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-none bg-accent/10">
+              <div className="p-2 bg-accent/10">
                 <Clock className="w-5 h-5 text-accent" />
               </div>
               <div>
@@ -322,7 +322,7 @@ export function MandateDashboard() {
 
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-none bg-green-500/10">
+              <div className="p-2 bg-green-500/10">
                 <Target className="w-5 h-5 text-green-500" />
               </div>
               <div>
@@ -338,7 +338,7 @@ export function MandateDashboard() {
 
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-none bg-yellow-500/10">
+              <div className="p-2 bg-yellow-500/10">
                 <Users className="w-5 h-5 text-yellow-500" />
               </div>
               <div>
@@ -352,7 +352,7 @@ export function MandateDashboard() {
 
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-none bg-purple-500/10">
+              <div className="p-2 bg-purple-500/10">
                 <DollarSign className="w-5 h-5 text-purple-500" />
               </div>
               <div>
@@ -456,7 +456,7 @@ export function MandateDashboard() {
                   <h4 className="font-medium text-text-primary mb-3">Team</h4>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent font-medium">
+                      <div className="w-8 h-8 bg-accent/20 flex items-center justify-center text-accent font-medium">
                         {mandate.lead_consultant?.name?.[0] || '?'}
                       </div>
                       <div>
@@ -468,7 +468,7 @@ export function MandateDashboard() {
                     </div>
                     {mandate.executive_sponsor && (
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500 font-medium">
+                        <div className="w-8 h-8 bg-purple-500/20 flex items-center justify-center text-purple-500 font-medium">
                           {mandate.executive_sponsor?.name?.[0] || '?'}
                         </div>
                         <div>

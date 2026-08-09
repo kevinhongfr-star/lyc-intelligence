@@ -25,7 +25,7 @@ const SIZE_STYLES = {
 export function Button({ variant = 'primary', size = 'md', className = '', children, ...props }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors ${VARIANT_STYLES[variant]} ${SIZE_STYLES[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 font-semibold transition-colors ${VARIANT_STYLES[variant]} ${SIZE_STYLES[size]} ${className}`}
       {...props}
     >
       {children}

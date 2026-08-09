@@ -79,11 +79,7 @@ export function ClientFeedbackModal({ candidate, mandateId, onClose, onSubmit }:
                 key={option.value}
                 type="button"
                 onClick={() => setFeedbackType(option.value as any)}
-                className={`w-full p-4 rounded-none border-2 text-left transition-colors ${
-                  feedbackType === option.value
-                    ? `${option.bgColor} border-current ${option.color}`
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
+                className={`w-full p-4 border-2 text-left transition-colors ${ feedbackType === option.value ?`${option.bgColor} border-current ${option.color}`: 'border-gray-200 hover:border-gray-300' }`}
               >
                 <div className="flex items-center gap-3">
                   <Icon className={`w-5 h-5 ${feedbackType === option.value ? option.color : 'text-gray-400'}`} />
@@ -140,7 +136,7 @@ export function ClientFeedbackModal({ candidate, mandateId, onClose, onSubmit }:
           >
             {submitting ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                <div className="animate-spin h-4 w-4 border-b-2 border-white mr-2"></div>
                 Submitting...
               </>
             ) : (

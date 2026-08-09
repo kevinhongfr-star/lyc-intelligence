@@ -93,7 +93,7 @@ function OutputPreview({ data }: { data: Record<string, any> }) {
       </button>
 
       {expanded && (
-        <div className="mt-2 p-2 rounded bg-gray-50 border border-gray-200 text-xs font-mono max-h-48 overflow-auto">
+        <div className="mt-2 p-2 bg-gray-50 border border-gray-200 text-xs font-mono max-h-48 overflow-auto">
           {entries.map(([key, value]) => (
             <div key={key} className="flex gap-2">
               <span className="text-purple-600">{key}:</span>
@@ -221,7 +221,7 @@ export function AgentActionReviewQueue({
                     {/* Header */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2">
-                        <div className={`flex items-center gap-1.5 px-2 py-1 rounded border text-xs font-semibold ${agent.color}`}>
+                        <div className={`flex items-center gap-1.5 px-2 py-1 border text-xs font-semibold ${agent.color}`}>
                           {agent.icon}
                           <span>{agent.label}</span>
                         </div>
@@ -261,7 +261,7 @@ export function AgentActionReviewQueue({
                           setReviewNotes(e.target.value);
                         }}
                         placeholder="Review notes (optional)"
-                        className="flex-1 text-sm px-3 py-2 rounded border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        className="flex-1 text-sm px-3 py-2 border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/50"
                         rows={2}
                       />
                       <div className="flex gap-2">
@@ -311,10 +311,10 @@ export function AgentActionReviewQueue({
               return (
                 <div
                   key={action.id}
-                  className="flex items-center justify-between p-3 rounded bg-bg-secondary border border-bg-tertiary"
+                  className="flex items-center justify-between p-3 bg-bg-secondary border border-bg-tertiary"
                 >
                   <div className="flex items-center gap-2">
-                    <div className={`flex items-center gap-1.5 px-2 py-1 rounded border text-xs font-semibold ${agent.color}`}>
+                    <div className={`flex items-center gap-1.5 px-2 py-1 border text-xs font-semibold ${agent.color}`}>
                       {agent.icon}
                       <span>{agent.label}</span>
                     </div>

@@ -47,7 +47,7 @@ export default function CandidateForumList() {
                 ? 'bg-accent text-white'
                 : 'text-text-muted hover:bg-bg-tertiary'
             }`}
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             {cat}
           </button>
@@ -61,7 +61,7 @@ export default function CandidateForumList() {
             key={thread.id}
             onClick={() => setSelectedThread(thread)}
             className="w-full text-left bg-bg-primary border border-bg-tertiary p-4 hover:bg-bg-secondary transition-colors"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">

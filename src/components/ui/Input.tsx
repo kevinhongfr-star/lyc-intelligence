@@ -37,7 +37,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       aria-invalid={error ? true : undefined}
       aria-describedby={describedById}
       className={cn(
-        'w-full px-3 py-2 bg-bg-tertiary border rounded-none text-sm text-text-primary placeholder:text-text-muted',
+        'w-full px-3 py-2 bg-bg-tertiary border text-sm text-text-primary placeholder:text-text-muted',
         'focus:outline-none focus:border-accent transition-colors',
         leftAdornment ? 'pl-9' : null,
         rightAdornment ? 'pr-9' : null,

@@ -92,7 +92,6 @@ export function MilestoneCelebration({
         style={{
           background: 'white',
           borderLeft: `4px solid ${ACCENT}`,
-          borderRadius: 0,
         }}
       >
         {/* Decorative sparkle */}
@@ -109,7 +108,6 @@ export function MilestoneCelebration({
             style={{
               background: `${ACCENT}15`,
               color: ACCENT,
-              borderRadius: 0,
             }}
           >
             <Icon className="w-6 h-6" />

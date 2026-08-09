@@ -77,14 +77,13 @@ export function UpgradeCTA({
 
       <div
         className="relative max-w-md w-full bg-white shadow-2xl overflow-hidden"
-        style={{ borderRadius: 0 }}
+        style={{ }}
       >
         {/* Header */}
         <div
           className="px-6 py-6 text-center relative"
           style={{
             background: `linear-gradient(135deg, ${ACCENT} 0%, ${ACCENT}CC 100%)`,
-            borderRadius: 0,
           }}
         >
           <button
@@ -99,7 +98,6 @@ export function UpgradeCTA({
             className="w-16 h-16 flex items-center justify-center mx-auto mb-4"
             style={{
               background: 'white',
-              borderRadius: 0,
             }}
           >
             <Crown className="w-8 h-8" style={{ color: ACCENT }} />
@@ -124,7 +122,6 @@ export function UpgradeCTA({
                 background: `${ACCENT}10`,
                 border: `1px solid ${ACCENT}40`,
                 color: ACCENT,
-                borderRadius: 0,
               }}
             >
               You need <strong>{shortfall}</strong> more miles for this action.
@@ -156,7 +153,6 @@ export function UpgradeCTA({
             style={{
               background: ACCENT,
               color: 'white',
-              borderRadius: 0,
             }}
           >
             <Sparkles className="w-4 h-4" />
@@ -170,7 +166,6 @@ export function UpgradeCTA({
             style={{
               background: 'transparent',
               color: '#666',
-              borderRadius: 0,
             }}
           >
             Maybe Later

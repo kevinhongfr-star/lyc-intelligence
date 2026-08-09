@@ -58,17 +58,17 @@ export function ClientMandateList({ onMandateClick }: ClientMandateListProps) {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'Active': return <span className="w-2 h-2 rounded-full bg-green-500"></span>;
-      case 'On Hold': return <span className="w-2 h-2 rounded-full bg-yellow-500"></span>;
-      case 'Completed': return <span className="w-2 h-2 rounded-full bg-gray-400"></span>;
-      default: return <span className="w-2 h-2 rounded-full bg-gray-400"></span>;
+      case 'Active': return <span className="w-2 h-2 bg-green-500"></span>;
+      case 'On Hold': return <span className="w-2 h-2 bg-yellow-500"></span>;
+      case 'Completed': return <span className="w-2 h-2 bg-gray-400"></span>;
+      default: return <span className="w-2 h-2 bg-gray-400"></span>;
     }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -88,7 +88,7 @@ export function ClientMandateList({ onMandateClick }: ClientMandateListProps) {
             <Button variant="ghost" size="sm" className="relative">
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center">
                   {unreadCount}
                 </span>
               )}
@@ -143,7 +143,7 @@ export function ClientMandateList({ onMandateClick }: ClientMandateListProps) {
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="flex-1 flex items-center gap-1">
-                          <div className="flex-1 h-2 bg-blue-100 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2 bg-blue-100 overflow-hidden">
                             <div
                               className="h-full bg-blue-600"
                               style={{ width: `${(mandate.pipeline_summary.sourced / 50) * 100}%` }}
@@ -153,7 +153,7 @@ export function ClientMandateList({ onMandateClick }: ClientMandateListProps) {
                         </div>
                         <ChevronRight className="w-4 h-4 text-gray-400" />
                         <div className="flex-1 flex items-center gap-1">
-                          <div className="flex-1 h-2 bg-green-100 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2 bg-green-100 overflow-hidden">
                             <div
                               className="h-full bg-green-600"
                               style={{ width: `${(mandate.pipeline_summary.screened / mandate.pipeline_summary.sourced) * 100}%` }}
@@ -163,7 +163,7 @@ export function ClientMandateList({ onMandateClick }: ClientMandateListProps) {
                         </div>
                         <ChevronRight className="w-4 h-4 text-gray-400" />
                         <div className="flex-1 flex items-center gap-1">
-                          <div className="flex-1 h-2 bg-amber-100 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2 bg-amber-100 overflow-hidden">
                             <div
                               className="h-full bg-amber-600"
                               style={{ width: `${(mandate.pipeline_summary.shortlisted / mandate.pipeline_summary.screened) * 100}%` }}
@@ -173,7 +173,7 @@ export function ClientMandateList({ onMandateClick }: ClientMandateListProps) {
                         </div>
                         <ChevronRight className="w-4 h-4 text-gray-400" />
                         <div className="flex-1 flex items-center gap-1">
-                          <div className="flex-1 h-2 bg-purple-100 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2 bg-purple-100 overflow-hidden">
                             <div
                               className="h-full bg-purple-600"
                               style={{ width: `${(mandate.pipeline_summary.interview / mandate.pipeline_summary.shortlisted) * 100}%` }}

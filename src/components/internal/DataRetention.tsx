@@ -12,7 +12,7 @@ export default function DataRetention() {
   };
 
   return (
-    <div className="bg-bg-primary border border-bg-tertiary" style={{ borderRadius: 0 }}>
+    <div className="bg-bg-primary border border-bg-tertiary" style={{ }}>
       <div className="p-4 border-b border-bg-tertiary bg-bg-secondary flex items-center gap-2">
         <Database className="w-4 h-4 text-text-muted" />
         <span className="text-sm font-medium text-text-primary">Data Retention Policies</span>

@@ -9,7 +9,7 @@ function GoalTracker() {
         <h2 className="font-serif text-xl text-text-primary">Your Goals</h2>
         <button
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-colors"
-          style={{ backgroundColor: '#C108AB', borderRadius: 0 }}
+          style={{ backgroundColor: '#C108AB' }}
         >
           <Plus className="w-4 h-4" />
           Add Goal
@@ -21,7 +21,7 @@ function GoalTracker() {
           <div
             key={goal.id}
             className="border border-bg-tertiary bg-bg-secondary p-5"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
@@ -31,7 +31,6 @@ function GoalTracker() {
                   <span
                     className="inline-flex items-center px-2 py-0.5 text-xs font-medium"
                     style={{
-                      borderRadius: 0,
                       backgroundColor:
                         goal.type === 'short_term' ? 'rgba(37,99,235,0.15)' : 'rgba(193,8,171,0.15)',
                       color: goal.type === 'short_term' ? '#2563eb' : '#C108AB',
@@ -50,13 +49,12 @@ function GoalTracker() {
                 <span className="text-xs text-text-muted">Progress</span>
                 <span className="text-xs font-medium text-text-primary">{goal.progress}%</span>
               </div>
-              <div className="w-full h-2 bg-bg-tertiary" style={{ borderRadius: 0 }}>
+              <div className="w-full h-2 bg-bg-tertiary" style={{ }}>
                 <div
                   className="h-full transition-all"
                   style={{
                     width: `${goal.progress}%`,
                     backgroundColor: '#C108AB',
-                    borderRadius: 0,
                   }}
                 />
               </div>
@@ -88,7 +86,7 @@ function GoalTracker() {
             {/* Deadline */}
             <div className="ml-7 mt-3 pt-3 border-t border-bg-tertiary">
               <span className="text-xs text-text-muted">
-                Deadline:{' '}
+                Deadline:{''}
                 <span className="text-text-primary font-medium">{goal.deadline}</span>
               </span>
             </div>

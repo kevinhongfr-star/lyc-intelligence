@@ -103,11 +103,11 @@ export function CandidatesPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-serif font-bold text-text-primary">Talent Pool</h1>
-          <p className="text-text-muted">{count.toLocaleString()} contacts{filtered.length !== count ? ` · ${filtered.length} shown` : ''}</p>
+          <p className="text-text-muted">{count.toLocaleString()} contacts{filtered.length !== count ? `· ${filtered.length} shown` : ''}</p>
         </div>
         <button
           onClick={() => setShowImportModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent-hover transition-colors min-h-[44px]"
+          className="flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-colors min-h-[44px]"
         >
           <Upload className="w-4 h-4" />
           Import from LinkedIn
@@ -123,13 +123,13 @@ export function CandidatesPage() {
               placeholder="Search by name, title, headline, skills..."
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(0); }}
-              className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
+              className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border border-bg-tertiary text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
             />
           </div>
           <select
             value={countryFilter}
             onChange={e => { setCountryFilter(e.target.value); setPage(0); }}
-            className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent min-w-[140px]"
+            className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary text-sm text-text-primary focus:outline-none focus:border-accent min-w-[140px]"
           >
             <option value="">All Countries</option>
             {countries.map(c => <option key={c} value={c}>{c}</option>)}
@@ -137,7 +137,7 @@ export function CandidatesPage() {
           <select
             value={tierFilter}
             onChange={e => { setTierFilter(e.target.value); setPage(0); }}
-            className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary focus:outline-none focus:border-accent min-w-[120px]"
+            className="px-3 py-2.5 bg-bg-secondary border border-bg-tertiary text-sm text-text-primary focus:outline-none focus:border-accent min-w-[120px]"
           >
             <option value="">All Tiers</option>
             <option value="S">S — C-Suite Elite</option>
@@ -153,7 +153,7 @@ export function CandidatesPage() {
             <button
               key={s.value}
               onClick={() => toggleSeniority(s.value)}
-              className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+              className={`px-2.5 py-1 text-xs border transition-colors ${
                 seniorityFilter.includes(s.value)
                   ? 'bg-accent/15 text-accent border-accent/30'
                   : 'bg-bg-tertiary text-text-muted border-transparent hover:text-text-primary'
@@ -165,7 +165,7 @@ export function CandidatesPage() {
           {(search || seniorityFilter.length || countryFilter || tierFilter) && (
             <button
               onClick={() => { setSearch(''); setSeniorityFilter([]); setCountryFilter(''); setTierFilter(''); setPage(0); }}
-              className="px-2.5 py-1 text-xs text-accent hover:bg-accent/10 rounded-full transition-colors"
+              className="px-2.5 py-1 text-xs text-accent hover:bg-accent/10 transition-colors"
             >
               Clear all
             </button>
@@ -185,7 +185,7 @@ export function CandidatesPage() {
           <p className="text-text-muted">No candidates match your filters</p>
         </div>
       ) : (
-        <div className="bg-bg-secondary rounded-none border border-bg-tertiary overflow-hidden">
+        <div className="bg-bg-secondary border border-bg-tertiary overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -229,7 +229,7 @@ export function CandidatesPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-text-muted capitalize">{(c.seniority || '—').replace('_', ' ')}</span>
+                        <span className="text-text-muted capitalize">{(c.seniority || '—').replace('_', '')}</span>
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`font-mono font-bold ${
@@ -241,7 +241,7 @@ export function CandidatesPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded border ${TIER_STYLES[tier]}`}>
+                        <span className={`inline-block text-[10px] font-bold px-1.5 py-0.5 border ${TIER_STYLES[tier]}`}>
                           {tier}
                         </span>
                       </td>
@@ -273,7 +273,7 @@ export function CandidatesPage() {
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="p-1.5 rounded bg-bg-tertiary disabled:opacity-40 hover:bg-bg-tertiary/70 transition-colors"
+                  className="p-1.5 bg-bg-tertiary disabled:opacity-40 hover:bg-bg-tertiary/70 transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -281,7 +281,7 @@ export function CandidatesPage() {
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="p-1.5 rounded bg-bg-tertiary disabled:opacity-40 hover:bg-bg-tertiary/70 transition-colors"
+                  className="p-1.5 bg-bg-tertiary disabled:opacity-40 hover:bg-bg-tertiary/70 transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

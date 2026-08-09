@@ -193,7 +193,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
           {[1, 2, 3].map(s => (
             <div key={s} className="flex items-center">
               <div 
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                className={`w-8 h-8 flex items-center justify-center text-sm font-bold ${
                   step >= s ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'
                 }`}
               >
@@ -206,7 +206,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-none p-4 text-red-700">
+        <div className="bg-red-50 border border-red-200 p-4 text-red-700">
           {error}
         </div>
       )}
@@ -224,14 +224,14 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                 <div
                   key={type}
                   onClick={() => toggleSolution(type)}
-                  className={`p-4 border-2 rounded-none cursor-pointer transition-all ${
+                  className={`p-4 border-2 cursor-pointer transition-all ${
                     isSelected 
                       ? 'border-accent bg-accent/5' 
                       : 'border-bg-tertiary hover:border-accent/50'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 rounded-none flex items-center ${
+                    <div className={`w-10 h-10 flex items-center ${
                       isSelected ? 'bg-accent text-white' : 'bg-bg-secondary text-text-muted'
                     }`}>
                       {config.icon}
@@ -242,7 +242,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                         {isSelected ? (
                           <Check className="w-5 h-5 text-accent" />
                         ) : (
-                          <div className="w-5 h-5 rounded border-2 border-bg-tertiary" />
+                          <div className="w-5 h-5 border-2 border-bg-tertiary" />
                         )}
                       </div>
                       <p className="text-sm text-text-muted mt-1">{config.description}</p>
@@ -262,7 +262,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
           <button
             onClick={() => setStep(2)}
             disabled={selectedSolutions.length === 0}
-            className="w-full py-3 bg-accent text-white rounded-none font-medium hover:bg-accent/90 disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-3 bg-accent text-white font-medium hover:bg-accent/90 disabled:opacity-50 flex items-center justify-center gap-2"
           >
             Continue to Configuration
             <ChevronRight className="w-4 h-4" />
@@ -289,9 +289,9 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
             const assessment = linkedAssessments[type];
             
             return (
-              <div key={type} className="bg-bg-secondary rounded-none p-6">
+              <div key={type} className="bg-bg-secondary p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-none bg-accent/10 flex items-center text-accent">
+                  <div className="w-10 h-10 bg-accent/10 flex items-center text-accent">
                     {config.icon}
                   </div>
                   <div>
@@ -308,10 +308,10 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                         <label className="block text-sm font-medium text-text-primary mb-1">Key Roles</label>
                         <input
                           type="text"
-                          value={detail.key_roles?.join(', ') || ''}
+                          value={detail.key_roles?.join(',') || ''}
                           onChange={(e) => updateSolutionDetail(type, { key_roles: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                           placeholder="e.g., CEO, CTO, Director of Operations"
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary"
                         />
                       </div>
                       <div>
@@ -319,7 +319,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                         <select
                           value={detail.timeline || ''}
                           onChange={(e) => updateSolutionDetail(type, { timeline: e.target.value })}
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary"
                         >
                           <option value="">Select timeline</option>
                           <option value="3-months">0-3 Months</option>
@@ -340,17 +340,17 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                           value={detail.candidate_count || ''}
                           onChange={(e) => updateSolutionDetail(type, { candidate_count: parseInt(e.target.value) || undefined })}
                           placeholder="Number of candidates to assess"
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary"
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-text-primary mb-1">Key Competencies</label>
                         <input
                           type="text"
-                          value={detail.competencies?.join(', ') || ''}
+                          value={detail.competencies?.join(',') || ''}
                           onChange={(e) => updateSolutionDetail(type, { competencies: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                           placeholder="e.g., Leadership, Communication, Technical Skills"
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary"
                         />
                       </div>
                     </>
@@ -365,7 +365,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                           value={detail.team_name || ''}
                           onChange={(e) => updateSolutionDetail(type, { team_name: e.target.value })}
                           placeholder="Name of the team to diagnose"
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary"
                         />
                       </div>
                       <div>
@@ -375,17 +375,17 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                           value={detail.team_size || ''}
                           onChange={(e) => updateSolutionDetail(type, { team_size: parseInt(e.target.value) || undefined })}
                           placeholder="Number of team members"
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary"
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-text-primary mb-1">Focus Areas</label>
                         <input
                           type="text"
-                          value={detail.focus_areas?.join(', ') || ''}
+                          value={detail.focus_areas?.join(',') || ''}
                           onChange={(e) => updateSolutionDetail(type, { focus_areas: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                           placeholder="e.g., Culture, Performance, Collaboration"
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary"
                         />
                       </div>
                     </>
@@ -397,10 +397,10 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                         <label className="block text-sm font-medium text-text-primary mb-1">Org Units</label>
                         <input
                           type="text"
-                          value={detail.org_units?.join(', ') || ''}
+                          value={detail.org_units?.join(',') || ''}
                           onChange={(e) => updateSolutionDetail(type, { org_units: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                           placeholder="e.g., Engineering, Product, Marketing"
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary"
                         />
                       </div>
                       <div>
@@ -410,7 +410,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                           value={detail.target_density || ''}
                           onChange={(e) => updateSolutionDetail(type, { target_density: parseInt(e.target.value) || undefined })}
                           placeholder="Target talent density percentage"
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary"
                         />
                       </div>
                     </>
@@ -425,7 +425,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                           onChange={(e) => updateSolutionDetail(type, { current_structure: e.target.value })}
                           placeholder="Describe the current organizational structure"
                           rows={3}
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none resize-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary resize-none"
                         />
                       </div>
                       <div>
@@ -435,7 +435,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                           onChange={(e) => updateSolutionDetail(type, { proposed_structure: e.target.value })}
                           placeholder="Describe the proposed organizational structure"
                           rows={3}
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none resize-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary resize-none"
                         />
                       </div>
                     </>
@@ -447,10 +447,10 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                         <label className="block text-sm font-medium text-text-primary mb-1">Roles</label>
                         <input
                           type="text"
-                          value={detail.roles?.join(', ') || ''}
+                          value={detail.roles?.join(',') || ''}
                           onChange={(e) => updateSolutionDetail(type, { roles: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                           placeholder="e.g., Engineering Manager, Product Lead, UX Designer"
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary"
                         />
                       </div>
                       <div>
@@ -460,7 +460,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                           onChange={(e) => updateSolutionDetail(type, { reporting_lines: e.target.value })}
                           placeholder="Describe reporting structure and hierarchy"
                           rows={2}
-                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none resize-none"
+                          className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary resize-none"
                         />
                       </div>
                     </>
@@ -472,7 +472,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                     <select
                       value={assessment || ''}
                       onChange={(e) => updateLinkedAssessment(type, e.target.value)}
-                      className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary rounded-none"
+                      className="w-full px-4 py-2 bg-bg-primary border border-bg-tertiary"
                     >
                       <option value="">Select assessment (optional)</option>
                       {config.recommendedAssessments.map(assess => (
@@ -496,13 +496,13 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
           <div className="flex gap-3">
             <button
               onClick={() => setStep(1)}
-              className="flex-1 py-3 border border-bg-tertiary rounded-none font-medium text-text-secondary hover:bg-bg-tertiary"
+              className="flex-1 py-3 border border-bg-tertiary font-medium text-text-secondary hover:bg-bg-tertiary"
             >
               Back
             </button>
             <button
               onClick={() => setStep(3)}
-              className="flex-1 py-3 bg-accent text-white rounded-none font-medium hover:bg-accent/90 flex items-center justify-center gap-2"
+              className="flex-1 py-3 bg-accent text-white font-medium hover:bg-accent/90 flex items-center justify-center gap-2"
             >
               Review & Submit
               <ChevronRight className="w-4 h-4" />
@@ -524,7 +524,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
             </button>
           </div>
 
-          <div className="bg-bg-secondary rounded-none p-6">
+          <div className="bg-bg-secondary p-6">
             <h3 className="font-semibold text-text-primary mb-4">Selected Solutions for {mandate.title}</h3>
             
             <div className="space-y-4">
@@ -534,9 +534,9 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                 const assessment = linkedAssessments[type];
                 
                 return (
-                  <div key={type} className="border border-bg-tertiary rounded-none p-4">
+                  <div key={type} className="border border-bg-tertiary p-4">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 rounded-none bg-accent/10 flex items-center text-accent">
+                      <div className="w-8 h-8 bg-accent/10 flex items-center text-accent">
                         {config.icon}
                       </div>
                       <div>
@@ -552,7 +552,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                       {type === 'succession' && (
                         <>
                           {detail.key_roles?.length && (
-                            <div>Roles: {detail.key_roles.join(', ')}</div>
+                            <div>Roles: {detail.key_roles.join(',')}</div>
                           )}
                           {detail.timeline && <div>Timeline: {detail.timeline}</div>}
                         </>
@@ -561,7 +561,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                         <>
                           {detail.candidate_count && <div>Candidates: {detail.candidate_count}</div>}
                           {detail.competencies?.length && (
-                            <div>Competencies: {detail.competencies.join(', ')}</div>
+                            <div>Competencies: {detail.competencies.join(',')}</div>
                           )}
                         </>
                       )}
@@ -570,14 +570,14 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                           {detail.team_name && <div>Team: {detail.team_name}</div>}
                           {detail.team_size && <div>Size: {detail.team_size}</div>}
                           {detail.focus_areas?.length && (
-                            <div>Focus: {detail.focus_areas.join(', ')}</div>
+                            <div>Focus: {detail.focus_areas.join(',')}</div>
                           )}
                         </>
                       )}
                       {type === 'density' && (
                         <>
                           {detail.org_units?.length && (
-                            <div>Units: {detail.org_units.join(', ')}</div>
+                            <div>Units: {detail.org_units.join(',')}</div>
                           )}
                           {detail.target_density && (
                             <div>Target: {detail.target_density}%</div>
@@ -592,7 +592,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
                       )}
                       {type === 'role_definition' && (
                         <>
-                          {detail.roles?.length && <div>Roles: {detail.roles.join(', ')}</div>}
+                          {detail.roles?.length && <div>Roles: {detail.roles.join(',')}</div>}
                           {detail.reporting_lines && <div>Reporting: Defined</div>}
                         </>
                       )}
@@ -606,7 +606,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
           <div className="flex gap-3">
             <button
               onClick={() => setStep(2)}
-              className="flex-1 py-3 border border-bg-tertiary rounded-none font-medium text-text-secondary hover:bg-bg-tertiary flex items-center justify-center gap-2"
+              className="flex-1 py-3 border border-bg-tertiary font-medium text-text-secondary hover:bg-bg-tertiary flex items-center justify-center gap-2"
             >
               <ChevronDown className="w-4 h-4" />
               Save as Draft
@@ -614,7 +614,7 @@ export function SolutionPicker({ mandate, onComplete }: SolutionPickerProps) {
             <button
               onClick={() => handleSubmit(true)}
               disabled={saving}
-              className="flex-1 py-3 bg-accent text-white rounded-none font-medium hover:bg-accent/90 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 py-3 bg-accent text-white font-medium hover:bg-accent/90 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {saving ? (
                 <>

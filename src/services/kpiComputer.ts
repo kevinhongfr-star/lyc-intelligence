@@ -308,12 +308,7 @@ async function computeTimeToShortlist(
     const { data, error } = await supabase
       .from('mandates')
       .select(
-        `
-        id,
-        created_at,
-        organization_id,
-        shortlist:candidates(status, created_at, shortlisted_at)
-      `
+        `id, created_at, organization_id, shortlist:candidates(status, created_at, shortlisted_at)`
       )
       .eq('organization_id', orgId)
       .gte('created_at', periodStart.toISOString())
@@ -369,14 +364,7 @@ async function computeTimeToHire(
     const { data, error } = await supabase
       .from('offers')
       .select(
-        `
-        id,
-        created_at,
-        accepted_at,
-        organization_id,
-        mandate_id,
-        mandates!offers_mandate_id_fkey(created_at)
-      `
+        `id, created_at, accepted_at, organization_id, mandate_id, mandates!offers_mandate_id_fkey(created_at)`
       )
       .eq('organization_id', orgId)
       .eq('status', 'accepted')

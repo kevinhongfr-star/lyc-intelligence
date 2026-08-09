@@ -48,7 +48,7 @@ export function TemplateEditor() {
     setTemplates(prev => prev.map(t => {
       if (t.id !== id) return t;
       const merged = { ...t, ...updates };
-      const allText = (merged.subject || '') + ' ' + (merged.body || '');
+      const allText = (merged.subject || '') + '' + (merged.body || '');
       const varMatches = allText.match(/\{(\w+)\}/g);
       merged.variables = varMatches ? [...new Set(varMatches.map(v => v.slice(1, -1)))] : [];
       return merged;
@@ -57,7 +57,7 @@ export function TemplateEditor() {
 
   const insertVariable = (variable: string) => {
     if (!editing) return;
-    const body = editing.body + ` {${variable}}`;
+    const body = editing.body + `{${variable}}`;
     updateTemplate(editing.id, { body });
     setCopiedVar(variable);
     setTimeout(() => setCopiedVar(null), 1000);
@@ -121,14 +121,14 @@ export function TemplateEditor() {
                     type="text"
                     value={editing.name}
                     onChange={e => updateTemplate(editing.id, { name: e.target.value })}
-                    className="flex-1 px-3 py-2 border border-border bg-bg text-sm font-medium focus:outline-none focus:border-accent rounded-none"
+                    className="flex-1 px-3 py-2 border border-border bg-bg text-sm font-medium focus:outline-none focus:border-accent"
                   />
                   <span className="text-xs text-text-muted ml-2">v{editing.version}</span>
                 </div>
                 <select
                   value={editing.channel}
                   onChange={e => updateTemplate(editing.id, { channel: e.target.value as Template['channel'] })}
-                  className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+                  className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
                 >
                   <option value="email">Email</option>
                   <option value="sms">SMS</option>
@@ -140,14 +140,14 @@ export function TemplateEditor() {
                     value={editing.subject}
                     onChange={e => updateTemplate(editing.id, { subject: e.target.value })}
                     placeholder="Subject line..."
-                    className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+                    className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
                   />
                 )}
                 <textarea
                   value={editing.body}
                   onChange={e => updateTemplate(editing.id, { body: e.target.value })}
                   rows={10}
-                  className="w-full px-3 py-2 border border-border bg-bg text-sm font-mono focus:outline-none focus:border-accent rounded-none"
+                  className="w-full px-3 py-2 border border-border bg-bg text-sm font-mono focus:outline-none focus:border-accent"
                 />
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs text-text-muted">Detected variables:</span>

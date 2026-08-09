@@ -22,7 +22,7 @@ export default function AssessmentDetail({ assessment, onBack, onStart }: Assess
       </Button>
 
       {/* Assessment header */}
-      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
         <div className="flex items-center gap-2 mb-3">
           <Badge variant="default" className="uppercase text-[10px] tracking-wider">
             {assessment.type}
@@ -52,17 +52,17 @@ export default function AssessmentDetail({ assessment, onBack, onStart }: Assess
 
       {/* Completed results summary */}
       {isCompleted && assessment.score !== undefined && (
-        <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+        <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
           <h3 className="font-serif font-semibold text-text-primary mb-4 flex items-center gap-2">
             <Award className="w-5 h-5 text-accent" />
             Your Results
           </h3>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-bg-secondary p-4" style={{ borderRadius: 0 }}>
+            <div className="bg-bg-secondary p-4" style={{ }}>
               <p className="text-sm text-text-muted">Score</p>
               <p className="text-2xl font-bold text-text-primary">{assessment.score}</p>
             </div>
-            <div className="bg-bg-secondary p-4" style={{ borderRadius: 0 }}>
+            <div className="bg-bg-secondary p-4" style={{ }}>
               <p className="text-sm text-text-muted">Percentile</p>
               <p className="text-2xl font-bold text-accent">{assessment.percentile}%</p>
             </div>
@@ -76,7 +76,7 @@ export default function AssessmentDetail({ assessment, onBack, onStart }: Assess
       )}
 
       {/* Sample question preview */}
-      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
         <h3 className="font-serif font-semibold text-text-primary mb-4 flex items-center gap-2">
           <BarChart2 className="w-5 h-5 text-text-muted" />
           Sample Question
@@ -87,7 +87,7 @@ export default function AssessmentDetail({ assessment, onBack, onStart }: Assess
             <div
               key={idx}
               className="bg-bg-secondary p-3 text-sm text-text-secondary"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               {option}
             </div>
@@ -101,11 +101,11 @@ export default function AssessmentDetail({ assessment, onBack, onStart }: Assess
           variant="default"
           size="lg"
           onClick={() => onStart?.(assessment)}
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           {isCompleted ? 'Retake Assessment' : 'Start Assessment'}
         </Button>
-        <Button variant="outline" size="lg" onClick={onBack} style={{ borderRadius: 0 }}>
+        <Button variant="outline" size="lg" onClick={onBack} style={{ }}>
           Cancel
         </Button>
       </div>

@@ -47,9 +47,9 @@ export function BenchmarkCard({ benchmark, query, loading }: BenchmarkCardProps)
     return (
       <Card className="p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-bg-secondary rounded w-1/3" />
-          <div className="h-32 bg-bg-secondary rounded" />
-          <div className="h-20 bg-bg-secondary rounded" />
+          <div className="h-6 bg-bg-secondary w-1/3" />
+          <div className="h-32 bg-bg-secondary" />
+          <div className="h-20 bg-bg-secondary" />
         </div>
       </Card>
     );
@@ -64,7 +64,7 @@ export function BenchmarkCard({ benchmark, query, loading }: BenchmarkCardProps)
             No Benchmark Data Available
           </h3>
           <p className="text-sm text-text-muted max-w-md mx-auto">
-            We need at least 3 data points to calculate a benchmark for{' '}
+            We need at least 3 data points to calculate a benchmark for{''}
             <span className="font-medium">{query.jobTitle}</span>.
             Try broadening your search or adding more placement data.
           </p>
@@ -98,8 +98,8 @@ export function BenchmarkCard({ benchmark, query, loading }: BenchmarkCardProps)
             </h3>
           </div>
           <p className="text-sm text-text-muted">
-            {[query.city, query.country].filter(Boolean).join(', ')}
-            {query.industry && ` • ${query.industry}`}
+            {[query.city, query.country].filter(Boolean).join(',')}
+            {query.industry && `• ${query.industry}`}
           </p>
         </div>
         <div className="text-right">
@@ -122,7 +122,7 @@ export function BenchmarkCard({ benchmark, query, loading }: BenchmarkCardProps)
 
       {/* Relaxation Note */}
       {benchmark.relaxationNote && (
-        <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-none">
+        <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100">
           <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-amber-800">{benchmark.relaxationNote}</p>
         </div>
@@ -137,8 +137,8 @@ export function BenchmarkCard({ benchmark, query, loading }: BenchmarkCardProps)
         {/* Bar */}
         <div className="relative h-8">
           {/* Range bar */}
-          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-3 bg-bg-secondary rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-blue-300 via-accent to-tier-1 rounded-full" />
+          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-3 bg-bg-secondary overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-blue-300 via-accent to-tier-1" />
           </div>
 
           {/* Percentile markers */}
@@ -148,7 +148,7 @@ export function BenchmarkCard({ benchmark, query, loading }: BenchmarkCardProps)
               className="absolute top-1/2 -translate-y-1/2"
               style={{ left: `${getPosition(p.value)}%` }}
             >
-              <div className="w-1.5 h-6 bg-white border-2 border-accent rounded-full -translate-x-1/2" />
+              <div className="w-1.5 h-6 bg-white border-2 border-accent -translate-x-1/2" />
             </div>
           ))}
 
@@ -157,7 +157,7 @@ export function BenchmarkCard({ benchmark, query, loading }: BenchmarkCardProps)
             className="absolute top-1/2 -translate-y-1/2"
             style={{ left: `${getPosition(benchmark.p50)}%` }}
           >
-            <div className="w-3 h-8 bg-tier-1 rounded-full -translate-x-1/2 shadow-md" />
+            <div className="w-3 h-8 bg-tier-1 -translate-x-1/2 shadow-md" />
           </div>
         </div>
 
@@ -203,7 +203,7 @@ export function BenchmarkCard({ benchmark, query, loading }: BenchmarkCardProps)
         <div className="flex gap-1">
           {benchmark.dataSources.map((source) => (
             <Badge key={source} variant="default" className="text-[10px]">
-              {source.replace('_', ' ')}
+              {source.replace('_', '')}
             </Badge>
           ))}
         </div>

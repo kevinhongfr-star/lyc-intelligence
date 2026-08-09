@@ -172,9 +172,9 @@ export function BillingDashboard() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Credit Balance Card */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-accent to-purple-600 rounded-2xl p-6 text-white">
+          <div className="bg-gradient-to-br from-accent to-purple-600 p-6 text-white">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-white/20 rounded-none flex items-center justify-center">
+              <div className="w-12 h-12 bg-white/20 flex items-center justify-center">
                 <CreditCard className="w-6 h-6" />
               </div>
               <div>
@@ -191,9 +191,9 @@ export function BillingDashboard() {
           </div>
 
           {/* Subscription Status Card */}
-          <div className="bg-white rounded-2xl p-6 border border-border">
+          <div className="bg-white p-6 border border-border">
             <div className="flex items-center gap-3 mb-4">
-              <div className={`w-12 h-12 rounded-none flex items-center justify-center ${
+              <div className={`w-12 h-12 flex items-center justify-center ${
                 subscriptionStatus === 'active' ? 'bg-green-100' : 
                 subscriptionStatus === 'past_due' ? 'bg-amber-100' : 'bg-gray-100'
               }`}>
@@ -228,7 +228,7 @@ export function BillingDashboard() {
             {subscriptionStatus === 'active' && (
               <button
                 onClick={handleManageSubscription}
-                className="w-full mt-4 py-2 px-4 border border-accent text-accent rounded-none hover:bg-accent/5 transition-colors"
+                className="w-full mt-4 py-2 px-4 border border-accent text-accent hover:bg-accent/5 transition-colors"
               >
                 Manage Subscription
               </button>
@@ -237,7 +237,7 @@ export function BillingDashboard() {
             {subscriptionStatus !== 'active' && (
               <button
                 onClick={() => window.location.href = '/pricing'}
-                className="w-full mt-4 py-2 px-4 bg-accent text-white rounded-none hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
+                className="w-full mt-4 py-2 px-4 bg-accent text-white hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
               >
                 Upgrade to Council
                 <ArrowRight className="w-4 h-4" />
@@ -247,11 +247,11 @@ export function BillingDashboard() {
         </div>
 
         {/* Credit Packs */}
-        <div className="bg-white rounded-2xl p-6 border border-border mb-8">
+        <div className="bg-white p-6 border border-border mb-8">
           <h2 className="text-lg font-semibold text-text-primary mb-4">Buy Additional Credits</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {creditPacks.map((pack) => (
-              <div key={pack.key} className="border border-border rounded-none p-4 hover:border-accent/50 transition-colors">
+              <div key={pack.key} className="border border-border p-4 hover:border-accent/50 transition-colors">
                 <div className="flex items-center gap-2 mb-2">
                   <Plus className="w-4 h-4 text-accent" />
                   <span className="font-medium text-text-primary">{pack.name}</span>
@@ -261,7 +261,7 @@ export function BillingDashboard() {
                 <button
                   onClick={() => handleBuyCredits(pack.key)}
                   disabled={loadingPack === pack.key}
-                  className="w-full py-2 px-4 bg-accent text-white rounded-none hover:bg-accent-hover transition-colors text-sm font-medium disabled:opacity-50"
+                  className="w-full py-2 px-4 bg-accent text-white hover:bg-accent-hover transition-colors text-sm font-medium disabled:opacity-50"
                 >
                   {loadingPack === pack.key ? (
                     <Loader2 className="w-4 h-4 animate-spin mx-auto" />
@@ -275,7 +275,7 @@ export function BillingDashboard() {
         </div>
 
         {/* Transaction History */}
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-white border border-border overflow-hidden">
           <div className="p-6 border-b border-border">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-text-primary flex items-center gap-2">
@@ -291,7 +291,7 @@ export function BillingDashboard() {
                   <button
                     key={f.key}
                     onClick={() => setFilter(f.key as typeof filter)}
-                    className={`px-3 py-1.5 rounded-none text-sm transition-colors ${
+                    className={`px-3 py-1.5 text-sm transition-colors ${
                       filter === f.key
                         ? 'bg-accent text-white'
                         : 'bg-bg-tertiary text-text-secondary hover:bg-bg-secondary'
@@ -314,7 +314,7 @@ export function BillingDashboard() {
               filteredTransactions.map((tx) => (
                 <div key={tx.id} className="p-4 flex items-center justify-between hover:bg-bg-tertiary/50 transition-colors">
                   <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    <div className={`w-10 h-10 flex items-center justify-center ${
                       tx.amount > 0 ? 'bg-green-100' : 'bg-red-100'
                     }`}>
                       {tx.amount > 0 ? (

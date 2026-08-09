@@ -18,7 +18,7 @@ export default function CandidateThreadView({ thread, onBack }: CandidateThreadV
       </Button>
 
       {/* Thread header */}
-      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
         <h2 className="font-serif text-xl font-semibold text-text-primary mb-3">
           {thread.title}
         </h2>
@@ -37,11 +37,11 @@ export default function CandidateThreadView({ thread, onBack }: CandidateThreadV
       </div>
 
       {/* Original post */}
-      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ borderRadius: 0 }}>
+      <div className="bg-bg-primary border border-bg-tertiary p-6" style={{ }}>
         <div className="flex items-center gap-3 mb-3">
           <div
             className="w-8 h-8 bg-accent/10 flex items-center justify-center text-accent font-semibold text-sm"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             {thread.author.charAt(0)}
           </div>
@@ -62,12 +62,12 @@ export default function CandidateThreadView({ thread, onBack }: CandidateThreadV
           <div
             key={idx}
             className="bg-bg-primary border border-bg-tertiary p-5"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <div className="flex items-center gap-3 mb-2">
               <div
                 className="w-7 h-7 bg-bg-tertiary flex items-center justify-center text-text-secondary font-semibold text-xs"
-                style={{ borderRadius: 0 }}
+                style={{ }}
               >
                 {comment.author.charAt(0)}
               </div>

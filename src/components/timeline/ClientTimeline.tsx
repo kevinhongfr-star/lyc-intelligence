@@ -83,12 +83,12 @@ export function ClientTimeline({ milestones, mandateTitle, mandateStatus }: Clie
   };
 
   return (
-    <div className="bg-card border border-card-border rounded-none overflow-hidden">
+    <div className="bg-card border border-card-border overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+            <div className="w-12 h-12 bg-accent/10 flex items-center justify-center">
               <Target className="w-6 h-6 text-accent" />
             </div>
             <div>
@@ -105,16 +105,16 @@ export function ClientTimeline({ milestones, mandateTitle, mandateStatus }: Clie
         </div>
 
         {/* Progress Bar */}
-        <div className="h-3 bg-bg-alt rounded-full overflow-hidden">
+        <div className="h-3 bg-bg-alt overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-accent to-accent/70 rounded-full transition-all duration-500"
+            className="h-full bg-gradient-to-r from-accent to-accent/70 transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
 
         <p className="text-sm text-text-muted mt-2">
           {completedMilestones.length} milestone{completedMilestones.length !== 1 ? 's' : ''} completed
-          {currentMilestone && ` · Currently working on: ${currentMilestone.label}`}
+          {currentMilestone && `· Currently working on: ${currentMilestone.label}`}
         </p>
       </div>
 
@@ -126,7 +126,7 @@ export function ClientTimeline({ milestones, mandateTitle, mandateStatus }: Clie
             key={milestone.key}
             className="p-4 flex items-center gap-4 bg-green-50/50"
           >
-            <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-green-500 flex items-center justify-center flex-shrink-0">
               <CheckCircle2 className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
@@ -139,7 +139,7 @@ export function ClientTimeline({ milestones, mandateTitle, mandateStatus }: Clie
         {/* Current Milestone */}
         {currentMilestone && (
           <div className="p-4 flex items-center gap-4 bg-blue-50/50 border-l-4 border-accent">
-            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0 animate-pulse">
+            <div className="w-8 h-8 bg-accent flex items-center justify-center flex-shrink-0 animate-pulse">
               <Circle className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
@@ -148,7 +148,7 @@ export function ClientTimeline({ milestones, mandateTitle, mandateStatus }: Clie
                 In Progress · Expected {formatDate(currentMilestone.targetDate)}
               </p>
             </div>
-            <div className="w-4 h-4 rounded-full bg-accent animate-bounce">
+            <div className="w-4 h-4 bg-accent animate-bounce">
               <TrendingUp className="w-4 h-4 text-white" />
             </div>
           </div>
@@ -160,7 +160,7 @@ export function ClientTimeline({ milestones, mandateTitle, mandateStatus }: Clie
             key={milestone.key}
             className="p-4 flex items-center gap-4 opacity-60"
           >
-            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-gray-300 flex items-center justify-center flex-shrink-0">
               <Circle className="w-5 h-5 text-gray-500" />
             </div>
             <div className="flex-1">

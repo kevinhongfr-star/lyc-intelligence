@@ -44,7 +44,7 @@ export function MandatesPage() {
         </div>
         <button
           onClick={() => navigate('/platform/mandates/new')}
-          className="px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent/90 transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Create Mandate
@@ -54,10 +54,10 @@ export function MandatesPage() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input placeholder="Search mandates..." value={search} onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" />
+            className="w-full pl-10 pr-4 py-2 bg-bg-secondary border border-bg-tertiary text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" />
         </div>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-          className="bg-bg-secondary border border-bg-tertiary rounded-none text-sm text-text-primary px-3 py-2 min-h-[44px]">
+          className="bg-bg-secondary border border-bg-tertiary text-sm text-text-primary px-3 py-2 min-h-[44px]">
           <option value="">All Statuses</option>
           {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
@@ -66,7 +66,7 @@ export function MandatesPage() {
         <div className="space-y-3">
           {filtered.map(m => (
             <div key={m.id} onClick={() => navigate(`/platform/mandates/${m.id}`)}
-              className="bg-bg-secondary border border-bg-tertiary rounded-none p-4 cursor-pointer hover:border-accent/50 transition-colors">
+              className="bg-bg-secondary border border-bg-tertiary p-4 cursor-pointer hover:border-accent/50 transition-colors">
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <h3 className="font-medium text-text-primary">{m.title}</h3>
@@ -74,7 +74,7 @@ export function MandatesPage() {
                 </div>
                 <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                   <select value={m.status} onChange={async e => { setUpdating(m.id); await updateMandateStatus(m.id, e.target.value); setUpdating(null); window.location.reload(); }}
-                    className="text-xs bg-bg-tertiary text-text-primary rounded px-2 py-1 border-0 min-h-[32px]">
+                    className="text-xs bg-bg-tertiary text-text-primary px-2 py-1 border-0 min-h-[32px]">
                     {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                   </select>
                   {updating === m.id && <Loader2 className="w-3 h-3 animate-spin text-accent" />}
@@ -83,13 +83,13 @@ export function MandatesPage() {
               <div className="flex gap-1">
                 {STAGE_ORDER.map(s => {
                   const c = s === 'SWEEP' ? m.tier1_count : s === 'CANVA' ? m.tier2_count : s === 'GRID' ? m.shortlisted_count : s === 'LENS' ? m.interview_count : m.placed_count;
-                  return <div key={s} className="flex-1 h-6 rounded flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{c}</div>;
+                  return <div key={s} className="flex-1 h-6 flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{c}</div>;
                 })}
               </div>
               <div className="flex gap-2 mt-2" onClick={e => e.stopPropagation()}>
-                <button onClick={() => handleStatusChange(m.id, 'won', e)} className="text-xs px-2 py-1 bg-tier-1/20 text-tier-1 rounded hover:bg-tier-1/30 flex items-center gap-1"><CheckCircle className="w-3 h-3" />Won</button>
-                <button onClick={() => handleStatusChange(m.id, 'on_hold', e)} className="text-xs px-2 py-1 bg-tier-2/20 text-tier-2 rounded hover:bg-tier-2/30 flex items-center gap-1"><PauseCircle className="w-3 h-3" />Hold</button>
-                <button onClick={() => handleStatusChange(m.id, 'lost', e)} className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 flex items-center gap-1"><XCircle className="w-3 h-3" />Lost</button>
+                <button onClick={() => handleStatusChange(m.id, 'won', e)} className="text-xs px-2 py-1 bg-tier-1/20 text-tier-1 hover:bg-tier-1/30 flex items-center gap-1"><CheckCircle className="w-3 h-3" />Won</button>
+                <button onClick={() => handleStatusChange(m.id, 'on_hold', e)} className="text-xs px-2 py-1 bg-tier-2/20 text-tier-2 hover:bg-tier-2/30 flex items-center gap-1"><PauseCircle className="w-3 h-3" />Hold</button>
+                <button onClick={() => handleStatusChange(m.id, 'lost', e)} className="text-xs px-2 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 flex items-center gap-1"><XCircle className="w-3 h-3" />Lost</button>
               </div>
             </div>
           ))}

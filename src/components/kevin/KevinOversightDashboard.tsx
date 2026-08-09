@@ -151,10 +151,10 @@ export function KevinOversightDashboard() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 8, height: 8, background: DS.success, borderRadius: '50%' }} />
+            <div style={{ width: 8, height: 8, background: DS.success }} />
             <span style={{ fontSize: 12, color: DS.textSecondary }}>Monitoring Active</span>
           </div>
-          <button onClick={loadDashboardData} style={{ padding: '6px 14px', background: 'transparent', border: `1px solid ${DS.border}`, color: DS.textSecondary, cursor: 'pointer', fontFamily: DS.bodyFont, fontSize: 13, borderRadius: DS.radius }}>
+          <button onClick={loadDashboardData} style={{ padding: '6px 14px', background: 'transparent', border: `1px solid ${DS.border}`, color: DS.textSecondary, cursor: 'pointer', fontFamily: DS.bodyFont, fontSize: 13 }}>
             Refresh
           </button>
         </div>
@@ -179,7 +179,7 @@ export function KevinOversightDashboard() {
           <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 32 }}>
               {systemMetrics.map((metric, i) => (
-                <div key={i} style={{ background: DS.bgCard, border: `1px solid ${DS.border}`, padding: 20, borderRadius: DS.radius }}>
+                <div key={i} style={{ background: DS.bgCard, border: `1px solid ${DS.border}`, padding: 20 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                     <div style={{ color: statusColor(metric.status) }}>{metric.icon}</div>
                     {metric.change !== undefined && (
@@ -194,7 +194,7 @@ export function KevinOversightDashboard() {
                 </div>
               ))}
             </div>
-            <div style={{ background: DS.bgCard, border: `1px solid ${DS.border}`, borderRadius: DS.radius }}>
+            <div style={{ background: DS.bgCard, border: `1px solid ${DS.border}` }}>
               <div style={{ padding: '16px 20px', borderBottom: `1px solid ${DS.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h2 style={{ fontFamily: DS.headingFont, fontSize: 15, fontWeight: 600, margin: 0 }}>Recent Alerts</h2>
                 <span style={{ fontSize: 12, color: DS.textMuted }}>{alerts.length} total</span>
@@ -202,7 +202,7 @@ export function KevinOversightDashboard() {
               <div>
                 {alerts.slice(0, 5).map(alert => (
                   <div key={alert.id} style={{ padding: '12px 20px', borderBottom: `1px solid ${DS.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 8, height: 8, background: severityColor(alert.severity), borderRadius: '50%', flexShrink: 0 }} />
+                    <div style={{ width: 8, height: 8, background: severityColor(alert.severity),  flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13 }}>{alert.message}</div>
                       <div style={{ fontSize: 11, color: DS.textMuted }}>{alert.source} · {new Date(alert.timestamp).toLocaleString()}</div>
@@ -223,11 +223,11 @@ export function KevinOversightDashboard() {
         {activeTab === 'agents' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
             {agentStatuses.map((agent, i) => (
-              <div key={i} style={{ background: DS.bgCard, border: `1px solid ${DS.border}`, padding: 20, borderRadius: DS.radius }}>
+              <div key={i} style={{ background: DS.bgCard, border: `1px solid ${DS.border}`, padding: 20 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <h3 style={{ fontFamily: DS.headingFont, fontSize: 15, fontWeight: 600, margin: 0 }}>{agent.name}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{ width: 8, height: 8, background: statusColor(agent.status), borderRadius: '50%' }} />
+                    <div style={{ width: 8, height: 8, background: statusColor(agent.status) }} />
                     <span style={{ fontSize: 12, color: statusColor(agent.status), textTransform: 'capitalize' }}>{agent.status}</span>
                   </div>
                 </div>
@@ -250,14 +250,14 @@ export function KevinOversightDashboard() {
         )}
 
         {activeTab === 'alerts' && (
-          <div style={{ background: DS.bgCard, border: `1px solid ${DS.border}`, borderRadius: DS.radius }}>
+          <div style={{ background: DS.bgCard, border: `1px solid ${DS.border}` }}>
             <div style={{ padding: '16px 20px', borderBottom: `1px solid ${DS.border}` }}>
               <h2 style={{ fontFamily: DS.headingFont, fontSize: 15, fontWeight: 600, margin: 0 }}>All Alerts</h2>
             </div>
             <div>
               {alerts.map(alert => (
                 <div key={alert.id} style={{ padding: '14px 20px', borderBottom: `1px solid ${DS.border}`, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <div style={{ width: 8, height: 8, background: severityColor(alert.severity), borderRadius: '50%', marginTop: 5, flexShrink: 0 }} />
+                  <div style={{ width: 8, height: 8, background: severityColor(alert.severity),  marginTop: 5, flexShrink: 0 }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, marginBottom: 4 }}>{alert.message}</div>
                     <div style={{ display: 'flex', gap: 12, fontSize: 11, color: DS.textMuted }}>
@@ -274,12 +274,12 @@ export function KevinOversightDashboard() {
         )}
 
         {activeTab === 'pipeline' && (
-          <div style={{ background: DS.bgCard, border: `1px solid ${DS.border}`, borderRadius: DS.radius, padding: 24 }}>
+          <div style={{ background: DS.bgCard, border: `1px solid ${DS.border}`,  padding: 24 }}>
             <h2 style={{ fontFamily: DS.headingFont, fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Pipeline Overview</h2>
             <p style={{ color: DS.textSecondary, fontSize: 13 }}>Connect to Supabase analytics endpoints to display mandate pipeline data, velocity metrics, and revenue tracking.</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginTop: 20 }}>
               {['Sourcing', 'Interview', 'Offer', 'Placed'].map((stage) => (
-                <div key={stage} style={{ padding: 16, border: `1px solid ${DS.border}`, borderRadius: DS.radius, textAlign: 'center' }}>
+                <div key={stage} style={{ padding: 16, border: `1px solid ${DS.border}`,  textAlign: 'center' }}>
                   <div style={{ fontSize: 11, color: DS.textMuted, marginBottom: 8 }}>{stage}</div>
                   <div style={{ fontSize: 24, fontWeight: 700, fontFamily: DS.headingFont, color: DS.textMuted }}>—</div>
                 </div>

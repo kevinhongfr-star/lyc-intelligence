@@ -392,7 +392,7 @@ export async function generateOrgChartPDF(params: PDFExportParams): Promise<void
     `Highest talent density in ${insights?.highestDensity?.sector || 'Technology'}/${insights?.highestDensity?.geo || 'APAC'} (${insights?.highestDensity?.score || 0}/100)`,
     `${insights?.companiesWithCharts || 0} companies with mapped org charts`,
     `${insights?.highRelevancePositions || 0} high-relevance positions identified`,
-    `Focus sectors: ${insights?.topSectors?.join(', ') || 'Technology, Finance'}`,
+    `Focus sectors: ${insights?.topSectors?.join(',') || 'Technology, Finance'}`,
   ];
 
   doc.setFontSize(10);

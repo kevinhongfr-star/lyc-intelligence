@@ -67,7 +67,7 @@ function ScoringPanel({ contact }: { contact: Contact }) {
           <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Score Results</span>
           <div className="flex items-center gap-2">
             <span className="text-2xl font-bold font-mono" style={{ color }}>{composite}</span>
-            <span className="text-xs font-bold text-white px-2 py-0.5 rounded" style={{ backgroundColor: color }}>Tier {tier}</span>
+            <span className="text-xs font-bold text-white px-2 py-0.5" style={{ backgroundColor: color }}>Tier {tier}</span>
           </div>
         </div>
         {result.sub_scores && Object.entries(result.sub_scores).map(([key, val]: [string, any]) => {
@@ -79,8 +79,8 @@ function ScoringPanel({ contact }: { contact: Contact }) {
                 <span className="text-xs font-medium text-text-primary">{meta.label}</span>
                 <span className="text-xs font-bold font-mono" style={{ color: meta.color }}>{val.score}</span>
               </div>
-              <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
-                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${val.score}%`, backgroundColor: meta.color }} />
+              <div className="h-1.5 bg-bg-tertiary overflow-hidden">
+                <div className="h-full transition-all duration-500" style={{ width: `${val.score}%`, backgroundColor: meta.color }} />
               </div>
               <p className="text-[10px] text-text-muted leading-relaxed">{val.rationale}</p>
             </div>
@@ -109,7 +109,7 @@ function ScoringPanel({ contact }: { contact: Contact }) {
           </div>
         )}
         {result.approach_strategy && (
-          <div className="bg-accent/5 border border-accent/20 rounded-none p-3 space-y-1">
+          <div className="bg-accent/5 border border-accent/20 p-3 space-y-1">
             <span className="text-[10px] font-bold text-accent uppercase tracking-wider">Approach Strategy</span>
             <p className="text-[11px] text-text-secondary leading-relaxed">{result.approach_strategy}</p>
           </div>
@@ -126,7 +126,7 @@ function ScoringPanel({ contact }: { contact: Contact }) {
         <span className="text-xs font-bold uppercase tracking-wider">5-Criteria Assessment</span>
       </div>
       <p className="text-[11px] text-text-muted">Run AI-powered assessment across Industry, Functional, Leadership, Track Record, and Strategic Fit criteria.</p>
-      <Button onClick={handleScore} disabled={loading} className="w-full bg-accent hover:bg-accent/90 text-white text-xs font-bold py-2.5 rounded-none transition-all">
+      <Button onClick={handleScore} disabled={loading} className="w-full bg-accent hover:bg-accent/90 text-white text-xs font-bold py-2.5 transition-all">
         {loading ? (
           <span className="flex items-center gap-2"><Clock size={13} className="animate-spin" /> Assessing...</span>
         ) : (
@@ -199,7 +199,7 @@ function AIQuickActionsPanel({ contact }: { contact: Contact }) {
               <button
                 key={action.key}
                 onClick={() => handleAction(action.key)}
-                className={`flex items-center gap-2 px-3 py-2.5 rounded-none text-xs font-medium border transition-all min-h-[44px] ${
+                className={`flex items-center gap-2 px-3 py-2.5 text-xs font-medium border transition-all min-h-[44px] ${
                   isActive
                     ? 'border-accent bg-accent/10 text-accent'
                     : 'border-bg-tertiary bg-bg-primary text-text-secondary hover:border-accent/30 hover:bg-accent/5'
@@ -217,19 +217,19 @@ function AIQuickActionsPanel({ contact }: { contact: Contact }) {
 
         {/* Output area */}
         {activeAction && (
-          <div className="border border-bg-tertiary rounded-none overflow-hidden">
+          <div className="border border-bg-tertiary overflow-hidden">
             <div className="flex items-center justify-between px-3 py-2 bg-bg-tertiary/50 border-b border-bg-tertiary">
               <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
                 {AI_ACTIONS_LIST.find(a => a.key === activeAction)?.label}
               </span>
               <div className="flex items-center gap-1">
                 {output && (
-                  <button onClick={handleCopy} className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-text-muted hover:text-accent hover:bg-accent/10 transition-colors">
+                  <button onClick={handleCopy} className="flex items-center gap-1 px-2 py-1 text-[10px] text-text-muted hover:text-accent hover:bg-accent/10 transition-colors">
                     <Copy size={10} />
                     {copied ? 'Copied!' : 'Copy'}
                   </button>
                 )}
-                <button onClick={() => { setActiveAction(null); setOutput(''); }} className="p-1 rounded hover:bg-bg-tertiary transition-colors">
+                <button onClick={() => { setActiveAction(null); setOutput(''); }} className="p-1 hover:bg-bg-tertiary transition-colors">
                   <X size={12} className="text-text-muted" />
                 </button>
               </div>
@@ -262,7 +262,7 @@ function CareerTimeline({ history }: { history: Array<{ company: string; role: s
     <div className="pl-4 border-l-2 border-border-subtle ml-2 space-y-5 relative">
       {history.map((item, idx) => (
         <div key={idx} className="relative space-y-1">
-          <div className={`absolute -left-[22px] top-1.5 w-3.5 h-3.5 rounded-full border-2 bg-bg-primary ${idx === 0 ? 'border-accent ring-4 ring-accent/10' : 'border-border-subtle'}`} />
+          <div className={`absolute -left-[22px] top-1.5 w-3.5 h-3.5 border-2 bg-bg-primary ${idx === 0 ? 'border-accent ring-4 ring-accent/10' : 'border-border-subtle'}`} />
           <div className="flex flex-wrap justify-between items-baseline">
             <span className="text-[10px] font-bold text-accent font-mono">#{history.length - idx}</span>
             <span className="text-[10px] text-text-muted font-semibold">{item.company}</span>
@@ -307,7 +307,7 @@ export function ExecutiveProfilePage() {
 
   const tier = getTier(contact.match_score_best ?? contact.trident_composite);
   const seniorityLabel = contact.seniority ? (SENIORITY_LABELS[contact.seniority] || contact.seniority) : null;
-  const initials = contact.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const initials = contact.name.split('').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
     <div className="space-y-6">
@@ -316,7 +316,7 @@ export function ExecutiveProfilePage() {
         <Link to="/platform/candidates" className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-accent transition-colors">
           <ArrowLeft size={13} /> Back to Talent Pool
         </Link>
-        <Link to={`/platform/candidates/${id}/report`} target="_blank" className="inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:text-accent/80 transition-colors bg-accent/10 px-3 py-1.5 rounded-none">
+        <Link to={`/platform/candidates/${id}/report`} target="_blank" className="inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:text-accent/80 transition-colors bg-accent/10 px-3 py-1.5">
           <FileDown size={13} /> Generate Report
         </Link>
       </div>
@@ -327,21 +327,21 @@ export function ExecutiveProfilePage() {
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-start gap-5">
             {/* Avatar */}
-            <div className="w-16 h-16 rounded-2xl text-white font-serif font-bold text-2xl flex items-center justify-center uppercase shadow-lg flex-shrink-0" style={{ backgroundColor: tier.color }}>
+            <div className="w-16 h-16 text-white font-serif font-bold text-2xl flex items-center justify-center uppercase shadow-lg flex-shrink-0" style={{ backgroundColor: tier.color }}>
               {initials}
             </div>
             {/* Info */}
             <div className="flex-1 space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-xl font-serif font-bold text-text-primary">{contact.name}</h1>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold font-mono" style={{ backgroundColor: `${tier.color}20`, color: tier.color }}>
+                <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold font-mono" style={{ backgroundColor: `${tier.color}20`, color: tier.color }}>
                   Tier {tier.tier}
                 </span>
                 {seniorityLabel && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border border-border-subtle text-[10px] text-text-secondary font-semibold text-text-muted">{seniorityLabel}</span>
+                  <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium border border-border-subtle text-[10px] text-text-secondary font-semibold text-text-muted">{seniorityLabel}</span>
                 )}
                 {contact.cxo_stamp && (
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-accent/10 text-accent">CXO</span>
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-[9px] font-medium bg-accent/10 text-accent">CXO</span>
                 )}
               </div>
               <p className="text-sm text-text-secondary font-medium">{contact.current_title || 'Title not available'}</p>
@@ -357,7 +357,7 @@ export function ExecutiveProfilePage() {
                     <Linkedin size={11} /> LinkedIn <ExternalLink size={9} />
                   </a>
                 )}
-                {contact.is_expat && <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border border-border-subtle text-text-secondary text-[9px]">Expat</span>}
+                {contact.is_expat && <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium border border-border-subtle text-text-secondary text-[9px]">Expat</span>}
               </div>
               {/* Quick stats */}
               <div className="flex flex-wrap gap-4 pt-2">
@@ -426,7 +426,7 @@ export function ExecutiveProfilePage() {
               {contact.education && contact.education.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {contact.education.map((edu, idx) => (
-                    <div key={idx} className="bg-bg-tertiary/50 border border-border-subtle rounded-none p-3 space-y-0.5">
+                    <div key={idx} className="bg-bg-tertiary/50 border border-border-subtle p-3 space-y-0.5">
                       <h4 className="text-xs font-bold text-text-primary">{edu.degree}</h4>
                       <p className="text-[11px] text-text-muted">{edu.school}</p>
                     </div>
@@ -449,7 +449,7 @@ export function ExecutiveProfilePage() {
             <CardContent>
               <div className="flex flex-wrap gap-1.5">
                 {(contact.skills || []).map((skill, idx) => (
-                  <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border border-border-subtle text-text-secondary">{skill}</span>
+                  <span key={idx} className="inline-flex items-center px-2 py-0.5 text-[10px] font-medium border border-border-subtle text-text-secondary">{skill}</span>
                 ))}
                 {(!contact.skills || contact.skills.length === 0) && (
                   <p className="text-xs text-text-muted italic">No skills recorded.</p>
@@ -464,7 +464,7 @@ export function ExecutiveProfilePage() {
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {contact.languages.map((lang, idx) => (
-                      <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-accent/10 text-accent">{lang}</span>
+                      <span key={idx} className="inline-flex items-center px-2 py-0.5 text-[10px] font-medium bg-accent/10 text-accent">{lang}</span>
                     ))}
                   </div>
                 </div>
@@ -513,31 +513,31 @@ export function ExecutiveProfilePage() {
               {contact.advisory_lane && (
                 <div className="flex justify-between items-center">
                   <span className="text-[11px] text-text-muted">Advisory Lane</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border border-border-subtle text-[10px] text-text-secondary font-semibold">{contact.advisory_lane}</span>
+                  <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium border border-border-subtle text-[10px] text-text-secondary font-semibold">{contact.advisory_lane}</span>
                 </div>
               )}
               {contact.advisory_tier && (
                 <div className="flex justify-between items-center">
                   <span className="text-[11px] text-text-muted">Advisory Tier</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-accent/10 text-accent">{contact.advisory_tier}</span>
+                  <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-medium bg-accent/10 text-accent">{contact.advisory_tier}</span>
                 </div>
               )}
               {contact.council_tier && (
                 <div className="flex justify-between items-center">
                   <span className="text-[11px] text-text-muted">Council Tier</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-accent/10 text-accent">{contact.council_tier}</span>
+                  <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-medium bg-accent/10 text-accent">{contact.council_tier}</span>
                 </div>
               )}
               {contact.market_side && (
                 <div className="flex justify-between items-center">
                   <span className="text-[11px] text-text-muted">Market Side</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border border-border-subtle text-[10px] text-text-secondary">{contact.market_side}</span>
+                  <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium border border-border-subtle text-[10px] text-text-secondary">{contact.market_side}</span>
                 </div>
               )}
               {contact.commercial_readiness && (
                 <div className="flex justify-between items-center">
                   <span className="text-[11px] text-text-muted">Commercial Readiness</span>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border border-border-subtle ${contact.commercial_readiness === 'high' || contact.commercial_readiness === 'ready' ? 'text-green-500 border-green-500/30' : 'text-text-secondary'}`}>
+                  <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-medium border border-border-subtle ${contact.commercial_readiness === 'high' || contact.commercial_readiness === 'ready' ? 'text-green-500 border-green-500/30' : 'text-text-secondary'}`}>
                     {contact.commercial_readiness}
                   </span>
                 </div>
@@ -545,13 +545,13 @@ export function ExecutiveProfilePage() {
               {contact.bd_priority && (
                 <div className="flex justify-between items-center">
                   <span className="text-[11px] text-text-muted">BD Priority</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border border-border-subtle text-[10px] text-text-secondary">{contact.bd_priority}</span>
+                  <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium border border-border-subtle text-[10px] text-text-secondary">{contact.bd_priority}</span>
                 </div>
               )}
               {contact.activity_status && (
                 <div className="flex justify-between items-center">
                   <span className="text-[11px] text-text-muted">Activity Status</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border border-border-subtle text-[10px] text-text-secondary">{contact.activity_status}</span>
+                  <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium border border-border-subtle text-[10px] text-text-secondary">{contact.activity_status}</span>
                 </div>
               )}
               {!contact.advisory_lane && !contact.advisory_tier && !contact.council_tier && (

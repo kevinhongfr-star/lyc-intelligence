@@ -35,7 +35,6 @@ export function SuggestedPrompts({ prompts, onPromptSelect }: SuggestedPromptsPr
             padding: '6px 12px',
             background: DS.card,
             border: `1px solid ${DS.cardBorder}`,
-            borderRadius: '14px',
             color: DS.textSecondary,
             fontSize: '11px',
             cursor: 'pointer',

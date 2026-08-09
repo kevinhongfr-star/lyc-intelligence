@@ -125,7 +125,6 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
               color: 'white',
               border: 'none',
               padding: '6px 12px',
-              borderRadius: '0px',
               fontSize: '12px',
               cursor: 'pointer',
               display: 'flex',
@@ -142,7 +141,6 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
         <div style={{
           background: '#f9fafb',
           padding: '12px',
-          borderRadius: '0px',
           marginBottom: '12px',
           border: '1px solid #e5e7eb',
         }}>
@@ -156,7 +154,6 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
               style={{
                 width: '100%',
                 padding: '8px',
-                borderRadius: '0px',
                 border: '1px solid #e5e7eb',
                 fontSize: '13px',
               }}
@@ -180,7 +177,6 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
               style={{
                 width: '100%',
                 padding: '8px',
-                borderRadius: '0px',
                 border: '1px solid #e5e7eb',
                 fontSize: '13px',
               }}
@@ -205,7 +201,6 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
                 color: 'white',
                 border: 'none',
                 padding: '6px 12px',
-                borderRadius: '0px',
                 fontSize: '12px',
                 cursor: 'pointer',
               }}
@@ -223,7 +218,6 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
                 color: '#374151',
                 border: 'none',
                 padding: '6px 12px',
-                borderRadius: '0px',
                 fontSize: '12px',
                 cursor: 'pointer',
               }}
@@ -254,7 +248,6 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
                 alignItems: 'center',
                 padding: '10px 12px',
                 background: '#f9fafb',
-                borderRadius: '0px',
                 border: '1px solid #e5e7eb',
               }}
             >
@@ -274,7 +267,6 @@ export function MandateTeam({ mandateId, isAdmin }: Props) {
                 <span style={{
                   fontSize: '11px',
                   padding: '2px 8px',
-                  borderRadius: '4px',
                   background: m.role === 'lead' ? '#C108AB' : m.role === 'viewer' ? '#9ca3af' : '#6b7280',
                   color: 'white',
                   textTransform: 'capitalize',

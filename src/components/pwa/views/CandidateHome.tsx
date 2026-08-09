@@ -123,9 +123,9 @@ export function CandidateHome() {
     return (
       <PageContainer>
         <div className="animate-pulse space-y-4">
-          <div className="h-24 bg-bg-alt rounded-none" />
-          <div className="h-16 bg-bg-alt rounded-none" />
-          <div className="h-32 bg-bg-alt rounded-none" />
+          <div className="h-24 bg-bg-alt" />
+          <div className="h-16 bg-bg-alt" />
+          <div className="h-32 bg-bg-alt" />
         </div>
       </PageContainer>
     );
@@ -137,18 +137,18 @@ export function CandidateHome() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-text-primary">
-            Hello, {profile?.name?.split(' ')[0]}
+            Hello, {profile?.name?.split('')[0]}
           </h1>
           <p className="text-text-muted">{profile?.title}</p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="relative p-2 rounded-full hover:bg-bg-alt transition-colors">
+          <button className="relative p-2 hover:bg-bg-alt transition-colors">
             <Bell className="w-6 h-6 text-text-muted" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500" />
           </button>
           <Link
             href="/candidate/profile"
-            className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"
+            className="w-10 h-10 bg-primary/10 flex items-center justify-center"
           >
             <span className="text-primary font-semibold">
               {profile?.name?.charAt(0)}
@@ -206,7 +206,7 @@ export function CandidateHome() {
                       <span>{interview.time}</span>
                     </div>
                   </div>
-                  <span className="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded">
+                  <span className="px-2 py-1 bg-primary/10 text-primary text-xs font-medium">
                     {interview.type}
                   </span>
                 </div>
@@ -238,7 +238,7 @@ export function CandidateHome() {
                 subtitle={`${assessment.mandateTitle} • Due ${assessment.dueDate}`}
                 leftIcon={<FileText className="w-5 h-5" />}
                 rightContent={
-                  <span className="px-2 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded">
+                  <span className="px-2 py-1 bg-amber-100 text-amber-800 text-xs font-medium">
                     Due Soon
                   </span>
                 }
@@ -271,7 +271,7 @@ export function CandidateHome() {
               leftIcon={<Briefcase className="w-5 h-5" />}
               rightContent={
                 <span
-                  className={`px-2 py-1 text-xs font-medium rounded ${application.statusColor}`}
+                  className={`px-2 py-1 text-xs font-medium ${application.statusColor}`}
                 >
                   {application.statusLabel}
                 </span>
@@ -288,9 +288,9 @@ export function CandidateHome() {
         <div className="grid grid-cols-2 gap-3">
           <Link
             href="/candidate/mandates"
-            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-none hover:bg-bg-alt transition-colors"
+            className="flex items-center gap-3 p-4 bg-card border border-card-border hover:bg-bg-alt transition-colors"
           >
-            <div className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
               <Briefcase className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -300,9 +300,9 @@ export function CandidateHome() {
           </Link>
           <Link
             href="/candidate/profile"
-            className="flex items-center gap-3 p-4 bg-card border border-card-border rounded-none hover:bg-bg-alt transition-colors"
+            className="flex items-center gap-3 p-4 bg-card border border-card-border hover:bg-bg-alt transition-colors"
           >
-            <div className="w-10 h-10 rounded-none bg-purple-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-purple-100 flex items-center justify-center">
               <FileText className="w-5 h-5 text-purple-600" />
             </div>
             <div>

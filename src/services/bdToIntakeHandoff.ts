@@ -156,7 +156,7 @@ function buildMandateTitle(opportunity: BDOpportunity): string {
     parts.push(`(${opportunity.primary_contact_title})`);
   }
 
-  return parts.join(' — ');
+  return parts.join('—');
 }
 
 /**

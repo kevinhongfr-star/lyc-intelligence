@@ -189,7 +189,7 @@ export function PipelineBoard({
             onClick={() => {
               /* Open comparison view */
             }}
-            className="px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent/90"
+            className="px-4 py-2 bg-accent text-white text-sm font-medium hover:bg-accent/90"
           >
             Compare {selectedCandidates.length} Candidates
           </button>
@@ -210,7 +210,7 @@ export function PipelineBoard({
             return (
               <div
                 key={stageName}
-                className={`w-44 flex-shrink-0 rounded-none border-2 transition-all ${
+                className={`w-44 flex-shrink-0 border-2 transition-all ${
                   isDragOver ? 'border-accent bg-accent/5' : 'border-bg-tertiary'
                 }`}
                 onDragOver={(e) => handleDragOver(e, stageName)}
@@ -219,13 +219,13 @@ export function PipelineBoard({
               >
                 {/* Stage Header */}
                 <div 
-                  className="px-3 py-2 border-b border-bg-tertiary rounded-t-lg"
+                  className="px-3 py-2 border-b border-bg-tertiary"
                   style={{ backgroundColor: stageConfig.bgColor }}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div 
-                        className="w-2.5 h-2.5 rounded-full"
+                        className="w-2.5 h-2.5"
                         style={{ backgroundColor: stageConfig.color }}
                       />
                       <span className="text-sm font-medium text-text-primary">
@@ -271,23 +271,23 @@ export function PipelineBoard({
       {/* Move Confirmation Modal */}
       {showMoveConfirmation && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-none p-6 max-w-sm w-full mx-4 shadow-2xl">
+          <div className="bg-white p-6 max-w-sm w-full mx-4 shadow-2xl">
             <h3 className="text-lg font-semibold text-text-primary mb-4">Confirm Move</h3>
             <p className="text-text-secondary mb-6">
-              Move <strong>{showMoveConfirmation.name}</strong> from{' '}
-              <span className="text-text-primary">{showMoveConfirmation.from}</span> to{' '}
+              Move <strong>{showMoveConfirmation.name}</strong> from{''}
+              <span className="text-text-primary">{showMoveConfirmation.from}</span> to{''}
               <span className="text-accent">{showMoveConfirmation.to}</span>?
             </p>
             <div className="flex gap-3">
               <button
                 onClick={cancelMove}
-                className="flex-1 px-4 py-2 border border-bg-tertiary rounded-none text-text-secondary hover:bg-bg-tertiary"
+                className="flex-1 px-4 py-2 border border-bg-tertiary text-text-secondary hover:bg-bg-tertiary"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmMove}
-                className="flex-1 px-4 py-2 bg-accent text-white rounded-none hover:bg-accent/90"
+                className="flex-1 px-4 py-2 bg-accent text-white hover:bg-accent/90"
               >
                 Move
               </button>
@@ -333,7 +333,7 @@ function CandidateCard({
       draggable
       onDragStart={onDragStart}
       onClick={onSelect}
-      className={`bg-bg-primary border border-bg-tertiary rounded-none p-3 cursor-pointer transition-all hover:shadow-md group ${
+      className={`bg-bg-primary border border-bg-tertiary p-3 cursor-pointer transition-all hover:shadow-md group ${
         isDragging ? 'opacity-50 scale-95' : ''
       } ${isSelected ? 'ring-2 ring-accent' : ''}`}
       style={{ borderLeftColor: stageConfig.color, borderLeftWidth: '3px' }}
@@ -341,7 +341,7 @@ function CandidateCard({
       {/* Header Row */}
       <div className="flex items-start gap-2 mb-2">
         <div 
-          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+          className="w-8 h-8 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
           style={{ backgroundColor: stageConfig.color }}
         >
           {candidate.contact?.name?.[0] ?? '?'}
@@ -372,7 +372,7 @@ function CandidateCard({
       <div className="flex items-center gap-2 mb-2">
         {score > 0 && (
           <span 
-            className="px-2 py-0.5 rounded text-xs font-bold text-white"
+            className="px-2 py-0.5 text-xs font-bold text-white"
             style={{ backgroundColor: scoreColor }}
           >
             {score}
@@ -380,7 +380,7 @@ function CandidateCard({
         )}
         {listStatus && (
           <span 
-            className="px-2 py-0.5 rounded text-xs text-white"
+            className="px-2 py-0.5 text-xs text-white"
             style={{ backgroundColor: listStatus.color }}
           >
             {listStatus.label}

@@ -155,11 +155,11 @@ export function PostPlacementFollowUp({
   };
 
   return (
-    <div className="bg-card border border-card-border rounded-none overflow-hidden">
+    <div className="bg-card border border-card-border overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+          <div className="w-12 h-12 bg-accent/10 flex items-center justify-center">
             <MessageSquare className="w-6 h-6 text-accent" />
           </div>
           <div>
@@ -195,7 +195,7 @@ export function PostPlacementFollowUp({
             return (
               <div
                 key={type}
-                className={`p-4 rounded-none border-2 ${
+                className={`p-4 border-2 ${
                   followUp?.status === 'responded'
                     ? 'bg-green-50 border-green-500'
                     : followUp?.status === 'sent'
@@ -209,7 +209,7 @@ export function PostPlacementFollowUp({
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 rounded-full ${config.bgColor} flex items-center justify-center`}>
+                    <div className={`w-10 h-10 ${config.bgColor} flex items-center justify-center`}>
                       <Icon className={`w-5 h-5 ${config.textColor}`} />
                     </div>
                     <div>
@@ -270,7 +270,7 @@ export function PostPlacementFollowUp({
 
                 {/* Response */}
                 {followUp?.response && (
-                  <div className="mt-4 p-3 bg-white rounded-none border border-green-200">
+                  <div className="mt-4 p-3 bg-white border border-green-200">
                     <p className="text-sm font-medium text-green-800 mb-1">Candidate Response:</p>
                     <p className="text-sm text-green-700 whitespace-pre-line">{followUp.response}</p>
                   </div>
@@ -284,7 +284,7 @@ export function PostPlacementFollowUp({
       {/* Response Modal */}
       {showResponseModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-none p-6 max-w-lg w-full mx-4">
+          <div className="bg-card p-6 max-w-lg w-full mx-4">
             <h3 className="text-lg font-semibold text-text-primary mb-4">
               Record Response
             </h3>
@@ -296,7 +296,7 @@ export function PostPlacementFollowUp({
               onChange={(e) => setResponseText(e.target.value)}
               placeholder="Enter the candidate's feedback..."
               rows={6}
-              className="w-full px-4 py-3 bg-bg-alt border border-card-border rounded-none text-text-primary resize-none mb-4"
+              className="w-full px-4 py-3 bg-bg-alt border border-card-border text-text-primary resize-none mb-4"
             />
             <div className="flex justify-end gap-3">
               <Button
@@ -338,17 +338,7 @@ export function generateFollowUpEmail(
   
   const subject = `Checking in — ${positionTitle}`;
 
-  const body = `Hi ${candidateName},
-
-Hope you're settling in well at ${clientName}! It's been ${months} month${type === '1m' ? '' : 's'} since you started as ${positionTitle}.
-
-How's the transition going? Any support you need from our side?
-
-Please reach out if you have any questions or just want to catch up.
-
-Best,
-${consultantName}
-`;
+  const body = `Hi ${candidateName}, Hope you're settling in well at ${clientName}! It's been ${months} month${type === '1m' ? '' : 's'} since you started as ${positionTitle}. How's the transition going? Any support you need from our side? Please reach out if you have any questions or just want to catch up. Best, ${consultantName}`;
 
   return { subject, body };
 }

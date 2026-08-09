@@ -170,7 +170,7 @@ export function InterviewQuestionGenerator({
   // Render configure step
   const renderConfigure = () => (
     <div className="space-y-6">
-      <div className="bg-bg-alt rounded-none p-4">
+      <div className="bg-bg-alt p-4">
         <h3 className="font-medium text-text-primary mb-2">Mandate</h3>
         <p className="text-sm text-text-secondary">{mandate.title}</p>
         <p className="text-xs text-text-muted mt-1">
@@ -178,7 +178,7 @@ export function InterviewQuestionGenerator({
         </p>
       </div>
 
-      <div className="bg-bg-alt rounded-none p-4">
+      <div className="bg-bg-alt p-4">
         <h3 className="font-medium text-text-primary mb-2">Success Profile</h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
@@ -194,7 +194,7 @@ export function InterviewQuestionGenerator({
           <span className="text-sm text-text-muted">Industries:</span>
           <div className="flex flex-wrap gap-1 mt-1">
             {successProfile.required_industries.map(industry => (
-              <span key={industry} className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded">
+              <span key={industry} className="px-2 py-0.5 bg-primary/10 text-primary text-xs">
                 {industry}
               </span>
             ))}
@@ -204,7 +204,7 @@ export function InterviewQuestionGenerator({
           <span className="text-sm text-text-muted">Competencies:</span>
           <div className="flex flex-wrap gap-1 mt-1">
             {successProfile.personality_indicators.map(p => (
-              <span key={p.trait} className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded">
+              <span key={p.trait} className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs">
                 {p.trait}
               </span>
             ))}
@@ -213,7 +213,7 @@ export function InterviewQuestionGenerator({
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
+        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-700">
           <span className="text-sm">{error}</span>
         </div>
       )}
@@ -233,7 +233,7 @@ export function InterviewQuestionGenerator({
   // Render generating step
   const renderGenerating = () => (
     <div className="flex flex-col items-center justify-center py-12 space-y-4">
-      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+      <div className="w-16 h-16 bg-primary/10 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
       <div className="text-center">
@@ -254,7 +254,7 @@ export function InterviewQuestionGenerator({
     return (
       <div
         key={question.id}
-        className={`border rounded-none transition-colors ${
+        className={`border transition-colors ${
           isEditing ? 'border-primary' : 'border-border'
         }`}
       >
@@ -273,7 +273,7 @@ export function InterviewQuestionGenerator({
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className={`px-2 py-0.5 text-xs font-medium rounded ${competencyColor.bg} ${competencyColor.text}`}>
+              <span className={`px-2 py-0.5 text-xs font-medium ${competencyColor.bg} ${competencyColor.text}`}>
                 {question.competencyArea}
               </span>
             </div>
@@ -288,7 +288,7 @@ export function InterviewQuestionGenerator({
                 e.stopPropagation();
                 setEditingId(isEditing ? null : question.id);
               }}
-              className="p-1 hover:bg-bg-alt rounded transition-colors"
+              className="p-1 hover:bg-bg-alt transition-colors"
             >
               <Edit3 className="w-4 h-4 text-text-muted" />
             </button>
@@ -297,7 +297,7 @@ export function InterviewQuestionGenerator({
                 e.stopPropagation();
                 handleDeleteQuestion(question.id);
               }}
-              className="p-1 hover:bg-red-50 rounded transition-colors"
+              className="p-1 hover:bg-red-50 transition-colors"
             >
               <Trash2 className="w-4 h-4 text-red-500" />
             </button>
@@ -317,7 +317,7 @@ export function InterviewQuestionGenerator({
                   <textarea
                     value={question.question}
                     onChange={(e) => handleUpdateQuestion(question.id, { question: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+                    className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary resize-none"
                     rows={2}
                     placeholder="Enter the interview question..."
                   />
@@ -331,7 +331,7 @@ export function InterviewQuestionGenerator({
                   <select
                     value={question.competencyArea}
                     onChange={(e) => handleUpdateQuestion(question.id, { competencyArea: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+                    className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary"
                   >
                     <option value="Technical">Technical</option>
                     <option value="Leadership">Leadership</option>
@@ -348,7 +348,7 @@ export function InterviewQuestionGenerator({
                   <textarea
                     value={question.whatToListenFor}
                     onChange={(e) => handleUpdateQuestion(question.id, { whatToListenFor: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+                    className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary resize-none"
                     rows={2}
                     placeholder="Key indicators in a good answer..."
                   />
@@ -362,7 +362,7 @@ export function InterviewQuestionGenerator({
                   <textarea
                     value={question.followUpQuestion}
                     onChange={(e) => handleUpdateQuestion(question.id, { followUpQuestion: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary resize-none"
+                    className="w-full px-3 py-2 border border-border bg-bg-base text-text-primary resize-none"
                     rows={2}
                     placeholder="A probing follow-up question..."
                   />
@@ -417,7 +417,7 @@ export function InterviewQuestionGenerator({
         return (
           <div key={area}>
             <div className="flex items-center gap-2 mb-3">
-              <span className={`px-2 py-1 text-xs font-medium rounded ${competencyColor.bg} ${competencyColor.text}`}>
+              <span className={`px-2 py-1 text-xs font-medium ${competencyColor.bg} ${competencyColor.text}`}>
                 {area}
               </span>
               <span className="text-sm text-text-muted">
@@ -432,7 +432,7 @@ export function InterviewQuestionGenerator({
       })}
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-none text-red-700">
+        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-700">
           <span className="text-sm">{error}</span>
         </div>
       )}
@@ -507,7 +507,7 @@ export function InterviewQuestionGeneratorButton({
               </h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-bg-alt rounded transition-colors"
+                className="p-1 hover:bg-bg-alt transition-colors"
               >
                 <X className="w-5 h-5 text-text-muted" />
               </button>

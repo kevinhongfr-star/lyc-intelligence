@@ -30,7 +30,7 @@ export function CandidateReportPage() {
 
   const tier = getTier(contact.match_score_best ?? contact.trident_composite);
   const seniorityLabel = contact.seniority ? (SENIORITY_LABELS[contact.seniority] || contact.seniority) : '—';
-  const initials = contact.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const initials = contact.name.split('').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   const company = contact.career_history?.[0]?.company || '—';
 
   const handlePrint = () => window.print();
@@ -42,7 +42,7 @@ export function CandidateReportPage() {
         <Link to={`/platform/candidates/${id}`} className="flex items-center gap-1.5 text-xs text-text-muted hover:text-accent">
           <ArrowLeft size={13} /> Back to Profile
         </Link>
-        <Button onClick={handlePrint} className="bg-accent hover:bg-accent/90 text-white text-xs font-bold px-4 py-2 rounded-none flex items-center gap-2">
+        <Button onClick={handlePrint} className="bg-accent hover:bg-accent/90 text-white text-xs font-bold px-4 py-2 flex items-center gap-2">
           <Download size={13} /> Export PDF
         </Button>
       </div>
@@ -58,7 +58,7 @@ export function CandidateReportPage() {
               <p className="text-sm text-gray-500 mt-1 font-sans">{contact.name} — {contact.current_title || 'Executive'}</p>
             </div>
             <div className="text-right">
-              <div className="w-14 h-14 rounded-none text-white font-bold text-2xl flex items-center justify-center uppercase" style={{ backgroundColor: tier.color, fontFamily: "'Liberation Serif', serif" }}>
+              <div className="w-14 h-14 text-white font-bold text-2xl flex items-center justify-center uppercase" style={{ backgroundColor: tier.color, fontFamily: "'Liberation Serif', serif" }}>
                 {initials}
               </div>
               <p className="text-[10px] text-gray-400 mt-2 font-sans">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
@@ -118,7 +118,7 @@ export function CandidateReportPage() {
               {contact.career_history.map((item, idx) => (
                 <div key={idx} className="flex gap-4">
                   <div className="flex flex-col items-center">
-                    <div className={`w-2.5 h-2.5 rounded-full ${idx === 0 ? 'bg-gray-900' : 'bg-gray-300'}`} />
+                    <div className={`w-2.5 h-2.5 ${idx === 0 ? 'bg-gray-900' : 'bg-gray-300'}`} />
                     {idx < contact.career_history!.length - 1 && <div className="w-0.5 flex-1 bg-gray-200 mt-1" />}
                   </div>
                   <div className="pb-3">
@@ -139,7 +139,7 @@ export function CandidateReportPage() {
           {contact.education && contact.education.length > 0 ? (
             <div className="grid grid-cols-2 gap-4">
               {contact.education.map((edu, idx) => (
-                <div key={idx} className="bg-gray-50 border border-gray-100 rounded-none p-3">
+                <div key={idx} className="bg-gray-50 border border-gray-100 p-3">
                   <p className="text-sm font-bold">{edu.degree}</p>
                   <p className="text-xs text-gray-500 font-sans">{edu.school}</p>
                 </div>
@@ -156,7 +156,7 @@ export function CandidateReportPage() {
           {contact.skills && contact.skills.length > 0 ? (
             <div className="flex flex-wrap gap-1.5">
               {contact.skills.map((skill, idx) => (
-                <span key={idx} className="text-[10px] font-sans px-2 py-0.5 border border-gray-200 rounded bg-gray-50 text-gray-700">{skill}</span>
+                <span key={idx} className="text-[10px] font-sans px-2 py-0.5 border border-gray-200 bg-gray-50 text-gray-700">{skill}</span>
               ))}
             </div>
           ) : (
@@ -167,7 +167,7 @@ export function CandidateReportPage() {
               <p className="text-[9px] uppercase tracking-wider text-gray-400 font-sans font-bold mb-1.5">Languages</p>
               <div className="flex flex-wrap gap-1.5">
                 {contact.languages.map((lang, idx) => (
-                  <span key={idx} className="text-[10px] font-sans px-2 py-0.5 border border-gray-300 rounded bg-gray-100 text-gray-800 font-semibold">{lang}</span>
+                  <span key={idx} className="text-[10px] font-sans px-2 py-0.5 border border-gray-300 bg-gray-100 text-gray-800 font-semibold">{lang}</span>
                 ))}
               </div>
             </div>
@@ -232,14 +232,7 @@ export function CandidateReportPage() {
       </div>
 
       {/* Print styles */}
-      <style>{`
-        @media print {
-          body { background: white !important; margin: 0; padding: 0; }
-          .print\\:hidden { display: none !important; }
-          #report { box-shadow: none !important; margin: 0 !important; max-width: 100% !important; }
-          @page { size: A4; margin: 15mm; }
-        }
-      `}</style>
+      <style>{`@media print { body { background: white !important; margin: 0; padding: 0; } .print\\:hidden { display: none !important; } #report { box-shadow: none !important; margin: 0 !important; max-width: 100% !important; } @page { size: A4; margin: 15mm; } }`}</style>
     </div>
   );
 }

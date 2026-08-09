@@ -50,7 +50,7 @@ function DonutChart({ segments, size = 120 }: { segments: { label: string; value
       <div className="space-y-1">
         {segments.map((seg, i) => (
           <div key={i} className="flex items-center gap-2 text-xs">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: seg.color }} />
+            <span className="w-2 h-2" style={{ backgroundColor: seg.color }} />
             <span className="text-text-muted">{seg.label}</span>
             <span className="text-text-primary font-medium">{seg.value}</span>
           </div>
@@ -64,7 +64,7 @@ function Sparkline({ data, color = '#C108AB', width = 200, height = 40 }: { data
   if (data.length < 2) return <div className="text-xs text-text-muted">Not enough data</div>;
   const max = Math.max(...data), min = Math.min(...data);
   const range = max - min || 1;
-  const points = data.map((v, i) => `${(i / (data.length - 1)) * width},${height - ((v - min) / range) * (height - 4) - 2}`).join(' ');
+  const points = data.map((v, i) => `${(i / (data.length - 1)) * width},${height - ((v - min) / range) * (height - 4) - 2}`).join('');
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full" style={{ maxHeight: height }}>
       <polyline points={points} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" />
@@ -143,7 +143,7 @@ export function MetrixPage() {
         </div>
         <div className="flex gap-2">
           {(['7d', '30d', '90d', 'all'] as const).map(p => (
-            <button key={p} onClick={() => setPeriod(p)} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${period === p ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>
+            <button key={p} onClick={() => setPeriod(p)} className={`px-3 py-2 text-sm min-h-[44px] ${period === p ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>
               {p === 'all' ? 'All Time' : p.toUpperCase()}
             </button>
           ))}
@@ -206,8 +206,8 @@ export function MetrixPage() {
                   <span className="text-text-secondary">{label}</span>
                   <span className="text-text-primary font-medium">{rate}%</span>
                 </div>
-                <div className="w-full h-2 bg-bg-tertiary rounded-full overflow-hidden">
-                  <div className="h-full bg-accent rounded-full transition-all" style={{ width: `${Math.min(100, rate)}%` }} />
+                <div className="w-full h-2 bg-bg-tertiary overflow-hidden">
+                  <div className="h-full bg-accent transition-all" style={{ width: `${Math.min(100, rate)}%` }} />
                 </div>
               </div>
             ))}

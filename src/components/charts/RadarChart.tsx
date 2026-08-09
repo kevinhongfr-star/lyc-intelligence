@@ -46,7 +46,7 @@ export function RadarChart({
       const point = getPoint(i, axis.value);
       return `${i === 0 ? 'M' : 'L'} ${point.x} ${point.y}`;
     })
-    .join(' ') + ' Z';
+    .join('') + 'Z';
 
   const gridLevels = [0.25, 0.5, 0.75, 1];
 
@@ -70,7 +70,7 @@ export function RadarChart({
                 const r = level * radius;
                 return `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)}`;
               })
-              .join(' ');
+              .join('');
             return (
               <polygon
                 key={i}

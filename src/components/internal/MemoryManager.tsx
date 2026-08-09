@@ -18,7 +18,7 @@ export default function MemoryManager() {
   };
 
   return (
-    <div className="bg-bg-primary border border-bg-tertiary" style={{ borderRadius: 0 }}>
+    <div className="bg-bg-primary border border-bg-tertiary" style={{ }}>
       <div className="p-4 border-b border-bg-tertiary bg-bg-secondary flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Brain className="w-5 h-5" style={{ color: '#C108AB' }} />
@@ -28,7 +28,7 @@ export default function MemoryManager() {
           <button
             onClick={() => setConfirmClearAll(true)}
             className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-red-600 border border-red-300 hover:bg-red-50 transition-colors"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <Trash2 className="w-3 h-3" />
             Clear All
@@ -43,14 +43,14 @@ export default function MemoryManager() {
           <button
             onClick={clearAll}
             className="px-3 py-1 text-xs font-semibold text-white bg-red-600 hover:bg-red-700"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             Confirm
           </button>
           <button
             onClick={() => setConfirmClearAll(false)}
             className="px-3 py-1 text-xs font-medium text-text-muted border border-bg-tertiary hover:bg-bg-secondary"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             Cancel
           </button>
@@ -76,10 +76,10 @@ export default function MemoryManager() {
                 <td className="px-4 py-3 text-sm text-text-primary">{mem.topic}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-16 h-1.5 bg-bg-tertiary" style={{ borderRadius: 0 }}>
+                    <div className="w-16 h-1.5 bg-bg-tertiary" style={{ }}>
                       <div
                         className="h-full"
-                        style={{ width: `${mem.confidence * 100}%`, backgroundColor: '#C108AB', borderRadius: 0 }}
+                        style={{ width: `${mem.confidence * 100}%`, backgroundColor: '#C108AB' }}
                       />
                     </div>
                     <span className="text-sm text-text-primary">{Math.round(mem.confidence * 100)}%</span>
@@ -94,14 +94,14 @@ export default function MemoryManager() {
                       <button
                         onClick={() => clearMemory(mem.id)}
                         className="px-2 py-0.5 text-xs font-semibold text-white bg-red-600"
-                        style={{ borderRadius: 0 }}
+                        style={{ }}
                       >
                         Yes
                       </button>
                       <button
                         onClick={() => setConfirmId(null)}
                         className="px-2 py-0.5 text-xs text-text-muted border border-bg-tertiary"
-                        style={{ borderRadius: 0 }}
+                        style={{ }}
                       >
                         No
                       </button>

@@ -116,7 +116,7 @@ export function AssessmentInvitationCard({
   };
 
   return (
-    <div className="bg-white rounded-none border border-card-border overflow-hidden">
+    <div className="bg-white border border-card-border overflow-hidden">
       {/* Header */}
       <div className="p-5 border-b border-border">
         <div className="flex items-start justify-between">
@@ -132,9 +132,9 @@ export function AssessmentInvitationCard({
       <div className="p-5 space-y-4">
         {/* Candidate info */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+          <div className="w-10 h-10 bg-accent/10 flex items-center justify-center">
             <span className="text-accent font-medium">
-              {invitation.candidate_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+              {invitation.candidate_name.split('').map(n => n[0]).join('').slice(0, 2)}
             </span>
           </div>
           <div>
@@ -262,25 +262,7 @@ export function renderAssessmentEmailTemplate(invitation: AssessmentInvitationDa
 } {
   const subject = `Assessment Invitation for ${invitation.mandate_title}`;
 
-  const body = `
-Hi ${invitation.candidate_name},
-
-You've been invited to complete a ${invitation.assessment_type} assessment for ${invitation.mandate_title} at ${invitation.client_name}.
-
-Click here to start: ${invitation.assessment_link}
-
-Estimated time: ${invitation.duration_minutes} minutes.
-
-Important notes:
-- The assessment is mobile-friendly, so you can complete it on any device
-- Your progress is auto-saved, so you can resume if interrupted
-${invitation.expires_at ? `- Please complete by ${new Date(invitation.expires_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}` : ''}
-
-If you have any questions, please contact ${invitation.consultant_name} at ${invitation.consultant_email}.
-
-Best regards,
-LYC Intelligence
-  `.trim();
+  const body = `Hi ${invitation.candidate_name}, You've been invited to complete a ${invitation.assessment_type} assessment for ${invitation.mandate_title} at ${invitation.client_name}. Click here to start: ${invitation.assessment_link} Estimated time: ${invitation.duration_minutes} minutes. Important notes: - The assessment is mobile-friendly, so you can complete it on any device - Your progress is auto-saved, so you can resume if interrupted ${invitation.expires_at ?`- Please complete by ${new Date(invitation.expires_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`: ''} If you have any questions, please contact ${invitation.consultant_name} at ${invitation.consultant_email}. Best regards, LYC Intelligence`.trim();
 
   return { subject, body };
 }
@@ -355,13 +337,13 @@ export function BatchInvitationModal({
   return (
     <div className="space-y-4">
       {/* Select all header */}
-      <div className="flex items-center justify-between p-4 bg-bg-alt rounded-none">
+      <div className="flex items-center justify-between p-4 bg-bg-alt">
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
             checked={selectedIds.size === candidates.length && candidates.length > 0}
             onChange={toggleAll}
-            className="w-4 h-4 rounded border-gray-300"
+            className="w-4 h-4 border-gray-300"
           />
           <span className="font-medium">Select all ({candidates.length})</span>
         </label>
@@ -375,13 +357,13 @@ export function BatchInvitationModal({
         {candidates.map(candidate => (
           <label
             key={candidate.id}
-            className="flex items-center gap-3 p-3 rounded-none hover:bg-bg-alt cursor-pointer"
+            className="flex items-center gap-3 p-3 hover:bg-bg-alt cursor-pointer"
           >
             <input
               type="checkbox"
               checked={selectedIds.has(candidate.id)}
               onChange={() => toggleOne(candidate.id)}
-              className="w-4 h-4 rounded border-gray-300"
+              className="w-4 h-4 border-gray-300"
             />
             <div>
               <p className="font-medium text-text-primary">{candidate.name}</p>

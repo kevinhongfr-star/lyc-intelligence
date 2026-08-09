@@ -99,7 +99,7 @@ export function NextActionReminders({ daysAhead = 7, maxItems = 20, onCandidateC
 
   if (loading) {
     return (
-      <div className="bg-bg-secondary border border-border rounded-none p-5">
+      <div className="bg-bg-secondary border border-border p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-text-primary flex items-center gap-2">
             <Bell className="w-4 h-4 text-accent" />
@@ -112,7 +112,7 @@ export function NextActionReminders({ daysAhead = 7, maxItems = 20, onCandidateC
   }
 
   return (
-    <div className="bg-bg-secondary border border-border rounded-none p-5">
+    <div className="bg-bg-secondary border border-border p-5">
       <div className="flex items-start justify-between mb-4 gap-2 flex-wrap">
         <div>
           <h3 className="font-semibold text-text-primary flex items-center gap-2">
@@ -126,19 +126,19 @@ export function NextActionReminders({ daysAhead = 7, maxItems = 20, onCandidateC
 
         <div className="flex items-center gap-2 text-xs">
           {overdueCount > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 rounded-full font-medium">
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 font-medium">
               <AlertTriangle className="w-3 h-3" />
               {overdueCount} overdue
             </span>
           )}
           {todayCount > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-800 rounded-full font-medium">
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-800 font-medium">
               <Clock className="w-3 h-3" />
               {todayCount} today
             </span>
           )}
           {upcomingCount > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full font-medium">
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-800 font-medium">
               <Calendar className="w-3 h-3" />
               {upcomingCount} this week
             </span>
@@ -163,7 +163,7 @@ export function NextActionReminders({ daysAhead = 7, maxItems = 20, onCandidateC
               <button
                 key={item.id}
                 onClick={() => onCandidateClick?.(item.candidateId, item.mandateId)}
-                className={`w-full text-left p-3 rounded-none border transition-all hover:shadow-sm ${
+                className={`w-full text-left p-3 border transition-all hover:shadow-sm ${
                   dateInfo.isOverdue
                     ? 'border-red-200 bg-red-50 hover:bg-red-100'
                     : dateInfo.isToday
@@ -172,7 +172,7 @@ export function NextActionReminders({ daysAhead = 7, maxItems = 20, onCandidateC
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-none flex-shrink-0 ${
+                  <div className={`p-2 flex-shrink-0 ${
                     dateInfo.isOverdue
                       ? 'bg-red-100 text-red-600'
                       : dateInfo.isToday
@@ -199,7 +199,7 @@ export function NextActionReminders({ daysAhead = 7, maxItems = 20, onCandidateC
                         </p>
                       </div>
                       <div className="flex items-center gap-1 flex-shrink-0">
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        <span className={`text-xs font-medium px-2 py-0.5 ${
                           dateInfo.isOverdue
                             ? 'bg-red-200 text-red-800'
                             : dateInfo.isToday
@@ -220,7 +220,7 @@ export function NextActionReminders({ daysAhead = 7, maxItems = 20, onCandidateC
 
                     <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/30">
                       <span className="text-xs text-text-muted">
-                        <span className="font-medium text-text-primary">Last:</span>{' '}
+                        <span className="font-medium text-text-primary">Last:</span>{''}
                         {item.lastAttemptChannel ? CHANNEL_LABELS[item.lastAttemptChannel as keyof typeof CHANNEL_LABELS] || item.lastAttemptChannel : '—'}
                       </span>
                       <ChevronRight className="w-3 h-3 text-text-muted ml-auto" />

@@ -197,7 +197,7 @@ export function TimelineView({
   const todayPosition = getPositionForDate(today.toISOString());
 
   return (
-    <div className="bg-card border border-card-border rounded-none overflow-hidden">
+    <div className="bg-card border border-card-border overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-card-border bg-bg-alt">
         <div className="flex items-center justify-between">
@@ -210,23 +210,23 @@ export function TimelineView({
           </div>
           <div className="flex items-center gap-2 text-sm text-text-muted">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-green-500" />
+              <div className="w-3 h-3 bg-green-500" />
               <span>On Time</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-yellow-500" />
+              <div className="w-3 h-3 bg-yellow-500" />
               <span>Late</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-blue-500" />
+              <div className="w-3 h-3 bg-blue-500" />
               <span>On Track</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-orange-500" />
+              <div className="w-3 h-3 bg-orange-500" />
               <span>At Risk</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
+              <div className="w-3 h-3 bg-red-500" />
               <span>Overdue</span>
             </div>
           </div>
@@ -257,7 +257,7 @@ export function TimelineView({
                 className="absolute top-0 bottom-0 w-0.5 bg-accent z-10"
                 style={{ left: `${180 + todayPosition}px` }}
               >
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs bg-accent text-white px-1 rounded">
+                <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs bg-accent text-white px-1">
                   Today
                 </div>
               </div>
@@ -293,7 +293,7 @@ export function TimelineView({
                     {/* Bar */}
                     {startPos >= 0 && (
                       <div
-                        className={`absolute top-1/2 -translate-y-1/2 h-6 rounded-full ${statusColors.bg} border-2 ${statusColors.border}`}
+                        className={`absolute top-1/2 -translate-y-1/2 h-6 ${statusColors.bg} border-2 ${statusColors.border}`}
                         style={{
                           left: `${startPos}px`,
                           width: `${Math.max(endPos - startPos + dayWidth, 24)}px`,
@@ -302,7 +302,7 @@ export function TimelineView({
                         {/* Progress fill for completed */}
                         {milestone?.actual_date && (
                           <div
-                            className="absolute inset-0 rounded-full bg-current opacity-20"
+                            className="absolute inset-0 bg-current opacity-20"
                             style={{
                               width: `${((new Date(milestone.actual_date).getTime() - new Date(milestone.target_date!).getTime()) / (1000 * 60 * 60 * 24) + 1) * 10}%`,
                             }}
@@ -314,7 +314,7 @@ export function TimelineView({
                     {/* Target Date Marker */}
                     {startPos >= 0 && (
                       <div
-                        className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-gray-400 border border-white z-10"
+                        className="absolute top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-400 border border-white z-10"
                         style={{ left: `${startPos - 4}px` }}
                         title={`Target: ${milestone?.target_date}`}
                       />
@@ -323,7 +323,7 @@ export function TimelineView({
                     {/* Actual Date Marker */}
                     {milestone?.actual_date && (
                       <div
-                        className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-green-600 border-2 border-white z-10"
+                        className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-green-600 border-2 border-white z-10"
                         style={{ left: `${endPos - 6}px` }}
                         title={`Actual: ${milestone.actual_date}`}
                       />
@@ -363,23 +363,23 @@ export function TimelineView({
       <div className="p-4 border-t border-card-border bg-bg-alt">
         <div className="flex items-center gap-6 text-sm text-text-muted">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full border-2 border-green-500 bg-green-100" />
+            <div className="w-4 h-4 border-2 border-green-500 bg-green-100" />
             <span>On Time</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full border-2 border-yellow-500 bg-yellow-100" />
+            <div className="w-4 h-4 border-2 border-yellow-500 bg-yellow-100" />
             <span>Completed Late</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full border-2 border-blue-500 bg-blue-100" />
+            <div className="w-4 h-4 border-2 border-blue-500 bg-blue-100" />
             <span>On Track</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full border-2 border-orange-500 bg-orange-100" />
+            <div className="w-4 h-4 border-2 border-orange-500 bg-orange-100" />
             <span>At Risk</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full border-2 border-red-500 bg-red-100" />
+            <div className="w-4 h-4 border-2 border-red-500 bg-red-100" />
             <span>Overdue</span>
           </div>
         </div>

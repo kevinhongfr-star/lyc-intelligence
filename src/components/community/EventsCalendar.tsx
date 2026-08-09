@@ -71,7 +71,7 @@ function EventsCalendar() {
               setSelectedDate(null);
             }}
             className="px-3 py-1 text-sm border border-bg-tertiary text-text-muted hover:bg-bg-tertiary"
-            style={{ borderRadius: 0, background: 'none', cursor: 'pointer' }}
+            style={{  background: 'none', cursor: 'pointer' }}
           >
             Prev
           </button>
@@ -86,7 +86,7 @@ function EventsCalendar() {
               setSelectedDate(null);
             }}
             className="px-3 py-1 text-sm border border-bg-tertiary text-text-muted hover:bg-bg-tertiary"
-            style={{ borderRadius: 0, background: 'none', cursor: 'pointer' }}
+            style={{  background: 'none', cursor: 'pointer' }}
           >
             Next
           </button>
@@ -94,7 +94,7 @@ function EventsCalendar() {
       </div>
 
       {/* Calendar grid */}
-      <div className="border border-bg-tertiary bg-bg-secondary" style={{ borderRadius: 0 }}>
+      <div className="border border-bg-tertiary bg-bg-secondary" style={{ }}>
         {/* Weekday headers */}
         <div className="grid grid-cols-7 border-b border-bg-tertiary">
           {weekDays.map((d) => (
@@ -123,7 +123,6 @@ function EventsCalendar() {
                 onClick={() => setSelectedDate(day === selectedDate ? null : day)}
                 className="min-h-[64px] p-1.5 text-left border-b border-r border-bg-tertiary transition-colors"
                 style={{
-                  borderRadius: 0,
                   background: isSelected ? '#C108AB10' : 'transparent',
                   border: isSelected ? '1px solid #C108AB' : undefined,
                   cursor: 'pointer',
@@ -141,7 +140,7 @@ function EventsCalendar() {
                       <span
                         key={ev.id}
                         className="w-2 h-2 inline-block"
-                        style={{ borderRadius: 0, background: EVENT_TYPE_COLORS[ev.type] }}
+                        style={{  background: EVENT_TYPE_COLORS[ev.type] }}
                       />
                     ))}
                   </div>
@@ -158,7 +157,7 @@ function EventsCalendar() {
           <span key={type} className="inline-flex items-center gap-1.5">
             <span
               className="w-3 h-3 inline-block"
-              style={{ borderRadius: 0, background: EVENT_TYPE_COLORS[type] }}
+              style={{  background: EVENT_TYPE_COLORS[type] }}
             />
             {label}
           </span>
@@ -186,14 +185,14 @@ function EventsCalendar() {
 
 function EventCard({ event }: { event: CommunityEvent }) {
   return (
-    <div className="bg-bg-secondary border border-bg-tertiary p-4" style={{ borderRadius: 0 }}>
+    <div className="bg-bg-secondary border border-bg-tertiary p-4" style={{ }}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h4 className="font-serif font-semibold text-sm text-text-primary">{event.title}</h4>
             <span
               className="px-1.5 py-0.5 text-[10px] font-semibold text-white"
-              style={{ borderRadius: 0, background: EVENT_TYPE_COLORS[event.type] }}
+              style={{  background: EVENT_TYPE_COLORS[event.type] }}
             >
               {EVENT_TYPE_LABELS[event.type]}
             </span>
@@ -216,7 +215,6 @@ function EventCard({ event }: { event: CommunityEvent }) {
         <button
           className="shrink-0 px-3 py-1.5 text-xs font-medium"
           style={{
-            borderRadius: 0,
             background: event.isRegistered ? '#E5E5E5' : '#C108AB',
             color: event.isRegistered ? '#666666' : '#FFFFFF',
             border: 'none',

@@ -229,7 +229,7 @@ export function CoachingProgress({
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 ${LEVEL_COLORS[comp.level]}`} />
-                      <span className="text-sm font-semibold text-[#1a1a1a] capitalize">{comp.competency.replace('-', ' ')}</span>
+                      <span className="text-sm font-semibold text-[#1a1a1a] capitalize">{comp.competency.replace('-', '')}</span>
                     </div>
                     <span className={`text-xs font-semibold uppercase ${LEVEL_TEXT[comp.level]}`}>{comp.level}</span>
                   </div>
@@ -329,7 +329,7 @@ export function CoachingProgress({
                         goal.status === 'ahead' ? 'text-blue-700' :
                         'text-[#555]'
                       }`}>
-                        {goal.status.replace('-', ' ')}
+                        {goal.status.replace('-', '')}
                       </span>
                     </div>
                     <div className="mt-3 flex items-center gap-2">

@@ -92,7 +92,7 @@ export function ReportAnnotations({ annotations, onAdd, onUpdate, onDelete }: Re
   };
 
   return (
-    <div className="bg-bg rounded-none border border-border flex flex-col h-full">
+    <div className="bg-bg border border-border flex flex-col h-full">
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-text-primary flex items-center gap-2">
@@ -138,7 +138,7 @@ export function ReportAnnotations({ annotations, onAdd, onUpdate, onDelete }: Re
         </div>
         <div className="flex gap-2">
           <input
-            className="flex-1 bg-bg border border-border p-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB] rounded-none"
+            className="flex-1 bg-bg border border-border p-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB]"
             placeholder={`Add ${TYPE_LABELS[selectedType].toLowerCase()}...`}
             value={newContent}
             onChange={(e) => setNewContent(e.target.value)}
@@ -183,16 +183,16 @@ export function ReportAnnotations({ annotations, onAdd, onUpdate, onDelete }: Re
                   {editingId === a.id ? (
                     <div className="flex gap-2">
                       <input
-                        className="flex-1 bg-bg-alt border border-border p-1 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB] rounded-none"
+                        className="flex-1 bg-bg-alt border border-border p-1 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB]"
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit(a.id)}
                         autoFocus
                       />
-                      <button onClick={() => handleSaveEdit(a.id)} className="p-1 hover:bg-bg rounded-none">
+                      <button onClick={() => handleSaveEdit(a.id)} className="p-1 hover:bg-bg">
                         <Check className="w-4 h-4 text-green-500" />
                       </button>
-                      <button onClick={() => setEditingId(null)} className="p-1 hover:bg-bg rounded-none">
+                      <button onClick={() => setEditingId(null)} className="p-1 hover:bg-bg">
                         <X className="w-4 h-4 text-text-muted" />
                       </button>
                     </div>
@@ -217,21 +217,21 @@ export function ReportAnnotations({ annotations, onAdd, onUpdate, onDelete }: Re
                     <>
                       <button
                         onClick={() => toggleResolved(a.id, !a.resolved)}
-                        className="p-1 hover:bg-bg rounded-none"
+                        className="p-1 hover:bg-bg"
                         title={a.resolved ? 'Mark unresolved' : 'Mark resolved'}
                       >
                         <Check className={`w-4 h-4 ${a.resolved ? 'text-green-500' : 'text-text-muted'}`} />
                       </button>
                       <button
                         onClick={() => handleStartEdit(a)}
-                        className="p-1 hover:bg-bg rounded-none"
+                        className="p-1 hover:bg-bg"
                         title="Edit"
                       >
                         <Pencil className="w-4 h-4 text-text-muted" />
                       </button>
                       <button
                         onClick={() => onDelete(a.id)}
-                        className="p-1 hover:bg-red-500/10 rounded-none"
+                        className="p-1 hover:bg-red-500/10"
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />

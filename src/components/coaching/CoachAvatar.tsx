@@ -66,7 +66,7 @@ export function CoachAvatar({
               style={{ backgroundColor: avatarColor }}
               animate={
                 status === 'speaking'
-                  ? { scale: [1, 1.05, 1], borderRadius: ['0px', '0px', '0px'] }
+                  ? { scale: [1, 1.05, 1] }
                   : status === 'listening'
                     ? { scale: [1, 1.02, 1] }
                     : { scale: 1 }

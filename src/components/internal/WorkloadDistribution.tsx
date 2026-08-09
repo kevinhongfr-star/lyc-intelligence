@@ -35,15 +35,15 @@ export default function WorkloadDistribution() {
       {/* Legend */}
       <div className="flex items-center gap-4 text-xs text-text-muted">
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 bg-tier-1" style={{ borderRadius: 0 }} />
+          <div className="w-3 h-3 bg-tier-1" style={{ }} />
           <span>Low</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 bg-amber-500" style={{ borderRadius: 0 }} />
+          <div className="w-3 h-3 bg-amber-500" style={{ }} />
           <span>Medium</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 bg-red-500" style={{ borderRadius: 0 }} />
+          <div className="w-3 h-3 bg-red-500" style={{ }} />
           <span>High</span>
         </div>
       </div>
@@ -58,7 +58,7 @@ export default function WorkloadDistribution() {
                 <div className="flex items-center gap-2">
                   <div
                     className="w-2.5 h-2.5 flex-shrink-0"
-                    style={{ borderRadius: 0, backgroundColor: member.avatarColor }}
+                    style={{  backgroundColor: member.avatarColor }}
                   />
                   <span className="text-sm font-medium text-text-primary">{member.name}</span>
                 </div>
@@ -72,16 +72,16 @@ export default function WorkloadDistribution() {
                         ? 'bg-tier-2Bg text-tier-2'
                         : 'bg-red-500/15 text-red-600'
                     }`}
-                    style={{ borderRadius: 0 }}
+                    style={{ }}
                   >
                     {getWorkloadLabel(member.mandates)}
                   </span>
                 </div>
               </div>
-              <div className="h-6 bg-bg-tertiary" style={{ borderRadius: 0 }}>
+              <div className="h-6 bg-bg-tertiary" style={{ }}>
                 <div
                   className={`h-full ${getWorkloadColor(member.mandates)} transition-all duration-500`}
-                  style={{ width: `${percentage}%`, borderRadius: 0 }}
+                  style={{ width: `${percentage}%` }}
                 />
               </div>
             </div>

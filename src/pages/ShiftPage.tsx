@@ -96,11 +96,11 @@ export default function ShiftPage() {
           return (
             <div
               key={d.type}
-              className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-white border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => setSelected(d.type)}
             >
               <div className="flex items-start justify-between mb-3">
-                <div className={`${d.color} w-10 h-10 rounded-lg flex items-center justify-center`}>
+                <div className={`${d.color} w-10 h-10 flex items-center justify-center`}>
                   <Icon className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xs font-medium text-slate-400">{d.credits} credits</span>
@@ -127,11 +127,11 @@ export default function ShiftPage() {
             No assessments yet. Take your first SHIFT diagnostic above.
           </p>
         ) : (
-          <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
+          <div className="bg-white border border-slate-200 divide-y divide-slate-100">
             {history.map((r) => (
               <div key={r.id} className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+                  <div className="w-10 h-10 bg-slate-100 flex items-center justify-center">
                     <span className="text-sm font-bold text-slate-600">
                       {r.composite_score}
                     </span>
@@ -140,7 +140,7 @@ export default function ShiftPage() {
                     <p className="text-sm font-medium text-slate-900">{r.assessment_name}</p>
                     <p className="text-xs text-slate-400">
                       {r.assessment_type} · {r.tier_label}
-                      {r.metadata?.archetype ? ` · ${r.metadata.archetype}` : ''}
+                      {r.metadata?.archetype ? `· ${r.metadata.archetype}` : ''}
                     </p>
                   </div>
                 </div>

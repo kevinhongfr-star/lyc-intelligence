@@ -58,7 +58,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
       aria-invalid={error ? true : undefined}
       aria-describedby={describedById}
       className={cn(
-        'w-full px-3 py-2 bg-bg-tertiary border rounded-none text-sm text-text-primary',
+        'w-full px-3 py-2 bg-bg-tertiary border text-sm text-text-primary',
         'focus:outline-none focus:border-accent transition-colors',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         error ? 'border-red-500' : 'border-bg-hover',

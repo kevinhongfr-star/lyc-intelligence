@@ -229,7 +229,7 @@ export default function HiringFunnel() {
                 <XAxis type="number" tick={{ fontSize: 11, fill: '#666' }} allowDecimals={false} />
                 <YAxis type="category" dataKey="stage" tick={{ fontSize: 11, fill: '#666' }} width={90} />
                 <RTooltip
-                  contentStyle={{ border: '1px solid #e5e7eb', borderRadius: 0, fontSize: 12 }}
+                  contentStyle={{ border: '1px solid #e5e7eb',  fontSize: 12 }}
                 />
                 <Bar dataKey="count" name="Candidates" fill="#C108AB" radius={[0, 4, 4, 0]} />
               </BarChart>
@@ -288,7 +288,7 @@ export default function HiringFunnel() {
                 />
                 <YAxis tick={{ fontSize: 11, fill: '#666' }} unit="d" allowDecimals={false} />
                 <RTooltip
-                  contentStyle={{ border: '1px solid #e5e7eb', borderRadius: 0, fontSize: 12 }}
+                  contentStyle={{ border: '1px solid #e5e7eb',  fontSize: 12 }}
                 />
                 <Bar dataKey="median_days" name="Median days" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -314,7 +314,7 @@ export default function HiringFunnel() {
                 />
                 <YAxis tick={{ fontSize: 11, fill: '#666' }} allowDecimals={false} />
                 <RTooltip
-                  contentStyle={{ border: '1px solid #e5e7eb', borderRadius: 0, fontSize: 12 }}
+                  contentStyle={{ border: '1px solid #e5e7eb',  fontSize: 12 }}
                 />
                 <Line
                   type="monotone"

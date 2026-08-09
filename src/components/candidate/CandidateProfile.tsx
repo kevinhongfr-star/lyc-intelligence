@@ -325,7 +325,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
             <button
               key={industry}
               onClick={() => toggleArrayItem('industries', industry)}
-              className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
+              className={`px-3 py-1.5 text-sm border transition-all ${
                 formData.industries?.includes(industry)
                   ? 'border-accent bg-accent/10 text-accent'
                   : 'border-border text-text-muted hover:border-accent/50'
@@ -347,7 +347,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
               {skill}
               <button
                 onClick={() => removeSkill(skill)}
-                className="p-0.5 hover:bg-bg-alt rounded"
+                className="p-0.5 hover:bg-bg-alt"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -385,14 +385,14 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
           Education
         </label>
         {formData.education?.map((edu, i) => (
-          <div key={i} className="flex items-center gap-3 mb-2 p-3 bg-bg-alt rounded-none">
+          <div key={i} className="flex items-center gap-3 mb-2 p-3 bg-bg-alt">
             <div className="flex-1">
               <div className="font-medium text-text-primary">{edu.degree}</div>
               <div className="text-sm text-text-muted">{edu.institution} • {edu.year}</div>
             </div>
             <button
               onClick={() => handleChange('education', formData.education?.filter((_, idx) => idx !== i))}
-              className="p-2 hover:bg-bg rounded text-text-muted hover:text-red-500"
+              className="p-2 hover:bg-bg text-text-muted hover:text-red-500"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -419,7 +419,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
     <div className="space-y-6">
       {/* Upload area */}
       <div
-        className={`border-2 border-dashed rounded-none p-8 text-center transition-colors ${
+        className={`border-2 border-dashed p-8 text-center transition-colors ${
           formData.cv_url 
             ? 'border-green-500 bg-green-500/5' 
             : 'border-border hover:border-accent/50'
@@ -472,7 +472,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
 
       {/* Extracted data */}
       {formData.cv_extracted && (
-        <div className="bg-card rounded-none border border-card-border p-5">
+        <div className="bg-card border border-card-border p-5">
           <h4 className="font-semibold text-text-primary mb-4">
             <CheckCircle2 className="w-5 h-5 text-green-500 inline mr-2" />
             Extracted Information
@@ -482,7 +482,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
               <div key={key} className="flex items-start gap-3">
                 <span className="text-text-muted capitalize w-24">{key}:</span>
                 <span className="text-text-primary">
-                  {Array.isArray(value) ? value.join(', ') : String(value)}
+                  {Array.isArray(value) ? value.join(',') : String(value)}
                 </span>
               </div>
             ))}
@@ -495,9 +495,9 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
 
       {/* CV Preview */}
       {formData.cv_url && (
-        <div className="bg-card rounded-none border border-card-border p-5">
+        <div className="bg-card border border-card-border p-5">
           <h4 className="font-semibold text-text-primary mb-4">CV Preview</h4>
-          <div className="bg-bg-alt rounded-none p-4 text-center">
+          <div className="bg-bg-alt p-4 text-center">
             <FileText className="w-8 h-8 mx-auto text-text-muted mb-2" />
             <p className="text-sm text-text-muted">PDF Preview Coming Soon</p>
           </div>
@@ -517,7 +517,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
           {JOB_STATUS.map(option => (
             <label
               key={option.value}
-              className={`flex items-center gap-3 p-3 rounded-none border cursor-pointer transition-all ${
+              className={`flex items-center gap-3 p-3 border cursor-pointer transition-all ${
                 formData.job_search_status === option.value
                   ? 'border-accent bg-accent/5'
                   : 'border-border hover:border-accent/50'
@@ -546,7 +546,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
             <button
               key={industry}
               onClick={() => toggleArrayItem('preferred_industries', industry)}
-              className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
+              className={`px-3 py-1.5 text-sm border transition-all ${
                 formData.preferred_industries?.includes(industry)
                   ? 'border-accent bg-accent/10 text-accent'
                   : 'border-border text-text-muted hover:border-accent/50'
@@ -567,7 +567,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
             <button
               key={geo}
               onClick={() => toggleArrayItem('preferred_geographies', geo)}
-              className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
+              className={`px-3 py-1.5 text-sm border transition-all ${
                 formData.preferred_geographies?.includes(geo)
                   ? 'border-accent bg-accent/10 text-accent'
                   : 'border-border text-text-muted hover:border-accent/50'
@@ -588,7 +588,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
             <button
               key={size}
               onClick={() => toggleArrayItem('preferred_company_sizes', size)}
-              className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
+              className={`px-3 py-1.5 text-sm border transition-all ${
                 formData.preferred_company_sizes?.includes(size)
                   ? 'border-accent bg-accent/10 text-accent'
                   : 'border-border text-text-muted hover:border-accent/50'
@@ -632,14 +632,14 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
   );
 
   return (
-    <div className="bg-card rounded-none border border-card-border">
+    <div className="bg-card border border-card-border">
       {/* Tabs */}
       <div className="flex items-center gap-1 p-4 border-b border-border overflow-x-auto">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-none text-sm font-medium whitespace-nowrap transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === tab.id
                 ? 'bg-accent text-white'
                 : 'text-text-muted hover:bg-bg-alt hover:text-text-primary'
@@ -654,7 +654,7 @@ export function CandidateProfile({ profile, onUpdate }: CandidateProfileProps) {
       {/* Content */}
       <div className="p-6">
         {error && (
-          <div className="mb-4 p-4 bg-red-500/10 rounded-none flex items-center gap-3">
+          <div className="mb-4 p-4 bg-red-500/10 flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-500" />
             <span className="text-red-500">{error}</span>
           </div>

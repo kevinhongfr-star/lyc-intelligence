@@ -75,10 +75,10 @@ export const adminService = {
 
   analytics: {
     platform: () => request<{ stats: any }>('/analytics/platform'),
-    usage: (days?: number) => request<{ metrics: any }>(`/analytics/usage${days ? `?days=${days}` : ''}`),
+    usage: (days?: number) => request<{ metrics: any }>(`/analytics/usage${days ?`?days=${days}`: ''}`),
     health: () => request<{ health: any }>('/analytics/health'),
     mandateHealth: () => request<{ items: any[] }>('/analytics/mandate-health'),
-    timeline: (days?: number) => request<{ timeline: any[] }>(`/analytics/timeline${days ? `?days=${days}` : ''}`),
+    timeline: (days?: number) => request<{ timeline: any[] }>(`/analytics/timeline${days ?`?days=${days}`: ''}`),
   },
 
   audit: {
@@ -96,7 +96,7 @@ export const adminService = {
 
   config: {
     list: (scope?: string) =>
-      request<{ configs: any[] }>(`/config${scope ? `?scope=${scope}` : ''}`),
+      request<{ configs: any[] }>(`/config${scope ?`?scope=${scope}`: ''}`),
     create: (data: any) => request<{ config: any }>('/config', { method: 'POST', body: JSON.stringify(data) }),
     update: (id: string, data: any) => request<{ config: any }>(`/config/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   },
@@ -121,7 +121,7 @@ export const adminService = {
     recordPayment: (data: any) => request<{ payment: any }>('/billing/payments', { method: 'POST', body: JSON.stringify(data) }),
     taxRates: () => request<{ rates: any[] }>('/billing/tax-rates'),
     calculateTax: (amount: number, region?: string) =>
-      request<{ tax: number; rate: number; total: number }>(`/billing/tax?amount=${amount}${region ? `&region=${region}` : ''}`),
+      request<{ tax: number; rate: number; total: number }>(`/billing/tax?amount=${amount}${region ?`&region=${region}`: ''}`),
     summary: (orgId: string) => request<{ summary: any }>(`/billing/${orgId}/summary`),
   },
 

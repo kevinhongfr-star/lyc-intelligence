@@ -138,7 +138,7 @@ export function ClientDashboard() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="text-sm font-semibold text-text-primary truncate">{m.title}</h3>
-                        <span className={HEALTH_STYLES[m.health]}>{m.health.replace('_', ' ')}</span>
+                        <span className={HEALTH_STYLES[m.health]}>{m.health.replace('_', '')}</span>
                       </div>
                       <p className="text-xs text-text-muted mt-0.5">
                         Lead: {m.lead_consultant_name} · {m.days_since_kickoff}d since kickoff
@@ -154,7 +154,7 @@ export function ClientDashboard() {
                         key={stage}
                         className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium bg-bg-secondary text-text-muted"
                       >
-                        {stage.replace('_', ' ')}: {count as number}
+                        {stage.replace('_', '')}: {count as number}
                       </span>
                     ))}
                   </div>

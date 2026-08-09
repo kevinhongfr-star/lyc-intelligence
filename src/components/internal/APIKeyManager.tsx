@@ -27,7 +27,7 @@ export default function APIKeyManager() {
         </div>
         <button
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-accent text-white hover:bg-accent-light transition-colors"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <Plus className="w-3.5 h-3.5" />
           Generate New Key
@@ -42,7 +42,7 @@ export default function APIKeyManager() {
             <div
               key={apiKey.id}
               className="bg-bg-primary border border-bg-tertiary p-4"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
@@ -54,13 +54,13 @@ export default function APIKeyManager() {
                           ? 'bg-tier-1Bg text-tier-1'
                           : 'bg-red-500/15 text-red-600'
                       }`}
-                      style={{ borderRadius: 0 }}
+                      style={{ }}
                     >
                       {currentStatus}
                     </span>
                   </div>
                   <div className="flex items-center gap-4 mt-2 text-sm text-text-muted">
-                    <span>Prefix: <code className="bg-bg-secondary px-1.5 py-0.5 text-xs" style={{ borderRadius: 0 }}>{apiKey.prefix}****</code></span>
+                    <span>Prefix: <code className="bg-bg-secondary px-1.5 py-0.5 text-xs" style={{ }}>{apiKey.prefix}****</code></span>
                     <span>Created: {apiKey.created}</span>
                     <span>Last used: {apiKey.lastUsed}</span>
                   </div>
@@ -72,7 +72,7 @@ export default function APIKeyManager() {
                       ? 'border-red-300 text-red-600 hover:bg-red-50'
                       : 'border-bg-tertiary text-text-secondary hover:bg-bg-secondary'
                   }`}
-                  style={{ borderRadius: 0 }}
+                  style={{ }}
                 >
                   <Ban className="w-3 h-3" />
                   {isActive ? 'Revoke' : 'Reactivate'}

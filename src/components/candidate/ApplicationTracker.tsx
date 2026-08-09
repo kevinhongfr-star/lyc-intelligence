@@ -137,7 +137,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
           <div className="space-y-4">
             {timeline.map((item, i) => (
               <div key={i} className="flex items-start gap-4 relative">
-                <div className={`z-10 w-8 h-8 rounded-full flex items-center justify-center ${
+                <div className={`z-10 w-8 h-8 flex items-center justify-center ${
                   item.completed 
                     ? 'bg-green-500 text-white' 
                     : item.date 
@@ -149,7 +149,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
                   ) : item.date ? (
                     <Clock className="w-4 h-4" />
                   ) : (
-                    <div className="w-2 h-2 rounded-full bg-border" />
+                    <div className="w-2 h-2 bg-border" />
                   )}
                 </div>
                 <div className="flex-1 pt-1">
@@ -183,7 +183,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
 
       {/* Filters */}
       {showFilters && (
-        <div className="bg-card rounded-none border border-card-border p-4">
+        <div className="bg-card border border-card-border p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">Search</label>
@@ -199,7 +199,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
               <select
                 value={filters.stage}
                 onChange={(e) => setFilters(prev => ({ ...prev, stage: e.target.value }))}
-                className="w-full px-3 py-2 bg-bg border border-border rounded-none text-text-primary"
+                className="w-full px-3 py-2 bg-bg border border-border text-text-primary"
               >
                 <option value="">All Stages</option>
                 {Object.entries(STAGE_LABELS).map(([value, label]) => (
@@ -222,7 +222,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
 
       {/* Application cards */}
       {filteredApps.length === 0 ? (
-        <div className="bg-card rounded-none border border-card-border p-8 text-center">
+        <div className="bg-card border border-card-border p-8 text-center">
           <Briefcase className="w-12 h-12 mx-auto text-text-muted opacity-50 mb-3" />
           <p className="text-text-muted">No applications found</p>
         </div>
@@ -232,7 +232,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
             <div
               key={app.id}
               onClick={() => openApplication(app)}
-              className="bg-card rounded-none border border-card-border p-5 hover:border-accent/50 cursor-pointer transition-all"
+              className="bg-card border border-card-border p-5 hover:border-accent/50 cursor-pointer transition-all"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -268,9 +268,9 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
                   <span>Progress</span>
                   <span>{getStageProgress(app.stage)}%</span>
                 </div>
-                <div className="h-2 bg-bg-alt rounded-full overflow-hidden">
+                <div className="h-2 bg-bg-alt overflow-hidden">
                   <div 
-                    className={`h-full rounded-full transition-all ${
+                    className={`h-full transition-all ${
                       ['placed', 'offer'].includes(app.stage.toLowerCase()) 
                         ? 'bg-green-500' 
                         : app.stage.toLowerCase() === 'rejected'
@@ -284,7 +284,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
 
               {/* Next steps */}
               {app.next_steps && (
-                <div className="mt-4 p-3 bg-bg-alt rounded-none">
+                <div className="mt-4 p-3 bg-bg-alt">
                   <div className="flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 text-accent mt-0.5" />
                     <span className="text-sm text-text-muted">{app.next_steps}</span>
@@ -314,7 +314,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
         </button>
 
         {/* Header */}
-        <div className="bg-card rounded-none border border-card-border p-6">
+        <div className="bg-card border border-card-border p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h2 className="text-xl font-semibold text-text-primary">
@@ -335,9 +335,9 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
               <span>Application Progress</span>
               <span>{getStageProgress(selectedApp.stage)}%</span>
             </div>
-            <div className="h-3 bg-bg-alt rounded-full overflow-hidden">
+            <div className="h-3 bg-bg-alt overflow-hidden">
               <div 
-                className={`h-full rounded-full ${
+                className={`h-full ${
                   ['placed', 'offer'].includes(selectedApp.stage.toLowerCase()) 
                     ? 'bg-green-500' 
                     : 'bg-accent'
@@ -375,7 +375,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Timeline */}
           <div className="lg:col-span-1">
-            <div className="bg-card rounded-none border border-card-border p-5">
+            <div className="bg-card border border-card-border p-5">
               {renderTimeline()}
             </div>
           </div>
@@ -384,7 +384,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
           <div className="lg:col-span-2 space-y-6">
             {/* Mandate Overview */}
             {selectedApp.mandate && (
-              <div className="bg-card rounded-none border border-card-border p-5">
+              <div className="bg-card border border-card-border p-5">
                 <h4 className="font-semibold text-text-primary mb-4">Mandate Overview</h4>
                 <div className="space-y-3 text-sm">
                   <div>
@@ -410,9 +410,9 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
 
             {/* Next Steps */}
             {selectedApp.next_steps && (
-              <div className="bg-card rounded-none border border-card-border p-5">
+              <div className="bg-card border border-card-border p-5">
                 <h4 className="font-semibold text-text-primary mb-4">Next Steps</h4>
-                <div className="p-4 bg-accent/5 border border-accent/20 rounded-none">
+                <div className="p-4 bg-accent/5 border border-accent/20">
                   <div className="flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 text-accent mt-0.5" />
                     <p className="text-text-primary">{selectedApp.next_steps}</p>
@@ -423,9 +423,9 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
 
             {/* Client Feedback */}
             {selectedApp.client_feedback && (
-              <div className="bg-card rounded-none border border-card-border p-5">
+              <div className="bg-card border border-card-border p-5">
                 <h4 className="font-semibold text-text-primary mb-4">Client Feedback</h4>
-                <div className="p-4 bg-bg-alt rounded-none">
+                <div className="p-4 bg-bg-alt">
                   <div className="flex items-center justify-between mb-3">
                     <Badge variant={
                       selectedApp.client_feedback.decision === 'approved' ? 'success' :
@@ -446,7 +446,7 @@ export function ApplicationTracker({ applications }: ApplicationTrackerProps) {
 
             {/* Match Details */}
             {selectedApp.match_reasons && selectedApp.match_reasons.length > 0 && (
-              <div className="bg-card rounded-none border border-card-border p-5">
+              <div className="bg-card border border-card-border p-5">
                 <h4 className="font-semibold text-text-primary mb-4">Why You're a Match</h4>
                 <ul className="space-y-2">
                   {selectedApp.match_reasons.map((reason: string, i: number) => (

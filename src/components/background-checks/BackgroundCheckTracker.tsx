@@ -95,7 +95,7 @@ export function BackgroundCheckTracker({ candidateId, onUploadResult }: Backgrou
 
       {isLoading ? (
         <div className="flex items-center justify-center py-8">
-          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent animate-spin" />
         </div>
       ) : checks.length === 0 ? (
         <div className="text-center py-8">
@@ -111,12 +111,12 @@ export function BackgroundCheckTracker({ candidateId, onUploadResult }: Backgrou
             return (
               <div
                 key={check.id}
-                className="p-4 bg-bg-alt rounded-none"
+                className="p-4 bg-bg-alt"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-none ${statusConfig.bg} flex items-center justify-center`}>
+                      <div className={`w-10 h-10 ${statusConfig.bg} flex items-center justify-center`}>
                         <StatusIcon className={`w-5 h-5 ${statusConfig.color}`} />
                       </div>
                       <div>
@@ -124,11 +124,11 @@ export function BackgroundCheckTracker({ candidateId, onUploadResult }: Backgrou
                           <span className="font-medium text-text-primary">
                             {CHECK_TYPE_LABELS[check.check_type]}
                           </span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs ${statusConfig.bg} ${statusConfig.color}`}>
+                          <span className={`px-2 py-0.5 text-xs ${statusConfig.bg} ${statusConfig.color}`}>
                             {statusConfig.label}
                           </span>
                           {check.result && (
-                            <span className={`px-2 py-0.5 rounded-full text-xs ${RESULT_CONFIG[check.result].bg} ${RESULT_CONFIG[check.result].color}`}>
+                            <span className={`px-2 py-0.5 text-xs ${RESULT_CONFIG[check.result].bg} ${RESULT_CONFIG[check.result].color}`}>
                               {RESULT_CONFIG[check.result].label}
                             </span>
                           )}
@@ -146,7 +146,7 @@ export function BackgroundCheckTracker({ candidateId, onUploadResult }: Backgrou
                           </div>
                         )}
                         {check.result_summary && (
-                          <div className="mt-2 p-2 bg-bg-base rounded text-sm text-text-primary">
+                          <div className="mt-2 p-2 bg-bg-base text-sm text-text-primary">
                             {check.result_summary}
                           </div>
                         )}

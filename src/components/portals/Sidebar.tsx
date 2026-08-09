@@ -91,7 +91,7 @@ export function Sidebar({
                     <span className="flex-1 truncate">{item.label}</span>
                   )}
                   {!collapsed && typeof item.badge === 'number' && item.badge > 0 && (
-                    <span className="bg-red-500 text-white text-[10px] font-medium px-1.5 py-0.5 rounded-full leading-none">
+                    <span className="bg-red-500 text-white text-[10px] font-medium px-1.5 py-0.5 leading-none">
                       {item.badge}
                     </span>
                   )}

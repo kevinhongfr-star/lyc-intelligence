@@ -145,7 +145,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
   // Get type config
   const getTypeConfig = (type: string) => ({
     color: NOTIFICATION_TYPE_COLORS[type] || 'bg-gray-100 text-gray-700',
-    label: NOTIFICATION_TYPE_LABELS[type] || type.replace('_', ' '),
+    label: NOTIFICATION_TYPE_LABELS[type] || type.replace('_', ''),
   });
 
   // Loading state
@@ -185,7 +185,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
               setIsRefreshing(true);
               setFilter('all');
             }}
-            className="p-2 hover:bg-bg-alt rounded-none transition-colors"
+            className="p-2 hover:bg-bg-alt transition-colors"
           >
             <RefreshCw className={`w-5 h-5 text-text-muted ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
@@ -198,7 +198,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
         <div className="flex gap-2">
           <button
             onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 text-sm font-medium transition-colors ${
               filter === 'all'
                 ? 'bg-primary text-white'
                 : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -208,7 +208,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
           </button>
           <button
             onClick={() => setFilter('unread')}
-            className={`px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 text-sm font-medium transition-colors ${
               filter === 'unread'
                 ? 'bg-primary text-white'
                 : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -220,7 +220,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
             <select
               value={filter === 'all' || filter === 'unread' ? '' : filter}
               onChange={(e) => setFilter(e.target.value || 'all')}
-              className="px-3 py-1.5 rounded-none text-sm font-medium bg-bg-alt text-text-muted border-none focus:outline-none focus:ring-2 focus:ring-primary"
+              className="px-3 py-1.5 text-sm font-medium bg-bg-alt text-text-muted border-none focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">Filter by type...</option>
               {Object.entries(NOTIFICATION_TYPE_LABELS).map(([value, label]) => (
@@ -234,7 +234,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
       {/* Notifications List */}
       {notifications.length === 0 ? (
         <Card className="p-6 text-center">
-          <div className="w-16 h-16 rounded-full bg-bg-alt flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 bg-bg-alt flex items-center justify-center mx-auto">
             <Clock className="w-8 h-8 text-text-muted" />
           </div>
           <h3 className="font-medium text-text-primary mt-4">No Notifications</h3>
@@ -259,7 +259,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
                   {/* Status indicator */}
                   <div className="flex flex-col items-center gap-2">
                     {!notification.read ? (
-                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      <div className="w-2 h-2 bg-primary" />
                     ) : (
                       <Check className="w-4 h-4 text-green-500" />
                     )}
@@ -268,7 +268,7 @@ export function NotificationsPage({ userId }: NotificationsPageProps) {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${typeConfig.color}`}>
+                      <span className={`px-2 py-0.5 text-xs font-medium ${typeConfig.color}`}>
                         {typeConfig.label}
                       </span>
                       {notification.emailSent && (

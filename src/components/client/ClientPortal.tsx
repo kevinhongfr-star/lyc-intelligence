@@ -53,7 +53,7 @@ export function ClientPortal({ children }: ClientPortalProps) {
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-center border-b border-bg-tertiary">
-          <div className="w-8 h-8 rounded-none bg-accent flex items-center justify-center">
+          <div className="w-8 h-8 bg-accent flex items-center justify-center">
             <Briefcase className="w-5 h-5 text-white" />
           </div>
           {!sidebarCollapsed && (
@@ -68,7 +68,7 @@ export function ClientPortal({ children }: ClientPortalProps) {
               <li key={item.id}>
                 <button
                   onClick={() => setActiveNav(item.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-none transition-all ${
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 transition-all ${
                     activeNav === item.id
                       ? 'bg-accent text-white'
                       : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
@@ -79,7 +79,7 @@ export function ClientPortal({ children }: ClientPortalProps) {
                     <span className="text-sm font-medium">{item.label}</span>
                   )}
                   {!sidebarCollapsed && activeNav === item.id && (
-                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white" />
+                    <span className="ml-auto w-1.5 h-1.5 bg-white" />
                   )}
                 </button>
               </li>
@@ -91,7 +91,7 @@ export function ClientPortal({ children }: ClientPortalProps) {
         <div className="p-2 border-t border-bg-tertiary">
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="w-full flex items-center justify-center py-2 text-text-muted hover:text-text-primary hover:bg-bg-tertiary rounded-none transition-colors"
+            className="w-full flex items-center justify-center py-2 text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-colors"
           >
             {sidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
           </button>
@@ -109,7 +109,7 @@ export function ClientPortal({ children }: ClientPortalProps) {
               <input
                 type="text"
                 placeholder="Search..."
-                className="w-64 pl-10 pr-4 py-2 bg-bg-tertiary border border-transparent rounded-none text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
+                className="w-64 pl-10 pr-4 py-2 bg-bg-tertiary border border-transparent text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
               />
             </div>
           </div>
@@ -120,7 +120,7 @@ export function ClientPortal({ children }: ClientPortalProps) {
 
             {/* User */}
             <div className="flex items-center gap-3 pl-4 border-l border-bg-tertiary">
-              <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
+              <div className="w-8 h-8 bg-accent/10 flex items-center justify-center">
                 <User className="w-4 h-4 text-accent" />
               </div>
               <div className="text-right">

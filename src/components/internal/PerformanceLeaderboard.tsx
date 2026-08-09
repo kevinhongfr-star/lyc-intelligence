@@ -59,7 +59,7 @@ export default function PerformanceLeaderboard() {
   );
 
   return (
-    <div className="bg-bg-primary border border-bg-tertiary" style={{ borderRadius: 0 }}>
+    <div className="bg-bg-primary border border-bg-tertiary" style={{ }}>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>

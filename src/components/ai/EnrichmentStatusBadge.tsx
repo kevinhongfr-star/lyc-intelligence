@@ -76,7 +76,7 @@ export function EnrichmentStatusBadge({
 
       {/* Tooltip */}
       <div className="absolute bottom-full left-0 mb-1 hidden group-hover:block z-50">
-        <div className="bg-gray-900 text-white text-xs rounded px-2 py-1.5 whitespace-nowrap">
+        <div className="bg-gray-900 text-white text-xs px-2 py-1.5 whitespace-nowrap">
           <div className="font-medium">{config.description}</div>
           <div className="text-gray-400 mt-0.5">
             Status: {config.label}
@@ -102,11 +102,11 @@ export function EnrichmentDot({ status }: { status: EnrichmentStatus }) {
 
   return (
     <div className="relative group">
-      <div className={`w-2 h-2 rounded-full ${colorClasses[config.variant]}`} />
+      <div className={`w-2 h-2 ${colorClasses[config.variant]}`} />
 
       {/* Tooltip */}
       <div className="absolute bottom-full left-0 mb-1 hidden group-hover:block z-50">
-        <div className="bg-gray-900 text-white text-xs rounded px-2 py-1.5 whitespace-nowrap">
+        <div className="bg-gray-900 text-white text-xs px-2 py-1.5 whitespace-nowrap">
           {config.description}
         </div>
         <div className="absolute top-full left-2 border-4 border-transparent border-t-gray-900" />

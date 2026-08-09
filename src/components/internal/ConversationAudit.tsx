@@ -43,7 +43,7 @@ export default function ConversationAudit() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
-    <div className="bg-bg-primary border border-bg-tertiary" style={{ borderRadius: 0 }}>
+    <div className="bg-bg-primary border border-bg-tertiary" style={{ }}>
       <div className="p-4 border-b border-bg-tertiary bg-bg-secondary flex items-center gap-2">
         <MessageCircle className="w-5 h-5" style={{ color: '#C108AB' }} />
         <span className="text-sm font-medium text-text-primary">Conversation Audit</span>
@@ -69,7 +69,7 @@ export default function ConversationAudit() {
                 <span className="text-sm text-text-primary font-mono shrink-0">{conv.userId}</span>
                 <span
                   className="inline-block px-2 py-0.5 text-xs font-semibold shrink-0"
-                  style={{ borderRadius: 0, backgroundColor: portalStyle.bg, color: portalStyle.text }}
+                  style={{  backgroundColor: portalStyle.bg, color: portalStyle.text }}
                 >
                   {conv.portal}
                 </span>
@@ -77,7 +77,7 @@ export default function ConversationAudit() {
                 <span className="text-sm text-text-muted shrink-0">{conv.startedAt}</span>
                 <span
                   className="inline-block px-2 py-0.5 text-xs font-semibold shrink-0 ml-auto"
-                  style={{ borderRadius: 0, backgroundColor: statusStyle.bg, color: statusStyle.text }}
+                  style={{  backgroundColor: statusStyle.bg, color: statusStyle.text }}
                 >
                   {conv.status}
                 </span>

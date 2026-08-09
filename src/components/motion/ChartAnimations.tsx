@@ -52,7 +52,7 @@ export function LineChartEntry({
 }: LineChartEntryProps) {
   const pathD = points
     .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
-    .join(' ');
+    .join('');
 
   return (
     <svg

@@ -48,7 +48,7 @@ export default function CandidateEvents() {
           <div
             key={event.id}
             className="bg-bg-primary border border-bg-tertiary p-5"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
@@ -87,7 +87,7 @@ export default function CandidateEvents() {
                 variant={isRegistered ? 'outline' : 'default'}
                 size="sm"
                 onClick={() => handleRegister(event.id)}
-                style={{ borderRadius: 0 }}
+                style={{ }}
               >
                 {isRegistered ? 'Registered' : 'Register'}
               </Button>

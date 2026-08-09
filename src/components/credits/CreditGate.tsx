@@ -131,7 +131,6 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
         padding: '16px',
         background: `${DS.accent}20`,
         border: `1px solid ${DS.accent}40`,
-        borderRadius: '0px',
         color: DS.text
       }}>
         <Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} />
@@ -150,7 +149,6 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
             padding: '32px',
             background: showInsufficientCredits ? `${DS.warning}10` : `${DS.muted}10`,
             border: `1px solid ${showInsufficientCredits ? DS.warning : DS.muted}`,
-            borderRadius: '0px',
             textAlign: 'center'
           }}>
             {showInsufficientCredits ? (
@@ -181,7 +179,6 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
               padding: '12px 24px',
               background: DS.accent,
               color: '#FFF',
-              borderRadius: '0px',
               fontSize: '14px',
               fontWeight: 600
             }}>
@@ -199,12 +196,7 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
         />
       )}
 
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </>
   );
 }

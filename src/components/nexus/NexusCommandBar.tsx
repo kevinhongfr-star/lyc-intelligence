@@ -73,7 +73,7 @@ export function NexusCommandBar({ isOpen, onToggle }: NexusCommandBarProps) {
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-fixed">
         <button
           onClick={onToggle}
-          className="flex items-center gap-2 px-4 py-3 bg-fuchsia text-white rounded-full shadow-lg hover:bg-fuchsia/90 transition-colors"
+          className="flex items-center gap-2 px-4 py-3 bg-fuchsia text-white shadow-lg hover:bg-fuchsia/90 transition-colors"
         >
           <Sparkles className="w-5 h-5" />
           <span className="font-semibold text-sm">NEXUS</span>
@@ -87,7 +87,7 @@ export function NexusCommandBar({ isOpen, onToggle }: NexusCommandBarProps) {
     <>
       {/* Response panel above bar */}
       {(response || loading) && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-xl bg-white rounded-card shadow-modal border border-border p-4 z-fixed">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-xl bg-white shadow-modal border border-border p-4 z-fixed">
           {loading ? (
             <div className="flex items-center gap-2 text-text-muted">
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -111,13 +111,13 @@ export function NexusCommandBar({ isOpen, onToggle }: NexusCommandBarProps) {
 
       {/* Suggestion dropdown */}
       {showSuggestions && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-xl bg-white rounded-card shadow-modal border border-border p-2 z-fixed">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-xl bg-white shadow-modal border border-border p-2 z-fixed">
           <div className="flex flex-wrap gap-2">
             {SUGGESTIONS.map((suggestion) => (
               <button
                 key={suggestion}
                 onClick={() => handleSuggestionClick(suggestion)}
-                className="px-3 py-1.5 bg-bg-warm rounded-md text-sm text-text-secondary hover:bg-fuchsia-light hover:text-fuchsia transition-colors"
+                className="px-3 py-1.5 bg-bg-warm text-sm text-text-secondary hover:bg-fuchsia-light hover:text-fuchsia transition-colors"
               >
                 {suggestion}
               </button>
@@ -128,7 +128,7 @@ export function NexusCommandBar({ isOpen, onToggle }: NexusCommandBarProps) {
 
       {/* Command bar */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-xl z-fixed">
-        <div className="flex items-center gap-2 bg-white rounded-full shadow-lg border border-border px-4 py-2">
+        <div className="flex items-center gap-2 bg-white shadow-lg border border-border px-4 py-2">
           <Sparkles className="w-5 h-5 text-fuchsia" />
           <input
             ref={inputRef}
@@ -142,7 +142,7 @@ export function NexusCommandBar({ isOpen, onToggle }: NexusCommandBarProps) {
           <button
             onClick={handleSend}
             disabled={!input.trim() || loading}
-            className={`p-2 rounded-full transition-colors ${
+            className={`p-2 transition-colors ${
               input.trim() && !loading
                 ? 'bg-fuchsia text-white hover:bg-fuchsia/90'
                 : 'bg-bg-warm text-text-muted'
@@ -152,7 +152,7 @@ export function NexusCommandBar({ isOpen, onToggle }: NexusCommandBarProps) {
           </button>
           <button
             onClick={onToggle}
-            className="p-2 rounded-full hover:bg-bg-warm text-text-muted"
+            className="p-2 hover:bg-bg-warm text-text-muted"
           >
             <X className="w-4 h-4" />
           </button>

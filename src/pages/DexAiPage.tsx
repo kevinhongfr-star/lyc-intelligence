@@ -37,7 +37,6 @@ const btnBase: React.CSSProperties = {
   fontWeight: 500,
   textDecoration: 'none',
   border: `1px solid ${INK}`,
-  borderRadius: 0,
   transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
   fontFamily: "'DM Sans', system-ui, sans-serif",
   cursor: 'pointer',
@@ -114,7 +113,7 @@ function Nav() {
             </li>
           ))}
         </ul>
-        <Link to="/nexus" style={{ padding: '10px 20px', background: ACCENT, color: WHITE, fontSize: 13, fontWeight: 500, textDecoration: 'none', borderRadius: 0, transition: 'background 200ms ease', minHeight: 40, display: 'inline-flex', alignItems: 'center' }}
+        <Link to="/nexus" style={{ padding: '10px 20px', background: ACCENT, color: WHITE, fontSize: 13, fontWeight: 500, textDecoration: 'none',  transition: 'background 200ms ease', minHeight: 40, display: 'inline-flex', alignItems: 'center' }}
           onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARK)}
           onMouseLeave={(e) => (e.currentTarget.style.background = ACCENT)}>
           Experience in NEXUS <ArrowRight size={12} style={{ marginLeft: 6 }} />
@@ -149,12 +148,7 @@ function Nav() {
           </div>
         </>
       )}
-      <style>{`
-        @media (max-width: 768px) {
-          .da-nav-links { display: none !important; }
-          .da-nav-toggle { display: flex !important; }
-        }
-      `}</style>
+      <style>{`@media (max-width: 768px) { .da-nav-links { display: none !important; } .da-nav-toggle { display: flex !important; } }`}</style>
     </nav>
   );
 }
@@ -407,24 +401,7 @@ export function DexAiPage() {
         <BackCTA />
       </main>
       <Footer />
-      <style>{`
-        .da-reveal {
-          opacity: 0;
-          transform: translateY(24px);
-          transition: opacity 350ms cubic-bezier(0.16,1,0.3,1), transform 350ms cubic-bezier(0.16,1,0.3,1);
-        }
-        .da-reveal.da-visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        @media (max-width: 768px) {
-          .da-arch-grid { grid-template-columns: 1fr !important; }
-          .da-arch-detail-grid { grid-template-columns: 1fr !important; }
-          .da-trust-grid { grid-template-columns: 1fr !important; }
-          .da-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
-          .da-reveal { opacity: 1; transform: none; transition: none; }
-        }
-      `}</style>
+      <style>{`.da-reveal { opacity: 0; transform: translateY(24px); transition: opacity 350ms cubic-bezier(0.16,1,0.3,1), transform 350ms cubic-bezier(0.16,1,0.3,1); } .da-reveal.da-visible { opacity: 1; transform: translateY(0); } @media (max-width: 768px) { .da-arch-grid { grid-template-columns: 1fr !important; } .da-arch-detail-grid { grid-template-columns: 1fr !important; } .da-trust-grid { grid-template-columns: 1fr !important; } .da-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; } .da-reveal { opacity: 1; transform: none; transition: none; } }`}</style>
     </div>
   );
 }

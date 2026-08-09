@@ -74,11 +74,7 @@ export async function getTeamShiftResults(
 ): Promise<Array<{ user_id: string; output_scores: Record<string, number>; profile: { name: string } }>> {
   const { data, error } = await supabase
     .from('scoring_runs')
-    .select(`
-      user_id,
-      output_scores,
-      profiles:user_id(name)
-    `)
+    .select(`user_id, output_scores, profiles:user_id(name)`)
     .eq('assessment_type', assessmentType)
     .in('user_id', teamMemberIds)
     .order('created_at', { ascending: false });
@@ -115,10 +111,7 @@ export async function getPeerShiftResults(
 ): Promise<Array<{ output_scores: Record<string, number> }>> {
   let query = supabase
     .from('scoring_runs')
-    .select(`
-      output_scores,
-      profiles:user_id(industry, function, seniority)
-    `)
+    .select(`output_scores, profiles:user_id(industry, function, seniority)`)
     .eq('assessment_type', assessmentType);
 
   const { data, error } = await query.limit(500);
@@ -368,11 +361,11 @@ function generateDefaultInsights(input: CozeBenchmarkInput): CozeBenchmarkOutput
   for (const dim of dimensions) {
     const diff = teamAvg[dim] - peerAvg[dim];
     if (diff >= 10) {
-      strengths.push(dim.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()));
-      insights.push(`Your team scores ${diff}% above peer average in ${dim.replace('_', ' ')}`);
+      strengths.push(dim.replace('_', '').replace(/\b\w/g, l => l.toUpperCase()));
+      insights.push(`Your team scores ${diff}% above peer average in ${dim.replace('_', '')}`);
     } else if (diff <= -10) {
-      gaps.push(dim.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()));
-      insights.push(`${dim.replace('_', ' ')} is ${Math.abs(diff)}% below peer average — consider focused development`);
+      gaps.push(dim.replace('_', '').replace(/\b\w/g, l => l.toUpperCase()));
+      insights.push(`${dim.replace('_', '')} is ${Math.abs(diff)}% below peer average — consider focused development`);
     }
   }
 

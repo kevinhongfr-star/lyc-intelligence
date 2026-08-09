@@ -192,7 +192,7 @@ export function ClientMandatesPage() {
                   </div>
                   <div>
                     <div className="text-xs font-medium text-text-primary">{selectedMandate.consultant_name}</div>
-                    <div className="text-[10px] text-text-muted capitalize">{selectedMandate.consultant_role?.replace(/_/g, ' ') ?? 'Consultant'}</div>
+                    <div className="text-[10px] text-text-muted capitalize">{selectedMandate.consultant_role?.replace(/_/g, '') ?? 'Consultant'}</div>
                   </div>
                   {selectedMandate.consultant_email && (
                     <a href={`mailto:${selectedMandate.consultant_email}`} className="text-fuchsia ml-1"><Mail className="w-3.5 h-3.5" /></a>
@@ -296,7 +296,7 @@ export function ClientMandatesPage() {
                       <div key={stage} className="flex-shrink-0 w-52">
                         <div className="flex items-center justify-between mb-2 px-1">
                           <span className="text-xs font-medium text-text-secondary">{stage}</span>
-                          <span className="text-xs text-text-muted bg-bg-warm px-1.5 py-0.5 rounded">{stageMap[stage] ?? candidates.length}</span>
+                          <span className="text-xs text-text-muted bg-bg-warm px-1.5 py-0.5">{stageMap[stage] ?? candidates.length}</span>
                         </div>
                         <div className="space-y-2 min-h-[60px] bg-bg-warm/40 p-2">
                           {candidates.length === 0 ? (

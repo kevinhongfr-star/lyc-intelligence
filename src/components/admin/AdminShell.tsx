@@ -41,9 +41,7 @@ const AdminShell: React.FC = () => {
   return (
     <div className="min-h-screen bg-bg text-text-primary flex">
       <aside
-        className={`fixed lg:relative lg:translate-x-0 top-0 left-0 h-screen w-64 bg-white border-r border-border z-50
-          transform transition-transform duration-200
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed lg:relative lg:translate-x-0 top-0 left-0 h-screen w-64 bg-white border-r border-border z-50 transform transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="flex items-center h-16 px-5 border-b border-border">
           <div className="flex items-center gap-2">
@@ -68,8 +66,7 @@ const AdminShell: React.FC = () => {
               end={end}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors
-                ${isActive
+                `flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors ${isActive
                   ? 'bg-fuchsia text-white'
                   : 'text-text-secondary hover:bg-bg-warm hover:text-text-primary'
                 }`

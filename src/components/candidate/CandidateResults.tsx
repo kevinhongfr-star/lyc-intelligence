@@ -95,7 +95,7 @@ function ScoreGauge({ score, label, size = 'md' }: { score: number; label: strin
   return (
     <div className="flex flex-col items-center">
       <div
-        className={`${sizeClasses[size]} rounded-full ${getScoreBgColor(score)} flex items-center justify-center font-bold ${getScoreColor(score)}`}
+        className={`${sizeClasses[size]} ${getScoreBgColor(score)} flex items-center justify-center font-bold ${getScoreColor(score)}`}
       >
         {score}
       </div>
@@ -119,7 +119,7 @@ function DimensionBar({ dimension }: { dimension: DimensionScore }) {
         <span className="font-medium text-text-primary">{dimension.name}</span>
         <span className="text-text-muted">{dimension.score}/100</span>
       </div>
-      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="h-2 bg-gray-200 overflow-hidden">
         <div
           className={`h-full ${getBarColor(dimension.score)} transition-all duration-500`}
           style={{ width: `${dimension.score}%` }}
@@ -134,13 +134,13 @@ function FullResultsView({ result }: { result: AssessmentResult }) {
   return (
     <div className="space-y-6">
       {/* Overall Score */}
-      <div className="flex flex-col items-center p-6 bg-gradient-to-br from-accent/5 to-accent/10 rounded-2xl">
+      <div className="flex flex-col items-center p-6 bg-gradient-to-br from-accent/5 to-accent/10">
         <ScoreGauge score={result.overall_score} label="Overall Fit Score" size="lg" />
         <div className="mt-4">{getRecommendationBadge(result.recommendation)}</div>
       </div>
 
       {/* Dimension Scores */}
-      <div className="bg-card rounded-none border border-card-border p-5">
+      <div className="bg-card border border-card-border p-5">
         <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
           <Target className="w-5 h-5 text-accent" />
           Dimension Scores
@@ -154,7 +154,7 @@ function FullResultsView({ result }: { result: AssessmentResult }) {
 
       {/* Strengths */}
       {result.strengths.length > 0 && (
-        <div className="bg-card rounded-none border border-card-border p-5">
+        <div className="bg-card border border-card-border p-5">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-green-500" />
             Strengths
@@ -172,7 +172,7 @@ function FullResultsView({ result }: { result: AssessmentResult }) {
 
       {/* Development Areas */}
       {result.development_areas.length > 0 && (
-        <div className="bg-card rounded-none border border-card-border p-5">
+        <div className="bg-card border border-card-border p-5">
           <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-yellow-500" />
             Development Areas
@@ -180,7 +180,7 @@ function FullResultsView({ result }: { result: AssessmentResult }) {
           <ul className="space-y-2">
             {result.development_areas.map((area, idx) => (
               <li key={idx} className="flex items-start gap-2">
-                <div className="w-5 h-5 rounded-full bg-yellow-100 flex items-center justify-center mt-0.5 flex-shrink-0">
+                <div className="w-5 h-5 bg-yellow-100 flex items-center justify-center mt-0.5 flex-shrink-0">
                   <span className="text-xs text-yellow-600">•</span>
                 </div>
                 <span className="text-text-primary">{area}</span>
@@ -191,7 +191,7 @@ function FullResultsView({ result }: { result: AssessmentResult }) {
       )}
 
       {/* Recommendation Summary */}
-      <div className="bg-accent/5 border border-accent/20 rounded-none p-5">
+      <div className="bg-accent/5 border border-accent/20 p-5">
         <h3 className="font-semibold text-text-primary mb-2 flex items-center gap-2">
           <Award className="w-5 h-5 text-accent" />
           Recommendation
@@ -215,7 +215,7 @@ function PassFailOnlyView({ result }: { result: AssessmentResult }) {
   return (
     <div className="flex flex-col items-center p-8 text-center">
       <div
-        className={`w-24 h-24 rounded-full flex items-center justify-center mb-4 ${
+        className={`w-24 h-24 flex items-center justify-center mb-4 ${
           isPass ? 'bg-green-100' : 'bg-yellow-100'
         }`}
       >
@@ -249,7 +249,7 @@ function PassFailOnlyView({ result }: { result: AssessmentResult }) {
 function HiddenResultsView() {
   return (
     <div className="flex flex-col items-center p-8 text-center">
-      <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+      <div className="w-24 h-24 bg-gray-100 flex items-center justify-center mb-4">
         <Lock className="w-12 h-12 text-gray-400" />
       </div>
 
@@ -260,7 +260,7 @@ function HiddenResultsView() {
         and they will be in touch with the next steps.
       </p>
 
-      <div className="mt-6 p-4 bg-bg-alt rounded-none">
+      <div className="mt-6 p-4 bg-bg-alt">
         <p className="text-sm text-text-muted">
           If you have any questions about the process, please contact your recruiter directly.
         </p>
@@ -283,7 +283,7 @@ export function CandidateResultsLoading() {
 export function CandidateResultsError({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center p-12 text-center">
-      <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+      <div className="w-16 h-16 bg-red-100 flex items-center justify-center mb-4">
         <XCircle className="w-8 h-8 text-red-500" />
       </div>
 
@@ -388,7 +388,7 @@ export function ResultsSummary({ results, onViewDetails, onChangeVisibility }: R
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 text-sm font-medium transition-colors ${
               filter === f
                 ? 'bg-accent text-white'
                 : 'text-text-muted hover:bg-gray-100'
@@ -409,7 +409,7 @@ export function ResultsSummary({ results, onViewDetails, onChangeVisibility }: R
         {filteredResults.map(result => (
           <div
             key={result.id}
-            className="bg-white rounded-none border border-card-border p-4 hover:shadow-md transition-shadow"
+            className="bg-white border border-card-border p-4 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -429,7 +429,7 @@ export function ResultsSummary({ results, onViewDetails, onChangeVisibility }: R
                   <select
                     value={result.visibility}
                     onChange={e => onChangeVisibility(result.id, e.target.value as ResultVisibility)}
-                    className="text-sm border border-border rounded-none px-2 py-1"
+                    className="text-sm border border-border px-2 py-1"
                   >
                     <option value="full">Full Results</option>
                     <option value="pass_fail">Pass/Fail Only</option>

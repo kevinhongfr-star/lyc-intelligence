@@ -211,10 +211,10 @@ export function WorkflowBuilder({ orgId, userId, onSave, onCancel, initialWorkfl
 
         <div className="space-y-4">
           {steps.map((step, index) => (
-            <div key={index} className="p-4 bg-bg-alt rounded-none">
+            <div key={index} className="p-4 bg-bg-alt">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
+                  <div className="w-8 h-8 bg-primary text-white flex items-center justify-center text-sm font-bold">
                     {step.step_order}
                   </div>
                   <span className="font-medium text-text-primary">Step {step.step_order}</span>
@@ -261,7 +261,7 @@ export function WorkflowBuilder({ orgId, userId, onSave, onCancel, initialWorkfl
                   >
                     {ROLES.map(role => (
                       <option key={role} value={role}>
-                        {role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        {role.replace('_', '').replace(/\b\w/g, l => l.toUpperCase())}
                       </option>
                     ))}
                   </Select>
@@ -289,7 +289,7 @@ export function WorkflowBuilder({ orgId, userId, onSave, onCancel, initialWorkfl
                   >
                     {ROLES.map(role => (
                       <option key={role} value={role}>
-                        {role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        {role.replace('_', '').replace(/\b\w/g, l => l.toUpperCase())}
                       </option>
                     ))}
                   </Select>

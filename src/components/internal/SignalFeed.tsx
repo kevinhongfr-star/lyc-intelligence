@@ -44,7 +44,7 @@ export default function SignalFeed() {
           value={sourceFilter}
           onChange={e => setSourceFilter(e.target.value)}
           className="border border-bg-tertiary bg-bg-primary text-text-primary text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#C108AB]/40"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <option value="all">All Sources</option>
           {sources.map(s => (
@@ -55,7 +55,7 @@ export default function SignalFeed() {
           value={typeFilter}
           onChange={e => setTypeFilter(e.target.value)}
           className="border border-bg-tertiary bg-bg-primary text-text-primary text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#C108AB]/40"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <option value="all">All Types</option>
           {types.map(t => (
@@ -69,7 +69,7 @@ export default function SignalFeed() {
           <div
             key={signal.id}
             className="border border-bg-tertiary bg-bg-primary p-4"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 space-y-2">

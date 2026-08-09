@@ -275,9 +275,9 @@ export function PipelineFunnelView() {
                   </div>
 
                   {/* Bar */}
-                  <div className="flex-1 h-6 bg-gray-100 rounded relative">
+                  <div className="flex-1 h-6 bg-gray-100 relative">
                     <div
-                      className={`h-full rounded ${color} transition-all`}
+                      className={`h-full ${color} transition-all`}
                       style={{ width: `${widthPercent}%` }}
                     />
                     {/* Count label */}
@@ -302,19 +302,19 @@ export function PipelineFunnelView() {
           {/* Legend */}
           <div className="flex items-center gap-4 mt-4 text-xs text-text-secondary">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-gray-400" />
+              <div className="w-3 h-3 bg-gray-400" />
               <span>Upstream</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-green-500" />
+              <div className="w-3 h-3 bg-green-500" />
               <span>Active</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-red-400" />
+              <div className="w-3 h-3 bg-red-400" />
               <span>Dead</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-cyan-400" />
+              <div className="w-3 h-3 bg-cyan-400" />
               <span>Client Phase</span>
             </div>
           </div>

@@ -31,13 +31,13 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
         onClick={onClose}
       />
       {/* Modal */}
-      <div className={`relative bg-white rounded-card shadow-modal w-full ${SIZE_CLASSES[size]} mx-4 max-h-[85vh] overflow-y-auto`}>
+      <div className={`relative bg-white shadow-modal w-full ${SIZE_CLASSES[size]} mx-4 max-h-[85vh] overflow-y-auto`}>
         {title && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
             <h3 className="font-serif font-bold text-lg text-text-primary">{title}</h3>
             <button
               onClick={onClose}
-              className="p-1 rounded-lg hover:bg-bg-warm text-text-muted hover:text-text-primary transition-colors"
+              className="p-1 hover:bg-bg-warm text-text-muted hover:text-text-primary transition-colors"
             >
               <X className="w-5 h-5" />
             </button>

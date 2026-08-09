@@ -78,7 +78,7 @@ export function LoginPage() {
         <div style={{ maxWidth: '400px', width: '100%' }}>
 
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+            <div style={{ width: '48px', height: '48px',  background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
               <Shield style={{ width: 24, height: 24, color: DS.accent }} />
             </div>
             <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
@@ -89,7 +89,7 @@ export function LoginPage() {
             </p>
           </div>
 
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px', boxShadow: DS.shadow }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '32px', boxShadow: DS.shadow }}>
             <form onSubmit={handleSubmit}
               onMouseEnter={handleMouseEnter}
             >
@@ -107,7 +107,7 @@ export function LoginPage() {
                     autoComplete="email"
                     style={{
                       width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px',
+                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
                       color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
                       fontFamily: DS.bodyFont,
                     }}
@@ -129,7 +129,7 @@ export function LoginPage() {
                     autoComplete="current-password"
                     style={{
                       width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, borderRadius: '0px',
+                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
                       color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
                       fontFamily: DS.bodyFont,
                     }}
@@ -138,7 +138,7 @@ export function LoginPage() {
               </div>
 
               {error && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: '#FEF2F2', borderRadius: '0px', color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: '#FEF2F2',  color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
                   <AlertCircle style={{ width: 18, height: 18, flexShrink: 0 }} />
                   {error}
                 </div>
@@ -151,7 +151,7 @@ export function LoginPage() {
                 style={{
                   width: '100%', padding: '14px',
                   background: DS.accent, color: '#FFFFFF',
-                  border: 'none', borderRadius: '0px',
+                  border: 'none', 
                   fontSize: '15px', fontWeight: 600,
                   cursor: loading ? 'not-allowed' : 'pointer',
                   opacity: loading ? 0.7 : 1,
@@ -186,11 +186,7 @@ export function LoginPage() {
         </div>
       </div>
 
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; }
-        input::placeholder { color: ${DS.muted}; }
-      `}</style>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; } input::placeholder { color: ${DS.muted}; }`}</style>
     </div>
   );
 }

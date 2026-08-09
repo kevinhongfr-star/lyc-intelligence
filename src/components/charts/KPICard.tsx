@@ -65,7 +65,7 @@ export function KPICard({
             style={{ color: trendColor }}
             aria-label={`${delta.trend} trend`}
           >
-            {delta.trend === 'up' ? '↑' : delta.trend === 'down' ? '↓' : '→'}{' '}
+            {delta.trend === 'up' ? '↑' : delta.trend === 'down' ? '↓' : '→'}{''}
             {delta.value > 0 ? '+' : ''}
             {delta.value}%
           </span>
@@ -94,7 +94,7 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
       const y = height - ((v - min) / range) * height;
       return `${x},${y}`;
     })
-    .join(' ');
+    .join('');
 
   return (
     <svg

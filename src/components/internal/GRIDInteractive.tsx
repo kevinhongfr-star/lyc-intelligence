@@ -17,7 +17,7 @@ export default function GRIDInteractive() {
     <div className="space-y-4">
       <div className="flex gap-6">
         <div className="flex-1 relative">
-          <div className="border border-bg-tertiary bg-bg-primary p-6 min-h-[400px]" style={{ borderRadius: 0 }}>
+          <div className="border border-bg-tertiary bg-bg-primary p-6 min-h-[400px]" style={{ }}>
             {/* Company nodes row */}
             <div className="flex gap-4 mb-12 justify-center flex-wrap">
               {companyNodes.map(node => (
@@ -29,7 +29,7 @@ export default function GRIDInteractive() {
                       ? 'border-[#C108AB] bg-[#C108AB]/5'
                       : 'border-bg-tertiary hover:border-[#C108AB]/40'
                   }`}
-                  style={{ borderRadius: 0 }}
+                  style={{ }}
                 >
                   <Building2 className="w-6 h-6 mx-auto mb-2 text-[#C108AB]" />
                   <div className="font-medium text-sm text-text-primary">{node.name}</div>
@@ -56,7 +56,7 @@ export default function GRIDInteractive() {
                         ? 'border-[#C108AB] bg-[#C108AB]/5'
                         : 'border-bg-tertiary hover:border-[#C108AB]/40'
                     }`}
-                    style={{ borderRadius: 0 }}
+                    style={{ }}
                   >
                     <User className="w-4 h-4 mx-auto mb-1 text-text-muted" />
                     <div className="font-medium text-xs text-text-primary">{node.name}</div>
@@ -73,7 +73,7 @@ export default function GRIDInteractive() {
 
         {/* Details panel */}
         {selectedNode && (
-          <div className="w-72 flex-shrink-0 border border-bg-tertiary bg-bg-primary p-4 self-start" style={{ borderRadius: 0 }}>
+          <div className="w-72 flex-shrink-0 border border-bg-tertiary bg-bg-primary p-4 self-start" style={{ }}>
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-medium text-text-muted uppercase tracking-wider">Details</span>
               <button onClick={() => setSelectedNodeId(null)} className="text-text-muted hover:text-text-primary">

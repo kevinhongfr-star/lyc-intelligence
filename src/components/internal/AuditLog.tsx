@@ -28,7 +28,7 @@ export default function AuditLog() {
   }, [filterUser, filterAction, search]);
 
   return (
-    <div className="bg-bg-primary border border-bg-tertiary" style={{ borderRadius: 0 }}>
+    <div className="bg-bg-primary border border-bg-tertiary" style={{ }}>
       <div className="p-4 border-b border-bg-tertiary bg-bg-secondary flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
@@ -38,14 +38,14 @@ export default function AuditLog() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-sm bg-bg-primary border border-bg-tertiary text-text-primary focus:border-accent"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           />
         </div>
         <select
           value={filterUser}
           onChange={(e) => setFilterUser(e.target.value)}
           className="px-3 py-2 text-sm bg-bg-primary border border-bg-tertiary text-text-primary"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <option value="all">All Users</option>
           {uniqueUsers.map((u) => (
@@ -56,7 +56,7 @@ export default function AuditLog() {
           value={filterAction}
           onChange={(e) => setFilterAction(e.target.value)}
           className="px-3 py-2 text-sm bg-bg-primary border border-bg-tertiary text-text-primary"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <option value="all">All Actions</option>
           {uniqueActions.map((a) => (

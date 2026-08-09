@@ -20,7 +20,7 @@ export default function OpsSystemHealth() {
             <div
               key={m.label}
               className="border border-bg-tertiary bg-bg-primary p-4"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-center gap-2 mb-3">
                 <Icon className="w-4 h-4" style={{ color: m.color }} />
@@ -29,13 +29,12 @@ export default function OpsSystemHealth() {
               <div className="text-2xl font-serif font-bold text-text-primary mb-3">
                 {m.label === 'Error Rate' ? `${m.value}${m.unit}` : m.label === 'Uptime' ? `${m.value}${m.unit}` : `${m.value}${m.unit}`}
               </div>
-              <div className="h-2 bg-bg-tertiary" style={{ borderRadius: 0 }}>
+              <div className="h-2 bg-bg-tertiary" style={{ }}>
                 <div
                   className="h-full transition-all"
                   style={{
                     width: `${Math.min(m.value, 100)}%`,
                     backgroundColor: m.color,
-                    borderRadius: 0,
                   }}
                 />
               </div>
@@ -44,7 +43,7 @@ export default function OpsSystemHealth() {
         })}
       </div>
 
-      <div className="flex items-center gap-8 border border-bg-tertiary bg-bg-primary p-4" style={{ borderRadius: 0 }}>
+      <div className="flex items-center gap-8 border border-bg-tertiary bg-bg-primary p-4" style={{ }}>
         <div className="flex items-center gap-2">
           <Link className="w-4 h-4 text-text-muted" />
           <span className="text-sm text-text-muted">Active Connections</span>

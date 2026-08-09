@@ -57,7 +57,7 @@ export function ExportPanel({ reportId, onExport }: ExportPanelProps) {
   ];
 
   return (
-    <div className="bg-bg rounded-none border border-border">
+    <div className="bg-bg border border-border">
       <div className="p-4 border-b border-border">
         <div className="flex items-center gap-2">
           <Download className="w-5 h-5 text-[#C108AB]" />
@@ -92,7 +92,7 @@ export function ExportPanel({ reportId, onExport }: ExportPanelProps) {
               type="checkbox"
               checked={includeEmail}
               onChange={(e) => setIncludeEmail(e.target.checked)}
-              className="w-4 h-4 rounded-none border-border"
+              className="w-4 h-4 border-border"
             />
             <Mail className="w-4 h-4 text-text-muted" />
             <span className="text-sm text-text-primary">Send via Email</span>
@@ -119,7 +119,7 @@ export function ExportPanel({ reportId, onExport }: ExportPanelProps) {
               <div>
                 <label className="block text-xs text-text-muted mb-1">Message (optional)</label>
                 <textarea
-                  className="w-full bg-bg-alt border border-border p-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB] min-h-[60px] rounded-none"
+                  className="w-full bg-bg-alt border border-border p-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-[#C108AB] min-h-[60px]"
                   value={emailBody}
                   onChange={(e) => setEmailBody(e.target.value)}
                   placeholder="Optional message..."
@@ -135,7 +135,7 @@ export function ExportPanel({ reportId, onExport }: ExportPanelProps) {
               type="checkbox"
               checked={includeShare}
               onChange={(e) => setIncludeShare(e.target.checked)}
-              className="w-4 h-4 rounded-none border-border"
+              className="w-4 h-4 border-border"
             />
             <Share2 className="w-4 h-4 text-text-muted" />
             <span className="text-sm text-text-primary">Create Share Link</span>
@@ -145,7 +145,7 @@ export function ExportPanel({ reportId, onExport }: ExportPanelProps) {
             <div className="mt-3 ml-6">
               <label className="block text-xs text-text-muted mb-1">Expiry</label>
               <select
-                className="w-full bg-bg-alt border border-border p-2 text-sm text-text-primary rounded-none"
+                className="w-full bg-bg-alt border border-border p-2 text-sm text-text-primary"
                 value={shareExpiry}
                 onChange={(e) => setShareExpiry(e.target.value)}
               >

@@ -24,7 +24,7 @@ const DS = {
 const customComponents = {
   table: ({ children }: any) => (
     <div style={{ overflowX: 'auto', margin: '8px 0' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', border: `1px solid ${DS.cardBorder}`, borderRadius: '0px', overflow: 'hidden' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', border: `1px solid ${DS.cardBorder}`,  overflow: 'hidden' }}>
         {children}
       </table>
     </div>
@@ -45,9 +45,9 @@ const customComponents = {
     </tr>
   ),
   code: ({ inline, children, ...props }: any) => {
-    if (inline) return <code style={{ background: '#FFFFFF', padding: '2px 6px', borderRadius: '4px', fontSize: '12px', color: DS.accent, fontFamily: 'monospace' }} {...props}>{children}</code>;
+    if (inline) return <code style={{ background: '#FFFFFF', padding: '2px 6px',  fontSize: '12px', color: DS.accent, fontFamily: 'monospace' }} {...props}>{children}</code>;
     return (
-      <pre style={{ background: '#FFFFFF', padding: '14px', borderRadius: '0px', overflowX: 'auto', margin: '8px 0', fontSize: '12px', color: DS.textSecondary, fontFamily: 'monospace', lineHeight: 1.5 }}>
+      <pre style={{ background: '#FFFFFF', padding: '14px',  overflowX: 'auto', margin: '8px 0', fontSize: '12px', color: DS.textSecondary, fontFamily: 'monospace', lineHeight: 1.5 }}>
         <code {...props}>{children}</code>
       </pre>
     );
@@ -81,7 +81,6 @@ export function MessageBubble({ role, content }: MessageBubbleProps) {
     <div style={{ alignSelf: role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
       <div style={{
         padding: '12px 16px',
-        borderRadius: role === 'user' ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
         background: role === 'user' ? DS.accent : DS.card,
         border: role === 'user' ? 'none' : `1px solid ${DS.border}`,
         color: role === 'user' ? '#FFF' : DS.textSecondary,

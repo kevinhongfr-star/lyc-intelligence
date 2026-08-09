@@ -114,8 +114,8 @@ export function EngagementTracker() {
             <div className="text-xs text-text-muted">
               <div>{total} response{total !== 1 ? 's' : ''}</div>
               <div>
-                <span style={{ color: '#10B981' }}>{promoters}P</span> ·{' '}
-                <span className="text-amber-600">{passives}N</span> ·{' '}
+                <span style={{ color: '#10B981' }}>{promoters}P</span> ·{''}
+                <span className="text-amber-600">{passives}N</span> ·{''}
                 <span className="text-red-500">{detractors}D</span>
               </div>
             </div>

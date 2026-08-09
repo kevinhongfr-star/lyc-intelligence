@@ -1,0 +1,27 @@
+import { JSX } from 'preact';
+import { PostHog } from './module';
+import { Survey, SurveyQuestionBranchingType } from '@posthog/browser-common';
+
+/**
+ * Determine the next survey step based on branching configuration.
+ * Returns the next question index, or SurveyQuestionBranchingType.End if the survey should end.
+ */
+declare function getNextSurveyStep(survey: Survey, currentQuestionIndex: number, response: string | string[] | number | null): number | typeof SurveyQuestionBranchingType.End;
+
+declare const renderSurveysPreview: ({ survey, parentElement, previewPageIndex, forceDisableHtml, onPreviewSubmit, onPreviewBack, positionStyles, }: {
+    survey: Survey;
+    parentElement: HTMLElement;
+    previewPageIndex: number;
+    forceDisableHtml?: boolean;
+    onPreviewSubmit?: (res: string | string[] | number | null) => void;
+    onPreviewBack?: () => void;
+    posthog?: PostHog;
+    positionStyles?: JSX.CSSProperties;
+}) => void;
+declare const renderFeedbackWidgetPreview: ({ survey, root, forceDisableHtml, }: {
+    survey: Survey;
+    root: HTMLElement;
+    forceDisableHtml?: boolean;
+}) => void;
+
+export { getNextSurveyStep, renderFeedbackWidgetPreview, renderSurveysPreview };

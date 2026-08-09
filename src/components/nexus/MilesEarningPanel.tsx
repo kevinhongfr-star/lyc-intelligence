@@ -131,7 +131,7 @@ export function MilesEarningPanel({ open, onClose, className }: MilesEarningPane
           'absolute right-0 top-0 bottom-0 w-full max-w-md bg-white overflow-y-auto shadow-xl',
           className
         )}
-        style={{ borderRadius: 0 }}
+        style={{ }}
       >
         {/* Header */}
         <div
@@ -174,7 +174,6 @@ export function MilesEarningPanel({ open, onClose, className }: MilesEarningPane
               style={{
                 background: `${ACCENT}08`,
                 border: `1px solid ${ACCENT}30`,
-                borderRadius: 0,
               }}
             >
               <p className="text-xs opacity-60" style={{ color: ACCENT }}>
@@ -189,7 +188,6 @@ export function MilesEarningPanel({ open, onClose, className }: MilesEarningPane
               style={{
                 background: `${ACCENT}08`,
                 border: `1px solid ${ACCENT}30`,
-                borderRadius: 0,
               }}
             >
               <p className="text-xs opacity-60" style={{ color: ACCENT }}>
@@ -213,7 +211,7 @@ export function MilesEarningPanel({ open, onClose, className }: MilesEarningPane
               <div
                 key={i}
                 className="h-16 animate-pulse"
-                style={{ background: `${ACCENT}10`, borderRadius: 0 }}
+                style={{ background: `${ACCENT}10` }}
               />
             ))
           ) : (
@@ -229,7 +227,6 @@ export function MilesEarningPanel({ open, onClose, className }: MilesEarningPane
                   style={{
                     background: `${ACCENT}08`,
                     border: `1px solid ${ACCENT}20`,
-                    borderRadius: 0,
                   }}
                 >
                   <div
@@ -237,7 +234,6 @@ export function MilesEarningPanel({ open, onClose, className }: MilesEarningPane
                     style={{
                       background: `${ACCENT}20`,
                       color: ACCENT,
-                      borderRadius: 0,
                     }}
                   >
                     {item.icon}

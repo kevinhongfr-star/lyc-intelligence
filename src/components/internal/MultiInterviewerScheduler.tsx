@@ -69,7 +69,7 @@ export default function MultiInterviewerScheduler() {
       <div className="flex gap-4 flex-wrap">
         {MOCK_INTERVIEWERS.map(iv => (
           <div key={iv.id} className="flex items-center gap-2 text-sm">
-            <div className="w-2 h-2 bg-[#C108AB]" style={{ borderRadius: 0 }} />
+            <div className="w-2 h-2 bg-[#C108AB]" style={{ }} />
             <span className="font-medium text-text-primary">{iv.name}</span>
             <span className="text-text-muted">({iv.role})</span>
           </div>
@@ -112,7 +112,7 @@ export default function MultiInterviewerScheduler() {
                               ? 'bg-[#C108AB]/15 border-[#C108AB]/30 hover:bg-[#C108AB]/25 cursor-pointer'
                               : 'bg-bg-tertiary/40 border-bg-tertiary cursor-default'
                         }`}
-                        style={{ borderRadius: 0 }}
+                        style={{ }}
                       >
                         {overlap && <CheckCircle2 className="w-3 h-3 mx-auto" />}
                       </button>
@@ -127,17 +127,17 @@ export default function MultiInterviewerScheduler() {
 
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1.5 text-xs text-text-muted">
-          <div className="w-3 h-3 bg-[#C108AB]/15 border border-[#C108AB]/30" style={{ borderRadius: 0 }} />
+          <div className="w-3 h-3 bg-[#C108AB]/15 border border-[#C108AB]/30" style={{ }} />
           <span>Overlap ({overlapSlots.length} slots)</span>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-text-muted">
-          <div className="w-3 h-3 bg-bg-tertiary/40 border border-bg-tertiary" style={{ borderRadius: 0 }} />
+          <div className="w-3 h-3 bg-bg-tertiary/40 border border-bg-tertiary" style={{ }} />
           <span>Unavailable</span>
         </div>
       </div>
 
       {selectedSlot !== null && (
-        <div className="border border-[#C108AB]/20 bg-[#C108AB]/5 p-4 flex items-center justify-between" style={{ borderRadius: 0 }}>
+        <div className="border border-[#C108AB]/20 bg-[#C108AB]/5 p-4 flex items-center justify-between" style={{ }}>
           <div>
             <p className="text-sm font-medium text-text-primary">
               Selected: {DAYS[Math.floor(selectedSlot / 8)]} at {HOURS[selectedSlot % 8]}
@@ -147,7 +147,7 @@ export default function MultiInterviewerScheduler() {
           <button
             onClick={() => setProposed(true)}
             className="px-4 py-2 bg-[#C108AB] hover:bg-[#A00790] text-white text-sm font-medium transition-colors"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             Propose Time
           </button>

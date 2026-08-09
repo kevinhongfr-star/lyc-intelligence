@@ -76,11 +76,11 @@ export function ConsultantLeaderboard({ consultants }: ConsultantLeaderboardProp
   );
 
   return (
-    <div className="bg-card border border-card-border rounded-none overflow-hidden">
+    <div className="bg-card border border-card-border overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
+          <div className="w-12 h-12 bg-yellow-100 flex items-center justify-center">
             <Trophy className="w-6 h-6 text-yellow-600" />
           </div>
           <div>
@@ -94,16 +94,16 @@ export function ConsultantLeaderboard({ consultants }: ConsultantLeaderboardProp
           {/* 2nd Place */}
           {top3[1] && (
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center mb-2">
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center mb-2">
                 <span className="text-xl font-bold text-gray-700">
-                  {top3[1].consultantName.split(' ').map(n => n[0]).join('')}
+                  {top3[1].consultantName.split('').map(n => n[0]).join('')}
                 </span>
               </div>
               <span className="text-sm font-medium text-text-primary truncate max-w-24" title={top3[1].consultantName}>
                 {top3[1].consultantName}
               </span>
               <span className="text-xs text-text-muted">{top3[1].placementsThisQuarter} Q</span>
-              <div className="h-16 w-16 bg-gradient-to-t from-gray-300 to-gray-100 rounded-t-lg mt-2 flex items-center justify-center">
+              <div className="h-16 w-16 bg-gradient-to-t from-gray-300 to-gray-100 mt-2 flex items-center justify-center">
                 <Medal className="w-8 h-8 text-gray-400" />
               </div>
             </div>
@@ -112,16 +112,16 @@ export function ConsultantLeaderboard({ consultants }: ConsultantLeaderboardProp
           {/* 1st Place */}
           {top3[0] && (
             <div className="flex flex-col items-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 flex items-center justify-center mb-2 ring-4 ring-yellow-200">
+              <div className="w-20 h-20 bg-gradient-to-br from-yellow-300 to-yellow-500 flex items-center justify-center mb-2 ring-4 ring-yellow-200">
                 <span className="text-2xl font-bold text-yellow-900">
-                  {top3[0].consultantName.split(' ').map(n => n[0]).join('')}
+                  {top3[0].consultantName.split('').map(n => n[0]).join('')}
                 </span>
               </div>
               <span className="text-sm font-bold text-text-primary truncate max-w-28" title={top3[0].consultantName}>
                 {top3[0].consultantName}
               </span>
               <span className="text-xs text-text-muted">{top3[0].placementsThisQuarter} Q</span>
-              <div className="h-20 w-20 bg-gradient-to-t from-yellow-400 to-yellow-200 rounded-t-lg mt-2 flex items-center justify-center">
+              <div className="h-20 w-20 bg-gradient-to-t from-yellow-400 to-yellow-200 mt-2 flex items-center justify-center">
                 <Trophy className="w-10 h-10 text-yellow-700" />
               </div>
             </div>
@@ -130,16 +130,16 @@ export function ConsultantLeaderboard({ consultants }: ConsultantLeaderboardProp
           {/* 3rd Place */}
           {top3[2] && (
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-200 to-amber-300 flex items-center justify-center mb-2">
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-200 to-amber-300 flex items-center justify-center mb-2">
                 <span className="text-xl font-bold text-amber-800">
-                  {top3[2].consultantName.split(' ').map(n => n[0]).join('')}
+                  {top3[2].consultantName.split('').map(n => n[0]).join('')}
                 </span>
               </div>
               <span className="text-sm font-medium text-text-primary truncate max-w-24" title={top3[2].consultantName}>
                 {top3[2].consultantName}
               </span>
               <span className="text-xs text-text-muted">{top3[2].placementsThisQuarter} Q</span>
-              <div className="h-12 w-16 bg-gradient-to-t from-amber-300 to-amber-100 rounded-t-lg mt-2 flex items-center justify-center">
+              <div className="h-12 w-16 bg-gradient-to-t from-amber-300 to-amber-100 mt-2 flex items-center justify-center">
                 <Award className="w-8 h-8 text-amber-600" />
               </div>
             </div>
@@ -185,11 +185,11 @@ export function ConsultantLeaderboard({ consultants }: ConsultantLeaderboardProp
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    <div className={`w-8 h-8 flex items-center justify-center ${
                       index === 0 ? 'bg-yellow-100' : index === 1 ? 'bg-gray-100' : index === 2 ? 'bg-amber-100' : 'bg-bg-alt'
                     }`}>
                       <span className="text-sm font-medium text-text-primary">
-                        {consultant.consultantName.split(' ').map(n => n[0]).join('')}
+                        {consultant.consultantName.split('').map(n => n[0]).join('')}
                       </span>
                     </div>
                     <span className="font-medium text-text-primary">{consultant.consultantName}</span>
@@ -269,9 +269,9 @@ export function ConsultantStatsCards({ consultants }: { consultants: ConsultantP
 
   return (
     <div className="grid grid-cols-4 gap-4">
-      <div className="bg-card border border-card-border rounded-none p-4">
+      <div className="bg-card border border-card-border p-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+          <div className="w-10 h-10 bg-yellow-100 flex items-center justify-center">
             <Trophy className="w-5 h-5 text-yellow-600" />
           </div>
           <div>
@@ -281,9 +281,9 @@ export function ConsultantStatsCards({ consultants }: { consultants: ConsultantP
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-none p-4">
+      <div className="bg-card border border-card-border p-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+          <div className="w-10 h-10 bg-green-100 flex items-center justify-center">
             <Users className="w-5 h-5 text-green-600" />
           </div>
           <div>
@@ -293,9 +293,9 @@ export function ConsultantStatsCards({ consultants }: { consultants: ConsultantP
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-none p-4">
+      <div className="bg-card border border-card-border p-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+          <div className="w-10 h-10 bg-blue-100 flex items-center justify-center">
             <Target className="w-5 h-5 text-blue-600" />
           </div>
           <div>
@@ -305,9 +305,9 @@ export function ConsultantStatsCards({ consultants }: { consultants: ConsultantP
         </div>
       </div>
 
-      <div className="bg-card border border-card-border rounded-none p-4">
+      <div className="bg-card border border-card-border p-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+          <div className="w-10 h-10 bg-purple-100 flex items-center justify-center">
             <Clock className="w-5 h-5 text-purple-600" />
           </div>
           <div>

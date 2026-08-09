@@ -115,7 +115,7 @@ export function CandidateMatchPanel({ contactId, candidateName, onMandateClick }
   const sortedMatches = [...matches].sort((a, b) => b.match_score - a.match_score);
 
   return (
-    <div className="bg-card border border-border rounded-none overflow-hidden">
+    <div className="bg-card border border-border overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-border">
         <div className="flex items-center justify-between">
@@ -154,7 +154,7 @@ export function CandidateMatchPanel({ contactId, candidateName, onMandateClick }
         </div>
 
         {runStatus && (
-          <div className="mt-3 flex items-center gap-2 text-sm text-primary bg-primary/5 rounded-none px-3 py-2">
+          <div className="mt-3 flex items-center gap-2 text-sm text-primary bg-primary/5 px-3 py-2">
             <Zap className="w-4 h-4 animate-pulse" />
             {runStatus}
           </div>
@@ -191,7 +191,7 @@ export function CandidateMatchPanel({ contactId, candidateName, onMandateClick }
                   className="px-6 py-4 hover:bg-bg-alt/50 cursor-pointer transition-colors"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-bg-alt flex items-center justify-center font-semibold text-text-muted text-sm">
+                    <div className="flex-shrink-0 w-8 h-8 bg-bg-alt flex items-center justify-center font-semibold text-text-muted text-sm">
                       #{index + 1}
                     </div>
 
@@ -214,7 +214,7 @@ export function CandidateMatchPanel({ contactId, candidateName, onMandateClick }
                           </span>
                         )}
                         {phase && (
-                          <span className="px-2 py-0.5 text-xs bg-bg-alt rounded-full">
+                          <span className="px-2 py-0.5 text-xs bg-bg-alt">
                             {phase}
                           </span>
                         )}

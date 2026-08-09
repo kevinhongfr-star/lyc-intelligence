@@ -177,7 +177,7 @@ function PromptEditorForm({
             type="text"
             value={form.name}
             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-            className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+            className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -186,7 +186,7 @@ function PromptEditorForm({
             type="text"
             value={form.description}
             onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-            className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+            className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -194,7 +194,7 @@ function PromptEditorForm({
           <select
             value={form.category}
             onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-            className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+            className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
           >
             {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -210,7 +210,7 @@ function PromptEditorForm({
               setForm(f => ({ ...f, content, variables: extractVars(content) }));
             }}
             rows={6}
-            className="w-full px-3 py-2 border border-border bg-bg text-sm font-mono focus:outline-none focus:border-accent rounded-none"
+            className="w-full px-3 py-2 border border-border bg-bg text-sm font-mono focus:outline-none focus:border-accent"
           />
           {form.variables.length > 0 && (
             <div className="mt-2 flex items-center gap-1 flex-wrap">

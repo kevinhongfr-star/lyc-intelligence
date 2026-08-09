@@ -135,7 +135,7 @@ export function CommunicationTimeline({ contactId, onEmailThreadClick }: Communi
 
   if (isLoading) {
     return (
-      <div className="bg-card border border-border rounded-none p-8 text-center">
+      <div className="bg-card border border-border p-8 text-center">
         <Loader2 className="w-6 h-6 text-primary animate-spin mx-auto" />
         <p className="text-text-muted mt-2">Loading communications...</p>
       </div>
@@ -143,7 +143,7 @@ export function CommunicationTimeline({ contactId, onEmailThreadClick }: Communi
   }
 
   return (
-    <div className="bg-card border border-border rounded-none overflow-hidden">
+    <div className="bg-card border border-border overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-border">
         <div className="flex items-center justify-between">
@@ -177,7 +177,7 @@ export function CommunicationTimeline({ contactId, onEmailThreadClick }: Communi
               <button
                 key={filter}
                 onClick={() => setChannelFilter(filter)}
-                className={`px-3 py-1 rounded-none text-xs font-medium transition-colors ${
+                className={`px-3 py-1 text-xs font-medium transition-colors ${
                   channelFilter === filter
                     ? 'bg-primary text-white'
                     : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -212,7 +212,7 @@ export function CommunicationTimeline({ contactId, onEmailThreadClick }: Communi
                   className="relative pl-16 pr-6 py-4 hover:bg-bg-alt/30 transition-colors"
                 >
                   {/* Icon dot */}
-                  <div className={`absolute left-5 w-7 h-7 rounded-full border-2 flex items-center justify-center ${getChannelColor(item)} bg-card`}>
+                  <div className={`absolute left-5 w-7 h-7 border-2 flex items-center justify-center ${getChannelColor(item)} bg-card`}>
                     {getChannelIcon(item)}
                   </div>
 
@@ -233,7 +233,7 @@ export function CommunicationTimeline({ contactId, onEmailThreadClick }: Communi
                       )}
                       {item.outcome && (
                         <span className={`text-xs font-medium ${OUTCOME_COLORS[item.outcome] || 'text-gray-500'}`}>
-                          {item.outcome.replace('_', ' ')}
+                          {item.outcome.replace('_', '')}
                         </span>
                       )}
                     </div>
@@ -286,8 +286,8 @@ export function CommunicationTimeline({ contactId, onEmailThreadClick }: Communi
 
                     {/* WeChat interaction type */}
                     {item.interaction_type && (
-                      <span className="inline-block mt-2 px-2 py-0.5 text-xs bg-bg-alt rounded text-text-muted">
-                        {item.interaction_type.replace(/_/g, ' ')}
+                      <span className="inline-block mt-2 px-2 py-0.5 text-xs bg-bg-alt text-text-muted">
+                        {item.interaction_type.replace(/_/g, '')}
                       </span>
                     )}
                   </div>

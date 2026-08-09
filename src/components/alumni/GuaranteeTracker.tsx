@@ -100,7 +100,7 @@ export function GuaranteeTracker({ alumniId }: GuaranteeTrackerProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-primary border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -129,14 +129,14 @@ export function GuaranteeTracker({ alumniId }: GuaranteeTrackerProps) {
             {guarantee.duration_months}-month guarantee
           </p>
         </div>
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${statusConfig.bg}`}>
+        <div className={`flex items-center gap-2 px-3 py-1.5 ${statusConfig.bg}`}>
           <StatusIcon className={`w-4 h-4 ${statusConfig.color}`} />
           <span className={`text-sm font-medium ${statusConfig.color}`}>{statusConfig.label}</span>
         </div>
       </div>
 
       {/* Countdown */}
-      <div className={`p-4 rounded-none mb-6 ${
+      <div className={`p-4 mb-6 ${
         isOverdue ? 'bg-red-50' : isUrgent ? 'bg-amber-50' : 'bg-bg-alt'
       }`}>
         <div className="flex items-center justify-between">
@@ -156,9 +156,9 @@ export function GuaranteeTracker({ alumniId }: GuaranteeTrackerProps) {
 
         {/* Progress Bar */}
         <div className="mt-4">
-          <div className="h-2 bg-bg-base rounded-full overflow-hidden">
+          <div className="h-2 bg-bg-base overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${
+              className={`h-full transition-all duration-500 ${
                 isOverdue ? 'bg-red-500' : isUrgent ? 'bg-amber-500' : 'bg-primary'
               }`}
               style={{ width: `${progress}%` }}
@@ -183,12 +183,12 @@ export function GuaranteeTracker({ alumniId }: GuaranteeTrackerProps) {
             return (
               <div
                 key={date}
-                className={`flex items-center justify-between p-3 rounded-none ${
+                className={`flex items-center justify-between p-3 ${
                   completed ? 'bg-green-50' : passed && !completed ? 'bg-red-50' : 'bg-bg-alt'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  <div className={`w-8 h-8 flex items-center justify-center ${
                     completed ? 'bg-green-100' : passed && !completed ? 'bg-red-100' : 'bg-bg-base'
                   }`}>
                     {completed ? (
@@ -225,12 +225,12 @@ export function GuaranteeTracker({ alumniId }: GuaranteeTrackerProps) {
           <h4 className="font-medium text-text-primary mb-3">Completed Check-ins</h4>
           <div className="space-y-2">
             {guarantee.check_ins_completed.map((checkIn, index) => (
-              <div key={index} className="flex items-start gap-3 p-3 bg-bg-alt rounded-none">
+              <div key={index} className="flex items-start gap-3 p-3 bg-bg-alt">
                 <MessageSquare className="w-4 h-4 text-text-muted mt-0.5" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-text-primary">{formatDate(checkIn.date)}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs ${
+                    <span className={`px-2 py-0.5 text-xs ${
                       checkIn.status === 'positive' ? 'bg-green-100 text-green-700' :
                       checkIn.status === 'neutral' ? 'bg-gray-100 text-gray-700' :
                       'bg-red-100 text-red-700'

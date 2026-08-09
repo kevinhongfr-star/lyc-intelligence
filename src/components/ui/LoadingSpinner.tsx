@@ -9,9 +9,7 @@
  * motion.css keyframes.
  *
  * @example
- * ```tsx
- * <LoadingSpinner size="md" label="Loading content" />
- * ```
+ * ```tsx * <LoadingSpinner size="md" label="Loading content" /> *```
  */
 import React from 'react';
 import { cn } from '@/lib/utils';

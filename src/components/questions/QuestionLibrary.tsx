@@ -251,7 +251,7 @@ export function QuestionLibrary({
         {[1, 2, 3].map(level => (
           <div
             key={level}
-            className={`w-2 h-2 rounded-full ${
+            className={`w-2 h-2 ${
               level <= difficulty ? 'bg-primary' : 'bg-gray-300'
             }`}
           />
@@ -315,7 +315,7 @@ export function QuestionLibrary({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search questions..."
-            className="w-full pl-10 pr-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+            className="w-full pl-10 pr-3 py-2 border border-border bg-bg-base text-text-primary"
           />
         </div>
 
@@ -335,16 +335,16 @@ export function QuestionLibrary({
         </Button>
 
         {/* View Mode */}
-        <div className="flex items-center gap-1 bg-bg-alt rounded-none p-1">
+        <div className="flex items-center gap-1 bg-bg-alt p-1">
           <button
             onClick={() => setViewMode('list')}
-            className={`p-1.5 rounded ${viewMode === 'list' ? 'bg-primary text-white' : 'text-text-muted'}`}
+            className={`p-1.5 ${viewMode === 'list' ? 'bg-primary text-white' : 'text-text-muted'}`}
           >
             <List className="w-4 h-4" />
           </button>
           <button
             onClick={() => setViewMode('grid')}
-            className={`p-1.5 rounded ${viewMode === 'grid' ? 'bg-primary text-white' : 'text-text-muted'}`}
+            className={`p-1.5 ${viewMode === 'grid' ? 'bg-primary text-white' : 'text-text-muted'}`}
           >
             <Grid className="w-4 h-4" />
           </button>
@@ -354,7 +354,7 @@ export function QuestionLibrary({
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="px-3 py-2 border border-border rounded-none bg-bg-base text-text-primary"
+          className="px-3 py-2 border border-border bg-bg-base text-text-primary"
         >
           <option value="usage">Most Used</option>
           <option value="newest">Newest</option>
@@ -376,7 +376,7 @@ export function QuestionLibrary({
                   <button
                     key={comp.value}
                     onClick={() => handleCompetencyToggle(comp.value)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                       selectedCompetencies.includes(comp.value)
                         ? comp.color
                         : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -398,7 +398,7 @@ export function QuestionLibrary({
                   <button
                     key={level}
                     onClick={() => setSelectedDifficulty(selectedDifficulty === level ? null : level)}
-                    className={`px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
+                    className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                       selectedDifficulty === level
                         ? 'bg-primary text-white'
                         : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -420,7 +420,7 @@ export function QuestionLibrary({
                   <button
                     key={option.value}
                     onClick={() => setSelectedSource(option.value)}
-                    className={`px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
+                    className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                       selectedSource === option.value
                         ? 'bg-primary text-white'
                         : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -436,7 +436,7 @@ export function QuestionLibrary({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowStarredOnly(!showStarredOnly)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-colors ${
                   showStarredOnly
                     ? 'bg-amber-100 text-amber-700'
                     : 'bg-bg-alt text-text-muted hover:bg-bg-base'
@@ -482,7 +482,7 @@ export function QuestionLibrary({
                       e.stopPropagation();
                       handleStar(question.id);
                     }}
-                    className="flex-shrink-0 p-1 hover:bg-amber-50 rounded transition-colors"
+                    className="flex-shrink-0 p-1 hover:bg-amber-50 transition-colors"
                   >
                     <Star className={`w-5 h-5 ${isStarred ? 'text-amber-500 fill-current' : 'text-text-muted'}`} />
                   </button>
@@ -493,7 +493,7 @@ export function QuestionLibrary({
                       {question.questionText}
                     </p>
                     <div className="flex items-center gap-3 mt-2">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${compConfig.color}`}>
+                      <span className={`px-2 py-0.5 text-xs font-medium ${compConfig.color}`}>
                         {compConfig.label}
                       </span>
                       {renderDifficulty(question.difficulty)}
@@ -549,7 +549,7 @@ export function QuestionLibrary({
                 <div className="space-y-3">
                   {/* Header */}
                   <div className="flex items-start justify-between">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${compConfig.color}`}>
+                    <span className={`px-2 py-0.5 text-xs font-medium ${compConfig.color}`}>
                       {compConfig.label}
                     </span>
                     <button

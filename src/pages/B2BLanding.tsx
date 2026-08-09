@@ -37,6 +37,20 @@ export function B2BLanding() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
+  // ── MOTION: CTA active-state micro-compress (scale 0.98, 120ms) ────
+  const ctaCompressHandlers = {
+    onMouseDown: (e: React.MouseEvent<HTMLElement>) => {
+      e.currentTarget.style.transition = 'transform 120ms cubic-bezier(0.4,0,0.2,1)';
+      e.currentTarget.style.transform = 'scale(0.98)';
+    },
+    onMouseUp: (e: React.MouseEvent<HTMLElement>) => {
+      e.currentTarget.style.transform = 'scale(1)';
+    },
+    onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
+      e.currentTarget.style.transform = 'scale(1)';
+    },
+  };
+
   const navLinks = [
     { label: 'NEXUS', href: '/nexus' },
     { label: 'For Business', href: '/b2b' },
@@ -52,7 +66,7 @@ export function B2BLanding() {
           {navLinks.map(l => (
             <a key={l.href} href={l.href} style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</a>
           ))}
-          <a href="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+          <a href="/login" className="cta-glow" {...ctaCompressHandlers} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF',  fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
             <Lock style={{ width: 14, height: 14 }} />Platform
           </a>
         </div>
@@ -64,7 +78,7 @@ export function B2BLanding() {
       <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`}>
         <button className="nav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu"><X style={{ width: 24, height: 24, color: '#000' }} /></button>
         {navLinks.map(l => (<a key={l.href} href={l.href} onClick={() => setMobileOpen(false)}>{l.label}</a>))}
-        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</a>
+        <a href="/login" onClick={() => setMobileOpen(false)} {...ctaCompressHandlers} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</a>
       </div>
 
       {/* Hero — fuchsia glow */}
@@ -81,10 +95,10 @@ export function B2BLanding() {
             Identify the right talent, score candidates with precision, and align your leadership team to accelerate results.
           </p>
           <div className="cta-row" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/match" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <a href="/match" className="cta-glow" {...ctaCompressHandlers} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF',  fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               Start — Executive Introduction <ArrowRight style={{ width: 16, height: 16 }} />
             </a>
-            <a href="/china-leadership-pipeline" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <a href="/china-leadership-pipeline" {...ctaCompressHandlers} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000',  fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               Leadership Assessment
             </a>
           </div>
@@ -106,7 +120,7 @@ export function B2BLanding() {
             { step: '02', icon: IconBridge, title: 'Add Candidates', desc: 'Paste CVs, LinkedIn profiles, or resume text for each candidate you want to evaluate.' },
             { step: '03', icon: IconTrident, title: 'Get Match Scores', desc: 'AI scores each candidate on 3 dimensions with verdicts, match reasons, risks, and approach strategy.' },
           ].map(s => (
-            <div key={s.step} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', boxShadow: DS.shadow }}>
+            <div key={s.step} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '24px', boxShadow: DS.shadow }}>
               <div style={{ color: DS.accent, marginBottom: '12px' }}><s.icon size={32} color={DS.accent} /></div>
               <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '6px' }}>Step {s.step}</div>
               <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>{s.title}</h3>
@@ -121,7 +135,7 @@ export function B2BLanding() {
         <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '8px' }}>
           Scoring Dimensions
         </div>
-        <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px', boxShadow: DS.shadow }}>
+        <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '32px', boxShadow: DS.shadow }}>
           <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 20px' }}>How Scoring Works</h3>
           <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
             {[
@@ -129,16 +143,16 @@ export function B2BLanding() {
               { name: 'Skills & Expertise', desc: 'Technical competencies, functional expertise, cross-border capability, language fit', color: DS.accent },
               { name: 'Organizational Fit', desc: 'Culture alignment, stakeholder complexity, transformation readiness, board dynamics', color: '#333333' },
             ].map(d => (
-              <div key={d.name} style={{ background: DS.bgAlt, borderRadius: '0px', padding: '16px' }}>
+              <div key={d.name} style={{ background: DS.bgAlt,  padding: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '8px' }}>
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: d.color, flexShrink: 0 }} />
+                  <div style={{ width: '8px', height: '8px',  background: d.color, flexShrink: 0 }} />
                   <h4 style={{ fontFamily: DS.bodyFont, fontSize: '14px', fontWeight: 600, color: DS.text, margin: 0 }}>{d.name}</h4>
                 </div>
                 <p style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted, lineHeight: 1.4, margin: 0 }}>{d.desc}</p>
               </div>
             ))}
           </div>
-          <div style={{ marginTop: '20px', padding: '12px 16px', background: DS.bgAlt, borderRadius: '0px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ marginTop: '20px', padding: '12px 16px', background: DS.bgAlt,  display: 'flex', alignItems: 'center', gap: '8px' }}>
             <IconForge size={14} color={DS.accent} />
             <span style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted }}>Each candidate receives a match verdict: Strong Fit, Good Fit, or Potential Fit — with detailed reasoning and approach strategy.</span>
           </div>
@@ -156,7 +170,7 @@ export function B2BLanding() {
             { icon: IconImpact, title: 'Confidential', desc: 'Your JDs and candidate data stay private. Never shared with third parties.' },
             { icon: IconBridge, title: 'Batch Processing', desc: 'Score multiple candidates against the same JD in one sweep.' },
           ].map(f => (
-            <div key={f.title} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', boxShadow: DS.shadow }}>
+            <div key={f.title} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '24px', boxShadow: DS.shadow }}>
               <div style={{ color: DS.accent, marginBottom: '12px' }}><f.icon size={24} color={DS.accent} /></div>
               <h3 style={{ fontFamily: DS.headingFont, fontSize: '15px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>{f.title}</h3>
               <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
@@ -170,7 +184,7 @@ export function B2BLanding() {
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0d0a14 0%, #1a0f1e 40%, #281530 70%, #3a2040 100%)' }} />
         <div style={{ position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '400px', background: 'radial-gradient(circle, rgba(193,8,171,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '500px', margin: '0 auto' }}>
-          <div style={{ width: '48px', height: '3px', background: '#C108AB', margin: '0 auto 16px', borderRadius: '2px' }} />
+          <div style={{ width: '48px', height: '3px', background: '#C108AB', margin: '0 auto 16px' }} />
           <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 12px' }}>Start matching today</h2>
           <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px' }}>Leadership isn't a title — it's a trajectory. Find the right one.</p>
           <LeadCaptureForm type="b2b" source="b2b_landing" heading="Get 3 complimentary candidate matches" subheading="Paste a job description, add CVs, get ranked results. No credit card." />

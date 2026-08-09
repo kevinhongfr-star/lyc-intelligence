@@ -27,7 +27,6 @@ function ForumList() {
             onClick={() => setActiveCategory(cat)}
             className="px-4 py-2 text-sm font-medium transition-colors"
             style={{
-              borderRadius: 0,
               borderBottom: activeCategory === cat ? '2px solid #C108AB' : '2px solid transparent',
               color: activeCategory === cat ? '#C108AB' : '#666666',
               background: 'none',
@@ -45,7 +44,7 @@ function ForumList() {
             key={thread.id}
             onClick={() => setSelectedThread(thread)}
             className="w-full text-left bg-bg-secondary border border-bg-tertiary p-4 hover:bg-bg-tertiary transition-colors"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
@@ -58,7 +57,7 @@ function ForumList() {
                   {thread.isExpert && (
                     <span
                       className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold text-white"
-                      style={{ borderRadius: 0, background: '#C108AB' }}
+                      style={{  background: '#C108AB' }}
                     >
                       <Star style={{ width: 10, height: 10 }} />
                       Expert
@@ -69,7 +68,7 @@ function ForumList() {
 
               <span
                 className="shrink-0 px-2 py-0.5 text-xs font-medium bg-bg-tertiary text-text-muted"
-                style={{ borderRadius: 0 }}
+                style={{ }}
               >
                 {thread.category}
               </span>

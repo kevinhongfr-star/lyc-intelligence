@@ -10,7 +10,7 @@
  * Usage:
  *   const { theme, resolvedTheme, setTheme, toggleTheme } = useTheme();
  *
- * The `theme` state is the user's preference ('light' | 'dark' | 'system').
+ * The `theme` state is the user's preference ('light'|'dark'|'system').
  * The `resolvedTheme` is the actual applied theme ('light' | 'dark').
  */
 
@@ -83,7 +83,7 @@ function storeTheme(theme: Theme): void {
 }
 
 export interface UseThemeReturn {
-  /** User's chosen preference: 'light', 'dark', or 'system'. */
+  /** User's chosen preference:'light','dark', or'system'. */
   theme: Theme;
   /** The actual applied theme after resolving 'system'. */
   resolvedTheme: ResolvedTheme;
@@ -99,16 +99,7 @@ export interface UseThemeReturn {
  * @returns Theme state and controls
  *
  * @example
- * ```tsx
- * function Header() {
- *   const { resolvedTheme, setTheme } = useTheme();
- *   return (
- *     <button onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}>
- *       Toggle theme
- *     </button>
- *   );
- * }
- * ```
+ * ```tsx * function Header() { * const { resolvedTheme, setTheme } = useTheme(); * return ( * <button onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}> * Toggle theme * </button> * ); * } *```
  */
 export function useTheme(): UseThemeReturn {
   const [theme, setThemeState] = useState<Theme>(getStoredTheme);

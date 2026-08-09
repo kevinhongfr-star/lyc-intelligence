@@ -197,19 +197,19 @@ export function ReferenceTracker({
     <div className="space-y-4">
       {/* Summary Stats */}
       <div className="grid grid-cols-4 gap-3">
-        <div className="bg-card border border-border rounded-none p-3 text-center">
+        <div className="bg-card border border-border p-3 text-center">
           <p className="text-2xl font-bold text-text-primary">{stats.total}</p>
           <p className="text-xs text-text-muted">Total</p>
         </div>
-        <div className="bg-green-50 border border-green-200 rounded-none p-3 text-center">
+        <div className="bg-green-50 border border-green-200 p-3 text-center">
           <p className="text-2xl font-bold text-green-600">{stats.submitted}</p>
           <p className="text-xs text-green-600">Submitted</p>
         </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-none p-3 text-center">
+        <div className="bg-amber-50 border border-amber-200 p-3 text-center">
           <p className="text-2xl font-bold text-amber-600">{stats.pending}</p>
           <p className="text-xs text-amber-600">Pending</p>
         </div>
-        <div className="bg-gray-50 border border-gray-200 rounded-none p-3 text-center">
+        <div className="bg-gray-50 border border-gray-200 p-3 text-center">
           <p className="text-2xl font-bold text-gray-600">{stats.expired}</p>
           <p className="text-xs text-gray-600">Inactive</p>
         </div>
@@ -229,7 +229,7 @@ export function ReferenceTracker({
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  <div className={`w-10 h-10 flex items-center justify-center ${
                     request.status === 'submitted'
                       ? 'bg-green-100'
                       : request.status === 'expired' || request.status === 'declined'
@@ -248,16 +248,16 @@ export function ReferenceTracker({
                     <p className="font-medium text-text-primary">{request.refereeName}</p>
                     <p className="text-sm text-text-muted">
                       {request.refereeTitle}
-                      {request.refereeCompany && ` at ${request.refereeCompany}`}
+                      {request.refereeCompany && `at ${request.refereeCompany}`}
                     </p>
                     <p className="text-xs text-text-muted mt-1">
-                      {request.refereeRelationship.replace('_', ' ')} • Invited {formatDate(request.invitedAt)}
+                      {request.refereeRelationship.replace('_', '')} • Invited {formatDate(request.invitedAt)}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-end gap-2">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${config.color}`}>
+                  <span className={`px-2 py-1 text-xs font-medium border ${config.color}`}>
                     {config.label}
                   </span>
                   {request.status === 'submitted' ? (
@@ -324,7 +324,7 @@ export function ReferenceStatsCards({ candidateId }: { candidateId: string }) {
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      <div className="bg-card border border-border rounded-none p-3">
+      <div className="bg-card border border-border p-3">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-green-600" />
           <span className="text-sm text-text-muted">Submitted</span>
@@ -333,7 +333,7 @@ export function ReferenceStatsCards({ candidateId }: { candidateId: string }) {
           {stats.submitted} / {stats.total}
         </p>
       </div>
-      <div className="bg-card border border-border rounded-none p-3">
+      <div className="bg-card border border-border p-3">
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4 text-amber-600" />
           <span className="text-sm text-text-muted">Pending</span>

@@ -38,7 +38,7 @@ export function StepIndicator({ steps, orientation = 'horizontal', className }: 
             <div className="flex flex-col items-center">
               <div
                 className={cn(
-                  'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold',
+                  'w-8 h-8 flex items-center justify-center text-sm font-semibold',
                   getStepColor(step.status),
                 )}
               >
@@ -81,7 +81,7 @@ export function StepIndicator({ steps, orientation = 'horizontal', className }: 
             )}
             <div
               className={cn(
-                'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0',
+                'w-8 h-8 flex items-center justify-center text-sm font-semibold shrink-0',
                 getStepColor(step.status),
               )}
             >

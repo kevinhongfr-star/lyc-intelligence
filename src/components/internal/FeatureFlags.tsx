@@ -29,13 +29,13 @@ export default function FeatureFlags() {
             <div
               key={flag.id}
               className="bg-bg-primary border border-bg-tertiary p-4"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3">
                     <span className="font-medium text-text-primary">{flag.label}</span>
-                    <code className="text-xs text-text-muted bg-bg-secondary px-1.5 py-0.5" style={{ borderRadius: 0 }}>
+                    <code className="text-xs text-text-muted bg-bg-secondary px-1.5 py-0.5" style={{ }}>
                       {flag.key}
                     </code>
                   </div>
@@ -44,7 +44,7 @@ export default function FeatureFlags() {
                       <span
                         key={portal}
                         className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-bg-secondary text-text-secondary"
-                        style={{ borderRadius: 0 }}
+                        style={{ }}
                       >
                         {portal}
                       </span>

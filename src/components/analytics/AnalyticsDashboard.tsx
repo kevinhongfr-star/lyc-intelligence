@@ -178,7 +178,7 @@ export function AnalyticsDashboard() {
   }) => (
     <Card className="p-4">
       <div className="flex items-center justify-between mb-2">
-        <div className={`p-2 rounded-none bg-${color === 'accent' ? 'accent/10' : color === 'green' ? 'green-500/10' : color === 'yellow' ? 'yellow-500/10' : color === 'purple' ? 'purple-500/10' : 'gray-500/10'}`}>
+        <div className={`p-2 bg-${color === 'accent' ? 'accent/10' : color === 'green' ? 'green-500/10' : color === 'yellow' ? 'yellow-500/10' : color === 'purple' ? 'purple-500/10' : 'gray-500/10'}`}>
           {icon}
         </div>
         {trend && getTrendIcon(trend)}
@@ -292,7 +292,7 @@ export function AnalyticsDashboard() {
             </h3>
             <div className="space-y-2">
               {overview.bottlenecks.map((b, i) => (
-                <div key={i} className="flex items-center justify-between p-2 bg-yellow-50 rounded-none">
+                <div key={i} className="flex items-center justify-between p-2 bg-yellow-50">
                   <div>
                     <span className="font-medium text-text-primary">{b.stage}</span>
                     <span className="text-sm text-text-muted ml-2">({b.avg_days}d avg)</span>
@@ -315,7 +315,7 @@ export function AnalyticsDashboard() {
         {workload.map(consultant => (
           <Card key={consultant.id} className="p-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-medium">
+              <div className="w-10 h-10 bg-accent/20 flex items-center justify-center text-accent font-medium">
                 {consultant.name?.[0] || '?'}
               </div>
               <div>
@@ -325,11 +325,11 @@ export function AnalyticsDashboard() {
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="text-center p-2 bg-green-50 rounded-none">
+              <div className="text-center p-2 bg-green-50">
                 <div className="text-lg font-bold text-green-600">{consultant.workload.active}</div>
                 <div className="text-xs text-text-muted">Active</div>
               </div>
-              <div className="text-center p-2 bg-blue-50 rounded-none">
+              <div className="text-center p-2 bg-blue-50">
                 <div className="text-lg font-bold text-blue-600">{consultant.workload.completed}</div>
                 <div className="text-xs text-text-muted">Completed</div>
               </div>
@@ -367,7 +367,7 @@ export function AnalyticsDashboard() {
             {qualityMetrics.alerts.map((alert, i) => (
               <div
                 key={i}
-                className={`flex items-center gap-2 p-3 rounded-none ${
+                className={`flex items-center gap-2 p-3 ${
                   alert.type === 'warning' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'
                 }`}
               >
@@ -418,7 +418,7 @@ export function AnalyticsDashboard() {
                 <div className="space-y-2">
                   {Object.entries(declineAnalysis.reason_distribution).map(([reason, count]) => (
                     <div key={reason} className="flex items-center justify-between">
-                      <span className="text-sm text-text-muted">{reason.replace('_', ' ')}</span>
+                      <span className="text-sm text-text-muted">{reason.replace('_', '')}</span>
                       <Badge variant="secondary">{count}</Badge>
                     </div>
                   ))}

@@ -66,12 +66,7 @@ export interface UseFocusTrapReturn {
  * @returns Ref to attach to the container and imperative focus methods
  *
  * @example
- * ```tsx
- * function Dialog({ open, onClose }) {
- *   const { ref } = useFocusTrap({ active: open, onEscape: onClose });
- *   return open ? <div ref={ref} role="dialog">...</div> : null;
- * }
- * ```
+ * ```tsx * function Dialog({ open, onClose }) { * const { ref } = useFocusTrap({ active: open, onEscape: onClose }); * return open ? <div ref={ref} role="dialog">...</div> : null; * } *```
  */
 export function useFocusTrap(options: UseFocusTrapOptions = {}): UseFocusTrapReturn {
   const {
@@ -180,18 +175,7 @@ export function useFocusTrap(options: UseFocusTrapOptions = {}): UseFocusTrapRet
  * @param targetId The id of the main content element to skip to
  *
  * @example
- * ```tsx
- * function AppLayout() {
- *   const skipLink = useSkipLink();
- *   return (
- *     <div>
- *       {skipLink}
- *       <header>...</header>
- *       <main id="main-content">...</main>
- *     </div>
- *   );
- * }
- * ```
+ * ```tsx * function AppLayout() { * const skipLink = useSkipLink(); * return ( * <div> * {skipLink} * <header>...</header> * <main id="main-content">...</main> * </div> * ); * } *```
  */
 export function useSkipLink(targetId = 'main-content'): React.ReactNode {
   // This is a simple render function — no state needed.
@@ -246,10 +230,7 @@ export function useSkipLink(targetId = 'main-content'): React.ReactNode {
  * @returns Whether keyboard focus mode is active
  *
  * @example
- * ```tsx
- * const isKeyboardUser = useFocusRing();
- * // Use isKeyboardUser to decide whether to show focus rings
- * ```
+ * ```tsx * const isKeyboardUser = useFocusRing(); * // Use isKeyboardUser to decide whether to show focus rings *```
  */
 export function useFocusRing(): boolean {
   const [isKeyboardUser, setIsKeyboardUser] = [

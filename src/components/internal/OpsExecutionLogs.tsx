@@ -23,7 +23,7 @@ export default function OpsExecutionLogs() {
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
           className="border border-bg-tertiary bg-bg-primary text-text-primary text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#C108AB]/40"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <option value="all">All Statuses</option>
           <option value="completed">Completed</option>

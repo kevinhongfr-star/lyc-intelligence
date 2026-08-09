@@ -95,7 +95,7 @@ export function CandidateCommunityPage() {
             <button
               onClick={() => setActiveCategory('all')}
               className={`text-left p-4 border transition-colors ${activeCategory === 'all' ? 'border-fuchsia bg-fuchsia-light' : 'border-border bg-white hover:border-fuchsia'}`}
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-lg">🌟</span>
@@ -108,7 +108,7 @@ export function CandidateCommunityPage() {
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.name)}
                 className={`text-left p-4 border transition-colors ${activeCategory === cat.name ? 'border-fuchsia bg-fuchsia-light' : 'border-border bg-white hover:border-fuchsia'}`}
-                style={{ borderRadius: 0 }}
+                style={{ }}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">{cat.icon}</span>
@@ -149,7 +149,7 @@ export function CandidateCommunityPage() {
                   key={thread.id}
                   className="flex items-start gap-3 py-3 border-b border-border last:border-b-0 hover:bg-bg-warm transition-colors -mx-4 px-4 cursor-pointer"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center flex-shrink-0">
                     <MessageSquare className="w-5 h-5 text-fuchsia" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -160,7 +160,7 @@ export function CandidateCommunityPage() {
                     <p className="text-xs text-text-secondary mt-1 line-clamp-1">{thread.excerpt}</p>
                     <div className="flex items-center gap-4 text-xs text-text-muted mt-2 flex-wrap">
                       <span>by {thread.author}</span>
-                      <span className="px-1.5 py-0.5 rounded bg-fuchsia-light text-fuchsia">{thread.category}</span>
+                      <span className="px-1.5 py-0.5 bg-fuchsia-light text-fuchsia">{thread.category}</span>
                       <span className="inline-flex items-center gap-1"><MessageSquare className="w-3 h-3" /> {thread.replies}</span>
                       <span className="inline-flex items-center gap-1"><Users className="w-3 h-3" /> {thread.views}</span>
                       <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> {thread.lastActivity}</span>

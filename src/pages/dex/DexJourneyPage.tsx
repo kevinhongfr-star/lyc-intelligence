@@ -272,7 +272,7 @@ function TimelineCard({ entry }: { entry: JourneyEntry }) {
   // Anchor to the timeline dot.
   return (
     <div className="relative">
-      <div className={`absolute left-[15px] top-3 w-2.5 h-2.5 rounded-full ${meta.tint.split(' ')[0]} border-2 border-white`} />
+      <div className={`absolute left-[15px] top-3 w-2.5 h-2.5 ${meta.tint.split('')[0]} border-2 border-white`} />
       {entry.link ? (
         <Link to={entry.link} className="block">{content}</Link>
       ) : (
@@ -296,7 +296,7 @@ function EmptyJourney() {
       <Link
         to="/dex/chat"
         className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#C108AB] text-white text-sm font-medium hover:bg-[#A00790] transition-colors"
-        style={{ borderRadius: 0 }}
+        style={{ }}
       >
         Start a conversation
         <ChevronRight className="w-4 h-4" />

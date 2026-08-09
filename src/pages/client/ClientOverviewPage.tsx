@@ -277,7 +277,6 @@ export function ClientOverviewPage() {
                     <RTooltip
                       contentStyle={{
                         border: '1px solid #e5e7eb',
-                        borderRadius: 0,
                         fontSize: 12,
                       }}
                     />
@@ -312,7 +311,7 @@ export function ClientOverviewPage() {
                       dataKey="count"
                       nameKey="tier"
                       label={({ tier, percent }) =>
-                        `${tier}  ${Math.round((percent ?? 0) * 100)}%`
+                        `${tier} ${Math.round((percent ?? 0) * 100)}%`
                       }
                       labelLine={false}
                     >
@@ -347,7 +346,7 @@ export function ClientOverviewPage() {
             <div className="space-y-3">
               {mandateStats.map((m, idx) => {
                 const total = m.total_candidates || 1;
-                const label = `${m.company_name ? m.company_name + ' — ' : ''}${m.mandate_title}`;
+                const label = `${m.company_name ? m.company_name + '—' : ''}${m.mandate_title}`;
                 return (
                   <div key={m.mandate_id}>
                     <div className="flex items-center justify-between text-xs mb-1">
@@ -440,7 +439,7 @@ export function ClientOverviewPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-sm font-medium text-text-primary truncate">{c.name}</div>
-                    <div className="text-xs text-text-muted capitalize">{c.role.replace(/_/g, ' ')}</div>
+                    <div className="text-xs text-text-muted capitalize">{c.role.replace(/_/g, '')}</div>
                   </div>
                   {c.email && (
                     <a href={`mailto:${c.email}`} className="text-fuchsia hover:opacity-70">

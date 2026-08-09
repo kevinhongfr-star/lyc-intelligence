@@ -61,7 +61,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
           <div key={item.label} style={{ 
             background: DS.card, 
             border: `1px solid ${DS.cardBorder}`, 
-            borderRadius: '0px', 
             padding: '16px', 
             textAlign: 'center' 
           }}>
@@ -86,7 +85,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
               style={{ 
                 background: DS.card, 
                 border: `1px solid ${DS.cardBorder}`, 
-                borderRadius: DS.radius, 
                 overflow: 'hidden'
               }}
             >
@@ -103,7 +101,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                 <div style={{ 
                   width: '36px', 
                   height: '36px', 
-                  borderRadius: '50%', 
                   background: `${fit.color}20`,
                   display: 'flex', 
                   alignItems: 'center', 
@@ -256,12 +253,11 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             <span style={{ fontSize: '11px', color: DS.muted }}>{dim.label}</span>
                             <span style={{ fontSize: '11px', fontWeight: 700, color: DS.text }}>{dim.score}</span>
                           </div>
-                          <div style={{ height: '6px', background: DS.border, borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ height: '6px', background: DS.border,  overflow: 'hidden' }}>
                             <div style={{ 
                               height: '100%', 
                               width: `${dim.score}%`, 
                               background: getScoreBarColor(dim.score), 
-                              borderRadius: '3px'
                             }} />
                           </div>
                         </div>
@@ -285,7 +281,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             background: DS.accent,
                             color: '#FFFFFF',
                             border: 'none',
-                            borderRadius: '0px',
                             fontSize: '12px',
                             fontWeight: 600,
                             cursor: 'pointer',
@@ -308,7 +303,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             background: DS.bg,
                             color: DS.textSecondary,
                             border: `1px solid ${DS.cardBorder}`,
-                            borderRadius: '0px',
                             fontSize: '12px',
                             fontWeight: 600,
                             cursor: 'pointer',
@@ -331,7 +325,6 @@ export function ResultsTable({ results, onDownloadPDF, onShareCard, onSaveCandid
                             background: DS.bg,
                             color: DS.textSecondary,
                             border: `1px solid ${DS.cardBorder}`,
-                            borderRadius: '0px',
                             fontSize: '12px',
                             fontWeight: 600,
                             cursor: 'pointer',

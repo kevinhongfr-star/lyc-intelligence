@@ -10,7 +10,7 @@ export default function InterviewTemplates() {
           <div
             key={template.id}
             className="border border-bg-tertiary bg-bg-primary p-4 hover:shadow-sm transition-shadow flex flex-col"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <div className="flex items-center gap-2 mb-3">
               <FileText className="w-4 h-4 text-[#C108AB]" />
@@ -34,7 +34,7 @@ export default function InterviewTemplates() {
 
             <button
               className="mt-4 w-full px-3 py-2 bg-[#C108AB] hover:bg-[#A00790] text-white text-xs font-medium transition-colors"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               Use Template
             </button>

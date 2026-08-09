@@ -60,15 +60,15 @@ export default function SLATracker() {
 
       {/* Summary */}
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/15 text-red-600 text-xs font-medium" style={{ borderRadius: 0 }}>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/15 text-red-600 text-xs font-medium" style={{ }}>
           <AlertTriangle className="w-3.5 h-3.5" />
           {overdue.length} overdue
         </div>
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/15 text-amber-600 text-xs font-medium" style={{ borderRadius: 0 }}>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/15 text-amber-600 text-xs font-medium" style={{ }}>
           <AlertCircle className="w-3.5 h-3.5" />
           {dueToday.length} due today
         </div>
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-bg-tertiary text-text-muted text-xs font-medium" style={{ borderRadius: 0 }}>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-bg-tertiary text-text-muted text-xs font-medium" style={{ }}>
           <CheckCircle className="w-3.5 h-3.5" />
           {dueThisWeek.length} due this week
         </div>
@@ -82,7 +82,7 @@ export default function SLATracker() {
             <div
               key={task.id}
               className={`bg-bg-primary border border-bg-tertiary p-3 ${getSLABorderStyle(task.daysUntil)}`}
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">

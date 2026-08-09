@@ -43,13 +43,13 @@ export default function CandidateReferralNetwork() {
           <div
             key={referral.id}
             className="bg-bg-primary border border-bg-tertiary p-5"
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3">
                 <div
                   className="w-10 h-10 bg-accent/10 flex items-center justify-center text-accent font-semibold"
-                  style={{ borderRadius: 0 }}
+                  style={{ }}
                 >
                   {referral.name.charAt(0)}
                 </div>
@@ -74,7 +74,7 @@ export default function CandidateReferralNetwork() {
                     variant="default"
                     size="sm"
                     onClick={() => handleRequestReferral(referral.id)}
-                    style={{ borderRadius: 0 }}
+                    style={{ }}
                     className="flex items-center gap-1"
                   >
                     <UserCheck className="w-4 h-4" />

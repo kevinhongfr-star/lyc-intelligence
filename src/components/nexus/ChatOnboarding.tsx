@@ -126,7 +126,7 @@ export function ChatOnboarding({ onComplete }: ChatOnboardingProps) {
 
         {/* Guest mode warning */}
         {guestMode && guestMessagesLeft > 0 && (
-          <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-amber-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg z-40">
+          <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-amber-500 text-white px-4 py-2 text-sm font-medium shadow-lg z-40">
             {guestMessagesLeft} message{guestMessagesLeft === 1 ? '' : 's'} remaining as guest
           </div>
         )}

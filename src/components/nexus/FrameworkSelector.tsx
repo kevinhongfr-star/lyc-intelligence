@@ -141,7 +141,7 @@ export function FrameworkSelector({
   return (
     <div
       className={cn('border border-[#E5E5E5] bg-white', className)}
-      style={{ borderRadius: 0 }}
+      style={{ }}
     >
       <div
         style={{
@@ -426,7 +426,6 @@ export function FrameworkSelector({
               fontWeight: 600,
               fontFamily: DS.bodyFont,
               cursor: selectedId ? 'pointer' : 'not-allowed',
-              borderRadius: 0,
               transition: 'background 0.2s ease',
             }}
             onMouseEnter={(e) => {

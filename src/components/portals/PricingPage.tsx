@@ -109,7 +109,6 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
             style={{
               background: `${ACCENT}12`,
               color: ACCENT,
-              borderRadius: 0,
             }}
           >
             <Sparkles className="w-4 h-4" />
@@ -126,7 +125,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
           </p>
 
           {/* Cycle toggle */}
-          <div className="inline-flex mt-8 overflow-hidden" style={{ borderRadius: 0 }}>
+          <div className="inline-flex mt-8 overflow-hidden" style={{ }}>
             <button
               onClick={() => setCycle('monthly')}
               className={cn(
@@ -135,7 +134,6 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
               )}
               style={{
                 background: cycle === 'monthly' ? ACCENT : '#F5F5F5',
-                borderRadius: 0,
               }}
             >
               Monthly
@@ -148,7 +146,6 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
               )}
               style={{
                 background: cycle === 'annual' ? ACCENT : '#F5F5F5',
-                borderRadius: 0,
               }}
             >
               Annual <span className="ml-1 text-xs opacity-80">Save ~17%</span>
@@ -165,7 +162,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
               <div
                 key={i}
                 className="h-96 animate-pulse"
-                style={{ background: '#F5F5F5', borderRadius: 0 }}
+                style={{ background: '#F5F5F5' }}
               />
             ))}
           </div>
@@ -187,13 +184,12 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                   )}
                   style={{
                     borderColor: isPopular ? ACCENT : '#E5E5E5',
-                    borderRadius: 0,
                   }}
                 >
                   {isPopular && (
                     <div
                       className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-medium text-white"
-                      style={{ background: ACCENT, borderRadius: 0 }}
+                      style={{ background: ACCENT }}
                     >
                       Most Popular
                     </div>
@@ -204,7 +200,6 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                     className="w-12 h-12 flex items-center justify-center mb-4"
                     style={{
                       background: TIER_COLORS[tierKey] || ACCENT,
-                      borderRadius: 0,
                     }}
                   >
                     {TIER_ICONS[tierKey]}
@@ -266,7 +261,6 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                     style={{
                       background: isFree ? '#F5F5F5' : ACCENT,
                       color: isFree ? '#000' : 'white',
-                      borderRadius: 0,
                     }}
                   >
                     {isProcessing ? (
@@ -295,7 +289,6 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
               background: '#FEE2E2',
               border: '1px solid #EF4444',
               color: '#991B1B',
-              borderRadius: 0,
             }}
           >
             {error}
@@ -310,7 +303,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
         </h2>
         <div
           className="overflow-hidden"
-          style={{ border: '1px solid #E5E5E5', borderRadius: 0 }}
+          style={{ border: '1px solid #E5E5E5' }}
         >
           <table className="w-full">
             <thead>

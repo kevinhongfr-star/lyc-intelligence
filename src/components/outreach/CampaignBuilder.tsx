@@ -73,7 +73,7 @@ export function CampaignBuilder({ onSave }: CampaignBuilderProps) {
               type="text"
               value={campaignName}
               onChange={e => setCampaignName(e.target.value)}
-              className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+              className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
             />
           </div>
           <div>
@@ -81,7 +81,7 @@ export function CampaignBuilder({ onSave }: CampaignBuilderProps) {
             <select
               value={channel}
               onChange={e => setChannel(e.target.value)}
-              className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+              className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
             >
               {CHANNELS.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -91,7 +91,7 @@ export function CampaignBuilder({ onSave }: CampaignBuilderProps) {
             <select
               value={segment}
               onChange={e => setSegment(e.target.value)}
-              className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent rounded-none"
+              className="w-full px-3 py-2 border border-border bg-bg text-sm focus:outline-none focus:border-accent"
             >
               {SEGMENTS.map(s => <option key={s} value={s}>{s}</option>)}
             </select>

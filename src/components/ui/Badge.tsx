@@ -61,7 +61,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
     <span
       ref={ref}
       className={cn(
-        'inline-flex items-center gap-1 rounded font-medium',
+        'inline-flex items-center gap-1 font-medium',
         VARIANTS[variant],
         SIZES[size],
         className,
@@ -71,7 +71,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
       {dot && (
         <span
           aria-hidden="true"
-          className={cn('inline-block w-1.5 h-1.5 rounded-full', DOT_COLORS[variant])}
+          className={cn('inline-block w-1.5 h-1.5', DOT_COLORS[variant])}
         />
       )}
       {children}

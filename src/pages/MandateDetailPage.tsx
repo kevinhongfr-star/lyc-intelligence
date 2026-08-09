@@ -50,23 +50,23 @@ function AddCompanyForm({ mandateId, onCompanyAdded }: { mandateId: string; onCo
   }
 
   return (
-    <div className="bg-bg-secondary border border-border rounded-none p-4">
+    <div className="bg-bg-secondary border border-border p-4">
       {!show ? (
-        <button onClick={() => setShow(true)} className="w-full py-3 border-2 border-dashed border-border rounded-none text-text-muted hover:text-accent hover:border-accent transition-colors text-sm font-medium">
+        <button onClick={() => setShow(true)} className="w-full py-3 border-2 border-dashed border-border text-text-muted hover:text-accent hover:border-accent transition-colors text-sm font-medium">
           + Add Target Company
         </button>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Company name *" required className="bg-bg-primary border border-border rounded-none px-3 py-2 text-sm min-h-[44px]" />
-            <input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="Industry" className="bg-bg-primary border border-border rounded-none px-3 py-2 text-sm min-h-[44px]" />
-            <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Location (e.g., Shanghai)" className="bg-bg-primary border border-border rounded-none px-3 py-2 text-sm min-h-[44px]" />
-            <input value={size} onChange={e => setSize(e.target.value)} placeholder="Size (e.g., 5000)" className="bg-bg-primary border border-border rounded-none px-3 py-2 text-sm min-h-[44px]" />
-            <input value={domain} onChange={e => setDomain(e.target.value)} placeholder="Domain (e.g., example.com)" className="bg-bg-primary border border-border rounded-none px-3 py-2 text-sm min-h-[44px]" colSpan={2} />
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Company name *" required className="bg-bg-primary border border-border px-3 py-2 text-sm min-h-[44px]" />
+            <input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="Industry" className="bg-bg-primary border border-border px-3 py-2 text-sm min-h-[44px]" />
+            <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Location (e.g., Shanghai)" className="bg-bg-primary border border-border px-3 py-2 text-sm min-h-[44px]" />
+            <input value={size} onChange={e => setSize(e.target.value)} placeholder="Size (e.g., 5000)" className="bg-bg-primary border border-border px-3 py-2 text-sm min-h-[44px]" />
+            <input value={domain} onChange={e => setDomain(e.target.value)} placeholder="Domain (e.g., example.com)" className="bg-bg-primary border border-border px-3 py-2 text-sm min-h-[44px]" colSpan={2} />
           </div>
           <div className="flex justify-end gap-2">
             <button type="button" onClick={() => setShow(false)} className="px-4 py-2 text-sm text-text-muted hover:text-text-primary min-h-[44px]">Cancel</button>
-            <button type="submit" disabled={saving || !name.trim()} className="px-4 py-2 bg-accent text-white rounded-none text-sm font-medium hover:bg-accent-hover disabled:opacity-50 min-h-[44px]">
+            <button type="submit" disabled={saving || !name.trim()} className="px-4 py-2 bg-accent text-white text-sm font-medium hover:bg-accent-hover disabled:opacity-50 min-h-[44px]">
               {saving ? 'Adding...' : 'Add Company'}
             </button>
           </div>
@@ -241,25 +241,25 @@ export function MandateDetailPage() {
           value={mandate.status}
           onChange={e => handleStatusChange(e.target.value)}
           disabled={statusUpdating}
-          className="text-sm bg-bg-tertiary text-text-primary rounded-none px-3 py-2 border-0 min-h-[44px]"
+          className="text-sm bg-bg-tertiary text-text-primary px-3 py-2 border-0 min-h-[44px]"
         >
           {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
-        <button onClick={() => handleStatusChange('won')} className="flex items-center gap-1 px-3 py-2 bg-tier-1/20 text-tier-1 rounded-none text-sm hover:bg-tier-1/30 min-h-[44px]">
+        <button onClick={() => handleStatusChange('won')} className="flex items-center gap-1 px-3 py-2 bg-tier-1/20 text-tier-1 text-sm hover:bg-tier-1/30 min-h-[44px]">
           <CheckCircle className="w-3.5 h-3.5" />Won
         </button>
-        <button onClick={() => handleStatusChange('on_hold')} className="flex items-center gap-1 px-3 py-2 bg-tier-2/20 text-tier-2 rounded-none text-sm hover:bg-tier-2/30 min-h-[44px]">
+        <button onClick={() => handleStatusChange('on_hold')} className="flex items-center gap-1 px-3 py-2 bg-tier-2/20 text-tier-2 text-sm hover:bg-tier-2/30 min-h-[44px]">
           <PauseCircle className="w-3.5 h-3.5" />Hold
         </button>
-        <button onClick={() => handleStatusChange('lost')} className="flex items-center gap-1 px-3 py-2 bg-red-500/20 text-red-400 rounded-none text-sm hover:bg-red-500/30 min-h-[44px]">
+        <button onClick={() => handleStatusChange('lost')} className="flex items-center gap-1 px-3 py-2 bg-red-500/20 text-red-400 text-sm hover:bg-red-500/30 min-h-[44px]">
           <XCircle className="w-3.5 h-3.5" />Lost
         </button>
         {intakeComplete ? (
-          <span className="ml-auto inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-200">
+          <span className="ml-auto inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 px-2 py-1 border border-emerald-200">
             <ListChecks className="w-3.5 h-3.5" /> Intake complete
           </span>
         ) : (
-          <span className="ml-auto inline-flex items-center gap-1 text-xs text-amber-800 bg-amber-50 px-2 py-1 rounded-full border border-amber-200">
+          <span className="ml-auto inline-flex items-center gap-1 text-xs text-amber-800 bg-amber-50 px-2 py-1 border border-amber-200">
             <AlertTriangle className="w-3.5 h-3.5" /> Intake required
           </span>
         )}
@@ -269,7 +269,7 @@ export function MandateDetailPage() {
       <div className="flex gap-1">
         {STAGE_ORDER.map(s => {
           const c = s === 'SWEEP' ? mandate.tier1_count : s === 'CANVA' ? mandate.tier2_count : s === 'GRID' ? mandate.shortlisted_count : s === 'LENS' ? mandate.interview_count : mandate.placed_count;
-          return <div key={s} className="flex-1 h-10 rounded flex items-center justify-center text-sm font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{s}: {c}</div>;
+          return <div key={s} className="flex-1 h-10 flex items-center justify-center text-sm font-medium" style={{ backgroundColor: `${STAGE_CONFIG[s].color}20`, color: STAGE_CONFIG[s].color }}>{s}: {c}</div>;
         })}
       </div>
 
@@ -294,7 +294,7 @@ export function MandateDetailPage() {
           >
             <t.icon className="w-4 h-4" />
             {t.label}
-            {t.warn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-label="action needed" />}
+            {t.warn && <span className="w-1.5 h-1.5 bg-amber-500" aria-label="action needed" />}
           </button>
         ))}
       </div>
@@ -338,15 +338,15 @@ export function MandateDetailPage() {
                 Pipeline ({pipeline.length} candidates)
               </h2>
               {!intakeComplete && (
-                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 p-2">
                   Pipeline additions are locked until intake is complete. Complete the Intake tab first.
                 </p>
               )}
               {pipeline.map(p => (
-                <div key={p.id} onClick={() => setSelectedCandidate(p.contact_id)} className={`bg-bg-secondary border rounded-none p-4 cursor-pointer transition-colors ${selectedCandidate === p.contact_id ? 'border-accent' : 'border-bg-tertiary hover:border-accent/30'}`}>
+                <div key={p.id} onClick={() => setSelectedCandidate(p.contact_id)} className={`bg-bg-secondary border p-4 cursor-pointer transition-colors ${selectedCandidate === p.contact_id ? 'border-accent' : 'border-bg-tertiary hover:border-accent/30'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">{p.contact?.name?.[0] ?? '?'}</div>
+                      <div className="w-8 h-8 bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">{p.contact?.name?.[0] ?? '?'}</div>
                       <div>
                         <h3 className="font-medium text-text-primary">{p.contact?.name ?? 'Unknown'}</h3>
                         <p className="text-xs text-text-muted">{p.contact?.current_title ?? ''} · {p.contact?.company?.name ?? ''}</p>
@@ -361,7 +361,7 @@ export function MandateDetailPage() {
                   <div className="flex gap-2 mt-2">
                     {NEXT_STAGE[p.stage] && (
                       <button onClick={e => { e.stopPropagation(); handleStageChange(p.id, NEXT_STAGE[p.stage]); }}
-                        className="text-xs px-2 py-1 bg-accent/20 text-accent rounded hover:bg-accent/30 transition-colors">
+                        className="text-xs px-2 py-1 bg-accent/20 text-accent hover:bg-accent/30 transition-colors">
                         → {STAGE_CONFIG[NEXT_STAGE[p.stage] as keyof typeof STAGE_CONFIG]?.label}
                       </button>
                     )}
@@ -369,7 +369,7 @@ export function MandateDetailPage() {
                       value={p.verdict || ''}
                       onClick={e => e.stopPropagation()}
                       onChange={async e => { await updatePipelineVerdict(p.id, e.target.value); await refresh(); }}
-                      className="text-xs bg-bg-tertiary text-text-muted rounded px-1 py-0.5 border-0"
+                      className="text-xs bg-bg-tertiary text-text-muted px-1 py-0.5 border-0"
                     >
                       <option value="">Verdict</option>
                       {VERDICT_OPTIONS.map(v => <option key={v} value={v}>{v}</option>)}
@@ -396,7 +396,7 @@ export function MandateDetailPage() {
                         </Button>
                       ))}
                     </div>
-                    {aiOutput && <div className="bg-bg-tertiary rounded-none p-3 text-sm text-text-secondary whitespace-pre-wrap max-h-64 overflow-auto">{aiOutput}</div>}
+                    {aiOutput && <div className="bg-bg-tertiary p-3 text-sm text-text-secondary whitespace-pre-wrap max-h-64 overflow-auto">{aiOutput}</div>}
                   </CardContent>
                 </Card>
               )}
@@ -436,14 +436,14 @@ export function MandateDetailPage() {
                   <CardContent>
                     <div className="space-y-2">
                       {successProfiles.slice(1).map(p => (
-                        <div key={p.id} className="flex items-center justify-between text-sm p-2 bg-slate-50 rounded">
+                        <div key={p.id} className="flex items-center justify-between text-sm p-2 bg-slate-50">
                           <div>
-                            <span className={`inline-block px-2 py-0.5 rounded text-xs mr-2 ${
+                            <span className={`inline-block px-2 py-0.5 text-xs mr-2 ${
                               p.status === 'approved' ? 'bg-emerald-100 text-emerald-800' :
                               p.status === 'rejected' ? 'bg-red-100 text-red-800' :
                               'bg-slate-200 text-slate-700'
                             }`}>
-                              {p.status.replace('_', ' ')}
+                              {p.status.replace('_', '')}
                             </span>
                             Created {new Date(p.created_at).toLocaleDateString()}
                           </div>
@@ -497,7 +497,7 @@ export function MandateDetailPage() {
           {/* Selected company detail */}
           {selectedCompany && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedCompany(null)}>
-              <div className="bg-bg-primary rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="bg-bg-primary max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div>
@@ -560,22 +560,22 @@ export function MandateDetailPage() {
             ) : (
               pipeline.map((p: any) => {
                 const contact = p.contact || {};
-                const contactName = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || 'Candidate';
+                const contactName = [contact.first_name, contact.last_name].filter(Boolean).join('') || 'Candidate';
                 return (
-                  <div key={p.id} className="bg-bg-secondary border border-border rounded-none p-4">
+                  <div key={p.id} className="bg-bg-secondary border border-border p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-accent/10 text-accent flex items-center justify-center text-sm font-medium">
-                          {contactName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                        <div className="w-10 h-10 bg-accent/10 text-accent flex items-center justify-center text-sm font-medium">
+                          {contactName.split('').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
                         </div>
                         <div>
                           <p className="font-medium text-text-primary">{contactName}</p>
                           <p className="text-xs text-text-muted">
-                            {[contact.title, contact.company?.name].filter(Boolean).join(' • ') || 'Candidate'}
+                            {[contact.title, contact.company?.name].filter(Boolean).join('•') || 'Candidate'}
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs text-text-muted bg-bg-tertiary px-2 py-1 rounded-full">
+                      <span className="text-xs text-text-muted bg-bg-tertiary px-2 py-1">
                         {p.stage || 'New'}
                       </span>
                     </div>
@@ -605,10 +605,10 @@ export function MandateDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-3 space-y-3">
               {pipeline.map(p => (
-                <div key={p.id} onClick={() => setSelectedCandidate(p.contact_id)} className={`bg-bg-secondary border rounded-none p-4 cursor-pointer transition-colors ${selectedCandidate === p.contact_id ? 'border-accent' : 'border-bg-tertiary hover:border-accent/30'}`}>
+                <div key={p.id} onClick={() => setSelectedCandidate(p.contact_id)} className={`bg-bg-secondary border p-4 cursor-pointer transition-colors ${selectedCandidate === p.contact_id ? 'border-accent' : 'border-bg-tertiary hover:border-accent/30'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">{p.contact?.name?.[0] ?? '?'}</div>
+                      <div className="w-8 h-8 bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">{p.contact?.name?.[0] ?? '?'}</div>
                       <div>
                         <h3 className="font-medium text-text-primary">{p.contact?.name ?? 'Unknown'}</h3>
                         <p className="text-xs text-text-muted">{p.contact?.current_title ?? ''} · {p.contact?.company?.name ?? ''}</p>

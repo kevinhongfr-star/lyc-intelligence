@@ -100,7 +100,7 @@ export async function scoreSingleCandidate(
       reasoning: [
         ...(r.match_reasons || []),
         ...(r.approach_strategy ? [`Approach: ${r.approach_strategy}`] : []),
-      ].join(' '),
+      ].join(''),
     };
   } catch (e) {
     console.error('[scoringClient] scoreSingleCandidate error:', e);

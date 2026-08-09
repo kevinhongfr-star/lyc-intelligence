@@ -162,17 +162,17 @@ export function CandidateInterviewPrepPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <button className="text-left p-4 border border-border bg-white hover:border-fuchsia transition-colors" style={{ borderRadius: 0 }}>
+              <button className="text-left p-4 border border-border bg-white hover:border-fuchsia transition-colors" style={{ }}>
                 <Video className="w-5 h-5 text-fuchsia mb-2" />
                 <div className="font-medium text-text-primary text-sm">Mock Interview</div>
                 <div className="text-xs text-text-muted mt-1">Practice with NEXUS Coach</div>
               </button>
-              <button className="text-left p-4 border border-border bg-white hover:border-fuchsia transition-colors" style={{ borderRadius: 0 }}>
+              <button className="text-left p-4 border border-border bg-white hover:border-fuchsia transition-colors" style={{ }}>
                 <FileText className="w-5 h-5 text-fuchsia mb-2" />
                 <div className="font-medium text-text-primary text-sm">Company Brief</div>
                 <div className="text-xs text-text-muted mt-1">Curated market intel</div>
               </button>
-              <button className="text-left p-4 border border-border bg-white hover:border-fuchsia transition-colors" style={{ borderRadius: 0 }}>
+              <button className="text-left p-4 border border-border bg-white hover:border-fuchsia transition-colors" style={{ }}>
                 <Brain className="w-5 h-5 text-fuchsia mb-2" />
                 <div className="font-medium text-text-primary text-sm">Question Bank</div>
                 <div className="text-xs text-text-muted mt-1">Role-specific prompts</div>
@@ -232,14 +232,14 @@ export function CandidateInterviewPrepPage() {
                   key={q.id}
                   className="flex items-start gap-3 py-3 border-b border-border last:border-b-0 hover:bg-bg-warm transition-colors -mx-4 px-4"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-fuchsia-light flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-fuchsia-light flex items-center justify-center flex-shrink-0">
                     <Target className="w-4 h-4 text-fuchsia" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-text-primary">{q.question}</p>
                     <div className="flex items-center gap-3 text-xs text-text-muted mt-2 flex-wrap">
-                      <span className="px-1.5 py-0.5 rounded bg-fuchsia-light text-fuchsia">{q.category}</span>
-                      <span className={`px-1.5 py-0.5 rounded ${DIFFICULTY_COLORS[q.difficulty]}`}>{q.difficulty}</span>
+                      <span className="px-1.5 py-0.5 bg-fuchsia-light text-fuchsia">{q.category}</span>
+                      <span className={`px-1.5 py-0.5 ${DIFFICULTY_COLORS[q.difficulty]}`}>{q.difficulty}</span>
                       <span className="inline-flex items-center gap-1"><BookOpen className="w-3 h-3" /> {q.framework}</span>
                     </div>
                   </div>

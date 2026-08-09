@@ -51,7 +51,7 @@ export default function PlatformSettingsPage() {
                   ? 'border-accent text-accent'
                   : 'border-transparent text-text-muted hover:text-text-primary'
               }`}
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <Icon className="w-4 h-4" />
               {tab.label}

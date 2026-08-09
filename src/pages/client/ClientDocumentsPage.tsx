@@ -104,7 +104,7 @@ function seedFallback(mandates: ClientMandate[]): ClientDocument[] {
   }
   out.push({
     id: 'seed-invoice-current',
-    title: 'Invoice LYC-' + new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0') + ' — Monthly Retainer',
+    title: 'Invoice LYC-' + new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0') + '— Monthly Retainer',
     category: 'invoice',
     file_type: 'PDF',
     file_size_bytes: 96_000,

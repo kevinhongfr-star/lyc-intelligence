@@ -35,7 +35,6 @@ const btnBase: React.CSSProperties = {
   fontWeight: 500,
   textDecoration: 'none',
   border: `1px solid ${INK}`,
-  borderRadius: 0,
   transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
   fontFamily: "'DM Sans', system-ui, sans-serif",
   cursor: 'pointer',
@@ -111,7 +110,7 @@ function Nav() {
             </li>
           ))}
         </ul>
-        <a href="#start" style={{ padding: '10px 20px', background: INK, color: WHITE, fontSize: 13, fontWeight: 500, textDecoration: 'none', borderRadius: 0, border: `1px solid ${INK}`, transition: 'background 200ms ease, border-color 200ms ease', minHeight: 40, display: 'inline-flex', alignItems: 'center' }}
+        <a href="#start" style={{ padding: '10px 20px', background: INK, color: WHITE, fontSize: 13, fontWeight: 500, textDecoration: 'none',  border: `1px solid ${INK}`, transition: 'background 200ms ease, border-color 200ms ease', minHeight: 40, display: 'inline-flex', alignItems: 'center' }}
           onMouseEnter={(e) => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.borderColor = ACCENT; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = INK; e.currentTarget.style.borderColor = INK; }}>
           Start — Executive Introduction
@@ -147,12 +146,7 @@ function Nav() {
           </div>
         </>
       )}
-      <style>{`
-        @media (max-width: 768px) {
-          .nav-links-desktop { display: none !important; }
-          .nav-toggle-btn { display: flex !important; }
-        }
-      `}</style>
+      <style>{`@media (max-width: 768px) { .nav-links-desktop { display: none !important; } .nav-toggle-btn { display: flex !important; } }`}</style>
     </nav>
   );
 }
@@ -580,20 +574,7 @@ export function NexusLanding() {
         <FinalCTA />
       </main>
       <Footer />
-      <style>{`
-        .nl-reveal {
-          opacity: 0;
-          transform: translateY(24px);
-          transition: opacity 350ms cubic-bezier(0.16,1,0.3,1), transform 350ms cubic-bezier(0.16,1,0.3,1);
-        }
-        .nl-reveal.nl-visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        @media (max-width: 768px) {
-          .nl-reveal { opacity: 1; transform: none; transition: none; }
-        }
-      `}</style>
+      <style>{`.nl-reveal { opacity: 0; transform: translateY(24px); transition: opacity 350ms cubic-bezier(0.16,1,0.3,1), transform 350ms cubic-bezier(0.16,1,0.3,1); } .nl-reveal.nl-visible { opacity: 1; transform: translateY(0); } @media (max-width: 768px) { .nl-reveal { opacity: 1; transform: none; transition: none; } }`}</style>
     </div>
   );
 }

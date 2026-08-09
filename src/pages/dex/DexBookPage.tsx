@@ -124,7 +124,7 @@ export function DexBookPage() {
                 </div>
                 <div className="flex-1">
                   <div className="font-medium text-[#1A1A2E]">{confirmed.consultant.name}</div>
-                  <div className="text-xs text-gray-500 capitalize">{confirmed.consultant.role?.replace(/_/g, ' ') ?? 'Consultant'}</div>
+                  <div className="text-xs text-gray-500 capitalize">{confirmed.consultant.role?.replace(/_/g, '') ?? 'Consultant'}</div>
                 </div>
                 <div className="flex items-center gap-1 text-xs text-gray-500">
                   <Calendar className="w-3.5 h-3.5" /> {confirmed.slot}
@@ -160,7 +160,7 @@ export function DexBookPage() {
             Book a 1:1 Coaching Session
           </h1>
           <p className="text-sm text-gray-600">
-            One credit per session with a senior LYC Partners consultant. You have{' '}
+            One credit per session with a senior LYC Partners consultant. You have{''}
             <span className="font-semibold text-fuchsia">{credit.balance} credits</span>.
           </p>
         </div>
@@ -198,7 +198,7 @@ export function DexBookPage() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="font-medium text-[#1A1A2E]">{c.name}</div>
-                        <div className="text-xs text-gray-500 capitalize">{c.role?.replace(/_/g, ' ') ?? 'Consultant'}</div>
+                        <div className="text-xs text-gray-500 capitalize">{c.role?.replace(/_/g, '') ?? 'Consultant'}</div>
                         {c.specializations && c.specializations.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
                             {c.specializations.slice(0, 3).map(s => (

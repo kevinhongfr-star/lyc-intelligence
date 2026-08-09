@@ -97,7 +97,7 @@ export function TalentAlertCard({ userId, onViewCandidate }: TalentAlertCardProp
           <Bell className="w-5 h-5 text-text-muted" />
           <h3 className="font-semibold text-text-primary">Talent Alerts</h3>
           {unviewedCount > 0 && (
-            <span className="px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs font-medium">
+            <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs font-medium">
               {unviewedCount}
             </span>
           )}
@@ -127,13 +127,13 @@ export function TalentAlertCard({ userId, onViewCandidate }: TalentAlertCardProp
             return (
               <div
                 key={alert.id}
-                className={`p-3 rounded-none cursor-pointer transition-colors ${
+                className={`p-3 cursor-pointer transition-colors ${
                   alert.viewed_at ? 'bg-bg-alt' : 'bg-blue-50'
                 } hover:bg-bg-base`}
                 onClick={() => onViewCandidate?.(alert.candidate_id)}
               >
                 <div className="flex items-start gap-3">
-                  <div className={`w-8 h-8 rounded-full ${config.bg} flex items-center justify-center flex-shrink-0`}>
+                  <div className={`w-8 h-8 ${config.bg} flex items-center justify-center flex-shrink-0`}>
                     <AlertIcon className={`w-4 h-4 ${config.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -145,7 +145,7 @@ export function TalentAlertCard({ userId, onViewCandidate }: TalentAlertCardProp
                       <span className="text-sm text-text-primary">
                         Candidate {alert.candidate_id.slice(0, 8)}
                       </span>
-                      <span className="px-2 py-0.5 bg-bg-base rounded text-xs">
+                      <span className="px-2 py-0.5 bg-bg-base text-xs">
                         Match: {formatMatchScore(alert.match_score)}%
                       </span>
                     </div>
@@ -156,7 +156,7 @@ export function TalentAlertCard({ userId, onViewCandidate }: TalentAlertCardProp
                         e.stopPropagation();
                         handleMarkAsViewed(alert.id);
                       }}
-                      className="p-1 hover:bg-bg-base rounded"
+                      className="p-1 hover:bg-bg-base"
                     >
                       <Eye className="w-4 h-4 text-text-muted" />
                     </button>

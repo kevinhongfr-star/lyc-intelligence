@@ -206,7 +206,7 @@ export function ReflectionDepthMeter({
                 lineHeight: 1.4,
               }}
             >
-              <strong style={{ color: DS.accent }}>Next:</strong> Move toward{' '}
+              <strong style={{ color: DS.accent }}>Next:</strong> Move toward{''}
               {DEPTH_LEVELS[DEPTH_INDEX[nextLevel]].label.toLowerCase()} responses for deeper insight.
             </span>
           </div>

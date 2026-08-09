@@ -79,7 +79,7 @@ export function MatchQualityBadge({ score, grade, showLabel = true, size = 'md' 
   };
 
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full font-semibold border ${config.color} ${sizeClasses[size]}`}>
+    <span className={`inline-flex items-center gap-1.5 font-semibold border ${config.color} ${sizeClasses[size]}`}>
       <Icon className={iconSizeClasses[size]} />
       {showLabel && <span>{score.toFixed(0)}</span>}
     </span>
@@ -97,9 +97,9 @@ export function MatchScoreBar({ score, grade, showScore = true, height = 'h-2' }
 
   return (
     <div className="w-full">
-      <div className={`w-full bg-bg-alt rounded-full overflow-hidden ${height}`}>
+      <div className={`w-full bg-bg-alt overflow-hidden ${height}`}>
         <div
-          className={`${config.barColor} ${height} rounded-full transition-all duration-500`}
+          className={`${config.barColor} ${height} transition-all duration-500`}
           style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
         />
       </div>

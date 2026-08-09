@@ -18,7 +18,7 @@ export default function ScorecardBuilder() {
         </div>
         <button
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-bg-tertiary text-text-secondary hover:bg-bg-secondary transition-colors"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <Plus className="w-3 h-3" />
           Create New
@@ -32,7 +32,7 @@ export default function ScorecardBuilder() {
             <div
               key={template.id}
               className="border border-bg-tertiary bg-bg-primary"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <button
                 onClick={() => toggleExpand(template.id)}
@@ -58,10 +58,10 @@ export default function ScorecardBuilder() {
                         <span className="text-text-secondary">{criterion.label}</span>
                         <span className="font-medium text-text-primary">{criterion.weight}%</span>
                       </div>
-                      <div className="h-2 bg-bg-tertiary" style={{ borderRadius: 0 }}>
+                      <div className="h-2 bg-bg-tertiary" style={{ }}>
                         <div
                           className="h-full bg-[#C108AB] transition-all"
-                          style={{ width: `${criterion.weight}%`, borderRadius: 0 }}
+                          style={{ width: `${criterion.weight}%` }}
                         />
                       </div>
                     </div>

@@ -21,7 +21,7 @@ export default function CalendarSync() {
         <div
           key={conn.id}
           className="border border-bg-tertiary bg-bg-primary p-4 flex items-center gap-4"
-          style={{ borderRadius: 0 }}
+          style={{ }}
         >
           <div className="flex-shrink-0 p-2 bg-bg-secondary">
             <Calendar className="w-5 h-5 text-text-muted" />
@@ -51,7 +51,7 @@ export default function CalendarSync() {
                 ? 'border-red-300 text-red-600 hover:bg-red-500/10'
                 : 'border-[#C108AB]/30 text-[#C108AB] hover:bg-[#C108AB]/10'
             }`}
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             {conn.status === 'connected' ? (
               <><Unlink className="w-3 h-3" /> Disconnect</>

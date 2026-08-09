@@ -111,7 +111,7 @@ export function ReportEditor({ report, onSave, onClose, onAutoSave }: ReportEdit
       </div>
 
       {draft.sections.map((section) => (
-        <div key={section.id} className="bg-bg border border-border p-4 rounded-none">
+        <div key={section.id} className="bg-bg border border-border p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Type className="w-4 h-4 text-[#C108AB]" />
@@ -122,16 +122,16 @@ export function ReportEditor({ report, onSave, onClose, onAutoSave }: ReportEdit
               />
             </div>
             <div className="flex items-center gap-1">
-              <button onClick={() => moveSection(section.id, 'up')} className="p-1 hover:bg-bg-alt rounded-none" title="Move up">
+              <button onClick={() => moveSection(section.id, 'up')} className="p-1 hover:bg-bg-alt" title="Move up">
                 <MoveUp className="w-4 h-4 text-text-muted" />
               </button>
-              <button onClick={() => moveSection(section.id, 'down')} className="p-1 hover:bg-bg-alt rounded-none" title="Move down">
+              <button onClick={() => moveSection(section.id, 'down')} className="p-1 hover:bg-bg-alt" title="Move down">
                 <MoveDown className="w-4 h-4 text-text-muted" />
               </button>
-              <button onClick={() => setEditingSection(editingSection === section.id ? null : section.id)} className="p-1 hover:bg-bg-alt rounded-none" title="Edit">
+              <button onClick={() => setEditingSection(editingSection === section.id ? null : section.id)} className="p-1 hover:bg-bg-alt" title="Edit">
                 <Edit3 className="w-4 h-4 text-text-muted" />
               </button>
-              <button onClick={() => deleteSection(section.id)} className="p-1 hover:bg-red-500/10 rounded-none" title="Delete">
+              <button onClick={() => deleteSection(section.id)} className="p-1 hover:bg-red-500/10" title="Delete">
                 <Trash2 className="w-4 h-4 text-red-500" />
               </button>
             </div>
@@ -149,7 +149,7 @@ export function ReportEditor({ report, onSave, onClose, onAutoSave }: ReportEdit
       ))}
 
       {draft.tables.map((table) => (
-        <div key={table.id} className="bg-bg border border-border p-4 rounded-none">
+        <div key={table.id} className="bg-bg border border-border p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Table className="w-4 h-4 text-[#C108AB]" />
@@ -160,10 +160,10 @@ export function ReportEditor({ report, onSave, onClose, onAutoSave }: ReportEdit
               />
             </div>
             <div className="flex items-center gap-1">
-              <button onClick={() => setEditingTable(editingTable === table.id ? null : table.id)} className="p-1 hover:bg-bg-alt rounded-none">
+              <button onClick={() => setEditingTable(editingTable === table.id ? null : table.id)} className="p-1 hover:bg-bg-alt">
                 <Edit3 className="w-4 h-4 text-text-muted" />
               </button>
-              <button onClick={() => deleteTable(table.id)} className="p-1 hover:bg-red-500/10 rounded-none">
+              <button onClick={() => deleteTable(table.id)} className="p-1 hover:bg-red-500/10">
                 <Trash2 className="w-4 h-4 text-red-500" />
               </button>
             </div>
@@ -173,16 +173,16 @@ export function ReportEditor({ report, onSave, onClose, onAutoSave }: ReportEdit
               <div className="flex gap-2 mb-2">
                 <input
                   className="flex-1 bg-bg-alt border border-border p-2 text-sm text-text-primary"
-                  value={table.headers.join(', ')}
+                  value={table.headers.join(',')}
                   onChange={(e) => updateTable(table.id, { headers: e.target.value.split(',').map((h) => h.trim()) })}
                   placeholder="Headers (comma separated)"
                 />
               </div>
               <textarea
                 className="w-full bg-bg-alt border border-border p-2 text-sm text-text-primary font-mono"
-                value={table.rows.map((r) => r.join(' | ')).join('\n')}
+                value={table.rows.map((r) => r.join('|')).join('\n')}
                 onChange={(e) => {
-                  const rows = e.target.value.split('\n').map((line) => line.split(' | '));
+                  const rows = e.target.value.split('\n').map((line) => line.split('|'));
                   updateTable(table.id, { rows });
                 }}
                 rows={table.rows.length}
@@ -293,7 +293,7 @@ export function ReportEditor({ report, onSave, onClose, onAutoSave }: ReportEdit
     <div className="h-full flex flex-col bg-bg">
       <div className="flex items-center justify-between p-4 border-b border-border bg-bg-alt">
         <div className="flex items-center gap-3">
-          <button onClick={onClose} className="p-2 hover:bg-bg rounded-none">
+          <button onClick={onClose} className="p-2 hover:bg-bg">
             <X className="w-5 h-5 text-text-muted" />
           </button>
           <div>

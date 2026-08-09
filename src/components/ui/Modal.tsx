@@ -11,16 +11,7 @@
  *   - Smooth enter/exit animations from motion.css
  *
  * @example
- * ```tsx
- * function ConfirmDialog({ open, onClose }) {
- *   return (
- *     <Modal isOpen={open} onClose={onClose} title="Confirm">
- *       <p>Are you sure?</p>
- *       <button onClick={onClose}>Cancel</button>
- *     </Modal>
- *   );
- * }
- * ```
+ * ```tsx * function ConfirmDialog({ open, onClose }) { * return ( * <Modal isOpen={open} onClose={onClose} title="Confirm"> * <p>Are you sure?</p> * <button onClick={onClose}>Cancel</button> * </Modal> * ); * } *```
  */
 import React, { forwardRef, useCallback, useEffect } from 'react';
 import { X } from 'lucide-react';

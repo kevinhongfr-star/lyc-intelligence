@@ -26,13 +26,10 @@ export function KpiCard({ value, label, trend, trendValue, onClick, icon }: KpiC
   return (
     <div 
       onClick={onClick}
-      className={`
-        bg-white rounded-card shadow-card border border-border p-4 
-        ${onClick ? 'cursor-pointer hover:shadow-card-hover hover:border-fuchsia transition-all' : ''}
-      `}
+      className={`bg-white shadow-card border border-border p-4 ${onClick ? 'cursor-pointer hover:shadow-card-hover hover:border-fuchsia transition-all' : ''}`}
     >
       {icon && (
-        <div className="w-10 h-10 rounded-lg bg-fuchsia-light flex items-center justify-center mb-3">
+        <div className="w-10 h-10 bg-fuchsia-light flex items-center justify-center mb-3">
           {icon}
         </div>
       )}

@@ -55,13 +55,9 @@ export function OrgIntelligencePage() {
             <li key={t.id}>
               <button
                 onClick={() => setActive(t.id)}
-                className={`
-                  px-4 py-2 text-sm font-medium flex items-center gap-2 border-b-2
-                  transition-colors whitespace-nowrap
-                  ${active === t.id
+                className={`px-4 py-2 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap ${active === t.id
                     ? 'border-accent text-accent'
-                    : 'border-transparent text-text-muted hover:text-text-primary hover:border-bg-hover'}
-                `}
+                    : 'border-transparent text-text-muted hover:text-text-primary hover:border-bg-hover'}`}
               >
                 {t.icon}
                 {t.label}
@@ -71,7 +67,7 @@ export function OrgIntelligencePage() {
         </ul>
       </nav>
 
-      <section className="bg-white border border-bg-hover rounded-none p-6">
+      <section className="bg-white border border-bg-hover p-6">
         <h2 className="text-xl font-medium text-text-primary">
           {TABS.find((t) => t.id === active)?.label}
         </h2>
@@ -92,7 +88,7 @@ export function OrgIntelligencePage() {
               <h3 className="text-sm font-medium text-text-secondary mb-2">
                 Format reference
               </h3>
-              <div className="bg-bg-secondary border border-bg-hover rounded-none p-3 font-mono text-xs overflow-x-auto">
+              <div className="bg-bg-secondary border border-bg-hover p-3 font-mono text-xs overflow-x-auto">
                 <div className="text-text-muted"># Required columns</div>
                 <div>name, mandate_id</div>
                 <div className="text-text-muted mt-2"># Optional columns</div>

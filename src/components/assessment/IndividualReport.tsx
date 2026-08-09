@@ -60,7 +60,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-accent border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -82,7 +82,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
     <div className="max-w-2xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-accent/10 flex items-center justify-center mx-auto mb-4">
           <Award className="w-8 h-8 text-accent" />
         </div>
         <h1 className="text-2xl font-serif font-bold text-text-primary mb-2">
@@ -92,7 +92,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
       </div>
 
       {/* Summary Card */}
-      <div className="bg-gradient-to-r from-accent to-purple-600 rounded-2xl p-6 text-white mb-6">
+      <div className="bg-gradient-to-r from-accent to-purple-600 p-6 text-white mb-6">
         <div className="text-center">
           <p className="text-white/80 text-sm mb-2">Overall Assessment</p>
           <div className="flex items-center justify-center gap-4">
@@ -111,9 +111,9 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
 
       {/* Archetype & Style */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-bg-secondary rounded-none p-5">
+        <div className="bg-bg-secondary p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-yellow-100 flex items-center justify-center">
               <Star className="w-5 h-5 text-yellow-600" />
             </div>
             <div>
@@ -128,9 +128,9 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
           )}
         </div>
 
-        <div className="bg-bg-secondary rounded-none p-5">
+        <div className="bg-bg-secondary p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+            <div className="w-10 h-10 bg-blue-100 flex items-center justify-center">
               <Zap className="w-5 h-5 text-blue-600" />
             </div>
             <div>
@@ -147,7 +147,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
       </div>
 
       {/* Dimension Scores */}
-      <div className="bg-bg-secondary rounded-none p-6 mb-6">
+      <div className="bg-bg-secondary p-6 mb-6">
         <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
           <Target className="w-5 h-5" />
           Dimension Breakdown
@@ -156,7 +156,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
           {catalog.dimensions.map(dim => {
             const dimScore = score.dimension_scores[dim.name] || 0;
             return (
-              <div key={dim.id} className="bg-white rounded-none p-4">
+              <div key={dim.id} className="bg-white p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-text-primary font-medium">{dim.name}</span>
@@ -174,9 +174,9 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
                     {dimScore}%
                   </span>
                 </div>
-                <div className="w-full h-2 bg-bg-tertiary rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-bg-tertiary overflow-hidden">
                   <div 
-                    className="h-full rounded-full transition-all duration-500"
+                    className="h-full transition-all duration-500"
                     style={{ 
                       width: `${dimScore}%`,
                       backgroundColor: getScoreColor(dimScore)
@@ -191,7 +191,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
       </div>
 
       {/* Strengths */}
-      <div className="bg-bg-secondary rounded-none p-6 mb-6">
+      <div className="bg-bg-secondary p-6 mb-6">
         <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
           <CheckCircle className="w-5 h-5 text-green-500" />
           Your Strengths
@@ -199,7 +199,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
         <div className="space-y-3">
           {score.strengths.map((strength, index) => (
             <div key={index} className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+              <div className="w-6 h-6 bg-green-100 flex items-center justify-center">
                 <CheckCircle className="w-4 h-4 text-green-600" />
               </div>
               <span className="text-text-secondary">{strength}</span>
@@ -209,7 +209,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
       </div>
 
       {/* Development Areas */}
-      <div className="bg-bg-secondary rounded-none p-6 mb-6">
+      <div className="bg-bg-secondary p-6 mb-6">
         <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-amber-500" />
           Development Opportunities
@@ -217,7 +217,7 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
         <div className="space-y-3">
           {score.development_areas.map((area, index) => (
             <div key={index} className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
+              <div className="w-6 h-6 bg-amber-100 flex items-center justify-center">
                 <ChevronRight className="w-4 h-4 text-amber-600" />
               </div>
               <span className="text-text-secondary">{area}</span>
@@ -227,11 +227,11 @@ export function IndividualReport({ workshopId, participantId }: IndividualReport
       </div>
 
       {/* Recommendations */}
-      <div className="bg-bg-secondary rounded-none p-6 mb-6">
+      <div className="bg-bg-secondary p-6 mb-6">
         <h2 className="text-lg font-semibold text-text-primary mb-4">Recommendations</h2>
         <div className="space-y-3">
           {score.recommendations.map((rec, index) => (
-            <div key={index} className="p-3 bg-white rounded-none border-l-4 border-accent">
+            <div key={index} className="p-3 bg-white border-l-4 border-accent">
               <p className="text-text-secondary">{rec}</p>
             </div>
           ))}

@@ -105,7 +105,7 @@ export function ContactSelector({ open, onClose, onSelect, multi = true }: Conta
         }
       }
       if (c.skills?.length) {
-        parts.push(`\nSkills: ${c.skills.join(', ')}`);
+        parts.push(`\nSkills: ${c.skills.join(',')}`);
       }
       return {
         contact_id: id,
@@ -127,7 +127,7 @@ export function ContactSelector({ open, onClose, onSelect, multi = true }: Conta
     }}>
       <div style={{
         background: DS.card, border: `1px solid ${DS.cardBorder}`,
-        borderRadius: '0px', padding: '24px', width: '100%', maxWidth: '640px',
+         padding: '24px', width: '100%', maxWidth: '640px',
         maxHeight: '80vh', display: 'flex', flexDirection: 'column'
       }}>
         {/* Header */}
@@ -150,7 +150,7 @@ export function ContactSelector({ open, onClose, onSelect, multi = true }: Conta
             style={{
               width: '100%', padding: '10px 12px 10px 38px',
               background: DS.bgAlt, border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '0px', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
+               fontSize: '14px', outline: 'none', boxSizing: 'border-box'
             }}
             autoFocus
           />
@@ -178,7 +178,6 @@ export function ContactSelector({ open, onClose, onSelect, multi = true }: Conta
                       padding: '12px 16px',
                       background: isSelected ? `${DS.accent}08` : DS.bgAlt,
                       border: `1px solid ${isSelected ? DS.accent : DS.cardBorder}`,
-                      borderRadius: '0px',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -187,7 +186,7 @@ export function ContactSelector({ open, onClose, onSelect, multi = true }: Conta
                     }}
                   >
                     <div style={{
-                      width: '20px', height: '20px', borderRadius: '4px',
+                      width: '20px', height: '20px', 
                       border: `2px solid ${isSelected ? DS.accent : DS.cardBorder}`,
                       background: isSelected ? DS.accent : 'transparent',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -202,7 +201,6 @@ export function ContactSelector({ open, onClose, onSelect, multi = true }: Conta
                         {c.trident_composite != null && (
                           <span style={{
                             fontSize: '11px', fontWeight: 700, padding: '2px 6px',
-                            borderRadius: '4px',
                             background: c.trident_composite >= 75 ? '#22C55E20' : c.trident_composite >= 50 ? '#EAB30820' : '#EF444420',
                             color: c.trident_composite >= 75 ? '#16A34A' : c.trident_composite >= 50 ? '#CA8A04' : '#DC2626'
                           }}>
@@ -239,7 +237,7 @@ export function ContactSelector({ open, onClose, onSelect, multi = true }: Conta
               onClick={onClose}
               style={{
                 padding: '10px 20px', background: DS.bgAlt, border: `1px solid ${DS.cardBorder}`,
-                borderRadius: '0px', color: DS.textSecondary, fontSize: '14px', cursor: 'pointer'
+                 color: DS.textSecondary, fontSize: '14px', cursor: 'pointer'
               }}
             >
               Cancel
@@ -249,12 +247,12 @@ export function ContactSelector({ open, onClose, onSelect, multi = true }: Conta
               disabled={selected.size === 0}
               style={{
                 padding: '10px 20px', background: DS.accent, border: 'none',
-                borderRadius: '0px', color: '#fff', fontSize: '14px', fontWeight: 600,
+                 color: '#fff', fontSize: '14px', fontWeight: 600,
                 cursor: selected.size > 0 ? 'pointer' : 'not-allowed',
                 opacity: selected.size > 0 ? 1 : 0.5
               }}
             >
-              Add {selected.size > 0 ? `${selected.size} ` : ''}to Match
+              Add {selected.size > 0 ? `${selected.size}` : ''}to Match
             </button>
           </div>
         </div>

@@ -106,7 +106,7 @@ const ContentModeration: React.FC = () => {
       });
       loadData();
     } catch (err) {
-      alert('Action failed: ' + (err as Error).message);
+      alert('Action failed:' + (err as Error).message);
     } finally {
       setActionLoading(null);
     }
@@ -189,7 +189,7 @@ const ContentModeration: React.FC = () => {
 
                 <p className="text-xs text-text-muted">
                   Content ID: <code className="bg-bg px-1 py-0.5">{item.content_id}</code>
-                  {' · '}
+                  {'·'}
                   Reported: {new Date(item.created_at).toLocaleString()}
                 </p>
 

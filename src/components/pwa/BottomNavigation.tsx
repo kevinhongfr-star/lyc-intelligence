@@ -86,7 +86,7 @@ export function BottomNavigation({
         {/* Logo */}
         <div className="p-4 border-b border-card-border">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-none bg-primary flex items-center justify-center">
+            <div className="w-10 h-10 bg-primary flex items-center justify-center">
               <span className="text-white font-bold text-lg">D</span>
             </div>
             <div>
@@ -104,7 +104,7 @@ export function BottomNavigation({
               <Link
                 key={item.id}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-none transition-colors ${
+                className={`flex items-center gap-3 px-4 py-3 transition-colors ${
                   isActive
                     ? 'bg-primary text-white'
                     : 'text-text-muted hover:bg-bg-alt hover:text-text-primary'
@@ -113,7 +113,7 @@ export function BottomNavigation({
                 {item.icon}
                 <span className="font-medium">{item.label}</span>
                 {item.badge && item.badge > 0 && (
-                  <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                  <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5">
                     {item.badge}
                   </span>
                 )}
@@ -128,12 +128,12 @@ export function BottomNavigation({
             <Link
               key={item.id}
               href={item.href}
-              className="flex items-center gap-3 px-4 py-3 rounded-none text-text-muted hover:bg-bg-alt hover:text-text-primary transition-colors"
+              className="flex items-center gap-3 px-4 py-3 text-text-muted hover:bg-bg-alt hover:text-text-primary transition-colors"
             >
               {item.icon}
               <span className="font-medium">{item.label}</span>
               {item.badge && item.badge > 0 && (
-                <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5">
                   {item.badge}
                 </span>
               )}
@@ -160,7 +160,7 @@ export function BottomNavigation({
                 <div className="relative">
                   {item.icon}
                   {item.badge && item.badge > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold flex items-center justify-center">
                       {item.badge > 9 ? '9+' : item.badge}
                     </span>
                   )}
@@ -189,7 +189,7 @@ export function BottomNavigation({
               className="fixed inset-0 bg-black/50 z-40"
               onClick={() => setShowMore(false)}
             />
-            <div className="absolute bottom-16 right-4 bg-card rounded-none shadow-lg border border-card-border z-50 w-56 overflow-hidden">
+            <div className="absolute bottom-16 right-4 bg-card shadow-lg border border-card-border z-50 w-56 overflow-hidden">
               {moreItems.map((item) => (
                 <Link
                   key={item.id}
@@ -200,7 +200,7 @@ export function BottomNavigation({
                   {item.icon}
                   <span className="font-medium">{item.label}</span>
                   {item.badge && item.badge > 0 && (
-                    <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                    <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5">
                       {item.badge}
                     </span>
                   )}

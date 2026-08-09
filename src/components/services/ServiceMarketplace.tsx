@@ -35,7 +35,7 @@ export default function ServiceMarketplace() {
                 ? 'bg-[#C108AB] text-white'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary hover:bg-bg-tertiary'
             }`}
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             {cat}
           </button>

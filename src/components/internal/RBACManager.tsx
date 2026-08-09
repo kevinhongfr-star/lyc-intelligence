@@ -23,7 +23,7 @@ export default function RBACManager() {
             <div
               key={role.id}
               className="bg-bg-primary border border-bg-tertiary"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <button
                 onClick={() => toggleExpand(role.id)}
@@ -44,7 +44,7 @@ export default function RBACManager() {
                       <span
                         key={p}
                         className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-accent-10 text-accent"
-                        style={{ borderRadius: 0 }}
+                        style={{ }}
                       >
                         {p}
                       </span>
@@ -65,7 +65,7 @@ export default function RBACManager() {
                         <span
                           key={p}
                           className="inline-flex items-center px-2.5 py-1 text-xs font-medium bg-accent-10 text-accent"
-                          style={{ borderRadius: 0 }}
+                          style={{ }}
                         >
                           {p}
                         </span>
@@ -75,7 +75,7 @@ export default function RBACManager() {
                   <div className="mt-4 flex justify-end">
                     <button
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-bg-tertiary text-text-secondary hover:bg-bg-secondary transition-colors"
-                      style={{ borderRadius: 0 }}
+                      style={{ }}
                     >
                       <Pencil className="w-3 h-3" />
                       Edit Role

@@ -51,7 +51,6 @@ export function CreditDisplay({ showTier = false }: CreditDisplayProps) {
       padding: '6px 12px',
       background: DS.card,
       border: `1px solid ${DS.border}`,
-      borderRadius: DS.radius,
     }}>
       <Zap style={{ width: 14, height: 14, color: getBalanceColor() }} />
       {credit.isLoading ? (
@@ -72,19 +71,13 @@ export function CreditDisplay({ showTier = false }: CreditDisplayProps) {
               textTransform: 'uppercase',
               padding: '2px 6px',
               background: `${getTierColor()}15`,
-              borderRadius: '4px',
             }}>
               {credit.tier}
             </span>
           )}
         </>
       )}
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

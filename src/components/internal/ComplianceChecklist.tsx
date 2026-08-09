@@ -35,16 +35,16 @@ export default function ComplianceChecklist() {
   };
 
   return (
-    <div className="bg-bg-primary border border-bg-tertiary" style={{ borderRadius: 0 }}>
+    <div className="bg-bg-primary border border-bg-tertiary" style={{ }}>
       <div className="p-4 border-b border-bg-tertiary bg-bg-secondary">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-text-primary">Compliance Progress</span>
           <span className="text-sm font-bold text-text-primary">{pct}%</span>
         </div>
-        <div className="w-full h-2 bg-bg-tertiary" style={{ borderRadius: 0 }}>
+        <div className="w-full h-2 bg-bg-tertiary" style={{ }}>
           <div
             className="h-full"
-            style={{ width: `${pct}%`, backgroundColor: '#C108AB', borderRadius: 0 }}
+            style={{ width: `${pct}%`, backgroundColor: '#C108AB' }}
           />
         </div>
         <p className="text-xs text-text-muted mt-1">{completed} of {total} items complete</p>
@@ -60,7 +60,7 @@ export default function ComplianceChecklist() {
             <span className="text-sm text-text-primary flex-1">{item.item}</span>
             <span
               className="inline-block px-2 py-0.5 text-xs font-medium text-white"
-              style={{ borderRadius: 0, backgroundColor: getStatusColor(item.status) === 'bg-green-600' ? '#16a34a' : getStatusColor(item.status) === 'bg-amber-500' ? '#f59e0b' : '#9ca3af' }}
+              style={{  backgroundColor: getStatusColor(item.status) === 'bg-green-600' ? '#16a34a' : getStatusColor(item.status) === 'bg-amber-500' ? '#f59e0b' : '#9ca3af' }}
             >
               {getStatusLabel(item.status)}
             </span>

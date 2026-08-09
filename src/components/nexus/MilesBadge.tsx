@@ -53,7 +53,6 @@ export function MilesBadge({
         background: `${ACCENT}12`,
         border: `1px solid ${ACCENT}40`,
         color: ACCENT,
-        borderRadius: 0,
       }}
     >
       <Zap className={s.icon} style={{ color: ACCENT }} />

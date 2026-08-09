@@ -262,7 +262,7 @@ export function CandidateAssessment({
             <button
               key={value}
               onClick={() => handleResponseChange(value)}
-              className={`flex-1 py-4 px-2 rounded-none border-2 transition-all text-center font-medium ${
+              className={`flex-1 py-4 px-2 border-2 transition-all text-center font-medium ${
                 currentValue === value
                   ? 'border-accent bg-accent/10 text-accent'
                   : 'border-gray-200 hover:border-gray-300 text-gray-700'
@@ -287,20 +287,20 @@ export function CandidateAssessment({
           <button
             key={idx}
             onClick={() => handleResponseChange(option)}
-            className={`w-full p-4 rounded-none border-2 text-left transition-all ${
+            className={`w-full p-4 border-2 text-left transition-all ${
               currentValue === option
                 ? 'border-accent bg-accent/10'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+              <div className={`w-5 h-5 border-2 flex items-center justify-center ${
                 currentValue === option
                   ? 'border-accent bg-accent'
                   : 'border-gray-300'
               }`}>
                 {currentValue === option && (
-                  <div className="w-2 h-2 rounded-full bg-white" />
+                  <div className="w-2 h-2 bg-white" />
                 )}
               </div>
               <span className="text-gray-800">{option}</span>
@@ -331,14 +331,14 @@ export function CandidateAssessment({
           <button
             key={idx}
             onClick={() => toggleOption(option)}
-            className={`w-full p-4 rounded-none border-2 text-left transition-all ${
+            className={`w-full p-4 border-2 text-left transition-all ${
               currentValue.includes(option)
                 ? 'border-accent bg-accent/10'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+              <div className={`w-5 h-5 border-2 flex items-center justify-center ${
                 currentValue.includes(option)
                   ? 'border-accent bg-accent'
                   : 'border-gray-300'
@@ -367,7 +367,7 @@ export function CandidateAssessment({
           onChange={e => handleResponseChange(e.target.value)}
           maxLength={maxLength}
           rows={6}
-          className="w-full p-4 rounded-none border-2 border-gray-200 focus:border-accent focus:outline-none resize-none text-gray-800"
+          className="w-full p-4 border-2 border-gray-200 focus:border-accent focus:outline-none resize-none text-gray-800"
           placeholder="Type your answer here..."
         />
         <div className="text-right text-sm text-gray-400">
@@ -404,9 +404,9 @@ export function CandidateAssessment({
         {currentValue.map((itemIndex, displayIndex) => (
           <div
             key={itemIndex}
-            className="flex items-center gap-3 p-4 bg-white rounded-none border-2 border-gray-200"
+            className="flex items-center gap-3 p-4 bg-white border-2 border-gray-200"
           >
-            <span className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600">
+            <span className="w-8 h-8 bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600">
               {displayIndex + 1}
             </span>
             <span className="flex-1 text-gray-800">{items[itemIndex]}</span>
@@ -414,14 +414,14 @@ export function CandidateAssessment({
               <button
                 onClick={() => displayIndex > 0 && moveItem(displayIndex, displayIndex - 1)}
                 disabled={displayIndex === 0}
-                className="p-2 rounded-none hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={() => displayIndex < items.length - 1 && moveItem(displayIndex, displayIndex + 1)}
                 disabled={displayIndex === items.length - 1}
-                className="p-2 rounded-none hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -459,7 +459,7 @@ export function CandidateAssessment({
               {onExit && (
                 <button
                   onClick={() => setShowExitConfirm(true)}
-                  className="p-2 hover:bg-gray-100 rounded-none"
+                  className="p-2 hover:bg-gray-100"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
@@ -487,7 +487,7 @@ export function CandidateAssessment({
               ) : null}
               {/* Timer */}
               {assessment.show_timer && timeRemaining !== null && (
-                <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+                <div className={`flex items-center gap-1 px-3 py-1 text-sm font-medium ${
                   timeRemaining < 300 ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'
                 }`}>
                   <Clock className="w-4 h-4" />
@@ -502,7 +502,7 @@ export function CandidateAssessment({
               <span>Question {currentIndex + 1} of {assessment.questions.length}</span>
               <span>{Math.round(progress)}% complete</span>
             </div>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-2 bg-gray-200 overflow-hidden">
               <div
                 className="h-full bg-accent transition-all duration-300"
                 style={{ width: `${progress}%` }}
@@ -514,7 +514,7 @@ export function CandidateAssessment({
 
       {/* Question */}
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
+        <div className="bg-white shadow-sm border border-gray-200 p-6 md:p-8">
           {/* Question text */}
           <div className="mb-6">
             <div className="flex items-start gap-2 mb-2">
@@ -564,17 +564,17 @@ export function CandidateAssessment({
                   <button
                     key={q.id}
                     onClick={() => setCurrentIndex(Math.max(0, currentIndex - 2 + i))}
-                    className={`w-2 h-2 rounded-full ${
+                    className={`w-2 h-2 ${
                       responses[q.id] ? 'bg-accent' : 'bg-gray-300'
                     }`}
                   />
                 ))}
-                <div className={`w-2 h-2 rounded-full ${responses[currentQuestion.id] ? 'bg-accent' : 'bg-accent/50'}`} />
+                <div className={`w-2 h-2 ${responses[currentQuestion.id] ? 'bg-accent' : 'bg-accent/50'}`} />
                 {assessment.questions.slice(currentIndex + 1, currentIndex + 3).map((q, i) => (
                   <button
                     key={q.id}
                     onClick={() => setCurrentIndex(currentIndex + 1 + i)}
-                    className={`w-2 h-2 rounded-full ${
+                    className={`w-2 h-2 ${
                       responses[q.id] ? 'bg-accent' : 'bg-gray-300'
                     }`}
                   />
@@ -619,7 +619,7 @@ export function CandidateAssessment({
       {/* Exit confirmation modal */}
       {showExitConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6">
+          <div className="bg-white max-w-sm w-full p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Exit Assessment?</h3>
             <p className="text-gray-500 mb-6">
               Your progress has been auto-saved. You can resume later from where you left off.

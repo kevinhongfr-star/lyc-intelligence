@@ -216,7 +216,7 @@ export function SearchFilters({ filters, onFiltersChange, onClear }: SearchFilte
             {(localFilters.skills as string[]).map(skill => (
               <span
                 key={skill}
-                className="flex items-center gap-1 px-3 py-1 bg-bg-alt rounded-full text-sm"
+                className="flex items-center gap-1 px-3 py-1 bg-bg-alt text-sm"
               >
                 {skill}
                 <button
@@ -251,7 +251,7 @@ export function SearchFilters({ filters, onFiltersChange, onClear }: SearchFilte
             {(localFilters.keywords as string[]).map(keyword => (
               <span
                 key={keyword}
-                className="flex items-center gap-1 px-3 py-1 bg-bg-alt rounded-full text-sm"
+                className="flex items-center gap-1 px-3 py-1 bg-bg-alt text-sm"
               >
                 {keyword}
                 <button

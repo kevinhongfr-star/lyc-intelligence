@@ -206,7 +206,7 @@ export function KevinReviewQueue({ onScorecardClick, onProfileClick }: KevinRevi
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 flex-1">
-                <div className={`w-3 h-12 rounded-full ${
+                <div className={`w-3 h-12 ${
                   item.type === 'trident'
                     ? item.segment === 'A' ? 'bg-green-500' : item.segment === 'B' ? 'bg-yellow-500' : 'bg-red-500'
                     : getGradeColor(item.canvas_grade).replace('bg-', 'bg-')

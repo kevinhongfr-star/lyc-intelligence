@@ -20,8 +20,8 @@ import type {
 import { DEFAULT_SUCCESS_PROFILE } from '@/types';
 
 const rowStyle = 'grid grid-cols-12 gap-2 items-start p-2 border-b last:border-b-0';
-const addBtnStyle = 'mt-2 px-3 py-1.5 text-sm bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100';
-const delBtnStyle = 'text-red-500 hover:text-red-700 text-xs px-2 py-1 border border-red-200 rounded';
+const addBtnStyle = 'mt-2 px-3 py-1.5 text-sm bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100';
+const delBtnStyle = 'text-red-500 hover:text-red-700 text-xs px-2 py-1 border border-red-200';
 const badgeStyle = (status: ProfileStatus) => {
   switch (status) {
     case 'approved': return 'bg-emerald-100 text-emerald-800';
@@ -183,7 +183,7 @@ export function SuccessProfileForm({ mandate, onSaved }: Props) {
       <Card>
         <CardContent className="flex items-center justify-between py-4">
           <div className="flex items-center gap-3">
-            <Badge className={badgeStyle(profile.status)}>{profile.status.replace('_', ' ')}</Badge>
+            <Badge className={badgeStyle(profile.status)}>{profile.status.replace('_', '')}</Badge>
             <span className="text-sm text-slate-500">
               {profile.id ? `Profile ID: ${profile.id.slice(0, 8)}` : 'New profile'}
             </span>
@@ -258,7 +258,7 @@ export function SuccessProfileForm({ mandate, onSaved }: Props) {
             {profile.required_industries?.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {profile.required_industries.map((ind, i) => (
-                  <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded text-sm">
+                  <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-sm">
                     {ind}
                     <button onClick={() => removeIndustry(i)} className="hover:text-red-600">×</button>
                   </span>
@@ -283,7 +283,7 @@ export function SuccessProfileForm({ mandate, onSaved }: Props) {
             {profile.required_geographies?.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {profile.required_geographies.map((geo, i) => (
-                  <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded text-sm">
+                  <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-sm">
                     {geo}
                     <button onClick={() => removeGeography(i)} className="hover:text-red-600">×</button>
                   </span>
@@ -304,7 +304,7 @@ export function SuccessProfileForm({ mandate, onSaved }: Props) {
           <div>
             <label className="text-xs font-medium text-slate-600">Target DISC profile</label>
             <select
-              className="mt-1 w-full border border-slate-200 rounded px-2 py-1.5 text-sm bg-white"
+              className="mt-1 w-full border border-slate-200 px-2 py-1.5 text-sm bg-white"
               value={profile.target_disc_profile || 'mixed'}
               onChange={(e) => updateField('target_disc_profile', e.target.value as DiscProfile)}
             >
@@ -371,7 +371,7 @@ export function SuccessProfileForm({ mandate, onSaved }: Props) {
                   onChange={(e) => updateCharacter(i, { trait: e.target.value })}
                 />
                 <select
-                  className="col-span-5 border border-slate-200 rounded px-2 py-1.5 text-sm bg-white"
+                  className="col-span-5 border border-slate-200 px-2 py-1.5 text-sm bg-white"
                   value={p.level}
                   onChange={(e) => updateCharacter(i, { level: e.target.value as CharacterLevel })}
                 >
@@ -459,7 +459,7 @@ export function SuccessProfileForm({ mandate, onSaved }: Props) {
             {profile.certifications?.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {profile.certifications.map((cert, i) => (
-                  <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded text-sm">
+                  <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-sm">
                     {cert}
                     <button onClick={() => removeCertification(i)} className="hover:text-red-600">×</button>
                   </span>
@@ -480,7 +480,7 @@ export function SuccessProfileForm({ mandate, onSaved }: Props) {
                   onChange={(e) => updateLanguage(i, { language: e.target.value })}
                 />
                 <select
-                  className="col-span-6 border border-slate-200 rounded px-2 py-1.5 text-sm bg-white"
+                  className="col-span-6 border border-slate-200 px-2 py-1.5 text-sm bg-white"
                   value={p.level}
                   onChange={(e) => updateLanguage(i, { level: e.target.value as LanguageLevel })}
                 >
@@ -512,7 +512,7 @@ export function SuccessProfileForm({ mandate, onSaved }: Props) {
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm text-slate-600">Current status:</span>
-            <Badge className={badgeStyle(profile.status)}>{profile.status.replace('_', ' ')}</Badge>
+            <Badge className={badgeStyle(profile.status)}>{profile.status.replace('_', '')}</Badge>
           </div>
           
           {profile.approved_by && (

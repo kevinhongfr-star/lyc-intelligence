@@ -159,12 +159,12 @@ export function OnboardingChecklist({
   };
 
   return (
-    <div className="bg-card border border-card-border rounded-none overflow-hidden">
+    <div className="bg-card border border-card-border overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-card-border">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+            <div className="w-12 h-12 bg-accent/10 flex items-center justify-center">
               <Users className="w-6 h-6 text-accent" />
             </div>
             <div>
@@ -188,9 +188,9 @@ export function OnboardingChecklist({
               {stats.completed}/{stats.total} tasks ({stats.percentage}%)
             </span>
           </div>
-          <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-3 bg-gray-200 overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-accent to-accent/70 rounded-full transition-all duration-500"
+              className="h-full bg-gradient-to-r from-accent to-accent/70 transition-all duration-500"
               style={{ width: `${stats.percentage}%` }}
             />
           </div>
@@ -233,7 +233,7 @@ export function OnboardingChecklist({
                 className="w-full p-4 flex items-center justify-between hover:bg-bg-alt transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full ${config.bgColor} flex items-center justify-center`}>
+                  <div className={`w-8 h-8 ${config.bgColor} flex items-center justify-center`}>
                     <Icon className={`w-4 h-4 ${config.color}`} />
                   </div>
                   <div className="text-left">
@@ -263,7 +263,7 @@ export function OnboardingChecklist({
                     return (
                       <div
                         key={idx}
-                        className={`px-4 py-3 mx-4 my-1 rounded-none ${
+                        className={`px-4 py-3 mx-4 my-1 ${
                           task.completed
                             ? 'bg-green-50'
                             : isOverdueTask
@@ -305,7 +305,7 @@ export function OnboardingChecklist({
                                     setEditingTask(globalIndex);
                                     setEditNotes(task.notes || '');
                                   }}
-                                  className="p-1 hover:bg-white/50 rounded"
+                                  className="p-1 hover:bg-white/50"
                                 >
                                   <Edit2 className="w-4 h-4 text-text-muted" />
                                 </button>
@@ -330,8 +330,8 @@ export function OnboardingChecklist({
                                   }`}>
                                     <Clock className="w-3 h-3" />
                                     Due {dueInfo.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                    {dueInfo.isOverdue && ` (${Math.abs(Math.ceil((today.getTime() - dueInfo.date.getTime()) / (1000 * 60 * 60 * 24)))}d overdue)`}
-                                    {dueInfo.isUrgent && !dueInfo.isOverdue && ' (soon)'}
+                                    {dueInfo.isOverdue && `(${Math.abs(Math.ceil((today.getTime() - dueInfo.date.getTime()) / (1000 * 60 * 60 * 24)))}d overdue)`}
+                                    {dueInfo.isUrgent && !dueInfo.isOverdue && '(soon)'}
                                   </span>
                                 )}
                               </div>
@@ -352,7 +352,7 @@ export function OnboardingChecklist({
                                   onChange={(e) => setEditNotes(e.target.value)}
                                   placeholder="Add notes..."
                                   rows={2}
-                                  className="w-full px-3 py-2 bg-white border border-card-border rounded text-sm resize-none"
+                                  className="w-full px-3 py-2 bg-white border border-card-border text-sm resize-none"
                                 />
                                 <div className="flex gap-2 mt-2">
                                   <Button

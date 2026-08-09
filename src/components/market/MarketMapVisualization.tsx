@@ -264,7 +264,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-none text-sm font-medium border transition-colors ${
+            className={`flex items-center gap-2 px-3 py-2 text-sm font-medium border transition-colors ${
               showFilters || hasActiveFilters
                 ? 'bg-accent text-white border-accent'
                 : 'bg-bg-secondary text-text-primary border-border hover:bg-slate-50'
@@ -273,13 +273,13 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
             <Filter className="w-4 h-4" />
             Filters
             {hasActiveFilters && (
-              <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-xs">
+              <span className="ml-1 px-1.5 py-0.5 bg-white/20 text-xs">
                 {selectedSectors.length + selectedGeographies.length}
               </span>
             )}
           </button>
 
-          <div className="flex items-center border border-border rounded-none overflow-hidden">
+          <div className="flex items-center border border-border overflow-hidden">
             <button
               onClick={() => setViewMode('grid')}
               className={`px-3 py-2 text-sm ${viewMode === 'grid' ? 'bg-accent text-white' : 'bg-bg-secondary text-text-muted hover:bg-slate-50'}`}
@@ -311,14 +311,14 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
           </span>
           <button
             onClick={handleExportPDF}
-            className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-none text-sm font-medium hover:bg-red-700 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors"
           >
             <Download className="w-4 h-4" />
             PDF
           </button>
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-none text-sm font-medium hover:bg-emerald-700 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors"
           >
             <Download className="w-4 h-4" />
             CSV
@@ -328,7 +328,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
 
       {/* Filters panel */}
       {showFilters && (
-        <div className="bg-bg-secondary border border-border rounded-none p-4 space-y-4">
+        <div className="bg-bg-secondary border border-border p-4 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Sector filter */}
             <div>
@@ -338,12 +338,12 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
               </h4>
               <div className="space-y-1 max-h-40 overflow-y-auto">
                 {allSectors.map(sector => (
-                  <label key={sector} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 p-1 rounded">
+                  <label key={sector} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 p-1">
                     <input
                       type="checkbox"
                       checked={selectedSectors.includes(sector)}
                       onChange={() => handleFilterToggle(sector, 'sector')}
-                      className="rounded border-border text-accent"
+                      className="border-border text-accent"
                     />
                     <span className="text-text-primary">{sector}</span>
                   </label>
@@ -359,12 +359,12 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
               </h4>
               <div className="space-y-1 max-h-40 overflow-y-auto">
                 {allGeographies.map(geo => (
-                  <label key={geo} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 p-1 rounded">
+                  <label key={geo} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 p-1">
                     <input
                       type="checkbox"
                       checked={selectedGeographies.includes(geo)}
                       onChange={() => handleFilterToggle(geo, 'geography')}
-                      className="rounded border-border text-accent"
+                      className="border-border text-accent"
                     />
                     <span className="text-text-primary">{geo}</span>
                   </label>
@@ -417,7 +417,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
           { label: 'Poor (<20)', color: COLORS.poor },
         ].map(item => (
           <span key={item.label} className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+            <span className="w-3 h-3" style={{ backgroundColor: item.color }} />
             {item.label}
           </span>
         ))}
@@ -425,7 +425,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
 
       {/* Grid view */}
       {viewMode === 'grid' && (
-        <div className="relative bg-slate-50 border border-border rounded-none overflow-hidden" style={{ height: '500px' }}>
+        <div className="relative bg-slate-50 border border-border overflow-hidden" style={{ height: '500px' }}>
           <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
             {/* Grid lines */}
             <defs>
@@ -471,7 +471,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
           {/* Tooltip */}
           {hoveredCompany && (
             <div
-              className="absolute bg-white shadow-xl border border-border rounded-none p-3 z-10 pointer-events-none min-w-[200px]"
+              className="absolute bg-white shadow-xl border border-border p-3 z-10 pointer-events-none min-w-[200px]"
               style={{
                 left: tooltipPos.x + 10,
                 top: tooltipPos.y + 10,
@@ -483,7 +483,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
               <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border">
                 <span className="text-xs text-text-muted">Fit Score:</span>
                 <span
-                  className="text-xs font-bold px-2 py-0.5 rounded"
+                  className="text-xs font-bold px-2 py-0.5"
                   style={{
                     backgroundColor: getBubbleColor(hoveredCompany.fit_score) + '20',
                     color: getBubbleColor(hoveredCompany.fit_score),
@@ -518,7 +518,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
 
       {/* List view */}
       {viewMode === 'list' && (
-        <div className="bg-bg-secondary border border-border rounded-none overflow-hidden">
+        <div className="bg-bg-secondary border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -549,7 +549,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
                     <td className="px-4 py-3 text-sm text-text-primary">{company.size || '—'}</td>
                     <td className="px-4 py-3">
                       <span
-                        className="inline-flex items-center px-2 py-1 rounded text-xs font-bold"
+                        className="inline-flex items-center px-2 py-1 text-xs font-bold"
                         style={{
                           backgroundColor: getBubbleColor(company.fit_score) + '20',
                           color: getBubbleColor(company.fit_score),
@@ -559,7 +559,7 @@ export function MarketMapVisualization({ companies, mandateId, onCompanyClick }:
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs px-2 py-1 rounded-full ${
+                      <span className={`text-xs px-2 py-1 ${
                         company.overview_status === 'completed'
                           ? 'bg-emerald-100 text-emerald-700'
                           : company.overview_status === 'generating'

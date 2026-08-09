@@ -62,8 +62,8 @@ export function CookieConsent() {
           <Cookie className="w-5 h-5 text-fuchsia flex-shrink-0 mt-0.5" />
           <div className="text-xs sm:text-sm text-[#B8B8C8] leading-relaxed">
             We use cookies to operate this site and improve your experience. Essential cookies are always on.
-            Analytics cookies help us understand usage. See our{' '}
-            <a href="/cookies" className="text-fuchsia hover:underline">Cookie Policy</a> and{' '}
+            Analytics cookies help us understand usage. See our{''}
+            <a href="/cookies" className="text-fuchsia hover:underline">Cookie Policy</a> and{''}
             <a href="/privacy" className="text-fuchsia hover:underline">Privacy Policy</a>.
           </div>
         </div>

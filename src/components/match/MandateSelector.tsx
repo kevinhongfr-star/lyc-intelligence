@@ -84,7 +84,7 @@ export function MandateSelector({ open, onClose, onSelect }: MandateSelectorProp
     }}>
       <div style={{
         background: DS.card, border: `1px solid ${DS.cardBorder}`,
-        borderRadius: '0px', padding: '24px', width: '100%', maxWidth: '640px',
+         padding: '24px', width: '100%', maxWidth: '640px',
         maxHeight: '80vh', display: 'flex', flexDirection: 'column'
       }}>
         {/* Header */}
@@ -107,7 +107,7 @@ export function MandateSelector({ open, onClose, onSelect }: MandateSelectorProp
             style={{
               width: '100%', padding: '10px 12px 10px 38px',
               background: DS.bgAlt, border: `1px solid ${DS.cardBorder}`,
-              borderRadius: '0px', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
+               fontSize: '14px', outline: 'none', boxSizing: 'border-box'
             }}
             autoFocus
           />
@@ -133,7 +133,6 @@ export function MandateSelector({ open, onClose, onSelect }: MandateSelectorProp
                     padding: '14px 16px',
                     background: DS.bgAlt,
                     border: `1px solid ${DS.cardBorder}`,
-                    borderRadius: '0px',
                     cursor: 'pointer',
                     transition: 'all 0.15s'
                   }}
@@ -152,7 +151,7 @@ export function MandateSelector({ open, onClose, onSelect }: MandateSelectorProp
                       {m.title}
                     </span>
                     <span style={{
-                      fontSize: '11px', padding: '2px 8px', borderRadius: '4px',
+                      fontSize: '11px', padding: '2px 8px', 
                       background: m.status === '1_search' ? '#3B82F620' : m.status === '5_placed' ? '#22C55E20' : '#EAB30820',
                       color: m.status === '1_search' ? '#2563EB' : m.status === '5_placed' ? '#16A34A' : '#CA8A04',
                       fontWeight: 600
@@ -182,7 +181,7 @@ export function MandateSelector({ open, onClose, onSelect }: MandateSelectorProp
         <div style={{ textAlign: 'center' }}>
           <button onClick={onClose} style={{
             padding: '10px 24px', background: DS.bgAlt, border: `1px solid ${DS.cardBorder}`,
-            borderRadius: '0px', color: DS.textSecondary, fontSize: '14px', cursor: 'pointer'
+             color: DS.textSecondary, fontSize: '14px', cursor: 'pointer'
           }}>
             Cancel
           </button>

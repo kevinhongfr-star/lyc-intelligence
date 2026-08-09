@@ -179,7 +179,7 @@ export function ScorecardView({ scorecardId, onEdit, onSendForReview }: Scorecar
           <div className="grid grid-cols-2 gap-2">
             {Object.entries(subDimensions).map(([key, value]) => (
               <div key={key} className="flex items-center justify-between text-sm">
-                <span className="text-text-muted capitalize">{key.replace(/_/g, ' ')}</span>
+                <span className="text-text-muted capitalize">{key.replace(/_/g, '')}</span>
                 <span className="font-medium text-text-primary">{value?.toFixed(1) || '-'}</span>
               </div>
             ))}
@@ -247,7 +247,7 @@ export function ScorecardView({ scorecardId, onEdit, onSendForReview }: Scorecar
         )}
 
         {scorecard.original_composite && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-none p-3 mb-3">
+          <div className="bg-yellow-50 border border-yellow-200 p-3 mb-3">
             <div className="text-sm text-yellow-800">
               <strong>Adjusted by Kevin</strong> — Original: D1={scorecard.original_d1}, D2={scorecard.original_d2}, D3={scorecard.original_d3}, Composite={scorecard.original_composite?.toFixed(1)}
             </div>
@@ -266,7 +266,7 @@ export function ScorecardView({ scorecardId, onEdit, onSendForReview }: Scorecar
                 {value === 'WARN' && <AlertCircle className="w-4 h-4 text-yellow-500" />}
                 {value === 'HALT' && <X className="w-4 h-4 text-red-500" />}
                 <span className="text-sm text-text-muted capitalize">
-                  {key.replace(/_/g, ' ')}
+                  {key.replace(/_/g, '')}
                 </span>
               </div>
             ))}
@@ -367,7 +367,7 @@ export function ScorecardView({ scorecardId, onEdit, onSendForReview }: Scorecar
           </h3>
           <div className="space-y-2">
             {scoreHistory.map(hist => (
-              <div key={hist.id} className="flex items-center justify-between p-2 bg-bg-alt rounded">
+              <div key={hist.id} className="flex items-center justify-between p-2 bg-bg-alt">
                 <div>
                   <div className="text-sm text-text-primary">
                     Composite: {hist.composite_score.toFixed(1)} — {hist.verdict} (Seg {hist.segment})

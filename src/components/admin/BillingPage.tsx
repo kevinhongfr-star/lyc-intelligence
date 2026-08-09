@@ -94,7 +94,7 @@ const BillingPage: React.FC = () => {
       setNewInvoice({ org_id: '', amount: '', due_date: '', description: '' });
       loadData();
     } catch (err) {
-      alert('Failed to create invoice: ' + (err as Error).message);
+      alert('Failed to create invoice:' + (err as Error).message);
     }
   }
 
@@ -104,7 +104,7 @@ const BillingPage: React.FC = () => {
       await adminService.billing.updateInvoiceStatus(id, 'paid');
       loadData();
     } catch (err) {
-      alert('Failed to mark as paid: ' + (err as Error).message);
+      alert('Failed to mark as paid:' + (err as Error).message);
     } finally {
       setMarkingPaid(null);
     }

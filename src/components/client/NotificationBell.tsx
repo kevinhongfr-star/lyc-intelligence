@@ -93,7 +93,7 @@ export function NotificationBell() {
       {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 hover:bg-bg-tertiary rounded-none transition-colors"
+        className="relative p-2 hover:bg-bg-tertiary transition-colors"
       >
         <Bell className="w-5 h-5 text-text-secondary" />
         {unreadCount > 0 && (
@@ -107,7 +107,7 @@ export function NotificationBell() {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-bg-tertiary rounded-none shadow-xl z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-bg-tertiary shadow-xl z-50 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-bg-tertiary">
             <h3 className="font-semibold text-text-primary">Notifications</h3>
@@ -125,7 +125,7 @@ export function NotificationBell() {
           <div className="max-h-80 overflow-y-auto">
             {loading ? (
               <div className="p-8 text-center">
-                <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
+                <div className="w-6 h-6 border-2 border-accent border-t-transparent animate-spin mx-auto" />
               </div>
             ) : notifications.length === 0 ? (
               <div className="p-8 text-center">

@@ -276,7 +276,7 @@ export function CreditStorePage() {
         </Card>
 
         <div className="text-center text-xs text-gray-400">
-          Your Executive Introduction is available now —{' '}
+          Your Executive Introduction is available now —{''}
           <a href="/dex/chat" className="text-fuchsia hover:underline">start chatting</a>.
         </div>
       </div>

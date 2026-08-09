@@ -97,7 +97,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
   };
 
   const formatDimensionName = (dim: string) => {
-    return dim.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return dim.replace('_', '').replace(/\b\w/g, l => l.toUpperCase());
   };
 
   const getPercentileColor = (percentile: number) => {
@@ -170,7 +170,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
               <h4 className="text-sm font-medium text-text-muted mb-3">Key Insights</h4>
               <div className="space-y-2">
                 {insights.insights.map((insight, i) => (
-                  <div key={i} className="p-3 bg-bg-alt rounded-none text-sm text-text-primary">
+                  <div key={i} className="p-3 bg-bg-alt text-sm text-text-primary">
                     {insight}
                   </div>
                 ))}
@@ -182,7 +182,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
               <h4 className="text-sm font-medium text-text-muted mb-3">Recommendations</h4>
               <div className="space-y-2">
                 {insights.recommendations.map((rec, i) => (
-                  <div key={i} className="p-3 bg-primary/5 rounded-none text-sm text-text-primary">
+                  <div key={i} className="p-3 bg-primary/5 text-sm text-text-primary">
                     {rec}
                   </div>
                 ))}
@@ -196,7 +196,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
               <h4 className="text-sm font-medium text-text-muted mb-3">Team Strengths</h4>
               <div className="flex flex-wrap gap-2">
                 {insights.team_strengths.map((strength, i) => (
-                  <span key={i} className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
+                  <span key={i} className="px-3 py-1 bg-green-100 text-green-700 text-sm">
                     {strength}
                   </span>
                 ))}
@@ -206,7 +206,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
               <h4 className="text-sm font-medium text-text-muted mb-3">Team Gaps</h4>
               <div className="flex flex-wrap gap-2">
                 {insights.team_gaps.map((gap, i) => (
-                  <span key={i} className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
+                  <span key={i} className="px-3 py-1 bg-red-100 text-red-700 text-sm">
                     {gap}
                   </span>
                 ))}
@@ -243,13 +243,13 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
                 <div className="flex gap-1">
                   {/* Team bar */}
                   <div
-                    className="h-6 bg-primary rounded"
+                    className="h-6 bg-primary"
                     style={{ width: `${teamScore}%` }}
                     title={`Team: ${teamScore}`}
                   />
                   {/* Peer bar */}
                   <div
-                    className="h-6 bg-gray-300 rounded"
+                    className="h-6 bg-gray-300"
                     style={{ width: `${peerScore}%` }}
                     title={`Peer: ${peerScore}`}
                   />
@@ -270,13 +270,13 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
         
         <div className="space-y-4">
           {benchmark.results.map(result => (
-            <div key={result.member_id} className="border border-border rounded-none">
+            <div key={result.member_id} className="border border-border">
               <div
                 className="flex items-center justify-between p-4 cursor-pointer hover:bg-bg-alt"
                 onClick={() => setExpandedMember(expandedMember === result.member_id ? null : result.member_id)}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                  <div className="w-10 h-10 bg-primary/10 flex items-center justify-center text-primary font-bold">
                     {result.member_name.charAt(0)}
                   </div>
                   <span className="font-medium text-text-primary">{result.member_name}</span>
@@ -295,7 +295,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
                         <span className="text-sm text-text-primary">{formatDimensionName(dim)}</span>
                         <div className="flex items-center gap-4">
                           <span className="text-sm text-text-muted">Score: {score}</span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getPercentileColor(percentile)}`}>
+                          <span className={`px-2 py-0.5 text-xs font-medium ${getPercentileColor(percentile)}`}>
                             {percentile}th percentile
                           </span>
                         </div>
@@ -320,7 +320,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
                 <th className="text-left text-sm font-medium text-text-muted p-2">Member</th>
                 {dimensions.map(dim => (
                   <th key={dim} className="text-center text-xs font-medium text-text-muted p-2">
-                    {formatDimensionName(dim).split(' ')[0]}
+                    {formatDimensionName(dim).split('')[0]}
                   </th>
                 ))}
               </tr>
@@ -339,7 +339,7 @@ export function BenchmarkReport({ benchmarkId }: BenchmarkReportProps) {
                     return (
                       <td key={dim} className="p-1">
                         <div
-                          className={`w-full h-8 rounded ${bgColor} flex items-center justify-center text-xs font-medium ${
+                          className={`w-full h-8 ${bgColor} flex items-center justify-center text-xs font-medium ${
                             percentile >= 60 ? 'text-white' : 'text-gray-700'
                           }`}
                           title={`${formatDimensionName(dim)}: ${percentile}th percentile`}

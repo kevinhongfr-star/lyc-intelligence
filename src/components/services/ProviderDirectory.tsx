@@ -66,7 +66,7 @@ export default function ProviderDirectory() {
                 ? 'bg-[#C108AB] text-white'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary hover:bg-bg-tertiary'
             }`}
-            style={{ borderRadius: 0 }}
+            style={{ }}
           >
             {spec}
           </button>
@@ -81,7 +81,7 @@ export default function ProviderDirectory() {
             <div
               key={provider.name}
               className="bg-bg-primary border border-bg-tertiary"
-              style={{ borderRadius: 0 }}
+              style={{ }}
             >
               <button
                 onClick={() =>
@@ -91,7 +91,7 @@ export default function ProviderDirectory() {
               >
                 <span
                   className="w-10 h-10 flex-shrink-0 flex items-center justify-center text-sm font-bold text-white"
-                  style={{ borderRadius: 0, backgroundColor: provider.avatarColor }}
+                  style={{  backgroundColor: provider.avatarColor }}
                 >
                   {provider.name.charAt(0)}
                 </span>
@@ -122,7 +122,7 @@ export default function ProviderDirectory() {
                       <span
                         key={spec}
                         className="px-2 py-0.5 text-xs font-medium bg-accent-10 text-accent"
-                        style={{ borderRadius: 0 }}
+                        style={{ }}
                       >
                         {spec}
                       </span>
@@ -133,7 +133,7 @@ export default function ProviderDirectory() {
                       <div
                         key={s.id}
                         className="flex items-center justify-between p-3 bg-bg-secondary"
-                        style={{ borderRadius: 0 }}
+                        style={{ }}
                       >
                         <div>
                           <p className="text-sm font-medium text-text-primary">{s.name}</p>

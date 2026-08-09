@@ -18,7 +18,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 function PriorityBadge({ score }: { score: number }) {
   const color = score >= 85 ? '#EF4444' : score >= 70 ? '#F59E0B' : score >= 50 ? '#3B82F6' : '#94A3B8';
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ backgroundColor: `${color}20`, color }}>
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold" style={{ backgroundColor: `${color}20`, color }}>
       <TrendingUp size={9} />
       {score}
     </span>
@@ -48,9 +48,9 @@ export function NotificationsPage() {
           <p className="text-text-secondary">{pendingCount} pending · {highPriorityCount} high priority</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setFilter('all')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${filter === 'all' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>All ({notifications.length})</button>
-          <button onClick={() => setFilter('pending')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${filter === 'pending' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Pending ({pendingCount})</button>
-          <button onClick={() => setFilter('high')} className={`px-3 py-2 text-sm rounded-none min-h-[44px] ${filter === 'high' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>High Priority ({highPriorityCount})</button>
+          <button onClick={() => setFilter('all')} className={`px-3 py-2 text-sm min-h-[44px] ${filter === 'all' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>All ({notifications.length})</button>
+          <button onClick={() => setFilter('pending')} className={`px-3 py-2 text-sm min-h-[44px] ${filter === 'pending' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>Pending ({pendingCount})</button>
+          <button onClick={() => setFilter('high')} className={`px-3 py-2 text-sm min-h-[44px] ${filter === 'high' ? 'bg-accent text-white' : 'bg-bg-tertiary text-text-muted'}`}>High Priority ({highPriorityCount})</button>
         </div>
       </div>
 
@@ -79,7 +79,7 @@ export function NotificationsPage() {
                     <div className="flex-1 min-w-0 space-y-2">
                       <div className="flex items-center gap-2">
                         <Badge variant="default" className="text-[10px]">{n.action_type}</Badge>
-                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusColor.bg} ${statusColor.text}`}>
+                        <span className={`text-[10px] font-medium px-2 py-0.5 ${statusColor.bg} ${statusColor.text}`}>
                           {n.status}
                         </span>
                         {n.due_date && (
@@ -95,7 +95,7 @@ export function NotificationsPage() {
                       </p>
 
                       {n.commercial_rationale && (
-                        <div className="bg-bg-tertiary/50 rounded-none p-3 mt-2">
+                        <div className="bg-bg-tertiary/50 p-3 mt-2">
                           <p className="text-[10px] font-bold text-accent uppercase tracking-wider mb-1">Commercial Rationale</p>
                           <p className="text-[11px] text-text-secondary leading-relaxed">{n.commercial_rationale}</p>
                         </div>
