@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LYC Intelligence — Your AI Leadership Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ============================================================ */
+    /* COLOR TOKENS — source: NEXUS Full System Design Spec v1   */
+    /* ============================================================ */
+    --ink: #0F1115;
+    --ink-90: rgba(15,17,21,0.9);
+    --ink-70: rgba(15,17,21,0.7);
+    --ink-50: rgba(15,17,21,0.5);
+    --ink-15: rgba(15,17,21,0.15);
+    --ink-08: rgba(15,17,21,0.08);
+    --fuchsia: #C108AB;
+    --fuchsia-dark: #9E078D;
+    --fuchsia-15: rgba(193,8,171,0.15);
+    --fuchsia-10: rgba(193,8,171,0.10);
+    --off: #F5F5F3;
+    --g100: #FAFAFA;
+    --g200: #E8E8E5;
+    --g300: #D4D4D1;
+    --g400: #9CA3AF;
+    --g600: #4B5563;
+    --g800: #1F2937;
+    --teal: #0D9488;
+    --teal-dark: #0F766E;
+    --teal-15: rgba(13,148,136,0.15);
+    --success: #059669;
+    --warning: #D97706;
+    --error: #DC2626;
+    --white: #FFFFFF;
+
+    /* Opacity scale */
+    --opacity-full: 1;
+    --opacity-high: 0.7;
+    --opacity-mid: 0.5;
+    --opacity-low: 0.3;
+    --opacity-faint: 0.1;
+
+    /* Typography scale */
+    --fs-display: 52px;
+    --fs-h1: 38px;
+    --fs-h2: 28px;
+    --fs-h3: 22px;
+    --fs-h4: 18px;
+    --fs-body-lg: 18px;
+    --fs-body: 16px;
+    --fs-body-sm: 14px;
+    --fs-caption: 13px;
+    --fs-mono-lg: 12px;
+    --fs-mono: 11px;
+    --fs-mono-sm: 10px;
+    --fs-btn: 14px;
+    --fs-btn-sm: 13px;
+
+    /* Spacing scale (base 4px) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
+    --space-25: 100px;
+    --space-30: 120px;
+
+    /* Motion & transition */
+    --dur-fast: 120ms;
+    --dur-base: 200ms;
+    --dur-slow: 350ms;
+    --dur-slower: 500ms;
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+    --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+    --ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 940px; margin: 0 auto; padding: 0 32px; }
+  h1, h2, h3, h4 {
+    font-family: 'Crimson Pro', serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  h1 { font-size: 52px; }
+  h2 { font-size: 38px; }
+  h3 { font-size: 24px; }
+  h4 { font-size: 18px; }
+  em { font-style: italic; color: var(--fuchsia); }
+  .mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .btn {
+    display: inline-block;
+    padding: 14px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    border-radius: 6px;
+  }
+  .btn-primary { background: var(--ink); color: white; }
+  .btn-primary:hover { background: var(--fuchsia); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+  }
+  .btn-secondary:hover { background: var(--ink); color: white; }
+  .btn-light {
+    background: white;
+    color: var(--ink);
+  }
+  .btn-light:hover { background: var(--fuchsia); color: white; }
+  .btn-outline-light {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  .btn-outline-light:hover { background: white; color: var(--ink); }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    background: rgba(15,17,21,0.85);
+    backdrop-filter: blur(12px);
+  }
+  .nav-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 32px;
+    max-width: 940px;
+    margin: 0 auto;
+  }
+  .nav-brand {
+    font-family: 'Crimson Pro', serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    color: white;
+  }
+  .nav-links { display: flex; gap: 28px; list-style: none; align-items: center; }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    color: white;
+    text-decoration: none;
+    opacity: 0.7;
+  }
+  .nav-links a:hover { opacity: 1; }
+  .nav-cta {
+    padding: 10px 20px;
+    background: var(--fuchsia);
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 6px;
+  }
+  .nav-cta:hover { opacity: 0.9; }
+
+  /* HERO — DARK */
+  .hero {
+    background: var(--ink);
+    color: white;
+    padding: 180px 0 140px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(193,8,171,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero .container { position: relative; z-index: 1; }
+  .hero .eyebrow {
+    color: var(--fuchsia);
+    margin-bottom: 28px;
+    display: inline-block;
+  }
+  .hero h1 {
+    max-width: 760px;
+    margin: 0 auto 24px;
+    color: white;
+  }
+  .hero .subcopy {
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto 40px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+  }
+  .hero .ctas {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 60px;
+  }
+  .hero .powered-by {
+    margin-top: 60px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.4);
+  }
+  .hero .powered-by strong {
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+  }
+  .hero-divider {
+    width: 1px;
+    height: 60px;
+    background: rgba(255,255,255,0.15);
+    margin: 0 auto;
+  }
+
+  /* SECTION COMMON */
+  section { padding: 100px 0; }
+  section.alt { background: var(--g100); }
+  section.dark { background: var(--ink); color: white; }
+  .section-label {
+    color: var(--fuchsia);
+    margin-bottom: 20px;
+    display: inline-block;
+  }
+  .section-header {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 64px;
+  }
+  .section-header h2 { margin-bottom: 20px; }
+  .section-header p {
+    font-size: 17px;
+    color: var(--g600);
+    line-height: 1.6;
+  }
+
+  /* CAPABILITIES SECTION */
+  .cap-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--g200);
+    border: 1px solid var(--g200);
+  }
+  .cap-card {
+    border-radius: 6px;
+    background: white;
+    padding: 40px 36px;
+  }
+  .cap-card .cap-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--g100);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--fuchsia);
+    font-weight: 500;
+  }
+  .cap-card h3 { margin-bottom: 12px; font-size: 22px; }
+  .cap-card p { color: var(--g600); font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+  .cap-card .cap-link {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fuchsia);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .cap-card .cap-link:hover { text-decoration: underline; }
+
+  /* B2C vs B2B SPLIT */
+  .split-section { padding: 100px 0; }
+  .split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .split-card {
+    padding: 48px 40px;
+    background: white;
+    border: 1px solid var(--g200);
+  }
+  .split-card.dark {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+  .split-card .split-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--fuchsia);
+    margin-bottom: 20px;
+    display: block;
+  }
+  .split-card h3 {
+    font-size: 30px;
+    margin-bottom: 16px;
+  }
+  .split-card.dark h3 { color: white; }
+  .split-card p {
+    color: var(--g600);
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+  .split-card.dark p { color: rgba(255,255,255,0.6); }
+  .split-card ul {
+    list-style: none;
+    margin-bottom: 32px;
+  }
+  .split-card li {
+    padding: 10px 0;
+    font-size: 14px;
+    border-bottom: 1px solid var(--g200);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .split-card.dark li { border-bottom-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+  .split-card li::before {
+    content: "→";
+    color: var(--fuchsia);
+    font-weight: 700;
+    font-size: 12px;
+  }
+
+  /* TRUST SECTION */
+  .trust-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 64px;
+    flex-wrap: wrap;
+  }
+  .trust-item {
+    text-align: center;
+  }
+  .trust-item .trust-brand {
+    font-family: 'Crimson Pro', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .trust-item .trust-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--g400);
+    margin-top: 6px;
+  }
+  .trust-divider {
+    width: 1px;
+    height: 40px;
+    background: var(--g200);
+  }
+  .trust-statement {
+    text-align: center;
+    max-width: 600px;
+    margin: 48px auto 0;
+    padding-top: 48px;
+    border-top: 1px solid var(--g200);
+  }
+  .trust-statement p {
+    font-size: 17px;
+    color: var(--g600);
+    line-height: 1.6;
+  }
+
+  /* FINAL CTA */
+  .final-cta {
+    border-radius: 6px;
+    background: var(--ink);
+    color: white;
+    text-align: center;
+    padding: 120px 0;
+  }
+  .final-cta .mono { color: var(--fuchsia); margin-bottom: 20px; display: block; }
+  .final-cta h2 {
+    color: white;
+    max-width: 640px;
+    margin: 0 auto 20px;
+    font-size: 42px;
+  }
+  .final-cta p {
+    color: rgba(255,255,255,0.6);
+    max-width: 520px;
+    margin: 0 auto 36px;
+    font-size: 17px;
+  }
+  .final-cta .ctas { display: flex; gap: 16px; justify-content: center; }
+  .final-cta .btn-primary { background: var(--fuchsia); color: white; }
+
+  /* FOOTER */
+  footer {
+    background: var(--g100);
+    padding: 64px 0 32px;
+    border-top: 1px solid var(--g200);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 48px;
+  }
+  .footer-brand h4 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  .footer-brand p {
+    color: var(--g600);
+    font-size: 14px;
+    max-width: 280px;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+  .footer-col h5 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--g400);
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 10px; }
+  .footer-col a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 14px;
+    opacity: 0.7;
+  }
+  .footer-col a:hover { opacity: 1; color: var(--fuchsia); }
+  .footer-bottom {
+    padding-top: 32px;
+    border-top: 1px solid var(--g200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--g400);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+
+  /* PERSONA GRID (B2C-first "Who it's for") */
+  .persona-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--g200);
+    border: 1px solid var(--g200);
+  }
+  .persona-card {
+    border-radius: 6px;
+    background: white;
+    padding: 44px 32px;
+  }
+  .persona-card.persona-featured {
+    background: var(--ink);
+    color: white;
+  }
+  .persona-icon {
+    font-size: 24px;
+    color: var(--fuchsia);
+    margin-bottom: 24px;
+    font-weight: 700;
+  }
+  .persona-card h3 {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+  .persona-card.persona-featured h3 { color: white; }
+  .persona-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--g400);
+    margin-bottom: 16px;
+  }
+  .persona-card.persona-featured .persona-sub { color: rgba(255,255,255,0.5); }
+  .persona-card > p:nth-of-type(2) {
+    color: var(--g600);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  .persona-card.persona-featured > p:nth-of-type(2) { color: rgba(255,255,255,0.7); }
+  .persona-card ul {
+    list-style: none;
+  }
+  .persona-card li {
+    padding: 10px 0;
+    font-size: 13px;
+    border-bottom: 1px solid var(--g200);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--g600);
+  }
+  .persona-card.persona-featured li {
+    border-bottom-color: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+  }
+  .persona-card li::before {
+    content: "→";
+    color: var(--fuchsia);
+    font-weight: 700;
+    font-size: 11px;
+  }
+
+  /* B2B TEASER BAND */
+  .b2b-teaser {
+    border-radius: 6px;
+    background: var(--ink);
+    color: white;
+    padding: 64px 0;
+  }
+  .b2b-teaser-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 48px;
+  }
+  .b2b-teaser .mono { color: var(--fuchsia); margin-bottom: 8px; display: block; font-size: 10px; }
+  .b2b-teaser h3 {
+    font-size: 28px;
+    color: white;
+    margin-bottom: 8px;
+  }
+  .b2b-teaser p {
+    color: rgba(255,255,255,0.6);
+    font-size: 15px;
+    max-width: 480px;
+  }
+  .b2b-teaser .btn { white-space: nowrap; }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 36px; }
+    h2 { font-size: 28px; }
+    .container { padding: 0 20px; }
+    .nav-inner { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 140px 0 80px; }
+    .hero .ctas { flex-direction: column; align-items: center; }
+    .cap-grid { grid-template-columns: 1fr; }
+    .split-grid { grid-template-columns: 1fr; }
+    .trust-row { flex-direction: column; gap: 32px; }
+    .trust-divider { display: none; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    section { padding: 72px 0; }
+    .final-cta .ctas { flex-direction: column; align-items: center; }
+    .persona-grid { grid-template-columns: 1fr; }
+    .b2b-teaser-inner { flex-direction: column; text-align: center; align-items: center; }
+    .b2b-teaser .btn { width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">LYC Intelligence</a>
+    <ul class="nav-links">
+      <li><a href="/nexus">NEXUS</a></li>
+      <li><a href="#capabilities">Capabilities</a></li>
+      <li><a href="#solutions">Solutions</a></li>
+      <li><a href="/dex-ai">DEX AI</a></li>
+    </ul>
+    <a href="/nexus#start" class="nav-cta">Get Started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <span class="mono eyebrow">LYC Intelligence presents</span>
+    <h1>Grow as a leader.<br><em>Your coach is always on.</em></h1>
+    <p class="subcopy">NEXUS is an AI leadership coach built on 10+ years of executive search intelligence. Get instant feedback, benchmark yourself against global leaders, and move your career forward — on your schedule.</p>
+    <div class="ctas">
+      <a href="/nexus#start" class="btn btn-light">Start Free — Executive Introduction</a>
+      <a href="/nexus" class="btn btn-outline-light">See How It Works</a>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="powered-by">Powered by <strong>DEX AI</strong></div>
+  </div>
+</section>
+
+<!-- WHAT YOUR COACH DOES -->
+<section id="capabilities">
+  <div class="container">
+    <div class="section-header">
+      <span class="mono section-label">What your coach does</span>
+      <h2>Four ways NEXUS <em>moves you forward</em></h2>
+      <p>One AI coach. Four executive capabilities. Built for leaders who take their growth seriously.</p>
+    </div>
+    <div class="cap-grid">
+      <div class="cap-card">
+        <div class="cap-icon">01</div>
+        <h3>AI Advisory Chat</h3>
+        <p>Executive-level coaching on career moves, leadership challenges, and high-stakes decisions — grounded in LYC frameworks and your personal context.</p>
+        <a href="/nexus" class="cap-link">Talk to your coach →</a>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">02</div>
+        <h3>Leadership Diagnostics</h3>
+        <p>The China Leadership Pipeline Diagnostic plus five more leadership assessments — benchmarked against executives in 47 markets.</p>
+        <a href="/nexus#diagnostics" class="cap-link">See the diagnostics →</a>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">03</div>
+        <h3>Role Fit Analysis</h3>
+        <p>AI-powered dimensional analysis of how well you fit any role. Know where you're strong and where to invest before you apply.</p>
+        <a href="/nexus" class="cap-link">Check your fit →</a>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">04</div>
+        <h3>Market Intelligence</h3>
+        <p>Understand where you stand in the talent market — compensation benchmarks, demand patterns, and competitive landscape.</p>
+        <a href="/nexus" class="cap-link">See market data →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="alt" id="who-its-for">
+  <div class="container">
+    <div class="section-header">
+      <span class="mono section-label">Who it's for</span>
+      <h2>Built for leaders <em>who take growth seriously</em></h2>
+      <p>Whether you're climbing the ladder, navigating a transition, or leading at the top — NEXUS meets you where you are.</p>
+    </div>
+    <div class="persona-grid">
+      <div class="persona-card">
+        <div class="persona-icon">▲</div>
+        <h3>Ascending Leaders</h3>
+        <p class="persona-sub">Directors & Senior Managers</p>
+        <p>You're on the cusp of the executive level. NEXUS helps you identify gaps, build your leadership brand, and prepare for the next move.</p>
+        <ul>
+          <li>Baseline diagnostic to see where you stand</li>
+          <li>Targeted development recommendations</li>
+          <li>Role-fit analysis for your next role</li>
+        </ul>
+      </div>
+      <div class="persona-card persona-featured">
+        <div class="persona-icon">◆</div>
+        <h3>Executives in Transition</h3>
+        <p class="persona-sub">VP & C-level changers</p>
+        <p>You're navigating a career pivot or actively exploring options. NEXUS gives you the intelligence to make the right move.</p>
+        <ul>
+          <li>Market positioning & compensation benchmarking</li>
+          <li>Executive-level interview prep</li>
+          <li>Decision coaching on offers & opportunities</li>
+        </ul>
+      </div>
+      <div class="persona-card">
+        <div class="persona-icon">●</div>
+        <h3>Sitting Executives</h3>
+        <p class="persona-sub">C-suite & Business Heads</p>
+        <p>You're already at the top. NEXUS keeps you sharp — with fresh perspectives, market context, and an always-available sounding board.</p>
+        <ul>
+          <li>On-demand leadership advisory</li>
+          <li>Talent market intelligence</li>
+          <li>Team & organizational diagnostics</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- B2B TEASER BAND -->
+<section class="b2b-teaser" id="for-business">
+  <div class="container">
+    <div class="b2b-teaser-inner">
+      <div>
+        <span class="mono">Also for business</span>
+        <h3>NEXUS for teams and organizations</h3>
+        <p>Enterprise-grade diagnostics, screening, and market intelligence for talent teams and search firms.</p>
+      </div>
+      <a href="/nexus#for-business" class="btn btn-outline-light">Enterprise solutions →</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST SECTION -->
+<section>
+  <div class="container">
+    <div class="section-header">
+      <span class="mono section-label">Why you can trust it</span>
+      <h2>Built on real expertise. <em>Validated by real data.</em></h2>
+    </div>
+    <div class="trust-row">
+      <div class="trust-item">
+        <div class="trust-brand">LYC Partners</div>
+        <div class="trust-sub">10+ years executive search</div>
+      </div>
+      <div class="trust-divider"></div>
+      <div class="trust-item">
+        <div class="trust-brand">DEX AI</div>
+        <div class="trust-sub">The intelligence engine</div>
+      </div>
+      <div class="trust-divider"></div>
+      <div class="trust-item">
+        <div class="trust-brand">47 Markets</div>
+        <div class="trust-sub">Global benchmark data</div>
+      </div>
+    </div>
+    <div class="trust-statement">
+      <p>Not generic AI. Not HR tech. NEXUS is built by people who've spent 10+ years in executive search and leadership assessment. The frameworks are proven. The data is real — from 47 markets and thousands of executive placements. The AI just puts it in your hands, on demand.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <span class="mono">Ready when you are</span>
+    <h2>Leadership isn't a title.<br><em>It's a trajectory.</em></h2>
+    <p>Start with the free Executive Introduction. About 15 minutes. Personalized insights. No credit card required.</p>
+    <div class="ctas">
+      <a href="/nexus#start" class="btn btn-primary">Start — Executive Introduction</a>
+      <a href="/nexus" class="btn btn-outline-light">Learn more about NEXUS</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h4>LYC Intelligence</h4>
+        <p>AI-powered leadership intelligence for executives and organizations that take talent seriously. Powered by DEX AI.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="/nexus">NEXUS</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">For Business</a></li>
+          <li><a href="/dex-ai">DEX AI</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">LYC Partners</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+          <li><a href="#">Security</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 LYC Intelligence. All rights reserved.</span>
+      <span>Powered by DEX AI</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
