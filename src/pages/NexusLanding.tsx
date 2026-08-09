@@ -82,7 +82,7 @@ function Nav() {
         <a href="#start" style={{ padding: '10px 20px', background: INK, color: WHITE, fontSize: 13, fontWeight: 500, textDecoration: 'none', borderRadius: 0, border: `1px solid ${INK}`, transition: 'background 200ms ease, border-color 200ms ease', minHeight: 40, display: 'inline-flex', alignItems: 'center' }}
           onMouseEnter={(e) => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.borderColor = ACCENT; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = INK; e.currentTarget.style.borderColor = INK; }}>
-          Start free
+          Start — Executive Introduction
         </a>
         <button
           className="nav-toggle-btn"
@@ -104,7 +104,7 @@ function Nav() {
                 { href: '#diagnostics', label: 'Diagnostics' },
                 { href: '#pricing', label: 'Pricing' },
                 { href: '#for-business', label: 'For Business' },
-                { href: '#start', label: 'Start free', primary: true },
+                { href: '#start', label: 'Start', primary: true },
               ].map(l => (
                 <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
                   style={{ display: 'block', fontSize: 16, color: INK, textDecoration: 'none', padding: '14px 0', borderBottom: `1px solid ${G200}`, minHeight: 44, fontWeight: l.primary ? 600 : 500, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
@@ -141,7 +141,7 @@ function Hero() {
           <a href="#start" style={btnPrimary}
             onMouseEnter={(e) => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.borderColor = ACCENT; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = INK; e.currentTarget.style.borderColor = INK; }}>
-            Start free — Executive Introduction
+            Start with Executive Introduction
           </a>
           <a href="#how-it-works" style={btnSecondary}
             onMouseEnter={(e) => { e.currentTarget.style.background = INK; e.currentTarget.style.color = WHITE; }}
@@ -268,7 +268,7 @@ function Diagnostics() {
           <a href="#start" style={{ ...btnPrimary, background: ACCENT, borderColor: ACCENT }}
             onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}>
-            Take your first diagnostic — free
+            Take your first diagnostic
           </a>
         </div>
       </div>
@@ -332,7 +332,7 @@ function B2BTeaser() {
 
 // ── PRICING ────────────────────────────────────────────────────────
 const PLANS = [
-  { label: 'Start', title: 'Executive Introduction', price: 'Free', small: null, desc: 'Get your first leadership diagnostic and initial advisory session. No credit card.', bullets: ['China Leadership Pipeline Diagnostic', 'Full narrative report', 'Initial advisory conversation', 'Basic profile'], cta: 'Start Free', href: '#start', featured: false },
+  { label: 'Start', title: 'Executive Introduction', price: '', small: null, desc: 'Get your first leadership diagnostic and initial advisory session. No credit card.', bullets: ['China Leadership Pipeline Diagnostic', 'Full narrative report', 'Initial advisory conversation', 'Basic profile'], cta: 'Start — Executive Introduction', href: '#start', featured: false },
   { label: 'Most Popular', title: 'Executive Access', price: 'From $29', small: '/month', desc: 'Full access to all diagnostics, unlimited advisory chat, and role fit analysis.', bullets: ['All 6 leadership diagnostics', 'Unlimited AI advisory chat', 'Role Fit Analysis — unlimited', 'Development tracking', 'Market intelligence access'], cta: 'Start Executive Access', href: '#start', featured: true },
   { label: 'Enterprise', title: 'For Teams & Firms', price: 'Custom', small: null, desc: 'Full platform for organizations, search firms, and talent teams.', bullets: ['Bulk candidate screening', 'Team pipeline diagnostics', 'Custom benchmarking', 'Dedicated support', 'API access'], cta: 'Talk to Sales', href: '#for-business', featured: false },
 ];
@@ -376,7 +376,7 @@ function Pricing() {
       <div style={containerStyle}>
         <div style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Pricing</span>
-          <h2 className="section-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Start for free. <em style={{ fontWeight: 400 }}>Grow when you're ready.</em></h2>
+          <h2 className="section-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Start with Executive Introduction. <em style={{ fontWeight: 400 }}>Grow when you're ready.</em></h2>
           <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>Three tiers designed for where you are today — with clear paths forward.</p>
         </div>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: G200, border: `1px solid ${G200}` }}>
@@ -434,11 +434,11 @@ function FinalCTA() {
       <div style={containerStyle}>
         <span style={{ ...monoStyle, color: ACCENT, marginBottom: 20, display: 'block' }}>Ready when you are</span>
         <h2 className="section-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", color: WHITE, maxWidth: 640, margin: '0 auto 20px', fontSize: 42, fontWeight: 700, lineHeight: 1.15 }}>Leadership isn't a title.<br /><em style={{ fontWeight: 400 }}>It's a trajectory.</em></h2>
-        <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 520, margin: '0 auto 36px', fontSize: 17, lineHeight: 1.6 }}>Start with the free Executive Introduction. No credit card required. About 15 minutes.</p>
+        <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 520, margin: '0 auto 36px', fontSize: 17, lineHeight: 1.6 }}>Start with the Executive Introduction. No credit card required. About 15 minutes.</p>
         <Link to="/nexus/chat" style={{ ...btnPrimary, background: ACCENT, color: WHITE, borderColor: ACCENT, padding: '16px 36px' }}
           onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
           onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}>
-          Start free — Executive Introduction
+          Start — Executive Introduction
         </Link>
       </div>
     </section>
