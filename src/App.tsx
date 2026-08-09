@@ -29,7 +29,7 @@ const AppShell = lazy(() => import('@/components/shell/AppShell').then(m => ({ d
 const AssessmentPage = lazy(() => import('@/pages/AssessmentPage').then(m => ({ default: m.AssessmentPage })));
 const B2BLanding = lazy(() => import('@/pages/B2BLanding').then(m => ({ default: m.B2BLanding })));
 const B2CLanding = lazy(() => import('@/pages/B2CLanding').then(m => ({ default: m.B2CLanding })));
-const NexusLanding = lazy(() => import('@/pages/NexusPage').then(m => ({ default: m.NexusPage })));
+const NexusLanding = lazy(() => import('@/pages/NexusLanding').then(m => ({ default: m.NexusLanding })));
 const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m.MatchPage })));
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
 
@@ -175,8 +175,9 @@ export default function App() {
           <Route path="/cpi" element={<Navigate to="/china-leadership-pipeline" replace />} />
           <Route path="/china-leadership-pipeline" element={<AssessmentPage />} />
           <Route path="/b2b" element={<B2BLanding />} />
-          <Route path="/b2c" element={<B2CLanding />} />
+          <Route path="/b2c" element={<Navigate to="/nexus" replace />} />
           <Route path="/nexus" element={<NexusLanding />} />
+          <Route path="/nexus/chat" element={<ProtectedRoute><NexusPage /></ProtectedRoute>} />
           <Route path="/match" element={<MatchPage />} />
           <Route path="/pricing" element={<PricingPage />} />
 
