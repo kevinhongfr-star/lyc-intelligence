@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Shield } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { getDefaultRoute } from '@/components/auth/PostLoginRedirect';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -55,7 +56,14 @@ export function LoginPage() {
     setLoading(false);
 
     if (result.success) {
-      navigate('/platform');
+      // Load profile to determine user role before redirecting
+      const store = useAuthStore.getState?.() || {};
+      if (store.loadProfile) {
+        await store.loadProfile();
+      }
+      const profile = useAuthStore.getState?.().profile;
+      const target = getDefaultRoute(profile?.role);
+      navigate(target);
     } else {
       setError(result.error || 'Invalid credentials. Please try again.');
     }

@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, MessageSquare, Trash2 } from 'lucide-react';
+import { Send, Loader2, MessageSquare, Trash2, UserPlus, ArrowRight } from 'lucide-react';
 import { sendChatMessage } from '@/services/coze';
-import { useAuth } from '@/contexts';
+import { useAuthStore } from '@/stores/authStore';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface Message { role: 'user' | 'assistant'; content: string; }
+
+const GUEST_MESSAGE_LIMIT = 3;
+const GUEST_STORAGE_KEY = 'nexus_guest_messages';
 
 const customComponents = {
   table: ({ children }: any) => (
@@ -50,22 +54,60 @@ const customComponents = {
   em: ({ children }: any) => <em className="italic text-gray-300">{children}</em>,
 };
 
+function getGuestCount(): number {
+  try {
+    return parseInt(localStorage.getItem(GUEST_STORAGE_KEY) || '0', 10);
+  } catch {
+    return 0;
+  }
+}
+
+function setGuestCount(count: number) {
+  try {
+    localStorage.setItem(GUEST_STORAGE_KEY, String(count));
+  } catch {}
+}
+
 export function NexusPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuthStore();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [guestCount, setGuestCountState] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const isGuest = !user;
+  const remaining = isGuest ? Math.max(0, GUEST_MESSAGE_LIMIT - guestCount) : Infinity;
+  const showGuestLimit = isGuest && guestCount >= GUEST_MESSAGE_LIMIT;
+
+  useEffect(() => {
+    if (isGuest) {
+      setGuestCountState(getGuestCount());
+    }
+  }, [isGuest]);
 
   const send = async () => {
     if (!input.trim() || loading) return;
+    if (showGuestLimit) {
+      navigate('/signup');
+      return;
+    }
+
     const userMsg = input.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setLoading(true);
-    const response = await sendChatMessage(userMsg, user?.id || 'anonymous', messages.slice(-10));
+
+    const response = await sendChatMessage(userMsg, user?.id || 'guest-anonymous', messages.slice(-10));
     setMessages(prev => [...prev, { role: 'assistant', content: response }]);
     setLoading(false);
+
+    if (isGuest) {
+      const newCount = guestCount + 1;
+      setGuestCountState(newCount);
+      setGuestCount(newCount);
+    }
   };
 
   const clearChat = () => setMessages([]);
@@ -79,11 +121,30 @@ export function NexusPage() {
           <h1 className="text-2xl font-serif font-bold text-text-primary">Nexus</h1>
           <p className="text-text-muted text-sm">Your LYC Intelligence assistant — ask about cross-border leadership, career strategy, and executive positioning</p>
         </div>
-        {messages.length > 0 && (
-          <button onClick={clearChat} className="flex items-center gap-1.5 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary min-h-[44px]">
-            <Trash2 className="w-3.5 h-3.5" /> Clear
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {isGuest && (
+            <div className="text-sm text-text-muted">
+              {remaining > 0 ? (
+                <span>{remaining} complimentary message{remaining === 1 ? '' : 's'} remaining</span>
+              ) : (
+                <span className="text-accent">Executive Introduction limit reached</span>
+              )}
+            </div>
+          )}
+          {isGuest && (
+            <Link
+              to="/signup"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm bg-accent text-white hover:bg-accent-light transition-colors"
+            >
+              <UserPlus className="w-3.5 h-3.5" /> Sign up for more
+            </Link>
+          )}
+          {messages.length > 0 && (
+            <button onClick={clearChat} className="flex items-center gap-1.5 px-3 py-2 text-sm text-text-muted hover:text-text-primary bg-bg-tertiary min-h-[44px]">
+              <Trash2 className="w-3.5 h-3.5" /> Clear
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-auto bg-bg-secondary border border-bg-tertiary p-4 space-y-4">
@@ -91,6 +152,11 @@ export function NexusPage() {
           <div className="text-text-muted text-center py-12">
             <MessageSquare className="w-8 h-8 mx-auto mb-3 opacity-50" />
             <p className="font-medium mb-2">Nexus is ready</p>
+            {isGuest && (
+              <p className="text-sm mb-4 text-text-muted">
+                Start with {GUEST_MESSAGE_LIMIT} complimentary messages — no account needed
+              </p>
+            )}
             <div className="grid grid-cols-2 gap-2 max-w-md mx-auto text-sm">
               {['How do I position for a cross-border role?', 'What makes a strong leadership profile?', 'What do boards look for in C-suite candidates?', 'How should I prepare for a board interview?'].map(q => (
                 <button key={q} onClick={() => { setInput(q); }} className="p-2 bg-bg-tertiary hover:bg-bg-hover text-text-secondary text-left transition-colors">{q}</button>
@@ -120,6 +186,23 @@ export function NexusPage() {
             </div>
           </div>
         )}
+        {showGuestLimit && !loading && (
+          <div className="bg-accent/10 border border-accent/30 p-6 text-center">
+            <UserPlus className="w-8 h-8 mx-auto mb-3 text-accent" />
+            <h3 className="font-serif text-lg font-bold text-text-primary mb-2">
+              You've used your complimentary messages
+            </h3>
+            <p className="text-text-muted text-sm mb-4">
+              Create an Executive Introduction account for 5 daily credits, full assessments, and personalized insights.
+            </p>
+            <Link
+              to="/signup"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent text-white text-sm font-medium hover:bg-accent-light transition-colors"
+            >
+              Sign up free <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
 
@@ -128,12 +211,13 @@ export function NexusPage() {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
-          placeholder="Ask Nexus about career positioning, cross-border leadership..."
-          className="flex-1 px-4 py-3 bg-bg-secondary border border-bg-tertiary text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent min-h-[44px]"
+          placeholder={showGuestLimit ? "Sign up to continue chatting..." : "Ask Nexus about career positioning, cross-border leadership..."}
+          disabled={showGuestLimit}
+          className="flex-1 px-4 py-3 bg-bg-secondary border border-bg-tertiary text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent min-h-[44px] disabled:opacity-50"
         />
         <button
           onClick={send}
-          disabled={loading || !input.trim()}
+          disabled={loading || !input.trim() || showGuestLimit}
           className="px-4 py-3 bg-accent hover:bg-accent-light text-white min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-50 transition-colors"
         >
           <Send className="w-4 h-4" />
@@ -142,3 +226,5 @@ export function NexusPage() {
     </div>
   );
 }
+
+export default NexusPage;

@@ -184,7 +184,7 @@ export default function App() {
           <Route path="/b2b" element={<B2BLanding />} />
           <Route path="/b2c" element={<Navigate to="/nexus" replace />} />
           <Route path="/nexus" element={<NexusLanding />} />
-          <Route path="/nexus/chat" element={<ProtectedRoute><NexusPage /></ProtectedRoute>} />
+          <Route path="/nexus/chat" element={<NexusPage />} />
           {/* ── Phase 14: Assessment diagnostic landing pages ── */}
           <Route path="/prism" element={<PrismLanding />} />
           <Route path="/prism/take" element={<PrismTakePage />} />
