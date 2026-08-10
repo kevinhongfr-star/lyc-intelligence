@@ -33,6 +33,7 @@ const NexusLanding = lazy(() => import('@/pages/NexusLanding').then(m => ({ defa
 const DexAiPage = lazy(() => import('@/pages/DexAiPage').then(m => ({ default: m.DexAiPage })));
 const PrismLanding = lazy(() => import('@/pages/PrismLanding').then(m => ({ default: m.PrismLanding })));
 const PrismTakePage = lazy(() => import('@/pages/PrismTakePage').then(m => ({ default: m.PrismTakePage })));
+const PrismResultsPage = lazy(() => import('@/pages/PrismResultsPage').then(m => ({ default: m.PrismResultsPage })));
 const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m.MatchPage })));
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
 
@@ -184,6 +185,7 @@ export default function App() {
           {/* ── Phase 14: Assessment diagnostic landing pages ── */}
           <Route path="/prism" element={<PrismLanding />} />
           <Route path="/prism/take" element={<PrismTakePage />} />
+          <Route path="/prism/results" element={<PrismResultsPage />} />
           <Route path="/diagnostics/prism/take" element={<PrismTakePage />} />
           <Route path="/match" element={<MatchPage />} />
           <Route path="/pricing" element={<PricingPage />} />
