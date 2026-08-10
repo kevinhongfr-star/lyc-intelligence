@@ -480,22 +480,32 @@ export function AssessmentFlow({ config }: Props) {
   // Submit
   const handleSubmit = useCallback(async () => {
     setPhase('submitting');
-    // Mark as submitting in storage
     const state: PersistedAssessmentState = {
       answers, currentIndex, startedAt: Date.now(), status: 'submitting',
     };
     saveState(code.toLowerCase(), state);
 
-    // Simulate processing (backend scoring would go here)
-    // In production: POST to /api/scoring/assessment with { code, answers }
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    let resultId: string | null = null;
 
-    // Mark done and clear storage
+    if (config.onSubmit) {
+      // Real backend submission
+      try {
+        const result = await config.onSubmit(answers);
+        resultId = result.resultId;
+      } catch (e) {
+        console.error('[AssessmentFlow] Submission failed:', e);
+        // Fall through to navigation with null ID — results page handles mock fallback
+      }
+    } else {
+      // Simulated processing
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+
     clearState(code.toLowerCase());
 
-    // Redirect to results page
-    navigate(resultsPath);
-  }, [answers, currentIndex, code, resultsPath, navigate]);
+    // Redirect to results page (with ID if available)
+    navigate(resultId ? `${resultsPath}/${resultId}` : resultsPath);
+  }, [answers, currentIndex, code, resultsPath, navigate, config]);
 
   // ── RENDER ───────────────────────────────────────────────────────
   if (phase === 'submitting') {

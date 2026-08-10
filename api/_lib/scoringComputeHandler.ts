@@ -2675,3 +2675,313 @@ function generateBenchmarkInsights(benchmark: any): any {
     team_gaps: gaps.length > 0 ? gaps : ['No significant gaps identified'],
   };
 }
+
+// ─────────────────────────────────────────────────────────────────
+// PRISM Assessment Mode — Career & Professional Branding
+// ─────────────────────────────────────────────────────────────────
+
+const PRISM_DIMENSIONS = [
+  { id: 'vision', name: 'Vision', description: 'Ability to see and articulate a compelling future state', lowLabel: 'Tactical', highLabel: 'Visionary' },
+  { id: 'resilience', name: 'Resilience', description: 'Capacity to maintain composure and recover from setbacks', lowLabel: 'Sensitive', highLabel: 'Resilient' },
+  { id: 'influence', name: 'Influence', description: 'Ability to persuade and mobilize others toward your vision', lowLabel: 'Reserved', highLabel: 'Influential' },
+  { id: 'strategy', name: 'Strategy', description: 'Skill in formulating and executing multi-step plans', lowLabel: 'Reactive', highLabel: 'Strategic' },
+  { id: 'mastery', name: 'Mastery', description: 'Depth of expertise in your core domain', lowLabel: 'Generalist', highLabel: 'Expert' },
+] as const;
+
+const PRISM_ARCHETYPES: Record<string, { description: string; traits: string[] }> = {
+  'Strategic Architect': {
+    description: 'You see the big picture and build systems to get there. Your strength lies in translating vision into structured plans, but you may sometimes overlook the human element in execution.',
+    traits: ['Long-term thinker', 'Systems-oriented', 'Change catalyst'],
+  },
+  'Resilient Operator': {
+    description: 'You thrive under pressure and turn chaos into order. Teams rely on you in crises, but you may struggle to step back and think strategically.',
+    traits: ['Crisis manager', 'Adaptable', 'Persistent'],
+  },
+  'Influential Leader': {
+    description: 'You naturally draw people in and build coalitions. Your communication skills open doors, but you may need to deepen technical mastery to match your influence.',
+    traits: ['Natural communicator', 'Relationship builder', 'Persuasive'],
+  },
+  'Masterful Expert': {
+    description: 'You are the go-to authority in your domain. Your depth of knowledge is unmatched, but you may need to broaden into vision and influence to lead at the next level.',
+    traits: ['Life-long learner', 'Knowledge sharer', 'Quality-driven'],
+  },
+};
+
+interface PRISMIntake {
+  answers: Record<string, number | number[]>;
+  context?: { role?: string; industry?: string; yearsExperience?: number };
+  user_id?: string;
+}
+
+interface PRISMAnalysisResult {
+  dimension_scores: Record<string, number>;
+  composite_score: number;
+  archetype: string;
+  archetype_description: string;
+  archetype_traits: string[];
+  strengths: Array<{ title: string; text: string; type: 'strength' }>;
+  gaps: Array<{ title: string; text: string; type: 'gap' }>;
+  development_actions: Array<{ priority: number; dimension: string; action: string; timeline: string }>;
+  confidence: number;
+}
+
+function buildPRISMAnalysisPrompt(intake: PRISMIntake): string {
+  const answers = intake.answers || {};
+  const ctx = intake.context || {};
+
+  return `You are a leadership development expert specializing in career diagnostics for LYC Intelligence.
+Analyze this PRISM (Career & Professional Branding) assessment:
+
+USER CONTEXT:
+- Role: ${ctx.role || 'Not specified'}
+- Industry: ${ctx.industry || 'Not specified'}
+- Experience: ${ctx.yearsExperience || 'Not specified'} years
+
+ASSESSMENT ANSWERS:
+${Object.entries(answers).map(([qid, val]) => `- ${qid}: ${Array.isArray(val) ? val.join(', ') : val}`).join('\n')}
+
+PRISM DIMENSIONS:
+${PRISM_DIMENSIONS.map(d => `- ${d.id} (${d.name}): ${d.description}`).join('\n')}
+
+Score each dimension 0-100 based on the answers. Higher scores indicate stronger alignment with the high label.
+Identify the top 2 strengths and top 2 growth areas.
+Provide 3 prioritized development actions.
+
+Return ONLY this JSON (no markdown, no code fences):
+{
+  "dimension_scores": { "vision": <0-100>, "resilience": <0-100>, "influence": <0-100>, "strategy": <0-100>, "mastery": <0-100> },
+  "archetype": "<one of: Strategic Architect, Resilient Operator, Influential Leader, Masterful Expert>",
+  "strengths": [
+    { "title": "<strength title>", "text": "<2-3 sentence insight>" },
+    { "title": "<strength title>", "text": "<2-3 sentence insight>" }
+  ],
+  "gaps": [
+    { "title": "<gap title>", "text": "<2-3 sentence insight>" },
+    { "title": "<gap title>", "text": "<2-3 sentence insight>" }
+  ],
+  "development_actions": [
+    { "dimension": "<dimension name>", "action": "<specific action>", "timeline": "<30/60/90 days>" },
+    { "dimension": "<dimension name>", "action": "<specific action>", "timeline": "<30/60/90 days>" },
+    { "dimension": "<dimension name>", "action": "<specific action>", "timeline": "<30/60/90 days>" }
+  ],
+  "confidence": <0.0-1.0>
+}`;
+}
+
+function parsePRISMResponse(raw: string): PRISMAnalysisResult {
+  let text = raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+  const parsed = JSON.parse(text);
+
+  // Dimension scores — clamp 0-100
+  const dimension_scores: Record<string, number> = {};
+  for (const dim of PRISM_DIMENSIONS) {
+    const val = Math.round(Number(parsed.dimension_scores?.[dim.id]) || 50);
+    dimension_scores[dim.id] = Math.max(0, Math.min(100, val));
+  }
+
+  const values = Object.values(dimension_scores);
+  const composite_score = values.length > 0
+    ? Math.round(values.reduce((a, b) => a + b, 0) / values.length)
+    : 50;
+
+  // Archetype — validate against known list
+  const archetype = PRISM_ARCHETYPES[parsed.archetype]
+    ? parsed.archetype
+    : determineArchetype(dimension_scores);
+  const archInfo = PRISM_ARCHETYPES[archetype];
+
+  const strengths = (Array.isArray(parsed.strengths) ? parsed.strengths : []).slice(0, 2).map((s: any) => ({
+    title: String(s.title || '').slice(0, 200),
+    text: String(s.text || '').slice(0, 500),
+    type: 'strength' as const,
+  }));
+
+  const gaps = (Array.isArray(parsed.gaps) ? parsed.gaps : []).slice(0, 2).map((g: any) => ({
+    title: String(g.title || '').slice(0, 200),
+    text: String(g.text || '').slice(0, 500),
+    type: 'gap' as const,
+  }));
+
+  const development_actions = (Array.isArray(parsed.development_actions) ? parsed.development_actions : [])
+    .slice(0, 3)
+    .map((d: any, i: number) => ({
+      priority: i + 1,
+      dimension: String(d.dimension || '').slice(0, 100),
+      action: String(d.action || '').slice(0, 500),
+      timeline: String(d.timeline || '90 days').slice(0, 50),
+    }));
+
+  return {
+    dimension_scores,
+    composite_score,
+    archetype,
+    archetype_description: archInfo.description,
+    archetype_traits: archInfo.traits,
+    strengths: strengths.length > 0 ? strengths : [{ title: 'Self-awareness', text: 'Completed assessment with honest self-reflection.', type: 'strength' as const }],
+    gaps: gaps.length > 0 ? gaps : [{ title: 'Continuous growth', text: 'Identify one area to develop over the next 90 days.', type: 'gap' as const }],
+    development_actions: development_actions.length > 0 ? development_actions : [
+      { priority: 1, dimension: 'Mastery', action: 'Deepen expertise in one core domain through deliberate practice.', timeline: '90 days' },
+    ],
+    confidence: Math.max(0, Math.min(1, Number(parsed.confidence) || 0.6)),
+  };
+}
+
+function determineArchetype(scores: Record<string, number>): string {
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const top = sorted[0]?.[0];
+  const second = sorted[1]?.[0];
+
+  if ((top === 'vision' || top === 'strategy') && (second === 'vision' || second === 'strategy')) {
+    return 'Strategic Architect';
+  }
+  if (top === 'resilience' || second === 'resilience') {
+    return 'Resilient Operator';
+  }
+  if (top === 'influence' || second === 'influence') {
+    return 'Influential Leader';
+  }
+  if (top === 'mastery' || second === 'mastery') {
+    return 'Masterful Expert';
+  }
+  return 'Strategic Architect';
+}
+
+function fallbackPRISMScore(intake: PRISMIntake): PRISMAnalysisResult {
+  const answers = intake.answers || {};
+  const scores: Record<string, number> = {};
+
+  for (const dim of PRISM_DIMENSIONS) {
+    // Collect all answer values for this dimension's questions
+    const dimAnswers = Object.entries(answers)
+      .filter(([key]) => key.startsWith(dim.id))
+      .map(([, val]) => Array.isArray(val) ? val.reduce((a, b) => a + b, 0) / Math.max(val.length, 1) : val);
+
+    if (dimAnswers.length === 0) {
+      scores[dim.id] = 50;
+      continue;
+    }
+
+    const avg = dimAnswers.reduce((a, b) => a + b, 0) / dimAnswers.length;
+    // Likert 1-5 → 0-100: ((score - 1) / 4) * 100
+    // MCQ scores 2-5 → normalize similarly
+    const normalized = Math.max(0, Math.min(100, Math.round(((avg - 1) / 4) * 100)));
+    scores[dim.id] = normalized;
+  }
+
+  const values = Object.values(scores);
+  const composite_score = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+  const archetype = determineArchetype(scores);
+  const archInfo = PRISM_ARCHETYPES[archetype];
+
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const topDim = sorted[0];
+  const bottomDim = sorted[sorted.length - 1];
+
+  return {
+    dimension_scores: scores,
+    composite_score,
+    archetype,
+    archetype_description: archInfo.description,
+    archetype_traits: archInfo.traits,
+    strengths: [
+      {
+        title: `${PRISM_DIMENSIONS.find(d => d.id === topDim[0])?.name || 'Top dimension'} is your superpower`,
+        text: `At ${topDim[1]}/100, you score in the ${topDim[1] >= 75 ? 'top quartile' : 'upper range'} of executives on this dimension.`,
+        type: 'strength' as const,
+      },
+    ],
+    gaps: [
+      {
+        title: `${PRISM_DIMENSIONS.find(d => d.id === bottomDim[0])?.name || 'Lowest dimension'} needs attention`,
+        text: `At ${bottomDim[1]}/100, this is your lowest-scoring dimension. Focused development here could yield the biggest gains.`,
+        type: 'gap' as const,
+      },
+    ],
+    development_actions: [
+      { priority: 1, dimension: PRISM_DIMENSIONS.find(d => d.id === bottomDim[0])?.name || 'Mastery', action: 'Dedicate 4 hours per week to deliberate practice in this area for the next 90 days.', timeline: '90 days' },
+      { priority: 2, dimension: 'Resilience', action: 'Build a daily 10-minute mindfulness or reflection practice.', timeline: '30 days' },
+      { priority: 3, dimension: 'Influence', action: 'Schedule 3 cross-functional conversations per month.', timeline: '60 days' },
+    ],
+    confidence: 0.6,
+  };
+}
+
+export async function handlePRISMAssessment(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse> {
+  const start = Date.now();
+
+  try {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ success: false, error: 'Method not allowed. Use POST.' });
+    }
+
+    const body = req.body || {};
+    const { answers, context, user_id } = body as PRISMIntake & { user_id?: string };
+
+    if (!answers || Object.keys(answers).length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required field: answers (must be a non-empty object)',
+      });
+    }
+
+    let analysis: PRISMAnalysisResult;
+    let tokens = 0;
+
+    try {
+      const prompt = buildPRISMAnalysisPrompt({ answers, context });
+      const { content, tokens: usedTokens } = await callDeepSeekForSHIFT(prompt);
+      analysis = parsePRISMResponse(content);
+      tokens = usedTokens;
+    } catch (e) {
+      console.warn('[PRISM] DeepSeek call failed, using fallback:', e);
+      analysis = fallbackPRISMScore({ answers, context });
+    }
+
+    // Persist to assessment_results table
+    let resultId: string | null = null;
+    if (isSupabaseConfigured()) {
+      try {
+        const inserted = await insert('assessment_results', {
+          user_id: user_id || null,
+          assessment_type: 'PRISM',
+          assessment_name: 'Career & Professional Branding',
+          dimensions: analysis.dimension_scores,
+          composite_score: analysis.composite_score,
+          tier_label: analysis.composite_score >= 75 ? 'Elite' : analysis.composite_score >= 50 ? 'Established' : 'Developing',
+          narrative: JSON.stringify({
+            archetype: analysis.archetype,
+            archetype_description: analysis.archetype_description,
+            archetype_traits: analysis.archetype_traits,
+            strengths: analysis.strengths,
+            gaps: analysis.gaps,
+          }),
+          raw_responses: { answers, context },
+          metadata: {
+            development_actions: analysis.development_actions,
+            confidence: analysis.confidence,
+            llm_used: tokens > 0,
+            tokens,
+          },
+          completed_at: new Date().toISOString(),
+        });
+        resultId = inserted?.id || null;
+      } catch (e) {
+        console.error('[PRISM] Failed to persist assessment_result:', e);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      analysis,
+      result_id: resultId,
+      assessment_type: 'PRISM',
+      total_tokens: tokens,
+      duration_ms: Date.now() - start,
+    });
+  } catch (err) {
+    return handleError(res, 'prism.assessment', err);
+  }
+}

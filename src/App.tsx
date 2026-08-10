@@ -186,7 +186,10 @@ export default function App() {
           <Route path="/prism" element={<PrismLanding />} />
           <Route path="/prism/take" element={<PrismTakePage />} />
           <Route path="/prism/results" element={<PrismResultsPage />} />
+          <Route path="/prism/results/:id" element={<PrismResultsPage />} />
+          <Route path="/diagnostics/prism" element={<PrismLanding />} />
           <Route path="/diagnostics/prism/take" element={<PrismTakePage />} />
+          <Route path="/diagnostics/prism/results/:id" element={<PrismResultsPage />} />
           <Route path="/match" element={<MatchPage />} />
           <Route path="/pricing" element={<PricingPage />} />
 

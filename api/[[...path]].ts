@@ -515,6 +515,10 @@ export default async function handler(
           const m = await import('./_lib/scoringComputeHandler.js');
           return m.handleSHIFTAssessment(req, res);
         }
+        if (sub === 'prism') {
+          const m = await import('./_lib/scoringComputeHandler.js');
+          return m.handlePRISMAssessment(req, res);
+        }
         if (sub === 'advisory' && pathArr[2] === 'report') {
           const m = await import('./_lib/scoringComputeHandler.js');
           return m.handleAdvisoryReport(req, res);

@@ -40,6 +40,9 @@ export interface AssessmentFlowConfig {
   resultsPath: string;
   /** Where the "back to landing" link goes */
   landingPath: string;
+  /** Optional: real submission handler. Returns result ID for redirect.
+   * If not provided, flow simulates processing with a 2s delay. */
+  onSubmit?: (answers: AnswerMap) => Promise<{ resultId: string | null }>;
 }
 
 /** Answer storage: questionId → answer value */

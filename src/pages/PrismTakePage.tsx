@@ -1,4 +1,5 @@
 import { AssessmentFlow, type AssessmentFlowConfig } from '@/components/assessment/flow';
+import { submitPRISMAssessment } from '@/services/prismAnalysis';
 
 const config: AssessmentFlowConfig = {
   code: 'PRISM',
@@ -7,6 +8,10 @@ const config: AssessmentFlowConfig = {
   prefix: 'prism-take',
   resultsPath: '/prism/results',
   landingPath: '/prism',
+  onSubmit: async (answers) => {
+    const response = await submitPRISMAssessment(answers);
+    return { resultId: response.result_id };
+  },
   questions: [
     // ── Vision (2 questions) ──
     {
