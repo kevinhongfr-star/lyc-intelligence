@@ -227,7 +227,7 @@ export default function App() {
           <Route path="/dex/journey" element={<ProtectedRoute><DexJourneyPage /></ProtectedRoute>} />
           <Route path="/dex/credits" element={<ProtectedRoute><CreditStorePage /></ProtectedRoute>} />
 
-          {/* ── Internal Operations (mockup surface) ── */}
+          {/* ── Internal Operations ── */}
           {ENABLE_PLATFORM && (
             <Route path="/app" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
               <Route index element={<Navigate to="dashboard" replace />} />
@@ -265,7 +265,12 @@ export default function App() {
               <Route path="oversight" element={<AdminRoute><KevinOversightDashboard /></AdminRoute>} />
               {/* Revenue analytics (S6-T06) */}
               <Route path="revenue" element={<AdminRoute><RevenueAnalyticsPage /></AdminRoute>} />
-              <Route path="intelligence" element={<PlaceholderPage title="Intelligence" />} />
+              {/* Placeholder-only sub-routes → graceful redirects (Phase 15.3 C1) */}
+              <Route path="trident" element={<Navigate to="/match" replace />} />
+              <Route path="canvas" element={<Navigate to="metrix" replace />} />
+              <Route path="shift" element={<Navigate to="/assessment/shift" replace />} />
+              <Route path="reports" element={<Navigate to="/progress" replace />} />
+              <Route path="intelligence" element={<Navigate to="analytics" replace />} />
             </Route>
           )}
 
@@ -278,44 +283,55 @@ export default function App() {
             <Route path="overview" element={<ClientOverviewPage />} />
             <Route path="mandates" element={<ClientMandatesPage />} />
             <Route path="pipeline-analytics" element={<ClientPipelineAnalyticsPage />} />
-            <Route path="talent-intel" element={<PlaceholderPage title="Talent Intelligence" />} />
-            <Route path="candidates" element={<PlaceholderPage title="B2B Candidates" />} />
-            <Route path="nexus-assistant" element={<PlaceholderPage title="NEXUS Assistant" />} />
             <Route path="documents" element={<ClientDocumentsPage />} />
-            <Route path="admin" element={<PlaceholderPage title="Admin & Security" />} />
-            <Route path="collaboration" element={<PlaceholderPage title="Collaboration" />} />
-            <Route path="onboarding" element={<PlaceholderPage title="Onboarding" />} />
+            {/* Placeholder routes → graceful redirects (Phase 15.3 C1).
+                Admin users who keep VITE_ENABLE_ADMIN_PREVIEW see these via
+                SURFACE_CONFIG working=false tabs, but in the route table we
+                always redirect so clicking a stale bookmark never lands on Placeholder. */}
+            <Route path="talent-intel" element={<Navigate to="overview" replace />} />
+            <Route path="candidates" element={<Navigate to="mandates" replace />} />
+            <Route path="nexus-assistant" element={<Navigate to="/nexus/chat" replace />} />
+            <Route path="admin" element={<Navigate to="overview" replace />} />
+            <Route path="collaboration" element={<Navigate to="overview" replace />} />
+            <Route path="onboarding" element={<Navigate to="overview" replace />} />
           </Route>
 
-          {/* ── B2C Coaching (mockup surface) ── */}
+          {/* ── B2C Coaching — Phase 15.3 C1 simplified nav:
+                NEXUS Chat · Assessments (11) · My Results / Reports · Profile / Settings
+                Old Placeholder-only sub-routes redirect to their nearest working neighbour. */}
           <Route path="/coaching" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
-            <Route index element={<Navigate to="coach" replace />} />
-            <Route path="coach" element={<PlaceholderPage title="Coach" />} />
-            <Route path="credits" element={<PlaceholderPage title="Credits & Plans" />} />
-            <Route path="intelligence" element={<PlaceholderPage title="B2C Intelligence" />} />
-            <Route path="career-intel" element={<PlaceholderPage title="Career Intelligence" />} />
-            <Route path="profile" element={<PlaceholderPage title="Profile & Settings" />} />
-            <Route path="chat-features" element={<PlaceholderPage title="Chat Features" />} />
-            <Route path="career-services" element={<PlaceholderPage title="Career Services" />} />
-            <Route path="engagement" element={<PlaceholderPage title="Engagement" />} />
-            <Route path="growth" element={<PlaceholderPage title="Growth" />} />
+            <Route index element={<Navigate to="nexus-chat" replace />} />
+            <Route path="nexus-chat" element={<NexusChatPage />} />
+            <Route path="assessments" element={<Navigate to="/assessment/shift" replace />} />
+            <Route path="results" element={<ProgressPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            {/* Legacy placeholder-only sub-routes → graceful redirects */}
+            <Route path="coach" element={<Navigate to="nexus-chat" replace />} />
+            <Route path="credits" element={<Navigate to="/account/billing" replace />} />
+            <Route path="intelligence" element={<Navigate to="results" replace />} />
+            <Route path="career-intel" element={<Navigate to="results" replace />} />
+            <Route path="chat-features" element={<Navigate to="nexus-chat" replace />} />
+            <Route path="career-services" element={<Navigate to="assessments" replace />} />
+            <Route path="engagement" element={<Navigate to="results" replace />} />
+            <Route path="growth" element={<Navigate to="profile" replace />} />
           </Route>
 
-          {/* ── Candidate Portal (mockup surface) ── */}
+          {/* ── Candidate Portal ── */}
           <Route path="/candidate" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<CandidateDashboardPage />} />
             <Route path="applications" element={<CandidateApplicationsPage />} />
-            <Route path="offers" element={<PlaceholderPage title="Offers & Decisions" />} />
             <Route path="opportunities" element={<CandidateOpportunitiesPage />} />
             <Route path="interview-prep" element={<CandidateInterviewPrepPage />} />
             <Route path="assessments" element={<CandidateAssessmentsPage />} />
-            <Route path="career-dev" element={<PlaceholderPage title="Career Development" />} />
             <Route path="community" element={<CandidateCommunityPage />} />
-            <Route path="nexus-coach" element={<PlaceholderPage title="NEXUS Coach" />} />
-            <Route path="profile" element={<PlaceholderPage title="Candidate Profile" />} />
-            <Route path="advanced-assessments" element={<PlaceholderPage title="Advanced Assessments" />} />
-            <Route path="settings-plus" element={<PlaceholderPage title="Settings+" />} />
+            {/* Placeholder-only sub-routes → redirect (Phase 15.3 C1) */}
+            <Route path="offers" element={<Navigate to="opportunities" replace />} />
+            <Route path="career-dev" element={<Navigate to="assessments" replace />} />
+            <Route path="nexus-coach" element={<Navigate to="/nexus/chat" replace />} />
+            <Route path="profile" element={<Navigate to="/profile" replace />} />
+            <Route path="advanced-assessments" element={<Navigate to="assessments" replace />} />
+            <Route path="settings-plus" element={<Navigate to="/dashboard" replace />} />
           </Route>
 
           {/* ── Authenticated user pages (standalone) ── */}
