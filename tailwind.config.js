@@ -1,0 +1,107 @@
+import typography from '@tailwindcss/typography';
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        // Clean neutral palette (Linear/Vercel-inspired)
+        'white': '#fff',
+        'bg': '#FFFFFF',
+        'bg-warm': '#FAFAFA',
+        'bg-elevated': '#FFFFFF',
+        'bg-sunken': '#F7F7F7',
+        'border': '#EBEBEB',
+        'border-subtle': '#F7F7F7',
+        'text-primary': '#171717',
+        'text-secondary': '#525252',
+        'text-muted': '#A3A3A3',
+        'text-faint': '#D4D4D4',
+        // Brand colors (fuchsia is primary accent)
+        'fuchsia': '#C108AB',
+        'fuchsia-hover': '#A50798',
+        'fuchsia-light': 'rgba(193,8,171,0.06)',
+        'fuchsia-10': 'rgba(193,8,171,0.10)',
+        'fuchsia-20': 'rgba(193,8,171,0.20)',
+        // Semantic colors
+        'green': '#16A34A',
+        'green-bg': 'rgba(22,163,74,0.06)',
+        'amber': '#CA8A04',
+        'amber-bg': 'rgba(202,138,4,0.06)',
+        'red': '#DC2626',
+        'red-bg': 'rgba(220,38,38,0.06)',
+        'blue': '#2563EB',
+        'blue-bg': 'rgba(37,99,235,0.06)',
+        // Legacy compatibility
+        'accent': '#C108AB',
+        'accent-hover': '#A50798',
+        'accent-light': '#E040C8',
+        'bg-primary': '#FFFFFF',
+        'bg-secondary': '#FAFAFA',
+        'bg-tertiary': '#F7F7F7',
+        'bg-hover': '#FAFAFA',
+        'tier-1': '#16A34A',
+        'tier-1Bg': 'rgba(22,163,74,0.06)',
+        'tier-2': '#CA8A04',
+        'tier-2Bg': 'rgba(202,138,4,0.06)',
+        'tier-3': '#A3A3A3',
+        'tier-3Bg': 'rgba(163,163,163,0.06)',
+        // Pipeline stages
+        'sweep': '#00897B',
+        'canva': '#C108AB',
+        'grid': '#CA8A04',
+        'lens': '#2563EB',
+        'placed': '#16A34A',
+        // Legacy brand palette
+        'teal': '#00897B',
+        'teal-light': '#4DB6AC',
+        'ocean': '#4FC3F7',
+        'ocean-deep': '#0288D1',
+        'slate': '#6B7280',
+        'sky': '#F7F7F7',
+        'mist': '#FAFAFA',
+        'lavender': '#F7F7F7',
+        'cream': '#FAFAFA',
+      },
+      fontFamily: {
+        serif: ['Libre Baskerville', 'Georgia', 'serif'],
+        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'xxs': '10px',
+      },
+      boxShadow: {
+        'xs': '0 1px 2px rgba(0,0,0,0.04)',
+        'sm': '0 1px 3px rgba(0,0,0,0.06)',
+        'md': '0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.04)',
+        'lg': '0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04)',
+        'xl': '0 20px 25px -5px rgba(0,0,0,0.08), 0 10px 10px -5px rgba(0,0,0,0.04)',
+        'card': '0 0 0 1px rgba(0,0,0,0.04)',
+        'card-hover': '0 4px 12px rgba(0,0,0,0.08)',
+        'modal': '0 16px 48px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)',
+        'inner': 'inset 0 2px 4px rgba(0,0,0,0.04)',
+      },
+      borderRadius: {
+        'card': '0px',
+      },
+      animation: {
+        'pulse-icon': 'iconPulse 2s ease-in-out infinite',
+        'rotate-icon': 'iconRotate 8s linear infinite',
+        'draw-icon': 'iconDraw 3s ease-in-out infinite',
+        'glow-cta': 'ctaGlow 2.5s ease-in-out infinite',
+        'float': 'dreamyFloat 8s ease-in-out infinite',
+        'enter': 'pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fadeIn': 'fadeIn 0.2s ease-out forwards',
+      },
+      transitionTimingFunction: {
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+      },
+      transitionDuration: {
+        'fast': '120ms',
+        'normal': '200ms',
+        'slow': '350ms',
+      },
+    },
+  },
+  plugins: [typography],
+};
