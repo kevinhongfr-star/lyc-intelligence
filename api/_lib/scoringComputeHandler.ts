@@ -2985,3 +2985,298 @@ export async function handlePRISMAssessment(
     return handleError(res, 'prism.assessment', err);
   }
 }
+
+// ─────────────────────────────────────────────────────────────────
+// SPARK Assessment Mode — AI Leadership Readiness
+// ─────────────────────────────────────────────────────────────────
+
+const SPARK_DIMENSIONS = [
+  { id: 'ai_vision', name: 'AI Vision', description: 'Your ability to see AI opportunities and implications', lowLabel: 'Skeptical', highLabel: 'Visionary' },
+  { id: 'data_fluency', name: 'Data Fluency', description: 'Your comfort with data-driven decision making', lowLabel: 'Data-averse', highLabel: 'Data-savvy' },
+  { id: 'change_leadership', name: 'Change Leadership', description: 'Your ability to lead teams through AI-driven transformation', lowLabel: 'Change-resistant', highLabel: 'Change leader' },
+  { id: 'ethics', name: 'Ethics', description: 'Your consideration of ethical implications of AI', lowLabel: 'Unconcerned', highLabel: 'Ethically-minded' },
+  { id: 'innovation', name: 'Innovation', description: 'Your appetite for experimenting with new AI tools and approaches', lowLabel: 'Traditional', highLabel: 'Innovative' },
+] as const;
+
+const SPARK_ARCHETYPES: Record<string, { description: string; traits: string[] }> = {
+  'AI Strategist': {
+    description: 'You see the big picture of AI transformation and lead accordingly. Your strength lies in envisioning how AI can reshape your business, but you may need to strengthen your execution and change management capabilities.',
+    traits: ['Visionary', 'Strategic', 'Transformative'],
+  },
+  'Data-Driven Leader': {
+    description: 'You leverage data and AI for better decision making. Your analytical rigor is a competitive advantage, but you may need to balance data with human judgment and ethical considerations.',
+    traits: ['Analytical', 'Evidence-based', 'Decisive'],
+  },
+  'Change Champion': {
+    description: 'You help organizations navigate AI-driven change. Teams trust you to guide them through transformation, but you may need to deepen your technical AI understanding.',
+    traits: ['Change agent', 'Coach', 'Motivator'],
+  },
+  'Ethical Innovator': {
+    description: 'You balance innovation with responsible AI use. Your principled approach builds trust, but you may need to move faster to keep pace with AI advancement.',
+    traits: ['Principled', 'Thoughtful', 'Innovative'],
+  },
+};
+
+function buildSPARKAnalysisPrompt(answers: Record<string, number | number[]>, context?: { role?: string; industry?: string; yearsExperience?: number }): string {
+  const ctx = context || {};
+  return `You are an AI leadership development expert specializing in AI readiness assessments for LYC Intelligence.
+Analyze this SPARK (AI Leadership Readiness) assessment:
+
+USER CONTEXT:
+- Role: ${ctx.role || 'Not specified'}
+- Industry: ${ctx.industry || 'Not specified'}
+- Experience: ${ctx.yearsExperience || 'Not specified'} years
+
+ASSESSMENT ANSWERS:
+${Object.entries(answers).map(([qid, val]) => `- ${qid}: ${Array.isArray(val) ? val.join(', ') : val}`).join('\n')}
+
+SPARK DIMENSIONS:
+${SPARK_DIMENSIONS.map(d => `- ${d.id} (${d.name}): ${d.description}`).join('\n')}
+
+Score each dimension 0-100 based on the answers. Higher scores indicate stronger alignment with the high label.
+Identify the top 2 strengths and top 2 growth areas.
+Provide 3 prioritized development actions focused on AI leadership readiness.
+
+Return ONLY this JSON (no markdown, no code fences):
+{
+  "dimension_scores": { "ai_vision": <0-100>, "data_fluency": <0-100>, "change_leadership": <0-100>, "ethics": <0-100>, "innovation": <0-100> },
+  "archetype": "<one of: AI Strategist, Data-Driven Leader, Change Champion, Ethical Innovator>",
+  "strengths": [
+    { "title": "<strength title>", "text": "<2-3 sentence insight>" },
+    { "title": "<strength title>", "text": "<2-3 sentence insight>" }
+  ],
+  "gaps": [
+    { "title": "<gap title>", "text": "<2-3 sentence insight>" },
+    { "title": "<gap title>", "text": "<2-3 sentence insight>" }
+  ],
+  "development_actions": [
+    { "dimension": "<dimension name>", "action": "<specific action>", "timeline": "<30/60/90 days>" },
+    { "dimension": "<dimension name>", "action": "<specific action>", "timeline": "<30/60/90 days>" },
+    { "dimension": "<dimension name>", "action": "<specific action>", "timeline": "<30/60/90 days>" }
+  ],
+  "confidence": <0.0-1.0>
+}`;
+}
+
+function determineSPARKArchetype(scores: Record<string, number>): string {
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const top = sorted[0]?.[0];
+  const second = sorted[1]?.[0];
+
+  if ((top === 'ai_vision' || top === 'innovation') && (second === 'ai_vision' || second === 'innovation')) {
+    return 'AI Strategist';
+  }
+  if (top === 'data_fluency' || second === 'data_fluency') {
+    return 'Data-Driven Leader';
+  }
+  if (top === 'change_leadership' || second === 'change_leadership') {
+    return 'Change Champion';
+  }
+  if (top === 'ethics' || second === 'ethics') {
+    return 'Ethical Innovator';
+  }
+  return 'AI Strategist';
+}
+
+function parseSPARKResponse(raw: string): SPARKAnalysisResult {
+  let text = raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+  const parsed = JSON.parse(text);
+
+  const dimension_scores: Record<string, number> = {};
+  for (const dim of SPARK_DIMENSIONS) {
+    const val = Math.round(Number(parsed.dimension_scores?.[dim.id]) || 50);
+    dimension_scores[dim.id] = Math.max(0, Math.min(100, val));
+  }
+
+  const values = Object.values(dimension_scores);
+  const composite_score = values.length > 0
+    ? Math.round(values.reduce((a, b) => a + b, 0) / values.length)
+    : 50;
+
+  const archetype = SPARK_ARCHETYPES[parsed.archetype]
+    ? parsed.archetype
+    : determineSPARKArchetype(dimension_scores);
+  const archInfo = SPARK_ARCHETYPES[archetype];
+
+  const strengths = (Array.isArray(parsed.strengths) ? parsed.strengths : []).slice(0, 2).map((s: any) => ({
+    title: String(s.title || '').slice(0, 200),
+    text: String(s.text || '').slice(0, 500),
+    type: 'strength' as const,
+  }));
+
+  const gaps = (Array.isArray(parsed.gaps) ? parsed.gaps : []).slice(0, 2).map((g: any) => ({
+    title: String(g.title || '').slice(0, 200),
+    text: String(g.text || '').slice(0, 500),
+    type: 'gap' as const,
+  }));
+
+  const development_actions = (Array.isArray(parsed.development_actions) ? parsed.development_actions : [])
+    .slice(0, 3)
+    .map((d: any, i: number) => ({
+      priority: i + 1,
+      dimension: String(d.dimension || '').slice(0, 100),
+      action: String(d.action || '').slice(0, 500),
+      timeline: String(d.timeline || '90 days').slice(0, 50),
+    }));
+
+  return {
+    dimension_scores,
+    composite_score,
+    archetype,
+    archetype_description: archInfo.description,
+    archetype_traits: archInfo.traits,
+    strengths: strengths.length > 0 ? strengths : [{ title: 'AI awareness', text: 'Completed the AI readiness assessment with honest self-reflection.', type: 'strength' as const }],
+    gaps: gaps.length > 0 ? gaps : [{ title: 'AI experimentation', text: 'Start experimenting with AI tools to build hands-on understanding.', type: 'gap' as const }],
+    development_actions: development_actions.length > 0 ? development_actions : [
+      { priority: 1, dimension: 'Innovation', action: 'Run one AI experiment per month in your workflow.', timeline: '30 days' },
+    ],
+    confidence: Math.max(0, Math.min(1, Number(parsed.confidence) || 0.6)),
+  };
+}
+
+function fallbackSPARKScore(answers: Record<string, number | number[]>): SPARKAnalysisResult {
+  const scores: Record<string, number> = {};
+
+  for (const dim of SPARK_DIMENSIONS) {
+    const dimAnswers = Object.entries(answers)
+      .filter(([key]) => key.startsWith(dim.id))
+      .map(([, val]) => Array.isArray(val) ? val.reduce((a, b) => a + b, 0) / Math.max(val.length, 1) : val);
+
+    if (dimAnswers.length === 0) {
+      scores[dim.id] = 50;
+      continue;
+    }
+
+    const avg = dimAnswers.reduce((a, b) => a + b, 0) / dimAnswers.length;
+    const normalized = Math.max(0, Math.min(100, Math.round(((avg - 1) / 4) * 100)));
+    scores[dim.id] = normalized;
+  }
+
+  const values = Object.values(scores);
+  const composite_score = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+  const archetype = determineSPARKArchetype(scores);
+  const archInfo = SPARK_ARCHETYPES[archetype];
+
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const topDim = sorted[0];
+  const bottomDim = sorted[sorted.length - 1];
+
+  return {
+    dimension_scores: scores,
+    composite_score,
+    archetype,
+    archetype_description: archInfo.description,
+    archetype_traits: archInfo.traits,
+    strengths: [
+      {
+        title: `${SPARK_DIMENSIONS.find(d => d.id === topDim[0])?.name || 'Top dimension'} is your superpower`,
+        text: `At ${topDim[1]}/100, you score in the ${topDim[1] >= 75 ? 'top quartile' : 'upper range'} of AI-ready leaders on this dimension.`,
+        type: 'strength' as const,
+      },
+    ],
+    gaps: [
+      {
+        title: `${SPARK_DIMENSIONS.find(d => d.id === bottomDim[0])?.name || 'Lowest dimension'} needs attention`,
+        text: `At ${bottomDim[1]}/100, this is your lowest-scoring dimension. Focused development here could yield the biggest AI readiness gains.`,
+        type: 'gap' as const,
+      },
+    ],
+    development_actions: [
+      { priority: 1, dimension: SPARK_DIMENSIONS.find(d => d.id === bottomDim[0])?.name || 'Innovation', action: 'Run one AI experiment per month. Start small — a single workflow, a single tool.', timeline: '30 days' },
+      { priority: 2, dimension: 'Change Leadership', action: 'Identify 3 AI champions in your organization to build a coalition.', timeline: '60 days' },
+      { priority: 3, dimension: 'Data Fluency', action: 'Schedule weekly data review sessions to build interpretation skills.', timeline: '90 days' },
+    ],
+    confidence: 0.6,
+  };
+}
+
+export interface SPARKAnalysisResult {
+  dimension_scores: Record<string, number>;
+  composite_score: number;
+  archetype: string;
+  archetype_description: string;
+  archetype_traits: string[];
+  strengths: Array<{ title: string; text: string; type: 'strength' }>;
+  gaps: Array<{ title: string; text: string; type: 'gap' }>;
+  development_actions: Array<{ priority: number; dimension: string; action: string; timeline: string }>;
+  confidence: number;
+}
+
+export async function handleSPARKAssessment(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse> {
+  const start = Date.now();
+
+  try {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ success: false, error: 'Method not allowed. Use POST.' });
+    }
+
+    const body = req.body || {};
+    const { answers, context, user_id } = body;
+
+    if (!answers || Object.keys(answers).length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required field: answers (must be a non-empty object)',
+      });
+    }
+
+    let analysis: SPARKAnalysisResult;
+    let tokens = 0;
+
+    try {
+      const prompt = buildSPARKAnalysisPrompt(answers, context);
+      const { content, tokens: usedTokens } = await callDeepSeekForSHIFT(prompt);
+      analysis = parseSPARKResponse(content);
+      tokens = usedTokens;
+    } catch (e) {
+      console.warn('[SPARK] DeepSeek call failed, using fallback:', e);
+      analysis = fallbackSPARKScore(answers);
+    }
+
+    let resultId: string | null = null;
+    if (isSupabaseConfigured()) {
+      try {
+        const inserted = await insert('assessment_results', {
+          user_id: user_id || null,
+          assessment_type: 'SPARK',
+          assessment_name: 'AI Leadership Readiness',
+          dimensions: analysis.dimension_scores,
+          composite_score: analysis.composite_score,
+          tier_label: analysis.composite_score >= 75 ? 'Elite' : analysis.composite_score >= 50 ? 'Established' : 'Developing',
+          narrative: JSON.stringify({
+            archetype: analysis.archetype,
+            archetype_description: analysis.archetype_description,
+            archetype_traits: analysis.archetype_traits,
+            strengths: analysis.strengths,
+            gaps: analysis.gaps,
+          }),
+          raw_responses: { answers, context },
+          metadata: {
+            development_actions: analysis.development_actions,
+            confidence: analysis.confidence,
+            llm_used: tokens > 0,
+            tokens,
+          },
+          completed_at: new Date().toISOString(),
+        });
+        resultId = inserted?.id || null;
+      } catch (e) {
+        console.error('[SPARK] Failed to persist assessment_result:', e);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      analysis,
+      result_id: resultId,
+      assessment_type: 'SPARK',
+      total_tokens: tokens,
+      duration_ms: Date.now() - start,
+    });
+  } catch (err) {
+    return handleError(res, 'spark.assessment', err);
+  }
+}

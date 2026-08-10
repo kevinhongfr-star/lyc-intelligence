@@ -519,6 +519,10 @@ export default async function handler(
           const m = await import('./_lib/scoringComputeHandler.js');
           return m.handlePRISMAssessment(req, res);
         }
+        if (sub === 'spark') {
+          const m = await import('./_lib/scoringComputeHandler.js');
+          return m.handleSPARKAssessment(req, res);
+        }
         if (sub === 'advisory' && pathArr[2] === 'report') {
           const m = await import('./_lib/scoringComputeHandler.js');
           return m.handleAdvisoryReport(req, res);

@@ -34,6 +34,9 @@ const DexAiPage = lazy(() => import('@/pages/DexAiPage').then(m => ({ default: m
 const PrismLanding = lazy(() => import('@/pages/PrismLanding').then(m => ({ default: m.PrismLanding })));
 const PrismTakePage = lazy(() => import('@/pages/PrismTakePage').then(m => ({ default: m.PrismTakePage })));
 const PrismResultsPage = lazy(() => import('@/pages/PrismResultsPage').then(m => ({ default: m.PrismResultsPage })));
+const SparkLanding = lazy(() => import('@/pages/SparkLanding').then(m => ({ default: m.SparkLanding })));
+const SparkTakePage = lazy(() => import('@/pages/SparkTakePage').then(m => ({ default: m.SparkTakePage })));
+const SparkResultsPage = lazy(() => import('@/pages/SparkResultsPage').then(m => ({ default: m.SparkResultsPage })));
 const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m.MatchPage })));
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
 
@@ -190,6 +193,14 @@ export default function App() {
           <Route path="/diagnostics/prism" element={<PrismLanding />} />
           <Route path="/diagnostics/prism/take" element={<PrismTakePage />} />
           <Route path="/diagnostics/prism/results/:id" element={<PrismResultsPage />} />
+          {/* ── SPARK: AI Leadership Readiness ── */}
+          <Route path="/spark" element={<SparkLanding />} />
+          <Route path="/spark/take" element={<SparkTakePage />} />
+          <Route path="/spark/results" element={<SparkResultsPage />} />
+          <Route path="/spark/results/:id" element={<SparkResultsPage />} />
+          <Route path="/diagnostics/spark" element={<SparkLanding />} />
+          <Route path="/diagnostics/spark/take" element={<SparkTakePage />} />
+          <Route path="/diagnostics/spark/results/:id" element={<SparkResultsPage />} />
           <Route path="/match" element={<MatchPage />} />
           <Route path="/pricing" element={<PricingPage />} />
 
