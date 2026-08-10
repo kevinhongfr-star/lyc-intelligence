@@ -29,14 +29,7 @@ const AppShell = lazy(() => import('@/components/shell/AppShell').then(m => ({ d
 const AssessmentPage = lazy(() => import('@/pages/AssessmentPage').then(m => ({ default: m.AssessmentPage })));
 const B2BLanding = lazy(() => import('@/pages/B2BLanding').then(m => ({ default: m.B2BLanding })));
 const B2CLanding = lazy(() => import('@/pages/B2CLanding').then(m => ({ default: m.B2CLanding })));
-const NexusLanding = lazy(() => import('@/pages/NexusLanding').then(m => ({ default: m.NexusLanding })));
-const DexAiPage = lazy(() => import('@/pages/DexAiPage').then(m => ({ default: m.DexAiPage })));
-const PrismLanding = lazy(() => import('@/pages/PrismLanding').then(m => ({ default: m.PrismLanding })));
-const PrismTakePage = lazy(() => import('@/pages/PrismTakePage').then(m => ({ default: m.PrismTakePage })));
-const PrismResultsPage = lazy(() => import('@/pages/PrismResultsPage').then(m => ({ default: m.PrismResultsPage })));
-const SparkLanding = lazy(() => import('@/pages/SparkLanding').then(m => ({ default: m.SparkLanding })));
-const SparkTakePage = lazy(() => import('@/pages/SparkTakePage').then(m => ({ default: m.SparkTakePage })));
-const SparkResultsPage = lazy(() => import('@/pages/SparkResultsPage').then(m => ({ default: m.SparkResultsPage })));
+const NexusLanding = lazy(() => import('@/pages/NexusPage').then(m => ({ default: m.NexusPage })));
 const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m.MatchPage })));
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
 
@@ -79,19 +72,6 @@ const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage').th
 const AdminRankingDashboard = lazy(() => import('@/pages/internal/AdminRankingDashboard').then(m => ({ default: m.AdminRankingDashboard })));
 const ScoringConfigPage = lazy(() => import('@/pages/internal/ScoringConfigPage').then(m => ({ default: m.ScoringConfigPage })));
 const KevinOversightDashboard = lazy(() => import('@/components/kevin/KevinOversightDashboard').then(m => ({ default: m.KevinOversightDashboard })));
-const ReportsPage = lazy(() => import('@/pages/ReportsPage').then(m => ({ default: m.ReportsPage })));
-const ReportDetailPage = lazy(() => import('@/pages/ReportDetailPage').then(m => ({ default: m.ReportDetailPage })));
-// ── Phase 7.5 Coaching Excellence (Coach route only) ──
-// const CoachingPage = lazy(() => import('@/pages/CoachingPage').then(m => ({ default: m.CoachingPage })));
-// ── Phase 9 GRID Market Mapping ──
-const GridPage = lazy(() => import('@/pages/GridPage'));
-// ── Phase 10 TRIDENT + CANVAS ──
-const TridentPage = lazy(() => import('@/pages/TridentPage'));
-const CanvasPage = lazy(() => import('@/pages/CanvasPage'));
-// ── Phase 11 SHIFT Suite ──
-const ShiftPage = lazy(() => import('@/pages/ShiftPage'));
-// ── Phase 12 CPI Portal Integration ──
-const CpiPage = lazy(() => import('@/pages/CpiPage'));
 
 // ── Candidate Portal pages (EO-4) ──
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
@@ -106,14 +86,6 @@ const ClientOverviewPage = lazy(() => import('@/pages/client/ClientOverviewPage'
 const ClientMandatesPage = lazy(() => import('@/pages/client/ClientMandatesPage').then(m => ({ default: m.ClientMandatesPage })));
 const ClientDocumentsPage = lazy(() => import('@/pages/client/ClientDocumentsPage').then(m => ({ default: m.ClientDocumentsPage })));
 const ClientPipelineAnalyticsPage = lazy(() => import('@/pages/client/ClientPipelineAnalyticsPage').then(m => ({ default: m.ClientPipelineAnalyticsPage })));
-
-// ── Phase 8 Client Portal ──
-const ClientShell = lazy(() => import('@/components/client/ClientShell').then(m => ({ default: m.ClientShell })));
-const ClientDashboard = lazy(() => import('@/pages/client/ClientDashboard').then(m => ({ default: m.ClientDashboard })));
-const CandidatePipeline = lazy(() => import('@/pages/client/CandidatePipeline').then(m => ({ default: m.CandidatePipeline })));
-const CandidateReview = lazy(() => import('@/pages/client/CandidateReview').then(m => ({ default: m.CandidateReview })));
-const ClientWorkflows = lazy(() => import('@/pages/client/ClientWorkflows').then(m => ({ default: m.ClientWorkflows })));
-const ClientEngagement = lazy(() => import('@/pages/client/ClientEngagement').then(m => ({ default: m.ClientEngagement })));
 
 // ── DEX AI B2C Portal pages (EO-5 / SPRINT 2) ──
 const DexLandingPage = lazy(() => import('@/pages/dex/DexLandingPage').then(m => ({ default: m.DexLandingPage })));
@@ -137,18 +109,6 @@ const RevenueAnalyticsPage = lazy(() => import('@/components/internal/RevenueAna
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const PlaceholderPage = lazy(() => import('@/pages/PlaceholderPage').then(m => ({ default: m.PlaceholderPage })));
-
-// ── Admin Portal pages (Phase 4) ──
-const AdminShell = lazy(() => import('@/components/admin/AdminShell').then(m => ({ default: m.default })));
-const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard').then(m => ({ default: m.default })));
-const AdminUsers = lazy(() => import('@/pages/admin/AdminUsers').then(m => ({ default: m.default })));
-const AdminOrganizations = lazy(() => import('@/pages/admin/AdminOrganizations').then(m => ({ default: m.default })));
-const AdminAnalytics = lazy(() => import('@/pages/admin/AdminAnalytics').then(m => ({ default: m.default })));
-const AdminBilling = lazy(() => import('@/pages/admin/AdminBilling').then(m => ({ default: m.default })));
-const AdminConfig = lazy(() => import('@/pages/admin/AdminConfig').then(m => ({ default: m.default })));
-const ContentModeration = lazy(() => import('@/components/admin/ContentModeration').then(m => ({ default: m.default })));
-const AuditLog = lazy(() => import('@/components/admin/AuditLog').then(m => ({ default: m.default })));
-const RolePermissions = lazy(() => import('@/components/admin/RolePermissions').then(m => ({ default: m.default })));
 
 const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
 
@@ -178,29 +138,11 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path="/assessment" element={<Navigate to="/china-leadership-pipeline" replace />} />
-          <Route path="/cpi" element={<Navigate to="/china-leadership-pipeline" replace />} />
-          <Route path="/china-leadership-pipeline" element={<AssessmentPage />} />
+          <Route path="/assessment" element={<AssessmentPage />} />
           <Route path="/b2b" element={<B2BLanding />} />
-          <Route path="/b2c" element={<Navigate to="/nexus" replace />} />
+          <Route path="/b2c" element={<B2CLanding />} />
           <Route path="/nexus" element={<NexusLanding />} />
-          <Route path="/nexus/chat" element={<NexusPage />} />
-          {/* ── Phase 14: Assessment diagnostic landing pages ── */}
-          <Route path="/prism" element={<PrismLanding />} />
-          <Route path="/prism/take" element={<PrismTakePage />} />
-          <Route path="/prism/results" element={<PrismResultsPage />} />
-          <Route path="/prism/results/:id" element={<PrismResultsPage />} />
-          <Route path="/diagnostics/prism" element={<PrismLanding />} />
-          <Route path="/diagnostics/prism/take" element={<PrismTakePage />} />
-          <Route path="/diagnostics/prism/results/:id" element={<PrismResultsPage />} />
-          {/* ── SPARK: AI Leadership Readiness ── */}
-          <Route path="/spark" element={<SparkLanding />} />
-          <Route path="/spark/take" element={<SparkTakePage />} />
-          <Route path="/spark/results" element={<SparkResultsPage />} />
-          <Route path="/spark/results/:id" element={<SparkResultsPage />} />
-          <Route path="/diagnostics/spark" element={<SparkLanding />} />
-          <Route path="/diagnostics/spark/take" element={<SparkTakePage />} />
-          <Route path="/diagnostics/spark/results/:id" element={<SparkResultsPage />} />
+          <Route path="/nexus/chat" element={<NexusLanding />} />
           <Route path="/match" element={<MatchPage />} />
           <Route path="/pricing" element={<PricingPage />} />
 
@@ -209,9 +151,8 @@ export default function App() {
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/cookies" element={<CookiesPage />} />
 
-          {/* ── DEX AI credibility page + deprecated route redirect ── */}
-          <Route path="/dex-ai" element={<DexAiPage />} />
-          <Route path="/dex" element={<Navigate to="/dex-ai" replace />} />
+          {/* ── DEX AI B2C Portal (EO-5 / SPRINT 2) ── */}
+          <Route path="/dex" element={<DexLandingPage />} />
           <Route path="/dex/chat" element={<ProtectedRoute><DexChatPage /></ProtectedRoute>} />
           <Route path="/dex/assess" element={<ProtectedRoute><DexAssessPage /></ProtectedRoute>} />
           <Route path="/dex/plan" element={<ProtectedRoute><DexPlanPage /></ProtectedRoute>} />
@@ -233,9 +174,6 @@ export default function App() {
               <Route path="candidates" element={<CandidatesPage />} />
               <Route path="candidates/:id" element={<ExecutiveProfilePage />} />
               <Route path="candidates/:id/report" element={<CandidateReportPage />} />
-              <Route path="trident" element={<TridentPage />} />
-              <Route path="canvas" element={<CanvasPage />} />
-              <Route path="shift" element={<ShiftPage />} />
               <Route path="companies" element={<CompaniesPage />} />
               <Route path="batch-scoring" element={<BatchScoringPage />} />
               <Route path="metrix" element={<MetrixPage />} />
@@ -261,9 +199,6 @@ export default function App() {
               {/* Revenue analytics (S6-T06) */}
               <Route path="revenue" element={<AdminRoute><RevenueAnalyticsPage /></AdminRoute>} />
               <Route path="intelligence" element={<PlaceholderPage title="Intelligence" />} />
-              {/* Phase 7 — Reports & Documents */}
-              <Route path="reports" element={<ReportsPage />} />
-              <Route path="reports/:id" element={<ReportDetailPage />} />
             </Route>
           )}
 
@@ -285,22 +220,10 @@ export default function App() {
             <Route path="onboarding" element={<PlaceholderPage title="Onboarding" />} />
           </Route>
 
-          {/* ── Phase 8 Client Portal ── */}
-          <Route path="/client-portal" element={<ProtectedRoute><ClientShell /></ProtectedRoute>}>
-            <Route index element={<ClientDashboard />} />
-            <Route path="pipeline" element={<CandidatePipeline />} />
-            <Route path="reviews" element={<CandidateReview />} />
-            <Route path="workflows" element={<ClientWorkflows />} />
-            <Route path="engagement" element={<ClientEngagement />} />
-          </Route>
-
           {/* ── B2C Coaching (mockup surface) ── */}
           <Route path="/coaching" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route index element={<Navigate to="coach" replace />} />
-            {/* Phase 7.5 — primary coach route (integrated) */}
-            {/*             <Route path="coach" element={<CoachingPage />} /> */}
-            {/* Phase 12 — CPI Assessment (portal-integrated) */}
-            <Route path="cpi" element={<CpiPage />} />
+            <Route path="coach" element={<PlaceholderPage title="Coach" />} />
             <Route path="credits" element={<PlaceholderPage title="Credits & Plans" />} />
             <Route path="intelligence" element={<PlaceholderPage title="B2C Intelligence" />} />
             <Route path="career-intel" element={<PlaceholderPage title="Career Intelligence" />} />
@@ -309,25 +232,6 @@ export default function App() {
             <Route path="career-services" element={<PlaceholderPage title="Career Services" />} />
             <Route path="engagement" element={<PlaceholderPage title="Engagement" />} />
             <Route path="growth" element={<PlaceholderPage title="Growth" />} />
-          </Route>
-
-          {/* ── Phase 9 GRID Market Mapping ── */}
-          <Route path="/grid" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
-            <Route index element={<GridPage />} />
-            <Route path="review" element={<GridPage />} />
-          </Route>
-
-          {/* ── Admin Portal (Phase 4) ── */}
-          <Route path="/admin" element={<AdminRoute><AdminShell /></AdminRoute>}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="organizations" element={<AdminOrganizations />} />
-            <Route path="moderation" element={<ContentModeration />} />
-            <Route path="analytics" element={<AdminAnalytics />} />
-            <Route path="billing" element={<AdminBilling />} />
-            <Route path="audit" element={<AuditLog />} />
-            <Route path="config" element={<AdminConfig />} />
-            <Route path="rbac" element={<RolePermissions />} />
           </Route>
 
           {/* ── Candidate Portal (mockup surface) ── */}

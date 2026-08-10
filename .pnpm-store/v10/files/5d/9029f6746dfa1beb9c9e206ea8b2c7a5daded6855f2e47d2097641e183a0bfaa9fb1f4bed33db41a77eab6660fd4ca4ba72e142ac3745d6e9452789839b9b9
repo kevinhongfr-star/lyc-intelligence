@@ -1,2 +1,0 @@
-export declare const LIB_VERSION = "10.69.0";
-//# sourceMappingURL=version.d.ts.map

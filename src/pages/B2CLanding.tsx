@@ -38,9 +38,8 @@ export function B2CLanding() {
   }, [mobileOpen]);
 
   const navLinks = [
-    { label: 'NEXUS', href: '/nexus' },
-    { label: 'For Business', href: '/b2b' },
-    { label: 'Pricing', href: '/pricing' },
+    { href: '/assessment', label: 'Assessments' },
+    { href: '/b2b', label: 'For Firms' },
   ];
 
   return (
@@ -52,7 +51,10 @@ export function B2CLanding() {
           {navLinks.map(l => (
             <a key={l.href} href={l.href} style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</a>
           ))}
-          <a href="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF',  fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+          <a href="/nexus/chat" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 18px', color: DS.text, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)' }}>
+            Try NEXUS <ArrowRight style={{ width: 12, height: 12 }} />
+          </a>
+          <a href="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
             <Lock style={{ width: 14, height: 14 }} />Platform
           </a>
         </div>
@@ -81,11 +83,11 @@ export function B2CLanding() {
             Understand your trajectory. Benchmark your leadership. Discover opportunities that match where you're headed.
           </p>
           <div className="cta-row" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/china-leadership-pipeline" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF',  fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
-              Complimentary Assessment <ArrowRight style={{ width: 16, height: 16 }} />
+            <a href="/nexus/chat" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+              Try NEXUS <ArrowRight style={{ width: 16, height: 16 }} />
             </a>
-            <a href="/nexus" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000',  fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
-              Consult Nexus
+            <a href="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+              Complimentary Assessment
             </a>
           </div>
         </div>
@@ -102,11 +104,11 @@ export function B2CLanding() {
         <h2 className="section-heading" style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 400, color: DS.text, textAlign: 'center', margin: '0 0 40px' }}>Your Assessment Includes</h2>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
           {[
-            { icon: IconImpact, title: 'Leadership Profile', desc: "Discover whether you're a Strategist, Operator, Catalyst, or Builder — with personalized insights for your career trajectory." },
+            { icon: IconImpact, title: 'Leadership Archetype', desc: "Discover whether you're a Strategist, Operator, Catalyst, or Builder — with personalized insights for your career trajectory." },
             { icon: IconLeap, title: 'Market Benchmark', desc: 'See how you compare across executive markets. Understand your positioning and unlock opportunities that match your trajectory.' },
             { icon: IconTrident, title: 'Career Benchmark', desc: 'Get benchmarked across Experience, Skills, and Organizational Fit — see exactly how you compare to what top firms look for in C-suite candidates.' },
           ].map(f => (
-            <div key={f.title} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '24px', boxShadow: DS.shadow }}>
+            <div key={f.title} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', boxShadow: DS.shadow }}>
               <div style={{ color: DS.accent, marginBottom: '12px' }}><f.icon size={24} color={DS.accent} /></div>
               <h3 style={{ fontFamily: DS.headingFont, fontSize: '15px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>{f.title}</h3>
               <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
@@ -118,7 +120,7 @@ export function B2CLanding() {
       {/* How It Works */}
       <div className="reveal" style={{ background: DS.bgAlt, padding: '64px 0' }}>
         <div className="section-padding" style={{ maxWidth: '700px', margin: '0 auto', padding: '0 32px' }}>
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '32px', boxShadow: DS.shadow }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px', boxShadow: DS.shadow }}>
             <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '8px', textAlign: 'center' }}>
               How It Works
             </div>
@@ -126,10 +128,10 @@ export function B2CLanding() {
             {[
               { step: '1', title: 'Enter your details', desc: 'Name, email, title, country — so we can personalize your report.' },
               { step: '2', title: 'Rate yourself', desc: '10 questions across leadership dimensions. Takes under 10 minutes.' },
-              { step: '3', title: 'Get your results', desc: 'Instant leadership profile + scores + downloadable PDF report.' },
+              { step: '3', title: 'Get your results', desc: 'Instant archetype + scores + downloadable PDF report.' },
             ].map((s, i) => (
               <div key={s.step} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', marginBottom: i < 2 ? '20px' : 0 }}>
-                <div style={{ width: '32px', height: '32px',  background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, fontSize: '14px', fontWeight: 700, color: DS.accent, flexShrink: 0 }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, fontSize: '14px', fontWeight: 700, color: DS.accent, flexShrink: 0 }}>
                   {s.step}
                 </div>
                 <div>
@@ -159,7 +161,7 @@ export function B2CLanding() {
           <div style={{ color: '#C108AB', marginBottom: '12px' }}><IconSpark size={24} color="#C108AB" /></div>
           <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 12px' }}>Ready to find out?</h2>
           <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px' }}>Leadership isn't a title — it's a trajectory. See it, shape it, accelerate it.</p>
-          <LeadCaptureForm type="b2c" source="b2c_landing" heading="Get your complimentary leadership profile" subheading="8 minutes. Leadership profile, benchmarks, and your 90-day priorities." />
+          <LeadCaptureForm type="b2c" source="b2c_landing" heading="Get your free leadership profile" subheading="8 minutes. Archetype, benchmarks, and your 90-day priorities." />
         </div>
       </div>
 
@@ -174,15 +176,17 @@ export function B2CLanding() {
             <div className="footer-label">Platform</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <a href="/match">Match Analysis</a>
-              <a href="/china-leadership-pipeline">Pipeline Diagnostic</a>
-              <a href="/nexus">Nexus</a>
+              <a href="/assessment">Assessments</a>
+              <a href="/nexus/chat">NEXUS AI</a>
             </div>
           </div>
           <div>
             <div className="footer-label">Company</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <a href="https://lyc-partners.ai" target="_blank" rel="noopener">LYC Partners</a>
-              <a href="/pricing">Contact</a>
+              <a href="/pricing">Pricing</a>
+              <a href="/terms">Terms</a>
+              <a href="/privacy">Privacy</a>
             </div>
           </div>
         </div>
