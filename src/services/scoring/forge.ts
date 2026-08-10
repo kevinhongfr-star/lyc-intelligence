@@ -1,0 +1,247 @@
+// ═══════════════════════════════════════════════════════════
+// FORGE Scoring Config
+// Source of truth: akira_source/diagnostic_portfolio/06_scoring_engine_code/forge_config.json
+// ═══════════════════════════════════════════════════════════
+
+export const INSTRUMENT = "FORGE";
+export const FULL_NAME = "Sales Excellence & Revenue Architecture";
+export const VERSION = "1.0";
+export const TOTAL_QUESTIONS = 36;
+export const SCALE = "1-5 Likert";
+export const DELIVERY_MINUTES = 14;
+export const TIER = "advisory";
+export const PRICE_MILES = 99;
+export const B2C_NAME = "Sales Excellence & Revenue Architecture";
+export const TAGLINE = "For revenue-facing leaders. Bilateral context navigation, system thinking, and go-to-market architecture.";
+
+export const DIMENSIONS = [
+  {
+    id: "D1",
+    name: "ADAPTIVE LEARNING ORIENTATION (ALO)",
+    question_ids: [
+      "FORGE_Q01",
+      "FORGE_Q02",
+      "FORGE_Q03",
+      "FORGE_Q04",
+      "FORGE_Q05",
+      "FORGE_Q06",
+      "FORGE_Q07",
+      "FORGE_Q08",
+      "FORGE_Q09"
+    ],
+    reverse_coded: [
+      "FORGE_Q03",
+      "FORGE_Q05",
+      "FORGE_Q09"
+    ],
+    raw_max: 45,
+    n_questions: 9,
+    sub_dimensions: [
+      "I actively seek operating contexts that will require me to d...",
+      "I am energised by operating challenges that expose gaps in m...",
+      "I tend to gravitate toward leadership assignments where my c...",
+      "When I receive feedback that challenges how I see my own ope...",
+      "I find it difficult to integrate feedback that is inconsiste...",
+      "I have changed something significant about how I operate as ...",
+      "When evidence contradicts an assumption I have been operatin...",
+      "I hold my current mental models of how leadership and organi...",
+      "I find it difficult to update long-held beliefs about how le..."
+    ],
+    normalised_max: 20,
+    normalised_formula: "(raw/45) x 20"
+  },
+  {
+    id: "D2",
+    name: "THREE FORCES AWARENESS (TFA)",
+    question_ids: [
+      "FORGE_Q10",
+      "FORGE_Q11",
+      "FORGE_Q12",
+      "FORGE_Q13",
+      "FORGE_Q14",
+      "FORGE_Q15",
+      "FORGE_Q16",
+      "FORGE_Q17",
+      "FORGE_Q18"
+    ],
+    reverse_coded: [
+      "FORGE_Q12",
+      "FORGE_Q15",
+      "FORGE_Q17"
+    ],
+    raw_max: 45,
+    n_questions: 9,
+    sub_dimensions: [
+      "I can identify specific instances in my current operating co...",
+      "When I encounter difficulty in bilateral relationships, I na...",
+      "I tend to explain bilateral operating challenges primarily i...",
+      "I can identify specific ways in which AI capability differen...",
+      "I have noticed at least one case in the past 12 months where...",
+      "I do not see AI capability differences as a significant stru...",
+      "I can identify specific instances in my current context wher...",
+      "I see the tempo gap in my current operating environment as p...",
+      "I can identify specific governance or succession decisions i..."
+    ],
+    normalised_max: 20,
+    normalised_formula: "(raw/45) x 20"
+  },
+  {
+    id: "D3",
+    name: "DEVELOPMENT AGENCY (DA)",
+    question_ids: [
+      "FORGE_Q19",
+      "FORGE_Q20",
+      "FORGE_Q21",
+      "FORGE_Q22",
+      "FORGE_Q23",
+      "FORGE_Q24",
+      "FORGE_Q25",
+      "FORGE_Q26",
+      "FORGE_Q27"
+    ],
+    reverse_coded: [
+      "FORGE_Q20",
+      "FORGE_Q23",
+      "FORGE_Q26"
+    ],
+    raw_max: 45,
+    n_questions: 9,
+    sub_dimensions: [
+      "I have a clear personal development focus for the next 12 mo...",
+      "Most of my development in the past three years has been stru...",
+      "I can articulate the specific gap I am trying to close in my...",
+      "I am effective at identifying and engaging the specific coac...",
+      "I wait for my organisation to provide development resources ...",
+      "In the past year, I have sought out at least one development...",
+      "My development practices remain consistent during high-press...",
+      "Development activity is the first thing I reduce when my ope...",
+      "I have maintained my development practices through at least ..."
+    ],
+    normalised_max: 20,
+    normalised_formula: "(raw/45) x 20"
+  },
+  {
+    id: "D4",
+    name: "BILATERAL CONTEXT NAVIGATION (BCN)",
+    question_ids: [
+      "FORGE_Q28",
+      "FORGE_Q29",
+      "FORGE_Q30",
+      "FORGE_Q31",
+      "FORGE_Q32",
+      "FORGE_Q33",
+      "FORGE_Q34",
+      "FORGE_Q35",
+      "FORGE_Q36"
+    ],
+    reverse_coded: [
+      "FORGE_Q29",
+      "FORGE_Q32",
+      "FORGE_Q35"
+    ],
+    raw_max: 45,
+    n_questions: 9,
+    sub_dimensions: [
+      "I function effectively in leadership situations where author...",
+      "I find it difficult to perform at my best when the operating...",
+      "I have experience leading effectively in bilateral contexts ...",
+      "I invest in the development of my bilateral counterparts — n...",
+      "I think of my development investment as something I extend p...",
+      "I have at least one bilateral counterpart whose capability I...",
+      "When I am facing multiple simultaneous leadership challenges...",
+      "When multiple leadership challenges are active at the same t...",
+      "I have a framework for deciding which of several concurrent ..."
+    ],
+    normalised_max: 20,
+    normalised_formula: "(raw/45) x 20"
+  }
+];
+
+export const COMPOSITE_BANDS = [
+  {
+    band: "Revenue Architect",
+    min: 80,
+    max: 100,
+    interpretation: "Scalable revenue architecture with strong system leadership. Revenue generation is organisational, not personality-dependent."
+  },
+  {
+    band: "Strong Performer",
+    min: 60,
+    max: 79,
+    interpretation: "Solid sales leadership with identifiable strengths. Some dimensions need investment to achieve scalable revenue architecture."
+  },
+  {
+    band: "Developing Sales Leader",
+    min: 40,
+    max: 59,
+    interpretation: "Foundational sales capability present but not yet at scale. Key dimensions require deliberate development."
+  },
+  {
+    band: "Sales Capability Gap",
+    min: 0,
+    max: 39,
+    interpretation: "Significant gaps in sales leadership architecture. Revenue generation may be at risk without targeted intervention."
+  }
+];
+
+export const DIMENSION_VERDICTS = [
+  {
+    dim: "all",
+    min: 16,
+    max: 20,
+    verdict: "Strong",
+    meaning: "Mature sales leadership with scalable architecture"
+  },
+  {
+    dim: "all",
+    min: 10,
+    max: 15.9,
+    verdict: "Developing",
+    meaning: "Emerging sales leadership with development opportunities"
+  },
+  {
+    dim: "all",
+    min: 0,
+    max: 9.9,
+    verdict: "Gap",
+    meaning: "Significant sales leadership gap requiring intervention"
+  }
+];
+
+export const ARCHETYPES = [
+  {
+    name: "Rainmaker",
+    selling_acumen: "High",
+    system_leadership: "Low",
+    core_pattern: "Personal relationship-driven revenue",
+    revenue_risk: "Cannot scale; revenue collapses when they leave"
+  },
+  {
+    name: "System Builder",
+    selling_acumen: "Low",
+    system_leadership: "High",
+    core_pattern: "Scalable revenue architecture",
+    revenue_risk: "Pipeline is strong; personal deals are weak"
+  },
+  {
+    name: "Revenue Architect",
+    selling_acumen: "High",
+    system_leadership: "High",
+    core_pattern: "Full commercial leadership",
+    revenue_risk: "Risk: under-delegates; creates revenue dependency"
+  },
+  {
+    name: "Promoted Seller",
+    selling_acumen: "High (individual)",
+    system_leadership: "Low",
+    core_pattern: "Top performer promoted into leadership",
+    revenue_risk: "Classic scaling failure; team underperforms"
+  }
+];
+
+
+export const SCORING_CONFIG = {
+  INSTRUMENT, FULL_NAME, VERSION, TOTAL_QUESTIONS, SCALE, DELIVERY_MINUTES,
+  TIER, PRICE_MILES, B2C_NAME, TAGLINE,
+  DIMENSIONS, COMPOSITE_BANDS, DIMENSION_VERDICTS, ARCHETYPES,
+};

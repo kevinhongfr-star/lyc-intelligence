@@ -17,7 +17,7 @@ const DS = {
   error: '#EF4444'
 };
 
-export type ActionType = 
+export type ActionType =
   | 'assessment'
   | 'match_single'
   | 'match_batch'
@@ -25,6 +25,8 @@ export type ActionType =
   | 'cv_optimization'
   | 'pdf_report'
   | 'document_upload';
+
+type GateUnit = 'credits' | 'miles';
 
 export const CREDIT_COSTS: Record<ActionType, number> = {
   assessment: 1,
@@ -46,14 +48,18 @@ export const ACTION_LABELS: Record<ActionType, string> = {
   document_upload: 'Document Upload'
 };
 
+const ASSESSMENT_ACTIONS: ActionType[] = ['assessment', 'pdf_report'];
+
 interface CreditGateProps {
   action: ActionType;
   children: React.ReactNode;
   onSuccess?: () => void;
   disabled?: boolean;
+  unit?: GateUnit;
 }
 
-export function CreditGate({ action, children, onSuccess, disabled = false }: CreditGateProps) {
+export function CreditGate({ action, children, onSuccess, disabled = false, unit }: CreditGateProps) {
+  const effectiveUnit: GateUnit = unit ?? (ASSESSMENT_ACTIONS.includes(action) ? 'miles' : 'credits');
   const { user, profile } = useAuthStore();
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -63,6 +69,10 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
   const credits = profile?.credits?.balance ?? 0;
   const cost = CREDIT_COSTS[action];
   const tier = profile?.tier || 'free';
+
+  const unitNoun = effectiveUnit === 'miles' ? 'Miles' : 'Credits';
+  const unitNounLower = effectiveUnit === 'miles' ? 'miles' : 'credits';
+  const unitShort = effectiveUnit === 'miles' ? 'mi' : 'credits';
 
   useEffect(() => {
     checkCredits();
@@ -91,26 +101,25 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
     if (disabled) return;
 
     setIsProcessing(true);
-    
+
     try {
-      // Attempt to spend credits via API
-      const response = await fetch('/api/credits/spend', {
+      const spendApi = effectiveUnit === 'miles' ? '/api/miles/spend' : '/api/credits/spend';
+      const response = await fetch(spendApi, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          userId: user?.id, 
+        body: JSON.stringify({
+          userId: user?.id,
           action,
-          cost 
+          cost,
+          unit: effectiveUnit,
         })
       });
 
       const data = await response.json();
 
       if (data.success) {
-        // Credits spent successfully
         if (onSuccess) onSuccess();
       } else {
-        // Insufficient credits
         setShowInsufficientCredits(true);
         setShowUpgrade(true);
       }
@@ -123,9 +132,9 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
 
   if (isProcessing) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'center',
         gap: '8px',
         padding: '16px',
@@ -155,10 +164,10 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
               <>
                 <AlertCircle style={{ width: 48, height: 48, color: DS.warning, margin: '0 auto 16px' }} />
                 <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', color: DS.text, marginBottom: '8px' }}>
-                  Insufficient Credits
+                  Insufficient {unitNoun}
                 </h3>
                 <p style={{ color: DS.textSecondary, marginBottom: '16px' }}>
-                  This action requires <strong>{cost} credits</strong>, but you only have <strong>{credits}</strong>.
+                  This action requires <strong>{cost} {unitShort}</strong>, but you only have <strong>{credits}</strong>.
                 </p>
               </>
             ) : (
@@ -168,13 +177,13 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
                   Premium Feature
                 </h3>
                 <p style={{ color: DS.textSecondary, marginBottom: '16px' }}>
-                  This action requires {cost} credits
+                  This action requires {cost} {unitShort}
                 </p>
               </>
             )}
-            <div style={{ 
-              display: 'inline-flex', 
-              alignItems: 'center', 
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
               gap: '8px',
               padding: '12px 24px',
               background: DS.accent,
@@ -182,7 +191,7 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
               fontSize: '14px',
               fontWeight: 600
             }}>
-              {credits >= cost ? 'Use Credits' : 'Upgrade to Continue'}
+              {credits >= cost ? `Use ${unitNoun}` : 'Upgrade to Continue'}
             </div>
           </div>
         )}
@@ -193,6 +202,7 @@ export function CreditGate({ action, children, onSuccess, disabled = false }: Cr
           onClose={() => setShowUpgrade(false)}
           requiredCredits={cost}
           currentCredits={credits}
+          unit={effectiveUnit}
         />
       )}
 

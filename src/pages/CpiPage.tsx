@@ -101,7 +101,7 @@ export default function CpiPage() {
   const handleDownloadReport = () => {
     if (!lastResult) return;
     const dimNames: Record<string, string> = {};
-    for (const d of DIMENSION_INFO) dimNames[d.id] = d.name;
+    for (const [id, d] of Object.entries(DIMENSION_INFO)) dimNames[id] = d.name;
 
     const reportData: CPIReportData = {
       name: user?.name || user?.email || 'Candidate',

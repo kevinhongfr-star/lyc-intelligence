@@ -1,0 +1,18 @@
+{
+  "instrument": "DRIVE",
+  "full_name": "Direction, Readiness, Insight, Values & Engagement",
+  "total_questions": 30,
+  "scale": "5-point Likert (1-5)",
+  "dimensions": [
+    {"id": "D1", "name": "Strategy", "questions": "Q01-Q06", "count": 6, "max_raw": 30},
+    {"id": "D2", "name": "Operations", "questions": "Q07-Q12", "count": 6, "max_raw": 30},
+    {"id": "D3", "name": "People", "questions": "Q13-Q18", "count": 6, "max_raw": 30},
+    {"id": "D4", "name": "Technology", "questions": "Q19-Q24", "count": 6, "max_raw": 30},
+    {"id": "D5", "name": "Results", "questions": "Q25-Q30", "count": 6, "max_raw": 30}
+  ],
+  "reverse_coded": ["DRIVE_Q03","DRIVE_Q09","DRIVE_Q15","DRIVE_Q21","DRIVE_Q27"],
+  "composite_formula": "(Total raw / 150) × 100",
+  "dimension_normalized": "(raw / 30) × 20",
+  "shift_weight": 0.15,
+  "profiles": ["Complete Executor","Strategic Driver (operational gap)","Operational Excellence Leader (strategy/results gap)"]
+}

@@ -18,6 +18,10 @@ interface CreditContextType {
   deductCredit: (amount: number, description: string) => Promise<boolean>;
   hasCredits: (amount?: number) => boolean;
   tier: CreditTier;
+  miles: number;
+  deductMiles: (amount: number, description: string) => Promise<boolean>;
+  refundMiles: (amount: number, description: string) => Promise<boolean>;
+  hasMiles: (amount?: number) => boolean;
 }
 
 const CreditLimits: Record<CreditTier, { daily: number; monthly: number }> = {
@@ -141,6 +145,49 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
     return credit.balance >= amount;
   };
 
+  const deductMiles = async (amount: number, description: string): Promise<boolean> => {
+    return deductCredit(amount, description.replace(/credits?/gi, 'miles').replace(/Credit/g, 'Miles'));
+  };
+
+  const refundMiles = async (amount: number, description: string): Promise<boolean> => {
+    if (!effectiveUserId) return false;
+    try {
+      const supabase = getSupabase();
+      const newBalance = credit.balance + amount;
+
+      await supabase
+        .from('credits')
+        .update({
+          balance: newBalance,
+          total_spent: Math.max(0, credit.totalSpent - amount),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', effectiveUserId);
+
+      await supabase.from('credit_transactions').insert({
+        user_id: effectiveUserId,
+        amount,
+        type: 'refund_miles',
+        description: description.replace(/credits?/gi, 'miles').replace(/Credit/g, 'Miles'),
+      });
+
+      setCredit(prev => ({
+        ...prev,
+        balance: newBalance,
+        totalSpent: Math.max(0, prev.totalSpent - amount),
+      }));
+
+      return true;
+    } catch (error) {
+      console.error('[CreditContext] Refund miles error:', error);
+      return false;
+    }
+  };
+
+  const hasMiles = (amount: number = 1): boolean => {
+    return credit.balance >= amount;
+  };
+
   useEffect(() => {
     refreshCredits();
   }, [refreshCredits]);
@@ -153,6 +200,10 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
         deductCredit,
         hasCredits,
         tier: credit.tier,
+        miles: credit.balance,
+        deductMiles,
+        refundMiles,
+        hasMiles,
       }}
     >
       {children}
@@ -169,7 +220,14 @@ export function useCredits() {
       deductCredit: async () => false,
       hasCredits: () => true,
       tier: 'free' as CreditTier,
+      miles: defaultCredit.balance,
+      deductMiles: async () => false,
+      refundMiles: async () => false,
+      hasMiles: () => true,
     };
   }
   return context;
 }
+
+export const MilesProvider = CreditProvider;
+export const useMiles = useCredits;

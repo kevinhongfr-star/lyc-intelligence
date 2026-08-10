@@ -45,7 +45,16 @@ export async function analyzeSHIFT(
     }
     
     const compositeScore = calculateSHIFTComposite(fallbackScores);
-    const archetype = getSHIFTArchetype(fallbackScores);
+    const dimEntries = Object.entries(fallbackScores).sort((a, b) => b[1] - a[1]);
+    const topDimId = dimEntries[0]?.[0] || "balanced";
+    const archetypeName =
+      topDimId.includes("strategic") ? "Strategic Architect" :
+      topDimId.includes("execution") || topDimId.includes("discipline") ? "Precision Operator" :
+      topDimId.includes("influence") || topDimId.includes("stakeholder") ? "Influential Builder" :
+      topDimId.includes("adapt") || topDimId.includes("cross") ? "Cross-Border Catalyst" :
+      topDimId.includes("presence") || topDimId.includes("leadership") ? "Adaptive Visionary" :
+      "Balanced Leader";
+    const archetype = archetypeName;
     
     return {
       result: {

@@ -1,0 +1,22 @@
+{
+  "instrument": "QUEST",
+  "full_name": "Qualified Executive Skills & Transition",
+  "total_questions": 30,
+  "scale": "5-point Likert (1-5)",
+  "dimensions": [
+    {"id": "D1", "name": "Strategic Clarity", "questions": "Q01-Q10", "count": 10, "max_raw": 50},
+    {"id": "D2", "name": "Adaptability", "questions": "Q11-Q20", "count": 10, "max_raw": 50},
+    {"id": "D3", "name": "Decision Quality", "questions": "Q21-Q30", "count": 10, "max_raw": 50}
+  ],
+  "reverse_coded": ["QUEST_Q04","QUEST_Q08","QUEST_Q13","QUEST_Q16","QUEST_Q19","QUEST_Q23","QUEST_Q28"],
+  "composite_formula": "(Total raw / 150) × 100",
+  "dimension_normalized": "(raw / 50) × 100",
+  "composite_bands": {
+    "80-100": "Strategically Ready",
+    "60-79": "Developing Readiness",
+    "40-59": "Not Yet Ready",
+    "0-39": "Significant Gap"
+  },
+  "shift_weight": 0.25,
+  "profiles": ["Complete Strategist","Clear Thinker (execution gap)","Adaptive Operator (clarity gap)","Capability-Building Executive"]
+}

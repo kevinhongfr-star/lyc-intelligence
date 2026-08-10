@@ -25,6 +25,9 @@ const DS = {
   radiusSm: '8px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
+  error: '#EF4444',
+  success: '#22C55E',
+  warning: '#EAB308',
 };
 
 interface ResultsPanelProps {

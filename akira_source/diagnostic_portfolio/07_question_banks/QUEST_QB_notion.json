@@ -1,0 +1,561 @@
+{
+  "instrument": "QUEST",
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "Strategic Thinking",
+      "sub_dimensions": [
+        {
+          "name": "Direction articulation",
+          "questions": [
+            {
+              "id": "QUEST_Q01",
+              "text": "I can articulate the strategic direction of my organisation with precision — including the specific priorities, trade-offs, and time horizons that define it — without referencing documents or presentations.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Pattern recognition",
+          "questions": [
+            {
+              "id": "QUEST_Q02",
+              "text": "I regularly identify patterns across market signals, competitive moves, and internal data that allow me to anticipate strategic challenges before they become visible to most others in my organisation.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Multi-horizon thinking",
+          "questions": [
+            {
+              "id": "QUEST_Q03",
+              "text": "I can hold the long-term strategic view and the near-term operational detail simultaneously — making decisions that serve both without sacrificing one for the other.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Strategic linkage",
+          "questions": [
+            {
+              "id": "QUEST_Q04",
+              "text": "I find it difficult to explain how the work of my function connects to the broader organisational strategy in terms that are meaningful to people outside my domain.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Assumption management",
+          "questions": [
+            {
+              "id": "QUEST_Q05",
+              "text": "I can clearly describe the two or three assumptions that, if proved false, would require our current strategy to change materially — and I monitor those assumptions actively.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Strategic translation",
+          "questions": [
+            {
+              "id": "QUEST_Q06",
+              "text": "When the organisational strategy changes significantly, I translate the implications into specific, actionable direction for my team without waiting for further guidance from above.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        }
+      ],
+      "questions": []
+    },
+    {
+      "id": "D2",
+      "name": "Execution Excellence",
+      "sub_dimensions": [
+        {
+          "name": "Organisational design for delivery",
+          "questions": [
+            {
+              "id": "QUEST_Q07",
+              "text": "I have built organisational structures, role accountabilities, and performance rhythms that produce consistent results — even when I am not directly involved in day-to-day delivery.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Strategy-to-results conversion",
+          "questions": [
+            {
+              "id": "QUEST_Q08",
+              "text": "I can describe a specific initiative I led in the past two years where I translated a complex strategic goal into a measurable operational outcome on schedule and within resource constraints.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Execution consistency",
+          "questions": [
+            {
+              "id": "QUEST_Q09",
+              "text": "My team often misses commitments or delivers below expectation even when the goal was clearly communicated — I find execution consistency difficult to sustain across my organisation.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Performance visibility",
+          "questions": [
+            {
+              "id": "QUEST_Q10",
+              "text": "I have a clear system for tracking progress against strategic priorities — one that gives me early warning when delivery is at risk, not just after the deadline has passed.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Accountability architecture",
+          "questions": [
+            {
+              "id": "QUEST_Q11",
+              "text": "I hold accountabilities clearly across my organisation — people know precisely what they own, what success looks like, and what the consequence of non-delivery is.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Resource discipline",
+          "questions": [
+            {
+              "id": "QUEST_Q12",
+              "text": "I am comfortable making resource trade-off decisions — stopping or de-prioritising initiatives that are not delivering — rather than allowing underperforming programmes to continue consuming capacity.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        }
+      ],
+      "questions": []
+    },
+    {
+      "id": "D3",
+      "name": "Commercial Acumen",
+      "sub_dimensions": [
+        {
+          "name": "Value creation understanding",
+          "questions": [
+            {
+              "id": "QUEST_Q13",
+              "text": "I can articulate the specific mechanism by which my organisation creates value for customers and captures a portion of that value commercially — with enough precision to make credible resource allocation decisions.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Financial literacy",
+          "questions": [
+            {
+              "id": "QUEST_Q14",
+              "text": "I am comfortable interpreting financial statements and using financial data — revenue, margin, cash flow, unit economics — to make strategic and operational decisions in my domain.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Commercial confidence",
+          "questions": [
+            {
+              "id": "QUEST_Q15",
+              "text": "I find commercial and financial conversations at the executive level difficult — I often rely on finance or commercial colleagues to interpret data before I can contribute meaningfully.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "APAC commercial intelligence",
+          "questions": [
+            {
+              "id": "QUEST_Q16",
+              "text": "I understand the specific commercial dynamics of the APAC markets where I operate — including how pricing, customer relationships, channel structures, and competitive intensity differ from Western market norms.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Commercial judgment under uncertainty",
+          "questions": [
+            {
+              "id": "QUEST_Q17",
+              "text": "I can make credible commercial decisions under uncertainty — recommending a course of action on pricing, market entry, or customer investment when the data is incomplete and the stakes are high.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Market intelligence application",
+          "questions": [
+            {
+              "id": "QUEST_Q18",
+              "text": "I regularly use market intelligence — competitor moves, customer feedback, macro trends — to refine commercial direction, not just to confirm decisions already made.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        }
+      ],
+      "questions": []
+    },
+    {
+      "id": "D4",
+      "name": "People Leadership",
+      "sub_dimensions": [
+        {
+          "name": "Team architecture",
+          "questions": [
+            {
+              "id": "QUEST_Q19",
+              "text": "I have deliberately built a team that is stronger than the sum of its individual members — where the team's collective capability exceeds what I could achieve by directing individuals separately.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Succession development",
+          "questions": [
+            {
+              "id": "QUEST_Q20",
+              "text": "I can identify at least two people in my current team who are on a trajectory to operate at my level or above within the next three years — and I am actively investing in that trajectory.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Team independence",
+          "questions": [
+            {
+              "id": "QUEST_Q21",
+              "text": "My team performs at a consistently high level when I am absent — they do not require my involvement in day-to-day decisions to maintain quality and pace.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Dependency risk",
+          "questions": [
+            {
+              "id": "QUEST_Q22",
+              "text": "I tend to be the primary decision-maker on most significant issues in my team — when I am not available, pace slows and quality varies noticeably.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Individualised development",
+          "questions": [
+            {
+              "id": "QUEST_Q23",
+              "text": "I tailor my leadership approach to the individual — adjusting how I challenge, support, and develop each person based on their specific capability profile, motivation, and growth stage.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "High-stakes people decisions",
+          "questions": [
+            {
+              "id": "QUEST_Q24",
+              "text": "I have navigated difficult people decisions — performance management, restructuring, role elimination — in ways that preserved the trust and psychological safety of the broader team.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        }
+      ],
+      "questions": []
+    },
+    {
+      "id": "D5",
+      "name": "Adaptive Capacity",
+      "sub_dimensions": [
+        {
+          "name": "Environmental scanning & response",
+          "questions": [
+            {
+              "id": "QUEST_Q25",
+              "text": "When market conditions shift significantly, I identify the strategic implications for my organisation before most peers or competitors do, and I act on those implications with appropriate speed.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Pivot capability",
+          "questions": [
+            {
+              "id": "QUEST_Q26",
+              "text": "I have successfully changed course on a significant strategic or operational initiative mid-execution — when new information made the original direction no longer viable — without losing stakeholder confidence in my leadership.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Ambiguity tolerance",
+          "questions": [
+            {
+              "id": "QUEST_Q27",
+              "text": "I perform at my best in stable, well-defined environments; when conditions are ambiguous or rapidly changing, my leadership effectiveness decreases noticeably.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "APAC change leadership",
+          "questions": [
+            {
+              "id": "QUEST_Q28",
+              "text": "I have led a team or organisation through a significant APAC regulatory, market, or stakeholder landscape shift — recalibrating strategy, structure, and priorities — while maintaining operational continuity.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Change resistance",
+          "questions": [
+            {
+              "id": "QUEST_Q29",
+              "text": "I tend to maintain existing plans and commitments even when new information suggests the direction needs to change, because changing course in front of stakeholders feels like an admission of failure.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Adaptive track record",
+          "questions": [
+            {
+              "id": "QUEST_Q30",
+              "text": "I can describe a specific instance in the past 12 months where I adapted my strategy or leadership approach in response to an external signal that others in my organisation had not yet acted on.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        }
+      ],
+      "questions": []
+    },
+    {
+      "id": "D6",
+      "name": "AI Readiness",
+      "sub_dimensions": [
+        {
+          "name": "Decision Architecture Readiness",
+          "questions": [
+            {
+              "id": "QUEST_Q31",
+              "text": "I have a clear framework for deciding which organisational decisions should be informed or supported by AI and which should remain under direct human judgment — and I apply it actively.",
+              "reverse_coded": false,
+              "weight": 1.0
+            },
+            {
+              "id": "QUEST_Q35",
+              "text": "When AI-generated analysis conflicts with my own judgment or intuition, I have a disciplined process for evaluating which to follow — rather than defaulting automatically to either the AI output or my instinct.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Data Governance Awareness",
+          "questions": [
+            {
+              "id": "QUEST_Q32",
+              "text": "I understand the data governance obligations that arise when AI is used in my organisation's decision-making processes — including who is accountable when AI-influenced decisions produce adverse outcomes.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "AI Ethics & Risk Oversight",
+          "questions": [
+            {
+              "id": "QUEST_Q33",
+              "text": "I rely primarily on my technical colleagues to determine how AI should be governed in my organisation — I don't see AI governance as a core leadership accountability at my level.",
+              "reverse_coded": true,
+              "weight": 1.0
+            },
+            {
+              "id": "QUEST_Q36",
+              "text": "I can articulate the specific ethical and reputational risks that AI deployment creates in my organisation's context — and I hold accountability for ensuring those risks are governed, not just identified.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Organisational AI Adoption Leadership",
+          "questions": [
+            {
+              "id": "QUEST_Q34",
+              "text": "I have led — or actively participated in — an organisational initiative to adopt or scale an AI tool or capability, including managing the change, resistance, and capability-building that adoption required.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        }
+      ],
+      "questions": []
+    }
+  ],
+  "archetypes": [
+    {
+      "name": "The Architect",
+      "#": "1",
+      "profile": "High Strategic Thinking + High Adaptive Capacity, Advanced band",
+      "core_strength": "Designs robust systems and can pivot them when context changes. Rare combination at senior executive level.",
+      "key_risk": "Over-engineering; perfectionism slowing delivery; may underinvest in commercial urgency",
+      "development_priority": "Delegation discipline; \"good enough\" calibration; commercial acumen deepening"
+    },
+    {
+      "name": "The Catalyst",
+      "#": "2",
+      "profile": "High Commercial Acumen + High Adaptive Capacity, Advanced band",
+      "core_strength": "Thrives in complexity and disruption; spots commercial opportunities others miss; acts fast",
+      "key_risk": "Impatience with process and governance; may burn out teams; can deprioritise people development",
+      "development_priority": "Sustainability mindset; team development investment; governance discipline"
+    },
+    {
+      "name": "The Diplomat",
+      "#": "3",
+      "profile": "High People Leadership + High Strategic Thinking, Advanced band",
+      "core_strength": "Builds coalitions, navigates politics, aligns diverse stakeholders around complex strategy",
+      "key_risk": "May prioritise harmony over hard decisions; can be slow to confront underperformance",
+      "development_priority": "Decisiveness under pressure; constructive confrontation capability; execution rigour"
+    },
+    {
+      "name": "The Commander",
+      "#": "4",
+      "profile": "High Execution Excellence + High Commercial Acumen, Advanced band",
+      "core_strength": "Delivers results through commercial discipline and operational rigour; highly credible in P&L conversations",
+      "key_risk": "May neglect people development for short-term results; can be directive at the expense of team capability-building",
+      "development_priority": "People leadership investment; long-term talent pipeline thinking; adaptive capacity"
+    },
+    {
+      "name": "The Navigator",
+      "#": "5",
+      "profile": "High Adaptive Capacity + High People Leadership, Developing band",
+      "core_strength": "Guides teams through change with empathy and consistency; preserves team cohesion in uncertainty",
+      "key_risk": "May lack strategic direction or commercial edge; change leadership without destination clarity",
+      "development_priority": "Strategic thinking sharpness; commercial acumen; decision conviction"
+    },
+    {
+      "name": "The Strategist",
+      "#": "6",
+      "profile": "High Strategic Thinking, Developing band",
+      "core_strength": "Sees the big picture clearly; excellent at analysis and direction-setting",
+      "key_risk": "Execution gaps — vision without delivery mechanism; may rely on others for follow-through",
+      "development_priority": "Execution Excellence; team mobilisation; accountability architecture"
+    },
+    {
+      "name": "The Engine",
+      "#": "7",
+      "profile": "High Execution Excellence, Developing band",
+      "core_strength": "Reliable delivery machine; consistent output; operationally credible",
+      "key_risk": "May be executing the wrong strategy; tends to optimise the current path rather than question it",
+      "development_priority": "Strategic thinking; commercial awareness; adaptive capacity"
+    },
+    {
+      "name": "The Entrepreneur",
+      "#": "8",
+      "profile": "High Commercial Acumen + High Adaptive Capacity, Developing band",
+      "core_strength": "Bold commercial moves; market-savvy; pivots fast when opportunity shifts",
+      "key_risk": "May lack organisational buy-in or people development capability; governance gaps",
+      "development_priority": "People leadership; execution discipline; stakeholder management"
+    },
+    {
+      "name": "The Specialist",
+      "#": "9",
+      "profile": "One dimension dominant (>15 pts above all others), any band",
+      "core_strength": "Deep expertise in one executive capability domain; highly valued for that specific strength",
+      "key_risk": "Over-reliance on single strength; may have blind spots in 2–3 other dimensions that limit seniority ceiling",
+      "development_priority": "Broadening capability across secondary dimensions; delegation of dominant strength to create capacity"
+    },
+    {
+      "name": "The Seedling",
+      "#": "10",
+      "profile": "Multiple low dimensions, Emerging band (avg <50)",
+      "core_strength": "High development potential; early in the executive capability journey; typically high motivation",
+      "key_risk": "Overwhelm; pursuing development in too many areas simultaneously; wrong sequencing of priorities",
+      "development_priority": "Focus on 1–2 highest-leverage dimensions only; structured mentoring; SHIFT-QUEST programme indicated"
+    }
+  ],
+  "scoring": {
+    "reverse_coded_items": [],
+    "bands": [
+      {
+        "composite_score_(/100)": "80–100",
+        "band": "Executive Ready",
+        "interpretation": "Strong capability across all five dimensions; operating at senior executive level"
+      },
+      {
+        "composite_score_(/100)": "60–79",
+        "band": "Near-Ready",
+        "interpretation": "1–2 capability gaps to address; strong foundation with targeted development needed"
+      },
+      {
+        "composite_score_(/100)": "40–59",
+        "band": "Capability Building",
+        "interpretation": "Substantive development needed in 2–3 dimensions; structured programme recommended"
+      },
+      {
+        "composite_score_(/100)": "20–39",
+        "band": "Early Executive",
+        "interpretation": "In transition to executive level; not yet operating at full capability"
+      },
+      {
+        "composite_score_(/100)": "0–19",
+        "band": "Pre-Executive",
+        "interpretation": "Fundamental capability gaps; foundational development required"
+      },
+      {
+        "normalised_score_(/100)": "75–100",
+        "verdict": "Strength",
+        "meaning": "Deployable capability; executive operates at this level consistently and under pressure"
+      },
+      {
+        "normalised_score_(/100)": "50–74",
+        "verdict": "Developing",
+        "meaning": "Functional in stable conditions; gaps emerge under pressure or in unfamiliar APAC contexts"
+      },
+      {
+        "normalised_score_(/100)": "0–49",
+        "verdict": "Gap",
+        "meaning": "Underdeveloped for the executive's current or target role; primary development priority"
+      }
+    ]
+  },
+  "total_questions": 36
+}

@@ -1,0 +1,20 @@
+{
+  "instrument": "IMPACT",
+  "full_name": "Organisational Impact & Leadership Legacy",
+  "total_questions": 30,
+  "scale": "5-point Likert (1-5)",
+  "dimensions": [
+    {"id": "D1", "name": "Strategic Impact", "questions": "Q01-Q06", "count": 6, "max_raw": 30},
+    {"id": "D2", "name": "Operational Impact", "questions": "Q07-Q12", "count": 6, "max_raw": 30},
+    {"id": "D3", "name": "People Impact", "questions": "Q13-Q18", "count": 6, "max_raw": 30},
+    {"id": "D4", "name": "Cultural Impact", "questions": "Q19-Q24", "count": 6, "max_raw": 30},
+    {"id": "D5", "name": "Market Impact", "questions": "Q25-Q30", "count": 6, "max_raw": 30}
+  ],
+  "reverse_coded": ["IMPACT_Q03","IMPACT_Q09","IMPACT_Q15","IMPACT_Q21","IMPACT_Q27"],
+  "composite_formula": "(Total raw / 150) × 100",
+  "dimension_normalized": "(raw / 30) × 20",
+  "shift_weight": 0.25,
+  "optional_rater": "10-question rater instrument (2 per dimension) for Corroboration Score",
+  "gating_effect": "IMPACT can gate SHIFT Composite - Limited Impact band triggers caveat",
+  "profiles": ["Transformational Leader","Strategic Architect (commercial gap)","Commercial Performer (strategic/cultural gap)"]
+}

@@ -1,0 +1,444 @@
+{
+  "instrument": "IMPACT",
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "Strategic Oversight",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q01",
+          "text": "I consistently ask questions in board discussions that challenge the strategic assumptions underlying management's proposals.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q02",
+          "text": "I am able to identify strategic risks that management has not surfaced — and I raise them.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q03",
+          "text": "I distinguish between my role as a board member (governing strategy) and the executive's role (creating strategy), and I hold that boundary clearly.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q04",
+          "text": "I find that I tend to ratify management's strategic proposals rather than challenging their underlying logic. [R]",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q05",
+          "text": "I bring a point of view to strategic board discussions that adds genuine value — not just process compliance or broad agreement.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q06",
+          "text": "I can evaluate strategic options at board level with genuine analytical independence, rather than relying entirely on management's framing.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D2",
+      "name": "Governance Rigour",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q07",
+          "text": "I apply my fiduciary responsibilities with consistent rigour, even when it creates tension with management.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q08",
+          "text": "I can identify when a governance risk has reached the threshold requiring board escalation — and I act on that judgment.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q09",
+          "text": "I hold management accountable for their commitments in a way that is clear and consistent without undermining their authority to operate.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q10",
+          "text": "I sometimes defer to the dominant voice in the boardroom rather than pressing a governance concern I believe is valid. [R]",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q11",
+          "text": "I understand the specific fiduciary and regulatory obligations that apply to my board role in the markets I operate in.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q12",
+          "text": "I can distinguish between governance risk and operational risk — and I engage at the governance level without overreaching into operations.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D3",
+      "name": "Stakeholder Intelligence",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q13",
+          "text": "I have a clear and current map of the key stakeholders my board mandate requires me to understand and engage.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q14",
+          "text": "I navigate the dynamics between independent directors and management with deliberate intelligence — I understand where the power sits and how to engage it effectively.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q15",
+          "text": "In APAC governance contexts, I am comfortable operating in environments where government or political stakeholders have a direct relationship with the board.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q16",
+          "text": "I find APAC government-board stakeholder dynamics more difficult to navigate than investor or management stakeholders. [R]",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q17",
+          "text": "I understand how major shareholder dynamics — including controlling family or state shareholders — affect board decision-making in the markets I operate in.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q18",
+          "text": "I bring useful stakeholder intelligence into board discussions — insights about investors, regulators, or market dynamics that strengthen the board's collective picture.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D4",
+      "name": "Mandate Legacy",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q19",
+          "text": "I think explicitly about the long-term legacy this board's decisions will create — not just the near-term performance metrics.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q20",
+          "text": "I advocate for decisions that protect the organisation's long-term health, even when they create short-term costs or discomfort.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q21",
+          "text": "I am more focused on the organisation's current performance metrics than on the lasting value the board is building. [R]",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q22",
+          "text": "I think carefully about what institutional knowledge, governance standards, and values I am contributing to this organisation's enduring capability.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q23",
+          "text": "I consider what the board's track record will look like in 10 years — and I make governance decisions with that perspective in mind.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q24",
+          "text": "I push back when I believe a decision optimises for short-term optics at the expense of long-term institutional credibility.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D5",
+      "name": "APAC Mandate Credibility",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q25",
+          "text": "My board or advisory profile — including my experience, network, and governance background — creates genuine credibility with APAC-native stakeholders.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q26",
+          "text": "I understand the governance and regulatory expectations of the specific APAC markets my board role requires me to engage (e.g., MAS in Singapore, CSRC/CAC in China, TSE reform standards in Japan).",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q27",
+          "text": "I have been able to build or access the APAC relationships needed to carry my board mandate effectively in the markets that matter.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q28",
+          "text": "When I am in a room with senior APAC business leaders, government officials, or regulators, I can tell that my authority does not fully land in the way I would like it to. [R]",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q29",
+          "text": "I understand the cultural norms — around consensus, hierarchy, face-saving, and relationship-first communication — that shape governance conversations in APAC board contexts.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q30",
+          "text": "My APAC governance credibility is actively strengthening — I am investing in the relationships, experience, and market intelligence that will deepen it over time.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    }
+  ],
+  "archetypes": [
+    {
+      "name": "The Architect",
+      "#": "1",
+      "orientation": "Governance + Strategy dominant",
+      "mandate_band": "High",
+      "core_dynamic": "Sets the standards and sees the big picture. The board member every chair wants. Rare combination of governance rigour and strategic intelligence operating at full strength.",
+      "risk_if_unaddressed": "May become the dominant voice — suppressing other directors' contributions. Board monoculture risk.",
+      "development_priority": "Board chair succession readiness; sponsoring governance uplift in co-directors",
+      "apac_modifier_note": "If APAC Mandate Credibility <50, Architect profile may not translate to APAC-native boards — high Western credibility, APAC gap possible"
+    },
+    {
+      "name": "The Steward",
+      "#": "2",
+      "orientation": "Governance + Legacy dominant",
+      "mandate_band": "High",
+      "core_dynamic": "Protects what has been built while building for the future. The institutional memory keeper. Brings a long-term governance lens that most boards undervalue.",
+      "risk_if_unaddressed": "May resist necessary change. Over-conservatism can slow board adaptation to market shifts.",
+      "development_priority": "Innovation mindset development; engaging constructively with disruption",
+      "apac_modifier_note": "Strong in Japan and Singapore governance contexts; may have less traction in higher-velocity APAC markets (e.g., SE Asia startups, China state contexts)"
+    },
+    {
+      "name": "The Networker",
+      "#": "3",
+      "orientation": "Relationship-dominant",
+      "mandate_band": "High",
+      "core_dynamic": "Connects dots across stakeholders, surfaces opportunities, reads the boardroom dynamics with exceptional precision.",
+      "risk_if_unaddressed": "Governance depth may lag relationship breadth. Substance must match style.",
+      "development_priority": "Deepening governance rigour; building analytical independence to match stakeholder intelligence",
+      "apac_modifier_note": "APAC Networkers with government stakeholder relationships are highly valuable — this archetype's APAC Mandate Credibility score is the most important modifier"
+    },
+    {
+      "name": "The Guardian",
+      "#": "4",
+      "orientation": "Governance-dominant",
+      "mandate_band": "Building",
+      "core_dynamic": "Rigorous on process, consistent on fiduciary duties, but not yet contributing at full strategic level. The conscientious director.",
+      "risk_if_unaddressed": "Strategic contribution remains thin. May be seen as a procedural resource rather than a thought leader.",
+      "development_priority": "Strategic oversight development; learning to ask questions that reframe management's strategic proposals",
+      "apac_modifier_note": "Strong governance foundation makes this archetype credible across APAC markets — APAC Credibility gap most likely in market-specific intelligence"
+    },
+    {
+      "name": "The Visionary",
+      "#": "5",
+      "orientation": "Strategy-dominant",
+      "mandate_band": "Building",
+      "core_dynamic": "Sees the future clearly. Brings genuine strategic intelligence. But governance mechanics are still tightening. Great strategist, developing director.",
+      "risk_if_unaddressed": "Governance gaps create risk exposure — may inadvertently overstep into executive territory.",
+      "development_priority": "Governance rigour; maintaining appropriate board/management boundary in strategic discussions",
+      "apac_modifier_note": "High value in APAC growth markets; may lack credibility with regulatory-facing boards (MAS, CSRC) where governance rigour is scrutinised"
+    },
+    {
+      "name": "The Bridge-Builder",
+      "#": "6",
+      "orientation": "Relationship + Legacy dominant",
+      "mandate_band": "Building",
+      "core_dynamic": "Builds relationships and thinks long-term. A connector with a genuine commitment to lasting value. Growing governance capability.",
+      "risk_if_unaddressed": "Strategic oversight depth may be insufficient for complex board mandates.",
+      "development_priority": "Strategic oversight development; governance formalisation beyond process compliance",
+      "apac_modifier_note": "Strong APAC stakeholder relationship builder — often effective with APAC-native boards where relational credibility opens governance conversations"
+    },
+    {
+      "name": "The Nominee",
+      "#": "7",
+      "orientation": "Any profile",
+      "mandate_band": "Fragile (any dim ≥50)",
+      "core_dynamic": "Recently appointed or still developing governance capability. Potential is present — at least one dimension shows credible foundation.",
+      "risk_if_unaddressed": "Development stalls if not actively supported. Risk of becoming a Passenger if learning support is absent.",
+      "development_priority": "Structured board director development programme; mentorship pairing with experienced director",
+      "apac_modifier_note": "APAC-specific governance literacy development is highest priority — Western governance training alone is insufficient for APAC board contexts"
+    },
+    {
+      "name": "The Passenger",
+      "#": "8",
+      "orientation": "All dims low",
+      "mandate_band": "Fragile (all dims <40)",
+      "core_dynamic": "Attends meetings, votes with the majority, contributes minimally. The board member whose presence does not strengthen the board's collective capability.",
+      "risk_if_unaddressed": "Continued presence weakens board effectiveness and sets a governance floor that others adapt to.",
+      "development_priority": "Honest assessment conversation required: targeted development or board exit",
+      "apac_modifier_note": "APAC Mandate Credibility is likely very low — limited value in APAC governance contexts without fundamental capability development"
+    },
+    {
+      "name": "Axis 1",
+      "description": "Impact Orientation: How does the board member primarily create value? (Governance-dominant / Strategy-dominant / Relationship-dominant / Legacy-dominant / Balanced)"
+    },
+    {
+      "name": "Axis 2",
+      "description": "Mandate Strength Band: How credibly do they operate in the governance role? (High / Building / Fragile)"
+    }
+  ],
+  "scoring": {
+    "reverse_coded_items": [],
+    "bands": [
+      {
+        "band": "High Mandate",
+        "score_range": "70–100",
+        "interpretation": "Strong governance foundation; credible and effective in board role"
+      },
+      {
+        "band": "Building Mandate",
+        "score_range": "40–69",
+        "interpretation": "Developing capability; some meaningful gaps to address"
+      },
+      {
+        "band": "Fragile Mandate",
+        "score_range": "0–39",
+        "interpretation": "Significant gaps in board effectiveness; development or honest role assessment required"
+      },
+      {
+        "#": "1",
+        "archetype": "The Architect",
+        "orientation": "Governance + Strategy dominant",
+        "mandate_band": "High",
+        "core_dynamic": "Sets the standards and sees the big picture. The board member every chair wants. Rare combination of governance rigour and strategic intelligence operating at full strength.",
+        "risk_if_unaddressed": "May become the dominant voice — suppressing other directors' contributions. Board monoculture risk.",
+        "development_priority": "Board chair succession readiness; sponsoring governance uplift in co-directors",
+        "apac_modifier_note": "If APAC Mandate Credibility <50, Architect profile may not translate to APAC-native boards — high Western credibility, APAC gap possible"
+      },
+      {
+        "#": "2",
+        "archetype": "The Steward",
+        "orientation": "Governance + Legacy dominant",
+        "mandate_band": "High",
+        "core_dynamic": "Protects what has been built while building for the future. The institutional memory keeper. Brings a long-term governance lens that most boards undervalue.",
+        "risk_if_unaddressed": "May resist necessary change. Over-conservatism can slow board adaptation to market shifts.",
+        "development_priority": "Innovation mindset development; engaging constructively with disruption",
+        "apac_modifier_note": "Strong in Japan and Singapore governance contexts; may have less traction in higher-velocity APAC markets (e.g., SE Asia startups, China state contexts)"
+      },
+      {
+        "#": "3",
+        "archetype": "The Networker",
+        "orientation": "Relationship-dominant",
+        "mandate_band": "High",
+        "core_dynamic": "Connects dots across stakeholders, surfaces opportunities, reads the boardroom dynamics with exceptional precision.",
+        "risk_if_unaddressed": "Governance depth may lag relationship breadth. Substance must match style.",
+        "development_priority": "Deepening governance rigour; building analytical independence to match stakeholder intelligence",
+        "apac_modifier_note": "APAC Networkers with government stakeholder relationships are highly valuable — this archetype's APAC Mandate Credibility score is the most important modifier"
+      },
+      {
+        "#": "4",
+        "archetype": "The Guardian",
+        "orientation": "Governance-dominant",
+        "mandate_band": "Building",
+        "core_dynamic": "Rigorous on process, consistent on fiduciary duties, but not yet contributing at full strategic level. The conscientious director.",
+        "risk_if_unaddressed": "Strategic contribution remains thin. May be seen as a procedural resource rather than a thought leader.",
+        "development_priority": "Strategic oversight development; learning to ask questions that reframe management's strategic proposals",
+        "apac_modifier_note": "Strong governance foundation makes this archetype credible across APAC markets — APAC Credibility gap most likely in market-specific intelligence"
+      },
+      {
+        "#": "5",
+        "archetype": "The Visionary",
+        "orientation": "Strategy-dominant",
+        "mandate_band": "Building",
+        "core_dynamic": "Sees the future clearly. Brings genuine strategic intelligence. But governance mechanics are still tightening. Great strategist, developing director.",
+        "risk_if_unaddressed": "Governance gaps create risk exposure — may inadvertently overstep into executive territory.",
+        "development_priority": "Governance rigour; maintaining appropriate board/management boundary in strategic discussions",
+        "apac_modifier_note": "High value in APAC growth markets; may lack credibility with regulatory-facing boards (MAS, CSRC) where governance rigour is scrutinised"
+      },
+      {
+        "#": "6",
+        "archetype": "The Bridge-Builder",
+        "orientation": "Relationship + Legacy dominant",
+        "mandate_band": "Building",
+        "core_dynamic": "Builds relationships and thinks long-term. A connector with a genuine commitment to lasting value. Growing governance capability.",
+        "risk_if_unaddressed": "Strategic oversight depth may be insufficient for complex board mandates.",
+        "development_priority": "Strategic oversight development; governance formalisation beyond process compliance",
+        "apac_modifier_note": "Strong APAC stakeholder relationship builder — often effective with APAC-native boards where relational credibility opens governance conversations"
+      },
+      {
+        "#": "7",
+        "archetype": "The Nominee",
+        "orientation": "Any profile",
+        "mandate_band": "Fragile (any dim ≥50)",
+        "core_dynamic": "Recently appointed or still developing governance capability. Potential is present — at least one dimension shows credible foundation.",
+        "risk_if_unaddressed": "Development stalls if not actively supported. Risk of becoming a Passenger if learning support is absent.",
+        "development_priority": "Structured board director development programme; mentorship pairing with experienced director",
+        "apac_modifier_note": "APAC-specific governance literacy development is highest priority — Western governance training alone is insufficient for APAC board contexts"
+      },
+      {
+        "#": "8",
+        "archetype": "The Passenger",
+        "orientation": "All dims low",
+        "mandate_band": "Fragile (all dims <40)",
+        "core_dynamic": "Attends meetings, votes with the majority, contributes minimally. The board member whose presence does not strengthen the board's collective capability.",
+        "risk_if_unaddressed": "Continued presence weakens board effectiveness and sets a governance floor that others adapt to.",
+        "development_priority": "Honest assessment conversation required: targeted development or board exit",
+        "apac_modifier_note": "APAC Mandate Credibility is likely very low — limited value in APAC governance contexts without fundamental capability development"
+      },
+      {
+        "rating": "APAC-Ready",
+        "score_range": "≥75",
+        "interpretation": "Credible with APAC stakeholders without adjustment. Experience, network, and governance profile create authentic authority in APAC governance contexts."
+      },
+      {
+        "rating": "APAC-Developing",
+        "score_range": "50–74",
+        "interpretation": "Credible with deliberate support and cultural development. Specific market or stakeholder gaps to address."
+      },
+      {
+        "rating": "APAC-Gap",
+        "score_range": "<50",
+        "interpretation": "Significant credibility gap in APAC governance contexts. Western governance credentials may not transfer. Urgent development or role recalibration recommended."
+      },
+      {
+        "mandate_band": "High Mandate",
+        "priority_1": "Succession and mentoring (board chair readiness)",
+        "priority_2": "Peer governance contribution (elevating the board collectively)",
+        "priority_3": "Specific archetype risk management"
+      },
+      {
+        "mandate_band": "Building Mandate",
+        "priority_1": "Dimension-specific capability development (per archetype)",
+        "priority_2": "APAC market literacy deepening",
+        "priority_3": "Board exposure expansion (committee leadership, cross-sector mandates)"
+      },
+      {
+        "mandate_band": "Fragile Mandate",
+        "priority_1": "Foundational governance training",
+        "priority_2": "Active mentorship pairing",
+        "priority_3": "Honest mandate fit assessment"
+      }
+    ]
+  },
+  "total_questions": 30
+}

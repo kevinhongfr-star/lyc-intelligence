@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRIVE - Execution Capability Assessment | LYC Partners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=DM+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --ink: #1a1a2e;
+    --white: #ffffff;
+    --off: #f5f6f8;
+    --g100: #f0f1f3;
+    --g200: #e2e4e8;
+    --g300: #c8cbd0;
+    --g400: #9ca0a8;
+    --g500: #6b7080;
+    --g600: #4a4e5a;
+    --fuchsia: #c108ab;
+    --fuchsia-light: rgba(193, 8, 171, 0.08);
+    --serif: 'Crimson Pro', Georgia, serif;
+    --sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--sans); background: var(--white); color: var(--ink); line-height: 1.8; -webkit-font-smoothing: antialiased; }
+.container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+.cover { background: var(--ink); color: var(--white); padding: 80px 24px 64px; text-align: left; }
+.cover-inner { max-width: 720px; margin: 0 auto; }
+.cover .logo { height: 32px; margin-bottom: 48px; opacity: 0.9; }
+.cover h1 { font-family: var(--serif); font-size: 56px; font-weight: 400; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px; }
+.cover .subtitle { font-family: var(--sans); font-size: 18px; font-weight: 400; opacity: 0.65; margin-bottom: 32px; line-height: 1.5; }
+.cover .meta { font-family: var(--mono); font-size: 11px; opacity: 0.4; letter-spacing: 0.5px; }
+.progress-bar { position: sticky; top: 0; z-index: 100; background: var(--white); padding: 12px 24px; }
+.progress-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+.progress-track { flex: 1; height: 4px; background: var(--g200); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--fuchsia); border-radius: 2px; width: 0%; transition: width 0.3s ease; }
+.progress-text { font-family: var(--mono); font-size: 11px; color: var(--g500); white-space: nowrap; }
+.instructions { padding: 48px 24px 32px; max-width: 720px; margin: 0 auto; }
+.instructions h2 { font-family: var(--serif); font-size: 28px; font-weight: 400; margin-bottom: 16px; }
+.instructions p { font-size: 15px; color: var(--g600); margin-bottom: 12px; line-height: 1.7; }
+.info-box { background: var(--g100); border-radius: 6px; padding: 20px 24px; margin-top: 24px; }
+.info-box p { margin-bottom: 0; font-size: 13px; color: var(--g500); }
+.dimension-section { padding: 32px 24px; max-width: 720px; margin: 0 auto; }
+.dimension-header { margin-bottom: 32px; }
+.dimension-label { font-family: var(--mono); font-size: 11px; color: var(--fuchsia); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+.dimension-title { font-family: var(--serif); font-size: 24px; font-weight: 400; color: var(--ink); }
+.question-card { background: var(--white); padding: 28px 0; margin-bottom: 8px; }
+.question-card + .question-card { border-top: 1px solid var(--g100); }
+.question-number { font-family: var(--mono); font-size: 11px; color: var(--g400); margin-bottom: 8px; }
+.question-text { font-size: 15px; font-weight: 500; color: var(--ink); line-height: 1.6; margin-bottom: 20px; }
+.likert-scale { display: flex; gap: 8px; flex-wrap: wrap; }
+.likert-option { flex: 1; min-width: 100px; }
+.likert-option input[type="radio"] { display: none; }
+.likert-option label { display: flex; flex-direction: column; align-items: center; padding: 14px 8px; background: var(--g100); border-radius: 6px; cursor: pointer; transition: all 0.2s ease; text-align: center; }
+.likert-option label:hover { background: var(--fuchsia-light); }
+.likert-option input[type="radio"]:checked + label { background: var(--fuchsia); color: var(--white); }
+.likert-option input[type="radio"]:checked + label .likert-number { color: var(--white); opacity: 0.8; }
+.likert-number { font-family: var(--mono); font-size: 11px; color: var(--g400); margin-bottom: 4px; }
+.likert-label { font-size: 11px; font-weight: 500; line-height: 1.3; }
+.section-divider { background: var(--off); padding: 32px 24px; margin: 16px 0; }
+.section-divider-inner { max-width: 720px; margin: 0 auto; }
+.submit-section { padding: 64px 24px; text-align: center; background: var(--off); }
+.submit-btn { display: inline-block; padding: 18px 48px; background: var(--ink); color: var(--white); font-family: var(--sans); font-size: 15px; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
+.submit-btn:hover { background: var(--fuchsia); transform: translateY(-1px); }
+.submit-note { font-size: 12px; color: var(--g400); margin-top: 16px; font-family: var(--mono); }
+.footer { padding: 24px; text-align: center; font-family: var(--mono); font-size: 11px; color: var(--g400); }
+.completion-page { display: none; padding: 80px 24px; text-align: center; max-width: 600px; margin: 0 auto; }
+.completion-page h2 { font-family: var(--serif); font-size: 36px; margin-bottom: 16px; }
+.completion-page p { font-size: 15px; color: var(--g600); margin-bottom: 12px; line-height: 1.7; }
+.next-steps { background: var(--g100); border-radius: 6px; padding: 24px; margin-top: 32px; text-align: left; }
+.next-steps h3 { font-family: var(--serif); font-size: 20px; margin-bottom: 12px; }
+@media (max-width: 640px) {
+    .cover h1 { font-size: 36px; }
+    .cover { padding: 48px 20px 40px; }
+    .likert-scale { flex-direction: column; }
+    .likert-option { min-width: 100%; }
+    .likert-option label { flex-direction: row; gap: 8px; padding: 12px 16px; }
+    .likert-number { margin-bottom: 0; }
+}
+</style>
+</head>
+<body>
+    <section class="cover">
+        <div class="cover-inner">
+            <img src="data:image/png;base64,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" alt="LYC Partners" class="logo">
+            <h1>DRIVE</h1>
+            <div class="subtitle">Execution Capability Assessment</div>
+            <div class="meta">10-12 MINUTES &bull; 36 QUESTIONS &bull; CONFIDENTIAL</div>
+        </div>
+    </section>
+
+    <div class="progress-bar" id="progressBar">
+        <div class="progress-inner">
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0 / 36</div>
+        </div>
+    </div>
+
+    <section class="instructions">
+        <h2>Before You Begin</h2>
+        <p>Measures what pushes you to act, sustain effort, and deliver results under pressure. Maps your motivational architecture — what energises you, what drains you, and how you sustain performance over time.</p>
+        <p>There are no right or wrong answers. Respond based on your genuine experience and perspective. Your responses are confidential and will be used to generate your personalised assessment report.</p>
+        <div class="info-box">
+            <p><strong>Scale:</strong> For each statement, select the response that best reflects how much you agree or disagree. Estimated completion time: 10-12 minutes.</p>
+        </div>
+    </section>
+
+    <form id="assessmentForm">
+
+    <div class="dimension-section">
+        <div class="dimension-header">
+            <div class="dimension-label">Section 1</div>
+            <div class="dimension-title">Intrinsic Motivation</div>
+        </div>
+
+        <div class="question-card" data-q="1">
+            <div class="question-number">Question 1 of 36</div>
+            <div class="question-text">The work itself — the intellectual challenge, the problem-solving, the craft — is the primary reason I remain in my current role, not the compensation, the organisation, or external recognition.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q01_1" name="q_DRIVE_Q01" value="1" required>
+            <label for="q_DRIVE_Q01_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q01_2" name="q_DRIVE_Q01" value="2" required>
+            <label for="q_DRIVE_Q01_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q01_3" name="q_DRIVE_Q01" value="3" required>
+            <label for="q_DRIVE_Q01_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q01_4" name="q_DRIVE_Q01" value="4" required>
+            <label for="q_DRIVE_Q01_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q01_5" name="q_DRIVE_Q01" value="5" required>
+            <label for="q_DRIVE_Q01_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="2">
+            <div class="question-number">Question 2 of 36</div>
+            <div class="question-text">I am most motivated when I am working on complex, demanding tasks that require my full attention — routine or administrative work drains my energy regardless of the external rewards attached.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q02_1" name="q_DRIVE_Q02" value="1" required>
+            <label for="q_DRIVE_Q02_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q02_2" name="q_DRIVE_Q02" value="2" required>
+            <label for="q_DRIVE_Q02_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q02_3" name="q_DRIVE_Q02" value="3" required>
+            <label for="q_DRIVE_Q02_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q02_4" name="q_DRIVE_Q02" value="4" required>
+            <label for="q_DRIVE_Q02_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q02_5" name="q_DRIVE_Q02" value="5" required>
+            <label for="q_DRIVE_Q02_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="3">
+            <div class="question-number">Question 3 of 36</div>
+            <div class="question-text">If the external rewards were sufficient — compensation, title, recognition — I would remain engaged even in work I find intellectually undemanding or unstimulating.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q03_1" name="q_DRIVE_Q03" value="1" required>
+            <label for="q_DRIVE_Q03_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q03_2" name="q_DRIVE_Q03" value="2" required>
+            <label for="q_DRIVE_Q03_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q03_3" name="q_DRIVE_Q03" value="3" required>
+            <label for="q_DRIVE_Q03_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q03_4" name="q_DRIVE_Q03" value="4" required>
+            <label for="q_DRIVE_Q03_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q03_5" name="q_DRIVE_Q03" value="5" required>
+            <label for="q_DRIVE_Q03_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="4">
+            <div class="question-number">Question 4 of 36</div>
+            <div class="question-text">There are moments in my current role when I become so absorbed in the work that I lose track of time — a state of flow that I find deeply motivating in itself.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q04_1" name="q_DRIVE_Q04" value="1" required>
+            <label for="q_DRIVE_Q04_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q04_2" name="q_DRIVE_Q04" value="2" required>
+            <label for="q_DRIVE_Q04_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q04_3" name="q_DRIVE_Q04" value="3" required>
+            <label for="q_DRIVE_Q04_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q04_4" name="q_DRIVE_Q04" value="4" required>
+            <label for="q_DRIVE_Q04_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q04_5" name="q_DRIVE_Q04" value="5" required>
+            <label for="q_DRIVE_Q04_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="5">
+            <div class="question-number">Question 5 of 36</div>
+            <div class="question-text">I would stay in my current role even if the external conditions deteriorated — the quality of the work itself is sufficient to sustain my motivation.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q05_1" name="q_DRIVE_Q05" value="1" required>
+            <label for="q_DRIVE_Q05_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q05_2" name="q_DRIVE_Q05" value="2" required>
+            <label for="q_DRIVE_Q05_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q05_3" name="q_DRIVE_Q05" value="3" required>
+            <label for="q_DRIVE_Q05_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q05_4" name="q_DRIVE_Q05" value="4" required>
+            <label for="q_DRIVE_Q05_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q05_5" name="q_DRIVE_Q05" value="5" required>
+            <label for="q_DRIVE_Q05_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="6">
+            <div class="question-number">Question 6 of 36</div>
+            <div class="question-text">In APAC cross-border assignments — where the cultural complexity, ambiguity, and relational demands are inherently rich — I find the work itself more motivating than in simpler, more familiar contexts.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q06_1" name="q_DRIVE_Q06" value="1" required>
+            <label for="q_DRIVE_Q06_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q06_2" name="q_DRIVE_Q06" value="2" required>
+            <label for="q_DRIVE_Q06_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q06_3" name="q_DRIVE_Q06" value="3" required>
+            <label for="q_DRIVE_Q06_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q06_4" name="q_DRIVE_Q06" value="4" required>
+            <label for="q_DRIVE_Q06_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q06_5" name="q_DRIVE_Q06" value="5" required>
+            <label for="q_DRIVE_Q06_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+    <div class="section-divider"><div class="section-divider-inner"></div></div>
+
+    <div class="dimension-section">
+        <div class="dimension-header">
+            <div class="dimension-label">Section 2</div>
+            <div class="dimension-title">Extrinsic Motivation</div>
+        </div>
+
+        <div class="question-card" data-q="7">
+            <div class="question-number">Question 7 of 36</div>
+            <div class="question-text">Visible recognition of my contributions — from senior stakeholders, from the organisation, or from my professional community — is an important source of motivation for me.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q07_1" name="q_DRIVE_Q07" value="1" required>
+            <label for="q_DRIVE_Q07_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q07_2" name="q_DRIVE_Q07" value="2" required>
+            <label for="q_DRIVE_Q07_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q07_3" name="q_DRIVE_Q07" value="3" required>
+            <label for="q_DRIVE_Q07_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q07_4" name="q_DRIVE_Q07" value="4" required>
+            <label for="q_DRIVE_Q07_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q07_5" name="q_DRIVE_Q07" value="5" required>
+            <label for="q_DRIVE_Q07_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="8">
+            <div class="question-number">Question 8 of 36</div>
+            <div class="question-text">The compensation, title, and status associated with my current role are meaningful motivating factors — not incidental to my engagement.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q08_1" name="q_DRIVE_Q08" value="1" required>
+            <label for="q_DRIVE_Q08_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q08_2" name="q_DRIVE_Q08" value="2" required>
+            <label for="q_DRIVE_Q08_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q08_3" name="q_DRIVE_Q08" value="3" required>
+            <label for="q_DRIVE_Q08_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q08_4" name="q_DRIVE_Q08" value="4" required>
+            <label for="q_DRIVE_Q08_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q08_5" name="q_DRIVE_Q08" value="5" required>
+            <label for="q_DRIVE_Q08_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="9">
+            <div class="question-number">Question 9 of 36</div>
+            <div class="question-text">When I achieve a significant result, I want it acknowledged — being told quietly that I did well is not enough; I want the recognition to match the contribution.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q09_1" name="q_DRIVE_Q09" value="1" required>
+            <label for="q_DRIVE_Q09_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q09_2" name="q_DRIVE_Q09" value="2" required>
+            <label for="q_DRIVE_Q09_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q09_3" name="q_DRIVE_Q09" value="3" required>
+            <label for="q_DRIVE_Q09_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q09_4" name="q_DRIVE_Q09" value="4" required>
+            <label for="q_DRIVE_Q09_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q09_5" name="q_DRIVE_Q09" value="5" required>
+            <label for="q_DRIVE_Q09_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="10">
+            <div class="question-number">Question 10 of 36</div>
+            <div class="question-text">I would be equally motivated in a role that paid significantly less, as long as the work itself was interesting and the mission was meaningful.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q10_1" name="q_DRIVE_Q10" value="1" required>
+            <label for="q_DRIVE_Q10_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q10_2" name="q_DRIVE_Q10" value="2" required>
+            <label for="q_DRIVE_Q10_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q10_3" name="q_DRIVE_Q10" value="3" required>
+            <label for="q_DRIVE_Q10_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q10_4" name="q_DRIVE_Q10" value="4" required>
+            <label for="q_DRIVE_Q10_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q10_5" name="q_DRIVE_Q10" value="5" required>
+            <label for="q_DRIVE_Q10_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="11">
+            <div class="question-number">Question 11 of 36</div>
+            <div class="question-text">My motivation increases measurably when I am in a high-visibility role — where my work and results are seen by senior leadership or the broader organisation.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q11_1" name="q_DRIVE_Q11" value="1" required>
+            <label for="q_DRIVE_Q11_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q11_2" name="q_DRIVE_Q11" value="2" required>
+            <label for="q_DRIVE_Q11_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q11_3" name="q_DRIVE_Q11" value="3" required>
+            <label for="q_DRIVE_Q11_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q11_4" name="q_DRIVE_Q11" value="4" required>
+            <label for="q_DRIVE_Q11_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q11_5" name="q_DRIVE_Q11" value="5" required>
+            <label for="q_DRIVE_Q11_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="12">
+            <div class="question-number">Question 12 of 36</div>
+            <div class="question-text">Career progression — movement to more senior titles, expanded scope, higher compensation — is an active and ongoing motivator for me, not just a background assumption.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q12_1" name="q_DRIVE_Q12" value="1" required>
+            <label for="q_DRIVE_Q12_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q12_2" name="q_DRIVE_Q12" value="2" required>
+            <label for="q_DRIVE_Q12_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q12_3" name="q_DRIVE_Q12" value="3" required>
+            <label for="q_DRIVE_Q12_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q12_4" name="q_DRIVE_Q12" value="4" required>
+            <label for="q_DRIVE_Q12_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q12_5" name="q_DRIVE_Q12" value="5" required>
+            <label for="q_DRIVE_Q12_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+    <div class="section-divider"><div class="section-divider-inner"></div></div>
+
+    <div class="dimension-section">
+        <div class="dimension-header">
+            <div class="dimension-label">Section 3</div>
+            <div class="dimension-title">Values Alignment</div>
+        </div>
+
+        <div class="question-card" data-q="13">
+            <div class="question-number">Question 13 of 36</div>
+            <div class="question-text">My daily work reflects what I believe is genuinely important — ethically, professionally, and in terms of the impact I want to have.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q13_1" name="q_DRIVE_Q13" value="1" required>
+            <label for="q_DRIVE_Q13_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q13_2" name="q_DRIVE_Q13" value="2" required>
+            <label for="q_DRIVE_Q13_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q13_3" name="q_DRIVE_Q13" value="3" required>
+            <label for="q_DRIVE_Q13_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q13_4" name="q_DRIVE_Q13" value="4" required>
+            <label for="q_DRIVE_Q13_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q13_5" name="q_DRIVE_Q13" value="5" required>
+            <label for="q_DRIVE_Q13_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="14">
+            <div class="question-number">Question 14 of 36</div>
+            <div class="question-text">I can clearly articulate why the work I do matters — not just commercially or organisationally, but in terms of what I personally value.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q14_1" name="q_DRIVE_Q14" value="1" required>
+            <label for="q_DRIVE_Q14_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q14_2" name="q_DRIVE_Q14" value="2" required>
+            <label for="q_DRIVE_Q14_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q14_3" name="q_DRIVE_Q14" value="3" required>
+            <label for="q_DRIVE_Q14_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q14_4" name="q_DRIVE_Q14" value="4" required>
+            <label for="q_DRIVE_Q14_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q14_5" name="q_DRIVE_Q14" value="5" required>
+            <label for="q_DRIVE_Q14_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="15">
+            <div class="question-number">Question 15 of 36</div>
+            <div class="question-text">I am being asked to do things in my current role that conflict with what I believe is right — creating a nagging sense of misalignment I cannot easily resolve.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q15_1" name="q_DRIVE_Q15" value="1" required>
+            <label for="q_DRIVE_Q15_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q15_2" name="q_DRIVE_Q15" value="2" required>
+            <label for="q_DRIVE_Q15_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q15_3" name="q_DRIVE_Q15" value="3" required>
+            <label for="q_DRIVE_Q15_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q15_4" name="q_DRIVE_Q15" value="4" required>
+            <label for="q_DRIVE_Q15_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q15_5" name="q_DRIVE_Q15" value="5" required>
+            <label for="q_DRIVE_Q15_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="16">
+            <div class="question-number">Question 16 of 36</div>
+            <div class="question-text">The organisation I work for conducts itself in ways that align with my personal ethical commitments — I am not required to suppress my values to succeed here.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q16_1" name="q_DRIVE_Q16" value="1" required>
+            <label for="q_DRIVE_Q16_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q16_2" name="q_DRIVE_Q16" value="2" required>
+            <label for="q_DRIVE_Q16_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q16_3" name="q_DRIVE_Q16" value="3" required>
+            <label for="q_DRIVE_Q16_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q16_4" name="q_DRIVE_Q16" value="4" required>
+            <label for="q_DRIVE_Q16_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q16_5" name="q_DRIVE_Q16" value="5" required>
+            <label for="q_DRIVE_Q16_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="17">
+            <div class="question-number">Question 17 of 36</div>
+            <div class="question-text">My current role allows me to contribute to something larger than commercial outcomes — to a purpose or mission I personally believe in.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q17_1" name="q_DRIVE_Q17" value="1" required>
+            <label for="q_DRIVE_Q17_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q17_2" name="q_DRIVE_Q17" value="2" required>
+            <label for="q_DRIVE_Q17_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q17_3" name="q_DRIVE_Q17" value="3" required>
+            <label for="q_DRIVE_Q17_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q17_4" name="q_DRIVE_Q17" value="4" required>
+            <label for="q_DRIVE_Q17_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q17_5" name="q_DRIVE_Q17" value="5" required>
+            <label for="q_DRIVE_Q17_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="18">
+            <div class="question-number">Question 18 of 36</div>
+            <div class="question-text">Even when external conditions are difficult — the work is hard, the organisation is under pressure — I feel that what I am doing matters in a way that sustains my commitment.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q18_1" name="q_DRIVE_Q18" value="1" required>
+            <label for="q_DRIVE_Q18_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q18_2" name="q_DRIVE_Q18" value="2" required>
+            <label for="q_DRIVE_Q18_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q18_3" name="q_DRIVE_Q18" value="3" required>
+            <label for="q_DRIVE_Q18_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q18_4" name="q_DRIVE_Q18" value="4" required>
+            <label for="q_DRIVE_Q18_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q18_5" name="q_DRIVE_Q18" value="5" required>
+            <label for="q_DRIVE_Q18_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+    <div class="section-divider"><div class="section-divider-inner"></div></div>
+
+    <div class="dimension-section">
+        <div class="dimension-header">
+            <div class="dimension-label">Section 4</div>
+            <div class="dimension-title">Confidence & Self-Efficacy</div>
+        </div>
+
+        <div class="question-card" data-q="19">
+            <div class="question-number">Question 19 of 36</div>
+            <div class="question-text">I believe I am capable of handling whatever challenges arise in my current role — including the ones I have not encountered yet.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q19_1" name="q_DRIVE_Q19" value="1" required>
+            <label for="q_DRIVE_Q19_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q19_2" name="q_DRIVE_Q19" value="2" required>
+            <label for="q_DRIVE_Q19_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q19_3" name="q_DRIVE_Q19" value="3" required>
+            <label for="q_DRIVE_Q19_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q19_4" name="q_DRIVE_Q19" value="4" required>
+            <label for="q_DRIVE_Q19_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q19_5" name="q_DRIVE_Q19" value="5" required>
+            <label for="q_DRIVE_Q19_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="20">
+            <div class="question-number">Question 20 of 36</div>
+            <div class="question-text">When I face a significant challenge at work, my default response is to lean in — to believe I can figure it out rather than to doubt whether I am the right person for it.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q20_1" name="q_DRIVE_Q20" value="1" required>
+            <label for="q_DRIVE_Q20_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q20_2" name="q_DRIVE_Q20" value="2" required>
+            <label for="q_DRIVE_Q20_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q20_3" name="q_DRIVE_Q20" value="3" required>
+            <label for="q_DRIVE_Q20_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q20_4" name="q_DRIVE_Q20" value="4" required>
+            <label for="q_DRIVE_Q20_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q20_5" name="q_DRIVE_Q20" value="5" required>
+            <label for="q_DRIVE_Q20_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="21">
+            <div class="question-number">Question 21 of 36</div>
+            <div class="question-text">I have a growing sense that the demands of my current role may be exceeding my capability — and that concern is affecting my performance and my wellbeing.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q21_1" name="q_DRIVE_Q21" value="1" required>
+            <label for="q_DRIVE_Q21_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q21_2" name="q_DRIVE_Q21" value="2" required>
+            <label for="q_DRIVE_Q21_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q21_3" name="q_DRIVE_Q21" value="3" required>
+            <label for="q_DRIVE_Q21_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q21_4" name="q_DRIVE_Q21" value="4" required>
+            <label for="q_DRIVE_Q21_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q21_5" name="q_DRIVE_Q21" value="5" required>
+            <label for="q_DRIVE_Q21_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="22">
+            <div class="question-number">Question 22 of 36</div>
+            <div class="question-text">My confidence in my own judgment and capability holds under pressure — I do not significantly second-guess myself when the stakes are high or the situation is ambiguous.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q22_1" name="q_DRIVE_Q22" value="1" required>
+            <label for="q_DRIVE_Q22_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q22_2" name="q_DRIVE_Q22" value="2" required>
+            <label for="q_DRIVE_Q22_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q22_3" name="q_DRIVE_Q22" value="3" required>
+            <label for="q_DRIVE_Q22_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q22_4" name="q_DRIVE_Q22" value="4" required>
+            <label for="q_DRIVE_Q22_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q22_5" name="q_DRIVE_Q22" value="5" required>
+            <label for="q_DRIVE_Q22_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="23">
+            <div class="question-number">Question 23 of 36</div>
+            <div class="question-text">I have made a significant career transition — new sector, new geography, new level of seniority — and successfully rebuilt my confidence and effectiveness in the new context.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q23_1" name="q_DRIVE_Q23" value="1" required>
+            <label for="q_DRIVE_Q23_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q23_2" name="q_DRIVE_Q23" value="2" required>
+            <label for="q_DRIVE_Q23_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q23_3" name="q_DRIVE_Q23" value="3" required>
+            <label for="q_DRIVE_Q23_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q23_4" name="q_DRIVE_Q23" value="4" required>
+            <label for="q_DRIVE_Q23_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q23_5" name="q_DRIVE_Q23" value="5" required>
+            <label for="q_DRIVE_Q23_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="24">
+            <div class="question-number">Question 24 of 36</div>
+            <div class="question-text">In APAC cross-border contexts — where the cultural, relational, and operational demands differ significantly from my baseline — I feel genuinely capable, not just technically competent.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q24_1" name="q_DRIVE_Q24" value="1" required>
+            <label for="q_DRIVE_Q24_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q24_2" name="q_DRIVE_Q24" value="2" required>
+            <label for="q_DRIVE_Q24_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q24_3" name="q_DRIVE_Q24" value="3" required>
+            <label for="q_DRIVE_Q24_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q24_4" name="q_DRIVE_Q24" value="4" required>
+            <label for="q_DRIVE_Q24_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q24_5" name="q_DRIVE_Q24" value="5" required>
+            <label for="q_DRIVE_Q24_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+    <div class="section-divider"><div class="section-divider-inner"></div></div>
+
+    <div class="dimension-section">
+        <div class="dimension-header">
+            <div class="dimension-label">Section 5</div>
+            <div class="dimension-title">Growth Orientation</div>
+        </div>
+
+        <div class="question-card" data-q="25">
+            <div class="question-number">Question 25 of 36</div>
+            <div class="question-text">I am more energised by assignments that require me to develop new skills than by assignments where I can apply expertise I have already built.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q25_1" name="q_DRIVE_Q25" value="1" required>
+            <label for="q_DRIVE_Q25_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q25_2" name="q_DRIVE_Q25" value="2" required>
+            <label for="q_DRIVE_Q25_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q25_3" name="q_DRIVE_Q25" value="3" required>
+            <label for="q_DRIVE_Q25_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q25_4" name="q_DRIVE_Q25" value="4" required>
+            <label for="q_DRIVE_Q25_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q25_5" name="q_DRIVE_Q25" value="5" required>
+            <label for="q_DRIVE_Q25_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="26">
+            <div class="question-number">Question 26 of 36</div>
+            <div class="question-text">When my current role stops being challenging — when I feel I have largely mastered what it requires — my motivation declines noticeably, even if external conditions are favourable.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q26_1" name="q_DRIVE_Q26" value="1" required>
+            <label for="q_DRIVE_Q26_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q26_2" name="q_DRIVE_Q26" value="2" required>
+            <label for="q_DRIVE_Q26_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q26_3" name="q_DRIVE_Q26" value="3" required>
+            <label for="q_DRIVE_Q26_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q26_4" name="q_DRIVE_Q26" value="4" required>
+            <label for="q_DRIVE_Q26_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q26_5" name="q_DRIVE_Q26" value="5" required>
+            <label for="q_DRIVE_Q26_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="27">
+            <div class="question-number">Question 27 of 36</div>
+            <div class="question-text">I prefer to operate in domains where I have deep established expertise — new challenges that require me to start from scratch are more uncomfortable than energising.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q27_1" name="q_DRIVE_Q27" value="1" required>
+            <label for="q_DRIVE_Q27_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q27_2" name="q_DRIVE_Q27" value="2" required>
+            <label for="q_DRIVE_Q27_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q27_3" name="q_DRIVE_Q27" value="3" required>
+            <label for="q_DRIVE_Q27_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q27_4" name="q_DRIVE_Q27" value="4" required>
+            <label for="q_DRIVE_Q27_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q27_5" name="q_DRIVE_Q27" value="5" required>
+            <label for="q_DRIVE_Q27_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="28">
+            <div class="question-number">Question 28 of 36</div>
+            <div class="question-text">I actively seek feedback and development input — not because it is expected, but because I am genuinely motivated by becoming more capable.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q28_1" name="q_DRIVE_Q28" value="1" required>
+            <label for="q_DRIVE_Q28_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q28_2" name="q_DRIVE_Q28" value="2" required>
+            <label for="q_DRIVE_Q28_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q28_3" name="q_DRIVE_Q28" value="3" required>
+            <label for="q_DRIVE_Q28_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q28_4" name="q_DRIVE_Q28" value="4" required>
+            <label for="q_DRIVE_Q28_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q28_5" name="q_DRIVE_Q28" value="5" required>
+            <label for="q_DRIVE_Q28_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="29">
+            <div class="question-number">Question 29 of 36</div>
+            <div class="question-text">I would take a role with a significantly steeper learning curve over a role where I would be immediately effective, if both were otherwise comparable.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q29_1" name="q_DRIVE_Q29" value="1" required>
+            <label for="q_DRIVE_Q29_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q29_2" name="q_DRIVE_Q29" value="2" required>
+            <label for="q_DRIVE_Q29_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q29_3" name="q_DRIVE_Q29" value="3" required>
+            <label for="q_DRIVE_Q29_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q29_4" name="q_DRIVE_Q29" value="4" required>
+            <label for="q_DRIVE_Q29_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q29_5" name="q_DRIVE_Q29" value="5" required>
+            <label for="q_DRIVE_Q29_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="30">
+            <div class="question-number">Question 30 of 36</div>
+            <div class="question-text">Taking on a new APAC mandate — with its unfamiliar regulatory, cultural, and relational complexity — is the kind of challenge that energises rather than intimidates me.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q30_1" name="q_DRIVE_Q30" value="1" required>
+            <label for="q_DRIVE_Q30_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q30_2" name="q_DRIVE_Q30" value="2" required>
+            <label for="q_DRIVE_Q30_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q30_3" name="q_DRIVE_Q30" value="3" required>
+            <label for="q_DRIVE_Q30_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q30_4" name="q_DRIVE_Q30" value="4" required>
+            <label for="q_DRIVE_Q30_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q30_5" name="q_DRIVE_Q30" value="5" required>
+            <label for="q_DRIVE_Q30_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+    <div class="section-divider"><div class="section-divider-inner"></div></div>
+
+    <div class="dimension-section">
+        <div class="dimension-header">
+            <div class="dimension-label">Section 6</div>
+            <div class="dimension-title">Engagement Risk</div>
+        </div>
+
+        <div class="question-card" data-q="31">
+            <div class="question-number">Question 31 of 36</div>
+            <div class="question-text">If I am honest with myself, there are days when I question whether I would remain in my current role if I were not financially or contractually obligated to do so.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q31_1" name="q_DRIVE_Q31" value="1" required>
+            <label for="q_DRIVE_Q31_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q31_2" name="q_DRIVE_Q31" value="2" required>
+            <label for="q_DRIVE_Q31_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q31_3" name="q_DRIVE_Q31" value="3" required>
+            <label for="q_DRIVE_Q31_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q31_4" name="q_DRIVE_Q31" value="4" required>
+            <label for="q_DRIVE_Q31_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q31_5" name="q_DRIVE_Q31" value="5" required>
+            <label for="q_DRIVE_Q31_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="32">
+            <div class="question-number">Question 32 of 36</div>
+            <div class="question-text">The work I am doing now feels structurally misaligned with what I need — not because the organisation is wrong, but because the role, the mandate, or the level of scope no longer fits who I have become.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q32_1" name="q_DRIVE_Q32" value="1" required>
+            <label for="q_DRIVE_Q32_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q32_2" name="q_DRIVE_Q32" value="2" required>
+            <label for="q_DRIVE_Q32_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q32_3" name="q_DRIVE_Q32" value="3" required>
+            <label for="q_DRIVE_Q32_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q32_4" name="q_DRIVE_Q32" value="4" required>
+            <label for="q_DRIVE_Q32_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q32_5" name="q_DRIVE_Q32" value="5" required>
+            <label for="q_DRIVE_Q32_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="33">
+            <div class="question-number">Question 33 of 36</div>
+            <div class="question-text">I have noticed a persistent decline in my discretionary effort — the extra thinking, the proactive initiative, the willingness to go beyond what is asked — over the past 6–12 months.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q33_1" name="q_DRIVE_Q33" value="1" required>
+            <label for="q_DRIVE_Q33_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q33_2" name="q_DRIVE_Q33" value="2" required>
+            <label for="q_DRIVE_Q33_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q33_3" name="q_DRIVE_Q33" value="3" required>
+            <label for="q_DRIVE_Q33_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q33_4" name="q_DRIVE_Q33" value="4" required>
+            <label for="q_DRIVE_Q33_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q33_5" name="q_DRIVE_Q33" value="5" required>
+            <label for="q_DRIVE_Q33_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="34">
+            <div class="question-number">Question 34 of 36</div>
+            <div class="question-text">Even when external conditions are positive — good team, supportive leadership, interesting work — I find it difficult to feel genuinely energised or committed.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q34_1" name="q_DRIVE_Q34" value="1" required>
+            <label for="q_DRIVE_Q34_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q34_2" name="q_DRIVE_Q34" value="2" required>
+            <label for="q_DRIVE_Q34_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q34_3" name="q_DRIVE_Q34" value="3" required>
+            <label for="q_DRIVE_Q34_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q34_4" name="q_DRIVE_Q34" value="4" required>
+            <label for="q_DRIVE_Q34_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q34_5" name="q_DRIVE_Q34" value="5" required>
+            <label for="q_DRIVE_Q34_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="35">
+            <div class="question-number">Question 35 of 36</div>
+            <div class="question-text">If a significant and attractive opportunity presented itself tomorrow — not just financially, but in terms of scope, challenge, or relational context — I would seriously consider leaving.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q35_1" name="q_DRIVE_Q35" value="1" required>
+            <label for="q_DRIVE_Q35_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q35_2" name="q_DRIVE_Q35" value="2" required>
+            <label for="q_DRIVE_Q35_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q35_3" name="q_DRIVE_Q35" value="3" required>
+            <label for="q_DRIVE_Q35_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q35_4" name="q_DRIVE_Q35" value="4" required>
+            <label for="q_DRIVE_Q35_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q35_5" name="q_DRIVE_Q35" value="5" required>
+            <label for="q_DRIVE_Q35_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="36">
+            <div class="question-number">Question 36 of 36</div>
+            <div class="question-text">There is a part of me that has already mentally left this role — I am going through the motions while waiting for something to change or for the right moment to move.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q36_1" name="q_DRIVE_Q36" value="1" required>
+            <label for="q_DRIVE_Q36_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q36_2" name="q_DRIVE_Q36" value="2" required>
+            <label for="q_DRIVE_Q36_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q36_3" name="q_DRIVE_Q36" value="3" required>
+            <label for="q_DRIVE_Q36_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q36_4" name="q_DRIVE_Q36" value="4" required>
+            <label for="q_DRIVE_Q36_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_DRIVE_Q36_5" name="q_DRIVE_Q36" value="5" required>
+            <label for="q_DRIVE_Q36_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+        <section class="submit-section">
+            <div class="container">
+                <button type="submit" class="submit-btn">Submit Assessment</button>
+                <div class="submit-note">Your responses are encrypted and confidential</div>
+            </div>
+        </section>
+    </form>
+
+    <div class="completion-page" id="completionPage">
+        <h2>Assessment Complete</h2>
+        <p>Thank you for completing the DRIVE assessment. Your responses have been recorded.</p>
+        <p>You will receive a confirmation email shortly with your preliminary results and next steps.</p>
+        <div class="next-steps">
+            <h3>What Happens Next</h3>
+            <p>1. Your responses are scored and analysed</p>
+            <p>2. A detailed report is generated within 24 hours</p>
+            <p>3. You'll receive your results via email</p>
+            <p>4. A debrief session can be scheduled with your consultant</p>
+        </div>
+    </div>
+
+    <div class="footer">LYC Partners &bull; Confidential Assessment &bull; DRIVE</div>
+
+    <script>
+        const totalQ = 36;
+        const form = document.getElementById('assessmentForm');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        
+        function updateProgress() {
+            const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+            const pct = (answered / totalQ) * 100;
+            progressFill.style.width = pct + '%';
+            progressText.textContent = answered + ' / ' + totalQ;
+        }
+        
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'radio') updateProgress();
+        });
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const responses = {};
+            document.querySelectorAll('input[type="radio"]:checked').forEach(input => {
+                responses[input.name] = input.value;
+            });
+            form.style.display = 'none';
+            document.getElementById('progressBar').style.display = 'none';
+            document.getElementById('completionPage').style.display = 'block';
+            console.log('Assessment responses:', responses);
+        });
+        
+        updateProgress();
+    </script>
+</body>
+</html>

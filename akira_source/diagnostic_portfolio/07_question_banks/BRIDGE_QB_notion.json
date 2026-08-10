@@ -1,0 +1,338 @@
+{
+  "instrument": "BRIDGE",
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "Mandate Clarity",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q01",
+          "text": "I have a specific, detailed understanding of what this mandate requires — not just the job title and general scope, but the specific outcomes the organisation needs in the next 18 months.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q02",
+          "text": "I can articulate how this mandate is different from any previous role I have held — and specifically what those differences require of me.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q03",
+          "text": "I have had direct conversations with the board or key principals about what success looks like in this mandate, and I have a clear shared picture of that definition.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q04",
+          "text": "I find that my understanding of what the mandate requires becomes clearer as I go, rather than having a clear picture at the outset. [R]",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q05",
+          "text": "I understand the specific organisational history, stakeholder politics, and market dynamics that define this mandate — not just the role description.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q06",
+          "text": "I can identify the two or three things that, if I get them wrong in the first 90 days, will make this mandate much harder to recover.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D2",
+      "name": "Stakeholder Navigation",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q07",
+          "text": "I have a structured approach to mapping the key stakeholders in a new APAC mandate context — including stakeholders who are not formally in my reporting line but whose support is essential.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q08",
+          "text": "In high-context APAC business environments, I invest deliberately in relationships before those relationships are needed — not in response to a specific transaction or requirement.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q09",
+          "text": "I have maintained a key APAC stakeholder relationship through a period of significant tension or misalignment — and the relationship emerged stronger.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q10",
+          "text": "I find transactional relationship-building (connecting when I need something) more natural than investing in relationships before a specific need arises. [R]",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q11",
+          "text": "I can read the informal power structures in an APAC organisation — who has real influence, who the key relationship brokers are, and how decisions actually get made.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q12",
+          "text": "I approach APAC government or political stakeholder relationships with the same investment and patience I apply to business relationships.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D3",
+      "name": "Communication Alignment",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q13",
+          "text": "I have adapted my natural communication style significantly to operate effectively in an APAC cross-border mandate — and I can describe specifically how I adapted.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q14",
+          "text": "I understand how my natural communication style — specifically its directness, debate orientation, or assertiveness — is read in the target APAC market.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q15",
+          "text": "I check for understanding and alignment in APAC stakeholder conversations rather than assuming agreement because no objection was raised.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q16",
+          "text": "I default to my natural communication style under pressure, even when I know it creates friction in the APAC context I am operating in. [R]",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q17",
+          "text": "I can deliver difficult messages — performance feedback, strategic disagreement, expectation misalignment — in ways that are heard and received in APAC relational contexts.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q18",
+          "text": "I read silence, indirection, and non-verbal cues in APAC stakeholder conversations as information, not as absence of a view.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D4",
+      "name": "Pressure Resilience",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q19",
+          "text": "I can identify, in advance, the specific types of mandate pressure that are most likely to change my behaviour in ways that are unhelpful — and I have strategies for those specific situations.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q20",
+          "text": "When a key stakeholder relationship fails or significantly deteriorates in a mandate context, I recover my effectiveness quickly.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q21",
+          "text": "Under sustained pressure from headquarters, the local team, and the market simultaneously, my decision quality holds.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q22",
+          "text": "When the mandate becomes politically difficult, I become more risk-averse and less willing to have the conversations that are needed. [R]",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q23",
+          "text": "I can sustain my mandate focus and performance through an extended period of uncertainty, without requiring resolution of the uncertainty before I continue to act.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q24",
+          "text": "I have specific early-warning indicators that tell me when my own performance is degrading under mandate pressure — and I act on those indicators before the degradation becomes visible to others.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D5",
+      "name": "Long-Game Thinking",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q25",
+          "text": "I am comfortable investing in APAC relationships and trust-building over a 3–5 year timeline, even when there is no immediate transactional return on that investment.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q26",
+          "text": "I resist pressure — from headquarters, from myself, or from the quarterly results cycle — to generate short-term wins at the expense of long-term relationship capital.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q27",
+          "text": "I can articulate specific examples of decisions I have made in APAC mandates that sacrificed short-term results to preserve or build long-term relationship trust.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q28",
+          "text": "I find it difficult to invest in relationships or initiatives where the return is more than 12 months away, particularly when short-term results are under pressure. [R]",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q29",
+          "text": "I understand that in APAC's relationship economy, my reputation is built over years — and I make decisions with that timeline in mind.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q30",
+          "text": "I can work patiently within a 3–5 year trust-building cycle with government or institutional APAC stakeholders, even when commercial pressure creates urgency.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D6",
+      "name": "Cultural Fluency",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q31",
+          "text": "I have a specific, current understanding of the cultural norms — around hierarchy, consensus, face-saving, and relationship-first communication — in the target APAC market I am entering.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q32",
+          "text": "When I have made a cultural misstep in an APAC context, I have been able to identify what happened, repair the relationship, and adjust my approach.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q33",
+          "text": "I understand how decision-making operates in the specific APAC governance context I am entering — including the informal processes and relationship dynamics that run alongside the formal structure.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q34",
+          "text": "I treat cultural differences in the target APAC market as context to understand and adapt to, rather than as friction to overcome.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q35",
+          "text": "I find that my instinctive approach to leadership — my default behaviours under pressure — is culturally compatible with the APAC market I am entering. [R]",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q36",
+          "text": "I have built genuine relationships with APAC-native colleagues, clients, or stakeholders that are not primarily transactional — relationships where cultural understanding is mutual rather than one-directional.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    }
+  ],
+  "archetypes": [
+    {
+      "name": "The Envoy",
+      "#": "1",
+      "weakest_dimension": "Stakeholder Navigation",
+      "three_fires_correlation": "Fire 1: Relationship deficit",
+      "failure_pattern": "Great on paper, fails in practice because relationships don't form. The mandate dies from isolation."
+    },
+    {
+      "name": "The Navigator",
+      "#": "2",
+      "weakest_dimension": "Mandate Clarity",
+      "three_fires_correlation": "Fire 1: Expectation gap",
+      "failure_pattern": "Misunderstands what the role actually requires. Misaligned expectations create early friction."
+    },
+    {
+      "name": "The Chameleon",
+      "#": "3",
+      "weakest_dimension": "Communication Alignment",
+      "three_fires_correlation": "Fire 2: Communication misfire",
+      "failure_pattern": "Says all the right things in the wrong way. Message is right but delivery creates friction."
+    },
+    {
+      "name": "The Anchor",
+      "#": "4",
+      "weakest_dimension": "Pressure Resilience",
+      "three_fires_correlation": "Fire 2: Pressure collapse",
+      "failure_pattern": "Starts strong, deteriorates under sustained pressure. The mandate doesn't fail in good times — it fails in the first crisis."
+    },
+    {
+      "name": "The Sprinter",
+      "#": "5",
+      "weakest_dimension": "Long-Game Thinking",
+      "three_fires_correlation": "Fire 3: Short-term trap",
+      "failure_pattern": "Wins short-term results but burns long-term relationship capital. The board sees Q1 wins and doesn't notice the damage."
+    },
+    {
+      "name": "The Cultural Operator",
+      "#": "6",
+      "weakest_dimension": "No dim <50, Cultural Fluency >70",
+      "three_fires_correlation": "Minimal fire risk",
+      "failure_pattern": "The ideal BRIDGE profile. Strong across all dimensions with cultural fluency as a demonstrated strength."
+    }
+  ],
+  "scoring": {
+    "reverse_coded_items": [],
+    "bands": [
+      {
+        "band": "High Mandate Readiness",
+        "score_range": "80–100",
+        "interpretation": "Strong readiness across all 6 dimensions; mandate risk is low"
+      },
+      {
+        "band": "Ready with Monitoring",
+        "score_range": "65–79",
+        "interpretation": "Capable mandate leader; 1–2 specific development dimensions to monitor"
+      },
+      {
+        "band": "Conditional Readiness",
+        "score_range": "50–64",
+        "interpretation": "Competent in stable contexts; variable readiness; development support recommended before appointment"
+      },
+      {
+        "band": "Readiness Gap",
+        "score_range": "35–49",
+        "interpretation": "Significant readiness gaps; development required before or immediately after appointment"
+      },
+      {
+        "band": "Not Recommended",
+        "score_range": "0–34",
+        "interpretation": "Significant mandate readiness deficit; not recommended for active transition mandate without substantial development"
+      }
+    ]
+  },
+  "total_questions": 36
+}

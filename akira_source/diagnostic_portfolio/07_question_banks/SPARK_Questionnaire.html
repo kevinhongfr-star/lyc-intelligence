@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPARK - AI Leadership Readiness Assessment | LYC Partners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=DM+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --ink: #1a1a2e;
+    --white: #ffffff;
+    --off: #f5f6f8;
+    --g100: #f0f1f3;
+    --g200: #e2e4e8;
+    --g300: #c8cbd0;
+    --g400: #9ca0a8;
+    --g500: #6b7080;
+    --g600: #4a4e5a;
+    --fuchsia: #c108ab;
+    --fuchsia-light: rgba(193, 8, 171, 0.08);
+    --serif: 'Crimson Pro', Georgia, serif;
+    --sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--sans); background: var(--white); color: var(--ink); line-height: 1.8; -webkit-font-smoothing: antialiased; }
+.container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+.cover { background: var(--ink); color: var(--white); padding: 80px 24px 64px; text-align: left; }
+.cover-inner { max-width: 720px; margin: 0 auto; }
+.cover .logo { height: 32px; margin-bottom: 48px; opacity: 0.9; }
+.cover h1 { font-family: var(--serif); font-size: 56px; font-weight: 400; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px; }
+.cover .subtitle { font-family: var(--sans); font-size: 18px; font-weight: 400; opacity: 0.65; margin-bottom: 32px; line-height: 1.5; }
+.cover .meta { font-family: var(--mono); font-size: 11px; opacity: 0.4; letter-spacing: 0.5px; }
+.progress-bar { position: sticky; top: 0; z-index: 100; background: var(--white); padding: 12px 24px; }
+.progress-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+.progress-track { flex: 1; height: 4px; background: var(--g200); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--fuchsia); border-radius: 2px; width: 0%; transition: width 0.3s ease; }
+.progress-text { font-family: var(--mono); font-size: 11px; color: var(--g500); white-space: nowrap; }
+.instructions { padding: 48px 24px 32px; max-width: 720px; margin: 0 auto; }
+.instructions h2 { font-family: var(--serif); font-size: 28px; font-weight: 400; margin-bottom: 16px; }
+.instructions p { font-size: 15px; color: var(--g600); margin-bottom: 12px; line-height: 1.7; }
+.info-box { background: var(--g100); border-radius: 6px; padding: 20px 24px; margin-top: 24px; }
+.info-box p { margin-bottom: 0; font-size: 13px; color: var(--g500); }
+.dimension-section { padding: 32px 24px; max-width: 720px; margin: 0 auto; }
+.dimension-header { margin-bottom: 32px; }
+.dimension-label { font-family: var(--mono); font-size: 11px; color: var(--fuchsia); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+.dimension-title { font-family: var(--serif); font-size: 24px; font-weight: 400; color: var(--ink); }
+.question-card { background: var(--white); padding: 28px 0; margin-bottom: 8px; }
+.question-card + .question-card { border-top: 1px solid var(--g100); }
+.question-number { font-family: var(--mono); font-size: 11px; color: var(--g400); margin-bottom: 8px; }
+.question-text { font-size: 15px; font-weight: 500; color: var(--ink); line-height: 1.6; margin-bottom: 20px; }
+.likert-scale { display: flex; gap: 8px; flex-wrap: wrap; }
+.likert-option { flex: 1; min-width: 100px; }
+.likert-option input[type="radio"] { display: none; }
+.likert-option label { display: flex; flex-direction: column; align-items: center; padding: 14px 8px; background: var(--g100); border-radius: 6px; cursor: pointer; transition: all 0.2s ease; text-align: center; }
+.likert-option label:hover { background: var(--fuchsia-light); }
+.likert-option input[type="radio"]:checked + label { background: var(--fuchsia); color: var(--white); }
+.likert-option input[type="radio"]:checked + label .likert-number { color: var(--white); opacity: 0.8; }
+.likert-number { font-family: var(--mono); font-size: 11px; color: var(--g400); margin-bottom: 4px; }
+.likert-label { font-size: 11px; font-weight: 500; line-height: 1.3; }
+.section-divider { background: var(--off); padding: 32px 24px; margin: 16px 0; }
+.section-divider-inner { max-width: 720px; margin: 0 auto; }
+.submit-section { padding: 64px 24px; text-align: center; background: var(--off); }
+.submit-btn { display: inline-block; padding: 18px 48px; background: var(--ink); color: var(--white); font-family: var(--sans); font-size: 15px; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
+.submit-btn:hover { background: var(--fuchsia); transform: translateY(-1px); }
+.submit-note { font-size: 12px; color: var(--g400); margin-top: 16px; font-family: var(--mono); }
+.footer { padding: 24px; text-align: center; font-family: var(--mono); font-size: 11px; color: var(--g400); }
+.completion-page { display: none; padding: 80px 24px; text-align: center; max-width: 600px; margin: 0 auto; }
+.completion-page h2 { font-family: var(--serif); font-size: 36px; margin-bottom: 16px; }
+.completion-page p { font-size: 15px; color: var(--g600); margin-bottom: 12px; line-height: 1.7; }
+.next-steps { background: var(--g100); border-radius: 6px; padding: 24px; margin-top: 32px; text-align: left; }
+.next-steps h3 { font-family: var(--serif); font-size: 20px; margin-bottom: 12px; }
+@media (max-width: 640px) {
+    .cover h1 { font-size: 36px; }
+    .cover { padding: 48px 20px 40px; }
+    .likert-scale { flex-direction: column; }
+    .likert-option { min-width: 100%; }
+    .likert-option label { flex-direction: row; gap: 8px; padding: 12px 16px; }
+    .likert-number { margin-bottom: 0; }
+}
+</style>
+</head>
+<body>
+    <section class="cover">
+        <div class="cover-inner">
+            <img src="data:image/png;base64,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" alt="LYC Partners" class="logo">
+            <h1>SPARK</h1>
+            <div class="subtitle">AI Leadership Readiness Assessment</div>
+            <div class="meta">7-9 MINUTES &bull; 27 QUESTIONS &bull; CONFIDENTIAL</div>
+        </div>
+    </section>
+
+    <div class="progress-bar" id="progressBar">
+        <div class="progress-inner">
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0 / 27</div>
+        </div>
+    </div>
+
+    <section class="instructions">
+        <h2>Before You Begin</h2>
+        <p>Evaluates your readiness to lead with AI across your organisation. Measures individual adoption readiness, capability exposure, and organisational preparedness for AI-driven transformation.</p>
+        <p>There are no right or wrong answers. Respond based on your genuine experience and perspective. Your responses are confidential and will be used to generate your personalised assessment report.</p>
+        <div class="info-box">
+            <p><strong>Scale:</strong> For each statement, select the response that best reflects how much you agree or disagree. Estimated completion time: 7-9 minutes.</p>
+        </div>
+    </section>
+
+    <form id="assessmentForm">
+
+    <div class="dimension-section">
+        <div class="dimension-header">
+            <div class="dimension-label">Section 1</div>
+            <div class="dimension-title">INDIVIDUAL AI ADOPTION READINESS (IAAR)</div>
+        </div>
+
+        <div class="question-card" data-q="1">
+            <div class="question-number">Question 1 of 27</div>
+            <div class="question-text">I currently use AI tools as part of my regular professional workflow, not just for occasional experimentation.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q01_1" name="q_Q01" value="1" required>
+            <label for="q_Q01_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q01_2" name="q_Q01" value="2" required>
+            <label for="q_Q01_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q01_3" name="q_Q01" value="3" required>
+            <label for="q_Q01_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q01_4" name="q_Q01" value="4" required>
+            <label for="q_Q01_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q01_5" name="q_Q01" value="5" required>
+            <label for="q_Q01_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="2">
+            <div class="question-number">Question 2 of 27</div>
+            <div class="question-text">I have integrated at least one AI-enabled capability into how I produce or review professional work in the last six months.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q02_1" name="q_Q02" value="1" required>
+            <label for="q_Q02_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q02_2" name="q_Q02" value="2" required>
+            <label for="q_Q02_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q02_3" name="q_Q02" value="3" required>
+            <label for="q_Q02_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q02_4" name="q_Q02" value="4" required>
+            <label for="q_Q02_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q02_5" name="q_Q02" value="5" required>
+            <label for="q_Q02_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="3">
+            <div class="question-number">Question 3 of 27</div>
+            <div class="question-text">My use of AI tools in my professional practice remains largely experimental and has not changed how I actually deliver work.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q03_1" name="q_Q03" value="1" required>
+            <label for="q_Q03_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q03_2" name="q_Q03" value="2" required>
+            <label for="q_Q03_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q03_3" name="q_Q03" value="3" required>
+            <label for="q_Q03_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q03_4" name="q_Q03" value="4" required>
+            <label for="q_Q03_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q03_5" name="q_Q03" value="5" required>
+            <label for="q_Q03_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="4">
+            <div class="question-number">Question 4 of 27</div>
+            <div class="question-text">I am willing to restructure professional workflows that I have used successfully for years if AI tools can produce the same or better output more efficiently.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q04_1" name="q_Q04" value="1" required>
+            <label for="q_Q04_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q04_2" name="q_Q04" value="2" required>
+            <label for="q_Q04_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q04_3" name="q_Q04" value="3" required>
+            <label for="q_Q04_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q04_4" name="q_Q04" value="4" required>
+            <label for="q_Q04_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q04_5" name="q_Q04" value="5" required>
+            <label for="q_Q04_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="5">
+            <div class="question-number">Question 5 of 27</div>
+            <div class="question-text">I am resistant to changing how I do professional work even when there is evidence that AI tools could produce comparable results faster.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q05_1" name="q_Q05" value="1" required>
+            <label for="q_Q05_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q05_2" name="q_Q05" value="2" required>
+            <label for="q_Q05_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q05_3" name="q_Q05" value="3" required>
+            <label for="q_Q05_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q05_4" name="q_Q05" value="4" required>
+            <label for="q_Q05_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q05_5" name="q_Q05" value="5" required>
+            <label for="q_Q05_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="6">
+            <div class="question-number">Question 6 of 27</div>
+            <div class="question-text">I actively look for established workflows in my professional practice that could be improved or replaced by AI tools.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q06_1" name="q_Q06" value="1" required>
+            <label for="q_Q06_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q06_2" name="q_Q06" value="2" required>
+            <label for="q_Q06_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q06_3" name="q_Q06" value="3" required>
+            <label for="q_Q06_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q06_4" name="q_Q06" value="4" required>
+            <label for="q_Q06_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q06_5" name="q_Q06" value="5" required>
+            <label for="q_Q06_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="7">
+            <div class="question-number">Question 7 of 27</div>
+            <div class="question-text">I can evaluate the output of AI tools in my professional domain with enough expertise to identify errors, gaps, and limitations without relying on external verification.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q07_1" name="q_Q07" value="1" required>
+            <label for="q_Q07_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q07_2" name="q_Q07" value="2" required>
+            <label for="q_Q07_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q07_3" name="q_Q07" value="3" required>
+            <label for="q_Q07_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q07_4" name="q_Q07" value="4" required>
+            <label for="q_Q07_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q07_5" name="q_Q07" value="5" required>
+            <label for="q_Q07_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="8">
+            <div class="question-number">Question 8 of 27</div>
+            <div class="question-text">I am concerned that I do not yet have the professional judgment required to identify when an AI-generated output in my domain is wrong in ways that are not immediately obvious.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q08_1" name="q_Q08" value="1" required>
+            <label for="q_Q08_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q08_2" name="q_Q08" value="2" required>
+            <label for="q_Q08_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q08_3" name="q_Q08" value="3" required>
+            <label for="q_Q08_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q08_4" name="q_Q08" value="4" required>
+            <label for="q_Q08_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q08_5" name="q_Q08" value="5" required>
+            <label for="q_Q08_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="9">
+            <div class="question-number">Question 9 of 27</div>
+            <div class="question-text">I treat AI-generated professional outputs as drafts that require expert review, not as finished work that can be used without verification.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q09_1" name="q_Q09" value="1" required>
+            <label for="q_Q09_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q09_2" name="q_Q09" value="2" required>
+            <label for="q_Q09_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q09_3" name="q_Q09" value="3" required>
+            <label for="q_Q09_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q09_4" name="q_Q09" value="4" required>
+            <label for="q_Q09_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q09_5" name="q_Q09" value="5" required>
+            <label for="q_Q09_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+    <div class="section-divider"><div class="section-divider-inner"></div></div>
+
+    <div class="dimension-section">
+        <div class="dimension-header">
+            <div class="dimension-label">Section 2</div>
+            <div class="dimension-title">CAPABILITY EXPOSURE ASSESSMENT (CEA)</div>
+        </div>
+
+        <div class="question-card" data-q="10">
+            <div class="question-number">Question 10 of 27</div>
+            <div class="question-text">I have a clear and current understanding of which AI capabilities are now available in my specific professional domain and what they can produce.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q10_1" name="q_Q10" value="1" required>
+            <label for="q_Q10_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q10_2" name="q_Q10" value="2" required>
+            <label for="q_Q10_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q10_3" name="q_Q10" value="3" required>
+            <label for="q_Q10_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q10_4" name="q_Q10" value="4" required>
+            <label for="q_Q10_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q10_5" name="q_Q10" value="5" required>
+            <label for="q_Q10_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="11">
+            <div class="question-number">Question 11 of 27</div>
+            <div class="question-text">I am uncertain about which AI tools are currently being used in my professional domain and what they are capable of doing at the level my clients or counterparts would expect.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q11_1" name="q_Q11" value="1" required>
+            <label for="q_Q11_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q11_2" name="q_Q11" value="2" required>
+            <label for="q_Q11_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q11_3" name="q_Q11" value="3" required>
+            <label for="q_Q11_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q11_4" name="q_Q11" value="4" required>
+            <label for="q_Q11_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q11_5" name="q_Q11" value="5" required>
+            <label for="q_Q11_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="12">
+            <div class="question-number">Question 12 of 27</div>
+            <div class="question-text">I can explain to a senior colleague or client what AI-enabled capabilities are now available in my domain, without significant gaps in my knowledge.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q12_1" name="q_Q12" value="1" required>
+            <label for="q_Q12_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q12_2" name="q_Q12" value="2" required>
+            <label for="q_Q12_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q12_3" name="q_Q12" value="3" required>
+            <label for="q_Q12_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q12_4" name="q_Q12" value="4" required>
+            <label for="q_Q12_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q12_5" name="q_Q12" value="5" required>
+            <label for="q_Q12_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="13">
+            <div class="question-number">Question 13 of 27</div>
+            <div class="question-text">I can identify at least two or three professional capabilities I currently possess that are at meaningful risk of being deprecated by AI tools within the next five years.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q13_1" name="q_Q13" value="1" required>
+            <label for="q_Q13_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q13_2" name="q_Q13" value="2" required>
+            <label for="q_Q13_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q13_3" name="q_Q13" value="3" required>
+            <label for="q_Q13_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q13_4" name="q_Q13" value="4" required>
+            <label for="q_Q13_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q13_5" name="q_Q13" value="5" required>
+            <label for="q_Q13_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="14">
+            <div class="question-number">Question 14 of 27</div>
+            <div class="question-text">I am confident that the professional capabilities I have developed over my career will remain as valuable in ten years as they are today.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q14_1" name="q_Q14" value="1" required>
+            <label for="q_Q14_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q14_2" name="q_Q14" value="2" required>
+            <label for="q_Q14_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q14_3" name="q_Q14" value="3" required>
+            <label for="q_Q14_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q14_4" name="q_Q14" value="4" required>
+            <label for="q_Q14_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q14_5" name="q_Q14" value="5" required>
+            <label for="q_Q14_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="15">
+            <div class="question-number">Question 15 of 27</div>
+            <div class="question-text">I have made a deliberate assessment of which of my current professional capabilities are most at risk from AI adoption and which will become more valuable as a result.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q15_1" name="q_Q15" value="1" required>
+            <label for="q_Q15_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q15_2" name="q_Q15" value="2" required>
+            <label for="q_Q15_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q15_3" name="q_Q15" value="3" required>
+            <label for="q_Q15_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q15_4" name="q_Q15" value="4" required>
+            <label for="q_Q15_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q15_5" name="q_Q15" value="5" required>
+            <label for="q_Q15_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="16">
+            <div class="question-number">Question 16 of 27</div>
+            <div class="question-text">I have a reasonably clear picture of the difference between my organisation's AI adoption level and the AI adoption level of my primary bilateral partner organisation.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q16_1" name="q_Q16" value="1" required>
+            <label for="q_Q16_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q16_2" name="q_Q16" value="2" required>
+            <label for="q_Q16_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q16_3" name="q_Q16" value="3" required>
+            <label for="q_Q16_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q16_4" name="q_Q16" value="4" required>
+            <label for="q_Q16_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q16_5" name="q_Q16" value="5" required>
+            <label for="q_Q16_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="17">
+            <div class="question-number">Question 17 of 27</div>
+            <div class="question-text">I have not actively assessed whether my bilateral partner organisation is ahead of or behind my organisation in AI capability adoption.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q17_1" name="q_Q17" value="1" required>
+            <label for="q_Q17_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q17_2" name="q_Q17" value="2" required>
+            <label for="q_Q17_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q17_3" name="q_Q17" value="3" required>
+            <label for="q_Q17_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q17_4" name="q_Q17" value="4" required>
+            <label for="q_Q17_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q17_5" name="q_Q17" value="5" required>
+            <label for="q_Q17_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="18">
+            <div class="question-number">Question 18 of 27</div>
+            <div class="question-text">I am aware of at least one specific way in which AI capability asymmetry between my organisation and a bilateral partner has already created a structural advantage or disadvantage in our relationship.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q18_1" name="q_Q18" value="1" required>
+            <label for="q_Q18_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q18_2" name="q_Q18" value="2" required>
+            <label for="q_Q18_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q18_3" name="q_Q18" value="3" required>
+            <label for="q_Q18_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q18_4" name="q_Q18" value="4" required>
+            <label for="q_Q18_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q18_5" name="q_Q18" value="5" required>
+            <label for="q_Q18_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+    <div class="section-divider"><div class="section-divider-inner"></div></div>
+
+    <div class="dimension-section">
+        <div class="dimension-header">
+            <div class="dimension-label">Section 3</div>
+            <div class="dimension-title">ORGANISATIONAL PREPAREDNESS (OP)</div>
+        </div>
+
+        <div class="question-card" data-q="19">
+            <div class="question-number">Question 19 of 27</div>
+            <div class="question-text">My organisation has a defined policy for which AI tools can be used by professional staff and under what conditions.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q19_1" name="q_Q19" value="1" required>
+            <label for="q_Q19_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q19_2" name="q_Q19" value="2" required>
+            <label for="q_Q19_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q19_3" name="q_Q19" value="3" required>
+            <label for="q_Q19_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q19_4" name="q_Q19" value="4" required>
+            <label for="q_Q19_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q19_5" name="q_Q19" value="5" required>
+            <label for="q_Q19_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="20">
+            <div class="question-number">Question 20 of 27</div>
+            <div class="question-text">My organisation has a process for reviewing AI-generated professional outputs before they are delivered to clients or used in decision-making.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q20_1" name="q_Q20" value="1" required>
+            <label for="q_Q20_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q20_2" name="q_Q20" value="2" required>
+            <label for="q_Q20_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q20_3" name="q_Q20" value="3" required>
+            <label for="q_Q20_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q20_4" name="q_Q20" value="4" required>
+            <label for="q_Q20_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q20_5" name="q_Q20" value="5" required>
+            <label for="q_Q20_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="21">
+            <div class="question-number">Question 21 of 27</div>
+            <div class="question-text">My organisation has no formal governance structure for AI tool adoption, and professional staff make their own choices about what to use.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q21_1" name="q_Q21" value="1" required>
+            <label for="q_Q21_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q21_2" name="q_Q21" value="2" required>
+            <label for="q_Q21_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q21_3" name="q_Q21" value="3" required>
+            <label for="q_Q21_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q21_4" name="q_Q21" value="4" required>
+            <label for="q_Q21_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q21_5" name="q_Q21" value="5" required>
+            <label for="q_Q21_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="22">
+            <div class="question-number">Question 22 of 27</div>
+            <div class="question-text">My organisation has the data access and data quality standards required to deploy AI tools effectively in professional services delivery.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q22_1" name="q_Q22" value="1" required>
+            <label for="q_Q22_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q22_2" name="q_Q22" value="2" required>
+            <label for="q_Q22_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q22_3" name="q_Q22" value="3" required>
+            <label for="q_Q22_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q22_4" name="q_Q22" value="4" required>
+            <label for="q_Q22_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q22_5" name="q_Q22" value="5" required>
+            <label for="q_Q22_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="23">
+            <div class="question-number">Question 23 of 27</div>
+            <div class="question-text">My organisation's data is organised and accessible in a way that would allow AI tools to be applied systematically rather than only on a case-by-case basis.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q23_1" name="q_Q23" value="1" required>
+            <label for="q_Q23_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q23_2" name="q_Q23" value="2" required>
+            <label for="q_Q23_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q23_3" name="q_Q23" value="3" required>
+            <label for="q_Q23_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q23_4" name="q_Q23" value="4" required>
+            <label for="q_Q23_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q23_5" name="q_Q23" value="5" required>
+            <label for="q_Q23_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="24">
+            <div class="question-number">Question 24 of 27</div>
+            <div class="question-text">Data quality and access limitations are a significant constraint on my organisation's ability to deploy AI tools beyond isolated use cases.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q24_1" name="q_Q24" value="1" required>
+            <label for="q_Q24_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q24_2" name="q_Q24" value="2" required>
+            <label for="q_Q24_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q24_3" name="q_Q24" value="3" required>
+            <label for="q_Q24_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q24_4" name="q_Q24" value="4" required>
+            <label for="q_Q24_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q24_5" name="q_Q24" value="5" required>
+            <label for="q_Q24_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="25">
+            <div class="question-number">Question 25 of 27</div>
+            <div class="question-text">My organisation is actively investing in developing its professional staff's capability to use AI tools effectively — not just providing access to tools, but building the skills to use them well.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q25_1" name="q_Q25" value="1" required>
+            <label for="q_Q25_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q25_2" name="q_Q25" value="2" required>
+            <label for="q_Q25_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q25_3" name="q_Q25" value="3" required>
+            <label for="q_Q25_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q25_4" name="q_Q25" value="4" required>
+            <label for="q_Q25_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q25_5" name="q_Q25" value="5" required>
+            <label for="q_Q25_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="26">
+            <div class="question-number">Question 26 of 27</div>
+            <div class="question-text">My organisation's approach to AI capability is primarily tool procurement rather than capability development in its professional workforce.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q26_1" name="q_Q26" value="1" required>
+            <label for="q_Q26_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q26_2" name="q_Q26" value="2" required>
+            <label for="q_Q26_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q26_3" name="q_Q26" value="3" required>
+            <label for="q_Q26_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q26_4" name="q_Q26" value="4" required>
+            <label for="q_Q26_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q26_5" name="q_Q26" value="5" required>
+            <label for="q_Q26_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+
+        <div class="question-card" data-q="27">
+            <div class="question-number">Question 27 of 27</div>
+            <div class="question-text">My organisation has a clear view of which professional capabilities need to be developed in its workforce to capture the productivity gains that AI tools can produce.</div>
+            <div class="likert-scale">
+        <div class="likert-option">
+            <input type="radio" id="q_Q27_1" name="q_Q27" value="1" required>
+            <label for="q_Q27_1">
+                <span class="likert-number">1</span>
+                <span class="likert-label">Strongly Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q27_2" name="q_Q27" value="2" required>
+            <label for="q_Q27_2">
+                <span class="likert-number">2</span>
+                <span class="likert-label">Disagree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q27_3" name="q_Q27" value="3" required>
+            <label for="q_Q27_3">
+                <span class="likert-number">3</span>
+                <span class="likert-label">Neutral</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q27_4" name="q_Q27" value="4" required>
+            <label for="q_Q27_4">
+                <span class="likert-number">4</span>
+                <span class="likert-label">Agree</span>
+            </label>
+        </div>
+        <div class="likert-option">
+            <input type="radio" id="q_Q27_5" name="q_Q27" value="5" required>
+            <label for="q_Q27_5">
+                <span class="likert-number">5</span>
+                <span class="likert-label">Strongly Agree</span>
+            </label>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+        <section class="submit-section">
+            <div class="container">
+                <button type="submit" class="submit-btn">Submit Assessment</button>
+                <div class="submit-note">Your responses are encrypted and confidential</div>
+            </div>
+        </section>
+    </form>
+
+    <div class="completion-page" id="completionPage">
+        <h2>Assessment Complete</h2>
+        <p>Thank you for completing the SPARK assessment. Your responses have been recorded.</p>
+        <p>You will receive a confirmation email shortly with your preliminary results and next steps.</p>
+        <div class="next-steps">
+            <h3>What Happens Next</h3>
+            <p>1. Your responses are scored and analysed</p>
+            <p>2. A detailed report is generated within 24 hours</p>
+            <p>3. You'll receive your results via email</p>
+            <p>4. A debrief session can be scheduled with your consultant</p>
+        </div>
+    </div>
+
+    <div class="footer">LYC Partners &bull; Confidential Assessment &bull; SPARK</div>
+
+    <script>
+        const totalQ = 27;
+        const form = document.getElementById('assessmentForm');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        
+        function updateProgress() {
+            const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+            const pct = (answered / totalQ) * 100;
+            progressFill.style.width = pct + '%';
+            progressText.textContent = answered + ' / ' + totalQ;
+        }
+        
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'radio') updateProgress();
+        });
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const responses = {};
+            document.querySelectorAll('input[type="radio"]:checked').forEach(input => {
+                responses[input.name] = input.value;
+            });
+            form.style.display = 'none';
+            document.getElementById('progressBar').style.display = 'none';
+            document.getElementById('completionPage').style.display = 'block';
+            console.log('Assessment responses:', responses);
+        });
+        
+        updateProgress();
+    </script>
+</body>
+</html>

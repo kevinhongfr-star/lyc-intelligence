@@ -8,17 +8,17 @@ interface DiagnosticCard {
   type: SHIFTAssessmentType;
   name: string;
   purpose: string;
-  credits: number;
+  miles: number;
   icon: typeof Brain;
   color: string;
 }
 
 const DIAGNOSTICS: DiagnosticCard[] = [
-  { type: 'LEAP', name: 'Learning & Execution Potential', purpose: 'Strategic clarity', credits: 3, icon: Brain, color: 'bg-indigo-500' },
-  { type: 'QUEST', name: 'Questioning & Inquiry Skills', purpose: 'Inquiry capability', credits: 3, icon: Target, color: 'bg-blue-500' },
-  { type: 'DRIVE', name: 'Execution & Delivery Capability', purpose: 'Change management', credits: 3, icon: Zap, color: 'bg-amber-500' },
-  { type: 'COACH', name: 'Coaching & Leadership Development', purpose: 'Team development', credits: 3, icon: Users, color: 'bg-emerald-500' },
-  { type: 'IMPACT', name: 'Influence & Executive Presence', purpose: 'Composite across all SHIFT', credits: 5, icon: TrendingUp, color: 'bg-rose-500' },
+  { type: 'LEAP', name: 'Learning & Execution Potential', purpose: 'Strategic clarity', miles: 3, icon: Brain, color: 'bg-indigo-500' },
+  { type: 'QUEST', name: 'Questioning & Inquiry Skills', purpose: 'Inquiry capability', miles: 3, icon: Target, color: 'bg-blue-500' },
+  { type: 'DRIVE', name: 'Execution & Delivery Capability', purpose: 'Change management', miles: 3, icon: Zap, color: 'bg-amber-500' },
+  { type: 'COACH', name: 'Coaching & Leadership Development', purpose: 'Team development', miles: 3, icon: Users, color: 'bg-emerald-500' },
+  { type: 'IMPACT', name: 'Influence & Executive Presence', purpose: 'Composite across all SHIFT', miles: 5, icon: TrendingUp, color: 'bg-rose-500' },
 ];
 
 interface PastResult {
@@ -103,7 +103,7 @@ export default function ShiftPage() {
                 <div className={`${d.color} w-10 h-10 flex items-center justify-center`}>
                   <Icon className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xs font-medium text-slate-400">{d.credits} credits</span>
+                <span className="text-xs font-medium text-slate-400">{d.miles} mi</span>
               </div>
               <h3 className="font-semibold text-slate-900 text-sm">{d.name}</h3>
               <p className="text-xs text-slate-500 mt-1">{d.purpose}</p>

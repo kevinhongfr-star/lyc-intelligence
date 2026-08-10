@@ -1,0 +1,33 @@
+{
+  "instrument": "LEAP",
+  "full_name": "Leadership Archetype & APAC Translation",
+  "total_questions": 30,
+  "scale": "5-point Likert (1-5)",
+  "dimensions": [
+    {"id": "D1", "name": "Market", "questions": "Q01-Q06", "count": 6, "max_raw": 30},
+    {"id": "D2", "name": "Capability", "questions": "Q07-Q12", "count": 6, "max_raw": 30},
+    {"id": "D3", "name": "Timing", "questions": "Q13-Q18", "count": 6, "max_raw": 30},
+    {"id": "D4", "name": "Risk", "questions": "Q19-Q24", "count": 6, "max_raw": 30},
+    {"id": "D5", "name": "Impact", "questions": "Q25-Q30", "count": 6, "max_raw": 30}
+  ],
+  "reverse_coded": ["LEAP_Q05","LEAP_Q11","LEAP_Q15","LEAP_Q21","LEAP_Q24","LEAP_Q27"],
+  "composite_formula": "(Total raw / 150) × 100",
+  "dimension_normalized": "(raw / 30) × 20",
+  "composite_bands": {
+    "85-100": "Exceptional",
+    "70-84": "Strong",
+    "55-69": "Developing",
+    "40-54": "Emerging",
+    "0-39": "Early stage"
+  },
+  "verdict_thresholds": {
+    "17-20": "Strong Primary",
+    "13-16": "Strong Secondary",
+    "9-12": "Reserve",
+    "5-8": "Weak",
+    "0-4": "Out of Scope"
+  },
+  "apac_modifier": "1.0-1.2x multiplier on dimension verdicts",
+  "archetype_families": ["Builders","Sustainers","Connectors","Strategists"],
+  "archetypes_count": 16
+}

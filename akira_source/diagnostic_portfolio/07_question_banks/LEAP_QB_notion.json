@@ -1,0 +1,534 @@
+{
+  "instrument": "LEAP",
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "Market",
+      "sub_dimensions": [
+        {
+          "name": "Competitive landscape",
+          "questions": [
+            {
+              "id": "LEAP_Q01",
+              "text": "I can articulate how the competitive landscape in my primary APAC market has shifted over the past 12 months, and what that shift means for my organisation's positioning.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Market intelligence",
+          "questions": [
+            {
+              "id": "LEAP_Q02",
+              "text": "I regularly track which market signals — regulatory, competitive, or macroeconomic — are most likely to affect my organisation's positioning in APAC before they are visible to my peers.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Positioning clarity",
+          "questions": [
+            {
+              "id": "LEAP_Q03",
+              "text": "I can describe precisely where my organisation's current positioning is strongest and where it is most exposed, relative to competitors, in the APAC markets I operate in.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Market entry",
+          "questions": [
+            {
+              "id": "LEAP_Q04",
+              "text": "When I enter a new APAC market, I develop a clear view of the competitive dynamics before making positioning or resource decisions.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Signal discrimination",
+          "questions": [
+            {
+              "id": "LEAP_Q05",
+              "text": "I find it difficult to distinguish between market signals that require an immediate strategic response and those that can be monitored without action.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Adaptive positioning",
+          "questions": [
+            {
+              "id": "LEAP_Q06",
+              "text": "I have successfully repositioned my organisation or function in an APAC market in response to a significant competitive or regulatory shift.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        }
+      ],
+      "questions": []
+    },
+    {
+      "id": "D2",
+      "name": "Capability",
+      "sub_dimensions": [
+        {
+          "name": "Self-differentiation",
+          "questions": [
+            {
+              "id": "LEAP_Q07",
+              "text": "I can identify with precision the two or three capabilities that differentiate my leadership contribution from other senior leaders operating in the same context.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Capability-mandate fit",
+          "questions": [
+            {
+              "id": "LEAP_Q08",
+              "text": "The capabilities I am known for in my organisation are the capabilities that are most strategically valuable for the mandates I am likely to take on next.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Development orientation",
+          "questions": [
+            {
+              "id": "LEAP_Q09",
+              "text": "I actively develop the capabilities that will be most critical in my next leadership context, not just the capabilities that are most rewarded in my current role.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Capability transfer",
+          "questions": [
+            {
+              "id": "LEAP_Q10",
+              "text": "When given a new mandate, I can rapidly assess which of my existing capabilities are directly transferable and which will need to be built or supplemented.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Value proposition",
+          "questions": [
+            {
+              "id": "LEAP_Q11",
+              "text": "I struggle to articulate a clear and distinctive value proposition for myself as a leader — the specific reason an organisation should choose me for a complex APAC mandate.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "APAC capability translation",
+          "questions": [
+            {
+              "id": "LEAP_Q12",
+              "text": "In cross-border APAC settings, I am able to deploy my core leadership capabilities effectively even when the operating norms differ significantly from my home context.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        }
+      ],
+      "questions": []
+    },
+    {
+      "id": "D3",
+      "name": "Timing",
+      "sub_dimensions": [
+        {
+          "name": "Timing recognition",
+          "questions": [
+            {
+              "id": "LEAP_Q13",
+              "text": "I can identify when an APAC market or stakeholder situation has shifted to a point where the timing for a major initiative or decision has become optimal, even under conditions of incomplete information.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Restraint and patience",
+          "questions": [
+            {
+              "id": "LEAP_Q14",
+              "text": "I have held back a decision or initiative in an APAC context because the timing was wrong — and that restraint proved to be the right call.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Pace calibration",
+          "questions": [
+            {
+              "id": "LEAP_Q15",
+              "text": "I tend to move too quickly on strategic decisions in unfamiliar APAC markets, before sufficient stakeholder alignment has been established.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "APAC pace alignment",
+          "questions": [
+            {
+              "id": "LEAP_Q16",
+              "text": "I calibrate the pace of my leadership actions to match the relationship-building timelines that APAC stakeholders and business cultures require, without losing strategic momentum.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Opportunity capture",
+          "questions": [
+            {
+              "id": "LEAP_Q17",
+              "text": "I have successfully identified a narrow window of opportunity in an APAC market or organisation and acted within it before the window closed.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Pressure management",
+          "questions": [
+            {
+              "id": "LEAP_Q18",
+              "text": "When internal or external pressure demands faster action than is advisable, I can manage that pressure while maintaining the timing discipline that the situation requires.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        }
+      ],
+      "questions": []
+    },
+    {
+      "id": "D4",
+      "name": "Risk",
+      "sub_dimensions": [
+        {
+          "name": "Risk assessment",
+          "questions": [
+            {
+              "id": "LEAP_Q19",
+              "text": "Before committing to a significant leadership action or initiative in an APAC context, I systematically assess the specific risks — political, relational, reputational, and commercial — involved.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Risk tolerance",
+          "questions": [
+            {
+              "id": "LEAP_Q20",
+              "text": "I have taken a calculated risk in an APAC context that most peers would have avoided, and managed the outcome effectively.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Risk calibration",
+          "questions": [
+            {
+              "id": "LEAP_Q21",
+              "text": "I find it difficult to accurately assess how much risk I am actually taking on in cross-border APAC situations, relative to what I would face in a more familiar context.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Risk mitigation",
+          "questions": [
+            {
+              "id": "LEAP_Q22",
+              "text": "I have a specific approach for identifying and mitigating the relational and reputational risks that arise when my leadership actions do not land as intended in an APAC context.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Risk readiness",
+          "questions": [
+            {
+              "id": "LEAP_Q23",
+              "text": "When a risk I identified in advance materialises during an APAC engagement, I have a pre-formed response that I can activate without significant delay or disruption.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Political risk",
+          "questions": [
+            {
+              "id": "LEAP_Q24",
+              "text": "I tend to underestimate the political risks involved when making decisions that affect stakeholders across different APAC organisational or cultural boundaries.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        }
+      ],
+      "questions": []
+    },
+    {
+      "id": "D5",
+      "name": "Impact",
+      "sub_dimensions": [
+        {
+          "name": "Outcome attribution",
+          "questions": [
+            {
+              "id": "LEAP_Q25",
+              "text": "I can point to specific, measurable outcomes in my current or most recent role that are directly attributable to my individual leadership contribution, separate from broader team or market factors.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Influence without authority",
+          "questions": [
+            {
+              "id": "LEAP_Q26",
+              "text": "I am able to influence stakeholders — senior leaders, peers, and external partners — in APAC contexts where I do not have formal authority over them.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Influence scope",
+          "questions": [
+            {
+              "id": "LEAP_Q27",
+              "text": "The impact I have in my organisation is primarily felt within my immediate team and function; I have limited visibility or influence beyond that boundary.",
+              "reverse_coded": true,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Stakeholder communication",
+          "questions": [
+            {
+              "id": "LEAP_Q28",
+              "text": "I can translate my leadership contributions into terms that resonate with different APAC stakeholder groups — boards, operating teams, regulators, and external partners — without losing the substance of what I have delivered.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Cross-border impact",
+          "questions": [
+            {
+              "id": "LEAP_Q29",
+              "text": "I have delivered a measurable outcome in a cross-border or multi-market APAC context that required sustained influence across different organisational and cultural boundaries.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        },
+        {
+          "name": "Impact orientation",
+          "questions": [
+            {
+              "id": "LEAP_Q30",
+              "text": "I have a clear picture of the impact I am building toward in the next 12–24 months, including the specific outcomes that will indicate I have delivered at the level I am capable of.",
+              "reverse_coded": false,
+              "weight": 1.0
+            }
+          ]
+        }
+      ],
+      "questions": []
+    }
+  ],
+  "archetypes": [
+    {
+      "name": "Catalyst",
+      "description": "Market-Timing dominant: drives change through energy and momentum"
+    },
+    {
+      "name": "Architect",
+      "description": "Market-Capability dominant: builds systems calibrated to competitive reality"
+    },
+    {
+      "name": "Pioneer",
+      "description": "Timing-Risk dominant: moves into new territory before competitors recognise the opening"
+    },
+    {
+      "name": "Founder",
+      "description": "Capability-Impact dominant: creates something durable from a position of differentiated strength"
+    },
+    {
+      "name": "Anchor",
+      "description": "Risk-Capability dominant: creates stability in turbulent market conditions"
+    },
+    {
+      "name": "Steward",
+      "description": "Capability-Impact dominant: develops and protects organisational capability over time"
+    },
+    {
+      "name": "Cultivator",
+      "description": "Capability-Market dominant: grows capability aligned to market evolution"
+    },
+    {
+      "name": "Guardian",
+      "description": "Risk-Market dominant: maintains positioning integrity under competitive pressure"
+    },
+    {
+      "name": "Diplomat",
+      "description": "Impact-Risk dominant: navigates complex stakeholder environments with precision"
+    },
+    {
+      "name": "Facilitator",
+      "description": "Market-Impact dominant: creates alignment across different market and cultural contexts"
+    },
+    {
+      "name": "Translator",
+      "description": "Capability-Market dominant: bridges capability gaps between different organisational worlds"
+    },
+    {
+      "name": "Champion",
+      "description": "Impact-Timing dominant: advocates powerfully at the right moment"
+    },
+    {
+      "name": "Analyst",
+      "description": "Market-Risk dominant: deconstructs competitive complexity into actionable intelligence"
+    },
+    {
+      "name": "Synthesiser",
+      "description": "Capability-Impact dominant: integrates diverse inputs into coherent strategic direction"
+    },
+    {
+      "name": "Architect (Strategic)",
+      "description": "Market-Capability dominant: designs the operating system for others to execute within"
+    },
+    {
+      "name": "Visionary",
+      "description": "Timing-Impact dominant: sees the future positioning others have not yet recognised"
+    },
+    {
+      "name": "LEAP Instrument",
+      "description": "Full Product Sheet (archetype-by-archetype APAC translation map)"
+    }
+  ],
+  "scoring": {
+    "reverse_coded_items": [
+      "LEAP_Q05",
+      "LEAP_Q11",
+      "LEAP_Q15",
+      "LEAP_Q21",
+      "LEAP_Q24",
+      "LEAP_Q27"
+    ],
+    "bands": [
+      {
+        "composite_score_(/100)": "85–100",
+        "band": "Exceptional",
+        "interpretation": "High competitive positioning readiness across all five dimensions; archetypal primary archetype activation"
+      },
+      {
+        "composite_score_(/100)": "70–84",
+        "band": "Strong",
+        "interpretation": "Strong readiness with one or two targeted development dimensions"
+      },
+      {
+        "composite_score_(/100)": "55–69",
+        "band": "Developing",
+        "interpretation": "Solid foundation; specific capability and positioning gaps present"
+      },
+      {
+        "composite_score_(/100)": "40–54",
+        "band": "Emerging",
+        "interpretation": "Foundational positioning work required; recommend structured development before next mandate"
+      },
+      {
+        "composite_score_(/100)": "0–39",
+        "band": "Early stage",
+        "interpretation": "Significant gaps across multiple dimensions; developmental programme recommended"
+      },
+      {
+        "normalised_score_(/20)": "17–20",
+        "verdict": "Strong Primary",
+        "meaning": "Dimension is a clear, deployable leadership strength; anchors the leader's archetype profile"
+      },
+      {
+        "normalised_score_(/20)": "13–16",
+        "verdict": "Strong Secondary",
+        "meaning": "Dimension is accessible and effective; available as a secondary mode under deliberate activation"
+      },
+      {
+        "normalised_score_(/20)": "9–12",
+        "verdict": "Reserve",
+        "meaning": "Dimension is present but inconsistently deployed; available under favourable conditions"
+      },
+      {
+        "normalised_score_(/20)": "5–8",
+        "verdict": "Weak",
+        "meaning": "Dimension is underdeveloped; creates friction in contexts that require it; development priority"
+      },
+      {
+        "normalised_score_(/20)": "0–4",
+        "verdict": "Out of Scope",
+        "meaning": "Dimension is absent or counterproductive; not available for deployment in current form"
+      },
+      {
+        "dimension": "D1: Market",
+        "questions": "Q01–Q06",
+        "max": "30"
+      },
+      {
+        "dimension": "D2: Capability",
+        "questions": "Q07–Q12",
+        "max": "30"
+      },
+      {
+        "dimension": "D3: Timing",
+        "questions": "Q13–Q18",
+        "max": "30"
+      },
+      {
+        "dimension": "D4: Risk",
+        "questions": "Q19–Q24",
+        "max": "30"
+      },
+      {
+        "dimension": "D5: Impact",
+        "questions": "Q25–Q30",
+        "max": "30"
+      },
+      {
+        "dimension": "LEAP Composite",
+        "questions": "Q01–Q30",
+        "max": "150",
+        "normalised_(/20)": "___/100"
+      }
+    ]
+  },
+  "total_questions": 30
+}

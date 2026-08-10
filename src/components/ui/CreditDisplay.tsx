@@ -2,8 +2,11 @@ import React from 'react';
 import { Zap, Loader2 } from 'lucide-react';
 import { useCredits } from '@/contexts/CreditContext';
 
+type UnitType = 'miles' | 'credits';
+
 interface CreditDisplayProps {
   showTier?: boolean;
+  unit?: UnitType;
 }
 
 const DS = {
@@ -19,7 +22,11 @@ const DS = {
   warning: '#CA8A04',
 };
 
-export function CreditDisplay({ showTier = false }: CreditDisplayProps) {
+function unitLabel(unit: UnitType): string {
+  return unit === 'miles' ? 'mi' : 'credits';
+}
+
+export function CreditDisplay({ showTier = false, unit = 'credits' }: CreditDisplayProps) {
   const { credit } = useCredits();
 
   const getTierColor = () => {
@@ -61,7 +68,7 @@ export function CreditDisplay({ showTier = false }: CreditDisplayProps) {
             {credit.tier === 'enterprise' ? '∞' : credit.balance}
           </span>
           <span style={{ fontSize: '11px', color: DS.muted }}>
-            credits
+            {unitLabel(unit)}
           </span>
           {showTier && (
             <span style={{
@@ -80,4 +87,8 @@ export function CreditDisplay({ showTier = false }: CreditDisplayProps) {
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
+}
+
+export function MilesDisplay({ showTier = false }: { showTier?: boolean }) {
+  return <CreditDisplay showTier={showTier} unit="miles" />;
 }

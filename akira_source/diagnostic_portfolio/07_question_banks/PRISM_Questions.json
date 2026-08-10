@@ -1,0 +1,21 @@
+{
+  "instrument": "PRISM",
+  "full_name": "Positioning, Relevance & Identity for Senior Executives",
+  "total_questions": 30,
+  "scale": "5-point Likert (1-5)",
+  "suite": "Advisory Suite (not SHIFT Composite)",
+  "dimensions": [
+    {"id": "D1", "name": "Brand Clarity", "questions": "Q01-Q06", "count": 6, "max_raw": 30},
+    {"id": "D2", "name": "Market Positioning", "questions": "Q07-Q12", "count": 6, "max_raw": 30},
+    {"id": "D3", "name": "Communication Impact", "questions": "Q13-Q18", "count": 6, "max_raw": 30},
+    {"id": "D4", "name": "Digital Presence", "questions": "Q19-Q24", "count": 6, "max_raw": 30},
+    {"id": "D5", "name": "Career Narrative", "questions": "Q25-Q30", "count": 6, "max_raw": 30}
+  ],
+  "reverse_coded": ["PRISM_Q03","PRISM_Q09","PRISM_Q15","PRISM_Q21","PRISM_Q27"],
+  "composite_formula": "(Total raw / 150) × 100",
+  "dimension_normalized": "(raw / 30) × 20",
+  "dual_track": true,
+  "tracks": ["Development Track","Transition Track"],
+  "apac_legibility": "Standalone APAC Legibility Score from 6 APAC-specific items (Q06, Q12, Q14, Q24, Q30, Q19-APAC)",
+  "profiles": ["Brand Leader","Capable but Invisible Leader","In-Room Performer","Career Transitioner"]
+}

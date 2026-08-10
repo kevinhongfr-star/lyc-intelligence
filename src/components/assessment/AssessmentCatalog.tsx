@@ -1,112 +1,161 @@
-import React, { useState } from 'react';
-import { ClipboardCheck, Clock, BarChart2 } from 'lucide-react';
-import { MOCK_ASSESSMENTS, type Assessment } from '@/mocks/advancedFeatures';
-import { Badge } from '@/components/ui';
-import AssessmentDetail from './AssessmentDetail';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import {
+  ASSESSMENT_CATALOG,
+  FLAGSHIP_KEYS,
+  SHIFT_SUITE_KEYS,
+  ADVISORY_PRODUCT_KEYS,
+  TIER_GROUP_LABELS,
+  type InstrumentTierGroup,
+  type AssessmentInfo,
+} from '@/assessments/catalog';
 
-type TypeTab = 'all' | 'personality' | 'cognitive' | 'skills' | 'leadership';
+interface SectionProps {
+  tierGroup: InstrumentTierGroup;
+  keys: string[];
+}
 
-const TYPE_TABS: { id: TypeTab; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'personality', label: 'Personality' },
-  { id: 'cognitive', label: 'Cognitive' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'leadership', label: 'Leadership' },
-];
-
-const STATUS_CONFIG: Record<Assessment['status'], { label: string; variant: 'success' | 'warning' | 'default'; color: string }> = {
-  available: { label: 'Available', variant: 'success', color: 'bg-green-500' },
-  in_progress: { label: 'In Progress', variant: 'warning', color: 'bg-amber-500' },
-  completed: { label: 'Completed', variant: 'default', color: 'bg-[#C108AB]' },
-};
-
-export default function AssessmentCatalog() {
-  const [activeTab, setActiveTab] = useState<TypeTab>('all');
-  const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
-
-  const filteredAssessments =
-    activeTab === 'all'
-      ? MOCK_ASSESSMENTS
-      : MOCK_ASSESSMENTS.filter((a) => a.type === activeTab);
-
-  if (selectedAssessment) {
-    return (
-      <AssessmentDetail
-        assessment={selectedAssessment}
-        onBack={() => setSelectedAssessment(null)}
-      />
-    );
-  }
+function InstrumentCard({ key, assessment, fullWidth }: { key?: string | number; assessment: AssessmentInfo; fullWidth?: boolean }) {
+  void key;
+  const accentBg = assessment.code === 'CPI' ? '#C108AB' : '#1a1a2e';
+  const dimNames = assessment.dimensions.slice(0, 3).map((d) => d.name);
+  const moreCount = assessment.dimensions.length - dimNames.length;
+  const dimsText = moreCount > 0
+    ? `${dimNames.join(', ')}, …`
+    : dimNames.join(', ');
 
   return (
-    <div className="space-y-6">
-      {/* Type filter tabs */}
-      <div className="flex gap-2 border-b border-bg-tertiary pb-3">
-        {TYPE_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === tab.id
-                ? 'bg-accent text-white'
-                : 'text-text-muted hover:bg-bg-tertiary'
-            }`}
-            style={{ }}
-          >
-            {tab.label}
-          </button>
-        ))}
+    <div
+      className={`bg-bg-primary border border-bg-tertiary p-5 flex flex-col hover:bg-bg-secondary transition-colors ${
+        fullWidth ? 'col-span-1 md:col-span-2 lg:col-span-3' : ''
+      }`}
+      style={{ borderRadius: 0 }}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <span
+          style={{
+            background: accentBg,
+            color: '#ffffff',
+            padding: '4px 8px',
+            fontSize: '10px',
+            fontFamily: 'monospace',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
+          {assessment.code}
+        </span>
       </div>
 
-      {/* Assessment grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredAssessments.map((assessment) => {
-          const statusConfig = STATUS_CONFIG[assessment.status];
+      <h3
+        className="font-serif font-semibold text-text-primary text-lg mb-1"
+        style={{ lineHeight: 1.25 }}
+      >
+        {assessment.b2cName}
+      </h3>
+
+      <div className="flex items-center gap-2 text-xs text-text-muted mb-3">
+        <span>{assessment.total_questions} questions</span>
+        <span>·</span>
+        <span>{assessment.duration_minutes} min</span>
+        <span>·</span>
+        <span>{assessment.style_count} archetypes</span>
+      </div>
+
+      <p className="text-sm text-text-muted mb-4 line-clamp-2" style={{ minHeight: '2.5rem' }}>
+        {assessment.tagline}
+      </p>
+
+      <div className="flex items-center flex-wrap gap-2 mb-4">
+        <span
+          className="text-[10px] uppercase tracking-wider px-2 py-1 border border-bg-tertiary text-text-muted"
+          style={{ fontFamily: 'monospace' }}
+        >
+          {assessment.dimensions.length} dimensions
+        </span>
+        <span className="text-xs text-text-muted truncate" style={{ flex: 1, minWidth: 0 }}>
+          {dimsText}
+        </span>
+      </div>
+
+      <div className="mt-auto flex items-center justify-between gap-3 pt-2">
+        <span
+          className="text-[10px] uppercase tracking-wider px-2 py-1 border border-bg-tertiary text-text-muted whitespace-nowrap"
+        >
+          {assessment.tierLabel}
+        </span>
+
+        <span
+          className="font-serif text-2xl font-bold"
+          style={{ color: '#C108AB' }}
+        >
+          {assessment.priceMiles} mi
+        </span>
+
+        <Link
+          to={`/assessment/${assessment.code.toLowerCase()}`}
+          className="text-sm text-text-primary px-3 py-1.5 border border-bg-tertiary hover:bg-bg-tertiary transition-colors whitespace-nowrap"
+          style={{ borderRadius: 0 }}
+        >
+          Explore →
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function TierSection({ tierGroup, keys }: SectionProps) {
+  const label = TIER_GROUP_LABELS[tierGroup];
+  const isFlagship = tierGroup === 'flagship';
+
+  return (
+    <section className="mb-10">
+      <div className="flex items-center justify-between mb-3">
+        <h2
+          className="text-sm tracking-widest uppercase text-text-muted"
+          style={{ fontFamily: 'monospace' }}
+        >
+          {label}
+        </h2>
+        <span className="text-xs text-text-muted">
+          {keys.length} instrument{keys.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+
+      <div
+        className="w-full mb-5"
+        style={{ borderTop: '1px solid #c8cbd0' }}
+      />
+
+      <div
+        className={`grid gap-4 ${
+          isFlagship
+            ? 'grid-cols-1'
+            : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+        }`}
+      >
+        {keys.map((code) => {
+          const info = ASSESSMENT_CATALOG[code];
+          if (!info) return null;
           return (
-            <button
-              key={assessment.id}
-              onClick={() => setSelectedAssessment(assessment)}
-              className="text-left bg-bg-primary border border-bg-tertiary p-5 hover:bg-bg-secondary transition-colors"
-              style={{ }}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <Badge variant="default" className="uppercase text-[10px] tracking-wider">
-                  {assessment.type}
-                </Badge>
-                <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
-              </div>
-              <h3 className="font-serif font-semibold text-text-primary text-lg mb-2">
-                {assessment.name}
-              </h3>
-              <p className="text-sm text-text-muted mb-4 line-clamp-2">
-                {assessment.description}
-              </p>
-              <div className="flex items-center gap-4 text-xs text-text-muted">
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {assessment.estimatedTime}
-                </span>
-                <span className="flex items-center gap-1">
-                  <ClipboardCheck className="w-3 h-3" />
-                  {assessment.questionCount} questions
-                </span>
-                {assessment.score !== undefined && (
-                  <span className="flex items-center gap-1">
-                    <BarChart2 className="w-3 h-3" />
-                    Score: {assessment.score}
-                  </span>
-                )}
-              </div>
-            </button>
+            <InstrumentCard
+              key={code}
+              assessment={info}
+              fullWidth={isFlagship}
+            />
           );
         })}
       </div>
+    </section>
+  );
+}
 
-      {filteredAssessments.length === 0 && (
-        <div className="text-center py-12 text-text-muted">
-          No assessments found for this category.
-        </div>
-      )}
+export default function AssessmentCatalog() {
+  return (
+    <div className="space-y-0">
+      <TierSection tierGroup="flagship" keys={FLAGSHIP_KEYS} />
+      <TierSection tierGroup="shift" keys={SHIFT_SUITE_KEYS} />
+      <TierSection tierGroup="advisory" keys={ADVISORY_PRODUCT_KEYS} />
     </div>
   );
 }

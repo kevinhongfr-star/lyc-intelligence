@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, ArrowLeft, Loader2, AlertCircle, CheckCircle2, Download, CreditCard, Crown } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Loader2, AlertCircle, CheckCircle2, Download, Zap, Crown } from 'lucide-react';
 import {
   SHIFTAssessmentType,
   SHIFTIntake,
@@ -9,7 +9,8 @@ import {
 } from '../../services/shiftAssessmentTypes';
 import { submitSHIFTAssessment } from '../../services/shiftAnalysis';
 import { useAuthStore } from '../../stores/authStore';
-import { getCreditBalance, spendCredits } from '../../services/creditService';
+import { getCreditBalance, deductMiles, refundMiles } from '../../services/creditService';
+import { spendAssessmentMiles } from '../../services/monetizationService';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -66,14 +67,14 @@ export function SHIFTAssessmentWizard({
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<SHIFTAnalysisResult | null>(null);
   const [scoringRunId, setScoringRunId] = useState<string | null>(null);
-  const [creditBalance, setCreditBalance] = useState(0);
+  const [milesBalance, setMilesBalance] = useState(0);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
-  // Load credit balance
+  // Load miles balance (same underlying ledger as credits; labeled as miles for assessment UI)
   useEffect(() => {
     if (user?.id) {
       getCreditBalance(user.id).then(info => {
-        if (info) setCreditBalance(info.balance);
+        if (info) setMilesBalance(info.balance);
       });
     }
   }, [user?.id]);
@@ -106,13 +107,13 @@ export function SHIFTAssessmentWizard({
       setError('Please enter a valid email and name');
       return;
     }
-    
-    // Check credits
-    if (user?.id && creditBalance < config.credits) {
+
+    // Check miles balance
+    if (user?.id && milesBalance < config.credits) {
       setShowUpgradeModal(true);
       return;
     }
-    
+
     setError(null);
     setStep('context');
   };
@@ -135,25 +136,34 @@ export function SHIFTAssessmentWizard({
   const handleComplete = async () => {
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
-      // Deduct credits first
+      // Deduct miles first (assessment subsystem uses miles labels)
       if (user?.id) {
-        const spendResult = await spendCredits(user.id, config.credits, `shift_assessment_${assessmentType}`);
-        if (!spendResult.success) {
-          setShowUpgradeModal(true);
-          setIsSubmitting(false);
-          return;
+        const deductResult = await deductMiles(
+          config.credits,
+          `${assessmentType} Assessment`,
+          { referenceId: `shift_${assessmentType}`, description: `${assessmentType} SHIFT diagnostic — ${config.credits} mi` }
+        );
+        if (!deductResult.success) {
+          const altResult = await spendAssessmentMiles(assessmentType, { userId: user.id });
+          if (!altResult.success) {
+            setShowUpgradeModal(true);
+            setIsSubmitting(false);
+            return;
+          }
+          setMilesBalance(altResult.newBalance);
+        } else {
+          setMilesBalance(deductResult.newBalance);
         }
-        setCreditBalance(spendResult.newBalance);
       }
-      
+
       // Submit assessment
       const { result, scoringRunId } = await submitSHIFTAssessment(state, assessmentType, user?.id);
       setAnalysisResult(result);
       setScoringRunId(scoringRunId);
       setStep('results');
-      
+
       if (onComplete) onComplete(result);
     } catch (e: any) {
       console.error('Assessment submission failed:', e);
@@ -198,9 +208,9 @@ export function SHIFTAssessmentWizard({
   return (
     <div style={{ width: '100%', minHeight: '100vh', background: DS.bg }}>
       {/* Header */}
-      <div style={{ 
-        maxWidth: '700px', 
-        margin: '0 auto', 
+      <div style={{
+        maxWidth: '700px',
+        margin: '0 auto',
         padding: '24px 24px 0',
         display: 'flex',
         justifyContent: 'space-between',
@@ -210,12 +220,12 @@ export function SHIFTAssessmentWizard({
           <h1 style={{ fontFamily: DS.headingFont, color: DS.text, fontSize: '24px', marginBottom: '4px' }}>
             {config.name}
           </h1>
-          <p style={{ color: DS.muted, fontSize: '14px' }}>{config.purpose} · {config.credits} credits</p>
+          <p style={{ color: DS.muted, fontSize: '14px' }}>{config.purpose} · {config.credits} mi</p>
         </div>
         {user && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CreditCard style={{ width: 16, height: 16, color: DS.accent }} />
-            <span style={{ fontSize: '14px', color: DS.textSecondary }}>{creditBalance} credits</span>
+            <Zap style={{ width: 16, height: 16, color: DS.accent }} />
+            <span style={{ fontSize: '14px', color: DS.textSecondary }}>{milesBalance} mi</span>
           </div>
         )}
       </div>
@@ -265,7 +275,7 @@ export function SHIFTAssessmentWizard({
           onSubmit={handleGateSubmit}
           error={error}
           creditsRequired={config.credits}
-          creditBalance={creditBalance}
+          creditBalance={milesBalance}
         />
       )}
 
@@ -347,8 +357,9 @@ export function SHIFTAssessmentWizard({
       {showUpgradeModal && (
         <UpgradeModal
           creditsRequired={config.credits}
-          currentBalance={creditBalance}
+          currentBalance={milesBalance}
           onClose={() => setShowUpgradeModal(false)}
+          unit="miles"
         />
       )}
     </div>
@@ -363,9 +374,9 @@ function GateStep({ state, setState, onSubmit, error, creditsRequired, creditBal
         Start Your Assessment
       </h2>
       <p style={{ color: DS.muted, marginBottom: '32px' }}>
-        Enter your details to begin. This assessment requires {creditsRequired} credits.
+        Enter your details to begin. This assessment requires {creditsRequired} mi.
       </p>
-      
+
       <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div>
           <label style={{ display: 'block', marginBottom: '6px', color: DS.textSecondary }}>
@@ -381,7 +392,7 @@ function GateStep({ state, setState, onSubmit, error, creditsRequired, creditBal
             placeholder="Your full name"
           />
         </div>
-        
+
         <div>
           <label style={{ display: 'block', marginBottom: '6px', color: DS.textSecondary }}>
             Email
@@ -413,7 +424,7 @@ function GateStep({ state, setState, onSubmit, error, creditsRequired, creditBal
         </div>
 
         {error && <p style={{ color: DS.error, fontSize: '14px' }}>{error}</p>}
-        
+
         <button
           type="submit"
           style={{
@@ -432,9 +443,9 @@ function GateStep({ state, setState, onSubmit, error, creditsRequired, creditBal
           }}
         >
           {creditBalance >= creditsRequired ? (
-            <>Start Assessment ({creditsRequired} credits) <ArrowRight /></>
+            <>Start Assessment ({creditsRequired} mi) <ArrowRight /></>
           ) : (
-            <>Insufficient Credits - Upgrade Required</>
+            <>Insufficient Miles - Upgrade Required</>
           )}
         </button>
       </form>
@@ -1216,7 +1227,11 @@ function ResultsStep({ assessmentType, result, intake, onDownloadPDF, isGenerati
 }
 
 // Upgrade Modal Component
-function UpgradeModal({ creditsRequired, currentBalance, onClose }: any) {
+function UpgradeModal({ creditsRequired, currentBalance, onClose, unit = 'credits' }: any) {
+  const isMiles = unit === 'miles';
+  const unitLabel = isMiles ? 'mi' : 'credits';
+  const unitNoun = isMiles ? 'Miles' : 'Credits';
+
   return (
     <div style={{
       position: 'fixed',
@@ -1246,15 +1261,15 @@ function UpgradeModal({ creditsRequired, currentBalance, onClose }: any) {
         }}>
           <Crown style={{ width: 24, height: 24, color: DS.accent }} />
         </div>
-        
+
         <h3 style={{ fontFamily: DS.headingFont, color: DS.text, fontSize: '20px', marginBottom: '8px' }}>
-          Insufficient Credits
+          Insufficient {unitNoun}
         </h3>
-        
+
         <p style={{ color: DS.muted, marginBottom: '16px' }}>
-          This assessment requires {creditsRequired} credits. You have {currentBalance} credits.
+          This assessment requires {creditsRequired} {unitLabel}. You have {currentBalance} {unitLabel}.
         </p>
-        
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <a
             href="/pricing"

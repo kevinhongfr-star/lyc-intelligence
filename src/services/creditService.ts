@@ -203,3 +203,126 @@ export function formatTransactionDescription(type: string, amount: number): stri
   };
   return descriptions[type] || `${prefix}${amount} ${type}`;
 }
+
+export interface MilesInfo {
+  miles: number;
+  tier: string;
+}
+
+export interface MilesTransaction {
+  id: string;
+  amount: number;
+  transactionType: string;
+  description: string | null;
+  createdAt: string;
+}
+
+export async function milesBalance(userId?: string): Promise<MilesInfo> {
+  const effectiveUserId = userId || useAuthStore.getState().user?.id;
+  if (!effectiveUserId) {
+    return { miles: 0, tier: 'free' };
+  }
+  const info = await getCreditBalance(effectiveUserId);
+  return {
+    miles: info?.balance ?? 0,
+    tier: info?.tier ?? 'free'
+  };
+}
+
+export async function deductMiles(
+  amount: number,
+  reason: string,
+  meta?: Record<string, unknown>
+): Promise<{ success: boolean; newBalance: number }> {
+  const userId = useAuthStore.getState().user?.id;
+  if (!userId) {
+    return { success: false, newBalance: 0 };
+  }
+  const milesReason = reason.replace(/credits?/gi, 'miles').replace(/Credit/g, 'Miles');
+  const action = meta?.referenceId
+    ? `${milesReason}_${meta.referenceId}`
+    : milesReason;
+  const description = meta?.description
+    ? String(meta.description).replace(/credits?/gi, 'miles').replace(/Credit/g, 'Miles')
+    : `${amount} miles · ${milesReason}`;
+
+  const result = await spendCredits(userId, amount, action);
+
+  try {
+    const sb = getSupabase();
+    await sb.from('credit_transactions').insert({
+      user_id: userId,
+      amount: -amount,
+      transaction_type: 'spend_miles',
+      description,
+      reference_id: meta?.referenceId || null,
+      metadata: meta || null,
+    });
+  } catch (e) {
+    console.warn('[Miles] Could not insert miles-labeled transaction:', e);
+  }
+
+  return result;
+}
+
+export async function refundMiles(
+  amount: number,
+  reason: string,
+  meta?: Record<string, unknown>
+): Promise<boolean> {
+  const userId = useAuthStore.getState().user?.id;
+  if (!userId) return false;
+
+  const milesReason = reason.replace(/credits?/gi, 'miles').replace(/Credit/g, 'Miles');
+  const description = meta?.description
+    ? String(meta.description).replace(/credits?/gi, 'miles').replace(/Credit/g, 'Miles')
+    : `Refund ${amount} miles · ${milesReason}`;
+
+  try {
+    const info = await getCreditBalance(userId);
+    const currentBalance = info?.balance ?? 0;
+    const newBalance = currentBalance + amount;
+
+    const sb = getSupabase();
+    await sb
+      .from('credits')
+      .update({
+        balance: newBalance,
+        total_spent: Math.max(0, (info?.totalSpent ?? 0) - amount),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId);
+
+    await sb.from('credit_transactions').insert({
+      user_id: userId,
+      amount,
+      transaction_type: 'refund_miles',
+      description,
+      reference_id: meta?.referenceId || null,
+      metadata: meta || null,
+    });
+
+    return true;
+  } catch (e) {
+    console.error('[Miles] refundMiles error:', e);
+    return false;
+  }
+}
+
+export async function milesLedger(userId?: string, limit: number = 20): Promise<MilesTransaction[]> {
+  const effectiveUserId = userId || useAuthStore.getState().user?.id;
+  if (!effectiveUserId) return [];
+
+  const txs = await getTransactionHistory(effectiveUserId, limit);
+  return txs.map((t) => ({
+    id: t.id,
+    amount: t.amount,
+    transactionType: t.transactionType
+      .replace(/credit/gi, 'miles')
+      .replace(/Credit/g, 'Miles'),
+    description: t.description
+      ? t.description.replace(/credits?/gi, (m) => (m[0] === m[0].toUpperCase() ? 'Miles' : 'miles'))
+      : null,
+    createdAt: t.createdAt,
+  }));
+}

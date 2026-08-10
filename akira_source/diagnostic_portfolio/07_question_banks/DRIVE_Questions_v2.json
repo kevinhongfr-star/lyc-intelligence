@@ -1,0 +1,530 @@
+{
+  "instrument": "DRIVE",
+  "version": "2.0",
+  "title": "DRIVE — Question Bank (Full) v2",
+  "description": "Motivation, Engagement Risk & Career Clarity | 10-Archetype Classification System",
+  "total_questions": 36,
+  "core_questions": 30,
+  "engagement_risk_questions": 6,
+  "scale": "5-point Likert (1=Strongly disagree, 5=Strongly agree)",
+  "estimated_completion": "~12 minutes",
+  "shift_composite_weight": 0.15,
+  "confidentiality": "Engagement Risk data is the most sensitive in the suite — never shared with executive's employer in B2B contexts",
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "Intrinsic Motivation",
+      "questions": "Q01-Q06",
+      "raw_max": 30,
+      "formula": "(raw/30) × 100",
+      "sub_dimensions": [
+        "Task engagement",
+        "Intellectual curiosity",
+        "Autonomy drive",
+        "Flow state frequency",
+        "Craft motivation",
+        "APAC intrinsic resonance"
+      ],
+      "reverse_coded": [
+        "Q03"
+      ]
+    },
+    {
+      "id": "D2",
+      "name": "Extrinsic Motivation",
+      "questions": "Q07-Q12",
+      "raw_max": 30,
+      "formula": "(raw/30) × 100",
+      "sub_dimensions": [
+        "Recognition sensitivity",
+        "Reward orientation",
+        "Recognition scope",
+        "Extrinsic independence",
+        "Visibility drive",
+        "Progression drive"
+      ],
+      "reverse_coded": [
+        "Q10"
+      ]
+    },
+    {
+      "id": "D3",
+      "name": "Values Alignment",
+      "questions": "Q13-Q18",
+      "raw_max": 30,
+      "formula": "(raw/30) × 100",
+      "sub_dimensions": [
+        "Purpose congruence",
+        "Values articulacy",
+        "Values conflict",
+        "Organisational ethics fit",
+        "Mission alignment",
+        "Sustained purpose"
+      ],
+      "reverse_coded": [
+        "Q15"
+      ]
+    },
+    {
+      "id": "D4",
+      "name": "Confidence & Self-Efficacy",
+      "questions": "Q19-Q24",
+      "raw_max": 30,
+      "formula": "(raw/30) × 100",
+      "sub_dimensions": [
+        "Role-specific confidence",
+        "Challenge orientation",
+        "Capability doubt",
+        "Pressure confidence",
+        "Adaptive self-efficacy",
+        "APAC contextual confidence"
+      ],
+      "reverse_coded": [
+        "Q21"
+      ]
+    },
+    {
+      "id": "D5",
+      "name": "Growth Orientation",
+      "questions": "Q25-Q30",
+      "raw_max": 30,
+      "formula": "(raw/30) × 100",
+      "sub_dimensions": [
+        "Development vs. mastery",
+        "Challenge dependency",
+        "Mastery preference",
+        "Development seeking",
+        "Learning curve preference",
+        "APAC growth appetite"
+      ],
+      "reverse_coded": [
+        "Q27"
+      ]
+    }
+  ],
+  "engagement_risk": {
+    "id": "ER",
+    "name": "Engagement Risk Sub-Score",
+    "questions": "Q31-Q36",
+    "raw_max": 30,
+    "formula": "(raw/30) × 100",
+    "reverse_coded": [
+      "Q34"
+    ],
+    "states": [
+      {
+        "range": "0-30",
+        "label": "Low Risk",
+        "state": "Fueled"
+      },
+      {
+        "range": "31-60",
+        "label": "Moderate Risk",
+        "state": "Flickering"
+      },
+      {
+        "range": "61-100",
+        "label": "High Risk",
+        "state": "Fading"
+      }
+    ]
+  },
+  "scoring": {
+    "composite_formula": "(raw_total/150) × 100",
+    "composite_max": 100,
+    "bands": [
+      {
+        "range": "80-100",
+        "band": "High Drive",
+        "interpretation": "Strong motivation across multiple dimensions; highly engaged and directed"
+      },
+      {
+        "range": "60-79",
+        "band": "Active Drive",
+        "interpretation": "Generally energised; 1-2 motivation dimensions with meaningful gaps"
+      },
+      {
+        "range": "40-59",
+        "band": "Moderate Drive",
+        "interpretation": "Partial alignment; significant gaps between role and motivational architecture"
+      },
+      {
+        "range": "20-39",
+        "band": "Low Drive",
+        "interpretation": "Substantial misalignment; disengagement risk is material"
+      },
+      {
+        "range": "0-19",
+        "band": "Disengaged",
+        "interpretation": "Motivational breakdown; urgent career review and role redesign required"
+      }
+    ]
+  },
+  "primary_motivation_type": {
+    "step1": "Compare D1 (Intrinsic) vs D2 (Extrinsic) — difference ≥10 points → Intrinsic-dominant OR Extrinsic-dominant; <10 → Dual-drive",
+    "step2": "If D3 (Values Alignment) > both D1 and D2 → Purpose-driven; If D5 (Growth Orientation) > both D1 and D2 → Growth-driven; If both D3 and D5 exceed D1 and D2, use whichever is higher",
+    "step3": "Drifter flag — when no clear dominant motivation source identified"
+  },
+  "archetypes": [
+    {
+      "name": "Achiever",
+      "motivation": "Extrinsic — results",
+      "state": "Fueled",
+      "pattern": "High output, target-driven",
+      "risk": "Burns out when recognition dries up"
+    },
+    {
+      "name": "Craftsman",
+      "motivation": "Intrinsic — quality",
+      "state": "Fueled",
+      "pattern": "Motivated by excellence of the work",
+      "risk": "Demotivated by bureaucracy and mediocrity"
+    },
+    {
+      "name": "Champion",
+      "motivation": "Relational — team",
+      "state": "Fueled",
+      "pattern": "Energised by building team capability",
+      "risk": "Loses motivation when team is removed"
+    },
+    {
+      "name": "Explorer",
+      "motivation": "Intrinsic — novelty",
+      "state": "Fueled",
+      "pattern": "Driven by new challenges and contexts",
+      "risk": "Disengages in stable, routine mandates"
+    },
+    {
+      "name": "Stalwart",
+      "motivation": "Mission — institutional",
+      "state": "Fueled",
+      "pattern": "Long-term institutional loyalty",
+      "risk": "Rigid in changing contexts"
+    },
+    {
+      "name": "Restless",
+      "motivation": "Intrinsic — ambition",
+      "state": "Flickering",
+      "pattern": "High capability, underplaced",
+      "risk": "Exits if mandate does not expand"
+    },
+    {
+      "name": "Golden Handcuffs",
+      "motivation": "Extrinsic — security",
+      "state": "Flickering",
+      "pattern": "Staying for rewards, not the work",
+      "risk": "Explore what would need to change to re-engage"
+    },
+    {
+      "name": "Drifter",
+      "motivation": "Unclear",
+      "state": "Flickering",
+      "pattern": "No dominant motivation source",
+      "risk": "Mandates feel arbitrary"
+    },
+    {
+      "name": "Burned-Out",
+      "motivation": "Depleted",
+      "state": "Fading",
+      "pattern": "Motivation structurally exhausted",
+      "risk": "Immediate safety assessment required"
+    },
+    {
+      "name": "Frozen Asset",
+      "motivation": "Blocked",
+      "state": "Fading",
+      "pattern": "High capability, structural paralysis",
+      "risk": "Organisational or mandate design intervention"
+    }
+  ],
+  "all_questions": [
+    {
+      "id": "DRIVE_Q01",
+      "text": "The work itself — the intellectual challenge, the problem-solving, the craft — is the primary reason I remain in my current role, not the compensation, the organisation, or external recognition.",
+      "dimension": "Intrinsic Motivation",
+      "sub_dimension": "Task engagement",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q02",
+      "text": "I am most motivated when I am working on complex, demanding tasks that require my full attention — routine or administrative work drains my energy regardless of the external rewards attached.",
+      "dimension": "Intrinsic Motivation",
+      "sub_dimension": "Intellectual curiosity",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q03",
+      "text": "If the external rewards were sufficient — compensation, title, recognition — I would remain engaged even in work I find intellectually undemanding or unstimulating.",
+      "dimension": "Intrinsic Motivation",
+      "sub_dimension": "Autonomy drive",
+      "reverse": true,
+      "weight": -1.0
+    },
+    {
+      "id": "DRIVE_Q04",
+      "text": "There are moments in my current role when I become so absorbed in the work that I lose track of time — a state of flow that I find deeply motivating in itself.",
+      "dimension": "Intrinsic Motivation",
+      "sub_dimension": "Flow state frequency",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q05",
+      "text": "I would stay in my current role even if the external conditions deteriorated — the quality of the work itself is sufficient to sustain my motivation.",
+      "dimension": "Intrinsic Motivation",
+      "sub_dimension": "Craft motivation",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q06",
+      "text": "In APAC cross-border assignments — where the cultural complexity, ambiguity, and relational demands are inherently rich — I find the work itself more motivating than in simpler, more familiar contexts.",
+      "dimension": "Intrinsic Motivation",
+      "sub_dimension": "APAC intrinsic resonance",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q07",
+      "text": "Visible recognition of my contributions — from senior stakeholders, from the organisation, or from my professional community — is an important source of motivation for me.",
+      "dimension": "Extrinsic Motivation",
+      "sub_dimension": "Recognition sensitivity",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q08",
+      "text": "The compensation, title, and status associated with my current role are meaningful motivating factors — not incidental to my engagement.",
+      "dimension": "Extrinsic Motivation",
+      "sub_dimension": "Reward orientation",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q09",
+      "text": "When I achieve a significant result, I want it acknowledged — being told quietly that I did well is not enough; I want the recognition to match the contribution.",
+      "dimension": "Extrinsic Motivation",
+      "sub_dimension": "Recognition scope",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q10",
+      "text": "I would be equally motivated in a role that paid significantly less, as long as the work itself was interesting and the mission was meaningful.",
+      "dimension": "Extrinsic Motivation",
+      "sub_dimension": "Extrinsic independence",
+      "reverse": true,
+      "weight": -1.0
+    },
+    {
+      "id": "DRIVE_Q11",
+      "text": "My motivation increases measurably when I am in a high-visibility role — where my work and results are seen by senior leadership or the broader organisation.",
+      "dimension": "Extrinsic Motivation",
+      "sub_dimension": "Visibility drive",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q12",
+      "text": "Career progression — movement to more senior titles, expanded scope, higher compensation — is an active and ongoing motivator for me, not just a background assumption.",
+      "dimension": "Extrinsic Motivation",
+      "sub_dimension": "Progression drive",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q13",
+      "text": "My daily work reflects what I believe is genuinely important — ethically, professionally, and in terms of the impact I want to have.",
+      "dimension": "Values Alignment",
+      "sub_dimension": "Purpose congruence",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q14",
+      "text": "I can clearly articulate why the work I do matters — not just commercially or organisationally, but in terms of what I personally value.",
+      "dimension": "Values Alignment",
+      "sub_dimension": "Values articulacy",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q15",
+      "text": "I am being asked to do things in my current role that conflict with what I believe is right — creating a nagging sense of misalignment I cannot easily resolve.",
+      "dimension": "Values Alignment",
+      "sub_dimension": "Values conflict",
+      "reverse": true,
+      "weight": -1.0
+    },
+    {
+      "id": "DRIVE_Q16",
+      "text": "The organisation I work for conducts itself in ways that align with my personal ethical commitments — I am not required to suppress my values to succeed here.",
+      "dimension": "Values Alignment",
+      "sub_dimension": "Organisational ethics fit",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q17",
+      "text": "My current role allows me to contribute to something larger than commercial outcomes — to a purpose or mission I personally believe in.",
+      "dimension": "Values Alignment",
+      "sub_dimension": "Mission alignment",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q18",
+      "text": "Even when external conditions are difficult — the work is hard, the organisation is under pressure — I feel that what I am doing matters in a way that sustains my commitment.",
+      "dimension": "Values Alignment",
+      "sub_dimension": "Sustained purpose",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q19",
+      "text": "I believe I am capable of handling whatever challenges arise in my current role — including the ones I have not encountered yet.",
+      "dimension": "Confidence & Self-Efficacy",
+      "sub_dimension": "Role-specific confidence",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q20",
+      "text": "When I face a significant challenge at work, my default response is to lean in — to believe I can figure it out rather than to doubt whether I am the right person for it.",
+      "dimension": "Confidence & Self-Efficacy",
+      "sub_dimension": "Challenge orientation",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q21",
+      "text": "I have a growing sense that the demands of my current role may be exceeding my capability — and that concern is affecting my performance and my wellbeing.",
+      "dimension": "Confidence & Self-Efficacy",
+      "sub_dimension": "Capability doubt",
+      "reverse": true,
+      "weight": -1.0
+    },
+    {
+      "id": "DRIVE_Q22",
+      "text": "My confidence in my own judgment and capability holds under pressure — I do not significantly second-guess myself when the stakes are high or the situation is ambiguous.",
+      "dimension": "Confidence & Self-Efficacy",
+      "sub_dimension": "Pressure confidence",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q23",
+      "text": "I have made a significant career transition — new sector, new geography, new level of seniority — and successfully rebuilt my confidence and effectiveness in the new context.",
+      "dimension": "Confidence & Self-Efficacy",
+      "sub_dimension": "Adaptive self-efficacy",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q24",
+      "text": "In APAC cross-border contexts — where the cultural, relational, and operational demands differ significantly from my baseline — I feel genuinely capable, not just technically competent.",
+      "dimension": "Confidence & Self-Efficacy",
+      "sub_dimension": "APAC contextual confidence",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q25",
+      "text": "I am more energised by assignments that require me to develop new skills than by assignments where I can apply expertise I have already built.",
+      "dimension": "Growth Orientation",
+      "sub_dimension": "Development vs. mastery",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q26",
+      "text": "When my current role stops being challenging — when I feel I have largely mastered what it requires — my motivation declines noticeably, even if external conditions are favourable.",
+      "dimension": "Growth Orientation",
+      "sub_dimension": "Challenge dependency",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q27",
+      "text": "I prefer to operate in domains where I have deep established expertise — new challenges that require me to start from scratch are more uncomfortable than energising.",
+      "dimension": "Growth Orientation",
+      "sub_dimension": "Mastery preference",
+      "reverse": true,
+      "weight": -1.0
+    },
+    {
+      "id": "DRIVE_Q28",
+      "text": "I actively seek feedback and development input — not because it is expected, but because I am genuinely motivated by becoming more capable.",
+      "dimension": "Growth Orientation",
+      "sub_dimension": "Development seeking",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q29",
+      "text": "I would take a role with a significantly steeper learning curve over a role where I would be immediately effective, if both were otherwise comparable.",
+      "dimension": "Growth Orientation",
+      "sub_dimension": "Learning curve preference",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q30",
+      "text": "Taking on a new APAC mandate — with its unfamiliar regulatory, cultural, and relational complexity — is the kind of challenge that energises rather than intimidates me.",
+      "dimension": "Growth Orientation",
+      "sub_dimension": "APAC growth appetite",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q31",
+      "text": "If I am honest with myself, there are days when I question whether I would remain in my current role if I were not financially or contractually obligated to do so.",
+      "dimension": "Engagement Risk",
+      "sub_dimension": "Retention dependency",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q32",
+      "text": "The work I am doing now feels structurally misaligned with what I need — not because the organisation is wrong, but because the role, the mandate, or the level of scope no longer fits who I have become.",
+      "dimension": "Engagement Risk",
+      "sub_dimension": "Structural misalignment",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q33",
+      "text": "I have noticed a persistent decline in my discretionary effort — the extra thinking, the proactive initiative, the willingness to go beyond what is asked — over the past 6–12 months.",
+      "dimension": "Engagement Risk",
+      "sub_dimension": "Discretionary decline",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q34",
+      "text": "Even when external conditions are positive — good team, supportive leadership, interesting work — I find it difficult to feel genuinely energised or committed.",
+      "dimension": "Engagement Risk",
+      "sub_dimension": "Energisation deficit",
+      "reverse": true,
+      "weight": -1.0
+    },
+    {
+      "id": "DRIVE_Q35",
+      "text": "If a significant and attractive opportunity presented itself tomorrow — not just financially, but in terms of scope, challenge, or relational context — I would seriously consider leaving.",
+      "dimension": "Engagement Risk",
+      "sub_dimension": "Exit readiness",
+      "reverse": false,
+      "weight": 1.0
+    },
+    {
+      "id": "DRIVE_Q36",
+      "text": "There is a part of me that has already mentally left this role — I am going through the motions while waiting for something to change or for the right moment to move.",
+      "dimension": "Engagement Risk",
+      "sub_dimension": "Psychological departure",
+      "reverse": false,
+      "weight": 1.0
+    }
+  ]
+}

@@ -1,6 +1,21 @@
 import type { AssessmentType, AssessmentReport } from '@/types';
-let jsPDFModule: typeof import('jspdf') | null = null;
-async function loadJsPDF() { if (!jsPDFModule) jsPDFModule = await import('jspdf'); return jsPDFModule; }
+
+declare global {
+  // Shim: jsPDF may not be installed in all environments.
+  const jsPDF: any;
+  interface Window { jsPDF?: any; }
+}
+
+let jsPDFModule: any = null;
+async function loadJsPDF() {
+  if (jsPDFModule) return jsPDFModule;
+  try {
+    jsPDFModule = await import('jspdf' as any);
+  } catch {
+    jsPDFModule = { default: undefined };
+  }
+  return jsPDFModule;
+}
 
 export async function generatePDF(assessmentType: AssessmentType, result: { scores: Record<string, number>; archetype: string; percentile: Record<string, number>; }, report: AssessmentReport, userName?: string): Promise<void> {
   const jsPDF = await loadJsPDF();

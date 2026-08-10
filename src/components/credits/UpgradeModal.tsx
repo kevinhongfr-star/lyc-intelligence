@@ -19,6 +19,7 @@ interface UpgradeModalProps {
   onClose: () => void;
   requiredCredits?: number;
   currentCredits?: number;
+  unit?: 'credits' | 'miles';
 }
 
 export const TIERS = [
@@ -78,10 +79,11 @@ export const TIERS = [
   }
 ];
 
-export function UpgradeModal({ onClose, requiredCredits, currentCredits }: UpgradeModalProps) {
+export function UpgradeModal({ onClose, requiredCredits, currentCredits, unit = 'credits' }: UpgradeModalProps) {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const unitLabel = unit === 'miles' ? 'mi' : 'credits';
 
   const handleUpgrade = async (tierId: string) => {
     setSelectedTier(tierId);
@@ -151,7 +153,7 @@ export function UpgradeModal({ onClose, requiredCredits, currentCredits }: Upgra
             </h2>
             {requiredCredits && currentCredits !== undefined && (
               <p style={{ color: DS.muted, fontSize: '14px' }}>
-                You need {requiredCredits} credits (have {currentCredits})
+                You need {requiredCredits} {unitLabel} (have {currentCredits})
               </p>
             )}
           </div>

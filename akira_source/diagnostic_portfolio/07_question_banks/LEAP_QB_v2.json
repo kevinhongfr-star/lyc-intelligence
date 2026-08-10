@@ -1,0 +1,137 @@
+{
+  "instrument": "LEAP",
+  "full_name": "Leadership Evaluation & Psychological Profiling",
+  "version": "2.0",
+  "total_questions": 15,
+  "delivery_time": "15 minutes",
+  "layers": {
+    "A_DISC": {
+      "description": "DISC Behavioral Assessment — forced-choice",
+      "questions": "Q1-Q8",
+      "format": "forced_choice_most_least",
+      "items_per_dimension": 2,
+      "item_sets": [
+        {
+          "id": "LEAP_DQ01",
+          "adjectives": {
+            "D": "Decisive",
+            "I": "Enthusiastic",
+            "S": "Patient",
+            "C": "Analytical"
+          }
+        },
+        {
+          "id": "LEAP_DQ02",
+          "adjectives": {
+            "D": "Direct",
+            "I": "Optimistic",
+            "S": "Reliable",
+            "C": "Precise"
+          }
+        },
+        {
+          "id": "LEAP_DQ03",
+          "adjectives": {
+            "D": "Competitive",
+            "I": "Persuasive",
+            "S": "Supportive",
+            "C": "Systematic"
+          }
+        },
+        {
+          "id": "LEAP_DQ04",
+          "adjectives": {
+            "D": "Results-oriented",
+            "I": "Sociable",
+            "S": "Steady",
+            "C": "Thorough"
+          }
+        },
+        {
+          "id": "LEAP_DQ05",
+          "adjectives": {
+            "D": "Assertive",
+            "I": "Expressive",
+            "S": "Cooperative",
+            "C": "Detail-oriented"
+          }
+        },
+        {
+          "id": "LEAP_DQ06",
+          "adjectives": {
+            "D": "Bold",
+            "I": "Inspiring",
+            "S": "Loyal",
+            "C": "Careful"
+          }
+        },
+        {
+          "id": "LEAP_DQ07",
+          "adjectives": {
+            "D": "Driven",
+            "I": "Charming",
+            "S": "Calm",
+            "C": "Accurate"
+          }
+        },
+        {
+          "id": "LEAP_DQ08",
+          "adjectives": {
+            "D": "Independent",
+            "I": "Outgoing",
+            "S": "Accommodating",
+            "C": "Diplomatic"
+          }
+        }
+      ]
+    },
+    "B_Career_Readiness": {
+      "description": "Career Readiness Assessment — Likert scale 1-5",
+      "questions": "Q9-Q15",
+      "items": [
+        {
+          "id": "LEAP_CR01",
+          "dimension": "Positioning",
+          "text": "I can articulate my unique professional value in one clear sentence that resonates with any audience.",
+          "scale": {"1": "Strongly disagree", "2": "Disagree", "3": "Neutral", "4": "Agree", "5": "Strongly agree"}
+        },
+        {
+          "id": "LEAP_CR02",
+          "dimension": "Proof",
+          "text": "In the past 3 years, I have built a track record of measurable, quantifiable achievements I can point to.",
+          "scale": {"1": "Strongly disagree", "2": "Disagree", "3": "Neutral", "4": "Agree", "5": "Strongly agree"}
+        },
+        {
+          "id": "LEAP_CR03",
+          "dimension": "Visibility",
+          "text": "I have visible thought leadership presence (articles, speaking, industry recognition) in the last 12 months.",
+          "scale": {"1": "Strongly disagree", "2": "Disagree", "3": "Neutral", "4": "Agree", "5": "Strongly agree"}
+        },
+        {
+          "id": "LEAP_CR04",
+          "dimension": "Network",
+          "text": "I have a strategic network of contacts who could actively influence or sponsor my next career move.",
+          "scale": {"1": "Strongly disagree", "2": "Disagree", "3": "Neutral", "4": "Agree", "5": "Strongly agree"}
+        },
+        {
+          "id": "LEAP_CR05",
+          "dimension": "Move_Readiness",
+          "text": "I have clarity on my next career direction and a realistic timeline for making the move.",
+          "scale": {"1": "Strongly disagree", "2": "Disagree", "3": "Neutral", "4": "Agree", "5": "Strongly agree"}
+        },
+        {
+          "id": "LEAP_CR06",
+          "dimension": "Cross_Border",
+          "text": "I have meaningful experience operating across multiple cultural contexts and feel comfortable navigating cultural complexity.",
+          "scale": {"1": "Strongly disagree", "2": "Disagree", "3": "Neutral", "4": "Agree", "5": "Strongly agree"}
+        },
+        {
+          "id": "LEAP_CR07",
+          "dimension": "Alignment",
+          "text": "My current role allows me to operate in a way that feels natural and aligned with my behavioural style.",
+          "scale": {"1": "Strongly disagree", "2": "Disagree", "3": "Neutral", "4": "Agree", "5": "Strongly agree"}
+        }
+      ]
+    }
+  }
+}

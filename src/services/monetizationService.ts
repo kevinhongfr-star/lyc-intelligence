@@ -105,3 +105,64 @@ export async function upgradeSubscription(
 ): Promise<{ upgraded: boolean }> {
   return v1Client.post('/billing/subscription/upgrade', { tier });
 }
+
+export const ASSESSMENT_MILES_COSTS: Record<string, number> = {
+  LEAP: 3,
+  QUEST: 3,
+  DRIVE: 3,
+  COACH: 3,
+  IMPACT: 5,
+  FORGE: 3,
+  BRIDGE: 3,
+  MOSAIC: 3,
+  CPI: 5,
+  PRISM: 3,
+  SPARK: 3,
+};
+
+export async function spendAssessmentMiles(
+  instrumentKey: string,
+  opts?: { referenceId?: string; userId?: string }
+): Promise<{ success: boolean; newBalance: number; milesUsed: number }> {
+  const milesUsed = ASSESSMENT_MILES_COSTS[instrumentKey] ?? 3;
+  try {
+    const result = (await v1Client.post('/billing/miles/spend', {
+      feature_key: `assessment_${instrumentKey.toLowerCase()}`,
+      amount: milesUsed,
+      description: `${instrumentKey} Assessment — ${milesUsed} mi`,
+      reference_id: opts?.referenceId,
+      user_id: opts?.userId,
+    })) as unknown as { new_balance?: number; data?: { new_balance?: number } };
+    const nb = typeof result === "object" && result
+      ? (typeof result.new_balance === "number" ? result.new_balance : (result.data && typeof result.data.new_balance === "number" ? result.data.new_balance : undefined))
+      : undefined;
+    return {
+      success: true,
+      newBalance: nb ?? 0,
+      milesUsed,
+    };
+  } catch (e) {
+    console.error('[Monetization] spendAssessmentMiles error:', e);
+    return { success: false, newBalance: 0, milesUsed };
+  }
+}
+
+export async function refundAssessmentMiles(
+  instrumentKey: string,
+  opts?: { referenceId?: string; reason?: string; userId?: string }
+): Promise<{ success: boolean; milesRefunded: number }> {
+  const milesRefunded = ASSESSMENT_MILES_COSTS[instrumentKey] ?? 3;
+  try {
+    await v1Client.post('/billing/miles/refund', {
+      feature_key: `assessment_${instrumentKey.toLowerCase()}`,
+      amount: milesRefunded,
+      description: `Refund ${milesRefunded} mi — ${instrumentKey} Assessment${opts?.reason ? ` · ${opts.reason}` : ''}`,
+      reference_id: opts?.referenceId,
+      user_id: opts?.userId,
+    });
+    return { success: true, milesRefunded };
+  } catch (e) {
+    console.error('[Monetization] refundAssessmentMiles error:', e);
+    return { success: false, milesRefunded };
+  }
+}

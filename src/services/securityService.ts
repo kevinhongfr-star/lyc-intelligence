@@ -36,11 +36,11 @@ export const securityService = {
   updateCSP: (csp: string) => request<CSPConfig>('/api/security/csp', {
     method: 'POST',
     body: JSON.stringify({ csp }),
-  })),
+  }),
   getRateLimits: () => request<RateLimits>('/api/security/rate-limits'),
   updateRateLimits: (rate_limits: unknown) => request<RateLimits>('/api/security/rate-limits', {
     method: 'POST',
     body: JSON.stringify({ rate_limits }),
-  })),
+  }),
   runAudit: () => request<SecurityAudit>('/api/security/audit'),
 };

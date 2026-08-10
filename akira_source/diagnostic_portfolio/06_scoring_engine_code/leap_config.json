@@ -1,0 +1,279 @@
+{
+  "instrument": "LEAP",
+  "full_name": "Leadership Archetype & APAC Translation",
+  "version": "1.0",
+  "total_questions": 30,
+  "scale": "1-5 Likert",
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "Market",
+      "question_ids": [
+        "LEAP_Q01",
+        "LEAP_Q02",
+        "LEAP_Q03",
+        "LEAP_Q04",
+        "LEAP_Q05",
+        "LEAP_Q06"
+      ],
+      "reverse_coded": [
+        "LEAP_Q05"
+      ],
+      "raw_max": 30,
+      "n_questions": 6,
+      "sub_dimensions": [
+        "Competitive landscape",
+        "Market intelligence",
+        "Positioning clarity",
+        "Market entry",
+        "Signal discrimination",
+        "Adaptive positioning"
+      ],
+      "normalised_max": 20,
+      "normalised_formula": "(raw/30) x 20"
+    },
+    {
+      "id": "D2",
+      "name": "Capability",
+      "question_ids": [
+        "LEAP_Q07",
+        "LEAP_Q08",
+        "LEAP_Q09",
+        "LEAP_Q10",
+        "LEAP_Q11",
+        "LEAP_Q12"
+      ],
+      "reverse_coded": [
+        "LEAP_Q11"
+      ],
+      "raw_max": 30,
+      "n_questions": 6,
+      "sub_dimensions": [
+        "Self-differentiation",
+        "Capability-mandate fit",
+        "Development orientation",
+        "Capability transfer",
+        "Value proposition",
+        "APAC capability translation"
+      ],
+      "normalised_max": 20,
+      "normalised_formula": "(raw/30) x 20"
+    },
+    {
+      "id": "D3",
+      "name": "Timing",
+      "question_ids": [
+        "LEAP_Q13",
+        "LEAP_Q14",
+        "LEAP_Q15",
+        "LEAP_Q16",
+        "LEAP_Q17",
+        "LEAP_Q18"
+      ],
+      "reverse_coded": [
+        "LEAP_Q15"
+      ],
+      "raw_max": 30,
+      "n_questions": 6,
+      "sub_dimensions": [
+        "Timing recognition",
+        "Restraint and patience",
+        "Pace calibration",
+        "APAC pace alignment",
+        "Opportunity capture",
+        "Pressure management"
+      ],
+      "normalised_max": 20,
+      "normalised_formula": "(raw/30) x 20"
+    },
+    {
+      "id": "D4",
+      "name": "Risk",
+      "question_ids": [
+        "LEAP_Q19",
+        "LEAP_Q20",
+        "LEAP_Q21",
+        "LEAP_Q22",
+        "LEAP_Q23",
+        "LEAP_Q24"
+      ],
+      "reverse_coded": [
+        "LEAP_Q21",
+        "LEAP_Q24"
+      ],
+      "raw_max": 30,
+      "n_questions": 6,
+      "sub_dimensions": [
+        "Risk assessment",
+        "Risk tolerance",
+        "Risk calibration",
+        "Risk mitigation",
+        "Risk readiness",
+        "Political risk"
+      ],
+      "normalised_max": 20,
+      "normalised_formula": "(raw/30) x 20"
+    },
+    {
+      "id": "D5",
+      "name": "Impact",
+      "question_ids": [
+        "LEAP_Q25",
+        "LEAP_Q26",
+        "LEAP_Q27",
+        "LEAP_Q28",
+        "LEAP_Q29",
+        "LEAP_Q30"
+      ],
+      "reverse_coded": [
+        "LEAP_Q27"
+      ],
+      "raw_max": 30,
+      "n_questions": 6,
+      "sub_dimensions": [
+        "Outcome attribution",
+        "Influence without authority",
+        "Influence scope",
+        "Stakeholder communication",
+        "Cross-border impact",
+        "Impact orientation"
+      ],
+      "normalised_max": 20,
+      "normalised_formula": "(raw/30) x 20"
+    }
+  ],
+  "composite_bands": [
+    {
+      "min": 85,
+      "max": 100,
+      "band": "Exceptional",
+      "interpretation": "High competitive positioning readiness across all five dimensions; archetypal primary archetype activation"
+    },
+    {
+      "min": 70,
+      "max": 84,
+      "band": "Strong",
+      "interpretation": "Strong readiness with one or two targeted development dimensions"
+    },
+    {
+      "min": 55,
+      "max": 69,
+      "band": "Developing",
+      "interpretation": "Solid foundation; specific capability and positioning gaps present"
+    },
+    {
+      "min": 40,
+      "max": 54,
+      "band": "Emerging",
+      "interpretation": "Foundational positioning work required; recommend structured development before next mandate"
+    },
+    {
+      "min": 0,
+      "max": 39,
+      "band": "Early stage",
+      "interpretation": "Significant gaps across multiple dimensions; developmental programme recommended"
+    }
+  ],
+  "dimension_verdicts": [
+    {
+      "min": 17,
+      "max": 20,
+      "verdict": "Strong Primary",
+      "meaning": "Dimension is a clear, deployable leadership strength; anchors the leader's archetype profile"
+    },
+    {
+      "min": 13,
+      "max": 16,
+      "verdict": "Strong Secondary",
+      "meaning": "Dimension is accessible and effective; available as a secondary mode under deliberate activation"
+    },
+    {
+      "min": 9,
+      "max": 12,
+      "verdict": "Reserve",
+      "meaning": "Dimension is present but inconsistently deployed; available under favourable conditions"
+    },
+    {
+      "min": 5,
+      "max": 8,
+      "verdict": "Weak",
+      "meaning": "Dimension is underdeveloped; creates friction in contexts that require it; development priority"
+    },
+    {
+      "min": 0,
+      "max": 4,
+      "verdict": "Out of Scope",
+      "meaning": "Dimension is absent or counterproductive; not available for deployment in current form"
+    }
+  ],
+  "archetypes": [
+    {
+      "name": "Catalyst",
+      "description": "Market-Timing dominant: drives change through energy and momentum"
+    },
+    {
+      "name": "Architect",
+      "description": "Market-Capability dominant: builds systems calibrated to competitive reality"
+    },
+    {
+      "name": "Pioneer",
+      "description": "Timing-Risk dominant: moves into new territory before competitors recognise the opening"
+    },
+    {
+      "name": "Founder",
+      "description": "Capability-Impact dominant: creates something durable from a position of differentiated strength"
+    },
+    {
+      "name": "Anchor",
+      "description": "Risk-Capability dominant: creates stability in turbulent market conditions"
+    },
+    {
+      "name": "Steward",
+      "description": "Capability-Impact dominant: develops and protects organisational capability over time"
+    },
+    {
+      "name": "Cultivator",
+      "description": "Capability-Market dominant: grows capability aligned to market evolution"
+    },
+    {
+      "name": "Guardian",
+      "description": "Risk-Market dominant: maintains positioning integrity under competitive pressure"
+    },
+    {
+      "name": "Diplomat",
+      "description": "Impact-Risk dominant: navigates complex stakeholder environments with precision"
+    },
+    {
+      "name": "Facilitator",
+      "description": "Market-Impact dominant: creates alignment across different market and cultural contexts"
+    },
+    {
+      "name": "Translator",
+      "description": "Capability-Market dominant: bridges capability gaps between different organisational worlds"
+    },
+    {
+      "name": "Champion",
+      "description": "Impact-Timing dominant: advocates powerfully at the right moment"
+    },
+    {
+      "name": "Analyst",
+      "description": "Market-Risk dominant: deconstructs competitive complexity into actionable intelligence"
+    },
+    {
+      "name": "Synthesiser",
+      "description": "Capability-Impact dominant: integrates diverse inputs into coherent strategic direction"
+    },
+    {
+      "name": "Architect (Strategic)",
+      "description": "Market-Capability dominant: designs the operating system for others to execute within"
+    },
+    {
+      "name": "Visionary",
+      "description": "Timing-Impact dominant: sees the future positioning others have not yet recognised"
+    },
+    {
+      "name": "LEAP Instrument",
+      "description": "Full Product Sheet (archetype-by-archetype APAC translation map)"
+    }
+  ]
+}

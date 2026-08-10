@@ -1,0 +1,183 @@
+{
+  "instrument": "COACH",
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "CROSS-BOUNDARY DEVELOPMENTAL ORIENTATION (CBDO)",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q01",
+          "text": "I invest as much deliberate effort in developing the capability of my bilateral counterparts as I do in developing my own direct reports.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q02",
+          "text": "I view developing my bilateral partner's team as part of my leadership responsibility, not as a discretionary investment.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q03",
+          "text": "I find it difficult to justify spending development energy on people who are not formally part of my team.",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q04",
+          "text": "When a bilateral counterpart learns at a different pace than I expect, I adjust my development approach rather than reducing my investment in their development.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q05",
+          "text": "I find it frustrating when my counterparts are slower to develop capability than I think they should be, and this affects the quality of my coaching conversations with them.",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q06",
+          "text": "I can sustain a genuine developmental orientation toward someone who is operating at a significantly slower learning pace than I do, without signalling impatience.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D2",
+      "name": "ADAPTIVE COACHING STYLE (ACS)",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q07",
+          "text": "I have more than one coaching approach and I deliberately select the approach based on the context, the person, and the relationship.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q08",
+          "text": "I tend to use the same coaching approach with most of the people I develop, regardless of their context or learning style.",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q09",
+          "text": "I can describe the specific differences between how I coach someone who needs challenge versus someone who needs support, and I apply these differences consistently.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q10",
+          "text": "I adapt the directness, tone, and structure of my feedback conversations depending on the cultural context of the person I am coaching.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q11",
+          "text": "I apply the same standards of directness in developmental feedback across all of the cultural contexts I work in.",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q12",
+          "text": "I have received feedback that my coaching approach does not land well in certain cultural contexts, and I have changed my approach as a result.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D3",
+      "name": "BILATERAL DEVELOPMENTAL RELATIONSHIP QUALITY (BDRQ)",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q13",
+          "text": "I have built developmental relationships with bilateral counterparts where the level of trust is comparable to the best developmental relationships I have with my own direct reports.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q14",
+          "text": "I find it takes significantly longer to build the level of trust required for honest developmental conversations with bilateral counterparts than with people on my own team.",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q15",
+          "text": "I have a specific approach for building developmental trust across institutional and cultural boundaries that I apply consistently.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q16",
+          "text": "I can hold bilateral counterparts accountable for commitments they have made in developmental conversations without it damaging the relationship or triggering a defensive response.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q17",
+          "text": "I tend to be less direct about holding bilateral counterparts accountable for development commitments than I would be with my own direct reports, because of the relationship complexity.",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q18",
+          "text": "I have effective strategies for re-engaging a bilateral counterpart who has not followed through on a developmental commitment, without escalating the conversation.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "D4",
+      "name": "COACHING UNDER BILATERAL CONSTRAINTS (CBC)",
+      "sub_dimensions": [],
+      "questions": [
+        {
+          "id": "Q19",
+          "text": "When the bilateral partnership is under significant performance or time pressure, I maintain a coaching orientation with my counterparts rather than defaulting to directive instructions.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q20",
+          "text": "Under high pressure, I revert to telling people what to do rather than coaching them to reach their own decision, even when I know a coaching approach would be more effective in the long run.",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q21",
+          "text": "I can identify the specific conditions under which I am most likely to abandon a coaching approach, and I have strategies for maintaining it even in those conditions.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q22",
+          "text": "I can coach effectively in situations where it is structurally unclear who holds decision authority — where the authority is genuinely shared and contested.",
+          "reverse_coded": false,
+          "weight": 1.0
+        },
+        {
+          "id": "Q23",
+          "text": "I find it difficult to maintain a coaching stance when I am unclear about whether I have the authority to hold the person I am coaching accountable for their commitments.",
+          "reverse_coded": true,
+          "weight": 1.0
+        },
+        {
+          "id": "Q24",
+          "text": "Authority ambiguity in a bilateral context does not materially affect the quality of my developmental conversations with my counterparts.",
+          "reverse_coded": false,
+          "weight": 1.0
+        }
+      ]
+    }
+  ],
+  "archetypes": [],
+  "scoring": {
+    "reverse_coded_items": [],
+    "bands": []
+  },
+  "total_questions": 24
+}
