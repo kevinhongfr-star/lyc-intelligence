@@ -25,13 +25,30 @@ const SignupPage = lazy(() => import('@/pages/SignupPage').then(m => ({ default:
 // ── App Shell (mockup 4-surface structure) ──
 const AppShell = lazy(() => import('@/components/shell/AppShell').then(m => ({ default: m.AppShell })));
 
-// ── Public product landing pages ──
+// ── Public product landing pages (Canonical — consolidated IA) ──
 const AssessmentPage = lazy(() => import('@/pages/AssessmentPage').then(m => ({ default: m.AssessmentPage })));
 const B2BLanding = lazy(() => import('@/pages/B2BLanding').then(m => ({ default: m.B2BLanding })));
-const B2CLanding = lazy(() => import('@/pages/B2CLanding').then(m => ({ default: m.B2CLanding })));
-const NexusLanding = lazy(() => import('@/pages/NexusPage').then(m => ({ default: m.NexusPage })));
+const NexusChatPage = lazy(() => import('@/pages/NexusPage').then(m => ({ default: m.NexusPage })));
 const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m.MatchPage })));
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
+
+// ── Assessment canonical routes (11 instruments — no duplicates) ──
+const CanonicalInstrumentLanding = lazy(() => import('@/pages/CanonicalInstrumentLanding').then(m => ({ default: m.CanonicalInstrumentLanding })));
+const CpiPage = lazy(() => import('@/pages/CpiPage').then(m => ({ default: m.CpiPage })));
+const CpiResultsPage = lazy(() => import('@/pages/CpiResultsPage').then(m => ({ default: m.CpiResultsPage })));
+const ShiftPage = lazy(() => import('@/pages/ShiftPage').then(m => ({ default: m.ShiftPage })));
+const PrismLanding = lazy(() => import('@/pages/PrismLanding').then(m => ({ default: m.PrismLanding })));
+const PrismResultsPage = lazy(() => import('@/pages/PrismResultsPage').then(m => ({ default: m.PrismResultsPage })));
+const SparkLanding = lazy(() => import('@/pages/SparkLanding').then(m => ({ default: m.SparkLanding })));
+const SparkResultsPage = lazy(() => import('@/pages/SparkResultsPage').then(m => ({ default: m.SparkResultsPage })));
+const LeapResultsPage = lazy(() => import('@/pages/LeapResultsPage').then(m => ({ default: m.LeapResultsPage })));
+const QuestResultsPage = lazy(() => import('@/pages/QuestResultsPage').then(m => ({ default: m.QuestResultsPage })));
+const ImpactResultsPage = lazy(() => import('@/pages/ImpactResultsPage').then(m => ({ default: m.ImpactResultsPage })));
+const ForgeResultsPage = lazy(() => import('@/pages/ForgeResultsPage').then(m => ({ default: m.ForgeResultsPage })));
+const DriveResultsPage = lazy(() => import('@/pages/DriveResultsPage').then(m => ({ default: m.DriveResultsPage })));
+const CoachResultsPage = lazy(() => import('@/pages/CoachResultsPage').then(m => ({ default: m.CoachResultsPage })));
+const BridgeResultsPage = lazy(() => import('@/pages/BridgeResultsPage').then(m => ({ default: m.BridgeResultsPage })));
+const MosaicResultsPage = lazy(() => import('@/pages/MosaicResultsPage').then(m => ({ default: m.MosaicResultsPage })));
 
 // ── Authenticated user pages ──
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
@@ -54,7 +71,6 @@ const CompaniesPage = lazy(() => import('@/pages/CompaniesPage').then(m => ({ de
 const BatchScoringPage = lazy(() => import('@/pages/BatchScoringPage').then(m => ({ default: m.BatchScoringPage })));
 const MetrixPage = lazy(() => import('@/pages/MetrixPage').then(m => ({ default: m.MetrixPage })));
 const ScoringRunsPage = lazy(() => import('@/pages/ScoringRunsPage').then(m => ({ default: m.ScoringRunsPage })));
-const NexusPage = lazy(() => import('@/pages/NexusPage').then(m => ({ default: m.NexusPage })));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 const OrgIntelligencePage = lazy(() => import('@/pages/OrgIntelligencePage').then(m => ({ default: m.OrgIntelligencePage })));
 const ProposalBuilderPage = lazy(() => import('@/pages/ProposalBuilderPage').then(m => ({ default: m.ProposalBuilderPage })));
@@ -133,18 +149,69 @@ export default function App() {
       <OnboardingWizard />
       <Suspense fallback={<Loading />}>
         <Routes>
-          {/* ── Public pages ── */}
+          {/* ── Public marketing — single consolidated entry point ── */}
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path="/assessment" element={<AssessmentPage />} />
+
+          {/* ── Legacy redirects — IA consolidation v3 ── */}
+          <Route path="/nexus" element={<Navigate to="/" replace />} />
+          <Route path="/nexus-landing" element={<Navigate to="/" replace />} />
+          <Route path="/b2c" element={<Navigate to="/" replace />} />
+          {/* Legacy instrument root URLs → canonical /assessment/:code */}
+          <Route path="/cpi" element={<Navigate to="/assessment/cpi" replace />} />
+          <Route path="/cpi/results" element={<Navigate to="/assessment/cpi/results" replace />} />
+          <Route path="/shift" element={<Navigate to="/assessment/shift" replace />} />
+          <Route path="/prism" element={<Navigate to="/assessment/prism" replace />} />
+          <Route path="/prism/results" element={<Navigate to="/assessment/prism/results" replace />} />
+          <Route path="/spark" element={<Navigate to="/assessment/spark" replace />} />
+          <Route path="/spark/results" element={<Navigate to="/assessment/spark/results" replace />} />
+          <Route path="/leap" element={<Navigate to="/assessment/leap" replace />} />
+          <Route path="/leap/results" element={<Navigate to="/assessment/leap/results" replace />} />
+          <Route path="/quest" element={<Navigate to="/assessment/quest" replace />} />
+          <Route path="/quest/results" element={<Navigate to="/assessment/quest/results" replace />} />
+          <Route path="/impact" element={<Navigate to="/assessment/impact" replace />} />
+          <Route path="/impact/results" element={<Navigate to="/assessment/impact/results" replace />} />
+          <Route path="/forge" element={<Navigate to="/assessment/forge" replace />} />
+          <Route path="/forge/results" element={<Navigate to="/assessment/forge/results" replace />} />
+          <Route path="/drive" element={<Navigate to="/assessment/drive" replace />} />
+          <Route path="/drive/results" element={<Navigate to="/assessment/drive/results" replace />} />
+          <Route path="/coach" element={<Navigate to="/assessment/coach" replace />} />
+          <Route path="/coach/results" element={<Navigate to="/assessment/coach/results" replace />} />
+          <Route path="/bridge" element={<Navigate to="/assessment/bridge" replace />} />
+          <Route path="/bridge/results" element={<Navigate to="/assessment/bridge/results" replace />} />
+          <Route path="/mosaic" element={<Navigate to="/assessment/mosaic" replace />} />
+          <Route path="/mosaic/results" element={<Navigate to="/assessment/mosaic/results" replace />} />
+
+          {/* ── Public product pages (Canonical) ── */}
+          <Route path="/nexus/chat" element={<NexusChatPage />} />
           <Route path="/b2b" element={<B2BLanding />} />
-          <Route path="/b2c" element={<B2CLanding />} />
-          <Route path="/nexus" element={<NexusLanding />} />
-          <Route path="/nexus/chat" element={<NexusLanding />} />
           <Route path="/match" element={<MatchPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/assessment" element={<Navigate to="/#assessment-catalog" replace />} />
+
+          {/* ── 11 Canonical Assessment Routes — exactly one public landing each ── */}
+          {/* Flagship + SHIFT suite entry + PRISM/SPARK custom landings */}
+          <Route path="/assessment/cpi" element={<CpiPage />} />
+          <Route path="/assessment/shift" element={<ShiftPage />} />
+          <Route path="/assessment/prism" element={<PrismLanding />} />
+          <Route path="/assessment/spark" element={<SparkLanding />} />
+          {/* Generic canonical landing for remaining 8 instruments: LEAP, QUEST, IMPACT, DRIVE, COACH, FORGE, BRIDGE, MOSAIC */}
+          <Route path="/assessment/:code" element={<CanonicalInstrumentLanding />} />
+
+          {/* Results routes — authenticated post-assessment */}
+          <Route path="/assessment/cpi/results" element={<CpiResultsPage />} />
+          <Route path="/assessment/prism/results" element={<PrismResultsPage />} />
+          <Route path="/assessment/spark/results" element={<SparkResultsPage />} />
+          <Route path="/assessment/leap/results" element={<LeapResultsPage />} />
+          <Route path="/assessment/quest/results" element={<QuestResultsPage />} />
+          <Route path="/assessment/impact/results" element={<ImpactResultsPage />} />
+          <Route path="/assessment/forge/results" element={<ForgeResultsPage />} />
+          <Route path="/assessment/drive/results" element={<DriveResultsPage />} />
+          <Route path="/assessment/coach/results" element={<CoachResultsPage />} />
+          <Route path="/assessment/bridge/results" element={<BridgeResultsPage />} />
+          <Route path="/assessment/mosaic/results" element={<MosaicResultsPage />} />
 
           {/* ── Legal pages (S4-T03) ── */}
           <Route path="/terms" element={<TermsPage />} />
@@ -178,7 +245,7 @@ export default function App() {
               <Route path="batch-scoring" element={<BatchScoringPage />} />
               <Route path="metrix" element={<MetrixPage />} />
               <Route path="scoring-runs" element={<ScoringRunsPage />} />
-              <Route path="chat" element={<NexusPage />} />
+              <Route path="chat" element={<NexusChatPage />} />
               <Route path="scheduler" element={<SchedulerPage />} />
               <Route path="org-intel" element={<AdminRoute><OrgIntelligencePage /></AdminRoute>} />
               <Route path="notifications" element={<NotificationsPage />} />
