@@ -358,13 +358,14 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     }
 
     if (DEEPSEEK_API_KEY) {
+      // Non-streaming first: frontend expects single JSON response
+      const nonStreamResult = await tryDeepSeekNonStreaming(messages);
+      if (nonStreamResult) {
+        return res.status(200).json(nonStreamResult);
+      }
+      // Streaming fallback
       const result = await tryDeepSeekStreaming(messages, res);
       if (result) return;
-
-      const fallbackResult = await tryDeepSeekNonStreaming(messages);
-      if (fallbackResult) {
-        return res.status(200).json(fallbackResult);
-      }
     }
 
     if (COZE_API_KEY && COZE_BOT_ID) {
