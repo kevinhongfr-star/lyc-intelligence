@@ -252,7 +252,7 @@ export function EngagementTracker() {
               {nps != null && (
                 <div className="mt-4">
                   <div className={`inline-flex items-center gap-2 px-3 py-2 border ${getNPSCategory(nps).className}`}>
-                    <getNPSCategory(nps).icon className="w-4 h-4" />
+                    {(() => { const IconComp = getNPSCategory(nps).icon; return <IconComp className="w-4 h-4" />; })()}
                     <span className="text-sm font-medium">{getNPSCategory(nps).label}</span>
                     <span className="text-xs opacity-75">· {nps}/10</span>
                   </div>

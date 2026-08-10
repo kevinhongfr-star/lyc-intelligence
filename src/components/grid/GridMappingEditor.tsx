@@ -91,7 +91,7 @@ export function GridMappingEditor() {
   const [generating, setGenerating] = useState(false);
   const [showAddSector, setShowAddSector] = useState(false);
   const [showAddCompany, setShowAddCompany] = useState(false);
-  const [showAddFunction, setShowAddCompany] = useState(false);
+  const [showAddFunction, setShowAddFunction] = useState(false);
 
   useEffect(() => {
     loadMapping();

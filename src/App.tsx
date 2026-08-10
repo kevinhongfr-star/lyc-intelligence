@@ -82,7 +82,7 @@ const KevinOversightDashboard = lazy(() => import('@/components/kevin/KevinOvers
 const ReportsPage = lazy(() => import('@/pages/ReportsPage').then(m => ({ default: m.ReportsPage })));
 const ReportDetailPage = lazy(() => import('@/pages/ReportDetailPage').then(m => ({ default: m.ReportDetailPage })));
 // ── Phase 7.5 Coaching Excellence (Coach route only) ──
-const CoachingPage = lazy(() => import('@/pages/CoachingPage').then(m => ({ default: m.CoachingPage })));
+// const CoachingPage = lazy(() => import('@/pages/CoachingPage').then(m => ({ default: m.CoachingPage })));
 // ── Phase 9 GRID Market Mapping ──
 const GridPage = lazy(() => import('@/pages/GridPage'));
 // ── Phase 10 TRIDENT + CANVAS ──
@@ -298,7 +298,7 @@ export default function App() {
           <Route path="/coaching" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route index element={<Navigate to="coach" replace />} />
             {/* Phase 7.5 — primary coach route (integrated) */}
-            <Route path="coach" element={<CoachingPage />} />
+            {/*             <Route path="coach" element={<CoachingPage />} /> */}
             {/* Phase 12 — CPI Assessment (portal-integrated) */}
             <Route path="cpi" element={<CpiPage />} />
             <Route path="credits" element={<PlaceholderPage title="Credits & Plans" />} />
