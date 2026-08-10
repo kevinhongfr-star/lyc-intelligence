@@ -4,12 +4,8 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/api/x/:mod/:path(.*)",
-      "destination": "/api/dispatch?__mod=:mod&__sub=:path"
-    },
-    {
-      "source": "/api/:mod/:path(.*)",
-      "destination": "/api/dispatch?__mod=:mod&__sub=:path"
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
     },
     {
       "source": "/((?!api/).*)",
