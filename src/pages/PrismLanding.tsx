@@ -10,7 +10,7 @@ const config: AssessmentLandingConfig = {
   accent: '#C108AB',
   prefix: 'prism',
   ctaLabel: 'Start the assessment',
-  ctaHref: '/login',
+  ctaHref: '/prism/take',
   ctaSecondaryLabel: 'See how it works',
   ctaSecondaryHref: '#how-it-works',
   dimensions: ASSESSMENT_CATALOG.PRISM.dimensions,
