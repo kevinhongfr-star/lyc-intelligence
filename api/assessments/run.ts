@@ -90,14 +90,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const supabase = createClient();
 
   try {
-    const ctx = await getAuthorizedContext(req, false);
-    if (!ctx) return res.status(401).json({ error: 'Unauthorized' });
+    // Allow anonymous users for complimentary assessment access (marketing funnel)
+    const ctx = await getAuthorizedContext(req, true);
+    const isAnonymous = !ctx;
+
+    // Anonymous users identified by x-anonymous-id header (client-generated)
+    const anonymousId = (req.headers['x-anonymous-id'] || req.headers['X-Anonymous-Id']) as string | undefined;
 
     // Any logged-in user can run their own assessments (leaders, candidates,
     // clients for org-sponsored, consultants for trialing). Admins always.
-    enforceScope(ctx, {
-      allow: ['admin', 'consultant', 'client', 'leader'],
-    });
+    // Anonymous users can run assessments (complimentary / marketing funnel)
+    if (!isAnonymous) {
+      enforceScope(ctx, {
+        allow: ['admin', 'consultant', 'client', 'leader'],
+      });
+    }
 
     const body = req.body || {};
     const code = normalizeCode(body.code);
@@ -117,7 +124,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .from('assessment_results')
         .select('id, score_summary, created_at, miles_debited')
         .eq('idempotency_key', idem)
-        .eq('user_id', ctx.userId)
+        .eq(isAnonymous ? 'anonymous_id' : 'user_id', isAnonymous ? (anonymousId || idem) : ctx.userId)
         .gte(
           'created_at',
           new Date(Date.now() - IDEMPOTENCY_TTL_SECONDS * 1000).toISOString(),
@@ -130,7 +137,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const { data: creditsNow } = await supabase
           .from('credits')
           .select('balance')
-          .eq('user_id', ctx.userId)
+          .eq(isAnonymous ? 'anonymous_id' : 'user_id', isAnonymous ? (anonymousId || idem) : ctx.userId)
           .limit(1)
           .maybeSingle();
         return res.status(200).json({
@@ -146,7 +153,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // ── Miles debit (atomic check + decrement) ────────────────────────
     // Admins + internal staff are exempted from paying (operational/QA).
-    const chargeMiles = !isAdminRole(ctx.role);
+    const chargeMiles = !isAnonymous && !isAdminRole(ctx.role);
     let remainingBalance = 0;
 
     if (chargeMiles) {
@@ -154,7 +161,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { data: creditRow, error: cErr } = await supabase
         .from('credits')
         .select('id, balance')
-        .eq('user_id', ctx.userId)
+        .eq(isAnonymous ? 'anonymous_id' : 'user_id', isAnonymous ? (anonymousId || idem) : ctx.userId)
         .limit(1)
         .maybeSingle();
       if (cErr) throw new RequestAuthError(`Credits lookup error: ${cErr.message}`, 500);
@@ -209,7 +216,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { data: creditsNow } = await supabase
         .from('credits')
         .select('balance')
-        .eq('user_id', ctx.userId)
+        .eq(isAnonymous ? 'anonymous_id' : 'user_id', isAnonymous ? (anonymousId || idem) : ctx.userId)
         .limit(1)
         .maybeSingle();
       remainingBalance = Number(creditsNow?.balance ?? 0);
@@ -222,7 +229,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: inserted, error: insErr } = await supabase
       .from('assessment_results')
       .insert({
-        user_id: ctx.userId,
+        user_id: isAnonymous ? null : ctx.userId,
+        anonymous_id: isAnonymous ? (anonymousId || idem || `anon_${Date.now()}`) : null,
         assessment_code: code,
         answers,
         duration_seconds: durationSeconds,
