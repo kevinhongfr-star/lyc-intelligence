@@ -14,7 +14,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '../../src/lib/supabase/server';
 import { getAuthorizedContext, RequestAuthError } from '../_lib/auth';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

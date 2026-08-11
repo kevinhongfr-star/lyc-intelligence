@@ -12,7 +12,7 @@
  */
 
 import type { VercelRequest } from '@vercel/node';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '../../src/lib/supabase/server';
 
 export type RoleKey =
   | 'admin' | 'lyc_admin' | 'super_admin'
