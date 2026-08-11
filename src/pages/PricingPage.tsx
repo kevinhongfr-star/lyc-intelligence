@@ -15,6 +15,8 @@ import {
   type PricingCurrency,
   type TierKey,
 } from '@/services/monetizationService';
+import { trackUpgradeAttempt, trackCTA, trackBillingView } from '@/analytics/eventTracker';
+import { reportError } from '@/analytics/errorMonitor';
 
 interface PricingPageProps {
   onUpgradeSuccess?: () => void;
@@ -31,6 +33,11 @@ const STRIPE_PRICE_ENV: Record<TierKey, string | undefined> = {
 export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
   const { user, profile } = useAuthStore();
 
+  // Track pricing/billing view on mount
+  React.useEffect(() => {
+    trackBillingView(user ? 'portal_nav' : 'direct_link');
+  }, [user]);
+
   // Currency: explicit toggle > user preference > auto-detect.
   const detected = useMemo<PricingCurrency>(() => {
     const pref = (profile as any)?.currency_preference ?? null;
@@ -44,6 +51,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
   const handleUpgrade = async (tierKey: TierKey) => {
     if (tierKey === 'explorer') {
       // Explorer = Executive Introduction → no checkout, just send to dashboard.
+      trackCTA({ location: 'pricing_tier', label: 'Explorer CTA', destination: user ? '/dashboard' : '/login', context_id: tierKey });
       if (!user) {
         window.location.href = '/login';
       } else {
@@ -52,6 +60,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
       return;
     }
 
+    trackUpgradeAttempt(tierKey, 'pricing_page');
     setLoadingTier(tierKey);
     setError(null);
 
@@ -83,6 +92,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
       }
     } catch (e: any) {
       console.error('Upgrade error:', e);
+      reportError(e, { scope: 'pricing:checkout', severity: 'error', extra: { tier: tierKey } });
       setError(e.message || 'Failed to start upgrade');
     } finally {
       setLoadingTier(null);

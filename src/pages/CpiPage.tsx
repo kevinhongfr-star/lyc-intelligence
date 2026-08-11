@@ -10,13 +10,15 @@
  *   3. On completion: persists intake to POST /api/x/cpi/analyze (scoring + LLM narrative + save)
  *   4. Download Report: generates printable HTML via cpiReportRenderer
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Compass, Globe, Users, Target, Award, ChevronRight, Loader2, Download, Clock, ArrowLeft } from 'lucide-react';
 import { AssessmentWizard } from '@/components/assessment/AssessmentWizard';
 import { useAuthStore } from '@/stores/authStore';
 import { SEO } from '@/components/seo/SEO';
 import { getAssessmentMeta } from '@/seo/pageMetadata';
 import { generateCPIReportHTML, type CPIReportData } from '@/services/cpiReportRenderer';
+import { trackCTA, trackAssessmentStart, trackAssessmentComplete, trackAssessmentPurchase } from '@/analytics/eventTracker';
+import { reportError } from '@/analytics/errorMonitor';
 import {
   DIMENSION_INFO,
   DIMENSION_WEIGHTS,
@@ -54,6 +56,14 @@ export default function CpiPage() {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [persisting, setPersisting] = useState(false);
   const [lastResult, setLastResult] = useState<any>(null);
+  const startTimeRef = useRef<number | null>(null);
+
+  const startAssessment = () => {
+    startTimeRef.current = Date.now();
+    trackCTA({ location: 'assessment_landing', label: 'Start CPI Assessment', destination: undefined, context_id: 'CPI' });
+    trackAssessmentStart('CPI', 'China Leadership Pipeline Diagnostic', 'landing');
+    setMode('assessment');
+  };
 
   const loadHistory = useCallback(async () => {
     if (!user) return;
@@ -80,6 +90,9 @@ export default function CpiPage() {
   // Persist intake to backend on wizard completion
   const handleComplete = async (intake: AssessmentState) => {
     setPersisting(true);
+    const durationSeconds = startTimeRef.current
+      ? Math.round((Date.now() - startTimeRef.current) / 1000)
+      : 0;
     try {
       const res = await fetch('/api/x/cpi/analyze', {
         method: 'POST',
@@ -90,9 +103,15 @@ export default function CpiPage() {
         const data = await res.json();
         if (data.success) {
           setLastResult(data.result);
+          // Assessment completion tracking
+          trackAssessmentComplete('CPI', 'China Leadership Pipeline Diagnostic', durationSeconds, 'completed');
+          // Purchase/credits tracking for CPI
+          trackAssessmentPurchase('CPI', 'China Leadership Pipeline Diagnostic', CPI_CREDITS, 'miles');
         }
       }
-    } catch {
+    } catch (e) {
+      reportError(e, { scope: 'cpi:analyze', severity: 'error' });
+      trackAssessmentComplete('CPI', 'China Leadership Pipeline Diagnostic', durationSeconds, 'partial');
       // non-blocking — local results already shown by wizard
     } finally {
       setPersisting(false);
@@ -196,7 +215,7 @@ export default function CpiPage() {
             </p>
           </div>
           <button
-            onClick={() => setMode('assessment')}
+            onClick={startAssessment}
             className="bg-white text-fuchsia-700 px-6 py-3 font-semibold text-sm hover:bg-fuchsia-50 transition-colors flex items-center gap-2 whitespace-nowrap"
           >
             Start Assessment <ChevronRight className="w-4 h-4" />

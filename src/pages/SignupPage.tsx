@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, User, Building } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from '@/stores/toastStore';
+import { trackSignupSuccess } from '@/analytics/eventTracker';
+import { reportError } from '@/analytics/errorMonitor';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -46,9 +48,12 @@ export function SignupPage() {
     setLoading(false);
 
     if (result.success) {
+      // Fire signup_success before navigation so the event is flushed
+      trackSignupSuccess('email', 'professional');
       toast.success('Account created successfully');
       navigate('/platform');
     } else {
+      reportError(new Error(result.error || 'Signup failed'), { scope: 'auth:signup', severity: 'warning', extra: { email: email.trim() } });
       setError(result.error || 'Failed to create account');
     }
   };

@@ -8,11 +8,15 @@
  *   - `level` ('page' | 'section') presentation toggle
  *   - Accessible default fallback (role="alert", aria-live="assertive")
  *
+ * Phase 17 / T02 (#1288) — all errors captured by the boundary are also
+ * reported via reportError() to the analytics/error sink (/api/events).
+ *
  * Default export name kept as `ErrorBoundary`; named export also available.
  */
 import React from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui';
+import { reportError } from '@/analytics/errorMonitor';
 
 export interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -39,6 +43,11 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, State> {
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo): void {
+    reportError(error, {
+      scope: 'react:error_boundary',
+      componentStack: info.componentStack ?? undefined,
+      severity: 'error',
+    });
     if (this.props.onError) {
       this.props.onError(error, info);
     }

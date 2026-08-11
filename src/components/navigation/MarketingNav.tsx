@@ -11,6 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, ChevronDown, ArrowRight, Sparkles } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getDefaultPortalRoute } from '@/services/portalClassification';
+import { trackCTA, trackNexusChatInitiation, setTrackingUser } from '@/analytics/eventTracker';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -40,13 +41,17 @@ export function MarketingNav(): React.ReactElement {
 
   const handlePortalEntry = () => {
     if (user) {
+      trackCTA({ location: 'nav_marketing', label: 'My Portal', destination: getDefaultPortalRoute(profile?.role) });
       navigate(getDefaultPortalRoute(profile?.role), { replace: true });
       return;
     }
+    trackNexusChatInitiation('nav_cta');
+    trackCTA({ location: 'nav_marketing', label: 'Try NEXUS (guest portal)', destination: '/nexus/chat' });
     navigate('/nexus/chat');
   };
 
   const handleSignOut = async () => {
+    setTrackingUser(null);
     await signOut();
     navigate('/', { replace: true });
   };
@@ -125,7 +130,9 @@ export function MarketingNav(): React.ReactElement {
             )}
           </div>
 
-          <Link to="/pricing" style={{ fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none' }}>
+          <Link to="/pricing"
+            onClick={() => trackCTA({ location: 'nav_marketing', label: 'Pricing', destination: '/pricing' })}
+            style={{ fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none' }}>
             Pricing
           </Link>
 
@@ -148,12 +155,18 @@ export function MarketingNav(): React.ReactElement {
             </div>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <Link to="/login" style={{
-                fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none',
-              }}>
+              <Link to="/login"
+                onClick={() => trackCTA({ location: 'nav_marketing', label: 'Sign in', destination: '/login' })}
+                style={{
+                  fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none',
+                }}>
                 Sign in
               </Link>
-              <button onClick={() => navigate('/nexus/chat')} style={{
+              <button onClick={() => {
+                trackNexusChatInitiation('nav_cta');
+                trackCTA({ location: 'nav_marketing', label: 'Try NEXUS', destination: '/nexus/chat' });
+                navigate('/nexus/chat');
+              }} style={{
                 padding: '9px 20px', fontSize: 14, fontWeight: 600,
                 background: DS.accent, color: '#fff', border: 'none', cursor: 'pointer',
                 fontFamily: DS.bodyFont,
@@ -180,7 +193,7 @@ export function MarketingNav(): React.ReactElement {
           borderTop: `1px solid ${DS.border}`, padding: '16px 32px 24px',
           background: DS.bg, display: 'flex', flexDirection: 'column', gap: 12,
         }}>
-          <Link to="/pricing" onClick={() => setMobileOpen(false)}
+          <Link to="/pricing" onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: 'Pricing (mobile)', destination: '/pricing' }); }}
             style={{ padding: '10px 0', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
             Pricing
           </Link>
@@ -189,7 +202,7 @@ export function MarketingNav(): React.ReactElement {
               Products
             </div>
             {products.map((p) => (
-              <Link key={p.label} to={p.href} onClick={() => setMobileOpen(false)}
+              <Link key={p.label} to={p.href} onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: `Product: ${p.label} (mobile)`, destination: p.href }); }}
                 style={{ display: 'block', padding: '10px 0', fontSize: 14, color: DS.text, textDecoration: 'none' }}>
                 {p.label}
               </Link>
@@ -201,18 +214,22 @@ export function MarketingNav(): React.ReactElement {
                 style={{ marginTop: 8, padding: '12px', background: DS.accent, color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
                 My Portal
               </button>
-              <button onClick={handleSignOut}
+              <button onClick={() => { setMobileOpen(false); handleSignOut(); }}
                 style={{ padding: '12px', background: 'transparent', border: `1px solid ${DS.border}`, color: DS.text, fontSize: 14, cursor: 'pointer' }}>
                 Sign out
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" onClick={() => setMobileOpen(false)}
+              <Link to="/login" onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: 'Sign in (mobile)', destination: '/login' }); }}
                 style={{ padding: '12px', textAlign: 'center', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
                 Sign in
               </Link>
-              <Link to="/nexus/chat" onClick={() => setMobileOpen(false)}
+              <Link to="/nexus/chat" onClick={() => {
+                setMobileOpen(false);
+                trackNexusChatInitiation('nav_cta_mobile');
+                trackCTA({ location: 'nav_marketing', label: 'Try NEXUS (mobile)', destination: '/nexus/chat' });
+              }}
                 style={{ padding: '12px', textAlign: 'center', background: DS.accent, color: '#fff', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
                 Try NEXUS
               </Link>

@@ -6,6 +6,8 @@ import { SEO } from '@/components/seo/SEO';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Link, useNavigate } from 'react-router-dom';
+import { trackCTA, trackNexusFirstMessageSent, trackNexusChatInitiation } from '@/analytics/eventTracker';
+import { reportError } from '@/analytics/errorMonitor';
 
 interface Message { role: 'user' | 'assistant'; content: string; suggested_prompts?: string[]; }
 
@@ -84,10 +86,16 @@ export function NexusPage() {
   const [suggestedPrompts, setSuggestedPrompts] = useState<string[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const firstMessageSentRef = useRef(false);
 
   const isGuest = !user;
   const remaining = isGuest ? Math.max(0, GUEST_MESSAGE_LIMIT - guestCount) : Infinity;
   const showGuestLimit = isGuest && guestCount >= GUEST_MESSAGE_LIMIT;
+
+  // Track chat view/page open when user lands on NEXUS chat page
+  useEffect(() => {
+    trackNexusChatInitiation('direct_link');
+  }, []);
 
   useEffect(() => {
     if (isGuest) {
@@ -115,6 +123,11 @@ export function NexusPage() {
       return;
     }
 
+    // If messageText is provided, it's a suggested prompt click
+    if (messageText) {
+      trackCTA({ location: 'nexus_chat', label: 'Suggested Prompt', destination: undefined, context_id: messageText.slice(0, 80) });
+    }
+
     setInput('');
     setSuggestedPrompts([]);
     setMessages(prev => [...prev, { role: 'user', content: text }]);
@@ -127,7 +140,14 @@ export function NexusPage() {
         messages.slice(-10).map(m => ({ role: m.role, content: m.content }))
       );
       setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+
+      // Track first user message sent (funnel step)
+      if (!firstMessageSentRef.current) {
+        firstMessageSentRef.current = true;
+        trackNexusFirstMessageSent('coze-gpt-4o');
+      }
     } catch (e) {
+      reportError(e, { scope: 'nexus:sendChatMessage', severity: 'warning' });
       setMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting right now. Please try again in a moment." }]);
     }
     setLoading(false);
@@ -165,6 +185,7 @@ export function NexusPage() {
             {isGuest ? (
               <Link
                 to="/login"
+                onClick={() => trackCTA({ location: 'nexus_chat', label: 'Sign in (header)', destination: '/login' })}
                 className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1.5 transition-colors"
               >
                 <LogIn className="w-4 h-4" />
@@ -172,7 +193,7 @@ export function NexusPage() {
               </Link>
             ) : (
               <div className="text-sm text-gray-500">
-                {profile?.first_name || user?.email}
+                {profile?.name || user?.email}
               </div>
             )}
           </div>
@@ -282,6 +303,7 @@ export function NexusPage() {
             </p>
             <Link
               to="/signup"
+              onClick={() => trackCTA({ location: 'nexus_chat', label: 'Create Account (guest limit CTA)', destination: '/signup' })}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors"
             >
               Create account <ArrowRight className="w-4 h-4" />

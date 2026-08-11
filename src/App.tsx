@@ -44,6 +44,18 @@ import { CookieConsent } from '@/components/CookieConsent';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import { Loader2 } from 'lucide-react';
 import { ToastContainer } from '@/components/ui/ToastContainer';
+// Phase 17 / T02 (#1288) — Vercel analytics + performance
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
+import { installGlobalErrorHandlers, reportError } from '@/analytics/errorMonitor';
+import {
+  useRoutePageViewTracker,
+  setTrackingUser,
+} from '@/analytics/eventTracker';
+
+// Install window.onerror + unhandledrejection listeners once, at module import
+// (idempotent, SSR-safe).
+installGlobalErrorHandlers();
 
 // ── Phase 16 — Portal layout wrappers ────────────────────────────────
 const MarketingLayout = lazy(() => import('@/components/layouts/MarketingLayout').then(m => ({ default: m.MarketingLayout })));
@@ -172,8 +184,22 @@ function Loading() {
 }
 
 export default function App() {
-  const { initialize } = useAuthStore();
+  const { initialize, profile, user } = useAuthStore();
   useEffect(() => { initialize(); }, [initialize]);
+
+  // Keep tracking user context in sync with auth state.
+  useEffect(() => {
+    setTrackingUser({ id: user?.id ?? null, role: profile?.role ?? null });
+  }, [user?.id, profile?.role]);
+
+  // Auto-track route changes (page_view events + landing funnel step 0).
+  // Must be called inside <Routes>'s Router context (main.tsx mounts BrowserRouter).
+  useRoutePageViewTracker();
+
+  // Any uncaught error thrown in the app root report block:
+  // errors from page renders are caught by ErrorBoundary above; global ones
+  // are caught by window.onerror/unhandledrejection (installed at import).
+  void reportError;
 
   return (
     <ErrorBoundary>
@@ -181,6 +207,8 @@ export default function App() {
       <ToastContainer />
       <CookieConsent />
       <OnboardingWizard />
+      <Analytics />
+      <SpeedInsights />
       <Suspense fallback={<Loading />}>
         <Routes>
           {/* ═══════════════════════════════════════════════════════════

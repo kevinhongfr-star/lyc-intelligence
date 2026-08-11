@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Shield } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getDefaultRoute } from '@/components/auth/PostLoginRedirect';
+import { trackLoginSuccess } from '@/analytics/eventTracker';
+import { reportError } from '@/analytics/errorMonitor';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -62,9 +64,12 @@ export function LoginPage() {
         await store.loadProfile();
       }
       const profile = useAuthStore.getState?.().profile;
+      // Fire login_success event with role context
+      trackLoginSuccess('email', profile?.role ?? undefined);
       const target = getDefaultRoute(profile?.role);
       navigate(target);
     } else {
+      reportError(new Error(result.error || 'Login failed'), { scope: 'auth:login', severity: 'warning', extra: { email: email.trim() } });
       setError(result.error || 'Invalid credentials. Please try again.');
     }
   };

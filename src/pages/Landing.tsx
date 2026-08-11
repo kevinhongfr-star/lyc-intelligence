@@ -4,6 +4,7 @@ import { ArrowRight, Menu, X, Lock, Layers, BadgeDollarSign, UserCheck } from 'l
 import { ASSESSMENT_CATALOG, FLAGSHIP_KEYS, SHIFT_SUITE_KEYS, ADVISORY_PRODUCT_KEYS, type AssessmentInfo } from '@/assessments/catalog';
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { SEO } from '@/components/seo/SEO';
+import { trackCTA, trackNexusChatInitiation, trackAssessmentStart } from '@/analytics/eventTracker';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -171,6 +172,10 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
   return (
     <a
       href={`/assessment/${a.code.toLowerCase()}`}
+      onClick={() => {
+        trackCTA({ location: 'assessment_card', label: `Assessment: ${a.code}`, destination: `/assessment/${a.code.toLowerCase()}`, context_id: a.code });
+        trackAssessmentStart(a.code, a.name, 'landing');
+      }}
       className="card-hover"
       style={{
         display: 'block',
@@ -484,6 +489,7 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
       <div style={{ marginTop: 'auto' }}>
         <a
           href={t.ctaHref}
+          onClick={() => trackCTA({ location: 'pricing_tier', label: `Pricing: ${t.cta}`, destination: t.ctaHref, context_id: t.key })}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -575,6 +581,7 @@ export function Landing() {
           ))}
           <a
             href="/nexus/chat"
+            onClick={() => { trackNexusChatInitiation('hero_nav'); trackCTA({ location: 'hero', label: 'Try NEXUS (nav)', destination: '/nexus/chat' }); }}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -593,6 +600,7 @@ export function Landing() {
           </a>
           <a
             href="/login"
+            onClick={() => trackCTA({ location: 'hero', label: 'Platform Login', destination: '/login' })}
             className="cta-glow"
             style={{
               display: 'inline-flex',
@@ -625,10 +633,10 @@ export function Landing() {
           <X style={{ width: 24, height: 24, color: '#000' }} />
         </button>
         {navLinks.map(l => (
-          <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)} style={{ color: DS.textSecondary, borderBottom: `1px solid ${DS.border}` }}>{l.label}</a>
+          <a key={l.href} href={l.href} onClick={() => { setMobileOpen(false); trackCTA({ location: 'hero', label: `Mobile: ${l.label}`, destination: l.href }); }} style={{ color: DS.textSecondary, borderBottom: `1px solid ${DS.border}` }}>{l.label}</a>
         ))}
-        <a href="/nexus/chat" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, borderBottom: `1px solid ${DS.border}` }}>Try NEXUS →</a>
-        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.text, borderBottom: `1px solid ${DS.border}` }}>Platform</a>
+        <a href="/nexus/chat" onClick={() => { setMobileOpen(false); trackNexusChatInitiation('hero_nav_mobile'); trackCTA({ location: 'hero', label: 'Try NEXUS (mobile)', destination: '/nexus/chat' }); }} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, borderBottom: `1px solid ${DS.border}` }}>Try NEXUS →</a>
+        <a href="/login" onClick={() => { setMobileOpen(false); trackCTA({ location: 'hero', label: 'Platform Login (mobile)', destination: '/login' }); }} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.text, borderBottom: `1px solid ${DS.border}` }}>Platform</a>
       </div>
 
       {/* HERO */}
@@ -736,6 +744,7 @@ export function Landing() {
           <div className="reveal reveal-delay-1" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
             <a
               href="/nexus/chat"
+              onClick={() => { trackNexusChatInitiation('hero_cta'); trackCTA({ location: 'hero', label: 'Try NEXUS (primary)', destination: '/nexus/chat' }); }}
               className="cta-glow"
               style={{
                 display: 'inline-flex',
@@ -758,6 +767,7 @@ export function Landing() {
             </a>
             <a
               href="#assessment-catalog"
+              onClick={() => trackCTA({ location: 'hero', label: 'Explore Assessments', destination: '#assessment-catalog' })}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -860,6 +870,7 @@ export function Landing() {
             <a
               key={c.title}
               href={c.href}
+              onClick={() => trackCTA({ location: 'match_cta', label: `Capability: ${c.cta}`, destination: c.href })}
               className="card-hover"
               style={{
                 background: DS.card,

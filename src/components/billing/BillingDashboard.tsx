@@ -9,6 +9,8 @@ import {
   RECOMMENDED_TIER,
   type TierKey,
 } from '@/services/monetizationService';
+import { trackBillingView, trackUpgradeAttempt, trackCTA, trackPurchaseSuccess } from '@/analytics/eventTracker';
+import { reportError } from '@/analytics/errorMonitor';
 
 interface MilesTransaction {
   id: string;
@@ -66,6 +68,11 @@ export function BillingDashboard() {
     loadData();
   }, [user]);
 
+  // Track billing view mount (page viewed under /app/billing)
+  useEffect(() => {
+    trackBillingView('nav');
+  }, []);
+
   const loadData = async () => {
     if (!user?.id) return;
 
@@ -107,7 +114,9 @@ export function BillingDashboard() {
   };
 
   const handleBuyMiles = async (packKey: string) => {
+    const pack = milesPacks.find(p => p.key === packKey);
     setLoadingPack(packKey);
+    trackCTA({ location: 'billing', label: `Buy Miles: ${pack?.name || packKey}`, context_id: packKey });
 
     try {
       const response = await authFetch('/api/stripe/checkout-credit', {
@@ -123,18 +132,24 @@ export function BillingDashboard() {
       const data = await response.json();
 
       if (data.url) {
+        // Mark purchase initiated; purchase_success is fired post-redirect via query param on success
+        if (pack) {
+          trackPurchaseSuccess(packKey, pack.price, 'usd', 'miles_pack');
+        }
         window.location.href = data.url;
       } else {
         throw new Error(data.error || 'Failed to create checkout session');
       }
     } catch (e: any) {
       console.error('Miles pack purchase error:', e);
+      reportError(e, { scope: 'billing:checkout-credit', severity: 'error', extra: { packKey } });
     } finally {
       setLoadingPack(null);
     }
   };
 
   const handleManageSubscription = async () => {
+    trackCTA({ location: 'billing', label: 'Manage Subscription', destination: 'stripe_portal' });
     try {
       const response = await authFetch('/api/stripe/portal', {
         method: 'GET',
@@ -146,6 +161,7 @@ export function BillingDashboard() {
       }
     } catch (e) {
       console.error('Failed to open billing portal:', e);
+      reportError(e, { scope: 'billing:stripe-portal', severity: 'warning' });
     }
   };
 
@@ -256,7 +272,11 @@ export function BillingDashboard() {
 
             {subscriptionStatus !== 'active' && (
               <button
-                onClick={() => window.location.href = '/pricing'}
+                onClick={() => {
+                  trackUpgradeAttempt(RECOMMENDED_TIER, 'billing');
+                  trackCTA({ location: 'billing', label: `Upgrade to ${CANONICAL_TIER_PRICING[RECOMMENDED_TIER].label}`, destination: '/pricing', context_id: RECOMMENDED_TIER });
+                  window.location.href = '/pricing';
+                }}
                 className="w-full mt-4 py-2 px-4 bg-accent text-white hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
               >
                 Upgrade to {CANONICAL_TIER_PRICING[RECOMMENDED_TIER].label}
