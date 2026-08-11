@@ -134,19 +134,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (existing) {
         // Get remaining balance for a fresh display.
-        const { data: creditsNow } = await supabase
-          .from('credits')
-          .select('balance')
-          .eq(isAnonymous ? 'anonymous_id' : 'user_id', isAnonymous ? (anonymousId || idem) : ctx.userId)
-          .limit(1)
-          .maybeSingle();
+        const idemRemaining = isAnonymous
+          ? 0
+          : (async () => {
+              const { data: creditsNow } = await supabase
+                .from('credits')
+                .select('balance')
+                .eq('user_id', ctx.userId)
+                .limit(1)
+                .maybeSingle();
+              return Number(creditsNow?.balance ?? 0);
+            })();
         return res.status(200).json({
           ok: true,
           idempotent: true,
           assessment_result_id: existing.id,
           score_summary: existing.score_summary,
           miles_debited: (existing as any).miles_debited ?? 0,
-          remaining_balance: creditsNow?.balance ?? 0,
+          remaining_balance: isAnonymous ? 0 : await idemRemaining,
         });
       }
     }
@@ -161,7 +166,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { data: creditRow, error: cErr } = await supabase
         .from('credits')
         .select('id, balance')
-        .eq(isAnonymous ? 'anonymous_id' : 'user_id', isAnonymous ? (anonymousId || idem) : ctx.userId)
+        .eq('user_id', ctx.userId)
         .limit(1)
         .maybeSingle();
       if (cErr) throw new RequestAuthError(`Credits lookup error: ${cErr.message}`, 500);
@@ -211,12 +216,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // Non-fatal: balance already debited. Log but do not fail the run.
         console.warn('[assessments/run] credit_transactions insert failed:', txErr?.message ?? txErr);
       }
+    } else if (isAnonymous) {
+      // Anonymous users have no credit account — balance is 0.
+      remainingBalance = 0;
     } else {
       // Admin/QA pass — get their current balance for display.
       const { data: creditsNow } = await supabase
         .from('credits')
         .select('balance')
-        .eq(isAnonymous ? 'anonymous_id' : 'user_id', isAnonymous ? (anonymousId || idem) : ctx.userId)
+        .eq('user_id', ctx.userId)
         .limit(1)
         .maybeSingle();
       remainingBalance = Number(creditsNow?.balance ?? 0);
@@ -317,3 +325,4 @@ function computeScoreSummary(code: string, answers: Record<string, any>) {
     duration_seconds_reference: Object.keys(answers).length * 42,
   };
 }
+
