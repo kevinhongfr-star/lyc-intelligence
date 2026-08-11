@@ -29,13 +29,13 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '../_lib/supabase-rest';
+import { createClient } from '../lib/supabase-rest';
 import {
   enforceScope,
   getAuthorizedContext,
   isAdminRole,
   RequestAuthError,
-} from '../_lib/auth';
+} from '../lib/auth';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Canonical costs — source of truth for server-side miles debits.

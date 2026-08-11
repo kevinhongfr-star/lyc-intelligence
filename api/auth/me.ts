@@ -14,8 +14,8 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '../_lib/supabase-rest';
-import { getAuthorizedContext, RequestAuthError } from '../_lib/auth';
+import { createClient } from '../lib/supabase-rest';
+import { getAuthorizedContext, RequestAuthError } from '../lib/auth';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS preflight — this endpoint is called cross-origin only by ourselves,

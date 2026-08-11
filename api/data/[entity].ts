@@ -18,7 +18,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '../../_lib/supabase-rest';
+import { createClient } from '../../lib/supabase-rest';
 import {
   AuthContext,
   enforceScope,
@@ -28,7 +28,7 @@ import {
   isConsultantRole,
   isLeaderRole,
   RequestAuthError,
-} from '../_lib/auth';
+} from '../lib/auth';
 
 // ── Entity access control list ──────────────────────────────────────────────
 // Each allowlisted entity => { read: roles allowed to READ,
