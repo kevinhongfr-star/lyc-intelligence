@@ -234,7 +234,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const score_summary = computeScoreSummary(code, answers);
 
     // ── Persist assessment_result ─────────────────────────────────────
-    const { data: inserted, error: insErr } = await supabase
+    const insResult = await supabase
       .from('assessment_results')
       .insert({
         user_id: isAnonymous ? null : ctx.userId,
@@ -255,8 +255,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }),
         },
       } as any)
-      .select('id, created_at')
-      .maybeSingle();
+      .select('id, created_at');
+    const inserted = Array.isArray(insResult?.data) ? insResult.data[0] ?? null : null;
+    const insErr = insResult?.error ?? null;
 
     if (insErr) {
       // Best-effort refund (if we already debited) to avoid stuck-loss.
