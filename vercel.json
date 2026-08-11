@@ -11,7 +11,7 @@
       "maxDuration": 10
     },
     "api/og.tsx": {
-      "runtime": "@vercel/edge",
+      "runtime": "edge",
       "regions": ["iad1"]
     },
     "api/auth/me.ts": {
