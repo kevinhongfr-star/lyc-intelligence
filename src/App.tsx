@@ -1,3 +1,40 @@
+/**
+ * Phase 16 — Full Portal Separation (formerly Phase B).
+ *
+ * THREE IDENTITIES + ONE INTERNAL ADMIN SURFACE, ONE CODEBASE:
+ *
+ *   1. <MarketingLayout>        — PUBLIC / MARKETING
+ *      Routes: /, /pricing, /nexus/chat, /assessment*, /b2b, /match,
+ *              /share/:id, login / signup / reset, legal pages, /dex
+ *      No auth required.
+ *
+ *   2. <LeaderPortalLayout>     — LEADER PORTAL (B2C), route prefix /app/*
+ *      For individual executives — NEXUS + assessments + miles + DEX.
+ *      Auth required; consultants bounced to /portal/dashboard.
+ *
+ *   3. <ConsultantPortalLayout> — CONSULTANT PORTAL (B2B), /portal/*
+ *      <ClientPortalLayout>     — CLIENT PORTAL (B2B), /client/*
+ *      For LYC consultants and B2B client organizations respectively.
+ *      ConsultantNav adapts IA per role.
+ *
+ *   4. <AdminLayout>            — ADMIN (internal), route prefix /admin/*
+ *      Only admin/lyc_admin/super_admin roles. Dense data UI.
+ *
+ *   5. <CandidatePortalLayout>  — CANDIDATE /candidate/*
+ *      Specialized candidate workspace (classified as "leader" role but
+ *      separate IA from B2C executive portal).
+ *
+ * Additional constraints honored:
+ *   • Single codebase — shared auth store, shared monetization constants.
+ *   • Lazy() code-splitting at page level preserves per-portal bundle chunks
+ *     (marketing visitors don't download the admin surface).
+ *   • All routes keep working — old URLs get `replace` redirects (301-style)
+ *     to the new URL structure so Phase 17 SEO/sitemap work is stable.
+ *   • No new serverless functions — only route/shell changes on top of
+ *     existing page handlers.
+ *   • Brand: zero radius, font trio (Libre Baskerville / DM Sans / IBM Plex
+ *     Mono), single accent #C108AB.
+ */
 import React, { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
@@ -8,22 +45,19 @@ import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import { Loader2 } from 'lucide-react';
 import { ToastContainer } from '@/components/ui/ToastContainer';
 
-// ── Admin route wrapper ──
-function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { user } = useAuthStore();
-  // TODO: Check admin role from user metadata
-  if (!user) return <Navigate to="/login" replace />;
-  return <>{children}</>;
-}
+// ── Phase 16 — Portal layout wrappers ────────────────────────────────
+const MarketingLayout = lazy(() => import('@/components/layouts/MarketingLayout').then(m => ({ default: m.MarketingLayout })));
+const LeaderPortalLayout = lazy(() => import('@/components/layouts/LeaderPortalLayout').then(m => ({ default: m.LeaderPortalLayout })));
+const ConsultantPortalLayout = lazy(() => import('@/components/layouts/ConsultantPortalLayout').then(m => ({ default: m.ConsultantPortalLayout })));
+const ClientPortalLayout = lazy(() => import('@/components/layouts/ConsultantPortalLayout').then(m => ({ default: m.ClientPortalLayout })));
+const AdminLayout = lazy(() => import('@/components/layouts/AdminLayout').then(m => ({ default: m.AdminLayout })));
+const CandidatePortalLayout = lazy(() => import('@/components/layouts/CandidatePortalLayout').then(m => ({ default: m.CandidatePortalLayout })));
 
 // ── Landing + Auth ──
 const Landing = lazy(() => import('@/pages/Landing').then(m => ({ default: m.Landing })));
 const LoginPage = lazy(() => import('@/pages/LoginPage').then(m => ({ default: m.LoginPage })));
 const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
 const SignupPage = lazy(() => import('@/pages/SignupPage').then(m => ({ default: m.SignupPage })));
-
-// ── App Shell (mockup 4-surface structure) ──
-const AppShell = lazy(() => import('@/components/shell/AppShell').then(m => ({ default: m.AppShell })));
 
 // ── Public product landing pages (Canonical — consolidated IA) ──
 const AssessmentPage = lazy(() => import('@/pages/AssessmentPage').then(m => ({ default: m.AssessmentPage })));
@@ -33,10 +67,12 @@ const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
 
 // ── Assessment canonical routes (11 instruments — no duplicates) ──
+// Mixed exports in this codebase; use `.default` for named-default pages and
+// direct member exports for named ones.
 const CanonicalInstrumentLanding = lazy(() => import('@/pages/CanonicalInstrumentLanding').then(m => ({ default: m.CanonicalInstrumentLanding })));
-const CpiPage = lazy(() => import('@/pages/CpiPage').then(m => ({ default: m.CpiPage })));
+const CpiPage = lazy(() => import('@/pages/CpiPage'));
 const CpiResultsPage = lazy(() => import('@/pages/CpiResultsPage').then(m => ({ default: m.CpiResultsPage })));
-const ShiftPage = lazy(() => import('@/pages/ShiftPage').then(m => ({ default: m.ShiftPage })));
+const ShiftPage = lazy(() => import('@/pages/ShiftPage'));
 const PrismLanding = lazy(() => import('@/pages/PrismLanding').then(m => ({ default: m.PrismLanding })));
 const PrismResultsPage = lazy(() => import('@/pages/PrismResultsPage').then(m => ({ default: m.PrismResultsPage })));
 const SparkLanding = lazy(() => import('@/pages/SparkLanding').then(m => ({ default: m.SparkLanding })));
@@ -50,15 +86,24 @@ const CoachResultsPage = lazy(() => import('@/pages/CoachResultsPage').then(m =>
 const BridgeResultsPage = lazy(() => import('@/pages/BridgeResultsPage').then(m => ({ default: m.BridgeResultsPage })));
 const MosaicResultsPage = lazy(() => import('@/pages/MosaicResultsPage').then(m => ({ default: m.MosaicResultsPage })));
 
-// ── Authenticated user pages ──
+// ── Authenticated user pages — shared across leader / (in future) candidate ──
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const ProgressPage = lazy(() => import('@/pages/ProgressPage').then(m => ({ default: m.ProgressPage })));
-const UserDocumentsPage = lazy(() => import('@/pages/UserDocumentsPage').then(m => ({ default: m.UserDocumentsPage })));
+const DocumentsPage = lazy(() => import('@/pages/UserDocumentsPage').then(m => ({ default: m.DocumentsPage })));
 const SharePage = lazy(() => import('@/pages/SharePage').then(m => ({ default: m.SharePage })));
 const ConsultantDashboard = lazy(() => import('@/components/dashboard/ConsultantDashboard').then(m => ({ default: m.ConsultantDashboard })));
 
-// ── Internal platform pages (real implementations) ──
+// ── DEX AI B2C Portal pages (EO-5 / SPRINT 2) ──
+const DexLandingPage = lazy(() => import('@/pages/dex/DexLandingPage').then(m => ({ default: m.DexLandingPage })));
+const DexChatPage = lazy(() => import('@/pages/dex/DexChatPage').then(m => ({ default: m.DexChatPage })));
+const DexAssessPage = lazy(() => import('@/pages/dex/DexAssessPage').then(m => ({ default: m.DexAssessPage })));
+const DexPlanPage = lazy(() => import('@/pages/dex/DexPlanPage').then(m => ({ default: m.DexPlanPage })));
+const DexBookPage = lazy(() => import('@/pages/dex/DexBookPage').then(m => ({ default: m.DexBookPage })));
+const DexJourneyPage = lazy(() => import('@/pages/dex/DexJourneyPage').then(m => ({ default: m.DexJourneyPage })));
+const CreditStorePage = lazy(() => import('@/pages/dex/CreditStorePage').then(m => ({ default: m.CreditStorePage })));
+
+// ── Consultant platform pages (real implementations, now under /portal/*) ──
 const PipelinePage = lazy(() => import('@/pages/PipelinePage').then(m => ({ default: m.PipelinePage })));
 const MandatesPage = lazy(() => import('@/pages/MandatesPage').then(m => ({ default: m.MandatesPage })));
 const MandateDetailPage = lazy(() => import('@/pages/MandateDetailPage').then(m => ({ default: m.MandateDetailPage })));
@@ -72,22 +117,26 @@ const BatchScoringPage = lazy(() => import('@/pages/BatchScoringPage').then(m =>
 const MetrixPage = lazy(() => import('@/pages/MetrixPage').then(m => ({ default: m.MetrixPage })));
 const ScoringRunsPage = lazy(() => import('@/pages/ScoringRunsPage').then(m => ({ default: m.ScoringRunsPage })));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
-const OrgIntelligencePage = lazy(() => import('@/pages/OrgIntelligencePage').then(m => ({ default: m.OrgIntelligencePage })));
 const ProposalBuilderPage = lazy(() => import('@/pages/ProposalBuilderPage').then(m => ({ default: m.ProposalBuilderPage })));
 const LensExportPage = lazy(() => import('@/pages/LensExportPage').then(m => ({ default: m.LensExportPage })));
-const AdvancedOpsPage = lazy(() => import('@/pages/internal/AdvancedOpsPage').then(m => ({ default: m.AdvancedOpsPage })));
-const SchedulingPlusPage = lazy(() => import('@/pages/internal/SchedulingPlusPage').then(m => ({ default: m.SchedulingPlusPage })));
-const IntelligencePlusPage = lazy(() => import('@/pages/internal/IntelligencePlusPage').then(m => ({ default: m.IntelligencePlusPage })));
-const PlatformSettingsPage = lazy(() => import('@/pages/internal/PlatformSettingsPage').then(m => ({ default: m.PlatformSettingsPage })));
-const TeamPage = lazy(() => import('@/pages/internal/TeamPage').then(m => ({ default: m.TeamPage })));
-const TasksPage = lazy(() => import('@/pages/internal/TasksPage').then(m => ({ default: m.TasksPage })));
-const AnalyticsPage = lazy(() => import('@/pages/internal/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
+
+// ── Admin-only pages (now under /admin/*) ──
+// These all use default export, so import directly.
+const AdvancedOpsPage = lazy(() => import('@/pages/internal/AdvancedOpsPage'));
+const SchedulingPlusPage = lazy(() => import('@/pages/internal/SchedulingPlusPage'));
+const IntelligencePlusPage = lazy(() => import('@/pages/internal/IntelligencePlusPage'));
+const PlatformSettingsPage = lazy(() => import('@/pages/internal/PlatformSettingsPage'));
+const TeamPage = lazy(() => import('@/pages/internal/TeamPage'));
+const TasksPage = lazy(() => import('@/pages/internal/TasksPage'));
+const AnalyticsPage = lazy(() => import('@/pages/internal/AnalyticsPage'));
 const ConsultantPerformancePage = lazy(() => import('@/pages/internal/ConsultantPerformancePage').then(m => ({ default: m.ConsultantPerformancePage })));
-const CompliancePage = lazy(() => import('@/pages/internal/CompliancePage').then(m => ({ default: m.CompliancePage })));
-const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage').then(m => ({ default: m.NexusEnginePage })));
+const CompliancePage = lazy(() => import('@/pages/internal/CompliancePage'));
+const NexusEnginePage = lazy(() => import('@/pages/internal/NexusEnginePage'));
 const AdminRankingDashboard = lazy(() => import('@/pages/internal/AdminRankingDashboard').then(m => ({ default: m.AdminRankingDashboard })));
 const ScoringConfigPage = lazy(() => import('@/pages/internal/ScoringConfigPage').then(m => ({ default: m.ScoringConfigPage })));
 const KevinOversightDashboard = lazy(() => import('@/components/kevin/KevinOversightDashboard').then(m => ({ default: m.KevinOversightDashboard })));
+const RevenueAnalyticsPage = lazy(() => import('@/components/internal/RevenueAnalytics').then(m => ({ default: m.default })));
+const OrgIntelligencePage = lazy(() => import('@/pages/OrgIntelligencePage').then(m => ({ default: m.OrgIntelligencePage })));
 
 // ── Candidate Portal pages (EO-4) ──
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
@@ -97,44 +146,29 @@ const CandidateCommunityPage = lazy(() => import('@/pages/candidate/CandidateCom
 const CandidateInterviewPrepPage = lazy(() => import('@/pages/candidate/CandidateInterviewPrepPage').then(m => ({ default: m.CandidateInterviewPrepPage })));
 const CandidateOpportunitiesPage = lazy(() => import('@/pages/candidate/CandidateOpportunitiesPage').then(m => ({ default: m.CandidateOpportunitiesPage })));
 
-// ── B2B Client Portal pages (EO-1 / SPRINT 3) ──
+// ── B2B Client Portal pages (EO-1 / SPRINT 3) — now under /client/* ──
 const ClientOverviewPage = lazy(() => import('@/pages/client/ClientOverviewPage').then(m => ({ default: m.ClientOverviewPage })));
 const ClientMandatesPage = lazy(() => import('@/pages/client/ClientMandatesPage').then(m => ({ default: m.ClientMandatesPage })));
 const ClientDocumentsPage = lazy(() => import('@/pages/client/ClientDocumentsPage').then(m => ({ default: m.ClientDocumentsPage })));
 const ClientPipelineAnalyticsPage = lazy(() => import('@/pages/client/ClientPipelineAnalyticsPage').then(m => ({ default: m.ClientPipelineAnalyticsPage })));
-
-// ── DEX AI B2C Portal pages (EO-5 / SPRINT 2) ──
-const DexLandingPage = lazy(() => import('@/pages/dex/DexLandingPage').then(m => ({ default: m.DexLandingPage })));
-const DexChatPage = lazy(() => import('@/pages/dex/DexChatPage').then(m => ({ default: m.DexChatPage })));
-const DexAssessPage = lazy(() => import('@/pages/dex/DexAssessPage').then(m => ({ default: m.DexAssessPage })));
-const DexPlanPage = lazy(() => import('@/pages/dex/DexPlanPage').then(m => ({ default: m.DexPlanPage })));
-const DexBookPage = lazy(() => import('@/pages/dex/DexBookPage').then(m => ({ default: m.DexBookPage })));
-const DexJourneyPage = lazy(() => import('@/pages/dex/DexJourneyPage').then(m => ({ default: m.DexJourneyPage })));
-const CreditStorePage = lazy(() => import('@/pages/dex/CreditStorePage').then(m => ({ default: m.CreditStorePage })));
 
 // ── Legal pages (S4-T03) ──
 const TermsPage = lazy(() => import('@/pages/LegalPages').then(m => ({ default: m.TermsPage })));
 const PrivacyPage = lazy(() => import('@/pages/LegalPages').then(m => ({ default: m.PrivacyPage })));
 const CookiesPage = lazy(() => import('@/pages/LegalPages').then(m => ({ default: m.CookiesPage })));
 
-// ── Billing dashboard (S6-T05) ──
+// ── Billing dashboard (S6-T05) — leader portal /app/billing ──
 const BillingDashboard = lazy(() => import('@/components/billing/BillingDashboard').then(m => ({ default: m.BillingDashboard })));
-// ── Revenue analytics (S6-T06) ──
-const RevenueAnalyticsPage = lazy(() => import('@/components/internal/RevenueAnalytics').then(m => ({ default: m.default })));
 
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
-const PlaceholderPage = lazy(() => import('@/pages/PlaceholderPage').then(m => ({ default: m.PlaceholderPage })));
 
-const ENABLE_PLATFORM = import.meta.env.VITE_ENABLE_PLATFORM === 'true';
-
-function Loading() { return <div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-fuchsia" /></div>; }
-
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuthStore();
-  if (isLoading) return <Loading />;
-  if (!user) return <Navigate to="/login" replace />;
-  return <>{children}</>;
+function Loading() {
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <Loader2 className="w-8 h-8 animate-spin text-fuchsia" />
+    </div>
+  );
 }
 
 export default function App() {
@@ -149,16 +183,230 @@ export default function App() {
       <OnboardingWizard />
       <Suspense fallback={<Loading />}>
         <Routes>
-          {/* ── Public marketing — single consolidated entry point ── */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/signup" element={<SignupPage />} />
+          {/* ═══════════════════════════════════════════════════════════
+              PHASE 16 · MARKETING LAYOUT — no auth, premium marketing chrome
+              ═══════════════════════════════════════════════════════════ */}
+          <Route path="/" element={<MarketingLayout />}>
+            <Route index element={<Landing />} />
 
-          {/* ── Legacy redirects — IA consolidation v3 ── */}
+            {/* Auth entry points (public, sit under marketing chrome) */}
+            <Route path="login" element={<LoginPage />} />
+            <Route path="reset-password" element={<ResetPasswordPage />} />
+            <Route path="signup" element={<SignupPage />} />
+
+            {/* Public product pages */}
+            <Route path="nexus/chat" element={<NexusChatPage />} />
+            <Route path="pricing" element={<PricingPage />} />
+            <Route path="b2b" element={<B2BLanding />} />
+            <Route path="match" element={<MatchPage />} />
+
+            {/* DEX B2C public landing. DEX /app/dex/* routes are auth'd. */}
+            <Route path="dex" element={<DexLandingPage />} />
+
+            {/* Assessment catalog entry point → marketing landing catalog */}
+            <Route path="assessments" element={<Navigate to="/#assessment-catalog" replace />} />
+            <Route path="assessment" element={<Navigate to="/#assessment-catalog" replace />} />
+
+            {/* ── 11 Canonical Assessment Routes ── */}
+            {/* Flagship + SHIFT + PRISM/SPARK custom landings */}
+            <Route path="assessment/cpi" element={<CpiPage />} />
+            <Route path="assessment/shift" element={<ShiftPage />} />
+            <Route path="assessment/prism" element={<PrismLanding />} />
+            <Route path="assessment/spark" element={<SparkLanding />} />
+            {/* Generic canonical landing for remaining 8 instruments */}
+            <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />
+
+            {/* Results routes — post-assessment (shareable / bookmarkable) */}
+            <Route path="assessment/cpi/results" element={<CpiResultsPage />} />
+            <Route path="assessment/prism/results" element={<PrismResultsPage />} />
+            <Route path="assessment/spark/results" element={<SparkResultsPage />} />
+            <Route path="assessment/leap/results" element={<LeapResultsPage />} />
+            <Route path="assessment/quest/results" element={<QuestResultsPage />} />
+            <Route path="assessment/impact/results" element={<ImpactResultsPage />} />
+            <Route path="assessment/forge/results" element={<ForgeResultsPage />} />
+            <Route path="assessment/drive/results" element={<DriveResultsPage />} />
+            <Route path="assessment/coach/results" element={<CoachResultsPage />} />
+            <Route path="assessment/bridge/results" element={<BridgeResultsPage />} />
+            <Route path="assessment/mosaic/results" element={<MosaicResultsPage />} />
+
+            {/* Share pages — publicly accessible shortlinks */}
+            <Route path="share/:id" element={<SharePage />} />
+
+            {/* Legal (S4-T03) */}
+            <Route path="terms" element={<TermsPage />} />
+            <Route path="privacy" element={<PrivacyPage />} />
+            <Route path="cookies" element={<CookiesPage />} />
+          </Route>
+
+          {/* ═══════════════════════════════════════════════════════════
+              PHASE 16 · LEADER PORTAL — /app/* (B2C executives)
+              Auth required. Role-guarded in LeaderPortalLayout
+              (consultants auto-bounced to /portal/dashboard).
+              ═══════════════════════════════════════════════════════════ */}
+          <Route path="/app" element={<LeaderPortalLayout />}>
+            <Route index element={<Navigate to="nexus" replace />} />
+            <Route path="nexus" element={<NexusChatPage />} />
+            <Route path="chat" element={<Navigate to="nexus" replace />} />
+
+            {/* Exec user workspace */}
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="results" element={<ProgressPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="documents" element={<DocumentsPage />} />
+
+            {/* Assessment flow deep-links (auth'd access to take/purchase) */}
+            <Route path="assessments" element={<AssessmentPage />} />
+            <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />
+
+            {/* Billing + subscription self-serve */}
+            <Route path="billing" element={<BillingDashboard />} />
+            <Route path="subscription" element={<Navigate to="billing" replace />} />
+
+            {/* DEX B2C — SPRINT 2 authenticated routes */}
+            <Route path="dex/chat" element={<DexChatPage />} />
+            <Route path="dex/assess" element={<DexAssessPage />} />
+            <Route path="dex/plan" element={<DexPlanPage />} />
+            <Route path="dex/book" element={<DexBookPage />} />
+            <Route path="dex/journey" element={<DexJourneyPage />} />
+            <Route path="dex/store" element={<CreditStorePage />} />
+            <Route path="dex/credits" element={<Navigate to="dex/store" replace />} />
+          </Route>
+
+          {/* ═══════════════════════════════════════════════════════════
+              PHASE 16 · CONSULTANT PORTAL — /portal/* (LYC consultants)
+              ConsultantPortalLayout enforces consultant+ role gating.
+              ═══════════════════════════════════════════════════════════ */}
+          <Route path="/portal" element={<ConsultantPortalLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<ConsultantDashboard />} />
+
+            {/* Mandates + GRID pipeline */}
+            <Route path="mandates" element={<MandatesPage />} />
+            <Route path="mandates/new" element={<ProposalBuilderPage />} />
+            <Route path="mandates/:id/edit" element={<ProposalBuilderPage />} />
+            <Route path="mandates/:id" element={<MandateDetailPage />} />
+            <Route path="mandates/:id/lens" element={<LensExportPage />} />
+            <Route path="pipeline" element={<PipelinePage />} />
+            <Route path="grid" element={<Navigate to="pipeline" replace />} />
+
+            {/* TRIDENT candidates + CANVAS + METRIX */}
+            <Route path="candidates" element={<CandidatesPage />} />
+            <Route path="candidates/:id" element={<ExecutiveProfilePage />} />
+            <Route path="candidates/:id/report" element={<CandidateReportPage />} />
+            <Route path="trident" element={<Navigate to="candidates" replace />} />
+            <Route path="companies" element={<CompaniesPage />} />
+            <Route path="canvas" element={<Navigate to="metrix" replace />} />
+            <Route path="metrix" element={<MetrixPage />} />
+
+            {/* NEXUS chat (context-aware consultant system prompt handled inside page) */}
+            <Route path="nexus" element={<NexusChatPage />} />
+
+            {/* Intelligence suite — scoring + runs + org intel */}
+            <Route path="intelligence" element={<AnalyticsPage />} />
+            <Route path="batch-scoring" element={<BatchScoringPage />} />
+            <Route path="scoring-runs" element={<ScoringRunsPage />} />
+            <Route path="reports" element={<Navigate to="/app/results" replace />} />
+
+            {/* Ops + scheduling */}
+            <Route path="scheduler" element={<SchedulerPage />} />
+            <Route path="notifications" element={<NotificationsPage />} />
+
+            {/* Account-level surface for consultants */}
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+
+            {/* SHIFT assessment deep-link (consultant can launch from portal) */}
+            <Route path="shift" element={<Navigate to="/assessment/shift" replace />} />
+          </Route>
+
+          {/* ═══════════════════════════════════════════════════════════
+              PHASE 16 · CLIENT PORTAL — /client/* (B2B org users)
+              ClientPortalLayout enforces client role gating and shows
+              the client-subset of ConsultantNav.
+              ═══════════════════════════════════════════════════════════ */}
+          <Route path="/client" element={<ClientPortalLayout />}>
+            <Route index element={<Navigate to="overview" replace />} />
+            <Route path="overview" element={<ClientOverviewPage />} />
+            <Route path="mandates" element={<ClientMandatesPage />} />
+            <Route path="pipeline-analytics" element={<ClientPipelineAnalyticsPage />} />
+            <Route path="documents" element={<ClientDocumentsPage />} />
+            {/* NEXUS client assistant */}
+            <Route path="nexus-assistant" element={<NexusChatPage />} />
+
+            {/* Backward-compat placeholder routes */}
+            <Route path="talent-intel" element={<Navigate to="overview" replace />} />
+            <Route path="candidates" element={<Navigate to="mandates" replace />} />
+            <Route path="admin" element={<Navigate to="overview" replace />} />
+            <Route path="collaboration" element={<Navigate to="overview" replace />} />
+            <Route path="onboarding" element={<Navigate to="overview" replace />} />
+          </Route>
+
+          {/* ═══════════════════════════════════════════════════════════
+              PHASE 16 · ADMIN — /admin/* (internal LYC ops staff only)
+              AdminLayout enforces admin/lyc_admin/super_admin role gating.
+              ═══════════════════════════════════════════════════════════ */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<KevinOversightDashboard />} />
+
+            {/* Users + team + tasks */}
+            <Route path="team" element={<TeamPage />} />
+            <Route path="consultants" element={<ConsultantPerformancePage />} />
+            <Route path="tasks" element={<TasksPage />} />
+            <Route path="users" element={<Navigate to="team" replace />} />
+
+            {/* Analytics + revenue */}
+            <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="revenue" element={<RevenueAnalyticsPage />} />
+            <Route path="oversight" element={<KevinOversightDashboard />} />
+
+            {/* Scoring + ranking config */}
+            <Route path="rankings" element={<AdminRankingDashboard />} />
+            <Route path="scoring" element={<ScoringConfigPage />} />
+            <Route path="org-intel" element={<OrgIntelligencePage />} />
+            <Route path="nexus-engine" element={<NexusEnginePage />} />
+
+            {/* Ops + compliance */}
+            <Route path="advanced-ops" element={<AdvancedOpsPage />} />
+            <Route path="scheduling-plus" element={<SchedulingPlusPage />} />
+            <Route path="intelligence-plus" element={<IntelligencePlusPage />} />
+            <Route path="compliance" element={<CompliancePage />} />
+
+            {/* Platform-wide configuration */}
+            <Route path="platform-settings" element={<PlatformSettingsPage />} />
+            <Route path="settings" element={<PlatformSettingsPage />} />
+          </Route>
+
+          {/* ═══════════════════════════════════════════════════════════
+              CANDIDATE PORTAL — /candidate/* (EO-4, Phase 16: keep IA)
+              Reuses leader-style sidebar for visual consistency.
+              ═══════════════════════════════════════════════════════════ */}
+          <Route path="/candidate" element={<CandidatePortalLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<CandidateDashboardPage />} />
+            <Route path="applications" element={<CandidateApplicationsPage />} />
+            <Route path="opportunities" element={<CandidateOpportunitiesPage />} />
+            <Route path="interview-prep" element={<CandidateInterviewPrepPage />} />
+            <Route path="assessments" element={<CandidateAssessmentsPage />} />
+            <Route path="community" element={<CandidateCommunityPage />} />
+            {/* Placeholder-only sub-routes → redirect (Phase 15.3 C1) */}
+            <Route path="offers" element={<Navigate to="opportunities" replace />} />
+            <Route path="career-dev" element={<Navigate to="assessments" replace />} />
+            <Route path="nexus-coach" element={<Navigate to="/nexus/chat" replace />} />
+            <Route path="profile" element={<Navigate to="/app/profile" replace />} />
+            <Route path="advanced-assessments" element={<Navigate to="assessments" replace />} />
+            <Route path="settings-plus" element={<Navigate to="/app/dashboard" replace />} />
+          </Route>
+
+          {/* ═══════════════════════════════════════════════════════════
+              PHASE 16 · ROUTE 301 REDIRECTS — old flat URLs → new URLs
+              ═══════════════════════════════════════════════════════════ */}
+
+          {/* Legacy /nexus shortcuts → canonical marketing or /app/nexus */}
           <Route path="/nexus" element={<Navigate to="/" replace />} />
           <Route path="/nexus-landing" element={<Navigate to="/" replace />} />
-          <Route path="/b2c" element={<Navigate to="/" replace />} />
+          <Route path="/b2c" element={<Navigate to="/app/nexus" replace />} />
+
           {/* Legacy instrument root URLs → canonical /assessment/:code */}
           <Route path="/cpi" element={<Navigate to="/assessment/cpi" replace />} />
           <Route path="/cpi/results" element={<Navigate to="/assessment/cpi/results" replace />} />
@@ -184,165 +432,83 @@ export default function App() {
           <Route path="/mosaic" element={<Navigate to="/assessment/mosaic" replace />} />
           <Route path="/mosaic/results" element={<Navigate to="/assessment/mosaic/results" replace />} />
 
-          {/* ── Public product pages (Canonical) ── */}
-          <Route path="/nexus/chat" element={<NexusChatPage />} />
-          <Route path="/b2b" element={<B2BLanding />} />
-          <Route path="/match" element={<MatchPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/assessment" element={<Navigate to="/#assessment-catalog" replace />} />
+          {/* Old legacy DEX auth URLs → /app/dex/* */}
+          <Route path="/dex/chat" element={<Navigate to="/app/dex/chat" replace />} />
+          <Route path="/dex/assess" element={<Navigate to="/app/dex/assess" replace />} />
+          <Route path="/dex/plan" element={<Navigate to="/app/dex/plan" replace />} />
+          <Route path="/dex/book" element={<Navigate to="/app/dex/book" replace />} />
+          <Route path="/dex/journey" element={<Navigate to="/app/dex/journey" replace />} />
+          <Route path="/dex/credits" element={<Navigate to="/app/dex/store" replace />} />
 
-          {/* ── 11 Canonical Assessment Routes — exactly one public landing each ── */}
-          {/* Flagship + SHIFT suite entry + PRISM/SPARK custom landings */}
-          <Route path="/assessment/cpi" element={<CpiPage />} />
-          <Route path="/assessment/shift" element={<ShiftPage />} />
-          <Route path="/assessment/prism" element={<PrismLanding />} />
-          <Route path="/assessment/spark" element={<SparkLanding />} />
-          {/* Generic canonical landing for remaining 8 instruments: LEAP, QUEST, IMPACT, DRIVE, COACH, FORGE, BRIDGE, MOSAIC */}
-          <Route path="/assessment/:code" element={<CanonicalInstrumentLanding />} />
+          {/* Old /coaching/* (previous B2C shell) → /app/* */}
+          <Route path="/coaching" element={<Navigate to="/app/nexus" replace />} />
+          <Route path="/coaching/nexus-chat" element={<Navigate to="/app/nexus" replace />} />
+          <Route path="/coaching/assessments" element={<Navigate to="/app/assessments" replace />} />
+          <Route path="/coaching/results" element={<Navigate to="/app/results" replace />} />
+          <Route path="/coaching/profile" element={<Navigate to="/app/profile" replace />} />
+          <Route path="/coaching/coach" element={<Navigate to="/app/nexus" replace />} />
+          <Route path="/coaching/credits" element={<Navigate to="/app/billing" replace />} />
+          <Route path="/coaching/intelligence" element={<Navigate to="/app/results" replace />} />
+          <Route path="/coaching/career-intel" element={<Navigate to="/app/results" replace />} />
+          <Route path="/coaching/chat-features" element={<Navigate to="/app/nexus" replace />} />
+          <Route path="/coaching/career-services" element={<Navigate to="/app/assessments" replace />} />
+          <Route path="/coaching/engagement" element={<Navigate to="/app/results" replace />} />
+          <Route path="/coaching/growth" element={<Navigate to="/app/profile" replace />} />
 
-          {/* Results routes — authenticated post-assessment */}
-          <Route path="/assessment/cpi/results" element={<CpiResultsPage />} />
-          <Route path="/assessment/prism/results" element={<PrismResultsPage />} />
-          <Route path="/assessment/spark/results" element={<SparkResultsPage />} />
-          <Route path="/assessment/leap/results" element={<LeapResultsPage />} />
-          <Route path="/assessment/quest/results" element={<QuestResultsPage />} />
-          <Route path="/assessment/impact/results" element={<ImpactResultsPage />} />
-          <Route path="/assessment/forge/results" element={<ForgeResultsPage />} />
-          <Route path="/assessment/drive/results" element={<DriveResultsPage />} />
-          <Route path="/assessment/coach/results" element={<CoachResultsPage />} />
-          <Route path="/assessment/bridge/results" element={<BridgeResultsPage />} />
-          <Route path="/assessment/mosaic/results" element={<MosaicResultsPage />} />
+          {/* Old standalone auth-only flat routes → /app/* counterparts */}
+          <Route path="/profile" element={<Navigate to="/app/profile" replace />} />
+          <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
+          <Route path="/progress" element={<Navigate to="/app/results" replace />} />
+          <Route path="/documents" element={<Navigate to="/app/documents" replace />} />
+          <Route path="/account/billing" element={<Navigate to="/app/billing" replace />} />
 
-          {/* ── Legal pages (S4-T03) ── */}
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/cookies" element={<CookiesPage />} />
+          {/* Backward compat: redirect old /platform/* → /portal/* */}
+          <Route path="/platform" element={<Navigate to="/portal/dashboard" replace />} />
+          <Route path="/platform/*" element={<Navigate to="/portal/dashboard" replace />} />
 
-          {/* ── DEX AI B2C Portal (EO-5 / SPRINT 2) ── */}
-          <Route path="/dex" element={<DexLandingPage />} />
-          <Route path="/dex/chat" element={<ProtectedRoute><DexChatPage /></ProtectedRoute>} />
-          <Route path="/dex/assess" element={<ProtectedRoute><DexAssessPage /></ProtectedRoute>} />
-          <Route path="/dex/plan" element={<ProtectedRoute><DexPlanPage /></ProtectedRoute>} />
-          <Route path="/dex/book" element={<ProtectedRoute><DexBookPage /></ProtectedRoute>} />
-          <Route path="/dex/journey" element={<ProtectedRoute><DexJourneyPage /></ProtectedRoute>} />
-          <Route path="/dex/credits" element={<ProtectedRoute><CreditStorePage /></ProtectedRoute>} />
+          {/* Old /app/* (previous consultant shell) → /portal/*
+             (except /app/[nexus|dashboard|results|profile|documents|assessments|billing|dex/*]
+             which are now B2C leader routes — already matched earlier since this
+             section is a wildcard fallback.) */}
+          <Route path="/app/pipeline" element={<Navigate to="/portal/pipeline" replace />} />
+          <Route path="/app/mandates" element={<Navigate to="/portal/mandates" replace />} />
+          <Route path="/app/mandates/new" element={<Navigate to="/portal/mandates/new" replace />} />
+          <Route path="/app/mandates/:id/edit" element={<Navigate to="/portal/mandates/:id/edit" replace />} />
+          <Route path="/app/mandates/:id" element={<Navigate to="/portal/mandates/:id" replace />} />
+          <Route path="/app/mandates/:id/lens" element={<Navigate to="/portal/mandates/:id/lens" replace />} />
+          <Route path="/app/candidates" element={<Navigate to="/portal/candidates" replace />} />
+          <Route path="/app/candidates/:id" element={<Navigate to="/portal/candidates/:id" replace />} />
+          <Route path="/app/candidates/:id/report" element={<Navigate to="/portal/candidates/:id/report" replace />} />
+          <Route path="/app/companies" element={<Navigate to="/portal/companies" replace />} />
+          <Route path="/app/batch-scoring" element={<Navigate to="/portal/batch-scoring" replace />} />
+          <Route path="/app/metrix" element={<Navigate to="/portal/metrix" replace />} />
+          <Route path="/app/scoring-runs" element={<Navigate to="/portal/scoring-runs" replace />} />
+          <Route path="/app/scheduler" element={<Navigate to="/portal/scheduler" replace />} />
+          <Route path="/app/notifications" element={<Navigate to="/portal/notifications" replace />} />
+          <Route path="/app/settings" element={<Navigate to="/portal/settings" replace />} />
+          <Route path="/app/advanced-ops" element={<Navigate to="/admin/advanced-ops" replace />} />
+          <Route path="/app/scheduling-plus" element={<Navigate to="/admin/scheduling-plus" replace />} />
+          <Route path="/app/intelligence-plus" element={<Navigate to="/admin/intelligence-plus" replace />} />
+          <Route path="/app/platform-settings" element={<Navigate to="/admin/platform-settings" replace />} />
+          <Route path="/app/team" element={<Navigate to="/admin/team" replace />} />
+          <Route path="/app/tasks" element={<Navigate to="/admin/tasks" replace />} />
+          <Route path="/app/analytics" element={<Navigate to="/admin/analytics" replace />} />
+          <Route path="/app/consultants" element={<Navigate to="/admin/consultants" replace />} />
+          <Route path="/app/compliance" element={<Navigate to="/admin/compliance" replace />} />
+          <Route path="/app/nexus-engine" element={<Navigate to="/admin/nexus-engine" replace />} />
+          <Route path="/app/rankings" element={<Navigate to="/admin/rankings" replace />} />
+          <Route path="/app/scoring" element={<Navigate to="/admin/scoring" replace />} />
+          <Route path="/app/oversight" element={<Navigate to="/admin/oversight" replace />} />
+          <Route path="/app/revenue" element={<Navigate to="/admin/revenue" replace />} />
+          <Route path="/app/org-intel" element={<Navigate to="/admin/org-intel" replace />} />
+          <Route path="/app/trident" element={<Navigate to="/match" replace />} />
+          <Route path="/app/canvas" element={<Navigate to="/portal/metrix" replace />} />
+          <Route path="/app/shift" element={<Navigate to="/assessment/shift" replace />} />
+          <Route path="/app/reports" element={<Navigate to="/app/results" replace />} />
+          <Route path="/app/intelligence" element={<Navigate to="/admin/analytics" replace />} />
+          <Route path="/app/chat" element={<Navigate to="/app/nexus" replace />} />
 
-          {/* ── Internal Operations ── */}
-          {ENABLE_PLATFORM && (
-            <Route path="/app" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<ConsultantDashboard />} />
-              <Route path="pipeline" element={<PipelinePage />} />
-              <Route path="mandates" element={<MandatesPage />} />
-              <Route path="mandates/new" element={<ProposalBuilderPage />} />
-              <Route path="mandates/:id/edit" element={<ProposalBuilderPage />} />
-              <Route path="mandates/:id" element={<MandateDetailPage />} />
-              <Route path="mandates/:id/lens" element={<LensExportPage />} />
-              <Route path="candidates" element={<CandidatesPage />} />
-              <Route path="candidates/:id" element={<ExecutiveProfilePage />} />
-              <Route path="candidates/:id/report" element={<CandidateReportPage />} />
-              <Route path="companies" element={<CompaniesPage />} />
-              <Route path="batch-scoring" element={<BatchScoringPage />} />
-              <Route path="metrix" element={<MetrixPage />} />
-              <Route path="scoring-runs" element={<ScoringRunsPage />} />
-              <Route path="chat" element={<NexusChatPage />} />
-              <Route path="scheduler" element={<SchedulerPage />} />
-              <Route path="org-intel" element={<AdminRoute><OrgIntelligencePage /></AdminRoute>} />
-              <Route path="notifications" element={<NotificationsPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="advanced-ops" element={<AdvancedOpsPage />} />
-              <Route path="scheduling-plus" element={<SchedulingPlusPage />} />
-              <Route path="intelligence-plus" element={<IntelligencePlusPage />} />
-              <Route path="platform-settings" element={<PlatformSettingsPage />} />
-              <Route path="team" element={<TeamPage />} />
-              <Route path="tasks" element={<TasksPage />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
-              <Route path="consultants" element={<AdminRoute><ConsultantPerformancePage /></AdminRoute>} />
-              <Route path="compliance" element={<CompliancePage />} />
-              <Route path="nexus-engine" element={<AdminRoute><NexusEnginePage /></AdminRoute>} />
-              <Route path="rankings" element={<AdminRoute><AdminRankingDashboard /></AdminRoute>} />
-              <Route path="scoring" element={<AdminRoute><ScoringConfigPage /></AdminRoute>} />
-              <Route path="oversight" element={<AdminRoute><KevinOversightDashboard /></AdminRoute>} />
-              {/* Revenue analytics (S6-T06) */}
-              <Route path="revenue" element={<AdminRoute><RevenueAnalyticsPage /></AdminRoute>} />
-              {/* Placeholder-only sub-routes → graceful redirects (Phase 15.3 C1) */}
-              <Route path="trident" element={<Navigate to="/match" replace />} />
-              <Route path="canvas" element={<Navigate to="metrix" replace />} />
-              <Route path="shift" element={<Navigate to="/assessment/shift" replace />} />
-              <Route path="reports" element={<Navigate to="/progress" replace />} />
-              <Route path="intelligence" element={<Navigate to="analytics" replace />} />
-            </Route>
-          )}
-
-          {/* Backward compat: redirect old /platform/* to /app */}
-          <Route path="/platform/*" element={<Navigate to="/app" replace />} />
-
-          {/* ── B2B Client Portal (real implementation — SPRINT 3 / EO_1) ── */}
-          <Route path="/client" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
-            <Route index element={<Navigate to="overview" replace />} />
-            <Route path="overview" element={<ClientOverviewPage />} />
-            <Route path="mandates" element={<ClientMandatesPage />} />
-            <Route path="pipeline-analytics" element={<ClientPipelineAnalyticsPage />} />
-            <Route path="documents" element={<ClientDocumentsPage />} />
-            {/* Placeholder routes → graceful redirects (Phase 15.3 C1).
-                Admin users who keep VITE_ENABLE_ADMIN_PREVIEW see these via
-                SURFACE_CONFIG working=false tabs, but in the route table we
-                always redirect so clicking a stale bookmark never lands on Placeholder. */}
-            <Route path="talent-intel" element={<Navigate to="overview" replace />} />
-            <Route path="candidates" element={<Navigate to="mandates" replace />} />
-            <Route path="nexus-assistant" element={<Navigate to="/nexus/chat" replace />} />
-            <Route path="admin" element={<Navigate to="overview" replace />} />
-            <Route path="collaboration" element={<Navigate to="overview" replace />} />
-            <Route path="onboarding" element={<Navigate to="overview" replace />} />
-          </Route>
-
-          {/* ── B2C Coaching — Phase 15.3 C1 simplified nav:
-                NEXUS Chat · Assessments (11) · My Results / Reports · Profile / Settings
-                Old Placeholder-only sub-routes redirect to their nearest working neighbour. */}
-          <Route path="/coaching" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
-            <Route index element={<Navigate to="nexus-chat" replace />} />
-            <Route path="nexus-chat" element={<NexusChatPage />} />
-            <Route path="assessments" element={<Navigate to="/assessment/shift" replace />} />
-            <Route path="results" element={<ProgressPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            {/* Legacy placeholder-only sub-routes → graceful redirects */}
-            <Route path="coach" element={<Navigate to="nexus-chat" replace />} />
-            <Route path="credits" element={<Navigate to="/account/billing" replace />} />
-            <Route path="intelligence" element={<Navigate to="results" replace />} />
-            <Route path="career-intel" element={<Navigate to="results" replace />} />
-            <Route path="chat-features" element={<Navigate to="nexus-chat" replace />} />
-            <Route path="career-services" element={<Navigate to="assessments" replace />} />
-            <Route path="engagement" element={<Navigate to="results" replace />} />
-            <Route path="growth" element={<Navigate to="profile" replace />} />
-          </Route>
-
-          {/* ── Candidate Portal ── */}
-          <Route path="/candidate" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<CandidateDashboardPage />} />
-            <Route path="applications" element={<CandidateApplicationsPage />} />
-            <Route path="opportunities" element={<CandidateOpportunitiesPage />} />
-            <Route path="interview-prep" element={<CandidateInterviewPrepPage />} />
-            <Route path="assessments" element={<CandidateAssessmentsPage />} />
-            <Route path="community" element={<CandidateCommunityPage />} />
-            {/* Placeholder-only sub-routes → redirect (Phase 15.3 C1) */}
-            <Route path="offers" element={<Navigate to="opportunities" replace />} />
-            <Route path="career-dev" element={<Navigate to="assessments" replace />} />
-            <Route path="nexus-coach" element={<Navigate to="/nexus/chat" replace />} />
-            <Route path="profile" element={<Navigate to="/profile" replace />} />
-            <Route path="advanced-assessments" element={<Navigate to="assessments" replace />} />
-            <Route path="settings-plus" element={<Navigate to="/dashboard" replace />} />
-          </Route>
-
-          {/* ── Authenticated user pages (standalone) ── */}
-          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
-          <Route path="/documents" element={<ProtectedRoute><UserDocumentsPage /></ProtectedRoute>} />
-          {/* Billing dashboard (S6-T05) */}
-          <Route path="/account/billing" element={<ProtectedRoute><BillingDashboard /></ProtectedRoute>} />
-          <Route path="/share/:id" element={<SharePage />} />
-
+          {/* Catchall 404 */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
