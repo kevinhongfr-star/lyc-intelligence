@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "type-check": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:api-helpers": "esbuild api/_lib_src/auth.ts api/_lib_src/supabase-rest.ts --format=esm --outdir=api/lib --platform=node"
   },
   "dependencies": {
     "@sentry/react": "^8.20.0",
