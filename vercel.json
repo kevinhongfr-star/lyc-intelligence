@@ -10,10 +10,6 @@
       "memory": 1024,
       "maxDuration": 10
     },
-    "api/og.tsx": {
-      "runtime": "edge",
-      "regions": ["iad1"]
-    },
     "api/auth/me.ts": {
       "memory": 1024,
       "maxDuration": 10
@@ -103,52 +99,201 @@
     }
   ],
   "redirects": [
-    { "source": "/home",       "destination": "/",                    "permanent": true },
-    { "source": "/products",   "destination": "/#assessment-catalog", "permanent": true },
-    { "source": "/enterprise", "destination": "/pricing",             "permanent": true },
-    { "source": "/pricing-old","destination": "/pricing",             "permanent": true },
-    { "source": "/for-business","destination": "/b2b",                "permanent": true },
-
-    { "source": "/about/about-us", "destination": "/about",           "permanent": true },
-    { "source": "/about-us",       "destination": "/about",           "permanent": true },
-
-    { "source": "/b2b#contact", "destination": "/contact",            "permanent": false }, 
-    { "source": "/contact-us",  "destination": "/contact",            "permanent": true },
-
-    { "source": "/app/pricing",           "destination": "/pricing",            "permanent": true },
-    { "source": "/app/billing",           "destination": "/member/billing",     "permanent": true },
-    { "source": "/app/nexus",             "destination": "/nexus/chat",         "permanent": true },
-    { "source": "/app/dashboard",         "destination": "/member/dashboard",   "permanent": true },
-    { "source": "/app/settings",          "destination": "/member/settings",    "permanent": true },
-    { "source": "/app/assessments",       "destination": "/assessment",         "permanent": true },
-    { "source": "/app/profile",           "destination": "/member/profile",     "permanent": true },
-    { "source": "/app/matches",           "destination": "/member/matches",     "permanent": true },
-    { "source": "/app/referrals",         "destination": "/referral",           "permanent": true },
-
-    { "source": "/portal/candidates",     "destination": "/candidate",          "permanent": true },
-    { "source": "/portal/mandates",       "destination": "/consultant/mandates","permanent": true },
-    { "source": "/portal/pipeline",       "destination": "/consultant/pipeline","permanent": true },
-    { "source": "/portal/settings",       "destination": "/consultant/settings","permanent": true },
-    { "source": "/portal/clients",        "destination": "/client/clients",     "permanent": true },
-    { "source": "/portal/admin",          "destination": "/admin",              "permanent": true },
-
-    { "source": "/assessments/china-pipeline-index", "destination": "/assessment/cpi",        "permanent": true },
-    { "source": "/assessments/cpi-diagnostic",       "destination": "/assessment/cpi",        "permanent": true },
-    { "source": "/assessments/shift-mobility",       "destination": "/assessment/shift",      "permanent": true },
-    { "source": "/assessments/career-shift",         "destination": "/assessment/shift",      "permanent": true },
-    { "source": "/assessments/cross-border",         "destination": "/assessment/cross-border","permanent": true },
-    { "source": "/assessments/executive-scope",      "destination": "/assessment/exec-scope", "permanent": true },
-    { "source": "/assessments/geo-fit",              "destination": "/assessment/geo-fit",    "permanent": true },
-    { "source": "/assessments/board-readiness",      "destination": "/assessment/board-readiness", "permanent": true },
-    { "source": "/assessments",                      "destination": "/assessment",           "permanent": true },
-
-    { "source": "/platform/nexus",       "destination": "/nexus/chat",   "permanent": true },
-    { "source": "/nexus",                "destination": "/nexus/chat",   "permanent": true },
-    { "source": "/chat",                 "destination": "/nexus/chat",   "permanent": true },
-
-    { "source": "/dashboard",            "destination": "/member/dashboard", "permanent": true },
-    { "source": "/settings",             "destination": "/member/settings",  "permanent": true },
-    { "source": "/login-old",            "destination": "/login",            "permanent": true }
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/products",
+      "destination": "/#assessment-catalog",
+      "permanent": true
+    },
+    {
+      "source": "/enterprise",
+      "destination": "/pricing",
+      "permanent": true
+    },
+    {
+      "source": "/pricing-old",
+      "destination": "/pricing",
+      "permanent": true
+    },
+    {
+      "source": "/for-business",
+      "destination": "/b2b",
+      "permanent": true
+    },
+    {
+      "source": "/about/about-us",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/about-us",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/b2b#contact",
+      "destination": "/contact",
+      "permanent": false
+    },
+    {
+      "source": "/contact-us",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/app/pricing",
+      "destination": "/pricing",
+      "permanent": true
+    },
+    {
+      "source": "/app/billing",
+      "destination": "/member/billing",
+      "permanent": true
+    },
+    {
+      "source": "/app/nexus",
+      "destination": "/nexus/chat",
+      "permanent": true
+    },
+    {
+      "source": "/app/dashboard",
+      "destination": "/member/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/app/settings",
+      "destination": "/member/settings",
+      "permanent": true
+    },
+    {
+      "source": "/app/assessments",
+      "destination": "/assessment",
+      "permanent": true
+    },
+    {
+      "source": "/app/profile",
+      "destination": "/member/profile",
+      "permanent": true
+    },
+    {
+      "source": "/app/matches",
+      "destination": "/member/matches",
+      "permanent": true
+    },
+    {
+      "source": "/app/referrals",
+      "destination": "/referral",
+      "permanent": true
+    },
+    {
+      "source": "/portal/candidates",
+      "destination": "/candidate",
+      "permanent": true
+    },
+    {
+      "source": "/portal/mandates",
+      "destination": "/consultant/mandates",
+      "permanent": true
+    },
+    {
+      "source": "/portal/pipeline",
+      "destination": "/consultant/pipeline",
+      "permanent": true
+    },
+    {
+      "source": "/portal/settings",
+      "destination": "/consultant/settings",
+      "permanent": true
+    },
+    {
+      "source": "/portal/clients",
+      "destination": "/client/clients",
+      "permanent": true
+    },
+    {
+      "source": "/portal/admin",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/china-pipeline-index",
+      "destination": "/assessment/cpi",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/cpi-diagnostic",
+      "destination": "/assessment/cpi",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/shift-mobility",
+      "destination": "/assessment/shift",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/career-shift",
+      "destination": "/assessment/shift",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/cross-border",
+      "destination": "/assessment/cross-border",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/executive-scope",
+      "destination": "/assessment/exec-scope",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/geo-fit",
+      "destination": "/assessment/geo-fit",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/board-readiness",
+      "destination": "/assessment/board-readiness",
+      "permanent": true
+    },
+    {
+      "source": "/assessments",
+      "destination": "/assessment",
+      "permanent": true
+    },
+    {
+      "source": "/platform/nexus",
+      "destination": "/nexus/chat",
+      "permanent": true
+    },
+    {
+      "source": "/nexus",
+      "destination": "/nexus/chat",
+      "permanent": true
+    },
+    {
+      "source": "/chat",
+      "destination": "/nexus/chat",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/member/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/settings",
+      "destination": "/member/settings",
+      "permanent": true
+    },
+    {
+      "source": "/login-old",
+      "destination": "/login",
+      "permanent": true
+    }
   ],
   "rewrites": [
     {
