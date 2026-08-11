@@ -2,22 +2,27 @@
  * /api/setup/assessment-table — One-time migration endpoint.
  *
  * Creates the assessment_results table if it doesn't exist.
- * Uses the same pg connection pattern as apply-rls.ts.
- *
- * DELETE THIS ENDPOINT AFTER USE — not for production long-term.
  * Auth: requires x-setup-key header matching SETUP_SECRET env var.
+ *
+ * DELETE AFTER USE.
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Pool } from 'pg';
 
-const SETUP_SECRET = process.env.SETUP_SECRET || 'lyc-p0fix-20260811-temp';
-const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SETUP_SECRET = process.env.SETUP_SECRET || '';
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 function buildConnectionString(): string {
+  // Extract project ref from Supabase URL
   const urlMatch = SUPABASE_URL.match(/https?:\/\/([a-z0-9]+)\.supabase\.co/);
   const projectRef = urlMatch ? urlMatch[1] : '';
+  
+  if (!projectRef) {
+    throw new Error(`Cannot extract Supabase project ref from URL: ${SUPABASE_URL}`);
+  }
+  
   const host = `db.${projectRef}.supabase.co`;
   return `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@${host}:5432/postgres`;
 }
@@ -48,86 +53,109 @@ CREATE INDEX IF NOT EXISTS idx_assessment_results_org ON public.assessment_resul
 -- Ensure RLS is enabled
 ALTER TABLE IF EXISTS public.assessment_results ENABLE ROW LEVEL SECURITY;
 
--- Self read policy
+-- Drop existing policies first
 DROP POLICY IF EXISTS assessment_results_self ON public.assessment_results;
-CREATE POLICY assessment_results_self ON public.assessment_results FOR SELECT USING (
-  (SELECT current_user_role()) IN ('admin', 'lyc_admin', 'super_admin')
-  OR (SELECT current_user_role()) IN ('consultant', 'lyc_consultant')
-  OR user_id = auth.uid()
-);
-
--- Self write policy  
 DROP POLICY IF EXISTS assessment_results_write ON public.assessment_results;
-CREATE POLICY assessment_results_write ON public.assessment_results FOR ALL USING (
-  (SELECT current_user_role()) IN ('admin', 'lyc_admin', 'super_admin')
-  OR user_id = auth.uid()
+DROP POLICY IF EXISTS assessment_results_anon_insert ON public.assessment_results;
+DROP POLICY IF EXISTS assessment_results_anon_select ON public.assessment_results;
+
+-- Self read policy (authenticated users see their own)
+CREATE POLICY assessment_results_self ON public.assessment_results FOR SELECT USING (
+  auth.uid() IS NOT NULL AND (
+    (current_setting('request.jwt.claims', true)::jsonb->>'role') IN ('admin', 'lyc_admin', 'super_admin')
+    OR (current_setting('request.jwt.claims', true)::jsonb->>'role') IN ('consultant', 'lyc_consultant')
+    OR user_id = auth.uid()
+  )
 );
 
--- Allow anon inserts for anonymous assessments (no user_id, uses anonymous_id)
-DROP POLICY IF EXISTS assessment_results_anon_insert ON public.assessment_results;
+-- Self write policy
+CREATE POLICY assessment_results_write ON public.assessment_results FOR ALL USING (
+  auth.uid() IS NOT NULL AND (
+    (current_setting('request.jwt.claims', true)::jsonb->>'role') IN ('admin', 'lyc_admin', 'super_admin')
+    OR user_id = auth.uid()
+  )
+) WITH CHECK (
+  auth.uid() IS NOT NULL AND (
+    (current_setting('request.jwt.claims', true)::jsonb->>'role') IN ('admin', 'lyc_admin', 'super_admin')
+    OR user_id = auth.uid()
+  )
+);
+
+-- Allow anon inserts for anonymous assessments
 CREATE POLICY assessment_results_anon_insert ON public.assessment_results FOR INSERT WITH CHECK (
   auth.uid() IS NULL AND anonymous_id IS NOT NULL
 );
 
 -- Allow anon select by anonymous_id
-DROP POLICY IF EXISTS assessment_results_anon_select ON public.assessment_results;
 CREATE POLICY assessment_results_anon_select ON public.assessment_results FOR SELECT USING (
   auth.uid() IS NULL AND anonymous_id IS NOT NULL
 );
 `;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  res.setHeader('Content-Type', 'application/json');
+
   const key = req.headers['x-setup-key'] || req.headers['X-Setup-Key'];
-  if (!key || key !== SETUP_SECRET) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  if (!key || !SETUP_SECRET || key !== SETUP_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized', has_secret: !!SETUP_SECRET });
   }
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (!SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_URL) {
-    return res.status(500).json({ error: 'Missing Supabase credentials' });
-  }
-
-  let pool: Pool | null = null;
   try {
-    pool = new Pool({
-      connectionString: buildConnectionString(),
+    const connString = buildConnectionString();
+    // Don't log the full string (contains password)
+    const maskedConn = connString.replace(/:.*@/, ':***@');
+    console.log('[setup] Connecting to:', maskedConn);
+
+    const pool = new Pool({
+      connectionString: connString,
       ssl: { rejectUnauthorized: false },
-      connectionTimeoutMillis: 10000,
+      connectionTimeoutMillis: 15000,
     });
 
-    const result = await pool.query(CREATE_TABLE_SQL);
-    const rowsAffected = Array.isArray(result) ? result.length : (result.rowCount || 0);
+    const client = await pool.connect();
+    console.log('[setup] Connected to DB');
 
-    // Verify table exists
-    const verify = await pool.query(
-      "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'assessment_results'"
-    );
-    const exists = verify.rows[0].count > 0;
+    try {
+      await client.query('BEGIN');
+      const result = await client.query(CREATE_TABLE_SQL);
+      await client.query('COMMIT');
 
-    // Check column count
-    const cols = await pool.query(
-      "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'assessment_results' ORDER BY ordinal_position"
-    );
+      // Verify
+      const verify = await client.query(
+        "SELECT count(*) as cnt FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'assessment_results'"
+      );
+      const exists = verify.rows[0].cnt > 0;
 
-    res.status(200).json({
-      status: 'success',
-      table_created: exists,
-      columns: cols.rows.map((r: any) => r.column_name),
-      column_count: cols.rows.length,
-      rows_affected: rowsAffected,
-      message: 'assessment_results table created successfully with RLS policies',
-    });
+      const cols = await client.query(
+        "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'assessment_results' ORDER BY ordinal_position"
+      );
+
+      res.status(200).json({
+        status: 'success',
+        table_created: exists,
+        column_count: cols.rows.length,
+        columns: cols.rows.map((r: any) => r.column_name),
+        message: 'assessment_results table created successfully with RLS policies',
+      });
+    } catch (queryErr: any) {
+      await client.query('ROLLBACK');
+      throw queryErr;
+    } finally {
+      client.release();
+      await pool.end();
+    }
   } catch (error: any) {
+    console.error('[setup] Error:', error.message);
     res.status(500).json({
       error: 'Failed to create table',
       message: error.message,
+      code: error.code,
+      supabase_url_present: !!SUPABASE_URL,
+      service_key_present: !!SUPABASE_SERVICE_ROLE_KEY,
     });
-  } finally {
-    if (pool) {
-      await pool.end();
-    }
   }
 }
