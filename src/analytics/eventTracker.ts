@@ -391,6 +391,27 @@ export function trackBillingView(source: 'nav' | 'link' | 'redirect' | string): 
   trackEvent('billing_view', { source });
 }
 
+// ── #1326: Lead / Enterprise conversion tracking ───────────────────────
+export function trackLeadCreated(ctx: {
+  tracking_id: string;
+  source: string;
+  company_size?: string;
+  timeline?: string;
+  current_tier?: string;
+  region?: string;
+}): void {
+  trackEvent('lead_created', ctx, { funnelStep: 'enterprise_lead' });
+}
+
+export function trackEnterpriseCTA(ctx: {
+  location: string;
+  action: 'view' | 'click' | 'submit' | 'dismiss';
+  company?: string;
+  target_tier?: string;
+}): void {
+  trackEvent('enterprise_cta', ctx);
+}
+
 // ── Route change hook (auto-tracks page view + landing_view funnel step on first load) ──
 
 let firstPageViewEmitted = false;

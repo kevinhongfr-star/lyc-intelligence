@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Check, Crown, Sparkles, ArrowRight, Loader2, Globe, Coins } from 'lucide-react';
+import { Check, Crown, Sparkles, ArrowRight, Loader2, Globe, Coins, Building2, MessageSquare, Phone, Users } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { authFetch } from '@/utils/authFetch';
 import { SEO } from '@/components/seo/SEO';
@@ -17,6 +17,8 @@ import {
 } from '@/services/monetizationService';
 import { trackUpgradeAttempt, trackCTA, trackBillingView } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
+import { EnterpriseSalesModal } from '@/components/portals/EnterpriseSalesModal';
+import type { LeadSource } from '@/services/leadEnrichmentService';
 
 interface PricingPageProps {
   onUpgradeSuccess?: () => void;
@@ -47,6 +49,10 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
   const [currency, setCurrency] = useState<PricingCurrency>(detected);
   const [loadingTier, setLoadingTier] = useState<TierKey | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // #1326: Enterprise / Council sales modal
+  const [enterpriseOpen, setEnterpriseOpen] = useState(false);
+  const [enterpriseSource, setEnterpriseSource] = useState<LeadSource>('pricing_enterprise');
 
   const handleUpgrade = async (tierKey: TierKey) => {
     if (tierKey === 'explorer') {
@@ -235,7 +241,15 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
 
                 {/* CTA */}
                 <button
-                  onClick={() => handleUpgrade(tierKey)}
+                  onClick={() => {
+                    // #1326: Executive + Council tiers route to Talk-to-Sales form
+                    if (tierKey === 'council' || tierKey === 'executive') {
+                      setEnterpriseSource(tierKey === 'council' ? 'pricing_council' : 'pricing_enterprise');
+                      setEnterpriseOpen(true);
+                    } else {
+                      handleUpgrade(tierKey);
+                    }
+                  }}
                   disabled={isLoading || isCurrent}
                   className={`w-full py-3 px-4 font-medium text-sm flex items-center justify-center gap-2 transition-all ${
                     isCurrent
@@ -256,6 +270,16 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                     <>
                       Get Started
                       <ArrowRight className="w-4 h-4" />
+                    </>
+                  ) : tierKey === 'council' ? (
+                    <>
+                      <Crown className="w-4 h-4" />
+                      Talk to partnerships
+                    </>
+                  ) : tierKey === 'executive' ? (
+                    <>
+                      <MessageSquare className="w-4 h-4" />
+                      Talk to sales
                     </>
                   ) : (
                     <>
@@ -327,6 +351,92 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* #1326: Enterprise + Teams conversion block */}
+      <div className="max-w-6xl mx-auto px-4 pb-16">
+        <div className="border-2 border-accent overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            {/* Enterprise column */}
+            <div className="p-8 bg-accent text-white">
+              <div className="font-mono text-[10.5px] uppercase tracking-[0.16em] font-bold mb-3 opacity-90">
+                Enterprise · Custom seat plans
+              </div>
+              <h3 className="font-serif text-2xl font-bold mb-3 leading-tight">
+                Rolling this out to 20+ people, a function, or the whole org?
+              </h3>
+              <p className="text-sm opacity-90 leading-relaxed mb-5 max-w-sm">
+                Volume seat pricing, procurement workflows, SSO + SCIM, white-labelled
+                reports, and partner consultants for debriefs. We will build the plan
+                around your outcomes.
+              </p>
+              <ul className="space-y-2 text-sm mb-6">
+                {[
+                  'Multi-tenant or dedicated deployment options',
+                  'SSO / SCIM / DPA / data residency',
+                  'White-labelled reports and custom instruments',
+                  'Consultant debrief packs and rollout playbooks',
+                  'Customer success lead + quarterly reviews',
+                ].map((b) => (
+                  <li key={b} className="flex items-start gap-2">
+                    <Check className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => { setEnterpriseSource('pricing_enterprise'); setEnterpriseOpen(true); }}
+                className="bg-white text-accent px-5 py-3 font-bold text-xs uppercase tracking-[0.12em] hover:bg-white/90 flex items-center gap-2"
+              >
+                <Building2 className="w-4 h-4" /> Talk to enterprise sales
+              </button>
+            </div>
+
+            {/* Council / Executive column */}
+            <div className="p-8 bg-white border-t md:border-t-0 md:border-l border-accent/30">
+              <div className="font-mono text-[10.5px] uppercase tracking-[0.16em] font-bold mb-3" style={{ color: '#7C3AED' }}>
+                Executive + Council · Invitation-only
+              </div>
+              <h3 className="font-serif text-2xl font-bold mb-3 leading-tight text-text-primary">
+                Senior leadership cohort, 1:1 debriefs, private workshops.
+              </h3>
+              <p className="text-sm text-text-muted leading-relaxed mb-5 max-w-sm">
+                Executive and Council seats are limited programs. Confirm
+                eligibility, fit, and pricing with a 20-minute partnerships call.
+              </p>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="p-4 bg-bg-tertiary/60 border border-border">
+                  <div className="flex items-center gap-1 text-xs font-mono uppercase tracking-wider text-text-muted mb-1">
+                    <Users className="w-3 h-3" /> Executive
+                  </div>
+                  <div className="text-sm font-semibold text-text-primary mb-0.5">1:1 Consultant Debriefs</div>
+                  <div className="text-xs text-text-muted">Monthly seat incl. live events</div>
+                </div>
+                <div className="p-4 bg-bg-tertiary/60 border border-border">
+                  <div className="flex items-center gap-1 text-xs font-mono uppercase tracking-wider text-text-muted mb-1">
+                    <Crown className="w-3 h-3" /> Council
+                  </div>
+                  <div className="text-sm font-semibold text-text-primary mb-0.5">Board-grade Cohort</div>
+                  <div className="text-xs text-text-muted">Private workshops + seat community</div>
+                </div>
+              </div>
+              <div className="flex gap-3 flex-wrap">
+                <button
+                  onClick={() => { setEnterpriseSource('pricing_council'); setEnterpriseOpen(true); }}
+                  className="px-5 py-3 font-bold text-xs uppercase tracking-[0.12em] bg-accent text-white hover:bg-accent-hover flex items-center gap-2"
+                >
+                  <Crown className="w-4 h-4" /> Apply for Council
+                </button>
+                <button
+                  onClick={() => { setEnterpriseSource('pricing_enterprise'); setEnterpriseOpen(true); }}
+                  className="px-5 py-3 font-bold text-xs uppercase tracking-[0.12em] border-2 border-text-primary text-text-primary hover:bg-bg-secondary flex items-center gap-2"
+                >
+                  <Phone className="w-4 h-4" /> Book 20-min intro
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -504,6 +614,20 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
           </button>
         </div>
       </div>
+
+      {/* Enterprise / Council sales modal */}
+      <EnterpriseSalesModal
+        open={enterpriseOpen}
+        onClose={() => setEnterpriseOpen(false)}
+        source={enterpriseSource}
+        prefill={{
+          first_name: (profile as any)?.first_name || undefined,
+          last_name: (profile as any)?.last_name || undefined,
+          work_email: user?.email || undefined,
+          company_name: (profile as any)?.company || (profile as any)?.organization || undefined,
+          job_title: (profile as any)?.job_title || (profile as any)?.title || undefined,
+        }}
+      />
     </div>
   );
 }

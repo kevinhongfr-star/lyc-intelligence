@@ -6,15 +6,20 @@
  * Visual: higher information density, professional services platform feel.
  * Zero radius, font trio, accent #C108AB.
  */
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, Users, GitBranch, Building2,
   BarChart3, Target, Grid3x3, Palette, FileText, Settings,
   Menu, X, LogOut, ChevronDown, Bell, CreditCard, Search,
+  Crown, UserPlus, ArrowRight,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { isClientRole, isInternalStaff } from '@/services/portalClassification';
+import {
+  CONSULTANT_TIER_META,
+  type ConsultantTierKey,
+} from '@/services/consultantInviteService';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -30,12 +35,31 @@ const DS = {
   hover: '#EFEFEF',
 };
 
-export function ConsultantNav(): React.ReactElement {
+export interface ConsultantNavProps {
+  /** Callback — opens the invite modal from the parent layout. */
+  onOpenInvite?: () => void;
+  /** Callback — opens upgrade modal or navigates to pricing. */
+  onUpgrade?: () => void;
+}
+
+export function ConsultantNav({ onOpenInvite, onUpgrade }: ConsultantNavProps): React.ReactElement {
   const navigate = useNavigate();
   const { profile, signOut } = useAuthStore();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const role = profile?.role;
+
+  // #1325: Normalize consultant tier from profile.tier (or role fallback).
+  // Never display the word "free" — entry tier label = "Starter Seat".
+  const tier: ConsultantTierKey = useMemo<ConsultantTierKey>(() => {
+    const rawTier = (profile as any)?.consultant_tier || (profile as any)?.tier || '';
+    const t = String(rawTier).toLowerCase();
+    if (t.includes('council')) return 'council_seat';
+    if (t.includes('executive')) return 'executive_seat';
+    if (t.includes('pro')) return 'pro_seat';
+    return 'starter_seat';
+  }, [profile]);
+  const tierMeta = CONSULTANT_TIER_META[tier];
 
   const clientItems = [
     { path: '/client/overview', label: 'Overview', icon: LayoutDashboard, section: 'Client' },
@@ -60,6 +84,8 @@ export function ConsultantNav(): React.ReactElement {
     { path: '/portal/scoring-runs', label: 'Scoring Runs', icon: FileText, section: 'Tools' },
     { path: '/portal/reports', label: 'Reports', icon: FileText, section: 'Deliverables' },
     { path: '/portal/scheduler', label: 'Scheduler', icon: Bell, section: 'Deliverables' },
+    { path: '/portal/team', label: 'Team & Invites', icon: Users, section: 'Account' },
+    { path: '/portal/billing', label: 'Plan & Billing', icon: CreditCard, section: 'Account' },
     { path: '/portal/notifications', label: 'Notifications', icon: Bell, section: 'Account' },
     { path: '/portal/settings', label: 'Settings', icon: Settings, section: 'Account' },
   ];
@@ -167,6 +193,78 @@ export function ConsultantNav(): React.ReactElement {
           <span style={{ marginLeft: 'auto', fontSize: 10, padding: '1px 5px', border: `1px solid ${DS.border}`, color: DS.muted }}>⌘K</span>
         </div>
       </div>
+
+      {/* #1325: Premium tier card + Invite button (internal consultants only) */}
+      {!isClientOnly && (
+        <div style={{ padding: 12, borderBottom: `1px solid ${DS.border}`, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {/* Tier badge card */}
+          <div style={{
+            padding: '10px 12px',
+            background: `${tierMeta.accent}0C`,
+            border: `1px solid ${tierMeta.accent}30`,
+            borderLeft: `3px solid ${tierMeta.accent}`,
+          }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              justifyContent: 'space-between',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <Crown style={{ width: 12, height: 12, color: tierMeta.accent }} />
+                <span style={{
+                  fontFamily: DS.monoFont, fontSize: 10, fontWeight: 700,
+                  letterSpacing: '0.14em', textTransform: 'uppercase',
+                  color: tierMeta.accent,
+                }}>
+                  {tierMeta.label}
+                </span>
+              </div>
+              {tier !== 'council_seat' && onUpgrade && (
+                <button
+                  type="button"
+                  onClick={onUpgrade}
+                  aria-label="Upgrade consultant tier"
+                  style={{
+                    background: 'transparent', border: 'none', cursor: 'pointer',
+                    padding: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
+                    fontFamily: DS.monoFont, fontSize: 9.5,
+                    letterSpacing: '0.1em', textTransform: 'uppercase',
+                    color: tierMeta.accent, fontWeight: 600,
+                  }}
+                >
+                  Upgrade <ArrowRight style={{ width: 10, height: 10 }} />
+                </button>
+              )}
+            </div>
+            <div style={{
+              marginTop: 6, fontSize: 11, color: DS.muted, lineHeight: 1.45,
+              fontFamily: DS.bodyFont,
+            }}>
+              {tierMeta.clientSeatLimit < 999
+                ? `${tierMeta.clientSeatLimit} client seat${tierMeta.clientSeatLimit === 1 ? '' : 's'} · ${tierMeta.inviteQuota} invites/mo`
+                : 'Unlimited seats · Unlimited invites'}
+            </div>
+          </div>
+
+          {/* Invite CTA button */}
+          {onOpenInvite && (
+            <button
+              type="button"
+              onClick={onOpenInvite}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                padding: '9px 12px',
+                background: DS.accent, color: '#FFF', border: 'none',
+                cursor: 'pointer',
+                fontFamily: DS.bodyFont, fontSize: 12, fontWeight: 700,
+                letterSpacing: '0.08em', textTransform: 'uppercase',
+                borderRadius: DS.radius,
+              }}
+            >
+              <UserPlus style={{ width: 13, height: 13 }} /> Invite Client
+            </button>
+          )}
+        </div>
+      )}
 
       <div style={{ flex: 1, padding: '12px 6px', overflowY: 'auto' }}>
         {renderNav()}

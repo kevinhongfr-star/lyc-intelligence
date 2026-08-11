@@ -6,13 +6,19 @@
  * role (client subset for pure client users, full nav for internal staff).
  * Visual: higher information density, professional services platform feel.
  * Zero radius, font trio, accent #C108AB.
+ *
+ * #1325 upgrades:
+ *   - Premium tier badge + seat/invite quotas (visible in ConsultantNav sidebar)
+ *   - InviteClientModal mounted at layout root so "Invite Client" is one click
+ *   - Upgrade → redirects to /pricing (consultant tier comparison table)
  */
-import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { Loader2, Lock } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { isConsultantRole, isClientRole, isInternalStaff } from '@/services/portalClassification';
 import ConsultantNav from '@/components/navigation/ConsultantNav';
+import { InviteClientModal } from '@/components/portals/InviteClientModal';
 
 const DS = {
   bodyFont: "'DM Sans', system-ui, sans-serif",
@@ -62,7 +68,9 @@ function AccessDenied() {
  * automatically based on the profile.role (client-only subset vs full).
  */
 export function ConsultantPortalLayout(): React.ReactElement {
+  const navigate = useNavigate();
   const { user, profile, isLoading } = useAuthStore();
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   if (isLoading) return <Loading />;
   if (!user) return <Navigate to="/login" replace />;
@@ -72,12 +80,17 @@ export function ConsultantPortalLayout(): React.ReactElement {
     return <AccessDenied />;
   }
 
+  const tier = (profile as any)?.consultant_tier || (profile as any)?.tier;
+
   return (
     <div style={{
       display: 'flex', minHeight: '100vh',
       background: DS.pageBg, fontFamily: DS.bodyFont,
     }} data-portal-kind="consultant">
-      <ConsultantNav />
+      <ConsultantNav
+        onOpenInvite={() => setInviteOpen(true)}
+        onUpgrade={() => navigate('/pricing', { state: { from: 'consultant-portal' } })}
+      />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <main
           id="consultant-main"
@@ -93,6 +106,13 @@ export function ConsultantPortalLayout(): React.ReactElement {
           </div>
         </main>
       </div>
+
+      <InviteClientModal
+        open={inviteOpen}
+        onClose={() => setInviteOpen(false)}
+        issuedBy={user.id}
+        issuerTier={tier}
+      />
     </div>
   );
 }
@@ -104,7 +124,9 @@ export function ConsultantPortalLayout(): React.ReactElement {
  * to /portal/ instead of client portal.
  */
 export function ClientPortalLayout(): React.ReactElement {
+  const navigate = useNavigate();
   const { user, profile, isLoading } = useAuthStore();
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   if (isLoading) return <Loading />;
   if (!user) return <Navigate to="/login" replace />;
@@ -117,12 +139,17 @@ export function ClientPortalLayout(): React.ReactElement {
     return <AccessDenied />;
   }
 
+  const tier = (profile as any)?.consultant_tier || (profile as any)?.tier;
+
   return (
     <div style={{
       display: 'flex', minHeight: '100vh',
       background: DS.pageBg, fontFamily: DS.bodyFont,
     }} data-portal-kind="client">
-      <ConsultantNav />
+      <ConsultantNav
+        onOpenInvite={() => setInviteOpen(true)}
+        onUpgrade={() => navigate('/pricing', { state: { from: 'client-portal' } })}
+      />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <main
           id="client-main"
@@ -138,6 +165,14 @@ export function ClientPortalLayout(): React.ReactElement {
           </div>
         </main>
       </div>
+
+      <InviteClientModal
+        open={inviteOpen}
+        onClose={() => setInviteOpen(false)}
+        issuedBy={user.id}
+        issuerTier={tier}
+        defaultRole="client_viewer"
+      />
     </div>
   );
 }

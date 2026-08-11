@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Calendar, History, Plus, ArrowRight, Loader2, Crown, Zap, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { CreditCard, Calendar, History, Plus, ArrowRight, Loader2, Crown, Zap, TrendingUp, TrendingDown, AlertCircle, Building2, MessageSquare, Phone } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditService';
 import { authFetch } from '@/utils/authFetch';
@@ -11,6 +11,9 @@ import {
 } from '@/services/monetizationService';
 import { trackBillingView, trackUpgradeAttempt, trackCTA, trackPurchaseSuccess } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
+import { EnterpriseSalesModal } from '@/components/portals/EnterpriseSalesModal';
+import { describeCapacityGate } from '@/services/leadEnrichmentService';
+import type { LeadSource } from '@/services/leadEnrichmentService';
 
 interface MilesTransaction {
   id: string;
@@ -52,9 +55,23 @@ export function BillingDashboard() {
   const [loadingPack, setLoadingPack] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'credits' | 'debits'>('all');
 
+  // #1326: Enterprise / Talk-to-sales modal
+  const [enterpriseOpen, setEnterpriseOpen] = useState(false);
+  const [enterpriseSource, setEnterpriseSource] = useState<LeadSource>('billing_upgrade_gate');
+
   // Canonical tier derived from the profile (fallback: explorer).
   const canonicalTier: TierKey = mapToCanonicalTier(profile?.tier);
   const tierPricing = CANONICAL_TIER_PRICING[canonicalTier];
+
+  // #1326: In-context capacity gates (miles balance vs monthly allowance)
+  const monthlyMilesLimit = tierPricing?.monthlyMiles || 0;
+  const capacityGate = describeCapacityGate({
+    currentTier: canonicalTier,
+    used: Math.max(0, monthlyMilesLimit - milesBalance),
+    limit: Math.max(1, monthlyMilesLimit),
+    resource: 'miles_monthly',
+    source: 'billing_upgrade_gate',
+  });
 
   // Top-up packs — flat miles purchases (prices in USD).
   const milesPacks: MilesPack[] = [
@@ -202,6 +219,77 @@ export function BillingDashboard() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* #1326: In-context capacity + enterprise CTA banner */}
+        {(capacityGate.canUpgrade || subscriptionStatus === 'none' || canonicalTier === 'explorer') && (
+          <div
+            className={`mb-8 border-2 p-5 flex items-start gap-4 justify-between flex-wrap ${
+              capacityGate.enterpriseSuitable
+                ? 'bg-gradient-to-r from-accent to-purple-700 border-accent text-white'
+                : capacityGate.canUpgrade
+                  ? 'bg-white border-accent/50'
+                  : 'bg-white border-border'
+            }`}
+          >
+            <div className="flex-1 min-w-[260px]">
+              <div className={`text-[10.5px] font-mono uppercase tracking-[0.14em] font-bold mb-2 ${
+                capacityGate.enterpriseSuitable ? 'opacity-90' : 'text-accent'
+              }`}>
+                {capacityGate.enterpriseSuitable ? 'Enterprise fit · Custom plan' : canonicalTier === 'explorer' ? 'Start here' : 'Upgrade nudge'}
+              </div>
+              <h3 className={`font-serif text-xl font-bold mb-2 ${
+                capacityGate.enterpriseSuitable ? 'text-white' : 'text-text-primary'
+              }`}>
+                {capacityGate.enterpriseSuitable
+                  ? capacityGate.headline
+                  : canonicalTier === 'explorer'
+                    ? 'Ready to run your first full assessment?'
+                    : capacityGate.headline}
+              </h3>
+              <p className={`text-sm leading-relaxed mb-0 max-w-lg ${
+                capacityGate.enterpriseSuitable ? 'opacity-90' : 'text-text-muted'
+              }`}>
+                {capacityGate.enterpriseSuitable
+                  ? capacityGate.description
+                  : canonicalTier === 'explorer'
+                    ? `Upgrade to Starter or Pro to unlock your monthly miles allowance and start the 11-instrument assessment catalog.`
+                    : capacityGate.description}
+              </p>
+            </div>
+            <div className="flex gap-3 flex-wrap">
+              {capacityGate.enterpriseSuitable ? (
+                <>
+                  <button
+                    onClick={() => { setEnterpriseSource('capacity_miles'); setEnterpriseOpen(true); }}
+                    className="px-5 py-3 font-bold text-xs uppercase tracking-[0.12em] bg-white text-accent hover:bg-white/90 flex items-center gap-2"
+                  >
+                    <Building2 className="w-4 h-4" /> Talk to enterprise sales
+                  </button>
+                  <button
+                    onClick={() => { setEnterpriseSource('billing_upgrade_gate'); setEnterpriseOpen(true); }}
+                    className="px-5 py-3 font-bold text-xs uppercase tracking-[0.12em] border-2 border-white text-white hover:bg-white/10 flex items-center gap-2"
+                  >
+                    <Phone className="w-4 h-4" /> Book intro
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => document.getElementById('upgrade-strip')?.scrollIntoView({ behavior: 'smooth' })}
+                    className={`px-5 py-3 font-bold text-xs uppercase tracking-[0.12em] bg-accent text-white hover:bg-accent-hover flex items-center gap-2`}
+                  >
+                    <Zap className="w-4 h-4" /> Upgrade plan
+                  </button>
+                  <button
+                    onClick={() => { setEnterpriseSource('billing_upgrade_gate'); setEnterpriseOpen(true); }}
+                    className="px-5 py-3 font-bold text-xs uppercase tracking-[0.12em] border-2 border-text-primary/70 text-text-primary hover:bg-bg-tertiary flex items-center gap-2"
+                  >
+                    <MessageSquare className="w-4 h-4" /> Talk to sales
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
         {/* Miles Balance Card */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <div className="bg-gradient-to-br from-accent to-purple-600 p-6 text-white">
@@ -287,7 +375,7 @@ export function BillingDashboard() {
         </div>
 
         {/* Current Tier Overview */}
-        <div className="bg-white p-6 border border-border mb-8">
+        <div id="upgrade-strip" className="bg-white p-6 border border-border mb-8">
           <h2 className="text-lg font-semibold text-text-primary mb-4">Current Tier</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             {CANONICAL_TIER_ORDER.map((tk) => {
@@ -428,6 +516,20 @@ export function BillingDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Enterprise / Council sales modal */}
+      <EnterpriseSalesModal
+        open={enterpriseOpen}
+        onClose={() => setEnterpriseOpen(false)}
+        source={enterpriseSource}
+        prefill={{
+          first_name: (profile as any)?.first_name || undefined,
+          last_name: (profile as any)?.last_name || undefined,
+          work_email: user?.email || undefined,
+          company_name: (profile as any)?.company || (profile as any)?.organization || undefined,
+          job_title: (profile as any)?.job_title || (profile as any)?.title || undefined,
+        }}
+      />
     </div>
   );
 }

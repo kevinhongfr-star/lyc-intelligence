@@ -131,6 +131,7 @@ const BatchScoringPage = lazy(() => import('@/pages/BatchScoringPage').then(m =>
 const MetrixPage = lazy(() => import('@/pages/MetrixPage').then(m => ({ default: m.MetrixPage })));
 const ScoringRunsPage = lazy(() => import('@/pages/ScoringRunsPage').then(m => ({ default: m.ScoringRunsPage })));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const TeamInvitesPage = lazy(() => import('@/pages/internal/TeamInvitesPage').then(m => ({ default: m.TeamInvitesPage })));
 const ProposalBuilderPage = lazy(() => import('@/pages/ProposalBuilderPage').then(m => ({ default: m.ProposalBuilderPage })));
 const LensExportPage = lazy(() => import('@/pages/LensExportPage').then(m => ({ default: m.LensExportPage })));
 
@@ -347,7 +348,10 @@ export default function App() {
             <Route path="notifications" element={<NotificationsPage />} />
 
             {/* Account-level surface for consultants */}
+            {/* #1325: Team & Invites — invite management, tier quota visibility */}
+            <Route path="team" element={<TeamInvitesPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="billing" element={<BillingDashboard />} />
             <Route path="profile" element={<ProfilePage />} />
 
             {/* SHIFT assessment deep-link (consultant can launch from portal) */}
