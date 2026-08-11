@@ -21,7 +21,7 @@ async function tryConnect(connStr: string, label: string): Promise<{ label: stri
     await pool.query('SELECT 1');
     return { label, ok: true };
   } catch (e: any) {
-    return { label, ok: false, error: e.message.substring(0, 120) };
+    return { label, ok: false, error: e.message.substring(0, 150) };
   } finally {
     if (pool) await pool.end().catch(() => {});
   }
@@ -35,16 +35,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const ref = extractProjectRef();
   
-  // Supabase has several connection string patterns
+  // More pooler user patterns
+  const poolerHost = 'aws-0-us-east-1.pooler.supabase.com';
   const connStrs: { label: string; str: string }[] = [
-    // Pattern 1: old direct DB
-    { label: 'db.ref.supabase.co', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.${ref}.supabase.co:5432/postgres` },
-    // Pattern 2: pooler with project ref in user
-    { label: 'aws-0-us-east-1.pooler (user=ref.postgres)', str: `postgresql://${ref}.postgres:${SUPABASE_SERVICE_ROLE_KEY}@aws-0-us-east-1.pooler.supabase.com:5432/postgres` },
-    // Pattern 3: pooler with options parameter  
-    { label: 'aws-0-us-east-1.pooler (options=ref)', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@aws-0-us-east-1.pooler.supabase.com:5432/postgres?options=project%3D${ref}` },
-    // Pattern 4: regional direct (try common regions)
-    { label: 'ref.supabase.co port 6543', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@${ref}.supabase.co:6543/postgres` },
+    // Various user formats for Supabase pooler
+    { label: 'user=postgres', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:6543/postgres` },
+    { label: 'user=ref.postgres', str: `postgresql://${ref}.postgres:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:6543/postgres` },
+    { label: 'user=ref.postgres 5432', str: `postgresql://${ref}.postgres:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:5432/postgres` },
+    { label: 'user=pgsql', str: `postgresql://pgsql:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:6543/postgres` },
+    // With project options
+    { label: 'options=ref user=postgres', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:6543/postgres?options=project%3D${ref}` },
+    { label: 'options=ref user=ref.postgres', str: `postgresql://${ref}.postgres:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:6543/postgres?options=project%3D${ref}` },
+    // Direct DB regional attempts
+    { label: 'db.ref.supabase.co 6543', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.${ref}.supabase.co:6543/postgres` },
   ];
 
   const results: Record<string, string> = {};
