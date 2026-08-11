@@ -68,7 +68,9 @@ export function CreditGate({ action, children, onSuccess, disabled = false, unit
 
   const credits = profile?.credits?.balance ?? 0;
   const cost = CREDIT_COSTS[action];
-  const tier = profile?.tier || 'free';
+  // #1320: Default to executive_introduction; accept legacy 'free'/'member' aliases.
+  const tier = profile?.tier || 'executive_introduction';
+  const isComplimentary = tier === 'executive_introduction' || tier === 'free' || tier === 'member';
 
   const unitNoun = effectiveUnit === 'miles' ? 'Miles' : 'Credits';
   const unitNounLower = effectiveUnit === 'miles' ? 'miles' : 'credits';
@@ -84,7 +86,9 @@ export function CreditGate({ action, children, onSuccess, disabled = false, unit
       return;
     }
 
-    if (tier !== 'free') {
+    // Paid-tier users have a monthly allowance (or effectively unlimited)
+    // so the "not enough credits" paywall is only applied to complimentary-tier users.
+    if (!isComplimentary) {
       setHasCredits(true);
       return;
     }

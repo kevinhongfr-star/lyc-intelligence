@@ -13,8 +13,8 @@ import { Button, Card, CardContent, Badge } from '@/components/ui';
 import { useCredits } from '@/contexts/CreditContext';
 import { authFetch } from '@/utils/authFetch';
 
-interface CreditPackPlan {
-  packKey: 'starter' | 'professional' | 'enterprise';
+interface MilesPackPlan {
+  packKey: 'starter' | 'professional' | 'enterprise' | 'council';
   name: string;
   price: string;
   credits: string;
@@ -22,19 +22,21 @@ interface CreditPackPlan {
   featured?: boolean;
 }
 
-// Catalog mirrors the server-side getCreditPackCatalog() in stripeHandler.ts.
-const CREDIT_PACKS: CreditPackPlan[] = [
+// #1318: Aligned with BillingDashboard milesPacks (canonical USD rates) —
+//        previously 10× underpriced ($9.99/$39.99/$99.99). Also added missing
+//        Council Pack that BillingDashboard already exposes ($3,999 / 5,000 mi).
+const CREDIT_PACKS: MilesPackPlan[] = [
   {
     packKey: 'starter',
     name: 'Starter Pack',
-    price: '$9.99',
+    price: '$99',
     credits: '100 mi',
     features: ['1 mile per DEX message', 'No expiry', 'Use anytime'],
   },
   {
     packKey: 'professional',
     name: 'Professional Pack',
-    price: '$39.99',
+    price: '$449',
     credits: '500 mi',
     features: ['1 mile per DEX message', 'Best value per mile', 'No expiry'],
     featured: true,
@@ -42,9 +44,16 @@ const CREDIT_PACKS: CreditPackPlan[] = [
   {
     packKey: 'enterprise',
     name: 'Enterprise Pack',
-    price: '$99.99',
+    price: '$1,299',
     credits: '1,500 mi',
     features: ['1 mile per DEX message', 'Lowest cost per mile', 'Team-friendly'],
+  },
+  {
+    packKey: 'council',
+    name: 'Council Pack',
+    price: '$3,999',
+    credits: '5,000 mi',
+    features: ['1 mile per DEX message', 'Best for teams', 'No expiry'],
   },
 ];
 
@@ -116,9 +125,9 @@ export function CreditStorePage() {
     }
   };
 
-  // `tier` from useCredits() is typed as CreditTier ('free'|'basic'|'pro'|'enterprise'),
-  // but the Stripe webhook may set the profile tier to 'council' at runtime, so cast
-  // for the membership check.
+  // `tier` from useCredits() accepts legacy values (free/member/council) plus
+  // canonical executive_introduction/basic/pro/enterprise. Council runtime tier
+  // maps to enterprise credit tier — both are treated as "Council member".
   const isCouncil = (tier as string) === 'council' || tier === 'enterprise';
 
   return (
@@ -181,10 +190,10 @@ export function CreditStorePage() {
           </div>
         )}
 
-        {/* Credit packs */}
+        {/* Miles packs — 4 packs, so switch to md:grid-cols-2 lg:grid-cols-4 for clean layout */}
         <div className="mb-10">
           <h2 className="text-lg font-semibold text-[#1A1A2E] mb-4">Buy Miles Packs</h2>
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {CREDIT_PACKS.map(p => (
               <Card
                 key={p.packKey}
@@ -224,7 +233,7 @@ export function CreditStorePage() {
           </div>
         </div>
 
-        {/* Council subscription */}
+        {/* Council subscription — #1318: Canonical $499/mo Council price + 600 mi allowance */}
         <Card className={`p-6 mb-8 ${isCouncil ? 'border-green-300' : 'border-fuchsia ring-1 ring-fuchsia'}`}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex-1 min-w-[240px]">
@@ -232,13 +241,13 @@ export function CreditStorePage() {
                 <Sparkles className="w-3 h-3" /> Membership
               </div>
               <h3 className="font-semibold text-[#1A1A2E] mb-1">Council Membership</h3>
-              <div className="text-fuchsia font-bold text-2xl mb-1">$29<span className="text-sm font-normal text-gray-500">/month</span></div>
+              <div className="text-fuchsia font-bold text-2xl mb-1">$499<span className="text-sm font-normal text-gray-500">/month</span></div>
               <ul className="space-y-2 mt-3">
                 <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /> 5 miles per day
+                  <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /> 600 mi monthly allowance
                 </li>
                 <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /> All SHIFT assessments
+                  <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /> All 11 assessments unlocked + PDF export
                 </li>
                 <li className="flex items-start gap-2 text-sm text-gray-600">
                   <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /> Priority support & exclusive content

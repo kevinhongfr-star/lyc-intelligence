@@ -12,15 +12,10 @@ import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { isConsultantRole } from '@/services/portalClassification';
 import LeaderNav from '@/components/navigation/LeaderNav';
-
-const DS = {
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  bg: '#FFFFFF',
-  pageBg: '#FAFAFA',
-  border: '#E5E5E5',
-  text: '#000000',
-  muted: '#666666',
-};
+// #1321: Adopt shared design-system barrel. pageBg = portal-specific background
+//        token (the subtle surface behind leader-portlet cards).
+import { LYC_SHARED_DS } from '@/styles/ds';
+const DS = { ...LYC_SHARED_DS, pageBg: '#FAFAFA' };
 
 function Loading() {
   return (

@@ -110,7 +110,7 @@ export async function getCreditBalance(userId: string): Promise<CreditInfo | nul
       dailyBalance: data.daily_balance,
       totalEarned: data.total_earned,
       totalSpent: data.total_spent,
-      tier: data.tier || 'free',
+      tier: data.tier || 'executive_introduction',
       tierCreditsPerMonth: data.tier_credits_per_month || 0,
       billingPeriodStart: data.billing_period_start
     };
@@ -193,7 +193,9 @@ export async function getTransactionHistory(
 }
 
 export function getLowCreditWarning(balance: number, tier: string): boolean {
-  if (tier !== 'free') return false;
+  // #1320: Complimentary tier aliases = 'executive_introduction' | 'free' | 'member'.
+  //         Only the complimentary (Explorer) tier has a low-balance warning.
+  if (tier !== 'executive_introduction' && tier !== 'free' && tier !== 'member') return false;
   return balance <= 5;
 }
 
@@ -274,12 +276,12 @@ export interface MilesTransaction {
 export async function milesBalance(userId?: string): Promise<MilesInfo> {
   const effectiveUserId = userId || useAuthStore.getState().user?.id;
   if (!effectiveUserId) {
-    return { miles: 0, tier: 'free' };
+    return { miles: 0, tier: 'executive_introduction' };
   }
   const info = await getCreditBalance(effectiveUserId);
   return {
     miles: info?.balance ?? 0,
-    tier: info?.tier ?? 'free'
+    tier: info?.tier ?? 'executive_introduction'
   };
 }
 

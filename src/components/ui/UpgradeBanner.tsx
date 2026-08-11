@@ -30,7 +30,9 @@ const DS = {
 export function UpgradeBanner({ type = 'empty', message, onDismiss }: UpgradeBannerProps) {
   const { credit, tier } = useCredits();
 
-  if (tier !== 'free') return null;
+  // #1320: Banner only renders for the complimentary Explorer tier and its legacy aliases.
+  const isExplorerTier = tier === 'executive_introduction' || tier === 'free' || tier === 'member';
+  if (!isExplorerTier) return null;
 
   const getDefaultMessage = () => {
     if (type === 'empty') {

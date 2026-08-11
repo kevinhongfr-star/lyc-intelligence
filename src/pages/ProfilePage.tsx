@@ -273,7 +273,7 @@ export function ProfilePage() {
         <div style={{ textAlign: 'center', padding: '40px', background: DS.card }}>
           <History style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
           <p style={{ fontSize: '15px', color: DS.muted, margin: '0 0 16px' }}>No assessments yet</p>
-          <a href="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: DS.accent, fontSize: '14px', textDecoration: 'none', fontWeight: 500 }}>
+          <a href="/app/assessments" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: DS.accent, fontSize: '14px', textDecoration: 'none', fontWeight: 500 }}>
             Take your first assessment
           </a>
         </div>

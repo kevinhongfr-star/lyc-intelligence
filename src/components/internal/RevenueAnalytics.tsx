@@ -220,7 +220,7 @@ export default function RevenueAnalytics() {
 
       <div className="flex items-center gap-2 text-xs text-text-muted bg-bg-warm p-3">
         <TrendingDown className="w-3.5 h-3.5" />
-        Pack revenue is estimated from miles-pack transaction logs at catalog prices. Subscription MRR reflects current active Council members at $29/mo.
+        Pack revenue is estimated from miles-pack transaction logs at catalog prices. Subscription MRR reflects current active Council members at $499/mo (canonical Council price).
       </div>
     </div>
   );

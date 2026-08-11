@@ -4,7 +4,12 @@ import * as Sentry from '@sentry/react';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
-import './styles/tokens.css';
+// #1321: Previously also imported './styles/tokens.css' which was a
+//        competing DEX AI Mockup v14 token set. The LYC canonical
+//        tokens live in ./index.css (LYC Design Tokens block +
+//        Phase 5 ECHO v6.0 block). Removing this duplicate import
+//        eliminates CSS-var drift (e.g. --bg vs --color-bg,
+//        --border vs --color-border, mismatched --text-* vars).
 import { initAnalytics } from './lib/analytics';
 import { installGlobalErrorHandlers } from './analytics/errorMonitor';
 

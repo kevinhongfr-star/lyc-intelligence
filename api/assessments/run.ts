@@ -38,22 +38,27 @@ import {
 } from '../_lib/auth';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Canonical costs — source of truth for server-side miles debits.
-// Matches assessments/catalog.ts milesCost values; clients MUST NOT override.
+// #1318: Canonical costs — SINGLE SOURCE OF TRUTH derived from
+//        monetizationService.CANONICAL_ASSESSMENT_PRICING.
+//   Standard (99 mi): LEAP / DRIVE / PRISM / MOSAIC / FORGE
+//   Premium  (149 mi): QUEST / COACH / IMPACT / BRIDGE / SPARK
+//   Unique   (199 mi): CPI
+// Previously all values were ~45-80 mi (old Phase 14 pricing) and did not
+// match the catalog or Stripe checkout charges.
 // ═══════════════════════════════════════════════════════════════════════════
 const ASSESSMENT_COSTS: Record<string, number> = {
-  CPI:     80,
-  SHIFT:   60,
-  PRISM:   50,
-  SPARK:   50,
-  LEAP:    45,
-  QUEST:   45,
-  IMPACT:  45,
-  FORGE:   45,
-  DRIVE:   45,
-  COACH:   45,
-  BRIDGE:  45,
-  MOSAIC:  45,
+  CPI:     199,  // Unique tier
+  SHIFT:   149,  // SHIFT flagship = Premium tier
+  PRISM:    99,  // Standard
+  SPARK:   149,  // Premium
+  LEAP:     99,  // Standard
+  QUEST:   149,  // Premium
+  IMPACT:  149,  // Premium
+  FORGE:    99,  // Standard
+  DRIVE:    99,  // Standard
+  COACH:   149,  // Premium
+  BRIDGE:   99,  // Standard
+  MOSAIC:   99,  // Standard
 };
 
 const IDEMPOTENCY_TTL_SECONDS = 86_400; // 24h

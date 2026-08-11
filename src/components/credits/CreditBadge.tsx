@@ -26,9 +26,11 @@ interface CreditBadgeProps {
 export function CreditBadge({ showBalance = true, size = 'md', unit = 'miles' }: CreditBadgeProps) {
   const { profile } = useAuthStore();
   const balance = profile?.credits?.balance ?? 0;
-  const tier = profile?.tier || 'free';
+  // #1320: Default to executive_introduction (canonical) and accept legacy 'free'/'member' aliases.
+  const tier = profile?.tier || 'executive_introduction';
+  const isComplimentary = tier === 'executive_introduction' || tier === 'free' || tier === 'member';
 
-  const isLow = balance <= 5 && tier === 'free';
+  const isLow = balance <= 5 && isComplimentary;
   const colors = isLow
     ? { bg: `${DS.warning}20`, border: `${DS.warning}40`, text: DS.warning }
     : { bg: `${DS.accent}20`, border: `${DS.accent}40`, text: DS.accent };
@@ -64,7 +66,7 @@ export function CreditBadge({ showBalance = true, size = 'md', unit = 'miles' }:
           {balance} {size !== 'sm' ? unitLabel : ''}
         </span>
       )}
-      {tier !== 'free' && (
+      {!isComplimentary && (
         <span style={{
           fontSize: '11px',
           fontWeight: 600,

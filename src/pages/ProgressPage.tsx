@@ -183,7 +183,7 @@ export function ProgressPage() {
           
           {canRetake && (
             <button
-              onClick={() => navigate('/assessment')}
+              onClick={() => navigate('/app/assessments')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -213,7 +213,7 @@ export function ProgressPage() {
               Take your first assessment to start tracking your progress
             </p>
             <button
-              onClick={() => navigate('/assessment')}
+              onClick={() => navigate('/app/assessments')}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',

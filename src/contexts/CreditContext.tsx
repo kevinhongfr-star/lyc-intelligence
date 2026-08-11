@@ -2,7 +2,19 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { getSupabase } from '@/services/supabaseApi';
 import { useAuthStore } from '@/stores/authStore';
 
-export type CreditTier = 'free' | 'basic' | 'pro' | 'enterprise';
+// #1318 + #1320: Canonical CreditTier.
+// The DB column may still contain legacy values ('free', 'member', 'council') from
+// older migrations, so the type accepts all of them. But all NEW inserts use
+// 'executive_introduction' and we normalise legacy values on read.
+export type CreditTier =
+  | 'executive_introduction'
+  | 'basic'
+  | 'pro'
+  | 'enterprise'
+  // legacy aliases — still readable from the DB:
+  | 'free'
+  | 'member'
+  | 'council';
 
 export interface CreditInfo {
   balance: number;
@@ -24,16 +36,47 @@ interface CreditContextType {
   hasMiles: (amount?: number) => boolean;
 }
 
+/**
+ * #1318: Aligned with CANONICAL_TIER_PRICING monthly miles allowances
+ *        (monetizationService.ts):
+ *   explorer / executive_introduction → monthly: 0 (chat-only, complimentary intro)
+ *   basic    (Starter)                 → monthly: 50
+ *   pro      (Pro)                     → monthly: 150
+ *   enterprise (Executive + Council)   → monthly: 300 Executive, 600 Council
+ *
+ * Infinity is no longer used — Council has a concrete 600 mi/mo allowance.
+ * 'council' is treated as enterprise (same 600 mi).
+ */
 const CreditLimits: Record<CreditTier, { daily: number; monthly: number }> = {
-  free: { daily: 5, monthly: 0 },
-  basic: { daily: 0, monthly: 20 },
-  pro: { daily: 0, monthly: 50 },
-  enterprise: { daily: 0, monthly: Infinity },
+  executive_introduction: { daily: 5, monthly: 0 },
+  free:                     { daily: 5, monthly: 0 }, // legacy alias
+  member:                   { daily: 5, monthly: 0 }, // legacy alias
+  basic:                    { daily: 0, monthly: 50 },
+  pro:                      { daily: 0, monthly: 150 },
+  enterprise:               { daily: 0, monthly: 600 },
+  council:                  { daily: 0, monthly: 600 }, // legacy alias for enterprise
 };
+
+/** Map any legacy tier string from the DB to a canonical CreditTier limit key. */
+function resolveLimitKey(tier: string | null | undefined): keyof typeof CreditLimits {
+  if (!tier) return 'executive_introduction';
+  const t = String(tier);
+  if (t in CreditLimits) return t as keyof typeof CreditLimits;
+  if (t === 'explorer') return 'executive_introduction';
+  if (t === 'starter') return 'basic';
+  if (t === 'executive') return 'enterprise';
+  return 'executive_introduction';
+}
+
+/** True when the given tier string maps to the complimentary Explorer tier. */
+export function isExecutiveIntroTier(tier: string | null | undefined): boolean {
+  const key = resolveLimitKey(tier);
+  return key === 'executive_introduction' || key === 'free' || key === 'member';
+}
 
 const defaultCredit: CreditInfo = {
   balance: 5,
-  tier: 'free',
+  tier: 'executive_introduction',
   totalEarned: 5,
   totalSpent: 0,
   isLoading: true,
@@ -65,37 +108,48 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
         .single();
 
       if (error || !data) {
+        // #1316: column = miles, not balance.
+        // #1320: default tier = executive_introduction, never "free".
         const { data: newData, error: insertError } = await supabase
           .from('credits')
-          .insert({ user_id: effectiveUserId, balance: 5, tier: 'free', total_earned: 5, total_spent: 0 })
+          .insert({
+            user_id: effectiveUserId,
+            miles: 5,
+            tier: 'executive_introduction',
+            total_earned: 5,
+            total_spent: 0,
+          })
           .select()
           .single();
 
         if (insertError) throw insertError;
         setCredit({
-          balance: newData.balance,
-          tier: newData.tier as CreditTier,
+          balance: newData.miles,
+          tier: (newData.tier as CreditTier) ?? 'executive_introduction',
           totalEarned: newData.total_earned,
           totalSpent: newData.total_spent,
           isLoading: false,
         });
       } else {
-        const limits = CreditLimits[data.tier as CreditTier] || CreditLimits.free;
-        let balance = data.balance;
+        const limitKey = resolveLimitKey(data.tier);
+        const limits = CreditLimits[limitKey];
+        // #1316: read from miles column (not balance)
+        let milesVal = Number(data.miles ?? data.balance ?? 0);
 
-        if (data.tier === 'free' && balance < 5) {
-          balance = 5;
+        // Complimentary tier always keeps a 5-mi floor so users can try DEX.
+        if (isExecutiveIntroTier(data.tier) && milesVal < 5) {
+          milesVal = 5;
           await supabase
             .from('credits')
-            .update({ balance: 5, updated_at: new Date().toISOString() })
+            .update({ miles: 5, updated_at: new Date().toISOString() })
             .eq('user_id', effectiveUserId);
         }
 
         setCredit({
-          balance,
-          tier: data.tier as CreditTier,
-          totalEarned: data.total_earned,
-          totalSpent: data.total_spent,
+          balance: milesVal,
+          tier: (data.tier as CreditTier) ?? 'executive_introduction',
+          totalEarned: data.total_earned ?? 0,
+          totalSpent: data.total_spent ?? 0,
           isLoading: false,
         });
       }
@@ -112,10 +166,11 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
       const supabase = getSupabase();
       const newBalance = credit.balance - amount;
 
+      // #1316: write miles column
       await supabase
         .from('credits')
         .update({
-          balance: newBalance,
+          miles: newBalance,
           total_spent: credit.totalSpent + amount,
           updated_at: new Date().toISOString(),
         })
@@ -155,10 +210,11 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
       const supabase = getSupabase();
       const newBalance = credit.balance + amount;
 
+      // #1316: write miles column
       await supabase
         .from('credits')
         .update({
-          balance: newBalance,
+          miles: newBalance,
           total_spent: Math.max(0, credit.totalSpent - amount),
           updated_at: new Date().toISOString(),
         })
@@ -219,7 +275,7 @@ export function useCredits() {
       refreshCredits: async () => {},
       deductCredit: async () => false,
       hasCredits: () => true,
-      tier: 'free' as CreditTier,
+      tier: 'executive_introduction' as CreditTier,
       miles: defaultCredit.balance,
       deductMiles: async () => false,
       refundMiles: async () => false,

@@ -8,18 +8,10 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import MarketingNav from '@/components/navigation/MarketingNav';
-
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  bg: '#FFFFFF',
-  footerBg: '#F9F9F9',
-  border: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-};
+// #1321: Adopt shared design-system barrel. Spread + override only for the
+//        one marketing-specific token (`footerBg`) that isn't in the core set.
+import { LYC_SHARED_DS } from '@/styles/ds';
+const DS = { ...LYC_SHARED_DS, footerBg: '#F9F9F9' };
 
 function MarketingFooter(): React.ReactElement {
   const year = new Date().getFullYear();

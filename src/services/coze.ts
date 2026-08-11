@@ -17,7 +17,7 @@ export async function sendChatMessage(
         message,
         history: history.slice(-10),
         userId,
-        tier: options?.tier || 'free',
+        tier: options?.tier || 'executive_introduction',
         memoryContext: options?.memoryContext || [],
         documentContext: options?.documentContext || '',
         systemPrompt: options?.systemPrompt,

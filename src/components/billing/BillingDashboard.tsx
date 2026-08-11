@@ -85,10 +85,14 @@ export function BillingDashboard() {
         setMilesBalance(creditInfo.balance);
       }
 
-      const tier = profile?.tier || 'member';
+      // #1320: Canonical default tier = executive_introduction (Explorer/complimentary).
+      //         Accept legacy aliases 'member' and 'free' for backward compatibility.
+      const tier = profile?.tier || 'executive_introduction';
+      const isComplimentaryTier =
+        tier === 'executive_introduction' || tier === 'member' || tier === 'free';
       const subStatus = profile?.stripe_subscription_status;
 
-      if (tier !== 'member' && tier !== 'free' && subStatus === 'active') {
+      if (!isComplimentaryTier && subStatus === 'active') {
         setSubscriptionStatus('active');
         const nextDate = new Date();
         nextDate.setDate(nextDate.getDate() + 30);

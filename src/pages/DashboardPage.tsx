@@ -275,7 +275,7 @@ export function DashboardPage() {
             title="Run Assessment"
             description="Discover your executive leadership profile"
             color={DS.success}
-            onClick={() => navigate('/assessment')}
+            onClick={() => navigate('/app/assessments')}
           />
           <ActionCard
             icon={FileText}
@@ -370,7 +370,7 @@ export function DashboardPage() {
                 <Target style={{ width: 32, height: 32, color: DS.muted, margin: '0 auto 12px' }} />
                 <p style={{ color: DS.muted, fontSize: '14px', marginBottom: '16px' }}>No assessment yet</p>
                 <button
-                  onClick={() => navigate('/assessment')}
+                  onClick={() => navigate('/app/assessments')}
                   style={{
                     padding: '10px 20px',
                     background: DS.accent,

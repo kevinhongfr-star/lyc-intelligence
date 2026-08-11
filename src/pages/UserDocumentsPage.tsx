@@ -40,9 +40,12 @@ export function DocumentsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const tier = profile?.tier || 'free';
+  // #1320: Accept all complimentary-tier aliases (executive_introduction, free, member).
+  //         Default new users to executive_introduction, never "free".
+  const tier = profile?.tier || 'executive_introduction';
+  const isComplimentaryTier = tier === 'executive_introduction' || tier === 'free' || tier === 'member';
   const maxDocs = getMaxDocumentsForTier(tier);
-  const canUpload = tier !== 'free' && documents.length < maxDocs;
+  const canUpload = !isComplimentaryTier && documents.length < maxDocs;
 
   useEffect(() => {
     if (!user) {
@@ -104,7 +107,7 @@ export function DocumentsPage() {
     setDeletingId(null);
   };
 
-  if (tier === 'free') {
+  if (isComplimentaryTier) {
     return (
       <div style={{ minHeight: '100vh', background: DS.bg, padding: '48px 24px' }}>
         <div style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>

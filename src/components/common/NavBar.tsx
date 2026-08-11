@@ -2,25 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, User, FileText, Settings, LogOut, ChevronDown, CreditCard } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-};
+// #1321: Shared DS barrel — replaces the local `const DS = {...}` every
+//        component was duplicating. Use LYC_SHARED_DS everywhere so values
+//        never drift between this NavBar and other surfaces.
+import { LYC_SHARED_DS as DS } from '@/styles/ds';
 
 export function NavBar() {
   const navigate = useNavigate();
@@ -35,7 +20,11 @@ export function NavBar() {
 
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard' },
-    { href: '/assessment', label: 'Assessment' },
+    // #1319: Assessment discoverability — rename to plural (matches IA) and route
+    //        to the authenticated assessment hub /app/assessments instead of the
+    //        old flat /assessment URL which unconditionally redirects to marketing
+    //        anchor #assessment-catalog (no user could ever actually TAKE an assessment).
+    { href: '/app/assessments', label: 'Assessments' },
     { href: '/match', label: 'Match' },
     { href: '/nexus', label: 'Nexus AI' },
   ];

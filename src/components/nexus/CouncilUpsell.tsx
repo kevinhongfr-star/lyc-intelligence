@@ -25,7 +25,7 @@ export function CouncilUpsell({ trigger, messageCount, onUpgrade }: CouncilUpsel
       case 'usage':
         return {
           title: 'You\'re Getting Great Value!',
-          description: `${messageCount} conversations in Executive Introduction. Starter = $29/mo for 5 mi/day + miles economy.`,
+          description: `${messageCount} conversations in Executive Introduction. Starter = $25/mo for 50 mi/month + miles economy.`,
           highlight: 'Open with miles',
         };
     }

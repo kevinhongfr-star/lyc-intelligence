@@ -7,7 +7,9 @@ export interface UserProfile {
   email: string;
   name: string;
   role: string | null;
-  tier: 'free' | 'member' | 'basic' | 'pro' | 'council' | 'enterprise';
+  // #1320: Canonical tiers (executive_introduction = Explorer/complimentary,
+  //         basic/pro/enterprise = paid) + legacy aliases for backward compatibility.
+  tier: 'executive_introduction' | 'free' | 'member' | 'basic' | 'pro' | 'council' | 'enterprise';
   icp: string | null;
   active_surface: string | null;
   organization_id: string | null;
