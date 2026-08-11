@@ -208,6 +208,31 @@ CREATE POLICY docs_write ON public.documents FOR ALL USING (
 );
 
 -- ============================================================
+
+-- ============================================================
+--  TABLE CREATION: assessment_results (added 2026-08-11 P0 fix)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.assessment_results (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+    anonymous_id text,
+    assessment_code text NOT NULL,
+    answers jsonb NOT NULL DEFAULT '{}'::jsonb,
+    duration_seconds integer DEFAULT 0,
+    score_summary jsonb,
+    miles_debited integer DEFAULT 0,
+    idempotency_key text,
+    organization_id uuid,
+    metadata jsonb DEFAULT '{}'::jsonb,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_assessment_results_user_id ON public.assessment_results(user_id);
+CREATE INDEX IF NOT EXISTS idx_assessment_results_code ON public.assessment_results(assessment_code);
+CREATE INDEX IF NOT EXISTS idx_assessment_results_idempotency ON public.assessment_results(idempotency_key);
+CREATE INDEX IF NOT EXISTS idx_assessment_results_org ON public.assessment_results(organization_id);
+
 --  TABLE: assessment_results (private per user)
 -- ============================================================
 ALTER TABLE IF EXISTS public.assessment_results ENABLE ROW LEVEL SECURITY;
