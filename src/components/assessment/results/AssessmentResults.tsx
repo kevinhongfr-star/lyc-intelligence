@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   INK, OFF, G200, G400, G600, WHITE,
@@ -12,10 +12,73 @@ import { KeyInsights } from './KeyInsights';
 import { DevelopmentPlan } from './DevelopmentPlan';
 import { NEXUSCTA } from './NEXUSCTA';
 import { ShareRetake } from './ShareRetake';
-import type { AssessmentResultsConfig } from './types';
+// #1322: Executive summary + progressive Section wrappers (new)
+import { ExecutiveSummary } from './ExecutiveSummary';
+import { Section } from './Section';
+import type {
+  AssessmentResultsConfig,
+  ExecutiveSummary as ExecutiveSummaryType,
+} from './types';
 
 interface Props {
   config: AssessmentResultsConfig;
+}
+
+/**
+ * Auto-build a sane ExecutiveSummary when a renderer hasn't provided one yet.
+ * Uses bracket classification + top strength/gap dimensions + archetype to
+ * write a plausible 30-second summary. This lets us land #1322 immediately on
+ * all 11 assessment results pages without waiting for content to be authored.
+ */
+function deriveExecutiveSummary(config: AssessmentResultsConfig): ExecutiveSummaryType {
+  const sortedDims = [...config.dimensions].sort((a, b) => b.score - a.score);
+  const strongest = sortedDims[0];
+  const weakest = sortedDims[sortedDims.length - 1];
+
+  let bracket: ExecutiveSummaryType['bracket'];
+  if (config.overallScore >= 85) bracket = 'Top 10%';
+  else if (config.overallScore >= 75) bracket = 'Top Quartile';
+  else if (config.overallScore >= 62) bracket = 'Above Average';
+  else if (config.overallScore >= 50) bracket = 'Solid Midfield';
+  else if (config.overallScore >= 35) bracket = 'Developing';
+  else bracket = 'Needs Attention';
+
+  const headline = `${config.archetype.name} — ${bracket} placement.`;
+  const synopsis =
+    strongest && weakest
+      ? `Your result is shaped by a sharp strength in ${strongest.name} (${strongest.score}) paired with an opportunity in ${weakest.name} (${weakest.score}). Your ${config.archetype.name} profile means you lean toward ${config.archetype.traits[0]?.toLowerCase() ?? 'a systematic approach'} — a differentiator in the right context.`
+      : `Your ${config.archetype.name} profile sits in the ${bracket} range. ${config.archetype.description}`;
+
+  const keyTakeaways: ExecutiveSummaryType['keyTakeaways'] = [
+    strongest
+      ? {
+          tone: 'strength',
+          label: `${strongest.name} is your stand-out strength`,
+          detail: strongest.description || `Your ${strongest.name} score (${strongest.score}) differentiates you from peers.`,
+        }
+      : { tone: 'neutral', label: 'Exec summary', detail: 'See below for full details.' },
+    weakest && weakest.score < (strongest?.score ?? 80) - 20
+      ? {
+          tone: 'gap',
+          label: `${weakest.name} is your development focus`,
+          detail: weakest.description || `A score of ${weakest.score} suggests room to deepen this dimension with focused practice.`,
+        }
+      : {
+          tone: 'neutral',
+          label: 'Balanced profile',
+          detail: 'Dimension scores are clustered — no extreme gaps, no single hero dimension.',
+        },
+    {
+      tone: 'neutral',
+      label: `Archetype: ${config.archetype.name}`,
+      detail:
+        config.archetype.traits[0]
+          ? `${config.archetype.traits[0]} — a signature tendency.`
+          : config.archetype.description.slice(0, 140),
+    },
+  ];
+
+  return { headline, synopsis, keyTakeaways, bracket };
 }
 
 // ── NAV ────────────────────────────────────────────────────────────
@@ -101,6 +164,13 @@ function Footer({ config }: { config: AssessmentResultsConfig }) {
 // ── MAIN WRAPPER ───────────────────────────────────────────────────
 export function AssessmentResults({ config }: Props) {
   useScrollReveal(config.prefix);
+  const revealClass = `${config.prefix}-reveal`;
+
+  // #1322: Always have an executive summary — renderer-supplied or auto-derived.
+  const summary = useMemo(
+    () => config.executiveSummary ?? deriveExecutiveSummary(config),
+    [config],
+  );
 
   return (
     <div style={{
@@ -110,13 +180,99 @@ export function AssessmentResults({ config }: Props) {
     }}>
       <Nav config={config} />
       <main>
-        <ResultsHero config={config} />
-        <DimensionScorecard config={config} />
-        <ArchetypeProfile config={config} />
-        <KeyInsights config={config} />
-        <DevelopmentPlan config={config} />
-        <NEXUSCTA config={config} />
-        <ShareRetake config={config} />
+        {/* 1. Hero: big score + archetype reveal (immediate, no gate) */}
+        <Section
+          sectionId="hero"
+          label=""
+          title=""
+          revealClass={revealClass}
+          accent={config.accent}
+        >
+          <ResultsHero config={config} />
+        </Section>
+
+        {/* 2. Executive Summary (30-second verdict) — auto-unfolded, no gate */}
+        <ExecutiveSummary
+          summary={summary}
+          accent={config.accent}
+          revealClass={revealClass}
+          overallScore={config.overallScore}
+          assessmentName={config.assessmentName}
+        />
+
+        {/* 3. Dimension Scorecard — GATED progressive reveal */}
+        <Section
+          sectionId="dimensions"
+          label="01 · Deep Dive"
+          title="Your dimension scorecard"
+          revealClass={revealClass}
+          accent={config.accent}
+          gated
+          gateCopy="Reveal your dimension breakdown"
+        >
+          <DimensionScorecard config={config} />
+        </Section>
+
+        {/* 4. Archetype Profile — GATED */}
+        <Section
+          sectionId="archetype"
+          label="02 · Archetype"
+          title={`What it means to be a ${config.archetype.name}`}
+          revealClass={revealClass}
+          accent={config.accent}
+          gated
+          gateCopy="Reveal the archetype story"
+        >
+          <ArchetypeProfile config={config} />
+        </Section>
+
+        {/* 5. Key Insights — GATED */}
+        <Section
+          sectionId="insights"
+          label="03 · Insights"
+          title="Stand-out themes we noticed"
+          revealClass={revealClass}
+          accent={config.accent}
+          gated
+          gateCopy="Reveal key insights"
+        >
+          <KeyInsights config={config} />
+        </Section>
+
+        {/* 6. Development Plan — GATED */}
+        <Section
+          sectionId="development"
+          label="04 · Action Plan"
+          title="Where to invest the next 90 days"
+          revealClass={revealClass}
+          accent={config.accent}
+          gated
+          gateCopy="Reveal development actions"
+        >
+          <DevelopmentPlan config={config} />
+        </Section>
+
+        {/* 7. NEXUS CTA (no gate) */}
+        <Section
+          sectionId="nexus"
+          label=""
+          title=""
+          revealClass={revealClass}
+          accent={config.accent}
+        >
+          <NEXUSCTA config={config} />
+        </Section>
+
+        {/* 8. Share / Retake (no gate) */}
+        <Section
+          sectionId="share"
+          label=""
+          title=""
+          revealClass={revealClass}
+          accent={config.accent}
+        >
+          <ShareRetake config={config} />
+        </Section>
       </main>
       <Footer config={config} />
       <RevealStyles prefix={config.prefix} />
