@@ -10,22 +10,18 @@ function extractProjectRef(): string {
   return m ? m[1] : '';
 }
 
-function buildConnectionString(host: string): string {
-  return `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@${host}:5432/postgres`;
-}
-
-async function tryConnect(host: string): Promise<{ ok: boolean; error?: string }> {
+async function tryConnect(connStr: string, label: string): Promise<{ label: string; ok: boolean; error?: string }> {
   let pool: Pool | null = null;
   try {
     pool = new Pool({
-      connectionString: buildConnectionString(host),
+      connectionString: connStr,
       ssl: { rejectUnauthorized: false },
       connectionTimeoutMillis: 5000,
     });
     await pool.query('SELECT 1');
-    return { ok: true };
+    return { label, ok: true };
   } catch (e: any) {
-    return { ok: false, error: e.message };
+    return { label, ok: false, error: e.message.substring(0, 120) };
   } finally {
     if (pool) await pool.end().catch(() => {});
   }
@@ -38,47 +34,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const ref = extractProjectRef();
-  const hosts = [
-    `db.${ref}.supabase.co`,
-    `${ref}.supabase.co`,
-    `db.${ref}.pooler.supabase.com`,
-    `aws-0-us-east-1.pooler.supabase.com`,
+  
+  // Supabase has several connection string patterns
+  const connStrs: { label: string; str: string }[] = [
+    // Pattern 1: old direct DB
+    { label: 'db.ref.supabase.co', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.${ref}.supabase.co:5432/postgres` },
+    // Pattern 2: pooler with project ref in user
+    { label: 'aws-0-us-east-1.pooler (user=ref.postgres)', str: `postgresql://${ref}.postgres:${SUPABASE_SERVICE_ROLE_KEY}@aws-0-us-east-1.pooler.supabase.com:5432/postgres` },
+    // Pattern 3: pooler with options parameter  
+    { label: 'aws-0-us-east-1.pooler (options=ref)', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@aws-0-us-east-1.pooler.supabase.com:5432/postgres?options=project%3D${ref}` },
+    // Pattern 4: regional direct (try common regions)
+    { label: 'ref.supabase.co port 6543', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@${ref}.supabase.co:6543/postgres` },
   ];
 
-  // First, find a working host
   const results: Record<string, string> = {};
-  let workingHost = '';
-  
-  for (const host of hosts) {
-    const r = await tryConnect(host);
-    results[host] = r.ok ? 'OK' : (r.error || 'fail');
-    if (r.ok && !workingHost) {
-      workingHost = host;
-      break; // stop at first working host
+  let workingConn = '';
+  let workingLabel = '';
+
+  for (const { label, str } of connStrs) {
+    const r = await tryConnect(str, label);
+    results[label] = r.ok ? 'OK' : (r.error || 'fail');
+    if (r.ok && !workingConn) {
+      workingConn = str;
+      workingLabel = label;
     }
   }
 
   if (req.method === 'GET') {
-    return res.status(200).json({ hosts: results, workingHost });
+    return res.status(200).json({ results, workingLabel });
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed', hosts: results });
+    return res.status(405).json({ error: 'Method not allowed', results, workingLabel });
   }
 
-  if (!workingHost) {
-    return res.status(500).json({ error: 'No working DB host found', hosts: results });
+  if (!workingConn) {
+    return res.status(500).json({ error: 'No working DB connection found', results });
   }
 
   const sql = typeof req.body === 'string' ? req.body : (req.body?.sql || '');
   if (!sql || sql.trim().length < 10) {
-    return res.status(400).json({ error: 'No SQL provided', hosts: results, workingHost });
+    return res.status(400).json({ error: 'No SQL provided', results, workingLabel });
   }
 
   let pool: Pool | null = null;
   try {
     pool = new Pool({
-      connectionString: buildConnectionString(workingHost),
+      connectionString: workingConn,
       ssl: { rejectUnauthorized: false },
       connectionTimeoutMillis: 15000,
     });
@@ -86,15 +88,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const result = await pool.query(sql);
     res.status(200).json({
       status: 'success',
-      workingHost,
+      workingLabel,
       rowCount: result.rowCount,
       command: result.command,
     });
   } catch (error: any) {
     res.status(500).json({
       error: 'Failed to execute SQL',
-      message: error.message,
-      workingHost,
+      message: error.message.substring(0, 300),
+      workingLabel,
     });
   } finally {
     if (pool) await pool.end().catch(() => {});
