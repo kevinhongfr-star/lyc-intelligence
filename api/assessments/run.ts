@@ -237,12 +237,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         score_summary,
         miles_debited: chargeMiles ? cost : 0,
         idempotency_key: idem,
-        organization_id: ctx.organizationId,
+        organization_id: isAnonymous ? null : ctx.organizationId,
         metadata: {
           ...metadata,
           __server_ts: new Date().toISOString(),
-          __role: ctx.role,
-          __tier: ctx.tier,
+          ...(isAnonymous ? {} : {
+            __role: ctx.role,
+            __tier: ctx.tier,
+          }),
         },
       } as any)
       .select('id, created_at')
