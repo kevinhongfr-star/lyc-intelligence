@@ -1,19 +1,27 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
 import {
   INK, OFF, G100, G200, G300, G400, G600, WHITE,
   monoStyle, containerStyle,
 } from '../landing/shared';
+import {
+  ScenarioQuestion,
+} from '../ScenarioQuestion';
 import type {
   AssessmentFlowConfig,
   AssessmentQuestion,
   AnswerMap,
   PersistedAssessmentState,
+  ContextAnswerMap,
+  ContextQuestion,
 } from './types';
+import { filterApplicable } from './skipLogic';
 
 interface Props {
   config: AssessmentFlowConfig;
+  /** Optional prefilled contextAnswers (e.g. from user profile) */
+  prefillContext?: ContextAnswerMap;
 }
 
 const STORAGE_KEY_PREFIX = 'assessment_flow_';
@@ -33,17 +41,11 @@ function loadState(slug: string): PersistedAssessmentState | null {
 function saveState(slug: string, state: PersistedAssessmentState) {
   try {
     localStorage.setItem(`${STORAGE_KEY_PREFIX}${slug}`, JSON.stringify(state));
-  } catch {
-    // storage full or unavailable — non-blocking
-  }
+  } catch { /* non-blocking */ }
 }
 
 function clearState(slug: string) {
-  try {
-    localStorage.removeItem(`${STORAGE_KEY_PREFIX}${slug}`);
-  } catch {
-    // non-blocking
-  }
+  try { localStorage.removeItem(`${STORAGE_KEY_PREFIX}${slug}`); } catch { /* non-blocking */ }
 }
 
 function isAnswered(q: AssessmentQuestion, answers: AnswerMap): boolean {
@@ -53,21 +55,20 @@ function isAnswered(q: AssessmentQuestion, answers: AnswerMap): boolean {
   return typeof val === 'number';
 }
 
+function contextIsComplete(qs: ContextQuestion[] | undefined, ca: ContextAnswerMap): boolean {
+  if (!qs) return true;
+  return qs.every((c) => {
+    if (c.optional) return true;
+    return c.defaultValue ? Boolean(ca[c.key] ?? c.defaultValue) : Boolean(ca[c.key]);
+  });
+}
+
 // ── LIKERT QUESTION ────────────────────────────────────────────────
 function LikertQuestion({
-  question,
-  value,
-  onSelect,
-  accent,
-}: {
-  question: AssessmentQuestion;
-  value: number | undefined;
-  onSelect: (score: number) => void;
-  accent: string;
-}) {
+  question, value, onSelect, accent,
+}: { question: AssessmentQuestion; value: number | undefined; onSelect: (score: number) => void; accent: string }) {
   const scale = [1, 2, 3, 4, 5];
   const labels = question.scaleLabels || ['Low', 'High'];
-
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, padding: '0 4px' }}>
@@ -78,41 +79,18 @@ function LikertQuestion({
         {scale.map((n) => {
           const selected = value === n;
           return (
-            <button
-              key={n}
-              onClick={() => onSelect(n)}
+            <button key={n} onClick={() => onSelect(n)}
               style={{
-                flex: 1,
-                minHeight: 56,
-                background: selected ? accent : WHITE,
-                border: `1px solid ${selected ? accent : G200}`,
-                cursor: 'pointer',
-                fontFamily: "'DM Sans', system-ui, sans-serif",
-                fontSize: 18,
-                fontWeight: 600,
+                flex: 1, minHeight: 56, background: selected ? accent : WHITE,
+                border: `1px solid ${selected ? accent : G200}`, cursor: 'pointer',
+                fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 600,
                 color: selected ? WHITE : INK,
                 transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 2,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               }}
-              onMouseEnter={(e) => {
-                if (!selected) {
-                  e.currentTarget.style.borderColor = accent;
-                  e.currentTarget.style.background = G100;
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!selected) {
-                  e.currentTarget.style.borderColor = G200;
-                  e.currentTarget.style.background = WHITE;
-                }
-              }}
-            >
-              <span>{n}</span>
-            </button>
+              onMouseEnter={(e) => { if (!selected) { e.currentTarget.style.borderColor = accent; e.currentTarget.style.background = G100; } }}
+              onMouseLeave={(e) => { if (!selected) { e.currentTarget.style.borderColor = G200; e.currentTarget.style.background = WHITE; } }}
+            >{n}</button>
           );
         })}
       </div>
@@ -122,63 +100,30 @@ function LikertQuestion({
 
 // ── MCQ SINGLE ─────────────────────────────────────────────────────
 function McqSingleQuestion({
-  question,
-  value,
-  onSelect,
-  accent,
-}: {
-  question: AssessmentQuestion;
-  value: number | undefined;
-  onSelect: (score: number, index: number) => void;
-  accent: string;
-}) {
+  question, value, onSelect, accent,
+}: { question: AssessmentQuestion; value: number | undefined; onSelect: (score: number, index: number) => void; accent: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {question.options?.map((opt, i) => {
         const selected = value === opt.score;
         return (
-          <button
-            key={i}
-            onClick={() => onSelect(opt.score, i)}
+          <button key={i} onClick={() => onSelect(opt.score, i)}
             style={{
-              width: '100%',
-              padding: '20px 24px',
-              background: selected ? accent : WHITE,
-              border: `1px solid ${selected ? accent : G200}`,
-              cursor: 'pointer',
-              fontFamily: "'DM Sans', system-ui, sans-serif",
-              fontSize: 15,
-              fontWeight: 500,
-              color: selected ? WHITE : INK,
-              textAlign: 'left',
-              transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 16,
+              width: '100%', padding: '20px 24px', background: selected ? accent : WHITE,
+              border: `1px solid ${selected ? accent : G200}`, cursor: 'pointer',
+              fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 15, fontWeight: 500,
+              color: selected ? WHITE : INK, textAlign: 'left',
+              transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)', display: 'flex', alignItems: 'center', gap: 16,
             }}
-            onMouseEnter={(e) => {
-              if (!selected) {
-                e.currentTarget.style.borderColor = accent;
-                e.currentTarget.style.background = G100;
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!selected) {
-                e.currentTarget.style.borderColor = G200;
-                e.currentTarget.style.background = WHITE;
-              }
-            }}
+            onMouseEnter={(e) => { if (!selected) { e.currentTarget.style.borderColor = accent; e.currentTarget.style.background = G100; } }}
+            onMouseLeave={(e) => { if (!selected) { e.currentTarget.style.borderColor = G200; e.currentTarget.style.background = WHITE; } }}
           >
             <span style={{
-              width: 28, height: 28, flexShrink: 0,
-              border: `1px solid ${selected ? WHITE : G300}`,
+              width: 28, height: 28, flexShrink: 0, border: `1px solid ${selected ? WHITE : G300}`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-              fontSize: 11, fontWeight: 500,
+              fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 11, fontWeight: 500,
               color: selected ? WHITE : G600,
-            }}>
-              {String.fromCharCode(65 + i)}
-            </span>
+            }}>{String.fromCharCode(65 + i)}</span>
             <span style={{ flex: 1 }}>{opt.label}</span>
             {selected && <Check style={{ width: 18, height: 18, color: WHITE }} />}
           </button>
@@ -190,71 +135,34 @@ function McqSingleQuestion({
 
 // ── MCQ MULTI ──────────────────────────────────────────────────────
 function McqMultiQuestion({
-  question,
-  value,
-  onToggle,
-  accent,
-}: {
-  question: AssessmentQuestion;
-  value: number[] | undefined;
-  onToggle: (score: number) => void;
-  accent: string;
-}) {
+  question, value, onToggle, accent,
+}: { question: AssessmentQuestion; value: number[] | undefined; onToggle: (score: number) => void; accent: string }) {
   const selected = value || [];
   const maxSel = question.maxSelections || 2;
-
   return (
     <div>
-      <div style={{ ...monoStyle, color: G600, fontSize: 10, marginBottom: 16 }}>
-        Select up to {maxSel}
-      </div>
+      <div style={{ ...monoStyle, color: G600, fontSize: 10, marginBottom: 16 }}>Select up to {maxSel}</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {question.options?.map((opt, i) => {
           const isSelected = selected.includes(opt.score);
           const atMax = selected.length >= maxSel && !isSelected;
           return (
-            <button
-              key={i}
-              onClick={() => !atMax && onToggle(opt.score)}
-              disabled={atMax}
+            <button key={i} onClick={() => !atMax && onToggle(opt.score)} disabled={atMax}
               style={{
-                width: '100%',
-                padding: '20px 24px',
-                background: isSelected ? accent : WHITE,
-                border: `1px solid ${isSelected ? accent : G200}`,
-                cursor: atMax ? 'not-allowed' : 'pointer',
-                opacity: atMax ? 0.4 : 1,
-                fontFamily: "'DM Sans', system-ui, sans-serif",
-                fontSize: 15,
-                fontWeight: 500,
-                color: isSelected ? WHITE : INK,
-                textAlign: 'left',
-                transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 16,
+                width: '100%', padding: '20px 24px', background: isSelected ? accent : WHITE,
+                border: `1px solid ${isSelected ? accent : G200}`, cursor: atMax ? 'not-allowed' : 'pointer',
+                opacity: atMax ? 0.4 : 1, fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: 15, fontWeight: 500, color: isSelected ? WHITE : INK, textAlign: 'left',
+                transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)', display: 'flex', alignItems: 'center', gap: 16,
               }}
-              onMouseEnter={(e) => {
-                if (!isSelected && !atMax) {
-                  e.currentTarget.style.borderColor = accent;
-                  e.currentTarget.style.background = G100;
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isSelected && !atMax) {
-                  e.currentTarget.style.borderColor = G200;
-                  e.currentTarget.style.background = WHITE;
-                }
-              }}
+              onMouseEnter={(e) => { if (!isSelected && !atMax) { e.currentTarget.style.borderColor = accent; e.currentTarget.style.background = G100; } }}
+              onMouseLeave={(e) => { if (!isSelected && !atMax) { e.currentTarget.style.borderColor = G200; e.currentTarget.style.background = WHITE; } }}
             >
               <span style={{
-                width: 28, height: 28, flexShrink: 0,
-                border: `1px solid ${isSelected ? WHITE : G300}`,
+                width: 28, height: 28, flexShrink: 0, border: `1px solid ${isSelected ? WHITE : G300}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: isSelected ? WHITE : 'transparent',
-              }}>
-                <Check style={{ width: 16, height: 16 }} />
-              </span>
+              }}><Check style={{ width: 16, height: 16 }} /></span>
               <span style={{ flex: 1 }}>{opt.label}</span>
             </button>
           );
@@ -264,20 +172,152 @@ function McqMultiQuestion({
   );
 }
 
+// ── CONTEXT PREFLIGHT ──────────────────────────────────────────────
+export function ContextPreflight({
+  contextQuestions,
+  contextAnswers,
+  onChange,
+  accent,
+  onComplete,
+  canSkip = false,
+  onSkip,
+}: {
+  contextQuestions: ContextQuestion[];
+  contextAnswers: ContextAnswerMap;
+  onChange: (key: string, value: string) => void;
+  accent: string;
+  onComplete?: () => void;
+  canSkip?: boolean;
+  onSkip?: () => void;
+}) {
+  const allComplete = contextIsComplete(contextQuestions, contextAnswers);
+  return (
+    <div style={{ maxWidth: 680, margin: '0 auto' }}>
+      <div style={{ textAlign: 'center', marginBottom: 36 }}>
+        <div style={{ ...monoStyle, color: accent, marginBottom: 12, fontSize: 11, letterSpacing: '0.08em' }}>Tell us about you</div>
+        <h1 style={{
+          fontFamily: "'Libre Baskerville', Georgia, serif",
+          fontSize: 30, fontWeight: 700, color: INK, lineHeight: 1.2, marginBottom: 12,
+        }}>
+          Entry expectations
+        </h1>
+        <p style={{ fontSize: 15, color: G600, lineHeight: 1.6 }}>
+          A quick 30-second preflight so we can tailor scenarios to your role and skip questions that don't apply.
+        </p>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+        {contextQuestions.map((c, idx) => (
+          <div key={c.id} style={{
+            border: `1px solid ${G200}`, padding: 24, background: WHITE,
+          }}>
+            <div style={{
+              ...monoStyle, color: G400, fontSize: 10, letterSpacing: '0.04em',
+              textTransform: 'uppercase', marginBottom: 8,
+            }}>
+              {idx + 1} of {contextQuestions.length}{c.optional ? ' · Optional' : ''}
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: INK, marginBottom: 4 }}>
+              {c.question}
+            </div>
+            {c.hint && <div style={{ fontSize: 13.5, color: G600, marginBottom: 16 }}>{c.hint}</div>}
+
+            {c.type === 'free_text' ? (
+              <input
+                defaultValue={c.defaultValue}
+                onBlur={(e) => onChange(c.key, e.target.value.trim())}
+                placeholder="Type here…"
+                style={{
+                  width: '100%', padding: '14px 16px',
+                  border: `1px solid ${contextAnswers[c.key] ? accent : G200}`,
+                  fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 15, color: INK,
+                  outline: 'none',
+                }}
+              />
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {(c.options || []).map((o) => {
+                  const current = contextAnswers[c.key] ?? c.defaultValue ?? '';
+                  const selected = current === o.value;
+                  return (
+                    <button
+                      type="button"
+                      key={o.value}
+                      onClick={() => onChange(c.key, o.value)}
+                      style={{
+                        width: '100%', padding: '14px 18px',
+                        border: `1px solid ${selected ? accent : G200}`,
+                        background: selected ? `${accent}12` : WHITE,
+                        textAlign: 'left', cursor: 'pointer',
+                        fontSize: 14.5, fontWeight: selected ? 600 : 400,
+                        color: INK,
+                        transition: 'all 160ms ease',
+                        display: 'flex', alignItems: 'center', gap: 12,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!selected) e.currentTarget.style.borderColor = accent;
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!selected) e.currentTarget.style.borderColor = G200;
+                      }}
+                    >
+                      <span style={{
+                        width: 18, height: 18, borderRadius: 9,
+                        border: `1.5px solid ${selected ? accent : G300}`,
+                        display: 'inline-block',
+                        background: selected ? accent : 'transparent',
+                        boxShadow: selected ? 'inset 0 0 0 3px #fff' : 'none',
+                      }} />
+                      <span>{o.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 40, alignItems: 'center' }}>
+        <div>{canSkip && onSkip ? (
+          <button onClick={onSkip}
+            style={{
+              border: 'none', background: 'none', cursor: 'pointer',
+              color: G600, fontSize: 14, fontWeight: 500,
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+            }}>
+            Skip for now
+          </button>
+        ) : <div />}</div>
+        {onComplete ? (
+          <button onClick={onComplete} disabled={!allComplete}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 28px',
+              background: allComplete ? accent : G200, border: 'none',
+              cursor: allComplete ? 'pointer' : 'not-allowed',
+              fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 15,
+              fontWeight: 600, color: allComplete ? WHITE : G400,
+              transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
+            }}>
+            Begin assessment <ArrowRight style={{ width: 16, height: 16 }} />
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 // ── REVIEW SCREEN ──────────────────────────────────────────────────
 function ReviewScreen({
-  config,
-  answers,
-  onEdit,
-  accent,
+  config, answers, onEdit, accent, applicable,
 }: {
   config: AssessmentFlowConfig;
   answers: AnswerMap;
   onEdit: (index: number) => void;
   accent: string;
+  applicable: AssessmentQuestion[];
 }) {
-  const answered = config.questions.filter((q) => isAnswered(q, answers)).length;
-
+  const answered = applicable.filter((q) => isAnswered(q, answers)).length;
   return (
     <div style={{ maxWidth: 680, margin: '0 auto' }}>
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -285,47 +325,34 @@ function ReviewScreen({
         <h1 style={{
           fontFamily: "'Libre Baskerville', Georgia, serif",
           fontSize: 32, fontWeight: 700, color: INK, lineHeight: 1.2, marginBottom: 12,
-        }}>
-          Ready to submit?
-        </h1>
+        }}>Ready to submit?</h1>
         <p style={{ fontSize: 16, color: G600, lineHeight: 1.6 }}>
-          {answered} of {config.questions.length} questions answered. Review your responses below before submitting.
+          {answered} of {applicable.length} applicable questions answered. Review your responses below before submitting.
         </p>
       </div>
       <div style={{ border: `1px solid ${G200}`, background: WHITE }}>
-        {config.questions.map((q, i) => {
+        {applicable.map((q, i) => {
           const val = answers[q.id];
           let display = '—';
-          if (q.type === 'likert' && typeof val === 'number') {
-            display = `${val} / 5`;
-          } else if (q.type === 'mcq_single' && typeof val === 'number') {
+          if (q.type === 'likert' && typeof val === 'number') display = `${val} / 5`;
+          else if ((q.type === 'mcq_single' || q.type === 'scenario') && typeof val === 'number') {
             const opt = q.options?.find((o) => o.score === val);
             display = opt?.label || '—';
-          } else if (q.type === 'mcq_multi' && Array.isArray(val)) {
-            display = val.length + ' selected';
-          }
+          } else if (q.type === 'mcq_multi' && Array.isArray(val)) display = val.length + ' selected';
           return (
-            <button
-              key={q.id}
-              onClick={() => onEdit(i)}
+            <button key={q.id} onClick={() => onEdit(i)}
               style={{
-                width: '100%', padding: '20px 24px',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                width: '100%', padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 background: 'none', border: 'none',
-                borderBottom: i < config.questions.length - 1 ? `1px solid ${G200}` : 'none',
+                borderBottom: i < applicable.length - 1 ? `1px solid ${G200}` : 'none',
                 cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
-              }}
-            >
+              }}>
               <div style={{ flex: 1, paddingRight: 24 }}>
-                <div style={{ ...monoStyle, color: G400, fontSize: 9, marginBottom: 4 }}>
-                  Q{i + 1}
-                </div>
+                <div style={{ ...monoStyle, color: G400, fontSize: 9, marginBottom: 4 }}>Q{i + 1}</div>
                 <div style={{ fontSize: 14, color: INK, fontWeight: 500, marginBottom: 4 }}>
                   {q.text}
                 </div>
-                <div style={{ fontSize: 13, color: G600 }}>
-                  {display}
-                </div>
+                <div style={{ fontSize: 13, color: G600 }}>{display}</div>
               </div>
               <ArrowRight style={{ width: 16, height: 16, color: G400, flexShrink: 0 }} />
             </button>
@@ -343,18 +370,13 @@ function SubmittingScreen({ accent }: { accent: string }) {
       minHeight: '60vh', display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
     }}>
-      <Loader2 style={{
-        width: 48, height: 48, color: accent,
-        animation: 'spin 1s linear infinite',
-      }} />
+      <Loader2 style={{ width: 48, height: 48, color: accent, animation: 'spin 1s linear infinite' }} />
       <h2 style={{
         fontFamily: "'Libre Baskerville', Georgia, serif",
         fontSize: 24, fontWeight: 700, color: INK, marginTop: 32, marginBottom: 8,
-      }}>
-        Analyzing your responses…
-      </h2>
+      }}>Analyzing your responses…</h2>
       <p style={{ fontSize: 15, color: G600, lineHeight: 1.6, textAlign: 'center', maxWidth: 400 }}>
-        Our AI is scoring your answers across all five dimensions and preparing your personalized report.
+        Scoring across dimensions, matching your archetype, and preparing the executive summary.
       </p>
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
@@ -362,79 +384,124 @@ function SubmittingScreen({ accent }: { accent: string }) {
 }
 
 // ── MAIN COMPONENT ─────────────────────────────────────────────────
-export function AssessmentFlow({ config }: Props) {
+export function AssessmentFlow({ config, prefillContext }: Props) {
   const navigate = useNavigate();
-  const { code, accent, prefix, questions, resultsPath, landingPath } = config;
+  const { code, accent, prefix, questions, resultsPath, landingPath, contextQuestions } = config;
 
   // State
   const [answers, setAnswers] = useState<AnswerMap>({});
+  const [contextAnswers, setContextAnswers] = useState<ContextAnswerMap>(prefillContext || {});
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [phase, setPhase] = useState<'questions' | 'review' | 'submitting'>('questions');
+  const [phase, setPhase] = useState<'context' | 'questions' | 'review' | 'submitting'>(
+    contextQuestions && contextQuestions.length ? 'context' : 'questions',
+  );
   const [hydrated, setHydrated] = useState(false);
 
-  // Storage key
+  // Key
   const storageKey = `${STORAGE_KEY_PREFIX}${code.toLowerCase()}`;
 
   // Hydrate from localStorage on mount
   useEffect(() => {
     const saved = loadState(code.toLowerCase());
-    if (saved && saved.status === 'in_progress') {
-      setAnswers(saved.answers);
-      setCurrentIndex(Math.min(saved.currentIndex, questions.length - 1));
+    if (saved) {
+      setAnswers(saved.answers || {});
+      setContextAnswers((prev) => ({ ...(prefillContext || {}), ...(saved.contextAnswers || {}), ...prev }));
+      if (saved.status === 'context' && contextQuestions?.length) {
+        setPhase('context');
+      } else {
+        setPhase('questions');
+        setCurrentIndex(Math.min(saved.currentIndex, questions.length - 1));
+      }
+    } else if (contextQuestions?.length) {
+      setPhase('context');
     }
     setHydrated(true);
-  }, [code, questions.length]);
+    void storageKey;
+  }, [code, questions.length, contextQuestions, prefillContext]);
 
   // Auto-save to localStorage whenever state changes
   useEffect(() => {
     if (!hydrated) return;
     const state: PersistedAssessmentState = {
       answers,
+      contextAnswers,
       currentIndex,
       startedAt: Date.now(),
-      status: 'in_progress',
+      status: phase === 'context' ? 'context' : 'in_progress',
     };
     saveState(code.toLowerCase(), state);
-  }, [answers, currentIndex, hydrated, code]);
+  }, [answers, contextAnswers, currentIndex, hydrated, code, phase]);
 
-  // Current question
-  const currentQ = questions[currentIndex];
-  const isLast = currentIndex === questions.length - 1;
-  const answeredCount = questions.filter((q) => isAnswered(q, answers)).length;
-  const progress = ((phase === 'review' ? questions.length : currentIndex) / questions.length) * 100;
+  // #1323: Filter applicable questions via skip logic
+  const applicableQuestions = useMemo(
+    () => filterApplicable(questions, answers, contextAnswers),
+    [questions, answers, contextAnswers],
+  );
+  void prefix;
+
+  // Current question / progress (over applicable questions only)
+  const currentQ = applicableQuestions[currentIndex];
+  const isLast = currentIndex >= applicableQuestions.length - 1;
+  const answeredCount = applicableQuestions.filter((q) => isAnswered(q, answers)).length;
+  const totalQ = applicableQuestions.length || 1;
+  const progress = phase === 'context'
+    ? 0
+    : ((phase === 'review' ? totalQ : currentIndex + 1) / totalQ) * 100;
+
+  // Skip-rule re-evaluation can make currentIndex > applicable length → clamp
+  useEffect(() => {
+    if (applicableQuestions.length > 0 && currentIndex >= applicableQuestions.length) {
+      setCurrentIndex(Math.max(0, applicableQuestions.length - 1));
+    }
+  }, [applicableQuestions.length, currentIndex]);
+
+  // Context handlers
+  const setContextAnswer = useCallback((key: string, value: string) => {
+    setContextAnswers((prev) => ({ ...prev, [key]: value }));
+  }, []);
+  const finishContext = useCallback(() => {
+    setPhase('questions');
+  }, []);
 
   // Answer handlers
-  const handleLikert = useCallback((score: number) => {
-    setAnswers((prev) => ({ ...prev, [currentQ.id]: score }));
-    // Auto-advance after a brief delay
+  const advance = useCallback(() => {
     setTimeout(() => {
-      if (currentIndex < questions.length - 1) {
-        setCurrentIndex((prev) => prev + 1);
-      } else {
-        setPhase('review');
-      }
+      // After the setTimeout, re-check applicable because skips may have activated
+      setCurrentIndex((curIdx) => {
+        const nextApplicable = filterApplicable(questions, answers, contextAnswers);
+        if (curIdx >= nextApplicable.length - 1) {
+          setPhase('review');
+          return nextApplicable.length - 1;
+        }
+        return curIdx + 1;
+      });
     }, 250);
-  }, [currentQ, currentIndex, questions.length]);
+  }, [questions, answers, contextAnswers]);
+
+  const handleLikert = useCallback((score: number) => {
+    if (!currentQ) return;
+    setAnswers((prev) => ({ ...prev, [currentQ.id]: score }));
+    advance();
+  }, [currentQ, advance]);
 
   const handleMcqSingle = useCallback((score: number) => {
+    if (!currentQ) return;
     setAnswers((prev) => ({ ...prev, [currentQ.id]: score }));
-    // Auto-advance
-    setTimeout(() => {
-      if (currentIndex < questions.length - 1) {
-        setCurrentIndex((prev) => prev + 1);
-      } else {
-        setPhase('review');
-      }
-    }, 250);
-  }, [currentQ, currentIndex, questions.length]);
+    advance();
+  }, [currentQ, advance]);
+
+  const handleScenario = useCallback((score: number) => {
+    if (!currentQ) return;
+    setAnswers((prev) => ({ ...prev, [currentQ.id]: score }));
+    advance();
+  }, [currentQ, advance]);
 
   const handleMcqMulti = useCallback((score: number) => {
+    if (!currentQ) return;
     setAnswers((prev) => {
       const current = (prev[currentQ.id] as number[]) || [];
       const maxSel = currentQ.maxSelections || 2;
-      if (current.includes(score)) {
-        return { ...prev, [currentQ.id]: current.filter((s) => s !== score) };
-      }
+      if (current.includes(score)) return { ...prev, [currentQ.id]: current.filter((s) => s !== score) };
       if (current.length >= maxSel) return prev;
       return { ...prev, [currentQ.id]: [...current, score] };
     });
@@ -442,70 +509,60 @@ export function AssessmentFlow({ config }: Props) {
 
   // Navigation
   const goNext = useCallback(() => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-    } else {
-      setPhase('review');
-    }
-  }, [currentIndex, questions.length]);
+    const nextApplicable = filterApplicable(questions, answers, contextAnswers);
+    if (currentIndex < nextApplicable.length - 1) setCurrentIndex((p) => p + 1);
+    else setPhase('review');
+  }, [currentIndex, questions, answers, contextAnswers]);
 
   const goBack = useCallback(() => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
-    }
-  }, [currentIndex]);
+    if (phase === 'context') return; // context handles its own questions array
+    if (currentIndex > 0) setCurrentIndex((prev) => prev - 1);
+  }, [phase, currentIndex]);
 
   // Keyboard support
   useEffect(() => {
-    if (phase !== 'questions') return;
+    if (phase !== 'questions' || !currentQ) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft' && currentIndex > 0) {
-        goBack();
-      } else if (e.key === 'ArrowRight' && isAnswered(currentQ, answers)) {
-        goNext();
-      } else if (currentQ.type === 'likert') {
+      if (e.key === 'ArrowLeft' && currentIndex > 0) goBack();
+      else if (e.key === 'ArrowRight' && isAnswered(currentQ, answers)) goNext();
+      else if (currentQ.type === 'likert') {
         const n = parseInt(e.key, 10);
         if (n >= 1 && n <= 5) handleLikert(n);
-      } else if (currentQ.type === 'mcq_single' && currentQ.options) {
+      } else if ((currentQ.type === 'mcq_single' || currentQ.type === 'scenario') && currentQ.options) {
         const n = parseInt(e.key, 10);
         if (n >= 1 && n <= currentQ.options.length) {
-          handleMcqSingle(currentQ.options[n - 1].score);
+          if (currentQ.type === 'scenario') handleScenario(currentQ.options[n - 1].score);
+          else handleMcqSingle(currentQ.options[n - 1].score);
         }
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, currentIndex, currentQ, answers, goBack, goNext, handleLikert, handleMcqSingle]);
+  }, [phase, currentIndex, currentQ, answers, goBack, goNext, handleLikert, handleMcqSingle, handleScenario]);
 
   // Submit
   const handleSubmit = useCallback(async () => {
     setPhase('submitting');
     const state: PersistedAssessmentState = {
-      answers, currentIndex, startedAt: Date.now(), status: 'submitting',
+      answers, contextAnswers, currentIndex, startedAt: Date.now(), status: 'submitting',
     };
     saveState(code.toLowerCase(), state);
 
     let resultId: string | null = null;
-
     if (config.onSubmit) {
-      // Real backend submission
       try {
-        const result = await config.onSubmit(answers);
+        const result = await config.onSubmit(answers, contextAnswers);
         resultId = result.resultId;
       } catch (e) {
         console.error('[AssessmentFlow] Submission failed:', e);
-        // Fall through to navigation with null ID — results page handles mock fallback
       }
     } else {
-      // Simulated processing
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }
 
     clearState(code.toLowerCase());
-
-    // Redirect to results page (with ID if available)
     navigate(resultId ? `${resultsPath}/${resultId}` : resultsPath);
-  }, [answers, currentIndex, code, resultsPath, navigate, config]);
+  }, [answers, contextAnswers, currentIndex, code, resultsPath, navigate, config]);
 
   // ── RENDER ───────────────────────────────────────────────────────
   if (phase === 'submitting') {
@@ -541,10 +598,7 @@ export function AssessmentFlow({ config }: Props) {
               letterSpacing: '0.08em', color: G400,
             }}>by LYC</span>
           </Link>
-          <Link to={landingPath} style={{
-            fontSize: 13, color: G600, textDecoration: 'none',
-            transition: 'color 120ms ease',
-          }}
+          <Link to={landingPath} style={{ fontSize: 13, color: G600, textDecoration: 'none' }}
             onMouseEnter={(e) => (e.currentTarget.style.color = INK)}
             onMouseLeave={(e) => (e.currentTarget.style.color = G600)}>
             Exit
@@ -562,116 +616,116 @@ export function AssessmentFlow({ config }: Props) {
 
       {/* ── CONTENT ────────────────────────────────────────────── */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 32px' }}>
+        {/* ── CONTEXT PREFLIGHT ─────────────────────────────── */}
+        {phase === 'context' && contextQuestions && contextQuestions.length ? (
+          <div style={{ width: '100%' }}>
+            <ContextPreflight
+              contextQuestions={contextQuestions}
+              contextAnswers={contextAnswers}
+              onChange={setContextAnswer}
+              accent={accent}
+              onComplete={finishContext}
+              canSkip
+              onSkip={finishContext}
+            />
+          </div>
+        ) : null}
+
+        {/* ── QUESTIONS ────────────────────────────────────── */}
         {phase === 'questions' && currentQ && (
-          <div style={{ maxWidth: 680, width: '100%' }}>
+          <div style={{ maxWidth: 720, width: '100%' }}>
             {/* Progress label */}
             <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              marginBottom: 48,
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32,
             }}>
-              <span style={{ ...monoStyle, color: G400, fontSize: 10 }}>
-                Question {currentIndex + 1} of {questions.length}
+              <span style={{ ...monoStyle, color: G400, fontSize: 11, letterSpacing: '0.04em' }}>
+                {currentQ.type === 'scenario' ? null : `Question ${currentIndex + 1} of ${applicableQuestions.length}`}
+                {(questions.length > applicableQuestions.length) && (
+                  <span style={{ marginLeft: 8, color: accent }}>
+                    · {questions.length - applicableQuestions.length} skipped via context
+                  </span>
+                )}
               </span>
               <span style={{ ...monoStyle, color: accent, fontSize: 10 }}>
                 {answeredCount} answered
               </span>
             </div>
 
-            {/* Question text */}
-            <h1 style={{
-              fontFamily: "'Libre Baskerville', Georgia, serif",
-              fontSize: 28, fontWeight: 700, color: INK,
-              lineHeight: 1.3, marginBottom: 8,
-            }}>
-              {currentQ.text}
-            </h1>
-            {currentQ.hint && (
-              <p style={{ fontSize: 15, color: G600, lineHeight: 1.6, marginBottom: 40 }}>
-                {currentQ.hint}
-              </p>
-            )}
-            {!currentQ.hint && <div style={{ height: 32 }} />}
+            {currentQ.type !== 'scenario' ? (
+              <>
+                {/* Non-scenario: regular question text */}
+                <h1 style={{
+                  fontFamily: "'Libre Baskerville', Georgia, serif",
+                  fontSize: 28, fontWeight: 700, color: INK, lineHeight: 1.3, marginBottom: 8,
+                }}>
+                  {currentQ.text}
+                </h1>
+                {currentQ.hint ? (
+                  <p style={{ fontSize: 15, color: G600, lineHeight: 1.6, marginBottom: 40 }}>
+                    {currentQ.hint}
+                  </p>
+                ) : <div style={{ height: 32 }} />}
+              </>
+            ) : null}
 
-            {/* Answer area */}
+            {/* Answer area: dispatch by type */}
             {currentQ.type === 'likert' && (
-              <LikertQuestion
-                question={currentQ}
-                value={answers[currentQ.id] as number | undefined}
-                onSelect={handleLikert}
-                accent={accent}
-              />
+              <LikertQuestion question={currentQ} value={answers[currentQ.id] as number | undefined}
+                onSelect={handleLikert} accent={accent} />
             )}
             {currentQ.type === 'mcq_single' && (
-              <McqSingleQuestion
-                question={currentQ}
-                value={answers[currentQ.id] as number | undefined}
-                onSelect={handleMcqSingle}
-                accent={accent}
-              />
+              <McqSingleQuestion question={currentQ} value={answers[currentQ.id] as number | undefined}
+                onSelect={handleMcqSingle} accent={accent} />
             )}
             {currentQ.type === 'mcq_multi' && (
-              <McqMultiQuestion
+              <McqMultiQuestion question={currentQ} value={answers[currentQ.id] as number[] | undefined}
+                onToggle={handleMcqMulti} accent={accent} />
+            )}
+            {currentQ.type === 'scenario' && (
+              <ScenarioQuestion
                 question={currentQ}
-                value={answers[currentQ.id] as number[] | undefined}
-                onToggle={handleMcqMulti}
+                currentAnswer={answers[currentQ.id] as number | undefined}
+                onAnswer={handleScenario}
+                questionNumber={currentIndex + 1}
+                totalQuestions={applicableQuestions.length}
                 accent={accent}
               />
             )}
 
             {/* Navigation */}
             <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              marginTop: 48,
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 48,
             }}>
-              <button
-                onClick={goBack}
-                disabled={currentIndex === 0}
+              <button onClick={goBack} disabled={currentIndex === 0}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '12px 20px', background: 'none',
-                  border: 'none', cursor: currentIndex === 0 ? 'not-allowed' : 'pointer',
-                  fontFamily: "'DM Sans', system-ui, sans-serif",
-                  fontSize: 14, fontWeight: 500, color: currentIndex === 0 ? G300 : INK,
-                  opacity: currentIndex === 0 ? 0.5 : 1,
-                  transition: 'opacity 120ms ease',
-                }}
-              >
+                  display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 20px',
+                  background: 'none', border: 'none',
+                  cursor: currentIndex === 0 ? 'not-allowed' : 'pointer',
+                  fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 500,
+                  color: currentIndex === 0 ? G300 : INK, opacity: currentIndex === 0 ? 0.5 : 1,
+                }}>
                 <ArrowLeft style={{ width: 16, height: 16 }} /> Back
               </button>
 
-              {/* For mcq_multi and non-auto-advancing, show Next button */}
               {currentQ.type === 'mcq_multi' && (
-                <button
-                  onClick={goNext}
-                  disabled={!isAnswered(currentQ, answers)}
+                <button onClick={goNext} disabled={!isAnswered(currentQ, answers)}
                   style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 8,
-                    padding: '12px 24px',
-                    background: isAnswered(currentQ, answers) ? accent : G200,
-                    border: 'none', cursor: isAnswered(currentQ, answers) ? 'pointer' : 'not-allowed',
-                    fontFamily: "'DM Sans', system-ui, sans-serif",
-                    fontSize: 14, fontWeight: 500,
+                    display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px',
+                    background: isAnswered(currentQ, answers) ? accent : G200, border: 'none',
+                    cursor: isAnswered(currentQ, answers) ? 'pointer' : 'not-allowed',
+                    fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 500,
                     color: isAnswered(currentQ, answers) ? WHITE : G400,
-                    transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
-                  }}
-                >
+                  }}>
                   {isLast ? 'Review' : 'Next'} <ArrowRight style={{ width: 16, height: 16 }} />
                 </button>
               )}
 
-              {/* For likert/mcq_single: show "skip to review" on last question */}
               {currentQ.type !== 'mcq_multi' && isLast && isAnswered(currentQ, answers) && (
-                <button
-                  onClick={() => setPhase('review')}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 8,
-                    padding: '12px 24px', background: accent, border: 'none',
-                    cursor: 'pointer',
-                    fontFamily: "'DM Sans', system-ui, sans-serif",
-                    fontSize: 14, fontWeight: 500, color: WHITE,
-                    transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
-                  }}
-                >
+                <button onClick={() => setPhase('review')} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px',
+                  background: accent, border: 'none', cursor: 'pointer',
+                  fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 500, color: WHITE,
+                }}>
                   Review <ArrowRight style={{ width: 16, height: 16 }} />
                 </button>
               )}
@@ -679,40 +733,30 @@ export function AssessmentFlow({ config }: Props) {
           </div>
         )}
 
+        {/* ── REVIEW ───────────────────────────────────────── */}
         {phase === 'review' && (
           <div style={{ maxWidth: 680, width: '100%' }}>
             <ReviewScreen
               config={config}
               answers={answers}
+              applicable={applicableQuestions}
               onEdit={(i) => { setCurrentIndex(i); setPhase('questions'); }}
               accent={accent}
             />
-            {/* Submit bar */}
-            <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              marginTop: 48,
-            }}>
-              <button
-                onClick={() => { setCurrentIndex(questions.length - 1); setPhase('questions'); }}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 48 }}>
+              <button onClick={() => { setCurrentIndex(Math.max(0, applicableQuestions.length - 1)); setPhase('questions'); }}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '12px 20px', background: 'none', border: 'none',
-                  cursor: 'pointer',
-                  fontFamily: "'DM Sans', system-ui, sans-serif",
-                  fontSize: 14, fontWeight: 500, color: INK,
-                }}
-              >
+                  display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 20px',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 500, color: INK,
+                }}>
                 <ArrowLeft style={{ width: 16, height: 16 }} /> Back
               </button>
-              <button
-                onClick={handleSubmit}
+              <button onClick={handleSubmit}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '14px 32px', background: accent, border: 'none',
-                  cursor: 'pointer',
-                  fontFamily: "'DM Sans', system-ui, sans-serif",
-                  fontSize: 15, fontWeight: 600, color: WHITE,
-                  transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
+                  display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px',
+                  background: accent, border: 'none', cursor: 'pointer',
+                  fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 15, fontWeight: 600, color: WHITE,
                 }}
                 onMouseDown={(e) => {
                   e.currentTarget.style.transform = 'scale(0.98)';

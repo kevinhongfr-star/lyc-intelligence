@@ -6,7 +6,10 @@ import {
   AssessmentState,
   WritingStyle,
   ASSESSMENT_ENGINE,
+  CPDScenario,
 } from '../../services/assessmentEngine';
+import { filterApplicable } from './flow/skipLogic';
+import type { ContextAnswerMap } from './flow/types';
 import { ScenarioQuestion } from './ScenarioQuestion';
 import { StyleSelector } from './StyleSelector';
 import { ResultsPanel } from './ResultsPanel';
@@ -35,7 +38,15 @@ const DS = {
 
 type Step = 'gate' | 'context' | 'dimensions' | 'cross_border' | 'style' | 'goals' | 'results';
 
-const TOTAL_DIMENSION_QUESTIONS = CPD_SCENARIOS.length;
+// #1323: Convert professionalContext to ContextAnswerMap semantics so skipIf
+// rules written for AssessmentFlow work equally in the legacy CPD wizard.
+function contextAnswersFromContext(ctx: AssessmentState['professionalContext']): ContextAnswerMap {
+  return {
+    seniority: ctx.situation,
+    geography: ctx.geography,
+    function: ctx.function,
+  };
+}
 
 export interface AssessmentWizardProps {
   prefillEmail?: string;
@@ -64,6 +75,18 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
   const [archetype, setArchetype] = useState<any>('Precision Operator');
   const [crossBorderScore, setCrossBorderScore] = useState<number>(0);
 
+  // #1323: Apply skipIf whenever professionalContext changes.
+  const applicableScenarios = (() => {
+    const ca = contextAnswersFromContext(state.professionalContext);
+    // filterApplicable signature: questions need id+skipIf fields. CPDScenario
+    // has both, so it satisfies the structural type. Force cast locally.
+    return filterApplicable(
+      CPD_SCENARIOS as unknown as Array<{ id: string; skipIf?: any }>,
+      state.dimensions,
+      ca,
+    ) as unknown as CPDScenario[];
+  })();
+
   // Auto-save to localStorage
   useEffect(() => {
     try {
@@ -86,6 +109,13 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
     }
   }, []);
 
+  // Clamp question index if applicable scenarios shrunk (skipIf got triggered)
+  useEffect(() => {
+    if (applicableScenarios.length > 0 && currentQuestionIndex >= applicableScenarios.length) {
+      setCurrentQuestionIndex(Math.max(0, applicableScenarios.length - 1));
+    }
+  }, [applicableScenarios.length, currentQuestionIndex]);
+
   const handleGateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!state.gate.email || !state.gate.name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.gate.email)) {
@@ -97,12 +127,13 @@ export function AssessmentWizard({ prefillEmail, prefillName, onComplete }: Asse
   };
 
   const answerDimensionQuestion = (score: number) => {
-    const questionId = CPD_SCENARIOS[currentQuestionIndex].id;
+    const questionId = applicableScenarios[currentQuestionIndex]?.id;
+    if (!questionId) return;
     setState(prev => ({
       ...prev,
       dimensions: { ...prev.dimensions, [questionId]: score }
     }));
-    if (currentQuestionIndex < TOTAL_DIMENSION_QUESTIONS - 1) {
+    if (currentQuestionIndex < applicableScenarios.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
       setStep('cross_border');

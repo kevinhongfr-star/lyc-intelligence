@@ -455,13 +455,22 @@ export interface CPDScenario {
   dimension: DimensionId;
   prompt: string;
   options: { label: string; value: 1 | 2 | 3 | 4 | 5; archetype_bias?: CPDArchetype }[];
+  /** #1323: Scenario setup paragraph (italic "you are here" context). */
+  scenarioContext?: string;
+  /** #1323: Framing prompt "What would you do in your first 48 hours?" */
+  entryExpectation?: string;
+  /** #1323: Skip rule; see flow/skipLogic.ts semantics. */
+  skipIf?: any;
 }
 
 export const CPD_SCENARIOS: CPDScenario[] = [
   {
     id: "sc1",
     dimension: "strategic_orientation",
-    prompt: "Your division is given a new 3-year mandate. The board wants both growth and margin expansion.",
+    scenarioContext:
+      "It's your second month on the job as VP of a $400M division. The board has just handed you a new 3-year mandate: they want double-digit top-line growth AND a 300 bps margin expansion. The CFO has privately told you not to bet the farm. Your direct reports are a mix of legacy incumbents and two external hires who are still finding their feet.",
+    prompt: "The board wants both growth and margin expansion.",
+    entryExpectation: "What do you do in your first two weeks?",
     options: [
       { label: "Define three strategic pillars with measurable guardrails before execution.", value: 5, archetype_bias: "Strategic Architect" },
       { label: "Frame a bold vision and empower direct reports to design the path.", value: 4, archetype_bias: "Adaptive Visionary" },
@@ -472,7 +481,10 @@ export const CPD_SCENARIOS: CPDScenario[] = [
   {
     id: "sc2",
     dimension: "execution_discipline",
+    scenarioContext:
+      "Q3 board pack is six weeks away. Your flagship cross-functional transformation — two years in — is slipping 10 weeks on timeline and the last two deliverables both had quality issues that your client CEO flagged on the monthly call. No one on the project team has flagged the risk; it's been death-by-a-thousand-cuts.",
     prompt: "A critical cross-functional project is slipping on timeline and quality.",
+    entryExpectation: "What's your first move?",
     options: [
       { label: "Reset the plan with weekly tracking, owners, and clear milestones.", value: 5, archetype_bias: "Precision Operator" },
       { label: "Hold a team workshop to rebuild commitments collaboratively.", value: 3, archetype_bias: "Influential Builder" },
@@ -483,7 +495,10 @@ export const CPD_SCENARIOS: CPDScenario[] = [
   {
     id: "sc3",
     dimension: "stakeholder_influence",
+    scenarioContext:
+      "You're preparing the FY27 budget bid. A sceptical regional leader — who has a track record of vetoing proposals they didn't help write — needs to approve by Friday. Their team has a reputation for running a tight, numbers-only process. Your CFO is on your side but will not fight this battle for you.",
     prompt: "A sceptical regional leader must approve your budget proposal this week.",
+    entryExpectation: "How do you get to yes?",
     options: [
       { label: "Tailor a one-page story to their incentives, then a short call.", value: 5, archetype_bias: "Influential Builder" },
       { label: "Send a data-heavy deck with supporting evidence.", value: 3, archetype_bias: "Precision Operator" },
@@ -494,7 +509,10 @@ export const CPD_SCENARIOS: CPDScenario[] = [
   {
     id: "sc4",
     dimension: "leadership_presence",
+    scenarioContext:
+      "Your company just announced a tough reorganisation: two business units merge, ~15% of roles in your scope will be redundant. The leadership team has briefed on secrecy and a clean Day-1 communication. You've just come out of the final approval meeting; the day after tomorrow is the all-hands where it will be announced. Your direct leadership team already knows and is visibly nervous.",
     prompt: "You need to inspire a nervous team the day after a tough reorganisation.",
+    entryExpectation: "What's your all-hands playbook?",
     options: [
       { label: "Acknowledge uncertainty, share a clear narrative, and invite questions.", value: 5, archetype_bias: "Adaptive Visionary" },
       { label: "Lay out the concrete next 30 days to restore confidence.", value: 4, archetype_bias: "Grounded Executor" },
@@ -505,7 +523,13 @@ export const CPD_SCENARIOS: CPDScenario[] = [
   {
     id: "sc5",
     dimension: "cross_border_adaptability",
+    // #1323 skip-if demo: skip the cross-border scenario entirely if the
+    // entry-expectation preflight captured geography === 'single_market'.
+    skipIf: { answerEquals: { key: "geography", value: "single_market" } },
+    scenarioContext:
+      "Global HQ (US) just rolled out a new regional operating model that centralises procurement and sets shared KPIs across markets. Your APAC market lead in Singapore has pushed back hard: local procurement cycles are 60 days slower than HQ, they say, and the new KPIs penalise relationship-based selling. Their email was blunt; the team is threatening an escalation.",
     prompt: "Your HQ decision is being resisted strongly by an APAC market team.",
+    entryExpectation: "You fly to Singapore on Monday. What's your move?",
     options: [
       { label: "Fly in, listen first, and adapt the decision to their operating reality.", value: 5, archetype_bias: "Cross-Border Catalyst" },
       { label: "Share the context behind the decision and ask for a 90-day trial.", value: 3, archetype_bias: "Grounded Executor" },
