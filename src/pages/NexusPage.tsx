@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, Sparkles, ArrowRight, LogIn } from 'lucide-react';
 import { sendChatMessage } from '@/services/coze';
 import { useAuthStore } from '@/stores/authStore';
+import { SEO } from '@/components/seo/SEO';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Link, useNavigate } from 'react-router-dom';
@@ -147,6 +148,7 @@ export function NexusPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      <SEO page="nexus" />
       {/* Header */}
       <header className="border-b border-gray-100 bg-white sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">

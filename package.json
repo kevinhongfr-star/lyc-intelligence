@@ -10,10 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0",
     "@sentry/react": "^8.20.0",
+    "@supabase/supabase-js": "^2.45.0",
     "@tailwindcss/typography": "^0.5.19",
     "@types/papaparse": "^5.5.2",
+    "@vercel/og": "^1.0.1",
     "framer-motion": "^11.3.0",
     "jose": "^6.2.3",
     "jspdf": "^2.5.1",

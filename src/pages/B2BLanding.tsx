@@ -3,6 +3,7 @@ import { initScrollReveal } from '@/lib/utils';
 import { ArrowRight, Menu, X, Lock, Users, Target, Gauge, Building2, ClipboardList, MessageSquarePlus } from 'lucide-react';
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
+import { SEO } from '@/components/seo/SEO';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -130,6 +131,7 @@ export function B2BLanding() {
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
+      <SEO page="b2b" />
       <Nav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
       {/* HERO — NEXUS for Teams */}

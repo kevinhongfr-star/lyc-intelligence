@@ -14,6 +14,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Compass, Globe, Users, Target, Award, ChevronRight, Loader2, Download, Clock, ArrowLeft } from 'lucide-react';
 import { AssessmentWizard } from '@/components/assessment/AssessmentWizard';
 import { useAuthStore } from '@/stores/authStore';
+import { SEO } from '@/components/seo/SEO';
+import { getAssessmentMeta } from '@/seo/pageMetadata';
 import { generateCPIReportHTML, type CPIReportData } from '@/services/cpiReportRenderer';
 import {
   DIMENSION_INFO,
@@ -173,6 +175,7 @@ export default function CpiPage() {
   // ── Landing mode ──
   return (
     <div className="space-y-8">
+      <SEO assessment={getAssessmentMeta('CPI', 'China Leadership Pipeline Diagnostic', 'CPI', 'Flagship leadership pipeline diagnostic validated against 20 years of APAC placement data.', 199, 15, 60)} />
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900">China Leadership Pipeline Diagnostic</h1>

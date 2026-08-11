@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Brain, Target, Zap, Users, TrendingUp, Clock, ChevronRight, Loader2 } from 'lucide-react';
 import { SHIFTAssessmentWizard } from '@/components/assessment/SHIFTAssessmentWizard';
 import { useAuthStore } from '@/stores/authStore';
+import { SEO } from '@/components/seo/SEO';
 import type { SHIFTAssessmentType } from '@/services/shiftAssessmentTypes';
 
 interface DiagnosticCard {
@@ -82,6 +83,7 @@ export default function ShiftPage() {
 
   return (
     <div className="space-y-8">
+      <SEO title="SHIFT Suite — 5 Leadership Assessments | LYC Intelligence" description="Five-instrument suite measuring learning, execution, inquiry, coaching, and impact. Each diagnostic takes 10 minutes. 99-149 miles per assessment. Part of the LYC Intelligence platform." path="/assessment/shift" />
       <div>
         <h1 className="text-2xl font-bold text-slate-900">SHIFT Suite</h1>
         <p className="text-sm text-slate-500 mt-1">

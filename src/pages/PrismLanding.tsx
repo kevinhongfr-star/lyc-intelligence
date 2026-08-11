@@ -1,5 +1,7 @@
 import { AssessmentLanding, type AssessmentLandingConfig } from '@/components/assessment/landing';
 import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
+import { SEO } from '@/components/seo/SEO';
+import { getAssessmentMeta } from '@/seo/pageMetadata';
 
 const config: AssessmentLandingConfig = {
   code: 'PRISM',
@@ -68,7 +70,16 @@ const config: AssessmentLandingConfig = {
 };
 
 export function PrismLanding() {
-  return <AssessmentLanding config={config} />;
+  const info = ASSESSMENT_CATALOG['PRISM'];
+  return (
+    <>
+      <SEO assessment={getAssessmentMeta(
+        info.code, info.name, info.b2cName, info.tagline,
+        info.priceMiles, info.duration_minutes, info.total_questions,
+      )} />
+      <AssessmentLanding config={config} />
+    </>
+  );
 }
 
 export default PrismLanding;

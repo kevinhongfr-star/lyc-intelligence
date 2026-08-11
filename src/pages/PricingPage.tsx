@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Check, Crown, Sparkles, ArrowRight, Loader2, Globe, Coins } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { authFetch } from '@/utils/authFetch';
+import { SEO } from '@/components/seo/SEO';
 import {
   CANONICAL_TIER_ORDER,
   CANONICAL_TIER_PRICING,
@@ -90,6 +91,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+      <SEO page="pricing" />
       {/* Header */}
       <div className="max-w-6xl mx-auto px-4 py-16 text-center">
         <h1 className="text-4xl font-bold text-text-primary mb-4">

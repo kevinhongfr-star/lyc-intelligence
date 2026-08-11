@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AssessmentWizard } from '../components/assessment/AssessmentWizard';
 import { useAuthStore } from '../stores/authStore';
+import { SEO } from '@/components/seo/SEO';
 
 export function AssessmentPage() {
   const [searchParams] = useSearchParams();
@@ -12,9 +13,10 @@ export function AssessmentPage() {
 
   return (
     <div style={{ background: '#FFFFFF', minHeight: '100vh' }}>
-      <AssessmentWizard 
-        prefillEmail={prefillEmail} 
-        prefillName={prefillName} 
+      <SEO page="assessments" />
+      <AssessmentWizard
+        prefillEmail={prefillEmail}
+        prefillName={prefillName}
       />
     </div>
   );

@@ -3,6 +3,7 @@ import { initScrollReveal } from '@/lib/utils';
 import { ArrowRight, Menu, X, Lock, Layers, BadgeDollarSign, UserCheck } from 'lucide-react';
 import { ASSESSMENT_CATALOG, FLAGSHIP_KEYS, SHIFT_SUITE_KEYS, ADVISORY_PRODUCT_KEYS, type AssessmentInfo } from '@/assessments/catalog';
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
+import { SEO } from '@/components/seo/SEO';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -532,6 +533,7 @@ export function Landing() {
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
+      <SEO page="landing" />
       {/* NAV */}
       <nav
         style={{

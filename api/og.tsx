@@ -1,0 +1,211 @@
+/**
+ * Phase 17 / T01 (#1287) — Dynamic OG image generator.
+ *
+ * Edge function using @vercel/og's ImageResponse.
+ * Renders 1200×630 PNG with LYC Intelligence brand template:
+ *   - LYC logo in corner
+ *   - Page title in Libre Baskerville
+ *   - Accent color bar at bottom (#C108AB)
+ *   - One template, per-page title variable
+ *
+ * Usage: /api/og?title=Page+Title&subtitle=Optional+Subtitle
+ *
+ * This is 1 serverless function — well within Vercel Hobby's 12-function limit.
+ */
+import { ImageResponse } from '@vercel/og';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+export const config = {
+  runtime: 'edge',
+};
+
+const ACCENT = '#C108AB';
+const HEADING_FONT = 'Libre Baskerville';
+const BODY_FONT = 'DM Sans';
+
+export default async function handler(req: VercelRequest, res: VercelResponse): Promise<ImageResponse> {
+  const { searchParams } = new URL(req.url || 'http://localhost');
+  const title = (searchParams.get('title') || 'LYC Intelligence').slice(0, 80);
+  const subtitle = (searchParams.get('subtitle') || '').slice(0, 120);
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: '#FFFFFF',
+          fontFamily: BODY_FONT,
+          position: 'relative',
+        }}
+      >
+        {/* Logo — top left */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '48px 56px',
+          }}
+        >
+          <div
+            style={{
+              width: '44px',
+              height: '44px',
+              backgroundColor: ACCENT,
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: HEADING_FONT,
+              fontWeight: 700,
+              fontSize: '22px',
+            }}
+          >
+            L
+          </div>
+          <span
+            style={{
+              fontFamily: HEADING_FONT,
+              fontSize: '20px',
+              fontWeight: 700,
+              color: '#000000',
+            }}
+          >
+            LYC Intelligence
+          </span>
+        </div>
+
+        {/* Title — center */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            flex: 1,
+            padding: '0 56px',
+            paddingBottom: '60px',
+          }}
+        >
+          <div
+            style={{
+              fontFamily: HEADING_FONT,
+              fontSize: title.length > 50 ? '44px' : '56px',
+              fontWeight: 700,
+              color: '#000000',
+              lineHeight: 1.15,
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 3,
+              overflow: 'hidden',
+            }}
+          >
+            {title}
+          </div>
+          {subtitle ? (
+            <div
+              style={{
+                fontFamily: BODY_FONT,
+                fontSize: '24px',
+                color: '#666666',
+                marginTop: '20px',
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 2,
+                overflow: 'hidden',
+              }}
+            >
+              {subtitle}
+            </div>
+          ) : null}
+        </div>
+
+        {/* Accent bar — bottom */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 56px',
+            paddingBottom: '40px',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: BODY_FONT,
+              fontSize: '18px',
+              color: '#666666',
+            }}
+          >
+            Know where you stand. Know where to go.
+          </span>
+          <span
+            style={{
+              fontFamily: BODY_FONT,
+              fontSize: '16px',
+              color: '#999999',
+            }}
+          >
+            lyc-intelligence.app
+          </span>
+        </div>
+
+        {/* Accent bar */}
+        <div
+          style={{
+            display: 'flex',
+            height: '8px',
+            width: '100%',
+          }}
+        >
+          <div style={{ flex: 1, backgroundColor: ACCENT }} />
+        </div>
+      </div>
+    ),
+    {
+      width: 1200,
+      height: 630,
+      // Fonts loaded via Google Fonts CSS in the edge runtime
+      fonts: [
+        {
+          name: HEADING_FONT,
+          data: await fetchFont('Libre+Baskerville:wght@700'),
+          weight: 700,
+          style: 'normal',
+        },
+        {
+          name: BODY_FONT,
+          data: await fetchFont('DM+Sans:wght@400;500;700'),
+          weight: 400,
+          style: 'normal',
+        },
+      ],
+    },
+  );
+}
+
+/** Fetch font from Google Fonts as ArrayBuffer for @vercel/og */
+async function fetchFont(cssQuery: string): Promise<ArrayBuffer> {
+  try {
+    const cssUrl = `https://fonts.googleapis.com/css2?family=${cssQuery}&display=swap`;
+    const cssRes = await fetch(cssUrl, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
+    });
+    const css = await cssRes.text();
+    // Extract the first woff2 URL
+    const match = css.match(/src:\s*url\(([^)]+)\)/);
+    if (match) {
+      const fontUrl = match[1].replace(/['"]/g, '');
+      const fontRes = await fetch(fontUrl);
+      return await fontRes.arrayBuffer();
+    }
+  } catch (e) {
+    // Fallback: let ImageResponse use system fonts
+  }
+  return new ArrayBuffer(0);
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/stores/toastStore';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, BarChart3, Shield, Loader2, Upload, Database, FileText, Plus } from 'lucide-react';
+import { SEO } from '@/components/seo/SEO';
 import { JDInput } from '../components/match/JDInput';
 import { CandidateList } from '../components/match/CandidateList';
 import { ResultsTable } from '../components/match/ResultsTable';
@@ -272,6 +273,7 @@ export function MatchPage() {
   if (step === 'gate') {
     return (
       <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+        <SEO page="match" />
         <div style={{ maxWidth: '480px', width: '100%' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>

@@ -4,6 +4,8 @@ import { ArrowLeft, ArrowRight, Menu, X, Lock, Layers, Clock, HelpCircle, Sparkl
 import { initScrollReveal } from '@/lib/utils';
 import { ASSESSMENT_CATALOG, type AssessmentInfo } from '@/assessments/catalog';
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
+import { SEO } from '@/components/seo/SEO';
+import { getAssessmentMeta } from '@/seo/pageMetadata';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -77,6 +79,15 @@ export function CanonicalInstrumentLanding() {
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
+      <SEO assessment={getAssessmentMeta(
+        info.code,
+        info.name,
+        info.b2cName,
+        info.tagline,
+        info.priceMiles,
+        info.duration_minutes,
+        info.total_questions,
+      )} />
       {/* NAV */}
       <nav
         style={{

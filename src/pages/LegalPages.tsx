@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, FileText, Shield, Cookie, Download, Trash2, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { authFetch } from '@/utils/authFetch';
+import { SEO } from '@/components/seo/SEO';
 
 interface Section {
   heading: string;
@@ -100,13 +101,16 @@ export function TermsPage() {
     },
   ];
   return (
-    <LegalLayout
-      title="Terms of Service"
-      icon={<FileText className="w-5 h-5" />}
-      intro="These Terms govern your use of LYC Intelligence. By accessing or using the Service, you agree to be bound by these Terms."
-      sections={sections}
-      lastUpdated="August 4, 2026"
-    />
+    <>
+      <SEO page="terms" />
+      <LegalLayout
+        title="Terms of Service"
+        icon={<FileText className="w-5 h-5" />}
+        intro="These Terms govern your use of LYC Intelligence. By accessing or using the Service, you agree to be bound by these Terms."
+        sections={sections}
+        lastUpdated="August 4, 2026"
+      />
+    </>
   );
 }
 
@@ -173,14 +177,17 @@ export function PrivacyPage() {
     },
   ];
   return (
-    <LegalLayout
-      title="Privacy Policy"
-      icon={<Shield className="w-5 h-5" />}
-      intro="This Privacy Policy explains how LYC Partners Shanghai collects, uses, and protects your personal data when you use LYC Intelligence."
-      sections={sections}
-      lastUpdated="August 4, 2026"
-      actions={<PrivacyActionsPanel />}
-    />
+    <>
+      <SEO page="privacy" />
+      <LegalLayout
+        title="Privacy Policy"
+        icon={<Shield className="w-5 h-5" />}
+        intro="This Privacy Policy explains how LYC Partners Shanghai collects, uses, and protects your personal data when you use LYC Intelligence."
+        sections={sections}
+        lastUpdated="August 4, 2026"
+        actions={<PrivacyActionsPanel />}
+      />
+    </>
   );
 }
 
@@ -213,13 +220,16 @@ export function CookiesPage() {
     },
   ];
   return (
-    <LegalLayout
-      title="Cookie Policy"
-      icon={<Cookie className="w-5 h-5" />}
-      intro="This policy explains how LYC Intelligence uses cookies and similar technologies, and how you can control them."
-      sections={sections}
-      lastUpdated="August 4, 2026"
-    />
+    <>
+      <SEO page="cookies" />
+      <LegalLayout
+        title="Cookie Policy"
+        icon={<Cookie className="w-5 h-5" />}
+        intro="This policy explains how LYC Intelligence uses cookies and similar technologies, and how you can control them."
+        sections={sections}
+        lastUpdated="August 4, 2026"
+      />
+    </>
   );
 }
 
