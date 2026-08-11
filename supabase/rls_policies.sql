@@ -123,22 +123,37 @@ CREATE POLICY credit_tx_insert ON public.credit_transactions FOR INSERT WITH CHE
 
 -- ============================================================
 --  TABLE: organizations (client B2B org context)
+--  #1308 / ISS-016: Previously consultant role read organization rows with
+--     ZERO org scoping — consultant could see ALL orgs (cross-customer leak).
+--     RLS fix: consultants now only see their assigned org.
+--     Write: consultants no longer permitted to mutate orgs (admin-only).
+--     API-layer ACL in api/data/[entity].ts also scopes to orgColumn (defense in depth).
 -- ============================================================
 ALTER TABLE IF EXISTS public.organizations ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS orgs_read ON public.organizations;
 CREATE POLICY orgs_read ON public.organizations FOR SELECT USING (
   is_admin_role(current_user_role())
-  OR is_consultant_role(current_user_role())
+  -- Consultant now restricted to their org (same as client scope pattern).
+  -- Uses current_user_org() helper — if consultant has no org they see 0 rows,
+  -- never unrestricted set.
+  OR (is_consultant_role(current_user_role()) AND id = current_user_org())
   OR (is_client_role(current_user_role()) AND id = current_user_org())
 );
 DROP POLICY IF EXISTS orgs_write ON public.organizations;
 CREATE POLICY orgs_write ON public.organizations FOR ALL USING (
-  is_admin_role(current_user_role()) OR is_consultant_role(current_user_role())
+  -- #1307 + #1308: orgs are admin-only writes. Consultants previously had
+  -- unrestricted write access here.
+  is_admin_role(current_user_role())
 );
 
 -- ============================================================
 --  TABLE: mandates + mandate_timelines (consultant work)
+--  #1308 / ISS-016: mandates read policy allowed consultants to read ALL rows
+--     across every org (direct Supabase REST call returned 5 mandates from
+--     cross-customer test data). Now: consultants must be in the mandate's org.
+--     Writes: admin-only (were admin + consultant, which allowed cross-customer
+--     mandate tampering via direct REST).
 -- ============================================================
 ALTER TABLE IF EXISTS public.mandates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.mandate_timelines ENABLE ROW LEVEL SECURITY;
@@ -146,19 +161,29 @@ ALTER TABLE IF EXISTS public.mandate_timelines ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS mandates_read ON public.mandates;
 CREATE POLICY mandates_read ON public.mandates FOR SELECT USING (
   is_admin_role(current_user_role())
-  OR is_consultant_role(current_user_role())
+  -- Consultant scoped to mandate's organization_id (matches API consultantScope:org_only)
+  OR (is_consultant_role(current_user_role()) AND organization_id = current_user_org())
   OR (is_client_role(current_user_role()) AND organization_id = current_user_org())
 );
 DROP POLICY IF EXISTS mandates_write ON public.mandates;
 CREATE POLICY mandates_write ON public.mandates FOR ALL USING (
-  is_admin_role(current_user_role()) OR is_consultant_role(current_user_role())
+  -- Admin-only write path.
+  is_admin_role(current_user_role())
 );
 
 -- mandate_timelines mirrors mandates' scoping via join to mandates
+--   #1308: consultant must be in the same org as the parent mandate (not just "any consultant")
+--   #1307: mandate_timeline writes admin-only (consultants can't tamper timelines)
 DROP POLICY IF EXISTS mandate_tl_read ON public.mandate_timelines;
 CREATE POLICY mandate_tl_read ON public.mandate_timelines FOR SELECT USING (
   is_admin_role(current_user_role())
-  OR is_consultant_role(current_user_role())
+  OR (
+    is_consultant_role(current_user_role())
+    AND EXISTS (
+      SELECT 1 FROM public.mandates m
+      WHERE m.id = mandate_timelines.mandate_id AND m.organization_id = current_user_org()
+    )
+  )
   OR (
     is_client_role(current_user_role())
     AND EXISTS (
@@ -169,7 +194,7 @@ CREATE POLICY mandate_tl_read ON public.mandate_timelines FOR SELECT USING (
 );
 DROP POLICY IF EXISTS mandate_tl_write ON public.mandate_timelines;
 CREATE POLICY mandate_tl_write ON public.mandate_timelines FOR ALL USING (
-  is_admin_role(current_user_role()) OR is_consultant_role(current_user_role())
+  is_admin_role(current_user_role())
 );
 
 -- ============================================================
@@ -675,3 +700,81 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 COMMENT ON FUNCTION public.promote_candidate_to_leader IS
 'Candidate → Leader identity migration (PHASE 16). Requires explicit consent flag. Writes audit trail. SECURITY DEFINER so consent enforcement is always enforced.';
+
+-- ============================================================
+--  #1310 / ISS-005 + ISS-011 — Brand compliance:
+--              credits.tier + profiles.tier defaults
+--              'free' → 'executive_introduction'
+--  + backfill of existing legacy rows + brand CHECK constraints.
+--
+--  Acceptable tier values (legacy aliases preserved for rollback safety):
+--     executive_introduction  (Explorer / complimentary — CANONICAL default)
+--     basic | pro | enterprise (paid tiers — canonical)
+--     council                  (legacy alias for enterprise)
+--     free  | member           (legacy aliases for executive_introduction)
+--
+--  Safety rules:
+--   - Every DDL is wrapped in an anonymous BEGIN/EXCEPTION block so the full
+--     script remains idempotent (safe to re-run against any state of the DB).
+--   - Backfill only rewrites tier = 'free'. 'council' / 'member' rows may
+--     already be source-of-truth in the deployed DB; CreditContext normalizes
+--     those at read time and we don't touch them here.
+--   - CHECK constraints use NOT VALID → backfill → VALIDATE pattern, so adding
+--     them never blocks for long on a large table.
+-- ============================================================
+
+-- 1. Credits: column DEFAULT + CHECK constraint + backfill.
+DO $$
+BEGIN
+  ALTER TABLE public.credits ALTER COLUMN tier SET DEFAULT 'executive_introduction'::text;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+  ALTER TABLE public.credits
+    ADD CONSTRAINT credits_tier_brand_compliance_ck
+    CHECK (tier IN (
+      'executive_introduction','basic','pro','enterprise',
+      'council','free','member'
+    )) NOT VALID;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL;
+END $$;
+
+UPDATE public.credits
+   SET tier = 'executive_introduction'
+ WHERE tier = 'free';
+
+DO $$
+BEGIN
+  ALTER TABLE public.credits VALIDATE CONSTRAINT credits_tier_brand_compliance_ck;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+-- 2. Profiles: same DEFAULT + CHECK + backfill (profiles also carries tier column).
+DO $$
+BEGIN
+  ALTER TABLE public.profiles ALTER COLUMN tier SET DEFAULT 'executive_introduction'::text;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+  ALTER TABLE public.profiles
+    ADD CONSTRAINT profiles_tier_brand_compliance_ck
+    CHECK (tier IN (
+      'executive_introduction','basic','pro','enterprise',
+      'council','free','member'
+    )) NOT VALID;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL;
+END $$;
+
+UPDATE public.profiles
+   SET tier = 'executive_introduction'
+ WHERE tier = 'free';
+
+DO $$
+BEGIN
+  ALTER TABLE public.profiles VALIDATE CONSTRAINT profiles_tier_brand_compliance_ck;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
