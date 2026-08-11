@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Bell, Shield, Palette, Sun, Moon, Users } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Input } from '@/components/ui';
-import { useAuth } from '@/contexts';
+import { useAuthStore } from '@/stores/authStore';
 import { TeamManagement } from '@/components/settings/TeamManagement';
 
 const ACCENT_COLORS = [
@@ -12,7 +12,17 @@ const ACCENT_COLORS = [
 ];
 
 export function SettingsPage() {
-  const { user } = useAuth();
+  const { profile } = useAuthStore();
+  const user = profile
+    ? {
+        id: profile.id,
+        email: profile.email,
+        name: profile.name,
+        // Guard: authStore profile.role may be typed narrowly; the profiles
+        // table always has a `role` column in Phase 16 (RLS requires it).
+        role: (profile as any)?.role as string | undefined ?? '',
+      }
+    : null;
   const [activeSection, setActiveSection] = useState<'profile' | 'notifications' | 'security' | 'appearance' | 'team'>('appearance');
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('lyc-theme') as 'dark' | 'light') || 'light';

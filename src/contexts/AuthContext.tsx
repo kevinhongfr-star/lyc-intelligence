@@ -1,3 +1,33 @@
+/**
+ * ⚠️  DEPRECATED — PHASE 16 AUTH CONSOLIDATION ⚠️
+ *
+ * This legacy AuthContext is NO LONGER MOUNTED in the app tree (main.tsx
+ * removed <AuthProvider> on 2026-08-11). It remains for historical
+ * reference only. Any remaining code calling `useAuth()` from '@/contexts'
+ * will fall back to the default empty context (user: null, isLoading: false,
+ * no-op login/logout) — which is almost certainly a BUG.
+ *
+ * CANONICAL AUTH SOURCE: `useAuthStore` from `@/stores/authStore`.
+ * Server-side identity verification: `POST /api/auth/me` with caller JWT
+ * returns { user, profile, context } verified against `profiles` table and
+ * Supabase auth.getUser() so JWT tampering cannot forge a role.
+ *
+ * TODO: delete this file once no callers reference it. Current callers
+ * confirmed migrated:
+ *   - SettingsPage → useAuthStore (profile.role / profile.email)
+ *   - AppLayout → useAuthStore (signOut + profile.role)
+ *   - main.tsx → removed <AuthProvider> wrapper
+ *
+ * Old dual-auth concern:
+ *   Before Phase 16, both AuthContext (hardcoded ADMIN_EMAILS = [kevin, alessio])
+ *   and authStore.ts (Supabase-based) coexisted. Role gating was inconsistent
+ *   and admins could be forged by signing up with any email.
+ *
+ *   Role source of truth is now:
+ *     1. Supabase `profiles.role` column (server-verified)
+ *     2. JWT `app_metadata.role` as fallback
+ *     3. RLS policies enforce scoping on every DB SELECT/INSERT/UPDATE/DELETE
+ */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { User, ICP } from '@/types';

@@ -52,6 +52,8 @@ import {
   useRoutePageViewTracker,
   setTrackingUser,
 } from '@/analytics/eventTracker';
+// Phase 17 / P1-1 — Per-page SEO / OG / twitter cards. Call once inside <BrowserRouter>.
+import { usePageMetadata } from '@/hooks/usePageMetadata';
 
 // Install window.onerror + unhandledrejection listeners once, at module import
 // (idempotent, SSR-safe).
@@ -195,6 +197,11 @@ export default function App() {
   // Auto-track route changes (page_view events + landing funnel step 0).
   // Must be called inside <Routes>'s Router context (main.tsx mounts BrowserRouter).
   useRoutePageViewTracker();
+
+  // Phase 17 / P1-1 — drive <title>, meta description, OG/twitter cards,
+  // canonical, and robots from per-route registry (30+ rules for marketing
+  // routes, 11 assessments, and noindex for all 5 portals).
+  usePageMetadata();
 
   // Any uncaught error thrown in the app root report block:
   // errors from page renders are caught by ErrorBoundary above; global ones

@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-import { AuthProvider } from './contexts';
 import './index.css';
 import './styles/tokens.css';
 import { initAnalytics } from './lib/analytics';
+import { installGlobalErrorHandlers } from './analytics/errorMonitor';
 
 // ── Sentry Error Monitoring (S4-T02) ──
 // Only activate when a DSN is explicitly configured. In dev/preview this is
@@ -43,12 +43,14 @@ if (sentryDsn) {
 
 initAnalytics();
 
+// Install onerror / unhandledrejection → reportError() pipeline.
+// (installGlobalErrorHandlers is idempotent.)
+installGlobalErrorHandlers();
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <App />
     </BrowserRouter>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

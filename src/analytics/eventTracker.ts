@@ -26,6 +26,10 @@
 
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+// Sink #3: PostHog. Disabled in dev until VITE_POSTHOG_KEY is set (initAnalytics no-ops
+// until that env var is populated). Importing side-effect-free module is fine.
+import { analyticsEnabled, trackPageView as posthogTrackPageView } from '@/lib/analytics';
+import posthog from 'posthog-js';
 
 // ── Event definitions (typed string unions for autocomplete) ─────────
 
@@ -169,12 +173,22 @@ export function setTrackingUser(partial: { id?: string | null; role?: string | n
   try {
     if (!partial || (!partial.id && !partial.role)) {
       localStorage.removeItem('lyc:tracker_user');
+      try { posthog.reset(); } catch { /* noop */ }
       return;
     }
     const payload: Record<string, string> = {};
     if (partial.id) payload.id = partial.id;
     if (partial.role) payload.role = partial.role;
     localStorage.setItem('lyc:tracker_user', JSON.stringify(payload));
+
+    // Sync identity into PostHog (identify only when the caller provided id).
+    if (analyticsEnabled && partial.id) {
+      try {
+        posthog.identify(partial.id, {
+          role: partial.role || undefined,
+        });
+      } catch { /* ignore posthog transport failures */ }
+    }
   } catch {
     /* ignore */
   }
@@ -400,5 +414,22 @@ export function useRoutePageViewTracker(): void {
       },
       isFirst ? { funnelStep: 'landing_view', path: location.pathname } : { path: location.pathname },
     );
+    // Also forward to PostHog for dashboarding when the key is set.
+    // PostHog's native `capture_pageview` is disabled (see analytics.ts)
+    // so we drive this manually with router precision.
+    try {
+      const user = getCurrentUser();
+      posthogTrackPageView(
+        location.pathname + (location.search || ''),
+        (user?.role as any) || undefined,
+      );
+      // PostHog $pageview override to keep dashboards intact:
+      if (analyticsEnabled) {
+        posthog.capture('$pageview', {
+          $current_url: window.location.href,
+          $pathname: location.pathname,
+        });
+      }
+    } catch { /* transport failures are OK */ }
   }, [location.pathname, location.search]);
 }

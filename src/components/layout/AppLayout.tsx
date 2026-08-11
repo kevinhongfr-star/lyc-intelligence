@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/stores/authStore';
 import { BarChart3, Users, Briefcase, Calendar, Bell, Settings, LogOut, LayoutDashboard, Zap, MessageSquare, Activity, ClipboardList, Eye, FileDown, Sun, Moon, Building2 } from 'lucide-react';
 import { CreditDisplay } from '@/components/ui/CreditDisplay';
 import { IconBridge, IconTrident, IconDrive, IconLeap, IconImpact, IconSpark, IconQuest, IconForge, IconPrism } from '@/components/icons/LycIcons';
@@ -28,12 +28,19 @@ const NAV_ITEMS = [
 type NavItem = { path?: string; icon?: any; label: string; exact?: boolean; type?: 'divider'; suffix?: string; roles?: string[] };
 
 export function AppLayout() {
-  const { user, logout } = useAuth();
-  const userRole = (user as any)?.role || 'user';
+  const { user, profile, signOut, isLoading } = useAuthStore();
+  const navigate = useNavigate();
+  const userRole = profile?.role || (user as any)?.role || 'user';
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => (localStorage.getItem('lyc-theme') as 'dark' | 'light') || 'light');
   const [pendingCount, setPendingCount] = useState(0);
+
+  const logout = async () => {
+    try { await signOut?.(); } catch { /* noop */ }
+    navigate('/login', { replace: true });
+  };
+  void isLoading;
 
   useEffect(() => {
     getNotifications().then(items => {

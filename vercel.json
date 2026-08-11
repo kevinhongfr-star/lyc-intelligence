@@ -1,10 +1,169 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "functions": {
+    "api/events.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/og.tsx": {
+      "runtime": "@vercel/edge",
+      "regions": ["iad1"]
+    },
+    "api/auth/me.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/data/[entity].ts": {
+      "memory": 1024,
+      "maxDuration": 15
+    },
+    "api/assessments/run.ts": {
+      "memory": 1536,
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.vercel-insights.com https://va.vercel-scripts.com https://us-assets.i.posthog.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https: wss:; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
+        }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    // ── Pre-consolidation marketing → canonical LYC IA (Phase 16) ──
+    { "source": "/home",       "destination": "/",                    "permanent": true },
+    { "source": "/products",   "destination": "/#assessment-catalog", "permanent": true },
+    { "source": "/enterprise", "destination": "/pricing",             "permanent": true },
+    { "source": "/pricing-old","destination": "/pricing",             "permanent": true },
+    { "source": "/for-business","destination": "/b2b",                "permanent": true },
+
+    // ── Old `/about` — user intent differs by target. The canonical about page
+    //    is now under /about (NOT /b2b as in Phase 15.5) — corrected to align
+    //    with the new marketing IA.
+    { "source": "/about/about-us", "destination": "/about",           "permanent": true },
+    { "source": "/about-us",       "destination": "/about",           "permanent": true },
+
+    // ── Old contact routes → canonical /contact ──
+    { "source": "/b2b#contact", "destination": "/contact",            "permanent": false }, // sanity
+    { "source": "/contact-us",  "destination": "/contact",            "permanent": true },
+
+    // ── Phase 15 legacy `/app/*` → Phase 16 portalised surfaces ──
+    { "source": "/app/pricing",           "destination": "/pricing",            "permanent": true },
+    { "source": "/app/billing",           "destination": "/member/billing",     "permanent": true },
+    { "source": "/app/nexus",             "destination": "/nexus/chat",         "permanent": true },
+    { "source": "/app/dashboard",         "destination": "/member/dashboard",   "permanent": true },
+    { "source": "/app/settings",          "destination": "/member/settings",    "permanent": true },
+    { "source": "/app/assessments",       "destination": "/assessment",         "permanent": true },
+    { "source": "/app/profile",           "destination": "/member/profile",     "permanent": true },
+    { "source": "/app/matches",           "destination": "/member/matches",     "permanent": true },
+    { "source": "/app/referrals",         "destination": "/referral",           "permanent": true },
+
+    // ── Phase 15 legacy `/portal/*` → Phase 16 role-scoped portals ──
+    //    Candidates → /candidate, consultants → /consultant, clients → /client
+    { "source": "/portal/candidates",     "destination": "/candidate",          "permanent": true },
+    { "source": "/portal/mandates",       "destination": "/consultant/mandates","permanent": true },
+    { "source": "/portal/pipeline",       "destination": "/consultant/pipeline","permanent": true },
+    { "source": "/portal/settings",       "destination": "/consultant/settings","permanent": true },
+    { "source": "/portal/clients",        "destination": "/client/clients",     "permanent": true },
+    { "source": "/portal/admin",          "destination": "/admin",              "permanent": true },
+
+    // ── Phase 14 beta legacy assessment URLs → canonical Phase 15 slugs ──
+    { "source": "/assessments/china-pipeline-index", "destination": "/assessment/cpi",        "permanent": true },
+    { "source": "/assessments/cpi-diagnostic",       "destination": "/assessment/cpi",        "permanent": true },
+    { "source": "/assessments/shift-mobility",       "destination": "/assessment/shift",      "permanent": true },
+    { "source": "/assessments/career-shift",         "destination": "/assessment/shift",      "permanent": true },
+    { "source": "/assessments/cross-border",         "destination": "/assessment/cross-border","permanent": true },
+    { "source": "/assessments/executive-scope",      "destination": "/assessment/exec-scope", "permanent": true },
+    { "source": "/assessments/geo-fit",              "destination": "/assessment/geo-fit",    "permanent": true },
+    { "source": "/assessments/board-readiness",      "destination": "/assessment/board-readiness", "permanent": true },
+    { "source": "/assessments",                      "destination": "/assessment",           "permanent": true },
+
+    // ── Old NEXUS /platform slug → canonical nexus/chat ──
+    { "source": "/platform/nexus",       "destination": "/nexus/chat",   "permanent": true },
+    { "source": "/nexus",                "destination": "/nexus/chat",   "permanent": true },
+    { "source": "/chat",                 "destination": "/nexus/chat",   "permanent": true },
+
+    // ── Final catch-alls for stale dashboard-ish URLs ──
+    { "source": "/dashboard",            "destination": "/member/dashboard", "permanent": true },
+    { "source": "/settings",             "destination": "/member/settings",  "permanent": true },
+    { "source": "/login-old",            "destination": "/login",            "permanent": true }
+  ],
   "rewrites": [
     {
-      "source": "/((?!api/).*)",
+      "source": "/((?!api/|assets/|og-image/|sitemap.xml$|robots.txt$|favicon.ico$|favicon\\..*|manifest.webmanifest$).*)",
       "destination": "/"
     }
   ]
