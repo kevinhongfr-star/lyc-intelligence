@@ -35,20 +35,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const ref = extractProjectRef();
   
-  // More pooler user patterns
-  const poolerHost = 'aws-0-us-east-1.pooler.supabase.com';
-  const connStrs: { label: string; str: string }[] = [
-    // Various user formats for Supabase pooler
-    { label: 'user=postgres', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:6543/postgres` },
-    { label: 'user=ref.postgres', str: `postgresql://${ref}.postgres:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:6543/postgres` },
-    { label: 'user=ref.postgres 5432', str: `postgresql://${ref}.postgres:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:5432/postgres` },
-    { label: 'user=pgsql', str: `postgresql://pgsql:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:6543/postgres` },
-    // With project options
-    { label: 'options=ref user=postgres', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:6543/postgres?options=project%3D${ref}` },
-    { label: 'options=ref user=ref.postgres', str: `postgresql://${ref}.postgres:${SUPABASE_SERVICE_ROLE_KEY}@${poolerHost}:6543/postgres?options=project%3D${ref}` },
-    // Direct DB regional attempts
-    { label: 'db.ref.supabase.co 6543', str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.${ref}.supabase.co:6543/postgres` },
+  // Try multiple regional poolers + user formats
+  const poolers = [
+    'ap-southeast-1.pooler.supabase.com',  // Singapore
+    'aws-ap-southeast-1.pooler.supabase.com',
+    'sgp-1.pooler.supabase.com',
+    'ap-south-1.pooler.supabase.com',
   ];
+  
+  const userFormats = [
+    { label: 'ref.postgres', user: `${ref}.postgres` },
+    { label: 'postgres', user: 'postgres' },
+  ];
+
+  const connStrs: { label: string; str: string }[] = [];
+  
+  for (const pooler of poolers) {
+    for (const uf of userFormats) {
+      connStrs.push({
+        label: `${pooler.split('.')[0]} ${uf.label}`,
+        str: `postgresql://${uf.user}:${SUPABASE_SERVICE_ROLE_KEY}@${pooler}:6543/postgres`,
+      });
+    }
+  }
+  
+  // Also try old-style direct with .supabase.com
+  connStrs.push({
+    label: 'db.ref.supabase.com',
+    str: `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@db.${ref}.supabase.com:5432/postgres`,
+  });
 
   const results: Record<string, string> = {};
   let workingConn = '';
@@ -56,7 +71,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   for (const { label, str } of connStrs) {
     const r = await tryConnect(str, label);
-    results[label] = r.ok ? 'OK' : (r.error || 'fail');
+    results[label] = r.ok ? 'OK' : (r.error || 'fail').substring(0, 80);
     if (r.ok && !workingConn) {
       workingConn = str;
       workingLabel = label;
@@ -64,11 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method === 'GET') {
-    return res.status(200).json({ results, workingLabel });
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed', results, workingLabel });
+    return res.status(200).json({ results, workingLabel, ref });
   }
 
   if (!workingConn) {
