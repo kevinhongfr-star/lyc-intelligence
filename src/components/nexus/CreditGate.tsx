@@ -79,6 +79,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
   }
 
   if (!result?.allowed && showModal) {
+    const r = result!;
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div className="bg-white max-w-md w-full overflow-hidden shadow-2xl">
@@ -95,12 +96,12 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
                 <Zap className="w-8 h-8 text-accent" />
               </div>
               <h3 className="text-xl font-bold text-text-primary mb-2">
-                {result.balance === 0 ? 'Out of Credits' : 'Low Credits'}
+                {r.balance === 0 ? 'Out of miles' : 'Low miles'}
               </h3>
               <p className="text-text-muted text-sm">
-                {result.balance === 0 
-                  ? 'Your complimentary trial has ended. Upgrade to Executive Access for unlimited insights.'
-                  : `You have ${result.balance} credit${result.balance === 1 ? '' : 's'} remaining.`
+                {r.balance === 0 
+                  ? 'Executive Introduction conversations are limited. Add a Starter plan to unlock miles and open the 11 instruments.'
+                  : `You have ${r.balance} mi remaining.`
                 }
               </p>
             </div>
@@ -131,7 +132,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
             <ul className="space-y-2 text-sm text-text-muted">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-accent" />
-                5 credits per day
+                5 mi per day allowance
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-accent" />

@@ -12,21 +12,21 @@ export function CouncilUpsell({ trigger, messageCount, onUpgrade }: CouncilUpsel
     switch (trigger) {
       case 'trial':
         return {
-          title: 'You\'re on the Complimentary Trial',
-          description: `You've sent ${messageCount} messages. Upgrade to Council for 5 credits/day + premium insights.`,
-          highlight: 'Start your 14-day complimentary trial',
+          title: 'Executive Introduction overview',
+          description: `You've sent ${messageCount} messages. Add a Starter plan for 5 mi/day + open all 11 instruments.`,
+          highlight: 'Open with miles',
         };
       case 'insight':
         return {
           title: 'Want Deeper Analysis?',
-          description: 'Council members get SHIFT assessments + personalized coaching sessions.',
+          description: 'Starter / Pro members open SHIFT assessments + personalised reports.',
           highlight: 'Unlock premium features',
         };
       case 'usage':
         return {
           title: 'You\'re Getting Great Value!',
-          description: `You've used ${messageCount} credits. Council subscription = $29/mo for 5 credits/day + unlimited insights.`,
-          highlight: 'Subscribe now',
+          description: `${messageCount} conversations in Executive Introduction. Starter = $29/mo for 5 mi/day + miles economy.`,
+          highlight: 'Open with miles',
         };
     }
   };
@@ -53,7 +53,7 @@ export function CouncilUpsell({ trigger, messageCount, onUpgrade }: CouncilUpsel
         <div className="ml-4 flex flex-col gap-3">
           <div className="flex items-center gap-2 text-sm text-text-muted">
             <Zap className="w-4 h-4 text-accent" />
-            <span>5 credits/day</span>
+            <span>5 mi/day allowance</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-text-muted">
             <Award className="w-4 h-4 text-accent" />

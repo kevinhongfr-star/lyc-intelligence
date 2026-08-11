@@ -23,8 +23,8 @@ export interface UpgradeCTAProps {
 const ACCENT = '#C108AB';
 
 const TIER_BENEFITS: Record<TierKey, string[]> = {
-  explorer: ['Basic chat access', '2 credits per day', 'Community forum'],
-  starter: ['Unlimited chat', 'All assessments', 'PDF export', 'Frameworks'],
+  explorer: ['Executive Introduction access', '2 mi per day', 'Community forum'],
+  starter: ['Unlimited chat', 'All 11 assessments', 'PDF export', 'Frameworks'],
   pro: ['Everything in Starter', 'Peer matching', 'Deliverables', 'Web research'],
   executive: ['Everything in Pro', 'Executive reviews', 'Events access', 'Priority support'],
   council: ['Everything in Executive', 'Council community', 'Live sessions', 'Workshops', 'Unlimited everything'],

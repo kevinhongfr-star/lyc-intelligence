@@ -1181,3 +1181,36 @@ html {
 .echo-empty-animate {
   animation: echo-empty-fade 300ms var(--echo-ease-enter) forwards;
 }
+
+/* ── Phase 15.4: NEXUS sidebar responsive layout ── */
+/* Mobile: show/hide based on className (controlled by showSidebar state toggle) */
+.nexus-sidebar-closed {
+  display: none;
+}
+.nexus-sidebar-open {
+  display: block;
+}
+/* Desktop (lg = 1024px and up): sidebar is always visible as a flex column */
+@media (min-width: 1024px) {
+  .nexus-sidebar-closed,
+  .nexus-sidebar-open {
+    display: block;
+    position: relative !important;
+  }
+}
+
+/* NEXUS pulse dot for the "live" status pill next to the brand wordmark */
+.nexus-pulse-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #C108AB;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 rgba(193, 8, 171, 0.6);
+  animation: nexus-pulse 1.8s ease-out infinite;
+}
+@keyframes nexus-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(193, 8, 171, 0.55); }
+  70%  { box-shadow: 0 0 0 10px rgba(193, 8, 171, 0);   }
+  100% { box-shadow: 0 0 0 0 rgba(193, 8, 171, 0);    }
+}
