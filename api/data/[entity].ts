@@ -18,7 +18,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '../../lib/supabase-rest.js';
+import { createClient } from '../lib/supabase-rest.js';
 import {
   AuthContext,
   enforceScope,
