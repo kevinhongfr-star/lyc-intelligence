@@ -34,6 +34,15 @@ import {
   ExplorationEarningTracker,
   isCompletedReflection,
 } from '@/nexus/nexusMilesService';
+import { AssessmentResultInsightCard } from './AssessmentResultInsightCard';
+import {
+  fetchUserAssessmentSummaries,
+  pickPrimaryResult,
+  buildNexusResultContext,
+  isResultQuery,
+  synthesize90DayPlan,
+  type UserAssessmentSummary,
+} from '@/services/assessmentResultService';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -62,12 +71,14 @@ interface Message {
   timestamp?: number;
   /** Extended metadata for product-aware rendering (recommendations, CTAs, earning events) */
   metadata?: {
-    type?: 'recommendation' | 'earning' | 'reflection_prompt';
+    type?: 'recommendation' | 'earning' | 'reflection_prompt' | 'result_explanation';
     instrumentCode?: string;
     recommendation?: AssessmentRecommendationResult;
     earningAction?: string;
     earningAmount?: number;
     earningMessage?: string;
+    /** result_explanation mode — which instrument result summary to render */
+    resultSummary?: UserAssessmentSummary;
   };
 }
 
@@ -172,6 +183,11 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
   const [citations, setCitations] = useState<
     Array<{ title: string; source: string | null; category: string; score: number }> | null
   >(null);
+
+  // #1324: Completed assessment summaries for the current user.
+  // Fetched on auth mount so NEXUS can explain results, synthesize plans,
+  // and inject the context into every AI-call system prompt.
+  const [userAssessmentSummaries, setUserAssessmentSummaries] = useState<UserAssessmentSummary[]>([]);
   
   // Diagnostic tracking state
   const [diagnosticProgress, setDiagnosticProgress] = useState(0);
@@ -263,12 +279,16 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
           setCreditTier(creditInfo.tier);
         }
 
-        // Fetch miles balance in parallel — the monetization currency
+        // Fetch miles balance + assessment summaries in parallel
         try {
-          const mb = await fetchMilesBalance();
+          const [mb, summaries] = await Promise.all([
+            fetchMilesBalance(),
+            fetchUserAssessmentSummaries(user.id),
+          ]);
           setMilesBalance(mb.balance);
+          setUserAssessmentSummaries(summaries);
         } catch (e) {
-          console.warn('[NexusChat] fetchMilesBalance failed (will retry on CTA):', e);
+          console.warn('[NexusChat] miles/summaries fetch failed:', e);
         }
         
         const savedSession = localStorage.getItem(`nexus_chat_${user.id}`);
@@ -310,8 +330,26 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     setAiState('thinking');
     setStreamingContent('');
 
+    // #1324: Inject result context into every request so the server-side prompt
+    // can reference real user data when answering "explain my results" questions.
+    const resultContext = buildNexusResultContext(userAssessmentSummaries);
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
+
+    // #1324: Heuristic result-query intent detection → BEFORE the AI call,
+    // append a result card as an assistant meta-message so the user sees their
+    // real data even if the API is slow or unavailable.
+    let appendedResultCard: { type: 'result_explanation'; resultSummary: UserAssessmentSummary } | null = null;
+    if (isResultQuery(userMsg) && userAssessmentSummaries.length > 0) {
+      const primary = pickPrimaryResult(userAssessmentSummaries);
+      if (primary) {
+        appendedResultCard = {
+          type: 'result_explanation',
+          resultSummary: primary,
+        };
+      }
+    }
 
     try {
       const res = await fetch('/api/nexus/chat', {
@@ -332,6 +370,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             company: (profile as any)?.company || (profile as any)?.company_name || null,
           },
           tier: profile?.tier || creditTier,
+          result_context: resultContext,
           stream: false, // Use non-streaming for reliable tag parsing
         }),
         signal: controller.signal,
@@ -348,7 +387,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
       }
 
       const data = await res.json();
-      handleResponse(data, userMsg);
+      handleResponse(data, userMsg, appendedResultCard);
     } catch (e: any) {
       clearTimeout(timeout);
       console.error('Chat failed:', e);
@@ -384,19 +423,43 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     },
     /** The user message that triggered this response. Used to run recommendation engine */
     triggeringUserMsg?: string,
+    /** #1324: Optional pre-AI result-explanation card to append (intent-detected) */
+    preCard?: { type: 'result_explanation'; resultSummary: UserAssessmentSummary } | null,
   ) => {
     // Strip diagnostic/milestone tags for display
     const displayContent = stripTagsForDisplay(data.response);
 
-    // Append assistant message first
+    const newMessages: Message[] = [];
+
+    // ── #1324: Pre-card (result explanation) comes FIRST so the AI reply can
+    // reference it naturally. If it's a plan-oriented query, open in plan mode.
+    if (preCard) {
+      const mode: 'summary' | 'plan' =
+        triggeringUserMsg && /plan|90[\s-]*day|develop|focus|invest|next.*step/i.test(triggeringUserMsg)
+          ? 'plan'
+          : 'summary';
+      newMessages.push({
+        role: 'assistant',
+        content: '',
+        metadata: {
+          type: 'result_explanation',
+          resultSummary: preCard.resultSummary,
+        },
+      });
+      // Attach precomputed plan to summary for downstream renderer
+      (newMessages[newMessages.length - 1].metadata as any)._plan = synthesize90DayPlan(preCard.resultSummary);
+      (newMessages[newMessages.length - 1].metadata as any)._mode = mode;
+    }
+
+    // Append assistant message
     const assistantMsg: Message = { role: 'assistant', content: displayContent };
 
     // Mark reflection prompt flag so NEXT user reply counts toward reflection earning
     if (isReflectionPrompt(displayContent)) {
-      assistantMsg.metadata = { type: 'reflection_prompt' };
+      assistantMsg.metadata = { ...(assistantMsg.metadata || {}), type: 'reflection_prompt' };
     }
 
-    const newMessages: Message[] = [assistantMsg];
+    newMessages.push(assistantMsg);
 
     // ── Recommendation engine: run over triggering user msg + assistant reply combined
     // (Both together give a much better signal than the user msg alone.)
@@ -1000,6 +1063,24 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                   >
                     <Sparkles style={{ width: 11, height: 11 }} />
                     +{amt} mi · {desc}
+                  </div>
+                );
+              }
+
+              // (c-prime) #1324: Result explanation card (scores + plan)
+              if (type === 'result_explanation' && m.metadata?.resultSummary) {
+                const summary = m.metadata.resultSummary;
+                const md = m.metadata as any;
+                return (
+                  <div
+                    key={`res-${i}`}
+                    style={{ alignSelf: 'stretch', width: '100%' }}
+                  >
+                    <AssessmentResultInsightCard
+                      summary={summary}
+                      mode={md._mode || 'summary'}
+                      plan={md._plan}
+                    />
                   </div>
                 );
               }
