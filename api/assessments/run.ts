@@ -90,14 +90,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const supabase = createClient();
 
   try {
-    const ctx = await getAuthorizedContext(req, false);
-    if (!ctx) return res.status(401).json({ error: 'Unauthorized' });
+    // Allow anonymous users for complimentary assessment access
+    const ctx = await getAuthorizedContext(req, true);
+    const isAnonymous = !ctx;
+    
+    // Anonymous users are identified by x-anonymous-id header (client-generated)
+    // or we generate one from the idempotency key for result retrieval
+    const anonymousId = (req.headers['x-anonymous-id'] || req.headers['X-Anonymous-Id']) as string | undefined;
 
     // Any logged-in user can run their own assessments (leaders, candidates,
     // clients for org-sponsored, consultants for trialing). Admins always.
-    enforceScope(ctx, {
-      allow: ['admin', 'consultant', 'client', 'leader'],
-    });
+    // Anonymous users can run assessments (complimentary / marketing funnel)
+    if (!isAnonymous) {
+      enforceScope(ctx, {
+        allow: ['admin', 'consultant', 'client', 'leader'],
+      });
+    }
 
     const body = req.body || {};
     const code = normalizeCode(body.code);
@@ -146,7 +154,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // ── Miles debit (atomic check + decrement) ────────────────────────
     // Admins + internal staff are exempted from paying (operational/QA).
-    const chargeMiles = !isAdminRole(ctx.role);
+    const chargeMiles = !isAnonymous && !isAdminRole(ctx.role);
     let remainingBalance = 0;
 
     if (chargeMiles) {
@@ -222,7 +230,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: inserted, error: insErr } = await supabase
       .from('assessment_results')
       .insert({
-        user_id: ctx.userId,
+        user_id: isAnonymous ? null : ctx.userId,
+        anonymous_id: isAnonymous ? (anonymousId || body.idempotency_key || `anon_${Date.now()}`) : null,
         assessment_code: code,
         answers,
         duration_seconds: durationSeconds,
