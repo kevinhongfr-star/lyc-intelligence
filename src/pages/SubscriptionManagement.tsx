@@ -19,6 +19,8 @@ import {
   cancelSubscription,
   upgradeSubscription,
   createCheckoutSession,
+  CANONICAL_TIER_PRICING,
+  RECOMMENDED_TIER,
   type SubscriptionStatus,
   type Invoice,
   type TierKey,
@@ -246,7 +248,12 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
           >
             <p className="text-xs opacity-60" style={{ color: '#666' }}>Plan</p>
             <p className="text-lg font-bold" style={{ color: ACCENT }}>
-              {(status?.tier || currentTier || 'explorer').toUpperCase()}
+              {(() => {
+                const rawTier = (status?.tier || currentTier || 'explorer') as TierKey;
+                const ct = CANONICAL_TIER_PRICING[rawTier];
+                if (!ct) return rawTier.toUpperCase();
+                return rawTier === 'explorer' ? ct.alias : ct.label;
+              })()}
             </p>
           </div>
           <div
@@ -305,23 +312,23 @@ export function SubscriptionManagement({ className, currentTier }: SubscriptionM
           )}
 
           <button
-            onClick={() => handleCheckout('executive', 'monthly')}
-            disabled={upgrading === 'executive'}
+            onClick={() => handleCheckout(RECOMMENDED_TIER, 'monthly')}
+            disabled={upgrading === RECOMMENDED_TIER}
             className={cn(
               'px-4 py-2 text-sm font-medium flex items-center gap-2 transition-colors',
-              upgrading === 'executive' ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+              upgrading === RECOMMENDED_TIER ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
             )}
             style={{
               background: ACCENT,
               color: 'white',
             }}
           >
-            {upgrading === 'executive' ? (
+            {upgrading === RECOMMENDED_TIER ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <Sparkles className="w-4 h-4" />
             )}
-            Upgrade to Executive
+            Upgrade to {CANONICAL_TIER_PRICING[RECOMMENDED_TIER].label}
           </button>
         </div>
       </div>

@@ -225,7 +225,7 @@ export function ClientDocumentsPage() {
         <div className="flex gap-2">
           <a href="/account/billing">
             <Button variant="outline" size="sm" className="flex items-center gap-1.5">
-              <CreditCard className="w-4 h-4" /> Credits &amp; Subscription
+              <CreditCard className="w-4 h-4" /> Miles &amp; Subscription
             </Button>
           </a>
         </div>
@@ -364,7 +364,7 @@ export function ClientDocumentsPage() {
               <div>
                 <h3 className="font-medium text-text-primary">Billing &amp; Subscription</h3>
                 <p className="text-sm text-text-secondary mt-0.5">
-                  Review your invoices, add credits, or manage your Council subscription.
+                  Review your invoices, add miles, or manage your Council subscription.
                 </p>
               </div>
             </div>

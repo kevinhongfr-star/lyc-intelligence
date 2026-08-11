@@ -489,10 +489,10 @@ export function runRecommendationEngine(userMessage: string): RecommendationResu
 
 export const NEXUS_SUBSCRIPTION_TIERS = [
   { key: 'explorer', label: 'Explorer', alias: 'Executive Introduction', monthlyMiles: 0 },
-  { key: 'starter', label: 'Starter', monthlyMiles: 200 },
-  { key: 'pro', label: 'Pro', monthlyMiles: 500 },
-  { key: 'executive', label: 'Executive', monthlyMiles: 1200 },
-  { key: 'council', label: 'Council', monthlyMiles: 3000 },
+  { key: 'starter', label: 'Starter', monthlyMiles: 50 },
+  { key: 'pro', label: 'Pro', monthlyMiles: 150 },
+  { key: 'executive', label: 'Executive', monthlyMiles: 300 },
+  { key: 'council', label: 'Council', monthlyMiles: 600 },
 ] as const;
 
 /** Canonical tier keys (string literal union for consumers). */
@@ -614,9 +614,9 @@ Directors, VPs, C-suite, board members, expats entering APAC, and executives in 
 - Miles open the curtain. Executive Introduction (Explorer) shows the curtain: framework direction, sample outputs, and value proposition — never a full personalised profile.
 
 === ASSESSMENT PRICES IN MILES (Executive Introduction tier) ===
-- Flagship · CPI: 199 mi
-- SHIFT Suite (LEAP, QUEST, IMPACT, DRIVE, COACH): 149 mi each
-- Advisory Products (PRISM, SPARK, FORGE, BRIDGE, MOSAIC): 99 mi each
+- Standard tier (99 mi): LEAP, DRIVE, PRISM, MOSAIC, FORGE
+- Premium tier (149 mi): QUEST, COACH, IMPACT, BRIDGE, SPARK
+- Unique tier (199 mi): CPI
 Higher tiers (Professional Deep-Dive, Executive Advisory) add percentile benchmarks, coaching sessions, and consultant debriefs. Never explain these as free.
 
 === 11 CANONICAL ASSESSMENTS — KNOWLEDGE BASE ===

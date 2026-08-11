@@ -71,8 +71,8 @@ export function TermsPage() {
       body: <p>You must provide accurate information when creating an account and are responsible for safeguarding your credentials. We reserve the right to suspend accounts that violate these terms or applicable law.</p>,
     },
     {
-      heading: 'Credits & Payment',
-      body: <p>The Service uses a credit-based system. Your "Executive Introduction" provides 5 complimentary messages. Additional credits may be purchased. Credits are non-refundable except where required by law and do not expire unless stated otherwise at purchase. Council memberships are billed as subscriptions and may be cancelled per their terms.</p>,
+      heading: 'Miles & Payment',
+      body: <p>The Service uses a miles-based system. Your "Executive Introduction" provides 5 complimentary messages. Additional miles may be purchased. Miles are non-refundable except where required by law and do not expire unless stated otherwise at purchase. Council memberships are billed as subscriptions and may be cancelled per their terms.</p>,
     },
     {
       heading: 'AI Disclaimer',
@@ -88,7 +88,7 @@ export function TermsPage() {
     },
     {
       heading: 'Limitation of Liability',
-      body: <p>To the maximum extent permitted by law, LYC Partners' total liability for any claim arising from the Service is limited to the amount you paid in the preceding 12 months, or the credits purchased, whichever is greater. We are not liable for indirect or consequential damages.</p>,
+      body: <p>To the maximum extent permitted by law, LYC Partners' total liability for any claim arising from the Service is limited to the amount you paid in the preceding 12 months, or the miles purchased, whichever is greater. We are not liable for indirect or consequential damages.</p>,
     },
     {
       heading: 'Governing Law & Dispute Resolution',

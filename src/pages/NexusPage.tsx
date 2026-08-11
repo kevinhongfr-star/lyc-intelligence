@@ -275,7 +275,7 @@ export function NexusPage() {
               Unlock the full experience
             </h3>
             <p className="text-sm text-gray-600 mb-4">
-              Create an Executive Introduction account for 5 daily credits,
+              Create an Executive Introduction account for 5 daily miles,
               full assessments, personalized insights, and saved conversation history.
             </p>
             <Link

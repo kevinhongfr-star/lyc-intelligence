@@ -196,7 +196,7 @@ export function DashboardPage() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: DS.card,  border: `1px solid ${DS.cardBorder}` }}>
               <CreditCard style={{ width: 16, height: 16, color: DS.accent }} />
-              <span style={{ fontSize: '14px', color: DS.text }}>{credits} credits</span>
+              <span style={{ fontSize: '14px', color: DS.text }}>{credits} mi</span>
             </div>
           </div>
         </div>
@@ -430,10 +430,10 @@ export function DashboardPage() {
             <Gift style={{ width: 24, height: 24, color: DS.success }} />
             <div>
               <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text }}>
-                Earn Credits
+                Earn Miles
               </h3>
               <p style={{ fontSize: '13px', color: DS.muted }}>
-                Refer a colleague and both get 5 bonus credits
+                Refer a colleague and both get 5 bonus miles
               </p>
             </div>
           </div>

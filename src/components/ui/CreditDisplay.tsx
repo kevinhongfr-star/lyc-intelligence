@@ -26,7 +26,7 @@ function unitLabel(unit: UnitType): string {
   return unit === 'miles' ? 'mi' : 'credits';
 }
 
-export function CreditDisplay({ showTier = false, unit = 'credits' }: CreditDisplayProps) {
+export function CreditDisplay({ showTier = false, unit = 'miles' }: CreditDisplayProps) {
   const { credit } = useCredits();
 
   const getTierColor = () => {

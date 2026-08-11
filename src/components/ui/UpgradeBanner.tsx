@@ -34,10 +34,10 @@ export function UpgradeBanner({ type = 'empty', message, onDismiss }: UpgradeBan
 
   const getDefaultMessage = () => {
     if (type === 'empty') {
-      return "You've used all your complimentary credits. Upgrade for unlimited access.";
+      return "You've used all your complimentary miles. Upgrade for unlimited access.";
     }
     if (type === 'low') {
-      return `Only ${credit.balance} credits left. Upgrade to never run out.`;
+      return `Only ${credit.balance} miles left. Upgrade to never run out.`;
     }
     return 'Unlock unlimited assessments and matches with a paid plan.';
   };

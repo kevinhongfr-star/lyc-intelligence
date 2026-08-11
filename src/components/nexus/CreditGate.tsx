@@ -112,7 +112,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
                 className="w-full py-3 px-4 bg-accent text-white font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
               >
                 <Crown className="w-5 h-5" />
-                Upgrade to Council
+                Upgrade to Starter
               </button>
 
               <button
@@ -127,24 +127,24 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
           <div className="bg-gradient-to-r from-accent/5 to-transparent p-6 border-t border-border">
             <h4 className="font-semibold text-text-primary mb-3 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-accent" />
-              Council Benefits
+              Starter Benefits
             </h4>
             <ul className="space-y-2 text-sm text-text-muted">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-accent" />
-                5 mi per day allowance
+                50 mi monthly allowance
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-accent" />
-                SHIFT career assessments
+                All 11 assessments unlocked
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-accent" />
-                Personalized coaching
+                Personalised assessment reports
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-accent" />
-                Priority support
+                NEXUS miles earning
               </li>
             </ul>
           </div>

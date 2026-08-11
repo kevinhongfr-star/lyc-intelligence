@@ -1,6 +1,60 @@
 import { getSupabase } from './supabaseApi';
 import { useAuthStore } from '../stores/authStore';
 
+/**
+ * ⚠️ DEPRECATED — Phase 15.5 / ticket #1303
+ * ─────────────────────────────────────────────────────────────────────────────
+ * This service is the LEGACY credits bridge layer. It talks to the backend
+ * `credits` and `credit_transactions` tables and the legacy `/api/credits/*`
+ * endpoints. The backend still uses "credits" internally as the table column
+ * and API path names — that is a deeper migration that is out of scope for
+ * the Phase 15.5 frontend alignment work.
+ *
+ * For all PRICING and TIER constants, use `@/services/monetizationService.ts`
+ * (CANONICAL_TIER_PRICING, CANONICAL_ASSESSMENT_PRICING, etc.) — that is the
+ * single source of truth.
+ *
+ * This file is preserved because:
+ *   1. The Supabase tables `credits` and `credit_transactions` are still the
+ *      physical store for the miles balance (the `balance` column IS the
+ *      miles balance — only the label changed in the UI).
+ *   2. The legacy API paths `/api/credits/spend`, `/api/credits/earn`,
+ *      `/api/credits/daily-reset` are still served by the backend and have
+ *      not been renamed.
+ *   3. The `tier` column on `credits` holds legacy tier strings ('free',
+ *      'basic', 'pro', 'council') that map to the canonical 5-tier model
+ *      via the `mapToCanonicalTier` helpers used across the UI.
+ *
+ * Implied database schema (no SQL files in repo — schema is managed externally):
+ *   credits
+ *     ├── user_id        uuid  (fk auth.users, pk)
+ *     ├── balance        int   (miles balance — labelled "miles" in UI)
+ *     ├── daily_balance  int
+ *     ├── total_earned   int
+ *     ├── total_spent    int
+ *     ├── tier           text  ('free' | 'basic' | 'pro' | 'council')
+ *     ├── tier_credits_per_month  int
+ *     ├── billing_period_start    timestamptz
+ *     └── updated_at     timestamptz
+ *   credit_transactions
+ *     ├── id             uuid  (pk)
+ *     ├── user_id        uuid  (fk auth.users)
+ *     ├── amount         int   (signed: + earns / - spends)
+ *     ├── transaction_type  text
+ *     ├── description    text
+ *     ├── reference_id   text
+ *     ├── metadata       jsonb
+ *     └── created_at     timestamptz
+ *
+ * RLS: assumed enabled on both tables with `user_id = auth.uid()` policies.
+ * No new tables were introduced in Phase 15.5 — frontend-only alignment.
+ *
+ * Future migration (out of scope): rename `credits` → `miles_balances`,
+ * `credit_transactions` → `miles_transactions`, and the `/api/credits/*`
+ * endpoints → `/api/miles/*`. Requires a coordinated backend + DB migration.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
 export interface CreditInfo {
   balance: number;
   dailyBalance: number;
@@ -147,7 +201,7 @@ export function getInsufficientCreditsMessage(
   required: number, 
   available: number
 ): string {
-  return `This action requires ${required} credits, but you only have ${available}. Upgrade to continue.`;
+  return `This action requires ${required} miles, but you only have ${available}. Upgrade to continue.`;
 }
 
 export async function updateUserTier(
@@ -191,7 +245,7 @@ export function formatTransactionDescription(type: string, amount: number): stri
     earn_daily: `${prefix}${amount} Daily login bonus`,
     earn_referral: `${prefix}${amount} Referral bonus`,
     earn_action: `${prefix}${amount} Action completed`,
-    earn_purchase: `${prefix}${amount} Credits purchased`,
+    earn_purchase: `${prefix}${amount} Miles purchased`,
     spend_assessment: `${amount} Assessment`,
     spend_match: `${amount} Match Analysis match`,
     spend_pdf: `${amount} PDF report`,

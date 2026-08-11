@@ -13,7 +13,7 @@ const MOCK_RECENT_REFERRALS = [
 const STAT_CARDS = [
   { label: 'Total Referrals', value: MOCK_REFERRAL_STATS.totalReferrals },
   { label: 'Successful', value: MOCK_REFERRAL_STATS.successfulReferrals },
-  { label: 'Credits Earned', value: MOCK_REFERRAL_STATS.creditsEarned },
+  { label: 'Miles Earned', value: MOCK_REFERRAL_STATS.creditsEarned },
   { label: 'Leaderboard Rank', value: `#${MOCK_REFERRAL_STATS.leaderboardRank}` },
 ];
 

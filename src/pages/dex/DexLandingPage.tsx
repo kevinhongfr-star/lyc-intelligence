@@ -64,7 +64,7 @@ export function DexLandingPage() {
             { icon: Brain, title: 'Career Strategy', desc: 'Map your next move with placement data from 7,400+ mandates.' },
             { icon: LineChart, title: 'Compensation Benchmarking', desc: 'Know your market worth across China and APAC roles.' },
             { icon: Compass, title: 'Cross-Border Transitions', desc: 'Navigate moves between Shanghai, Singapore, and Hong Kong.' },
-            { icon: Shield, title: 'Confidential Advisory', desc: 'Private, judgment-free guidance from a trusted partner.' },
+            { icon: Shield, title: 'Confidential Advisory', desc: 'Private, non-judgmental guidance from a trusted partner.' },
           ].map(f => (
             <div key={f.title} className="p-6 border border-gray-100 hover:border-fuchsia/30 transition-colors">
               <div className="w-10 h-10 bg-fuchsia/10 text-fuchsia flex items-center justify-center mb-4">
@@ -85,7 +85,7 @@ export function DexLandingPage() {
               className="text-3xl md:text-4xl font-bold text-[#1A1A2E] mb-3"
               style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
             >
-              Simple, credit-based access
+              Simple, miles-based access
             </h2>
             <p className="text-sm text-gray-600">
               Begin with your Executive Introduction — 5 complimentary messages. No card required.
@@ -94,8 +94,8 @@ export function DexLandingPage() {
           <div className="grid md:grid-cols-3 gap-5">
             {[
               { name: 'Executive Introduction', price: 'Complimentary', detail: '5 messages to experience DEX AI', cta: 'Start Now', href: '/dex/chat' },
-              { name: 'Credit Pack', price: 'Pay as you go', detail: '1 credit per message — buy what you need', cta: 'Get Credits', href: '/dex/credits' },
-              { name: 'Monthly Pro', price: 'Subscription', detail: '100 credits/month + priority responses', cta: 'View Plans', href: '/dex/credits' },
+              { name: 'Miles Pack', price: 'Pay as you go', detail: '1 mile per message — buy what you need', cta: 'Get Miles', href: '/dex/credits' },
+              { name: 'Monthly Pro', price: 'Subscription', detail: '100 mi/month + priority responses', cta: 'View Plans', href: '/dex/credits' },
             ].map(p => (
               <div key={p.name} className="bg-white p-6 border border-gray-100 flex flex-col">
                 <h3 className="font-semibold text-[#1A1A2E] mb-1">{p.name}</h3>
@@ -119,7 +119,7 @@ export function DexLandingPage() {
           Ready for 1:1 guidance?
         </h2>
         <p className="text-sm text-gray-600 mb-8 max-w-xl mx-auto">
-          Book a confidential coaching session with a senior LYC Partners consultant. One credit per session.
+          Book a confidential coaching session with a senior LYC Partners consultant. One mile per session.
         </p>
         <a href="/dex/book">
           <Button size="lg">Book a Coaching Session <ArrowRight className="w-4 h-4" /></Button>

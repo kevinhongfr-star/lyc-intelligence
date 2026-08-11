@@ -29,7 +29,7 @@ const SECTIONS = [
   { id: 'goals' as Section, icon: Target, title: 'Career Goals', description: 'Your short and long-term objectives' },
   { id: 'assessments' as Section, icon: History, title: 'Assessment History', description: 'Past assessments and results' },
   { id: 'memory' as Section, icon: Lightbulb, title: 'Memory Summary', description: 'Insights Nexus has learned about you' },
-  { id: 'subscription' as Section, icon: CreditCard, title: 'Subscription & Credits', description: 'Manage your plan and credits' },
+  { id: 'subscription' as Section, icon: CreditCard, title: 'Subscription & Miles', description: 'Manage your plan and miles balance' },
   { id: 'documents' as Section, icon: FileText, title: 'Document Library', description: 'Your CV and supporting documents' },
 ];
 
@@ -322,7 +322,7 @@ export function ProfilePage() {
   const renderSubscriptionSection = () => (
     <div>
       <h2 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 24px' }}>
-        Subscription & Credits
+        Subscription & Miles
       </h2>
       <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -344,15 +344,15 @@ export function ProfilePage() {
           </button>
         </div>
         <div style={{ borderTop: `1px solid ${DS.border}`, paddingTop: '16px' }}>
-          <p style={{ fontSize: '13px', color: DS.muted, margin: '0 0 8px' }}>Credits Available</p>
+          <p style={{ fontSize: '13px', color: DS.muted, margin: '0 0 8px' }}>Miles Available</p>
           <p style={{ fontSize: '32px', fontWeight: 700, color: DS.text, margin: 0 }}>—</p>
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
         {[
-          { label: 'Basic', price: '$9.99/mo', features: '20 credits/month' },
-          { label: 'Pro', price: '$29.99/mo', features: '50 credits/month' },
-          { label: 'Enterprise', price: 'Custom', features: 'Unlimited' },
+          { label: 'Starter', price: '$25/mo', features: '50 mi / month' },
+          { label: 'Pro', price: '$99/mo', features: '150 mi / month' },
+          { label: 'Council', price: '$499/mo', features: '600 mi / month' },
         ].map((plan) => (
           <div key={plan.label} style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '16px', textAlign: 'center' }}>
             <h4 style={{ fontSize: '14px', fontWeight: 600, color: DS.text, margin: '0 0 4px' }}>{plan.label}</h4>

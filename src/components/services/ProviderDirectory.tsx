@@ -141,7 +141,7 @@ export default function ProviderDirectory() {
                         </div>
                         <div className="flex items-center gap-1 text-sm">
                           <span className="font-semibold text-text-primary">{s.priceCredits}</span>
-                          <span className="text-text-muted text-xs">credits</span>
+                          <span className="text-text-muted text-xs">mi</span>
                         </div>
                       </div>
                     ))}

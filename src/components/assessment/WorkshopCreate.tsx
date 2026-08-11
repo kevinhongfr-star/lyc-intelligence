@@ -114,7 +114,7 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
 
       const creditSuccess = await deductOrgCredits(orgId, 5, `Advisory assessment: ${workshopDetails.assessment_type}`);
       if (!creditSuccess) {
-        throw new Error('Failed to deduct credits');
+        throw new Error('Failed to deduct miles');
       }
 
       setSuccess(true);
@@ -438,9 +438,9 @@ const ASSESSMENT_TYPES: Array<{ id: 'PRISM' | 'FORGE' | 'SPARK' | 'BRIDGE' | 'MO
               <div className="flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-medium text-amber-800">Credit Charge</p>
+                  <p className="font-medium text-amber-800">Miles Charge</p>
                   <p className="text-sm text-amber-700">
-                    Launching this workshop will deduct {creditsRequired} credits from your organization's balance.
+                    Launching this workshop will deduct {creditsRequired} miles from your organization's balance.
                   </p>
                 </div>
               </div>

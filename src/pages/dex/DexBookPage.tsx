@@ -84,7 +84,7 @@ export function DexBookPage() {
     const ok = await deductCredit(1, `Coaching session with ${selectedConsultant.name}`);
     setBooking(false);
     if (!ok) {
-      setError('Could not deduct a credit for this session. Please try again.');
+      setError('Could not deduct a mile for this session. Please try again.');
       return;
     }
     await refreshCredits();
@@ -160,8 +160,8 @@ export function DexBookPage() {
             Book a 1:1 Coaching Session
           </h1>
           <p className="text-sm text-gray-600">
-            One credit per session with a senior LYC Partners consultant. You have{''}
-            <span className="font-semibold text-fuchsia">{credit.balance} credits</span>.
+            One mile per session with a senior LYC Partners consultant. You have{''}
+            <span className="font-semibold text-fuchsia">{credit.balance} mi</span>.
           </p>
         </div>
 
@@ -232,7 +232,7 @@ export function DexBookPage() {
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-[#1A1A2E]">Select a time with {selectedConsultant.name}</h3>
-                    <Badge variant="outline" className="text-xs">1 credit</Badge>
+                    <Badge variant="outline" className="text-xs">1 mile</Badge>
                   </div>
                   <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                     {TIME_SLOTS.map(s => {
@@ -266,7 +266,7 @@ export function DexBookPage() {
                 onClick={handleBook}
                 disabled={!selectedConsultant || !slot || booking || credit.balance < 1}
               >
-                {booking ? 'Booking…' : credit.balance < 1 ? 'No credits' : 'Confirm Booking'}
+                {booking ? 'Booking…' : credit.balance < 1 ? 'No miles' : 'Confirm Booking'}
               </Button>
             </div>
           </>

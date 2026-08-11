@@ -4,6 +4,9 @@ import { cn } from '@/lib/utils';
 import {
   fetchTiers,
   createCheckoutSession,
+  CANONICAL_TIER_PRICING,
+  CANONICAL_TIER_ORDER,
+  RECOMMENDED_TIER,
   type Tier,
   type TierKey,
   type BillingCycle,
@@ -34,6 +37,18 @@ const TIER_COLORS: Record<TierKey, string> = {
   council: '#C108AB',
 };
 
+/** Canonical fallback tiers derived from CANONICAL_TIER_PRICING (Phase 15.5 / ticket #1303). */
+const CANONICAL_FALLBACK_TIERS: Tier[] = CANONICAL_TIER_ORDER.map((key) => {
+  const p = CANONICAL_TIER_PRICING[key];
+  return {
+    key,
+    name: key === 'explorer' ? p.alias! : p.label,
+    priceMonthly: p.usdMonthly,
+    priceAnnual: p.usdMonthly * 10,
+    features: p.benefits,
+  };
+});
+
 /**
  * PricingPage — public pricing page.
  * Displays all tiers with features and CTAs.
@@ -51,17 +66,11 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
     setLoading(true);
     fetchTiers()
       .then((data) => {
-        if (mounted) setTiers(data);
+        if (mounted) setTiers(data.length ? data : CANONICAL_FALLBACK_TIERS);
       })
       .catch(() => {
         if (mounted) {
-          setTiers([
-            { key: 'explorer', name: 'Executive Introduction', priceMonthly: 0, priceAnnual: 0, features: ['Basic chat', '2 credits/day'] },
-            { key: 'starter', name: 'Starter', priceMonthly: 29, priceAnnual: 290, features: ['Unlimited chat', 'All assessments', 'PDF export'] },
-            { key: 'pro', name: 'Pro', priceMonthly: 99, priceAnnual: 990, features: ['Everything in Starter', 'Peer matching', 'Deliverables'] },
-            { key: 'executive', name: 'Executive', priceMonthly: 299, priceAnnual: 2990, features: ['Everything in Pro', 'Executive reviews', 'Events'] },
-            { key: 'council', name: 'Executive Access', priceMonthly: 999, priceAnnual: 9990, features: ['Everything in Executive', 'Live sessions', 'Workshops'] },
-          ]);
+          setTiers(CANONICAL_FALLBACK_TIERS);
         }
       })
       .finally(() => {
@@ -171,9 +180,10 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
             {tiers.map((tier) => {
               const price = cycle === 'monthly' ? tier.priceMonthly : tier.priceAnnual;
               const isFree = price === 0;
-              const isPopular = tier.key === 'starter' || tier.key === 'pro';
+              const isPopular = tier.key === RECOMMENDED_TIER;
               const isProcessing = processingTier === tier.key;
               const tierKey = tier.key as TierKey;
+              const canonical = CANONICAL_TIER_PRICING[tierKey];
 
               return (
                 <div
@@ -231,6 +241,16 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                           /{cycle === 'monthly' ? 'mo' : 'yr'}
                         </span>
                       </div>
+                    )}
+                    {canonical && canonical.monthlyMiles > 0 && (
+                      <p className="text-xs mt-1" style={{ color: ACCENT }}>
+                        {canonical.monthlyMiles} mi / month
+                      </p>
+                    )}
+                    {canonical && canonical.monthlyMiles === 0 && (
+                      <p className="text-xs mt-1" style={{ color: '#888' }}>
+                        Chat only · no monthly miles
+                      </p>
                     )}
                   </div>
 
@@ -311,26 +331,33 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                 <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#333' }}>
                   Feature
                 </th>
-                {['Executive Introduction', 'Starter', 'Pro', 'Executive', 'Executive Access'].map((n) => (
-                  <th
-                    key={n}
-                    className="px-6 py-4 text-center text-sm font-semibold"
-                    style={{ color: '#333' }}
-                  >
-                    {n}
-                  </th>
-                ))}
+                {CANONICAL_TIER_ORDER.map((key) => {
+                  const t = CANONICAL_TIER_PRICING[key];
+                  const label = key === 'explorer' ? t.alias! : t.label;
+                  return (
+                    <th
+                      key={key}
+                      className="px-6 py-4 text-center text-sm font-semibold"
+                      style={{ color: key === RECOMMENDED_TIER ? ACCENT : '#333' }}
+                    >
+                      {label}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
               {[
-                { feature: 'Chat Messages', values: ['Basic', 'Unlimited', 'Unlimited', 'Unlimited', 'Unlimited'] },
-                { feature: 'Assessments', values: ['1', 'Unlimited', 'Unlimited', 'Unlimited', 'Unlimited'] },
-                { feature: 'PDF Export', values: ['—', '✓', '✓', '✓', '✓'] },
-                { feature: 'Peer Matching', values: ['—', '—', '✓', '✓', '✓'] },
-                { feature: 'Executive Reviews', values: ['—', '—', '—', '✓', '✓'] },
-                { feature: 'Live Sessions', values: ['—', '—', '—', '—', '✓'] },
-                { feature: 'Workshops', values: ['—', '—', '—', '—', '✓'] },
+                { feature: 'Monthly miles', values: ['—', '50 mi', '150 mi', '300 mi', '600 mi'] },
+                { feature: 'NEXUS chat', values: ['Executive Introduction', 'Standard', 'Priority', 'Priority', 'Unlimited'] },
+                { feature: 'All 11 assessments', values: ['Preview only', '✓', '✓', '✓', '✓'] },
+                { feature: 'Personalised reports', values: ['—', '✓', '✓', '✓', '✓'] },
+                { feature: 'Peer benchmarking', values: ['—', '—', '✓', '✓', '✓'] },
+                { feature: 'Deliverable workspace', values: ['—', '—', '✓', '✓', '✓'] },
+                { feature: 'Executive consultant debriefs', values: ['—', '—', '—', '✓', '✓'] },
+                { feature: 'Live event access', values: ['—', '—', '—', '✓', '✓'] },
+                { feature: 'Council community & workshops', values: ['—', '—', '—', '—', '✓'] },
+                { feature: 'NEXUS miles earning', values: ['—', '✓', '✓', '✓', '✓'] },
               ].map((row, i) => (
                 <tr
                   key={i}

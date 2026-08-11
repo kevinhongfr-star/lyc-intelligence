@@ -170,7 +170,7 @@ export function DexChatPage() {
             </span>
           ) : (
             <span className="px-2.5 py-1 bg-gray-100 text-gray-500 font-medium flex items-center gap-1">
-              <Zap className="w-3 h-3 text-fuchsia" /> {credit.balance} credits
+              <Zap className="w-3 h-3 text-fuchsia" /> {credit.balance} mi
             </span>
           )}
         </div>
@@ -227,10 +227,10 @@ export function DexChatPage() {
         <div className="px-4 md:px-6 py-3 bg-fuchsia-50 border-t border-fuchsia/30 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-sm text-fuchsia-600">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            You are out of credits. Get more to continue the conversation.
+            You are out of miles. Get more to continue the conversation.
           </div>
           <a href="/dex/credits">
-            <Button size="sm">Get Credits</Button>
+            <Button size="sm">Get Miles</Button>
           </a>
         </div>
       )}

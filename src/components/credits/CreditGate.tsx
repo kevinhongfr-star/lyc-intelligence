@@ -59,7 +59,7 @@ interface CreditGateProps {
 }
 
 export function CreditGate({ action, children, onSuccess, disabled = false, unit }: CreditGateProps) {
-  const effectiveUnit: GateUnit = unit ?? (ASSESSMENT_ACTIONS.includes(action) ? 'miles' : 'credits');
+  const effectiveUnit: GateUnit = unit ?? 'miles';
   const { user, profile } = useAuthStore();
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);

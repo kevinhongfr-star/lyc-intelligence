@@ -161,7 +161,7 @@ export function B2CLanding() {
           <div style={{ color: '#C108AB', marginBottom: '12px' }}><IconSpark size={24} color="#C108AB" /></div>
           <h2 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 12px' }}>Ready to find out?</h2>
           <p style={{ fontFamily: DS.bodyFont, fontSize: '15px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px' }}>Leadership isn't a title — it's a trajectory. See it, shape it, accelerate it.</p>
-          <LeadCaptureForm type="b2c" source="b2c_landing" heading="Get your free leadership profile" subheading="8 minutes. Archetype, benchmarks, and your 90-day priorities." />
+          <LeadCaptureForm type="b2c" source="b2c_landing" heading="Get your complimentary leadership profile" subheading="8 minutes. Archetype, benchmarks, and your 90-day priorities." />
         </div>
       </div>
 

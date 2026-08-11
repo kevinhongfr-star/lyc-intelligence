@@ -349,7 +349,7 @@ export function SweepResultsTable({ mandateId, contactIds, onComplete }: SweepRe
 
       <Card className="p-3 bg-bg-alt">
         <div className="flex items-center justify-between text-sm text-text-muted">
-          <span>Credits consumed: 10 (entire SWEEP run)</span>
+          <span>Miles consumed: 10 (entire SWEEP run)</span>
           <span>Total: {contactIds.length} candidates in {(elapsedMs / 1000).toFixed(1)}s</span>
         </div>
       </Card>

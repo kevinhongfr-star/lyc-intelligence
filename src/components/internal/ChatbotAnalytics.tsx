@@ -8,7 +8,7 @@ export default function ChatbotAnalytics() {
     { label: 'Avg Messages', value: MOCK_CHATBOT_STATS.avgMessagesPerConversation, icon: Hash },
     { label: 'Avg Response Time', value: MOCK_CHATBOT_STATS.avgResponseTime, icon: Clock },
     { label: 'Satisfaction', value: `${MOCK_CHATBOT_STATS.satisfactionScore}/5`, icon: Star },
-    { label: 'Credit Usage', value: MOCK_CHATBOT_STATS.creditUsage.toLocaleString(), icon: CreditCard },
+    { label: 'Miles Usage', value: MOCK_CHATBOT_STATS.creditUsage.toLocaleString(), icon: CreditCard },
   ];
 
   return (

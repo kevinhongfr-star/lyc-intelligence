@@ -448,7 +448,7 @@ export function TridentScorePanel({ contactId, mandateId, onSave, onNext }: Trid
           </div>
 
           <div className="mt-4 pt-4 border-t border-border text-center text-xs text-text-muted">
-            <div>10 credits will be consumed</div>
+            <div>10 miles will be consumed</div>
             <div className="mt-1">⌘+S to save | ⌘+⏎ for next</div>
           </div>
         </Card>

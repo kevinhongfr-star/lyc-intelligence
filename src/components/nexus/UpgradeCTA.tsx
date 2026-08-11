@@ -1,7 +1,10 @@
 import React from 'react';
 import { Crown, Sparkles, ArrowRight, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { TierKey } from '@/services/monetizationService';
+import {
+  CANONICAL_TIER_PRICING,
+  type TierKey,
+} from '@/services/monetizationService';
 
 export interface UpgradeCTAProps {
   /** Whether the CTA is visible */
@@ -22,29 +25,26 @@ export interface UpgradeCTAProps {
 
 const ACCENT = '#C108AB';
 
-const TIER_BENEFITS: Record<TierKey, string[]> = {
-  explorer: ['Executive Introduction access', '2 mi per day', 'Community forum'],
-  starter: ['Unlimited chat', 'All 11 assessments', 'PDF export', 'Frameworks'],
-  pro: ['Everything in Starter', 'Peer matching', 'Deliverables', 'Web research'],
-  executive: ['Everything in Pro', 'Executive reviews', 'Events access', 'Priority support'],
-  council: ['Everything in Executive', 'Council community', 'Live sessions', 'Workshops', 'Unlimited everything'],
-};
+const TIER_BENEFITS: Record<TierKey, string[]> = Object.fromEntries(
+  (Object.keys(CANONICAL_TIER_PRICING) as TierKey[]).map((k) => [
+    k,
+    CANONICAL_TIER_PRICING[k].benefits,
+  ]),
+) as Record<TierKey, string[]>;
 
-const TIER_NAMES: Record<TierKey, string> = {
-  explorer: 'Explorer',
-  starter: 'Starter',
-  pro: 'Pro',
-  executive: 'Executive',
-  council: 'Council',
-};
+const TIER_NAMES: Record<TierKey, string> = Object.fromEntries(
+  (Object.keys(CANONICAL_TIER_PRICING) as TierKey[]).map((k) => [
+    k,
+    k === 'explorer' ? CANONICAL_TIER_PRICING[k].alias! : CANONICAL_TIER_PRICING[k].label,
+  ]),
+) as Record<TierKey, string>;
 
-const TIER_PRICES: Record<TierKey, string> = {
-  explorer: 'Executive Introduction',
-  starter: '$29/mo',
-  pro: '$99/mo',
-  executive: '$299/mo',
-  council: '$999/mo',
-};
+const TIER_PRICES: Record<TierKey, string> = Object.fromEntries(
+  (Object.keys(CANONICAL_TIER_PRICING) as TierKey[]).map((k) => {
+    const t = CANONICAL_TIER_PRICING[k];
+    return [k, t.usdMonthly === 0 ? 'Executive Introduction' : `$${t.usdMonthly}/mo`];
+  }),
+) as Record<TierKey, string>;
 
 /**
  * UpgradeCTA — contextual upgrade prompt.

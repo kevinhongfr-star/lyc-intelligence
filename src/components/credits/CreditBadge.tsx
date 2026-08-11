@@ -23,7 +23,7 @@ interface CreditBadgeProps {
   unit?: BadgeUnit;
 }
 
-export function CreditBadge({ showBalance = true, size = 'md', unit = 'credits' }: CreditBadgeProps) {
+export function CreditBadge({ showBalance = true, size = 'md', unit = 'miles' }: CreditBadgeProps) {
   const { profile } = useAuthStore();
   const balance = profile?.credits?.balance ?? 0;
   const tier = profile?.tier || 'free';

@@ -92,7 +92,7 @@ export const MOCK_ROLES = [
 export const MOCK_FEATURE_FLAGS = [
   { id: 'ff1', key: 'nexus_streaming', label: 'Nexus Streaming Mode', enabled: true, portals: ['admin', 'b2b_client', 'b2c_leader', 'candidate'] },
   { id: 'ff2', key: 'org_health_v2', label: 'Org Health V2 Algorithm', enabled: false, portals: ['admin'] },
-  { id: 'ff3', key: 'credit_system', label: 'Credit Gating', enabled: true, portals: ['b2c_leader', 'candidate'] },
+  { id: 'ff3', key: 'credit_system', label: 'Miles Gating', enabled: true, portals: ['b2c_leader', 'candidate'] },
   { id: 'ff4', key: 'dark_mode', label: 'Dark Mode', enabled: false, portals: ['admin', 'b2b_client', 'b2c_leader', 'candidate'] },
   { id: 'ff5', key: 'interview_sim_ai', label: 'AI Interview Simulator', enabled: false, portals: ['candidate'] },
 ];

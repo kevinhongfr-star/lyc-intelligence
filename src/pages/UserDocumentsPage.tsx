@@ -113,7 +113,7 @@ export function DocumentsPage() {
             Document Storage
           </h1>
           <p style={{ fontSize: '16px', color: DS.muted, marginBottom: '32px' }}>
-            Upgrade to Basic or Pro to upload and analyze your documents.
+            Upgrade to Starter or Pro to upload and analyze your documents.
           </p>
           <button 
             onClick={() => navigate('/pricing')} 

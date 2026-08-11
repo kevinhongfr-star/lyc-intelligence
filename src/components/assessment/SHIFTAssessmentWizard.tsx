@@ -1227,7 +1227,7 @@ function ResultsStep({ assessmentType, result, intake, onDownloadPDF, isGenerati
 }
 
 // Upgrade Modal Component
-function UpgradeModal({ creditsRequired, currentBalance, onClose, unit = 'credits' }: any) {
+function UpgradeModal({ creditsRequired, currentBalance, onClose, unit = 'miles' }: any) {
   const isMiles = unit === 'miles';
   const unitLabel = isMiles ? 'mi' : 'credits';
   const unitNoun = isMiles ? 'Miles' : 'Credits';

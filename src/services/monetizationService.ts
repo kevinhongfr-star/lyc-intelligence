@@ -56,6 +56,314 @@ export type BillingCycle = 'monthly' | 'annual';
 export const TIER_KEYS = ['explorer', 'starter', 'pro', 'executive', 'council'] as const;
 export type TierKey = typeof TIER_KEYS[number];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CANONICAL PRICING — single source of truth (Phase 15.5, ticket #1303)
+//
+// Reference: specs/NEXUS_PRODUCT_SPEC_v3_ALIGNED.md §2
+// 5-tier model: Explorer / Starter / Pro / Executive / Council
+// Currency = miles. Explorer tier = "Executive Introduction" (never "free").
+// China pricing: 1/3 of global, displayed in CNY (USD * 7 / 3, rounded).
+// Assessment pricing: 3 tiers (Standard $99 / Premium $149 / Unique $199).
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type PricingCurrency = 'USD' | 'CNY';
+
+export interface CanonicalTierPricing {
+  key: TierKey;
+  label: string;
+  /** Display label for the Explorer tier — "Executive Introduction" (never "free"). */
+  alias?: string;
+  /** Global monthly price in USD. Explorer = 0. */
+  usdMonthly: number;
+  /** China monthly price in CNY (1/3 of global, rounded). Explorer = 0. */
+  cnyMonthly: number;
+  /** Monthly miles allowance. Explorer = 0 (chat only). */
+  monthlyMiles: number;
+  /** Whether this tier earns miles via NEXUS actions. Explorer = false. */
+  earnsMiles: boolean;
+  /** Headline benefits (canonical copy, no "credits" / no "free"). */
+  benefits: string[];
+}
+
+/**
+ * CANONICAL_TIER_PRICING — the 5-tier subscription table.
+ * This is the single source of truth for all pricing surfaces.
+ */
+export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
+  explorer: {
+    key: 'explorer',
+    label: 'Explorer',
+    alias: 'Executive Introduction',
+    usdMonthly: 0,
+    cnyMonthly: 0,
+    monthlyMiles: 0,
+    earnsMiles: false,
+    benefits: [
+      'Executive Introduction access to NEXUS chat',
+      'Framework exploration and sample outputs',
+      'Assessment previews (no personalised reports)',
+      'Community forum',
+    ],
+  },
+  starter: {
+    key: 'starter',
+    label: 'Starter',
+    usdMonthly: 25,
+    cnyMonthly: 59,
+    monthlyMiles: 50,
+    earnsMiles: true,
+    benefits: [
+      '50 mi monthly allowance',
+      'All 11 assessments unlocked',
+      'Personalised assessment reports',
+      'NEXUS miles earning (exploration +5, reflection +3)',
+      'PDF report export',
+    ],
+  },
+  pro: {
+    key: 'pro',
+    label: 'Pro',
+    usdMonthly: 99,
+    cnyMonthly: 233,
+    monthlyMiles: 150,
+    earnsMiles: true,
+    benefits: [
+      '150 mi monthly allowance',
+      'Everything in Starter',
+      'Peer benchmarking across regional C-suite',
+      'Deliverable workspace (canvas, grid)',
+      'Priority NEXUS responses',
+    ],
+  },
+  executive: {
+    key: 'executive',
+    label: 'Executive',
+    usdMonthly: 199,
+    cnyMonthly: 466,
+    monthlyMiles: 300,
+    earnsMiles: true,
+    benefits: [
+      '300 mi monthly allowance',
+      'Everything in Pro',
+      'Executive consultant debriefs',
+      'Live event access',
+      'Priority support',
+    ],
+  },
+  council: {
+    key: 'council',
+    label: 'Council',
+    usdMonthly: 499,
+    cnyMonthly: 1165,
+    monthlyMiles: 600,
+    earnsMiles: true,
+    benefits: [
+      '600 mi monthly allowance',
+      'Everything in Executive',
+      'Council community and live sessions',
+      'Quarterly executive workshops',
+      'Unlimited NEXUS conversations',
+    ],
+  },
+};
+
+/** Ordered list of tiers for rendering pricing tables. */
+export const CANONICAL_TIER_ORDER: TierKey[] = [
+  'explorer', 'starter', 'pro', 'executive', 'council',
+];
+
+/** Recommended tier for highlighting on the pricing page. */
+export const RECOMMENDED_TIER: TierKey = 'pro';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ASSESSMENT PRICING — 3 tiers (Standard / Premium / Unique)
+// Miles cost mirrors USD pricing (~1 mile = $1).
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type AssessmentPriceTier = 'standard' | 'premium' | 'unique';
+
+export interface CanonicalAssessmentPricing {
+  tier: AssessmentPriceTier;
+  label: string;
+  /** USD price (also = miles cost, since 1 mi ≈ $1). */
+  usd: number;
+  /** CNY price (1/3 of USD, rounded to nearest whole). */
+  cny: number;
+  /** Miles cost (same as USD). */
+  miles: number;
+  /** Instruments in this price tier. */
+  instruments: string[];
+}
+
+/**
+ * CANONICAL_ASSESSMENT_PRICING — the 3-tier assessment pricing table.
+ * Source: Phase 15.5 spec / NEXUS_Pricing_Canonical_v1.0.
+ */
+export const CANONICAL_ASSESSMENT_PRICING: Record<
+  AssessmentPriceTier,
+  CanonicalAssessmentPricing
+> = {
+  standard: {
+    tier: 'standard',
+    label: 'Standard',
+    usd: 99,
+    cny: 33,
+    miles: 99,
+    instruments: ['LEAP', 'DRIVE', 'PRISM', 'MOSAIC', 'FORGE'],
+  },
+  premium: {
+    tier: 'premium',
+    label: 'Premium',
+    usd: 149,
+    cny: 50,
+    miles: 149,
+    instruments: ['QUEST', 'COACH', 'IMPACT', 'BRIDGE', 'SPARK'],
+  },
+  unique: {
+    tier: 'unique',
+    label: 'Unique',
+    usd: 199,
+    cny: 66,
+    miles: 199,
+    instruments: ['CPI'],
+  },
+};
+
+export const CANONICAL_ASSESSMENT_ORDER: AssessmentPriceTier[] = [
+  'standard', 'premium', 'unique',
+];
+
+/**
+ * Map instrument code → its canonical assessment price tier.
+ * Built from CANONICAL_ASSESSMENT_PRICING so there is one source of truth.
+ */
+export const INSTRUMENT_PRICE_TIER: Record<string, AssessmentPriceTier> =
+  Object.fromEntries(
+    Object.values(CANONICAL_ASSESSMENT_PRICING).flatMap((p) =>
+      p.instruments.map((code) => [code, p.tier] as const),
+    ),
+  );
+
+/**
+ * ASSESSMENT_MILES_COSTS — per-instrument miles cost.
+ * Derived from CANONICAL_ASSESSMENT_PRICING (99 / 149 / 199).
+ */
+export const ASSESSMENT_MILES_COSTS: Record<string, number> = Object.fromEntries(
+  Object.values(CANONICAL_ASSESSMENT_PRICING).flatMap((p) =>
+    p.instruments.map((code) => [code, p.miles] as const),
+  ),
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CURRENCY DETECTION & FORMATTING (Phase 15.5, ticket #1303 — China pricing)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Detect the user's preferred currency.
+ * Priority order:
+ *   1. Explicit user setting (profile.currency_preference) — 'USD' | 'CNY'
+ *   2. Browser timezone (Asia/Shanghai, Asia/Beijing, Asia/Hong_Kong*, etc.)
+ *   3. navigator.language (zh-CN, zh-Hans, zh-*)
+ *   4. Default: 'USD'
+ *
+ * *Hong Kong / Macau / Taiwan are NOT mainland China — we treat them as USD
+ * for pricing purposes unless the user explicitly opts into CNY.
+ */
+export function detectUserCurrency(opts?: {
+  timezone?: string | null;
+  locale?: string | null;
+  preference?: string | null;
+}): PricingCurrency {
+  // 1. Explicit preference
+  const pref = opts?.preference?.toUpperCase();
+  if (pref === 'CNY' || pref === 'CN' || pref === 'RMB') return 'CNY';
+  if (pref === 'USD' || pref === 'US' || pref === 'GLOBAL') return 'USD';
+
+  // 2. Timezone
+  const tz = opts?.timezone ?? (typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : null);
+  if (tz && (tz === 'Asia/Shanghai' || tz === 'Asia/Beijing' || tz === 'Asia/Urumqi' || tz === 'Asia/Chongqing')) {
+    return 'CNY';
+  }
+
+  // 3. Locale
+  const locale = opts?.locale ?? (typeof navigator !== 'undefined' ? navigator.language : null);
+  if (locale && /^zh-(CN|Hans)/i.test(locale)) {
+    return 'CNY';
+  }
+
+  // 4. Default
+  return 'USD';
+}
+
+/**
+ * Format a tier price for display.
+ * Returns objects so callers can compose rich UIs without re-parsing strings.
+ *
+ * Explorer tier: returns { display: 'Executive Introduction', isZero: true }
+ * — never "Free" or "$0".
+ */
+export function formatTierPrice(
+  tierKey: TierKey,
+  currency: PricingCurrency = 'USD',
+): {
+  primary: string;
+  secondary: string;
+  isZero: boolean;
+  currency: PricingCurrency;
+} {
+  const tier = CANONICAL_TIER_PRICING[tierKey];
+  if (!tier) {
+    return { primary: '—', secondary: '', isZero: false, currency };
+  }
+
+  if (tier.usdMonthly === 0) {
+    return {
+      primary: 'Executive Introduction',
+      secondary: 'Complimentary access',
+      isZero: true,
+      currency,
+    };
+  }
+
+  if (currency === 'CNY') {
+    return {
+      primary: `¥${tier.cnyMonthly}`,
+      secondary: '/ 月',
+      isZero: false,
+      currency,
+    };
+  }
+
+  return {
+    primary: `$${tier.usdMonthly}`,
+    secondary: '/ mo',
+    isZero: false,
+    currency,
+  };
+}
+
+/**
+ * Format an assessment price for display.
+ * Standard / Premium / Unique tiers, USD or CNY.
+ */
+export function formatAssessmentPrice(
+  priceTier: AssessmentPriceTier,
+  currency: PricingCurrency = 'USD',
+): { primary: string; miles: number } {
+  const p = CANONICAL_ASSESSMENT_PRICING[priceTier];
+  if (!p) return { primary: '—', miles: 0 };
+  const primary = currency === 'CNY' ? `¥${p.cny}` : `$${p.usd}`;
+  return { primary, miles: p.miles };
+}
+
+/**
+ * Convenience: get the miles cost for a specific instrument code.
+ * Falls back to 99 (Standard tier) if the code is not in the catalog.
+ */
+export function getInstrumentMilesCost(instrumentCode: string): number {
+  return ASSESSMENT_MILES_COSTS[instrumentCode] ?? 99;
+}
+
 export async function fetchTiers(): Promise<Tier[]> {
   return v1Client.get<Tier[]>('/billing/tiers');
 }
@@ -106,25 +414,11 @@ export async function upgradeSubscription(
   return v1Client.post('/billing/subscription/upgrade', { tier });
 }
 
-export const ASSESSMENT_MILES_COSTS: Record<string, number> = {
-  LEAP: 3,
-  QUEST: 3,
-  DRIVE: 3,
-  COACH: 3,
-  IMPACT: 5,
-  FORGE: 3,
-  BRIDGE: 3,
-  MOSAIC: 3,
-  CPI: 5,
-  PRISM: 3,
-  SPARK: 3,
-};
-
 export async function spendAssessmentMiles(
   instrumentKey: string,
   opts?: { referenceId?: string; userId?: string }
 ): Promise<{ success: boolean; newBalance: number; milesUsed: number }> {
-  const milesUsed = ASSESSMENT_MILES_COSTS[instrumentKey] ?? 3;
+  const milesUsed = getInstrumentMilesCost(instrumentKey);
   try {
     const result = (await v1Client.post('/billing/miles/spend', {
       feature_key: `assessment_${instrumentKey.toLowerCase()}`,
@@ -151,7 +445,7 @@ export async function refundAssessmentMiles(
   instrumentKey: string,
   opts?: { referenceId?: string; reason?: string; userId?: string }
 ): Promise<{ success: boolean; milesRefunded: number }> {
-  const milesRefunded = ASSESSMENT_MILES_COSTS[instrumentKey] ?? 3;
+  const milesRefunded = getInstrumentMilesCost(instrumentKey);
   try {
     await v1Client.post('/billing/miles/refund', {
       feature_key: `assessment_${instrumentKey.toLowerCase()}`,

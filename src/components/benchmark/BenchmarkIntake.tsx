@@ -426,7 +426,7 @@ export function BenchmarkIntake({ organizationId, userId, onComplete }: Benchmar
             <div className="flex items-center gap-3">
               <CreditCard className="w-5 h-5 text-primary" />
               <div>
-                <span className="font-medium text-text-primary">15 Credits</span>
+                <span className="font-medium text-text-primary">15 Miles</span>
                 <span className="text-sm text-text-muted ml-2">will be charged to your organization</span>
               </div>
             </div>

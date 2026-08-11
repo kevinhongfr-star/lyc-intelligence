@@ -189,7 +189,7 @@ export default function CpiPage() {
           <div>
             <h2 className="text-lg font-semibold">Ready to assess your leadership pipeline readiness?</h2>
             <p className="text-sm text-fuchsia-100 mt-1">
-              20 scenario questions + 5 cross-border readiness questions · {CPI_CREDITS} credits
+              20 scenario questions + 5 cross-border readiness questions · {CPI_CREDITS} mi
             </p>
           </div>
           <button

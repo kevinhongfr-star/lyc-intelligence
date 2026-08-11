@@ -72,7 +72,7 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
         <div className="flex items-center gap-1">
           <CreditCard className="w-4 h-4 text-accent" />
           <span className="font-semibold text-text-primary">{service.priceCredits}</span>
-          <span className="text-xs text-text-muted">credits</span>
+          <span className="text-xs text-text-muted">mi</span>
         </div>
         <button
           onClick={() => onBook(service)}

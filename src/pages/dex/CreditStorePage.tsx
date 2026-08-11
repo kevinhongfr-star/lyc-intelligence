@@ -28,23 +28,23 @@ const CREDIT_PACKS: CreditPackPlan[] = [
     packKey: 'starter',
     name: 'Starter Pack',
     price: '$9.99',
-    credits: '100 credits',
-    features: ['1 credit per DEX message', 'No expiry', 'Use anytime'],
+    credits: '100 mi',
+    features: ['1 mile per DEX message', 'No expiry', 'Use anytime'],
   },
   {
     packKey: 'professional',
     name: 'Professional Pack',
     price: '$39.99',
-    credits: '500 credits',
-    features: ['1 credit per DEX message', 'Best value per credit', 'No expiry'],
+    credits: '500 mi',
+    features: ['1 mile per DEX message', 'Best value per mile', 'No expiry'],
     featured: true,
   },
   {
     packKey: 'enterprise',
     name: 'Enterprise Pack',
     price: '$99.99',
-    credits: '1,500 credits',
-    features: ['1 credit per DEX message', 'Lowest cost per credit', 'Team-friendly'],
+    credits: '1,500 mi',
+    features: ['1 mile per DEX message', 'Lowest cost per mile', 'Team-friendly'],
   },
 ];
 
@@ -130,16 +130,16 @@ export function CreditStorePage() {
 
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-fuchsia/10 text-fuchsia text-xs font-semibold uppercase tracking-wide mb-3">
-            <Zap className="w-3 h-3" /> Credits & Plans
+            <Zap className="w-3 h-3" /> Miles & Plans
           </div>
           <h1
             className="text-3xl font-bold text-[#1A1A2E] mb-2"
             style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
           >
-            Credits & Plans
+            Miles & Plans
           </h1>
           <p className="text-sm text-gray-600">
-            Use credits to message DEX AI or book coaching sessions. Begin with your complimentary Executive Introduction.
+            Use miles to message DEX AI or book coaching sessions. Begin with your complimentary Executive Introduction.
           </p>
         </div>
 
@@ -153,7 +153,7 @@ export function CreditStorePage() {
                 </div>
                 <div>
                   <div className="text-xs text-gray-500 uppercase tracking-wide">Current Balance</div>
-                  <div className="text-3xl font-bold text-[#1A1A2E]">{credit.balance} credits</div>
+                  <div className="text-3xl font-bold text-[#1A1A2E]">{credit.balance} mi</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -183,7 +183,7 @@ export function CreditStorePage() {
 
         {/* Credit packs */}
         <div className="mb-10">
-          <h2 className="text-lg font-semibold text-[#1A1A2E] mb-4">Buy Credit Packs</h2>
+          <h2 className="text-lg font-semibold text-[#1A1A2E] mb-4">Buy Miles Packs</h2>
           <div className="grid md:grid-cols-3 gap-5">
             {CREDIT_PACKS.map(p => (
               <Card
@@ -235,7 +235,7 @@ export function CreditStorePage() {
               <div className="text-fuchsia font-bold text-2xl mb-1">$29<span className="text-sm font-normal text-gray-500">/month</span></div>
               <ul className="space-y-2 mt-3">
                 <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /> 5 credits per day
+                  <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /> 5 miles per day
                 </li>
                 <li className="flex items-start gap-2 text-sm text-gray-600">
                   <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /> All SHIFT assessments

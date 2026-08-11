@@ -431,7 +431,7 @@ export function MatchPage() {
                     {isFirstBatch ? (
                       <span style={{ color: DS.success }}>Complimentary (first 3 matches)</span>
                     ) : (
-                      <>Cost: <strong>{creditCost.credits} credits</strong>
+                      <>Cost: <strong>{creditCost.credits} mi</strong>
                         {userCredits < creditCost.credits && <span style={{ color: DS.warning, marginLeft: '8px' }}>(You have {userCredits})</span>}
                       </>
                     )}
@@ -455,8 +455,8 @@ export function MatchPage() {
         {showCreditModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', zIndex: 1000 }}>
             <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '32px', maxWidth: '400px', textAlign: 'center' }}>
-              <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', color: DS.text, marginBottom: '12px' }}>Insufficient Credits</h3>
-              <p style={{ fontSize: '14px', color: DS.muted, marginBottom: '20px' }}>You need {creditCost.credits} credits but only have {userCredits}.</p>
+              <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', color: DS.text, marginBottom: '12px' }}>Insufficient Miles</h3>
+              <p style={{ fontSize: '14px', color: DS.muted, marginBottom: '20px' }}>You need {creditCost.credits} miles but only have {userCredits}.</p>
               <button onClick={() => setShowCreditModal(false)} style={{ padding: '10px 20px', background: DS.accent, border: 'none',  color: '#FFFFFF', cursor: 'pointer', fontWeight: 600, minHeight: '44px' }}>
                 Understood
               </button>

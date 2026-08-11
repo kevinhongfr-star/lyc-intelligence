@@ -74,7 +74,7 @@ export default function BookingFlow({ service, onClose }: BookingFlowProps) {
               <div className="flex items-center gap-1">
                 <CreditCard className="w-3.5 h-3.5 text-accent" />
                 <span className="font-semibold text-text-primary">{service.priceCredits}</span>
-                <span className="text-text-muted">credits</span>
+                <span className="text-text-muted">mi</span>
               </div>
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function BookingFlow({ service, onClose }: BookingFlowProps) {
                 <span className="text-sm text-text-muted">Total</span>
                 <div className="flex items-center gap-1">
                   <CreditCard className="w-4 h-4 text-accent" />
-                  <span className="font-bold text-text-primary">{service.priceCredits} credits</span>
+                  <span className="font-bold text-text-primary">{service.priceCredits} mi</span>
                 </div>
               </div>
             </div>
@@ -172,7 +172,7 @@ export default function BookingFlow({ service, onClose }: BookingFlowProps) {
             style={{ }}
           >
             <CreditCard className="w-4 h-4" />
-            Confirm & Pay {service.priceCredits} Credits
+            Confirm & Pay {service.priceCredits} Miles
           </button>
         )}
       </div>

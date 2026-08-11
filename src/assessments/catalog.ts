@@ -312,10 +312,18 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = INSTRUMENT_ORD
       scoring.TIER === "flagship" ? "flagship" : scoring.TIER === "shift" ? "shift" : "advisory";
     const tierLabel = TIER_GROUP_LABELS[tierGroup];
 
-    let priceMiles = scoring.PRICE_MILES;
-    if (tierGroup === "flagship") priceMiles = 199;
-    else if (tierGroup === "shift") priceMiles = 149;
-    else priceMiles = 99;
+    // Phase 15.5 / ticket #1303 — canonical 3-tier assessment pricing.
+    // Standard (99 mi): LEAP, DRIVE, PRISM, MOSAIC, FORGE
+    // Premium (149 mi): QUEST, COACH, IMPACT, BRIDGE, SPARK
+    // Unique  (199 mi): CPI
+    // NOTE: tierGroup (flagship/shift/advisory) is the catalog grouping,
+    // NOT the price tier. Pricing is per-instrument per the canonical spec.
+    const CANONICAL_PRICE_MILES: Record<string, number> = {
+      LEAP: 99, DRIVE: 99, PRISM: 99, MOSAIC: 99, FORGE: 99,
+      QUEST: 149, COACH: 149, IMPACT: 149, BRIDGE: 149, SPARK: 149,
+      CPI: 199,
+    };
+    const priceMiles = CANONICAL_PRICE_MILES[code] ?? 99;
 
     const is_cpi = tierGroup === "flagship";
     const is_shift = tierGroup === "shift";

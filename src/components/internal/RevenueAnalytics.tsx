@@ -102,7 +102,7 @@ export default function RevenueAnalytics() {
   const { totals, monthly, tierDistribution, recentPacks } = data;
   const chartData = monthly.map(m => ({
     month: fmtMonth(m.month),
-    'Credit Packs': Number(m.packRevenue.toFixed(2)),
+    'Miles Packs': Number(m.packRevenue.toFixed(2)),
     Subscriptions: Number(m.subscriptionRevenue.toFixed(2)),
   }));
   const maxTierCount = Math.max(...tierDistribution.map(t => t.count), 1);
@@ -113,7 +113,7 @@ export default function RevenueAnalytics() {
     { label: 'Pack Revenue', value: fmtMoney(totals.packRevenue), icon: DollarSign, hint: `${totals.packCount} packs sold` },
     { label: 'Active Subscribers', value: String(totals.activeSubscribers), icon: Users, hint: 'Council members' },
     { label: 'Churn Rate', value: fmtPct(totals.churnRate), icon: Repeat, hint: `${totals.churnedSubscribers} churned` },
-    { label: 'Credit Utilization', value: fmtPct(totals.creditUtilization), icon: Activity, hint: 'spent / earned' },
+    { label: 'Miles Utilization', value: fmtPct(totals.creditUtilization), icon: Activity, hint: 'spent / earned' },
   ];
 
   return (
@@ -123,7 +123,7 @@ export default function RevenueAnalytics() {
           <TrendingUp className="w-5 h-5 text-fuchsia" /> Revenue Analytics
         </h2>
         <p className="text-sm text-text-muted mt-1">
-          Commerce overview — credit pack sales, Council subscriptions, and credit utilization.
+          Commerce overview — miles pack sales, Council subscriptions, and miles utilization.
           {data.generatedAt && (
             <span className="ml-1 text-xs">Generated {new Date(data.generatedAt).toLocaleString()}.</span>
           )}
@@ -162,7 +162,7 @@ export default function RevenueAnalytics() {
                 contentStyle={{ fontSize: 12 }}
               />
               <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="Credit Packs" stackId="r" fill="#C108AB" />
+              <Bar dataKey="Miles Packs" stackId="r" fill="#C108AB" />
               <Bar dataKey="Subscriptions" stackId="r" fill="#1A1A2E" />
             </BarChart>
           </ResponsiveContainer>
@@ -197,7 +197,7 @@ export default function RevenueAnalytics() {
 
         {/* Recent pack purchases */}
         <div className="bg-white border border-border p-5">
-          <h3 className="text-sm font-semibold text-text-primary mb-4">Recent Credit Pack Purchases</h3>
+          <h3 className="text-sm font-semibold text-text-primary mb-4">Recent Miles Pack Purchases</h3>
           {recentPacks.length === 0 ? (
             <div className="py-8 text-center text-sm text-text-muted">No pack purchases yet.</div>
           ) : (
@@ -205,7 +205,7 @@ export default function RevenueAnalytics() {
               {recentPacks.map((p, i) => (
                 <div key={i} className="py-2.5 flex items-center justify-between">
                   <div>
-                    <div className="text-sm font-medium text-text-primary">+{p.credits} credits</div>
+                    <div className="text-sm font-medium text-text-primary">+{p.credits} miles</div>
                     <div className="text-xs text-text-muted">
                       {p.created_at ? new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
                     </div>
@@ -220,7 +220,7 @@ export default function RevenueAnalytics() {
 
       <div className="flex items-center gap-2 text-xs text-text-muted bg-bg-warm p-3">
         <TrendingDown className="w-3.5 h-3.5" />
-        Pack revenue is estimated from credit-pack transaction logs at catalog prices. Subscription MRR reflects current active Council members at $29/mo.
+        Pack revenue is estimated from miles-pack transaction logs at catalog prices. Subscription MRR reflects current active Council members at $29/mo.
       </div>
     </div>
   );
