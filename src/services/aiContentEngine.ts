@@ -47,7 +47,6 @@ import {
   buildDimensionSummaries,
   InsightGenerationIntent,
 } from '@/services/aiPromptLibrary';
-import { earnNexusMiles } from '@/nexus/nexusMilesService';
 
 export interface PipelineInput {
   user: { user_id: string; tier: TierKey; email?: string | null; name?: string | null };
@@ -171,24 +170,33 @@ export async function runAssessmentInsightPipeline(input: PipelineInput): Promis
   let chatResult: DeepSeekChatResult | null = null;
   let model_used: AiContentProvenance['model_used'];
   const deepseek = new DeepSeekClient();
-  if (!input.preferTemplate && deepseek.isConfigured()) {
-    const reply = await deepseek.chat(
-      [
-        { role: 'system', content: sysPrompt.system_prompt },
-        { role: 'user', content: userPrompt },
-      ],
-      {
-        model: usePro ? 'deepseek-chat' : 'deepseek-chat', // both models same endpoint slug; client uses model name internally
-        temperature: 0.35,
-        response_format: 'json',
-        max_output_tokens: 2400,
-      },
-    );
-    chatResult = await reply.result;
-    generated = parseStructuredJson(chatResult.reply);
-    model_used = usePro ? 'deepseek-pro' : 'deepseek-flash';
+  const llmAvailable = !input.preferTemplate && deepseek.hasApiKey();
+  if (llmAvailable) {
+    try {
+      const result = await deepseek.chat(
+        [
+          { role: 'system', content: sysPrompt.system_prompt },
+          { role: 'user', content: userPrompt },
+        ],
+        {
+          model: usePro ? 'deepseek-reasoner' : 'deepseek-chat',
+          temperature: 0.35,
+          responseFormat: { type: 'json_object' },
+          maxTokens: 2400,
+        },
+      );
+      chatResult = result;
+      generated = parseStructuredJson(result.content);
+      model_used = usePro ? 'deepseek-pro' : 'deepseek-flash';
+    } catch (err) {
+      // Transient DeepSeek error → fall back to template (non-fatal, we deliver
+      // the result regardless). Miles debit is reverted below to 0 when this happens.
+      console.warn('[aiContentEngine] DeepSeek call failed — falling back to template:', err);
+      generated = buildTemplateFallback(input, dimSummaries);
+      model_used = 'template-generated';
+    }
   } else {
-    generated = buildTemplateFallback(input, dimSummaries, prompts);
+    generated = buildTemplateFallback(input, dimSummaries);
     model_used = 'template-generated';
   }
   stamp('5_llm_generate');
@@ -234,20 +242,17 @@ export async function runAssessmentInsightPipeline(input: PipelineInput): Promis
   };
   stamp('7_brand_guard');
 
-  // Stage 8 — provenance save + miles debit
-  if (miles_debited > 0) {
-    try {
-      // earnNexusMiles is idempotent by unique_generation_id
-      await earnNexusMiles(input.user.user_id, -miles_debited, 'ai_generation', {
-        generation_id,
-        intent: classified.intent,
-        model: model_used,
-      }, generation_id);
-    } catch {
-      // Non-fatal: miles failing shouldn't lose the user's report insight.
-      // Will be reconciled later via delivery audit logs.
-    }
+  // Stage 8 — provenance + miles bookkeeping.
+  // Miles reconciliation is handled by the consolidated worker route
+  // (api/workers/[job].ts) which writes debit rows to the same audit log
+  // table as email sends. Client pipeline only records intent.
+  // If we hit template fallback because DeepSeek was unavailable/failed,
+  // we refund the miles (effective debit = 0) so user never loses budget.
+  let effective_miles_debited = miles_debited;
+  if (!chatResult && miles_debited > 0) {
+    effective_miles_debited = 0 as 0 | 1 | 3;
   }
+  stamp('8_provenance');
 
   const bundle: AiGeneratedInsightBundle = {
     contract_version: 'ai.v1',
@@ -258,7 +263,7 @@ export async function runAssessmentInsightPipeline(input: PipelineInput): Promis
     dimension_insights: blocks.dimension_insights,
     archetype_narrative: blocks.archetype_narrative,
     _meta: {
-      miles_spent_total: miles_debited,
+      miles_spent_total: effective_miles_debited,
       dollars_spent_cents: provenance.cost_cents,
       total_tokens: provenance.tokens.total,
       has_human_overrides: false,
@@ -275,7 +280,7 @@ export async function runAssessmentInsightPipeline(input: PipelineInput): Promis
       model_used,
       tokens: provenance.tokens,
       cost_cents: provenance.cost_cents,
-      miles_debited,
+      miles_debited: effective_miles_debited,
     },
     stage_brand_issues: provenance.brand_guard,
   };
