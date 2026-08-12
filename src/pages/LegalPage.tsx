@@ -28,7 +28,7 @@ export function LegalPage() {
               <button
                 key={t}
                 onClick={() => setActiveTab(t)}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === t ? 'text-purple-700' : 'text-gray-600 border-transparent hover:text-gray-900'}`}
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === t ? 'text-[#C108AB]' : 'text-gray-600 border-transparent hover:text-gray-900'}`}
                 style={activeTab === t ? { borderColor: '#C108AB' } : {}}
                 data-testid={`legal-tab-${t}`}
               >

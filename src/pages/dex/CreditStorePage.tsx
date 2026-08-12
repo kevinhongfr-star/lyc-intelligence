@@ -36,7 +36,7 @@ const CREDIT_PACKS: CreditPackPlan[] = [
     name: 'Professional Pack',
     price: '$39.99',
     credits: '500 mi',
-    features: ['1 mile per DEX message', 'Best value per mile', 'No expiry'],
+    features: ['1 mile per DEX message', 'Optimal miles per purchase', 'No expiry'],
     featured: true,
   },
   {

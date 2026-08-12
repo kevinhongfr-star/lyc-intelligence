@@ -8,6 +8,22 @@ export interface Tier {
   features: string[];
 }
 
+// ── Canonical tier_key → display name mapping (#1318) ──
+// Internal keys are stable IDs (never shown to users). Display labels are
+// the canonical brand names per #1318 / brand master.
+//   explorer  → Executive Introduction (complimentary entry)
+//   starter   → Professional
+//   pro       → Executive
+//   executive → Council
+//   council   → Enterprise (B2B / custom)
+export const TIER_DISPLAY_NAMES: Record<TierKey, string> = {
+  explorer: 'Executive Introduction',
+  starter: 'Professional',
+  pro: 'Executive',
+  executive: 'Council',
+  council: 'Enterprise',
+};
+
 export interface MilesBalance {
   balance: number;
   total_earned: number;
@@ -57,11 +73,13 @@ export const TIER_KEYS = ['explorer', 'starter', 'pro', 'executive', 'council'] 
 export type TierKey = typeof TIER_KEYS[number];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CANONICAL PRICING — single source of truth (Phase 15.5, ticket #1303)
+// CANONICAL PRICING — single source of truth (#1318 / Phase 15.5 / #1303)
 //
 // Reference: specs/NEXUS_PRODUCT_SPEC_v3_ALIGNED.md §2
-// 5-tier model: Explorer / Starter / Pro / Executive / Council
-// Currency = miles. Explorer tier = "Executive Introduction" (never "free").
+// 5-tier model (canonical display names per #1318):
+//   Executive Introduction / Professional / Executive / Council / Enterprise
+// Internal tier_key values are stable IDs, never shown to users.
+// Currency = miles. Entry tier = "Executive Introduction" (never "free").
 // China pricing: 1/3 of global, displayed in CNY (USD * 7 / 3, rounded).
 // Assessment pricing: 3 tiers (Standard $99 / Premium $149 / Unique $199).
 // ─────────────────────────────────────────────────────────────────────────────
@@ -92,7 +110,7 @@ export interface CanonicalTierPricing {
 export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
   explorer: {
     key: 'explorer',
-    label: 'Explorer',
+    label: 'Executive Introduction',
     alias: 'Executive Introduction',
     usdMonthly: 0,
     cnyMonthly: 0,
@@ -107,7 +125,7 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
   },
   starter: {
     key: 'starter',
-    label: 'Starter',
+    label: 'Professional',
     usdMonthly: 25,
     cnyMonthly: 59,
     monthlyMiles: 50,
@@ -122,14 +140,14 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
   },
   pro: {
     key: 'pro',
-    label: 'Pro',
+    label: 'Executive',
     usdMonthly: 99,
     cnyMonthly: 233,
     monthlyMiles: 150,
     earnsMiles: true,
     benefits: [
       '150 mi monthly allowance',
-      'Everything in Starter',
+      'Everything in Professional',
       'Peer benchmarking across regional C-suite',
       'Deliverable workspace (canvas, grid)',
       'Priority NEXUS responses',
@@ -137,32 +155,32 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
   },
   executive: {
     key: 'executive',
-    label: 'Executive',
+    label: 'Council',
     usdMonthly: 199,
     cnyMonthly: 466,
     monthlyMiles: 300,
     earnsMiles: true,
     benefits: [
       '300 mi monthly allowance',
-      'Everything in Pro',
-      'Executive consultant debriefs',
-      'Live event access',
+      'Everything in Executive',
+      'Council community and live sessions',
+      'Quarterly executive workshops',
       'Priority support',
     ],
   },
   council: {
     key: 'council',
-    label: 'Council',
+    label: 'Enterprise',
     usdMonthly: 499,
     cnyMonthly: 1165,
     monthlyMiles: 600,
     earnsMiles: true,
     benefits: [
       '600 mi monthly allowance',
-      'Everything in Executive',
-      'Council community and live sessions',
-      'Quarterly executive workshops',
-      'Unlimited NEXUS conversations',
+      'Everything in Council',
+      'SSO, SCIM & role-based access',
+      'Custom framework training',
+      'Dedicated account contact',
     ],
   },
 };

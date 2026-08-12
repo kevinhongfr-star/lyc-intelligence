@@ -53,7 +53,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
   const handleUpgrade = async (tierKey: TierKey) => {
     if (tierKey === 'explorer') {
       // Explorer = Executive Introduction → no checkout, just send to dashboard.
-      trackCTA({ location: 'pricing_tier', label: 'Explorer CTA', destination: user ? '/dashboard' : '/login', context_id: tierKey });
+      trackCTA({ location: 'pricing_tier', label: 'Executive Introduction CTA', destination: user ? '/dashboard' : '/login', context_id: tierKey });
       if (!user) {
         window.location.href = '/login';
       } else {
@@ -256,7 +256,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                     'Current Plan'
                   ) : isExplorer ? (
                     <>
-                      Get Started
+                      Begin
                       <ArrowRight className="w-4 h-4" />
                     </>
                   ) : (

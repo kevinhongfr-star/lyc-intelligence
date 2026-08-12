@@ -394,7 +394,7 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
             borderRadius: DS.radius,
           }}
         >
-          Most Chosen
+          Recommended
         </div>
       )}
       <div style={{ marginBottom: '20px' }}>
@@ -766,8 +766,8 @@ export function Landing() {
               Try NEXUS <ArrowRight style={{ width: 15, height: 15 }} />
             </a>
             <a
-              href="#assessment-catalog"
-              onClick={() => trackCTA({ location: 'hero', label: 'Explore Assessments', destination: '#assessment-catalog' })}
+              href="/assessment"
+              onClick={() => trackCTA({ location: 'hero', label: 'Explore Assessments', destination: '/assessment' })}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',

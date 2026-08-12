@@ -257,7 +257,7 @@ function GateStep({ state, setState, onSubmit, error }: any) {
   return (
     <div style={{ maxWidth: '500px', margin: '0 auto', padding: '24px' }}>
       <h1 style={{ fontFamily: DS.headingFont, color: DS.text, fontSize: '28px', marginBottom: '12px' }}>
-        Let's get started
+        Begin your assessment
       </h1>
       <p style={{ color: DS.muted, marginBottom: '32px' }}>
         Enter your details to start your assessment.

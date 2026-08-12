@@ -15,7 +15,7 @@ export function DexLandingPage() {
       <section className="bg-white text-gray-900">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 text-teal-600 text-xs font-semibold uppercase tracking-wide mb-5">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-fuchsia/10 text-fuchsia text-xs font-semibold uppercase tracking-wide mb-5">
               <Sparkles className="w-3 h-3" />
               Executive Introduction · 5 Complimentary Messages
             </div>
@@ -56,7 +56,7 @@ export function DexLandingPage() {
             What DEX AI can do for you
           </h2>
           <p className="text-sm text-gray-600">
-            Four pillars of executive intelligence, available the moment you need them.
+            Four dimensions of executive intelligence, available the moment you need them.
           </p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">

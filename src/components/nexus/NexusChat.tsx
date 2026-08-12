@@ -10,7 +10,7 @@ import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditSe
 import { supabase } from '@/lib/supabase';
 import {
   getUserAssessmentContext,
-  buildAssessmentContextForNexus,
+  buildAssessmentContextForNEXUS,
 } from '@/nexus/assessmentContext';
 import { CreditGate } from './CreditGate';
 import { CareerInsight } from './CareerInsight';
@@ -28,14 +28,14 @@ import {
 import {
   NEXUS_ASSESSMENT_KB,
   runRecommendationEngine,
-  buildNexusSystemPrompt,
+  buildNEXUSSystemPrompt,
   canonicalTierLabel,
   TIER_KEYS_CANONICAL,
   NEXUS_INTRO_QUESTIONS,
   type AssessmentRecommendationResult,
 } from '@/nexus/nexusKnowledge';
 import {
-  earnNexusMiles,
+  earnNEXUSMiles,
   ExplorationEarningTracker,
   isCompletedReflection,
 } from '@/nexus/nexusMilesService';
@@ -84,7 +84,7 @@ interface ChatSession {
   updatedAt: number;
 }
 
-interface NexusChatProps {
+interface NEXUSChatProps {
   showHeader?: boolean;
   initialPrompts?: string[];
   onMessageSent?: () => void;
@@ -107,13 +107,13 @@ function mapToCanonicalTier(tierStr: string | null | undefined): TIER_KEYS_CANON
   return TIER_KEYS_CANONICAL.EXPLORER;
 }
 
-export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: NexusChatProps) {
+export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: NEXUSChatProps) {
   const { user, profile } = useAuthStore();
   const [searchParams] = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: buildNexusSystemPrompt().openingGreeting,
+      content: buildNEXUSSystemPrompt().openingGreeting,
     },
   ]);
   /**
@@ -142,7 +142,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
    * user's actual results during the conversation.
    */
   const nexusPrompt = useMemo(
-    () => buildNexusSystemPrompt(assessmentContextStr),
+    () => buildNEXUSSystemPrompt(assessmentContextStr),
     [assessmentContextStr],
   );
   /** Miles balance, fetched on mount + CTA actions. */
@@ -289,7 +289,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
           const mb = await fetchMilesBalance();
           setMilesBalance(mb.balance);
         } catch (e) {
-          console.warn('[NexusChat] fetchMilesBalance failed (will retry on CTA):', e);
+          console.warn('[NEXUSChat] fetchMilesBalance failed (will retry on CTA):', e);
         }
         
         const savedSession = localStorage.getItem(`nexus_chat_${user.id}`);
@@ -300,7 +300,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             setSessionId(parsed.sessionId);
             setMessageCount(parsed.messageCount || 0);
           } catch (e) {
-            console.error('[NexusChat] Failed to load saved session:', e);
+            console.error('[NEXUSChat] Failed to load saved session:', e);
           }
         } else {
           const newId = `session_${Date.now()}`;
@@ -323,11 +323,11 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     getUserAssessmentContext(user.id)
       .then((results) => {
         if (cancelled) return;
-        const ctx = buildAssessmentContextForNexus(results);
+        const ctx = buildAssessmentContextForNEXUS(results);
         setAssessmentContextStr(ctx.contextString);
       })
       .catch((e) => {
-        console.warn('[NexusChat] assessment context load failed (non-fatal):', e);
+        console.warn('[NEXUSChat] assessment context load failed (non-fatal):', e);
       });
     return () => {
       cancelled = true;
@@ -624,7 +624,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     // Run earnings in background
     if (promisedEarnings) {
       Promise.resolve(promisedEarnings).catch((e) =>
-        console.warn('[NexusChat] earning award failed (non-fatal):', e),
+        console.warn('[NEXUSChat] earning award failed (non-fatal):', e),
       );
     }
     
@@ -712,8 +712,8 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
    * and optionally appends an earning meta-message into the chat stream.
    */
   const awardEarnedMiles = useCallback(
-    async (action: Parameters<typeof earnNexusMiles>[0], opts?: Parameters<typeof earnNexusMiles>[1]) => {
-      const result = await earnNexusMiles(action, {
+    async (action: Parameters<typeof earnNEXUSMiles>[0], opts?: Parameters<typeof earnNEXUSMiles>[1]) => {
+      const result = await earnNEXUSMiles(action, {
         ...opts,
         tierKey: canonicalTier,
       });
@@ -800,7 +800,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               <MessageSquare className="w-5 h-5 text-accent" />
             </div>
             <div>
-              <h3 className="font-semibold text-text-primary">Nexus</h3>
+              <h3 className="font-semibold text-text-primary">NEXUS</h3>
               <p className="text-xs text-text-muted">{sessions.length} conversations</p>
             </div>
           </div>
@@ -898,7 +898,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               )}
               {budgetStatus && (
                 <div
-                  title={`Daily Nexus budget: ¥${budgetStatus.spent_cny.toFixed(2)} / ¥${budgetStatus.budget_cny.toFixed(2)} (${budgetStatus.utilization_pct.toFixed(0)}%)`}
+                  title={`Daily NEXUS budget: ¥${budgetStatus.spent_cny.toFixed(2)} / ¥${budgetStatus.budget_cny.toFixed(2)} (${budgetStatus.utilization_pct.toFixed(0)}%)`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100"
                   style={{ border: '1px solid #E5E7EB', borderRadius: DS.radius }}
                 >
@@ -941,7 +941,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               )}
               {retrievedMemories !== null && retrievedMemories > 0 && (
                 <div
-                  title={`Nexus retrieved ${retrievedMemories} relevant memor${retrievedMemories === 1 ? 'y' : 'ies'} from past conversations`}
+                  title={`NEXUS retrieved ${retrievedMemories} relevant memor${retrievedMemories === 1 ? 'y' : 'ies'} from past conversations`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#ECFDF5]"
                   style={{ border: '1px solid #A7F3D0', borderRadius: DS.radius }}
                 >
@@ -975,9 +975,9 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             <div style={{ textAlign: 'center', padding: '32px 0 20px' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: `${DS.accent}15`,  marginBottom: '12px' }}>
                 <span className="nexus-pulse-dot" />
-                <span style={{ fontSize: '12px', color: DS.accent, fontWeight: 600 }}>Nexus</span>
+                <span style={{ fontSize: '12px', color: DS.accent, fontWeight: 600 }}>NEXUS</span>
               </div>
-              <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>Nexus</h1>
+              <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>NEXUS</h1>
               <p style={{ fontSize: '14px', color: DS.muted }}>Know where you stand. Know where to go.</p>
             </div>
           )}

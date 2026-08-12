@@ -37,7 +37,7 @@ export function NavBar() {
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/assessment', label: 'Assessment' },
     { href: '/match', label: 'Match' },
-    { href: '/nexus', label: 'Nexus AI' },
+    { href: '/nexus', label: 'NEXUS AI' },
   ];
 
   return (

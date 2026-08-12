@@ -28,7 +28,7 @@ const SECTIONS = [
   { id: 'identity' as Section, icon: User, title: 'Career Identity', description: 'Your basic professional information' },
   { id: 'goals' as Section, icon: Target, title: 'Career Goals', description: 'Your short and long-term objectives' },
   { id: 'assessments' as Section, icon: History, title: 'Assessment History', description: 'Past assessments and results' },
-  { id: 'memory' as Section, icon: Lightbulb, title: 'Memory Summary', description: 'Insights Nexus has learned about you' },
+  { id: 'memory' as Section, icon: Lightbulb, title: 'Memory Summary', description: 'Insights NEXUS has learned about you' },
   { id: 'subscription' as Section, icon: CreditCard, title: 'Subscription & Miles', description: 'Manage your plan and miles balance' },
   { id: 'documents' as Section, icon: FileText, title: 'Document Library', description: 'Your CV and supporting documents' },
 ];
@@ -310,10 +310,10 @@ export function ProfilePage() {
       <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '24px', textAlign: 'center' }}>
         <Lightbulb style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
         <p style={{ fontSize: '15px', color: DS.muted, margin: '0 0 8px' }}>
-          Nexus learns about you through your conversations
+          NEXUS learns about you through your conversations
         </p>
         <p style={{ fontSize: '13px', color: DS.muted }}>
-          Key insights from your chats will appear here as Nexus gets to know you better.
+          Key insights from your chats will appear here as NEXUS gets to know you better.
         </p>
       </div>
     </div>

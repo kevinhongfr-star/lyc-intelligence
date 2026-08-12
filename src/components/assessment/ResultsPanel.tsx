@@ -274,7 +274,7 @@ export function ResultsPanel({
         }}
       >
         
-        {/* Phase 6.1 — Insight bridge to Nexus */}
+        {/* Phase 6.1 — Insight bridge to NEXUS */}
         <div style={{
           background: 'rgba(193,8,171,0.08)',
           border: '1px solid rgba(193,8,171,0.25)',
@@ -295,7 +295,7 @@ export function ResultsPanel({
                textDecoration: 'none', fontWeight: 600, fontSize: '14px'
             }}
           >
-            Build your 90-day plan with Nexus →
+            Build your 90-day plan with NEXUS →
           </a>
         </div>
 <Download style={{ width: 20, height: 20 }} />
