@@ -1,0 +1,552 @@
+{
+  "meta": {
+    "id": "prism",
+    "title": "PRISM",
+    "subtitle": "Career & Professional Branding Diagnostic",
+    "accent_color": "#0f172a",
+    "total_questions": 20,
+    "total_dimensions": 5,
+    "tier_key": "executive_introduction",
+    "status": "placeholder"
+  },
+  "dimensions": [
+    {
+      "key": "clarity",
+      "name": "Clarity",
+      "description": "How well-defined is your professional identity",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 1
+    },
+    {
+      "key": "visibility",
+      "name": "Visibility",
+      "description": "How easily can others find and understand your value",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 2
+    },
+    {
+      "key": "differentiation",
+      "name": "Differentiation",
+      "description": "How distinct is your brand from peers",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 3
+    },
+    {
+      "key": "consistency",
+      "name": "Consistency",
+      "description": "How consistent is your brand across channels",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 4
+    },
+    {
+      "key": "authority",
+      "name": "Authority",
+      "description": "Perceived expertise and thought leadership",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 5
+    }
+  ],
+  "archetypes": [
+    {
+      "key": "the_architect",
+      "name": "The Architect",
+      "description": "Builds professional identity with intention and precision",
+      "key_traits": [
+        "Strategic",
+        "Deliberate",
+        "Structured"
+      ],
+      "sort_order": 1
+    },
+    {
+      "key": "the_connector",
+      "name": "The Connector",
+      "description": "Leverages relationships and networks for brand amplification",
+      "key_traits": [
+        "Relational",
+        "Amplifying",
+        "Social"
+      ],
+      "sort_order": 2
+    },
+    {
+      "key": "the_specialist",
+      "name": "The Specialist",
+      "description": "Builds brand through deep domain expertise",
+      "key_traits": [
+        "Focused",
+        "Expert",
+        "Depth-first"
+      ],
+      "sort_order": 3
+    },
+    {
+      "key": "the_influencer",
+      "name": "The Influencer",
+      "description": "Shapes industry narrative through thought leadership",
+      "key_traits": [
+        "Visionary",
+        "Vocal",
+        "Trend-setting"
+      ],
+      "sort_order": 4
+    }
+  ],
+  "questions": [
+    {
+      "key": "q_001",
+      "type": "scale",
+      "prompt": "Placeholder question 1 for Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "clarity",
+      "weight": 1.0,
+      "sort_order": 1,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_002",
+      "type": "scale",
+      "prompt": "Placeholder question 2 for Visibility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "visibility",
+      "weight": 1.0,
+      "sort_order": 2,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_003",
+      "type": "single_select",
+      "prompt": "Placeholder question 3 for Differentiation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "differentiation",
+      "weight": 1.0,
+      "sort_order": 3,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ],
+      "skip_logic": [
+        {
+          "condition": {
+            "question_id": "q_003",
+            "operator": "equals",
+            "value": "c"
+          },
+          "action": "jump_to",
+          "target": "q_007"
+        }
+      ]
+    },
+    {
+      "key": "q_004",
+      "type": "scale",
+      "prompt": "Placeholder question 4 for Consistency dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "consistency",
+      "weight": 1.0,
+      "sort_order": 4,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_005",
+      "type": "single_select",
+      "prompt": "Placeholder question 5 for Authority dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "authority",
+      "weight": 1.0,
+      "sort_order": 5,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_006",
+      "type": "scale",
+      "prompt": "Placeholder question 6 for Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "clarity",
+      "weight": 1.0,
+      "sort_order": 6,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_007",
+      "type": "scale",
+      "prompt": "Placeholder question 7 for Visibility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "visibility",
+      "weight": 1.0,
+      "sort_order": 7,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_008",
+      "type": "single_select",
+      "prompt": "Placeholder question 8 for Differentiation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "differentiation",
+      "weight": 1.0,
+      "sort_order": 8,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_009",
+      "type": "scale",
+      "prompt": "Placeholder question 9 for Consistency dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "consistency",
+      "weight": 1.0,
+      "sort_order": 9,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_010",
+      "type": "single_select",
+      "prompt": "Placeholder question 10 for Authority dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "authority",
+      "weight": 1.0,
+      "sort_order": 10,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_011",
+      "type": "scale",
+      "prompt": "Placeholder question 11 for Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "clarity",
+      "weight": 1.0,
+      "sort_order": 11,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_012",
+      "type": "scale",
+      "prompt": "Placeholder question 12 for Visibility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "visibility",
+      "weight": 1.0,
+      "sort_order": 12,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_013",
+      "type": "single_select",
+      "prompt": "Placeholder question 13 for Differentiation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "differentiation",
+      "weight": 1.0,
+      "sort_order": 13,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_014",
+      "type": "scale",
+      "prompt": "Placeholder question 14 for Consistency dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "consistency",
+      "weight": 1.0,
+      "sort_order": 14,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_015",
+      "type": "single_select",
+      "prompt": "Placeholder question 15 for Authority dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "authority",
+      "weight": 1.0,
+      "sort_order": 15,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_016",
+      "type": "scale",
+      "prompt": "Placeholder question 16 for Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "clarity",
+      "weight": 1.0,
+      "sort_order": 16,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_017",
+      "type": "scale",
+      "prompt": "Placeholder question 17 for Visibility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "visibility",
+      "weight": 1.0,
+      "sort_order": 17,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_018",
+      "type": "single_select",
+      "prompt": "Placeholder question 18 for Differentiation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "differentiation",
+      "weight": 1.0,
+      "sort_order": 18,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_019",
+      "type": "scale",
+      "prompt": "Placeholder question 19 for Consistency dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "consistency",
+      "weight": 1.0,
+      "sort_order": 19,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_020",
+      "type": "single_select",
+      "prompt": "Placeholder question 20 for Authority dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "authority",
+      "weight": 1.0,
+      "sort_order": 20,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "weighted_average",
+    "overall_formula": "dimension_weighted_avg",
+    "archetype_mapping": "highest_dimension_combo"
+  },
+  "result_insights": {
+    "high": "Your strengths in this dimension are notable. You demonstrate advanced capabilities that set you apart in PRISM.",
+    "medium": "You are developing well in this area. With focused effort, you can elevate your PRISM capabilities to the next level.",
+    "low": "This is an area for growth. Consider targeted development activities to strengthen your PRISM foundation."
+  }
+}
