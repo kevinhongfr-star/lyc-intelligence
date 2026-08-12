@@ -142,86 +142,13 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
       keywords: [...DEFAULT_META.keywords!, 'SHIFT', 'career mobility', 'career transition'],
     },
   },
-  {
-    pattern: '/assessment/exec-scope',
-    meta: {
-      title: 'Exec Scope Assessment | Span of Control & P&L Fit',
-      description:
-        'Exec Scope evaluates your span-of-control, P&L ownership, and strategic scope to surface the right next executive role for you in China.',
-      canonical: u('/assessment/exec-scope'),
-      keywords: [...DEFAULT_META.keywords!, 'exec scope', 'P&L', 'span of control'],
-    },
-  },
-  {
-    pattern: '/assessment/cross-border',
-    meta: {
-      title: 'Cross-Border Leader Readiness Assessment | LYC',
-      description:
-        'How ready are you for a cross-border executive post spanning China + HQ? Score yourself against 248 LYC cross-border placements since 2019.',
-      canonical: u('/assessment/cross-border'),
-      keywords: [...DEFAULT_META.keywords!, 'cross-border', 'international', 'HQ'],
-    },
-  },
-  {
-    pattern: '/assessment/geo-fit',
-    meta: {
-      title: 'Geo-Fit Assessment | Best China Market Geography for Your Career',
-      description:
-        'Geo-Fit compares your profile across Shanghai, Beijing, Shenzhen, Greater Bay Area and regional hubs — weighted by your function and industry.',
-      canonical: u('/assessment/geo-fit'),
-      keywords: [...DEFAULT_META.keywords!, 'geo fit', 'Shanghai', 'Shenzhen', 'Beijing'],
-    },
-  },
-  {
-    pattern: '/assessment/negotiation',
-    meta: {
-      title: 'Executive Compensation Negotiation Diagnostic',
-      description:
-        '14 questions to pressure-test your total comp package (base, long-term, retention, sign-on). Output: negotiation leverage sheet + LYC market reference.',
-      canonical: u('/assessment/negotiation'),
-      keywords: [...DEFAULT_META.keywords!, 'compensation', 'negotiation', 'salary'],
-    },
-  },
-  {
-    pattern: '/assessment/org-fit',
-    meta: {
-      title: 'Org Culture Fit Assessment | China Operating Leaders',
-      description:
-        'Rate your cultural preferences and match against 340 China employer archetypes in the LYC library. Output: 5 best-culture target companies.',
-      canonical: u('/assessment/org-fit'),
-      keywords: [...DEFAULT_META.keywords!, 'culture fit', 'org fit', 'employer brand'],
-    },
-  },
-  {
-    pattern: '/assessment/fp-radar',
-    meta: {
-      title: 'Founder Partner Radar | Cofounder & Investor Fit',
-      description:
-        'FP-Radar scores founder-partner alignment across 8 vectors for operators considering founder roles or venture partner paths in China tech.',
-      canonical: u('/assessment/fp-radar'),
-      keywords: [...DEFAULT_META.keywords!, 'founder', 'cofounder', 'venture partner'],
-    },
-  },
-  {
-    pattern: '/assessment/board-readiness',
-    meta: {
-      title: 'Board Readiness Assessment | Independent Director Path',
-      description:
-        'The Board Readiness Assessment surfaces your gaps vs. 160+ LYC independent director mandates — and a 90-day action plan to close them.',
-      canonical: u('/assessment/board-readiness'),
-      keywords: [...DEFAULT_META.keywords!, 'board readiness', 'independent director', 'NED'],
-    },
-  },
-  {
-    pattern: '/assessment/personal-governance',
-    meta: {
-      title: 'Personal Governance | Executive Operating System',
-      description:
-        'Personal Governance benchmarks your calendar, decisions, inbox, and energy system against 120 LYC Council-level executives in China.',
-      canonical: u('/assessment/personal-governance'),
-      keywords: [...DEFAULT_META.keywords!, 'personal governance', 'executive productivity'],
-    },
-  },
+  // NOTE: SEO entries for the 7 remaining canonical instruments (leap, quest,
+  // impact, drive, coach, prism, spark, forge, bridge, mosaic) are served by
+  // the `/assessment/:code` fallback route + CanonicalInstrumentLanding. The
+  // phantom routes that previously lived here (exec-scope, cross-border,
+  // geo-fit, negotiation, org-fit, fp-radar, board-readiness,
+  // personal-governance) pointed at non-existent instruments and were removed
+  // in ticket #1319 to stop indexing 404s.
   {
     pattern: '/assessment',
     meta: {

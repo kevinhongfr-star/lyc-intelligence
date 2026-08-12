@@ -116,10 +116,10 @@ export function CreditStorePage() {
     }
   };
 
-  // `tier` from useCredits() is typed as CreditTier ('free'|'basic'|'pro'|'enterprise'),
-  // but the Stripe webhook may set the profile tier to 'council' at runtime, so cast
-  // for the membership check.
-  const isCouncil = (tier as string) === 'council' || tier === 'enterprise';
+  // `tier` from useCredits() is typed as canonical CreditTier
+  // ('explorer'|'starter'|'pro'|'executive'|'council'). Council members get
+  // unlimited miles — check the canonical value.
+  const isCouncil = (tier as string) === 'council';
 
   return (
     <div className="min-h-screen bg-white">

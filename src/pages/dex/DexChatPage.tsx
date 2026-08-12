@@ -104,7 +104,11 @@ export function DexChatPage() {
 
     // API tier hint
     const apiTier =
-      gateState === 'intro' ? 'intro' : credit.tier === 'enterprise' ? 'pro' : 'standard';
+      gateState === 'intro'
+        ? 'intro'
+        : credit.tier === 'executive' || credit.tier === 'council'
+          ? 'pro'
+          : 'standard';
 
     let replyText = '';
     try {

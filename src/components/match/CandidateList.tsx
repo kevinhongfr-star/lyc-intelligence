@@ -139,7 +139,7 @@ Include: work history, education, key achievements, skills"
                     lineHeight: 1.5, 
                     resize: 'vertical', 
                     outline: 'none',
-                    fontFamily: 'Inter, sans-serif'
+                    fontFamily: "'DM Sans', system-ui, sans-serif"
                   }}
                 />
               </div>

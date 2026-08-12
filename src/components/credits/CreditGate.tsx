@@ -68,7 +68,7 @@ export function CreditGate({ action, children, onSuccess, disabled = false, unit
 
   const credits = profile?.credits?.balance ?? 0;
   const cost = CREDIT_COSTS[action];
-  const tier = profile?.tier || 'free';
+  const tier = profile?.tier || 'explorer';
 
   const unitNoun = effectiveUnit === 'miles' ? 'Miles' : 'Credits';
   const unitNounLower = effectiveUnit === 'miles' ? 'miles' : 'credits';
@@ -84,7 +84,7 @@ export function CreditGate({ action, children, onSuccess, disabled = false, unit
       return;
     }
 
-    if (tier !== 'free') {
+    if (tier !== 'explorer') {
       setHasCredits(true);
       return;
     }

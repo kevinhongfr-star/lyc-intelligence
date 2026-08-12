@@ -30,7 +30,7 @@ const DS = {
 export function UpgradeBanner({ type = 'empty', message, onDismiss }: UpgradeBannerProps) {
   const { credit, tier } = useCredits();
 
-  if (tier !== 'free') return null;
+  if (tier !== 'explorer') return null;
 
   const getDefaultMessage = () => {
     if (type === 'empty') {

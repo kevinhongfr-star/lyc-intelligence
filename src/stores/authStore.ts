@@ -7,7 +7,7 @@ export interface UserProfile {
   email: string;
   name: string;
   role: string | null;
-  tier: 'free' | 'member' | 'basic' | 'pro' | 'council' | 'enterprise';
+  tier: 'explorer' | 'starter' | 'pro' | 'executive' | 'council';
   icp: string | null;
   active_surface: string | null;
   organization_id: string | null;

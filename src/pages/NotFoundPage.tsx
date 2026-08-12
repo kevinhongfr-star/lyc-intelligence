@@ -183,9 +183,9 @@ export default function NotFoundPage() {
             }}
           >
             {[
-              { href: '/pricing',                  icon: <Search size={15} />,  label: 'Pricing & Tiers',          sub: 'Explorer → Executive → Council' },
+              { href: '/pricing',                  icon: <Search size={15} />,  label: 'Pricing & Tiers',          sub: 'Executive Introduction → Council' },
               { href: '/assessment/cpi',           icon: <Search size={15} />,  label: 'CPI Diagnostic',          sub: 'China Leadership Pipeline' },
-              { href: '/assessment/shift',         icon: <Search size={15} />,  label: 'SHIFT Mobility',          sub: 'Career transition radar' },
+              { href: '/assessment',               icon: <Search size={15} />,  label: 'All 11 Assessments',       sub: 'Browse the full diagnostic catalog' },
               { href: '/b2b',                      icon: <Search size={15} />,  label: 'Executive Search (B2B)',  sub: 'Client / consultant portal' },
             ].map((r) => (
               <a

@@ -779,7 +779,7 @@ html {
 
   --echo-font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
   --echo-font-serif: 'Libre Baskerville', Georgia, serif;
-  --echo-font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --echo-font-mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
 
   --echo-spacing-4: 4px;
   --echo-spacing-8: 8px;
@@ -1199,13 +1199,13 @@ html {
   }
 }
 
-/* NEXUS pulse dot for the "live" status pill next to the brand wordmark */
+/* NEXUS pulse dot for the "live" status pill next to the brand wordmark.
+   Brand rule: zero border-radius everywhere — rendered as a square indicator. */
 .nexus-pulse-dot {
   display: inline-block;
   width: 8px;
   height: 8px;
   background: #C108AB;
-  border-radius: 9999px;
   box-shadow: 0 0 0 rgba(193, 8, 171, 0.6);
   animation: nexus-pulse 1.8s ease-out infinite;
 }

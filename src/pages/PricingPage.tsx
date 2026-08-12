@@ -184,7 +184,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   </h3>
                   {isExplorer && (
                     <p className="text-xs text-text-muted uppercase tracking-wide mt-1">
-                      Explorer tier
+                      Complimentary access
                     </p>
                   )}
                 </div>

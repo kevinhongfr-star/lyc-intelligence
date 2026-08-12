@@ -63,7 +63,7 @@ Example:
           lineHeight: 1.6,
           resize: 'vertical',
           outline: 'none',
-          fontFamily: 'Inter, sans-serif'
+          fontFamily: "'DM Sans', system-ui, sans-serif"
         }}
       />
 

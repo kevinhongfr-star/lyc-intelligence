@@ -37,7 +37,7 @@ describe('design-tokens', () => {
     it('defines font families', () => {
       expect(TYPE_SCALE.font.sans).toContain('DM Sans');
       expect(TYPE_SCALE.font.serif).toContain('Libre Baskerville');
-      expect(TYPE_SCALE.font.mono).toContain('JetBrains Mono');
+      expect(TYPE_SCALE.font.mono).toContain('IBM Plex Mono');
     });
 
     it('uses crimson for display heading', () => {

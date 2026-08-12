@@ -40,9 +40,9 @@ export function DocumentsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const tier = profile?.tier || 'free';
+  const tier = profile?.tier || 'explorer';
   const maxDocs = getMaxDocumentsForTier(tier);
-  const canUpload = tier !== 'free' && documents.length < maxDocs;
+  const canUpload = tier !== 'explorer' && documents.length < maxDocs;
 
   useEffect(() => {
     if (!user) {
@@ -104,7 +104,7 @@ export function DocumentsPage() {
     setDeletingId(null);
   };
 
-  if (tier === 'free') {
+  if (tier === 'explorer') {
     return (
       <div style={{ minHeight: '100vh', background: DS.bg, padding: '48px 24px' }}>
         <div style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>

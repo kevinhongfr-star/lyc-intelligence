@@ -43,15 +43,15 @@ interface PricingTierRow {
 const SUBSCRIPTION_TIERS: PricingTierRow[] = [
   {
     key: 'explorer',
-    name: 'Explorer',
-    label: 'Executive Introduction',
+    name: 'Executive Introduction',
+    label: 'Complimentary access',
     priceUsd: '—',
     miles: 0,
     features: [
-      'NEXUS AI — limited sessions',
-      'Framework awareness (basic)',
-      'Sample insight previews',
-      'Benchmark teasers',
+      'NEXUS AI — introductory sessions',
+      'Framework exploration and sample outputs',
+      'Assessment previews (no personalised reports)',
+      'Community forum',
     ],
     cta: 'Begin exploration',
     ctaHref: '/nexus/chat',

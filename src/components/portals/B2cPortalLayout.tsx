@@ -14,7 +14,9 @@ import type { NavItem } from './types';
 
 const NAV: NavItem[] = [
   { path: '/b2c', label: 'Dashboard', icon: Home, end: true },
-  { path: '/b2c/assessments', label: 'Assessments', icon: ClipboardList },
+  // `/assessment` redirects to the canonical catalog anchor on the landing page.
+  // The previous `/b2c/assessments` target was never routed and 404'd.
+  { path: '/assessment', label: 'Assessments', icon: ClipboardList },
   { path: '/b2c/results', label: 'Results', icon: BarChart3 },
   { path: '/b2c/account', label: 'Account', icon: User },
 ];

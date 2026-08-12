@@ -5,14 +5,14 @@ import { useAuthStore } from '@/stores/authStore';
 
 interface CreditGateProps {
   messageCount: number;
-  onApproved: (reason: 'free_trial' | 'credit_deducted') => void;
+  onApproved: (reason: 'intro_tier' | 'credit_deducted') => void;
   onUpgrade: () => void;
   onCancel: () => void;
 }
 
 interface CreditCheckResult {
   allowed: boolean;
-  reason: 'free_trial' | 'credit_deducted' | 'insufficient_credits';
+  reason: 'intro_tier' | 'credit_deducted' | 'insufficient_credits';
   balance?: number;
 }
 
@@ -22,16 +22,16 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
   const [result, setResult] = useState<CreditCheckResult | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const FREE_TRIAL_LIMIT = 5;
+  const INTRO_TIER_LIMIT = 5;
 
   useEffect(() => {
     const checkCredits = async () => {
       setLoading(true);
       
       try {
-        if (messageCount <= FREE_TRIAL_LIMIT) {
-          setResult({ allowed: true, reason: 'free_trial' });
-          onApproved('free_trial');
+        if (messageCount <= INTRO_TIER_LIMIT) {
+          setResult({ allowed: true, reason: 'intro_tier' });
+          onApproved('intro_tier');
           return;
         }
 

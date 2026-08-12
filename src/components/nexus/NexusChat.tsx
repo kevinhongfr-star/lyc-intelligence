@@ -118,7 +118,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     initialPrompts || NEXUS_INTRO_QUESTIONS,
   );
   const [creditBalance, setCreditBalance] = useState(0);
-  const [creditTier, setCreditTier] = useState('free');
+  const [creditTier, setCreditTier] = useState('explorer');
   /** Canonical tier key used by miles economy & tier gating */
   const canonicalTier = useMemo<TIER_KEYS_CANONICAL>(
     () => mapToCanonicalTier(creditTier),
@@ -183,7 +183,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
   
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const FREE_TRIAL_LIMIT = 5;
+  const INTRO_TIER_LIMIT = 5;
 
   // ── Chat Persistence Helpers ──
   async function createChatSession(userId: string, title?: string) {
@@ -488,7 +488,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     }
   };
 
-  const handleCreditApproval = (reason: 'free_trial' | 'credit_deducted') => {
+  const handleCreditApproval = (reason: 'intro_tier' | 'credit_deducted') => {
     setPendingApproval(false);
     if (reason === 'credit_deducted' && user?.id) {
       getCreditBalance(user.id).then(info => {
@@ -537,7 +537,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
       ]);
     }
     
-    if (newMessageCount > FREE_TRIAL_LIMIT && canonicalTier === TIER_KEYS_CANONICAL.EXPLORER && creditBalance < 1) {
+    if (newMessageCount > INTRO_TIER_LIMIT && canonicalTier === TIER_KEYS_CANONICAL.EXPLORER && creditBalance < 1) {
       setPendingApproval(true);
       return;
     }
@@ -645,7 +645,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     // "free" tier internally maps to Explorer (Executive Introduction); keep the
     // existing gating but use "Executive Introduction" copy in UI.
     if (canonicalTier !== TIER_KEYS_CANONICAL.EXPLORER) return null;
-    if (messageCount === FREE_TRIAL_LIMIT) return 'trial' as const;
+    if (messageCount === INTRO_TIER_LIMIT) return 'trial' as const;
     if (messageCount > 0 && messageCount % 5 === 0) return 'insight' as const;
     if (messageCount >= 10) return 'usage' as const;
     return null;
@@ -908,7 +908,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 </div>
               )}
               <a href="/b2b" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Firms</a>
-              <a href="/b2c" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Leaders</a>
+              <a href="/assessment" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Assessments</a>
               <a href="/match" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Score Match</a>
             </div>
           </nav>

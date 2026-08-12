@@ -99,7 +99,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
     }
   };
 
-  const handleSelectFree = () => {
+  const handleSelectIntro = () => {
     window.location.href = '/dashboard';
   };
 
@@ -179,7 +179,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tiers.map((tier) => {
               const price = cycle === 'monthly' ? tier.priceMonthly : tier.priceAnnual;
-              const isFree = price === 0;
+              const isIntro = price === 0;
               const isPopular = tier.key === RECOMMENDED_TIER;
               const isProcessing = processingTier === tier.key;
               const tierKey = tier.key as TierKey;
@@ -222,7 +222,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
 
                   {/* Price */}
                   <div className="mb-4">
-                    {isFree ? (
+                    {isIntro ? (
                       <span
                         className="text-3xl font-bold"
                         style={{ color: '#000' }}
@@ -272,15 +272,15 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
 
                   {/* CTA */}
                   <button
-                    onClick={() => (isFree ? handleSelectFree() : handleSelect(tierKey))}
+                    onClick={() => (isIntro ? handleSelectIntro() : handleSelect(tierKey))}
                     disabled={isProcessing}
                     className={cn(
                       'w-full py-3 px-4 font-semibold flex items-center justify-center gap-2 transition-colors',
                       isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
                     )}
                     style={{
-                      background: isFree ? '#F5F5F5' : ACCENT,
-                      color: isFree ? '#000' : 'white',
+                      background: isIntro ? '#F5F5F5' : ACCENT,
+                      color: isIntro ? '#000' : 'white',
                     }}
                   >
                     {isProcessing ? (
@@ -290,7 +290,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                       </>
                     ) : (
                       <>
-                        {isFree ? 'Get Started' : `Choose ${tier.name}`}
+                        {isIntro ? 'Get Started' : `Choose ${tier.name}`}
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
