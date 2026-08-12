@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, User, Building } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from '@/stores/toastStore';
 import { trackSignupSuccess } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
+import {
+  validatePasswordStrength,
+  passwordScoreLabel,
+  passwordScoreColor,
+} from '@/lib/auth/passwordPolicy';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",
@@ -33,6 +38,12 @@ export function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // #1312: live password strength evaluation
+  const pwdStrength = useMemo(
+    () => validatePasswordStrength(password, { email, name }),
+    [password, email, name],
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -40,7 +51,12 @@ export function SignupPage() {
     if (!email.trim()) { setError('Email is required'); return; }
     if (!name.trim()) { setError('Name is required'); return; }
     if (!password) { setError('Password is required'); return; }
-    if (password.length < 8) { setError('Password must be at least 8 characters'); return; }
+    // #1312: enforce password policy (min 12 chars, mix of classes,
+    // not in common-password list, no personal info).
+    if (!pwdStrength.passes) {
+      setError(pwdStrength.warnings[0] || 'Please choose a stronger password');
+      return;
+    }
     if (password !== confirmPassword) { setError('Passwords do not match'); return; }
 
     setLoading(true);
@@ -136,15 +152,39 @@ export function SignupPage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 8 characters"
+                    placeholder="At least 12 characters"
                     autoComplete="new-password"
                     style={{
                       width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
+                      background: DS.bg, border: `1px solid ${DS.cardBorder}`,
                       color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
                       fontFamily: DS.bodyFont, boxSizing: 'border-box',
                     }}
                   />
+                </div>
+                {/* #1312: live password strength meter — zero border radius per brand rule */}
+                <div style={{ marginTop: '8px' }}>
+                  <div style={{ display: 'flex', height: '4px', background: '#E5E5E5' }}>
+                    {[0, 1, 2, 3, 4].map((level) => (
+                      <div
+                        key={level}
+                        style={{
+                          width: '20%',
+                          background: level < pwdStrength.score ? passwordScoreColor(pwdStrength.score) : 'transparent',
+                          borderRight: level < 4 ? '1px solid #FFFFFF' : 'none',
+                          transition: 'background-color 200ms cubic-bezier(0.4,0,0.2,1)',
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: '4px', fontFamily: DS.bodyFont }}>
+                    <span style={{ color: passwordScoreColor(pwdStrength.score) }}>
+                      {pwdStrength.score > 0 ? passwordScoreLabel(pwdStrength.score) : ' '}
+                    </span>
+                    {pwdStrength.warnings.length > 0 && (
+                      <span style={{ color: '#B91C1C' }}>{pwdStrength.warnings[0]}</span>
+                    )}
+                  </div>
                 </div>
               </div>
 
