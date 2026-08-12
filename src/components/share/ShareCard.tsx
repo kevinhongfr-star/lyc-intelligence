@@ -9,7 +9,7 @@ const DS = {
   textSecondary: '#CCCCCC',
   success: '#10B981',
   warning: '#F59E0B',
-  radius: '12px'
+  radius: '0'
 };
 
 interface Props {

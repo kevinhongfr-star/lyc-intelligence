@@ -10,8 +10,8 @@ const DS = {
   text: '#000000',
   textSecondary: '#333333',
   muted: '#666666',
-  radius: '12px',
-  radiusSm: '8px',
+  radius: '0',
+  radiusSm: '0',
 };
 
 interface DbContact {
