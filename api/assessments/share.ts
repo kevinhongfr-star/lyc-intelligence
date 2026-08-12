@@ -30,6 +30,7 @@ import {
   assertBodySize,
   assertUuid,
   clampInt,
+  logServerError,
   sanitizeObject,
   DEFAULT_BODY_LIMIT,
 } from '../lib/validate.js';
@@ -67,7 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       return res.status(200).json({ ok: true, payload: data.shared_payload });
     } catch (err: any) {
-      console.error('[api/assessments/share] GET by token error:', err);
+      logServerError('api/assessments/share GET by token', err, req);
       return res.status(500).json({ ok: false, error: 'Failed to fetch shared result' });
     }
   }
@@ -99,7 +100,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (error) throw error;
       return res.status(200).json({ ok: true, data: data || [] });
     } catch (err: any) {
-      console.error('[api/assessments/share] GET list error:', err);
+      logServerError('api/assessments/share GET list', err, req);
       return res.status(500).json({ ok: false, error: 'Failed to list share links' });
     }
   }
@@ -161,7 +162,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         expires_at: data.expires_at,
       });
     } catch (err: any) {
-      console.error('[api/assessments/share] POST error:', err);
+      logServerError('api/assessments/share POST', err, req);
       return res.status(500).json({ ok: false, error: 'Failed to create share link' });
     }
   }
@@ -188,7 +189,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (error) throw error;
       return res.status(200).json({ ok: true });
     } catch (err: any) {
-      console.error('[api/assessments/share] DELETE error:', err);
+      logServerError('api/assessments/share DELETE', err, req);
       return res.status(500).json({ ok: false, error: 'Failed to revoke share link' });
     }
   }

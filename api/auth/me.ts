@@ -16,6 +16,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '../lib/supabase-rest.js';
 import { getAuthorizedContext, RequestAuthError } from '../lib/auth.js';
+import { logServerError } from '../lib/validate.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS preflight — this endpoint is called cross-origin only by ourselves,
@@ -65,7 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (e instanceof RequestAuthError) {
       return res.status(e.status).json({ error: e.message });
     }
-    console.error('[api/auth/me] unexpected:', e);
+    logServerError('api/auth/me unexpected', e, req);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

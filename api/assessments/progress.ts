@@ -22,6 +22,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '../lib/supabase-rest.js';
 import { getAuthorizedContext, RequestAuthError } from '../lib/auth.js';
+import { logServerError } from '../lib/validate.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   let ctx;
@@ -63,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (error) throw error;
       return res.status(200).json({ ok: true, data: data || [] });
     } catch (err: any) {
-      console.error('[api/assessments/progress] GET error:', err);
+      logServerError('api/assessments/progress GET', err, req);
       return res.status(500).json({ ok: false, error: 'Failed to fetch progress' });
     }
   }
@@ -108,7 +109,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (error) throw error;
       return res.status(200).json({ ok: true, data });
     } catch (err: any) {
-      console.error('[api/assessments/progress] POST error:', err);
+      logServerError('api/assessments/progress POST', err, req);
       return res.status(500).json({ ok: false, error: 'Failed to start assessment' });
     }
   }
@@ -156,7 +157,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (error) throw error;
       return res.status(200).json({ ok: true, data });
     } catch (err: any) {
-      console.error('[api/assessments/progress] PATCH error:', err);
+      logServerError('api/assessments/progress PATCH', err, req);
       return res.status(500).json({ ok: false, error: 'Failed to update progress' });
     }
   }

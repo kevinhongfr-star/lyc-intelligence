@@ -39,6 +39,7 @@ import {
 import {
   assertBodySize,
   clampInt,
+  logServerError,
   sanitizeObject,
   DEFAULT_BODY_LIMIT,
 } from '../lib/validate.js';
@@ -306,7 +307,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (e instanceof RequestAuthError) {
       return res.status(e.status).json({ error: e.message });
     }
-    console.error('[api/assessments/run] unexpected:', e);
+    logServerError('api/assessments/run unexpected', e, req);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

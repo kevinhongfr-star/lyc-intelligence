@@ -12,6 +12,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '../lib/supabase-rest.js';
+import { logServerError } from '../lib/validate.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
@@ -46,7 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (error) throw error;
     return res.status(200).json({ ok: true, data: data || [] });
   } catch (err: any) {
-    console.error('[api/assessments/catalog] error:', err);
+    logServerError('api/assessments/catalog', err, req);
     return res.status(500).json({ ok: false, error: 'Failed to fetch assessment catalog' });
   }
 }

@@ -35,9 +35,12 @@ import {
   assertColumnName,
   assertEntityName,
   DEFAULT_BODY_LIMIT,
+  logServerError,
   parseFilters,
   parseOrderParam,
   parseSelectList,
+  safeErrorMessage,
+  safeErrorStatus,
   sanitizeObject,
 } from '../lib/validate.js';
 
@@ -206,7 +209,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       query = applyRoleFilters(query, ctx, acl);
 
       const { data, error, count } = await query;
-      if (error) throw new RequestAuthError(`DB error: ${error.message}`, 500);
+      if (error) {
+        // #1310: log full error server-side, return safe message to client.
+        logServerError('api/data/[entity] GET', error, req);
+        throw new RequestAuthError(safeErrorMessage(error, 'Failed to fetch data'), safeErrorStatus(error, 500));
+      }
       if (req.method === 'HEAD') {
         res.setHeader('X-Total-Count', String(count ?? 0));
         return res.status(204).end();
@@ -263,7 +270,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
         dq = applyRoleFilters(dq, ctx, acl);
         const { error, count: delCount } = await dq;
-        if (error) throw new RequestAuthError(`DB delete error: ${error.message}`, 500);
+        if (error) {
+          logServerError('api/data/[entity] DELETE', error, req);
+          throw new RequestAuthError(safeErrorMessage(error, 'Failed to delete'), safeErrorStatus(error, 500));
+        }
         return res.status(200).json({ ok: true, deleted: delCount ?? 0 });
       }
 
@@ -309,7 +319,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .from(entity)
           .upsert(body.upsert, { onConflict: body.on_conflict || undefined })
           .select(selectCols);
-        if (error) throw new RequestAuthError(`DB upsert error: ${error.message}`, 500);
+        if (error) {
+          logServerError('api/data/[entity] UPSERT', error, req);
+          throw new RequestAuthError(safeErrorMessage(error, 'Failed to save'), safeErrorStatus(error, 500));
+        }
         return res.status(200).json({ ok: true, data });
       }
 
@@ -337,7 +350,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       query = applyRoleFilters(query, ctx, acl);
       const { data, error, count } = await query;
-      if (error) throw new RequestAuthError(`DB error: ${error.message}`, 500);
+      if (error) {
+        logServerError('api/data/[entity] POST filter', error, req);
+        throw new RequestAuthError(safeErrorMessage(error, 'Failed to fetch data'), safeErrorStatus(error, 500));
+      }
       res.setHeader('X-Total-Count', String(count ?? 0));
       return res.status(200).json({ ok: true, data, count });
     }
@@ -347,7 +363,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (e instanceof RequestAuthError) {
       return res.status(e.status).json({ error: e.message });
     }
-    console.error('[api/data/[entity]] unexpected:', e);
+    logServerError('api/data/[entity] unexpected', e, req);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

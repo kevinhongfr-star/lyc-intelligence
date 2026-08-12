@@ -274,3 +274,163 @@ export function parseSelectList(raw: string | string[] | undefined): string[] {
   }
   return cols;
 }
+
+// ── #1310: Error message hardening ────────────────────────────────
+//
+// Problem: API endpoints were returning raw Supabase/PostgREST error
+// messages to the client (e.g. "DB error: column profiles.role does
+// not exist"). These leak schema details, table names, and constraint
+// names — useful to attackers probing the API.
+//
+// Fix: two-layer approach.
+//   1. logServerError(ctx, err) — full structured log to stderr with
+//      sensitive headers scrubbed. Goes to log drains, never to client.
+//   2. safeErrorMessage(err, fallback) — returns a user-safe message.
+//      RequestAuthError messages pass through (already curated).
+//      PostgREST errors get mapped to generic strings.
+//      Unknown errors get the fallback.
+
+const SUPABASE_ERROR_MAP: Record<string, string> = {
+  // PostgREST error codes (https://postgrest.org/en/stable/api.html#errors)
+  'PGRST116': 'Resource not found',
+  'PGRST204': 'No content available',
+  'PGRST301': 'Invalid request parameters',
+  'PGRST302': 'Invalid filter syntax',
+  // Postgres SQLSTATE codes (subset that surface to clients)
+  '23505': 'Resource already exists',                    // unique_violation
+  '23503': 'Referenced resource does not exist',         // foreign_key_violation
+  '23502': 'Missing required field',                     // not_null_violation
+  '23514': 'Invalid input',                              // check_violation
+  '42501': 'Permission denied',                          // insufficient_privilege
+  '42601': 'Invalid request',                            // syntax_error
+  '22001': 'Input too long',                             // string_data_right_truncation
+  '22003': 'Numeric value out of range',                 // numeric_value_out_of_range
+  '22008': 'Invalid datetime',                           // datetime_field_overflow
+  '22023': 'Invalid parameter type',                     // invalid_parameter_value
+  '42P01': 'Service unavailable',                        // undefined_table (config issue)
+  '42703': 'Service unavailable',                        // undefined_column (config issue)
+  '40001': 'Conflict, please retry',                     // serialization_failure
+  '40P01': 'Conflict, please retry',                     // deadlock_detected
+};
+
+/**
+ * Returns a user-safe error message. Never leaks DB schema, table
+ * names, constraint names, or stack traces.
+ */
+export function safeErrorMessage(
+  err: unknown,
+  fallback = 'Internal server error',
+): string {
+  if (!err) return fallback;
+
+  // RequestAuthError messages are already curated — pass through.
+  if (err instanceof RequestAuthError) {
+    return err.message;
+  }
+
+  // Supabase / PostgREST errors look like { code, message, details, hint }
+  const any = err as any;
+  if (any?.code && typeof any.code === 'string') {
+    const mapped = SUPABASE_ERROR_MAP[any.code];
+    if (mapped) return mapped;
+    // Fall through to generic for unknown codes — do NOT surface the
+    // raw message because it typically contains column/table names.
+    if (any.code.startsWith('PGRST') || any.code.match(/^[0-9A-Z]{5}$/)) {
+      return fallback;
+    }
+  }
+
+  // Generic Error: check for a few safe prefixes; otherwise fallback.
+  if (err instanceof Error) {
+    const msg = err.message || '';
+    // Allow network errors and explicit user-facing messages.
+    if (/^Network error|^Failed to fetch|^Timeout|^Invalid\b|^Missing\b/i.test(msg)) {
+      return msg;
+    }
+  }
+
+  return fallback;
+}
+
+/**
+ * Maps any error to an appropriate HTTP status code.
+ * RequestAuthError carries its own status; Supabase errors get a
+ * best-effort mapping; unknown errors default to 500.
+ */
+export function safeErrorStatus(err: unknown, fallback = 500): number {
+  if (err instanceof RequestAuthError) return err.status;
+  const code = (err as any)?.code;
+  if (typeof code === 'string') {
+    if (code === '23505') return 409;          // unique_violation
+    if (code === '23503') return 400;          // foreign_key_violation
+    if (code === '23502') return 422;          // not_null_violation
+    if (code === '42501') return 403;          // insufficient_privilege
+    if (code === 'PGRST116') return 404;
+    if (code?.startsWith('PGRST')) return 400;
+    if (code?.match(/^22/)) return 422;        // data_exception
+    if (code?.match(/^23/)) return 409;        // integrity_constraint_violation
+    if (code?.match(/^42/)) return 500;        // config/syntax (server issue, not client)
+  }
+  return fallback;
+}
+
+/** Headers that must never appear in server logs. */
+const SENSITIVE_HEADER_KEYS = new Set([
+  'authorization', 'cookie', 'set-cookie', 'x-api-key',
+  'x-anonymous-id', 'x-supabase-key', 'api-key',
+]);
+
+/**
+ * Structured server-side error log. Scrubs sensitive headers and
+ * writes a single JSON line to stderr (Vercel log drains pick this up).
+ *
+ * The error object's full message + stack IS logged here (server-side
+ * only) for debugging — just never returned to the client.
+ */
+export function logServerError(
+  context: string,
+  err: unknown,
+  req?: { headers?: Record<string, string | string[] | undefined>; url?: string; method?: string },
+): void {
+  const scrubbedHeaders: Record<string, string> = {};
+  if (req?.headers) {
+    for (const [k, v] of Object.entries(req.headers)) {
+      if (SENSITIVE_HEADER_KEYS.has(k.toLowerCase())) {
+        scrubbedHeaders[k] = '[REDACTED]';
+      } else if (typeof v === 'string') {
+        scrubbedHeaders[k] = v.slice(0, 256);
+      }
+    }
+  }
+
+  const payload = {
+    ts: new Date().toISOString(),
+    context,
+    error: err instanceof Error
+      ? {
+          name: err.name,
+          message: err.message,
+          stack: err.stack?.split('\n').slice(0, 10).join('\n'),
+          code: (err as any)?.code,
+          status: (err as any)?.status,
+        }
+      : { message: String(err).slice(0, 1024) },
+    req: req
+      ? {
+          method: req.method,
+          url: req.url ? String(req.url).slice(0, 512) : undefined,
+          headers: scrubbedHeaders,
+        }
+      : undefined,
+  };
+
+  // Use process.stderr to avoid Vercel request log noise.
+  try {
+    process.stderr.write(JSON.stringify(payload) + '\n');
+  } catch {
+    // If stderr write fails (rare), fall back to console.
+    // eslint-disable-next-line no-console
+    console.error(payload);
+  }
+}
+

@@ -138,6 +138,121 @@ function parseSelectList(raw) {
   }
   return cols;
 }
+const SUPABASE_ERROR_MAP = {
+  // PostgREST error codes (https://postgrest.org/en/stable/api.html#errors)
+  "PGRST116": "Resource not found",
+  "PGRST204": "No content available",
+  "PGRST301": "Invalid request parameters",
+  "PGRST302": "Invalid filter syntax",
+  // Postgres SQLSTATE codes (subset that surface to clients)
+  "23505": "Resource already exists",
+  // unique_violation
+  "23503": "Referenced resource does not exist",
+  // foreign_key_violation
+  "23502": "Missing required field",
+  // not_null_violation
+  "23514": "Invalid input",
+  // check_violation
+  "42501": "Permission denied",
+  // insufficient_privilege
+  "42601": "Invalid request",
+  // syntax_error
+  "22001": "Input too long",
+  // string_data_right_truncation
+  "22003": "Numeric value out of range",
+  // numeric_value_out_of_range
+  "22008": "Invalid datetime",
+  // datetime_field_overflow
+  "22023": "Invalid parameter type",
+  // invalid_parameter_value
+  "42P01": "Service unavailable",
+  // undefined_table (config issue)
+  "42703": "Service unavailable",
+  // undefined_column (config issue)
+  "40001": "Conflict, please retry",
+  // serialization_failure
+  "40P01": "Conflict, please retry"
+  // deadlock_detected
+};
+function safeErrorMessage(err, fallback = "Internal server error") {
+  if (!err) return fallback;
+  if (err instanceof RequestAuthError) {
+    return err.message;
+  }
+  const any = err;
+  if (any?.code && typeof any.code === "string") {
+    const mapped = SUPABASE_ERROR_MAP[any.code];
+    if (mapped) return mapped;
+    if (any.code.startsWith("PGRST") || any.code.match(/^[0-9A-Z]{5}$/)) {
+      return fallback;
+    }
+  }
+  if (err instanceof Error) {
+    const msg = err.message || "";
+    if (/^Network error|^Failed to fetch|^Timeout|^Invalid\b|^Missing\b/i.test(msg)) {
+      return msg;
+    }
+  }
+  return fallback;
+}
+function safeErrorStatus(err, fallback = 500) {
+  if (err instanceof RequestAuthError) return err.status;
+  const code = err?.code;
+  if (typeof code === "string") {
+    if (code === "23505") return 409;
+    if (code === "23503") return 400;
+    if (code === "23502") return 422;
+    if (code === "42501") return 403;
+    if (code === "PGRST116") return 404;
+    if (code?.startsWith("PGRST")) return 400;
+    if (code?.match(/^22/)) return 422;
+    if (code?.match(/^23/)) return 409;
+    if (code?.match(/^42/)) return 500;
+  }
+  return fallback;
+}
+const SENSITIVE_HEADER_KEYS = /* @__PURE__ */ new Set([
+  "authorization",
+  "cookie",
+  "set-cookie",
+  "x-api-key",
+  "x-anonymous-id",
+  "x-supabase-key",
+  "api-key"
+]);
+function logServerError(context, err, req) {
+  const scrubbedHeaders = {};
+  if (req?.headers) {
+    for (const [k, v] of Object.entries(req.headers)) {
+      if (SENSITIVE_HEADER_KEYS.has(k.toLowerCase())) {
+        scrubbedHeaders[k] = "[REDACTED]";
+      } else if (typeof v === "string") {
+        scrubbedHeaders[k] = v.slice(0, 256);
+      }
+    }
+  }
+  const payload = {
+    ts: (/* @__PURE__ */ new Date()).toISOString(),
+    context,
+    error: err instanceof Error ? {
+      name: err.name,
+      message: err.message,
+      stack: err.stack?.split("\n").slice(0, 10).join("\n"),
+      code: err?.code,
+      status: err?.status
+    } : { message: String(err).slice(0, 1024) },
+    req: req ? {
+      method: req.method,
+      url: req.url ? String(req.url).slice(0, 512) : void 0,
+      headers: scrubbedHeaders
+    } : void 0
+  };
+  try {
+    process.stderr.write(JSON.stringify(payload) + "\n");
+  } catch {
+    console.error(payload);
+  }
+}
 export {
   DEFAULT_ARRAY_LIMIT,
   DEFAULT_BODY_LIMIT,
@@ -149,9 +264,12 @@ export {
   assertOneOf,
   assertUuid,
   clampInt,
+  logServerError,
   parseFilters,
   parseOrderParam,
   parseSelectList,
+  safeErrorMessage,
+  safeErrorStatus,
   sanitizeObject,
   sanitizeString
 };
