@@ -1,5 +1,6 @@
 // ── ASSESSMENT FLOW TYPES ──────────────────────────────────────────
 // #1323: Added skipIf + branch support for conditional question flow.
+// #1323: Added scenario question format (context stem before the prompt).
 
 /** Supported question response types */
 export type QuestionType = 'likert' | 'mcq_single' | 'mcq_multi';
@@ -23,6 +24,18 @@ export interface AssessmentQuestion {
   hint?: string;
   /** For mcq_multi: max selections allowed */
   maxSelections?: number;
+
+  // ── #1323: Scenario question format ────────────────────────────
+
+  /**
+   * Optional scenario context shown above the question prompt. When present,
+   * the question renders as a scenario-based item: the scenario stem is
+   * displayed in a distinct block above the response options, signalling
+   * "answer in the context of this situation" rather than abstract self-
+   * report. This closes the positioning gap where marketing promises
+   * scenario-based assessment but the engine only emitted Likert items.
+   */
+  scenario?: string;
 
   // ── #1323: Skip logic & branching ───────────────────────────────
 

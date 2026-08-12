@@ -4,6 +4,7 @@ import { ArrowRight, Menu, X, Lock, Users, Target, Gauge, Building2, ClipboardLi
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 import { SEO } from '@/components/seo/SEO';
+import { EnterpriseContactForm } from '@/components/billing/EnterpriseContactForm';
 
 const DS = {
   headingFont: "'Crimson Pro', Georgia, serif",
@@ -118,6 +119,10 @@ function Nav({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen
 
 export function B2BLanding() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  // #1326: Enterprise contact form modal — human handoff, NOT NEXUS bot.
+  // Mirrors the pricing page pattern so B2B "Talk to sales" routes to the
+  // same human channel everywhere, not into NEXUS.
+  const [enterpriseOpen, setEnterpriseOpen] = useState(false);
 
   useEffect(() => {
     const observer = initScrollReveal();
@@ -596,13 +601,26 @@ export function B2BLanding() {
               ))}
             </ul>
             <div style={{ marginTop: '28px' }}>
-              <a
-                href="/nexus/chat"
+              <button
+                type="button"
+                onClick={() => setEnterpriseOpen(true)}
                 className="cta-glow"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '16px 32px', background: '#C108AB', color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', borderRadius: DS.radius }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '16px 32px', background: '#C108AB', color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', borderRadius: DS.radius, border: 'none', cursor: 'pointer' }}
               >
                 Talk to sales <ArrowRight style={{ width: 14, height: 14 }} />
-              </a>
+              </button>
+              <p
+                style={{
+                  marginTop: '10px',
+                  fontFamily: DS.monoFont,
+                  fontSize: '10px',
+                  color: DS.muted,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Human follow-up · Not a bot
+              </p>
             </div>
           </div>
           <div
@@ -748,6 +766,31 @@ export function B2BLanding() {
       </section>
 
       <UnifiedFooter />
+
+      {/* #1326 — Enterprise contact modal (human, not NEXUS bot). Mirrors
+          the pricing page pattern so B2B "Talk to sales" lands in the same
+          human channel everywhere. */}
+      {enterpriseOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Talk to our team"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(10,10,18,0.55)' }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setEnterpriseOpen(false);
+          }}
+        >
+          <div className="w-full max-w-xl max-h-[92vh] overflow-y-auto">
+            <EnterpriseContactForm
+              dismissible
+              onClose={() => setEnterpriseOpen(false)}
+              heading="Talk to our team"
+              subheading={'Tell us about your firm and we\u2019ll design a NEXUS for Teams deployment that fits \u2014 seats, SSO, custom framework training, and a dedicated point of contact. You\u2019ll hear from a human, not a bot.'}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

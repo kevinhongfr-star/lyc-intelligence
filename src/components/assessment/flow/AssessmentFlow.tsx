@@ -730,6 +730,26 @@ export function AssessmentFlow({ config }: Props) {
               </span>
             </div>
 
+            {/* #1323: Scenario context block (shown above prompt when present) */}
+            {currentQ.scenario && (
+              <div style={{
+                marginBottom: 28,
+                padding: '20px 24px',
+                background: G100,
+                borderLeft: `3px solid ${accent}`,
+              }}>
+                <span style={{ ...monoStyle, color: accent, fontSize: 9, marginBottom: 8, display: 'block' }}>
+                  Scenario
+                </span>
+                <p style={{
+                  fontSize: 16, color: G600, lineHeight: 1.65, margin: 0,
+                  fontFamily: "'DM Sans', system-ui, sans-serif",
+                }}>
+                  {currentQ.scenario}
+                </p>
+              </div>
+            )}
+
             {/* Question text */}
             <h1 style={{
               fontFamily: "'Crimson Pro', Georgia, serif",
