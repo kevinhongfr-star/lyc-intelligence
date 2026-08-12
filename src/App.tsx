@@ -54,6 +54,7 @@ import {
 } from '@/analytics/eventTracker';
 // Phase 17 / P1-1 — Per-page SEO / OG / twitter cards. Call once inside <BrowserRouter>.
 import { usePageMetadata } from '@/hooks/usePageMetadata';
+import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 
 // Install window.onerror + unhandledrejection listeners once, at module import
 // (idempotent, SSR-safe).
@@ -202,6 +203,10 @@ export default function App() {
   // canonical, and robots from per-route registry (30+ rules for marketing
   // routes, 11 assessments, and noindex for all 5 portals).
   usePageMetadata();
+
+  // Phase 3 / #1311 — idle + absolute session timeout. Mounts activity
+  // listeners, periodic check, and tab-visibility validation.
+  useSessionTimeout();
 
   // Any uncaught error thrown in the app root report block:
   // errors from page renders are caught by ErrorBoundary above; global ones
