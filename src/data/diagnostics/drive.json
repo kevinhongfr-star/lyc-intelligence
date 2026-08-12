@@ -1,0 +1,737 @@
+{
+  "meta": {
+    "id": "drive",
+    "title": "DRIVE",
+    "subtitle": "Execution Capability Framework",
+    "accent_color": "#334155",
+    "total_questions": 30,
+    "total_dimensions": 5,
+    "tier_key": "executive",
+    "status": "placeholder"
+  },
+  "dimensions": [
+    {
+      "key": "strategic_clarity",
+      "name": "Strategic Clarity",
+      "description": "Translating vision into actionable plans",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 1
+    },
+    {
+      "key": "operational_discipline",
+      "name": "Operational Discipline",
+      "description": "Process rigor and reliability",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 2
+    },
+    {
+      "key": "agility",
+      "name": "Agility",
+      "description": "Speed of decision and adaptation",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 3
+    },
+    {
+      "key": "talent_leverage",
+      "name": "Talent Leverage",
+      "description": "Getting the right people in the right roles",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 4
+    },
+    {
+      "key": "measurement",
+      "name": "Measurement",
+      "description": "KPIs, feedback loops, and accountability",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 5
+    }
+  ],
+  "archetypes": [
+    {
+      "key": "the_operator",
+      "name": "The Operator",
+      "description": "Excels at operational excellence and systematic execution",
+      "key_traits": [
+        "Systematic",
+        "Reliable",
+        "Process-driven"
+      ],
+      "sort_order": 1
+    },
+    {
+      "key": "the_innovator",
+      "name": "The Innovator",
+      "description": "Drives execution through creative problem-solving",
+      "key_traits": [
+        "Creative",
+        "Adaptive",
+        "Experimental"
+      ],
+      "sort_order": 2
+    },
+    {
+      "key": "the_builder",
+      "name": "The Builder",
+      "description": "Constructs and scales organizations from the ground up",
+      "key_traits": [
+        "Foundational",
+        "Scaling",
+        "Architectural"
+      ],
+      "sort_order": 3
+    },
+    {
+      "key": "the_strategist",
+      "name": "The Strategist",
+      "description": "Aligns execution with long-term strategic positioning",
+      "key_traits": [
+        "Strategic",
+        "Aligned",
+        "Forward-looking"
+      ],
+      "sort_order": 4
+    }
+  ],
+  "questions": [
+    {
+      "key": "q_001",
+      "type": "scale",
+      "prompt": "Placeholder question 1 for Strategic Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "strategic_clarity",
+      "weight": 1.0,
+      "sort_order": 1,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_002",
+      "type": "scenario",
+      "prompt": "Placeholder question 2 for Operational Discipline dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "operational_discipline",
+      "weight": 1.0,
+      "sort_order": 2,
+      "scenario": "Scenario context for question 2. You are in a situation that tests your operational discipline capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_003",
+      "type": "scale",
+      "prompt": "Placeholder question 3 for Agility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "agility",
+      "weight": 1.0,
+      "sort_order": 3,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_004",
+      "type": "multi_select",
+      "prompt": "Placeholder question 4 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "talent_leverage",
+      "weight": 1.0,
+      "sort_order": 4,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 2
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 2
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 2
+        },
+        {
+          "value": "d",
+          "label": "Option D",
+          "score": 2
+        }
+      ],
+      "max_selections": 2
+    },
+    {
+      "key": "q_005",
+      "type": "scale",
+      "prompt": "Placeholder question 5 for Measurement dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "measurement",
+      "weight": 1.0,
+      "sort_order": 5,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_006",
+      "type": "scenario",
+      "prompt": "Placeholder question 6 for Strategic Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "strategic_clarity",
+      "weight": 1.0,
+      "sort_order": 6,
+      "scenario": "Scenario context for question 6. You are in a situation that tests your strategic clarity capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_007",
+      "type": "scale",
+      "prompt": "Placeholder question 7 for Operational Discipline dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "operational_discipline",
+      "weight": 1.0,
+      "sort_order": 7,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_008",
+      "type": "scenario",
+      "prompt": "Placeholder question 8 for Agility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "agility",
+      "weight": 1.0,
+      "sort_order": 8,
+      "scenario": "Scenario context for question 8. You are in a situation that tests your agility capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_009",
+      "type": "scale",
+      "prompt": "Placeholder question 9 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "talent_leverage",
+      "weight": 1.0,
+      "sort_order": 9,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_010",
+      "type": "multi_select",
+      "prompt": "Placeholder question 10 for Measurement dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "measurement",
+      "weight": 1.0,
+      "sort_order": 10,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 2
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 2
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 2
+        },
+        {
+          "value": "d",
+          "label": "Option D",
+          "score": 2
+        }
+      ],
+      "max_selections": 2
+    },
+    {
+      "key": "q_011",
+      "type": "scale",
+      "prompt": "Placeholder question 11 for Strategic Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "strategic_clarity",
+      "weight": 1.0,
+      "sort_order": 11,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_012",
+      "type": "scenario",
+      "prompt": "Placeholder question 12 for Operational Discipline dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "operational_discipline",
+      "weight": 1.0,
+      "sort_order": 12,
+      "scenario": "Scenario context for question 12. You are in a situation that tests your operational discipline capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_013",
+      "type": "scale",
+      "prompt": "Placeholder question 13 for Agility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "agility",
+      "weight": 1.0,
+      "sort_order": 13,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_014",
+      "type": "scenario",
+      "prompt": "Placeholder question 14 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "talent_leverage",
+      "weight": 1.0,
+      "sort_order": 14,
+      "scenario": "Scenario context for question 14. You are in a situation that tests your talent leverage capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_015",
+      "type": "scale",
+      "prompt": "Placeholder question 15 for Measurement dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "measurement",
+      "weight": 1.0,
+      "sort_order": 15,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_016",
+      "type": "multi_select",
+      "prompt": "Placeholder question 16 for Strategic Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "strategic_clarity",
+      "weight": 1.0,
+      "sort_order": 16,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 2
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 2
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 2
+        },
+        {
+          "value": "d",
+          "label": "Option D",
+          "score": 2
+        }
+      ],
+      "max_selections": 2
+    },
+    {
+      "key": "q_017",
+      "type": "scale",
+      "prompt": "Placeholder question 17 for Operational Discipline dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "operational_discipline",
+      "weight": 1.0,
+      "sort_order": 17,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_018",
+      "type": "scenario",
+      "prompt": "Placeholder question 18 for Agility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "agility",
+      "weight": 1.0,
+      "sort_order": 18,
+      "scenario": "Scenario context for question 18. You are in a situation that tests your agility capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_019",
+      "type": "scale",
+      "prompt": "Placeholder question 19 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "talent_leverage",
+      "weight": 1.0,
+      "sort_order": 19,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_020",
+      "type": "scenario",
+      "prompt": "Placeholder question 20 for Measurement dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "measurement",
+      "weight": 1.0,
+      "sort_order": 20,
+      "scenario": "Scenario context for question 20. You are in a situation that tests your measurement capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_021",
+      "type": "scale",
+      "prompt": "Placeholder question 21 for Strategic Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "strategic_clarity",
+      "weight": 1.0,
+      "sort_order": 21,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_022",
+      "type": "multi_select",
+      "prompt": "Placeholder question 22 for Operational Discipline dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "operational_discipline",
+      "weight": 1.0,
+      "sort_order": 22,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 2
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 2
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 2
+        },
+        {
+          "value": "d",
+          "label": "Option D",
+          "score": 2
+        }
+      ],
+      "max_selections": 2
+    },
+    {
+      "key": "q_023",
+      "type": "scale",
+      "prompt": "Placeholder question 23 for Agility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "agility",
+      "weight": 1.0,
+      "sort_order": 23,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_024",
+      "type": "scenario",
+      "prompt": "Placeholder question 24 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "talent_leverage",
+      "weight": 1.0,
+      "sort_order": 24,
+      "scenario": "Scenario context for question 24. You are in a situation that tests your talent leverage capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_025",
+      "type": "scale",
+      "prompt": "Placeholder question 25 for Measurement dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "measurement",
+      "weight": 1.0,
+      "sort_order": 25,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_026",
+      "type": "scenario",
+      "prompt": "Placeholder question 26 for Strategic Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "strategic_clarity",
+      "weight": 1.0,
+      "sort_order": 26,
+      "scenario": "Scenario context for question 26. You are in a situation that tests your strategic clarity capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_027",
+      "type": "scale",
+      "prompt": "Placeholder question 27 for Operational Discipline dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "operational_discipline",
+      "weight": 1.0,
+      "sort_order": 27,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_028",
+      "type": "multi_select",
+      "prompt": "Placeholder question 28 for Agility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "agility",
+      "weight": 1.0,
+      "sort_order": 28,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 2
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 2
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 2
+        },
+        {
+          "value": "d",
+          "label": "Option D",
+          "score": 2
+        }
+      ],
+      "max_selections": 2
+    },
+    {
+      "key": "q_029",
+      "type": "scale",
+      "prompt": "Placeholder question 29 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "talent_leverage",
+      "weight": 1.0,
+      "sort_order": 29,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_030",
+      "type": "scenario",
+      "prompt": "Placeholder question 30 for Measurement dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "measurement",
+      "weight": 1.0,
+      "sort_order": 30,
+      "scenario": "Scenario context for question 30. You are in a situation that tests your measurement capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    }
+  ],
+  "scoring": {
+    "method": "weighted_average",
+    "overall_formula": "dimension_weighted_avg",
+    "archetype_mapping": "highest_dimension_combo"
+  },
+  "result_insights": {
+    "high": "Your strengths in this dimension are notable. You demonstrate advanced capabilities that set you apart in DRIVE.",
+    "medium": "You are developing well in this area. With focused effort, you can elevate your DRIVE capabilities to the next level.",
+    "low": "This is an area for growth. Consider targeted development activities to strengthen your DRIVE foundation."
+  }
+}

@@ -102,6 +102,11 @@ const CoachResultsPage = lazy(() => import('@/pages/CoachResultsPage').then(m =>
 const BridgeResultsPage = lazy(() => import('@/pages/BridgeResultsPage').then(m => ({ default: m.BridgeResultsPage })));
 const MosaicResultsPage = lazy(() => import('@/pages/MosaicResultsPage').then(m => ({ default: m.MosaicResultsPage })));
 
+// ── Phase 7: Canonical diagnostic pages (branching-native engine + #1341 data model) ──
+const DiagnosticLandingPage = lazy(() => import('@/pages/DiagnosticLandingPage').then(m => ({ default: m.DiagnosticLandingPage })));
+const DiagnosticTakePage = lazy(() => import('@/pages/DiagnosticTakePage').then(m => ({ default: m.DiagnosticTakePage })));
+const DiagnosticResultsPage = lazy(() => import('@/pages/DiagnosticResultsPage').then(m => ({ default: m.DiagnosticResultsPage })));
+
 // ── Authenticated user pages — shared across leader / (in future) candidate ──
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
@@ -270,6 +275,12 @@ export default function App() {
             <Route path="assessment/coach/results" element={<CoachResultsPage />} />
             <Route path="assessment/bridge/results" element={<BridgeResultsPage />} />
             <Route path="assessment/mosaic/results" element={<MosaicResultsPage />} />
+
+            {/* ── Phase 7: Canonical diagnostic routes (#1276-#1286) ── */}
+            {/* New branching-native engine with #1341 data model + #1340 tier gating */}
+            <Route path="diagnostics/:slug" element={<DiagnosticLandingPage />} />
+            <Route path="diagnostics/:slug/take" element={<DiagnosticTakePage />} />
+            <Route path="diagnostics/:slug/results/:resultId" element={<DiagnosticResultsPage />} />
 
             {/* Share pages — publicly accessible shortlinks */}
             <Route path="share/:id" element={<SharePage />} />
