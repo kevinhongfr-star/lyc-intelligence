@@ -1,7 +1,7 @@
 import { AssessmentLanding, type AssessmentLandingConfig } from '@/components/assessment/landing';
 import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
 import { SEO } from '@/components/seo/SEO';
-import { getAssessmentMeta } from '@/seo/pageMetadata';
+import { getAssessmentMeta } from '@/lib/seo/pageMetadata';
 
 const config: AssessmentLandingConfig = {
   code: 'SPARK',

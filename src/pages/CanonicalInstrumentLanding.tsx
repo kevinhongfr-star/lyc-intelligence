@@ -5,7 +5,7 @@ import { initScrollReveal } from '@/lib/utils';
 import { ASSESSMENT_CATALOG, type AssessmentInfo } from '@/assessments/catalog';
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { SEO } from '@/components/seo/SEO';
-import { getAssessmentMeta } from '@/seo/pageMetadata';
+import { getAssessmentMeta } from '@/lib/seo/pageMetadata';
 
 const DS = {
   headingFont: "'Libre Baskerville', Georgia, serif",

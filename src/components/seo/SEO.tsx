@@ -12,7 +12,7 @@
  *   <SEO title="Custom" description="Custom" path="/custom" />
  */
 import React, { useEffect } from 'react';
-import { PAGE_META, SITE_URL, type PageMeta, type AssessmentMeta } from '@/seo/pageMetadata';
+import { PAGE_META, SITE_URL, type PageMeta, type AssessmentMeta } from '@/lib/seo/pageMetadata';
 
 interface SEOProps {
   /** Use a pre-defined page from PAGE_META registry */

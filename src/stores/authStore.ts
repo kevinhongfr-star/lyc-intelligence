@@ -7,7 +7,8 @@ export interface UserProfile {
   email: string;
   name: string;
   role: string | null;
-  tier: 'free' | 'member' | 'basic' | 'pro' | 'council' | 'enterprise';
+  /** Canonical tier keys — aligned with monetizationService.TierKey */
+  tier: 'explorer' | 'starter' | 'pro' | 'executive' | 'council' | string;
   icp: string | null;
   active_surface: string | null;
   organization_id: string | null;
@@ -21,6 +22,20 @@ export interface UserProfile {
   created_at: string;
   updated_at: string;
 }
+
+/**
+ * #1291 — Fields a user is allowed to update on their own profile via the client.
+ * Privileged fields (role, tier, organization_id, stripe_*) are excluded to
+ * prevent privilege escalation. Those can only be changed server-side or via
+ * admin intervention.
+ */
+const ALLOWED_PROFILE_FIELDS: ReadonlySet<keyof UserProfile> = new Set([
+  'name',
+  'icp',
+  'active_surface',
+  'subtype',
+  'onboarded_at',
+]);
 
 interface AuthStore {
   user: any | null;
@@ -138,8 +153,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         password,
         options: { 
           data: { 
-            tier: 'member', 
-            role: 'member',
+            tier: 'explorer', 
+            role: 'leader',
             name 
           } 
         }
@@ -153,8 +168,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           email,
           name,
           icp: icp,
-          tier: 'member',
-          role: 'member',
+          tier: 'explorer',
+          role: 'leader',
         });
         if (profileError) console.warn('[AuthStore] Profile creation error:', profileError);
         
@@ -235,10 +250,23 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     const { supabase, user } = get();
     if (!supabase || !user) return { success: false, error: 'Not authenticated' };
 
+    // #1291 — Filter to allowed fields only, preventing privilege escalation
+    // via client-side role/tier/organization_id/stripe_* writes.
+    const safeUpdates: Record<string, unknown> = {};
+    for (const key of Object.keys(updates) as (keyof UserProfile)[]) {
+      if (ALLOWED_PROFILE_FIELDS.has(key)) {
+        safeUpdates[key] = updates[key];
+      }
+    }
+    if (Object.keys(safeUpdates).length === 0) {
+      return { success: false, error: 'No updatable fields provided' };
+    }
+    safeUpdates.updated_at = new Date().toISOString();
+
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update(safeUpdates)
         .eq('id', user.id);
       
       if (error) return { success: false, error: error.message };

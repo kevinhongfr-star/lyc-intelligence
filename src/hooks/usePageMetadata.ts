@@ -12,7 +12,9 @@
  */
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { resolveMetadata, DEFAULT_META, PageMetadata } from '@/lib/seo/pageMetadata';
+import { resolveMetadata, DEFAULT_META, type PageMetadata } from '@/lib/seo/pageMetadata';
+
+const JSON_LD_ID = 'json-ld-page';
 
 /** Upsert (or create) a <meta> tag by property or name selector. */
 function upsertMeta(selector: 'property' | 'name', key: string, content: string | undefined) {
@@ -42,6 +44,23 @@ function upsertCanonical(href: string | undefined) {
     document.head.appendChild(el);
   }
   el.setAttribute('href', href);
+}
+
+/** Upsert (or remove) a JSON-LD <script> block for structured data. */
+function upsertJsonLd(data: object | null | undefined) {
+  const existing = document.getElementById(JSON_LD_ID);
+  if (!data) {
+    existing?.remove();
+    return;
+  }
+  let el = existing as HTMLScriptElement | null;
+  if (!el) {
+    el = document.createElement('script');
+    el.type = 'application/ld+json';
+    el.id = JSON_LD_ID;
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(data);
 }
 
 function apply(m: PageMetadata, fullUrl: string) {
@@ -77,6 +96,9 @@ function apply(m: PageMetadata, fullUrl: string) {
     upsertMeta('name', 'robots', 'index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1');
     upsertCanonical(m.canonical ?? fullUrl);
   }
+
+  // 7. JSON-LD structured data
+  upsertJsonLd(m.structuredData);
 }
 
 export function usePageMetadata() {

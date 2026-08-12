@@ -15,7 +15,7 @@ import { Compass, Globe, Users, Target, Award, ChevronRight, Loader2, Download, 
 import { AssessmentWizard } from '@/components/assessment/AssessmentWizard';
 import { useAuthStore } from '@/stores/authStore';
 import { SEO } from '@/components/seo/SEO';
-import { getAssessmentMeta } from '@/seo/pageMetadata';
+import { getAssessmentMeta } from '@/lib/seo/pageMetadata';
 import { generateCPIReportHTML, type CPIReportData } from '@/services/cpiReportRenderer';
 import { trackCTA, trackAssessmentStart, trackAssessmentComplete, trackAssessmentPurchase } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';

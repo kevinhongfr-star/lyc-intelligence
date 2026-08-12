@@ -254,27 +254,142 @@
     },
     {
       "source": "/assessments/cross-border",
-      "destination": "/assessment/cross-border",
+      "destination": "/assessment/bridge",
       "permanent": true
     },
     {
       "source": "/assessments/executive-scope",
-      "destination": "/assessment/exec-scope",
+      "destination": "/assessment/leap",
       "permanent": true
     },
     {
       "source": "/assessments/geo-fit",
-      "destination": "/assessment/geo-fit",
+      "destination": "/assessment/mosaic",
       "permanent": true
     },
     {
       "source": "/assessments/board-readiness",
-      "destination": "/assessment/board-readiness",
+      "destination": "/assessment/coach",
       "permanent": true
     },
     {
       "source": "/assessments",
       "destination": "/assessment",
+      "permanent": true
+    },
+    {
+      "source": "/cpi",
+      "destination": "/assessment/cpi",
+      "permanent": true
+    },
+    {
+      "source": "/cpi/results",
+      "destination": "/assessment/cpi/results",
+      "permanent": true
+    },
+    {
+      "source": "/shift",
+      "destination": "/assessment/shift",
+      "permanent": true
+    },
+    {
+      "source": "/prism",
+      "destination": "/assessment/prism",
+      "permanent": true
+    },
+    {
+      "source": "/prism/results",
+      "destination": "/assessment/prism/results",
+      "permanent": true
+    },
+    {
+      "source": "/spark",
+      "destination": "/assessment/spark",
+      "permanent": true
+    },
+    {
+      "source": "/spark/results",
+      "destination": "/assessment/spark/results",
+      "permanent": true
+    },
+    {
+      "source": "/leap",
+      "destination": "/assessment/leap",
+      "permanent": true
+    },
+    {
+      "source": "/quest",
+      "destination": "/assessment/quest",
+      "permanent": true
+    },
+    {
+      "source": "/impact",
+      "destination": "/assessment/impact",
+      "permanent": true
+    },
+    {
+      "source": "/forge",
+      "destination": "/assessment/forge",
+      "permanent": true
+    },
+    {
+      "source": "/drive",
+      "destination": "/assessment/drive",
+      "permanent": true
+    },
+    {
+      "source": "/coach",
+      "destination": "/assessment/coach",
+      "permanent": true
+    },
+    {
+      "source": "/bridge",
+      "destination": "/assessment/bridge",
+      "permanent": true
+    },
+    {
+      "source": "/mosaic",
+      "destination": "/assessment/mosaic",
+      "permanent": true
+    },
+    {
+      "source": "/b2c",
+      "destination": "/nexus/chat",
+      "permanent": true
+    },
+    {
+      "source": "/coaching",
+      "destination": "/nexus/chat",
+      "permanent": true
+    },
+    {
+      "source": "/coiling",
+      "destination": "/nexus/chat",
+      "permanent": true
+    },
+    {
+      "source": "/profile",
+      "destination": "/app/profile",
+      "permanent": true
+    },
+    {
+      "source": "/progress",
+      "destination": "/app/results",
+      "permanent": true
+    },
+    {
+      "source": "/documents",
+      "destination": "/app/documents",
+      "permanent": true
+    },
+    {
+      "source": "/platform",
+      "destination": "/portal/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/platform/:path*",
+      "destination": "/portal/dashboard",
       "permanent": true
     },
     {

@@ -93,11 +93,13 @@ export function getMaxDocumentsForTier(tier: string): number {
   switch (tier) {
     case 'council':
       return Infinity;
+    case 'executive':
+      return 20;
     case 'pro':
       return 10;
-    case 'basic':
+    case 'starter':
       return 3;
-    default:
+    default: // explorer
       return 0;
   }
 }

@@ -7,6 +7,7 @@ import './index.css';
 import './styles/tokens.css';
 import { initAnalytics } from './lib/analytics';
 import { installGlobalErrorHandlers } from './analytics/errorMonitor';
+import { initWebVitalsReporter } from './analytics/webVitalsReporter';
 
 // ── Sentry Error Monitoring (S4-T02) ──
 // Only activate when a DSN is explicitly configured. In dev/preview this is
@@ -46,6 +47,9 @@ initAnalytics();
 // Install onerror / unhandledrejection → reportError() pipeline.
 // (installGlobalErrorHandlers is idempotent.)
 installGlobalErrorHandlers();
+
+// Web Vitals → PostHog + event tracker (#1288)
+initWebVitalsReporter();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

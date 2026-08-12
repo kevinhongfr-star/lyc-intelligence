@@ -53,8 +53,8 @@ export async function signUp(
     options: {
       data: {
         name,
-        tier: 'member',
-        role: 'member',
+        tier: 'explorer',
+        role: 'leader',
         ...metadata,
       },
     },
