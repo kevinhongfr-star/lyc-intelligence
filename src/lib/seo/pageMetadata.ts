@@ -191,7 +191,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
     pattern: '/member',
     meta: {
       title: 'Leader Portal | LYC Intelligence',
-      description: 'Your executive dashboard: saved diagnostics, matched mandates, NEXUS history, and referral credits.',
+      description: 'Your executive dashboard: saved diagnostics, matched mandates, NEXUS history, and referral miles.',
       noindex: true,
     },
   },

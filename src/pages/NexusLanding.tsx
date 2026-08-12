@@ -383,7 +383,7 @@ function B2BTeaser() {
 // ── PRICING ────────────────────────────────────────────────────────
 const PLANS = [
   { label: 'Start', title: 'Executive Introduction', price: '', small: null, desc: 'Get your first leadership diagnostic and initial advisory session. No credit card.', bullets: ['China Leadership Pipeline Diagnostic', 'Full narrative report', 'Initial advisory conversation', 'Basic profile'], cta: 'Start — Executive Introduction', href: '#start', featured: false },
-  { label: 'Most Popular', title: 'Executive Access', price: 'From $29', small: '/month', desc: 'Full access to all diagnostics, unlimited advisory chat, and role fit analysis.', bullets: ['All 6 leadership diagnostics', 'Unlimited AI advisory chat', 'Role Fit Analysis — unlimited', 'Development tracking', 'Market intelligence access'], cta: 'Start Executive Access', href: '#start', featured: true },
+  { label: 'Recommended', title: 'Executive Access', price: 'From $29', small: '/month', desc: 'Full access to all diagnostics, unlimited advisory chat, and role fit analysis.', bullets: ['All 6 leadership diagnostics', 'Unlimited AI advisory chat', 'Role Fit Analysis — unlimited', 'Development tracking', 'Market intelligence access'], cta: 'Begin Executive Access', href: '#start', featured: true },
   { label: 'Enterprise', title: 'For Teams & Firms', price: 'Custom', small: null, desc: 'Full platform for organizations, search firms, and talent teams.', bullets: ['Bulk candidate screening', 'Team pipeline diagnostics', 'Custom benchmarking', 'Dedicated support', 'API access'], cta: 'Talk to Sales', href: '#for-business', featured: false },
 ];
 function PricingCard({ plan }: { plan: typeof PLANS[number] }) {

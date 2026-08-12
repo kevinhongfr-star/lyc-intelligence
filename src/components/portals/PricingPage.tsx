@@ -201,7 +201,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                       className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-medium text-white"
                       style={{ background: ACCENT }}
                     >
-                      Most Popular
+                      Recommended
                     </div>
                   )}
 
@@ -290,7 +290,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                       </>
                     ) : (
                       <>
-                        {isIntro ? 'Get Started' : `Choose ${tier.name}`}
+                        {isIntro ? 'Begin' : `Choose ${tier.name}`}
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}

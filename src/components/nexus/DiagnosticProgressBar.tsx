@@ -139,7 +139,7 @@ export function DiagnosticProgressBar({ dimensions, progress, className }: Diagn
   );
 }
 
-// Default dimensions for Nexus diagnostic
+// Default dimensions for NEXUS diagnostic
 export const DEFAULT_DIAGNOSTIC_DIMENSIONS: DiagnosticDimension[] = [
   { id: 'role', label: 'Role — Mandate, scope, authority', complete: false },
   { id: 'situation', label: 'Situation — Context, market position', complete: false },

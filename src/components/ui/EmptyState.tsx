@@ -99,7 +99,7 @@ const VARIANT_CONFIG: Record<EmptyStateVariant, { illustration: React.ReactNode;
   default: {
     illustration: <DefaultIllustration />,
     title: 'Nothing here yet',
-    defaultDescription: 'Get started by creating your first item.',
+    defaultDescription: 'Create your first item to see it here.',
   },
   'no-results': {
     illustration: <NoResultsIllustration />,

@@ -209,7 +209,7 @@ export function SharePage() {
               cursor: 'pointer'
             }}
           >
-            Get Started
+            Begin
           </button>
         </div>
       </div>

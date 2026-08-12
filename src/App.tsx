@@ -77,9 +77,10 @@ const SignupPage = lazy(() => import('@/pages/SignupPage').then(m => ({ default:
 // ── Public product landing pages (Canonical — consolidated IA) ──
 const AssessmentPage = lazy(() => import('@/pages/AssessmentPage').then(m => ({ default: m.AssessmentPage })));
 const B2BLanding = lazy(() => import('@/pages/B2BLanding').then(m => ({ default: m.B2BLanding })));
-const NexusChatPage = lazy(() => import('@/pages/NexusPage').then(m => ({ default: m.NexusPage })));
+const NexusChatPage = lazy(() => import('@/pages/NexusPage').then(m => ({ default: m.NEXUSPage })));
 const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m.MatchPage })));
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
+const AssessmentCatalogPage = lazy(() => import('@/pages/AssessmentCatalogPage').then(m => ({ default: m.AssessmentCatalogPage })));
 
 // ── Assessment canonical routes (11 instruments — no duplicates) ──
 // Mixed exports in this codebase; use `.default` for named-default pages and
@@ -243,9 +244,9 @@ export default function App() {
             {/* DEX B2C public landing. DEX /app/dex/* routes are auth'd. */}
             <Route path="dex" element={<DexLandingPage />} />
 
-            {/* Assessment catalog entry point → marketing landing catalog */}
-            <Route path="assessments" element={<Navigate to="/#assessment-catalog" replace />} />
-            <Route path="assessment" element={<Navigate to="/#assessment-catalog" replace />} />
+            {/* Assessment catalog — dedicated /assessment page (#1319 discoverability) */}
+            <Route path="assessments" element={<Navigate to="/assessment" replace />} />
+            <Route path="assessment" element={<AssessmentCatalogPage />} />
 
             {/* ── 11 Canonical Assessment Routes ── */}
             {/* Flagship + SHIFT + PRISM/SPARK custom landings */}

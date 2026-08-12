@@ -1,7 +1,7 @@
 /**
  * src/pages/dex/DexJourneyPage.tsx — S7-T06 (N6)
  *
- * Journey Dashboard: a unified visual timeline of the user's Nexus journey.
+ * Journey Dashboard: a unified visual timeline of the user's NEXUS journey.
  * Aggregates conversations, insights, pipeline milestones, and proactive
  * suggestions into a single chronological view, with summary KPIs at the top.
  *
@@ -131,7 +131,7 @@ export function DexJourneyPage() {
             <Link
               to="/dex/chat"
               className="p-2 -ml-2 text-[#666] hover:text-[#1A1A2E] transition-colors"
-              aria-label="Back to Nexus"
+              aria-label="Back to NEXUS"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
@@ -142,7 +142,7 @@ export function DexJourneyPage() {
               <p className="text-xs text-[#666]">
                 {summary?.first_interaction_at
                   ? `Since ${formatDate(summary.first_interaction_at)}`
-                  : 'A timeline of your progress with Nexus'}
+                  : 'A timeline of your progress with NEXUS'}
               </p>
             </div>
           </div>
@@ -150,7 +150,7 @@ export function DexJourneyPage() {
             to="/dex/chat"
             className="text-sm text-[#C108AB] hover:text-[#A00790] font-medium"
           >
-            Continue with Nexus →
+            Continue with NEXUS →
           </Link>
         </div>
       </header>
@@ -290,7 +290,7 @@ function EmptyJourney() {
         Your journey starts here
       </h2>
       <p className="text-sm text-[#666] mb-6 max-w-md mx-auto">
-        Once you start chatting with Nexus, applying to mandates, or completing
+        Once you start chatting with NEXUS, applying to mandates, or completing
         assessments, your timeline will populate here.
       </p>
       <Link

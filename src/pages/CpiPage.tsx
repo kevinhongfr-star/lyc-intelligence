@@ -40,11 +40,11 @@ interface PastResult {
 }
 
 const DIMENSION_DISPLAY: Array<{ id: DimensionId; icon: typeof Compass; color: string }> = [
-  { id: 'strategic_orientation', icon: Compass, color: 'bg-indigo-500' },
-  { id: 'cross_border_adaptability', icon: Globe, color: 'bg-blue-500' },
-  { id: 'stakeholder_influence', icon: Users, color: 'bg-emerald-500' },
-  { id: 'execution_discipline', icon: Target, color: 'bg-amber-500' },
-  { id: 'leadership_presence', icon: Award, color: 'bg-rose-500' },
+  { id: 'strategic_orientation', icon: Compass, color: 'bg-[#C108AB]' },
+  { id: 'cross_border_adaptability', icon: Globe, color: 'bg-[#C108AB]' },
+  { id: 'stakeholder_influence', icon: Users, color: 'bg-[#C108AB]' },
+  { id: 'execution_discipline', icon: Target, color: 'bg-[#C108AB]' },
+  { id: 'leadership_presence', icon: Award, color: 'bg-[#C108AB]' },
 ];
 
 const CPI_CREDITS = 5;

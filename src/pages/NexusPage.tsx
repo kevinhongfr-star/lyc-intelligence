@@ -76,7 +76,7 @@ function setGuestCount(count: number) {
   } catch {}
 }
 
-export function NexusPage() {
+export function NEXUSPage() {
   const { user, profile } = useAuthStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -225,7 +225,7 @@ export function NexusPage() {
               Executive advisory, on demand.
             </h2>
             <p className="text-gray-600 max-w-lg mb-8 leading-relaxed">
-              Nexus is calibrated on 500+ executive placements across 47 markets.
+              NEXUS is calibrated on 500+ executive placements across 47 markets.
               Ask about career positioning, cross-border leadership, board readiness,
               or executive transition strategy.
             </p>
@@ -260,7 +260,7 @@ export function NexusPage() {
                       <div className="w-6 h-6 bg-primary/10 flex items-center justify-center">
                         <Sparkles className="w-3 h-3 text-primary" />
                       </div>
-                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Nexus</span>
+                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">NEXUS</span>
                     </div>
                   )}
                   <div
@@ -291,7 +291,7 @@ export function NexusPage() {
                     <div className="w-6 h-6 bg-primary/10 flex items-center justify-center">
                       <Sparkles className="w-3 h-3 text-primary" />
                     </div>
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Nexus</span>
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">NEXUS</span>
                   </div>
                   <div className="bg-gray-50 border border-gray-100 px-5 py-4 flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin text-primary" />
@@ -337,7 +337,7 @@ export function NexusPage() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={showGuestLimit ? "Create an account to continue..." : "Ask Nexus about career strategy, leadership positioning, board readiness..."}
+              placeholder={showGuestLimit ? "Create an account to continue..." : "Ask NEXUS about career strategy, leadership positioning, board readiness..."}
               disabled={showGuestLimit || loading}
               rows={1}
               className="w-full px-4 py-3 bg-transparent text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none resize-none disabled:opacity-50 font-sans leading-relaxed"
@@ -355,7 +355,7 @@ export function NexusPage() {
             </div>
           </div>
           <p className="text-xs text-gray-400 text-center mt-2">
-            Nexus may produce inaccurate information. Verify critical decisions.
+            NEXUS may produce inaccurate information. Verify critical decisions.
           </p>
         </div>
       </main>
@@ -363,4 +363,4 @@ export function NexusPage() {
   );
 }
 
-export default NexusPage;
+export default NEXUSPage;

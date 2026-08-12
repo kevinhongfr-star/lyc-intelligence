@@ -149,7 +149,7 @@ export function SignupPrompt({ messageCount, onSignUp, onContinueAsGuest }: Sign
           </p>
           <p className="text-amber-600 text-sm mt-1">
             {messageCount >= 2 
-              ? 'Please sign up to continue chatting with Nexus.'
+              ? 'Please sign up to continue chatting with NEXUS.'
               : `You've used ${messageCount} Executive Introduction message${messageCount === 1 ?'':'s'}. Create an account for a 5 mi/day Starter allowance!`
             }
           </p>
