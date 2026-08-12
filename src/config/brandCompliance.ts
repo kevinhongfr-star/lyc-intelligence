@@ -25,8 +25,10 @@ export const DESIGN_RULES = [
     acceptanceCriteria:
       'No Inter, JetBrains Mono, Fira Code, or system-ui as primary. ' +
       'Headings use Crimson Pro. Body uses DM Sans. Code/labels/' +
-      'metadata use IBM Plex Mono. Google Fonts import includes all 3.',
-    verify: 'grep -rn "Inter\\|JetBrains\\|Fira Code" src/ | grep -v node_modules',
+      'metadata use IBM Plex Mono. All three families self-hosted ' +
+      'as woff2 files in /public/fonts/ — zero Google Fonts CDN ' +
+      'references anywhere in the bundled app or report HTML output.',
+    verify: 'grep -rn "Inter\\|JetBrains\\|Fira Code\\|fonts.googleapis\\|fonts.gstatic" src/ index.html public/ | grep -v node_modules | grep -v akira_source',
   },
   {
     id: 'one-accent-per-page',
@@ -52,15 +54,22 @@ export const DESIGN_RULES = [
   },
   {
     id: 'functional-animation',
-    rule: 'Functional animation only, 120-350ms duration',
+    rule: 'Functional animation only, 120-350ms envelope. Exceptions only for loading states (skeleton shimmer, load spinners, progress bars), state-feedback pulses, and scroll-reveal staggers.',
     acceptanceCriteria:
-      'Transitions for hover states, reveals, and state changes. Duration ' +
-      'between 120ms and 350ms. No animations > 350ms (no slow fills, no ' +
-      'duration-500/700). No decorative animations (no spinning logos, no ' +
-      'bouncing elements). Easing: cubic-bezier(0.4, 0, 0.2, 1) or ease.',
+      'Transitions for hover states, reveals, and state changes. Durations ' +
+      'MUST be one of: 120ms (micro-interactions), 150ms, 200ms (standard), 250ms, 300ms, 350ms (reveals). ' +
+      'Reveal motion: opacity 350ms + translateY(24px) with --ease-out-expo; use the ' +
+      'global .reveal/.reveal.visible classes; reveal delays (80/160/240ms) for staggers. ' +
+      'Easing for interactions: cubic-bezier(0.4, 0, 0.2, 1) (standard) or the named ' +
+      '.ease-standard/.ease-emphasized classes from motion.css. ' +
+      'Decorative animations are banned: no infinite bouncing (animate-bounce), ' +
+      'no spinning logos, no slow ambient float/drift. ' +
+      'Allowed exceptions > 350ms: skeleton shimmer (1.5s), spinner rotation, ' +
+      'assessment-icon micro-animations (.anim-* in index.css), pulse/CTA glow, ' +
+      'progress bar fill, milestone celebration, toast/modal enter+exit.',
     verify:
-      'grep -rn "duration-[5-9]00\\|duration-1000\\|500ms\\|700ms" src/ | ' +
-      'grep -v node_modules',
+      'grep -rnE "animate-bounce|bouncing|\\.5s|500ms|700ms|duration-[5-9]00|duration-1000" src/ | ' +
+      'grep -v node_modules | grep -v "debounce\\|debounceMs\\|shimmer\\|skeleton\\|spinner\\|spin\\|pulse\\|progress\\|bar-f"',
   },
 ] as const;
 

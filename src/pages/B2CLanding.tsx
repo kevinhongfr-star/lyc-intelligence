@@ -54,7 +54,7 @@ export function B2CLanding() {
           <a href="/nexus/chat" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 18px', color: DS.text, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)' }}>
             Try NEXUS <ArrowRight style={{ width: 12, height: 12 }} />
           </a>
-          <a href="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+          <a href="/login" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
             <Lock style={{ width: 14, height: 14 }} />Platform
           </a>
         </div>
@@ -83,10 +83,10 @@ export function B2CLanding() {
             Understand your trajectory. Benchmark your leadership. Discover opportunities that match where you're headed.
           </p>
           <div className="cta-row" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/nexus/chat" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <a href="/nexus/chat" className="cta-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               Try NEXUS <ArrowRight style={{ width: 16, height: 16 }} />
             </a>
-            <a href="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', borderRadius: '0px', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+            <a href="/assessment" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               Complimentary Assessment
             </a>
           </div>
@@ -108,7 +108,7 @@ export function B2CLanding() {
             { icon: IconLeap, title: 'Market Benchmark', desc: 'See how you compare across executive markets. Understand your positioning and unlock opportunities that match your trajectory.' },
             { icon: IconTrident, title: 'Career Benchmark', desc: 'Get benchmarked across Experience, Skills, and Organizational Fit — see exactly how you compare to what top firms look for in C-suite candidates.' },
           ].map(f => (
-            <div key={f.title} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '24px', boxShadow: DS.shadow }}>
+            <div key={f.title} className="card-hover" style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, padding: '24px', boxShadow: DS.shadow }}>
               <div style={{ color: DS.accent, marginBottom: '12px' }}><f.icon size={24} color={DS.accent} /></div>
               <h3 style={{ fontFamily: DS.headingFont, fontSize: '15px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>{f.title}</h3>
               <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
@@ -120,7 +120,7 @@ export function B2CLanding() {
       {/* How It Works */}
       <div className="reveal" style={{ background: DS.bgAlt, padding: '64px 0' }}>
         <div className="section-padding" style={{ maxWidth: '700px', margin: '0 auto', padding: '0 32px' }}>
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, borderRadius: DS.radius, padding: '32px', boxShadow: DS.shadow }}>
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, padding: '32px', boxShadow: DS.shadow }}>
             <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.accent, marginBottom: '8px', textAlign: 'center' }}>
               How It Works
             </div>

@@ -27,18 +27,12 @@
     <!-- Canonical -->
     <link rel="canonical" href="https://lyc-intelligence.app" />
 
-    <!-- Google Fonts — LYC Brand Typography -->
-    <!-- #1338: Crimson Pro is self-hosted (woff2 in /public/fonts/).
-         DM Sans + IBM Plex Mono remain on Google Fonts CDN until Phase 6 (#1273).
-         #1313: crossorigin="anonymous" required under COEP require-corp;
-         Google Fonts CSS sends Access-Control-Allow-Origin: * so CORS mode
-         succeeds. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" crossorigin="anonymous" />
-
-    <!-- #1316: Preload critical Crimson Pro font for LCP optimization -->
-    <link rel="preload" href="/fonts/CrimsonPro-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <!-- #1273: All brand fonts self-hosted — zero CDN dependencies.
+         Crimson Pro (headings), DM Sans (body), IBM Plex Mono (mono) —
+         woff2 Latin subsets in /public/fonts/ with local @font-face in index.css. -->
+    <link rel="preload" href="/fonts/CrimsonPro-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/DMSans-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/IBMPlexMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

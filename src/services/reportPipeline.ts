@@ -324,7 +324,16 @@ export async function renderReport(
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${instrumentName} — ${result.archetype}</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;700&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  /* #1273: Standalone report HTML — self-hosted font URLs relative to the app root.
+     When exported/saved as a standalone HTML file, fonts fall back to system equivalents. */
+  @font-face { font-family:'Crimson Pro'; src:url('/fonts/CrimsonPro-Regular.woff2') format('woff2'); font-weight:400 700; font-style:normal; font-display:swap; }
+  @font-face { font-family:'Crimson Pro'; src:url('/fonts/CrimsonPro-Italic.woff2') format('woff2'); font-weight:400 700; font-style:italic; font-display:swap; }
+  @font-face { font-family:'DM Sans'; src:url('/fonts/DMSans-Regular.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }
+  @font-face { font-family:'DM Sans'; src:url('/fonts/DMSans-Medium.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap; }
+  @font-face { font-family:'DM Sans'; src:url('/fonts/DMSans-SemiBold.woff2') format('woff2'); font-weight:600; font-style:normal; font-display:swap; }
+  @font-face { font-family:'DM Sans'; src:url('/fonts/DMSans-Bold.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }
+  @font-face { font-family:'IBM Plex Mono'; src:url('/fonts/IBMPlexMono-Regular.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }
+  @font-face { font-family:'IBM Plex Mono'; src:url('/fonts/IBMPlexMono-Medium.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap; }
   * { margin:0; padding:0; box-sizing:border-box; border-radius:0 !important; }
   body { font-family:'DM Sans',system-ui,sans-serif; color:#1a1a1a; line-height:1.6; background:#FFFFFF; }
   .page { width:210mm; min-height:297mm; padding:22mm 20mm; margin:0 auto; background:#fff; }

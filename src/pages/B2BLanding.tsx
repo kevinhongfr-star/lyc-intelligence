@@ -237,13 +237,13 @@ export function B2BLanding() {
             <a
               href="/match"
               className="cta-glow"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 36px', background: '#C108AB', color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', borderRadius: DS.radius }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 36px', background: '#C108AB', color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none' }}
             >
               Try Match Analysis <ArrowRight style={{ width: 15, height: 15 }} />
             </a>
             <a
               href="/nexus/chat"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 32px', border: '1px solid rgba(255,255,255,0.28)', color: '#FFFFFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', textDecoration: 'none', borderRadius: DS.radius, background: 'rgba(255,255,255,0.04)' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 32px', border: '1px solid rgba(255,255,255,0.28)', color: '#FFFFFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', textDecoration: 'none', background: 'rgba(255,255,255,0.04)' }}
             >
               Launch NEXUS
             </a>
@@ -330,7 +330,7 @@ export function B2BLanding() {
               style={{
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: DS.radius,
+ 
                 padding: '28px 24px',
                 boxShadow: DS.shadow,
                 display: 'flex',
@@ -338,7 +338,7 @@ export function B2BLanding() {
                 gap: '12px',
               }}
             >
-              <div style={{ display: 'inline-flex', width: '40px', height: '40px', background: `${DS.accent}12`, color: DS.accent, alignItems: 'center', justifyContent: 'center', borderRadius: DS.radius }}>
+              <div style={{ display: 'inline-flex', width: '40px', height: '40px', background: `${DS.accent}12`, color: DS.accent, alignItems: 'center', justifyContent: 'center' }}>
                 <f.icon style={{ width: 18, height: 18 }} />
               </div>
               <div
@@ -425,7 +425,7 @@ export function B2BLanding() {
                 style={{
                   background: DS.card,
                   border: `1px solid ${DS.cardBorder}`,
-                  borderRadius: DS.radius,
+ 
                   padding: '28px 24px',
                   boxShadow: DS.shadow,
                 }}
@@ -443,7 +443,7 @@ export function B2BLanding() {
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      borderRadius: DS.radius,
+ 
                     }}
                   >
                     {String(i + 1).padStart(2, '0')}
@@ -494,7 +494,7 @@ export function B2BLanding() {
               padding: '20px 24px',
               background: DS.card,
               border: `1px solid ${DS.cardBorder}`,
-              borderRadius: DS.radius,
+ 
               display: 'flex',
               alignItems: 'flex-start',
               gap: '14px',
@@ -507,7 +507,7 @@ export function B2BLanding() {
                 height: '40px',
                 background: `${DS.accent}14`,
                 color: DS.accent,
-                borderRadius: DS.radius,
+ 
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -605,7 +605,7 @@ export function B2BLanding() {
                 type="button"
                 onClick={() => setEnterpriseOpen(true)}
                 className="cta-glow"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '16px 32px', background: '#C108AB', color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', borderRadius: DS.radius, border: 'none', cursor: 'pointer' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '16px 32px', background: '#C108AB', color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', border: 'none', cursor: 'pointer' }}
               >
                 Talk to sales <ArrowRight style={{ width: 14, height: 14 }} />
               </button>
@@ -627,7 +627,7 @@ export function B2BLanding() {
             className="card-hover"
             style={{
               background: '#0A0A12',
-              borderRadius: DS.radius,
+ 
               padding: '32px',
               border: `1px solid ${DS.accent}22`,
               boxShadow: `0 30px 70px ${DS.accent}16`,
@@ -641,7 +641,7 @@ export function B2BLanding() {
               style={{
                 background: '#12121E',
                 padding: '16px',
-                borderRadius: DS.radius,
+ 
                 marginBottom: '12px',
                 border: `1px solid ${DS.accent}22`,
               }}
@@ -655,7 +655,7 @@ export function B2BLanding() {
               style={{
                 background: `${DS.accent}14`,
                 padding: '16px',
-                borderRadius: DS.radius,
+ 
                 border: `1px solid ${DS.accent}22`,
               }}
             >
@@ -677,9 +677,9 @@ export function B2BLanding() {
                 letterSpacing: '0.14em',
               }}
             >
-              <span style={{ padding: '4px 8px', background: '#1a1a27', borderRadius: DS.radius }}>GOV</span>
-              <span style={{ padding: '4px 8px', background: '#1a1a27', borderRadius: DS.radius }}>APAC</span>
-              <span style={{ padding: '4px 8px', background: '#1a1a27', borderRadius: DS.radius }}>VERDICT</span>
+              <span style={{ padding: '4px 8px', background: '#1a1a27' }}>GOV</span>
+              <span style={{ padding: '4px 8px', background: '#1a1a27' }}>APAC</span>
+              <span style={{ padding: '4px 8px', background: '#1a1a27' }}>VERDICT</span>
             </div>
           </div>
         </div>
