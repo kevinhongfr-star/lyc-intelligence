@@ -26,7 +26,10 @@ import { getAuthorizedContext, RequestAuthError } from '../lib/auth.js';
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   let ctx;
   try {
-    ctx = await getAuthorizedContext(req, { requireAuth: true });
+    // #1309: getAuthorizedContext takes (req, allowAnonymous:boolean).
+    // Previously called with `{ requireAuth: true }` which is truthy
+    // and thus treated as allowAnonymous=true — auth bypass.
+    ctx = await getAuthorizedContext(req, false);
   } catch (err) {
     if (err instanceof RequestAuthError) {
       return res.status(err.status).json({ ok: false, error: err.message });

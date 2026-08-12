@@ -26,6 +26,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '../lib/supabase-rest.js';
 import { getAuthorizedContext, RequestAuthError } from '../lib/auth.js';
+import {
+  assertBodySize,
+  assertUuid,
+  clampInt,
+  sanitizeObject,
+  DEFAULT_BODY_LIMIT,
+} from '../lib/validate.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const supabase = createClient();
@@ -68,7 +75,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // ── All other operations require authentication ──────────────
   let ctx;
   try {
-    ctx = await getAuthorizedContext(req, { requireAuth: true });
+    // #1309: getAuthorizedContext takes (req, allowAnonymous:boolean).
+    // Previously called with `{ requireAuth: true }` which is truthy
+    // and thus treated as allowAnonymous=true — a real auth bypass.
+    ctx = await getAuthorizedContext(req, false);
   } catch (err) {
     if (err instanceof RequestAuthError) {
       return res.status(err.status).json({ ok: false, error: err.message });
@@ -96,10 +106,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── POST: create share link ──────────────────────────────────
   if (req.method === 'POST') {
-    const { result_id, assessment_code, payload, max_views } = req.body || {};
+    // #1309: body size + sanitize. The shared payload is stored as
+    // jsonb and rendered publicly — strip control chars and cap size.
+    assertBodySize(req.body, DEFAULT_BODY_LIMIT);
+    const body = sanitizeObject(req.body || {}) as {
+      result_id?: string;
+      assessment_code?: string;
+      payload?: unknown;
+      max_views?: number;
+    };
+    const { result_id, assessment_code, payload, max_views } = body;
+
     if (!result_id || !assessment_code || !payload) {
       return res.status(400).json({ ok: false, error: 'result_id, assessment_code, and payload are required' });
     }
+    // Validate result_id is a UUID — anything else would either be a
+    // bad request or an attempt to probe other rows.
+    try {
+      assertUuid(String(result_id), 'result_id');
+    } catch (e: any) {
+      return res.status(422).json({ ok: false, error: e.message });
+    }
+    // Assessment code: uppercase + length cap.
+    const code = String(assessment_code).toUpperCase().slice(0, 32);
 
     try {
       // Generate opaque token
@@ -111,9 +140,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           share_token: token,
           owner_id: userId,
           result_id,
-          assessment_code: assessment_code.toUpperCase(),
-          shared_payload: payload,  // caller must sanitize (strip PII) before sending
-          max_views: max_views ?? null,
+          assessment_code: code,
+          shared_payload: payload,  // already sanitized above
+          max_views: clampInt(max_views, 0, 1_000_000, 0) || null,
         })
         .select()
         .single();
@@ -139,9 +168,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── DELETE: revoke share link ────────────────────────────────
   if (req.method === 'DELETE') {
-    const { share_id } = req.body || {};
+    const { share_id } = sanitizeObject(req.body || {}) as { share_id?: string };
     if (!share_id) {
       return res.status(400).json({ ok: false, error: 'share_id is required' });
+    }
+    try {
+      assertUuid(String(share_id), 'share_id');
+    } catch (e: any) {
+      return res.status(422).json({ ok: false, error: e.message });
     }
 
     try {

@@ -18,6 +18,7 @@
  * in log drains / alerting integrations without needing webhooks here.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { assertBodySize, sanitizeObject, DEFAULT_BODY_LIMIT, DEFAULT_ARRAY_LIMIT } from './lib/validate.js';
 
 interface EventShape {
   name: string;
@@ -95,7 +96,23 @@ export default function handler(req: VercelRequest, res: VercelResponse): void {
   }
 
   const body = req.body;
-  const events: unknown[] = Array.isArray(body?.events) ? body.events : [];
+  // #1309: enforce body size limit + sanitize. Events are logged to stdout
+  // and forwarded to log drains — strip control chars and cap array length
+  // to prevent log injection and DoS.
+  try {
+    assertBodySize(body, DEFAULT_BODY_LIMIT);
+  } catch {
+    res.status(413).json({ ok: false, error: 'payload too large' });
+    return;
+  }
+  const sanitizedBody = sanitizeObject(body, {
+    maxDepth: 6,
+    maxStringLength: 4096,
+    maxArrayLength: 200,  // cap events per request
+  }) as { events?: unknown[] } | null;
+  const events: unknown[] = Array.isArray(sanitizedBody?.events)
+    ? sanitizedBody!.events.slice(0, DEFAULT_ARRAY_LIMIT)
+    : [];
 
   const now = Date.now();
   rotateWindow(now);

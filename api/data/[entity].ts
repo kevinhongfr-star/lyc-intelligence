@@ -30,6 +30,16 @@ import {
   isLeaderRole,
   RequestAuthError,
 } from '../lib/auth.js';
+import {
+  assertBodySize,
+  assertColumnName,
+  assertEntityName,
+  DEFAULT_BODY_LIMIT,
+  parseFilters,
+  parseOrderParam,
+  parseSelectList,
+  sanitizeObject,
+} from '../lib/validate.js';
 
 // ── Entity access control list ──────────────────────────────────────────────
 // Each allowlisted entity => { read: roles allowed to READ,
@@ -93,10 +103,9 @@ const ENTITY_ACL: Record<string, Acl> = {
 };
 
 function parseColumnCsv(s?: string | string[]): string[] {
-  if (!s) return ['*'];
-  const raw = Array.isArray(s) ? s[0] : s;
-  const cols = raw.split(',').map(c => c.trim()).filter(Boolean);
-  return cols.length ? cols : ['*'];
+  // #1309: delegate to validated parser. Rejects anything that isn't
+  // a safe identifier (or '*'). Throws RequestAuthError(422) on bad input.
+  return parseSelectList(s);
 }
 
 function applyRoleFilters(
@@ -147,6 +156,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!ctx) return res.status(401).json({ error: 'Unauthorized' });
 
     const entity = (req.query?.entity as string) || '';
+    // #1309: validate entity name format even though it must match ACL.
+    try {
+      assertEntityName(entity);
+    } catch {
+      return res.status(404).json({ error: `Entity not accessible` });
+    }
     const acl = ENTITY_ACL[entity];
     if (!acl) {
       return res.status(404).json({ error: `Entity "${entity}" not accessible through this endpoint` });
@@ -162,34 +177,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const selectCols = parseColumnCsv(q.select as any).join(',');
       let query = supabase.from(entity).select(selectCols, { count: 'exact' });
 
-      // Simple filter params: eq=col:val  neq=col:val  gt=col:val  lt=col:val  in=col:a|b|c
-      for (const [op, paramName] of [
-        ['eq', 'eq'], ['neq', 'neq'], ['gt', 'gt'], ['lt', 'lt'],
-        ['gte', 'gte'], ['lte', 'lte'], ['in', 'in'], ['like', 'like'],
-      ] as const) {
-        const raw = q[paramName];
-        if (!raw) continue;
-        const pairs = Array.isArray(raw) ? raw : [raw as string];
-        for (const pair of pairs) {
-          const [col, val] = (pair as string).split(':');
-          if (!col || val === undefined) continue;
-          if (op === 'in') {
-            query = query.in(col, val.split('|'));
-          } else if (op === 'like') {
-            query = query.like(col, val);
-          } else {
-            query = (query as any)[op](col, val);
-          }
+      // #1309: parse & validate all filter params in one pass.
+      // parseFilters throws RequestAuthError(422) on invalid column names.
+      const filters = parseFilters(q as Record<string, string | string[] | undefined>);
+      for (const f of filters) {
+        if (f.op === 'in') {
+          query = query.in(f.column, f.value.split('|'));
+        } else if (f.op === 'like') {
+          query = query.like(f.column, f.value);
+        } else {
+          query = (query as any)[f.op](f.column, f.value);
         }
       }
 
-      if (q.order) {
-        const [col, dir = 'asc'] = (q.order as string).split(':');
-        query = query.order(col, { ascending: dir !== 'desc' });
+      const order = parseOrderParam(q.order as string | undefined);
+      if (order) {
+        query = query.order(order.column, { ascending: order.ascending });
       } else {
-        const hasCreated = true; // heuristic — most tables have created_at
+        // heuristic — most tables have created_at; ignore if not present
         try { query = query.order('created_at', { ascending: false }); } catch { /* ignore */ }
-        void hasCreated;
       }
 
       const limit = Math.min(Number(q.limit) || 100, 500);
@@ -211,7 +217,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // ── POST: { filters, upsert, delete_by } ──────────────────────────
     if (req.method === 'POST') {
-      const body = req.body || {};
+      // #1309: enforce body size limit (256 KB default) and sanitize
+      // the whole body up front — strips control chars from strings,
+      // drops prototype-polluting keys, caps array length, caps depth.
+      assertBodySize(req.body, DEFAULT_BODY_LIMIT);
+      const body = sanitizeObject(req.body || {}) as {
+        select?: string;
+        upsert?: Record<string, unknown>;
+        delete_by?: Record<string, unknown>;
+        filters?: Array<{ col: string; op: string; value: unknown }>;
+        order?: string;
+        on_conflict?: string;
+        limit?: number;
+        offset?: number;
+      };
+
       // Write access check first.
       if (body.upsert || body.delete_by) {
         if (!acl.write || acl.write.length === 0) {
@@ -236,7 +256,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         }
         let dq = supabase.from(entity).delete({ count: 'exact' });
-        for (const [k, v] of Object.entries(body.delete_by)) dq = dq.eq(k, v);
+        // #1309: validate every column name in delete_by before applying.
+        for (const [k, v] of Object.entries(body.delete_by)) {
+          assertColumnName(k);
+          dq = dq.eq(k, v as any);
+        }
         dq = applyRoleFilters(dq, ctx, acl);
         const { error, count: delCount } = await dq;
         if (error) throw new RequestAuthError(`DB delete error: ${error.message}`, 500);
@@ -274,6 +298,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
           body.upsert[acl.orgColumn] = ctx.organizationId;
         }
+        // #1309: validate on_conflict column name if provided.
+        if (body.on_conflict) {
+          for (const c of String(body.on_conflict).split(',')) {
+            assertColumnName(c.trim());
+          }
+        }
 
         const { data, error } = await supabase
           .from(entity)
@@ -287,12 +317,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       let query = supabase.from(entity).select(selectCols, { count: 'exact' });
       for (const f of (body.filters || [])) {
         if (!f?.col || !f?.op) continue;
-        if (f.op === 'in') query = query.in(f.col, f.value || []);
+        // #1309: validate column + op before applying.
+        try {
+          assertColumnName(f.col);
+        } catch {
+          continue;  // skip invalid filter
+        }
+        if (!['eq','neq','gt','lt','gte','lte','in','like'].includes(f.op)) continue;
+        if (f.op === 'in') query = query.in(f.col, (f.value as any[]) || []);
         else query = (query as any)[f.op]?.(f.col, f.value) ?? query;
       }
       if (body.order) {
-        const [col, dir = 'asc'] = (body.order as string).split(':');
-        query = query.order(col, { ascending: dir !== 'desc' });
+        const order = parseOrderParam(body.order);
+        if (order) query = query.order(order.column, { ascending: order.ascending });
       }
       const limit = Math.min(Number(body.limit) || 100, 500);
       query = query.limit(limit);

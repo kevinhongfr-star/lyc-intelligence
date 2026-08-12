@@ -36,6 +36,12 @@ import {
   isAdminRole,
   RequestAuthError,
 } from '../lib/auth.js';
+import {
+  assertBodySize,
+  clampInt,
+  sanitizeObject,
+  DEFAULT_BODY_LIMIT,
+} from '../lib/validate.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Canonical costs — source of truth for server-side miles debits.
@@ -107,14 +113,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const body = req.body || {};
+    // #1309: enforce body size limit and sanitize user-provided objects.
+    // Assessment answers + metadata are stored as jsonb — strip control
+    // chars, drop prototype-polluting keys, cap depth/length.
+    assertBodySize(body, DEFAULT_BODY_LIMIT);
     const code = normalizeCode(body.code);
-    const answers = body.answers ?? {};
-    if (typeof answers !== 'object' || Array.isArray(answers)) {
+    const rawAnswers = body.answers ?? {};
+    if (typeof rawAnswers !== 'object' || Array.isArray(rawAnswers)) {
       throw new RequestAuthError('`answers` must be an object of question->response', 400);
     }
-    const durationSeconds = Number(body.durationSeconds) || 0;
-    const metadata = body.metadata || {};
-    const idem = typeof body.idempotency_key === 'string' ? body.idempotency_key.trim() : null;
+    const answers = sanitizeObject(rawAnswers, {
+      maxDepth: 8,
+      maxStringLength: 32 * 1024,  // 32 KB per answer field
+      maxArrayLength: 1000,
+    });
+    // Duration is informational — clamp to plausible bounds (0..24h).
+    const durationSeconds = clampInt(body.durationSeconds, 0, 86_400, 0);
+    const metadata = sanitizeObject(body.metadata || {}, {
+      maxDepth: 6,
+      maxStringLength: 8 * 1024,
+      maxArrayLength: 200,
+    });
+    // Idempotency key: limit length to prevent abuse.
+    const idemRaw = typeof body.idempotency_key === 'string' ? body.idempotency_key.trim() : null;
+    const idem = idemRaw && idemRaw.length <= 256 ? idemRaw : null;
 
     const cost = ASSESSMENT_COSTS[code];
 

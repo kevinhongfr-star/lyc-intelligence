@@ -54,7 +54,11 @@ function isAdminRole(role) {
 }
 function isConsultantRole(role) {
   if (!role) return false;
-  return isAdminRole(role) || ["consultant", "lyc_consultant"].includes(role);
+  return isAdminRole(role) || ["consultant", "lyc_consultant", "team_lead"].includes(role);
+}
+function isScopedConsultantRole(role) {
+  if (!role) return false;
+  return ["consultant", "lyc_consultant", "team_lead"].includes(role);
 }
 function isClientRole(role) {
   if (!role) return false;
@@ -98,5 +102,6 @@ export {
   isClientRole,
   isConsultantRole,
   isInternalStaff,
-  isLeaderRole
+  isLeaderRole,
+  isScopedConsultantRole
 };
