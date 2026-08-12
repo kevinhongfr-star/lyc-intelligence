@@ -43,7 +43,7 @@ function Nav({ config }: { config: AssessmentLandingConfig }) {
     }}>
       <div style={{ maxWidth: 940, margin: '0 auto', padding: '20px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Link to="/" style={{
-          fontFamily: "'Libre Baskerville', Georgia, serif",
+          fontFamily: "'Crimson Pro', Georgia, serif",
           fontSize: 20, fontWeight: 700, textDecoration: 'none', color: INK,
           display: 'flex', alignItems: 'baseline', gap: 6,
         }}>
@@ -110,7 +110,7 @@ function Footer({ config }: { config: AssessmentLandingConfig }) {
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
           <div>
             <span style={{
-              fontFamily: "'Libre Baskerville', Georgia, serif",
+              fontFamily: "'Crimson Pro', Georgia, serif",
               fontSize: 18, fontWeight: 700, color: INK,
             }}>{name}</span>
             <p style={{

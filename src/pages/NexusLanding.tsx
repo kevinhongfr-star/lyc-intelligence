@@ -98,7 +98,7 @@ function Nav() {
       transition: 'border-color 200ms ease, background 200ms ease',
     }}>
       <div style={{ maxWidth: 940, margin: '0 auto', padding: '20px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link to="/nexus" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: 20, fontWeight: 700, textDecoration: 'none', color: INK, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+        <Link to="/nexus" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, textDecoration: 'none', color: INK, display: 'flex', alignItems: 'baseline', gap: 6 }}>
           NEXUS <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.08em', color: G400, fontStyle: 'normal' }}>by LYC</span>
         </Link>
         <ul className="nav-links-desktop" style={{ display: 'flex', gap: 28, listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
@@ -159,7 +159,7 @@ function Hero() {
       <div aria-hidden="true" style={{ position: 'absolute', top: 140, left: '50%', transform: 'translateX(-50%)', width: 2, height: 200, background: `linear-gradient(to bottom, ${ACCENT} 0%, transparent 100%)`, pointerEvents: 'none' }} />
       <div style={containerStyle} className="nl-reveal">
         <span style={{ ...monoStyle, color: ACCENT, marginBottom: 28, display: 'inline-block' }}>Your AI leadership coach</span>
-        <h1 className="hero-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, lineHeight: 1.15, color: INK, fontSize: 48, maxWidth: 760, margin: '0 auto 24px' }}>
+        <h1 className="hero-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, lineHeight: 1.15, color: INK, fontSize: 48, maxWidth: 760, margin: '0 auto 24px' }}>
           Grow faster. <br /><em style={{ fontWeight: 400 }}>Always have a coach.</em>
         </h1>
         <p className="hero-sub" style={{ fontSize: 18, maxWidth: 600, margin: '0 auto 40px', color: G600, lineHeight: 1.6 }}>
@@ -193,7 +193,7 @@ function WhatIs() {
       <div style={containerStyle} className="nl-reveal">
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
           <span style={sectionLabel}>What NEXUS is</span>
-          <h2 className="section-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 34, lineHeight: 1.2, color: INK, marginBottom: 32 }}>Your coach. <em style={{ fontWeight: 400 }}>On your schedule.</em></h2>
+          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 34, lineHeight: 1.2, color: INK, marginBottom: 32 }}>Your coach. <em style={{ fontWeight: 400 }}>On your schedule.</em></h2>
           <p style={{ fontSize: 18, lineHeight: 1.7, color: G600, marginBottom: 24 }}><strong style={{ color: INK, fontWeight: 600 }}>Most leadership advice is either generic or expensive.</strong> Self-help content doesn't know your context. Executive coaches cost thousands and aren't there at 9pm when you're stuck on a decision.</p>
           <p style={{ fontSize: 18, lineHeight: 1.7, color: G600, marginBottom: 24 }}>NEXUS is different. It's an AI leadership coach grounded in <strong style={{ color: INK, fontWeight: 600 }}>LYC Partners' 10+ years of executive search data</strong>, validated assessment frameworks, and real talent market intelligence.</p>
           <p style={{ fontSize: 18, lineHeight: 1.7, color: G600, marginBottom: 24 }}>Ask it about a tricky promotion conversation. Get benchmarked against peers in your market. Analyze your next career move. All from your phone or laptop, whenever you need it.</p>
@@ -216,7 +216,7 @@ function Capabilities() {
       <div style={containerStyle}>
         <div className="nl-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>What your coach does</span>
-          <h2 className="section-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Four ways NEXUS <em style={{ fontWeight: 400 }}>moves you forward</em></h2>
+          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Four ways NEXUS <em style={{ fontWeight: 400 }}>moves you forward</em></h2>
           <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>Everything a senior leader needs to understand their strengths, benchmark their capabilities, and make better career and leadership decisions.</p>
         </div>
         <div className="nl-reveal grid-responsive-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, background: G200, border: `1px solid ${G200}` }}>
@@ -229,7 +229,7 @@ function Capabilities() {
             onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = ACCENT; }}
             onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'transparent'; }}>
               <div className="nl-reveal" style={{ width: 40, height: 40, marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', background: G100, fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 14, color: ACCENT, fontWeight: 500, transitionDelay: `${i * 80}ms` }}>{c.n}</div>
-              <h3 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 22, marginBottom: 12, lineHeight: 1.25, color: INK }}>{c.title}</h3>
+              <h3 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 22, marginBottom: 12, lineHeight: 1.25, color: INK }}>{c.title}</h3>
               <p style={{ color: G600, fontSize: 15, lineHeight: 1.6, marginBottom: 20 }}>{c.desc}</p>
               <a href={c.href} style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', color: ACCENT, textDecoration: 'none', fontWeight: 500, marginTop: 'auto' }}
                 onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
@@ -254,7 +254,7 @@ function HowItWorks() {
       <div style={containerStyle}>
         <div className="nl-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>How it works</span>
-          <h2 className="section-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 0 }}>Three steps. <em style={{ fontWeight: 400 }}>No guesswork.</em></h2>
+          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 0 }}>Three steps. <em style={{ fontWeight: 400 }}>No guesswork.</em></h2>
         </div>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48, position: 'relative' }}>
           {STEPS.map((s, i) => (
@@ -262,10 +262,10 @@ function HowItWorks() {
               {/* Staggered number reveals — only the number, 80ms stagger, total <350ms */}
               <div className="nl-reveal" style={{
                 position: 'absolute', top: 0, left: 0,
-                fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: 48, fontWeight: 400, fontStyle: 'italic', color: ACCENT, lineHeight: 1,
+                fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 48, fontWeight: 400, fontStyle: 'italic', color: ACCENT, lineHeight: 1,
                 transitionDelay: `${i * 80}ms`,
               }}>{s.n}</div>
-              <h3 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 14, lineHeight: 1.25, color: INK }}>{s.title}</h3>
+              <h3 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 14, lineHeight: 1.25, color: INK }}>{s.title}</h3>
               <p style={{ color: G600, fontSize: 15, lineHeight: 1.6 }}>{s.desc}</p>
             </div>
           ))}
@@ -290,7 +290,7 @@ function Diagnostics() {
       <div style={containerStyle}>
         <div className="nl-reveal" style={{ maxWidth: 640, margin: '0 auto 56px', textAlign: 'center' }}>
           <span style={sectionLabel}>Diagnostics</span>
-          <h2 className="section-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Know where you stand. <em style={{ fontWeight: 400 }}>Measured, not guessed.</em></h2>
+          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Know where you stand. <em style={{ fontWeight: 400 }}>Measured, not guessed.</em></h2>
           <p style={{ color: G600, fontSize: 17, lineHeight: 1.6 }}>Every diagnostic is built on validated executive assessment frameworks and benchmarked against real leaders. Not personality tests. Actual leadership measurement.</p>
         </div>
         <div className="nl-reveal grid-responsive-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, background: G200, border: `1px solid ${G200}`, marginBottom: 56 }}>
@@ -303,7 +303,7 @@ function Diagnostics() {
             onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = ACCENT; }}
             onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'transparent'; }}>
               <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: ACCENT, marginBottom: 14, display: 'block' }}>{d.tag}</span>
-              <h4 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 18, marginBottom: 10, lineHeight: 1.3, color: INK }}>{d.title}</h4>
+              <h4 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 18, marginBottom: 10, lineHeight: 1.3, color: INK }}>{d.title}</h4>
               <p style={{ color: G600, fontSize: 14, lineHeight: 1.6, marginBottom: 18 }}>{d.desc}</p>
               <div style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 11, color: G400, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{d.meta}</div>
             </div>
@@ -333,7 +333,7 @@ function Personas() {
       <div style={containerStyle}>
         <div className="nl-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Who it's for</span>
-          <h2 className="section-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Built for leaders <em style={{ fontWeight: 400 }}>who take growth seriously</em></h2>
+          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Built for leaders <em style={{ fontWeight: 400 }}>who take growth seriously</em></h2>
           <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>If you're ambitious and you know your development is the bottleneck, NEXUS is for you.</p>
         </div>
         <div className="nl-reveal grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
@@ -345,7 +345,7 @@ function Personas() {
             onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = ACCENT; }}
             onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = G200; }}>
               <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: ACCENT, marginBottom: 16, display: 'block' }}>{p.label}</span>
-              <h4 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 12, lineHeight: 1.25, color: INK }}>{p.title}</h4>
+              <h4 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 12, lineHeight: 1.25, color: INK }}>{p.title}</h4>
               <p style={{ color: G600, fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>{p.desc}</p>
               <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                 {p.bullets.map(b => (
@@ -368,7 +368,7 @@ function B2BTeaser() {
     <section id="for-business" style={{ textAlign: 'center', padding: '80px 0', background: G100, borderTop: `1px solid ${G200}`, borderBottom: `1px solid ${G200}` }} className="section-padding">
       <div style={containerStyle} className="nl-reveal">
         <span style={{ ...monoStyle, color: G600, marginBottom: 16, display: 'block' }}>Also for business</span>
-        <h3 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", color: INK, maxWidth: 500, margin: '0 auto 16px', fontSize: 26, fontWeight: 700, lineHeight: 1.25 }}>NEXUS for teams and organizations</h3>
+        <h3 style={{ fontFamily: "'Crimson Pro', Georgia, serif", color: INK, maxWidth: 500, margin: '0 auto 16px', fontSize: 26, fontWeight: 700, lineHeight: 1.25 }}>NEXUS for teams and organizations</h3>
         <p style={{ color: G600, maxWidth: 500, margin: '0 auto 24px', fontSize: 15, lineHeight: 1.6 }}>If you're looking at this for your team or your firm, NEXUS scales for enterprise use. Team-level pipeline assessment, consistent scoring across recruiters, bulk candidate screening.</p>
         <a href="/b2b" style={{ ...btnSecondary, fontSize: 13, padding: '10px 22px', minHeight: 40 }} {...ctaCompressHandlers}
           onMouseEnter={(e) => { e.currentTarget.style.background = INK; e.currentTarget.style.color = WHITE; }}
@@ -404,8 +404,8 @@ function PricingCard({ plan }: { plan: typeof PLANS[number] }) {
     onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; if (!f) e.currentTarget.style.borderColor = ACCENT; }}
     onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; if (!f) e.currentTarget.style.borderColor = 'transparent'; }}>
       <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: ACCENT, marginBottom: 12, fontWeight: 500 }}>{plan.label}</span>
-      <h3 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: 22, marginBottom: 8, fontWeight: 700, lineHeight: 1.25, color: text }}>{plan.title}</h3>
-      <div style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: 28, fontWeight: 700, marginBottom: 20, color: text }}>
+      <h3 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 22, marginBottom: 8, fontWeight: 700, lineHeight: 1.25, color: text }}>{plan.title}</h3>
+      <div style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 28, fontWeight: 700, marginBottom: 20, color: text }}>
         {plan.price}{plan.small && <span style={{ fontSize: 14, fontWeight: 400, color: muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}> {plan.small}</span>}
       </div>
       <p style={{ fontSize: 14, color: muted, marginBottom: 24, lineHeight: 1.6 }}>{plan.desc}</p>
@@ -432,7 +432,7 @@ function Pricing() {
       <div style={containerStyle}>
         <div className="nl-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Pricing</span>
-          <h2 className="section-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Start with Executive Introduction. <em style={{ fontWeight: 400 }}>Grow when you're ready.</em></h2>
+          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Start with Executive Introduction. <em style={{ fontWeight: 400 }}>Grow when you're ready.</em></h2>
           <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>Three tiers designed for where you are today — with clear paths forward.</p>
         </div>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: G200, border: `1px solid ${G200}` }}>
@@ -460,20 +460,20 @@ function Trust() {
       <div style={containerStyle}>
         <div className="nl-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Why you can trust it</span>
-          <h2 className="section-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 0 }}>Built on real expertise. <em style={{ fontWeight: 400 }}>Validated by real data.</em></h2>
+          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 0 }}>Built on real expertise. <em style={{ fontWeight: 400 }}>Validated by real data.</em></h2>
         </div>
         <div className="nl-reveal grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48, textAlign: 'center' }}>
           {TRUST.map(t => (
             <div key={t.title} style={{ padding: '0 16px' }}>
               <div style={{ width: 48, height: 48, margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${G200}`, fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 16, color: ACCENT, background: WHITE }}>{t.icon}</div>
-              <h4 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: 18, marginBottom: 10, fontWeight: 700, color: INK }}>{t.title}</h4>
+              <h4 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 18, marginBottom: 10, fontWeight: 700, color: INK }}>{t.title}</h4>
               <p style={{ color: G600, fontSize: 14, lineHeight: 1.6 }}>{t.desc}</p>
             </div>
           ))}
         </div>
         <div className="nl-reveal" style={{ textAlign: 'center', marginTop: 64, paddingTop: 48, borderTop: `1px solid ${G200}` }}>
           <span style={{ ...monoStyle, color: G400, marginBottom: 12, display: 'block' }}>The intelligence engine</span>
-          <strong style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: 20, fontWeight: 700, color: INK }}>Powered by DEX AI</strong><br />
+          <strong style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, color: INK }}>Powered by DEX AI</strong><br />
           <Link to="/dex-ai" style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: ACCENT, textDecoration: 'none', fontWeight: 500, display: 'inline-block', marginTop: 16 }}
             onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
             onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}>Learn how DEX AI works →</Link>
@@ -489,7 +489,7 @@ function FinalCTA() {
     <section id="start" style={{ textAlign: 'center', padding: '120px 0', background: INK, color: WHITE }} className="section-padding">
       <div style={containerStyle} className="nl-reveal">
         <span style={{ ...monoStyle, color: ACCENT, marginBottom: 20, display: 'block' }}>Ready when you are</span>
-        <h2 className="section-heading" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", color: WHITE, maxWidth: 640, margin: '0 auto 20px', fontSize: 42, fontWeight: 700, lineHeight: 1.15 }}>Leadership isn't a title.<br /><em style={{ fontWeight: 400 }}>It's a trajectory.</em></h2>
+        <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", color: WHITE, maxWidth: 640, margin: '0 auto 20px', fontSize: 42, fontWeight: 700, lineHeight: 1.15 }}>Leadership isn't a title.<br /><em style={{ fontWeight: 400 }}>It's a trajectory.</em></h2>
         <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 520, margin: '0 auto 36px', fontSize: 17, lineHeight: 1.6 }}>Start with the Executive Introduction. No credit card required. About 15 minutes.</p>
         <Link to="/nexus/chat" style={{ ...btnPrimary, background: ACCENT, color: WHITE, borderColor: ACCENT, padding: '16px 36px' }} {...ctaCompressHandlers}
           onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
@@ -513,7 +513,7 @@ function Footer() {
       <div style={containerStyle}>
         <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
           <div>
-            <h4 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: 20, fontWeight: 700, marginBottom: 8, display: 'flex', alignItems: 'baseline', gap: 6, color: INK, lineHeight: 1.2 }}>
+            <h4 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, marginBottom: 8, display: 'flex', alignItems: 'baseline', gap: 6, color: INK, lineHeight: 1.2 }}>
               NEXUS <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', color: G400, fontWeight: 400, fontStyle: 'normal' }}>by LYC</span>
             </h4>
             <p style={{ color: G600, fontSize: 14, maxWidth: 280, marginTop: 16, lineHeight: 1.6 }}>Your AI leadership coach — built on executive search data and validated assessment frameworks.</p>

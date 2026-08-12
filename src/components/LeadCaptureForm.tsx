@@ -12,7 +12,7 @@ interface LeadCaptureFormProps {
 }
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'Crimson Pro', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',

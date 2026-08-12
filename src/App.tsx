@@ -32,7 +32,7 @@
  *     to the new URL structure so Phase 17 SEO/sitemap work is stable.
  *   • No new serverless functions — only route/shell changes on top of
  *     existing page handlers.
- *   • Brand: zero radius, font trio (Libre Baskerville / DM Sans / IBM Plex
+ *   • Brand: zero radius, font trio (Crimson Pro / DM Sans / IBM Plex
  *     Mono), single accent #C108AB.
  */
 import React, { Suspense, lazy, useEffect } from 'react';

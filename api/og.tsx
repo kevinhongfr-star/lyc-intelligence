@@ -4,7 +4,7 @@
  * Edge function using @vercel/og's ImageResponse.
  * Renders 1200×630 PNG with LYC Intelligence brand template:
  *   - LYC logo in corner
- *   - Page title in Libre Baskerville
+ *   - Page title in Crimson Pro
  *   - Accent color bar at bottom (#C108AB)
  *   - One template, per-page title variable
  *
@@ -20,7 +20,7 @@ export const config = {
 };
 
 const ACCENT = '#C108AB';
-const HEADING_FONT = 'Libre Baskerville';
+const HEADING_FONT = 'Crimson Pro';
 const BODY_FONT = 'DM Sans';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<ImageResponse> {
@@ -171,7 +171,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       fonts: [
         {
           name: HEADING_FONT,
-          data: await fetchFont('Libre+Baskerville:wght@700'),
+          data: await fetchFont('Crimson+Pro:wght@700'),
           weight: 700,
           style: 'normal',
         },

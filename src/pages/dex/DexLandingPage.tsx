@@ -21,7 +21,7 @@ export function DexLandingPage() {
             </div>
             <h1
               className="text-4xl md:text-5xl font-bold leading-tight mb-4"
-              style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
+              style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
               AI-powered executive advisory for China-APAC leaders
             </h1>
@@ -51,7 +51,7 @@ export function DexLandingPage() {
         <div className="text-center max-w-2xl mx-auto mb-12">
           <h2
             className="text-3xl md:text-4xl font-bold text-[#1A1A2E] mb-3"
-            style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
+            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
           >
             What DEX AI can do for you
           </h2>
@@ -83,7 +83,7 @@ export function DexLandingPage() {
           <div className="text-center mb-10">
             <h2
               className="text-3xl md:text-4xl font-bold text-[#1A1A2E] mb-3"
-              style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
+              style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
               Simple, miles-based access
             </h2>
@@ -114,7 +114,7 @@ export function DexLandingPage() {
       <section className="max-w-4xl mx-auto px-4 md:px-6 py-16 md:py-20 text-center">
         <h2
           className="text-3xl md:text-4xl font-bold text-[#1A1A2E] mb-4"
-          style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
+          style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
         >
           Ready for 1:1 guidance?
         </h2>

@@ -35,7 +35,7 @@ function LegalLayout({ title, icon, intro, sections, lastUpdated, actions }: {
           <div className="w-10 h-10 bg-fuchsia/10 text-fuchsia flex items-center justify-center">{icon}</div>
           <h1
             className="text-3xl font-bold text-[#1A1A2E]"
-            style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
+            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
           >
             {title}
           </h1>

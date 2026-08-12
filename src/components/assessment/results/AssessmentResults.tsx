@@ -30,7 +30,7 @@ function Nav({ config }: { config: AssessmentResultsConfig }) {
     }}>
       <div style={{ ...containerStyle, padding: '20px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Link to="/" style={{
-          fontFamily: "'Libre Baskerville', Georgia, serif",
+          fontFamily: "'Crimson Pro', Georgia, serif",
           fontSize: 20, fontWeight: 700, textDecoration: 'none', color: INK,
           display: 'flex', alignItems: 'baseline', gap: 6,
         }}>
@@ -66,7 +66,7 @@ function Footer({ config }: { config: AssessmentResultsConfig }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 48 }}>
           <div>
             <span style={{
-              fontFamily: "'Libre Baskerville', Georgia, serif",
+              fontFamily: "'Crimson Pro', Georgia, serif",
               fontSize: 18, fontWeight: 700, color: INK,
             }}>{assessmentName}</span>
             <p style={{ fontSize: 13, color: G600, marginTop: 12, lineHeight: 1.5, maxWidth: 300 }}>

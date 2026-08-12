@@ -167,7 +167,7 @@ export function InterviewSchedule({ mandateId, onSchedule, onCancel }: Interview
 
   return (
     <div style={{ maxWidth: '640px', margin: '0 auto', padding: '24px' }}>
-      <h2 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '24px', fontWeight: 700, marginBottom: '24px', color: DS.text }}>
+      <h2 style={{ fontFamily: "'Crimson Pro', serif", fontSize: '24px', fontWeight: 700, marginBottom: '24px', color: DS.text }}>
         Schedule Interview
       </h2>
 

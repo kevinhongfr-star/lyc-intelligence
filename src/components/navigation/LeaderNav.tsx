@@ -17,7 +17,7 @@ import { MilesBadge } from '@/components/nexus/MilesBadge';
 import { fetchMilesBalance } from '@/services/monetizationService';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'Crimson Pro', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',

@@ -142,7 +142,7 @@ export function DexAssessPage() {
             </div>
             <h1
               className="text-3xl font-bold text-[#1A1A2E] mb-2"
-              style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
+              style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
               Your Leadership Profile
             </h1>
@@ -190,7 +190,7 @@ export function DexAssessPage() {
           </div>
           <h1
             className="text-3xl font-bold text-[#1A1A2E] mb-2"
-            style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
+            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
           >
             Executive Leadership Self-Assessment
           </h1>

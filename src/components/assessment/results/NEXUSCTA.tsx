@@ -38,7 +38,7 @@ export function NEXUSCTA({ config }: Props) {
             </span>
           </div>
           <h2 style={{
-            fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700,
+            fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: WHITE, marginBottom: 20,
           }}>
             Keep the momentum <em style={{ fontWeight: 400 }}>going</em>

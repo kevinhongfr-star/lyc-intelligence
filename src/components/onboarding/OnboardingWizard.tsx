@@ -10,7 +10,7 @@
  *   3. Guided tour of key features (3 highlights)
  *   4. CTA to the primary action for the chosen role
  *
- * Brand rules: zero border radius, Libre Baskerville headings, DM Sans body,
+ * Brand rules: zero border radius, Crimson Pro headings, DM Sans body,
  * IBM Plex Mono labels, one accent color (fuchsia), premium tone, animations
  * 120-350ms. No "free" — use "complimentary".
  */

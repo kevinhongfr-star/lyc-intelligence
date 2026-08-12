@@ -91,7 +91,7 @@ function Nav() {
       borderBottom: `1px solid ${G200}`,
     }}>
       <div style={{ maxWidth: 940, margin: '0 auto', padding: '18px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link to="/dex-ai" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: 20, fontWeight: 700, textDecoration: 'none', color: INK, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+        <Link to="/dex-ai" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, textDecoration: 'none', color: INK, display: 'flex', alignItems: 'baseline', gap: 6 }}>
           DEX AI <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.08em', color: G400 }}>by LYC</span>
         </Link>
         <ul className="da-nav-links" style={{ display: 'flex', gap: 28, listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
@@ -160,7 +160,7 @@ function Hero() {
       <div style={containerStyle}>
         <span style={{ ...monoStyle, color: ACCENT, marginBottom: 28, display: 'inline-block' }}>Technology</span>
         <h1 style={{
-          fontFamily: "'Libre Baskerville', Georgia, serif",
+          fontFamily: "'Crimson Pro', Georgia, serif",
           fontWeight: 700, fontSize: 52, lineHeight: 1.15,
           color: INK, maxWidth: 720, margin: '0 auto 24px',
           letterSpacing: '-0.02em',
@@ -206,7 +206,7 @@ function Architecture() {
       <div style={containerStyle}>
         <div className="da-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Architecture</span>
-          <h2 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 38, lineHeight: 1.15, color: INK, marginBottom: 20, letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 38, lineHeight: 1.15, color: INK, marginBottom: 20, letterSpacing: '-0.02em' }}>
             How it works <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 400 }}>under the hood.</em>
           </h2>
           <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>DEX AI isn't a single model. It's a system of specialized AI components that work together — orchestrated by NEXUS to deliver leadership intelligence you can trust.</p>
@@ -220,7 +220,7 @@ function Architecture() {
             padding: '28px 32px', marginBottom: 8,
           }}>
             <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: ACCENT, marginBottom: 8, display: 'block' }}>Layer 04 — Interface</span>
-            <h3 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 8, lineHeight: 1.2, color: WHITE }}>NEXUS Orchestration Layer</h3>
+            <h3 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 8, lineHeight: 1.2, color: WHITE }}>NEXUS Orchestration Layer</h3>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>Ties everything together in one conversational interface. Routes requests, manages context, and delivers coherent, actionable responses.</p>
           </div>
           {/* Middle: Core AI Systems (2-col grid) */}
@@ -234,7 +234,7 @@ function Architecture() {
               onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = ACCENT; }}
               onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = G200; }}>
                 <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: ACCENT, marginBottom: 8, display: 'block' }}>{l.label}</span>
-                <h3 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 8, lineHeight: 1.2, color: INK }}>{l.title}</h3>
+                <h3 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 8, lineHeight: 1.2, color: INK }}>{l.title}</h3>
                 <p style={{ fontSize: 14, color: G600, lineHeight: 1.6 }}>{l.desc}</p>
               </div>
             ))}
@@ -253,7 +253,7 @@ function Architecture() {
             onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = ACCENT; }}
             onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'transparent'; }}>
               <div style={{ width: 36, height: 36, marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', background: G100, fontSize: 18, color: ACCENT }}>{c.icon}</div>
-              <h3 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 12, lineHeight: 1.2, color: INK }}>{c.title}</h3>
+              <h3 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 12, lineHeight: 1.2, color: INK }}>{c.title}</h3>
               <p style={{ color: G600, fontSize: 14, lineHeight: 1.6 }}>{c.desc}</p>
               <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
                 {c.items.map(it => (
@@ -283,7 +283,7 @@ function TrustSecurity() {
       <div style={containerStyle}>
         <div className="da-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Trust &amp; Security</span>
-          <h2 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 38, lineHeight: 1.15, color: INK, marginBottom: 20, letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 38, lineHeight: 1.15, color: INK, marginBottom: 20, letterSpacing: '-0.02em' }}>
             Built with <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 400 }}>security at the core.</em>
           </h2>
           <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>We take data privacy and model quality seriously. Here's what that means in practice.</p>
@@ -298,7 +298,7 @@ function TrustSecurity() {
             onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = ACCENT; }}
             onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = G200; }}>
               <div style={{ width: 40, height: 40, marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', background: G100, fontSize: 20, color: ACCENT }}>{c.icon}</div>
-              <h3 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 12, lineHeight: 1.2, color: INK }}>{c.title}</h3>
+              <h3 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 20, marginBottom: 12, lineHeight: 1.2, color: INK }}>{c.title}</h3>
               <p style={{ color: G600, fontSize: 14, lineHeight: 1.6 }}>{c.desc}</p>
               <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
                 {c.items.map(it => (
@@ -321,7 +321,7 @@ function BackCTA() {
     <section style={{ textAlign: 'center', padding: '120px 0', background: INK, color: WHITE }}>
       <div style={containerStyle}>
         <span style={{ ...monoStyle, color: ACCENT, marginBottom: 20, display: 'block' }}>See it in action</span>
-        <h2 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", color: WHITE, maxWidth: 640, margin: '0 auto 20px', fontSize: 40, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+        <h2 style={{ fontFamily: "'Crimson Pro', Georgia, serif", color: WHITE, maxWidth: 640, margin: '0 auto 20px', fontSize: 40, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em' }}>
           DEX AI powers <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 400 }}>NEXUS.</em><br />See what it can do for you.
         </h2>
         <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 520, margin: '0 auto 36px', fontSize: 17, lineHeight: 1.6 }}>The best way to understand DEX AI is to experience the product it powers. Start with the Executive Introduction — about 15 minutes.</p>
@@ -347,7 +347,7 @@ function Footer() {
       <div style={containerStyle}>
         <div className="da-footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
           <div>
-            <h4 style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: 20, fontWeight: 700, marginBottom: 8, color: INK, lineHeight: 1.2, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <h4 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, marginBottom: 8, color: INK, lineHeight: 1.2, display: 'flex', alignItems: 'baseline', gap: 6 }}>
               DEX AI <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', color: G400, fontWeight: 400 }}>by LYC</span>
             </h4>
             <p style={{ color: G600, fontSize: 14, maxWidth: 280, marginTop: 16, lineHeight: 1.6 }}>The intelligence engine behind NEXUS. Multi-agent AI systems, specialized assessment models, and talent market data.</p>

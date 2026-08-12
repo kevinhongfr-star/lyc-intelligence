@@ -64,7 +64,7 @@ export default {
         'cream': '#FAFAFA',
       },
       fontFamily: {
-        serif: ['Libre Baskerville', 'Georgia', 'serif'],
+        serif: ['Crimson Pro', 'Georgia', 'serif'],
         sans: ['DM Sans', 'system-ui', 'sans-serif'],
       },
       fontSize: {

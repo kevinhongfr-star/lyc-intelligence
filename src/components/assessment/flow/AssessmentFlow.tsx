@@ -349,7 +349,7 @@ function ReviewScreen({
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
         <div style={{ ...monoStyle, color: accent, marginBottom: 16 }}>Review</div>
         <h1 style={{
-          fontFamily: "'Libre Baskerville', Georgia, serif",
+          fontFamily: "'Crimson Pro', Georgia, serif",
           fontSize: 32, fontWeight: 700, color: INK, lineHeight: 1.2, marginBottom: 12,
         }}>
           Ready to submit?
@@ -414,7 +414,7 @@ function SubmittingScreen({ accent }: { accent: string }) {
         animation: 'spin 1s linear infinite',
       }} />
       <h2 style={{
-        fontFamily: "'Libre Baskerville', Georgia, serif",
+        fontFamily: "'Crimson Pro', Georgia, serif",
         fontSize: 24, fontWeight: 700, color: INK, marginTop: 32, marginBottom: 8,
       }}>
         Analyzing your responses…
@@ -613,7 +613,7 @@ export function AssessmentFlow({ config }: Props) {
       }}>
         <div style={{ ...containerStyle, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Link to={landingPath} style={{
-            fontFamily: "'Libre Baskerville', Georgia, serif",
+            fontFamily: "'Crimson Pro', Georgia, serif",
             fontSize: 16, fontWeight: 700, color: INK, textDecoration: 'none',
             display: 'flex', alignItems: 'baseline', gap: 6,
           }}>
@@ -652,7 +652,7 @@ export function AssessmentFlow({ config }: Props) {
                 {config.code} Assessment
               </div>
               <h1 style={{
-                fontFamily: "'Libre Baskerville', Georgia, serif",
+                fontFamily: "'Crimson Pro', Georgia, serif",
                 fontSize: 32, fontWeight: 700, color: INK, lineHeight: 1.2, marginBottom: 16,
               }}>
                 {config.intro.title}
@@ -732,7 +732,7 @@ export function AssessmentFlow({ config }: Props) {
 
             {/* Question text */}
             <h1 style={{
-              fontFamily: "'Libre Baskerville', Georgia, serif",
+              fontFamily: "'Crimson Pro', Georgia, serif",
               fontSize: 28, fontWeight: 700, color: INK,
               lineHeight: 1.3, marginBottom: 8,
             }}>

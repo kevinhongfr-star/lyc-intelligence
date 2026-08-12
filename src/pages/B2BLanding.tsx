@@ -6,7 +6,7 @@ import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 import { SEO } from '@/components/seo/SEO';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'Crimson Pro', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   monoFont: "'IBM Plex Mono', ui-monospace, monospace",
   accent: '#C108AB',

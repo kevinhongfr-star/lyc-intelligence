@@ -14,7 +14,7 @@ import { toast } from '@/stores/toastStore';
 import { FileText, Trash2, Calendar, ExternalLink, X, Check } from 'lucide-react';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'Crimson Pro', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',

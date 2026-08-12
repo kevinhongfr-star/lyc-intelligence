@@ -22,7 +22,7 @@ export function KeyInsights({ config }: Props) {
         <div className={`${prefix}-reveal`} style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Key insights</span>
           <h2 className="section-heading" style={{
-            fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700,
+            fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20,
           }}>
             What you should <em style={{ fontWeight: 400 }}>pay attention to</em>
@@ -58,7 +58,7 @@ export function KeyInsights({ config }: Props) {
                   </span>
                 </div>
                 <h3 style={{
-                  fontFamily: "'Libre Baskerville', Georgia, serif",
+                  fontFamily: "'Crimson Pro', Georgia, serif",
                   fontSize: 20, fontWeight: 700, color: INK, marginBottom: 12, lineHeight: 1.25,
                 }}>
                   {insight.title}

@@ -44,7 +44,7 @@ const monoStyle: React.CSSProperties = {
 };
 
 const headingStyle: React.CSSProperties = {
-  fontFamily: "'Libre Baskerville', Georgia, serif",
+  fontFamily: "'Crimson Pro', Georgia, serif",
 };
 
 const bodyStyle: React.CSSProperties = {

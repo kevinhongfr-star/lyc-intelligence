@@ -10,7 +10,7 @@ import { Outlet, Link } from 'react-router-dom';
 import MarketingNav from '@/components/navigation/MarketingNav';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'Crimson Pro', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   bg: '#FFFFFF',

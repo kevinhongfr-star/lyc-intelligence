@@ -30,7 +30,7 @@ export function AssessmentHero({ config }: Props) {
       <div style={containerStyle} className={`${prefix}-reveal`}>
         <span style={{ ...monoStyle, color: accent, marginBottom: 28, display: 'inline-block' }}>{tagline}</span>
         <h1 className="hero-heading" style={{
-          fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700,
+          fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700,
           lineHeight: 1.15, color: INK, fontSize: 48,
           maxWidth: 760, margin: '0 auto 24px',
         }}>

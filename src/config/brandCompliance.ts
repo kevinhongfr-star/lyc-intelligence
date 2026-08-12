@@ -21,10 +21,10 @@ export const DESIGN_RULES = [
   },
   {
     id: 'canonical-fonts',
-    rule: '3-font system: Libre Baskerville (serif/headings) + DM Sans (sans/body) + IBM Plex Mono (mono/labels)',
+    rule: '3-font system: Crimson Pro (serif/headings) + DM Sans (sans/body) + IBM Plex Mono (mono/labels)',
     acceptanceCriteria:
       'No Inter, JetBrains Mono, Fira Code, or system-ui as primary. ' +
-      'Headings use Libre Baskerville. Body uses DM Sans. Code/labels/' +
+      'Headings use Crimson Pro. Body uses DM Sans. Code/labels/' +
       'metadata use IBM Plex Mono. Google Fonts import includes all 3.',
     verify: 'grep -rn "Inter\\|JetBrains\\|Fira Code" src/ | grep -v node_modules',
   },

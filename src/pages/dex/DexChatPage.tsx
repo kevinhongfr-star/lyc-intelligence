@@ -190,7 +190,7 @@ export function DexChatPage() {
               </div>
               <h2
                 className="text-2xl font-bold mb-2"
-                style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
+                style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
               >
                 Welcome to your Executive Introduction
               </h2>

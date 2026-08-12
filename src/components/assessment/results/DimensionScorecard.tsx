@@ -56,7 +56,7 @@ export function DimensionScorecard({ config }: Props) {
         <div className={`${prefix}-reveal`} style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Dimension scorecard</span>
           <h2 className="section-heading" style={{
-            fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700,
+            fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20,
           }}>
             Your five dimensions, <em style={{ fontWeight: 400 }}>at a glance</em>
@@ -86,7 +86,7 @@ export function DimensionScorecard({ config }: Props) {
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <span style={{
-                      fontFamily: "'Libre Baskerville', Georgia, serif",
+                      fontFamily: "'Crimson Pro', Georgia, serif",
                       fontSize: 20, fontWeight: 700, color: INK,
                     }}>
                       {d.name}

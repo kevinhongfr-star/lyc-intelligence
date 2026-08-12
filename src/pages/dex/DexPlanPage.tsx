@@ -182,7 +182,7 @@ export function DexPlanPage() {
           </div>
           <h1
             className="text-3xl font-bold text-[#1A1A2E] mb-2"
-            style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
+            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
           >
             Your Personalized Growth Path
           </h1>

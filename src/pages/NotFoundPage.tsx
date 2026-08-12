@@ -3,7 +3,7 @@
  *
  * Visual contract with LYC brand rollout:
  *   - Accent #C108AB (magenta) for primary CTA / accent bar
- *   - Display headings: Libre Baskerville serif
+ *   - Display headings: Crimson Pro serif
  *   - Body copy: DM Sans
  *   - Zero radius everywhere (no rounded corners)
  *   - No drop-shadow chrome — flat premium
@@ -50,7 +50,7 @@ export default function NotFoundPage() {
           />
           <div
             style={{
-              fontFamily: "'Libre Baskerville', Georgia, serif",
+              fontFamily: "'Crimson Pro', Georgia, serif",
               fontSize: 'clamp(72px, 12vw, 160px)',
               lineHeight: 0.92,
               fontWeight: 700,
@@ -95,7 +95,7 @@ export default function NotFoundPage() {
       >
         <h1
           style={{
-            fontFamily: "'Libre Baskerville', Georgia, serif",
+            fontFamily: "'Crimson Pro', Georgia, serif",
             fontSize: 'clamp(28px, 3.4vw, 44px)',
             lineHeight: 1.15,
             fontWeight: 700,

@@ -5,7 +5,7 @@ import { ShareCard } from '../components/share/ShareCard';
 import { getShareCard } from '../services/shareCardService';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'Crimson Pro', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',
