@@ -12,6 +12,7 @@ import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { isConsultantRole } from '@/services/portalClassification';
 import LeaderNav from '@/components/navigation/LeaderNav';
+import { SkipToContent } from '@/components/a11y/SkipToContent';
 
 const DS = {
   bodyFont: "'DM Sans', system-ui, sans-serif",
@@ -54,6 +55,7 @@ export function LeaderPortalLayout(): React.ReactElement {
       display: 'flex', minHeight: '100vh',
       background: DS.pageBg, fontFamily: DS.bodyFont,
     }} data-portal-kind="leader">
+      <SkipToContent targetId="leader-main" />
       <LeaderNav variant="sidebar" />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         {/* Top spacer for mobile */}

@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { SEO } from '@/components/seo/SEO';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { trackCTA, trackNexusFirstMessageSent, trackNexusChatInitiation } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
 
@@ -79,6 +79,7 @@ function setGuestCount(count: number) {
 export function NexusPage() {
   const { user, profile } = useAuthStore();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -87,6 +88,18 @@ export function NexusPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const firstMessageSentRef = useRef(false);
+
+  // #1324: Pre-fill the input when arriving with a `q` query param (e.g. from
+  // an "Ask NEXUS about this" CTA on the assessment results page).
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q) {
+      setInput(q);
+      // Focus the input so the user can review and send.
+      setTimeout(() => inputRef.current?.focus(), 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const isGuest = !user;
   const remaining = isGuest ? Math.max(0, GUEST_MESSAGE_LIMIT - guestCount) : Infinity;

@@ -122,8 +122,8 @@ export function Table<T extends Record<string, unknown>>({
   }
 
   return (
-    <div className={cn('bg-bg-secondary border border-bg-tertiary overflow-hidden', className)}>
-      <table className="w-full">
+    <div className={cn('bg-bg-secondary border border-bg-tertiary overflow-x-auto', className)}>
+      <table className="w-full min-w-[640px]">
         <thead>
           <tr
             className={cn(

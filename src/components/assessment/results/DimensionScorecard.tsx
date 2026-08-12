@@ -3,6 +3,7 @@ import {
   INK, G100, G200, G300, G400, G600, WHITE,
   monoStyle, containerStyle, makeSectionLabel,
 } from '../landing/shared';
+import { AskNexusButton } from './AskNexusButton';
 import type { AssessmentResultsConfig } from './types';
 
 interface Props {
@@ -40,14 +41,14 @@ function AnimatedBar({ score, accent }: { score: number; accent: string }) {
       <div style={{
         position: 'absolute', top: 0, left: 0, bottom: 0,
         width: `${width}%`, background: color,
-        transition: 'width 800ms cubic-bezier(0.16,1,0.3,1)',
+        transition: 'width 350ms cubic-bezier(0.16,1,0.3,1)',
       }} />
     </div>
   );
 }
 
 export function DimensionScorecard({ config }: Props) {
-  const { dimensions, accent, prefix } = config;
+  const { dimensions, accent, prefix, assessmentCode, assessmentName } = config;
   const sectionLabel = makeSectionLabel(accent);
 
   return (
@@ -105,6 +106,14 @@ export function DimensionScorecard({ config }: Props) {
                 }}>
                   <span style={{ fontSize: 11, color: G400 }}>{d.lowLabel}</span>
                   <span style={{ fontSize: 11, color: G400 }}>{d.highLabel}</span>
+                </div>
+                <div style={{ marginTop: 14 }}>
+                  <AskNexusButton
+                    dimension={d.name}
+                    assessmentCode={assessmentCode}
+                    accent={accent}
+                    question={`On my ${assessmentName} results, my "${d.name}" dimension scored ${d.score} out of 100. What does this score mean, and how should I develop this dimension?`}
+                  />
                 </div>
               </div>
             );

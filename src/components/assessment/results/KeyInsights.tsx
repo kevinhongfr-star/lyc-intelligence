@@ -5,6 +5,7 @@ import {
   monoStyle, containerStyle, makeSectionLabel,
   makeCardHoverHandlers,
 } from '../landing/shared';
+import { AskNexusButton } from './AskNexusButton';
 import type { AssessmentResultsConfig } from './types';
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export function KeyInsights({ config }: Props) {
-  const { insights, accent, prefix } = config;
+  const { insights, accent, prefix, assessmentCode, assessmentName } = config;
   const sectionLabel = makeSectionLabel(accent);
   const hoverHandlers = makeCardHoverHandlers(accent);
 
@@ -66,6 +67,14 @@ export function KeyInsights({ config }: Props) {
                 <p style={{ fontSize: 15, color: G600, lineHeight: 1.6, margin: 0 }}>
                   {insight.text}
                 </p>
+                <div style={{ marginTop: 20 }}>
+                  <AskNexusButton
+                    dimension={insight.title}
+                    assessmentCode={assessmentCode}
+                    accent={accent}
+                    question={`On my ${assessmentName} results, you flagged "${insight.title}" as a ${isStrength ? 'strength' : 'growth area'}. Can you explain this finding and how I should act on it?`}
+                  />
+                </div>
               </div>
             );
           })}

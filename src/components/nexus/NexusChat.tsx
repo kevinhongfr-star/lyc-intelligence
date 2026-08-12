@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from '@/stores/toastStore';
 import {
   ArrowRight, Shield, Loader2, RefreshCw, Paperclip,
@@ -7,6 +8,10 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditService';
 import { supabase } from '@/lib/supabase';
+import {
+  getUserAssessmentContext,
+  buildAssessmentContextForNexus,
+} from '@/nexus/assessmentContext';
 import { CreditGate } from './CreditGate';
 import { CareerInsight } from './CareerInsight';
 import { CouncilUpsell } from './CouncilUpsell';
@@ -104,12 +109,19 @@ function mapToCanonicalTier(tierStr: string | null | undefined): TIER_KEYS_CANON
 
 export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: NexusChatProps) {
   const { user, profile } = useAuthStore();
+  const [searchParams] = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
       content: buildNexusSystemPrompt().openingGreeting,
     },
   ]);
+  /**
+   * #1324: Assessment context string for the user (built from their actual
+   * assessment_results). Injected into the NEXUS system prompt and forwarded
+   * to the chat API so NEXUS can reference the user's real scores.
+   */
+  const [assessmentContextStr, setAssessmentContextStr] = useState<string>('');
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [aiState, setAiState] = useState<'idle' | 'thinking' | 'error'>('idle');
@@ -123,6 +135,15 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
   const canonicalTier = useMemo<TIER_KEYS_CANONICAL>(
     () => mapToCanonicalTier(creditTier),
     [creditTier],
+  );
+  /**
+   * #1324: Enriched NEXUS system prompt. When the user's assessment context
+   * is available, it is appended to the prompt so NEXUS can reference the
+   * user's actual results during the conversation.
+   */
+  const nexusPrompt = useMemo(
+    () => buildNexusSystemPrompt(assessmentContextStr),
+    [assessmentContextStr],
   );
   /** Miles balance, fetched on mount + CTA actions. */
   const [milesBalance, setMilesBalance] = useState<number | null>(null);
@@ -290,6 +311,38 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     loadSession();
   }, [user?.id]);
 
+  // #1324: Load the user's assessment context on mount so NEXUS can reference
+  // their actual assessment_results. Built into the system prompt (see
+  // nexusPrompt memo) and forwarded to the chat API (see sendMessage body).
+  useEffect(() => {
+    let cancelled = false;
+    if (!user?.id) {
+      setAssessmentContextStr('');
+      return;
+    }
+    getUserAssessmentContext(user.id)
+      .then((results) => {
+        if (cancelled) return;
+        const ctx = buildAssessmentContextForNexus(results);
+        setAssessmentContextStr(ctx.contextString);
+      })
+      .catch((e) => {
+        console.warn('[NexusChat] assessment context load failed (non-fatal):', e);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  // #1324: Pre-fill the input from the `q` query param (e.g. arriving from an
+  // "Ask NEXUS about this" CTA on the results page). Only pre-fills — the user
+  // reviews and sends, so credits are never spent without intent.
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q) setInput(q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   useEffect(() => {
     if (user?.id && sessionId) {
       localStorage.setItem(`nexus_chat_${user.id}`, JSON.stringify({
@@ -333,6 +386,9 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
           },
           tier: profile?.tier || creditTier,
           stream: false, // Use non-streaming for reliable tag parsing
+          // #1324: forward the user's assessment context so the server-side
+          // persona can inject the user's actual results into the system prompt.
+          assessment_context: assessmentContextStr || undefined,
         }),
         signal: controller.signal,
       });
@@ -634,7 +690,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     setSessionId(newId);
     setMessages([{
       role: 'assistant',
-      content: buildNexusSystemPrompt().openingGreeting,
+      content: nexusPrompt.openingGreeting,
     }]);
     setMessageCount(0);
     setShowSidebar(false);

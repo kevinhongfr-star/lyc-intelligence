@@ -13,6 +13,8 @@ import {
   MessageCircle,
   Phone,
   BarChart3,
+  Send,
+  ArrowUpRight,
 } from 'lucide-react';
 import {
   StatCard,
@@ -20,6 +22,7 @@ import {
   ActivityFeed,
 } from './DashboardWidgets';
 import { authFetch } from '@/utils/authFetch';
+import { QuickAssignAssessment } from '@/components/consultant/QuickAssignAssessment';
 
 export function ConsultantDashboard() {
   const [loading, setLoading] = useState(true);
@@ -27,6 +30,7 @@ export function ConsultantDashboard() {
   const [velocityData, setVelocityData] = useState<any>(null);
   const [activityData, setActivityData] = useState<any[]>([]);
   const [kpisData, setKpisData] = useState<any[]>([]);
+  const [assignOpen, setAssignOpen] = useState(false);
 
   useEffect(() => {
     loadAllData();
@@ -73,17 +77,51 @@ export function ConsultantDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Header — primary CTA above the fold */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">My Dashboard</h1>
+          <div
+            className="flex items-center gap-2 mb-1"
+            style={{
+              fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+              fontSize: '10px',
+              fontWeight: 700,
+              letterSpacing: '0.24em',
+              textTransform: 'uppercase',
+              color: '#C108AB',
+            }}
+          >
+            <BarChart3 className="w-3 h-3" />
+            <span>Consultant workspace</span>
+          </div>
+          <h1
+            className="text-2xl font-bold text-text-primary"
+            style={{ fontFamily: "'Crimson Pro', Georgia, serif", letterSpacing: '-0.01em' }}
+          >
+            My Dashboard
+          </h1>
           <p className="text-text-muted mt-1">Your pipeline and activity overview</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-text-muted">
-          <BarChart3 className="w-4 h-4" />
-          <span>Real-time data</span>
-        </div>
+        <button
+          onClick={() => setAssignOpen(true)}
+          className="inline-flex items-center gap-2 px-5 py-3 bg-accent text-white font-semibold hover:bg-accent-hover transition-all"
+          style={{
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontSize: '13px',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            minHeight: '44px',
+            transitionDuration: '200ms',
+            transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
+        >
+          <Send className="w-4 h-4" />
+          Assign Assessment
+        </button>
       </div>
+
+      {/* Recent activity — above the fold, premium panel */}
+      <RecentActivityPanel items={activityData} loading={loading} />
 
       {/* Top Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -254,6 +292,158 @@ export function ConsultantDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Quick assign modal */}
+      <QuickAssignAssessment
+        open={assignOpen}
+        onClose={() => setAssignOpen(false)}
+        onSent={() => {
+          // Refresh activity feed so the new invite surfaces immediately.
+          loadAllData();
+        }}
+      />
+    </div>
+  );
+}
+
+/* ── Recent activity panel (premium, above the fold) ─────────────────── */
+function RecentActivityPanel({
+  items,
+  loading,
+}: {
+  items: any[];
+  loading: boolean;
+}) {
+  const recent = (items || []).slice(0, 4);
+  const monoFont = "'IBM Plex Mono', 'Courier New', monospace";
+  const bodyFont = "'DM Sans', system-ui, sans-serif";
+  const headingFont = "'Crimson Pro', Georgia, serif";
+
+  return (
+    <div
+      className="bg-card border border-border"
+      style={{ padding: '18px 20px' }}
+    >
+      <div
+        className="flex items-center justify-between mb-3"
+        style={{ borderBottom: '1px solid var(--border, #E5E5E5)', paddingBottom: '12px' }}
+      >
+        <div>
+          <div
+            style={{
+              fontFamily: monoFont,
+              fontSize: '10px',
+              fontWeight: 700,
+              letterSpacing: '0.24em',
+              textTransform: 'uppercase',
+              color: '#C108AB',
+              marginBottom: '4px',
+            }}
+          >
+            Recent activity
+          </div>
+          <h3
+            style={{
+              margin: 0,
+              fontFamily: headingFont,
+              fontSize: '17px',
+              fontWeight: 700,
+              color: 'var(--text-primary, #000000)',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Latest in your pipeline
+          </h3>
+        </div>
+        <span
+          style={{
+            fontFamily: monoFont,
+            fontSize: '10px',
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: 'var(--text-muted, #666666)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}
+        >
+          <Clock className="w-3 h-3" /> Live
+        </span>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center gap-2 text-text-muted" style={{ padding: '10px 0' }}>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span style={{ fontFamily: bodyFont, fontSize: '13px' }}>Loading activity…</span>
+        </div>
+      ) : recent.length === 0 ? (
+        <div
+          style={{
+            padding: '14px 0',
+            fontFamily: bodyFont,
+            fontSize: '13px',
+            color: 'var(--text-muted, #666666)',
+          }}
+        >
+          No recent activity yet. Use <strong style={{ color: 'var(--text-primary, #000000)', fontWeight: 600 }}>Assign Assessment</strong> to send your first invite.
+        </div>
+      ) : (
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
+          {recent.map((item, i) => {
+            const label = item?.title || item?.description || item?.message || 'Activity';
+            const meta = item?.timestamp || item?.created_at || item?.time || '';
+            const kind = (item?.type || item?.kind || '').toString();
+            return (
+              <li
+                key={i}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '24px 1fr auto',
+                  gap: '12px',
+                  alignItems: 'center',
+                  padding: '10px 0',
+                  borderBottom:
+                    i < recent.length - 1 ? '1px solid var(--border, #E5E5E5)' : 'none',
+                }}
+              >
+                <span
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    background: '#C108AB',
+                    justifySelf: 'center',
+                  }}
+                />
+                <span
+                  style={{
+                    fontFamily: bodyFont,
+                    fontSize: '13px',
+                    color: 'var(--text-primary, #000000)',
+                    lineHeight: 1.4,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                  title={label}
+                >
+                  {label}
+                </span>
+                <span
+                  style={{
+                    fontFamily: monoFont,
+                    fontSize: '10px',
+                    letterSpacing: '0.1em',
+                    color: 'var(--text-muted, #666666)',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {kind || meta || ''}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

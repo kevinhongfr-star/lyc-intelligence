@@ -68,13 +68,13 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
       if (error || !data) {
         const { data: newData, error: insertError } = await supabase
           .from('credits')
-          .insert({ user_id: effectiveUserId, balance: 5, tier: 'explorer', total_earned: 5, total_spent: 0 })
+          .insert({ user_id: effectiveUserId, miles: 5, tier: 'explorer', total_earned: 5, total_spent: 0 })
           .select()
           .single();
 
         if (insertError) throw insertError;
         setCredit({
-          balance: newData.balance,
+          balance: newData.miles,
           tier: newData.tier as CreditTier,
           totalEarned: newData.total_earned,
           totalSpent: newData.total_spent,
@@ -82,13 +82,13 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
         });
       } else {
         const limits = CreditLimits[data.tier as CreditTier] || CreditLimits.explorer;
-        let balance = data.balance;
+        let balance = data.miles;
 
         if (data.tier === 'explorer' && balance < 5) {
           balance = 5;
           await supabase
             .from('credits')
-            .update({ balance: 5, updated_at: new Date().toISOString() })
+            .update({ miles: 5, updated_at: new Date().toISOString() })
             .eq('user_id', effectiveUserId);
         }
 
@@ -116,7 +116,7 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
       await supabase
         .from('credits')
         .update({
-          balance: newBalance,
+          miles: newBalance,
           total_spent: credit.totalSpent + amount,
           updated_at: new Date().toISOString(),
         })
@@ -159,7 +159,7 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
       await supabase
         .from('credits')
         .update({
-          balance: newBalance,
+          miles: newBalance,
           total_spent: Math.max(0, credit.totalSpent - amount),
           updated_at: new Date().toISOString(),
         })

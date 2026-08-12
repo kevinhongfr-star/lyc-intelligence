@@ -17,6 +17,7 @@ import {
 } from '@/services/monetizationService';
 import { trackUpgradeAttempt, trackCTA, trackBillingView } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
+import { EnterpriseContactForm } from '@/components/billing/EnterpriseContactForm';
 
 interface PricingPageProps {
   onUpgradeSuccess?: () => void;
@@ -47,6 +48,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
   const [currency, setCurrency] = useState<PricingCurrency>(detected);
   const [loadingTier, setLoadingTier] = useState<TierKey | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [enterpriseOpen, setEnterpriseOpen] = useState(false);
 
   const handleUpgrade = async (tierKey: TierKey) => {
     if (tierKey === 'explorer') {
@@ -273,6 +275,119 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
           })}
         </div>
       </div>
+
+      {/* Enterprise / Team tier — human contact CTA (#1326) */}
+      <div className="max-w-7xl mx-auto px-4 pb-16">
+        <div
+          className="relative border-2 border-accent bg-gradient-to-br from-accent/5 via-white to-white p-8 md:p-10 flex flex-col lg:flex-row items-start lg:items-center gap-8"
+          style={{ borderColor: '#C108AB' }}
+        >
+          <div className="flex-1">
+            <div
+              className="inline-flex items-center gap-1 bg-accent text-white px-3 py-1 text-xs font-semibold mb-4 whitespace-nowrap"
+              style={{ background: '#C108AB' }}
+            >
+              <Sparkles className="w-3 h-3" />
+              For Teams
+            </div>
+            <h3
+              className="text-2xl md:text-3xl font-bold text-text-primary mb-2"
+              style={{ fontFamily: "'Crimson Pro', Georgia, serif", letterSpacing: '-0.01em' }}
+            >
+              NEXUS for Teams &amp; Enterprise
+            </h3>
+            <p className="text-text-muted text-base max-w-2xl mb-5 leading-relaxed">
+              Seat-based deployment with SSO, custom framework training, mandate-level
+              confidentiality, and a dedicated point of contact. Built for retained search
+              practices, in-house talent teams, and boards.
+            </p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 max-w-2xl">
+              {[
+                'SSO, SCIM, SAML & role-based access',
+                'Custom framework training onboarding',
+                'Mandate-level confidentiality controls',
+                'Org-level usage & pipeline analytics',
+                'Dedicated human account contact',
+                'Council-tier seats for every desk',
+              ].map((benefit) => (
+                <li key={benefit} className="flex items-start gap-2 text-sm">
+                  <Check className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+                  <span className="text-text-secondary">{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex flex-col items-start lg:items-end gap-3 lg:min-w-[220px]">
+            <div
+              className="text-xs text-text-muted uppercase tracking-wide"
+              style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", letterSpacing: '0.2em' }}
+            >
+              Custom pricing
+            </div>
+            <div
+              className="text-3xl font-bold text-text-primary mb-1"
+              style={{ fontFamily: "'Crimson Pro', Georgia, serif", letterSpacing: '-0.01em' }}
+            >
+              Talk to sales
+            </div>
+            <button
+              onClick={() => {
+                trackCTA({
+                  location: 'pricing_enterprise',
+                  label: 'Request a demo',
+                  destination: 'enterprise_contact_form',
+                });
+                setEnterpriseOpen(true);
+              }}
+              className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-accent text-white font-semibold hover:bg-accent-hover transition-all"
+              style={{
+                background: '#C108AB',
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: '13px',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                minHeight: '48px',
+                transitionDuration: '200ms',
+                transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+              }}
+            >
+              Request a demo
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <p
+              className="text-xs text-text-muted text-center lg:text-right"
+              style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", letterSpacing: '0.14em', textTransform: 'uppercase' }}
+            >
+              Human follow-up · Not a bot
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Enterprise contact modal (#1326) — human, not NEXUS */}
+      {enterpriseOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Talk to our team"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(10,10,18,0.55)' }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setEnterpriseOpen(false);
+          }}
+        >
+          <div className="w-full max-w-xl max-h-[92vh] overflow-y-auto">
+            <EnterpriseContactForm
+              dismissible
+              onClose={() => setEnterpriseOpen(false)}
+              onSuccess={() => {
+                // Keep the success state visible briefly; modal auto-clears on close.
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Assessment Pricing Section */}
       <div className="max-w-6xl mx-auto px-4 pb-16">

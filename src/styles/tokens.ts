@@ -154,7 +154,7 @@ export const TRANSITIONS = {
   fast: '150ms ease-in-out',
   normal: '200ms ease-in-out',
   slow: '300ms ease-in-out',
-  slower: '500ms ease-in-out',
+  slower: '350ms ease-in-out',
 } as const;
 
 export type TransitionKey = keyof typeof TRANSITIONS;

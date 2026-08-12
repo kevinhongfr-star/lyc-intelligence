@@ -25,7 +25,7 @@ interface CreditBadgeProps {
 
 export function CreditBadge({ showBalance = true, size = 'md', unit = 'miles' }: CreditBadgeProps) {
   const { profile } = useAuthStore();
-  const balance = profile?.credits?.balance ?? 0;
+  const balance = profile?.credits?.miles ?? profile?.credits?.balance ?? 0;
   const tier = profile?.tier || 'explorer';
 
   const isLow = balance <= 5 && tier === 'explorer';
