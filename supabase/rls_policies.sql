@@ -85,6 +85,11 @@ CREATE POLICY profiles_select_self ON public.profiles
   );
 
 -- Profiles can UPDATE their own row only; admins full
+-- NOTE: privileged columns (role, tier, organization_id, subtype,
+-- miles_balance, billing/advisory fields) are protected by a
+-- BEFORE INSERT/UPDATE trigger — see
+-- supabase/migrations/20260812_role_escalation_prevention.sql
+-- (Ticket #1308 — Phase 3 role escalation prevention).
 DROP POLICY IF EXISTS profiles_update_self ON public.profiles;
 CREATE POLICY profiles_update_self ON public.profiles
   FOR UPDATE USING (

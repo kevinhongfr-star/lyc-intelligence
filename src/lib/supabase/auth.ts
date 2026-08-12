@@ -16,6 +16,39 @@ export interface AuthResult {
   data?: unknown;
 }
 
+// ── #1308: Privileged column allowlist ────────────────────────────
+// Columns a non-admin user is allowed to write to their own profile.
+// Anything NOT in this list is stripped before the update reaches the DB.
+// The DB trigger (20260812_role_escalation_prevention.sql) is the second
+// line of defense — this frontend filter prevents accidental writes and
+// surfaces a clear error to the UI.
+const PRIVILEGED_PROFILE_COLUMNS = new Set([
+  'role',
+  'tier',
+  'organization_id',
+  'subtype',
+  'miles_balance',
+  'stripe_customer_id',
+  'stripe_subscription_id',
+  'advisory_tier',
+  'council_tier',
+  'notion_profile_id',
+  'advisory_lane',
+  'id',          // PK — never writable via updateProfile
+  'created_at',  // immutable
+]);
+
+/** Strip privileged columns from a profile-update payload. */
+function stripPrivilegedColumns(
+  updates: Record<string, unknown>,
+): Record<string, unknown> {
+  const safe: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(updates)) {
+    if (!PRIVILEGED_PROFILE_COLUMNS.has(k)) safe[k] = v;
+  }
+  return safe;
+}
+
 // ── Sign in ──
 
 export async function signInWithPassword(
@@ -47,6 +80,10 @@ export async function signUp(
   name: string,
   metadata?: Record<string, unknown>,
 ): Promise<AuthResult> {
+  // #1308: never allow callers to override role/tier/organization_id via
+  // metadata. The DB trigger enforces this too, but stripping here keeps
+  // user_metadata clean and surfaces no false expectations in the UI.
+  const safeMetadata = metadata ? stripPrivilegedColumns(metadata) : {};
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -55,7 +92,7 @@ export async function signUp(
         name,
         tier: 'member',
         role: 'member',
-        ...metadata,
+        ...safeMetadata,
       },
     },
   });
@@ -130,9 +167,13 @@ export async function updateProfile(
   userId: string,
   updates: Record<string, unknown>,
 ) {
+  // #1308: strip privileged columns before they reach the DB. The DB
+  // trigger is the second line of defense; this prevents accidental
+  // writes and keeps the error path clean for legit callers.
+  const safeUpdates = stripPrivilegedColumns(updates);
   const { data, error } = await supabase
     .from('profiles')
-    .update({ ...updates, updated_at: new Date().toISOString() })
+    .update({ ...safeUpdates, updated_at: new Date().toISOString() })
     .eq('id', userId)
     .select()
     .single();

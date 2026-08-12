@@ -235,12 +235,26 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     const { supabase, user } = get();
     if (!supabase || !user) return { success: false, error: 'Not authenticated' };
 
+    // #1308: strip privileged columns before they reach the DB.
+    // role/tier/organization_id/subtype/miles_balance/billing fields are
+    // server-managed. The DB trigger is the second line of defense.
+    const PRIVILEGED = new Set([
+      'role', 'tier', 'organization_id', 'subtype', 'miles_balance',
+      'stripe_customer_id', 'stripe_subscription_id',
+      'advisory_tier', 'council_tier', 'notion_profile_id', 'advisory_lane',
+      'id', 'created_at',
+    ]);
+    const safeUpdates: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(updates)) {
+      if (!PRIVILEGED.has(k)) safeUpdates[k] = v;
+    }
+
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...safeUpdates, updated_at: new Date().toISOString() })
         .eq('id', user.id);
-      
+
       if (error) return { success: false, error: error.message };
       await get().loadProfile();
       return { success: true };
