@@ -130,13 +130,15 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Diagnostic accents — apply .report-accent-<slug> on .report-shell */
+  /* Diagnostic accents — apply .report-accent-<slug> on .report-shell.
+   * Values per #89 PDF spec (#89 ticket copy):
+   * PRISM=#C108AB SPARK=#FF6B35 FORGE=#1E88E5 BRIDGE=#00B4D8 MOSAIC=#7B2CBF DRIVE=#2D6A4F */
   .report-accent-prism  { --report-accent: #C108AB; --report-accent-ink: #760568; }
-  .report-accent-spark  { --report-accent: #7C3AED; --report-accent-ink: #4C1D95; }
-  .report-accent-forge  { --report-accent: #0A7A4E; --report-accent-ink: #064E31; }
-  .report-accent-bridge { --report-accent: #A86A00; --report-accent-ink: #704600; }
-  .report-accent-mosaic { --report-accent: #1E5A9E; --report-accent-ink: #103A69; }
-  .report-accent-drive  { --report-accent: #117A8B; --report-accent-ink: #07505B; }
+  .report-accent-spark  { --report-accent: #FF6B35; --report-accent-ink: #C94A15; }
+  .report-accent-forge  { --report-accent: #1E88E5; --report-accent-ink: #0E5AA2; }
+  .report-accent-bridge { --report-accent: #00B4D8; --report-accent-ink: #007B96; }
+  .report-accent-mosaic { --report-accent: #7B2CBF; --report-accent-ink: #4E1682; }
+  .report-accent-drive  { --report-accent: #2D6A4F; --report-accent-ink: #184330; }
 }
 
 /* ================================================================

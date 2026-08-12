@@ -19,6 +19,7 @@
     "@vercel/og": "^1.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "framer-motion": "^11.3.0",
+    "html2canvas": "^1.4.1",
     "jose": "^6.2.3",
     "jspdf": "^2.5.1",
     "lucide-react": "^0.400.0",

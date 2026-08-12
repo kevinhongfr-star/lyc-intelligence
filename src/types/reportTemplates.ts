@@ -31,6 +31,9 @@ import type {
   AssessmentDefinitionRow,
 } from '@/types/database';
 import type { TierKey } from '@/config/tierConfig';
+import { PdfReport } from '@/components/report/PdfReport';
+import { WebResultPage } from '@/components/report/WebResultPage';
+import { ShareResultEmail } from '@/components/email/ShareResultEmail';
 
 /* ── Template Identifiers ─────────────────────────────────────────── */
 
@@ -181,84 +184,123 @@ export function renderReport<Data, Ctx = unknown>(
   };
 }
 
-/* ── Registry stubs (8 templates) ──────────────────────────────────
- * Batch 1: registry entries with placeholder renderers.
- * Batch 2: replace each placeholder with real React implementations per #62/#1343.
- * Each entry is typed, so TS enforces contracts immediately.
+/* ── Registry (8 real templates, #62/#1343) ────────────────────────
+ * All 8 entries:
+ *   • validateData — structural check against AssessmentResultData shape
+ *   • applyTierRedactions — Executive Introduction cap (3 dims + 1 strength + truncated AI)
+ *   • render — real React component: WebResultPage / PdfReport / ShareResultEmail
  */
 
 type AssessmentResultTemplate = ReportTemplate<AssessmentResultData>;
 
-/** Placeholder that renders a "Template stub" banner — used until Batch 2. */
-function stubTemplate(id: B2CTemplateId, diagnostic: DiagnosticSlug | null, kind: TemplateKind, title: string): AssessmentResultTemplate {
+function baseValidateData(data: unknown): string[] {
+  const d = data as AssessmentResultData | null | undefined;
+  const issues: string[] = [];
+  if (!d) return ['data is null/undefined'];
+  if (!d.definition?.assessment_id) issues.push('definition.assessment_id is required');
+  if (typeof d.result?.overall_score !== 'number' || d.result.overall_score < 0 || d.result.overall_score > 100) {
+    issues.push('result.overall_score must be a number 0-100');
+  }
+  if (!Array.isArray(d.dimensions)) issues.push('dimensions must be an array');
+  if (!d.recipient?.name) issues.push('recipient.name is required');
+  return issues;
+}
+
+/**
+ * Tier redaction per #1343:
+ *   • executive_introduction → max 3 dimensions, summary-only AI insights + 1 strength, growth/next-steps hidden, ctaVariant = upgrade
+ *   • Professional+ → pass through unchanged
+ */
+function baseApplyTierRedactions(data: AssessmentResultData, viewerTier: TierKey | 'anonymous') {
+  if (viewerTier !== 'executive_introduction') {
+    return { data, ctaVariant: null as string | null };
+  }
+  const next: AssessmentResultData = { ...data };
+  if (next.aiInsights) {
+    next.aiInsights = {
+      summary: next.aiInsights.summary,
+      strengths: next.aiInsights.strengths.slice(0, 1),
+      growthAreas: [],
+      nextSteps: [],
+    };
+  }
+  if (next.dimensions && next.dimensions.length > 3) {
+    next.dimensions = next.dimensions.slice(0, 3);
+  }
+  return { data: next, ctaVariant: 'executive_introduction_upgrade' as const };
+}
+
+/**
+ * Builds a PDF template entry for a specific diagnostic slug.
+ * All 6 diagnostics share the <PdfReport> component — accent color is supplied
+ * by the `.report-accent-<slug>` CSS class applied by reportShellClass() inside
+ * PdfReport, so the variants diverge by accent color only (as #89 specifies).
+ */
+function diagnosticPdfTemplate(
+  id: B2CTemplateId,
+  slug: DiagnosticSlug,
+  title: string,
+): AssessmentResultTemplate {
   return {
     id,
-    diagnostic,
-    kind,
+    diagnostic: slug,
+    kind: 'pdf',
     title,
-    description: `${title} — stub implementation (Batch 2: #62/#1343 will replace)`,
-    validateData(data) {
-      const d = data as AssessmentResultData | null | undefined;
-      const issues: string[] = [];
-      if (!d) return ['data is null/undefined'];
-      if (!d.definition?.assessment_id) issues.push('definition.assessment_id is required');
-      if (typeof d.result?.overall_score !== 'number' || d.result.overall_score < 0 || d.result.overall_score > 100) {
-        issues.push('result.overall_score must be a number 0-100');
-      }
-      if (!Array.isArray(d.dimensions)) issues.push('dimensions must be an array');
-      if (!d.recipient?.name) issues.push('recipient.name is required');
-      return issues;
-    },
-    applyTierRedactions(data, viewerTier) {
-      // Executive Introduction redaction spec (#1343):
-      //  - AI insights: show summary only, hide growth areas/next steps
-      //  - Dimensions: show 3, truncate rest with "Upgrade to see all N"
-      //  - Insert upgrade CTA
-      if (viewerTier !== 'executive_introduction') {
-        return { data, ctaVariant: null };
-      }
-      const next = { ...data };
-      if (next.aiInsights) {
-        next.aiInsights = {
-          summary: next.aiInsights.summary,
-          strengths: next.aiInsights.strengths.slice(0, 1),
-          growthAreas: [],
-          nextSteps: [],
-        };
-      }
-      if (next.dimensions && next.dimensions.length > 3) {
-        next.dimensions = next.dimensions.slice(0, 3);
-      }
-      return { data: next, ctaVariant: 'executive_introduction_upgrade' };
-    },
+    description: `${title} — A4 PDF, zero border radius, ${slug} accent from #89 spec.`,
+    validateData: baseValidateData,
+    applyTierRedactions: baseApplyTierRedactions,
     render(data) {
-      const slug = data.definition.assessment_id ?? 'unknown';
-      return React.createElement(
-        'div',
-        {
-          className: `report-shell report-accent-${slug} report-a4`,
-          'data-template': id,
-          'data-stub': '1',
-          style: { padding: '32px', border: '2px dashed var(--report-border-strong)' },
-        },
-        React.createElement('p', { className: 'report-brand-mark' }, `TEMPLATE STUB — Batch 2 implementation`),
-        React.createElement('h1', { className: 'report-h1' }, title),
-        React.createElement('p',  { className: 'report-lead' }, `${data.recipient.name} — ${data.definition.title ?? slug}`),
-        React.createElement('p',  { className: 'report-body' }, `Overall score: ${data.result.overall_score} / 100 (${data.result.overall_level ?? '—'})`),
-      );
+      return React.createElement(PdfReport, { data, forPdfExport: true });
     },
   };
 }
 
 export const TEMPLATES: Record<B2CTemplateId, AssessmentResultTemplate> = {
-  'assessment/web/result':      stubTemplate('assessment/web/result',      null,    'web',   'Assessment Results — Shared Web Layout'),
-  'assessment/pdf/prism':       stubTemplate('assessment/pdf/prism',       'prism', 'pdf',   'PRISM — Career & Professional Branding PDF Report'),
-  'assessment/pdf/spark':       stubTemplate('assessment/pdf/spark',       'spark', 'pdf',   'SPARK — AI Leadership Readiness PDF Report'),
-  'assessment/pdf/forge':       stubTemplate('assessment/pdf/forge',       'forge', 'pdf',   'FORGE — Sales Excellence PDF Report'),
-  'assessment/pdf/bridge':      stubTemplate('assessment/pdf/bridge',      'bridge','pdf',   'BRIDGE — China Leadership Readiness PDF Report'),
-  'assessment/pdf/mosaic':      stubTemplate('assessment/pdf/mosaic',      'mosaic','pdf',   'MOSAIC — Cultural Intelligence PDF Report'),
-  'assessment/pdf/drive':       stubTemplate('assessment/pdf/drive',       'drive', 'pdf',   'DRIVE — Execution Capability Framework PDF Report'),
-  'assessment/email/share-result': stubTemplate('assessment/email/share-result', null, 'email', 'Share Result — Email Single-Pager'),
+  /* 1. assessment/web/result — shared web wrapper for all 6 diagnostics */
+  'assessment/web/result': {
+    id: 'assessment/web/result',
+    diagnostic: null,
+    kind: 'web',
+    title: 'Assessment Results — Shared Web Layout',
+    description: 'Result page: score hero, dimensions, AI insights, archetype, NEXUS CTA, share/export.',
+    validateData: baseValidateData,
+    applyTierRedactions: baseApplyTierRedactions,
+    render(data, ctx) {
+      return React.createElement(WebResultPage, {
+        data,
+        ctaVariant: ctx?.ctaVariant,
+        actions: ctx?.extras?.actions,
+      });
+    },
+  },
+
+  /* 2–7. One PDF entry per diagnostic slug */
+  'assessment/pdf/prism':  diagnosticPdfTemplate('assessment/pdf/prism',  'prism',  'PRISM — Career & Professional Branding PDF Report'),
+  'assessment/pdf/spark':  diagnosticPdfTemplate('assessment/pdf/spark',  'spark',  'SPARK — AI Leadership Readiness PDF Report'),
+  'assessment/pdf/forge':  diagnosticPdfTemplate('assessment/pdf/forge',  'forge',  'FORGE — Sales Excellence PDF Report'),
+  'assessment/pdf/bridge': diagnosticPdfTemplate('assessment/pdf/bridge', 'bridge', 'BRIDGE — China Leadership Readiness PDF Report'),
+  'assessment/pdf/mosaic': diagnosticPdfTemplate('assessment/pdf/mosaic', 'mosaic', 'MOSAIC — Cultural Intelligence PDF Report'),
+  'assessment/pdf/drive':  diagnosticPdfTemplate('assessment/pdf/drive',  'drive',  'DRIVE — Execution Capability Framework PDF Report'),
+
+  /* 8. assessment/email/share-result — email share card (used by #1348 Email Engine) */
+  'assessment/email/share-result': {
+    id: 'assessment/email/share-result',
+    diagnostic: null,
+    kind: 'email',
+    title: 'Share Result — Email Single-Pager',
+    description: 'SendCloud-safe 600px layout. Accepts shareUrl + senderNote via extras.',
+    validateData: baseValidateData,
+    applyTierRedactions: baseApplyTierRedactions,
+    render(data, ctx) {
+      const extras = ctx?.extras as { shareUrl?: string; senderNote?: string; senderName?: string } | undefined;
+      return React.createElement(ShareResultEmail, {
+        data,
+        shareUrl: extras?.shareUrl ?? (typeof window !== 'undefined' ? window.location.href : ''),
+        senderNote: extras?.senderNote,
+        senderName: extras?.senderName,
+      });
+    },
+  },
 };
 
 /* ── Lookup helpers ─────────────────────────────────────────────── */

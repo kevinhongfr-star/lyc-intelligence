@@ -13,18 +13,22 @@
 import type { DiagnosticSlug } from '@/types/assessment';
 
 // ── Diagnostic accent colors (matches .report-accent-<slug> classes) ──
+/**
+ * Diagnostic accent colors — values locked per #89 PDF spec.
+ * PRISM=#C108AB SPARK=#FF6B35 FORGE=#1E88E5 BRIDGE=#00B4D8 MOSAIC=#7B2CBF DRIVE=#2D6A4F
+ */
 export const DIAGNOSTIC_ACCENTS: Record<DiagnosticSlug, {
   accent: string;
   accent_ink: string;
   accent_5: string;
   accent_10: string;
 }> = {
-  prism:  { accent: '#C108AB', accent_ink: '#760568', accent_5: 'rgba(193,8,171,0.05)', accent_10: 'rgba(193,8,171,0.10)' },
-  spark:  { accent: '#7C3AED', accent_ink: '#4C1D95', accent_5: 'rgba(124,58,237,0.05)', accent_10: 'rgba(124,58,237,0.10)' },
-  forge:  { accent: '#0A7A4E', accent_ink: '#064E31', accent_5: 'rgba(10,122,78,0.05)', accent_10: 'rgba(10,122,78,0.10)' },
-  bridge: { accent: '#A86A00', accent_ink: '#704600', accent_5: 'rgba(168,106,0,0.05)', accent_10: 'rgba(168,106,0,0.10)' },
-  mosaic: { accent: '#1E5A9E', accent_ink: '#103A69', accent_5: 'rgba(30,90,158,0.05)', accent_10: 'rgba(30,90,158,0.10)' },
-  drive:  { accent: '#117A8B', accent_ink: '#07505B', accent_5: 'rgba(17,122,139,0.05)', accent_10: 'rgba(17,122,139,0.10)' },
+  prism:  { accent: '#C108AB', accent_ink: '#760568', accent_5:  rgba(193,  8,171,0.05), accent_10: rgba(193,  8,171,0.10) },
+  spark:  { accent: '#FF6B35', accent_ink: '#C94A15', accent_5:  rgba(255,107, 53,0.05), accent_10: rgba(255,107, 53,0.10) },
+  forge:  { accent: '#1E88E5', accent_ink: '#0E5AA2', accent_5:  rgba( 30,136,229,0.05), accent_10: rgba( 30,136,229,0.10) },
+  bridge: { accent: '#00B4D8', accent_ink: '#007B96', accent_5:  rgba(  0,180,216,0.05), accent_10: rgba(  0,180,216,0.10) },
+  mosaic: { accent: '#7B2CBF', accent_ink: '#4E1682', accent_5:  rgba(123, 44,191,0.05), accent_10: rgba(123, 44,191,0.10) },
+  drive:  { accent: '#2D6A4F', accent_ink: '#184330', accent_5:  rgba( 45,106, 79,0.05), accent_10: rgba( 45,106, 79,0.10) },
 };
 
 export type DiagnosticAccentKey = DiagnosticSlug;
