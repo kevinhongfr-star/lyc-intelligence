@@ -1,51 +1,184 @@
-/* Build v2026.05.28.4 — Light theme platform fix */
+/* Build v2026.08.12 — Phase 8 Design System Foundation (#33) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── LYC Design Tokens ── */
+/*
+ * #33 — ECHO v6.0 Canonical Design Tokens
+ * All tokens as CSS custom properties. Consumed by:
+ *   - Base component library (Button, Card, Modal, Toast, etc.)
+ *   - Portal shells (#81-#85)
+ *   - Report engine templates (#62-#70)
+ */
 :root {
-  /* Primary Colors */
-  --color-primary: #C108AB;
-  --color-primary-hover: #A00790;
-  --color-primary-light: rgba(193, 8, 171, 0.08);
-  
-  /* Background Colors */
-  --color-bg: #FFFFFF;
-  --color-bg-warm: #FAF8F5;
-  --color-bg-alt: #F5F5F5;
-  --color-card: #FFFFFF;
-  --color-card-border: #E5E5E5;
-  
-  /* Text Colors */
-  --color-text: #000000;
-  --color-text-secondary: #333333;
-  --color-muted: #666666;
-  --color-border: #E5E5E5;
-  
-  /* Accent Colors */
-  --color-teal: #00897B;
-  --color-success: #00897B;
-  --color-warning: #F59E0B;
-  --color-error: #DC2626;
-  
-  /* Typography */
-  --font-heading: 'Crimson Pro', Georgia, serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
-  
-  /* Spacing */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-  
-  /* Brand Rule: Zero Border Radius */
+  /* ============================================================
+   * 1. TYPOGRAPHY — Crimson Pro display + DM Sans body + IBM Plex Mono
+   * ============================================================ */
+  --font-display: 'Crimson Pro', Georgia, serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+
+  --font-weight-light:    300;
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* Type scale (desktop) */
+  --text-display:  48px;   /* Page hero */
+  --text-h1:       36px;   /* Section title */
+  --text-h2:       28px;   /* Subsection title */
+  --text-h3:       22px;   /* Card title */
+  --text-body-lg:  18px;   /* Lead paragraph */
+  --text-body:     16px;   /* Default body */
+  --text-body-sm:  14px;   /* Secondary text, labels */
+  --text-caption:  12px;   /* Captions, metadata */
+
+  /* Line heights */
+  --leading-display:  1.1;
+  --leading-heading:  1.2;
+  --leading-subhead:  1.25;
+  --leading-body:     1.6;
+  --leading-label:    1.4;
+
+  /* Letter spacing */
+  --tracking-tight:  -0.02em;
+  --tracking-normal:  0;
+  --tracking-wide:    0.05em;
+
+  /* ============================================================
+   * 2. COLOR — LYC v6 palette + semantic tokens
+   * ============================================================ */
+
+  /* Brand core */
+  --color-accent: #C108AB;
+  --color-accent-hover: #A00790;
+  --color-accent-pressed: #860678;
+  --color-accent-5:  rgba(193, 8, 171, 0.05);
+  --color-accent-10: rgba(193, 8, 171, 0.10);
+  --color-accent-20: rgba(193, 8, 171, 0.20);
+  --color-accent-90: rgba(193, 8, 171, 0.90);
+
+  /* Backgrounds */
+  --color-bg:          #FFFFFF;
+  --color-bg-warm:     #FAF8F5;
+  --color-bg-alt:      #F5F5F3;
+  --color-bg-canvas:   #FBFAF8;
+  --color-bg-dark:     #0A0A12;   /* For CTA sections, footers */
+  --color-card:        #FFFFFF;
+  --color-card-hover:  #FBFAF8;
+
+  /* Borders & dividers */
+  --color-border:       #E8E7E4;
+  --color-border-strong:#D3D1CC;
+  --color-border-subtle:#F0EFEB;
+  --color-divider:      #EEECE8;
+
+  /* Text */
+  --color-ink:        #0F1115;
+  --color-ink-soft:   #2A2C33;
+  --color-text:       #15151E;
+  --color-text-secondary: #4A4A58;
+  --color-muted:      #6B7280;
+  --color-muted-dim:  #9CA3AF;
+  --color-on-accent:  #FFFFFF;
+  --color-on-dark:    #FFFFFF;
+
+  /* Semantic */
+  --color-success:  #0D9488;  /* teal */
+  --color-teal:     #0D9488;
+  --color-warning:  #B45309;
+  --color-error:    #DC2626;
+  --color-info:     #1D4ED8;
+
+  /* Pastel utilities */
+  --color-sky:       #E0F2FE;
+  --color-mist:      #F1F5F9;
+  --color-lavender:  #F3E8FF;
+  --color-cream:     #FEF3C7;
+
+  /* ============================================================
+   * 3. SPACING — 4px base scale
+   * ============================================================ */
+  --space-0:  0px;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  28px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* Legacy aliases for backward compatibility */
+  --spacing-xs: var(--space-2);
+  --spacing-sm: var(--space-3);
+  --spacing-md: var(--space-4);
+  --spacing-lg: var(--space-6);
+  --spacing-xl: var(--space-8);
+
+  /* Content width */
+  --content-width-sm:   640px;
+  --content-width-md:   768px;
+  --content-width-base: 940px;
+  --content-width-lg:   1120px;
+  --content-width-xl:   1280px;
+
+  /* ============================================================
+   * 4. MOTION — 120-350ms envelope (from motion.css)
+   * ============================================================ */
+  --dur-fastest: 80ms;
+  --dur-faster:  120ms;
+  --dur-fast:    150ms;
+  --dur-normal:  200ms;
+  --dur-slow:    300ms;
+  --dur-slower:  350ms;
+  --dur-slowest: 350ms;
+
+  --ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:         cubic-bezier(0.4, 0, 0.8, 0.2);
+  --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ============================================================
+   * 5. LAYERING / Z-INDEX
+   * ============================================================ */
+  --z-base:       0;
+  --z-card:       10;
+  --z-navigation: 40;
+  --z-overlay:    80;
+  --z-modal:      100;
+  --z-popover:    120;
+  --z-toast:      160;
+  --z-tooltip:    180;
+
+  /* ============================================================
+   * 6. SHADOWS — paper editorial feel
+   * ============================================================ */
+  --shadow-none:    0 0 0 rgba(0,0,0,0);
+  --shadow-xs:      0 1px 2px rgba(15, 17, 21, 0.04);
+  --shadow-sm:      0 1px 3px rgba(15, 17, 21, 0.06);
+  --shadow-md:      0 4px 12px rgba(15, 17, 21, 0.08);
+  --shadow-lg:      0 8px 24px rgba(15, 17, 21, 0.10);
+  --shadow-xl:      0 16px 40px rgba(15, 17, 21, 0.12);
+  --shadow-overlay: 0 24px 64px rgba(15, 17, 21, 0.18);
+
+  /* ============================================================
+   * 7. RADIUS — BRAND RULE: zero border radius everywhere
+   * ============================================================ */
   --radius-none: 0px;
+  --radius:      0px;
+  --radius-md:   0px;
+  --radius-lg:   0px;
+  --radius-full: 9999px;   /* preserved ONLY for circular elements (score rings, avatars) */
 }
 
 /* ── LYC Brand Rule: ZERO BORDER RADIUS ── */
@@ -1294,6 +1427,124 @@ body {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 1fr));
     gap: 40px;
+  }
+}
+
+/* ================================================================
+ * #33 — RESPONSIVE BREAKPOINTS (canonical system-wide)
+ * Mobile-first: 0px base, breakpoints go up from there.
+ * ================================================================ */
+@custom-media --bp-sm (min-width: 480px);   /* small phones → large phones */
+@custom-media --bp-md (min-width: 768px);   /* tablet */
+@custom-media --bp-lg (min-width: 1024px);  /* laptop / small desktop */
+@custom-media --bp-xl (min-width: 1280px);  /* desktop */
+@custom-media --bp-2xl (min-width: 1536px); /* large desktop */
+@custom-media --bp-sm-down (max-width: 479px);
+@custom-media --bp-md-down (max-width: 767px);
+@custom-media --bp-lg-down (max-width: 1023px);
+@custom-media --bp-xl-down (max-width: 1279px);
+@custom-media --bp-reduced-motion (prefers-reduced-motion: reduce);
+
+/* ================================================================
+ * #33 — PRINT STYLESHEET — for reports, dashboards, key views
+ * Zero border radius preserved. Optimize for A4 + Letter.
+ * ================================================================ */
+@media print {
+  @page {
+    margin: 20mm 16mm;
+    size: A4;
+  }
+
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+
+  /* Hide all chrome */
+  nav, footer, header, aside, .no-print, [data-no-print],
+  button, .nav-shell, .topbar-shell, .sidebar-shell,
+  .toast-container, .modal-overlay, .command-palette,
+  .surface-tabs, .navigation-drawer {
+    display: none !important;
+  }
+
+  /* Full bleed for content */
+  main, .print-content, [data-print="page"] {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    background: #fff !important;
+  }
+
+  /* Typography for print */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Crimson Pro', Georgia, serif !important;
+    page-break-after: avoid;
+    color: #000 !important;
+  }
+  body, p, li, td, th, div, span {
+    font-family: 'DM Sans', sans-serif !important;
+    color: #000 !important;
+  }
+  code, pre, .mono {
+    font-family: 'IBM Plex Mono', monospace !important;
+  }
+
+  /* Links — print URL after text */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #444 !important;
+  }
+
+  /* Cards: remove shadows, add thin borders (for print visibility) */
+  .card, [class*="Card"], .print-card {
+    box-shadow: none !important;
+    border: 0.5pt solid #bbb !important;
+    background: #fff !important;
+    break-inside: avoid;
+  }
+
+  /* Tables: clean print */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 0.5pt solid #ccc !important;
+    padding: 4pt 8pt !important;
+  }
+  th {
+    background: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Page break rules */
+  h1, h2, h3, h4, h5, h6 { page-break-after: avoid; }
+  table, figure, img, svg, .chart, .avoid-break { page-break-inside: avoid; }
+  .page-break { page-break-before: always; }
+  .no-break { page-break-inside: avoid; }
+
+  /* Accent colors: force exact print */
+  .score-circle, .accent-text, [style*="--color-accent"] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* ================================================================
+ * #33 — REDUCED MOTION — disable all animations/transitions
+ * ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
