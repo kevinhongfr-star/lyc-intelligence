@@ -6,6 +6,7 @@
 /* @import MUST come before all other non-tailwind CSS statements per Vite CSS spec. */
 @import './styles/motion.css';
 @import './styles/dark-mode.css';
+@import './styles/reportTokens.css';   /* #61 Report design tokens (B2C: PDF/Print/Email) */
 
 /*
  * #33 — ECHO v6.0 Canonical Design Tokens

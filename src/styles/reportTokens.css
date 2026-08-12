@@ -1,0 +1,609 @@
+/**
+ * styles/reportTokens.css — #61 Report Design System Tokens (B2C only)
+ *
+ * Scoped under .report-* classes so tokens don't bleed into the main app
+ * (which uses the index.css ECHO tokens). These tokens OPTIMISE FOR:
+ *
+ *   1. PDF export (html2canvas + jsPDF via pdf.ts infrastructure)
+ *   2. Physical print (A4 / US Letter via @page rules)
+ *   3. Email inlined CSS (SendCloud adapter — @layer email-css uses
+ *      simple rules that email clients render reliably)
+ *
+ * Brand continuity with index.css:
+ *   - Zero border radius on ALL elements
+ *   - Crimson Pro headings, DM Sans body, IBM Plex Mono for data/numbers
+ *   - Core accent #C108AB (LYC signature fuchsia) — per-diagnostic accents
+ *     apply via --report-accent override scoped to each diagnostic report
+ *
+ * USAGE:
+ *   - Report pages: <div className="report-shell report-a4"> ... </div>
+ *   - PDF rendering: wrap HTML in .report-shell + .report-a4 / .report-letter
+ *   - Email templates: wrap in .email-shell + @layer email-css rules
+ *
+ * THIS FILE IS @imported from index.css — DO NOT @import from here back out.
+ */
+
+@layer report-base, report-pages, report-components, report-print, email-css;
+
+/* ================================================================
+ * LAYER: report-base — Design tokens for reports
+ * ================================================================ */
+@layer report-base {
+  .report-shell {
+    /* ── 1. Typography (report-optimised scale) ─────────────── */
+    --report-font-display: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+    --report-font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --report-font-mono: 'IBM Plex Mono', 'SF Mono', Menlo, Consolas, monospace;
+
+    --report-weight-light:    300;
+    --report-weight-regular:  400;
+    --report-weight-medium:   500;
+    --report-weight-semibold: 600;
+    --report-weight-bold:     700;
+
+    /* Type scale — physical documents feel denser than web */
+    --report-text-hero:      40px;  /* cover page branding + overall score */
+    --report-text-cover-h1:  32px;  /* diagnostic name on cover */
+    --report-text-h1:        22px;  /* section title (e.g. DIMENSIONS) */
+    --report-text-h2:        18px;  /* sub-section (dimension name) */
+    --report-text-h3:        15px;  /* card / insight header */
+    --report-text-lead:      14px;  /* executive summary lead */
+    --report-text-body:      12px;  /* body copy */
+    --report-text-caption:   10px;  /* caption, labels, footnotes */
+    --report-text-mono:      11px;  /* data / numeric readouts */
+
+    --report-leading-tight:  1.15;
+    --report-leading-heading:1.25;
+    --report-leading-body:   1.55;
+    --report-leading-mono:   1.4;
+
+    --report-tracking-title: -0.01em;
+    --report-tracking-body:   0.005em;
+    --report-tracking-mono:   0.02em;
+
+    /* ── 2. Color palette (print-safe CMYK-friendly values) ── */
+    --report-accent:         #C108AB;  /* LYC fuchsia — override per diagnostic */
+    --report-accent-5:       rgba(193,8,171,0.05);
+    --report-accent-10:      rgba(193,8,171,0.10);
+    --report-accent-20:      rgba(193,8,171,0.20);
+    --report-accent-ink:     #760568;  /* darker, more CMYK-safe variant */
+
+    --report-ink:            #0A0A0A;  /* near-black for print (not pure #000) */
+    --report-ink-soft:       #2E2C2C;
+    --report-text:           #1A1A1A;
+    --report-text-secondary: #5A5A5A;
+    --report-muted:          #8C8C8C;
+    --report-muted-dim:      #B5B5B5;
+
+    --report-paper:          #FFFFFF;
+    --report-paper-cream:    #FBFAF8;   /* alt page backgrounds for multi-chapter */
+    --report-paper-alt:      #F6F5F3;   /* card fills */
+    --report-card:           #FFFFFF;
+    --report-card-alt:       #FAFAF8;
+
+    --report-border:         #E8E5E2;
+    --report-border-strong:  #C9C5C0;
+    --report-border-subtle:  #F0EEEB;
+    --report-divider:        #DDDAD6;
+
+    --report-success:        #0A7A4E;
+    --report-teal:           #117A8B;
+    --report-warning:        #A86A00;
+    --report-error:          #9A2336;
+    --report-info:           #1E5A9E;
+    --report-sky:            #2D6E9E;
+    --report-lavender:       #5C4E95;
+    --report-cream:          #C6A964;
+
+    /* ── 3. Spacing (print: 4px/8px rhythm for tight alignment) ─ */
+    --report-space-1:  4px;
+    --report-space-2:  8px;
+    --report-space-3:  12px;
+    --report-space-4:  16px;
+    --report-space-5:  20px;
+    --report-space-6:  24px;
+    --report-space-8:  32px;
+    --report-space-10: 40px;
+    --report-space-12: 48px;
+    --report-space-16: 64px;
+
+    /* ── 4. Dimension + gauge palette ──────────────────────── */
+    --report-dim-1: #C108AB;   /* accent: highest-weight dim */
+    --report-dim-2: #117A8B;
+    --report-dim-3: #A86A00;
+    --report-dim-4: #1E5A9E;
+    --report-dim-5: #5C4E95;
+    --report-dim-6: #0A7A4E;
+
+    /* ── 5. Radius (ZERO) + shadow (very subtle print-safe) ── */
+    --report-radius:  0;      /* NEVER override */
+    --report-shadow-card:  0 1px 0 rgba(10,10,10,0.04);  /* hairline only */
+    --report-shadow-none:  none;
+
+    color: var(--report-text);
+    font-family: var(--report-font-body);
+    font-size: var(--report-text-body);
+    line-height: var(--report-leading-body);
+    background: var(--report-paper);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Diagnostic accents — apply .report-accent-<slug> on .report-shell */
+  .report-accent-prism  { --report-accent: #C108AB; --report-accent-ink: #760568; }
+  .report-accent-spark  { --report-accent: #7C3AED; --report-accent-ink: #4C1D95; }
+  .report-accent-forge  { --report-accent: #0A7A4E; --report-accent-ink: #064E31; }
+  .report-accent-bridge { --report-accent: #A86A00; --report-accent-ink: #704600; }
+  .report-accent-mosaic { --report-accent: #1E5A9E; --report-accent-ink: #103A69; }
+  .report-accent-drive  { --report-accent: #117A8B; --report-accent-ink: #07505B; }
+}
+
+/* ================================================================
+ * LAYER: report-pages — Physical page sizing
+ * A4 (210mm x 297mm) primary, US Letter (8.5in x 11in) alt
+ * ================================================================ */
+@layer report-pages {
+  .report-a4 {
+    /* Inner content area — accounts for 16mm margins, so PDF ≈ A4 page */
+    width: 178mm;           /* 210mm - 2×16mm = 178mm */
+    min-height: 265mm;      /* 297mm - 2×16mm = 265mm (min, flex expands) */
+    padding: 16mm 18mm;
+    max-width: 178mm;
+  }
+  .report-letter {
+    width: 6.5in;           /* 8.5 - 2×1.0in margins */
+    min-height: 9.0in;      /* 11  - 2×1.0in */
+    padding: 1.0in 1.0in;
+    max-width: 6.5in;
+  }
+  @media screen {
+    .report-a4, .report-letter {
+      background: var(--report-paper);
+      border: 1px solid var(--report-border-strong);
+      box-shadow: var(--report-shadow-card);
+      margin: var(--report-space-6) auto;
+    }
+  }
+
+  /* Page break helpers */
+  .report-page-break { page-break-before: always; break-before: page; }
+  .report-avoid-break { page-break-inside: avoid; break-inside: avoid; }
+  .report-chapter { page-break-before: always; break-before: page; }
+  h1.report-h1, h2.report-h2, h3.report-h3 { page-break-after: avoid; }
+  table.report-table, figure.report-figure, .report-card, .report-gauge-wrap {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}
+
+/* ================================================================
+ * LAYER: report-components — reusable semantic classes
+ * ================================================================ */
+@layer report-components {
+  .report-h1 {
+    font-family: var(--report-font-display);
+    font-weight: var(--report-weight-semibold);
+    font-size: var(--report-text-h1);
+    line-height: var(--report-leading-heading);
+    letter-spacing: var(--report-tracking-title);
+    color: var(--report-ink);
+    margin: 0 0 var(--report-space-4) 0;
+  }
+  .report-h2 {
+    font-family: var(--report-font-display);
+    font-weight: var(--report-weight-semibold);
+    font-size: var(--report-text-h2);
+    line-height: var(--report-leading-heading);
+    color: var(--report-ink);
+    margin: 0 0 var(--report-space-3) 0;
+  }
+  .report-h3 {
+    font-family: var(--report-font-display);
+    font-weight: var(--report-weight-medium);
+    font-size: var(--report-text-h3);
+    line-height: var(--report-leading-heading);
+    color: var(--report-ink-soft);
+    margin: 0 0 var(--report-space-2) 0;
+  }
+  .report-hero {
+    font-family: var(--report-font-display);
+    font-weight: var(--report-weight-bold);
+    font-size: var(--report-text-hero);
+    line-height: var(--report-leading-tight);
+    letter-spacing: var(--report-tracking-title);
+    color: var(--report-ink);
+    margin: 0;
+  }
+  .report-lead {
+    font-size: var(--report-text-lead);
+    color: var(--report-text);
+    line-height: 1.65;
+    margin: 0;
+  }
+  .report-body { font-size: var(--report-text-body); margin: 0; color: var(--report-text); }
+  .report-caption {
+    font-size: var(--report-text-caption);
+    color: var(--report-muted);
+    margin: 0;
+  }
+  .report-mono {
+    font-family: var(--report-font-mono);
+    font-size: var(--report-text-mono);
+    line-height: var(--report-leading-mono);
+    letter-spacing: var(--report-tracking-mono);
+    color: var(--report-ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .report-accent-text { color: var(--report-accent); }
+
+  .report-rule {
+    border: 0;
+    border-top: 1px solid var(--report-divider);
+    margin: var(--report-space-6) 0;
+  }
+  .report-rule-accent {
+    border: 0;
+    border-top: 2px solid var(--report-accent);
+    margin: var(--report-space-5) 0;
+  }
+
+  .report-card {
+    background: var(--report-card);
+    border: 1px solid var(--report-border);
+    padding: var(--report-space-4);
+    margin: 0 0 var(--report-space-4) 0;
+    border-radius: 0;
+  }
+  .report-card-alt {
+    background: var(--report-card-alt);
+    border: 1px solid var(--report-border-subtle);
+    padding: var(--report-space-4);
+  }
+
+  /* Brand strip — LYC accent bar used on covers + section headers */
+  .report-brand-strip {
+    height: 6px;
+    background: var(--report-accent);
+    width: 100%;
+  }
+  .report-brand-mark {
+    font-family: var(--report-font-mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--report-muted);
+  }
+
+  /* Data row for KPIs — label + mono number */
+  .report-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: var(--report-space-3);
+    margin: var(--report-space-4) 0;
+  }
+  .report-kpi {
+    border-top: 3px solid var(--report-accent);
+    background: var(--report-card-alt);
+    padding: var(--report-space-3);
+  }
+  .report-kpi .kpi-label {
+    font-family: var(--report-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--report-text-secondary);
+  }
+  .report-kpi .kpi-value {
+    display: block;
+    margin-top: var(--report-space-1);
+    font-family: var(--report-font-display);
+    font-weight: var(--report-weight-semibold);
+    font-size: 26px;
+    color: var(--report-ink);
+  }
+  .report-kpi .kpi-sub {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--report-font-mono);
+    font-size: 10px;
+    color: var(--report-muted);
+  }
+
+  /* Dimension bar — label + score bar (100% width track, accent fill) */
+  .report-dim-row {
+    display: grid;
+    grid-template-columns: 160px minmax(0,1fr) 50px;
+    gap: var(--report-space-3);
+    align-items: center;
+    padding: var(--report-space-2) 0;
+    border-bottom: 1px solid var(--report-border-subtle);
+  }
+  .report-dim-label {
+    font-size: var(--report-text-body);
+    color: var(--report-ink-soft);
+    font-weight: var(--report-weight-medium);
+  }
+  .report-dim-track {
+    height: 10px;
+    background: var(--report-paper-alt);
+    border: 1px solid var(--report-border-subtle);
+    overflow: hidden;
+  }
+  .report-dim-fill {
+    height: 100%;
+    background: var(--report-accent);
+    width: var(--dim-fill, 0%);
+    transition: width 200ms linear;
+  }
+  .report-dim-score {
+    font-family: var(--report-font-mono);
+    font-size: var(--report-text-mono);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--report-ink-soft);
+  }
+
+  /* Insight cards (tier-labeled) */
+  .report-insight {
+    border-left: 3px solid var(--report-accent);
+    background: var(--report-accent-5);
+    padding: var(--report-space-3) var(--report-space-4);
+    margin: var(--report-space-3) 0;
+  }
+  .report-insight-label {
+    display: block;
+    font-family: var(--report-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--report-accent-ink);
+    margin-bottom: var(--report-space-1);
+  }
+  .report-insight-body {
+    font-size: var(--report-text-body);
+    color: var(--report-ink-soft);
+    line-height: var(--report-leading-body);
+    margin: 0;
+  }
+
+  /* Score gauge — centered circle + numeric overlay */
+  .report-gauge-wrap {
+    width: 180px;
+    height: 180px;
+    position: relative;
+  }
+  .report-gauge-svg { width: 100%; height: 100%; }
+  .report-gauge-track { fill: none; stroke: var(--report-border); stroke-width: 10; }
+  .report-gauge-fill  { fill: none; stroke: var(--report-accent); stroke-width: 10; stroke-linecap: square; }
+  .report-gauge-value {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-family: var(--report-font-display);
+    font-weight: var(--report-weight-bold);
+    font-size: 56px;
+    color: var(--report-ink);
+    line-height: 1;
+  }
+  .report-gauge-label {
+    position: absolute; left:0; right:0; bottom: 40px;
+    text-align: center;
+    font-family: var(--report-font-mono);
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--report-muted);
+  }
+
+  /* Print-optimised table */
+  table.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--report-text-body);
+    margin: var(--report-space-4) 0;
+  }
+  table.report-table th {
+    text-align: left;
+    font-family: var(--report-font-mono);
+    font-size: var(--report-text-caption);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--report-text-secondary);
+    background: var(--report-card-alt);
+    padding: 8px 10px;
+    border-top: 2px solid var(--report-border-strong);
+    border-bottom: 1px solid var(--report-border);
+    font-weight: var(--report-weight-medium);
+  }
+  table.report-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--report-border-subtle);
+    vertical-align: top;
+    color: var(--report-text);
+  }
+  table.report-table tr:last-child td { border-bottom: 2px solid var(--report-border-strong); }
+
+  /* Footer — page number, confidentiality, brand */
+  .report-footer-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: var(--report-space-2) 0 0;
+    border-top: 1px solid var(--report-border-subtle);
+    margin-top: var(--report-space-4);
+    font-family: var(--report-font-mono);
+    font-size: 9px;
+    color: var(--report-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .report-footer-left { text-align: left; }
+  .report-footer-center { text-align: center; }
+  .report-footer-right { text-align: right; }
+
+  /* Confidentiality banner — used on cover + footer */
+  .report-confidential {
+    border: 1px solid var(--report-border-subtle);
+    padding: var(--report-space-2) var(--report-space-3);
+    font-family: var(--report-font-mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--report-text-secondary);
+    background: var(--report-card-alt);
+    text-align: center;
+  }
+}
+
+/* ================================================================
+ * LAYER: report-print — @media print overrides for physical/PDF
+ * ================================================================ */
+@layer report-print {
+  @media print, screen {
+    /* Force exact colour fidelity for PDF renderers */
+    .report-shell { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @media print {
+    .report-shell {
+      background: #fff !important;
+      color: #000 !important;
+      box-shadow: none !important;
+      border: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    /* Body reset when printing reports */
+    body:has(.report-shell) {
+      background: #fff !important;
+      margin: 0 !important;
+    }
+    @page { margin: 0; size: A4; }
+    .report-a4 { @page { size: A4; } }
+    .report-letter { @page { size: Letter; } }
+
+    /* Hide any surrounding chrome when printing report nodes */
+    .report-shell ~ *,
+    .report-shell * { visibility: visible; }
+    .report-no-print, .report-shell .no-print, .report-shell [data-no-print] { display: none !important; }
+  }
+}
+
+/* ================================================================
+ * LAYER: email-css — SendCloud-safe inlineable rules
+ *   Keep selectors FLAT, NO media queries that Outlook will strip,
+ *   NO pseudo-classes, NO custom properties in final output (the
+ *   SendCloud adapter inlines these values via string replacement).
+ *   Values are DUPLICATED here so email templates use a flat subset.
+ * ================================================================ */
+@layer email-css {
+  .email-shell {
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #1a1a1a;
+    background: #fbfaf8;
+    margin: 0;
+    padding: 24px 0;
+  }
+  .email-body {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid #e8e5e2;
+  }
+  .email-header-strip { height: 6px; background: #C108AB; }
+  .email-inner { padding: 32px 36px; }
+  .email-brand-mark {
+    font-family: 'IBM Plex Mono', Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #8c8c8c;
+    margin-bottom: 16px;
+  }
+  .email-h1 {
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #0a0a0a;
+    margin: 0 0 12px 0;
+  }
+  .email-h2 {
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #0a0a0a;
+    margin: 24px 0 8px 0;
+  }
+  .email-lead {
+    font-size: 15px;
+    color: #2e2c2c;
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+  }
+  .email-body-text { font-size: 14px; color: #1a1a1a; margin: 0 0 12px 0; }
+  .email-rule { border-top: 1px solid #dddad6; margin: 24px 0; }
+  .email-card {
+    background: #fafaf8;
+    border: 1px solid #e8e5e2;
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+  .email-card-label {
+    font-family: 'IBM Plex Mono', Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #760568;
+    margin-bottom: 6px;
+  }
+  .email-metric {
+    display: inline-block;
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #C108AB;
+    margin-right: 8px;
+  }
+  .email-metric-label {
+    font-family: 'IBM Plex Mono', Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #5a5a5a;
+  }
+  .email-cta-button {
+    display: inline-block;
+    background: #C108AB;
+    color: #ffffff !important;
+    text-decoration: none;
+    padding: 14px 24px;
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    margin: 16px 0;
+  }
+  .email-muted {
+    font-size: 12px;
+    color: #8c8c8c;
+    line-height: 1.5;
+  }
+  .email-signature {
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid #e8e5e2;
+    font-size: 13px;
+    color: #2e2c2c;
+  }
+  .email-signature .sig-name { font-weight: 600; color: #0a0a0a; }
+  .email-signature .sig-role { color: #5a5a5a; }
+  .email-footer {
+    padding: 16px 36px 32px;
+    background: #f6f5f3;
+    font-family: 'IBM Plex Mono', Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: #8c8c8c;
+    line-height: 1.5;
+  }
+  .email-footer a { color: #8c8c8c; }
+}
