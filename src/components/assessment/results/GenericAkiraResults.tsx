@@ -240,7 +240,7 @@ export function GenericAkiraResults({
           <div style={{
             width: 32, height: 32, border: `2px solid ${G200}`,
             borderTopColor: ACCENT,
-            animation: 'spin 0.8s linear infinite',
+            animation: 'spin 350ms linear infinite',
             margin: '0 auto 24px',
           }} />
           <p style={{ color: G600, fontSize: 14 }}>Loading your {instrumentKey} results…</p>

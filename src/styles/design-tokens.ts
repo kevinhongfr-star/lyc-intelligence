@@ -363,9 +363,9 @@ export const MOTION = {
       slow: '300ms',
     },
     complex: {
-      fast: '400ms',
-      base: '500ms',
-      slow: '600ms',
+      fast: '300ms',
+      base: '350ms',
+      slow: '350ms',
     },
   },
   easing: {

@@ -364,7 +364,7 @@ export function ProgressPage() {
                               height: '100%',
                               width: `${score}%`,
                               background: color,
-                              transition: 'width 0.5s ease'
+                              transition: 'width 350ms ease'
                             }} />
                           </div>
                         </div>

@@ -11,6 +11,7 @@ import { ArchetypeProfile } from './ArchetypeProfile';
 import { KeyInsights } from './KeyInsights';
 import { DevelopmentPlan } from './DevelopmentPlan';
 import { NEXUSCTA } from './NEXUSCTA';
+import { CrossDiagnosticSummary } from './CrossDiagnosticSummary';
 import { ShareRetake } from './ShareRetake';
 import type { AssessmentResultsConfig } from './types';
 
@@ -116,6 +117,12 @@ export function AssessmentResults({ config }: Props) {
         <KeyInsights config={config} />
         <DevelopmentPlan config={config} />
         <NEXUSCTA config={config} />
+        <CrossDiagnosticSummary
+          assessmentCode={config.assessmentCode}
+          accent={config.accent}
+          prefix={config.prefix}
+          nexusPath={config.nexusPath}
+        />
         <ShareRetake config={config} />
       </main>
       <Footer config={config} />

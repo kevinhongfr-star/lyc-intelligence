@@ -484,6 +484,55 @@ export function runRecommendationEngine(userMessage: string): RecommendationResu
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 2b. LYC METHODOLOGY KNOWLEDGE — coaching frameworks behind the instruments
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * LYC methodology knowledge — the executive-coaching frameworks that underpin
+ * each instrument. Grounds NEXUS in LYC's intellectual property so it can speak
+ * to the methodology (not just the surface catalog) when a user asks "what does
+ * this framework actually measure?". Derived from the canonical catalog/KB.
+ */
+export const NEXUS_METHODOLOGY_KB: Record<string, { framework: string; methodology: string }> = {
+  PRISM: {
+    framework: 'Career & Professional Branding',
+    methodology:
+      'PRISM audits whether the market can read your value the way you intend. Five dimensions — brand clarity, market legibility, identity consistency, narrative power, visibility — isolate where the market misreads you. The methodology assumes most senior profiles fail on legibility first, not quality of experience, so it front-loads a legibility diagnostic before narrative rewrite work.',
+  },
+  SPARK: {
+    framework: 'AI Leadership Readiness',
+    methodology:
+      'SPARK measures executive AI readiness along individual adoption, organisational capability exposure, and structural preparedness (governance, infrastructure, investment posture). The methodology is built on the observation that executives fail first on the second dimension — they do not see where AI is already changing the organisation around them — so it surfaces exposure gaps before prescribing a personal workflow plan.',
+  },
+  FORGE: {
+    framework: 'Sales & Bilateral Partnership Operating',
+    methodology:
+      'FORGE is built for bilateral contexts where authority is ambiguous — sales alliances, JVs, shared mandates. It tests adaptive learning orientation, awareness of the three structural forces (AI asymmetry, tempo acceleration, governance/succession), development agency, and bilateral navigation. The methodology distinguishes personal capability gaps from structural forces so the user does not over-attribute partnership friction to themselves.',
+  },
+  BRIDGE: {
+    framework: 'APAC / China Inbound Leadership',
+    methodology:
+      'BRIDGE is the APAC-inbound executive diagnostic: mandate specificity, stakeholder navigation, communication adaptation, pressure resilience, long-term trust orientation, and target-market cultural fluency. The methodology is calibrated to the 1-in-3 cross-border placement failure rate within 18 months — it surfaces the specific failure mode before the assignment is taken, not after.',
+  },
+  MOSAIC: {
+    framework: 'Cross-Border Cultural Intelligence',
+    methodology:
+      'MOSAIC diagnoses cross-institutional partnerships where governance and trust operate differently on each side. Four dimensions — institutional dynamics, relationship-building velocity, normative fit, root-cause conflict resolution. The methodology\'s core thesis: most partnership conflicts are misdiagnosed as personal when they are actually structural or normative, so it forces a root-cause classification before prescribing a fix.',
+  },
+  DRIVE: {
+    framework: 'Execution & Motivational Sustainability',
+    methodology:
+      'DRIVE diagnoses where a leader\'s motivation actually comes from — intrinsic craft, extrinsic recognition, values alignment, confidence under pressure, growth orientation. The methodology assumes plateaus are usually one dimension slipping while others compensate, and that the wrong fix (title, comp) does not address the specific slipping dimension. It prescribes corrective experiments matched to the failing dimension.',
+  },
+};
+
+function buildMethodologyBulkForSystemPrompt(): string {
+  return Object.entries(NEXUS_METHODOLOGY_KB).map(([code, m]) => {
+    return `- ${code} · ${m.framework}\n      Methodology: ${m.methodology}`;
+  }).join('\n');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 3. FRAMEWORK-AWARE SYSTEM PROMPT
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -547,18 +596,29 @@ export const NEXUS_INTRO_QUESTIONS: string[] = [
  * Build a system prompt context object plus the opening greeting and the
  * 11-assessment knowledge payload. This lets the chat agent hydrate its
  * persona per turn without re-importing everything.
+ *
+ * #1324: `assessmentContext` (from buildAssessmentContextForNexus) is appended
+ * to the system prompt when provided, so NEXUS can reference the user's actual
+ * assessment results during the conversation.
  */
-export function buildNexusSystemPrompt(): {
+export function buildNexusSystemPrompt(assessmentContext?: string): {
   openingGreeting: string;
   systemPrompt: string;
   subscriptionTiers: typeof NEXUS_SUBSCRIPTION_TIERS;
   assessmentKBCount: number;
+  /** True when a user assessment context was injected into the prompt */
+  hasUserAssessmentContext: boolean;
 } {
+  const hasContext = Boolean(assessmentContext && assessmentContext.trim());
+  const systemPrompt = hasContext
+    ? `${NEXUS_SYSTEM_PROMPT}\n\n${assessmentContext!.trim()}`
+    : NEXUS_SYSTEM_PROMPT;
   return {
     openingGreeting: NEXUS_OPENING_GREETING,
-    systemPrompt: NEXUS_SYSTEM_PROMPT,
+    systemPrompt,
     subscriptionTiers: NEXUS_SUBSCRIPTION_TIERS,
     assessmentKBCount: NEXUS_KB_CODES_ORDERED.length,
+    hasUserAssessmentContext: hasContext,
   };
 }
 
@@ -623,6 +683,11 @@ Higher tiers (Professional Deep-Dive, Executive Advisory) add percentile benchma
 LYC Intelligence catalog below. You know all of these. You reference them with their code when recommending.
 
 ${buildKnowledgeBulkForSystemPrompt()}
+
+=== LYC METHODOLOGY KNOWLEDGE — coaching frameworks behind the instruments ===
+When a user asks what a framework actually measures or why it is built the way it is, ground your answer in the methodology below. Speak to the coaching thesis, not just the dimension list.
+
+${buildMethodologyBulkForSystemPrompt()}
 
 === CONFIDENTIALITY PROMISE — embedded in identity ===
 Every conversation is treated as confidential. Nothing the user shares in this conversation is shared outside LYC Intelligence, is never used to train public-facing models, and does not appear in any example or template without written consent. You keep a confidence the way an executive coach keeps a confidence.

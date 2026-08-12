@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, User, Building } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
@@ -10,6 +10,7 @@ import {
   passwordScoreLabel,
   passwordScoreColor,
 } from '@/lib/auth/passwordPolicy';
+import { captureUTMParams, captureAndStoreUTM } from '@/utils/utmTracking';
 
 const DS = {
   headingFont: "'Crimson Pro', Georgia, serif",
@@ -44,6 +45,12 @@ export function SignupPage() {
     [password, email, name],
   );
 
+  // #1326: capture UTM/source params on first mount so they survive the
+  // email-verification redirect. Persisted to sessionStorage for later write.
+  useEffect(() => {
+    captureUTMParams();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -67,6 +74,13 @@ export function SignupPage() {
       // Fire signup_success before navigation so the event is flushed
       trackSignupSuccess('email', 'professional');
       toast.success('Account created successfully');
+      // #1326: persist first-touch UTM/source onto the new profile.
+      const userId = useAuthStore.getState().user?.id;
+      if (userId) {
+        captureAndStoreUTM(userId).catch((e) => {
+          reportError(e, { scope: 'utm:store', severity: 'warning', extra: { userId } });
+        });
+      }
       navigate('/platform');
     } else {
       reportError(new Error(result.error || 'Signup failed'), { scope: 'auth:signup', severity: 'warning', extra: { email: email.trim() } });

@@ -112,7 +112,7 @@ export function PrismResultsPage() {
           <div style={{
             width: 32, height: 32, border: '2px solid #E8E8E5',
             borderTopColor: '#C108AB',
-            animation: 'spin 0.8s linear infinite',
+            animation: 'spin 350ms linear infinite',
             margin: '0 auto 24px',
           }} />
           <p style={{ color: '#4B5563', fontSize: 14 }}>Loading your results…</p>

@@ -8,6 +8,7 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import MarketingNav from '@/components/navigation/MarketingNav';
+import { SkipToContent } from '@/components/a11y/SkipToContent';
 
 const DS = {
   headingFont: "'Crimson Pro', Georgia, serif",
@@ -124,10 +125,11 @@ export function MarketingLayout(): React.ReactElement {
       display: 'flex', flexDirection: 'column', minHeight: '100vh',
       background: DS.bg, fontFamily: DS.bodyFont,
     }} data-portal-kind="marketing">
+      <SkipToContent targetId="main-content" />
       <MarketingNav />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <main id="main-content" aria-label="Main content" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Outlet />
-      </div>
+      </main>
       <MarketingFooter />
     </div>
   );

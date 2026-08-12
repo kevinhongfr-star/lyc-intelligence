@@ -112,7 +112,7 @@ export function ReflectionDepthMeter({
               right: 0,
               height: `${fillPercent}%`,
               background: `linear-gradient(180deg, ${DS.accent} 0%, ${DS.accentHover} 100%)`,
-              transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+              transition: 'height 350ms cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
           {DEPTH_LEVELS.map((_, i) => {
