@@ -6,6 +6,7 @@ import {
   useScrollReveal, RevealStyles,
 } from '../landing/shared';
 import { ResultsHero } from './ResultsHero';
+import { ExecutiveSummary } from './ExecutiveSummary';
 import { DimensionScorecard } from './DimensionScorecard';
 import { ArchetypeProfile } from './ArchetypeProfile';
 import { KeyInsights } from './KeyInsights';
@@ -13,6 +14,7 @@ import { DevelopmentPlan } from './DevelopmentPlan';
 import { NEXUSCTA } from './NEXUSCTA';
 import { CrossDiagnosticSummary } from './CrossDiagnosticSummary';
 import { ShareRetake } from './ShareRetake';
+import { ProgressiveProfileModal } from '@/components/onboarding/ProgressiveProfileModal';
 import type { AssessmentResultsConfig } from './types';
 
 interface Props {
@@ -112,6 +114,7 @@ export function AssessmentResults({ config }: Props) {
       <Nav config={config} />
       <main>
         <ResultsHero config={config} />
+        <ExecutiveSummary config={config} />
         <DimensionScorecard config={config} />
         <ArchetypeProfile config={config} />
         <KeyInsights config={config} />
@@ -127,6 +130,15 @@ export function AssessmentResults({ config }: Props) {
       </main>
       <Footer config={config} />
       <RevealStyles prefix={config.prefix} />
+      {/*
+        #1326 — Progressive profiling: lightly ask for title + company after
+        the user has finished an assessment. The modal self-gates on missing
+        profile fields and a 14-day dismissal flag in localStorage, so it
+        only fires once per assessment cycle and never nags authenticated
+        users who already have this data. Anonymous users see nothing —
+        ProgressiveProfileModal bails when `profile` is null.
+      */}
+      <ProgressiveProfileModal assessmentName={config.assessmentName} />
     </div>
   );
 }

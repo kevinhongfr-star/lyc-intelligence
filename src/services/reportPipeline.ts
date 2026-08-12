@@ -8,6 +8,7 @@ import {
 import { generateCPIReportHTML, type CPIReportData } from './cpiReportRenderer';
 import * as reportService from './reportService';
 import type { ScoreResult as AkiraScoreResult } from '../lib/akira/engine';
+import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
 
 export type InstrumentKey =
   | 'CPI'
@@ -530,14 +531,50 @@ export function instrumentToConfig(instrumentKey: string, result: ScoreResult): 
   const prefix = `${key.toLowerCase()}-results`;
   const lowerKey = key.toLowerCase();
 
-  const dimensions = Object.entries(result.dimensionScores).map(([id, score]) => ({
-    id,
-    name: result.dimensionNames[id] || id,
-    score,
-    lowLabel: 'Low',
-    highLabel: 'High',
-    description: `${result.dimensionNames[id] || id} dimension score`,
-  }));
+  // P1 #1322 — pull real dimension metadata from the canonical catalog instead
+  // of generic "Low/High" placeholders, and auto-generate the "why it matters"
+  // + "what to do next" layers from score bands so every instrument gets the
+  // progressive-reveal treatment without per-page wiring.
+  const catalogEntry = ASSESSMENT_CATALOG[key];
+  const catalogDimsById = new Map(
+    (catalogEntry?.dimensions || []).map((d) => [d.id, d])
+  );
+
+  const dimensions = Object.entries(result.dimensionScores).map(([id, score]) => {
+    const cat = catalogDimsById.get(id);
+    const name = result.dimensionNames[id] || cat?.name || id;
+    const description = cat?.description || `${name} dimension score`;
+    const lowLabel = cat?.lowLabel || 'Developing';
+    const highLabel = cat?.highLabel || 'Established';
+
+    // Score-band-derived "why it matters" + action suggestion (#1322).
+    let whyItMatters: string;
+    let actionSuggestion: string;
+    if (score >= 75) {
+      whyItMatters = `${name} is a signature strength in your profile. At this level it compounds your other dimensions and is a credible differentiator in executive positioning conversations.`;
+      actionSuggestion = `Lead with ${name} in board and search narratives. Look for mandates where this strength is the primary lever, and use it to offset adjacent gaps rather than over-investing here.`;
+    } else if (score >= 50) {
+      whyItMatters = `${name} is functional but not yet a differentiator. In executive contexts, peers at this band blend in rather than stand out — the gap to the next band is where competitive positioning is won.`;
+      actionSuggestion = `Targeted development on ${name}: identify one high-stakes context per quarter where you deliberately stretch this dimension, and seek feedback from a counterpart who models the high band.`;
+    } else if (score >= 35) {
+      whyItMatters = `${name} is a material gap relative to executive benchmarks. At this band it can quietly cap your readiness for broader mandates — decision-makers will sense it before they can name it.`;
+      actionSuggestion = `Treat ${name} as a primary development priority. Pair a structured 90-day plan with coaching or a NEXUS deep-dive, and revisit with a re-assessment to confirm movement.`;
+    } else {
+      whyItMatters = `${name} is a foundational gap. At this level it is likely already affecting outcomes in your current mandate, not just future ones — it warrants attention before broader positioning work.`;
+      actionSuggestion = `Prioritise ${name} immediately. Start with the development actions below, consider a consultant-matched debrief, and defer high-stakes contexts that depend heavily on this dimension until you see movement.`;
+    }
+
+    return {
+      id,
+      name,
+      score,
+      lowLabel,
+      highLabel,
+      description,
+      whyItMatters,
+      actionSuggestion,
+    };
+  });
 
   return {
     assessmentCode: key,

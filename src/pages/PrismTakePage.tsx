@@ -8,6 +8,18 @@ const config: AssessmentFlowConfig = {
   prefix: 'prism-take',
   resultsPath: '/prism/results',
   landingPath: '/prism',
+  // #1323: Entry expectation screen — sets time, count, and deliverable expectations.
+  intro: {
+    title: 'PRISM — Professional Brand & Visibility Diagnostic',
+    body: 'You will answer 10 questions across five dimensions of executive brand and market visibility. Each is scenario-based or behavioral — answer as you actually decide, not as you think you should.',
+    duration: '~4 minutes',
+    expectations: [
+      '10 questions across Vision, Resilience, Influence, Strategy, and Mastery',
+      'Scenario-based and behavioral items — no abstract self-rating',
+      'Your progress auto-saves; resume on your next login if interrupted',
+      'On completion: executive summary, dimension scorecard, archetype, and development roadmap',
+    ],
+  },
   onSubmit: async (answers) => {
     const response = await submitPRISMAssessment(answers);
     return { resultId: response.result_id };
@@ -18,12 +30,14 @@ const config: AssessmentFlowConfig = {
       id: 'vision_1',
       type: 'mcq_single',
       dimension: 'vision',
-      text: 'When facing a new strategic challenge, your first instinct is to:',
+      // #1323: Scenario-based question — answer in context, not in theory.
+      scenario: 'A board member asks you, unprompted, where you see your function in three years. You have 90 seconds to answer.',
+      text: 'What shapes your response most?',
       options: [
-        { label: 'Map out the long-term implications and future scenarios', score: 5 },
-        { label: 'Identify the immediate actions needed to address it', score: 3 },
-        { label: 'Consult with others to gather different perspectives', score: 4 },
-        { label: 'Look at what competitors or peers have done in similar situations', score: 2 },
+        { label: 'A clear, pre-articulated vision you have been refining for months', score: 5 },
+        { label: 'The immediate priorities and risks on your desk today', score: 3 },
+        { label: 'What you have heard peers and competitors articulating', score: 2 },
+        { label: 'A directional sense, but you would want to think before committing', score: 4 },
       ],
     },
     {
@@ -35,23 +49,29 @@ const config: AssessmentFlowConfig = {
     },
     // ── Resilience (2 questions) ──
     {
-      id: 'resilience_1',
-      type: 'mcq_single',
-      dimension: 'resilience',
-      text: 'When a major project fails, you typically:',
-      options: [
-        { label: 'Take time to process, then analyze what went wrong', score: 4 },
-        { label: 'Immediately start planning the next initiative', score: 5 },
-        { label: 'Feel discouraged for days before regaining momentum', score: 2 },
-        { label: 'Seek blame and ensure accountability', score: 3 },
-      ],
-    },
-    {
       id: 'resilience_2',
       type: 'likert',
       dimension: 'resilience',
       text: 'I maintain composure and clarity under intense pressure.',
       scaleLabels: ['Rarely', 'Almost always'],
+    },
+    {
+      id: 'resilience_1',
+      type: 'mcq_single',
+      dimension: 'resilience',
+      // #1323: Skip logic — this scenario follow-up only shows if the gate
+      // question (resilience_2, answered above) indicates the respondent
+      // already operates under pressure. Respondents who rarely face pressure
+      // skip the scenario, reducing total questions and completion time.
+      skipIf: (answers) => (answers['resilience_2'] as number) <= 2,
+      scenario: 'A major initiative you championed publicly has missed its target by 40%. The executive team is meeting in 48 hours to review.',
+      text: 'In the 48 hours before that meeting, you primarily:',
+      options: [
+        { label: 'Reframe the narrative around what was learned and what to adjust', score: 5 },
+        { label: 'Go quiet and prepare a defensive case', score: 2 },
+        { label: 'Schedule one-on-ones with key stakeholders before the meeting', score: 4 },
+        { label: 'Focus on identifying who is accountable and why', score: 3 },
+      ],
     },
     // ── Influence (2 questions) ──
     {

@@ -282,6 +282,69 @@ export function CanonicalInstrumentLanding() {
         </div>
       </section>
 
+      {/* #1323: WHAT YOU'LL GET + SAMPLE QUESTION — entry expectation setting */}
+      <section className="reveal" style={{ background: DS.bgAlt, borderBottom: `1px solid ${DS.border}`, padding: '72px 32px' }}>
+        <div style={{ maxWidth: '1120px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '48px', alignItems: 'start' }}>
+          {/* What you'll get */}
+          <div>
+            <div style={{ fontFamily: DS.monoFont, fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.26em', color: DS.accent, marginBottom: '14px' }}>
+              What you'll get
+            </div>
+            <h2 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(22px, 2.6vw, 28px)', fontWeight: 700, color: DS.text, margin: '0 0 24px', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+              A consulting-grade deliverable, not a survey result.
+            </h2>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {[
+                { icon: '01', title: 'Executive summary', text: 'A one-line verdict and three key findings you can grasp in 30 seconds.' },
+                { icon: '02', title: `${info.dimensions.length}-dimension scorecard`, text: 'Each dimension scored 0–100 against executive benchmarks, with progressive-reveal interpretation.' },
+                { icon: '03', title: `${info.archetype_count} archetypes`, text: `Your leadership archetype identified, with defining traits and how it plays in APAC contexts.` },
+                { icon: '04', title: 'Development roadmap', text: 'Prioritised actions with timelines — not generic advice, but targeted next steps.' },
+                { icon: '05', title: 'NEXUS deep-dive access', text: 'Ask NEXUS to explain any finding, synthesise across diagnostics, or pressure-test a decision.' },
+              ].map((item) => (
+                <li key={item.icon} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                  <span style={{ fontFamily: DS.monoFont, fontSize: '11px', color: DS.accent, fontWeight: 600, flexShrink: 0, paddingTop: '2px' }}>{item.icon}</span>
+                  <div>
+                    <div style={{ fontFamily: DS.headingFont, fontSize: '15px', fontWeight: 700, color: DS.text, marginBottom: '3px' }}>{item.title}</div>
+                    <div style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, lineHeight: 1.55 }}>{item.text}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Sample question preview */}
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, boxShadow: DS.shadow, padding: '32px 28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+              <span style={{ fontFamily: DS.monoFont, fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: DS.accent }}>Sample question</span>
+              <span style={{ fontFamily: DS.monoFont, fontSize: '10px', color: DS.muted, letterSpacing: '0.1em' }}>~{Math.max(1, Math.round(info.duration_minutes / info.total_questions))} min · 1 of {info.total_questions}</span>
+            </div>
+            <div style={{ padding: '16px 18px', background: DS.bgAlt, borderLeft: `3px solid ${DS.accent}`, marginBottom: '20px' }}>
+              <span style={{ fontFamily: DS.monoFont, fontSize: '9px', color: DS.accent, marginBottom: '6px', display: 'block' }}>Scenario</span>
+              <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, lineHeight: 1.6, margin: 0 }}>
+                You're six months into an APAC mandate. Headquarters is pushing for a quarterly win; your local team is asking you to protect a 3-year relationship that hasn't yet converted to revenue.
+              </p>
+            </div>
+            <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, lineHeight: 1.35, margin: '0 0 20px' }}>
+              How do you frame the decision back to headquarters?
+            </h3>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+              {['1', '2', '3', '4', '5'].map((n, i) => (
+                <div key={n} style={{ flex: 1, height: '44px', border: `1px solid ${DS.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, background: i === 3 ? DS.accent : DS.card, borderColor: i === 3 ? DS.accent : DS.cardBorder, color: i === 3 ? '#FFF' : DS.muted }}>
+                  {n}
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 4px' }}>
+              <span style={{ fontFamily: DS.monoFont, fontSize: '9px', color: DS.muted }}>Defer to short-term</span>
+              <span style={{ fontFamily: DS.monoFont, fontSize: '9px', color: DS.accent }}>Protect long-term</span>
+            </div>
+            <p style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted, lineHeight: 1.5, margin: '20px 0 0', borderTop: `1px solid ${DS.border}`, paddingTop: '16px' }}>
+              Scenario-based items replace abstract self-report. You answer in context, not in theory — the way executives actually decide.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* DIMENSIONS */}
       <section className="reveal section-padding" style={{ maxWidth: '1120px', margin: '0 auto', padding: '88px 32px 48px' }}>
         <div style={{ textAlign: 'center', marginBottom: '44px' }}>

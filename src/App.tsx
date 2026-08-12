@@ -128,6 +128,7 @@ const NotificationsPage = lazy(() => import('@/pages/NotificationsPage').then(m 
 const CandidatesPage = lazy(() => import('@/pages/CandidatesPage').then(m => ({ default: m.CandidatesPage })));
 const ExecutiveProfilePage = lazy(() => import('@/pages/ExecutiveProfilePage').then(m => ({ default: m.ExecutiveProfilePage })));
 const CandidateReportPage = lazy(() => import('@/pages/CandidateReportPage').then(m => ({ default: m.CandidateReportPage })));
+const ConsultantSummaryPage = lazy(() => import('@/pages/ConsultantSummaryPage').then(m => ({ default: m.ConsultantSummaryPage })));
 const CompaniesPage = lazy(() => import('@/pages/CompaniesPage').then(m => ({ default: m.CompaniesPage })));
 const BatchScoringPage = lazy(() => import('@/pages/BatchScoringPage').then(m => ({ default: m.BatchScoringPage })));
 const MetrixPage = lazy(() => import('@/pages/MetrixPage').then(m => ({ default: m.MetrixPage })));
@@ -334,6 +335,7 @@ export default function App() {
             <Route path="candidates" element={<CandidatesPage />} />
             <Route path="candidates/:id" element={<ExecutiveProfilePage />} />
             <Route path="candidates/:id/report" element={<CandidateReportPage />} />
+            <Route path="candidates/:id/summary" element={<ConsultantSummaryPage />} />
             <Route path="trident" element={<Navigate to="candidates" replace />} />
             <Route path="companies" element={<CompaniesPage />} />
             <Route path="canvas" element={<Navigate to="metrix" replace />} />

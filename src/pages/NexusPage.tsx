@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Send, Loader2, Sparkles, ArrowRight, LogIn } from 'lucide-react';
 import { sendChatMessage } from '@/services/coze';
 import { useAuthStore } from '@/stores/authStore';
@@ -8,6 +8,8 @@ import remarkGfm from 'remark-gfm';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { trackCTA, trackNexusFirstMessageSent, trackNexusChatInitiation } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
+import { buildNexusSystemPrompt } from '@/nexus/nexusKnowledge';
+import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
 
 interface Message { role: 'user' | 'assistant'; content: string; suggested_prompts?: string[]; }
 
@@ -101,6 +103,30 @@ export function NEXUSPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  // #1324: Consume the `code` query param — when the user arrives from an
+  // "Ask NEXUS" CTA on a results page, inject the specific assessment
+  // framework context into the system prompt so NEXUS grounds its answer
+  // in the right instrument's methodology and dimensions.
+  const codeParam = searchParams.get('code');
+  const frameworkContext = useMemo(() => {
+    if (!codeParam) return undefined;
+    const info = ASSESSMENT_CATALOG[codeParam.toUpperCase()];
+    if (!info) return undefined;
+    const dimList = info.dimensions.map(d => `${d.name} (${d.lowLabel} → ${d.highLabel})`).join('; ');
+    return [
+      `=== CURRENT ASSESSMENT CONTEXT ===`,
+      `The user is asking about their ${info.name} (${info.code}) results.`,
+      `Instrument measures ${info.dimensions.length} dimensions: ${dimList}.`,
+      `Tagline: ${info.tagline}`,
+      `Ground your answer in this instrument's framework. Reference the specific dimensions by name when explaining findings.`,
+    ].join('\n');
+  }, [codeParam]);
+
+  const systemPrompt = useMemo(
+    () => buildNexusSystemPrompt(frameworkContext).systemPrompt,
+    [frameworkContext]
+  );
+
   const isGuest = !user;
   const remaining = isGuest ? Math.max(0, GUEST_MESSAGE_LIMIT - guestCount) : Infinity;
   const showGuestLimit = isGuest && guestCount >= GUEST_MESSAGE_LIMIT;
@@ -150,7 +176,8 @@ export function NEXUSPage() {
       const response = await sendChatMessage(
         text,
         user?.id || 'guest-' + (localStorage.getItem('nexus_guest_id') || Math.random().toString(36).slice(2)),
-        messages.slice(-10).map(m => ({ role: m.role, content: m.content }))
+        messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
+        systemPrompt ? { systemPrompt } : undefined
       );
       setMessages(prev => [...prev, { role: 'assistant', content: response }]);
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { UserPlus, Mail, Lock, ArrowRight, Loader2, X, CheckCircle } from 'lucide-react';
+import { UserPlus, Mail, Lock, ArrowRight, Loader2, X, CheckCircle, Crown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 
 interface SignupPromptProps {
@@ -142,19 +143,33 @@ export function SignupPrompt({ messageCount, onSignUp, onContinueAsGuest }: Sign
 
   return (
     <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 p-4 mb-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <p className="text-amber-800 font-semibold">
             {messageCount >= 2 ? 'Guest limit reached' : 'Continue with an account'}
           </p>
           <p className="text-amber-600 text-sm mt-1">
-            {messageCount >= 2 
+            {messageCount >= 2
               ? 'Please sign up to continue chatting with NEXUS.'
               : `You've used ${messageCount} Executive Introduction message${messageCount === 1 ?'':'s'}. Create an account for a 5 mi/day Starter allowance!`
             }
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          {/* #1326 — paid upgrade path. Guests hitting the limit can upgrade
+              immediately instead of being forced into the free signup flow.
+              Routes to /pricing where the human-handoff enterprise form and
+              tier cards live. */}
+          {messageCount >= 2 && (
+            <Link
+              to="/pricing"
+              className="px-4 py-2 bg-ink text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
+              style={{ background: '#0A0A12' }}
+            >
+              <Crown className="w-4 h-4" />
+              See paid plans
+            </Link>
+          )}
           <button
             onClick={() => setShowSignupForm(true)}
             className="px-4 py-2 bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-colors flex items-center gap-2"

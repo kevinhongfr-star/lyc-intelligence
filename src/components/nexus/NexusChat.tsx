@@ -10,7 +10,7 @@ import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditSe
 import { supabase } from '@/lib/supabase';
 import {
   getUserAssessmentContext,
-  buildAssessmentContextForNEXUS,
+  buildAssessmentContextForNexus,
 } from '@/nexus/assessmentContext';
 import { CreditGate } from './CreditGate';
 import { CareerInsight } from './CareerInsight';
@@ -28,17 +28,18 @@ import {
 import {
   NEXUS_ASSESSMENT_KB,
   runRecommendationEngine,
-  buildNEXUSSystemPrompt,
+  buildNexusSystemPrompt,
   canonicalTierLabel,
   TIER_KEYS_CANONICAL,
   NEXUS_INTRO_QUESTIONS,
   type AssessmentRecommendationResult,
 } from '@/nexus/nexusKnowledge';
 import {
-  earnNEXUSMiles,
+  earnNexusMiles,
   ExplorationEarningTracker,
   isCompletedReflection,
 } from '@/nexus/nexusMilesService';
+import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
 
 const DS = {
   headingFont: "'Crimson Pro', Georgia, serif",
@@ -113,7 +114,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: buildNEXUSSystemPrompt().openingGreeting,
+      content: buildNexusSystemPrompt().openingGreeting,
     },
   ]);
   /**
@@ -139,11 +140,34 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
   /**
    * #1324: Enriched NEXUS system prompt. When the user's assessment context
    * is available, it is appended to the prompt so NEXUS can reference the
-   * user's actual results during the conversation.
+   * user's actual results during the conversation. When the user arrives via
+   * an "Ask NEXUS" CTA with a `code` param, the specific instrument's
+   * framework context is also injected so NEXUS grounds its answer in the
+   * right methodology.
    */
+  const codeParam = searchParams.get('code');
+  const frameworkContext = useMemo(() => {
+    if (!codeParam) return '';
+    const info = ASSESSMENT_CATALOG[codeParam.toUpperCase()];
+    if (!info) return '';
+    const dimList = info.dimensions.map(d => `${d.name} (${d.lowLabel} → ${d.highLabel})`).join('; ');
+    return [
+      `=== CURRENT ASSESSMENT CONTEXT ===`,
+      `The user is asking about their ${info.name} (${info.code}) results.`,
+      `Instrument measures ${info.dimensions.length} dimensions: ${dimList}.`,
+      `Tagline: ${info.tagline}`,
+      `Ground your answer in this instrument's framework. Reference the specific dimensions by name when explaining findings.`,
+    ].join('\n');
+  }, [codeParam]);
+
+  const combinedContext = useMemo(
+    () => [frameworkContext, assessmentContextStr].filter(Boolean).join('\n\n'),
+    [frameworkContext, assessmentContextStr],
+  );
+
   const nexusPrompt = useMemo(
-    () => buildNEXUSSystemPrompt(assessmentContextStr),
-    [assessmentContextStr],
+    () => buildNexusSystemPrompt(combinedContext || undefined),
+    [combinedContext],
   );
   /** Miles balance, fetched on mount + CTA actions. */
   const [milesBalance, setMilesBalance] = useState<number | null>(null);
@@ -323,7 +347,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
     getUserAssessmentContext(user.id)
       .then((results) => {
         if (cancelled) return;
-        const ctx = buildAssessmentContextForNEXUS(results);
+        const ctx = buildAssessmentContextForNexus(results);
         setAssessmentContextStr(ctx.contextString);
       })
       .catch((e) => {
@@ -388,7 +412,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
           stream: false, // Use non-streaming for reliable tag parsing
           // #1324: forward the user's assessment context so the server-side
           // persona can inject the user's actual results into the system prompt.
-          assessment_context: assessmentContextStr || undefined,
+          assessment_context: combinedContext || undefined,
         }),
         signal: controller.signal,
       });
@@ -712,8 +736,8 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
    * and optionally appends an earning meta-message into the chat stream.
    */
   const awardEarnedMiles = useCallback(
-    async (action: Parameters<typeof earnNEXUSMiles>[0], opts?: Parameters<typeof earnNEXUSMiles>[1]) => {
-      const result = await earnNEXUSMiles(action, {
+    async (action: Parameters<typeof earnNexusMiles>[0], opts?: Parameters<typeof earnNexusMiles>[1]) => {
+      const result = await earnNexusMiles(action, {
         ...opts,
         tierKey: canonicalTier,
       });

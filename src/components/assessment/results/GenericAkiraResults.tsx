@@ -4,6 +4,7 @@ import { Download, Loader2, AlertTriangle } from 'lucide-react';
 import {
   AssessmentResults,
   ResultsHero,
+  ExecutiveSummary,
   DimensionScorecard,
   ArchetypeProfile,
   KeyInsights,
@@ -364,6 +365,7 @@ export function GenericAkiraResults({
           <div style={{ paddingTop: 24 }}>
             <ResultsHero config={configForRender} />
           </div>
+          <ExecutiveSummary config={configForRender} />
           <DimensionScorecard config={configForRender} />
           <ArchetypeProfile config={configForRender} />
           <KeyInsights config={configForRender} />
