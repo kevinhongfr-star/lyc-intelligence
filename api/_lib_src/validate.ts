@@ -21,6 +21,7 @@
  *   - Sanitizers are idempotent and never throw
  */
 
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { RequestAuthError } from './auth.js';
 
 // ── Regexes ────────────────────────────────────────────────────────
@@ -207,6 +208,104 @@ export function assertBodySize(
       413,
     );
   }
+}
+
+/**
+ * #1314: Safely parse a JSON request body.
+ *
+ * Vercel's `@vercel/node` runtime auto-parses `application/json` bodies
+ * and sets `req.body` to the parsed object. But when the JSON is
+ * malformed, behavior varies by runtime version: `req.body` may be a
+ * raw string, an empty object, or the parse may throw before the
+ * handler runs. This helper guarantees consistent handling:
+ *
+ *   - If `req.body` is already an object/array → return it as-is.
+ *   - If `req.body` is a string → attempt JSON.parse; throw 400 on failure.
+ *   - If `req.body` is undefined/null → return {} (treat as empty body).
+ *
+ * Always returns a sanitized object (control chars stripped, prototype-
+ * pollution keys dropped, depth/length capped). Throws RequestAuthError
+ * (status 400) for malformed JSON so callers' try/catch maps it to a
+ * clean 400 response instead of a 500.
+ */
+export function parseJsonBody<T = Record<string, unknown>>(
+  req: { body?: unknown; headers?: Record<string, string | string[] | undefined> },
+  opts: { maxStringLength?: number; maxArrayLength?: number; maxDepth?: number } = {},
+): T {
+  const raw = req.body;
+
+  // Already-parsed object (Vercel success path).
+  if (raw !== null && raw !== undefined && typeof raw === 'object' && !Array.isArray(raw)) {
+    return sanitizeObject<T>(raw, opts);
+  }
+  // Arrays are valid JSON bodies too — sanitize and return.
+  if (Array.isArray(raw)) {
+    return sanitizeObject<T>(raw, opts);
+  }
+
+  // String body: either Content-Type wasn't JSON (Vercel left it as a
+  // string) OR the JSON was malformed and Vercel fell back to raw string.
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim();
+    if (trimmed === '') return {} as T;
+    try {
+      const parsed = JSON.parse(trimmed);
+      return sanitizeObject<T>(parsed, opts);
+    } catch {
+      throw new RequestAuthError('Malformed JSON body', 400);
+    }
+  }
+
+  // No body — return empty object. GET/DELETE typically have none.
+  if (raw === undefined || raw === null) return {} as T;
+
+  // Any other type (number, boolean, buffer) — reject as bad request.
+  throw new RequestAuthError('Invalid request body', 400);
+}
+
+// ── URL / path validation (#1314) ──────────────────────────────────
+
+/** Max URL length before we reject. Vercel's own limit is 8192; we
+ *  reject earlier to avoid log noise and reject abuse. */
+export const DEFAULT_MAX_URL_LENGTH = 4096;
+
+/**
+ * #1314: Assert the request URL (path + query) is within a sane length.
+ * Extremely long URLs (typically from attackers stuffing payloads into
+ * query params) cause 500s in some runtimes. Reject with 414 instead.
+ */
+export function assertUrlLength(
+  req: { url?: string },
+  max = DEFAULT_MAX_URL_LENGTH,
+): void {
+  const url = req.url ?? '';
+  if (url.length > max) {
+    throw new RequestAuthError('URI too long', 414);
+  }
+}
+
+// ── Shared API error responder (#1314) ────────────────────────────
+//
+// Centralizes the try/catch → safe JSON response pattern so every
+// endpoint returns:
+//   - RequestAuthError.status + .message (already curated)
+//   - Supabase errors → mapped status + safe message (no internals)
+//   - Unknown errors → 500 + "Internal server error" (logged w/ stack)
+//
+// Never leaks stack traces, table names, or constraint names.
+
+export function handleApiError(
+  res: VercelResponse,
+  err: unknown,
+  context: string,
+  req?: VercelRequest,
+): void {
+  if (err instanceof RequestAuthError) {
+    res.status(err.status).json({ error: err.message });
+    return;
+  }
+  logServerError(context, err, req);
+  res.status(500).json({ error: 'Internal server error' });
 }
 
 /**
@@ -431,6 +530,113 @@ export function logServerError(
     // If stderr write fails (rare), fall back to console.
     // eslint-disable-next-line no-console
     console.error(payload);
+  }
+}
+
+// ── #1314: Rate limiting (in-memory sliding window) ───────────────
+//
+// Lightweight per-IP rate limiter for auth-sensitive endpoints.
+// Vercel serverless functions are stateless across invocations, but
+// within a warm container this provides effective protection against
+// brute-force / enumeration attempts. For production-grade limiting,
+// pair with Vercel Edge Middleware or an upstream WAF.
+//
+// Usage:
+//   const limiter = new RateLimiter(60_000, 30);  // 30 req/min
+//   const rl = limiter.check(getClientIp(req));
+//   if (!rl.allowed) return res.status(429).json({ error: 'Too many requests' });
+
+export interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  resetAt: number;  // epoch ms
+}
+
+export class RateLimiter {
+  private buckets = new Map<string, number[]>();
+  private lastCleanup = Date.now();
+
+  constructor(
+    private readonly windowMs: number,
+    private readonly maxRequests: number,
+  ) {}
+
+  check(key: string): RateLimitResult {
+    const now = Date.now();
+
+    // Periodic cleanup — evict expired buckets every 5 minutes.
+    if (now - this.lastCleanup > 300_000) {
+      this.cleanup(now);
+      this.lastCleanup = now;
+    }
+
+    const windowStart = now - this.windowMs;
+    const existing = this.buckets.get(key) || [];
+    const fresh = existing.filter((t) => t > windowStart);
+
+    if (fresh.length >= this.maxRequests) {
+      const oldestInWindow = fresh[0] ?? now;
+      return {
+        allowed: false,
+        remaining: 0,
+        resetAt: oldestInWindow + this.windowMs,
+      };
+    }
+
+    fresh.push(now);
+    this.buckets.set(key, fresh);
+    return {
+      allowed: true,
+      remaining: this.maxRequests - fresh.length,
+      resetAt: now + this.windowMs,
+    };
+  }
+
+  private cleanup(now: number): void {
+    const windowStart = now - this.windowMs;
+    for (const [key, timestamps] of this.buckets) {
+      const fresh = timestamps.filter((t) => t > windowStart);
+      if (fresh.length === 0) {
+        this.buckets.delete(key);
+      } else {
+        this.buckets.set(key, fresh);
+      }
+    }
+  }
+}
+
+/**
+ * Extract client IP from Vercel request headers. Vercel sets
+ * x-forwarded-for and x-real-ip on incoming requests.
+ */
+export function getClientIp(req: VercelRequest): string {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string') {
+    return forwarded.split(',')[0].trim();
+  }
+  if (Array.isArray(forwarded) && forwarded.length > 0) {
+    return forwarded[0].trim();
+  }
+  const realIp = req.headers['x-real-ip'];
+  if (typeof realIp === 'string') return realIp.trim();
+  return 'unknown';
+}
+
+/**
+ * Apply rate limit headers to a response. Call after a successful
+ * rate limit check to inform the client of their remaining quota.
+ */
+export function setRateLimitHeaders(
+  res: VercelResponse,
+  rl: RateLimitResult,
+  maxRequests: number,
+): void {
+  res.setHeader('X-RateLimit-Limit', String(maxRequests));
+  res.setHeader('X-RateLimit-Remaining', String(Math.max(0, rl.remaining)));
+  res.setHeader('X-RateLimit-Reset', String(Math.ceil(rl.resetAt / 1000)));
+  if (!rl.allowed) {
+    const retryAfter = Math.ceil((rl.resetAt - Date.now()) / 1000);
+    res.setHeader('Retry-After', String(Math.max(1, retryAfter)));
   }
 }
 

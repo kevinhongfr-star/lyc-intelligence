@@ -100,6 +100,42 @@ function assertBodySize(body, limit = DEFAULT_BODY_LIMIT) {
     );
   }
 }
+function parseJsonBody(req, opts = {}) {
+  const raw = req.body;
+  if (raw !== null && raw !== void 0 && typeof raw === "object" && !Array.isArray(raw)) {
+    return sanitizeObject(raw, opts);
+  }
+  if (Array.isArray(raw)) {
+    return sanitizeObject(raw, opts);
+  }
+  if (typeof raw === "string") {
+    const trimmed = raw.trim();
+    if (trimmed === "") return {};
+    try {
+      const parsed = JSON.parse(trimmed);
+      return sanitizeObject(parsed, opts);
+    } catch {
+      throw new RequestAuthError("Malformed JSON body", 400);
+    }
+  }
+  if (raw === void 0 || raw === null) return {};
+  throw new RequestAuthError("Invalid request body", 400);
+}
+const DEFAULT_MAX_URL_LENGTH = 4096;
+function assertUrlLength(req, max = DEFAULT_MAX_URL_LENGTH) {
+  const url = req.url ?? "";
+  if (url.length > max) {
+    throw new RequestAuthError("URI too long", 414);
+  }
+}
+function handleApiError(res, err, context, req) {
+  if (err instanceof RequestAuthError) {
+    res.status(err.status).json({ error: err.message });
+    return;
+  }
+  logServerError(context, err, req);
+  res.status(500).json({ error: "Internal server error" });
+}
 function parseFilters(query, allowedOps = ["eq", "neq", "gt", "lt", "gte", "lte", "in", "like"]) {
   const out = [];
   for (const op of allowedOps) {
@@ -253,23 +289,97 @@ function logServerError(context, err, req) {
     console.error(payload);
   }
 }
+class RateLimiter {
+  constructor(windowMs, maxRequests) {
+    this.windowMs = windowMs;
+    this.maxRequests = maxRequests;
+  }
+  windowMs;
+  maxRequests;
+  buckets = /* @__PURE__ */ new Map();
+  lastCleanup = Date.now();
+  check(key) {
+    const now = Date.now();
+    if (now - this.lastCleanup > 3e5) {
+      this.cleanup(now);
+      this.lastCleanup = now;
+    }
+    const windowStart = now - this.windowMs;
+    const existing = this.buckets.get(key) || [];
+    const fresh = existing.filter((t) => t > windowStart);
+    if (fresh.length >= this.maxRequests) {
+      const oldestInWindow = fresh[0] ?? now;
+      return {
+        allowed: false,
+        remaining: 0,
+        resetAt: oldestInWindow + this.windowMs
+      };
+    }
+    fresh.push(now);
+    this.buckets.set(key, fresh);
+    return {
+      allowed: true,
+      remaining: this.maxRequests - fresh.length,
+      resetAt: now + this.windowMs
+    };
+  }
+  cleanup(now) {
+    const windowStart = now - this.windowMs;
+    for (const [key, timestamps] of this.buckets) {
+      const fresh = timestamps.filter((t) => t > windowStart);
+      if (fresh.length === 0) {
+        this.buckets.delete(key);
+      } else {
+        this.buckets.set(key, fresh);
+      }
+    }
+  }
+}
+function getClientIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded === "string") {
+    return forwarded.split(",")[0].trim();
+  }
+  if (Array.isArray(forwarded) && forwarded.length > 0) {
+    return forwarded[0].trim();
+  }
+  const realIp = req.headers["x-real-ip"];
+  if (typeof realIp === "string") return realIp.trim();
+  return "unknown";
+}
+function setRateLimitHeaders(res, rl, maxRequests) {
+  res.setHeader("X-RateLimit-Limit", String(maxRequests));
+  res.setHeader("X-RateLimit-Remaining", String(Math.max(0, rl.remaining)));
+  res.setHeader("X-RateLimit-Reset", String(Math.ceil(rl.resetAt / 1e3)));
+  if (!rl.allowed) {
+    const retryAfter = Math.ceil((rl.resetAt - Date.now()) / 1e3);
+    res.setHeader("Retry-After", String(Math.max(1, retryAfter)));
+  }
+}
 export {
   DEFAULT_ARRAY_LIMIT,
   DEFAULT_BODY_LIMIT,
+  DEFAULT_MAX_URL_LENGTH,
   DEFAULT_STRING_LIMIT,
+  RateLimiter,
   assertBodySize,
   assertColumnName,
   assertEmail,
   assertEntityName,
   assertOneOf,
+  assertUrlLength,
   assertUuid,
   clampInt,
+  getClientIp,
+  handleApiError,
   logServerError,
   parseFilters,
+  parseJsonBody,
   parseOrderParam,
   parseSelectList,
   safeErrorMessage,
   safeErrorStatus,
   sanitizeObject,
-  sanitizeString
+  sanitizeString,
+  setRateLimitHeaders
 };

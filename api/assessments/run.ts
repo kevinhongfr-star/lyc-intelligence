@@ -38,8 +38,11 @@ import {
 } from '../lib/auth.js';
 import {
   assertBodySize,
+  assertUrlLength,
   clampInt,
+  handleApiError,
   logServerError,
+  parseJsonBody,
   sanitizeObject,
   DEFAULT_BODY_LIMIT,
 } from '../lib/validate.js';
@@ -97,6 +100,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const supabase = createClient();
 
   try {
+    // #1314: reject oversized URLs before processing.
+    assertUrlLength(req);
+
     // Allow anonymous users for complimentary assessment access (marketing funnel)
     const ctx = await getAuthorizedContext(req, true);
     const isAnonymous = !ctx;
@@ -113,11 +119,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    const body = req.body || {};
-    // #1309: enforce body size limit and sanitize user-provided objects.
-    // Assessment answers + metadata are stored as jsonb — strip control
-    // chars, drop prototype-polluting keys, cap depth/length.
-    assertBodySize(body, DEFAULT_BODY_LIMIT);
+    // #1309 + #1314: parse + sanitize body. parseJsonBody throws 400 on
+    // malformed JSON instead of letting a SyntaxError surface as a 500.
+    assertBodySize(req.body, DEFAULT_BODY_LIMIT);
+    const body = parseJsonBody<{
+      code?: string;
+      answers?: Record<string, unknown>;
+      durationSeconds?: number;
+      metadata?: Record<string, unknown>;
+      idempotency_key?: string;
+    }>(req);
     const code = normalizeCode(body.code);
     const rawAnswers = body.answers ?? {};
     if (typeof rawAnswers !== 'object' || Array.isArray(rawAnswers)) {
@@ -292,7 +303,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           });
         } catch { /* ignore — ops alert */ }
       }
-      throw new RequestAuthError(`Failed saving results: ${insErr.message}`, 500);
+      // #1314: don't leak insErr.message — log server-side, return safe msg.
+      logServerError('api/assessments/run insert failed', insErr, req);
+      throw new RequestAuthError('Failed to save assessment results', 500);
     }
 
     return res.status(200).json({
@@ -304,11 +317,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       remaining_balance: remainingBalance,
     });
   } catch (e: any) {
-    if (e instanceof RequestAuthError) {
-      return res.status(e.status).json({ error: e.message });
-    }
-    logServerError('api/assessments/run unexpected', e, req);
-    return res.status(500).json({ error: 'Internal server error' });
+    // #1314: centralized error handling — never leaks stack traces.
+    handleApiError(res, e, 'api/assessments/run unexpected', req);
+    return;
   }
 }
 

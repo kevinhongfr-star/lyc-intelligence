@@ -18,7 +18,17 @@
  * in log drains / alerting integrations without needing webhooks here.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { assertBodySize, sanitizeObject, DEFAULT_BODY_LIMIT, DEFAULT_ARRAY_LIMIT } from './lib/validate.js';
+import {
+  assertBodySize,
+  assertUrlLength,
+  getClientIp,
+  handleApiError,
+  parseJsonBody,
+  RateLimiter,
+  setRateLimitHeaders,
+  DEFAULT_BODY_LIMIT,
+  DEFAULT_ARRAY_LIMIT,
+} from './lib/validate.js';
 
 interface EventShape {
   name: string;
@@ -42,6 +52,12 @@ interface WindowStat {
 
 const WINDOW_MS = 60 * 1000;
 let window: WindowStat = { pageViews: 0, criticalErrors: 0, bucketStart: Date.now() };
+
+// #1314/#1315: Rate limit — 60 events requests per minute per IP.
+// This is a public unauthenticated endpoint; rate limiting prevents
+// log injection flooding and DoS via oversized event batches.
+const EVENTS_RATE_LIMITER = new RateLimiter(60_000, 60);
+const EVENTS_RATE_MAX = 60;
 
 function rotateWindow(now: number): void {
   if (now - window.bucketStart > WINDOW_MS) {
@@ -72,6 +88,23 @@ function isEventShape(o: unknown): o is EventShape {
 }
 
 export default function handler(req: VercelRequest, res: VercelResponse): void {
+  // #1314: reject oversized URLs before any processing.
+  try {
+    assertUrlLength(req);
+  } catch (e) {
+    handleApiError(res, e, 'api/events url-length', req);
+    return;
+  }
+
+  // #1314/#1315: Rate limit — per-IP sliding window.
+  const clientIp = getClientIp(req);
+  const rl = EVENTS_RATE_LIMITER.check(clientIp);
+  setRateLimitHeaders(res, rl, EVENTS_RATE_MAX);
+  if (!rl.allowed) {
+    res.status(429).json({ ok: false, error: 'Rate limit exceeded' });
+    return;
+  }
+
   if (req.method === 'GET') {
     const { stats } = req.query;
     if (stats === '1') {
@@ -95,23 +128,22 @@ export default function handler(req: VercelRequest, res: VercelResponse): void {
     return;
   }
 
-  const body = req.body;
-  // #1309: enforce body size limit + sanitize. Events are logged to stdout
-  // and forwarded to log drains — strip control chars and cap array length
-  // to prevent log injection and DoS.
+  // #1309 + #1314: enforce body size limit, then parse + sanitize.
+  // parseJsonBody throws RequestAuthError(400) on malformed JSON instead
+  // of letting a SyntaxError surface as a 500.
   try {
-    assertBodySize(body, DEFAULT_BODY_LIMIT);
-  } catch {
-    res.status(413).json({ ok: false, error: 'payload too large' });
+    assertBodySize(req.body, DEFAULT_BODY_LIMIT);
+  } catch (e) {
+    handleApiError(res, e, 'api/events body-size', req);
     return;
   }
-  const sanitizedBody = sanitizeObject(body, {
+  const sanitizedBody = parseJsonBody<{ events?: unknown[] }>(req, {
     maxDepth: 6,
     maxStringLength: 4096,
     maxArrayLength: 200,  // cap events per request
-  }) as { events?: unknown[] } | null;
+  });
   const events: unknown[] = Array.isArray(sanitizedBody?.events)
-    ? sanitizedBody!.events.slice(0, DEFAULT_ARRAY_LIMIT)
+    ? sanitizedBody.events.slice(0, DEFAULT_ARRAY_LIMIT)
     : [];
 
   const now = Date.now();

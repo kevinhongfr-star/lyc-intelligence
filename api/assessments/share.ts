@@ -28,14 +28,24 @@ import { createClient } from '../lib/supabase-rest.js';
 import { getAuthorizedContext, RequestAuthError } from '../lib/auth.js';
 import {
   assertBodySize,
+  assertUrlLength,
   assertUuid,
   clampInt,
+  handleApiError,
   logServerError,
-  sanitizeObject,
+  parseJsonBody,
   DEFAULT_BODY_LIMIT,
 } from '../lib/validate.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // #1314: reject oversized URLs before any processing.
+  try {
+    assertUrlLength(req);
+  } catch (e) {
+    handleApiError(res, e, 'api/assessments/share url-length', req);
+    return;
+  }
+
   const supabase = createClient();
 
   // ── Public read by token: GET /api/assessments/share?token=xxx ──
@@ -107,15 +117,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── POST: create share link ──────────────────────────────────
   if (req.method === 'POST') {
-    // #1309: body size + sanitize. The shared payload is stored as
-    // jsonb and rendered publicly — strip control chars and cap size.
+    // #1309 + #1314: body size + parse + sanitize. parseJsonBody throws
+    // 400 on malformed JSON. The shared payload is stored as jsonb and
+    // rendered publicly — strip control chars and cap size.
     assertBodySize(req.body, DEFAULT_BODY_LIMIT);
-    const body = sanitizeObject(req.body || {}) as {
+    const body = parseJsonBody<{
       result_id?: string;
       assessment_code?: string;
       payload?: unknown;
       max_views?: number;
-    };
+    }>(req);
     const { result_id, assessment_code, payload, max_views } = body;
 
     if (!result_id || !assessment_code || !payload) {
@@ -169,7 +180,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── DELETE: revoke share link ────────────────────────────────
   if (req.method === 'DELETE') {
-    const { share_id } = sanitizeObject(req.body || {}) as { share_id?: string };
+    // #1314: parseJsonBody throws 400 on malformed JSON.
+    const { share_id } = parseJsonBody<{ share_id?: string }>(req);
     if (!share_id) {
       return res.status(400).json({ ok: false, error: 'share_id is required' });
     }

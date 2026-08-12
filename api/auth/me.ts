@@ -16,7 +16,41 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '../lib/supabase-rest.js';
 import { getAuthorizedContext, RequestAuthError } from '../lib/auth.js';
-import { logServerError } from '../lib/validate.js';
+import {
+  assertUrlLength,
+  getClientIp,
+  handleApiError,
+  logServerError,
+  RateLimiter,
+  setRateLimitHeaders,
+} from '../lib/validate.js';
+
+// #1314: Rate limit — 60 requests per minute per IP.
+// Prevents user enumeration and brute-force token probing.
+// Supabase Auth handles rate limiting for signup/login/reset internally.
+const AUTH_RATE_LIMITER = new RateLimiter(60_000, 60);
+const AUTH_RATE_MAX = 60;
+
+// #1315: Safe profile columns — explicitly allowlist what we return
+// from /api/auth/me. Never select '*' which could leak internal fields
+// added by future migrations (e.g. internal_notes, flags, tokens).
+const SAFE_PROFILE_COLUMNS = [
+  'id',
+  'email',
+  'name',
+  'role',
+  'tier',
+  'organization_id',
+  'icp',
+  'active_surface',
+  'onboarded_at',
+  'avatar_url',
+  'bio',
+  'title',
+  'company',
+  'created_at',
+  'updated_at',
+].join(',');
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS preflight — this endpoint is called cross-origin only by ourselves,
@@ -35,15 +69,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // #1314: reject oversized URLs before processing.
+    assertUrlLength(req);
+
+    // #1314: Rate limit check — per-IP sliding window.
+    const clientIp = getClientIp(req);
+    const rl = AUTH_RATE_LIMITER.check(clientIp);
+    setRateLimitHeaders(res, rl, AUTH_RATE_MAX);
+    if (!rl.allowed) {
+      return res.status(429).json({ error: 'Too many requests' });
+    }
+
     const ctx = await getAuthorizedContext(req, false);
     if (!ctx) return res.status(401).json({ error: 'Unauthorized' });
 
     const supabase = createClient();
 
-    // Get the auth.user struct (verified by getUser) + profile row
+    // #1315: Select only safe columns — never '*' on profiles.
     const { data: profile } = await supabase
       .from('profiles')
-      .select('*')
+      .select(SAFE_PROFILE_COLUMNS)
       .eq('id', ctx.userId)
       .limit(1)
       .maybeSingle();
@@ -63,10 +108,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       server_time: new Date().toISOString(),
     });
   } catch (e: any) {
-    if (e instanceof RequestAuthError) {
-      return res.status(e.status).json({ error: e.message });
-    }
-    logServerError('api/auth/me unexpected', e, req);
-    return res.status(500).json({ error: 'Internal server error' });
+    // #1314: centralized error handling — never leaks stack traces.
+    handleApiError(res, e, 'api/auth/me unexpected', req);
+    return;
   }
 }

@@ -22,9 +22,22 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '../lib/supabase-rest.js';
 import { getAuthorizedContext, RequestAuthError } from '../lib/auth.js';
-import { logServerError } from '../lib/validate.js';
+import {
+  assertUrlLength,
+  handleApiError,
+  logServerError,
+  parseJsonBody,
+} from '../lib/validate.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // #1314: reject oversized URLs before any processing.
+  try {
+    assertUrlLength(req);
+  } catch (e) {
+    handleApiError(res, e, 'api/assessments/progress url-length', req);
+    return;
+  }
+
   let ctx;
   try {
     // #1309: getAuthorizedContext takes (req, allowAnonymous:boolean).
@@ -71,7 +84,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── POST: start or resume ────────────────────────────────────
   if (req.method === 'POST') {
-    const { assessment_code, total_questions, assessment_id } = req.body || {};
+    // #1314: parseJsonBody throws 400 on malformed JSON.
+    const { assessment_code, total_questions, assessment_id } = parseJsonBody<{
+      assessment_code?: string;
+      total_questions?: number;
+      assessment_id?: string;
+    }>(req);
     if (!assessment_code) {
       return res.status(400).json({ ok: false, error: 'assessment_code is required' });
     }
@@ -116,7 +134,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── PATCH: save answer / advance / complete ──────────────────
   if (req.method === 'PATCH') {
-    const { assessment_code, question_id, answer, current_question, status, result_id, miles_spent } = req.body || {};
+    // #1314: parseJsonBody throws 400 on malformed JSON. Sanitize the
+    // answer field since it's stored as jsonb and could contain anything.
+    const body = parseJsonBody<{
+      assessment_code?: string;
+      question_id?: string;
+      answer?: unknown;
+      current_question?: number;
+      status?: string;
+      result_id?: string;
+      miles_spent?: number;
+    }>(req);
+    const { assessment_code, question_id, answer, current_question, status, result_id, miles_spent } = body;
     if (!assessment_code) {
       return res.status(400).json({ ok: false, error: 'assessment_code is required' });
     }

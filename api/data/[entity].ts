@@ -34,9 +34,12 @@ import {
   assertBodySize,
   assertColumnName,
   assertEntityName,
+  assertUrlLength,
   DEFAULT_BODY_LIMIT,
+  handleApiError,
   logServerError,
   parseFilters,
+  parseJsonBody,
   parseOrderParam,
   parseSelectList,
   safeErrorMessage,
@@ -58,7 +61,11 @@ type Acl = {
   orgColumn?: string;         // e.g. 'organization_id', 'org_id'
 };
 const ENTITY_ACL: Record<string, Acl> = {
-  profiles:             { read: ['admin','consultant','client','leader'], write: ['admin','leader'], selfColumn: 'id', orgColumn: 'organization_id' },
+  // #1313: profiles write is admin-only. Leaders update their own profile
+  // via Supabase client-side RLS (updateProfile in authStore), NOT through
+  // this endpoint. This prevents non-admins from creating profile rows
+  // (i.e., "inviting" users) or assigning organization_id / role / tier.
+  profiles:             { read: ['admin','consultant','client','leader'], write: ['admin'], selfColumn: 'id', orgColumn: 'organization_id' },
   credits:              { read: ['admin','leader'],                  write: ['admin','leader'],  selfColumn: 'user_id' },
   credit_transactions:  { read: ['admin','leader'],                  write: ['admin'],            selfColumn: 'user_id' },
   organizations:        { read: ['admin','consultant','client'],     write: ['admin','consultant'], orgColumn: 'id' },
@@ -155,6 +162,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // #1314: reject oversized URLs before any processing — avoids 500s
+    // from attackers stuffing payloads into query params.
+    assertUrlLength(req);
+
     const ctx = await getAuthorizedContext(req, false);
     if (!ctx) return res.status(401).json({ error: 'Unauthorized' });
 
@@ -224,11 +235,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // ── POST: { filters, upsert, delete_by } ──────────────────────────
     if (req.method === 'POST') {
-      // #1309: enforce body size limit (256 KB default) and sanitize
-      // the whole body up front — strips control chars from strings,
-      // drops prototype-polluting keys, caps array length, caps depth.
+      // #1309 + #1314: enforce body size limit, then parse + sanitize.
+      // parseJsonBody throws RequestAuthError(400) on malformed JSON
+      // (instead of letting a SyntaxError surface as a 500).
       assertBodySize(req.body, DEFAULT_BODY_LIMIT);
-      const body = sanitizeObject(req.body || {}) as {
+      const body = parseJsonBody<{
         select?: string;
         upsert?: Record<string, unknown>;
         delete_by?: Record<string, unknown>;
@@ -237,7 +248,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         on_conflict?: string;
         limit?: number;
         offset?: number;
-      };
+      }>(req);
 
       // Write access check first.
       if (body.upsert || body.delete_by) {
@@ -245,6 +256,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           throw new RequestAuthError(`Write not permitted on "${entity}"`, 403);
         }
         enforceScope(ctx, { allow: acl.write });
+
+        // #1313: Defense-in-depth — privileged fields on profiles (role,
+        // tier, organization_id) require admin even if the caller somehow
+        // passes the write ACL. The DB trigger also enforces this, but we
+        // reject early with a clear 403 before hitting the database.
+        if (entity === 'profiles' && body.upsert) {
+          const privilegedFields = ['role', 'tier', 'organization_id', 'is_admin', 'is_staff'];
+          const attempted = privilegedFields.filter(f => body.upsert![f] !== undefined);
+          if (attempted.length > 0 && !isAdminRole(ctx.role)) {
+            throw new RequestAuthError(
+              `Permission denied: setting ${attempted.join(', ')} requires admin role`,
+              403,
+            );
+          }
+        }
       } else {
         // Read-only POST (filters only)
         enforceScope(ctx, { allow: acl.read });
@@ -360,10 +386,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (e: any) {
-    if (e instanceof RequestAuthError) {
-      return res.status(e.status).json({ error: e.message });
-    }
-    logServerError('api/data/[entity] unexpected', e, req);
-    return res.status(500).json({ error: 'Internal server error' });
+    // #1314: centralized error handling — never leaks stack traces.
+    handleApiError(res, e, 'api/data/[entity] unexpected', req);
+    return;
   }
 }
