@@ -1,5 +1,6 @@
 export { AssessmentResults } from './AssessmentResults';
 export { ResultsHero } from './ResultsHero';
+export { ExecutiveSummary, deriveExecutiveSummary } from './ExecutiveSummary';
 export { DimensionScorecard } from './DimensionScorecard';
 export { ArchetypeProfile } from './ArchetypeProfile';
 export { KeyInsights } from './KeyInsights';
@@ -14,4 +15,6 @@ export type {
   ArchetypeResult,
   InsightCard,
   DevelopmentAction,
+  ExecutiveSummary as ExecutiveSummaryData,
+  KeyFinding,
 } from './types';

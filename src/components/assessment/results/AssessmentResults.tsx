@@ -6,6 +6,7 @@ import {
   useScrollReveal, RevealStyles,
 } from '../landing/shared';
 import { ResultsHero } from './ResultsHero';
+import { ExecutiveSummary } from './ExecutiveSummary';
 import { DimensionScorecard } from './DimensionScorecard';
 import { ArchetypeProfile } from './ArchetypeProfile';
 import { KeyInsights } from './KeyInsights';
@@ -112,6 +113,7 @@ export function AssessmentResults({ config }: Props) {
       <Nav config={config} />
       <main>
         <ResultsHero config={config} />
+        <ExecutiveSummary config={config} />
         <DimensionScorecard config={config} />
         <ArchetypeProfile config={config} />
         <KeyInsights config={config} />
