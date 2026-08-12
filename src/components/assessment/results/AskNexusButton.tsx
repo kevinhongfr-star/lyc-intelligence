@@ -50,7 +50,7 @@ export function AskNexusButton({
         color: accent,
         background: 'transparent',
         border: `1px solid ${accent}`,
-        borderRadius: 0,
+ 
         cursor: 'pointer',
         minHeight: 32,
         transition: 'background 200ms cubic-bezier(0.4,0,0.2,1), color 200ms cubic-bezier(0.4,0,0.2,1)',

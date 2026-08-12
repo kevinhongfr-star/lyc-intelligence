@@ -54,8 +54,9 @@
   border-radius: 0 !important;
 }
 
-/* #1338: Crimson Pro — self-hosted woff2 (variable font, covers 400/600/700).
-   DM Sans + IBM Plex Mono remain on Google Fonts CDN until Phase 6 (#1273). */
+/* #1273: All three brand fonts fully self-hosted (woff2 Latin subsets in /public/fonts/).
+   Crimson Pro variable (400-700 normal/italic) + DM Sans 400/500/600/700 + IBM Plex Mono 400/500.
+   Zero Google Fonts CDN dependencies anywhere in the bundled app. */
 @font-face {
   font-family: 'Crimson Pro';
   src: url('/fonts/CrimsonPro-Regular.woff2') format('woff2');
@@ -253,21 +254,6 @@ html {
   from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 350ms var(--ease-out), transform 350ms var(--ease-out);
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.reveal-delay-1 { transition-delay: 80ms; }
-.reveal-delay-2 { transition-delay: 160ms; }
-.reveal-delay-3 { transition-delay: 240ms; }
 
 /* Card hover — smooth cubic-bezier */
 .card-hover {
@@ -760,7 +746,8 @@ body {
   transform: translateY(-1px);
 }
 
-/* Scroll reveal — ease-out-expo for intentional content appearance */
+/* Scroll reveal — ease-out-expo for intentional content appearance.
+   Duration 350ms with 24px rise = premium, functional reveal motion (#1275). */
 .reveal {
   opacity: 0;
   transform: translateY(24px);
@@ -770,6 +757,10 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+/* Staggered delays for grouped reveals — within 350ms envelope */
+.reveal-delay-1 { transition-delay: 80ms; }
+.reveal-delay-2 { transition-delay: 160ms; }
+.reveal-delay-3 { transition-delay: 240ms; }
 
 /* Fuchsia accent backgrounds at multiple opacities */
 .bg-accent-5 { background-color: var(--accent-5); }

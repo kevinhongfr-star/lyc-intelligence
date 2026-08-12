@@ -98,7 +98,7 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
         textDecoration: 'none',
         background: DS.card,
         border: `1px solid ${DS.cardBorder}`,
-        borderRadius: DS.radius,
+ 
         padding: wide ? '32px 28px' : '24px 20px',
         boxShadow: DS.shadow,
         transition: 'all 0.25s ease',
@@ -367,7 +367,7 @@ export function AssessmentCatalogPage() {
               marginLeft: '8px',
               background: DS.accent,
               color: '#FFFFFF',
-              borderRadius: DS.radius,
+ 
               fontFamily: DS.bodyFont,
               fontSize: '13px',
               fontWeight: 600,
@@ -470,7 +470,7 @@ export function AssessmentCatalogPage() {
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
                 textDecoration: 'none',
-                borderRadius: DS.radius,
+ 
                 transition: 'all 0.2s ease',
               }}
             >
@@ -492,7 +492,7 @@ export function AssessmentCatalogPage() {
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 textDecoration: 'none',
-                borderRadius: DS.radius,
+ 
                 background: DS.card,
               }}
             >
@@ -544,7 +544,7 @@ export function AssessmentCatalogPage() {
               color: DS.accent,
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: DS.radius,
+ 
               marginBottom: '20px',
             }}
           >
@@ -591,7 +591,7 @@ export function AssessmentCatalogPage() {
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
               textDecoration: 'none',
-              borderRadius: DS.radius,
+ 
               transition: 'all 0.2s ease',
             }}
           >

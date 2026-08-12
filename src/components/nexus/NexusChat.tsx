@@ -882,7 +882,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                     border: `1px solid ${
                       canonicalTier === TIER_KEYS_CANONICAL.EXPLORER ? `${DS.accent}40` : '#FED7AA'
                     }`,
-                    borderRadius: DS.radius,
+ 
                   }}
                 >
                   <Crown
@@ -914,7 +914,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 <div
                   title={`Intent: ${lastIntentLabel} (${lastIntent})`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#F3F0FF]"
-                  style={{ border: '1px solid #EDE9FE', borderRadius: DS.radius }}
+                  style={{ border: '1px solid #EDE9FE' }}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#7C3AED]" />
                   <span className="text-xs font-medium text-[#6D28D9]">{lastIntentLabel}</span>
@@ -924,7 +924,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 <div
                   title={`Daily NEXUS budget: ¥${budgetStatus.spent_cny.toFixed(2)} / ¥${budgetStatus.budget_cny.toFixed(2)} (${budgetStatus.utilization_pct.toFixed(0)}%)`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100"
-                  style={{ border: '1px solid #E5E7EB', borderRadius: DS.radius }}
+                  style={{ border: '1px solid #E5E7EB' }}
                 >
                   <Zap className="w-3.5 h-3.5 text-gray-600" />
                   <span className="text-xs font-medium text-gray-700">
@@ -942,7 +942,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                       : ''
                   }${userContextMeta.active_mandates > 0 ? ` | Active mandates: ${userContextMeta.active_mandates}` : ''} | Conversations: ${userContextMeta.conversation_count}`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#FFF7ED]"
-                  style={{ border: '1px solid #FED7AA', borderRadius: DS.radius }}
+                  style={{ border: '1px solid #FED7AA' }}
                 >
                   <Crown className="w-3.5 h-3.5 text-[#C2410C]" />
                   <span className="text-xs font-medium text-[#9A3412] capitalize">
@@ -967,7 +967,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 <div
                   title={`NEXUS retrieved ${retrievedMemories} relevant memor${retrievedMemories === 1 ? 'y' : 'ies'} from past conversations`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#ECFDF5]"
-                  style={{ border: '1px solid #A7F3D0', borderRadius: DS.radius }}
+                  style={{ border: '1px solid #A7F3D0' }}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#059669]" />
                   <span className="text-xs font-medium text-[#047857]">
@@ -979,7 +979,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 <div
                   title={`Grounded on ${citations.length} source${citations.length === 1 ? '' : 's'} from the LYC content library:\n${citations.map((c, i) =>`[${i + 1}] ${c.title}${c.source ? ` — ${c.source}` : ''} (${(c.score * 100).toFixed(0)}%)`).join('\n')}`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#EFF6FF]"
-                  style={{ border: '1px solid #BFDBFE', borderRadius: DS.radius }}
+                  style={{ border: '1px solid #BFDBFE' }}
                 >
                   <Shield className="w-3.5 h-3.5 text-[#2563EB]" />
                   <span className="text-xs font-medium text-[#1D4ED8]">
@@ -1070,7 +1070,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                       padding: '6px 12px',
                       background: `${DS.accent}12`,
                       border: `1px solid ${DS.accent}40`,
-                      borderRadius: DS.radius,
+ 
                       fontFamily: DS.monoFont,
                       fontSize: '11px',
                       letterSpacing: '0.06em',
@@ -1103,7 +1103,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                       fontSize: '14px',
                       lineHeight: '1.6',
                       wordBreak: 'break-word',
-                      borderRadius: DS.radius,
+ 
                       whiteSpace: 'pre-wrap',
                     }}
                   >
@@ -1279,7 +1279,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
 
       {showUpgradeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white max-w-lg w-full overflow-hidden shadow-2xl" style={{ borderRadius: DS.radius }}>
+          <div className="bg-white max-w-lg w-full overflow-hidden shadow-2xl" style={{ }}>
             <div className="p-6 text-white" style={{ background: `linear-gradient(135deg, ${DS.accent} 0%, #8B067B 100%)` }}>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-white/20 flex items-center justify-center">
@@ -1328,7 +1328,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                   window.open('/pricing', '_blank');
                 }}
                 className="w-full py-3 px-4 bg-accent text-white font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
-                style={{ borderRadius: DS.radius }}
+                style={{ }}
               >
                 Add miles to plan
                 <ArrowRight className="w-4 h-4" />
@@ -1337,7 +1337,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
               <button
                 onClick={() => setShowUpgradeModal(false)}
                 className="w-full mt-3 py-3 px-4 bg-bg-tertiary text-text-primary font-medium hover:bg-bg-secondary transition-colors"
-                style={{ borderRadius: DS.radius }}
+                style={{ }}
               >
                 Keep exploring
               </button>

@@ -148,7 +148,7 @@ export function ClientTimeline({ milestones, mandateTitle, mandateStatus }: Clie
                 In Progress · Expected {formatDate(currentMilestone.targetDate)}
               </p>
             </div>
-            <div className="w-4 h-4 bg-accent animate-bounce">
+            <div className="w-4 h-4 bg-accent" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <TrendingUp className="w-4 h-4 text-white" />
             </div>
           </div>

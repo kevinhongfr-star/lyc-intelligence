@@ -55,7 +55,7 @@ export function CanonicalInstrumentLanding() {
           </p>
           <a
             href="/assessment"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', textDecoration: 'none', fontFamily: DS.bodyFont, fontSize: '12px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', borderRadius: DS.radius }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', textDecoration: 'none', fontFamily: DS.bodyFont, fontSize: '12px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}
           >
             <ArrowLeft style={{ width: 13, height: 13 }} /> Browse assessments
           </a>
@@ -260,7 +260,7 @@ export function CanonicalInstrumentLanding() {
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
                 textDecoration: 'none',
-                borderRadius: DS.radius,
+ 
               }}
             >
               Begin with NEXUS <ArrowRight style={{ width: 15, height: 15 }} />
@@ -272,7 +272,7 @@ export function CanonicalInstrumentLanding() {
                 gap: '4px',
                 padding: '14px 24px',
                 border: '1px solid rgba(255,255,255,0.18)',
-                borderRadius: DS.radius,
+ 
               }}
             >
               <span style={{ fontFamily: DS.headingFont, fontSize: '26px', fontWeight: 700, color: DS.accent, lineHeight: 1 }}>{info.priceMiles}</span>
@@ -385,7 +385,7 @@ export function CanonicalInstrumentLanding() {
               style={{
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: DS.radius,
+ 
                 padding: '22px 20px',
                 boxShadow: DS.shadow,
               }}
@@ -403,7 +403,7 @@ export function CanonicalInstrumentLanding() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderRadius: DS.radius,
+ 
                   }}
                 >
                   {String(i + 1).padStart(2, '0')}
@@ -475,7 +475,7 @@ export function CanonicalInstrumentLanding() {
                   style={{
                     background: highlight ? '#0A0A12' : DS.card,
                     border: highlight ? `2px solid ${DS.accent}` : `1px solid ${DS.cardBorder}`,
-                    borderRadius: DS.radius,
+ 
                     padding: '28px 24px',
                     display: 'flex',
                     flexDirection: 'column',
@@ -499,7 +499,7 @@ export function CanonicalInstrumentLanding() {
                         letterSpacing: '0.2em',
                         padding: '4px 10px',
                         textTransform: 'uppercase',
-                        borderRadius: DS.radius,
+ 
                       }}
                     >
                       Recommended
@@ -517,7 +517,7 @@ export function CanonicalInstrumentLanding() {
                         fontWeight: 500,
                         textTransform: 'uppercase',
                         letterSpacing: '0.16em',
-                        borderRadius: DS.radius,
+ 
                       }}
                     >
                       {p.tier.toUpperCase()}
@@ -570,7 +570,7 @@ export function CanonicalInstrumentLanding() {
                       fontWeight: 700,
                       textTransform: 'uppercase',
                       letterSpacing: '0.16em',
-                      borderRadius: DS.radius,
+ 
                       boxSizing: 'border-box',
                     }}
                   >
@@ -626,7 +626,7 @@ export function CanonicalInstrumentLanding() {
                 style={{
                   background: DS.card,
                   border: `1px solid ${DS.cardBorder}`,
-                  borderRadius: DS.radius,
+ 
                   padding: '20px 18px',
                   boxShadow: DS.shadow,
                 }}
@@ -650,7 +650,7 @@ export function CanonicalInstrumentLanding() {
                           padding: '3px 8px',
                           background: `${DS.accent}10`,
                           color: DS.accent,
-                          borderRadius: DS.radius,
+ 
                         }}
                       >
                         {t.slice(0, 36)}
@@ -745,7 +745,7 @@ export function CanonicalInstrumentLanding() {
               padding: '18px 36px',
               background: '#C108AB',
               color: '#FFFFFF',
-              borderRadius: '0px',
+ 
               fontFamily: DS.bodyFont,
               fontSize: '13px',
               fontWeight: 700,
@@ -776,7 +776,7 @@ function Stat({ icon: Icon, value, label }: { icon: any; value: string; label: s
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: DS.radius,
+ 
         }}
       >
         <Icon style={{ width: 18, height: 18 }} />

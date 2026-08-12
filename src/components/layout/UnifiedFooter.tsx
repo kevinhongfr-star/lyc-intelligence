@@ -190,7 +190,7 @@ export function UnifiedFooter() {
               textDecoration: 'none',
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              borderRadius: DS.radius,
+ 
               marginBottom: '16px',
             }}
           >

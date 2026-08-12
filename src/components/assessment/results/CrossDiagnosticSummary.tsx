@@ -156,7 +156,7 @@ export function CrossDiagnosticSummary({ assessmentCode, accent, prefix, nexusPa
                   padding: '12px 22px', background: accent, color: WHITE,
                   fontFamily: "'DM Sans', system-ui, sans-serif",
                   fontSize: 14, fontWeight: 500, textDecoration: 'none',
-                  border: `1px solid ${accent}`, borderRadius: 0, minHeight: 44,
+                  border: `1px solid ${accent}`, minHeight: 44,
                   transition: 'background 200ms cubic-bezier(0.4,0,0.2,1), color 200ms cubic-bezier(0.4,0,0.2,1)',
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = WHITE; e.currentTarget.style.color = INK; }}

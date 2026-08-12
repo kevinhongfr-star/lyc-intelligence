@@ -159,7 +159,7 @@ function TierBadge({ label, color = DS.accent }: { label: string; color?: string
         fontWeight: 500,
         textTransform: 'uppercase',
         letterSpacing: '0.16em',
-        borderRadius: DS.radius,
+ 
       }}
     >
       {label}
@@ -182,7 +182,7 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
         textDecoration: 'none',
         background: DS.card,
         border: `1px solid ${DS.cardBorder}`,
-        borderRadius: DS.radius,
+ 
         padding: wide ? '32px 28px' : '24px 20px',
         boxShadow: DS.shadow,
         transition: 'all 0.25s ease',
@@ -367,7 +367,7 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
       style={{
         background: highlight ? '#0A0A12' : DS.card,
         border: highlight ? `2px solid ${DS.accent}` : `1px solid ${DS.cardBorder}`,
-        borderRadius: DS.radius,
+ 
         padding: '28px 24px',
         display: 'flex',
         flexDirection: 'column',
@@ -391,7 +391,7 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
             letterSpacing: '0.2em',
             padding: '4px 10px',
             textTransform: 'uppercase',
-            borderRadius: DS.radius,
+ 
           }}
         >
           Recommended
@@ -505,7 +505,7 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
             fontWeight: 700,
             textTransform: 'uppercase',
             letterSpacing: '0.16em',
-            borderRadius: DS.radius,
+ 
             transition: 'background 0.2s ease',
             boxSizing: 'border-box',
           }}
@@ -609,7 +609,7 @@ export function Landing() {
               padding: '10px 20px',
               background: DS.accent,
               color: '#FFFFFF',
-              borderRadius: '0px',
+ 
               fontFamily: DS.bodyFont,
               fontSize: '13px',
               fontWeight: 600,
@@ -759,7 +759,7 @@ export function Landing() {
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
                 textDecoration: 'none',
-                borderRadius: DS.radius,
+ 
                 transition: 'all 0.2s ease',
               }}
             >
@@ -781,7 +781,7 @@ export function Landing() {
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 textDecoration: 'none',
-                borderRadius: DS.radius,
+ 
                 background: 'rgba(255,255,255,0.04)',
                 backdropFilter: 'blur(6px)',
                 WebkitBackdropFilter: 'blur(6px)',
@@ -875,7 +875,7 @@ export function Landing() {
               style={{
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: DS.radius,
+ 
                 padding: '28px 24px',
                 textDecoration: 'none',
                 boxShadow: DS.shadow,
@@ -884,7 +884,7 @@ export function Landing() {
                 gap: '12px',
               }}
             >
-              <div style={{ display: 'inline-flex', width: '40px', height: '40px', background: `${DS.accent}12`, color: DS.accent, alignItems: 'center', justifyContent: 'center', borderRadius: DS.radius }}>
+              <div style={{ display: 'inline-flex', width: '40px', height: '40px', background: `${DS.accent}12`, color: DS.accent, alignItems: 'center', justifyContent: 'center' }}>
                 <c.icon style={{ width: 18, height: 18 }} />
               </div>
               <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, margin: 0, letterSpacing: '-0.01em' }}>
@@ -1107,7 +1107,7 @@ export function Landing() {
                 padding: '18px 36px',
                 background: '#C108AB',
                 color: '#FFFFFF',
-                borderRadius: '0px',
+ 
                 fontFamily: DS.bodyFont,
                 fontSize: '13px',
                 fontWeight: 700,
@@ -1127,7 +1127,7 @@ export function Landing() {
                 padding: '18px 32px',
                 border: '1px solid rgba(193,8,171,0.45)',
                 color: '#C108AB',
-                borderRadius: '0px',
+ 
                 fontFamily: DS.bodyFont,
                 fontSize: '13px',
                 fontWeight: 700,
