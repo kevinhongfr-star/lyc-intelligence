@@ -26,6 +26,7 @@ import {
   isClientRole,
   isAdminRole,
   isConsultantRole,
+  isScopedConsultantRole,
   isLeaderRole,
   RequestAuthError,
 } from '../lib/auth.js';
@@ -39,17 +40,18 @@ import {
 type Acl = {
   read: Array<'admin' | 'consultant' | 'client' | 'leader'>;
   write?: Array<'admin' | 'consultant' | 'client' | 'leader'>;
-  selfColumn?: string;  // e.g. 'user_id', 'owner_id', 'requester_id', 'subject_id', 'id'
-  orgColumn?: string;   // e.g. 'organization_id', 'org_id'
+  selfColumn?: string;        // e.g. 'user_id', 'owner_id' — column = userId for leader/candidate self-scoping
+  consultantColumn?: string;  // column = userId for scoped-consultant per-user scoping (e.g. 'lead_consultant_id', 'owner_id')
+  orgColumn?: string;         // e.g. 'organization_id', 'org_id'
 };
 const ENTITY_ACL: Record<string, Acl> = {
   profiles:             { read: ['admin','consultant','client','leader'], write: ['admin','leader'], selfColumn: 'id', orgColumn: 'organization_id' },
   credits:              { read: ['admin','leader'],                  write: ['admin','leader'],  selfColumn: 'user_id' },
   credit_transactions:  { read: ['admin','leader'],                  write: ['admin'],            selfColumn: 'user_id' },
   organizations:        { read: ['admin','consultant','client'],     write: ['admin','consultant'], orgColumn: 'id' },
-  mandates:             { read: ['admin','consultant','client'],     write: ['admin','consultant'], orgColumn: 'organization_id' },
+  mandates:             { read: ['admin','consultant','client'],     write: ['admin','consultant'], consultantColumn: 'lead_consultant_id', orgColumn: 'organization_id' },
   mandate_timelines:    { read: ['admin','consultant','client'],     write: ['admin','consultant'] },
-  contacts:             { read: ['admin','consultant','client','leader'], write: ['admin','consultant'], selfColumn: 'id', orgColumn: 'organization_id' },
+  contacts:             { read: ['admin','consultant','client','leader'], write: ['admin','consultant'], selfColumn: 'id', consultantColumn: 'owner_id', orgColumn: 'organization_id' },
   documents:            { read: ['admin','consultant','client','leader'], write: ['admin','consultant','leader'], selfColumn: 'owner_id', orgColumn: 'organization_id' },
   assessment_results:   { read: ['admin','consultant','leader'],     write: ['admin','leader'],   selfColumn: 'user_id' },
   memories:             { read: ['admin','leader'],                  write: ['admin','leader'],   selfColumn: 'user_id' },
@@ -107,7 +109,15 @@ function applyRoleFilters(
     query = query.eq(acl.orgColumn, ctx.organizationId);
   }
 
-  // 2) Leader rows: if table has an owner/user column AND caller isn't admin/consultant,
+  // 2) Scoped consultants (NOT admins): filter by consultantColumn when defined.
+  //    This restricts consultants to their own mandates (lead_consultant_id)
+  //    and contacts (owner_id). Admins bypass this — they see everything.
+  //    Ticket #1306, #1307 — Phase 3 consultant RLS scoping.
+  if (isScopedConsultantRole(ctx.role) && acl.consultantColumn) {
+    query = query.eq(acl.consultantColumn, ctx.userId);
+  }
+
+  // 3) Leader rows: if table has an owner/user column AND caller isn't admin/consultant,
   //    scope to self (admins/consultants can see broader, they're internal).
   if (acl.selfColumn && !isAdminRole(ctx.role) && !isConsultantRole(ctx.role) && !isClientRole(ctx.role)) {
     // Leaders / candidates only see their own rows.
@@ -243,6 +253,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           // If caller didn't provide it, default it for them on insert scenarios.
           if (ownerVal === undefined) {
             body.upsert[acl.selfColumn] = ctx.userId;
+          }
+        }
+        // Consultant scoping: scoped consultants must own the rows they write.
+        // Ticket #1306, #1307.
+        if (isScopedConsultantRole(ctx.role) && acl.consultantColumn) {
+          const colVal = body.upsert[acl.consultantColumn];
+          if (colVal !== undefined && String(colVal) !== String(ctx.userId)) {
+            throw new RequestAuthError(`Cannot set ${acl.consultantColumn} to another user`, 403);
+          }
+          if (colVal === undefined) {
+            body.upsert[acl.consultantColumn] = ctx.userId;
           }
         }
         // Client-org scoping: enforce org id on upserted rows.

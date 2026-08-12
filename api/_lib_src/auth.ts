@@ -123,7 +123,18 @@ export function isAdminRole(role?: RoleKey | null): boolean {
 }
 export function isConsultantRole(role?: RoleKey | null): boolean {
   if (!role) return false;
-  return isAdminRole(role) || ['consultant', 'lyc_consultant'].includes(role);
+  return isAdminRole(role) || ['consultant', 'lyc_consultant', 'team_lead'].includes(role);
+}
+
+/**
+ * Scoped consultant: internal staff who are NOT admins.
+ * These users are restricted to their own mandates (lead_consultant_id)
+ * and contacts (owner_id). Admins bypass scoping.
+ * Ticket #1306, #1307 — Phase 3 consultant RLS scoping.
+ */
+export function isScopedConsultantRole(role?: RoleKey | null): boolean {
+  if (!role) return false;
+  return ['consultant', 'lyc_consultant', 'team_lead'].includes(role);
 }
 export function isClientRole(role?: RoleKey | null): boolean {
   if (!role) return false;
