@@ -31,6 +31,11 @@ import { QualityGate, bannedWordScanner, canonicalTierNameCheck } from '@/nexus/
 import { normalizeBrandPhrases } from '@/services/aiPromptLibrary';
 import type { TierKey } from '@/config/tierConfig';
 import { TIER_META } from '@/config/tierConfig';
+import { DeepSeekClient, type DeepSeekChatResult } from '@/nexus/deepseekClient';
+import { deductMiles, refundMiles } from '@/services/creditService';
+
+const deepseek = new DeepSeekClient();
+
 import { WelcomeEmailTemplate } from '@/components/email/WelcomeEmail';
 import { AssessmentCompleteEmailTemplate } from '@/components/email/AssessmentCompleteEmail';
 import { EmailVerificationEmailTemplate } from '@/components/email/EmailVerificationEmail';
@@ -133,12 +138,33 @@ export function applyBrandLens(input: BrandLensInput): BrandLens {
 
 export type VoiceTone = (typeof TONE_BY_CONTEXT)[keyof typeof TONE_BY_CONTEXT];
 
+export interface VoiceEngineResult {
+  /** Rewritten HTML body. */
+  html_body: string;
+  /** Rewritten subject (if voice engine touched it). Keep original when voice skipped. */
+  subject: string;
+  /** True when DeepSeek call was attempted and returned content. */
+  voice_rewrote: boolean;
+  /** Whether rules fallback was used (AI path failed, or user tier/opt-out skipped AI). */
+  used_fallback: boolean;
+  /** Step to append to provenance chain for the email pipeline. */
+  provenance_step: {
+    stage: 'voice_engine';
+    at: string;
+    miles_debited: 0 | 1;
+    tokens?: { prompt_tokens: number; completion_tokens: number };
+    error?: string;
+  };
+}
+
 export function voiceForEmail(kind: EmailKind): {
   tone: VoiceTone;
   subject_prefix: string;
   max_subject_len: number;
   forbidden_words: string[];
   min_paragraphs: number;
+  /** per-template voice-engine policy. */
+  enable_voice_engine_default: boolean;
 } {
   switch (kind) {
     case 'welcome':
@@ -148,6 +174,7 @@ export function voiceForEmail(kind: EmailKind): {
         max_subject_len: 60,
         forbidden_words: ['free', 'discount', 'unlock', 'level up'],
         min_paragraphs: 2,
+        enable_voice_engine_default: true,
       };
     case 'assessment_complete':
       return {
@@ -156,6 +183,7 @@ export function voiceForEmail(kind: EmailKind): {
         max_subject_len: 70,
         forbidden_words: ['passed', 'failed', 'grade', 'scorecard'],
         min_paragraphs: 2,
+        enable_voice_engine_default: true,
       };
     case 'email_verification':
       return {
@@ -164,6 +192,7 @@ export function voiceForEmail(kind: EmailKind): {
         max_subject_len: 50,
         forbidden_words: [],
         min_paragraphs: 1,
+        enable_voice_engine_default: false,
       };
     case 'password_reset':
       return {
@@ -172,6 +201,7 @@ export function voiceForEmail(kind: EmailKind): {
         max_subject_len: 50,
         forbidden_words: ['compromised', 'hacked'],
         min_paragraphs: 1,
+        enable_voice_engine_default: false,
       };
     case 'upgrade_confirmation':
       return {
@@ -180,6 +210,7 @@ export function voiceForEmail(kind: EmailKind): {
         max_subject_len: 70,
         forbidden_words: ['free', 'sale', 'deal', 'bargain'],
         min_paragraphs: 2,
+        enable_voice_engine_default: true,
       };
     case 'weekly_digest':
       return {
@@ -188,6 +219,7 @@ export function voiceForEmail(kind: EmailKind): {
         max_subject_len: 80,
         forbidden_words: [],
         min_paragraphs: 3,
+        enable_voice_engine_default: true,
       };
     case 'nexus_conversation_summary':
       return {
@@ -196,6 +228,7 @@ export function voiceForEmail(kind: EmailKind): {
         max_subject_len: 80,
         forbidden_words: ['magic', 'secret', 'trick'],
         min_paragraphs: 3,
+        enable_voice_engine_default: true,
       };
     case 'share_result':
       return {
@@ -204,34 +237,344 @@ export function voiceForEmail(kind: EmailKind): {
         max_subject_len: 80,
         forbidden_words: ['free', 'check out this', 'amazing'],
         min_paragraphs: 2,
+        enable_voice_engine_default: true,
       };
   }
 }
 
-/* ── #104 Content generator (lightweight; no LLM unless opted in) ── */
+function voiceSystemPrompt(kind: EmailKind): string {
+  const voice = voiceForEmail(kind);
+  const tone = typeof voice.tone === 'object' ? JSON.stringify(voice.tone) : String(voice.tone);
+  const principles = Array.isArray(VOICE_PRINCIPLES)
+    ? VOICE_PRINCIPLES.map((p, i) => `${i + 1}. ${typeof p === 'string' ? p : JSON.stringify(p)}`).join('\n')
+    : String(VOICE_PRINCIPLES ?? '');
+  const contextHint =
+    kind === 'assessment_complete'
+      ? 'This email delivers a recent assessment result to the person who completed it. Be supportive, specific, and concise — no corporate speak. The recipient has earned real insight; treat them like a seasoned executive.'
+      : kind === 'weekly_digest'
+      ? 'This email is a weekly digest of NEXUS activity, completed assessments and shareable insights. Be informative without being cheerful. Prioritize brevity and a clear next step.'
+      : kind === 'share_result'
+      ? 'This email is from one professional to another sharing an assessment report link. Respect the sender voice: formal but not cold. The body contains the sender note — keep its spirit but tighten phrasing.'
+      : kind === '3day_checkin'
+      ? 'This is a 3-day check-in after a completed assessment. Reference exactly one key insight. Invite them back to their dashboard to continue the journey.'
+      : 'Standard LYC Partners voice — executive, concise, human, never corporate-speak.';
+  return (
+    'You rewrite email HTML content to match LYC Partners brand voice.\n' +
+    'Rules:\n' +
+    '- Keep ALL factual content intact. Do not invent new data, names, numbers, scores, links, tokens, or dates.\n' +
+    '- Keep the HTML structure intact: do not remove <table>, <a href="…">, <img>, <style> blocks, or CTA links.\n' +
+    '- Rewrite prose only (p, h1-h4, div text, span, li text nodes). Keep all non-text markup untouched.\n' +
+    '- Executive, concise, human. No "Hey there!" or corporate platitudes ("At X we believe …").\n' +
+    '- Never invent the word "free" — use "Executive Introduction" or "complimentary assessment".\n' +
+    '- Brand tone context: ' + tone + '\n' +
+    '- Template context: ' + contextHint + '\n' +
+    '- Brand principles:\n' + principles + '\n\n' +
+    'Return exactly the rewritten HTML in a JSON string field: { "html": "<!— rewritten HTML —>" }. Do not wrap HTML with markdown code fences.'
+  );
+}
+
+/**
+ * #103 Voice engine (LLM version). Per-template, per-tier:
+ *   Executive Introduction → skip (return content unchanged, provenance records skip, 0 mi)
+ *   professional tier (and above) → rewrite enabled (1 mi on success, 0 mi on failure).
+ *   professional tier with enable_voice_engine=false → skip.
+ * Costs 1 mile. Falls back to rules-only if LLM unavailable or returns invalid shape.
+ */
+export async function applyVoiceEngineRewriting(opts: {
+  kind: EmailKind;
+  subject: string;
+  html_body: string;
+  tier?: TierKey | null;
+  enable_voice_engine?: boolean;
+  user_id?: string;
+}): Promise<VoiceEngineResult> {
+  const baseline = (status: 'rules_fallback' | 'skip', miles: 0 | 1, error?: string): VoiceEngineResult => ({
+    html_body: normalizeBrandPhrases(rulesRewrite(opts.html_body, opts.kind)),
+    subject: applyToneToSubject(opts.subject, voiceForEmail(opts.kind).subject_prefix, voiceForEmail(opts.kind).max_subject_len),
+    voice_rewrote: false,
+    used_fallback: status === 'rules_fallback',
+    provenance_step: {
+      stage: 'voice_engine',
+      at: new Date().toISOString(),
+      miles_debited: miles,
+      error,
+    },
+  });
+
+  const voiceCfg = voiceForEmail(opts.kind);
+  const useVoice =
+    opts.enable_voice_engine !== false &&
+    voiceCfg.enable_voice_engine_default &&
+    opts.tier &&
+    opts.tier !== 'executive_introduction' &&
+    opts.tier !== 'explorer';
+
+  if (!useVoice) {
+    // EI tier or template opted out — skip voice engine. 0 miles charged.
+    return baseline('skip', 0);
+  }
+
+  // Deduct miles up front; refund on failure.
+  let debited = false;
+  try {
+    if (opts.user_id) {
+      const r = await deductMiles(1, `email voice_engine ${opts.kind}`, {
+        description: `Voice engine rewrite (${opts.kind}) — 1 mile`,
+      });
+      debited = r.success;
+    }
+  } catch { /* ignore — miles debit best-effort */ }
+
+  if (!deepseek.hasApiKey()) {
+    if (debited) void refundMiles(1, `email voice_engine ${opts.kind} offline`).catch(() => {});
+    return baseline('rules_fallback', 0, 'deepseek offline/no-key');
+  }
+
+  let chatResult: DeepSeekChatResult | null = null;
+  try {
+    chatResult = await deepseek.chat(
+      [
+        { role: 'system', content: voiceSystemPrompt(opts.kind) },
+        { role: 'user', content: `Subject: ${opts.subject}\n\nHTML body:\n${truncateHtml(opts.html_body, 14_000)}\n` },
+      ],
+      {
+        model: 'deepseek-chat',
+        temperature: 0.4,
+        maxTokens: 3600,
+        responseFormat: { type: 'json_object' },
+      },
+    );
+  } catch (e: any) {
+    if (debited) void refundMiles(1, `email voice_engine ${opts.kind} failure`).catch(() => {});
+    return baseline('rules_fallback', 0, e?.message ?? String(e));
+  }
+
+  const parsed = parseJsonBodySafe(chatResult.content) as { html?: string };
+  if (!parsed || !parsed.html || typeof parsed.html !== 'string') {
+    if (debited) void refundMiles(1, `email voice_engine ${opts.kind} parse failure`).catch(() => {});
+    return baseline('rules_fallback', 0, 'invalid voice rewrite response');
+  }
+
+  return {
+    html_body: parsed.html,
+    subject: applyToneToSubject(opts.subject, voiceCfg.subject_prefix, voiceCfg.max_subject_len),
+    voice_rewrote: true,
+    used_fallback: false,
+    provenance_step: {
+      stage: 'voice_engine',
+      at: new Date().toISOString(),
+      miles_debited: 1,
+      tokens: {
+        prompt_tokens: chatResult.usage?.prompt_tokens ?? 0,
+        completion_tokens: chatResult.usage?.completion_tokens ?? 0,
+      },
+    },
+  };
+}
+
+/** Deterministic rules-based rewrite (fallback). Normalizes brand phrases and subject casing only. */
+function rulesRewrite(html: string, _kind: EmailKind): string {
+  return normalizeBrandPhrases(html);
+}
+
+function truncateHtml(html: string, chars: number): string {
+  if (html.length <= chars) return html;
+  return html.slice(0, chars) + '\n<!-- [truncated for LLM context budget] -->';
+}
+
+function parseJsonBodySafe(content: string): any {
+  try { return JSON.parse(content); } catch { /* ignore */ }
+  const m = content.match(/\{[\s\S]*\}/);
+  if (m) { try { return JSON.parse(m[0]); } catch { /* ignore */ } }
+  return null;
+}
+
+/* ── #104 Content generator (AI opt-in) ──────────────────────────── */
+
+export const AI_CONTENT_MILES_COST: Record<EmailKind, 0 | 2 | 3 | 5> = {
+  welcome: 0,
+  password_reset: 0,
+  email_verification: 0,
+  upgrade_confirmation: 2,
+  assessment_complete: 3,
+  share_result: 2,
+  weekly_digest: 5,
+  nexus_conversation_summary: 4,
+};
 
 export interface ContentGenerateRequest {
   kind: EmailKind;
   subject_template: string;
   preheader_template: string;
   variables: EmailVariables;
+  /** If true: use AI when tier + miles allow. */
   enable_ai?: boolean;
+  tier?: TierKey | null;
+  user_id?: string;
+  /** Optional: data to personalize with (assessment results, digest counts, etc.). */
+  context?: Record<string, unknown>;
 }
 
+export interface ContentGenerateResult {
+  subject: string;
+  preheader: string;
+  /** Optional personalized intro paragraph the template can render as {{ai_intro_paragraph}}. */
+  ai_intro_paragraph?: string;
+  /** Optional list of key insight callouts for templates with an insights block. */
+  ai_callouts?: string[];
+  /** Optional closing / CTA paragraph. */
+  ai_closing_paragraph?: string;
+  ai_enhanced: boolean;
+  provenance_step: {
+    stage: 'content_generator';
+    at: string;
+    miles_debited: 0 | 2 | 3 | 4 | 5;
+    tokens?: { prompt_tokens: number; completion_tokens: number };
+    error?: string;
+  };
+}
+
+function contentGeneratorSystemPrompt(kind: EmailKind): string {
+  return (
+    'You personalize outbound LYC Partners email content. You receive the default template subject, preheader, and user+context. You write:\n' +
+    '- subject_line (short, executive-friendly)\n' +
+    '- preheader (preview text, 80–120 chars, no emoji, no words like "free")\n' +
+    '- opening_paragraph (personalized summary, 2–4 sentences)\n' +
+    '- closing_paragraph (CTA-forward, 1–2 sentences) — optional but preferred for AI templates\n' +
+    '- key_callouts: string[] — 1 to 3 bullets, one sentence each, grounded ONLY in data provided.\n\n' +
+    'Rules:\n' +
+    '- Executive, concise, human. No corporate-speak. No words "free", "deal", "amazing".\n' +
+    '- DO NOT invent data. If context is empty, keep callouts empty and stick to template defaults.\n' +
+    '- Output strict JSON: { "subject_line": string, "preheader": string, "opening_paragraph": string, "closing_paragraph": string, "key_callouts": string[] }.\n' +
+    `Template type: ${kind}.\n`
+  );
+}
+
+function contentGeneratorUserMessage(req: ContentGenerateRequest): string {
+  const baseSubject = substituteVariables(req.subject_template, req.variables);
+  const basePreheader = substituteVariables(req.preheader_template, req.variables);
+  return (
+    `Default subject: ${baseSubject}\n` +
+    `Default preheader: ${basePreheader}\n` +
+    `User/template variables (JSON): ${JSON.stringify(safeVarsSnapshot(req.variables), null, 2)}\n` +
+    (req.context ? `Context (JSON): ${JSON.stringify(req.context, null, 2)}\n` : '') +
+    `User tier: ${req.tier ?? 'unknown'}\n` +
+    `\nReturn strictly { subject_line, preheader, opening_paragraph, closing_paragraph, key_callouts: [] } JSON.`
+  );
+}
+
+function safeVarsSnapshot(v: EmailVariables): EmailVariables {
+  const safe: EmailVariables = {};
+  for (const [k, val] of Object.entries(v ?? {})) {
+    if (k.toLowerCase().includes('password') || k.toLowerCase().includes('secret')) continue;
+    safe[k] = val;
+  }
+  return safe;
+}
+
+/**
+ * #104 AI email content generator. Per-template, per-tier behavior:
+ *   Executive Introduction → never use AI; return template-only (0 miles).
+ *   professional: AI subject + opening paragraph (full package depends on template; default we return all fields).
+ *   executive / council / enterprise: full AI content + voice engine enabled downstream.
+ * Miles cost per template: see AI_CONTENT_MILES_COST (0/2/3/4/5).
+ */
 export async function generateEmailContent(
   req: ContentGenerateRequest,
-): Promise<{ subject: string; preheader: string; ai_enhanced: boolean }> {
+): Promise<ContentGenerateResult> {
   // 1. Default: pure variable substitution (no API calls).
-  let subject = substituteVariables(req.subject_template, req.variables);
-  let preheader = substituteVariables(req.preheader_template, req.variables);
-
-  // 2. Opt-in AI enhancement: no-op implementation here — placeholder for
-  // future DeepSeek call if caller wants it. We keep the pipeline typed so
-  // Batch 4 can add real generation without changing callers.
+  const subject_base = substituteVariables(req.subject_template, req.variables);
+  const preheader_base = substituteVariables(req.preheader_template, req.variables);
   const voice = voiceForEmail(req.kind);
-  subject = applyToneToSubject(subject, voice.subject_prefix, voice.max_subject_len);
+  const subject_subject_formatted = applyToneToSubject(subject_base, voice.subject_prefix, voice.max_subject_len);
 
-  return { subject, preheader, ai_enhanced: false };
+  const makeSkip = (error?: string): ContentGenerateResult => ({
+    subject: subject_subject_formatted,
+    preheader: preheader_base,
+    ai_enhanced: false,
+    provenance_step: {
+      stage: 'content_generator',
+      at: new Date().toISOString(),
+      miles_debited: 0,
+      error,
+    },
+  });
+
+  // Gates
+  const milesCost = AI_CONTENT_MILES_COST[req.kind];
+  if (!req.enable_ai || milesCost === 0 || !req.tier || req.tier === 'executive_introduction' || req.tier === 'explorer') {
+    return makeSkip(milesCost === 0 ? 'template ai_disabled by policy' : undefined);
+  }
+  if (!deepseek.hasApiKey()) {
+    return makeSkip('deepseek no-api-key');
+  }
+
+  // Deduct miles up front; refund on failure.
+  let debited = false;
+  try {
+    if (req.user_id) {
+      const r = await deductMiles(milesCost, `email content_generator ${req.kind}`, {
+        description: `AI content generation (${req.kind}) — ${milesCost} miles`,
+      });
+      debited = r.success;
+    }
+  } catch { /* ignore */ }
+
+  let chatResult: DeepSeekChatResult | null = null;
+  try {
+    chatResult = await deepseek.chat(
+      [
+        { role: 'system', content: contentGeneratorSystemPrompt(req.kind) },
+        { role: 'user', content: contentGeneratorUserMessage(req) },
+      ],
+      {
+        model: 'deepseek-chat',
+        temperature: 0.35,
+        maxTokens: 2400,
+        responseFormat: { type: 'json_object' },
+      },
+    );
+  } catch (e: any) {
+    if (debited) void refundMiles(milesCost, `email content_generator ${req.kind} failure`).catch(() => {});
+    return makeSkip(e?.message ?? String(e));
+  }
+
+  const parsed = parseJsonBodySafe(chatResult.content) as {
+    subject_line?: string;
+    preheader?: string;
+    opening_paragraph?: string;
+    closing_paragraph?: string;
+    key_callouts?: string[];
+  } | null;
+  if (!parsed) {
+    if (debited) void refundMiles(milesCost, `email content_generator ${req.kind} parse`).catch(() => {});
+    return makeSkip('invalid json from llm');
+  }
+
+  const subject = applyToneToSubject(
+    parsed.subject_line?.trim() || subject_base,
+    voice.subject_prefix,
+    voice.max_subject_len,
+  );
+  const preheader = parsed.preheader?.trim() || preheader_base;
+
+  return {
+    subject,
+    preheader,
+    ai_intro_paragraph: parsed.opening_paragraph?.trim() || undefined,
+    ai_closing_paragraph: parsed.closing_paragraph?.trim() || undefined,
+    ai_callouts: Array.isArray(parsed.key_callouts) ? parsed.key_callouts.filter(Boolean) : undefined,
+    ai_enhanced: true,
+    provenance_step: {
+      stage: 'content_generator',
+      at: new Date().toISOString(),
+      miles_debited: milesCost,
+      tokens: {
+        prompt_tokens: chatResult.usage?.prompt_tokens ?? 0,
+        completion_tokens: chatResult.usage?.completion_tokens ?? 0,
+      },
+    },
+  };
 }
 
 function applyToneToSubject(subject: string, prefix: string, maxLen: number): string {
@@ -340,10 +683,18 @@ export interface RunPipelineInput<V extends AnyVars = AnyVars> {
   preheader_template?: string;
   /** If true: ask ContentGenerator to try AI-enhanced subject/preheader. */
   enable_ai?: boolean;
+  /** Enable/disable voice-engine rewriting for this run independent of template default. */
+  enable_voice_engine?: boolean;
   /** Diagnostic or tier influence brand lens */
   diagnosticSlug?: DiagnosticSlug;
   tier?: TierKey;
+  /** Miles debit auth: user performing the action. */
+  user_id?: string;
 }
+
+export type ProvenanceStep =
+  | ContentGenerateResult['provenance_step']
+  | VoiceEngineResult['provenance_step'];
 
 export interface RunPipelineResult {
   kind: EmailKind;
@@ -352,11 +703,22 @@ export interface RunPipelineResult {
   banned_hits: BannedWordResult[];
   brand_issues: EmailValidationIssue[];
   ai_enhanced: boolean;
+  voice_rewrote: boolean;
+  provenance: ProvenanceStep[];
+  total_miles_debited: number;
 }
 
 /**
  * Run the full #101–#106 pipeline. The caller then passes `validated` into
  * the #114 SendCloud adapter (and the adapter writes #116 delivery log).
+ *
+ * Pipeline stages (ordered):
+ *   1. Brand lens + template selection (#102)
+ *   2. AI content generation — subject / preheader / AI paragraph injection (#104)
+ *   3. Template HTML render with substituted variables (#105)
+ *   4. Voice engine rewrite — HTML prose rewritten in brand voice (#103)
+ *   5. Forbidden-word / tier-naming audit (#106)
+ *   6. Structural validation (#101)
  */
 export async function runEmailPipeline<V extends AnyVars = AnyVars>(
   input: RunPipelineInput<V>,
@@ -365,24 +727,56 @@ export async function runEmailPipeline<V extends AnyVars = AnyVars>(
   if (!def) throw new Error(`Unknown email kind: ${input.kind}`);
 
   const lens = applyBrandLens({ kind: input.kind, diagnosticSlug: input.diagnosticSlug, tier: input.tier });
-  // #105 substitute + render
+  const provenance: ProvenanceStep[] = [];
+  let total_miles_debited = 0;
+
   const subject_tpl = input.subject_template ?? def.defaultSubject;
   const preheader_tpl = input.preheader_template ?? def.defaultPreheader;
 
-  // #104 content gen (subject / preheader — AI optional)
-  const { subject, preheader, ai_enhanced } = await generateEmailContent({
+  // ── 2. #104 Content generation ─────────────────────────────────────
+  const content = await generateEmailContent({
     kind: input.kind,
     subject_template: subject_tpl,
     preheader_template: preheader_tpl,
     variables: input.variables,
     enable_ai: input.enable_ai,
+    tier: input.tier ?? null,
+    user_id: input.user_id,
   });
+  provenance.push(content.provenance_step);
+  total_miles_debited += content.provenance_step.miles_debited;
+  let subject = content.subject;
+  let preheader = content.preheader;
+  const ai_enhanced = content.ai_enhanced;
 
-  // Render template HTML (runs variables inside React for typed safety)
-  const html_body = renderEmailHtml(def, { ...input.variables, __preheader: preheader }, lens);
+  // Wire AI paragraphs into template variables so React components receive them.
+  const enhancedVariables: AnyVars = {
+    ...input.variables,
+    __preheader: preheader,
+    __ai_intro_paragraph: content.ai_intro_paragraph ?? '',
+    __ai_closing_paragraph: content.ai_closing_paragraph ?? '',
+    __ai_callouts_json: content.ai_callouts ? JSON.stringify(content.ai_callouts) : '',
+  };
 
-  // #103 voice: apply brand phrase normalization (already in renderHtml via normalizeBrandPhrases)
-  // #102 lens variables: ensure accent references are brand-correct
+  // ── 3. Template HTML render ───────────────────────────────────────
+  let html_body = renderEmailHtml(def, enhancedVariables, lens);
+
+  // ── 4. #103 Voice engine rewriting ────────────────────────────────
+  const voiceRewrite = await applyVoiceEngineRewriting({
+    kind: input.kind,
+    subject,
+    html_body,
+    tier: input.tier ?? null,
+    enable_voice_engine: input.enable_voice_engine,
+    user_id: input.user_id,
+  });
+  provenance.push(voiceRewrite.provenance_step);
+  total_miles_debited += voiceRewrite.provenance_step.miles_debited;
+  html_body = voiceRewrite.html_body;
+  subject = voiceRewrite.subject;
+  const voice_rewrote = voiceRewrite.voice_rewrote;
+
+  // ── 5. Forbidden word audit (#106) + tier naming ──────────────────
   const voice = voiceForEmail(input.kind);
   const voiceIssues: EmailValidationIssue[] = [];
   for (const fw of voice.forbidden_words) {
@@ -391,8 +785,6 @@ export async function runEmailPipeline<V extends AnyVars = AnyVars>(
       voiceIssues.push({ severity: 'warn', code: 'VOICE_FORBIDDEN_WORD', message: `Forbidden word for ${input.kind} tone: "${fw}"` });
     }
   }
-
-  // #106 banned word scan
   const banned_hits = scanBannedWords(html_body + ' ' + subject);
   const brand_issues_from_scan: EmailValidationIssue[] = banned_hits
     .filter((h) => h.severity === 'hard')
@@ -402,13 +794,11 @@ export async function runEmailPipeline<V extends AnyVars = AnyVars>(
       code: 'BRAND_BANNED_WORD',
       message: `Hard violation (${h.category}): "${h.word}" appears ${h.occurrences}x`,
     }));
-
-  // canonical tier naming
   const canonicalIssues = canonicalTierNameCheck(html_body + ' ' + subject)
     .slice(0, 5)
     .map((t) => ({ severity: 'warn' as const, code: 'TIER_NAMING' as const, message: t.detail }));
 
-  // #101 structural
+  // ── 6. Structural validation (#101) ───────────────────────────────
   const structural = validateEmailStructural({
     to: input.to,
     from_name: def.defaultFromName,
@@ -421,6 +811,8 @@ export async function runEmailPipeline<V extends AnyVars = AnyVars>(
   const allIssues = [...structural.issues, ...variableIssues, ...voiceIssues, ...brand_issues_from_scan, ...canonicalIssues];
   const validated: ValidatedEmail = {
     ...structural,
+    subject,
+    html_body,
     issues: allIssues,
     ok: !allIssues.some((i) => i.severity === 'error'),
   };
@@ -432,6 +824,9 @@ export async function runEmailPipeline<V extends AnyVars = AnyVars>(
     banned_hits,
     brand_issues: [...voiceIssues, ...brand_issues_from_scan, ...canonicalIssues],
     ai_enhanced,
+    voice_rewrote,
+    provenance,
+    total_miles_debited,
   };
 }
 
