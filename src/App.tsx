@@ -160,6 +160,13 @@ const KevinOversightDashboard = lazy(() => import('@/components/kevin/KevinOvers
 const RevenueAnalyticsPage = lazy(() => import('@/components/internal/RevenueAnalytics').then(m => ({ default: m.default })));
 const OrgIntelligencePage = lazy(() => import('@/pages/OrgIntelligencePage').then(m => ({ default: m.OrgIntelligencePage })));
 
+// ── Phase 9 Batch 5 · B2C Assessment Admin pages (#84 / #1346) ──
+const AdminResultsPage = lazy(() => import('@/pages/admin/AdminResultsPage'));
+const AdminResultDetailPage = lazy(() => import('@/pages/admin/AdminResultDetailPage'));
+const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
+const AdminAiOpsPage = lazy(() => import('@/pages/admin/AdminAiOpsPage'));
+const AdminEmailOpsPage = lazy(() => import('@/pages/admin/AdminEmailOpsPage'));
+
 // ── Candidate Portal pages (EO-4) ──
 const CandidateDashboardPage = lazy(() => import('@/pages/candidate/CandidateDashboardPage').then(m => ({ default: m.CandidateDashboardPage })));
 const CandidateApplicationsPage = lazy(() => import('@/pages/candidate/CandidateApplicationsPage').then(m => ({ default: m.CandidateApplicationsPage })));
@@ -400,14 +407,20 @@ export default function App() {
               AdminLayout enforces admin/lyc_admin/super_admin role gating.
               ═══════════════════════════════════════════════════════════ */}
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route index element={<Navigate to="results" replace />} />
             <Route path="dashboard" element={<KevinOversightDashboard />} />
+
+            {/* Phase 9 B2C Assessment Admin (#84 / #1346) */}
+            <Route path="results" element={<AdminResultsPage />} />
+            <Route path="results/:id" element={<AdminResultDetailPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
+            <Route path="ai-ops" element={<AdminAiOpsPage />} />
+            <Route path="email-ops" element={<AdminEmailOpsPage />} />
 
             {/* Users + team + tasks */}
             <Route path="team" element={<TeamPage />} />
             <Route path="consultants" element={<ConsultantPerformancePage />} />
             <Route path="tasks" element={<TasksPage />} />
-            <Route path="users" element={<Navigate to="team" replace />} />
 
             {/* Analytics + revenue */}
             <Route path="analytics" element={<AnalyticsPage />} />

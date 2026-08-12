@@ -13,6 +13,7 @@ import {
   LayoutDashboard, Users, Building2, BarChart3, Settings as SettingsIcon,
   Shield, DollarSign, Eye, UserCheck, Zap, Menu, X, LogOut, ChevronDown,
   Gauge, Sliders, Network, Trophy, Lock, Workflow, FileBarChart,
+  FileText, Bot, Mail,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -40,7 +41,13 @@ export function AdminNav(): React.ReactElement {
 
   const items = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: Gauge, section: 'Overview' },
-    { path: '/admin/users', label: 'Users', icon: Users, section: 'Management' },
+
+    // Phase 9 Batch 5 — B2C assessment admin
+    { path: '/admin/results', label: 'Results', icon: FileText, section: 'Assessment B2C' },
+    { path: '/admin/users', label: 'Users / Tiers', icon: Users, section: 'Assessment B2C' },
+    { path: '/admin/ai-ops', label: 'AI Operations', icon: Bot, section: 'Assessment B2C' },
+    { path: '/admin/email-ops', label: 'Email Operations', icon: Mail, section: 'Assessment B2C' },
+
     { path: '/admin/organizations', label: 'Organizations', icon: Building2, section: 'Management' },
     { path: '/admin/consultants', label: 'Consultants', icon: UserCheck, section: 'Management' },
     { path: '/admin/analytics', label: 'Analytics', icon: BarChart3, section: 'Insights' },

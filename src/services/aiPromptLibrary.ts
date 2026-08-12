@@ -55,7 +55,7 @@ export interface PerDiagnosticPrompts {
 
 const RESPONSE_SCHEMA_PREABMLE = `
 ---
-OUTPUT FORMAT (strict JSON, no markdown fences unless wrapping JSON in a single ```json fence at top and bottom):
+OUTPUT FORMAT (strict JSON, no markdown fences unless wrapping JSON in a single \\\`\\\`\\\`json fence at top and bottom):
 {
   "summary": "1 paragraph overall assessment, 80–120 words, Premium not SaaS, Executive Introduction tier preview only shows summary + 1 strength + 0 growth — never mention the word free.",
   "strengths": ["Strength one.", "Strength two.", "Strength three."],
