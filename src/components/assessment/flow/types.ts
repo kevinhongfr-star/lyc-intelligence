@@ -1,4 +1,5 @@
 // ── ASSESSMENT FLOW TYPES ──────────────────────────────────────────
+// #1323: Added skipIf + branch support for conditional question flow.
 
 /** Supported question response types */
 export type QuestionType = 'likert' | 'mcq_single' | 'mcq_multi';
@@ -22,6 +23,27 @@ export interface AssessmentQuestion {
   hint?: string;
   /** For mcq_multi: max selections allowed */
   maxSelections?: number;
+
+  // ── #1323: Skip logic & branching ───────────────────────────────
+
+  /**
+   * Skip this question if the predicate returns true. Evaluated against
+   * the current answer set when the flow would display this question.
+   * Skipped questions are not shown and not counted in progress.
+   *
+   * Example: skip a follow-up if the gate question scored below 3.
+   *   skipIf: (answers) => (answers['q5'] as number) < 3
+   */
+  skipIf?: (answers: AnswerMap) => boolean;
+
+  /**
+   * Branch to a specific question ID after this question is answered.
+   * Return null (or omit) for default linear progression (next in array).
+   *
+   * Example: route to a different section based on mcq choice.
+   *   branch: (answers) => answers['q3'] === 5 ? 'section_b_q1' : null
+   */
+  branch?: (answers: AnswerMap) => string | null;
 }
 
 /** Configuration for a complete assessment flow */
@@ -43,6 +65,22 @@ export interface AssessmentFlowConfig {
   /** Optional: real submission handler. Returns result ID for redirect.
    * If not provided, flow simulates processing with a 2s delay. */
   onSubmit?: (answers: AnswerMap) => Promise<{ resultId: string | null }>;
+
+  // ── #1323: Entry expectation screen ─────────────────────────────
+
+  /**
+   * Optional intro screen shown before the first question. Sets
+   * expectations about assessment duration, what to expect, and
+   * the complimentary / tier context.
+   */
+  intro?: {
+    title: string;
+    body: string;
+    /** Estimated duration label, e.g. "~10 minutes" */
+    duration?: string;
+    /** Bullet points of what to expect */
+    expectations?: string[];
+  };
 }
 
 /** Answer storage: questionId → answer value */
