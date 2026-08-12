@@ -3,6 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @import MUST come before all other non-tailwind CSS statements per Vite CSS spec. */
+@import './styles/motion.css';
+@import './styles/dark-mode.css';
+
 /*
  * #33 — ECHO v6.0 Canonical Design Tokens
  * All tokens as CSS custom properties. Consumed by:
@@ -733,10 +737,6 @@ body {
   }
 }
 
-
-/* ── Phase 5: ECHO v6.0 Design Excellence ── */
-@import './styles/motion.css';
-@import './styles/dark-mode.css';
 
 /* ── LYC Brand Keyframe Animations ── */
 
