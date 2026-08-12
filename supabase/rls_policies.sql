@@ -46,7 +46,18 @@ $$ LANGUAGE plpgsql IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION public.is_consultant_role(r text) RETURNS boolean AS $$
 BEGIN
-  RETURN COALESCE(r, '') IN ('consultant','lyc_consultant','admin','lyc_admin','super_admin');
+  -- Includes admins for backward compat (many tables grant blanket staff access).
+  -- Per-user scoping for mandates/contacts uses is_scoped_consultant() instead.
+  RETURN COALESCE(r, '') IN ('consultant','lyc_consultant','team_lead','admin','lyc_admin','super_admin');
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+-- Scoped consultant: internal staff who are NOT admins. These users see only
+-- their own mandates (lead_consultant_id) and contacts (owner_id).
+-- Ticket #1306, #1307 — Phase 3 consultant RLS scoping.
+CREATE OR REPLACE FUNCTION public.is_scoped_consultant(r text) RETURNS boolean AS $$
+BEGIN
+  RETURN COALESCE(r, '') IN ('consultant','lyc_consultant','team_lead');
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
@@ -146,19 +157,23 @@ ALTER TABLE IF EXISTS public.mandate_timelines ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS mandates_read ON public.mandates;
 CREATE POLICY mandates_read ON public.mandates FOR SELECT USING (
   is_admin_role(current_user_role())
-  OR is_consultant_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND lead_consultant_id = auth.uid())
   OR (is_client_role(current_user_role()) AND organization_id = current_user_org())
 );
 DROP POLICY IF EXISTS mandates_write ON public.mandates;
 CREATE POLICY mandates_write ON public.mandates FOR ALL USING (
-  is_admin_role(current_user_role()) OR is_consultant_role(current_user_role())
+  is_admin_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND lead_consultant_id = auth.uid())
 );
 
 -- mandate_timelines mirrors mandates' scoping via join to mandates
 DROP POLICY IF EXISTS mandate_tl_read ON public.mandate_timelines;
 CREATE POLICY mandate_tl_read ON public.mandate_timelines FOR SELECT USING (
   is_admin_role(current_user_role())
-  OR is_consultant_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND EXISTS (
+    SELECT 1 FROM public.mandates m
+    WHERE m.id = mandate_timelines.mandate_id AND m.lead_consultant_id = auth.uid()
+  ))
   OR (
     is_client_role(current_user_role())
     AND EXISTS (
@@ -169,7 +184,11 @@ CREATE POLICY mandate_tl_read ON public.mandate_timelines FOR SELECT USING (
 );
 DROP POLICY IF EXISTS mandate_tl_write ON public.mandate_timelines;
 CREATE POLICY mandate_tl_write ON public.mandate_timelines FOR ALL USING (
-  is_admin_role(current_user_role()) OR is_consultant_role(current_user_role())
+  is_admin_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND EXISTS (
+    SELECT 1 FROM public.mandates m
+    WHERE m.id = mandate_timelines.mandate_id AND m.lead_consultant_id = auth.uid()
+  ))
 );
 
 -- ============================================================
@@ -180,13 +199,14 @@ ALTER TABLE IF EXISTS public.contacts ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS contacts_read ON public.contacts;
 CREATE POLICY contacts_read ON public.contacts FOR SELECT USING (
   is_admin_role(current_user_role())
-  OR is_consultant_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND owner_id = auth.uid())
   OR (is_client_role(current_user_role()) AND organization_id = current_user_org())
   OR id::text = auth.uid()::text   -- candidate reading their own contact
 );
 DROP POLICY IF EXISTS contacts_write ON public.contacts;
 CREATE POLICY contacts_write ON public.contacts FOR ALL USING (
-  is_admin_role(current_user_role()) OR is_consultant_role(current_user_role())
+  is_admin_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND owner_id = auth.uid())
 );
 
 -- ============================================================
