@@ -97,7 +97,7 @@ export function ScoreGauge({ score, size = 120, label, className }: ScoreGaugePr
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          style={{ transition: 'stroke-dashoffset 500ms cubic-bezier(0.4, 0, 0.2, 1)' }}
+          style={{ transition: 'stroke-dashoffset 350ms cubic-bezier(0.4, 0, 0.2, 1)' }}
         />
       </svg>
       <div className="absolute bottom-0 flex flex-col items-center">

@@ -324,7 +324,7 @@ export async function renderReport(
 <title>${instrumentName} — ${result.archetype}</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
-  * { margin:0; padding:0; box-sizing:border-box; }
+  * { margin:0; padding:0; box-sizing:border-box; border-radius:0 !important; }
   body { font-family:'DM Sans',system-ui,sans-serif; color:#1a1a1a; line-height:1.6; background:#FFFFFF; }
   .page { width:210mm; min-height:297mm; padding:22mm 20mm; margin:0 auto; background:#fff; }
   .section { margin-bottom:36px; page-break-inside:avoid; }

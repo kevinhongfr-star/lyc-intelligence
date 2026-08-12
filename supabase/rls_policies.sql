@@ -675,3 +675,57 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 COMMENT ON FUNCTION public.promote_candidate_to_leader IS
 'Candidate → Leader identity migration (PHASE 16). Requires explicit consent flag. Writes audit trail. SECURITY DEFINER so consent enforcement is always enforced.';
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- Phase 2 Amendments / Ticket #1334 + #1337 — Assessment metadata + shares
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- assessments catalog: public read on published, admin-only write
+ALTER TABLE public.assessments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS assessments_read ON public.assessments;
+CREATE POLICY assessments_read ON public.assessments FOR SELECT USING (
+  is_published = true
+  OR is_admin_role(current_user_role())
+);
+DROP POLICY IF EXISTS assessments_write ON public.assessments;
+CREATE POLICY assessments_write ON public.assessments FOR ALL USING (
+  is_admin_role(current_user_role())
+);
+
+-- user_assessment_progress: user-scoped (user_id = auth.uid())
+ALTER TABLE public.user_assessment_progress ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS uap_read ON public.user_assessment_progress;
+CREATE POLICY uap_read ON public.user_assessment_progress FOR SELECT USING (
+  user_id = auth.uid()
+  OR is_admin_role(current_user_role())
+);
+DROP POLICY IF EXISTS uap_insert ON public.user_assessment_progress;
+CREATE POLICY uap_insert ON public.user_assessment_progress FOR INSERT WITH CHECK (
+  user_id = auth.uid()
+);
+DROP POLICY IF EXISTS uap_update ON public.user_assessment_progress;
+CREATE POLICY uap_update ON public.user_assessment_progress FOR UPDATE USING (
+  user_id = auth.uid()
+);
+DROP POLICY IF EXISTS uap_delete ON public.user_assessment_progress;
+CREATE POLICY uap_delete ON public.user_assessment_progress FOR DELETE USING (
+  user_id = auth.uid()
+  OR is_admin_role(current_user_role())
+);
+
+-- assessment_shares: owner CRUD + public read by token (capability URL)
+ALTER TABLE public.assessment_shares ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS shares_owner_all ON public.assessment_shares;
+CREATE POLICY shares_owner_all ON public.assessment_shares FOR ALL USING (
+  owner_id = auth.uid()
+  OR is_admin_role(current_user_role())
+);
+-- Public read: the share_token IS the auth (capability URL pattern).
+-- RLS allows SELECT on active (non-revoked, non-expired) shares.
+-- The API layer validates the token matches the request.
+DROP POLICY IF EXISTS shares_public_read ON public.assessment_shares;
+CREATE POLICY shares_public_read ON public.assessment_shares FOR SELECT USING (
+  revoked_at IS NULL
+  AND expires_at > now()
+  AND (max_views IS NULL OR view_count < max_views)
+);

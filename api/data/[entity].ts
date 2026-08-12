@@ -84,6 +84,10 @@ const ENTITY_ACL: Record<string, Acl> = {
   data_consents:        { read: ['admin','consultant','client','leader'], write: ['admin','consultant','leader'], selfColumn: 'subject_id', orgColumn: 'organization_id' },
   cross_border_transfers: { read: ['admin','consultant'],            write: ['admin','consultant'] },
   automation_rules:     { read: ['admin','consultant','leader'],     write: ['admin','consultant','leader'], selfColumn: 'owner_id' },
+  // Phase 2 Amendments / #1334 + #1337
+  assessments:           { read: ['admin','consultant','client','leader'], write: ['admin'] },
+  user_assessment_progress: { read: ['admin','leader'], write: ['admin','leader'], selfColumn: 'user_id' },
+  assessment_shares:     { read: ['admin','leader'], write: ['admin','leader'], selfColumn: 'owner_id' },
 };
 
 function parseColumnCsv(s?: string | string[]): string[] {
