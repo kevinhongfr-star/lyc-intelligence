@@ -152,9 +152,9 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/assessment',
     meta: {
-      title: 'All 11 Leadership Diagnostics | LYC Intelligence',
+      title: '6 Leadership Assessments | LYC Intelligence',
       description:
-        'Every LYC diagnostic in one place. CPI, SHIFT, Comp Negotiation, Board Readiness and 8 more — start in under 60 seconds, pay only for the ones you run.',
+        'Every LYC leadership assessment in one place. PRISM, SPARK, FORGE, BRIDGE, MOSAIC, DRIVE — start in under 60 seconds, get a personalised report.',
       canonical: u('/assessment'),
       keywords: [...DEFAULT_META.keywords!, 'diagnostics', 'assessment list'],
     },

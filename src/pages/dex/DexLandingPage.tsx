@@ -26,7 +26,7 @@ export function DexLandingPage() {
               AI-powered executive advisory for China-APAC leaders
             </h1>
             <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8 max-w-2xl">
-              DEX AI is your always-on advisor for career strategy, compensation benchmarking, and
+              LYC Intelligence is your always-on advisor for career strategy, compensation benchmarking, and
               cross-border transitions — trained on LYC Partners' placement intelligence across 7,400+
               executive mandates.
             </p>
@@ -53,7 +53,7 @@ export function DexLandingPage() {
             className="text-3xl md:text-4xl font-bold text-[#1A1A2E] mb-3"
             style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
           >
-            What DEX AI can do for you
+            What LYC Intelligence can do for you
           </h2>
           <p className="text-sm text-gray-600">
             Four dimensions of executive intelligence, available the moment you need them.
@@ -93,7 +93,7 @@ export function DexLandingPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { name: 'Executive Introduction', price: 'Complimentary', detail: '5 messages to experience DEX AI', cta: 'Start Now', href: '/dex/chat' },
+              { name: 'Executive Introduction', price: 'Complimentary', detail: '5 messages to experience LYC Intelligence', cta: 'Start Now', href: '/dex/chat' },
               { name: 'Miles Pack', price: 'Pay as you go', detail: '1 mile per message — buy what you need', cta: 'Get Miles', href: '/dex/credits' },
               { name: 'Monthly Pro', price: 'Subscription', detail: '100 mi/month + priority responses', cta: 'View Plans', href: '/dex/credits' },
             ].map(p => (

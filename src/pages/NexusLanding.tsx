@@ -180,7 +180,7 @@ function Hero() {
         </div>
         <div style={{ width: 1, height: 60, background: G300, margin: '0 auto' }} />
         <div style={{ marginTop: 80, fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.12em', color: G400 }}>
-          Powered by <strong style={{ color: INK, fontWeight: 500, letterSpacing: '0.12em' }}>DEX AI</strong>
+          Powered by <strong style={{ color: INK, fontWeight: 500, letterSpacing: '0.12em' }}>LYC Intelligence</strong>
         </div>
       </div>
     </section>
@@ -452,7 +452,7 @@ function Pricing() {
 // ── TRUST ──────────────────────────────────────────────────────────
 const TRUST = [
   { icon: '★', title: 'Backed by LYC Partners', desc: "10+ years of executive search and assessment expertise across China and APAC. We've placed hundreds of senior leaders." },
-  { icon: '⚡', title: 'Powered by DEX AI', desc: 'Multi-agent AI systems, specialized assessment models, and talent market data — all working together behind the scenes.' },
+  { icon: '⚡', title: 'Powered by LYC Intelligence', desc: 'Multi-agent AI systems, specialized assessment models, and talent market data — all working together behind the scenes.' },
   { icon: '◎', title: 'Global Benchmarks', desc: "Every diagnostic is benchmarked against executives across 47 markets. You're not just comparing to yourself." },
 ];
 function Trust() {

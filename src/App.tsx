@@ -215,7 +215,7 @@ export default function App() {
 
   // Phase 17 / P1-1 — drive <title>, meta description, OG/twitter cards,
   // canonical, and robots from per-route registry (30+ rules for marketing
-  // routes, 11 assessments, and noindex for all 5 portals).
+  // routes, 6 assessments, and noindex for all 5 portals).
   usePageMetadata();
 
   // Phase 3 / #1311 — idle + absolute session timeout. Mounts activity
@@ -276,7 +276,7 @@ export default function App() {
             <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />
 
             {/* Results routes — post-assessment (shareable / bookmarkable) */}
-            {/* Keep all 11 results routes — bookmarks from prior sessions must not break. */}
+            {/* Keep all results routes — bookmarks from prior sessions must not break. */}
             <Route path="assessment/cpi/results" element={<CpiResultsPage />} />
             <Route path="assessment/prism/results" element={<PrismResultsPage />} />
             <Route path="assessment/spark/results" element={<SparkResultsPage />} />

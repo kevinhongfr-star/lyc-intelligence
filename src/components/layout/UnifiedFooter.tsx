@@ -19,8 +19,7 @@ const links = {
   ],
   platform: [
     { href: '/nexus/chat', label: 'NEXUS AI' },
-    { href: '/assessment', label: 'Assessments (11)' },
-    { href: '/match', label: 'Match Analysis' },
+    { href: '/assessment', label: 'Leadership Assessments' },
   ],
   company: [
     { href: 'https://lyc-partners.ai', label: 'LYC Partners', external: true },
