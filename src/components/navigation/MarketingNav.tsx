@@ -2,7 +2,7 @@
  * Phase 16 — MarketingNav (public / marketing identity).
  *
  * No auth required. Brand: premium marketing nav.
- * Links: Products dropdown, Pricing, Try NEXUS CTA.
+ * Links: Products dropdown, Pricing, Meet NEXUS CTA.
  * Visual: lots of whitespace, serif-heavy brand feel.
  * Zero radius, font trio, accent #C108AB.
  */
@@ -59,8 +59,8 @@ export function MarketingNav(): React.ReactElement {
   // Phase 9 Batch 6, ticket #1352 — only B2C products in marketing nav dropdown.
   // Match Analysis (B2B recruiters) + B2B Search Platform removed.
   const products = [
-    { label: 'NEXUS AI', href: '/nexus/chat', desc: 'Executive advisory chatbot' },
-    { label: 'Leadership Assessments', href: '/assessment', desc: '6 leadership assessments' },
+    { label: 'NEXUS AI', href: '/nexus/chat', desc: 'Your AI executive coach' },
+    { label: 'Leadership Assessments', href: '/assessments', desc: '6 leadership assessments' },
   ];
 
   return (
@@ -173,7 +173,7 @@ export function MarketingNav(): React.ReactElement {
                 display: 'inline-flex', alignItems: 'center', gap: 8,
               }}>
                 <Sparkles size={15} />
-                Try NEXUS
+                Meet NEXUS
                 <ArrowRight size={15} />
               </button>
             </div>
@@ -231,7 +231,7 @@ export function MarketingNav(): React.ReactElement {
                 trackCTA({ location: 'nav_marketing', label: 'Try NEXUS (mobile)', destination: '/nexus/chat' });
               }}
                 style={{ padding: '12px', textAlign: 'center', background: DS.accent, color: '#fff', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
-                Try NEXUS
+                Meet NEXUS
               </Link>
             </>
           )}

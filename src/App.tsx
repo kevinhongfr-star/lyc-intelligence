@@ -257,21 +257,29 @@ export default function App() {
             {/* DEX B2C public landing. DEX /app/dex/* routes are auth'd. */}
             <Route path="dex" element={<DexLandingPage />} />
 
-            {/* Assessment catalog — dedicated /assessment page (#1319 discoverability) */}
-            <Route path="assessments" element={<Navigate to="/assessment" replace />} />
-            <Route path="assessment" element={<AssessmentCatalogPage />} />
+            {/* Assessment catalog — #1363 canonical URL is /assessments (plural, user-centric).
+                /assessment and /diagnostics kept as redirects so no link or bookmark 404s. */}
+            <Route path="assessments" element={<AssessmentCatalogPage />} />
+            <Route path="assessment" element={<Navigate to="/assessments" replace />} />
 
             {/* ── 6 Real B2C Assessment Routes (Batch 6 ticket #1351) ── */}
-            {/* Real landings: PRISM, SPARK */}
+            {/* Canonical individual landings under /assessments/:code (#1363) */}
+            <Route path="assessments/prism" element={<PrismLanding />} />
+            <Route path="assessments/spark" element={<SparkLanding />} />
+            {/* Generic canonical landing for FORGE, BRIDGE, MOSAIC, DRIVE */}
+            <Route path="assessments/:code" element={<CanonicalInstrumentLanding />} />
+
+            {/* Legacy /assessment/:code landings kept working (no redirect) so the
+                take/results flow and old bookmarks never 404. New links use /assessments/:code. */}
             <Route path="assessment/prism" element={<PrismLanding />} />
             <Route path="assessment/spark" element={<SparkLanding />} />
             {/* Explicit redirects for instruments that have no landing data */}
-            <Route path="assessment/cpi" element={<Navigate to="/assessment" replace />} />
-            <Route path="assessment/shift" element={<Navigate to="/assessment" replace />} />
-            <Route path="assessment/leap" element={<Navigate to="/assessment" replace />} />
-            <Route path="assessment/quest" element={<Navigate to="/assessment" replace />} />
-            <Route path="assessment/impact" element={<Navigate to="/assessment" replace />} />
-            <Route path="assessment/coach" element={<Navigate to="/assessment" replace />} />
+            <Route path="assessment/cpi" element={<Navigate to="/assessments" replace />} />
+            <Route path="assessment/shift" element={<Navigate to="/assessments" replace />} />
+            <Route path="assessment/leap" element={<Navigate to="/assessments" replace />} />
+            <Route path="assessment/quest" element={<Navigate to="/assessments" replace />} />
+            <Route path="assessment/impact" element={<Navigate to="/assessments" replace />} />
+            <Route path="assessment/coach" element={<Navigate to="/assessments" replace />} />
             {/* Generic canonical landing for 4 remaining instruments: FORGE, BRIDGE, MOSAIC, DRIVE */}
             <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />
 
@@ -290,7 +298,10 @@ export default function App() {
             <Route path="assessment/mosaic/results" element={<MosaicResultsPage />} />
 
             {/* ── Phase 7: Canonical diagnostic routes (#1276-#1286) ── */}
-            {/* New branching-native engine with #1341 data model + #1340 tier gating */}
+            {/* New branching-native engine with #1341 data model + #1340 tier gating.
+                #1363: /diagnostics (exact) redirects to the /assessments catalog.
+                /diagnostics/:slug landing + take/results flow kept intact (no breakage). */}
+            <Route path="diagnostics" element={<Navigate to="/assessments" replace />} />
             <Route path="diagnostics/:slug" element={<DiagnosticLandingPage />} />
             <Route path="diagnostics/:slug/take" element={<DiagnosticTakePage />} />
             <Route path="diagnostics/:slug/results/:resultId" element={<DiagnosticResultsPage />} />

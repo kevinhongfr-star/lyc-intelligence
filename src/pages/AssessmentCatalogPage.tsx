@@ -50,26 +50,10 @@ interface CategoryDef {
   priceHint: string;
 }
 
-// Phase 9 Batch 6 ticket #1351: only 6 real assessments — consolidate to single category.
+// #1362 — user-centric categories. Flagship / SHIFT Suite were internal taxonomy
+// with zero real assessments; consolidated to a single "Leadership Assessments"
+// group. Internal tier-group keys (flagship/shift/advisory) are unchanged.
 const CATEGORIES: CategoryDef[] = [
-  {
-    group: 'flagship',
-    label: 'Flagship',
-    eyebrow: '0 assessments · positioned for future release',
-    description:
-      'The single-shot diagnostic calibrated against 20 years of LYC APAC placement data. Begin here before a senior market move — it establishes the composite baseline every other instrument refines.',
-    keys: FLAGSHIP_KEYS,
-    priceHint: '—',
-  },
-  {
-    group: 'shift',
-    label: 'SHIFT Suite',
-    eyebrow: '0 assessments · positioned for future release',
-    description:
-      'For leaders stepping into a broader mandate — functional to enterprise, executive to board, or resetting motivation and coaching range. Each instrument isolates the dimension where the transition typically breaks.',
-    keys: SHIFT_SUITE_KEYS,
-    priceHint: '—',
-  },
   {
     group: 'advisory',
     label: 'Leadership Assessments',
@@ -81,14 +65,25 @@ const CATEGORIES: CategoryDef[] = [
   },
 ];
 
+// #1362 — short descriptive subtitle under each assessment name so visitors
+// know what each one measures (brand names alone have no descriptive value).
+const ASSESSMENT_SUBTITLE: Record<string, string> = {
+  PRISM: 'Career & Professional Branding',
+  SPARK: 'AI Leadership Readiness',
+  FORGE: 'Sales Excellence',
+  BRIDGE: 'China Leadership Readiness',
+  MOSAIC: 'Cultural Intelligence',
+  DRIVE: 'Execution Capability',
+};
+
 function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
   // Ticket #1353: USD-first (miles ≈ USD 1:1). Light gray eyebrow (#1355).
   const priceUsd = a.priceMiles;
   return (
     <a
-      href={`/assessment/${a.code.toLowerCase()}`}
+      href={`/assessments/${a.code.toLowerCase()}`}
       onClick={() => {
-        trackCTA({ location: 'assessment_card', label: `Assessment: ${a.code}`, destination: `/assessment/${a.code.toLowerCase()}`, context_id: a.code });
+        trackCTA({ location: 'assessment_card', label: `Assessment: ${a.code}`, destination: `/assessments/${a.code.toLowerCase()}`, context_id: a.code });
         trackAssessmentStart(a.code, a.name, 'catalog');
       }}
       className="card-hover"
@@ -131,6 +126,23 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
           >
             {a.name}
           </h3>
+          {/* #1362 — descriptive subtitle so visitors know what each assessment measures.
+              Neutral label (not accent) — fuchsia stays reserved for the CTA below. */}
+          {ASSESSMENT_SUBTITLE[a.code] && (
+            <div
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: '12px',
+                fontWeight: 600,
+                color: DS.text,
+                marginTop: '3px',
+                letterSpacing: '0.01em',
+                opacity: 0.78,
+              }}
+            >
+              {ASSESSMENT_SUBTITLE[a.code]}
+            </div>
+          )}
         </div>
         <span
           style={{
@@ -208,7 +220,7 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
             color: DS.accent,
           }}
         >
-          Explore instrument
+          Explore assessment
         </span>
         <ArrowRight style={{ width: 14, height: 14, color: DS.accent }} />
       </div>
@@ -303,10 +315,10 @@ export function AssessmentCatalogPage() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
-  // Ticket #1352 — only B2C links in marketing nav.
+  // Ticket #1352 — only B2C links in marketing nav. #1363 — canonical /assessments URL.
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/assessment', label: 'Assessments' },
+    { href: '/assessments', label: 'Assessments' },
     { href: '/pricing', label: 'Pricing' },
     { href: '/nexus/chat', label: 'NEXUS AI' },
   ];
@@ -345,14 +357,14 @@ export function AssessmentCatalogPage() {
               style={{
                 fontFamily: DS.bodyFont,
                 fontSize: '13px',
-                color: l.href === '/assessment' ? DS.accent : DS.textSecondary,
+                color: l.href === '/assessments' ? DS.accent : DS.textSecondary,
                 textDecoration: 'none',
                 padding: '10px 14px',
                 minHeight: '44px',
                 display: 'inline-flex',
                 alignItems: 'center',
-                fontWeight: l.href === '/assessment' ? 700 : 500,
-                borderBottom: l.href === '/assessment' ? `2px solid ${DS.accent}` : '2px solid transparent',
+                fontWeight: l.href === '/assessments' ? 700 : 500,
+                borderBottom: l.href === '/assessments' ? `2px solid ${DS.accent}` : '2px solid transparent',
               }}
             >
               {l.label}
@@ -564,7 +576,7 @@ export function AssessmentCatalogPage() {
               letterSpacing: '-0.01em',
             }}
           >
-            Not sure which instrument fits?
+            Not sure which assessment fits?
           </h2>
           <p
             style={{
@@ -576,8 +588,8 @@ export function AssessmentCatalogPage() {
               lineHeight: 1.6,
             }}
           >
-            NEXUS holds all eleven frameworks in memory and surfaces the diagnostic matched
-            to your current transition point — not the one you would have picked by default.
+            NEXUS knows all six assessments and surfaces the one matched to your current
+            transition point — not the one you would have picked by default.
           </p>
           <a
             href="/nexus/chat"

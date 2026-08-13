@@ -1,18 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Lightbulb, Target } from 'lucide-react';
 import {
-  INK, G100, G200, G300, G400, G600, WHITE,
+  INK, G200, G400, G600, WHITE,
   monoStyle, containerStyle, makeSectionLabel,
 } from '../landing/shared';
-import { AskNexusButton } from './AskNexusButton';
+import { Card, CardContent } from '@/components/ui';
 import type { AssessmentResultsConfig } from './types';
 
 interface Props {
   config: AssessmentResultsConfig;
 }
 
+function scoreColor(score: number, accent: string): string {
+  if (score >= 75) return '#2D7A3E';
+  if (score >= 50) return accent;
+  if (score >= 35) return '#C97824';
+  return '#9CA3AF';
+}
+
 /** Animated bar that fills when scrolled into view */
-function AnimatedBar({ score, accent }: { score: number; accent: string }) {
+function AnimatedBar({ score, color }: { score: number; color: string }) {
   const [width, setWidth] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -22,7 +29,6 @@ function AnimatedBar({ score, accent }: { score: number; accent: string }) {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          // Stagger via slight delay
           setTimeout(() => setWidth(score), 100);
           observer.disconnect();
         }
@@ -32,8 +38,6 @@ function AnimatedBar({ score, accent }: { score: number; accent: string }) {
     observer.observe(el);
     return () => observer.disconnect();
   }, [score]);
-
-  const color = score >= 75 ? '#2D7A3E' : score >= 50 ? accent : score >= 35 ? '#C97824' : '#9CA3AF';
 
   return (
     <div ref={ref} style={{
@@ -49,9 +53,9 @@ function AnimatedBar({ score, accent }: { score: number; accent: string }) {
 }
 
 export function DimensionScorecard({ config }: Props) {
-  const { dimensions, accent, prefix, assessmentCode, assessmentName } = config;
+  const { dimensions, accent, prefix } = config;
   const sectionLabel = makeSectionLabel(accent);
-  const [expandedId, setExpandedId] = useState<string | null>(dimensions[0]?.id ?? null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
     <section style={{ padding: '100px 0' }}>
@@ -62,147 +66,140 @@ export function DimensionScorecard({ config }: Props) {
             fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20,
           }}>
-            Your five dimensions, <em style={{ fontWeight: 400 }}>at a glance</em>
+            Your dimensions, <em style={{ fontWeight: 400 }}>at a glance</em>
           </h2>
           <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>
-            Each dimension is scored 0–100, benchmarked against executive populations.
-            Select a dimension to reveal what it means, why it matters, and what to do next.
+            Each dimension is scored 0–100 against executive benchmarks. Open a dimension for why it matters and what to do next.
           </p>
         </div>
 
-        <div className={`${prefix}-reveal`} style={{ maxWidth: 760, margin: '0 auto' }}>
+        <div className={`${prefix}-reveal`} style={{ maxWidth: 820, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
           {dimensions.map((d, i) => {
-            const color = d.score >= 75 ? '#2D7A3E' : d.score >= 50 ? accent : d.score >= 35 ? '#C97824' : '#9CA3AF';
+            const color = scoreColor(d.score, accent);
             const isOpen = expandedId === d.id;
-            const hasDeepDive = Boolean(d.description || d.whyItMatters || d.actionSuggestion);
+            const hasDeepDive = Boolean(d.whyItMatters || d.actionSuggestion);
             return (
-              <div key={d.id} style={{
-                borderBottom: `1px solid ${G200}`,
-                background: isOpen ? G100 : 'transparent',
-                transition: 'background 200ms ease',
-              }}>
-                {/* Collapsed row — always visible (the "score first" layer) */}
-                <button
-                  onClick={() => hasDeepDive && setExpandedId(isOpen ? null : d.id)}
-                  disabled={!hasDeepDive}
-                  aria-expanded={isOpen}
-                  style={{
-                    width: '100%', padding: '24px 8px', textAlign: 'left',
-                    background: 'transparent', border: 'none', cursor: hasDeepDive ? 'pointer' : 'default',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12,
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flex: 1, minWidth: 0 }}>
+              <Card
+                key={d.id}
+                style={{
+                  background: WHITE,
+                  borderColor: isOpen ? accent : G200,
+                  transition: 'border-color 200ms ease',
+                }}
+              >
+                <CardContent style={{ padding: '28px 28px' }}>
+                  {/* Header row — name + score */}
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+                    gap: 16, marginBottom: 18,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, minWidth: 0 }}>
+                      <span style={{
+                        fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+                        fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em',
+                        color: G400, fontWeight: 500,
+                      }}>
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <span style={{
+                        fontFamily: "'Crimson Pro', Georgia, serif",
+                        fontSize: 21, fontWeight: 700, color: INK,
+                      }}>
+                        {d.name}
+                      </span>
+                    </div>
                     <span style={{
                       fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-                      fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em',
-                      color: G400, fontWeight: 500,
+                      fontSize: 22, fontWeight: 500, color, flexShrink: 0,
                     }}>
-                      {String(i + 1).padStart(2, '0')}
+                      {d.score}
                     </span>
-                    <span style={{
-                      fontFamily: "'Crimson Pro', Georgia, serif",
-                      fontSize: 20, fontWeight: 700, color: INK,
-                    }}>
-                      {d.name}
-                    </span>
-                    {hasDeepDive && (
-                      <ChevronDown style={{
-                        width: 16, height: 16, color: G400,
-                        transition: 'transform 200ms ease',
-                        transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                        flexShrink: 0,
-                      }} />
-                    )}
                   </div>
-                  <span style={{
-                    fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-                    fontSize: 18, fontWeight: 500, color: color,
-                    flexShrink: 0,
-                  }}>
-                    {d.score}
-                  </span>
-                </button>
-                <div style={{ padding: '0 8px 24px' }}>
-                  <AnimatedBar score={d.score} accent={accent} />
-                  <div style={{
-                    display: 'flex', justifyContent: 'space-between', marginTop: 8,
-                  }}>
+
+                  {/* Score bar + low/high labels */}
+                  <AnimatedBar score={d.score} color={color} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
                     <span style={{ fontSize: 11, color: G400 }}>{d.lowLabel}</span>
                     <span style={{ fontSize: 11, color: G400 }}>{d.highLabel}</span>
                   </div>
-                </div>
 
-                {/* Progressive reveal — interpretation + why it matters + action */}
-                {isOpen && hasDeepDive && (
-                  <div style={{
-                    padding: '0 8px 32px',
-                    animation: 'dimensionReveal 300ms cubic-bezier(0.16,1,0.3,1)',
-                  }}>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-                      gap: 16,
-                      marginTop: 4,
+                  {/* One-line interpretation — always visible */}
+                  {d.description && (
+                    <p style={{
+                      fontSize: 15, color: G600, lineHeight: 1.6, margin: '18px 0 0',
                     }}>
-                      {/* What it means */}
-                      {d.description && (
+                      {d.description}
+                    </p>
+                  )}
+
+                  {/* Progressive reveal — why it matters + action */}
+                  {hasDeepDive && (
+                    <div style={{ marginTop: 18 }}>
+                      <button
+                        type="button"
+                        onClick={() => setExpandedId(isOpen ? null : d.id)}
+                        aria-expanded={isOpen}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 6,
+                          background: 'transparent', border: 'none', cursor: 'pointer',
+                          padding: 0,
+                          fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+                          fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em',
+                          color: G600, fontWeight: 500,
+                        }}
+                      >
+                        {isOpen ? 'Hide detail' : 'Why it matters & next step'}
+                        <ChevronDown style={{
+                          width: 14, height: 14, color: G400,
+                          transition: 'transform 200ms ease',
+                          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                        }} />
+                      </button>
+
+                      {isOpen && (
                         <div style={{
-                          padding: '20px', background: WHITE, border: `1px solid ${G200}`,
+                          marginTop: 18,
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                          gap: 16,
+                          animation: 'dimensionReveal 300ms cubic-bezier(0.16,1,0.3,1)',
                         }}>
-                          <span style={{ ...monoStyle, color: accent, fontSize: 9, marginBottom: 10, display: 'block' }}>
-                            What this means
-                          </span>
-                          <p style={{ fontSize: 14, color: G600, lineHeight: 1.6, margin: 0 }}>
-                            {d.description}
-                          </p>
-                        </div>
-                      )}
-                      {/* Why it matters */}
-                      {d.whyItMatters && (
-                        <div style={{
-                          padding: '20px', background: WHITE, border: `1px solid ${G200}`,
-                        }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                            <Lightbulb style={{ width: 14, height: 14, color: accent }} />
-                            <span style={{ ...monoStyle, color: accent, fontSize: 9 }}>
-                              Why it matters
-                            </span>
-                          </div>
-                          <p style={{ fontSize: 14, color: G600, lineHeight: 1.6, margin: 0 }}>
-                            {d.whyItMatters}
-                          </p>
-                        </div>
-                      )}
-                      {/* What to do */}
-                      {d.actionSuggestion && (
-                        <div style={{
-                          padding: '20px', background: WHITE, border: `1px solid ${G200}`,
-                          gridColumn: '1 / -1',
-                        }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                            <Target style={{ width: 14, height: 14, color: '#2D7A3E' }} />
-                            <span style={{ ...monoStyle, color: '#2D7A3E', fontSize: 9 }}>
-                              What to do next
-                            </span>
-                          </div>
-                          <p style={{ fontSize: 14, color: G600, lineHeight: 1.6, margin: 0 }}>
-                            {d.actionSuggestion}
-                          </p>
+                          {d.whyItMatters && (
+                            <div style={{
+                              padding: '18px', background: '#FAFAFA', border: `1px solid ${G200}`,
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                                <Lightbulb style={{ width: 14, height: 14, color: accent }} />
+                                <span style={{ ...monoStyle, color: '#9CA3AF', fontSize: 9 }}>
+                                  Why it matters
+                                </span>
+                              </div>
+                              <p style={{ fontSize: 14, color: G600, lineHeight: 1.6, margin: 0 }}>
+                                {d.whyItMatters}
+                              </p>
+                            </div>
+                          )}
+                          {d.actionSuggestion && (
+                            <div style={{
+                              padding: '18px', background: '#FAFAFA', border: `1px solid ${G200}`,
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                                <Target style={{ width: 14, height: 14, color: '#2D7A3E' }} />
+                                <span style={{ ...monoStyle, color: '#9CA3AF', fontSize: 9 }}>
+                                  What to do next
+                                </span>
+                              </div>
+                              <p style={{ fontSize: 14, color: G600, lineHeight: 1.6, margin: 0 }}>
+                                {d.actionSuggestion}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                    <div style={{ marginTop: 16 }}>
-                      <AskNexusButton
-                        dimension={d.name}
-                        assessmentCode={assessmentCode}
-                        accent={accent}
-                        question={`On my ${assessmentName} results, my "${d.name}" dimension scored ${d.score} out of 100. What does this score mean, and how should I develop this dimension?`}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </CardContent>
+              </Card>
             );
           })}
         </div>

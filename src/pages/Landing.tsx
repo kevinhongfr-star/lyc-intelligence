@@ -143,7 +143,7 @@ const CAPABILITIES = [
     icon: UserCheck,
     title: 'Personalized recommendations',
     desc: 'Based on what you discuss, NEXUS surfaces the right diagnostic at the right moment — not generic personality tests, but targeted assessments matched to your current transition point.',
-    href: '/assessment',
+    href: '/assessments',
     cta: 'Browse assessments',
   },
 ];

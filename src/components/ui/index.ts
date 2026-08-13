@@ -50,6 +50,12 @@ export { LoadingState, ErrorState,
   type LoadingStateProps, type LoadingStateSize, type ErrorStateProps,
 } from './ContentStates';
 
+/* ── #1360: Section / typography primitives ──────────────────── */
+export {
+  Container, SectionHeading, Text, Eyebrow,
+  type ContainerProps, type SectionHeadingProps, type TextProps, type TextVariant,
+} from './Section';
+
 /* ── Shared layout chrome (portal components, re-exported) ───── */
 export { TopBar, type TopBarProps } from '../portals/TopBar';
 export { Sidebar, type SidebarProps, type SidebarItem } from '../portals/Sidebar';

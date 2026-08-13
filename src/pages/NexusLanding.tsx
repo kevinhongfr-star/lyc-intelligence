@@ -159,12 +159,12 @@ function Hero() {
       {/* Static hero accent line (2px vertical gradient, fuchsia → transparent, ~200px tall, no animation) */}
       <div aria-hidden="true" style={{ position: 'absolute', top: 140, left: '50%', transform: 'translateX(-50%)', width: 2, height: 200, background: `linear-gradient(to bottom, ${ACCENT} 0%, transparent 100%)`, pointerEvents: 'none' }} />
       <div style={containerStyle} className="nl-reveal">
-        <span style={{ ...monoStyle, color: ACCENT, marginBottom: 28, display: 'inline-block' }}>Your AI leadership coach</span>
+        <span style={{ ...monoStyle, color: ACCENT, marginBottom: 28, display: 'inline-block' }}>Your AI executive coach</span>
         <h1 className="hero-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, lineHeight: 1.15, color: INK, fontSize: 48, maxWidth: 760, margin: '0 auto 24px' }}>
-          Grow faster. <br /><em style={{ fontWeight: 400 }}>Always have a coach.</em>
+          NEXUS knows your assessments. <br /><em style={{ fontWeight: 400 }}>And what to do next.</em>
         </h1>
-        <p className="hero-sub" style={{ fontSize: 18, maxWidth: 600, margin: '0 auto 40px', color: G600, lineHeight: 1.6 }}>
-          Get instant, executive-level feedback on your leadership decisions. Benchmark yourself against 47 markets. Know exactly where you stand and what to work on next — anytime, on demand.
+        <p className="hero-sub" style={{ fontSize: 18, maxWidth: 620, margin: '0 auto 40px', color: G600, lineHeight: 1.6 }}>
+          NEXUS is your AI executive coach. It knows all six leadership assessments, can interpret your results, and gives you personalised leadership advice based on your profile.
         </p>
         <div className="cta-row" style={{ display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 60, flexWrap: 'wrap' }}>
           <a href="#start" style={btnPrimary} {...ctaCompressHandlers}
@@ -194,10 +194,9 @@ function WhatIs() {
       <div style={containerStyle} className="nl-reveal">
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
           <span style={sectionLabel}>What NEXUS is</span>
-          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 34, lineHeight: 1.2, color: INK, marginBottom: 32 }}>Your coach. <em style={{ fontWeight: 400 }}>On your schedule.</em></h2>
-          <p style={{ fontSize: 18, lineHeight: 1.7, color: G600, marginBottom: 24 }}><strong style={{ color: INK, fontWeight: 600 }}>Most leadership advice is either generic or expensive.</strong> Self-help content doesn't know your context. Executive coaches cost thousands and aren't there at 9pm when you're stuck on a decision.</p>
-          <p style={{ fontSize: 18, lineHeight: 1.7, color: G600, marginBottom: 24 }}>NEXUS is different. It's an AI leadership coach grounded in <strong style={{ color: INK, fontWeight: 600 }}>LYC Partners' 10+ years of executive search data</strong>, validated assessment frameworks, and real talent market intelligence.</p>
-          <p style={{ fontSize: 18, lineHeight: 1.7, color: G600, marginBottom: 24 }}>Ask it about a tricky promotion conversation. Get benchmarked against peers in your market. Analyze your next career move. All from your phone or laptop, whenever you need it.</p>
+          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 34, lineHeight: 1.2, color: INK, marginBottom: 32 }}>A coach that knows <em style={{ fontWeight: 400 }}>your assessments.</em></h2>
+          <p style={{ fontSize: 18, lineHeight: 1.7, color: G600, marginBottom: 24 }}>NEXUS is an AI executive coach built on LYC's assessment methodology and APAC executive placement data. It knows all six leadership assessments, reads your results, and carries your context into every reply — so the guidance is about you, not a template.</p>
+          <p style={{ fontSize: 18, lineHeight: 1.7, color: G600, marginBottom: 24 }}>Ask a question before a hard decision, talk through a transition, or pressure-test a 90-day plan. The coach is there whenever the question appears.</p>
         </div>
       </div>
     </section>
@@ -206,21 +205,20 @@ function WhatIs() {
 
 // ── CAPABILITIES ───────────────────────────────────────────────────
 const CAPS = [
-  { n: '01', title: 'AI Advisory Chat', desc: 'Executive-level guidance on leadership, career, and talent questions. Context-aware — remembers your profile, your assessments, your situation. Not generic answers.', link: 'Try a question →', href: '/nexus/chat' },
-  { n: '02', title: 'Leadership Diagnostics', desc: 'Scientific assessments that measure where you actually stand. Strengths, blind spots, developmental areas — with benchmarks against real executive populations.', link: 'See Diagnostics →', href: '#diagnostics' },
-  { n: '03', title: 'Role Fit Analysis', desc: "Curious about a new role? Upload any JD and see how you match across dimensions. Know where you're strong and where you'd need to grow — before you apply.", link: 'Check a role →', href: '#start' },
-  { n: '04', title: 'Market Intelligence', desc: 'Talent market data specific to your industry and level. Compensation benchmarks, in-demand capabilities, and movement patterns — so you negotiate from information.', link: 'View your market →', href: '#start' },
+  { n: '01', title: 'Get a read on your situation', desc: "Describe your career transition, team challenge, or cross-border move. NEXUS listens to the specifics and maps you to the right assessment — so you test what actually matters.", link: 'Describe your situation →', href: '#diagnostics' },
+  { n: '02', title: 'Understand your results', desc: 'After any assessment, NEXUS walks you through what your scores mean, where the blind spots are, and what to do next — in plain language, tied to your profile.', link: 'Try it with your results →', href: '/nexus/chat' },
+  { n: '03', title: 'Plan your next 90 days', desc: 'Turn insight into action. NEXUS builds a concrete development plan grounded in 20 years of LYC APAC placement data — sequenced, specific, and tied to the role you want next.', link: 'Build your plan →', href: '/nexus/chat' },
 ];
 function Capabilities() {
   return (
     <section id="capabilities" style={{ padding: '100px 0' }} className="section-padding">
       <div style={containerStyle}>
         <div className="nl-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
-          <span style={sectionLabel}>What your coach does</span>
-          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Four ways NEXUS <em style={{ fontWeight: 400 }}>moves you forward</em></h2>
-          <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>Everything a senior leader needs to understand their strengths, benchmark their capabilities, and make better career and leadership decisions.</p>
+          <span style={sectionLabel}>What NEXUS does</span>
+          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Three things NEXUS <em style={{ fontWeight: 400 }}>actually does</em></h2>
+          <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>Not a chatbot that guesses. A coach that knows your assessments, reads your results, and turns them into a plan.</p>
         </div>
-        <div className="nl-reveal grid-responsive-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, background: G200, border: `1px solid ${G200}` }}>
+        <div className="nl-reveal grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: G200, border: `1px solid ${G200}` }}>
           {CAPS.map((c, i) => (
             <div key={c.n} style={{
               background: WHITE, padding: '40px 36px', display: 'flex', flexDirection: 'column',
@@ -245,17 +243,48 @@ function Capabilities() {
 
 // ── HOW IT WORKS ───────────────────────────────────────────────────
 const STEPS = [
-  { n: '01', title: 'Start', desc: 'Create your profile and do your first diagnostic. It takes about 15 minutes. NEXUS learns your context from the very first interaction.' },
-  { n: '02', title: 'Understand', desc: 'Get your personalized report with strengths, blind spots, and benchmarked results. Then start asking questions — your coach already knows your profile.' },
-  { n: '03', title: 'Grow', desc: 'Follow development recommendations, track your progress, and keep moving. Your coach is always there when you hit a new question or crossroads.' },
+  { n: '01', title: 'Take an assessment', desc: 'Start with one of the six leadership assessments — about 15 to 25 minutes. NEXUS learns your context from the first result.' },
+  { n: '02', title: 'Read it with NEXUS', desc: 'Walk through what your scores mean and where the gaps are, benchmarked against real executive populations. Then ask your coach anything.' },
+  { n: '03', title: 'Act on a plan', desc: 'Turn the read into a concrete 90-day development plan, grounded in LYC placement data. Your coach is there when the next question surfaces.' },
 ];
+
+// ── WHAT YOU CAN ASK ───────────────────────────────────────────────
+const EXAMPLE_PROMPTS = [
+  "I'm moving from a functional VP role to country GM — what should I test for?",
+  "My PRISM scores show weak visibility — how do I fix that?",
+  "I'm relocating to Shanghai — what cultural gaps should I expect?",
+  "My board wants a 90-day turnaround plan — where do I start?",
+  "I keep losing senior hires to competitors — what am I missing?",
+];
+function WhatToAsk() {
+  return (
+    <section style={{ padding: '100px 0' }} className="section-padding">
+      <div style={containerStyle}>
+        <div className="nl-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 56px' }}>
+          <span style={sectionLabel}>What you can ask NEXUS</span>
+          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 16 }}>Ask it like you'd <em style={{ fontWeight: 400 }}>ask a coach</em></h2>
+          <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>Real questions, in your own words. NEXUS carries your profile and results into every reply.</p>
+        </div>
+        <div className="nl-reveal" style={{ maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 1, background: G200, border: `1px solid ${G200}` }}>
+          {EXAMPLE_PROMPTS.map((q, i) => (
+            <div key={i} style={{ background: WHITE, padding: '22px 28px', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+              <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 12, color: ACCENT, marginTop: 4, flexShrink: 0 }}>→</span>
+              <span style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 18, color: INK, lineHeight: 1.5, fontStyle: 'italic' }}>{q}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 function HowItWorks() {
   return (
     <section id="how-it-works" style={{ padding: '100px 0', background: G100 }} className="section-padding">
       <div style={containerStyle}>
         <div className="nl-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>How it works</span>
-          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 0 }}>Three steps. <em style={{ fontWeight: 400 }}>No guesswork.</em></h2>
+          <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 16 }}>Three steps. <em style={{ fontWeight: 400 }}>No guesswork.</em></h2>
+          <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>Trained on our assessment methodology and your results — NEXUS carries your context into every reply.</p>
         </div>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48, position: 'relative' }}>
           {STEPS.map((s, i) => (
@@ -384,8 +413,8 @@ function B2BTeaser() {
 // ── PRICING ────────────────────────────────────────────────────────
 // Ticket #1352 — only B2C plans on marketing landing page (Enterprise / B2B removed from visitor view).
 const PLANS = [
-  { label: 'Start', title: 'Executive Introduction', price: '', small: null, desc: 'Get your first leadership diagnostic and initial advisory session. No credit card.', bullets: ['China Leadership Pipeline Diagnostic', 'Full narrative report', 'Initial advisory conversation', 'Basic profile'], cta: 'Start — Executive Introduction', href: '#start', featured: false },
-  { label: 'Recommended', title: 'Executive Access', price: 'From $29', small: '/month', desc: 'Full access to all diagnostics, unlimited advisory chat, and role fit analysis.', bullets: ['All 6 leadership diagnostics', 'Unlimited AI advisory chat', 'Role Fit Analysis — unlimited', 'Development tracking', 'Market intelligence access'], cta: 'Begin Executive Access', href: '#start', featured: true },
+  { label: 'Start', title: 'Executive Introduction', price: '', small: null, desc: 'Get your first leadership diagnostic and 3 NEXUS messages to try it. No credit card.', bullets: ['China Leadership Pipeline Diagnostic', 'Full narrative report', '3 NEXUS messages to try it', 'Basic profile'], cta: 'Start — Executive Introduction', href: '#start', featured: false },
+  { label: 'Recommended', title: 'Executive Access', price: 'From $29', small: '/month', desc: 'Full access to all diagnostics, unlimited NEXUS, and role fit analysis.', bullets: ['All 6 leadership diagnostics', 'Unlimited NEXUS access', 'Role Fit Analysis — unlimited', 'Development tracking', 'Market intelligence access'], cta: 'Begin Executive Access', href: '#start', featured: true },
 ];
 function PricingCard({ plan }: { plan: typeof PLANS[number] }) {
   const f = plan.featured;
@@ -434,7 +463,7 @@ function Pricing() {
         <div className="nl-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Pricing</span>
           <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20 }}>Start with Executive Introduction. <em style={{ fontWeight: 400 }}>Grow when you're ready.</em></h2>
-          <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>Three tiers designed for where you are today — with clear paths forward.</p>
+          <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>Complimentary access includes 3 NEXUS messages to try it. Subscribers get unlimited NEXUS access.</p>
         </div>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: G200, border: `1px solid ${G200}` }}>
           {PLANS.map(p => <PricingCard key={p.title} plan={p} />)}
@@ -515,7 +544,7 @@ function Footer() {
             <h4 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, marginBottom: 8, display: 'flex', alignItems: 'baseline', gap: 6, color: INK, lineHeight: 1.2 }}>
               NEXUS <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', color: G400, fontWeight: 400, fontStyle: 'normal' }}>by LYC</span>
             </h4>
-            <p style={{ color: G600, fontSize: 14, maxWidth: 280, marginTop: 16, lineHeight: 1.6 }}>Your AI leadership coach — built on executive search data and validated assessment frameworks.</p>
+            <p style={{ color: G600, fontSize: 14, maxWidth: 280, marginTop: 16, lineHeight: 1.6 }}>Your AI executive coach — knows your six leadership assessments, reads your results, and plans your next move.</p>
           </div>
           <div>
             <h5 style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: G400, marginBottom: 20, fontWeight: 500 }}>Product</h5>
@@ -563,6 +592,7 @@ export function NexusLanding() {
         <Hero />
         <WhatIs />
         <Capabilities />
+        <WhatToAsk />
         <HowItWorks />
         <Diagnostics />
         <Personas />

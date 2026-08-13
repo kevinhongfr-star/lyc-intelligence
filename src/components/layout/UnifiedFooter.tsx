@@ -19,7 +19,7 @@ const links = {
   ],
   platform: [
     { href: '/nexus/chat', label: 'NEXUS AI' },
-    { href: '/assessment', label: 'Leadership Assessments' },
+    { href: '/assessments', label: 'Leadership Assessments' },
   ],
   company: [
     { href: 'https://lyc-partners.ai', label: 'LYC Partners', external: true },
@@ -75,8 +75,7 @@ export function UnifiedFooter() {
               maxWidth: '280px',
             }}
           >
-            The intelligent front door to leadership intelligence. Assessment-driven insight for executives,
-            boards, and the firms that advise them.
+            Assessment-driven leadership intelligence for executives, boards, and the firms that advise them.
           </p>
           <div
             style={{
@@ -193,7 +192,7 @@ export function UnifiedFooter() {
               marginBottom: '16px',
             }}
           >
-            Try NEXUS
+            Meet NEXUS
           </a>
           <div
             style={{

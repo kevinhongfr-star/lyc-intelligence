@@ -1,18 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
-import { Download, Loader2, AlertTriangle } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
+import { ArrowRight, Download, AlertTriangle } from 'lucide-react';
 import {
-  AssessmentResults,
-  ResultsHero,
-  ExecutiveSummary,
   DimensionScorecard,
   ArchetypeProfile,
   KeyInsights,
-  DevelopmentPlan,
   ShareRetake,
-  NEXUSCTA,
   type AssessmentResultsConfig,
 } from './index';
+import { deriveExecutiveSummary } from './ExecutiveSummary';
+import { Container, SectionHeading, Card, CardContent } from '@/components/ui';
 import {
   runAndRenderReport,
   getReportMeta,
@@ -29,6 +26,7 @@ const OFF = '#F5F5F3';
 const G200 = '#E8E8E5';
 const G400 = '#8A8A82';
 const G600 = '#52524B';
+const WHITE = '#FFFFFF';
 const ACCENT = '#C108AB';
 
 const containerStyle: React.CSSProperties = {
@@ -51,6 +49,32 @@ const headingStyle: React.CSSProperties = {
 const bodyStyle: React.CSSProperties = {
   fontFamily: "'DM Sans', system-ui, sans-serif",
 };
+
+/** Semantic score-band color — keeps the established 4-band pattern. */
+function scoreColor(score: number, accent: string): string {
+  if (score >= 75) return '#2D7A3E';
+  if (score >= 50) return accent;
+  if (score >= 35) return '#C97824';
+  return '#9CA3AF';
+}
+
+/** Horizontal score bar that fills on mount (350ms — within brand motion budget). */
+function ScoreBar({ score, color }: { score: number; color: string }) {
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const t = setTimeout(() => setWidth(score), 150);
+    return () => clearTimeout(t);
+  }, [score]);
+  return (
+    <div style={{ height: 10, background: G200, position: 'relative', overflow: 'hidden' }}>
+      <div style={{
+        position: 'absolute', top: 0, left: 0, bottom: 0,
+        width: `${width}%`, background: color,
+        transition: 'width 350ms cubic-bezier(0.16,1,0.3,1)',
+      }} />
+    </div>
+  );
+}
 
 interface GenericAkiraResultsProps {
   instrumentKey: string;
@@ -299,6 +323,19 @@ export function GenericAkiraResults({
     accent: ACCENT,
   };
 
+  const summary = deriveExecutiveSummary(configForRender);
+  const scoreColorVal = scoreColor(configForRender.overallScore, ACCENT);
+  const sortedActions = [...configForRender.developmentActions].sort(
+    (a, b) => a.priority - b.priority
+  );
+  const { prefix, assessmentName, archetype, overallScore } = configForRender;
+  const accentLink: React.CSSProperties = {
+    display: 'inline-flex', alignItems: 'center', gap: 6,
+    fontFamily: "'DM Sans', system-ui, sans-serif",
+    fontSize: 14, fontWeight: 500, color: ACCENT,
+    textDecoration: 'none', transition: 'opacity 200ms ease',
+  };
+
   return (
     <div style={{
       background: OFF, color: INK, minHeight: '100vh',
@@ -361,24 +398,177 @@ export function GenericAkiraResults({
       </header>
 
       <main>
-        <div style={containerStyle}>
-          <div style={{ paddingTop: 24 }}>
-            <ResultsHero config={configForRender} />
-          </div>
-          <ExecutiveSummary config={configForRender} />
-          <DimensionScorecard config={configForRender} />
-          <ArchetypeProfile config={configForRender} />
-          <KeyInsights config={configForRender} />
-          <DevelopmentPlan config={configForRender} />
-          <NEXUSCTA config={configForRender} />
-          <ShareRetake config={configForRender} />
-        </div>
+        {/* Hero — overall score large + one-sentence summary + visual score bar */}
+        <section style={{ padding: '112px 0 72px', background: OFF }}>
+          <Container width="base">
+            <div className={`${prefix}-reveal`} style={{ textAlign: 'center' }}>
+              <SectionHeading
+                eyebrow={`${assessmentName} · Results`}
+                title={<>Your <em style={{ fontWeight: 400 }}>archetype</em> is {archetype.name}</>}
+                subtitle={summary.verdict}
+                align="center"
+                as="h1"
+              />
+              <div style={{ marginTop: 44 }}>
+                <div style={{
+                  fontFamily: "'Crimson Pro', Georgia, serif",
+                  fontSize: 92, fontWeight: 700, lineHeight: 1, color: scoreColorVal,
+                }}>
+                  {overallScore}
+                </div>
+                <div style={{ ...monoStyle, color: G400, marginTop: 8 }}>
+                  Overall score / 100
+                </div>
+                <div style={{ maxWidth: 460, margin: '28px auto 0' }}>
+                  <ScoreBar score={overallScore} color={scoreColorVal} />
+                </div>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        {/* At a glance — the 3 key findings (executive summary data, preserved) */}
+        <section style={{ padding: '0 0 96px', background: OFF }}>
+          <Container width="base">
+            <div className={`${prefix}-reveal`} style={{
+              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 1, background: G200, border: `1px solid ${G200}`,
+            }}>
+              {summary.keyFindings.map((finding, i) => (
+                <div key={i} style={{ background: WHITE, padding: '24px 22px' }}>
+                  <span style={{
+                    ...monoStyle, color: '#9CA3AF', fontSize: 9,
+                    marginBottom: 10, display: 'block',
+                  }}>
+                    {finding.label}
+                  </span>
+                  <p style={{ fontSize: 14, color: G600, lineHeight: 1.55, margin: 0 }}>
+                    {finding.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Container>
+        </section>
+
+        {/* Key insights — narrative cards */}
+        <KeyInsights config={configForRender} />
+
+        {/* Dimension breakdown — cleaner cards with score bars */}
+        <DimensionScorecard config={configForRender} />
+
+        {/* Archetype profile */}
+        <ArchetypeProfile config={configForRender} />
+
+        {/* What this means for you — narrative takeaways (development plan data, preserved) */}
+        <section style={{ padding: '100px 0', background: WHITE }}>
+          <Container width="md">
+            <div className={`${prefix}-reveal`}>
+              <SectionHeading
+                eyebrow="What this means for you"
+                title={<>Where to <em style={{ fontWeight: 400 }}>focus next</em></>}
+                align="left"
+              />
+              <p style={{ fontSize: 17, color: G600, lineHeight: 1.6, marginTop: 24, maxWidth: 620 }}>
+                Based on your lowest-scoring dimensions, these are the moves that will shift the needle over the coming quarter.
+              </p>
+              <div style={{ marginTop: 40, maxWidth: 680 }}>
+                {sortedActions.map((action, i) => (
+                  <div key={i} style={{
+                    paddingBottom: 24, marginBottom: 24,
+                    borderBottom: i < sortedActions.length - 1 ? `1px solid ${G200}` : 'none',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, marginBottom: 8, flexWrap: 'wrap' }}>
+                      <span style={{ ...monoStyle, color: '#9CA3AF', fontSize: 11 }}>
+                        {String(action.priority).padStart(2, '0')}
+                      </span>
+                      <span style={{
+                        fontFamily: "'Crimson Pro', Georgia, serif",
+                        fontSize: 19, fontWeight: 700, color: INK,
+                      }}>
+                        {action.dimension}
+                      </span>
+                      <span style={{ ...monoStyle, color: G400, fontSize: 10 }}>
+                        · {action.timeline}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: 16, color: G600, lineHeight: 1.65, margin: 0 }}>
+                      {action.action}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        {/* Next steps — try another assessment + tier upgrade prompt */}
+        <section style={{ padding: '100px 0', background: OFF, borderTop: `1px solid ${G200}` }}>
+          <Container width="base">
+            <div className={`${prefix}-reveal`}>
+              <SectionHeading
+                eyebrow="Next steps"
+                title="Keep the momentum"
+                align="center"
+              />
+              <div style={{
+                display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                gap: 24, maxWidth: 760, margin: '48px auto 0',
+              }}>
+                <Card style={{ background: WHITE, borderColor: G200 }}>
+                  <CardContent style={{ padding: '32px 28px' }}>
+                    <h3 style={{
+                      fontFamily: "'Crimson Pro', Georgia, serif",
+                      fontSize: 22, fontWeight: 700, color: INK, marginBottom: 12, lineHeight: 1.25,
+                    }}>
+                      Explore another assessment
+                    </h3>
+                    <p style={{ fontSize: 15, color: G600, lineHeight: 1.6, margin: '0 0 24px' }}>
+                      Each diagnostic reveals a different facet of your leadership. Find the one that meets your next moment.
+                    </p>
+                    <Link
+                      to="/assessments"
+                      style={accentLink}
+                      onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.8'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+                    >
+                      Browse assessments <ArrowRight style={{ width: 14, height: 14 }} />
+                    </Link>
+                  </CardContent>
+                </Card>
+                <Card style={{ background: WHITE, borderColor: G200 }}>
+                  <CardContent style={{ padding: '32px 28px' }}>
+                    <h3 style={{
+                      fontFamily: "'Crimson Pro', Georgia, serif",
+                      fontSize: 22, fontWeight: 700, color: INK, marginBottom: 12, lineHeight: 1.25,
+                    }}>
+                      Unlock deeper diagnostics
+                    </h3>
+                    <p style={{ fontSize: 15, color: G600, lineHeight: 1.6, margin: '0 0 24px' }}>
+                      Higher tiers open the full leadership suite plus cross-assessment synthesis.
+                    </p>
+                    <Link
+                      to="/pricing"
+                      style={accentLink}
+                      onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.8'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+                    >
+                      View plans <ArrowRight style={{ width: 14, height: 14 }} />
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        <ShareRetake config={configForRender} />
       </main>
 
-      {/* Footer */}
+      {/* Footer — with the single, subtle NEXUS entry point (#1361) */}
       <footer style={{ background: OFF, borderTop: `1px solid ${G200}`, padding: '64px 0 32px', marginTop: 64 }}>
         <div style={containerStyle}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 48 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 48, flexWrap: 'wrap', gap: 32 }}>
             <div>
               <span style={{ ...headingStyle, fontSize: 18, fontWeight: 700, color: INK }}>
                 {instrumentKey}
@@ -390,11 +580,28 @@ export function GenericAkiraResults({
             <div>
               <div style={{ ...monoStyle, color: G400, marginBottom: 12 }}>Platform</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <a href="/nexus" style={{ color: G600, textDecoration: 'none', fontSize: 13 }}>NEXUS</a>
                 <a href="/pricing" style={{ color: G600, textDecoration: 'none', fontSize: 13 }}>Pricing</a>
               </div>
             </div>
           </div>
+
+          {/* The single, subtle NEXUS entry point for this result page */}
+          <div style={{ paddingBottom: 24, textAlign: 'center' }}>
+            <Link
+              to="/nexus/chat"
+              style={{
+                ...monoStyle, color: G600, textDecoration: 'none', fontSize: 12,
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                transition: 'color 200ms ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = ACCENT; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = G600; }}
+            >
+              Discuss your results with NEXUS AI
+              <ArrowRight style={{ width: 13, height: 13 }} />
+            </Link>
+          </div>
+
           <div style={{
             paddingTop: 32, borderTop: `1px solid ${G200}`,
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',

@@ -66,6 +66,7 @@ export default {
       fontFamily: {
         serif: ['Crimson Pro', 'Georgia', 'serif'],
         sans: ['DM Sans', 'system-ui', 'sans-serif'],
+        mono: ['IBM Plex Mono', 'ui-monospace', 'Courier New', 'monospace'],
       },
       fontSize: {
         'xxs': '10px',
