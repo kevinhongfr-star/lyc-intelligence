@@ -45,7 +45,35 @@ import {
   safeErrorMessage,
   safeErrorStatus,
   sanitizeObject,
+  rateLimit,
+  setRateLimitHeaders,
 } from '../lib/validate.js';
+import { z } from 'zod';
+
+// ── V3-6 / #1347 Consultant-entity block list ─────────────────────────────
+// Consultant / B2B-internal entities are NEVER exposed to the public or
+// B2C unauthenticated users. These tables require auth + admin OR
+// consultant role — leader/candidate/client viewer always 403.
+
+const CONSULTANT_ONLY_ENTITIES = new Set([
+  'consultants',
+  'consultant_profiles',
+  'consultant_performance',
+  'consultant_assignments',
+  'mandates',
+  'mandate_matches',
+  'pipeline_stages',
+  'mandate_timelines',
+]);
+
+function isConsultantOnlyEntity(entity: string): boolean {
+  if (CONSULTANT_ONLY_ENTITIES.has(entity)) return true;
+  // Also guard mandate_matches / consultant_* wildcard variants
+  if (entity.startsWith('consultant_')) return true;
+  if (entity.startsWith('mandate_match')) return true;
+  if (entity === 'pipeline_stages') return true;
+  return false;
+}
 
 // ── Entity access control list ──────────────────────────────────────────────
 // Each allowlisted entity => { read: roles allowed to READ,
@@ -56,9 +84,9 @@ import {
 type Acl = {
   read: Array<'admin' | 'consultant' | 'client' | 'leader'>;
   write?: Array<'admin' | 'consultant' | 'client' | 'leader'>;
-  selfColumn?: string;        // e.g. 'user_id', 'owner_id' — column = userId for leader/candidate self-scoping
-  consultantColumn?: string;  // column = userId for scoped-consultant per-user scoping (e.g. 'lead_consultant_id', 'owner_id')
-  orgColumn?: string;         // e.g. 'organization_id', 'org_id'
+  selfColumn?: string;
+  consultantColumn?: string;
+  orgColumn?: string;
 };
 const ENTITY_ACL: Record<string, Acl> = {
   // #1313: profiles write is admin-only. Leaders update their own profile
@@ -170,15 +198,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!ctx) return res.status(401).json({ error: 'Unauthorized' });
 
     const entity = (req.query?.entity as string) || '';
-    // #1309: validate entity name format even though it must match ACL.
     try {
       assertEntityName(entity);
     } catch {
       return res.status(404).json({ error: `Entity not accessible` });
     }
+
+    // ── V3-6 / #1347: Consultant / B2B entities are B2B/internal-only. ──
+    // Public (B2C unauth) users MUST NOT fetch consultant entities.
+    // If the caller is NOT admin and NOT consultant role → 403.
+    if (isConsultantOnlyEntity(entity)) {
+      const roleOk = isAdminRole(ctx.role) || isConsultantRole(ctx.role);
+      if (!roleOk) {
+        return res.status(403).json({
+          ok: false,
+          code: 'FORBIDDEN',
+          message: 'Consultant data not available to public users',
+        });
+      }
+    }
+
     const acl = ENTITY_ACL[entity];
     if (!acl) {
       return res.status(404).json({ error: `Entity "${entity}" not accessible through this endpoint` });
+    }
+
+    // ── V3-7 / #1346 Write rate limit (global 20 writes / 60s per user) ─
+    if (req.method === 'POST') {
+      const rl = rateLimit(req, ctx.userId);
+      setRateLimitHeaders(res, rl, 20);
+      if (!rl.allowed) {
+        return res.status(429).json({
+          ok: false,
+          code: 'RATE_LIMITED',
+          message: 'Too many write requests — please retry in a moment',
+        });
+      }
     }
 
     const supabase = createClient();
@@ -236,10 +291,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // ── POST: { filters, upsert, delete_by } ──────────────────────────
     if (req.method === 'POST') {
       // #1309 + #1314: enforce body size limit, then parse + sanitize.
-      // parseJsonBody throws RequestAuthError(400) on malformed JSON
-      // (instead of letting a SyntaxError surface as a 500).
       assertBodySize(req.body, DEFAULT_BODY_LIMIT);
-      const body = parseJsonBody<{
+
+      const PostBodySchema = z.object({
+        select: z.string().max(4096).optional(),
+        upsert: z.record(z.string(), z.any()).max(200).optional(),
+        delete_by: z.record(z.string(), z.any()).max(100).optional(),
+        filters: z.array(z.object({ col: z.string().max(64), op: z.string().max(16), value: z.any() })).max(50).optional(),
+        order: z.string().max(256).optional(),
+        on_conflict: z.string().max(256).optional(),
+        limit: z.number().int().min(0).max(500).optional(),
+        offset: z.number().int().min(0).optional(),
+      });
+
+      const rawBody = parseJsonBody<{
         select?: string;
         upsert?: Record<string, unknown>;
         delete_by?: Record<string, unknown>;
@@ -249,6 +314,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         limit?: number;
         offset?: number;
       }>(req);
+
+      // V3-7: zod-validate the write shape before processing
+      const needsWrite = !!rawBody.upsert || !!rawBody.delete_by;
+      const body = needsWrite ? (function () {
+        try { return PostBodySchema.parse(rawBody); } catch (zErr: any) {
+          const first = zErr?.issues?.[0];
+          const msg = first
+            ? `Invalid input at ${first.path.join('.')}: ${first.message}`
+            : 'Invalid write body';
+          throw new RequestAuthError(msg.slice(0, 256), 422);
+        }
+      })() : rawBody;
 
       // Write access check first.
       if (body.upsert || body.delete_by) {
@@ -300,6 +377,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           logServerError('api/data/[entity] DELETE', error, req);
           throw new RequestAuthError(safeErrorMessage(error, 'Failed to delete'), safeErrorStatus(error, 500));
         }
+
+        // V3-7 audit write (best-effort — never fail on audit errors)
+        try {
+          await supabase.from('audit_logs').insert({
+            actor_user_id: ctx.userId,
+            action: `DELETE:${entity}`,
+            entity,
+            record_count: delCount ?? 0,
+            details: { columns: Object.keys(body.delete_by ?? {}) },
+            ip_address: null,
+            user_agent: null,
+          });
+        } catch (_auditErr) { /* swallow */ }
+
         return res.status(200).json({ ok: true, deleted: delCount ?? 0 });
       }
 
@@ -349,6 +440,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           logServerError('api/data/[entity] UPSERT', error, req);
           throw new RequestAuthError(safeErrorMessage(error, 'Failed to save'), safeErrorStatus(error, 500));
         }
+
+        // V3-7 audit write (best-effort — never fail on audit errors)
+        try {
+          await supabase.from('audit_logs').insert({
+            actor_user_id: ctx.userId,
+            action: `POST:${entity}`,
+            entity,
+            record_count: data?.length ?? 0,
+            details: { upsert_keys: Object.keys(body.upsert ?? {}) },
+            ip_address: null,
+            user_agent: null,
+          });
+        } catch (_auditErr) { /* swallow */ }
+
         return res.status(200).json({ ok: true, data });
       }
 

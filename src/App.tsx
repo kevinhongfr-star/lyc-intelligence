@@ -36,7 +36,7 @@
  *     Mono), single accent #C108AB.
  */
 import React, { Suspense, lazy, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { CreditProvider } from '@/contexts/CreditContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -192,6 +192,12 @@ const BillingDashboard = lazy(() => import('@/components/billing/BillingDashboar
 // ── Placeholder + not found ──
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
+function DiagnosticsRedirect() {
+  const { pathname, search, hash } = useLocation();
+  const sub = pathname.replace(/^\/diagnostics/, '');
+  return <Navigate to={'/assessment' + (sub || '') + search + hash} replace />;
+}
+
 function Loading() {
   return (
     <div className="flex items-center justify-center h-screen">
@@ -263,15 +269,7 @@ export default function App() {
             <Route path="assessments" element={<AssessmentCatalogPage />} />
             <Route path="assessment" element={<Navigate to="/assessments" replace />} />
 
-            {/* ── 6 Real B2C Assessment Routes (Batch 6 ticket #1351) ── */}
-            {/* Canonical individual landings under /assessments/:code (#1363) */}
-            <Route path="assessments/prism" element={<PrismLanding />} />
-            <Route path="assessments/spark" element={<SparkLanding />} />
-            {/* Generic canonical landing for FORGE, BRIDGE, MOSAIC, DRIVE */}
-            <Route path="assessments/:code" element={<CanonicalInstrumentLanding />} />
-
-            {/* Legacy /assessment/:code landings kept working (no redirect) so the
-                take/results flow and old bookmarks never 404. New links use /assessments/:code. */}
+            {/* ── Canonical singular assessment landing routes (V3-2) ── */}
             <Route path="assessment/prism" element={<PrismLanding />} />
             <Route path="assessment/spark" element={<SparkLanding />} />
             {/* Explicit redirects for instruments that have no landing data */}
@@ -298,14 +296,8 @@ export default function App() {
             <Route path="assessment/bridge/results" element={<BridgeResultsPage />} />
             <Route path="assessment/mosaic/results" element={<MosaicResultsPage />} />
 
-            {/* ── Phase 7: Canonical diagnostic routes (#1276-#1286) ── */}
-            {/* New branching-native engine with #1341 data model + #1340 tier gating.
-                #1363: /diagnostics (exact) redirects to the /assessments catalog.
-                /diagnostics/:slug landing + take/results flow kept intact (no breakage). */}
-            <Route path="diagnostics" element={<Navigate to="/assessments" replace />} />
-            <Route path="diagnostics/:slug" element={<DiagnosticLandingPage />} />
-            <Route path="diagnostics/:slug/take" element={<DiagnosticTakePage />} />
-            <Route path="diagnostics/:slug/results/:resultId" element={<DiagnosticResultsPage />} />
+            {/* ── Diagnostics → canonical /assessment/* (V3-2 + V3-8 SPA fallback) ── */}
+            <Route path="diagnostics/*" element={<DiagnosticsRedirect />} />
 
             {/* Share pages — publicly accessible shortlinks */}
             <Route path="share/:id" element={<SharePage />} />

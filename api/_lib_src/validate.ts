@@ -23,6 +23,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { RequestAuthError } from './auth.js';
+import { z } from 'zod';
 
 // ── Regexes ────────────────────────────────────────────────────────
 // Postgres identifier: lowercase letters, digits, underscore. Must
@@ -473,23 +474,69 @@ export function safeErrorStatus(err: unknown, fallback = 500): number {
   return fallback;
 }
 
-/** Headers that must never appear in server logs. */
 const SENSITIVE_HEADER_KEYS = new Set([
   'authorization', 'cookie', 'set-cookie', 'x-api-key',
   'x-anonymous-id', 'x-supabase-key', 'api-key',
 ]);
 
+// ── V3-5 / #1345 Server-side PII scrubbers ──────────────────────────
+const RE_EMAIL = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+const RE_UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+const RE_ASSESSMENT_VALUES =
+  /(strategic_thinking|operational_excellence|stakeholder_leadership|market_acumen|change_leadership|team_development|commercial_drive|cross_border|overall_competency|situational_judgment|interpersonal_effectiveness|growth_potential|self_awareness|ambiguity_tolerance|learning_agility|emotional_regulation|purpose_alignment|network_activation|risk_appetite|relational_mobility|purpose_orientation|performance_culture|people_stewardship|process_rigor|pioneering_thinking|partnership_intelligence|strategic_clarity|execution_bias|impact_resonance|stakeholder_equity|scalability_posture|market_creation)[\s:=]*"\s*\d+["\s,]/g;
+
+function shortHash(s: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return ('0000000' + Math.abs(h >>> 0).toString(16)).slice(-8);
+}
+
+function scrubMessage(s: string): string {
+  if (!s) return s;
+  let out = s;
+  out = out.replace(RE_EMAIL, '[email scrubbed]');
+  out = out.replace(RE_UUID, (m) => `[uuid_${shortHash(m)}]`);
+  out = out.replace(RE_ASSESSMENT_VALUES, '[assessment_dim_val scrubbed]');
+  return out;
+}
+
+function scrubBodyForLog(body: unknown): unknown {
+  try {
+    if (body === null || body === undefined) return body;
+    if (typeof body === 'string') {
+      return scrubMessage(body).slice(0, 512);
+    }
+    if (typeof body === 'object') {
+      const serialized = JSON.stringify(body);
+      const scrubbed = scrubMessage(serialized);
+      return scrubbed.length > 512 ? scrubbed.slice(0, 512) + '…' : JSON.parse(scrubbed);
+    }
+    return body;
+  } catch {
+    return '[body scrubbed]';
+  }
+}
+
 /**
- * Structured server-side error log. Scrubs sensitive headers and
- * writes a single JSON line to stderr (Vercel log drains pick this up).
+ * Structured server-side error log. Scrubs sensitive headers, PII from
+ * error messages (emails → [email scrubbed], UUIDs → truncated hash,
+ * assessment dimension values → scrubbed), and req.body fragments.
+ * Writes a single JSON line to stderr.
  *
- * The error object's full message + stack IS logged here (server-side
- * only) for debugging — just never returned to the client.
+ * The scrubbed message + stack is logged server-side (never to client).
  */
 export function logServerError(
   context: string,
   err: unknown,
-  req?: { headers?: Record<string, string | string[] | undefined>; url?: string; method?: string },
+  req?: {
+    headers?: Record<string, string | string[] | undefined>;
+    url?: string;
+    method?: string;
+    body?: unknown;
+  },
 ): void {
   const scrubbedHeaders: Record<string, string> = {};
   if (req?.headers) {
@@ -497,37 +544,38 @@ export function logServerError(
       if (SENSITIVE_HEADER_KEYS.has(k.toLowerCase())) {
         scrubbedHeaders[k] = '[REDACTED]';
       } else if (typeof v === 'string') {
-        scrubbedHeaders[k] = v.slice(0, 256);
+        scrubbedHeaders[k] = scrubMessage(v).slice(0, 256);
       }
     }
   }
 
+  const errorPayload = err instanceof Error
+    ? {
+        name: err.name,
+        message: scrubMessage(err.message).slice(0, 1024),
+        stack: err.stack ? scrubMessage(err.stack).split('\n').slice(0, 10).join('\n') : undefined,
+        code: (err as any)?.code,
+        status: (err as any)?.status,
+      }
+    : { message: scrubMessage(String(err)).slice(0, 1024) };
+
   const payload = {
     ts: new Date().toISOString(),
     context,
-    error: err instanceof Error
-      ? {
-          name: err.name,
-          message: err.message,
-          stack: err.stack?.split('\n').slice(0, 10).join('\n'),
-          code: (err as any)?.code,
-          status: (err as any)?.status,
-        }
-      : { message: String(err).slice(0, 1024) },
+    error: errorPayload,
     req: req
       ? {
           method: req.method,
-          url: req.url ? String(req.url).slice(0, 512) : undefined,
+          url: req.url ? scrubMessage(String(req.url)).slice(0, 512) : undefined,
           headers: scrubbedHeaders,
+          body: req.body !== undefined ? scrubBodyForLog(req.body) : undefined,
         }
       : undefined,
   };
 
-  // Use process.stderr to avoid Vercel request log noise.
   try {
     process.stderr.write(JSON.stringify(payload) + '\n');
   } catch {
-    // If stderr write fails (rare), fall back to console.
     // eslint-disable-next-line no-console
     console.error(payload);
   }
@@ -638,5 +686,42 @@ export function setRateLimitHeaders(
     const retryAfter = Math.ceil((rl.resetAt - Date.now()) / 1000);
     res.setHeader('Retry-After', String(Math.max(1, retryAfter)));
   }
+}
+
+// ── V3-7 / #1346 Write-specific rate limiter (20 writes / 60s) ──────
+//
+// Key = path + userId (or IP for anonymous). Sliding window, in-memory.
+// Use this for POST/PUT/DELETE endpoints so endpoints don't need to
+// construct their own RateLimiter each time.
+
+const WRITE_RATE_LIMITER = new RateLimiter(60_000, 20);
+
+export interface WriteRateLimitResult extends RateLimitResult {}
+
+/**
+ * Rate-limit a write request by (path + userId) fallback to IP.
+ * Use for POST/PUT/DELETE routes. 20 writes / 60s.
+ */
+export function rateLimit(req: VercelRequest, userId?: string | null): WriteRateLimitResult {
+  const ip = getClientIp(req);
+  const path = req.url?.split('?')[0] || 'unknown';
+  const key = userId ? `${path}:uid:${userId}` : `${path}:ip:${ip}`;
+  return WRITE_RATE_LIMITER.check(key);
+}
+
+// ── V3-7 / #1346 Zod write-schema validation helper ─────────────────
+//
+// Wraps z.Schema.parse() into a clean RequestAuthError(422) so handlers
+// don't need to wrap ZodError everywhere. Usage:
+//
+//   const body = validateWrite(AssessmentRunSchema, req.body);
+
+export function validateWrite<T>(schema: z.Schema<T>, payload: unknown): T {
+  const result = schema.safeParse(payload);
+  if (!result.success) {
+    const issues = result.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ').slice(0, 512);
+    throw new RequestAuthError(`Invalid input: ${issues || 'validation failed'}`, 422);
+  }
+  return result.data;
 }
 

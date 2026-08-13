@@ -45,7 +45,10 @@ import {
   parseJsonBody,
   sanitizeObject,
   DEFAULT_BODY_LIMIT,
+  rateLimit,
+  setRateLimitHeaders,
 } from '../lib/validate.js';
+import { z } from 'zod';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Canonical costs — source of truth for server-side miles debits.
@@ -106,6 +109,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Allow anonymous users for complimentary assessment access (marketing funnel)
     const ctx = await getAuthorizedContext(req, true);
     const isAnonymous = !ctx;
+    const userId = (!isAnonymous && ctx) ? (ctx.userId as string) : null;
+
+    // V3-7 / #1346 Rate limit: 20 writes / 60s per user (or IP for anon)
+    const rl = rateLimit(req, userId);
+    setRateLimitHeaders(res, rl, 20);
+    if (!rl.allowed) {
+      return res.status(429).json({
+        ok: false,
+        code: 'RATE_LIMITED',
+        message: 'Too many assessment runs — please retry in a moment',
+      });
+    }
 
     // Anonymous users identified by x-anonymous-id header (client-generated)
     const anonymousId = (req.headers['x-anonymous-id'] || req.headers['X-Anonymous-Id']) as string | undefined;
@@ -122,14 +137,52 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // #1309 + #1314: parse + sanitize body. parseJsonBody throws 400 on
     // malformed JSON instead of letting a SyntaxError surface as a 500.
     assertBodySize(req.body, DEFAULT_BODY_LIMIT);
-    const body = parseJsonBody<{
+    const rawBody = parseJsonBody<{
       code?: string;
       answers?: Record<string, unknown>;
       durationSeconds?: number;
       metadata?: Record<string, unknown>;
       idempotency_key?: string;
     }>(req);
+
+    // V3-7 / #1346 Zod write-schema validation
+    const AssessmentRunSchema = z.object({
+      code: z.string().min(1).max(32),
+      answers: z.record(z.string(), z.any()).max(500).optional(),
+      durationSeconds: z.number().int().min(0).max(86_400).optional(),
+      metadata: z.record(z.string(), z.any()).max(200).optional(),
+      idempotency_key: z.string().max(256).optional(),
+    });
+    let body: typeof rawBody;
+    try {
+      body = AssessmentRunSchema.parse(rawBody);
+    } catch (zErr: any) {
+      const first = zErr?.issues?.[0];
+      const msg = first
+        ? `Invalid input at ${first.path.join('.')}: ${first.message}`
+        : 'Invalid assessment body';
+      throw new RequestAuthError(msg.slice(0, 256), 422);
+    }
+
     const code = normalizeCode(body.code);
+
+    // V3-4 / #1344: Tier check BEFORE running.
+    // Executive Introduction (executive_introduction / explorer) or unauthenticated
+    // users may ONLY run the complimentary CPI assessment.
+    const isUnauth = isAnonymous;
+    const userTier = (!isUnauth && ctx) ? (ctx.tier || null) : null;
+    const isExecIntro = isUnauth
+      ? true
+      : (!userTier || userTier === 'executive_introduction' || userTier === 'explorer');
+    if (isExecIntro && code !== 'CPI') {
+      return res.status(403).json({
+        ok: false,
+        code: 'TIER_RESTRICTED',
+        message: 'This assessment requires an Executive Deep-Dive subscription or higher.',
+        upgradeHref: '/pricing',
+      });
+    }
+
     const rawAnswers = body.answers ?? {};
     if (typeof rawAnswers !== 'object' || Array.isArray(rawAnswers)) {
       throw new RequestAuthError('`answers` must be an object of question->response', 400);

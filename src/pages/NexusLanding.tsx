@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, ArrowRight, Star, Zap, Target } from 'lucide-react';
+import { ArrowRight, Star, Zap, Target } from 'lucide-react';
 import { SEO } from '@/components/seo/SEO';
 import { NexusChatMockup } from '@/components/visual/ProductMockup';
 import { DS } from '@/tokens';
@@ -70,79 +70,6 @@ const ctaCompressHandlers = {
     e.currentTarget.style.transform = 'scale(1)';
   },
 };
-
-// ── NAV ────────────────────────────────────────────────────────────
-function Nav() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  return (
-    <nav style={{
-      position: 'fixed', top: 0, left: 0, right: 0,
-      background: DS.bg,
-      zIndex: 100,
-      borderBottom: scrolled ? `1px solid ${DS.border}` : '1px solid transparent',
-      transition: 'border-color 200ms ease, background 200ms ease',
-    }}>
-      <div style={{ maxWidth: 940, margin: '0 auto', padding: '20px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link to="/nexus" style={{ fontFamily: DS.headingFont, fontSize: 20, fontWeight: 700, textDecoration: 'none', color: DS.text, display: 'flex', alignItems: 'baseline', gap: 6 }}>
-          NEXUS <span style={{ fontFamily: DS.monoFont, fontSize: 10, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.08em', color: DS.mutedDim, fontStyle: 'normal' }}>by LYC</span>
-        </Link>
-        <ul className="nav-links-desktop" style={{ display: 'flex', gap: 28, listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
-          {/* Ticket #1352 — remove For Business B2B link from marketing nav */}
-          {[['#capabilities', 'What it does'], ['#diagnostics', 'Diagnostics'], ['#pricing', 'Pricing']].map(([h, l]) => (
-            <li key={h}>
-              <a href={h} style={{ fontSize: 13, fontWeight: 500, color: DS.text, textDecoration: 'none', opacity: 0.7, transition: 'opacity 120ms ease' }}
-                onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-                onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}>{l}</a>
-            </li>
-          ))}
-        </ul>
-        <a href="#start" style={{ padding: '10px 20px', background: DS.text, color: DS.bg, fontSize: 13, fontWeight: 500, textDecoration: 'none',  border: `1px solid ${DS.text}`, transition: 'background 200ms ease, border-color 200ms ease', minHeight: 40, display: 'inline-flex', alignItems: 'center' }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = DS.accent; e.currentTarget.style.borderColor = DS.accent; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = DS.text; e.currentTarget.style.borderColor = DS.text; }}>
-          Start — Executive Introduction
-        </a>
-        <button
-          className="nav-toggle-btn"
-          onClick={() => setMobileOpen(v => !v)}
-          aria-label="Toggle menu"
-          style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 8, minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center', color: DS.text }}
-        >
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </div>
-      {mobileOpen && (
-        <>
-          <div onClick={() => setMobileOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 150 }} />
-          <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 280, background: DS.bg, boxShadow: '-4px 0 24px rgba(0,0,0,0.1)', zIndex: 200, padding: '80px 32px 32px', transition: 'transform 350ms cubic-bezier(0.16,1,0.3,1)' }}>
-            <button onClick={() => setMobileOpen(false)} aria-label="Close menu" style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', cursor: 'pointer', minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', color: DS.text }}><X size={22} /></button>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {[
-                { href: '#capabilities', label: 'What it does' },
-                { href: '#diagnostics', label: 'Diagnostics' },
-                { href: '#pricing', label: 'Pricing' },
-                { href: '#start', label: 'Start', primary: true },
-              ].map(l => (
-                <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
-                  style={{ display: 'block', fontSize: 16, color: DS.text, textDecoration: 'none', padding: '14px 0', borderBottom: `1px solid ${DS.border}`, minHeight: 44, fontWeight: l.primary ? 600 : 500, fontFamily: DS.bodyFont }}>
-                  {l.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-      <style>{`@media (max-width: 768px) { .nav-links-desktop { display: none !important; } .nav-toggle-btn { display: flex !important; } }`}</style>
-    </nav>
-  );
-}
 
 // ── HERO ───────────────────────────────────────────────────────────
 function Hero() {
@@ -590,7 +517,6 @@ export function NexusLanding() {
   return (
     <div style={{ background: DS.bgAlt, color: DS.text, minHeight: '100vh', fontFamily: DS.bodyFont, lineHeight: 1.6, WebkitFontSmoothing: 'antialiased' }}>
       <SEO page="nexus" />
-      <Nav />
       <main>
         <Hero />
         <WhatIs />

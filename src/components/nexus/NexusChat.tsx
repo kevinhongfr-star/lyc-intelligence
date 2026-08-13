@@ -114,7 +114,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: buildNexusSystemPrompt().openingGreeting,
+      content: "I'm NEXUS — LYC's executive intelligence system. I ask the questions most executives skip. Tell me a little about where you are, and we'll find the right framework for you. Or try the complimentary CPI assessment first.",
     },
   ]);
   /**
@@ -391,7 +391,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
     const timeout = setTimeout(() => controller.abort(), 30000);
 
     try {
-      const res = await fetch('/api/nexus/chat', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -433,13 +433,13 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
       clearTimeout(timeout);
       console.error('Chat failed:', e);
       const isAbort = e?.name === 'AbortError';
+      setAiState('error');
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: isAbort
-          ? 'The request took too long. Please try a shorter question or try again.'
-          : `Sorry, something went wrong: ${e?.message || 'Unknown error'}`
+          ? 'NEXUS is temporarily unavailable — please retry in a moment. If the issue persists, reload the page.'
+          : 'NEXUS is temporarily unavailable — please retry in a moment. If the issue persists, reload the page.'
       }]);
-      setAiState('idle');
       setStreamingContent(null);
     } finally {
       setLoading(false);
@@ -676,31 +676,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
         return;
       }
 
-      setLoading(true);
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', 'document');
-      
-      try {
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await response.json();
-        if (data.text) {
-          setMessages(prev => [...prev, {
-            role: 'user',
-            content: `I've uploaded a document: ${file.name}. Please analyze it and help me understand its content.`
-          }]);
-          setMessageCount(prev => prev + 1);
-          await sendMessage(`Please analyze this document: ${file.name}`);
-        }
-      } catch (error) {
-        console.error('Upload failed:', error);
-        toast.error('Failed to upload document');
-      } finally {
-        setLoading(false);
-      }
+      toast.warning('Document upload unavailable — please retry later');
     };
     input.click();
   }, [sendMessage]);
@@ -714,7 +690,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
     setSessionId(newId);
     setMessages([{
       role: 'assistant',
-      content: nexusPrompt.openingGreeting,
+      content: "I'm NEXUS — LYC's executive intelligence system. I ask the questions most executives skip. Tell me a little about where you are, and we'll find the right framework for you. Or try the complimentary CPI assessment first.",
     }]);
     setMessageCount(0);
     setShowSidebar(false);
@@ -1146,9 +1122,26 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
             />
 
             {aiState === 'thinking' && !streamingContent && (
-              <div style={{ alignSelf: 'flex-start', padding: '12px 16px', background: DS.card, border: `1px solid ${DS.cardBorder}`,  color: DS.muted, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
-                Thinking...
+              <div
+                style={{
+                  alignSelf: 'flex-start',
+                  maxWidth: '80%',
+                }}
+              >
+                <div
+                  style={{
+                    padding: '14px 18px',
+                    background: DS.card,
+                    border: `1px solid ${DS.cardBorder}`,
+                    color: DS.muted,
+                    fontSize: '14px',
+                    lineHeight: '1.6',
+                    fontFamily: DS.monoFont,
+                    letterSpacing: '0.15em',
+                  }}
+                >
+                  <span className="animate-pulse">···</span>
+                </div>
               </div>
             )}
 

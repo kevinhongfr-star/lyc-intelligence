@@ -1,28 +1,21 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Menu, X, Lock, Layers, Clock, HelpCircle, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Layers, Clock, HelpCircle, Sparkles } from 'lucide-react';
 import { initScrollReveal } from '@/lib/utils';
 import { DS } from '@/tokens';
 import { ASSESSMENT_CATALOG, type AssessmentInfo } from '@/assessments/catalog';
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { SEO } from '@/components/seo/SEO';
 import { getAssessmentMeta } from '@/seo/pageMetadata';
-import { Logo } from '@/components/ui/Logo';
 
 export function CanonicalInstrumentLanding() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
 
   useEffect(() => {
     const observer = initScrollReveal();
     return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
 
   const key = (code || '').toUpperCase();
   const info: AssessmentInfo | undefined = ASSESSMENT_CATALOG[key];
@@ -53,12 +46,6 @@ export function CanonicalInstrumentLanding() {
     : info.is_shift
       ? 'SHIFT SUITE · 149 MI'
       : 'ADVISORY · 99 MI';
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/assessment', label: 'Assessments' },
-    { href: '/match', label: 'Match Analysis' },
-    { href: '/pricing', label: 'Pricing' },
-  ];
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
@@ -71,61 +58,6 @@ export function CanonicalInstrumentLanding() {
         info.duration_minutes,
         info.total_questions,
       )} />
-      {/* NAV */}
-      <nav
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 40,
-          background: DS.bg,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '14px 32px',
-          borderBottom: `1px solid ${DS.border}`,
-        }}
-      >
-        <Logo size="md" variant="light" />
-        <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {navLinks.map(l => (
-            <a
-              key={l.href}
-              href={l.href}
-              style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', padding: '10px 14px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', fontWeight: 500 }}
-            >
-              {l.label}
-            </a>
-          ))}
-          <a
-            href="/nexus/chat"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 18px', marginLeft: '8px', color: DS.text, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
-          >
-            Try NEXUS <ArrowRight style={{ width: 12, height: 12 }} />
-          </a>
-          <a
-            href="/login"
-            className="cta-glow"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: DS.bg, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
-          >
-            <Lock style={{ width: 14, height: 14 }} /> Platform
-          </a>
-        </div>
-        <button className="nav-toggle" onClick={() => setMobileOpen(true)} aria-label="Open menu">
-          <Menu style={{ color: DS.text }} />
-        </button>
-      </nav>
-
-      <div className={`nav-mobile-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
-      <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`} style={{ background: DS.bg }}>
-        <button className="nav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu">
-          <X style={{ width: 24, height: 24, color: DS.text }} />
-        </button>
-        {navLinks.map(l => (
-          <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)} style={{ color: DS.textSecondary, borderBottom: `1px solid ${DS.border}` }}>{l.label}</a>
-        ))}
-        <a href="/nexus/chat" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, borderBottom: `1px solid ${DS.border}` }}>Try NEXUS →</a>
-        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.text, borderBottom: `1px solid ${DS.border}` }}>Platform</a>
-      </div>
 
       {/* HERO */}
       <section

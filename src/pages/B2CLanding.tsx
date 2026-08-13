@@ -1,55 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { initScrollReveal } from '@/lib/utils';
 import { DS } from '@/tokens';
 import { IconImpact, IconLeap, IconTrident, IconSpark, IconQuest, IconForge } from '@/components/icons/LycIcons';
-import { ArrowRight, Menu, X, Lock } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 
 export function B2CLanding() {
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const observer = initScrollReveal();
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (mobileOpen) { document.body.style.overflow = 'hidden'; } else { document.body.style.overflow = ''; }
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
-
-  const navLinks = [
-    { href: '/assessment', label: 'Assessments' },
-    { href: '/b2b', label: 'For Firms' },
-  ];
-
   return (
     <div style={{ minHeight: '100vh', background: DS.bg }}>
-      {/* Nav */}
-      <nav className="nav-sticky" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>LYC Intelligence</a>
-        <div className="nav-links">
-          {navLinks.map(l => (
-            <a key={l.href} href={l.href} style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)', minHeight: '44px', display: 'flex', alignItems: 'center' }}>{l.label}</a>
-          ))}
-          <a href="/nexus/chat" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 18px', color: DS.text, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'color 0.2s cubic-bezier(0.4,0,0.2,1)' }}>
-            Try NEXUS <ArrowRight style={{ width: 12, height: 12 }} />
-          </a>
-          <a href="/login" className="" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFFFFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
-            <Lock style={{ width: 14, height: 14 }} />Platform
-          </a>
-        </div>
-        <button className="nav-toggle" onClick={() => setMobileOpen(true)} aria-label="Open menu"><Menu /></button>
-      </nav>
-
-      {/* Mobile */}
-      <div className={`nav-mobile-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
-      <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`}>
-        <button className="nav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu"><X style={{ width: 24, height: 24, color: '#000' }} /></button>
-        {navLinks.map(l => (<a key={l.href} href={l.href} onClick={() => setMobileOpen(false)}>{l.label}</a>))}
-        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, border: 'none', borderBottom: '1px solid #E5E5E5' }}>Platform</a>
-      </div>
-
       {/* Hero — fuchsia glow */}
       <div className="hero-padding section-padding" style={{ maxWidth: '900px', margin: '0 auto', padding: '96px 32px 60px', textAlign: 'center', position: 'relative' }}>
         <div style={{ position: 'absolute', top: '-80px', left: '50%', transform: 'translateX(-50%)', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(193,8,171,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />

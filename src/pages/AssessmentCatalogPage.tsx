@@ -1,604 +1,611 @@
-/**
- * AssessmentCatalogPage — dedicated /assessment catalog (#1319).
- *
- * Phase 9 Batch 6 ticket #1351: 6 real leadership assessments (PRISM, SPARK,
- * FORGE, BRIDGE, MOSAIC, DRIVE) — fake CPI/SHIFT/QUEST/etc. entries removed.
- *
- * CTAs are assessments-first: every card links directly to the instrument
- * landing page. NEXUS appears only as a secondary "not sure where to start"
- * prompt at the bottom, preserving NEXUS as the intelligent front door without
- * burying the diagnostics behind it.
- */
-import React, { useEffect, useState } from 'react';
-import { ArrowRight, Menu, X, Lock, Compass } from 'lucide-react';
-import { initScrollReveal } from '@/lib/utils';
+import React, { useState, useMemo } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { DS } from '@/tokens';
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import {
   ASSESSMENT_CATALOG,
-  FLAGSHIP_KEYS,
-  SHIFT_SUITE_KEYS,
-  ADVISORY_PRODUCT_KEYS,
   type AssessmentInfo,
-  type InstrumentTierGroup,
 } from '@/assessments/catalog';
-import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { SEO } from '@/components/seo/SEO';
-import { trackCTA, trackAssessmentStart } from '@/analytics/eventTracker';
+import { trackCTA } from '@/analytics/eventTracker';
 
-interface CategoryDef {
-  group: InstrumentTierGroup;
-  label: string;
-  eyebrow: string;
-  description: string;
-  keys: string[];
-  priceHint: string;
-}
+type FilterCategory = 'all' | 'self-awareness' | 'leadership-impact' | 'transition-change' | 'team-culture';
 
-// #1362 — user-centric categories. Flagship / SHIFT Suite were internal taxonomy
-// with zero real assessments; consolidated to a single "Leadership Assessments"
-// group. Internal tier-group keys (flagship/shift/advisory) are unchanged.
-const CATEGORIES: CategoryDef[] = [
-  {
-    group: 'advisory',
-    label: 'Leadership Assessments',
-    eyebrow: '6 assessments · targeted transition points',
-    description:
-      'Focused diagnostics for the current pressure point — market legibility, AI readiness, execution calibration, cross-border fit, or global cultural navigation. Choose the one that names the tension you are sitting in.',
-    keys: ADVISORY_PRODUCT_KEYS,
-    priceHint: 'STANDARD $99 USD · PREMIUM $149 USD',
-  },
+const CATEGORY_FILTERS: { key: FilterCategory; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'self-awareness', label: 'Self-Awareness' },
+  { key: 'leadership-impact', label: 'Leadership Impact' },
+  { key: 'transition-change', label: 'Transition & Change' },
+  { key: 'team-culture', label: 'Team & Culture' },
 ];
 
-// #1362 — short descriptive subtitle under each assessment name so visitors
-// know what each one measures (brand names alone have no descriptive value).
-const ASSESSMENT_SUBTITLE: Record<string, string> = {
-  PRISM: 'Career & Professional Branding',
-  SPARK: 'AI Leadership Readiness',
-  FORGE: 'Sales Excellence',
-  BRIDGE: 'China Leadership Readiness',
-  MOSAIC: 'Cultural Intelligence',
-  DRIVE: 'Execution Capability',
+const ASSESSMENT_CATEGORIES: Record<string, FilterCategory> = {
+  cpi: 'self-awareness',
+  prism: 'self-awareness',
+  spark: 'self-awareness',
+  coach: 'self-awareness',
+  impact: 'leadership-impact',
+  leap: 'leadership-impact',
+  forge: 'leadership-impact',
+  bridge: 'transition-change',
+  drive: 'transition-change',
+  mosaic: 'transition-change',
+  quest: 'team-culture',
 };
 
-function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
-  // Ticket #1353: USD-first (miles ≈ USD 1:1). Light gray eyebrow (#1355).
-  const priceUsd = a.priceMiles;
+const ALL_11_ORDER = ['CPI', 'LEAP', 'SPARK', 'IMPACT', 'QUEST', 'BRIDGE', 'DRIVE', 'FORGE', 'COACH', 'PRISM', 'MOSAIC'];
+
+interface CatalogEntry {
+  code: string;
+  slug: string;
+  name: string;
+  benefit: string;
+  dimensions: number;
+  archetypes: number;
+  price: number;
+  questions: number;
+  minutes: number;
+}
+
+function buildCatalogEntry(code: string): CatalogEntry {
+  const slug = code.toLowerCase();
+  const fromCatalog: AssessmentInfo | undefined = (ASSESSMENT_CATALOG as any)[code];
+  if (fromCatalog) {
+    return {
+      code,
+      slug,
+      name: fromCatalog.name,
+      benefit: fromCatalog.tagline || `${fromCatalog.b2cName} assessment.`,
+      dimensions: fromCatalog.dimensions.length,
+      archetypes: fromCatalog.archetype_count,
+      price: fromCatalog.priceMiles,
+      questions: fromCatalog.total_questions,
+      minutes: fromCatalog.duration_minutes,
+    };
+  }
+  const FALLBACKS: Record<string, Partial<CatalogEntry> & { name: string; benefit: string }> = {
+    CPI: { name: 'China Pipeline Index', benefit: 'Flagship executive positioning diagnostic for APAC markets.', dimensions: 6, archetypes: 12, price: 199, questions: 120, minutes: 45 },
+    LEAP: { name: 'LEAP Transition', benefit: 'Role-transition readiness for executives stepping up or across.', dimensions: 5, archetypes: 16, price: 149, questions: 80, minutes: 30 },
+    IMPACT: { name: 'IMPACT Board', benefit: 'Governance and board-level contribution calibration.', dimensions: 5, archetypes: 9, price: 149, questions: 75, minutes: 25 },
+    QUEST: { name: 'QUEST Leadership', benefit: 'Leadership operating model across six executive dimensions.', dimensions: 6, archetypes: 12, price: 149, questions: 90, minutes: 30 },
+    COACH: { name: 'COACH Developmental', benefit: 'Developmental coaching orientation and bilateral capability.', dimensions: 4, archetypes: 8, price: 99, questions: 60, minutes: 20 },
+  };
+  const fb = FALLBACKS[code] || { name: code, benefit: `${code} executive assessment.`, dimensions: 4, archetypes: 8, price: 99, questions: 60, minutes: 20 };
+  return {
+    code,
+    slug,
+    name: fb.name,
+    benefit: fb.benefit,
+    dimensions: fb.dimensions ?? 4,
+    archetypes: fb.archetypes ?? 8,
+    price: fb.price ?? 99,
+    questions: fb.questions ?? 60,
+    minutes: fb.minutes ?? 20,
+  };
+}
+
+const FULL_CATALOG: CatalogEntry[] = ALL_11_ORDER.map(buildCatalogEntry);
+const BY_CODE: Record<string, CatalogEntry> = Object.fromEntries(FULL_CATALOG.map((e) => [e.code, e]));
+
+function FlagshipBadge() {
   return (
-    <a
-      href={`/assessments/${a.code.toLowerCase()}`}
-      onClick={() => {
-        trackCTA({ location: 'assessment_card', label: `Assessment: ${a.code}`, destination: `/assessments/${a.code.toLowerCase()}`, context_id: a.code });
-        trackAssessmentStart(a.code, a.name, 'catalog');
-      }}
-      className="card-hover"
+    <span
       style={{
-        display: 'block',
-        textDecoration: 'none',
-        background: DS.card,
-        border: `1px solid ${DS.cardBorder}`,
- 
-        padding: wide ? '32px 28px' : '24px 20px',
-        boxShadow: DS.shadow,
-        transition: 'all 0.25s ease',
-        height: '100%',
+        display: 'inline-block',
+        fontFamily: DS.monoFont,
+        fontSize: '10px',
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase',
+        background: DS.accent,
+        color: DS.bg,
+        padding: '4px 10px',
+        fontWeight: 600,
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
-        <div>
-          <div
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: '10px',
-              letterSpacing: '0.2em',
-              // #1355 — light gray eyebrow
-              color: DS.eyebrow,
-              textTransform: 'uppercase',
-              marginBottom: '6px',
-            }}
-          >
-            {a.code}
-          </div>
-          <h3
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: wide ? '22px' : '17px',
-              fontWeight: 700,
-              color: DS.text,
-              margin: 0,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {a.name}
-          </h3>
-          {/* #1362 — descriptive subtitle so visitors know what each assessment measures.
-              Neutral label (not accent) — fuchsia stays reserved for the CTA below. */}
-          {ASSESSMENT_SUBTITLE[a.code] && (
-            <div
-              style={{
-                fontFamily: DS.bodyFont,
-                fontSize: '12px',
-                fontWeight: 600,
-                color: DS.text,
-                marginTop: '3px',
-                letterSpacing: '0.01em',
-                opacity: 0.78,
-              }}
-            >
-              {ASSESSMENT_SUBTITLE[a.code]}
-            </div>
-          )}
-        </div>
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'baseline',
-            gap: '2px',
-            fontFamily: DS.headingFont,
-            fontSize: wide ? '28px' : '20px',
-            fontWeight: 700,
-            color: DS.text,
-            lineHeight: 1,
-          }}
-        >
-          ${priceUsd}
-          <span
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: '9px',
-              letterSpacing: '0.1em',
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              marginLeft: '6px',
-              color: '#9CA3AF',
-            }}
-          >
-            USD
-          </span>
-        </span>
-      </div>
-      <p
-        style={{
-          fontFamily: DS.bodyFont,
-          fontSize: '13px',
-          lineHeight: 1.55,
-          color: DS.textSecondary,
-          margin: '0 0 16px',
-          minHeight: wide ? '48px' : '60px',
-        }}
-      >
-        {a.tagline || `${a.b2cName} — ${a.dimensions.length} dimensions, ${a.archetype_count} archetypes.`}
-      </p>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          fontFamily: DS.monoFont,
-          fontSize: '11px',
-          color: DS.muted,
-          letterSpacing: '0.04em',
-          marginBottom: '20px',
-          flexWrap: 'wrap',
-        }}
-      >
-        <span>{a.total_questions} Q</span>
-        <span style={{ color: DS.cardBorder }}>·</span>
-        <span>{a.duration_minutes} MIN</span>
-        <span style={{ color: DS.cardBorder }}>·</span>
-        <span>{a.archetype_count} ARCHETYPES</span>
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderTop: `1px solid ${DS.border}`,
-          paddingTop: '12px',
-        }}
-      >
-        <span
-          style={{
-            fontFamily: DS.bodyFont,
-            fontSize: '12px',
-            fontWeight: 600,
-            color: DS.text,
-          }}
-        >
-          Explore assessment
-        </span>
-        <ArrowRight style={{ width: 14, height: 14, color: DS.text }} />
-      </div>
+      Flagship
+    </span>
+  );
+}
+
+function MethodologySignal({ entry }: { entry: CatalogEntry }) {
+  return (
+    <div
+      style={{
+        fontFamily: DS.monoFont,
+        fontSize: '11px',
+        letterSpacing: '0.06em',
+        color: DS.muted,
+        textTransform: 'uppercase',
+      }}
+    >
+      {entry.dimensions} dimensions · {entry.archetypes} archetypes
+    </div>
+  );
+}
+
+function LearnMoreLink({ slug }: { slug: string }) {
+  return (
+    <a
+      href={`/assessment/${slug}`}
+      onClick={() => trackCTA({ location: 'catalog_card', label: `Learn more: ${slug}`, destination: `/assessment/${slug}` })}
+      style={{
+        fontFamily: DS.bodyFont,
+        fontSize: '13px',
+        fontWeight: 600,
+        color: DS.text,
+        textDecoration: 'none',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        borderBottom: `1px solid ${DS.border}`,
+        paddingBottom: '2px',
+      }}
+    >
+      Learn more <ArrowRight style={{ width: 12, height: 12 }} />
     </a>
   );
 }
 
-function CategorySection({ cat }: { cat: CategoryDef }) {
-  const assessments = cat.keys.map((k) => ASSESSMENT_CATALOG[k]).filter(Boolean);
-  if (assessments.length === 0) return null;
-  const wide = cat.group === 'flagship';
+function FlagshipCard() {
+  const cpi = BY_CODE['CPI'];
   return (
-    <section style={{ marginBottom: '72px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px', borderBottom: `1px solid ${DS.border}`, paddingBottom: '12px' }}>
-        <div>
-          <div
-            style={{
-              display: 'inline-block',
-              fontFamily: DS.monoFont,
-              fontSize: '10px',
-              letterSpacing: '0.2em',
-              // #1355 — light gray eyebrow per brand v1.2
-              color: DS.eyebrow,
-              textTransform: 'uppercase',
-              marginBottom: '6px',
-            }}
-          >
-            {cat.eyebrow}
+    <div style={{ gridColumn: '1 / -1' }}>
+      <Card variant="flat" interactive>
+        <CardHeader>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <FlagshipBadge />
+            <div>
+              <CardTitle
+                style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: '32px',
+                  fontWeight: 700,
+                  letterSpacing: '-0.015em',
+                }}
+              >
+                {cpi.name}
+              </CardTitle>
+              <CardDescription
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: '15px',
+                  marginTop: '8px',
+                  color: DS.textSecondary,
+                }}
+              >
+                {cpi.benefit}
+              </CardDescription>
+            </div>
           </div>
-          <h3
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: '24px',
-              fontWeight: 700,
-              color: DS.text,
-              margin: 0,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {cat.label}
-          </h3>
-        </div>
-        <div
-          style={{
-            fontFamily: DS.monoFont,
-            fontSize: '11px',
-            color: DS.muted,
-            letterSpacing: '0.1em',
-            textAlign: 'right',
-          }}
-        >
-          {cat.priceHint}
-        </div>
-      </div>
-      <p
-        style={{
-          fontFamily: DS.bodyFont,
-          fontSize: '13.5px',
-          lineHeight: 1.6,
-          color: DS.textSecondary,
-          margin: '0 0 28px',
-          maxWidth: '680px',
-        }}
-      >
-        {cat.description}
-      </p>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: wide ? '1fr' : 'repeat(auto-fill, minmax(260px, 1fr))',
-          gap: '16px',
-        }}
-      >
-        {assessments.map((a) => (
-          <AssessmentCard key={a.code} a={a} wide={wide} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-export function AssessmentCatalogPage() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    const observer = initScrollReveal();
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
-
-  // Ticket #1352 — only B2C links in marketing nav. #1363 — canonical /assessments URL.
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/assessments', label: 'Assessments' },
-    { href: '/pricing', label: 'Pricing' },
-    { href: '/nexus/chat', label: 'NEXUS AI' },
-  ];
-
-  const totalInstruments =
-    FLAGSHIP_KEYS.length + SHIFT_SUITE_KEYS.length + ADVISORY_PRODUCT_KEYS.length;
-
-  return (
-    <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
-      <SEO page="assessments" />
-
-      {/* NAV */}
-      <nav
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 40,
-          background: DS.bg,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '14px 32px',
-          borderBottom: `1px solid ${DS.border}`,
-        }}
-      >
-        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none', letterSpacing: '-0.01em' }}>
-          LYC Intelligence
-        </a>
-        <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {navLinks.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              style={{
-                fontFamily: DS.bodyFont,
-                fontSize: '13px',
-                color: l.href === '/assessments' ? DS.accent : DS.textSecondary,
-                textDecoration: 'none',
-                padding: '10px 14px',
-                minHeight: '44px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                fontWeight: l.href === '/assessments' ? 700 : 500,
-                borderBottom: l.href === '/assessments' ? `2px solid ${DS.accent}` : '2px solid transparent',
-              }}
-            >
-              {l.label}
-            </a>
-          ))}
-          <a
-            href="/login"
-            onClick={() => trackCTA({ location: 'catalog_nav', label: 'Platform Login', destination: '/login' })}
-            className=""
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '10px 20px',
-              marginLeft: '8px',
-              background: DS.accent,
-              color: '#FFFFFF',
- 
-              fontFamily: DS.bodyFont,
-              fontSize: '13px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              minHeight: '44px',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <Lock style={{ width: 14, height: 14 }} /> Platform
-          </a>
-        </div>
-        <button className="nav-toggle" onClick={() => setMobileOpen(true)} aria-label="Open menu">
-          <Menu style={{ color: DS.text }} />
-        </button>
-      </nav>
-
-      {/* MOBILE OVERLAY */}
-      <div className={`nav-mobile-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
-      <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`} style={{ background: DS.bg }}>
-        <button className="nav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu">
-          <X style={{ width: 24, height: 24, color: '#000' }} />
-        </button>
-        {navLinks.map((l) => (
-          <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)} style={{ color: DS.textSecondary, borderBottom: `1px solid ${DS.border}` }}>{l.label}</a>
-        ))}
-        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.text, borderBottom: `1px solid ${DS.border}` }}>Platform</a>
-      </div>
-
-      {/* HERO */}
-      <section
-        style={{
-          background: DS.bgAlt,
-          padding: '88px 32px 64px',
-          borderBottom: `1px solid ${DS.border}`,
-        }}
-      >
-        <div style={{ maxWidth: '820px', margin: '0 auto', textAlign: 'center' }}>
-          <div
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: '10px',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.28em',
-              // #1355 — light gray eyebrow
-              color: DS.eyebrow,
-              marginBottom: '16px',
-            }}
-          >
-            Assessment Catalog
-          </div>
-          <h1
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: 'clamp(32px, 5vw, 48px)',
-              fontWeight: 700,
-              color: DS.text,
-              margin: '0 auto 16px',
-              lineHeight: 1.12,
-              letterSpacing: '-0.015em',
-              maxWidth: '720px',
-            }}
-          >
-            Six leadership assessments.<br />One right fit per moment.
-          </h1>
-          <p
-            style={{
-              fontFamily: DS.bodyFont,
-              fontSize: '15px',
-              color: DS.textSecondary,
-              maxWidth: '580px',
-              margin: '0 auto 32px',
-              lineHeight: 1.65,
-            }}
-          >
-            Each assessment is validated against 20 years of LYC APAC placement data — not
-            generic personality tests, but targeted diagnostics matched to the transition you
-            are actually in.
-          </p>
+        </CardHeader>
+        <CardContent>
           <div
             style={{
               display: 'flex',
-              gap: '12px',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
+              flexDirection: 'column',
+              gap: '20px',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
             }}
           >
-            <a
-              href="#catalog"
-              onClick={() => trackCTA({ location: 'catalog_hero', label: 'Browse the catalog', destination: '#catalog' })}
+            <MethodologySignal entry={cpi} />
+            <div
               style={{
-                display: 'inline-flex',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '12px',
                 alignItems: 'center',
-                gap: '10px',
-                padding: '16px 32px',
-                background: DS.accent,
-                color: '#FFFFFF',
-                fontFamily: DS.bodyFont,
-                fontSize: '13px',
-                fontWeight: 700,
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                textDecoration: 'none',
- 
-                transition: 'all 0.2s ease',
               }}
             >
-              Browse the catalog <ArrowRight style={{ width: 14, height: 14 }} />
-            </a>
-            <a
-              href="/pricing"
-              onClick={() => trackCTA({ location: 'catalog_hero', label: 'View pricing', destination: '/pricing' })}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '16px 28px',
-                border: `1px solid ${DS.border}`,
-                color: DS.text,
-                fontFamily: DS.bodyFont,
-                fontSize: '13px',
-                fontWeight: 600,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                textDecoration: 'none',
- 
-                background: DS.card,
-              }}
-            >
-              View pricing
-            </a>
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={() => {
+                  trackCTA({ location: 'catalog_flagship', label: 'Start CPI Assessment', destination: '/assessment/cpi' });
+                  window.location.href = '/assessment/cpi';
+                }}
+              >
+                Start CPI Assessment
+              </Button>
+              <LearnMoreLink slug={cpi.slug} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function HeroCard({ code }: { code: string }) {
+  const entry = BY_CODE[code];
+  return (
+    <Card variant="flat" interactive>
+      <CardHeader>
+        <div
+          style={{
+            fontFamily: DS.monoFont,
+            fontSize: '10px',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            color: DS.eyebrow,
+            marginBottom: '8px',
+          }}
+        >
+          {entry.code}
+        </div>
+        <CardTitle
+          style={{
+            fontFamily: DS.headingFont,
+            fontSize: '22px',
+            fontWeight: 700,
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {entry.name}
+        </CardTitle>
+        <CardDescription
+          style={{
+            fontFamily: DS.bodyFont,
+            fontSize: '13.5px',
+            marginTop: '6px',
+            color: DS.textSecondary,
+            minHeight: '44px',
+          }}
+        >
+          {entry.benefit}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            alignItems: 'flex-start',
+          }}
+        >
+          <MethodologySignal entry={entry} />
+          <LearnMoreLink slug={entry.slug} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function FullCatalogCard({ entry }: { entry: CatalogEntry }) {
+  return (
+    <a
+      href={`/assessment/${entry.slug}`}
+      onClick={() => trackCTA({ location: 'catalog_grid', label: `Card: ${entry.code}`, destination: `/assessment/${entry.slug}` })}
+      style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}
+    >
+      <Card variant="flat" interactive style={{ height: '100%' }}>
+        <CardHeader>
+          <div
+            style={{
+              fontFamily: DS.monoFont,
+              fontSize: '10px',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: DS.eyebrow,
+              marginBottom: '8px',
+            }}
+          >
+            {entry.code}
+          </div>
+          <CardTitle
+            style={{
+              fontFamily: DS.headingFont,
+              fontSize: '18px',
+              fontWeight: 600,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {entry.name}
+          </CardTitle>
+          <CardDescription
+            style={{
+              fontFamily: DS.bodyFont,
+              fontSize: '12.5px',
+              marginTop: '4px',
+              color: DS.textSecondary,
+              minHeight: '38px',
+            }}
+          >
+            {entry.benefit}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <MethodologySignal entry={entry} />
+            <ArrowRight style={{ width: 14, height: 14, color: DS.text }} />
+          </div>
+        </CardContent>
+      </Card>
+    </a>
+  );
+}
+
+function FilterTabs({
+  active,
+  onChange,
+}: {
+  active: FilterCategory;
+  onChange: (k: FilterCategory) => void;
+}) {
+  return (
+    <div
+      role="tablist"
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '0',
+        borderBottom: `1px solid ${DS.border}`,
+        marginBottom: '32px',
+      }}
+    >
+      {CATEGORY_FILTERS.map((f) => {
+        const isActive = active === f.key;
+        return (
+          <button
+            key={f.key}
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => onChange(f.key)}
+            style={{
+              fontFamily: DS.bodyFont,
+              fontSize: '13px',
+              fontWeight: isActive ? 700 : 500,
+              color: isActive ? DS.text : DS.textSecondary,
+              background: 'transparent',
+              border: 'none',
+              padding: '12px 16px',
+              cursor: 'pointer',
+              letterSpacing: '0.02em',
+              borderBottom: isActive ? `2px solid ${DS.accent}` : '2px solid transparent',
+              transition: DS.transition,
+              marginBottom: '-1px',
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                (e.currentTarget as HTMLButtonElement).style.color = DS.text;
+                (e.currentTarget as HTMLButtonElement).style.borderBottom = `2px solid ${DS.accent}4D`;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                (e.currentTarget as HTMLButtonElement).style.color = DS.textSecondary;
+                (e.currentTarget as HTMLButtonElement).style.borderBottom = '2px solid transparent';
+              }
+            }}
+          >
+            {f.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+const PAGE_STYLE: React.CSSProperties = {
+  minHeight: '100vh',
+  background: DS.bg,
+  color: DS.text,
+};
+
+const WRAPPER: React.CSSProperties = {
+  maxWidth: '1180px',
+  margin: '0 auto',
+  padding: '64px 32px',
+};
+
+const SECTION_HEAD: React.CSSProperties = {
+  marginBottom: '24px',
+  paddingBottom: '16px',
+  borderBottom: `1px solid ${DS.border}`,
+};
+
+const EYEBROW_MONO: React.CSSProperties = {
+  fontFamily: DS.monoFont,
+  fontSize: '10px',
+  letterSpacing: '0.22em',
+  textTransform: 'uppercase',
+  color: DS.eyebrow,
+  marginBottom: '8px',
+  fontWeight: 600,
+};
+
+const SECTION_TITLE: React.CSSProperties = {
+  fontFamily: DS.headingFont,
+  fontSize: '26px',
+  fontWeight: 700,
+  letterSpacing: '-0.015em',
+  margin: 0,
+  color: DS.text,
+};
+
+const SECTION_SUB: React.CSSProperties = {
+  fontFamily: DS.bodyFont,
+  fontSize: '13.5px',
+  color: DS.textSecondary,
+  marginTop: '6px',
+  lineHeight: 1.55,
+  maxWidth: '620px',
+};
+
+const PAGE_TITLE: React.CSSProperties = {
+  fontFamily: DS.headingFont,
+  fontSize: 'clamp(34px, 5vw, 48px)',
+  fontWeight: 700,
+  letterSpacing: '-0.02em',
+  margin: '0 0 12px',
+  color: DS.text,
+  lineHeight: 1.1,
+};
+
+const PAGE_LEAD: React.CSSProperties = {
+  fontFamily: DS.bodyFont,
+  fontSize: '15px',
+  color: DS.textSecondary,
+  lineHeight: 1.65,
+  maxWidth: '640px',
+  margin: 0,
+};
+
+const HERO_WRAP: React.CSSProperties = {
+  background: DS.bgAlt,
+  padding: '64px 32px',
+  borderBottom: `1px solid ${DS.border}`,
+};
+
+const HERO_INNER: React.CSSProperties = {
+  maxWidth: '1180px',
+  margin: '0 auto',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'flex-end',
+  gap: '32px',
+  flexWrap: 'wrap',
+};
+
+export function AssessmentCatalogPage() {
+  const [activeFilter, setActiveFilter] = useState<FilterCategory>('all');
+
+  const filteredCatalog = useMemo(() => {
+    if (activeFilter === 'all') return FULL_CATALOG;
+    return FULL_CATALOG.filter((e) => ASSESSMENT_CATEGORIES[e.slug] === activeFilter);
+  }, [activeFilter]);
+
+  return (
+    <div style={PAGE_STYLE}>
+      <SEO page="assessments" />
+
+      <div style={HERO_WRAP}>
+        <div style={HERO_INNER}>
+          <div>
+            <div style={EYEBROW_MONO}>Assessment Catalog</div>
+            <h1 style={PAGE_TITLE}>
+              Eleven leadership assessments.<br />One right fit per moment.
+            </h1>
+            <p style={PAGE_LEAD}>
+              Validated against 20 years of LYC APAC placement data. Targeted diagnostics
+              matched to the transition you are actually in — not generic personality tests.
+            </p>
           </div>
           <div
             style={{
-              marginTop: '28px',
               fontFamily: DS.monoFont,
               fontSize: '11px',
               color: DS.muted,
               letterSpacing: '0.16em',
+              textAlign: 'right',
             }}
           >
-            {totalInstruments} ASSESSMENTS · USD PRICING · COMPLIMENTARY INTRO AVAILABLE
+            11 ASSESSMENTS · USD PRICING · COMPLIMENTARY INTRO AVAILABLE
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* CATALOG */}
-      <section
-        id="catalog"
-        className="reveal section-padding"
-        style={{ maxWidth: '1120px', margin: '0 auto', padding: '80px 32px 48px' }}
-      >
-        {CATEGORIES.map((cat) => (
-          <CategorySection key={cat.group} cat={cat} />
-        ))}
-      </section>
-
-      {/* NEXUS SECONDARY CTA */}
-      <section
-        className="reveal"
-        style={{
-          background: DS.bgAlt,
-          padding: '80px 32px',
-          borderTop: `1px solid ${DS.border}`,
-          borderBottom: `1px solid ${DS.border}`,
-        }}
-      >
-        <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'center' }}>
+      <main style={WRAPPER}>
+        {/* SECTION 1 — FLAGSHIP CPI */}
+        <section style={{ marginBottom: '72px' }}>
+          <div style={SECTION_HEAD}>
+            <div style={EYEBROW_MONO}>01 · Flagship</div>
+            <h2 style={SECTION_TITLE}>Flagship Instrument</h2>
+            <p style={SECTION_SUB}>
+              The CPI is our flagship — validated against two decades of APAC executive placements.
+              For executives who want the complete calibration.
+            </p>
+          </div>
           <div
             style={{
-              display: 'inline-flex',
-              width: '44px',
-              height: '44px',
-              background: `${DS.accent}12`,
-              color: DS.accent,
-              alignItems: 'center',
-              justifyContent: 'center',
- 
-              marginBottom: '20px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '16px',
             }}
           >
-            <Compass style={{ width: 20, height: 20 }} />
+            <FlagshipCard />
           </div>
-          <h2
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: 'clamp(24px, 3vw, 30px)',
-              fontWeight: 700,
-              color: DS.text,
-              margin: '0 0 12px',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            Not sure which assessment fits?
-          </h2>
-          <p
-            style={{
-              fontFamily: DS.bodyFont,
-              fontSize: '14.5px',
-              color: DS.textSecondary,
-              maxWidth: '480px',
-              margin: '0 auto 28px',
-              lineHeight: 1.6,
-            }}
-          >
-            NEXUS knows all six assessments and surfaces the one matched to your current
-            transition point — not the one you would have picked by default.
-          </p>
-          <a
-            href="/nexus/chat"
-            onClick={() => trackCTA({ location: 'catalog_nexus', label: 'Ask NEXUS', destination: '/nexus/chat' })}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '15px 30px',
-              background: '#0A0A12',
-              color: '#FFFFFF',
-              fontFamily: DS.bodyFont,
-              fontSize: '13px',
-              fontWeight: 700,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              textDecoration: 'none',
- 
-              transition: 'all 0.2s ease',
-            }}
-          >
-            Ask NEXUS <ArrowRight style={{ width: 13, height: 13 }} />
-          </a>
-        </div>
-      </section>
+        </section>
 
-      <UnifiedFooter />
+        {/* SECTION 2 — HERO ASSESSMENTS (LEAP, SPARK, IMPACT) */}
+        <section style={{ marginBottom: '72px' }}>
+          <div style={SECTION_HEAD}>
+            <div style={EYEBROW_MONO}>02 · Hero</div>
+            <h2 style={SECTION_TITLE}>Hero Assessments</h2>
+            <p style={SECTION_SUB}>
+              Three focused diagnostics for the most common executive pressure points
+              in mid-career transition, AI leadership readiness, and board-level contribution.
+            </p>
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '16px',
+            }}
+            className="hero-grid"
+          >
+            <HeroCard code="LEAP" />
+            <HeroCard code="SPARK" />
+            <HeroCard code="IMPACT" />
+          </div>
+        </section>
+
+        {/* SECTION 3 — FULL CATALOG 11 WITH FILTER TABS */}
+        <section style={{ marginBottom: '24px' }}>
+          <div style={SECTION_HEAD}>
+            <div style={EYEBROW_MONO}>03 · Full Catalog</div>
+            <h2 style={SECTION_TITLE}>Browse All Eleven Instruments</h2>
+            <p style={SECTION_SUB}>
+              Filter by category. Every assessment can be started directly from its landing page
+              or surfaced through NEXUS if you are unsure which fits.
+            </p>
+          </div>
+
+          <FilterTabs active={activeFilter} onChange={setActiveFilter} />
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '16px',
+            }}
+            className="catalog-grid"
+          >
+            {filteredCatalog.map((entry) => (
+              <FullCatalogCard key={entry.code} entry={entry} />
+            ))}
+          </div>
+        </section>
+      </main>
+
+      <style>{`
+        @media (max-width: 1024px) {
+          .catalog-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (max-width: 768px) {
+          .hero-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .catalog-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 480px) {
+          .hero-grid { grid-template-columns: 1fr !important; }
+          .catalog-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,125 +1,142 @@
-/**
- * TierGate.tsx — Tier-based access control component for diagnostics.
- *
- * #1340: ALL tier gating logic uses tier_key (canonical ID), never display
- * names. This component checks whether a user can access a diagnostic and
- * either renders the children (accessible) or a locked state (inaccessible).
- *
- * Locked state shows:
- *   - Value preview of the diagnostic
- *   - Tier-appropriate upgrade CTA copy
- *   - "Unlock this assessment" headline
- *
- * Anonymous flow:
- *   - Executive Introduction tier diagnostics (PRISM + SPARK) can be taken
- *     without login. The gate renders children even for anonymous users.
- *   - Higher-tier diagnostics show locked state for anonymous users.
- */
-
 import React from 'react';
 import {
   canAccessDiagnostic,
-  getLockedCTA,
   isAnonymousAllowed,
   tierDisplayName,
   DIAGNOSTIC_TIER_REQUIREMENT,
   type DiagnosticSlug,
 } from '@/config/tierConfig';
 import { getDiagnostic } from '@/data/diagnostics';
-import { INK, OFF, G200, G300, G400, G600, WHITE, monoStyle, containerStyle, makeBtnPrimary, ctaCompressHandlers } from '@/components/assessment/landing/shared';
+import { canTakeAssessment } from '@/lib/assessmentAccessEnforcement';
+import { useAuthStore } from '@/stores/authStore';
+
+const DS = {
+  headingFont: "'Crimson Pro', 'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+  bodyFont: "'DM Sans', sans-serif",
+  accent: '#C108AB',
+  accentSoft: '#C108AB20',
+  accentBorder: '#C108AB40',
+  bg: '#FAFAF8',
+  card: '#FFFFFF',
+  muted: '#8A8A8A',
+  text: '#0A0A0A',
+  textSecondary: '#555555',
+  border: '#E8E8E5',
+};
 
 export interface TierGateProps {
-  /** Diagnostic slug: 'prism', 'spark', 'forge', 'bridge', 'mosaic', 'drive' */
   slug: string;
-  /** User's current tier key (canonical or legacy) */
-  userTier: string | null | undefined;
-  /** Content to render if access is granted */
+  userTier?: string | null | undefined;
   children: React.ReactNode;
 }
 
-export function TierGate({ slug, userTier, children }: TierGateProps) {
+export function TierGate({ slug, userTier: userTierProp, children }: TierGateProps) {
+  const { profile } = useAuthStore();
+  const userTier = userTierProp ?? profile?.tier ?? null;
   const def = getDiagnostic(slug);
+
   if (!def) {
     return (
-      <div style={{ ...containerStyle, padding: '80px 32px', textAlign: 'center' }}>
-        <h2 style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontSize: 28, color: INK }}>
+      <div style={{ background: DS.bg, padding: '80px 32px', textAlign: 'center' }}>
+        <h2 style={{ fontFamily: DS.headingFont, fontSize: 28, color: DS.text }}>
           Diagnostic not found
         </h2>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", color: G600, marginTop: 12 }}>
-          The diagnostic "{slug}" does not exist in the catalog.
+        <p style={{ fontFamily: DS.bodyFont, color: DS.textSecondary, marginTop: 12 }}>
+          The diagnostic &quot;{slug}&quot; does not exist in the catalog.
         </p>
       </div>
     );
   }
 
+  const assessmentCode = (slug || '').toUpperCase();
+  const tierVerdict = canTakeAssessment(userTier, assessmentCode);
   const anonymousAllowed = isAnonymousAllowed(slug);
-  const hasAccess = canAccessDiagnostic(userTier, slug);
+  const legacyAccess = canAccessDiagnostic(userTier, slug);
+  const hasAccess = tierVerdict.allowed || legacyAccess || anonymousAllowed;
 
-  // Access granted (or anonymous allowed)
-  if (hasAccess || anonymousAllowed) {
+  if (hasAccess) {
     return <>{children}</>;
   }
 
-  // Locked state
-  const cta = getLockedCTA(slug, userTier);
-  const accent = def.meta.accent_color;
+  const accent = DS.accent;
   const requiredTier = DIAGNOSTIC_TIER_REQUIREMENT[slug as DiagnosticSlug];
 
   return (
-    <div style={{ background: OFF }}>
-      <div style={{ ...containerStyle, padding: '80px 32px' }}>
+    <div style={{ background: DS.bg }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 32px' }}>
         <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
-          {/* Diagnostic preview */}
-          <div style={{ ...monoStyle, color: accent, marginBottom: 16 }}>
-            {def.meta.title} — {def.meta.subtitle}
+          <div style={{
+            display: 'inline-block',
+            fontFamily: 'monospace',
+            fontSize: 12,
+            letterSpacing: 1.5,
+            color: accent,
+            background: DS.accentSoft,
+            border: `1px solid ${DS.accentBorder}`,
+            padding: '6px 14px',
+            borderRadius: 999,
+            marginBottom: 24,
+          }}>
+            {def.meta.title.toUpperCase()} — LOCKED
           </div>
 
           <h1 style={{
-            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
-            fontSize: 36,
-            color: INK,
+            fontFamily: DS.headingFont,
+            fontSize: 40,
+            lineHeight: 1.15,
+            color: DS.text,
             marginBottom: 16,
+            fontWeight: 500,
           }}>
-            {cta.headline}
+            This assessment is part of the paid suite
           </h1>
 
           <p style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: 16,
-            color: G600,
-            lineHeight: 1.6,
-            marginBottom: 32,
+            fontFamily: DS.bodyFont,
+            fontSize: 17,
+            color: DS.textSecondary,
+            lineHeight: 1.65,
+            marginBottom: 36,
           }}>
-            {cta.body}
+            Executive Introduction covers one complimentary leadership assessment (CPI).
+            Upgrade to Executive or Professional Deep-Dive for SPARK, LEAP, IMPACT,
+            and the full framework catalog.
           </p>
 
-          {/* Value preview — dimension list */}
           <div style={{
-            background: WHITE,
-            border: `1px solid ${G200}`,
-            padding: 32,
-            marginBottom: 32,
+            background: DS.card,
+            border: `1px solid ${DS.border}`,
+            borderRadius: 12,
+            padding: 28,
+            marginBottom: 36,
             textAlign: 'left',
           }}>
-            <div style={{ ...monoStyle, color: G400, marginBottom: 16 }}>
-              WHAT YOU'LL MEASURE
+            <div style={{
+              fontFamily: 'monospace',
+              fontSize: 11,
+              letterSpacing: 1.5,
+              color: DS.muted,
+              marginBottom: 16,
+            }}>
+              WHAT YOU&apos;LL MEASURE
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 18 }}>
               {def.dimensions.map((dim) => (
                 <div key={dim.key}>
                   <div style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: DS.bodyFont,
                     fontWeight: 600,
                     fontSize: 14,
-                    color: INK,
+                    color: DS.text,
                   }}>
                     {dim.name}
                   </div>
                   <div style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: DS.bodyFont,
                     fontSize: 12,
-                    color: G600,
+                    color: DS.textSecondary,
                     marginTop: 4,
+                    lineHeight: 1.5,
                   }}>
                     {dim.description}
                   </div>
@@ -128,20 +145,75 @@ export function TierGate({ slug, userTier, children }: TierGateProps) {
             </div>
           </div>
 
-          {/* CTA button */}
-          <a
-            href="/pricing"
-            style={makeBtnPrimary(accent)}
-            {...ctaCompressHandlers}
-          >
-            {cta.button}
-          </a>
-
-          {/* Tier requirement note */}
           <div style={{
-            ...monoStyle,
-            color: G400,
-            marginTop: 24,
+            display: 'inline-flex',
+            gap: 12,
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+          }}>
+            <a
+              href="/signup"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '14px 28px',
+                fontFamily: DS.bodyFont,
+                fontSize: 15,
+                fontWeight: 600,
+                color: accent,
+                background: 'transparent',
+                border: `1.5px solid ${accent}`,
+                borderRadius: 8,
+                cursor: 'pointer',
+                textDecoration: 'none',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = DS.accentSoft;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              Get Executive Introduction
+            </a>
+
+            <a
+              href="/pricing"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '14px 28px',
+                fontFamily: DS.bodyFont,
+                fontSize: 15,
+                fontWeight: 600,
+                color: '#FFFFFF',
+                background: accent,
+                border: `1.5px solid ${accent}`,
+                borderRadius: 8,
+                cursor: 'pointer',
+                textDecoration: 'none',
+                transition: 'opacity 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '0.9';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1';
+              }}
+            >
+              Upgrade
+            </a>
+          </div>
+
+          <div style={{
+            fontFamily: 'monospace',
+            fontSize: 11,
+            letterSpacing: 1.5,
+            color: DS.muted,
+            marginTop: 28,
           }}>
             REQUIRES {tierDisplayName(requiredTier).toUpperCase()} TIER OR ABOVE
           </div>

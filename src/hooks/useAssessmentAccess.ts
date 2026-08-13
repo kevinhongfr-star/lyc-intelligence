@@ -31,6 +31,7 @@ import {
   normalizeTier,
   DIAGNOSTIC_TIER_REQUIREMENT,
 } from '@/config/tierConfig';
+import { canTakeAssessment, COMPLIMENTARY_ASSESSMENT_CODE } from '@/lib/assessmentAccessEnforcement';
 
 export interface UseAssessmentAccessOptions {
   /** Viewer's tier (from profiles.tier_key after normalizeTier). */
@@ -121,13 +122,21 @@ export function computeAssessmentAccess(
   const canAccessNexus =
     !opts.viaShareToken && (isAdmin || (tierMeets(viewerTier, 'professional') && flags.nexus_enabled));
 
-  const canStartAssessment =
-    !opts.viaShareToken && viewerRole !== 'anonymous' // anonymous browse allowed but need user to save attempt
-      ? true
-      : opts.diagnosticSlug
-        ? // anonymous EI diagnostics can be started (complimentary, as per #1344 "can browse catalog + start EI assessment")
-          DIAGNOSTIC_TIER_REQUIREMENT[opts.diagnosticSlug] === 'executive_introduction'
-        : true;
+  const canStartAssessment = (() => {
+    if (opts.viaShareToken) return false;
+    const codeFromSlug = opts.diagnosticSlug
+      ? (opts.diagnosticSlug as string).toUpperCase()
+      : COMPLIMENTARY_ASSESSMENT_CODE;
+    const tierCheck = canTakeAssessment(
+      viewerRole === 'anonymous' ? null : viewerTier,
+      codeFromSlug,
+    );
+    if (tierCheck.allowed) return true;
+    if (viewerRole === 'anonymous') {
+      return codeFromSlug === COMPLIMENTARY_ASSESSMENT_CODE;
+    }
+    return tierMeets(viewerTier, 'professional');
+  })();
 
   const canShareResult = viewerRole === 'user' || isAdmin;
 

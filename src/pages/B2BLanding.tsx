@@ -1,21 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { initScrollReveal } from '@/lib/utils';
-import { ArrowRight, Menu, X, Lock, Users, Target, Gauge, Building2, ClipboardList, MessageSquarePlus } from 'lucide-react';
+import { ArrowRight, Users, Target, Gauge, Building2, ClipboardList, MessageSquarePlus } from 'lucide-react';
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 import { SEO } from '@/components/seo/SEO';
 import { EnterpriseContactForm } from '@/components/billing/EnterpriseContactForm';
 import { DS } from '@/tokens';
-import { Logo } from '@/components/ui/Logo';
 
 const B2B_HERO_POSTER = 'https://www.lyc-partners.ai/images/heroes/hero-b2b-boardroom.webp';
-
-const NAV_LINKS = [
-  { href: '/match', label: 'Match Analysis' },
-  { href: '/assessment', label: 'Assessments' },
-  { href: '/pricing', label: 'Pricing' },
-  { href: '/', label: 'For Leaders' },
-];
 
 const B2B_FEATURES = [
   {
@@ -44,62 +36,7 @@ const MATCH_DIMENSIONS = [
   { code: 'D3', name: 'Organizational Fit', desc: 'Cultural alignment, stakeholder mapping, transformation readiness, board dynamics.' },
 ];
 
-function Nav({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen: (v: boolean) => void }) {
-  return (
-    <>
-      <nav
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 40,
-          background: DS.bg,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '14px 32px',
-          borderBottom: `1px solid ${DS.border}`,
-        }}
-      >
-        <Logo size="md" variant="light" />
-        <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {NAV_LINKS.map(l => (
-            <a
-              key={l.href}
-              href={l.href}
-              style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', padding: '10px 14px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', fontWeight: 500 }}
-            >{l.label}</a>
-          ))}
-          <a
-            href="/nexus/chat"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 18px', marginLeft: '8px', color: DS.text, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
-          >
-            Try NEXUS <ArrowRight style={{ width: 12, height: 12 }} />
-          </a>
-          <a
-            href="/login"
-            className="cta-glow"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: DS.bg, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
-          >
-            <Lock style={{ width: 14, height: 14 }} /> Platform
-          </a>
-        </div>
-        <button className="nav-toggle" onClick={() => setMobileOpen(true)} aria-label="Open menu"><Menu style={{ color: DS.text }} /></button>
-      </nav>
-      <div className={`nav-mobile-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
-      <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`} style={{ background: DS.bg }}>
-        <button className="nav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu"><X style={{ width: 24, height: 24, color: DS.text }} /></button>
-        {NAV_LINKS.map(l => (
-          <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)} style={{ color: DS.textSecondary, borderBottom: `1px solid ${DS.border}` }}>{l.label}</a>
-        ))}
-        <a href="/nexus/chat" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, borderBottom: `1px solid ${DS.border}` }}>Try NEXUS →</a>
-        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.text, borderBottom: `1px solid ${DS.border}` }}>Platform</a>
-      </div>
-    </>
-  );
-}
-
 export function B2BLanding() {
-  const [mobileOpen, setMobileOpen] = useState(false);
   // #1326: Enterprise contact form modal — human handoff, NOT NEXUS bot.
   // Mirrors the pricing page pattern so B2B "Talk to sales" routes to the
   // same human channel everywhere, not into NEXUS.
@@ -109,11 +46,6 @@ export function B2BLanding() {
     const observer = initScrollReveal();
     return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
@@ -155,7 +87,6 @@ export function B2BLanding() {
       </div>
 
       <SEO page="b2b" />
-      <Nav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
       {/* HERO — NEXUS for Teams */}
       <section

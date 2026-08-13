@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { DS } from '@/tokens';
 
 // ── DESIGN TOKENS — Phase 9 Batch 6 ticket #1356
@@ -72,79 +72,6 @@ const ctaCompressHandlers = {
     e.currentTarget.style.transform = 'scale(1)';
   },
 };
-
-// ── NAV (light fixed) ──────────────────────────────────────────────
-function Nav() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  return (
-    <nav style={{
-      position: 'fixed', top: 0, left: 0, right: 0,
-      background: DS.bg,
-      zIndex: 100,
-      borderBottom: `1px solid ${DS.border}`,
-    }}>
-      <div style={{ maxWidth: 940, margin: '0 auto', padding: '18px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link to="/" style={{ fontFamily: DS.headingFont, fontSize: 20, fontWeight: 700, textDecoration: 'none', color: DS.text, display: 'flex', alignItems: 'baseline', gap: 6 }}>
-          LYC Intelligence <span style={{ fontFamily: DS.monoFont, fontSize: 10, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.08em', color: DS.mutedDim }}>Technology</span>
-        </Link>
-        <ul className="da-nav-links" style={{ display: 'flex', gap: 28, listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
-          {[
-            { href: '#architecture', label: 'Architecture' },
-            { href: '#security', label: 'Security' },
-            { href: '/nexus', label: 'NEXUS' },
-          ].map(l => (
-            <li key={l.href}>
-              {l.href.startsWith('#') ? (
-                <a href={l.href} style={{ fontSize: 13, fontWeight: 500, color: DS.text, textDecoration: 'none', opacity: 0.7, transition: 'opacity 120ms ease' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}>{l.label}</a>
-              ) : (
-                <Link to={l.href} style={{ fontSize: 13, fontWeight: 500, color: DS.text, textDecoration: 'none', opacity: 0.7, transition: 'opacity 120ms ease' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}>{l.label}</Link>
-              )}
-            </li>
-          ))}
-        </ul>
-        <Link to="/nexus" style={{ padding: '10px 20px', background: DS.accent, color: DS.bg, fontSize: 13, fontWeight: 500, textDecoration: 'none',  transition: 'background 200ms ease', minHeight: 40, display: 'inline-flex', alignItems: 'center' }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = DS.accentDark)}
-          onMouseLeave={(e) => (e.currentTarget.style.background = DS.accent)}>
-          Experience in NEXUS <ArrowRight size={12} style={{ marginLeft: 6 }} />
-        </Link>
-        <button
-          className="da-nav-toggle"
-          onClick={() => setMobileOpen(v => !v)}
-          aria-label="Toggle menu"
-          style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 8, minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center', color: DS.text }}
-        >
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </div>
-      {mobileOpen && (
-        <>
-          <div onClick={() => setMobileOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 150 }} />
-          <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 280, background: DS.bgAlt, zIndex: 200, padding: '80px 32px 32px', borderLeft: `1px solid ${DS.border}` }}>
-            <button onClick={() => setMobileOpen(false)} aria-label="Close menu" style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', cursor: 'pointer', minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', color: DS.text }}><X size={22} /></button>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {[
-                { href: '#architecture', label: 'Architecture' },
-                { href: '#security', label: 'Security' },
-                { href: '/nexus', label: 'NEXUS' },
-                { href: '/nexus', label: 'Experience in NEXUS →', primary: true },
-              ].map(l => (
-                <a key={l.label} href={l.href} onClick={() => setMobileOpen(false)}
-                  style={{ display: 'block', fontSize: 16, color: DS.text, textDecoration: 'none', padding: '14px 0', borderBottom: `1px solid ${DS.border}`, minHeight: 44, fontWeight: l.primary ? 600 : 500, fontFamily: DS.bodyFont }}>
-                  {l.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-      <style>{`@media (max-width: 768px) { .da-nav-links { display: none !important; } .da-nav-toggle { display: flex !important; } }`}</style>
-    </nav>
-  );
-}
 
 // ── HERO (light, fuchsia LYC accent) ─────────────────────────────────
 function Hero() {
@@ -387,7 +314,6 @@ export function DexAiPage() {
   useScrollReveal();
   return (
     <div style={{ background: DS.bgAlt, color: DS.text, minHeight: '100vh', fontFamily: DS.bodyFont, lineHeight: 1.6, WebkitFontSmoothing: 'antialiased' }}>
-      <Nav />
       <main>
         <Hero />
         <Architecture />

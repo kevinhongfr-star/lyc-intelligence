@@ -35,7 +35,10 @@ import {
   logServerError,
   parseJsonBody,
   DEFAULT_BODY_LIMIT,
+  rateLimit,
+  setRateLimitHeaders,
 } from '../lib/validate.js';
+import { z } from 'zod';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // #1314: reject oversized URLs before any processing.
@@ -117,16 +120,46 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── POST: create share link ──────────────────────────────────
   if (req.method === 'POST') {
+    // V3-7 / #1346 Rate limit: 20 writes / 60s per user
+    const rl = rateLimit(req, userId);
+    setRateLimitHeaders(res, rl, 20);
+    if (!rl.allowed) {
+      return res.status(429).json({
+        ok: false,
+        code: 'RATE_LIMITED',
+        error: 'Too many share link requests — please retry in a moment',
+      });
+    }
+
     // #1309 + #1314: body size + parse + sanitize. parseJsonBody throws
     // 400 on malformed JSON. The shared payload is stored as jsonb and
     // rendered publicly — strip control chars and cap size.
     assertBodySize(req.body, DEFAULT_BODY_LIMIT);
-    const body = parseJsonBody<{
+    const rawBody = parseJsonBody<{
       result_id?: string;
       assessment_code?: string;
       payload?: unknown;
       max_views?: number;
     }>(req);
+
+    // V3-7 / #1346 Zod write-schema validation
+    const ShareCreateSchema = z.object({
+      result_id: z.string().uuid(),
+      assessment_code: z.string().min(1).max(32),
+      payload: z.record(z.string(), z.any()).or(z.array(z.any())),
+      max_views: z.number().int().min(0).max(1_000_000).optional(),
+    });
+    let body: typeof rawBody;
+    try {
+      body = ShareCreateSchema.parse(rawBody);
+    } catch (zErr: any) {
+      const first = zErr?.issues?.[0];
+      const msg = first
+        ? `Invalid input at ${first.path.join('.')}: ${first.message}`
+        : 'Invalid share body';
+      return res.status(422).json({ ok: false, error: msg.slice(0, 200) });
+    }
+
     const { result_id, assessment_code, payload, max_views } = body;
 
     if (!result_id || !assessment_code || !payload) {
@@ -180,8 +213,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── DELETE: revoke share link ────────────────────────────────
   if (req.method === 'DELETE') {
+    // V3-7 / #1346 Rate limit
+    const rl = rateLimit(req, userId);
+    setRateLimitHeaders(res, rl, 20);
+    if (!rl.allowed) {
+      return res.status(429).json({
+        ok: false,
+        code: 'RATE_LIMITED',
+        error: 'Too many share revocation requests',
+      });
+    }
     // #1314: parseJsonBody throws 400 on malformed JSON.
-    const { share_id } = parseJsonBody<{ share_id?: string }>(req);
+    const rawDel = parseJsonBody<{ share_id?: string }>(req);
+
+    // V3-7 / #1346 Zod delete-schema validation
+    const ShareDeleteSchema = z.object({ share_id: z.string().uuid() });
+    let shareDelBody: { share_id?: string };
+    try {
+      shareDelBody = ShareDeleteSchema.parse(rawDel);
+    } catch (_zErr) {
+      return res.status(422).json({ ok: false, error: 'Invalid share_id (expected UUID)' });
+    }
+    const { share_id } = shareDelBody;
     if (!share_id) {
       return res.status(400).json({ ok: false, error: 'share_id is required' });
     }

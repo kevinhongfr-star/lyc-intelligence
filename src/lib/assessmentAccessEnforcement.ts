@@ -28,6 +28,60 @@ import { normalizeTier, tierMeets, type TierKey, DIAGNOSTIC_TIER_REQUIREMENT } f
 import { computeAssessmentAccess, DEFAULT_FEATURE_FLAGS, type FeatureFlagState } from '@/hooks/useAssessmentAccess';
 import type { DiagnosticSlug } from '@/types/assessment';
 
+export const COMPLIMENTARY_ASSESSMENT_CODE = 'CPI';
+export const EXEC_INTRO_PAID_TIERS: TierKey[] = ['professional', 'executive', 'council', 'enterprise'];
+
+export interface CanTakeAssessmentResult {
+  allowed: boolean;
+  reason: 'tier' | 'miles' | 'ok';
+  upgradeMessage?: string;
+  upgradeHref?: string;
+}
+
+export function canTakeAssessment(
+  userTier: string | null,
+  assessmentCode: string,
+  creditsOrMiles?: number,
+): CanTakeAssessmentResult {
+  const code = assessmentCode?.trim().toUpperCase() ?? '';
+  const tier = normalizeTier(userTier);
+  const isUnauth = !userTier;
+  const isExecIntro = tier === 'executive_introduction' || isUnauth;
+
+  if (code === COMPLIMENTARY_ASSESSMENT_CODE) {
+    return { allowed: true, reason: 'ok' };
+  }
+
+  if (isExecIntro) {
+    return {
+      allowed: false,
+      reason: 'tier',
+      upgradeMessage: 'This assessment requires an Executive Deep-Dive subscription or higher.',
+      upgradeHref: '/pricing',
+    };
+  }
+
+  const isPaidTier = tier && EXEC_INTRO_PAID_TIERS.some(t => tierMeets(tier, t));
+  if (isPaidTier) {
+    if (creditsOrMiles !== undefined && creditsOrMiles < 0) {
+      return {
+        allowed: false,
+        reason: 'miles',
+        upgradeMessage: 'Insufficient miles balance to start this assessment.',
+        upgradeHref: '/pricing',
+      };
+    }
+    return { allowed: true, reason: 'ok' };
+  }
+
+  return {
+    allowed: false,
+    reason: 'tier',
+    upgradeMessage: 'This assessment requires an Executive Deep-Dive subscription or higher.',
+    upgradeHref: '/pricing',
+  };
+}
+
 export type GuardedAction =
   | 'assessment/run'
   | 'assessment/share'

@@ -16,7 +16,15 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handleApiError, parseJsonBody, DEFAULT_BODY_LIMIT, logServerError } from './lib/validate.js';
+import {
+  handleApiError,
+  parseJsonBody,
+  DEFAULT_BODY_LIMIT,
+  logServerError,
+  rateLimit,
+  setRateLimitHeaders,
+} from './lib/validate.js';
+import { z } from 'zod';
 
 // ── DeepSeek client (Node import — src/* compiles via Vercel's Vite pass) ───
 import { DeepSeekClient, type DeepSeekMessage } from './src/nexus/deepseekClient.js';
@@ -155,7 +163,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const body = await parseJsonBody(req, DEFAULT_BODY_LIMIT);
+    // V3-7 / #1346 Rate limit: 20 writes / 60s per user or IP
+    const chatRlPrelude = rateLimit(req, null);
+    setRateLimitHeaders(res, chatRlPrelude, 20);
+    if (!chatRlPrelude.allowed) {
+      res.status(429).json({
+        ok: false,
+        code: 'RATE_LIMITED',
+        error: 'Too many chat turns — please retry in a moment',
+      });
+      return;
+    }
+
+    const rawBody = await parseJsonBody(req, DEFAULT_BODY_LIMIT);
+
+    // V3-7 / #1346 Zod write-schema validation for chat payload
+    const ChatSchema = z.object({
+      message: z.string().min(1).max(8192),
+      history: z.array(z.object({ role: z.string().max(32), content: z.string().max(8192) })).max(50).optional(),
+      userId: z.string().max(256).optional(),
+      tier: z.string().max(64).optional(),
+      memoryContext: z.record(z.string(), z.any()).max(200).optional(),
+      documentContext: z.string().max(16384).optional(),
+      systemPrompt: z.string().max(32768).optional(),
+    });
+    let body: any;
+    try {
+      body = ChatSchema.parse(rawBody);
+    } catch (zErr: any) {
+      const first = zErr?.issues?.[0];
+      const msg = first
+        ? `Invalid input at ${first.path.join('.')}: ${first.message}`
+        : 'Invalid chat body';
+      res.status(422).json({ ok: false, error: msg.slice(0, 200) });
+      return;
+    }
+
     const message: string = String(body?.message ?? '').trim();
     if (!message) {
       res.status(400).json({ ok: false, error: 'message required' });
