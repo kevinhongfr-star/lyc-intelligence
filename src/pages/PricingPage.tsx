@@ -9,6 +9,9 @@ import {
   CANONICAL_ASSESSMENT_ORDER,
   CANONICAL_ASSESSMENT_PRICING,
   RECOMMENDED_TIER,
+  PRICING_PAGE_TIERS,
+  TIER_DISPLAY_NAME,
+  TIER_DISPLAY_BENEFITS,
   detectUserCurrency,
   savePreferredCurrency,
   formatTierPrice,
@@ -158,16 +161,20 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
         </p>
       </div>
 
-      {/* Subscription Tier Cards */}
-      <div className="max-w-7xl mx-auto px-4 pb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {CANONICAL_TIER_ORDER.map((tierKey) => {
+      {/* Subscription Tier Cards — #1366 simplified to 3 user-centric tiers.
+          Enterprise (council) is rendered separately below as a B2B section. */}
+      <div className="max-w-5xl mx-auto px-4 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {PRICING_PAGE_TIERS.map((tierKey) => {
             const tier = CANONICAL_TIER_PRICING[tierKey];
             const price = formatTierPrice(tierKey, currency);
             const isRecommended = tierKey === RECOMMENDED_TIER;
             const isCurrent = profile?.tier === tierKey || profile?.tier === tier.key;
             const isExplorer = tierKey === 'explorer';
             const isLoading = loadingTier === tierKey;
+            // #1365 — user-centric display name + benefit-focused copy
+            const displayName = TIER_DISPLAY_NAME[tierKey];
+            const displayBenefits = TIER_DISPLAY_BENEFITS[tierKey] ?? tier.benefits;
 
             return (
               <div
@@ -195,10 +202,10 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   </div>
                 )}
 
-                {/* Tier label */}
+                {/* Tier label — #1365 user-centric display name */}
                 <div className="mb-4">
                   <h3 className="text-xl font-bold text-text-primary">
-                    {isExplorer ? tier.alias : tier.label}
+                    {displayName}
                   </h3>
                   {isExplorer && (
                     <p className="text-xs text-text-muted uppercase tracking-wide mt-1">
@@ -212,7 +219,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   {price.isZero ? (
                     <div>
                       <div className="text-2xl font-bold text-text-primary leading-tight">
-                        Executive Introduction
+                        Complimentary
                       </div>
                       <div className="text-sm text-text-muted mt-1">
                         {price.secondary}
@@ -242,9 +249,9 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   )}
                 </div>
 
-                {/* Benefits */}
+                {/* Benefits — #1365 benefit-focused copy */}
                 <ul className="space-y-2 mb-6 flex-1">
-                  {tier.benefits.map((benefit, i) => (
+                  {displayBenefits.map((benefit, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
                       <Check className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
                       <span className="text-text-secondary">{benefit}</span>
@@ -278,7 +285,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                     </>
                   ) : (
                     <>
-                      Upgrade to {tier.label}
+                      Upgrade to {displayName}
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
@@ -483,7 +490,6 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
               <tr className="bg-bg-tertiary">
                 <th className="px-4 py-3 text-left font-medium text-text-secondary">Feature</th>
                 {CANONICAL_TIER_ORDER.map((tierKey) => {
-                  const tier = CANONICAL_TIER_PRICING[tierKey];
                   const isRecommended = tierKey === RECOMMENDED_TIER;
                   return (
                     <th
@@ -492,7 +498,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                         isRecommended ? 'text-accent' : 'text-text-secondary'
                       }`}
                     >
-                      {tierKey === 'explorer' ? tier.alias : tier.label}
+                      {TIER_DISPLAY_NAME[tierKey]}
                     </th>
                   );
                 })}

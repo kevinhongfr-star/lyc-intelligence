@@ -134,7 +134,7 @@ function Footer({ config }: { config: AssessmentLandingConfig }) {
             <div style={{ ...monoStyle, color: G400, marginBottom: 12 }}>Platform</div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <Link to="/nexus" style={footerLink}>NEXUS</Link>
-              <Link to="/dex-ai" style={footerLink}>DEX AI</Link>
+              <Link to="/dex-ai" style={footerLink}>LYC Intelligence</Link>
               <Link to="/pricing" style={footerLink}>Pricing</Link>
               <Link to="/login" style={footerLink}>Login</Link>
             </div>

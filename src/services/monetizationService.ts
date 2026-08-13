@@ -194,6 +194,63 @@ export const CANONICAL_TIER_ORDER: TierKey[] = [
 export const RECOMMENDED_TIER: TierKey = 'pro';
 
 // ─────────────────────────────────────────────────────────────────────────────
+// #1365 — Tier DISPLAY names (user-centric). Internal tier_key IDs are stable
+// and preserved for billing/credits/database; this layer only changes what
+// visitors see. Simplifies 5 internal tiers to 3 + complimentary + enterprise.
+//   explorer  → Complimentary   (was "Executive Introduction" — kept as legal alias)
+//   starter   → Professional     (internal low tier, not shown on main pricing grid)
+//   pro       → Professional     (the featured middle tier shown on pricing)
+//   executive → Council
+//   council   → Enterprise       (B2B, separate funnel)
+// Brand rule: never "free" — use "Complimentary".
+// ─────────────────────────────────────────────────────────────────────────────
+export const TIER_DISPLAY_NAME: Record<TierKey, string> = {
+  explorer: 'Complimentary',
+  starter: 'Professional',
+  pro: 'Professional',
+  executive: 'Council',
+  council: 'Enterprise',
+};
+
+/** Tiers shown on the main pricing grid (3 user-centric tiers).
+ *  Enterprise (council) is rendered separately as a B2B section.
+ *  Starter is folded into Professional and not shown standalone. */
+export const PRICING_PAGE_TIERS: TierKey[] = ['explorer', 'pro', 'executive'];
+
+/** Benefit-focused display copy (replaces feature-list benefits on visitor
+ *  pricing surfaces). Keyed by internal tier id. */
+export const TIER_DISPLAY_BENEFITS: Record<TierKey, string[]> = {
+  explorer: [
+    'Try any assessment with a complimentary report',
+    '3 NEXUS messages to get a read on your situation',
+    'Preview the full assessment catalog',
+  ],
+  starter: [
+    'All 6 leadership assessments unlocked',
+    'Personalised assessment reports',
+    'NEXUS coaching on your results',
+  ],
+  pro: [
+    'All 6 leadership assessments with personalised reports',
+    'See how you compare to regional C-suite peers',
+    'Unlimited NEXUS coaching on your results',
+    'Export PDF reports for your own use',
+  ],
+  executive: [
+    'Everything in Professional, plus executive depth',
+    'Join the Council — quarterly workshops with peers',
+    'Priority NEXUS responses and dedicated support',
+    'Full historical tracking across assessments',
+  ],
+  council: [
+    'Seat-based deployment with SSO and SCIM',
+    'Custom assessment training for your team',
+    'Org-level analytics and a dedicated contact',
+    'Council-tier seats for every desk',
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // ASSESSMENT PRICING — 3 tiers (Standard / Premium / Unique)
 // Miles cost mirrors USD pricing (~1 mile = $1).
 // ─────────────────────────────────────────────────────────────────────────────

@@ -544,7 +544,7 @@ export function Landing() {
 
   // Ticket #1352 — only B2C links in marketing nav.
   const navLinks = [
-    { href: '/assessment', label: 'Assessments' },
+    { href: '/assessments', label: 'Assessments' },
     { href: '/pricing', label: 'Pricing' },
     { href: '/nexus/chat', label: 'NEXUS AI' },
   ];
