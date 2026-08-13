@@ -6,7 +6,7 @@
  * recommended discussion topics so the consultant can walk into the debrief
  * prepared in 60 seconds.
  *
- * Brand rules: zero border radius, Crimson Pro headings, DM Sans body,
+ * Brand rules: zero border radius, System serif headings (DejaVu Serif / Georgia / Times), DM Sans body,
  * IBM Plex Mono labels, single accent #C108AB, premium tone.
  */
 import React from 'react';
@@ -53,7 +53,7 @@ export interface ConsultantResultsSummaryProps {
 }
 
 const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   monoFont: "'IBM Plex Mono', 'Courier New', monospace",
   accent: '#C108AB',

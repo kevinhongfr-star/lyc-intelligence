@@ -42,7 +42,7 @@ export function TierGate({ slug, userTier, children }: TierGateProps) {
   if (!def) {
     return (
       <div style={{ ...containerStyle, padding: '80px 32px', textAlign: 'center' }}>
-        <h2 style={{ fontFamily: "'Crimson Pro', serif", fontSize: 28, color: INK }}>
+        <h2 style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontSize: 28, color: INK }}>
           Diagnostic not found
         </h2>
         <p style={{ fontFamily: "'DM Sans', sans-serif", color: G600, marginTop: 12 }}>
@@ -75,7 +75,7 @@ export function TierGate({ slug, userTier, children }: TierGateProps) {
           </div>
 
           <h1 style={{
-            fontFamily: "'Crimson Pro', serif",
+            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
             fontSize: 36,
             color: INK,
             marginBottom: 16,

@@ -5,7 +5,7 @@
  * blur, add HTTP weight, and cause CLS), these are pure CSS/HTML mockups that
  * render crisply at any resolution, use brand fonts/colors, and load instantly.
  *
- * Zero border radius, Crimson Pro / DM Sans / IBM Plex Mono, #C108AB accent.
+ * Zero border radius, System serif / DM Sans / IBM Plex Mono, #C108AB accent.
  */
 
 import React from 'react';
@@ -29,7 +29,7 @@ const mono: React.CSSProperties = {
 };
 
 const serif: React.CSSProperties = {
-  fontFamily: "'Crimson Pro', Georgia, serif",
+  fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
 };
 
 const sans: React.CSSProperties = {

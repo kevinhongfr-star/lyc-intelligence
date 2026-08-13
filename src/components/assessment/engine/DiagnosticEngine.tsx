@@ -52,7 +52,7 @@ const AUTO_ADVANCE_MS = 260;
 /** Functional submitting delay (ms). */
 const SUBMIT_DELAY_MS = 350;
 
-const FONT_HEAD = "'Crimson Pro', Georgia, serif";
+const FONT_HEAD = "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif";
 const FONT_BODY = "'DM Sans', system-ui, sans-serif";
 const FONT_MONO = "'IBM Plex Mono', 'Courier New', monospace";
 

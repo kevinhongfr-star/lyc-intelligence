@@ -9,7 +9,9 @@
  *  - Radius is ALWAYS 0 (zero border radius is canonical; `radius-full` preserved
  *    only for genuinely circular elements like score rings/avatars, never on
  *    buttons/cards/inputs/modals/badges).
- *  - Headings = Crimson Pro, body = DM Sans, mono = IBM Plex Mono.
+ *  - V1.1 FIX 1: Headings = system serif stack (DejaVu Serif / Georgia / Times),
+ *    body = DM Sans, mono = IBM Plex Mono. No Crimson Pro, no custom font
+ *    loading for headings — zero FOIT/FOUC, instant first paint.
  *  - One accent: LYC fuchsia #C108AB, reserved for CTAs / active nav / ≤1 key
  *    data point per section. Eyebrows use gray-500 (#616170), NEVER the accent.
  *  - Motion envelope 120–350ms, ease-out standard. No default "ease".
@@ -82,10 +84,12 @@ export const G400 = MUTED_DIM;       /* #9CA3AF */
 export const G600 = GRAY_600;
 
 /* ============================================================
- * 2. TYPOGRAPHY — Crimson Pro / DM Sans / IBM Plex Mono
+ * 2. TYPOGRAPHY — V1.1 FIX 1: System serif / DM Sans / IBM Plex Mono
  * ============================================================ */
 
-export const FONT_DISPLAY = "'Crimson Pro', Georgia, serif";
+// V1.1 FIX 1: System serif headings — no custom font loading. Zero FOIT/FOUC.
+// Instant first paint for headings. Native OS fonts only.
+export const FONT_DISPLAY = "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif";
 export const FONT_BODY = "'DM Sans', system-ui, sans-serif";
 export const FONT_MONO = "'IBM Plex Mono', ui-monospace, monospace";
 

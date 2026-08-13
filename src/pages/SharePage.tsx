@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getShareCard, type ShareCard, type ShareCardType } from '../services/shareCardService';
 import { SEO } from '@/components/seo/SEO';
-import { DS } from '@/tokens';
+import { DS, WHITE } from '@/tokens';
 
 interface Teaser {
   eyebrow: string;
@@ -238,7 +238,7 @@ export function SharePage() {
               minHeight: '44px',
               padding: '12px 24px',
               background: DS.accent,
-              color: '#FFFFFF',
+              color: WHITE,
               border: 'none',
               fontFamily: DS.bodyFont,
               fontSize: '14px',
@@ -465,7 +465,7 @@ export function SharePage() {
               minHeight: '48px',
               padding: '14px 24px',
               background: DS.accent,
-              color: '#FFFFFF',
+              color: WHITE,
               border: 'none',
               fontFamily: DS.bodyFont,
               fontSize: '15px',

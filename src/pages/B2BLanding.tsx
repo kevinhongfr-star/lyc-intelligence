@@ -78,7 +78,7 @@ function Nav({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen
           <a
             href="/login"
             className="cta-glow"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: DS.bg, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
           >
             <Lock style={{ width: 14, height: 14 }} /> Platform
           </a>
@@ -120,7 +120,7 @@ export function B2BLanding() {
       {/* Phase 9 Batch 6 ticket #1357 — B2B pages can be reached directly; provide B2C return path */}
       <div
         style={{
-          background: '#0A0A0A',
+          background: DS.bgDark,
           padding: '10px 32px',
           display: 'flex',
           alignItems: 'center',
@@ -131,8 +131,8 @@ export function B2BLanding() {
           fontFamily: DS.bodyFont,
         }}
       >
-        <span style={{ color: '#FFFFFF' }}>
-          <span style={{ fontFamily: DS.monoFont, textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: 8, color: '#C108AB' }}>B2B · Client Portal</span>
+        <span style={{ color: DS.bg }}>
+          <span style={{ fontFamily: DS.monoFont, textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: 8, color: DS.accent }}>B2B · Client Portal</span>
           This page is for search-firm &amp; talent clients. Individual leaders — visit the main B2C experience.
         </span>
         <a
@@ -142,8 +142,8 @@ export function B2BLanding() {
             alignItems: 'center',
             gap: 6,
             padding: '6px 14px',
-            border: `1px solid #C108AB`,
-            color: '#C108AB',
+            border: `1px solid ${DS.accent}`,
+            color: DS.accent,
             textDecoration: 'none',
             fontWeight: 600,
             fontSize: 12,
@@ -230,7 +230,7 @@ export function B2BLanding() {
               fontFamily: DS.headingFont,
               fontSize: 'clamp(34px, 5.6vw, 56px)',
               fontWeight: 700,
-              color: '#FFFFFF',
+              color: DS.bg,
               margin: '0 auto 16px',
               lineHeight: 1.08,
               letterSpacing: '-0.015em',
@@ -255,13 +255,13 @@ export function B2BLanding() {
             <a
               href="/match"
               className="cta-glow"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 36px', background: '#C108AB', color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 36px', background: DS.accent, color: DS.bg, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none' }}
             >
               Try Match Analysis <ArrowRight style={{ width: 15, height: 15 }} />
             </a>
             <a
               href="/nexus/chat"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 32px', border: '1px solid rgba(255,255,255,0.28)', color: '#FFFFFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', textDecoration: 'none', background: 'rgba(255,255,255,0.04)' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 32px', border: '1px solid rgba(255,255,255,0.28)', color: DS.bg, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', textDecoration: 'none', background: 'rgba(255,255,255,0.04)' }}
             >
               Launch NEXUS
             </a>
@@ -454,7 +454,7 @@ export function B2BLanding() {
                       width: '36px',
                       height: '36px',
                       background: DS.accent,
-                      color: '#FFF',
+                      color: DS.bg,
                       fontFamily: DS.monoFont,
                       fontSize: '12px',
                       fontWeight: 700,
@@ -623,7 +623,7 @@ export function B2BLanding() {
                 type="button"
                 onClick={() => setEnterpriseOpen(true)}
                 className="cta-glow"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '16px 32px', background: '#C108AB', color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '16px 32px', background: DS.accent, color: DS.bg, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', border: 'none', cursor: 'pointer' }}
               >
                 Talk to sales <ArrowRight style={{ width: 14, height: 14 }} />
               </button>
@@ -644,7 +644,7 @@ export function B2BLanding() {
           <div
             className="card-hover"
             style={{
-              background: '#0A0A12',
+              background: DS.bgDark,
  
               padding: '32px',
               border: `1px solid ${DS.accent}22`,
@@ -657,7 +657,7 @@ export function B2BLanding() {
             </div>
             <div
               style={{
-                background: '#12121E',
+                background: DS.bgDark,
                 padding: '16px',
  
                 marginBottom: '12px',
@@ -695,9 +695,9 @@ export function B2BLanding() {
                 letterSpacing: '0.14em',
               }}
             >
-              <span style={{ padding: '4px 8px', background: '#1a1a27' }}>GOV</span>
-              <span style={{ padding: '4px 8px', background: '#1a1a27' }}>APAC</span>
-              <span style={{ padding: '4px 8px', background: '#1a1a27' }}>VERDICT</span>
+              <span style={{ padding: '4px 8px', background: DS.bgDark }}>GOV</span>
+              <span style={{ padding: '4px 8px', background: DS.bgDark }}>APAC</span>
+              <span style={{ padding: '4px 8px', background: DS.bgDark }}>VERDICT</span>
             </div>
           </div>
         </div>
@@ -719,7 +719,7 @@ export function B2BLanding() {
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(135deg, #0a0812 0%, #160c1c 40%, #25122d 70%, #33183f 100%)',
+            background: `linear-gradient(135deg, ${DS.bgDark} 0%, #160c1c 40%, #25122d 70%, #33183f 100%)`,
           }}
         />
         <div
@@ -754,7 +754,7 @@ export function B2BLanding() {
               fontFamily: DS.headingFont,
               fontSize: 'clamp(28px, 4vw, 40px)',
               fontWeight: 700,
-              color: '#FFFFFF',
+              color: DS.bg,
               margin: '0 0 16px',
               lineHeight: 1.15,
               letterSpacing: '-0.01em',

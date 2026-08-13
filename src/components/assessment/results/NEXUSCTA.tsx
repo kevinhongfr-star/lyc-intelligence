@@ -50,7 +50,7 @@ export function NEXUSCTA({ config }: Props) {
             </span>
           </div>
           <h2 style={{
-            fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700,
+            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: WHITE, marginBottom: 20,
           }}>
             Talk through your <em style={{ fontWeight: 400 }}>{assessmentName}</em> results

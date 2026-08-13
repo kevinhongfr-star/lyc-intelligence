@@ -22,6 +22,7 @@ import {
 import { trackUpgradeAttempt, trackCTA, trackBillingView } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
 import { EnterpriseContactForm } from '@/components/billing/EnterpriseContactForm';
+import { DS } from '@/tokens';
 
 interface PricingPageProps {
   onUpgradeSuccess?: () => void;
@@ -120,7 +121,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
         {/* Ticket #1355 — light gray eyebrow per v1.2 brand spec */}
         <div
           className="mb-3 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: '#9CA3AF', fontFamily: "'IBM Plex Mono', 'Courier New', monospace" }}
+          style={{ color: DS.eyebrow, fontFamily: DS.monoFont }}
         >
           Plans &amp; pricing
         </div>
@@ -240,7 +241,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                 {/* Ticket #1353 — Monthly miles shown muted/secondary (USD is primary).
                      Logged-in users see the usual, visitors see less emphasis. */}
                 <div className="mb-4 pb-4 border-b border-border">
-                  <div className="text-[10px] text-[#9CA3AF] uppercase tracking-widest">Monthly miles</div>
+                  <div className="text-[10px] uppercase tracking-widest" style={{ color: DS.mutedDim }}>Monthly miles</div>
                   <div className={`text-xl font-semibold ${user ? 'text-accent' : 'text-text-muted'}`}>
                     {tier.monthlyMiles === 0 ? '—' : `${tier.monthlyMiles} mi`}
                   </div>
@@ -304,19 +305,17 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
       <div className="max-w-7xl mx-auto px-4 pb-16">
         <div
           className="relative border-2 border-accent bg-gradient-to-br from-accent/5 via-white to-white p-8 md:p-10 flex flex-col lg:flex-row items-start lg:items-center gap-8"
-          style={{ borderColor: '#C108AB' }}
         >
           <div className="flex-1">
             <div
               className="inline-flex items-center gap-1 bg-accent text-white px-3 py-1 text-xs font-semibold mb-4 whitespace-nowrap"
-              style={{ background: '#C108AB' }}
             >
               <Sparkles className="w-3 h-3" />
               For Teams
             </div>
             <h3
               className="text-2xl md:text-3xl font-bold text-text-primary mb-2"
-              style={{ fontFamily: "'Crimson Pro', Georgia, serif", letterSpacing: '-0.01em' }}
+              style={{ fontFamily: DS.headingFont, letterSpacing: '-0.01em' }}
             >
               NEXUS for Teams &amp; Enterprise
             </h3>
@@ -345,13 +344,13 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
           <div className="flex flex-col items-start lg:items-end gap-3 lg:min-w-[220px]">
             <div
               className="text-xs text-text-muted uppercase tracking-wide"
-              style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", letterSpacing: '0.2em' }}
+              style={{ fontFamily: DS.monoFont, letterSpacing: '0.2em' }}
             >
               Custom pricing
             </div>
             <div
               className="text-3xl font-bold text-text-primary mb-1"
-              style={{ fontFamily: "'Crimson Pro', Georgia, serif", letterSpacing: '-0.01em' }}
+              style={{ fontFamily: DS.headingFont, letterSpacing: '-0.01em' }}
             >
               Talk to sales
             </div>
@@ -366,8 +365,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
               }}
               className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-accent text-white font-semibold hover:bg-accent-hover transition-all"
               style={{
-                background: '#C108AB',
-                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontFamily: DS.bodyFont,
                 fontSize: '13px',
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
@@ -381,7 +379,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
             </button>
             <p
               className="text-xs text-text-muted text-center lg:text-right"
-              style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", letterSpacing: '0.14em', textTransform: 'uppercase' }}
+              style={{ fontFamily: DS.monoFont, letterSpacing: '0.14em', textTransform: 'uppercase' }}
             >
               Human follow-up · Not a bot
             </p>
@@ -419,7 +417,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
           {/* Ticket #1355 — light gray eyebrow */}
           <div
             className="mb-2 text-xs font-semibold tracking-widest uppercase"
-            style={{ color: '#9CA3AF', fontFamily: "'IBM Plex Mono', 'Courier New', monospace" }}
+            style={{ color: DS.eyebrow, fontFamily: DS.monoFont }}
           >
             Assessment pricing
           </div>
@@ -456,7 +454,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   <span className="text-sm text-text-muted">one-time</span>
                 </div>
                 {/* Ticket #1353 — miles as secondary muted info */}
-                <div className="text-xs text-[#9CA3AF] font-medium mb-4 tracking-wide">
+                <div className="text-xs font-medium mb-4 tracking-wide" style={{ color: DS.mutedDim }}>
                   ≈ {display.miles} mi · billed in {currency}
                 </div>
 

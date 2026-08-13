@@ -40,7 +40,7 @@ export type DiagnosticAccentKey = DiagnosticSlug;
 // ── Typography ──────────────────────────────────────────────────────
 
 export const REPORT_TYPOGRAPHY = {
-  fontDisplay: "'Crimson Pro', Georgia, 'Times New Roman', serif",
+  fontDisplay: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   fontBody: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   fontMono: "'IBM Plex Mono', 'SF Mono', Menlo, Consolas, monospace",
   fontSansFallback: "Arial, sans-serif",    // for Outlook-safe email inlining

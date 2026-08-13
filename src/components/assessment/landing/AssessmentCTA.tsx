@@ -25,7 +25,7 @@ export function AssessmentCTA({ config }: Props) {
           width: 48, height: 3, background: accent, margin: '0 auto 24px',
         }} />
         <h2 className="section-heading" style={{
-          fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700,
+          fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
           fontSize: 36, lineHeight: 1.2, color: WHITE, textAlign: 'center',
           maxWidth: 600, margin: '0 auto 16px',
         }}>

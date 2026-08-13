@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AssessmentResults, type AssessmentResultsConfig } from '@/components/assessment/results';
 import { getSPARKResult, type SPARKAnalysisResult } from '@/services/sparkAnalysis';
+import { DS, TEAL, GRAY_600 } from '@/tokens';
 
 // ── MOCK DATA (fallback when no backend result is available) ───────
 const mockConfig: AssessmentResultsConfig = {
   assessmentCode: 'SPARK',
   assessmentName: 'SPARK',
-  accent: '#0D9488',
+  accent: TEAL,
   prefix: 'spark-results',
   overallScore: 68,
   archetype: {
@@ -56,7 +57,7 @@ function resultToConfig(result: SPARKAnalysisResult): AssessmentResultsConfig {
   return {
     assessmentCode: 'SPARK',
     assessmentName: 'SPARK',
-    accent: '#0D9488',
+    accent: TEAL,
     prefix: 'spark-results',
     overallScore: result.composite_score,
     archetype: {
@@ -103,18 +104,18 @@ export function SparkResultsPage() {
   if (!config) {
     return (
       <div style={{
-        background: '#F5F5F3', minHeight: '100vh', display: 'flex',
+        background: DS.bgAlt, minHeight: '100vh', display: 'flex',
         alignItems: 'center', justifyContent: 'center',
-        fontFamily: "'DM Sans', system-ui, sans-serif",
+        fontFamily: DS.bodyFont,
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{
-            width: 32, height: 32, border: '2px solid #E8E8E5',
-            borderTopColor: '#0D9488',
+            width: 32, height: 32, border: `2px solid ${DS.border}`,
+            borderTopColor: TEAL,
             animation: 'spin 350ms linear infinite',
             margin: '0 auto 24px',
           }} />
-          <p style={{ color: '#4B5563', fontSize: 14 }}>Loading your results…</p>
+          <p style={{ color: GRAY_600, fontSize: 14 }}>Loading your results…</p>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>

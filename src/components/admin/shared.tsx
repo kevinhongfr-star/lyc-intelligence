@@ -1,14 +1,14 @@
 /**
  * Shared B2C admin UI primitives: shell, card, badges, inputs, buttons.
  * Keeps the 5 admin pages consistent with report tokens.
- * Zero radius, Crimson Pro headings, DM Sans body, IBM Plex Mono for numerics/IDs.
+ * Zero radius, System serif headings (DejaVu Serif / Georgia / Times), DM Sans body, IBM Plex Mono for numerics/IDs.
  */
 import React from 'react';
 import { useAuthStore } from '@/stores/authStore';
 
 export const MONO = '"IBM Plex Mono", ui-monospace, "Courier New", monospace';
 export const BODY = '"DM Sans", system-ui, -apple-system, sans-serif';
-export const HEADING = '"Crimson Pro", Georgia, serif';
+export const HEADING = '"DejaVu Serif", "Georgia", "Times New Roman", Times, serif';
 
 export const B2C_ADMIN = {
   MONO,

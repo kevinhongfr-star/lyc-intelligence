@@ -96,7 +96,7 @@ export function ConsultantDashboard() {
           </div>
           <h1
             className="text-2xl font-bold text-text-primary"
-            style={{ fontFamily: "'Crimson Pro', Georgia, serif", letterSpacing: '-0.01em' }}
+            style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", letterSpacing: '-0.01em' }}
           >
             My Dashboard
           </h1>
@@ -317,7 +317,7 @@ function RecentActivityPanel({
   const recent = (items || []).slice(0, 4);
   const monoFont = "'IBM Plex Mono', 'Courier New', monospace";
   const bodyFont = "'DM Sans', system-ui, sans-serif";
-  const headingFont = "'Crimson Pro', Georgia, serif";
+  const headingFont = "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif";
 
   return (
     <div

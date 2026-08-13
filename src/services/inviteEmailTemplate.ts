@@ -4,7 +4,7 @@
  * Generates a premium HTML email string for a consultant-sent assessment
  * invitation. Follows brand rules:
  *   • Zero border radius everywhere
- *   • Crimson Pro for headings, DM Sans for body, IBM Plex Mono for labels
+ *   • System serif (DejaVu Serif / Georgia / Times) for headings, DM Sans for body, IBM Plex Mono for labels
  *   • Single accent color #C108AB (crimson)
  *   • No "free" — uses "complimentary"; entry tier is "Executive Introduction"
  *   • Premium tone (not SaaS): generous whitespace, mono labels with wide
@@ -38,7 +38,7 @@ const MUTED = '#616170';
 const BORDER = '#E9E7E1';
 const BG_ALT = '#F7F6F3';
 
-const FONT_HEADING = "'Crimson Pro', Georgia, 'Times New Roman', serif";
+const FONT_HEADING = "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif";
 const FONT_BODY = "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 const FONT_MONO = "'IBM Plex Mono', 'SF Mono', Menlo, Consolas, 'Courier New', monospace";
 

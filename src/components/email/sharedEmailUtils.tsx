@@ -35,7 +35,7 @@ export function formatDate(iso?: string | Date | null): string {
 
 export const FONT_STACKS = {
   mono:    "'IBM Plex Mono', 'Menlo', monospace",
-  heading: "'Crimson Pro', Georgia, serif",
+  heading: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   body:    "'DM Sans', Arial, sans-serif",
 } as const;
 

@@ -1,105 +1,108 @@
 /**
- * Design system: Logo / Brand wordmark (#1356).
+ * V1.1 FIX 2: Design system — Official LYC wordmark image (#1356).
  *
- * Single shared Logo component for the entire surface. Replaces the 6+ bespoke
- * "LYC Intelligence" wordmark treatments across navs, footers, and auth pages.
+ * Single shared Logo component. Replaces 6+ bespoke wordmark treatments.
+ *
+ * BRAND RULE (non-negotiable):
+ *  Official LYC wordmark image ONLY — exact same as lyc-partners.ai.
+ *  NO custom product logo. NO "LYC Intelligence" lockup. NO L badge icon mark.
+ *  Wordmark says "LYC" only. Renders as <img>, NOT text.
  *
  * Two context variants:
- *  - `light` : for LIGHT backgrounds — dark text (#0A0A12), accent badge.
- *  - `dark`  : for DARK backgrounds — white text, accent badge.
+ *  - `light` : for LIGHT backgrounds — dark wordmark (lyc_wordmark.svg)
+ *  - `dark`  : for DARK backgrounds — white/reverse wordmark (lyc_wordmark_reverse.svg)
  *
- * Brand rules:
- *  - Zero border radius on the badge (#1349).
- *  - Crimson Pro wordmark, 700 weight (#1369).
- *  - Badge is the only place the accent appears in the logo (color discipline).
- *  - Renders a react-router <Link to="/"> by default; pass `as` for other tags.
+ * Sizes are image heights:
+ *  - sm: 20px
+ *  - md: 28px (default — nav/footer standard)
+ *  - lg: 40px
+ *
+ * Renders a react-router <Link to="/"> by default; pass `as` for other tags
+ * (e.g. `as="a"` for external hrefs, `as="div"` for non-link decorative).
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ACCENT, FONT_DISPLAY, TEXT, WHITE } from '@/tokens';
 
 export type LogoVariant = 'light' | 'dark';
 export type LogoSize = 'sm' | 'md' | 'lg';
 
 export interface LogoProps {
+  /** Wordmark variant — light = dark wordmark on light bg; dark = white wordmark on dark bg */
   variant?: LogoVariant;
+  /** Size controls image height in px (sm=20, md=28, lg=40). Aspect ratio preserved automatically. */
   size?: LogoSize;
-  /** Show the "L" accent badge. Default true. */
-  showBadge?: boolean;
-  /** Wordmark text. Defaults to "LYC Intelligence". */
-  label?: string;
   /** Destination for the link. Defaults to "/". */
   to?: string;
-  /** Override the anchor — pass `as="div"` for a non-link logo. */
+  /** Override the link tag — pass `as="a"` for external href, `as="div"` for non-link. */
   as?: React.ElementType;
+  /** href for `as="a"` external links */
+  href?: string;
   className?: string;
   style?: React.CSSProperties;
 }
 
-const BADGE_SIZE: Record<LogoSize, number> = { sm: 24, md: 32, lg: 40 };
-const BADGE_FONT: Record<LogoSize, number> = { sm: 12, md: 15, lg: 18 };
-const WORDMARK_FONT: Record<LogoSize, number> = { sm: 16, md: 18, lg: 22 };
+/** Wordmark image heights (px). */
+const IMAGE_HEIGHT: Record<LogoSize, number> = { sm: 20, md: 28, lg: 40 };
+
+/** Wordmark aspect ratio from the SVG viewBox (120 / 28 ≈ 4.286). */
+const WORDSMARK_ASPECT = 120 / 28;
+
+const WORDMARK_SRC: Record<LogoVariant, string> = {
+  light: '/brand/lyc_wordmark.svg',
+  dark: '/brand/lyc_wordmark_reverse.svg',
+};
+
+const WORDMARK_ALT = 'LYC';
 
 export function Logo({
   variant = 'light',
   size = 'md',
-  showBadge = true,
-  label = 'LYC Intelligence',
   to = '/',
   as,
+  href,
   className,
   style,
 }: LogoProps): React.ReactElement {
-  const wordmarkColor = variant === 'dark' ? WHITE : TEXT;
-  const Tag: React.ElementType = as ?? Link;
-  const linkProps = as ? {} : { to };
+  const imgHeight = IMAGE_HEIGHT[size];
+  const imgWidth = Math.round(imgHeight * WORDSMARK_ASPECT);
 
-  return (
-    <Tag
-      {...linkProps}
-      className={className}
-      style={{
+  // Build the <img> — the official wordmark
+  const img = React.createElement('img', {
+    src: WORDMARK_SRC[variant],
+    alt: WORDMARK_ALT,
+    height: imgHeight,
+    width: imgWidth,
+    style: {
+      display: 'block',
+      height: `${imgHeight}px`,
+      width: `${imgWidth}px`,
+      maxWidth: '100%',
+    },
+    loading: 'eager' as const,   // Wordmark is always above the fold
+    fetchPriority: 'high' as const,
+  });
+
+  // Wrap in caller-specified tag (or Link by default)
+  const Tag: React.ElementType = as ?? Link;
+  const linkProps: Record<string, unknown> = as
+    ? (as === 'a' && href ? { href } : {})
+    : { to };
+
+  return React.createElement(
+    Tag,
+    {
+      ...linkProps,
+      className,
+      style: {
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 10,
+        justifyContent: 'center',
         textDecoration: 'none',
         ...style,
-      }}
-    >
-      {showBadge && (
-        <span
-          aria-hidden="true"
-          style={{
-            width: BADGE_SIZE[size],
-            height: BADGE_SIZE[size],
-            background: ACCENT,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: WHITE,
-            fontFamily: FONT_DISPLAY,
-            fontWeight: 700,
-            fontSize: BADGE_FONT[size],
-            lineHeight: 1,
-            flexShrink: 0,
-          }}
-        >
-          L
-        </span>
-      )}
-      <span
-        style={{
-          fontFamily: FONT_DISPLAY,
-          fontSize: WORDMARK_FONT[size],
-          fontWeight: 700,
-          color: wordmarkColor,
-          letterSpacing: '-0.01em',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {label}
-      </span>
-    </Tag>
+      },
+      'aria-label': WORDMARK_ALT,
+    },
+    img,
   );
 }
 

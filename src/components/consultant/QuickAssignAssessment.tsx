@@ -8,7 +8,7 @@
  *   Step 3 — Review + send (renders a branded invite preview)
  *
  * Uses the branded invite email template. Brand rules: zero border radius,
- * Crimson Pro headings, DM Sans body, IBM Plex Mono labels, single accent
+ * System serif headings (DejaVu Serif / Georgia / Times), DM Sans body, IBM Plex Mono labels, single accent
  * #C108AB, 200ms transitions, cubic-bezier(0.4,0,0.2,1).
  */
 import React, { useMemo, useState } from 'react';
@@ -57,7 +57,7 @@ const ASSESSMENTS: AssessmentOption[] = [
 ];
 
 const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   monoFont: "'IBM Plex Mono', 'Courier New', monospace",
   accent: '#C108AB',

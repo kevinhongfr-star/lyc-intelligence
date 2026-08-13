@@ -122,7 +122,7 @@ export const TierUpgradeCTA: React.FC<TierUpgradeCTAProps> = ({
       <h3
         className="m-0"
         style={{
-          fontFamily: "'Crimson Pro', Georgia, serif",
+          fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
           fontSize: 22,
           lineHeight: 1.2,
           color: '#0B0B0B',

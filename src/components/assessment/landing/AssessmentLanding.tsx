@@ -26,7 +26,7 @@ const ACCENT = BRAND_ACCENT;
 const SAMPLE_PCTS = [82, 67, 91, 54, 76, 70];
 
 // Shared typography helpers.
-const serif = "'Crimson Pro', Georgia, serif";
+const serif = "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif";
 const sans = "'DM Sans', system-ui, sans-serif";
 
 function firstSentence(s: string): string {

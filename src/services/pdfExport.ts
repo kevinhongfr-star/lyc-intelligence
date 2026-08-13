@@ -7,7 +7,7 @@
  *   • jsPDF (already in project deps)
  *
  * Why html2canvas → jpg raster pipeline?
- *   • Google Fonts (Crimson Pro / DM Sans / IBM Plex Mono) need to be loaded
+ *   • Google Fonts (System serif / DM Sans / IBM Plex Mono) need to be loaded
  *     before capture — we wait for `document.fonts.ready`.
  *   • html2canvas 1.x has good table + SVG gauge fidelity (PdfReport uses
  *     <svg>, not external chart libs).
@@ -50,7 +50,7 @@ export interface ExportAssessmentPdfOptions {
  * Primary entry point — capture a rendered PdfReport and save the PDF file.
  *
  * Implementation notes:
- *   1. Ensure fonts are ready so all three brand fonts (Crimson Pro/DM Sans/IBM Plex Mono)
+ *   1. Ensure fonts are ready so all three brand fonts (system serif/DM Sans/IBM Plex Mono)
  *      render correctly in the raster and thus in the PDF.
  *   2. Split pages by `section[data-report-section]` children of the report node.
  *      Each chapter becomes one PDF page. If a section is taller than the page

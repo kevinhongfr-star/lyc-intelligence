@@ -63,7 +63,7 @@ const REVEAL_MS = 350;
 const STAGGER_MS = 80;
 const EASE_EXPO = 'cubic-bezier(0.16, 1, 0.3, 1)';
 const HEADING: React.CSSProperties = {
-  fontFamily: "'Crimson Pro', Georgia, serif",
+  fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
 };
 const BODY: React.CSSProperties = {
   fontFamily: "'DM Sans', system-ui, sans-serif",

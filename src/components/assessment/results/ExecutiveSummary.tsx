@@ -90,7 +90,7 @@ export function ExecutiveSummary({ config }: Props) {
         }}>
           <div style={{ flexShrink: 0 }}>
             <div style={{
-              fontFamily: "'Crimson Pro', Georgia, serif",
+              fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
               fontSize: 44, fontWeight: 700, lineHeight: 1,
               color: band.color,
             }}>
@@ -105,7 +105,7 @@ export function ExecutiveSummary({ config }: Props) {
               Executive verdict
             </span>
             <p style={{
-              fontFamily: "'Crimson Pro', Georgia, serif",
+              fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
               fontSize: 20, fontWeight: 600, color: INK,
               lineHeight: 1.35, margin: 0,
             }}>

@@ -2,6 +2,7 @@ import { AssessmentLanding, type AssessmentLandingConfig } from '@/components/as
 import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
 import { SEO } from '@/components/seo/SEO';
 import { getAssessmentMeta } from '@/seo/pageMetadata';
+import { DS, TEAL } from '@/tokens';
 
 const config: AssessmentLandingConfig = {
   code: 'SPARK',
@@ -9,7 +10,7 @@ const config: AssessmentLandingConfig = {
   tagline: 'AI Leadership Readiness',
   heroDescription:
     'Assess your readiness to lead in the age of AI. Discover how you score across five dimensions of AI leadership — from vision to ethics. Get a personalized readiness profile in fifteen minutes.',
-  accent: '#0D9488',
+  accent: TEAL,
   prefix: 'spark',
   ctaLabel: 'Start the assessment',
   ctaHref: '/spark/take',

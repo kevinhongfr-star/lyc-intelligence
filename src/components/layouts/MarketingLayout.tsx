@@ -11,7 +11,7 @@ import MarketingNav from '@/components/navigation/MarketingNav';
 import { SkipToContent } from '@/components/a11y/SkipToContent';
 
 const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   bg: '#FFFFFF',

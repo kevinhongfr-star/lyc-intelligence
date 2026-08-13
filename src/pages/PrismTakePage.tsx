@@ -1,10 +1,11 @@
 import { AssessmentFlow, type AssessmentFlowConfig } from '@/components/assessment/flow';
 import { submitPRISMAssessment } from '@/services/prismAnalysis';
+import { DS } from '@/tokens';
 
 const config: AssessmentFlowConfig = {
   code: 'PRISM',
   name: 'PRISM',
-  accent: '#C108AB',
+  accent: DS.accent,
   prefix: 'prism-take',
   resultsPath: '/prism/results',
   landingPath: '/prism',

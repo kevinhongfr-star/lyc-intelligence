@@ -1,10 +1,11 @@
 import { AssessmentFlow, type AssessmentFlowConfig } from '@/components/assessment/flow';
 import { submitSPARKAssessment } from '@/services/sparkAnalysis';
+import { DS } from '@/tokens';
 
 const config: AssessmentFlowConfig = {
   code: 'SPARK',
   name: 'SPARK',
-  accent: '#0D9488',
+  accent: DS.accent,
   prefix: 'spark-take',
   resultsPath: '/spark/results',
   landingPath: '/spark',

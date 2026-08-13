@@ -43,7 +43,7 @@ const monoStyle: React.CSSProperties = {
 };
 
 const headingStyle: React.CSSProperties = {
-  fontFamily: "'Crimson Pro', Georgia, serif",
+  fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
 };
 
 const bodyStyle: React.CSSProperties = {
@@ -411,7 +411,7 @@ export function GenericAkiraResults({
               />
               <div style={{ marginTop: 44 }}>
                 <div style={{
-                  fontFamily: "'Crimson Pro', Georgia, serif",
+                  fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
                   fontSize: 92, fontWeight: 700, lineHeight: 1, color: scoreColorVal,
                 }}>
                   {overallScore}
@@ -483,7 +483,7 @@ export function GenericAkiraResults({
                         {String(action.priority).padStart(2, '0')}
                       </span>
                       <span style={{
-                        fontFamily: "'Crimson Pro', Georgia, serif",
+                        fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
                         fontSize: 19, fontWeight: 700, color: INK,
                       }}>
                         {action.dimension}
@@ -518,7 +518,7 @@ export function GenericAkiraResults({
                 <Card style={{ background: WHITE, borderColor: G200 }}>
                   <CardContent style={{ padding: '32px 28px' }}>
                     <h3 style={{
-                      fontFamily: "'Crimson Pro', Georgia, serif",
+                      fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
                       fontSize: 22, fontWeight: 700, color: INK, marginBottom: 12, lineHeight: 1.25,
                     }}>
                       Explore another assessment
@@ -539,7 +539,7 @@ export function GenericAkiraResults({
                 <Card style={{ background: WHITE, borderColor: G200 }}>
                   <CardContent style={{ padding: '32px 28px' }}>
                     <h3 style={{
-                      fontFamily: "'Crimson Pro', Georgia, serif",
+                      fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
                       fontSize: 22, fontWeight: 700, color: INK, marginBottom: 12, lineHeight: 1.25,
                     }}>
                       Unlock deeper diagnostics

@@ -107,7 +107,7 @@ export function DexBookPage() {
           </div>
           <h1
             className="text-3xl font-bold text-[#1A1A2E] mb-2"
-            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+            style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
           >
             Session Booked
           </h1>
@@ -155,7 +155,7 @@ export function DexBookPage() {
           </div>
           <h1
             className="text-3xl font-bold text-[#1A1A2E] mb-2"
-            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+            style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
           >
             Book a 1:1 Coaching Session
           </h1>

@@ -14,6 +14,7 @@ import { buildLandingConfig } from '@/services/diagnosticLandingConfig';
 import { getDiagnostic } from '@/data/diagnostics';
 import { TierGate } from '@/components/assessment/TierGate';
 import { useAuthStore } from '@/stores/authStore';
+import { DS } from '@/tokens';
 
 export default function DiagnosticLandingPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -26,11 +27,11 @@ export default function DiagnosticLandingPage() {
   if (!def) {
     return (
       <div style={{ padding: '120px 32px', textAlign: 'center', maxWidth: 640, margin: '0 auto' }}>
-        <h1 style={{ fontFamily: "'Crimson Pro', serif", fontSize: 32 }}>
+        <h1 style={{ fontFamily: DS.headingFont, fontSize: 32 }}>
           Diagnostic not found
         </h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b7280', marginTop: 12 }}>
-          The diagnostic "{slug}" does not exist. <a href="/assessment" style={{ color: '#C108AB' }}>Browse all diagnostics</a>
+        <p style={{ fontFamily: DS.bodyFont, color: DS.muted, marginTop: 12 }}>
+          The diagnostic "{slug}" does not exist. <a href="/assessment" style={{ color: DS.accent }}>Browse all diagnostics</a>
         </p>
       </div>
     );

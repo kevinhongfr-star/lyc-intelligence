@@ -68,7 +68,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           style={{
             margin: 0,
             marginBottom: 8,
-            fontFamily: '"Crimson Pro", Georgia, serif',
+            fontFamily: '"DejaVu Serif", "Georgia", "Times New Roman", Times, serif',
             fontSize: 20,
             fontWeight: 700,
             lineHeight: 1.2,

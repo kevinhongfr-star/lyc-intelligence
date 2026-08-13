@@ -7,7 +7,7 @@
  *
  * Brand rules enforced:
  *   - Zero border radius (global `* { border-radius: 0 !important }` already covers this)
- *   - Crimson Pro headings, DM Sans body, IBM Plex Mono eyebrows
+ *   - System serif headings (DejaVu Serif / Georgia / Times), DM Sans body, IBM Plex Mono eyebrows
  *   - Eyebrow labels default to light gray #9CA3AF (brand v1.2) — accent reserved
  *     for CTAs + key emphasis only
  *   - Functional motion 120–350ms only

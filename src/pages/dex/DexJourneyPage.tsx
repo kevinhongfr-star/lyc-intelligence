@@ -136,7 +136,7 @@ export function DexJourneyPage() {
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <div>
-              <h1 className="font-serif text-xl text-[#1A1A2E]" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+              <h1 className="font-serif text-xl text-[#1A1A2E]" style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}>
                 Your Journey
               </h1>
               <p className="text-xs text-[#666]">
@@ -233,7 +233,7 @@ function SummaryKpis({ summary }: { summary: JourneySummary }) {
                 {k.label}
               </span>
             </div>
-            <div className="text-2xl font-semibold text-[#1A1A2E]" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+            <div className="text-2xl font-semibold text-[#1A1A2E]" style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}>
               {k.value}
             </div>
           </div>
@@ -286,7 +286,7 @@ function EmptyJourney() {
   return (
     <div className="text-center py-20">
       <Clock className="w-10 h-10 text-[#C108AB] mx-auto mb-4" />
-      <h2 className="font-serif text-xl text-[#1A1A2E] mb-2" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+      <h2 className="font-serif text-xl text-[#1A1A2E] mb-2" style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}>
         Your journey starts here
       </h2>
       <p className="text-sm text-[#666] mb-6 max-w-md mx-auto">

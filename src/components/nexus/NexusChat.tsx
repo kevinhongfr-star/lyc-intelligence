@@ -42,7 +42,7 @@ import {
 import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
 
 const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   monoFont: "'IBM Plex Mono', ui-monospace, monospace",
   accent: '#C108AB',

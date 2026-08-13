@@ -12,7 +12,7 @@ import { StyleSelector } from './StyleSelector';
 import { ResultsPanel } from './ResultsPanel';
 
 const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',

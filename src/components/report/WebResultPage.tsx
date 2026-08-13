@@ -75,7 +75,7 @@ export const WebResultPage: React.FC<WebResultPageProps> = ({ data, ctaVariant, 
               <circle cx="110" cy="110" r="76" fill="#FFFFFF" />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: '72px', lineHeight: 1, color: 'var(--report-ink)' }}>
+              <div style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontSize: '72px', lineHeight: 1, color: 'var(--report-ink)' }}>
                 {overall}
               </div>
               <div

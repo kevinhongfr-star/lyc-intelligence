@@ -38,7 +38,7 @@ export function CanonicalInstrumentLanding() {
           </p>
           <a
             href="/assessment"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', textDecoration: 'none', fontFamily: DS.bodyFont, fontSize: '12px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: DS.bg, textDecoration: 'none', fontFamily: DS.bodyFont, fontSize: '12px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}
           >
             <ArrowLeft style={{ width: 13, height: 13 }} /> Browse assessments
           </a>
@@ -47,7 +47,7 @@ export function CanonicalInstrumentLanding() {
     );
   }
 
-  const tierColor = info.is_cpi ? DS.accent : '#15151E';
+  const tierColor = info.is_cpi ? DS.accent : DS.bgDark;
   const tierEyebrow = info.is_cpi
     ? 'FLAGSHIP · 199 MI'
     : info.is_shift
@@ -105,7 +105,7 @@ export function CanonicalInstrumentLanding() {
           <a
             href="/login"
             className="cta-glow"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: DS.bg, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
           >
             <Lock style={{ width: 14, height: 14 }} /> Platform
           </a>
@@ -118,7 +118,7 @@ export function CanonicalInstrumentLanding() {
       <div className={`nav-mobile-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
       <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`} style={{ background: DS.bg }}>
         <button className="nav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu">
-          <X style={{ width: 24, height: 24, color: '#000' }} />
+          <X style={{ width: 24, height: 24, color: DS.text }} />
         </button>
         {navLinks.map(l => (
           <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)} style={{ color: DS.textSecondary, borderBottom: `1px solid ${DS.border}` }}>{l.label}</a>
@@ -132,8 +132,8 @@ export function CanonicalInstrumentLanding() {
         style={{
           position: 'relative',
           overflow: 'hidden',
-          background: `linear-gradient(135deg, ${info.is_cpi ? '#140a1a' : '#0c0c18'} 0%, #0a0812 45%, #1a0c1e 100%)`,
-          color: '#FFF',
+          background: `linear-gradient(135deg, ${info.is_cpi ? DS.bgDark : DS.bgDark} 0%, ${DS.bgDark} 45%, #1a0c1e 100%)`,
+          color: DS.bg,
         }}
       >
         <div
@@ -192,7 +192,7 @@ export function CanonicalInstrumentLanding() {
                 fontFamily: DS.headingFont,
                 fontSize: 'clamp(32px, 5vw, 52px)',
                 fontWeight: 700,
-                color: '#FFF',
+                color: DS.bg,
                 margin: '0 0 10px',
                 lineHeight: 1.1,
                 letterSpacing: '-0.015em',
@@ -231,8 +231,8 @@ export function CanonicalInstrumentLanding() {
                 alignItems: 'center',
                 gap: '10px',
                 padding: '18px 36px',
-                background: '#C108AB',
-                color: '#FFF',
+                background: DS.accent,
+                color: DS.bg,
                 fontFamily: DS.bodyFont,
                 fontSize: '13px',
                 fontWeight: 700,
@@ -266,7 +266,7 @@ export function CanonicalInstrumentLanding() {
         <div style={{ maxWidth: '1120px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '48px', alignItems: 'start' }}>
           {/* What you'll get */}
           <div>
-            <div style={{ fontFamily: DS.monoFont, fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.26em', color: DS.accent, marginBottom: '14px' }}>
+            <div style={{ fontFamily: DS.monoFont, fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.26em', color: DS.eyebrow, marginBottom: '14px' }}>
               What you'll get
             </div>
             <h2 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(22px, 2.6vw, 28px)', fontWeight: 700, color: DS.text, margin: '0 0 24px', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
@@ -294,7 +294,7 @@ export function CanonicalInstrumentLanding() {
           {/* Sample question preview */}
           <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, boxShadow: DS.shadow, padding: '32px 28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-              <span style={{ fontFamily: DS.monoFont, fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: DS.accent }}>Sample question</span>
+              <span style={{ fontFamily: DS.monoFont, fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: DS.eyebrow }}>Sample question</span>
               <span style={{ fontFamily: DS.monoFont, fontSize: '10px', color: DS.muted, letterSpacing: '0.1em' }}>~{Math.max(1, Math.round(info.duration_minutes / info.total_questions))} min · 1 of {info.total_questions}</span>
             </div>
             <div style={{ padding: '16px 18px', background: DS.bgAlt, borderLeft: `3px solid ${DS.accent}`, marginBottom: '20px' }}>
@@ -308,7 +308,7 @@ export function CanonicalInstrumentLanding() {
             </h3>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
               {['1', '2', '3', '4', '5'].map((n, i) => (
-                <div key={n} style={{ flex: 1, height: '44px', border: `1px solid ${DS.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, background: i === 3 ? DS.accent : DS.card, borderColor: i === 3 ? DS.accent : DS.cardBorder, color: i === 3 ? '#FFF' : DS.muted }}>
+                <div key={n} style={{ flex: 1, height: '44px', border: `1px solid ${DS.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, background: i === 3 ? DS.accent : DS.card, borderColor: i === 3 ? DS.accent : DS.cardBorder, color: i === 3 ? DS.bg : DS.muted }}>
                   {n}
                 </div>
               ))}
@@ -334,7 +334,7 @@ export function CanonicalInstrumentLanding() {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.26em',
-              color: DS.accent,
+              color: DS.eyebrow,
               marginBottom: '12px',
             }}
           >
@@ -374,8 +374,8 @@ export function CanonicalInstrumentLanding() {
                   style={{
                     width: '32px',
                     height: '32px',
-                    background: info.is_cpi ? DS.accent : '#15151E',
-                    color: '#FFF',
+                    background: info.is_cpi ? DS.accent : DS.bgDark,
+                    color: DS.bg,
                     fontFamily: DS.monoFont,
                     fontSize: '11px',
                     fontWeight: 700,
@@ -420,7 +420,7 @@ export function CanonicalInstrumentLanding() {
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.26em',
-                color: DS.accent,
+                color: DS.eyebrow,
                 marginBottom: '12px',
               }}
             >
@@ -452,7 +452,7 @@ export function CanonicalInstrumentLanding() {
                   key={p.tier}
                   className="card-hover"
                   style={{
-                    background: highlight ? '#0A0A12' : DS.card,
+                    background: highlight ? DS.bgDark : DS.card,
                     border: highlight ? `2px solid ${DS.accent}` : `1px solid ${DS.cardBorder}`,
  
                     padding: '28px 24px',
@@ -471,7 +471,7 @@ export function CanonicalInstrumentLanding() {
                         right: '24px',
                         transform: 'translateY(-50%)',
                         background: DS.accent,
-                        color: '#FFF',
+                        color: DS.bg,
                         fontFamily: DS.monoFont,
                         fontSize: '9px',
                         fontWeight: 600,
@@ -489,8 +489,8 @@ export function CanonicalInstrumentLanding() {
                       style={{
                         display: 'inline-block',
                         padding: '4px 10px',
-                        background: highlight ? DS.accent : (info.is_cpi ? `${DS.accent}18` : '#1a1a25'),
-                        color: highlight ? '#FFF' : (info.is_cpi ? DS.accent : '#FFF'),
+                        background: highlight ? DS.accent : (info.is_cpi ? `${DS.accent}18` : DS.bgDark),
+                        color: highlight ? DS.bg : (info.is_cpi ? DS.accent : DS.bg),
                         fontFamily: DS.monoFont,
                         fontSize: '10px',
                         fontWeight: 500,
@@ -502,7 +502,7 @@ export function CanonicalInstrumentLanding() {
                       {p.tier.toUpperCase()}
                     </span>
                   </div>
-                  <div style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, color: highlight ? '#FFF' : DS.text, marginBottom: '4px' }}>
+                  <div style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, color: highlight ? DS.bg : DS.text, marginBottom: '4px' }}>
                     {p.name}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '20px' }}>
@@ -541,8 +541,8 @@ export function CanonicalInstrumentLanding() {
                       gap: '8px',
                       width: '100%',
                       padding: '14px 18px',
-                      background: highlight ? DS.accent : '#0A0A12',
-                      color: '#FFF',
+                      background: highlight ? DS.accent : DS.bgDark,
+                      color: DS.bg,
                       textDecoration: 'none',
                       fontFamily: DS.bodyFont,
                       fontSize: '12px',
@@ -573,7 +573,7 @@ export function CanonicalInstrumentLanding() {
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.26em',
-                color: DS.accent,
+                color: DS.eyebrow,
                 marginBottom: '12px',
               }}
             >
@@ -659,7 +659,7 @@ export function CanonicalInstrumentLanding() {
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(135deg, #0a0812 0%, #160c1c 40%, #25122d 70%, #33183f 100%)',
+            background: `linear-gradient(135deg, ${DS.bgDark} 0%, #160c1c 40%, #25122d 70%, #33183f 100%)`,
           }}
         />
         <div
@@ -694,7 +694,7 @@ export function CanonicalInstrumentLanding() {
               fontFamily: DS.headingFont,
               fontSize: 'clamp(26px, 4vw, 38px)',
               fontWeight: 700,
-              color: '#FFFFFF',
+              color: DS.bg,
               margin: '0 0 16px',
               lineHeight: 1.15,
               letterSpacing: '-0.01em',
@@ -722,8 +722,8 @@ export function CanonicalInstrumentLanding() {
               alignItems: 'center',
               gap: '10px',
               padding: '18px 36px',
-              background: '#C108AB',
-              color: '#FFFFFF',
+              background: DS.accent,
+              color: DS.bg,
  
               fontFamily: DS.bodyFont,
               fontSize: '13px',
@@ -750,7 +750,7 @@ function Stat({ icon: Icon, value, label }: { icon: any; value: string; label: s
         style={{
           width: '40px',
           height: '40px',
-          background: 'rgba(193,8,171,0.12)',
+          background: `${DS.accent}1F`,
           color: DS.accent,
           display: 'inline-flex',
           alignItems: 'center',
@@ -761,7 +761,7 @@ function Stat({ icon: Icon, value, label }: { icon: any; value: string; label: s
         <Icon style={{ width: 18, height: 18 }} />
       </div>
       <div>
-        <div style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, lineHeight: 1, color: '#FFF' }}>{value}</div>
+        <div style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, lineHeight: 1, color: DS.bg }}>{value}</div>
         <div style={{ fontFamily: DS.monoFont, fontSize: '9.5px', letterSpacing: '0.16em', color: 'rgba(255,255,255,0.45)', marginTop: '4px', textTransform: 'uppercase' }}>{label}</div>
       </div>
     </div>

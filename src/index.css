@@ -17,9 +17,10 @@
  */
 :root {
   /* ============================================================
-   * 1. TYPOGRAPHY — Crimson Pro display + DM Sans body + IBM Plex Mono
+   * 1. TYPOGRAPHY — V1.1 FIX 1: System serif display + DM Sans body + IBM Plex Mono
    * ============================================================ */
-  --font-display: 'Crimson Pro', Georgia, serif;
+  /* V1.1 FIX 1: System serif headings — no custom font loading. Zero FOIT/FOUC. */
+  --font-display: 'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif;
   --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
 
@@ -192,41 +193,9 @@
   border-radius: 0 !important;
 }
 
-/* #1273: All three brand fonts fully self-hosted (woff2 Latin subsets in /public/fonts/).
-   Crimson Pro variable (400-700 normal/italic) + DM Sans 400/500/600/700 + IBM Plex Mono 400/500.
-   Zero Google Fonts CDN dependencies anywhere in the bundled app. */
-@font-face {
-  font-family: 'Crimson Pro';
-  src: url('/fonts/CrimsonPro-Regular.woff2') format('woff2');
-  font-weight: 400 700;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: 'Crimson Pro';
-  src: url('/fonts/CrimsonPro-RegularLatinExt.woff2') format('woff2');
-  font-weight: 400 700;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-  font-family: 'Crimson Pro';
-  src: url('/fonts/CrimsonPro-Italic.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: 'Crimson Pro';
-  src: url('/fonts/CrimsonPro-ItalicLatinExt.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
+/* V1.1 FIX 1: Headings use system serif stack — NO Crimson Pro @font-face.
+   DM Sans and IBM Plex Mono remain self-hosted for body/mono consistency.
+   Zero FOIT/FOUC for headings — instant native first paint. */
 @font-face {
   font-family: 'DM Sans';
   src: url('/fonts/DMSans-Regular.woff2') format('woff2');
@@ -275,7 +244,7 @@
 :root {
   /* ── LYC Brand Design System ── */
   --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
-  --font-serif: 'Crimson Pro', Georgia, serif;
+  --font-serif: 'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif;
   --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
   --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -970,7 +939,7 @@ body {
   --echo-neutral-900: #262626;
 
   --echo-font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
-  --echo-font-serif: 'Crimson Pro', Georgia, serif;
+  --echo-font-serif: 'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif;
   --echo-font-mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
 
   --echo-spacing-4: 4px;
@@ -1482,7 +1451,7 @@ body {
 
   /* Typography for print */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Crimson Pro', Georgia, serif !important;
+    font-family: 'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif !important;
     page-break-after: avoid;
     color: #000 !important;
   }

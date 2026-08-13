@@ -80,7 +80,7 @@ BRAND LANGUAGE RULES — failure to follow these is a hard audit issue:
 /* ── Framing per diagnostic (kept short, specific enough to avoid generic copy) ── */
 
 const framingPrism =
-  'PRISM measures Career & Professional Branding — dimensions are Strategic Positioning, Market Differentiation, Narrative Control, Visibility & Influence, Offer Readiness, Digital Footprint Quality. Headings carry Crimson Pro weight (thick, authoritative, editorial).';
+  'PRISM measures Career & Professional Branding — dimensions are Strategic Positioning, Market Differentiation, Narrative Control, Visibility & Influence, Offer Readiness, Digital Footprint Quality. Headings carry System serif weight (thick, authoritative, editorial).';
 
 const framingSpark =
   'SPARK measures AI Leadership Readiness — dimensions are Strategic AI Acumen, Implementation & Governance, Team Enablement, Risk & Ethics, Change Adoption, Measured ROI. Avoid hype language ("AGI is here", etc.). Stick to practical application and governance.';

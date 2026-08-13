@@ -64,7 +64,8 @@ export default {
         'cream': '#FAFAFA',
       },
       fontFamily: {
-        serif: ['Crimson Pro', 'Georgia', 'serif'],
+        // V1.1 FIX 1: System serif headings — no Crimson Pro, no custom font loading
+        serif: ['DejaVu Serif', 'Georgia', 'Times New Roman', 'Times', 'serif'],
         sans: ['DM Sans', 'system-ui', 'sans-serif'],
         mono: ['IBM Plex Mono', 'ui-monospace', 'Courier New', 'monospace'],
       },

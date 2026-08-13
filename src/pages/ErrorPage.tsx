@@ -1,6 +1,6 @@
 /**
  * Phase 9 Batch 6 ticket #1357 — on-brand 500 / error page.
- * Visual contract: Crimson Pro headings, DM Sans body, IBM Plex Mono signatures,
+ * Visual contract: System serif headings (DejaVu Serif / Georgia / Times), DM Sans body, IBM Plex Mono signatures,
  * zero radius, LYC fuchsia accent #C108AB, warm/deterministic tone for executives.
  */
 import React from 'react';
@@ -46,7 +46,7 @@ export default function ErrorPage() {
           />
           <div
             style={{
-              fontFamily: "'Crimson Pro', Georgia, serif",
+              fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
               fontSize: 'clamp(72px, 12vw, 160px)',
               lineHeight: 0.92,
               fontWeight: 700,
@@ -91,7 +91,7 @@ export default function ErrorPage() {
       >
         <h1
           style={{
-            fontFamily: "'Crimson Pro', Georgia, serif",
+            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
             fontSize: 'clamp(28px, 3.4vw, 44px)',
             lineHeight: 1.15,
             fontWeight: 700,

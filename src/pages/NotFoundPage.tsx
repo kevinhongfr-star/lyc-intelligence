@@ -3,7 +3,7 @@
  *
  * Visual contract with LYC brand rollout:
  *   - Accent #C108AB (magenta) for primary CTA / accent bar
- *   - Display headings: Crimson Pro serif
+ *   - Display headings: System serif stack (DejaVu Serif / Georgia / Times)
  *   - Body copy: DM Sans
  *   - Zero radius everywhere (no rounded corners)
  *   - No drop-shadow chrome — flat premium
@@ -12,17 +12,18 @@
 import React from 'react';
 import { ArrowRight, Compass, Home, Search } from 'lucide-react';
 import { SEO } from '@/components/seo/SEO';
+import { DS, WHITE } from '@/tokens';
 
 export default function NotFoundPage() {
   return (
     <div
       style={{
         minHeight: '100vh',
-        background: '#FFFFFF',
+        background: DS.bg,
         display: 'flex',
         alignItems: 'stretch',
-        fontFamily: "'DM Sans', system-ui, sans-serif",
-        color: '#000000',
+        fontFamily: DS.bodyFont,
+        color: DS.text,
       }}
     >
       <SEO title="Page Not Found — LYC Intelligence" description="The page you're looking for doesn't exist. Explore LYC Intelligence assessments and NEXUS AI coaching." path="/404" />
@@ -30,13 +31,13 @@ export default function NotFoundPage() {
       <div
         style={{
           width: 'clamp(220px, 32vw, 440px)',
-          background: '#0A0A0A',
-          color: '#FFFFFF',
+          background: DS.bgDark,
+          color: WHITE,
           padding: 'clamp(32px, 6vw, 72px)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          borderRight: `3px solid #C108AB`,
+          borderRight: `3px solid ${DS.accent}`,
         }}
       >
         <div>
@@ -46,13 +47,13 @@ export default function NotFoundPage() {
               display: 'inline-block',
               height: 6,
               width: 96,
-              background: '#C108AB',
+              background: DS.accent,
               marginBottom: 40,
             }}
           />
           <div
             style={{
-              fontFamily: "'Crimson Pro', Georgia, serif",
+              fontFamily: DS.headingFont,
               fontSize: 'clamp(72px, 12vw, 160px)',
               lineHeight: 0.92,
               fontWeight: 700,
@@ -64,11 +65,11 @@ export default function NotFoundPage() {
           </div>
           <p
             style={{
-              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontFamily: DS.bodyFont,
               fontSize: 14,
               textTransform: 'uppercase',
               letterSpacing: '0.18em',
-              color: '#C108AB',
+              color: DS.eyebrow,
               marginTop: 32,
               marginBottom: 0,
               fontWeight: 600,
@@ -97,12 +98,12 @@ export default function NotFoundPage() {
       >
         <h1
           style={{
-            fontFamily: "'Crimson Pro', Georgia, serif",
+            fontFamily: DS.headingFont,
             fontSize: 'clamp(28px, 3.4vw, 44px)',
             lineHeight: 1.15,
             fontWeight: 700,
             margin: 0,
-            color: '#000000',
+            color: DS.text,
             maxWidth: 640,
           }}
         >
@@ -113,7 +114,7 @@ export default function NotFoundPage() {
           style={{
             fontSize: 17,
             lineHeight: 1.55,
-            color: '#444444',
+            color: DS.textSecondary,
             maxWidth: 560,
             marginTop: 24,
             marginBottom: 48,
@@ -132,8 +133,8 @@ export default function NotFoundPage() {
               alignItems: 'center',
               gap: 10,
               padding: '14px 22px',
-              background: '#C108AB',
-              color: '#FFFFFF',
+              background: DS.accent,
+              color: WHITE,
               textDecoration: 'none',
               fontWeight: 600,
               fontSize: 15,
@@ -150,8 +151,8 @@ export default function NotFoundPage() {
               alignItems: 'center',
               gap: 10,
               padding: '14px 22px',
-              border: '1.5px solid #000000',
-              color: '#000000',
+              border: `1.5px solid ${DS.text}`,
+              color: DS.text,
               textDecoration: 'none',
               fontWeight: 600,
               fontSize: 15,
@@ -170,7 +171,7 @@ export default function NotFoundPage() {
               fontWeight: 700,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-              color: '#666666',
+              color: DS.eyebrow,
               marginBottom: 16,
             }}
           >
@@ -195,23 +196,23 @@ export default function NotFoundPage() {
                 href={r.href}
                 style={{
                   padding: '16px 18px',
-                  border: '1px solid #E5E5E5',
+                  border: `1px solid ${DS.border}`,
                   textDecoration: 'none',
-                  color: '#000000',
+                  color: DS.text,
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 4,
                   transition: 'border-color 120ms ease',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#C108AB')}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#E5E5E5')}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = DS.accent)}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = DS.border)}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}>
                   {r.icon}
                   <span>{r.label}</span>
-                  <ArrowRight size={14} style={{ marginLeft: 'auto', color: '#C108AB' }} />
+                  <ArrowRight size={14} style={{ marginLeft: 'auto', color: DS.accent }} />
                 </div>
-                <div style={{ fontSize: 13, color: '#666666' }}>{r.sub}</div>
+                <div style={{ fontSize: 13, color: DS.muted }}>{r.sub}</div>
               </a>
             ))}
           </div>
@@ -222,14 +223,14 @@ export default function NotFoundPage() {
           style={{
             marginTop: 64,
             fontSize: 12,
-            color: '#AAAAAA',
-            fontFamily: "'IBM Plex Mono', ui-monospace, monospace",
+            color: DS.mutedDim,
+            fontFamily: DS.monoFont,
           }}
         >
           HTTP 404 · NotFoundRoute · if you believe this is a platform error, contact{' '}
           <a
             href="mailto:ops@lyc-intelligence.app"
-            style={{ color: '#C108AB', textDecoration: 'none' }}
+            style={{ color: DS.accent, textDecoration: 'none' }}
           >
             ops@lyc-intelligence.app
           </a>

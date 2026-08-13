@@ -36,11 +36,11 @@ describe('design-tokens', () => {
 
     it('defines font families', () => {
       expect(TYPE_SCALE.font.sans).toContain('DM Sans');
-      expect(TYPE_SCALE.font.serif).toContain('Crimson Pro');
+      expect(TYPE_SCALE.font.serif).toContain('DejaVu Serif');  // V1.1 FIX 1: system serif headings
       expect(TYPE_SCALE.font.mono).toContain('IBM Plex Mono');
     });
 
-    it('uses crimson for display heading', () => {
+    it('defines system-serif display heading scale', () => {
       expect(TYPE_SCALE.scale.display.fontSize).toBe('72px');
       expect(TYPE_SCALE.scale.display.fontWeight).toBe(700);
     });

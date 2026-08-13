@@ -6,7 +6,7 @@
  *  - Instrument name, 1-line value prop, price in miles
  *  - "Take assessment" button → starts the flow (or gated modal if miles insufficient)
  *
- * Brand rules enforced: no border radius, font trio (Crimson Pro / DM Sans / IBM Plex Mono),
+ * Brand rules enforced: no border radius, font trio (System serif / DM Sans / IBM Plex Mono),
  * accent #C108AB, no "free" word, currency = miles (mi suffix).
  */
 import React, { useState } from 'react';
@@ -22,7 +22,7 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 
 const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   monoFont: "'IBM Plex Mono', ui-monospace, monospace",
   accent: '#C108AB',

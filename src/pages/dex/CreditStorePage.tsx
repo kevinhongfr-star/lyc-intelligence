@@ -134,7 +134,7 @@ export function CreditStorePage() {
           </div>
           <h1
             className="text-3xl font-bold text-[#1A1A2E] mb-2"
-            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+            style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
           >
             Miles & Plans
           </h1>

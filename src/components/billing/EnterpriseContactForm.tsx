@@ -5,7 +5,7 @@
  * Enterprise/Team tier. Submits to the contacts API so a human (sales) picks
  * it up — this is deliberately NOT routed into NEXUS.
  *
- * Brand rules: zero border radius, Crimson Pro headings, DM Sans body,
+ * Brand rules: zero border radius, System serif headings (DejaVu Serif / Georgia / Times), DM Sans body,
  * IBM Plex Mono labels, single accent #C108AB, 200ms transitions.
  */
 import React, { useState } from 'react';
@@ -44,7 +44,7 @@ const TEAM_SIZE_OPTIONS = [
 ];
 
 const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   monoFont: "'IBM Plex Mono', 'Courier New', monospace",
   accent: '#C108AB',

@@ -10,7 +10,7 @@
  * meaning, not brand accent.
  *
  * FONT LIMITATION: this renderer draws text via jsPDF's built-in Helvetica.
- * The ECHO brand fonts (Crimson Pro / DM Sans / IBM Plex Mono) cannot be
+ * The ECHO brand fonts (System serif / DM Sans / IBM Plex Mono) cannot be
  * embedded here without bundling the woff2 binaries as jsPDF font payloads.
  * The B2C assessment PDF path (pdfExport.ts → html2canvas(PdfReport.tsx))
  * renders real brand fonts because it rasterises live HTML; this B2B LENS

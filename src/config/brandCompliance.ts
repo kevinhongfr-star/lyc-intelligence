@@ -21,10 +21,10 @@ export const DESIGN_RULES = [
   },
   {
     id: 'canonical-fonts',
-    rule: '3-font system: Crimson Pro (serif/headings) + DM Sans (sans/body) + IBM Plex Mono (mono/labels)',
+    rule: '3-font system: System serif (DejaVu Serif/Georgia/Times, headings) + DM Sans (sans/body) + IBM Plex Mono (mono/labels)',
     acceptanceCriteria:
       'No Inter, JetBrains Mono, Fira Code, or system-ui as primary. ' +
-      'Headings use Crimson Pro. Body uses DM Sans. Code/labels/' +
+      'Headings use system serif (DejaVu Serif / Georgia / Times). Body uses DM Sans. Code/labels/' +
       'metadata use IBM Plex Mono. All three families self-hosted ' +
       'as woff2 files in /public/fonts/ — zero Google Fonts CDN ' +
       'references anywhere in the bundled app or report HTML output.',

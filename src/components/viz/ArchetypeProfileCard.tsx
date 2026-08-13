@@ -53,7 +53,7 @@ export const ArchetypeProfileCard: React.FC<ArchetypeProfileCardProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           minHeight: 140,
-          fontFamily: '"Crimson Pro", Georgia, serif',
+          fontFamily: '"DejaVu Serif", "Georgia", "Times New Roman", Times, serif',
           fontSize: 120,
           fontWeight: 800,
           letterSpacing: '-0.04em',
@@ -68,7 +68,7 @@ export const ArchetypeProfileCard: React.FC<ArchetypeProfileCardProps> = ({
           style={{
             margin: 0,
             marginBottom: 10,
-            fontFamily: '"Crimson Pro", Georgia, serif',
+            fontFamily: '"DejaVu Serif", "Georgia", "Times New Roman", Times, serif',
             fontSize: 28,
             fontWeight: 700,
             lineHeight: 1.1,

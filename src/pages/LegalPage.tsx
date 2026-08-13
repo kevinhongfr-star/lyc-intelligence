@@ -3,6 +3,7 @@ import { TermsPage } from '../components/legal/TermsPage';
 import { PrivacyPage } from '../components/legal/PrivacyPage';
 import { DPA } from '../components/legal/DPA';
 import { ComplianceBadge } from '../components/legal/ComplianceBadge';
+import { DS } from '@/tokens';
 
 type Tab = 'terms' | 'privacy' | 'dpa' | 'cookies' | 'subprocessors' | 'compliance';
 
@@ -28,8 +29,8 @@ export function LegalPage() {
               <button
                 key={t}
                 onClick={() => setActiveTab(t)}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === t ? 'text-[#C108AB]' : 'text-gray-600 border-transparent hover:text-gray-900'}`}
-                style={activeTab === t ? { borderColor: '#C108AB' } : {}}
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === t ? '' : 'text-gray-600 border-transparent hover:text-gray-900'}`}
+                style={activeTab === t ? { color: DS.accent, borderColor: DS.accent } : {}}
                 data-testid={`legal-tab-${t}`}
               >
                 {tabLabels[t]}

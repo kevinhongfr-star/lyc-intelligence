@@ -11,6 +11,7 @@ import { ArrowLeft, FileText, Shield, Cookie, Download, Trash2, Loader2, AlertCi
 import { useAuthStore } from '@/stores/authStore';
 import { authFetch } from '@/utils/authFetch';
 import { SEO } from '@/components/seo/SEO';
+import { DS } from '@/tokens';
 
 interface Section {
   heading: string;
@@ -34,8 +35,8 @@ function LegalLayout({ title, icon, intro, sections, lastUpdated, actions }: {
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 bg-fuchsia/10 text-fuchsia flex items-center justify-center">{icon}</div>
           <h1
-            className="text-3xl font-bold text-[#1A1A2E]"
-            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+            className="text-3xl font-bold"
+            style={{ color: DS.text, fontFamily: DS.headingFont }}
           >
             {title}
           </h1>
@@ -45,7 +46,7 @@ function LegalLayout({ title, icon, intro, sections, lastUpdated, actions }: {
         <div className="space-y-8">
           {sections.map((s, i) => (
             <section key={i}>
-              <h2 className="font-semibold text-[#1A1A2E] mb-2">{i + 1}. {s.heading}</h2>
+              <h2 className="font-semibold mb-2" style={{ color: DS.text }}>{i + 1}. {s.heading}</h2>
               <div className="text-sm text-gray-700 leading-relaxed space-y-2">{s.body}</div>
             </section>
           ))}
@@ -308,7 +309,7 @@ function PrivacyActionsPanel() {
 
   return (
     <div className="mt-12 p-5 border border-gray-200 bg-gray-50">
-      <h3 className="font-semibold text-[#1A1A2E] mb-1">Exercise your rights</h3>
+      <h3 className="font-semibold mb-1" style={{ color: DS.text }}>Exercise your rights</h3>
       <p className="text-xs text-gray-500 mb-4">
         Download a copy of your personal data (right to portability) or request account deletion.
       </p>

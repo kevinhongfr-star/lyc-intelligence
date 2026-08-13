@@ -7,7 +7,7 @@
  * Persists the captured fields to the profile via the auth store, and remembers
  * a dismissal in localStorage so we don't nag on every assessment.
  *
- * Brand rules: zero border radius, Crimson Pro headings, DM Sans body,
+ * Brand rules: zero border radius, System serif headings (DejaVu Serif / Georgia / Times), DM Sans body,
  * IBM Plex Mono labels, single accent #C108AB, 200ms transitions.
  */
 import React, { useEffect, useState } from 'react';
@@ -30,7 +30,7 @@ const DISMISS_KEY = 'lyc.progressive_profile.dismissed';
 const DISMISS_TTL_MS = 1000 * 60 * 60 * 24 * 14; // 14 days
 
 const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   monoFont: "'IBM Plex Mono', 'Courier New', monospace",
   accent: '#C108AB',

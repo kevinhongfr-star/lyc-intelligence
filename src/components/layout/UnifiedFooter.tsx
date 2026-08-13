@@ -9,7 +9,7 @@ import { Logo } from '@/components/ui/Logo';
  *   - Light background (#F9FAFB) with dark text — clean, modern, not SaaS-y
  *   - Column headers as light-gray eyebrows (#9CA3AF), not accent color
  *   - Zero border radius (global CSS enforces this)
- *   - Crimson Pro brand wordmark, DM Sans body, IBM Plex Mono bottom bar
+ *   - official LYC wordmark image, DM Sans body, IBM Plex Mono bottom bar
  *   - One accent (#C108AB) used only for the CTA button
  *   - B2B links removed from main columns; tiny "For Business" in bottom bar
  *   - Mobile-responsive: single-column stack below 768px
@@ -53,7 +53,8 @@ export function UnifiedFooter() {
       >
         {/* Brand */}
         <div>
-          <Logo variant="dark" size="lg" />
+          {/* V1.1 FIX 2: Footer bg is DS.bg (light mist) → light variant = dark wordmark */}
+          <Logo variant="light" size="lg" />
           <p
             style={{
               fontSize: '13px',

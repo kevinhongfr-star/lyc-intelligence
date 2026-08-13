@@ -16,7 +16,7 @@
 export const TYPE_SCALE = {
   font: {
     sans: "'DM Sans', system-ui, -apple-system, sans-serif",
-    serif: "'Crimson Pro', Georgia, serif",
+    serif: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
     mono: "'IBM Plex Mono', ui-monospace, 'Courier New', monospace",
   },
   scale: {

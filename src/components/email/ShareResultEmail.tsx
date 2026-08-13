@@ -5,7 +5,7 @@
  *   • 600px outer width (email-css layer handles it; we also inline widths)
  *   • No CSS custom properties (they strip in many clients)
  *   • Color palette hardcoded inline so we don't depend on external CSS
- *   • Crimson Pro headings fall back to Georgia; DM Sans → Arial/sans-serif
+ *   • System serif headings (DejaVu Serif / Georgia / Times) fall back to Georgia; DM Sans → Arial/sans-serif
  *
  * Content: recipient greeting, score hero mini, 3 strengths (or 1 for EI tier),
  * share CTA to open in browser, footer confidentiality.
@@ -86,7 +86,7 @@ export const ShareResultEmail: React.FC<ShareResultEmailProps> = ({
                     <h1
                       style={{
                         margin: '16px 0 0',
-                        fontFamily: "'Crimson Pro', Georgia, serif",
+                        fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
                         fontSize: 32,
                         lineHeight: 1.15,
                         color: accent,
@@ -127,7 +127,7 @@ export const ShareResultEmail: React.FC<ShareResultEmailProps> = ({
                         <p
                           style={{
                             margin: '8px 0 0',
-                            fontFamily: "'Crimson Pro', Georgia, serif",
+                            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
                             fontSize: 18,
                             lineHeight: 1.4,
                             color: '#0E0E0E',
@@ -168,7 +168,7 @@ export const ShareResultEmail: React.FC<ShareResultEmailProps> = ({
                             style={{
                               width: 110,
                               verticalAlign: 'middle',
-                              fontFamily: "'Crimson Pro', Georgia, serif",
+                              fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
                               fontSize: 64,
                               lineHeight: 1,
                               color: '#0E0E0E',

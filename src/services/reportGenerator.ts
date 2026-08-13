@@ -5,7 +5,7 @@
  * (zero border radius). Accent is LYC fuchsia #C108AB (rgb 193,8,171).
  *
  * FONT LIMITATION: text is drawn with jsPDF's built-in Helvetica — the
- * ECHO brand fonts (Crimson Pro / DM Sans / IBM Plex Mono) cannot be
+ * ECHO brand fonts (System serif / DM Sans / IBM Plex Mono) cannot be
  * embedded without bundling font binaries as jsPDF payloads. The canonical
  * B2C assessment PDF path (pdfExport.ts → html2canvas of PdfReport.tsx)
  * renders the real brand fonts and is the source of truth for PDFs.

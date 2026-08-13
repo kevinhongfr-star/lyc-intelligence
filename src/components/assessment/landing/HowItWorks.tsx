@@ -19,7 +19,7 @@ export function HowItWorks({ config }: Props) {
         <div className={`${prefix}-reveal`} style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>How it works</span>
           <h2 className="section-heading" style={{
-            fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700,
+            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20,
           }}>
             Three steps, <em style={{ fontWeight: 400 }}>fifteen minutes</em>
@@ -43,7 +43,7 @@ export function HowItWorks({ config }: Props) {
                 {s.step}
               </div>
               <h3 style={{
-                fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700,
+                fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
                 fontSize: 22, marginBottom: 12, lineHeight: 1.25, color: INK,
               }}>
                 {s.title}

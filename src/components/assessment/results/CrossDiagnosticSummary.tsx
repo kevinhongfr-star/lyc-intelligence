@@ -31,7 +31,7 @@ interface Props {
  * assessment results. Synthesizes recurring strengths, recurring gaps, and
  * recommended focus areas, plus a "based on your results, take [Y]" CTA (#1324).
  *
- * Brand rules: zero border radius, Crimson Pro headings, DM Sans body, IBM Plex
+ * Brand rules: zero border radius, System serif headings (DejaVu Serif / Georgia / Times), DM Sans body, IBM Plex
  * Mono labels, single accent color. Premium, not SaaS.
  */
 export function CrossDiagnosticSummary({ assessmentCode, accent, prefix, nexusPath }: Props) {
@@ -75,7 +75,7 @@ export function CrossDiagnosticSummary({ assessmentCode, accent, prefix, nexusPa
         <div className={`${prefix}-reveal`} style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Cross-diagnostic synthesis</span>
           <h2 className="section-heading" style={{
-            fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700,
+            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20,
           }}>
             Patterns across your <em style={{ fontWeight: 400 }}>{results.length} diagnostics</em>
@@ -139,7 +139,7 @@ export function CrossDiagnosticSummary({ assessmentCode, accent, prefix, nexusPa
                 Recommended next diagnostic
               </span>
               <h3 style={{
-                fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700,
+                fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
                 fontSize: 26, lineHeight: 1.25, color: WHITE, marginBottom: 14,
               }}>
                 Based on your results, take <em style={{ fontWeight: 400, color: accent }}>{recommendation.name}</em>
@@ -204,7 +204,7 @@ function InsightGroup({
               borderBottom: i < items.length - 1 ? `1px solid ${G200}` : 'none',
             }}>
               <div style={{
-                fontFamily: "'Crimson Pro', Georgia, serif",
+                fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
                 fontSize: 17, fontWeight: 700, color: INK, marginBottom: 6, lineHeight: 1.3,
               }}>
                 {item.title}

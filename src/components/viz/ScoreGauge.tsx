@@ -95,7 +95,7 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
         >
           <div
             style={{
-              fontFamily: '"Crimson Pro", Georgia, Times, serif',
+              fontFamily: '"DejaVu Serif", "Georgia", "Times New Roman", Times, serif',
               fontSize: 64,
               fontWeight: 700,
               lineHeight: 1,
