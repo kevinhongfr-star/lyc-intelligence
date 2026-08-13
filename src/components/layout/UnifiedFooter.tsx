@@ -88,7 +88,7 @@ export function UnifiedFooter() {
               letterSpacing: '0.08em',
             }}
           >
-            NEXUS · 11 INSTRUMENTS · MILES ECONOMY
+            NEXUS AI · 6 LEADERSHIP ASSESSMENTS · LYC INTELLIGENCE
           </div>
         </div>
 

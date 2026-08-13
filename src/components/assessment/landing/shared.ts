@@ -46,8 +46,10 @@ export function makeBtnPrimary(accent: string): React.CSSProperties {
 export function makeBtnSecondary(accent: string): React.CSSProperties {
   return { ...btnBase, background: 'transparent', color: INK, borderColor: INK };
 }
-export function makeSectionLabel(accent: string): React.CSSProperties {
-  return { ...monoStyle, color: accent, marginBottom: 20, display: 'inline-block' };
+export function makeSectionLabel(_accent: string): React.CSSProperties {
+  // Phase 9 Batch 6 ticket #1355 — brand v1.2 spec: eyebrow/section labels use light gray #9CA3AF,
+  // NOT the accent color. Accent is reserved for CTAs + interactive key highlights only.
+  return { ...monoStyle, color: '#9CA3AF', marginBottom: 20, display: 'inline-block' };
 }
 
 // ── MOTION HOOKS ───────────────────────────────────────────────────

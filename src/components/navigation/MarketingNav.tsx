@@ -56,11 +56,11 @@ export function MarketingNav(): React.ReactElement {
     navigate('/', { replace: true });
   };
 
+  // Phase 9 Batch 6, ticket #1352 — only B2C products in marketing nav dropdown.
+  // Match Analysis (B2B recruiters) + B2B Search Platform removed.
   const products = [
     { label: 'NEXUS AI', href: '/nexus/chat', desc: 'Executive advisory chatbot' },
-    { label: 'Leadership Assessments', href: '/assessment', desc: '11 diagnostic instruments' },
-    { label: 'Match Analysis', href: '/match', desc: 'Candidate-mandate alignment' },
-    { label: 'B2B Search Platform', href: '/b2b', desc: 'For client organizations' },
+    { label: 'Leadership Assessments', href: '/assessment', desc: '6 leadership assessments' },
   ];
 
   return (

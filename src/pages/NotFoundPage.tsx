@@ -184,9 +184,9 @@ export default function NotFoundPage() {
           >
             {[
               { href: '/pricing',                  icon: <Search size={15} />,  label: 'Pricing & Tiers',          sub: 'Executive Introduction → Council' },
-              { href: '/assessment/cpi',           icon: <Search size={15} />,  label: 'CPI Diagnostic',          sub: 'China Leadership Pipeline' },
-              { href: '/assessment',               icon: <Search size={15} />,  label: 'All 11 Assessments',       sub: 'Browse the full diagnostic catalog' },
-              { href: '/b2b',                      icon: <Search size={15} />,  label: 'Executive Search (B2B)',  sub: 'Client / consultant portal' },
+              { href: '/assessment/prism',         icon: <Search size={15} />,  label: 'PRISM Transition Diagnostic', sub: 'Career transition clarity' },
+              { href: '/assessments',              icon: <Search size={15} />,  label: 'All 6 Leadership Assessments', sub: 'Browse the full catalog' },
+              { href: '/nexus',                    icon: <Search size={15} />,  label: 'NEXUS AI',                 sub: 'Conversational leadership advisor' },
             ].map((r) => (
               <a
                 key={r.href}

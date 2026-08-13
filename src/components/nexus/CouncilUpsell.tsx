@@ -13,19 +13,19 @@ export function CouncilUpsell({ trigger, messageCount, onUpgrade }: CouncilUpsel
       case 'trial':
         return {
           title: 'Executive Introduction overview',
-          description: `You've sent ${messageCount} messages. Add a Starter plan for 5 mi/day + open all 11 instruments.`,
+          description: `You've sent ${messageCount} messages. Add a Starter plan for 5 mi/day + open all 6 leadership assessments.`,
           highlight: 'Open with miles',
         };
       case 'insight':
         return {
           title: 'Want Deeper Analysis?',
-          description: 'Starter / Pro members open SHIFT assessments + personalised reports.',
+          description: 'Starter / Pro members open targeted assessments + personalised reports.',
           highlight: 'Unlock premium features',
         };
       case 'usage':
         return {
           title: 'You\'re Getting Great Value!',
-          description: `${messageCount} conversations in Executive Introduction. Starter = $29/mo for 5 mi/day + miles economy.`,
+          description: `${messageCount} conversations in Executive Introduction. Starter = $29/mo for 5 mi/day.`,
           highlight: 'Open with miles',
         };
     }

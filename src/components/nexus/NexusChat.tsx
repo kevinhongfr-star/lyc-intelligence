@@ -1287,7 +1287,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 </div>
                 <div>
                   <h3 className="text-xl font-bold" style={{ fontFamily: DS.headingFont }}>Starter & Pro — add miles to your plan</h3>
-                  <p className="text-white/80 text-sm">Move past Executive Introduction. Open the 11 instruments with miles.</p>
+                  <p className="text-white/80 text-sm">Move past Executive Introduction. Open all 6 leadership assessments with miles.</p>
                 </div>
               </div>
             </div>
@@ -1304,8 +1304,8 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 <div className="flex items-center gap-3">
                   <Award className="w-5 h-5" style={{ color: DS.accent }} />
                   <div>
-                    <p className="font-semibold text-text-primary">All 11 instruments</p>
-                    <p className="text-sm text-text-muted">CPI Flagship, the full SHIFT Suite, and Advisory products.</p>
+                    <p className="font-semibold text-text-primary">All 6 leadership assessments</p>
+                    <p className="text-sm text-text-muted">Standard and Premium tiers, covering transition, execution, AI readiness, cross-border, and global navigation.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

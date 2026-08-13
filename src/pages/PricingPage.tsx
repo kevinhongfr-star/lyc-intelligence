@@ -10,6 +10,7 @@ import {
   CANONICAL_ASSESSMENT_PRICING,
   RECOMMENDED_TIER,
   detectUserCurrency,
+  savePreferredCurrency,
   formatTierPrice,
   formatAssessmentPrice,
   type PricingCurrency,
@@ -46,6 +47,13 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
   }, [profile]);
 
   const [currency, setCurrency] = useState<PricingCurrency>(detected);
+
+  // Ticket #1354: when currency changes via manual toggle, persist to localStorage so subsequent
+  // visits respect the user's explicit choice (overrides auto-detect).
+  React.useEffect(() => {
+    savePreferredCurrency(currency);
+  }, [currency]);
+
   const [loadingTier, setLoadingTier] = useState<TierKey | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [enterpriseOpen, setEnterpriseOpen] = useState(false);
@@ -106,12 +114,20 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
       <SEO page="pricing" />
       {/* Header */}
       <div className="max-w-6xl mx-auto px-4 py-16 text-center">
+        {/* Ticket #1355 — light gray eyebrow per v1.2 brand spec */}
+        <div
+          className="mb-3 text-xs font-semibold tracking-widest uppercase"
+          style={{ color: '#9CA3AF', fontFamily: "'IBM Plex Mono', 'Courier New', monospace" }}
+        >
+          Plans &amp; pricing
+        </div>
         <h1 className="text-4xl font-bold text-text-primary mb-4">
           Choose Your Plan
         </h1>
         <p className="text-text-muted text-lg max-w-2xl mx-auto">
           Five tiers, calibrated to where you are in your executive journey.
-          Currency is <span className="font-medium">miles</span> — earn monthly, spend on assessments.
+          Pricing shown in {currency === 'CNY' ? 'CNY (China regional pricing)' : 'USD (global pricing)'}.
+          {user && ' Monthly miles are included with every active subscription.'}
         </p>
 
         {/* Currency Toggle */}
@@ -214,13 +230,14 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   )}
                 </div>
 
-                {/* Monthly miles */}
+                {/* Ticket #1353 — Monthly miles shown muted/secondary (USD is primary).
+                     Logged-in users see the usual, visitors see less emphasis. */}
                 <div className="mb-4 pb-4 border-b border-border">
-                  <div className="text-xs text-text-muted uppercase tracking-wide">Monthly miles</div>
-                  <div className="text-2xl font-semibold text-accent">
+                  <div className="text-[10px] text-[#9CA3AF] uppercase tracking-widest">Monthly miles</div>
+                  <div className={`text-xl font-semibold ${user ? 'text-accent' : 'text-text-muted'}`}>
                     {tier.monthlyMiles === 0 ? '—' : `${tier.monthlyMiles} mi`}
                   </div>
-                  {tier.earnsMiles && (
+                  {tier.earnsMiles && user && (
                     <div className="text-xs text-text-muted mt-1">Earns miles via NEXUS actions</div>
                   )}
                 </div>
@@ -392,16 +409,25 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
       {/* Assessment Pricing Section */}
       <div className="max-w-6xl mx-auto px-4 pb-16">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-text-primary mb-2">Assessment Pricing</h2>
+          {/* Ticket #1355 — light gray eyebrow */}
+          <div
+            className="mb-2 text-xs font-semibold tracking-widest uppercase"
+            style={{ color: '#9CA3AF', fontFamily: "'IBM Plex Mono', 'Courier New', monospace" }}
+          >
+            Assessment pricing
+          </div>
+          <h2 className="text-2xl font-bold text-text-primary mb-2">Individual Assessments</h2>
           <p className="text-text-muted">
-            Three price tiers across the 11-instrument catalog. Pay once per assessment — miles or fiat.
+            Two price tiers across the 6-assessment catalog. Pay once per assessment.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {CANONICAL_ASSESSMENT_ORDER.map((priceTier) => {
             const p = CANONICAL_ASSESSMENT_PRICING[priceTier];
             const display = formatAssessmentPrice(priceTier, currency);
+            // Ticket #1351: skip tiers with no instruments (e.g. Custom/Unique — no items currently)
+            if (p.instruments.length === 0) return null;
             const isUnique = priceTier === 'unique';
 
             return (
@@ -422,12 +448,13 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   <span className="text-3xl font-bold text-text-primary">{display.primary}</span>
                   <span className="text-sm text-text-muted">one-time</span>
                 </div>
-                <div className="text-sm text-accent font-medium mb-4">
-                  {display.miles} mi
+                {/* Ticket #1353 — miles as secondary muted info */}
+                <div className="text-xs text-[#9CA3AF] font-medium mb-4 tracking-wide">
+                  ≈ {display.miles} mi · billed in {currency}
                 </div>
 
                 <div className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                  Instruments
+                  Assessments
                 </div>
                 <div className="flex flex-wrap gap-1.5 mb-6">
                   {p.instruments.map((code) => (
@@ -482,7 +509,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   values: ['Executive Introduction', 'Standard', 'Priority', 'Priority', 'Unlimited'],
                 },
                 {
-                  feature: 'All 11 assessments',
+                  feature: 'All 6 leadership assessments',
                   values: ['Preview only', '✓', '✓', '✓', '✓'],
                 },
                 {

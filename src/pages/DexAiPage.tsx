@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, ArrowRight } from 'lucide-react';
 
-// ── DESIGN TOKENS (shared, teal accent for DEX AI page) ────────────
-const ACCENT = '#0D9488'; // teal — DEX AI page only
-const ACCENT_DARK = '#0F766E';
+// ── DESIGN TOKENS — Phase 9 Batch 6 ticket #1356
+// DEX AI is the INTERNAL engine code name; publicly there is only LYC Intelligence (same brand family,
+// same accent fuchsia #C108AB as the rest of the site). No teal. Section labels use light gray #9CA3AF.
+const ACCENT = '#C108AB'; // LYC fuchsia — single brand accent on all public pages
+const ACCENT_DARK = '#A00790';
 const INK = '#0F1115';
 const OFF = '#F5F5F3';
 const G100 = '#FAFAFA';
@@ -45,7 +47,8 @@ const btnBase: React.CSSProperties = {
 
 const btnPrimary: React.CSSProperties = { ...btnBase, background: ACCENT, color: WHITE, borderColor: ACCENT };
 const btnSecondary: React.CSSProperties = { ...btnBase, background: 'transparent', color: INK };
-const sectionLabel: React.CSSProperties = { ...monoStyle, color: ACCENT, marginBottom: 20, display: 'inline-block' };
+// Ticket #1355 — section labels light gray per v1.2 brand spec
+const sectionLabel: React.CSSProperties = { ...monoStyle, color: G400, marginBottom: 20, display: 'inline-block' };
 
 // ── MOTION: Scroll reveal hook (fadeUp 350ms, IntersectionObserver) ──
 function useScrollReveal() {
@@ -91,8 +94,8 @@ function Nav() {
       borderBottom: `1px solid ${G200}`,
     }}>
       <div style={{ maxWidth: 940, margin: '0 auto', padding: '18px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link to="/dex-ai" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, textDecoration: 'none', color: INK, display: 'flex', alignItems: 'baseline', gap: 6 }}>
-          DEX AI <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.08em', color: G400 }}>by LYC</span>
+        <Link to="/" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, textDecoration: 'none', color: INK, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          LYC Intelligence <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.08em', color: G400 }}>Technology</span>
         </Link>
         <ul className="da-nav-links" style={{ display: 'flex', gap: 28, listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
           {[
@@ -153,25 +156,26 @@ function Nav() {
   );
 }
 
-// ── HERO (light, teal accent) ──────────────────────────────────────
+// ── HERO (light, fuchsia LYC accent) ─────────────────────────────────
 function Hero() {
   return (
     <section style={{ padding: '180px 0 120px', textAlign: 'center', position: 'relative' }}>
       <div style={containerStyle}>
-        <span style={{ ...monoStyle, color: ACCENT, marginBottom: 28, display: 'inline-block' }}>Technology</span>
+        {/* Ticket #1355 — eyebrow light gray not accent */}
+        <span style={{ ...monoStyle, color: G400, marginBottom: 28, display: 'inline-block' }}>Technology</span>
         <h1 style={{
           fontFamily: "'Crimson Pro', Georgia, serif",
           fontWeight: 700, fontSize: 52, lineHeight: 1.15,
           color: INK, maxWidth: 720, margin: '0 auto 24px',
           letterSpacing: '-0.02em',
         }}>
-          Powered by <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 400 }}>DEX AI.</em>
+          Powered by <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 400 }}>LYC Intelligence.</em>
         </h1>
         <p style={{ fontSize: 18, maxWidth: 640, margin: '0 auto 32px', color: G600, lineHeight: 1.6 }}>
-          The intelligence engine behind NEXUS. Multi-agent AI systems, specialized assessment models, and talent market data — all working together to power leadership intelligence.
+          Multi-agent AI systems, specialized assessment models, and talent market data — all working together to power leadership intelligence for executives on the move.
         </p>
         <div style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: G400, marginBottom: 40 }}>
-          DEX AI is the engine. NEXUS is the product.
+          LYC Intelligence is the platform. NEXUS is the experience.
         </div>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to="/nexus" style={btnPrimary} {...ctaCompressHandlers}
@@ -180,7 +184,7 @@ function Hero() {
             Experience it in NEXUS <ArrowRight size={14} style={{ marginLeft: 6 }} />
           </Link>
         </div>
-        {/* Static hero accent line (1px vertical gradient, teal → transparent, no animation) */}
+        {/* Static hero accent line (1px vertical gradient, LYC fuchsia → transparent, no animation) */}
         <div style={{ width: 1, height: 60, background: `linear-gradient(to bottom, ${ACCENT}, transparent)`, margin: '80px auto 0' }} />
       </div>
     </section>
@@ -209,7 +213,7 @@ function Architecture() {
           <h2 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 38, lineHeight: 1.15, color: INK, marginBottom: 20, letterSpacing: '-0.02em' }}>
             How it works <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 400 }}>under the hood.</em>
           </h2>
-          <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>DEX AI isn't a single model. It's a system of specialized AI components that work together — orchestrated by NEXUS to deliver leadership intelligence you can trust.</p>
+          <p style={{ fontSize: 17, color: G600, lineHeight: 1.6 }}>LYC Intelligence isn't a single model. It's a system of specialized AI components that work together — orchestrated by NEXUS to deliver leadership intelligence you can trust.</p>
         </div>
 
         {/* Architecture stack diagram */}
@@ -320,11 +324,12 @@ function BackCTA() {
   return (
     <section style={{ textAlign: 'center', padding: '120px 0', background: INK, color: WHITE }}>
       <div style={containerStyle}>
-        <span style={{ ...monoStyle, color: ACCENT, marginBottom: 20, display: 'block' }}>See it in action</span>
+        {/* Ticket #1355 — eyebrow label light gray (use lightened gray for dark bg: #9CA3AF equivalent works on dark) */}
+        <span style={{ ...monoStyle, color: '#9CA3AF', marginBottom: 20, display: 'block' }}>See it in action</span>
         <h2 style={{ fontFamily: "'Crimson Pro', Georgia, serif", color: WHITE, maxWidth: 640, margin: '0 auto 20px', fontSize: 40, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em' }}>
-          DEX AI powers <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 400 }}>NEXUS.</em><br />See what it can do for you.
+          LYC Intelligence powers <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 400 }}>NEXUS.</em><br />See what it can do for you.
         </h2>
-        <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 520, margin: '0 auto 36px', fontSize: 17, lineHeight: 1.6 }}>The best way to understand DEX AI is to experience the product it powers. Start with the Executive Introduction — about 15 minutes.</p>
+        <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 520, margin: '0 auto 36px', fontSize: 17, lineHeight: 1.6 }}>The best way to understand LYC Intelligence is to experience it through NEXUS. Start with the Executive Introduction — about 15 minutes.</p>
         <Link to="/nexus#start" style={{ ...btnPrimary, padding: '16px 36px' }} {...ctaCompressHandlers}
           onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARK)}
           onMouseLeave={(e) => (e.currentTarget.style.background = ACCENT)}>
@@ -348,17 +353,16 @@ function Footer() {
         <div className="da-footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
           <div>
             <h4 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, marginBottom: 8, color: INK, lineHeight: 1.2, display: 'flex', alignItems: 'baseline', gap: 6 }}>
-              DEX AI <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', color: G400, fontWeight: 400 }}>by LYC</span>
+              LYC Intelligence <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', color: G400, fontWeight: 400 }}>Technology</span>
             </h4>
-            <p style={{ color: G600, fontSize: 14, maxWidth: 280, marginTop: 16, lineHeight: 1.6 }}>The intelligence engine behind NEXUS. Multi-agent AI systems, specialized assessment models, and talent market data.</p>
+            <p style={{ color: G600, fontSize: 14, maxWidth: 280, marginTop: 16, lineHeight: 1.6 }}>Multi-agent AI systems, specialized assessment models, and talent market data — powering leadership intelligence for executives on the move.</p>
           </div>
           <div>
             <h5 style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: G400, marginBottom: 20, fontWeight: 500 }}>Product</h5>
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               <li style={{ marginBottom: 10 }}><Link to="/nexus" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>NEXUS</Link></li>
+              <li style={{ marginBottom: 10 }}><Link to="/assessments" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>Assessments</Link></li>
               <li style={{ marginBottom: 10 }}><Link to="/pricing" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>Pricing</Link></li>
-              <li style={{ marginBottom: 10 }}><Link to="/b2b" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>For Business</Link></li>
-              <li style={{ marginBottom: 10 }}><Link to="/dex-ai" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>DEX AI</Link></li>
             </ul>
           </div>
           <div>
@@ -381,7 +385,7 @@ function Footer() {
         </div>
         <div style={{ paddingTop: 32, borderTop: `1px solid ${G200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: G400, fontFamily: "'IBM Plex Mono', 'Courier New', monospace", flexWrap: 'wrap', gap: 12 }}>
           <span>© 2026 LYC Intelligence. All rights reserved.</span>
-          <span>Powered by DEX AI</span>
+          <span>Made for leaders</span>
         </div>
       </div>
     </footer>

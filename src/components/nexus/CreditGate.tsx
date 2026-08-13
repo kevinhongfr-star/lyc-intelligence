@@ -100,7 +100,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
               </h3>
               <p className="text-text-muted text-sm">
                 {r.balance === 0 
-                  ? 'Executive Introduction conversations are limited. Add a Starter plan to unlock miles and open the 11 instruments.'
+                  ? 'Executive Introduction conversations are limited. Add a Starter plan to unlock miles and open all 6 leadership assessments.'
                   : `You have ${r.balance} mi remaining.`
                 }
               </p>
@@ -136,7 +136,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-accent" />
-                All 11 assessments unlocked
+                All 6 leadership assessments unlocked
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-accent" />

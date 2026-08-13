@@ -95,9 +95,9 @@ export const SHARED_PRICING_TIERS: AssessmentPricing[] = [
 ];
 
 export const TIER_GROUP_LABELS: Record<InstrumentTierGroup, string> = {
-  flagship: "Flagship",
-  shift: "SHIFT Suite",
-  advisory: "Advisory Products",
+  flagship: "Leadership",
+  shift: "Leadership",
+  advisory: "Leadership Assessments",
 };
 
 const FLAGSHIP_PRICING: AssessmentPricing[] = [
@@ -292,11 +292,15 @@ function filterArchetypes(instrument: string, archetypes: any[]): any[] {
   return archetypes.filter((a) => !axes.has(a.name));
 }
 
-const INSTRUMENT_ORDER = ["CPI", "LEAP", "QUEST", "IMPACT", "DRIVE", "COACH", "PRISM", "SPARK", "FORGE", "BRIDGE", "MOSAIC"] as const;
+// ── Phase 9 Batch 6, ticket #1351 — only keep instruments with real diagnostic data.
+// Real 6: PRISM, SPARK, FORGE, BRIDGE, MOSAIC, DRIVE
+// Removed (no JSON data files / not B2C): CPI, LEAP, QUEST, IMPACT, COACH
+const INSTRUMENT_ORDER = ["PRISM", "SPARK", "FORGE", "BRIDGE", "MOSAIC", "DRIVE"] as const;
 
-export const FLAGSHIP_KEYS: string[] = ["CPI"];
-export const SHIFT_SUITE_KEYS: string[] = ["LEAP", "QUEST", "IMPACT", "DRIVE", "COACH"];
-export const ADVISORY_PRODUCT_KEYS: string[] = ["PRISM", "SPARK", "FORGE", "BRIDGE", "MOSAIC"];
+// No flagship or shift-suite entries without data — 6 assessments, all Advisory Products
+export const FLAGSHIP_KEYS: string[] = [];
+export const SHIFT_SUITE_KEYS: string[] = [];
+export const ADVISORY_PRODUCT_KEYS: string[] = ["PRISM", "SPARK", "FORGE", "BRIDGE", "MOSAIC", "DRIVE"];
 export const LISTED_INSTRUMENT_KEYS: string[] = [
   ...FLAGSHIP_KEYS,
   ...SHIFT_SUITE_KEYS,
@@ -312,16 +316,14 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = INSTRUMENT_ORD
       scoring.TIER === "flagship" ? "flagship" : scoring.TIER === "shift" ? "shift" : "advisory";
     const tierLabel = TIER_GROUP_LABELS[tierGroup];
 
-    // Phase 15.5 / ticket #1303 — canonical 3-tier assessment pricing.
-    // Standard (99 mi): LEAP, DRIVE, PRISM, MOSAIC, FORGE
-    // Premium (149 mi): QUEST, COACH, IMPACT, BRIDGE, SPARK
-    // Unique  (199 mi): CPI
-    // NOTE: tierGroup (flagship/shift/advisory) is the catalog grouping,
-    // NOT the price tier. Pricing is per-instrument per the canonical spec.
+    // Phase 9 Batch 6, ticket #1351 — canonical 6 assessment prices.
+    // Standard  ($99 · 99 mi): PRISM, DRIVE, FORGE, MOSAIC
+    // Premium ($149 · 149 mi): SPARK, BRIDGE
+    // Executive Introduction: complimentary
+    // NOTE: tierGroup is now just 'Leadership Assessments' for the 6.
     const CANONICAL_PRICE_MILES: Record<string, number> = {
-      LEAP: 99, DRIVE: 99, PRISM: 99, MOSAIC: 99, FORGE: 99,
-      QUEST: 149, COACH: 149, IMPACT: 149, BRIDGE: 149, SPARK: 149,
-      CPI: 199,
+      PRISM: 99, DRIVE: 99, FORGE: 99, MOSAIC: 99,
+      SPARK: 149, BRIDGE: 149,
     };
     const priceMiles = CANONICAL_PRICE_MILES[code] ?? 99;
 

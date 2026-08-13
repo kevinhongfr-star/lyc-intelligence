@@ -48,10 +48,10 @@ export function CanonicalInstrumentLanding() {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, padding: '32px' }}>
         <div style={{ textAlign: 'center', maxWidth: '480px' }}>
-          <div style={{ fontFamily: DS.monoFont, fontSize: '11px', letterSpacing: '0.2em', color: DS.accent, marginBottom: '12px', textTransform: 'uppercase' }}>Instrument not found</div>
+          <div style={{ fontFamily: DS.monoFont, fontSize: '11px', letterSpacing: '0.2em', color: '#9CA3AF', marginBottom: '12px', textTransform: 'uppercase' }}>Instrument not found</div>
           <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', marginBottom: '16px', color: DS.text }}>This assessment does not exist.</h1>
           <p style={{ color: DS.muted, marginBottom: '28px', lineHeight: 1.6 }}>
-            The instrument code "{code}" is not in the canonical catalog. Return to the assessment catalog to browse all 11 diagnostics.
+            The instrument code "{code}" is not in the canonical catalog. Return to the assessment catalog to browse all 6 leadership assessments.
           </p>
           <a
             href="/assessment"
@@ -176,7 +176,7 @@ export function CanonicalInstrumentLanding() {
               href="/assessment"
               style={{ fontFamily: DS.monoFont, fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
-              <ArrowLeft style={{ width: 12, height: 12 }} /> All 11 instruments
+              <ArrowLeft style={{ width: 12, height: 12 }} /> All 6 assessments
             </a>
             <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
             <div

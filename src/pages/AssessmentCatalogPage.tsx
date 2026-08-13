@@ -1,11 +1,8 @@
 /**
  * AssessmentCatalogPage — dedicated /assessment catalog (#1319).
  *
- * Surfaces all 11 canonical diagnostics in one indexable, shareable page,
- * organised by the 3 canonical categories (Flagship / SHIFT Suite / Advisory
- * Products) per NEXUS Product Spec v3 §6. Replaces the previous /assessment →
- * /#assessment-catalog hash redirect so assessments have their own URL, SEO
- * metadata, and navigation target.
+ * Phase 9 Batch 6 ticket #1351: 6 real leadership assessments (PRISM, SPARK,
+ * FORGE, BRIDGE, MOSAIC, DRIVE) — fake CPI/SHIFT/QUEST/etc. entries removed.
  *
  * CTAs are assessments-first: every card links directly to the instrument
  * landing page. NEXUS appears only as a secondary "not sure where to start"
@@ -53,38 +50,40 @@ interface CategoryDef {
   priceHint: string;
 }
 
+// Phase 9 Batch 6 ticket #1351: only 6 real assessments — consolidate to single category.
 const CATEGORIES: CategoryDef[] = [
   {
     group: 'flagship',
     label: 'Flagship',
-    eyebrow: '1 instrument · positioning baseline',
+    eyebrow: '0 assessments · positioned for future release',
     description:
       'The single-shot diagnostic calibrated against 20 years of LYC APAC placement data. Begin here before a senior market move — it establishes the composite baseline every other instrument refines.',
     keys: FLAGSHIP_KEYS,
-    priceHint: 'UNIQUE TIER · 199 MI',
+    priceHint: '—',
   },
   {
     group: 'shift',
     label: 'SHIFT Suite',
-    eyebrow: '5 instruments · executive transitions',
+    eyebrow: '0 assessments · positioned for future release',
     description:
       'For leaders stepping into a broader mandate — functional to enterprise, executive to board, or resetting motivation and coaching range. Each instrument isolates the dimension where the transition typically breaks.',
     keys: SHIFT_SUITE_KEYS,
-    priceHint: 'STANDARD 99 MI · PREMIUM 149 MI',
+    priceHint: '—',
   },
   {
     group: 'advisory',
-    label: 'Advisory Products',
-    eyebrow: '5 instruments · targeted pressure points',
+    label: 'Leadership Assessments',
+    eyebrow: '6 assessments · targeted transition points',
     description:
-      'Focused diagnostics for the current pressure point — market legibility, AI readiness, bilateral coaching, cross-border fit, or partnership architecture. Choose the one that names the tension you are sitting in.',
+      'Focused diagnostics for the current pressure point — market legibility, AI readiness, execution calibration, cross-border fit, or global cultural navigation. Choose the one that names the tension you are sitting in.',
     keys: ADVISORY_PRODUCT_KEYS,
-    priceHint: 'STANDARD 99 MI · PREMIUM 149 MI',
+    priceHint: 'STANDARD $99 USD · PREMIUM $149 USD',
   },
 ];
 
 function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
-  const accentColor = a.is_cpi ? DS.accent : '#15151E';
+  // Ticket #1353: USD-first (miles ≈ USD 1:1). Light gray eyebrow (#1355).
+  const priceUsd = a.priceMiles;
   return (
     <a
       href={`/assessment/${a.code.toLowerCase()}`}
@@ -112,7 +111,8 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
               fontFamily: DS.monoFont,
               fontSize: '10px',
               letterSpacing: '0.2em',
-              color: DS.accent,
+              // #1355 — light gray eyebrow
+              color: '#9CA3AF',
               textTransform: 'uppercase',
               marginBottom: '6px',
             }}
@@ -140,11 +140,11 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
             fontFamily: DS.headingFont,
             fontSize: wide ? '28px' : '20px',
             fontWeight: 700,
-            color: accentColor,
+            color: DS.text,
             lineHeight: 1,
           }}
         >
-          {a.priceMiles}
+          ${priceUsd}
           <span
             style={{
               fontFamily: DS.monoFont,
@@ -152,10 +152,11 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
               letterSpacing: '0.1em',
               fontWeight: 500,
               textTransform: 'uppercase',
-              marginLeft: '4px',
+              marginLeft: '6px',
+              color: '#9CA3AF',
             }}
           >
-            mi
+            USD
           </span>
         </span>
       </div>
@@ -229,7 +230,8 @@ function CategorySection({ cat }: { cat: CategoryDef }) {
               fontFamily: DS.monoFont,
               fontSize: '10px',
               letterSpacing: '0.2em',
-              color: DS.accent,
+              // #1355 — light gray eyebrow per brand v1.2
+              color: '#9CA3AF',
               textTransform: 'uppercase',
               marginBottom: '6px',
             }}
@@ -301,11 +303,12 @@ export function AssessmentCatalogPage() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
+  // Ticket #1352 — only B2C links in marketing nav.
   const navLinks = [
+    { href: '/', label: 'Home' },
     { href: '/assessment', label: 'Assessments' },
-    { href: '/match', label: 'Match Analysis' },
     { href: '/pricing', label: 'Pricing' },
-    { href: '/b2b', label: 'For Firms' },
+    { href: '/nexus/chat', label: 'NEXUS AI' },
   ];
 
   const totalInstruments =
@@ -412,7 +415,8 @@ export function AssessmentCatalogPage() {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.28em',
-              color: DS.accent,
+              // #1355 — light gray eyebrow
+              color: '#9CA3AF',
               marginBottom: '16px',
             }}
           >
@@ -430,7 +434,7 @@ export function AssessmentCatalogPage() {
               maxWidth: '720px',
             }}
           >
-            Eleven leadership diagnostics.<br />Three categories. One right fit per moment.
+            Six leadership assessments.<br />One right fit per moment.
           </h1>
           <p
             style={{
@@ -442,9 +446,9 @@ export function AssessmentCatalogPage() {
               lineHeight: 1.65,
             }}
           >
-            Each instrument is validated against 20 years of LYC APAC placement data — not
+            Each assessment is validated against 20 years of LYC APAC placement data — not
             generic personality tests, but targeted diagnostics matched to the transition you
-            are actually in. Spend miles on exactly what you need.
+            are actually in.
           </p>
           <div
             style={{
@@ -508,7 +512,7 @@ export function AssessmentCatalogPage() {
               letterSpacing: '0.16em',
             }}
           >
-            {totalInstruments} INSTRUMENTS · 3 CATEGORIES · MILES ECONOMY
+            {totalInstruments} ASSESSMENTS · USD PRICING · COMPLIMENTARY INTRO AVAILABLE
           </div>
         </div>
       </section>

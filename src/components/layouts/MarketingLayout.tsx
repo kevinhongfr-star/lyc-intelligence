@@ -24,13 +24,14 @@ const DS = {
 
 function MarketingFooter(): React.ReactElement {
   const year = new Date().getFullYear();
+  // Phase 9 Batch 6, ticket #1352 — B2C marketing footer only. Remove B2B Match link.
+  // Replace "For Business" with "About" only; keep /b2b as direct-access route but not in footer.
   const columns = [
     {
       title: 'Product',
       links: [
         { label: 'NEXUS AI', href: '/nexus/chat' },
-        { label: 'Assessments', href: '/assessment' },
-        { label: 'Match Analysis', href: '/match' },
+        { label: 'Leadership Assessments', href: '/assessment' },
         { label: 'Pricing', href: '/pricing' },
       ],
     },
@@ -38,7 +39,6 @@ function MarketingFooter(): React.ReactElement {
       title: 'Company',
       links: [
         { label: 'About', href: '/#about' },
-        { label: 'For Business', href: '/b2b' },
         { label: 'Contact', href: 'mailto:hello@lycintelligence.com' },
       ],
     },

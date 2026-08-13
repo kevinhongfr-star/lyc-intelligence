@@ -136,6 +136,43 @@ export function B2BLanding() {
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
+      {/* Phase 9 Batch 6 ticket #1357 — B2B pages can be reached directly; provide B2C return path */}
+      <div
+        style={{
+          background: '#0A0A0A',
+          padding: '10px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 12,
+          flexWrap: 'wrap',
+          fontSize: 13,
+          fontFamily: DS.bodyFont,
+        }}
+      >
+        <span style={{ color: '#FFFFFF' }}>
+          <span style={{ fontFamily: DS.monoFont, textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: 8, color: '#C108AB' }}>B2B · Client Portal</span>
+          This page is for search-firm &amp; talent clients. Individual leaders — visit the main B2C experience.
+        </span>
+        <a
+          href="/"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 14px',
+            border: `1px solid #C108AB`,
+            color: '#C108AB',
+            textDecoration: 'none',
+            fontWeight: 600,
+            fontSize: 12,
+            minHeight: 28,
+          }}
+        >
+          Go to B2C site <ArrowRight size={12} />
+        </a>
+      </div>
+
       <SEO page="b2b" />
       <Nav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 

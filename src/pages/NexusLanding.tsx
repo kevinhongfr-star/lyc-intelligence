@@ -41,9 +41,10 @@ const btnBase: React.CSSProperties = {
   minHeight: 44,
 };
 
+// Ticket #1355 — section eyebrow labels use light gray #9CA3AF per brand v1.2, not accent.
 const btnPrimary: React.CSSProperties = { ...btnBase, background: INK, color: WHITE };
 const btnSecondary: React.CSSProperties = { ...btnBase, background: 'transparent', color: INK };
-const sectionLabel: React.CSSProperties = { ...monoStyle, color: ACCENT, marginBottom: 20, display: 'inline-block' };
+const sectionLabel: React.CSSProperties = { ...monoStyle, color: G400, marginBottom: 20, display: 'inline-block' };
 
 // ── MOTION: Scroll reveal hook (fadeUp 350ms, IntersectionObserver) ──
 function useScrollReveal() {
@@ -102,7 +103,8 @@ function Nav() {
           NEXUS <span style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.08em', color: G400, fontStyle: 'normal' }}>by LYC</span>
         </Link>
         <ul className="nav-links-desktop" style={{ display: 'flex', gap: 28, listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
-          {[['#capabilities', 'What it does'], ['#diagnostics', 'Diagnostics'], ['#pricing', 'Pricing'], ['#for-business', 'For Business']].map(([h, l]) => (
+          {/* Ticket #1352 — remove For Business B2B link from marketing nav */}
+          {[['#capabilities', 'What it does'], ['#diagnostics', 'Diagnostics'], ['#pricing', 'Pricing']].map(([h, l]) => (
             <li key={h}>
               <a href={h} style={{ fontSize: 13, fontWeight: 500, color: INK, textDecoration: 'none', opacity: 0.7, transition: 'opacity 120ms ease' }}
                 onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
@@ -134,7 +136,6 @@ function Nav() {
                 { href: '#capabilities', label: 'What it does' },
                 { href: '#diagnostics', label: 'Diagnostics' },
                 { href: '#pricing', label: 'Pricing' },
-                { href: '#for-business', label: 'For Business' },
                 { href: '#start', label: 'Start', primary: true },
               ].map(l => (
                 <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
@@ -381,10 +382,10 @@ function B2BTeaser() {
 }
 
 // ── PRICING ────────────────────────────────────────────────────────
+// Ticket #1352 — only B2C plans on marketing landing page (Enterprise / B2B removed from visitor view).
 const PLANS = [
   { label: 'Start', title: 'Executive Introduction', price: '', small: null, desc: 'Get your first leadership diagnostic and initial advisory session. No credit card.', bullets: ['China Leadership Pipeline Diagnostic', 'Full narrative report', 'Initial advisory conversation', 'Basic profile'], cta: 'Start — Executive Introduction', href: '#start', featured: false },
   { label: 'Recommended', title: 'Executive Access', price: 'From $29', small: '/month', desc: 'Full access to all diagnostics, unlimited advisory chat, and role fit analysis.', bullets: ['All 6 leadership diagnostics', 'Unlimited AI advisory chat', 'Role Fit Analysis — unlimited', 'Development tracking', 'Market intelligence access'], cta: 'Begin Executive Access', href: '#start', featured: true },
-  { label: 'Enterprise', title: 'For Teams & Firms', price: 'Custom', small: null, desc: 'Full platform for organizations, search firms, and talent teams.', bullets: ['Bulk candidate screening', 'Team pipeline diagnostics', 'Custom benchmarking', 'Dedicated support', 'API access'], cta: 'Talk to Sales', href: '#for-business', featured: false },
 ];
 function PricingCard({ plan }: { plan: typeof PLANS[number] }) {
   const f = plan.featured;
@@ -473,10 +474,8 @@ function Trust() {
         </div>
         <div className="nl-reveal" style={{ textAlign: 'center', marginTop: 64, paddingTop: 48, borderTop: `1px solid ${G200}` }}>
           <span style={{ ...monoStyle, color: G400, marginBottom: 12, display: 'block' }}>The intelligence engine</span>
-          <strong style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, color: INK }}>Powered by DEX AI</strong><br />
-          <Link to="/dex-ai" style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: ACCENT, textDecoration: 'none', fontWeight: 500, display: 'inline-block', marginTop: 16 }}
-            onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-            onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}>Learn how DEX AI works →</Link>
+          {/* Ticket #1356 — internal DEX code name removed from public copy. This is LYC Intelligence platform. */}
+          <strong style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, color: INK }}>Powered by LYC Intelligence</strong><br />
         </div>
       </div>
     </section>
@@ -523,9 +522,8 @@ function Footer() {
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               <li style={{ marginBottom: 10 }}><Link to="/nexus" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>NEXUS</Link></li>
               <li style={{ marginBottom: 10 }}><a href="#pricing" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>Pricing</a></li>
-              <li style={{ marginBottom: 10 }}><a href="#diagnostics" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>Diagnostics</a></li>
-              <li style={{ marginBottom: 10 }}><a href="#for-business" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>For Business</a></li>
-              <li style={{ marginBottom: 10 }}><Link to="/dex-ai" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>DEX AI</Link></li>
+              <li style={{ marginBottom: 10 }}><a href="#diagnostics" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>Leadership Assessments</a></li>
+              <li style={{ marginBottom: 10 }}><Link to="/assessment" style={a} onMouseEnter={linkHandlers.enter} onMouseLeave={linkHandlers.leave}>Catalog</Link></li>
             </ul>
           </div>
           <div>
@@ -548,7 +546,7 @@ function Footer() {
         </div>
         <div className="footer-inline" style={{ paddingTop: 32, borderTop: `1px solid ${G200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: G400, fontFamily: "'IBM Plex Mono', 'Courier New', monospace", flexWrap: 'wrap', gap: 12 }}>
           <span>© 2026 LYC Intelligence. All rights reserved.</span>
-          <span>Powered by DEX AI</span>
+          <span>Made for leaders.</span>
         </div>
       </div>
     </footer>

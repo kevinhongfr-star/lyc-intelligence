@@ -82,7 +82,7 @@ const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
 const AssessmentCatalogPage = lazy(() => import('@/pages/AssessmentCatalogPage').then(m => ({ default: m.AssessmentCatalogPage })));
 
-// ── Assessment canonical routes (11 instruments — no duplicates) ──
+// ── Assessment canonical routes (6 real instruments — PRISM, SPARK, FORGE, BRIDGE, MOSAIC, DRIVE) ──
 // Mixed exports in this codebase; use `.default` for named-default pages and
 // direct member exports for named ones.
 const CanonicalInstrumentLanding = lazy(() => import('@/pages/CanonicalInstrumentLanding').then(m => ({ default: m.CanonicalInstrumentLanding })));
@@ -261,16 +261,22 @@ export default function App() {
             <Route path="assessments" element={<Navigate to="/assessment" replace />} />
             <Route path="assessment" element={<AssessmentCatalogPage />} />
 
-            {/* ── 11 Canonical Assessment Routes ── */}
-            {/* Flagship + SHIFT + PRISM/SPARK custom landings */}
-            <Route path="assessment/cpi" element={<CpiPage />} />
-            <Route path="assessment/shift" element={<ShiftPage />} />
+            {/* ── 6 Real B2C Assessment Routes (Batch 6 ticket #1351) ── */}
+            {/* Real landings: PRISM, SPARK */}
             <Route path="assessment/prism" element={<PrismLanding />} />
             <Route path="assessment/spark" element={<SparkLanding />} />
-            {/* Generic canonical landing for remaining 8 instruments */}
+            {/* Explicit redirects for instruments that have no landing data */}
+            <Route path="assessment/cpi" element={<Navigate to="/assessment" replace />} />
+            <Route path="assessment/shift" element={<Navigate to="/assessment" replace />} />
+            <Route path="assessment/leap" element={<Navigate to="/assessment" replace />} />
+            <Route path="assessment/quest" element={<Navigate to="/assessment" replace />} />
+            <Route path="assessment/impact" element={<Navigate to="/assessment" replace />} />
+            <Route path="assessment/coach" element={<Navigate to="/assessment" replace />} />
+            {/* Generic canonical landing for 4 remaining instruments: FORGE, BRIDGE, MOSAIC, DRIVE */}
             <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />
 
             {/* Results routes — post-assessment (shareable / bookmarkable) */}
+            {/* Keep all 11 results routes — bookmarks from prior sessions must not break. */}
             <Route path="assessment/cpi/results" element={<CpiResultsPage />} />
             <Route path="assessment/prism/results" element={<PrismResultsPage />} />
             <Route path="assessment/spark/results" element={<SparkResultsPage />} />

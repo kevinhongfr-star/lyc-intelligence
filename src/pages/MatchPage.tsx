@@ -15,6 +15,7 @@ import { PipelineSaveModal } from '../components/match/PipelineSaveModal';
 const DS = {
   headingFont: "'Crimson Pro', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
+  monoFont: "'IBM Plex Mono', ui-monospace, monospace",
   accent: '#C108AB',
   accentHover: '#A00790',
   bg: '#FFFFFF',
@@ -33,6 +34,47 @@ const DS = {
   warning: '#EAB308',
   error: '#EF4444',
 };
+
+function B2BBanner() {
+  return (
+    <div
+      style={{
+        background: '#0A0A0A',
+        padding: '10px 32px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 12,
+        flexWrap: 'wrap',
+        fontSize: 13,
+        fontFamily: DS.bodyFont,
+        flexShrink: 0,
+      }}
+    >
+      <span style={{ color: '#FFFFFF' }}>
+        <span style={{ fontFamily: DS.monoFont, textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: 8, color: '#C108AB' }}>B2B · Client Portal</span>
+        Match Analysis is built for search-firm &amp; talent clients. Individual leaders — visit the B2C experience.
+      </span>
+      <a
+        href="/"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '6px 14px',
+          border: `1px solid #C108AB`,
+          color: '#C108AB',
+          textDecoration: 'none',
+          fontWeight: 600,
+          fontSize: 12,
+          minHeight: 28,
+        }}
+      >
+        Go to B2C site <ArrowRight size={12} />
+      </a>
+    </div>
+  );
+}
 
 interface LeadData { name: string; email: string; company: string; title: string; }
 
@@ -272,8 +314,10 @@ export function MatchPage() {
   // ─── GATE STEP ───
   if (step === 'gate') {
     return (
-      <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-        <SEO page="match" />
+      <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex', flexDirection: 'column', padding: 0 }}>
+        <B2BBanner />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', minHeight: 0 }}>
+          <SEO page="match" />
         <div style={{ maxWidth: '480px', width: '100%' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
@@ -313,6 +357,7 @@ export function MatchPage() {
             </div>
           </div>
         </div>
+        </div>
       </div>
     );
   }
@@ -320,8 +365,9 @@ export function MatchPage() {
   // ─── ENGINE STEP ───
   if (step === 'engine') {
     return (
-      <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
-        <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+      <div style={{ minHeight: '100vh', background: DS.bg, padding: 0 }}>
+        <B2BBanner />
+        <div style={{ padding: '24px', maxWidth: '960px', margin: '0 auto' }}>
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -477,8 +523,9 @@ export function MatchPage() {
 
   // ─── RESULTS STEP ───
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg, padding: '24px' }}>
-      <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+    <div style={{ minHeight: '100vh', background: DS.bg, padding: 0 }}>
+      <B2BBanner />
+      <div style={{ padding: '24px', maxWidth: '960px', margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>

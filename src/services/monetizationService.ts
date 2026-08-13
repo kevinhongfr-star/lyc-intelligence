@@ -132,7 +132,7 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
     earnsMiles: true,
     benefits: [
       '50 mi monthly allowance',
-      'All 11 assessments unlocked',
+      'All 6 leadership assessments unlocked',
       'Personalised assessment reports',
       'NEXUS miles earning (exploration +5, reflection +3)',
       'PDF report export',
@@ -214,8 +214,11 @@ export interface CanonicalAssessmentPricing {
 }
 
 /**
- * CANONICAL_ASSESSMENT_PRICING — the 3-tier assessment pricing table.
- * Source: Phase 15.5 spec / NEXUS_Pricing_Canonical_v1.0.
+ * CANONICAL_ASSESSMENT_PRICING — assessment pricing table (Phase 9 Batch 6 ticket #1351).
+ * Only real 6 B2C instruments with data files.
+ * Standard ($99 USD): DRIVE, PRISM, FORGE, MOSAIC
+ * Premium ($149 USD): SPARK, BRIDGE
+ * Unique tier removed (CPI removed).
  */
 export const CANONICAL_ASSESSMENT_PRICING: Record<
   AssessmentPriceTier,
@@ -227,7 +230,7 @@ export const CANONICAL_ASSESSMENT_PRICING: Record<
     usd: 99,
     cny: 33,
     miles: 99,
-    instruments: ['LEAP', 'DRIVE', 'PRISM', 'MOSAIC', 'FORGE'],
+    instruments: ['DRIVE', 'PRISM', 'FORGE', 'MOSAIC'],
   },
   premium: {
     tier: 'premium',
@@ -235,15 +238,15 @@ export const CANONICAL_ASSESSMENT_PRICING: Record<
     usd: 149,
     cny: 50,
     miles: 149,
-    instruments: ['QUEST', 'COACH', 'IMPACT', 'BRIDGE', 'SPARK'],
+    instruments: ['SPARK', 'BRIDGE'],
   },
   unique: {
     tier: 'unique',
-    label: 'Unique',
+    label: 'Custom',
     usd: 199,
     cny: 66,
     miles: 199,
-    instruments: ['CPI'],
+    instruments: [], // No real unique-tier B2C instruments at this time.
   },
 };
 
@@ -278,13 +281,14 @@ export const ASSESSMENT_MILES_COSTS: Record<string, number> = Object.fromEntries
 
 /**
  * Detect the user's preferred currency.
- * Priority order:
- *   1. Explicit user setting (profile.currency_preference) — 'USD' | 'CNY'
- *   2. Browser timezone (Asia/Shanghai, Asia/Beijing, Asia/Hong_Kong*, etc.)
- *   3. navigator.language (zh-CN, zh-Hans, zh-*)
- *   4. Default: 'USD'
+ * Priority order (#1354 update):
+ *   1. localStorage['preferredCurrency'] (manual toggle saved across sessions, pre-auth)
+ *   2. Explicit user setting (profile.currency_preference) — 'USD' | 'CNY'
+ *   3. Browser timezone (Asia/Shanghai, Asia/Beijing, Asia/Urumqi, Asia/Chongqing)
+ *   4. navigator.language (zh-CN, zh-Hans → CNY; zh-Hant / HK/TW/MO stay USD)
+ *   5. Default: 'USD'
  *
- * *Hong Kong / Macau / Taiwan are NOT mainland China — we treat them as USD
+ * Note: Hong Kong / Macau / Taiwan are NOT mainland China — we treat them as USD
  * for pricing purposes unless the user explicitly opts into CNY.
  */
 export function detectUserCurrency(opts?: {
@@ -292,7 +296,13 @@ export function detectUserCurrency(opts?: {
   locale?: string | null;
   preference?: string | null;
 }): PricingCurrency {
-  // 1. Explicit preference
+  // 0. localStorage manual override (pre-auth)
+  if (typeof localStorage !== 'undefined') {
+    const saved = localStorage.getItem('preferredCurrency')?.toUpperCase();
+    if (saved === 'CNY' || saved === 'USD') return saved as PricingCurrency;
+  }
+
+  // 1. Explicit preference (profile.currency_preference)
   const pref = opts?.preference?.toUpperCase();
   if (pref === 'CNY' || pref === 'CN' || pref === 'RMB') return 'CNY';
   if (pref === 'USD' || pref === 'US' || pref === 'GLOBAL') return 'USD';
@@ -311,6 +321,23 @@ export function detectUserCurrency(opts?: {
 
   // 4. Default
   return 'USD';
+}
+
+/**
+ * Save the user's manual currency choice to localStorage (used by manual toggle).
+ * User's manual toggle always overrides auto-detect (#1354).
+ */
+export function savePreferredCurrency(currency: PricingCurrency): void {
+  if (typeof localStorage === 'undefined') return;
+  localStorage.setItem('preferredCurrency', currency.toUpperCase());
+}
+
+/**
+ * Clear manual currency override, fall back to geo/timezone/locale detection.
+ */
+export function clearPreferredCurrency(): void {
+  if (typeof localStorage === 'undefined') return;
+  localStorage.removeItem('preferredCurrency');
 }
 
 /**

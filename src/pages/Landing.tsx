@@ -121,19 +121,21 @@ const SUBSCRIPTION_TIERS: PricingTierRow[] = [
   },
 ];
 
-// ── 3 Capability cards ──
+// ── 3 Capability cards
+// Phase 9 Batch 6 ticket #1353: remove "Miles economy" from visitor-facing capability cards.
+// Ticket #1351: fix 11→6 diagnostic count.
 const CAPABILITIES = [
   {
     icon: Layers,
     title: 'Framework-aware conversations',
-    desc: 'NEXUS knows all 11 diagnostic frameworks end-to-end. Ask about positioning, governance, cross-border fit, or team transitions — it speaks the language of executive leadership, not generic advice.',
+    desc: 'NEXUS knows all 6 leadership assessment frameworks end-to-end. Ask about positioning, governance, cross-border fit, or team transitions — it speaks the language of executive leadership, not generic advice.',
     href: '/nexus/chat',
     cta: 'Start a conversation',
   },
   {
     icon: BadgeDollarSign,
-    title: 'Miles economy',
-    desc: 'Engage with NEXUS to earn miles. Spend them on deep assessments, benchmark reports, 360° feedback, and executive content. Subscription miles reset monthly; earned miles persist.',
+    title: 'Simple transparent pricing',
+    desc: 'Pay for assessments à la carte from $99, or subscribe for a monthly allocation and deeper benefits. No fluff, no hidden fees.',
     href: '/pricing',
     cta: 'View pricing',
   },
@@ -168,7 +170,8 @@ function TierBadge({ label, color = DS.accent }: { label: string; color?: string
 }
 
 function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
-  const accentColor = a.is_cpi ? DS.accent : '#15151E';
+  // Phase 9 Batch 6 ticket #1353: USD-first for visitors. Miles ≈ USD.
+  const priceUsd = a.priceMiles; // miles and USD are 1:1
   return (
     <a
       href={`/assessment/${a.code.toLowerCase()}`}
@@ -196,7 +199,8 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
               fontFamily: DS.monoFont,
               fontSize: '10px',
               letterSpacing: '0.2em',
-              color: DS.accent,
+              // Ticket #1355: eyebrow labels are light gray, not accent
+              color: '#9CA3AF',
               textTransform: 'uppercase',
               marginBottom: '6px',
             }}
@@ -224,11 +228,11 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
             fontFamily: DS.headingFont,
             fontSize: wide ? '28px' : '20px',
             fontWeight: 700,
-            color: accentColor,
+            color: DS.text,
             lineHeight: 1,
           }}
         >
-          {a.priceMiles}
+          ${priceUsd}
           <span
             style={{
               fontFamily: DS.monoFont,
@@ -236,10 +240,11 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
               letterSpacing: '0.1em',
               fontWeight: 500,
               textTransform: 'uppercase',
-              marginLeft: '4px',
+              marginLeft: '6px',
+              color: '#9CA3AF',
             }}
           >
-            mi
+            USD
           </span>
         </span>
       </div>
@@ -313,12 +318,13 @@ function renderTierGroup(label: string, accent: string, keys: string[]) {
               fontFamily: DS.monoFont,
               fontSize: '10px',
               letterSpacing: '0.2em',
-              color: accent,
+              // Ticket #1355: eyebrow labels → #9CA3AF light gray per v1.2 brand spec
+              color: '#9CA3AF',
               textTransform: 'uppercase',
               marginBottom: '6px',
             }}
           >
-            {assessments.length} {assessments.length === 1 ? 'INSTRUMENT' : 'INSTRUMENTS'}
+            {assessments.length} {assessments.length === 1 ? 'ASSESSMENT' : 'ASSESSMENTS'}
           </div>
           <h3
             style={{
@@ -341,8 +347,11 @@ function renderTierGroup(label: string, accent: string, keys: string[]) {
             letterSpacing: '0.1em',
           }}
           >
-            {assessments.length === 1 ? 'UNIQUE TIER · 199 MI' : label.includes('SHIFT') ? 'PREMIUM TIER · 149 MI' : 'STANDARD TIER · 99 MI'}
-          </div>
+            {/* Ticket #1353: USD labels on catalog tiers */}
+            {assessments.length === 1
+              ? 'FROM $99 USD'
+              : label.includes('Premium') ? 'PREMIUM · $149 USD' : 'STANDARD · $99 USD'}
+        </div>
       </div>
       <div
         style={{
@@ -446,19 +455,22 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
           </span>
         )}
       </div>
-      <div
-        style={{
-          fontFamily: DS.monoFont,
-          fontSize: '11px',
-          color: highlight ? DS.accent : DS.accent,
-          letterSpacing: '0.1em',
-          marginBottom: '20px',
-          textTransform: 'uppercase',
-          fontWeight: 600,
-        }}
-      >
-        {t.miles} MI / MO included
-      </div>
+      {/* Ticket #1353: Miles made secondary (small, muted) — visitor-facing page shows USD as primary */}
+      {t.priceUsd !== '—' && t.miles > 0 && (
+        <div
+          style={{
+            fontFamily: DS.monoFont,
+            fontSize: '10px',
+            color: highlight ? 'rgba(255,255,255,0.4)' : '#9CA3AF',
+            letterSpacing: '0.1em',
+            marginBottom: '18px',
+            textTransform: 'uppercase',
+            fontWeight: 500,
+          }}
+        >
+          {t.miles} mi included / mo
+        </div>
+      )}
       <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {t.features.map(f => (
           <li
@@ -530,11 +542,11 @@ export function Landing() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
+  // Ticket #1352 — only B2C links in marketing nav.
   const navLinks = [
     { href: '/assessment', label: 'Assessments' },
-    { href: '/match', label: 'Match Analysis' },
     { href: '/pricing', label: 'Pricing' },
-    { href: '/b2b', label: 'For Firms' },
+    { href: '/nexus/chat', label: 'NEXUS AI' },
   ];
 
   return (
@@ -737,8 +749,8 @@ export function Landing() {
               lineHeight: 1.6,
             }}
           >
-            NEXUS holds every diagnostic framework in memory, surfaces the blind spots you haven't
-            named yet, and opens the door to deep assessments that cost miles — not subscriptions alone.
+            NEXUS holds every leadership assessment framework in memory, surfaces the blind spots you haven't
+            named yet, and opens the door to deep assessments tailored to your current transition.
           </p>
 
           <div className="reveal reveal-delay-1" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
@@ -799,7 +811,7 @@ export function Landing() {
               letterSpacing: '0.16em',
             }}
           >
-            11 CANONICAL INSTRUMENTS · 3 TIERS · MILES ECONOMY
+            6 LEADERSHIP ASSESSMENTS · 2 TIERS · TRANSPARENT PRICING
           </div>
         </div>
       </section>
@@ -818,7 +830,7 @@ export function Landing() {
           }}
         >
           {[
-            { v: '11', l: 'Diagnostic frameworks' },
+            { v: '6', l: 'Leadership assessments' },
             { v: '47', l: 'Markets covered' },
             { v: '93%', l: 'Executive retention' },
             { v: '20yr', l: 'APAC placement data' },
@@ -844,7 +856,8 @@ export function Landing() {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.26em',
-              color: DS.accent,
+              // Ticket #1355: light gray eyebrow #9CA3AF
+              color: '#9CA3AF',
               marginBottom: '12px',
             }}
           >
@@ -926,7 +939,8 @@ export function Landing() {
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.26em',
-                color: DS.accent,
+                // Ticket #1355: light gray eyebrow
+                color: '#9CA3AF',
                 marginBottom: '12px',
               }}
             >
@@ -944,7 +958,7 @@ export function Landing() {
                 letterSpacing: '-0.01em',
               }}
             >
-              Eleven instruments. Three categories.<br />Exactly one right fit per moment.
+              Six leadership assessments.<br />Exactly one right fit per moment.
             </h2>
             <p
               style={{
@@ -956,14 +970,12 @@ export function Landing() {
                 lineHeight: 1.6,
               }}
             >
-              Spend miles on exactly what you need — flagship single-shot diagnostic, full SHIFT
-              suite for executive transitions, or targeted advisory for the current pressure point.
+              Pay for exactly what you need — a targeted diagnostic for a specific
+              transition moment, or subscribe for the full suite.
             </p>
           </div>
 
-          {renderTierGroup('Flagship', DS.accent, FLAGSHIP_KEYS)}
-          {renderTierGroup('SHIFT Suite', '#15151E', SHIFT_SUITE_KEYS)}
-          {renderTierGroup('Advisory Products', '#15151E', ADVISORY_PRODUCT_KEYS)}
+          {renderTierGroup('Leadership Assessments', DS.accent, ADVISORY_PRODUCT_KEYS)}
         </div>
       </section>
 
@@ -977,11 +989,12 @@ export function Landing() {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.26em',
-              color: DS.accent,
+              // Ticket #1355: light gray eyebrow
+              color: '#9CA3AF',
               marginBottom: '12px',
             }}
           >
-            Miles economy
+            Subscription plans
           </div>
           <h2
             style={{
@@ -1007,8 +1020,7 @@ export function Landing() {
               lineHeight: 1.6,
             }}
           >
-            Earn miles through engagement, or subscribe to a monthly allocation.
-            ~$1 = 1 mile parity — spend on assessments, benchmarking, 360° feedback, and content.
+            All USD pricing shown. Monthly allocations and member benefits are explained after sign-up.
           </p>
         </div>
         <div
