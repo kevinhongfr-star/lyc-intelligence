@@ -2,13 +2,13 @@
  * Phase 16 — MarketingNav (public / marketing identity).
  *
  * No auth required. Brand: premium marketing nav.
- * Links: Products dropdown, Pricing, Meet NEXUS CTA.
+ * Links: Home, Assessments, NEXUS, Pricing + Meet NEXUS CTA.
  * Visual: lots of whitespace, serif-heavy brand feel.
  * Zero radius, font trio, accent #C108AB.
  */
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown, ArrowRight, Sparkles } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Menu, X, ArrowRight, Sparkles } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getDefaultPortalRoute } from '@/services/portalClassification';
 import { trackCTA, trackNexusChatInitiation, setTrackingUser } from '@/analytics/eventTracker';
@@ -17,9 +17,9 @@ import { Logo } from '@/components/ui/Logo';
 
 export function MarketingNav(): React.ReactElement {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, profile, signOut } = useAuthStore();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [productsOpen, setProductsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -46,12 +46,7 @@ export function MarketingNav(): React.ReactElement {
     navigate('/', { replace: true });
   };
 
-  // Phase 9 Batch 6, ticket #1352 — only B2C products in marketing nav dropdown.
-  // Match Analysis (B2B recruiters) + B2B Search Platform removed.
-  const products = [
-    { label: 'NEXUS AI', href: '/nexus/chat', desc: 'Your AI executive coach' },
-    { label: 'Leadership Assessments', href: '/assessments', desc: '6 leadership assessments' },
-  ];
+  const isHome = location.pathname === '/' && !location.hash;
 
   return (
     <header
@@ -71,47 +66,31 @@ export function MarketingNav(): React.ReactElement {
 
         {/* Desktop nav */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }} className="hidden md:flex">
-          {/* Products dropdown */}
-          <div style={{ position: 'relative' }}
-            onMouseEnter={() => setProductsOpen(true)}
-            onMouseLeave={() => setProductsOpen(false)}
-          >
-            <button style={{
-              background: 'none', border: 'none', padding: '8px 2px',
-              display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer',
-              fontSize: 14, fontWeight: 500, color: DS.textSecondary,
-              fontFamily: DS.bodyFont,
+          <Link to="/"
+            onClick={() => trackCTA({ location: 'nav_marketing', label: 'Home', destination: '/' })}
+            style={{
+              fontSize: 14, fontWeight: 500,
+              color: isHome ? DS.text : DS.textSecondary,
+              textDecoration: 'none', fontFamily: DS.bodyFont,
             }}>
-              Products
-              <ChevronDown size={14} style={{ transform: productsOpen ? 'rotate(180deg)' : undefined, transition: 'transform 0.15s' }} />
-            </button>
-            {productsOpen && (
-              <div style={{
-                position: 'absolute', top: '100%', left: -16, width: 320,
-                background: DS.bg, border: `1px solid ${DS.border}`,
-                padding: 8, marginTop: 4, zIndex: 60,
-              }}>
-                {products.map((p) => (
-                  <Link key={p.label} to={p.href} onClick={() => setProductsOpen(false)}
-                    style={{
-                      display: 'block', padding: '12px 16px', textDecoration: 'none', color: DS.text,
-                      border: 'none', background: 'transparent', cursor: 'pointer', width: '100%',
-                      textAlign: 'left',
-                    }}
-                    onMouseOver={(e) => { e.currentTarget.style.background = `${DS.accent}0D`; }}
-                    onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                  >
-                    <div style={{ fontSize: 14, fontWeight: 600 }}>{p.label}</div>
-                    <div style={{ fontSize: 12, color: DS.muted, marginTop: 2 }}>{p.desc}</div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+            Home
+          </Link>
+
+          <Link to="/assessments"
+            onClick={() => trackCTA({ location: 'nav_marketing', label: 'Assessments', destination: '/assessments' })}
+            style={{ fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none', fontFamily: DS.bodyFont }}>
+            Assessments
+          </Link>
+
+          <Link to="/#nexus"
+            onClick={() => trackCTA({ location: 'nav_marketing', label: 'NEXUS', destination: '/#nexus' })}
+            style={{ fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none', fontFamily: DS.bodyFont }}>
+            NEXUS
+          </Link>
 
           <Link to="/pricing"
             onClick={() => trackCTA({ location: 'nav_marketing', label: 'Pricing', destination: '/pricing' })}
-            style={{ fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none' }}>
+            style={{ fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none', fontFamily: DS.bodyFont }}>
             Pricing
           </Link>
 
@@ -172,21 +151,23 @@ export function MarketingNav(): React.ReactElement {
           borderTop: `1px solid ${DS.border}`, padding: '16px 32px 24px',
           background: DS.bg, display: 'flex', flexDirection: 'column', gap: 12,
         }}>
+          <Link to="/" onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: 'Home (mobile)', destination: '/' }); }}
+            style={{ padding: '10px 0', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
+            Home
+          </Link>
+          <Link to="/assessments" onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: 'Assessments (mobile)', destination: '/assessments' }); }}
+            style={{ padding: '10px 0', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
+            Assessments
+          </Link>
+          <Link to="/#nexus" onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: 'NEXUS (mobile)', destination: '/#nexus' }); }}
+            style={{ padding: '10px 0', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
+            NEXUS
+          </Link>
           <Link to="/pricing" onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: 'Pricing (mobile)', destination: '/pricing' }); }}
             style={{ padding: '10px 0', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
             Pricing
           </Link>
-          <div style={{ borderTop: `1px solid ${DS.border}`, marginTop: 4, paddingTop: 12 }}>
-            <div style={{ fontSize: 12, color: DS.muted, marginBottom: 8, letterSpacing: 1, textTransform: 'uppercase' }}>
-              Products
-            </div>
-            {products.map((p) => (
-              <Link key={p.label} to={p.href} onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: `Product: ${p.label} (mobile)`, destination: p.href }); }}
-                style={{ display: 'block', padding: '10px 0', fontSize: 14, color: DS.text, textDecoration: 'none' }}>
-                {p.label}
-              </Link>
-            ))}
-          </div>
+          <div style={{ borderTop: `1px solid ${DS.border}`, marginTop: 4, paddingTop: 12 }} />
           {user ? (
             <>
               <button onClick={() => { setMobileOpen(false); handlePortalEntry(); }}

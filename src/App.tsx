@@ -249,6 +249,7 @@ export default function App() {
             <Route path="signup" element={<SignupPage />} />
 
             {/* Public product pages */}
+            <Route path="nexus" element={<Navigate to="/#nexus" replace />} />
             <Route path="nexus/chat" element={<NexusChatPage />} />
             <Route path="pricing" element={<PricingPage />} />
             <Route path="b2b" element={<B2BLanding />} />

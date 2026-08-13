@@ -7,8 +7,7 @@ import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { SEO } from '@/components/seo/SEO';
 import { trackCTA, trackNexusChatInitiation, trackAssessmentStart } from '@/analytics/eventTracker';
 import { ResultMockup, NexusChatMockup } from '@/components/visual/ProductMockup';
-
-const HERO_POSTER = 'https://www.lyc-partners.ai/images/heroes/hero-boardroom.webp';
+import { Card, CardContent, CardDescription, CardTitle, CardHeader } from '@/components/ui/Card';
 
 // ── 5 Subscription Tiers (Canonical NEXUS Pricing v1.0) ──
 interface PricingTierRow {
@@ -138,7 +137,7 @@ function TierBadge({ label, color = DS.accent }: { label: string; color?: string
         display: 'inline-block',
         padding: '4px 10px',
         background: color,
-        color: '#FFFFFF',
+        color: DS.bg,
         fontFamily: DS.monoFont,
         fontSize: '10px',
         fontWeight: 500,
@@ -224,7 +223,7 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
               fontWeight: 500,
               textTransform: 'uppercase',
               marginLeft: '6px',
-              color: '#9CA3AF',
+              color: DS.mutedDim,
             }}
           >
             USD
@@ -357,9 +356,8 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
     <div
       className="card-hover"
       style={{
-        background: highlight ? '#0A0A12' : DS.card,
+        background: highlight ? DS.bgDark : DS.card,
         border: highlight ? `2px solid ${DS.accent}` : `1px solid ${DS.cardBorder}`,
- 
         padding: '28px 24px',
         display: 'flex',
         flexDirection: 'column',
@@ -376,28 +374,27 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
             right: '24px',
             transform: 'translateY(-50%)',
             background: DS.accent,
-            color: '#FFF',
+            color: DS.bg,
             fontFamily: DS.monoFont,
             fontSize: '9px',
             fontWeight: 600,
             letterSpacing: '0.2em',
             padding: '4px 10px',
             textTransform: 'uppercase',
- 
           }}
         >
           Recommended
         </div>
       )}
       <div style={{ marginBottom: '20px' }}>
-        <TierBadge label={t.key.toUpperCase()} color={highlight ? DS.accent : '#1a1a25'} />
+        <TierBadge label={t.key.toUpperCase()} color={highlight ? DS.accent : DS.bgDark} />
       </div>
       <div
         style={{
           fontFamily: DS.headingFont,
           fontSize: '22px',
           fontWeight: 700,
-          color: highlight ? '#FFF' : DS.text,
+          color: highlight ? DS.bg : DS.text,
           marginBottom: '4px',
           letterSpacing: '-0.01em',
         }}
@@ -420,7 +417,7 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
             fontFamily: DS.headingFont,
             fontSize: '28px',
             fontWeight: 700,
-            color: highlight ? '#FFF' : DS.text,
+            color: highlight ? DS.bg : DS.text,
             lineHeight: 1,
           }}
         >
@@ -444,7 +441,7 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
           style={{
             fontFamily: DS.monoFont,
             fontSize: '10px',
-            color: highlight ? 'rgba(255,255,255,0.4)' : '#9CA3AF',
+            color: highlight ? 'rgba(255,255,255,0.4)' : DS.mutedDim,
             letterSpacing: '0.1em',
             marginBottom: '18px',
             textTransform: 'uppercase',
@@ -473,7 +470,7 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
                 width: '5px',
                 height: '5px',
                 marginTop: '7px',
-                background: highlight ? DS.accent : DS.accent,
+                background: DS.accent,
                 flexShrink: 0,
               }}
             />
@@ -492,15 +489,14 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
             gap: '8px',
             width: '100%',
             padding: '14px 18px',
-            background: highlight ? DS.accent : '#0A0A12',
-            color: '#FFF',
+            background: highlight ? DS.accent : DS.bgDark,
+            color: DS.bg,
             textDecoration: 'none',
             fontFamily: DS.bodyFont,
             fontSize: '12px',
             fontWeight: 700,
             textTransform: 'uppercase',
             letterSpacing: '0.16em',
- 
             transition: 'background 0.2s ease',
             boxSizing: 'border-box',
           }}
@@ -525,274 +521,860 @@ export function Landing() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
-  // Ticket #1352 — only B2C links in marketing nav.
-  const navLinks = [
-    { href: '/assessments', label: 'Assessments' },
-    { href: '/pricing', label: 'Pricing' },
-    { href: '/nexus/chat', label: 'NEXUS AI' },
-  ];
-
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
       <SEO page="landing" />
-      {/* NAV */}
-      <nav
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 40,
-          background: DS.bg,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '14px 32px',
-          borderBottom: `1px solid ${DS.border}`,
-        }}
-      >
-        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none', letterSpacing: '-0.01em' }}>
-          LYC Intelligence
-        </a>
-        <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {navLinks.map(l => (
-            <a
-              key={l.href}
-              href={l.href}
-              style={{
-                fontFamily: DS.bodyFont,
-                fontSize: '13px',
-                color: DS.textSecondary,
-                textDecoration: 'none',
-                padding: '10px 14px',
-                minHeight: '44px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                fontWeight: 500,
-              }}
-            >
-              {l.label}
-            </a>
-          ))}
-          <a
-            href="/nexus/chat"
-            onClick={() => { trackNexusChatInitiation('hero_nav'); trackCTA({ location: 'hero', label: 'Try NEXUS (nav)', destination: '/nexus/chat' }); }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '10px 18px',
-              marginLeft: '8px',
-              color: DS.text,
-              fontFamily: DS.bodyFont,
-              fontSize: '13px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              minHeight: '44px',
-            }}
-          >
-            Try NEXUS <ArrowRight style={{ width: 12, height: 12 }} />
-          </a>
-          <a
-            href="/login"
-            onClick={() => trackCTA({ location: 'hero', label: 'Platform Login', destination: '/login' })}
-            className=""
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '10px 20px',
-              background: DS.accent,
-              color: '#FFFFFF',
- 
-              fontFamily: DS.bodyFont,
-              fontSize: '13px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              minHeight: '44px',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <Lock style={{ width: 14, height: 14 }} /> Platform
-          </a>
-        </div>
-        <button className="nav-toggle" onClick={() => setMobileOpen(true)} aria-label="Open menu">
-          <Menu style={{ color: DS.text }} />
-        </button>
-      </nav>
 
-      {/* MOBILE OVERLAY */}
-      <div className={`nav-mobile-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
-      <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`} style={{ background: DS.bg }}>
-        <button className="nav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu">
-          <X style={{ width: 24, height: 24, color: '#000' }} />
-        </button>
-        {navLinks.map(l => (
-          <a key={l.href} href={l.href} onClick={() => { setMobileOpen(false); trackCTA({ location: 'hero', label: `Mobile: ${l.label}`, destination: l.href }); }} style={{ color: DS.textSecondary, borderBottom: `1px solid ${DS.border}` }}>{l.label}</a>
-        ))}
-        <a href="/nexus/chat" onClick={() => { setMobileOpen(false); trackNexusChatInitiation('hero_nav_mobile'); trackCTA({ location: 'hero', label: 'Try NEXUS (mobile)', destination: '/nexus/chat' }); }} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, borderBottom: `1px solid ${DS.border}` }}>Try NEXUS →</a>
-        <a href="/login" onClick={() => { setMobileOpen(false); trackCTA({ location: 'hero', label: 'Platform Login (mobile)', destination: '/login' }); }} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.text, borderBottom: `1px solid ${DS.border}` }}>Platform</a>
-      </div>
+      <style>{`
+        @keyframes radar-draw {
+          from { stroke-dashoffset: 800; opacity: 0; }
+          to { stroke-dashoffset: 0; opacity: 1; }
+        }
+        @keyframes radar-pulse {
+          0% { transform: scale(1); opacity: 0.8; }
+          50% { transform: scale(1.06); opacity: 1; }
+          100% { transform: scale(1); opacity: 0.8; }
+        }
+        .radar-accent {
+          stroke-dasharray: 800;
+          animation: radar-draw 350ms ease-out both;
+        }
+        .radar-pulse {
+          transform-origin: 210px 210px;
+          animation: radar-pulse 2.2s ease-in-out infinite;
+        }
+        .hero-grid {
+          display: grid;
+          grid-template-columns: repeat(6, 1fr);
+          gap: 48px;
+          align-items: center;
+        }
+        .hero-text { grid-column: 1 / span 3; }
+        .hero-visual { grid-column: 4 / span 3; }
+        .lineup-grid {
+          display: grid;
+          grid-template-columns: repeat(12, 1fr);
+          gap: 16px;
+        }
+        .lineup-cpi { grid-column: 1 / span 6; grid-row: span 2; }
+        .lineup-leap { grid-column: 7 / span 3; }
+        .lineup-spark { grid-column: 10 / span 3; }
+        .lineup-impact { grid-column: 7 / span 6; }
+        .nexus-grid {
+          display: grid;
+          grid-template-columns: repeat(12, 1fr);
+          gap: 32px;
+          align-items: center;
+        }
+        .nexus-text { grid-column: 1 / span 6; }
+        .nexus-visual { grid-column: 8 / span 5; }
+        @media (max-width: 1023px) {
+          .lineup-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+          .lineup-cpi { grid-column: 1 / span 2; grid-row: auto; }
+          .lineup-leap { grid-column: 1 / span 1; }
+          .lineup-spark { grid-column: 2 / span 1; }
+          .lineup-impact { grid-column: 1 / span 2; }
+        }
+        @media (max-width: 767px) {
+          .hero-grid {
+            grid-template-columns: 1fr;
+            gap: 32px;
+          }
+          .hero-text, .hero-visual { grid-column: auto; }
+          .hero-visual { order: -1; }
+          .lineup-grid {
+            grid-template-columns: 1fr;
+          }
+          .lineup-cpi, .lineup-leap, .lineup-spark, .lineup-impact {
+            grid-column: 1 / -1;
+          }
+          .nexus-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+          }
+          .nexus-text, .nexus-visual { grid-column: auto; }
+          .nexus-visual { order: -1; }
+        }
+      `}</style>
 
-      {/* HERO */}
+      {/* SECTION 1: HERO (V2-1 / V2-5 / V2-6) */}
       <section
         style={{
-          position: 'relative',
-          overflow: 'hidden',
-          minHeight: '82vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          background: DS.bg,
+          padding: 'clamp(72px, 10vw, 120px) 32px',
+          maxWidth: '1280px',
+          margin: '0 auto',
         }}
       >
-        {/* Background image layer */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: `url(${HERO_POSTER})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            filter: 'blur(2px) brightness(0.55)',
-            transform: 'scale(1.04)',
-          }}
-        />
-        {/* Gradient overlay — deep obsidian with fuchsia edge */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'linear-gradient(180deg, rgba(7,6,14,0.85) 0%, rgba(10,6,14,0.7) 30%, rgba(18,10,24,0.7) 55%, rgba(8,5,12,0.95) 100%)',
-          }}
-        />
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: '8%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '720px',
-            height: '480px',
-            background: 'radial-gradient(circle, rgba(193,8,171,0.14) 0%, transparent 65%)',
-            pointerEvents: 'none',
-          }}
-        />
+        <div className="hero-grid">
+          <div className="hero-text">
+            <div
+              style={{
+                fontFamily: DS.monoFont,
+                fontSize: '10px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.28em',
+                color: DS.eyebrow,
+                marginBottom: '16px',
+              }}
+            >
+              POWERED BY NEXUS
+            </div>
+            <h1
+              style={{
+                fontFamily: DS.headingFont,
+                fontWeight: 700,
+                fontSize: 'clamp(38px, 5.6vw, 62px)',
+                lineHeight: 1.08,
+                letterSpacing: '-0.015em',
+                color: DS.text,
+                marginBottom: '16px',
+                maxWidth: '620px',
+                margin: 0,
+              }}
+            >
+              Executive Intelligence, Built for Leaders Who Think
+            </h1>
+            <p
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: 'clamp(15px, 1.6vw, 18px)',
+                color: DS.textSecondary,
+                maxWidth: '560px',
+                lineHeight: 1.6,
+                marginBottom: '36px',
+                marginTop: '16px',
+              }}
+            >
+              11 leadership assessments built on executive search methodology. Powered by NEXUS, LYC's intelligence system.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <a
+                href="/assessments"
+                onClick={() => trackCTA({ location: 'hero_v2', label: 'Explore Assessments', destination: '/assessments' })}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '16px 32px',
+                  background: DS.accent,
+                  color: DS.bg,
+                  fontFamily: DS.bodyFont,
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.18em',
+                  textDecoration: 'none',
+                  transition: DS.transition,
+                }}
+              >
+                Explore Assessments <ArrowRight style={{ width: 14, height: 14 }} />
+              </a>
+              <a
+                href="#nexus"
+                onClick={() => trackCTA({ location: 'hero_v2', label: 'What is NEXUS?', destination: '#nexus' })}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '16px 32px',
+                  border: `1px solid ${DS.border}`,
+                  color: DS.text,
+                  background: 'transparent',
+                  fontFamily: DS.bodyFont,
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.18em',
+                  textDecoration: 'none',
+                  transition: DS.transition,
+                }}
+              >
+                What is NEXUS?
+              </a>
+            </div>
+          </div>
 
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 2,
-            maxWidth: '920px',
-            padding: '104px 32px 80px',
-            textAlign: 'center',
-            margin: '0 auto',
-          }}
-        >
+          <div className="hero-visual">
+            <svg
+              viewBox="0 0 420 420"
+              width="100%"
+              height="auto"
+              role="img"
+              aria-label="6 leadership dimensions radar — Strategic Positioning highlighted"
+            >
+              <g transform="translate(210, 210)">
+                {/* 4 concentric radar grid polygons */}
+                {[60, 110, 155, 195].map((r, i) => {
+                  const pts = [];
+                  for (let j = 0; j < 6; j++) {
+                    const angle = (Math.PI / 3) * j - Math.PI / 2;
+                    pts.push(`${Math.cos(angle) * r},${Math.sin(angle) * r}`);
+                  }
+                  return (
+                    <polygon
+                      key={i}
+                      points={pts.join(' ')}
+                      fill="none"
+                      stroke={DS.border}
+                      strokeWidth="1"
+                    />
+                  );
+                })}
+
+                {/* 6 axis lines from center */}
+                {[0, 1, 2, 3, 4, 5].map(i => {
+                  const angle = (Math.PI / 3) * i - Math.PI / 2;
+                  const isAccent = i === 0;
+                  return (
+                    <line
+                      key={i}
+                      x1="0"
+                      y1="0"
+                      x2={Math.cos(angle) * 195}
+                      y2={Math.sin(angle) * 195}
+                      stroke={isAccent ? DS.accent : DS.border}
+                      strokeWidth={isAccent ? 2 : 1}
+                      className={isAccent ? 'radar-accent' : ''}
+                    />
+                  );
+                })}
+
+                {/* Sample data polygon — light fill */}
+                <polygon
+                  points={(() => {
+                    const vals = [165, 120, 100, 130, 90, 115];
+                    return vals.map((v, i) => {
+                      const angle = (Math.PI / 3) * i - Math.PI / 2;
+                      return `${Math.cos(angle) * v},${Math.sin(angle) * v}`;
+                    }).join(' ');
+                  })()}
+                  fill={`${DS.accent}10`}
+                  stroke={DS.mutedDim}
+                  strokeWidth="1"
+                />
+
+                {/* Strategic Positioning accent data point with pulse */}
+                <g className="radar-pulse">
+                  <circle
+                    cx={Math.cos(-Math.PI / 2) * 165}
+                    cy={Math.sin(-Math.PI / 2) * 165}
+                    r="8"
+                    fill={DS.accent}
+                    opacity="0.18"
+                  />
+                </g>
+                <circle
+                  cx={Math.cos(-Math.PI / 2) * 165}
+                  cy={Math.sin(-Math.PI / 2) * 165}
+                  r="5"
+                  fill={DS.accent}
+                />
+              </g>
+
+              {/* Dimension labels around perimeter */}
+              {[
+                { label: 'Strategic Positioning', angle: -Math.PI / 2, accent: true },
+                { label: 'Cross-Border Adaptability', angle: -Math.PI / 2 + Math.PI / 3 },
+                { label: 'Stakeholder Influence', angle: -Math.PI / 2 + (2 * Math.PI) / 3 },
+                { label: 'Execution Rigour', angle: -Math.PI / 2 + Math.PI },
+                { label: 'Executive Presence', angle: -Math.PI / 2 + (4 * Math.PI) / 3 },
+                { label: 'Governance & Fiduciary', angle: -Math.PI / 2 + (5 * Math.PI) / 3 },
+              ].map((d, i) => {
+                const r = 195;
+                const labelR = r + 28;
+                const x = 210 + Math.cos(d.angle) * labelR;
+                const y = 210 + Math.sin(d.angle) * labelR;
+                return (
+                  <text
+                    key={i}
+                    x={x}
+                    y={y}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontFamily={DS.monoFont}
+                    fontSize="10"
+                    textTransform="uppercase"
+                    fill={d.accent ? DS.accent : DS.muted}
+                    letterSpacing="0.12em"
+                    fontWeight={d.accent ? 600 : 400}
+                  >
+                    {d.label}
+                  </text>
+                );
+              })}
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 2: HERO LINEUP (V2-3: 4 assessment cards) */}
+      <section
+        id="lineup"
+        style={{
+          background: DS.bg,
+          maxWidth: '1280px',
+          margin: '0 auto',
+          padding: '0 32px 96px',
+        }}
+      >
+        <div style={{ textAlign: 'center' }}>
           <div
-            className="section-label-dark"
             style={{
               fontFamily: DS.monoFont,
-              fontSize: '10px',
-              fontWeight: 600,
               textTransform: 'uppercase',
+              fontSize: '10px',
               letterSpacing: '0.28em',
-              color: 'rgba(255,255,255,0.55)',
-              marginBottom: '20px',
+              color: DS.eyebrow,
+              marginBottom: '12px',
             }}
           >
-            LYC INTELLIGENCE · V3.0
+            FLAGSHIP + CORE
           </div>
-          <h1
-            className="hero-heading"
+          <h2
             style={{
               fontFamily: DS.headingFont,
-              fontSize: 'clamp(36px, 6vw, 60px)',
               fontWeight: 700,
-              color: '#FFFFFF',
-              margin: '0 auto 16px',
-              lineHeight: 1.08,
-              letterSpacing: '-0.015em',
-              maxWidth: '820px',
+              fontSize: 'clamp(26px, 3vw, 34px)',
+              color: DS.text,
+              marginBottom: '12px',
+              margin: '0 0 12px',
             }}
           >
-            The intelligent front door<br />to leadership intelligence.
-          </h1>
+            Four assessments. One methodology.
+          </h2>
           <p
-            className="hero-sub"
             style={{
               fontFamily: DS.bodyFont,
-              fontSize: 'clamp(15px, 1.7vw, 18px)',
-              color: 'rgba(255,255,255,0.72)',
-              maxWidth: '600px',
-              margin: '0 auto 44px',
+              fontSize: '14px',
+              color: DS.muted,
+              maxWidth: '620px',
+              margin: '0 auto 48px',
               lineHeight: 1.6,
             }}
           >
-            NEXUS holds every leadership assessment framework in memory, surfaces the blind spots you haven't
-            named yet, and opens the door to deep assessments tailored to your current transition.
+            The flagship CPI for general executives, plus three targeted diagnostics for career transitions, AI readiness, and board governance.
           </p>
+        </div>
 
-          <div className="reveal reveal-delay-1" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
-            <a
-              href="/nexus/chat"
-              onClick={() => { trackNexusChatInitiation('hero_cta'); trackCTA({ location: 'hero', label: 'Try NEXUS (primary)', destination: '/nexus/chat' }); }}
-              className=""
+        <div className="lineup-grid">
+          {/* CPI — FLAGSHIP, cols 1-6, spans 2 rows */}
+          <Card variant="accent" className="lineup-cpi" interactive={false} style={{ position: 'relative', height: '100%' }}>
+            <div
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '18px 36px',
-                background: '#C108AB',
-                color: '#FFF',
-                fontFamily: DS.bodyFont,
-                fontSize: '13px',
-                fontWeight: 700,
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                textDecoration: 'none',
- 
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Try NEXUS <ArrowRight style={{ width: 15, height: 15 }} />
-            </a>
-            <a
-              href="/assessment"
-              onClick={() => trackCTA({ location: 'hero', label: 'Explore Assessments', destination: '/assessment' })}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '18px 32px',
-                border: '1px solid rgba(255,255,255,0.28)',
-                color: '#FFFFFF',
-                fontFamily: DS.bodyFont,
-                fontSize: '13px',
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                fontFamily: DS.monoFont,
+                fontSize: '9px',
                 fontWeight: 600,
-                letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                textDecoration: 'none',
- 
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(6px)',
-                WebkitBackdropFilter: 'blur(6px)',
+                padding: '3px 8px',
+                background: DS.accent,
+                color: DS.bg,
+                letterSpacing: '0.16em',
               }}
             >
-              Explore assessments
+              FLAGSHIP
+            </div>
+            <CardHeader style={{ paddingBottom: '12px' }}>
+              <div
+                style={{
+                  fontFamily: DS.monoFont,
+                  fontSize: '9px',
+                  textTransform: 'uppercase',
+                  color: DS.eyebrow,
+                  letterSpacing: '0.22em',
+                  marginBottom: '6px',
+                }}
+              >
+                5 dimensions · 12 archetypes · 36 questions
+              </div>
+              <CardTitle
+                style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: '22px',
+                  fontWeight: 700,
+                  color: DS.text,
+                  margin: 0,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                Leadership Composite Index
+              </CardTitle>
+            </CardHeader>
+            <CardContent style={{ padding: '0 24px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+              <CardDescription
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: '14px',
+                  color: DS.textSecondary,
+                  lineHeight: 1.6,
+                  margin: '0 0 24px',
+                }}
+              >
+                General executive positioning across 5 validated leadership dimensions.
+              </CardDescription>
+              <div style={{ marginTop: 'auto' }}>
+                <a
+                  href="/assessment/cpi"
+                  onClick={() => trackCTA({ location: 'lineup_cpi', label: 'CPI Learn more', destination: '/assessment/cpi' })}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    minHeight: '44px',
+                    fontFamily: DS.bodyFont,
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    color: DS.textSecondary,
+                    textDecoration: 'none',
+                    transition: DS.transition,
+                    background: 'transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = DS.text;
+                    e.currentTarget.style.background = DS.border;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = DS.textSecondary;
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  Learn more <ArrowRight style={{ width: 14, height: 14 }} />
+                </a>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* LEAP — cols 7-9 */}
+          <Card variant="flat" className="lineup-leap" interactive={false} style={{ height: '100%' }}>
+            <CardHeader style={{ paddingBottom: '12px' }}>
+              <div
+                style={{
+                  fontFamily: DS.monoFont,
+                  fontSize: '9px',
+                  textTransform: 'uppercase',
+                  color: DS.eyebrow,
+                  letterSpacing: '0.22em',
+                  marginBottom: '6px',
+                }}
+              >
+                5 dimensions · 16 archetypes · 32 questions
+              </div>
+              <CardTitle
+                style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: '18px',
+                  fontWeight: 700,
+                  color: DS.text,
+                  margin: 0,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                Leadership Transition Profile
+              </CardTitle>
+            </CardHeader>
+            <CardContent style={{ padding: '0 20px 20px' }}>
+              <CardDescription
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: '13px',
+                  color: DS.textSecondary,
+                  lineHeight: 1.55,
+                  margin: '0 0 16px',
+                  minHeight: '48px',
+                }}
+              >
+                Executive career positioning, proof, visibility, and transition readiness.
+              </CardDescription>
+              <a
+                href="/assessment/leap"
+                onClick={() => trackCTA({ location: 'lineup_leap', label: 'LEAP Learn more', destination: '/assessment/leap' })}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '8px 16px',
+                  minHeight: '44px',
+                  fontFamily: DS.bodyFont,
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: DS.textSecondary,
+                  textDecoration: 'none',
+                  transition: DS.transition,
+                  background: 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = DS.text;
+                  e.currentTarget.style.background = DS.border;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = DS.textSecondary;
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                Learn more <ArrowRight style={{ width: 14, height: 14 }} />
+              </a>
+            </CardContent>
+          </Card>
+
+          {/* SPARK — cols 10-12 */}
+          <Card variant="flat" className="lineup-spark" interactive={false} style={{ height: '100%' }}>
+            <CardHeader style={{ paddingBottom: '12px' }}>
+              <div
+                style={{
+                  fontFamily: DS.monoFont,
+                  fontSize: '9px',
+                  textTransform: 'uppercase',
+                  color: DS.eyebrow,
+                  letterSpacing: '0.22em',
+                  marginBottom: '6px',
+                }}
+              >
+                3 dimensions · 9 archetypes · 28 questions
+              </div>
+              <CardTitle
+                style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: '18px',
+                  fontWeight: 700,
+                  color: DS.text,
+                  margin: 0,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                AI Readiness Profile
+              </CardTitle>
+            </CardHeader>
+            <CardContent style={{ padding: '0 20px 20px' }}>
+              <CardDescription
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: '13px',
+                  color: DS.textSecondary,
+                  lineHeight: 1.55,
+                  margin: '0 0 16px',
+                  minHeight: '48px',
+                }}
+              >
+                Executive and organisational readiness for AI adoption, governance, and leverage.
+              </CardDescription>
+              <a
+                href="/assessment/spark"
+                onClick={() => trackCTA({ location: 'lineup_spark', label: 'SPARK Learn more', destination: '/assessment/spark' })}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '8px 16px',
+                  minHeight: '44px',
+                  fontFamily: DS.bodyFont,
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: DS.textSecondary,
+                  textDecoration: 'none',
+                  transition: DS.transition,
+                  background: 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = DS.text;
+                  e.currentTarget.style.background = DS.border;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = DS.textSecondary;
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                Learn more <ArrowRight style={{ width: 14, height: 14 }} />
+              </a>
+            </CardContent>
+          </Card>
+
+          {/* IMPACT — cols 7-12 */}
+          <Card variant="flat" className="lineup-impact" interactive={false} style={{ height: '100%' }}>
+            <CardHeader style={{ paddingBottom: '12px' }}>
+              <div
+                style={{
+                  fontFamily: DS.monoFont,
+                  fontSize: '9px',
+                  textTransform: 'uppercase',
+                  color: DS.eyebrow,
+                  letterSpacing: '0.22em',
+                  marginBottom: '6px',
+                }}
+              >
+                5 dimensions · 11 archetypes · 30 questions
+              </div>
+              <CardTitle
+                style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: '20px',
+                  fontWeight: 700,
+                  color: DS.text,
+                  margin: 0,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                Board Governance Index
+              </CardTitle>
+            </CardHeader>
+            <CardContent style={{ padding: '0 24px 24px' }}>
+              <CardDescription
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: '14px',
+                  color: DS.textSecondary,
+                  lineHeight: 1.55,
+                  margin: '0 0 20px',
+                }}
+              >
+                Director effectiveness: fiduciary rigour, stakeholder influence, and legacy impact.
+              </CardDescription>
+              <a
+                href="/assessment/impact"
+                onClick={() => trackCTA({ location: 'lineup_impact', label: 'IMPACT Learn more', destination: '/assessment/impact' })}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '8px 16px',
+                  minHeight: '44px',
+                  fontFamily: DS.bodyFont,
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: DS.textSecondary,
+                  textDecoration: 'none',
+                  transition: DS.transition,
+                  background: 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = DS.text;
+                  e.currentTarget.style.background = DS.border;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = DS.textSecondary;
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                Learn more <ArrowRight style={{ width: 14, height: 14 }} />
+              </a>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div style={{ textAlign: 'right', marginTop: '32px' }}>
+          <a
+            href="/assessments"
+            onClick={() => trackCTA({ location: 'lineup_seeall', label: 'See all 11 assessments', destination: '/assessments' })}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontFamily: DS.bodyFont,
+              fontSize: '13px',
+              fontWeight: 600,
+              color: DS.text,
+              textDecoration: 'none',
+            }}
+          >
+            See all 11 assessments <ArrowRight style={{ width: 14, height: 14 }} />
+          </a>
+        </div>
+      </section>
+
+      {/* SECTION 3: PROOF POINT (V2-4) */}
+      <section
+        id="nexus"
+        style={{
+          background: DS.bgDark,
+          color: DS.bg,
+          padding: 'clamp(80px, 10vw, 112px) 32px',
+          width: '100%',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1280px',
+            margin: '0 auto',
+          }}
+          className="nexus-grid"
+        >
+          <div className="nexus-text">
+            <div
+              style={{
+                fontFamily: DS.monoFont,
+                textTransform: 'uppercase',
+                fontSize: '10px',
+                letterSpacing: '0.28em',
+                color: DS.mutedDim,
+                marginBottom: '16px',
+              }}
+            >
+              METHODOLOGY, NOT HYPE
+            </div>
+            <h2
+              style={{
+                fontFamily: DS.headingFont,
+                fontWeight: 700,
+                fontSize: 'clamp(26px, 3vw, 36px)',
+                color: DS.bg,
+                lineHeight: 1.18,
+                marginBottom: '20px',
+                maxWidth: '520px',
+                margin: '0 0 20px',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              We didn't invent these frameworks. We tested them across decades of executive placements.
+            </h2>
+            <p
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: '15px',
+                lineHeight: 1.65,
+                color: 'rgba(255,255,255,0.72)',
+                maxWidth: '520px',
+                marginBottom: '14px',
+              }}
+            >
+              Every assessment here is calibrated against LYC Partners' 20-year placement database across APAC. Dimensions aren't theoretical — they're the signals that consistently predict retention, promotion, and board-level outcomes for C-suite and VP-level executives.
+            </p>
+            <p
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: '15px',
+                lineHeight: 1.65,
+                color: 'rgba(255,255,255,0.72)',
+                maxWidth: '520px',
+                marginBottom: '28px',
+              }}
+            >
+              Questions are statistically validated. Archetype distributions mirror real placement populations. Results show you where you stand against actual executive benchmarks, not an abstract norm group.
+            </p>
+            <a
+              href="#assessment-catalog"
+              onClick={() => trackCTA({ location: 'nexus_proof', label: 'See how it works', destination: '#assessment-catalog' })}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '14px 28px',
+                border: '1px solid rgba(255,255,255,0.35)',
+                color: DS.bg,
+                fontFamily: DS.bodyFont,
+                fontSize: '12px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.18em',
+                textDecoration: 'none',
+                background: 'transparent',
+                transition: DS.transition,
+              }}
+            >
+              See how it works <ArrowRight style={{ width: 14, height: 14 }} />
             </a>
           </div>
 
-          <div
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: '11px',
-              color: 'rgba(255,255,255,0.35)',
-              letterSpacing: '0.16em',
-            }}
-          >
-            6 LEADERSHIP ASSESSMENTS · 2 TIERS · TRANSPARENT PRICING
+          <div className="nexus-visual">
+            <svg
+              viewBox="0 0 520 260"
+              width="100%"
+              height="auto"
+              role="img"
+              aria-label="Assessment flow: Question → Dimension scoring → Archetype matching → Composite score → NEXUS analysis → Actionable report"
+            >
+              {/* Arrow markers definition */}
+              <defs>
+                <marker
+                  id="arrow-right"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="6"
+                  markerHeight="6"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill={DS.mutedDim} />
+                </marker>
+              </defs>
+
+              {/* 6 flow nodes */}
+              {[
+                { label: 'QUESTIONS', x: 20, w: 66, highlight: false },
+                { label: 'DIMENSIONS', x: 106, w: 76, highlight: false },
+                { label: 'ARCHETYPES', x: 202, w: 78, highlight: false },
+                { label: 'COMPOSITE', x: 300, w: 76, highlight: true },
+                { label: 'NEXUS', x: 396, w: 56, highlight: false },
+                { label: 'REPORT', x: 472, w: 56, highlight: false },
+              ].map((node, i) => (
+                <g key={i}>
+                  <rect
+                    x={node.x}
+                    y="90"
+                    width={node.w}
+                    height="60"
+                    fill={node.highlight ? DS.accent : `${DS.mutedDim}18`}
+                    stroke={node.highlight ? DS.accent : DS.mutedDim}
+                    strokeWidth="1"
+                  />
+                  <text
+                    x={node.x + node.w / 2}
+                    y="122"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontFamily={DS.monoFont}
+                    fontSize="9"
+                    textTransform="uppercase"
+                    letterSpacing="0.12em"
+                    fontWeight={node.highlight ? 600 : 400}
+                    fill={node.highlight ? DS.bg : DS.mutedDim}
+                  >
+                    {node.label}
+                  </text>
+                  {/* Step label under box */}
+                  <text
+                    x={node.x + node.w / 2}
+                    y="185"
+                    textAnchor="middle"
+                    fontFamily={DS.monoFont}
+                    fontSize="9"
+                    textTransform="uppercase"
+                    letterSpacing="0.14em"
+                    fill={node.highlight ? DS.accent : DS.mutedDim}
+                    fontWeight={node.highlight ? 600 : 400}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </text>
+                </g>
+              ))}
+
+              {/* Arrow connector lines between steps */}
+              {[
+                [86, 136],
+                [182, 232],
+                [280, 308],
+                [376, 404],
+                [452, 468],
+              ].map(([x1, x2], i) => (
+                <line
+                  key={i}
+                  x1={x1}
+                  y1="120"
+                  x2={x2}
+                  y2="120"
+                  stroke={DS.mutedDim}
+                  strokeWidth="1"
+                  markerEnd="url(#arrow-right)"
+                />
+              ))}
+            </svg>
           </div>
         </div>
       </section>
@@ -1067,6 +1649,7 @@ export function Landing() {
           padding: '100px 32px',
           textAlign: 'center',
           marginTop: '48px',
+          background: DS.bg,
         }}
       >
         <div
@@ -1074,7 +1657,8 @@ export function Landing() {
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(135deg, #0a0812 0%, #160c1c 40%, #25122d 70%, #33183f 100%)',
+            background: `linear-gradient(135deg, ${DS.accent}08 0%, ${DS.accent}04 40%, transparent 100%)`,
+            pointerEvents: 'none',
           }}
         />
         <div
@@ -1086,7 +1670,7 @@ export function Landing() {
             transform: 'translateX(-50%)',
             width: '720px',
             height: '480px',
-            background: 'radial-gradient(circle, rgba(193,8,171,0.18) 0%, transparent 65%)',
+            background: `radial-gradient(circle, ${DS.accent}0A 0%, transparent 65%)`,
             pointerEvents: 'none',
           }}
         />
@@ -1098,7 +1682,7 @@ export function Landing() {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.28em',
-              color: 'rgba(255,255,255,0.5)',
+              color: DS.muted,
               marginBottom: '16px',
             }}
           >
@@ -1109,7 +1693,7 @@ export function Landing() {
               fontFamily: DS.headingFont,
               fontSize: 'clamp(28px, 4vw, 40px)',
               fontWeight: 700,
-              color: '#FFFFFF',
+              color: DS.text,
               margin: '0 0 16px',
               lineHeight: 1.15,
               letterSpacing: '-0.01em',
@@ -1121,7 +1705,7 @@ export function Landing() {
             style={{
               fontFamily: DS.bodyFont,
               fontSize: '15px',
-              color: 'rgba(255,255,255,0.62)',
+              color: DS.textSecondary,
               maxWidth: '440px',
               margin: '0 auto 36px',
               lineHeight: 1.6,
@@ -1138,9 +1722,8 @@ export function Landing() {
                 alignItems: 'center',
                 gap: '10px',
                 padding: '18px 36px',
-                background: '#C108AB',
-                color: '#FFFFFF',
- 
+                background: DS.accent,
+                color: DS.bg,
                 fontFamily: DS.bodyFont,
                 fontSize: '13px',
                 fontWeight: 700,
@@ -1158,9 +1741,8 @@ export function Landing() {
                 alignItems: 'center',
                 gap: '10px',
                 padding: '18px 32px',
-                border: '1px solid rgba(193,8,171,0.45)',
-                color: '#C108AB',
- 
+                border: `1px solid ${DS.accent}73`,
+                color: DS.accent,
                 fontFamily: DS.bodyFont,
                 fontSize: '13px',
                 fontWeight: 700,
