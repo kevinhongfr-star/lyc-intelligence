@@ -1,28 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { initScrollReveal } from '@/lib/utils';
+import { DS } from '@/tokens';
 import { IconImpact, IconLeap, IconTrident, IconSpark, IconQuest, IconForge } from '@/components/icons/LycIcons';
 import { ArrowRight, Menu, X, Lock } from 'lucide-react';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
-
-const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  // LYC Brand: Zero border-radius
-  radius: '0px',
-  radiusSm: '0px',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-};
 
 export function B2CLanding() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -73,7 +54,7 @@ export function B2CLanding() {
       <div className="hero-padding section-padding" style={{ maxWidth: '900px', margin: '0 auto', padding: '96px 32px 60px', textAlign: 'center', position: 'relative' }}>
         <div style={{ position: 'absolute', top: '-80px', left: '50%', transform: 'translateX(-50%)', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(193,8,171,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: '#9CA3AF', marginBottom: '16px' }}>
+          <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.eyebrow, marginBottom: '16px' }}>
             For Senior Leaders
           </div>
           <h1 className="hero-heading" style={{ fontFamily: DS.headingFont, fontSize: '48px', fontWeight: 700, color: DS.text, margin: '0 0 16px', lineHeight: 1.1 }}>
@@ -98,7 +79,7 @@ export function B2CLanding() {
 
       {/* What You Get — branded icons */}
       <div className="reveal section-padding" style={{ maxWidth: '900px', margin: '0 auto', padding: '64px 32px' }}>
-        <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: '#9CA3AF', marginBottom: '8px', textAlign: 'center' }}>
+        <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.eyebrow, marginBottom: '8px', textAlign: 'center' }}>
           Your Assessment Includes
         </div>
         <h2 className="section-heading" style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 400, color: DS.text, textAlign: 'center', margin: '0 0 40px' }}>Your Assessment Includes</h2>
@@ -121,7 +102,7 @@ export function B2CLanding() {
       <div className="reveal" style={{ background: DS.bgAlt, padding: '64px 0' }}>
         <div className="section-padding" style={{ maxWidth: '700px', margin: '0 auto', padding: '0 32px' }}>
           <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, padding: '32px', boxShadow: DS.shadow }}>
-            <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: '#9CA3AF', marginBottom: '8px', textAlign: 'center' }}>
+            <div className="section-label" style={{ fontFamily: DS.bodyFont, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color: DS.eyebrow, marginBottom: '8px', textAlign: 'center' }}>
               How It Works
             </div>
             <h3 style={{ fontFamily: DS.headingFont, fontSize: '20px', fontWeight: 600, color: DS.text, margin: '0 0 24px', textAlign: 'center' }}>3 Steps to Your Results</h3>
@@ -131,7 +112,7 @@ export function B2CLanding() {
               { step: '3', title: 'Get your results', desc: 'Instant archetype + scores + downloadable PDF report.' },
             ].map((s, i) => (
               <div key={s.step} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', marginBottom: i < 2 ? '20px' : 0 }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, fontSize: '14px', fontWeight: 700, color: DS.accent, flexShrink: 0 }}>
+                <div style={{ width: '32px', height: '32px', background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, fontSize: '14px', fontWeight: 700, color: DS.accent, flexShrink: 0 }}>
                   {s.step}
                 </div>
                 <div>

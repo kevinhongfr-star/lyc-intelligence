@@ -1,20 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, ArrowRight } from 'lucide-react';
+import { ACCENT, ACCENT_DARK, INK, OFF, G100, G200, G300, G400, G600, WHITE, EYEBROW } from '@/tokens';
 
 // ── DESIGN TOKENS — Phase 9 Batch 6 ticket #1356
 // DEX AI is the INTERNAL engine code name; publicly there is only LYC Intelligence (same brand family,
 // same accent fuchsia #C108AB as the rest of the site). No teal. Section labels use light gray #9CA3AF.
-const ACCENT = '#C108AB'; // LYC fuchsia — single brand accent on all public pages
-const ACCENT_DARK = '#A00790';
-const INK = '#0F1115';
-const OFF = '#F5F5F3';
-const G100 = '#FAFAFA';
-const G200 = '#E8E8E5';
-const G300 = '#D4D4D1';
-const G400 = '#9CA3AF';
-const G600 = '#4B5563';
-const WHITE = '#FFFFFF';
 
 const monoStyle: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
@@ -48,7 +39,7 @@ const btnBase: React.CSSProperties = {
 const btnPrimary: React.CSSProperties = { ...btnBase, background: ACCENT, color: WHITE, borderColor: ACCENT };
 const btnSecondary: React.CSSProperties = { ...btnBase, background: 'transparent', color: INK };
 // Ticket #1355 — section labels light gray per v1.2 brand spec
-const sectionLabel: React.CSSProperties = { ...monoStyle, color: G400, marginBottom: 20, display: 'inline-block' };
+const sectionLabel: React.CSSProperties = { ...monoStyle, color: EYEBROW, marginBottom: 20, display: 'inline-block' };
 
 // ── MOTION: Scroll reveal hook (fadeUp 350ms, IntersectionObserver) ──
 function useScrollReveal() {
@@ -88,8 +79,7 @@ function Nav() {
   return (
     <nav style={{
       position: 'fixed', top: 0, left: 0, right: 0,
-      background: 'rgba(245,245,243,0.92)',
-      backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+      background: WHITE,
       zIndex: 100,
       borderBottom: `1px solid ${G200}`,
     }}>
@@ -162,14 +152,14 @@ function Hero() {
     <section style={{ padding: '180px 0 120px', textAlign: 'center', position: 'relative' }}>
       <div style={containerStyle}>
         {/* Ticket #1355 — eyebrow light gray not accent */}
-        <span style={{ ...monoStyle, color: G400, marginBottom: 28, display: 'inline-block' }}>Technology</span>
+        <span style={{ ...monoStyle, color: EYEBROW, marginBottom: 28, display: 'inline-block' }}>Technology</span>
         <h1 style={{
           fontFamily: "'Crimson Pro', Georgia, serif",
           fontWeight: 700, fontSize: 52, lineHeight: 1.15,
           color: INK, maxWidth: 720, margin: '0 auto 24px',
           letterSpacing: '-0.02em',
         }}>
-          Powered by <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 400 }}>LYC Intelligence.</em>
+          Built on <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 400 }}>LYC Intelligence.</em>
         </h1>
         <p style={{ fontSize: 18, maxWidth: 640, margin: '0 auto 32px', color: G600, lineHeight: 1.6 }}>
           Multi-agent AI systems, specialized assessment models, and talent market data — all working together to power leadership intelligence for executives on the move.

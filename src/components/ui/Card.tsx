@@ -1,24 +1,57 @@
 /**
- * Design system: Card
+ * Design system: Card (#1390).
  *
- * Adds CardDescription + CardFooter to the Phase 0 set, and forwards refs.
- * Existing exports (Card, CardHeader, CardTitle, CardContent) keep their
- * signatures so current call sites render unchanged.
+ * Single shared Card component with 3 ECHO v1.2 variants:
+ *  - `flat`     : 1px gray border, no shadow; hover → border turns accent.
+ *  - `elevated` : subtle shadow, no border; hover → lift + shadow increase.
+ *  - `accent`   : 2px left accent border, white bg (no hover lift).
+ *
+ * Brand rules:
+ *  - Zero border radius (#1349).
+ *  - 24–32px padding via CardContent (#1389).
+ *  - 200ms ease-out hover transitions (#1367).
+ *
+ * Also exposes CardHeader (eyebrow + title), CardTitle, CardDescription,
+ * CardContent, CardFooter. Existing call sites render unchanged (default
+ * variant = `flat`, matching the prior bg/border treatment).
  */
 import React, { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
+
+export type CardVariant = 'flat' | 'elevated' | 'accent';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
+  variant?: CardVariant;
+  /** Hover affordance for the `flat` variant (border → accent). Default true. */
+  interactive?: boolean;
 }
 
+const VARIANT_BASE: Record<CardVariant, string> = {
+  flat: 'bg-white border border-bg-tertiary',
+  elevated: 'bg-white border border-transparent shadow-sm',
+  accent: 'bg-white border border-bg-tertiary border-l-2 border-l-accent',
+};
+
+const VARIANT_HOVER: Record<CardVariant, string> = {
+  flat: 'hover:border-accent hover:shadow-card-hover',
+  elevated: 'hover:-translate-y-0.5 hover:shadow-card-hover',
+  accent: '',
+};
+
 export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
-  { children, className, ...rest },
+  { children, className, variant = 'flat', interactive = true, ...rest },
   ref,
 ) {
   return (
     <div
       ref={ref}
-      className={`bg-bg-secondary border border-bg-tertiary ${className || ''}`}
+      className={cn(
+        'rounded-none transition-colors duration-200 ease-out',
+        VARIANT_BASE[variant],
+        interactive && VARIANT_HOVER[variant],
+        className,
+      )}
       {...rest}
     >
       {children}

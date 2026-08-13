@@ -12,6 +12,7 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowRight, Menu, X, Lock, Compass } from 'lucide-react';
 import { initScrollReveal } from '@/lib/utils';
+import { DS } from '@/tokens';
 import {
   ASSESSMENT_CATALOG,
   FLAGSHIP_KEYS,
@@ -23,23 +24,6 @@ import {
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { SEO } from '@/components/seo/SEO';
 import { trackCTA, trackAssessmentStart } from '@/analytics/eventTracker';
-
-const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  monoFont: "'IBM Plex Mono', ui-monospace, monospace",
-  accent: '#C108AB',
-  bg: '#FFFFFF',
-  bgAlt: '#F7F6F3',
-  card: '#FFFFFF',
-  cardBorder: '#E9E7E1',
-  text: '#0A0A12',
-  textSecondary: '#2B2B3A',
-  muted: '#616170',
-  border: '#E9E7E1',
-  radius: '0px',
-  shadow: '0 1px 2px rgba(10,10,18,0.06), 0 1px 1px rgba(10,10,18,0.04)',
-};
 
 interface CategoryDef {
   group: InstrumentTierGroup;
@@ -107,7 +91,7 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
               fontSize: '10px',
               letterSpacing: '0.2em',
               // #1355 — light gray eyebrow
-              color: '#9CA3AF',
+              color: DS.eyebrow,
               textTransform: 'uppercase',
               marginBottom: '6px',
             }}
@@ -217,12 +201,12 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
             fontFamily: DS.bodyFont,
             fontSize: '12px',
             fontWeight: 600,
-            color: DS.accent,
+            color: DS.text,
           }}
         >
           Explore assessment
         </span>
-        <ArrowRight style={{ width: 14, height: 14, color: DS.accent }} />
+        <ArrowRight style={{ width: 14, height: 14, color: DS.text }} />
       </div>
     </a>
   );
@@ -243,7 +227,7 @@ function CategorySection({ cat }: { cat: CategoryDef }) {
               fontSize: '10px',
               letterSpacing: '0.2em',
               // #1355 — light gray eyebrow per brand v1.2
-              color: '#9CA3AF',
+              color: DS.eyebrow,
               textTransform: 'uppercase',
               marginBottom: '6px',
             }}
@@ -336,9 +320,7 @@ export function AssessmentCatalogPage() {
           position: 'sticky',
           top: 0,
           zIndex: 40,
-          background: 'rgba(255,255,255,0.92)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
+          background: DS.bg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -428,7 +410,7 @@ export function AssessmentCatalogPage() {
               textTransform: 'uppercase',
               letterSpacing: '0.28em',
               // #1355 — light gray eyebrow
-              color: '#9CA3AF',
+              color: DS.eyebrow,
               marginBottom: '16px',
             }}
           >

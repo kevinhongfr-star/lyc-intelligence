@@ -1,4 +1,6 @@
 import React from 'react';
+import { DS } from '@/tokens';
+import { Logo } from '@/components/ui/Logo';
 
 /**
  * #1377 — Footer redesign (premium, B2C-focused).
@@ -12,19 +14,6 @@ import React from 'react';
  *   - B2B links removed from main columns; tiny "For Business" in bottom bar
  *   - Mobile-responsive: single-column stack below 768px
  */
-
-const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  monoFont: "'IBM Plex Mono', ui-monospace, monospace",
-  accent: '#C108AB',
-  bg: '#F9FAFB',
-  border: '#E5E7EB',
-  text: '#111827',
-  textSecondary: '#374151',
-  muted: '#6B7280',
-  eyebrow: '#9CA3AF',
-};
 
 const links = {
   product: [
@@ -64,19 +53,7 @@ export function UnifiedFooter() {
       >
         {/* Brand */}
         <div>
-          <a
-            href="/"
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: '22px',
-              fontWeight: 700,
-              color: DS.text,
-              textDecoration: 'none',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            LYC Intelligence
-          </a>
+          <Logo variant="dark" size="lg" />
           <p
             style={{
               fontSize: '13px',

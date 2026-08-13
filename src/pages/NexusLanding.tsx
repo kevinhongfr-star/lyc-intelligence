@@ -3,16 +3,7 @@ import { Link } from 'react-router-dom';
 import { Menu, X, ArrowRight, Star, Zap, Target } from 'lucide-react';
 import { SEO } from '@/components/seo/SEO';
 import { NexusChatMockup } from '@/components/visual/ProductMockup';
-
-const ACCENT = '#C108AB';
-const INK = '#0F1115';
-const OFF = '#F5F5F3';
-const G100 = '#FAFAFA';
-const G200 = '#E8E8E5';
-const G300 = '#D4D4D1';
-const G400 = '#9CA3AF';
-const G600 = '#4B5563';
-const WHITE = '#FFFFFF';
+import { ACCENT, INK, OFF, G100, G200, G300, G400, G600, WHITE, EYEBROW } from '@/tokens';
 
 const monoStyle: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
@@ -46,7 +37,7 @@ const btnBase: React.CSSProperties = {
 // Ticket #1355 — section eyebrow labels use light gray #9CA3AF per brand v1.2, not accent.
 const btnPrimary: React.CSSProperties = { ...btnBase, background: INK, color: WHITE };
 const btnSecondary: React.CSSProperties = { ...btnBase, background: 'transparent', color: INK };
-const sectionLabel: React.CSSProperties = { ...monoStyle, color: G400, marginBottom: 20, display: 'inline-block' };
+const sectionLabel: React.CSSProperties = { ...monoStyle, color: EYEBROW, marginBottom: 20, display: 'inline-block' };
 
 // ── MOTION: Scroll reveal hook (fadeUp 350ms, IntersectionObserver) ──
 function useScrollReveal() {
@@ -94,8 +85,7 @@ function Nav() {
   return (
     <nav style={{
       position: 'fixed', top: 0, left: 0, right: 0,
-      background: scrolled ? 'rgba(245,245,243,0.96)' : 'rgba(245,245,243,0.92)',
-      backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+      background: WHITE,
       zIndex: 100,
       borderBottom: scrolled ? `1px solid ${G200}` : '1px solid transparent',
       transition: 'border-color 200ms ease, background 200ms ease',
@@ -182,7 +172,7 @@ function Hero() {
         </div>
         <div style={{ width: 1, height: 60, background: G300, margin: '0 auto' }} />
         <div style={{ marginTop: 80, fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.12em', color: G400 }}>
-          Powered by <strong style={{ color: INK, fontWeight: 500, letterSpacing: '0.12em' }}>LYC Intelligence</strong>
+          Built on <strong style={{ color: INK, fontWeight: 500, letterSpacing: '0.12em' }}>LYC Intelligence</strong>
         </div>
       </div>
     </section>
@@ -488,7 +478,7 @@ function Pricing() {
 // #1370 — standardized on lucide-react icons (no mixed emoji/text symbols).
 const TRUST = [
   { icon: Star, title: 'Backed by LYC Partners', desc: "10+ years of executive search and assessment expertise across China and APAC. We've placed hundreds of senior leaders." },
-  { icon: Zap, title: 'Powered by LYC Intelligence', desc: 'Multi-agent AI systems, specialized assessment models, and talent market data — all working together behind the scenes.' },
+  { icon: Zap, title: 'Built on LYC Intelligence', desc: 'Multi-agent AI systems, specialized assessment models, and talent market data — all working together behind the scenes.' },
   { icon: Target, title: 'Global Benchmarks', desc: "Every diagnostic is benchmarked against executives across 47 markets. You're not just comparing to yourself." },
 ];
 function Trust() {
@@ -516,7 +506,7 @@ function Trust() {
         <div className="nl-reveal" style={{ textAlign: 'center', marginTop: 64, paddingTop: 48, borderTop: `1px solid ${G200}` }}>
           <span style={{ ...monoStyle, color: G400, marginBottom: 12, display: 'block' }}>The intelligence engine</span>
           {/* Ticket #1356 — internal DEX code name removed from public copy. This is LYC Intelligence platform. */}
-          <strong style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, color: INK }}>Powered by LYC Intelligence</strong><br />
+          <strong style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 20, fontWeight: 700, color: INK }}>Built on LYC Intelligence</strong><br />
         </div>
       </div>
     </section>

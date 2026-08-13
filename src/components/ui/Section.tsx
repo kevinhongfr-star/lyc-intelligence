@@ -14,6 +14,7 @@
  */
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { EYEBROW } from '@/tokens';
 
 // ── Container ────────────────────────────────────────────────────────
 export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -76,7 +77,7 @@ export function SectionHeading({
       {eyebrow && (
         <span
           className="block font-mono uppercase tracking-[0.12em] text-[11px] font-medium mb-5"
-          style={{ color: eyebrowAccent ?? '#9CA3AF' }}
+          style={{ color: eyebrowAccent ?? EYEBROW }}
         >
           {eyebrow}
         </span>
@@ -133,7 +134,7 @@ export function Text({
   );
 }
 
-/** Eyebrow label — light gray #9CA3AF default per brand v1.2. */
+/** Eyebrow label — light gray (#616170, gray-500) default per brand v1.2 (#1353). */
 export function Eyebrow({
   children,
   accent,
@@ -146,7 +147,7 @@ export function Eyebrow({
   return (
     <span
       className={cn('block font-mono uppercase tracking-[0.12em] text-[11px] font-medium mb-5', className)}
-      style={{ color: accent ?? '#9CA3AF' }}
+      style={{ color: accent ?? EYEBROW }}
     >
       {children}
     </span>

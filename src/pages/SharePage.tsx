@@ -3,26 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getShareCard, type ShareCard, type ShareCardType } from '../services/shareCardService';
 import { SEO } from '@/components/seo/SEO';
-
-const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  monoFont: "'IBM Plex Mono', ui-monospace, monospace",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  eyebrow: '#9CA3AF',
-  border: '#E5E5E5',
-  radius: '0',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  transition: '200ms ease',
-};
+import { DS } from '@/tokens';
 
 interface Teaser {
   eyebrow: string;

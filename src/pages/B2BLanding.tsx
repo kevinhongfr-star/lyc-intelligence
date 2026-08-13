@@ -5,25 +5,8 @@ import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 import { SEO } from '@/components/seo/SEO';
 import { EnterpriseContactForm } from '@/components/billing/EnterpriseContactForm';
-
-const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  monoFont: "'IBM Plex Mono', ui-monospace, monospace",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F7F6F3',
-  card: '#FFFFFF',
-  cardBorder: '#E9E7E1',
-  text: '#0A0A12',
-  textSecondary: '#2B2B3A',
-  muted: '#616170',
-  border: '#E9E7E1',
-  radius: '0px',
-  shadow: '0 1px 2px rgba(10,10,18,0.06), 0 1px 1px rgba(10,10,18,0.04)',
-  shadowHover: '0 12px 30px rgba(10,10,18,0.08)',
-};
+import { DS } from '@/tokens';
+import { Logo } from '@/components/ui/Logo';
 
 const B2B_HERO_POSTER = 'https://www.lyc-partners.ai/images/heroes/hero-b2b-boardroom.webp';
 
@@ -69,9 +52,7 @@ function Nav({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen
           position: 'sticky',
           top: 0,
           zIndex: 40,
-          background: 'rgba(255,255,255,0.92)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
+          background: DS.bg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -79,7 +60,7 @@ function Nav({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen
           borderBottom: `1px solid ${DS.border}`,
         }}
       >
-        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none', letterSpacing: '-0.01em' }}>LYC Intelligence</a>
+        <Logo size="md" variant="light" />
         <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {NAV_LINKS.map(l => (
             <a
@@ -338,7 +319,7 @@ export function B2BLanding() {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.26em',
-              color: DS.accent,
+              color: DS.eyebrow,
               marginBottom: '12px',
             }}
           >
@@ -383,7 +364,7 @@ export function B2BLanding() {
                   fontFamily: DS.monoFont,
                   fontSize: '10px',
                   letterSpacing: '0.2em',
-                  color: DS.accent,
+                  color: DS.eyebrow,
                   textTransform: 'uppercase',
                   fontWeight: 700,
                 }}
@@ -419,7 +400,7 @@ export function B2BLanding() {
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.26em',
-                color: DS.accent,
+                color: DS.eyebrow,
                 marginBottom: '12px',
               }}
             >
@@ -592,7 +573,7 @@ export function B2BLanding() {
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.26em',
-                color: DS.accent,
+                color: DS.eyebrow,
                 marginBottom: '12px',
               }}
             >

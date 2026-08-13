@@ -12,18 +12,8 @@ import { Menu, X, ChevronDown, ArrowRight, Sparkles } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getDefaultPortalRoute } from '@/services/portalClassification';
 import { trackCTA, trackNexusChatInitiation, setTrackingUser } from '@/analytics/eventTracker';
-
-const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  border: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-};
+import { DS } from '@/tokens';
+import { Logo } from '@/components/ui/Logo';
 
 export function MarketingNav(): React.ReactElement {
   const navigate = useNavigate();
@@ -76,19 +66,8 @@ export function MarketingNav(): React.ReactElement {
       }}
     >
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
-        {/* Logo */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-          <span style={{
-            width: 32, height: 32, background: DS.accent,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontFamily: DS.headingFont, fontWeight: 700, fontSize: 15,
-          }}>
-            L
-          </span>
-          <span style={{ fontFamily: DS.headingFont, fontSize: 18, fontWeight: 700, color: DS.text }}>
-            LYC Intelligence
-          </span>
-        </Link>
+        {/* Logo — shared component (#1356) */}
+        <Logo size="md" variant="light" />
 
         {/* Desktop nav */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }} className="hidden md:flex">

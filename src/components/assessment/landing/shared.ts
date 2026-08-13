@@ -1,19 +1,24 @@
 import React, { useEffect, useState, useCallback } from 'react';
+// #1351 / #1353 — canonical tokens from the single source of truth.
+import { ACCENT, EYEBROW } from '@/tokens';
 
 // ── DESIGN TOKENS ──────────────────────────────────────────────────
+// Re-exported here so existing call sites (`INK`, `G400`, etc.) keep working,
+// but the canonical values now flow from `@/tokens`.
 export const INK = '#0F1115';
 export const OFF = '#F5F5F3';
 export const G100 = '#FAFAFA';
 export const G200 = '#E8E8E5';
 export const G300 = '#D4D4D1';
-export const G400 = '#9CA3AF';
+export const G400 = '#9CA3AF';   /* gray-400 — fainter metadata only */
 export const G600 = '#4B5563';
 export const WHITE = '#FFFFFF';
 
-// #1376 — ECHO brand spec v1.2. ONE accent (LYC fuchsia #C108AB), reserved for
-// CTAs + key highlights only. Section eyebrows use light gray #9CA3AF.
-export const BRAND_ACCENT = '#C108AB';
-export const EYEBROW_GRAY = '#9CA3AF';
+// #1376 / #1353 — ECHO brand spec v1.2. ONE accent (LYC fuchsia #C108AB),
+// reserved for CTAs + key highlights only. Section eyebrows use the canonical
+// light gray #616170 (gray-500 / EYEBROW token), NOT #9CA3AF and NOT accent.
+export const BRAND_ACCENT = ACCENT;
+export const EYEBROW_GRAY = EYEBROW;   /* #616170 — canonical eyebrow color */
 
 // #1376 — canonical category labels for the 6 assessments. Mirrors the subtitle
 // system on the catalog page so every landing shows the same descriptive label
@@ -64,9 +69,10 @@ export function makeBtnSecondary(accent: string): React.CSSProperties {
   return { ...btnBase, background: 'transparent', color: INK, borderColor: INK };
 }
 export function makeSectionLabel(_accent: string): React.CSSProperties {
-  // Phase 9 Batch 6 ticket #1355 — brand v1.2 spec: eyebrow/section labels use light gray #9CA3AF,
-  // NOT the accent color. Accent is reserved for CTAs + interactive key highlights only.
-  return { ...monoStyle, color: '#9CA3AF', marginBottom: 20, display: 'inline-block' };
+  // #1353 — brand v1.2 spec: eyebrow/section labels use the canonical light
+  // gray #616170 (EYEBROW token / gray-500), NOT #9CA3AF and NOT the accent.
+  // Accent is reserved for CTAs + interactive key highlights only.
+  return { ...monoStyle, color: EYEBROW, marginBottom: 20, display: 'inline-block' };
 }
 
 // ── MOTION HOOKS ───────────────────────────────────────────────────

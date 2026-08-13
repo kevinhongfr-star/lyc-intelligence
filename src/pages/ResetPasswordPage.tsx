@@ -7,19 +7,8 @@ import {
   passwordScoreLabel,
   passwordScoreColor,
 } from '@/lib/auth/passwordPolicy';
-
-const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  bg: '#FFFFFF',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-};
+import { DS } from '@/tokens';
+import { Logo } from '@/components/ui/Logo';
 
 type Mode = 'request' | 'reset';
 
@@ -168,7 +157,7 @@ export function ResetPasswordPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@company.com"
                     autoComplete="email"
-                    style={inputStyle(DS)}
+                    style={inputStyle()}
                   />
                 </InputWithIcon>
               </Field>
@@ -187,7 +176,7 @@ export function ResetPasswordPage() {
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="At least 12 characters"
                     autoComplete="new-password"
-                    style={inputStyle(DS)}
+                    style={inputStyle()}
                   />
                 </InputWithIcon>
               </Field>
@@ -203,7 +192,7 @@ export function ResetPasswordPage() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter your new password"
                     autoComplete="new-password"
-                    style={inputStyle(DS)}
+                    style={inputStyle()}
                   />
                 </InputWithIcon>
               </Field>
@@ -236,9 +225,7 @@ export function ResetPasswordPage() {
 function Nav() {
   return (
     <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
-      <Link to="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>
-        LYC Intelligence
-      </Link>
+      <Logo size="md" variant="light" />
       <Link to="/login" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: DS.muted, textDecoration: 'none', fontFamily: DS.bodyFont }}>
         <ArrowLeft style={{ width: 14, height: 14 }} /> Back to login
       </Link>
@@ -289,7 +276,7 @@ function InputWithIcon({ icon, children }: { icon: React.ReactNode; children: Re
   );
 }
 
-function inputStyle(DS: typeof DS): React.CSSProperties {
+function inputStyle(): React.CSSProperties {
   return {
     width: '100%',
     padding: '12px 16px 12px 44px',

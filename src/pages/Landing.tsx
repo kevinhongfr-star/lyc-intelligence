@@ -1,30 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { initScrollReveal } from '@/lib/utils';
+import { DS } from '@/tokens';
 import { ArrowRight, Menu, X, Lock, Layers, BadgeDollarSign, UserCheck } from 'lucide-react';
 import { ASSESSMENT_CATALOG, FLAGSHIP_KEYS, SHIFT_SUITE_KEYS, ADVISORY_PRODUCT_KEYS, type AssessmentInfo } from '@/assessments/catalog';
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { SEO } from '@/components/seo/SEO';
 import { trackCTA, trackNexusChatInitiation, trackAssessmentStart } from '@/analytics/eventTracker';
 import { ResultMockup, NexusChatMockup } from '@/components/visual/ProductMockup';
-
-const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  monoFont: "'IBM Plex Mono', ui-monospace, monospace",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F7F6F3',
-  card: '#FFFFFF',
-  cardBorder: '#E9E7E1',
-  text: '#0A0A12',
-  textSecondary: '#2B2B3A',
-  muted: '#616170',
-  border: '#E9E7E1',
-  radius: '0px',
-  shadow: '0 1px 2px rgba(10,10,18,0.06), 0 1px 1px rgba(10,10,18,0.04)',
-  shadowHover: '0 12px 30px rgba(10,10,18,0.08)',
-};
 
 const HERO_POSTER = 'https://www.lyc-partners.ai/images/heroes/hero-boardroom.webp';
 
@@ -201,7 +183,7 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
               fontSize: '10px',
               letterSpacing: '0.2em',
               // Ticket #1355: eyebrow labels are light gray, not accent
-              color: '#9CA3AF',
+              color: DS.eyebrow,
               textTransform: 'uppercase',
               marginBottom: '6px',
             }}
@@ -294,12 +276,12 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
             fontFamily: DS.bodyFont,
             fontSize: '12px',
             fontWeight: 600,
-            color: DS.accent,
+            color: DS.text,
           }}
         >
           Learn more
         </span>
-        <ArrowRight style={{ width: 14, height: 14, color: DS.accent }} />
+        <ArrowRight style={{ width: 14, height: 14, color: DS.text }} />
       </div>
     </a>
   );
@@ -320,7 +302,7 @@ function renderTierGroup(label: string, accent: string, keys: string[]) {
               fontSize: '10px',
               letterSpacing: '0.2em',
               // Ticket #1355: eyebrow labels → #9CA3AF light gray per v1.2 brand spec
-              color: '#9CA3AF',
+              color: DS.eyebrow,
               textTransform: 'uppercase',
               marginBottom: '6px',
             }}
@@ -559,9 +541,7 @@ export function Landing() {
           position: 'sticky',
           top: 0,
           zIndex: 40,
-          background: 'rgba(255,255,255,0.92)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
+          background: DS.bg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -858,7 +838,7 @@ export function Landing() {
               textTransform: 'uppercase',
               letterSpacing: '0.26em',
               // Ticket #1355: light gray eyebrow #9CA3AF
-              color: '#9CA3AF',
+              color: DS.eyebrow,
               marginBottom: '12px',
             }}
           >
@@ -916,7 +896,7 @@ export function Landing() {
                   fontFamily: DS.bodyFont,
                   fontSize: '12.5px',
                   fontWeight: 600,
-                  color: DS.accent,
+                  color: DS.text,
                 }}
               >
                 {c.cta} <ArrowRight style={{ width: 13, height: 13 }} />
@@ -939,7 +919,7 @@ export function Landing() {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.26em',
-              color: '#9CA3AF',
+              color: DS.eyebrow,
               marginBottom: '12px',
             }}
           >
@@ -981,11 +961,11 @@ export function Landing() {
                 textTransform: 'uppercase',
                 letterSpacing: '0.26em',
                 // Ticket #1355: light gray eyebrow
-                color: '#9CA3AF',
-                marginBottom: '12px',
-              }}
-            >
-              Assessment Catalog
+              color: DS.eyebrow,
+              marginBottom: '12px',
+            }}
+          >
+            Assessment Catalog
             </div>
             <h2
               style={{
@@ -1031,7 +1011,7 @@ export function Landing() {
               textTransform: 'uppercase',
               letterSpacing: '0.26em',
               // Ticket #1355: light gray eyebrow
-              color: '#9CA3AF',
+              color: DS.eyebrow,
               marginBottom: '12px',
             }}
           >

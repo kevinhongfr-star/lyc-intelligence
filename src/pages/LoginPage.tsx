@@ -5,25 +5,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { getDefaultRoute } from '@/components/auth/PostLoginRedirect';
 import { trackLoginSuccess } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
-
-const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F5F5F5',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '0',
-  radiusSm: '0',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-  shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
-};
+import { DS } from '@/tokens';
+import { Logo } from '@/components/ui/Logo';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -78,9 +61,7 @@ export function LoginPage() {
     <div style={{ minHeight: '100vh', background: DS.bg }}>
       {/* Header */}
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <Link to="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>
-          LYC Intelligence
-        </Link>
+        <Logo size="md" variant="light" />
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
           <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Back to site</Link>
         </div>

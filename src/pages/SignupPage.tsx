@@ -11,22 +11,8 @@ import {
   passwordScoreColor,
 } from '@/lib/auth/passwordPolicy';
 import { captureUTMParams, captureAndStoreUTM } from '@/utils/utmTracking';
-
-const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  card: '#FFFFFF',
-  cardBorder: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-  border: '#E5E5E5',
-  radius: '0',
-  shadow: '0 1px 3px rgba(0,0,0,0.08)',
-};
+import { DS } from '@/tokens';
+import { Logo } from '@/components/ui/Logo';
 
 export function SignupPage() {
   const navigate = useNavigate();
@@ -91,9 +77,7 @@ export function SignupPage() {
   return (
     <div style={{ minHeight: '100vh', background: DS.bg }}>
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <Link to="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>
-          LYC Intelligence
-        </Link>
+        <Logo size="md" variant="light" />
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
           <Link to="/login" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Already have an account? Sign in</Link>
         </div>

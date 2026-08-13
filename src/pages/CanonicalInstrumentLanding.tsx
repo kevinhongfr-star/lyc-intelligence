@@ -2,29 +2,12 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Menu, X, Lock, Layers, Clock, HelpCircle, Sparkles } from 'lucide-react';
 import { initScrollReveal } from '@/lib/utils';
+import { DS } from '@/tokens';
 import { ASSESSMENT_CATALOG, type AssessmentInfo } from '@/assessments/catalog';
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { SEO } from '@/components/seo/SEO';
 import { getAssessmentMeta } from '@/seo/pageMetadata';
-
-const DS = {
-  headingFont: "'Crimson Pro', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  monoFont: "'IBM Plex Mono', ui-monospace, monospace",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F7F6F3',
-  card: '#FFFFFF',
-  cardBorder: '#E9E7E1',
-  text: '#0A0A12',
-  textSecondary: '#2B2B3A',
-  muted: '#616170',
-  border: '#E9E7E1',
-  radius: '0px',
-  shadow: '0 1px 2px rgba(10,10,18,0.06), 0 1px 1px rgba(10,10,18,0.04)',
-  shadowHover: '0 12px 30px rgba(10,10,18,0.08)',
-};
+import { Logo } from '@/components/ui/Logo';
 
 export function CanonicalInstrumentLanding() {
   const { code } = useParams<{ code: string }>();
@@ -48,7 +31,7 @@ export function CanonicalInstrumentLanding() {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, padding: '32px' }}>
         <div style={{ textAlign: 'center', maxWidth: '480px' }}>
-          <div style={{ fontFamily: DS.monoFont, fontSize: '11px', letterSpacing: '0.2em', color: '#9CA3AF', marginBottom: '12px', textTransform: 'uppercase' }}>Instrument not found</div>
+          <div style={{ fontFamily: DS.monoFont, fontSize: '11px', letterSpacing: '0.2em', color: DS.eyebrow, marginBottom: '12px', textTransform: 'uppercase' }}>Instrument not found</div>
           <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', marginBottom: '16px', color: DS.text }}>This assessment does not exist.</h1>
           <p style={{ color: DS.muted, marginBottom: '28px', lineHeight: 1.6 }}>
             The instrument code "{code}" is not in the canonical catalog. Return to the assessment catalog to browse all 6 leadership assessments.
@@ -94,9 +77,7 @@ export function CanonicalInstrumentLanding() {
           position: 'sticky',
           top: 0,
           zIndex: 40,
-          background: 'rgba(255,255,255,0.92)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
+          background: DS.bg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -104,9 +85,7 @@ export function CanonicalInstrumentLanding() {
           borderBottom: `1px solid ${DS.border}`,
         }}
       >
-        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none', letterSpacing: '-0.01em' }}>
-          LYC Intelligence
-        </a>
+        <Logo size="md" variant="light" />
         <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {navLinks.map(l => (
             <a
