@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import { ArrowRight, Home, Compass, RefreshCw } from 'lucide-react';
+import { SEO } from '@/components/seo/SEO';
 
 export default function ErrorPage() {
   return (
@@ -18,6 +19,7 @@ export default function ErrorPage() {
         color: '#000000',
       }}
     >
+      <SEO title="Error — LYC Intelligence" description="Something went wrong. LYC Intelligence." path="/error" />
       {/* Left accent column */}
       <div
         style={{

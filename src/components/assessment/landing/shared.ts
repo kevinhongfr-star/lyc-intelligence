@@ -10,6 +10,23 @@ export const G400 = '#9CA3AF';
 export const G600 = '#4B5563';
 export const WHITE = '#FFFFFF';
 
+// #1376 — ECHO brand spec v1.2. ONE accent (LYC fuchsia #C108AB), reserved for
+// CTAs + key highlights only. Section eyebrows use light gray #9CA3AF.
+export const BRAND_ACCENT = '#C108AB';
+export const EYEBROW_GRAY = '#9CA3AF';
+
+// #1376 — canonical category labels for the 6 assessments. Mirrors the subtitle
+// system on the catalog page so every landing shows the same descriptive label
+// regardless of which caller built the config (PrismLanding vs DiagnosticLandingPage).
+export const ASSESSMENT_SUBTITLE: Record<string, string> = {
+  PRISM: 'Career & Professional Branding',
+  SPARK: 'AI Leadership Readiness',
+  FORGE: 'Sales Excellence',
+  BRIDGE: 'China Leadership Readiness',
+  MOSAIC: 'Cultural Intelligence',
+  DRIVE: 'Execution Capability',
+};
+
 export const monoStyle: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
   fontSize: '11px',

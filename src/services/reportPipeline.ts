@@ -62,18 +62,23 @@ export interface ReportMeta {
   generatedAt?: Date;
 }
 
+// #1379 brand compliance (ECHO Canonical Brand Spec): a SINGLE accent
+// color is permitted across all reports — LYC fuchsia #C108AB. The legacy
+// per-instrument teal/blue/green/amber/purple secondary accents have been
+// collapsed to the fuchsia accent so no secondary brand color leaks into
+// the rendered HTML/PDF reports.
 const INSTRUMENT_ACCENTS: Record<string, string> = {
   CPI: '#C108AB',
   PRISM: '#C108AB',
-  SPARK: '#0D9488',
-  LEAP: '#6366F1',
-  QUEST: '#3B82F6',
-  DRIVE: '#F59E0B',
-  COACH: '#10B981',
-  IMPACT: '#F43F5E',
-  FORGE: '#8B5CF6',
-  BRIDGE: '#EC4899',
-  MOSAIC: '#14B8A6',
+  SPARK: '#C108AB',
+  LEAP: '#C108AB',
+  QUEST: '#C108AB',
+  DRIVE: '#C108AB',
+  COACH: '#C108AB',
+  IMPACT: '#C108AB',
+  FORGE: '#C108AB',
+  BRIDGE: '#C108AB',
+  MOSAIC: '#C108AB',
 };
 
 const INSTRUMENT_NAMES: Record<string, string> = {
@@ -257,7 +262,7 @@ export async function renderReport(
       const pct = Math.max(0, Math.min(100, score));
       return `<tr>
         <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;font-size:14px;font-weight:500;">${name}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;text-align:center;font-family:Georgia,serif;font-weight:700;font-size:18px;color:${color};">${score}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;text-align:center;font-family:'Crimson Pro',Georgia,serif;font-weight:700;font-size:18px;color:${color};">${score}</td>
         <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;">
           <div style="width:100%;height:10px;background:#F0F0F0;">
             <div style="height:100%;width:${pct}%;background:${color};"></div>
@@ -287,7 +292,7 @@ export async function renderReport(
   const actionsList = (result.development_actions || [])
     .sort((a, b) => a.priority - b.priority)
     .map((a, i) => `<li style="display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #F0F0F0;font-size:14px;">
-      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">${i + 1}</span>
+      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:'Crimson Pro',Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">${i + 1}</span>
       <div>
         <div style="font-weight:600;margin-bottom:4px;">${a.dimension}</div>
         <div style="color:#333;line-height:1.6;">${a.action}</div>
@@ -295,7 +300,7 @@ export async function renderReport(
       </div>
     </li>`)
     .join('') || `<li style="display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #F0F0F0;font-size:14px;">
-      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">1</span>
+      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:'Crimson Pro',Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">1</span>
       <div>
         <div style="font-weight:600;margin-bottom:4px;">Focused Practice</div>
         <div style="color:#333;line-height:1.6;">Identify your lowest-scoring dimension and schedule a weekly 60-minute focused practice for the next 90 days.</div>
@@ -352,7 +357,7 @@ export async function renderReport(
   .cover .meta-label { color:#666; display:inline-block; width:110px; }
   .archetype-badge { display:inline-block; margin-top:20px; padding:10px 28px; background:${accent}; color:#fff; font-family:'Crimson Pro',serif; font-size:18px; font-weight:700; }
   .score-display { display:flex; align-items:center; gap:24px; margin-bottom:16px; }
-  .score-circle { width:110px; height:110px; border-radius:50%; border:6px solid ${accent}; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; }
+  .score-circle { width:110px; height:110px; border-radius:0; border:6px solid ${accent}; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; }
   .score-circle .num { font-family:'Crimson Pro',serif; font-size:34px; font-weight:700; color:${accent}; line-height:1; }
   .score-circle .max { font-size:12px; color:#999; }
   .score-info .tier { font-family:'Crimson Pro',serif; font-size:20px; color:${accent}; font-weight:700; }

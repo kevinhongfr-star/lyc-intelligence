@@ -14,8 +14,12 @@ import type { DiagnosticSlug } from '@/types/assessment';
 
 // ── Diagnostic accent colors (matches .report-accent-<slug> classes) ──
 /**
- * Diagnostic accent colors — values locked per #89 PDF spec.
- * PRISM=#C108AB SPARK=#FF6B35 FORGE=#1E88E5 BRIDGE=#00B4D8 MOSAIC=#7B2CBF DRIVE=#2D6A4F
+ * Diagnostic accent colors.
+ * #1379 brand compliance (ECHO Canonical Brand Spec): a SINGLE accent
+ * color is permitted — LYC fuchsia #C108AB. The per-diagnostic slugs are
+ * retained so reportShellClass()/PdfReport keep working, but every slug
+ * now resolves to the same fuchsia accent + CMYK-safe ink. No teal/blue/
+ * green/orange secondary accents.
  */
 export const DIAGNOSTIC_ACCENTS: Record<DiagnosticSlug, {
   accent: string;
@@ -24,11 +28,11 @@ export const DIAGNOSTIC_ACCENTS: Record<DiagnosticSlug, {
   accent_10: string;
 }> = {
   prism:  { accent: '#C108AB', accent_ink: '#760568', accent_5:  rgba(193,  8,171,0.05), accent_10: rgba(193,  8,171,0.10) },
-  spark:  { accent: '#FF6B35', accent_ink: '#C94A15', accent_5:  rgba(255,107, 53,0.05), accent_10: rgba(255,107, 53,0.10) },
-  forge:  { accent: '#1E88E5', accent_ink: '#0E5AA2', accent_5:  rgba( 30,136,229,0.05), accent_10: rgba( 30,136,229,0.10) },
-  bridge: { accent: '#00B4D8', accent_ink: '#007B96', accent_5:  rgba(  0,180,216,0.05), accent_10: rgba(  0,180,216,0.10) },
-  mosaic: { accent: '#7B2CBF', accent_ink: '#4E1682', accent_5:  rgba(123, 44,191,0.05), accent_10: rgba(123, 44,191,0.10) },
-  drive:  { accent: '#2D6A4F', accent_ink: '#184330', accent_5:  rgba( 45,106, 79,0.05), accent_10: rgba( 45,106, 79,0.10) },
+  spark:  { accent: '#C108AB', accent_ink: '#760568', accent_5:  rgba(193,  8,171,0.05), accent_10: rgba(193,  8,171,0.10) },
+  forge:  { accent: '#C108AB', accent_ink: '#760568', accent_5:  rgba(193,  8,171,0.05), accent_10: rgba(193,  8,171,0.10) },
+  bridge: { accent: '#C108AB', accent_ink: '#760568', accent_5:  rgba(193,  8,171,0.05), accent_10: rgba(193,  8,171,0.10) },
+  mosaic: { accent: '#C108AB', accent_ink: '#760568', accent_5:  rgba(193,  8,171,0.05), accent_10: rgba(193,  8,171,0.10) },
+  drive:  { accent: '#C108AB', accent_ink: '#760568', accent_5:  rgba(193,  8,171,0.05), accent_10: rgba(193,  8,171,0.10) },
 };
 
 export type DiagnosticAccentKey = DiagnosticSlug;
@@ -101,11 +105,18 @@ export const REPORT_COLORS = {
   divider: '#DDDAD6',
 
   success: '#0A7A4E',
-  teal: '#117A8B',
   warning: '#A86A00',
   error: '#9A2336',
   info: '#1E5A9E',
-  dimensionPalette: ['#C108AB', '#117A8B', '#A86A00', '#1E5A9E', '#5C4E95', '#0A7A4E'] as const,
+  // #1379 brand compliance: ONE accent (LYC fuchsia). Legacy decorative
+  // secondary accents (teal/lavender/sky/cream) collapse to the accent so
+  // they cannot leak. Functional status colors above are retained for
+  // score-band/tier encoding only.
+  teal: '#C108AB',
+  sky: '#C108AB',
+  lavender: '#C108AB',
+  cream: '#C108AB',
+  dimensionPalette: ['#C108AB', '#C108AB', '#C108AB', '#C108AB', '#C108AB', '#C108AB'] as const,
 } as const;
 
 // ── Level scale maps score→level → color pair per level ────────────

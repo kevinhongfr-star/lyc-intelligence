@@ -29,10 +29,13 @@
 
     <!-- #1273: All brand fonts self-hosted — zero CDN dependencies.
          Crimson Pro (headings), DM Sans (body), IBM Plex Mono (mono) —
-         woff2 Latin subsets in /public/fonts/ with local @font-face in index.css. -->
+         woff2 Latin subsets in /public/fonts/ with local @font-face in index.css.
+         #1378: preload critical weights + preconnect third-party APIs. -->
     <link rel="preload" href="/fonts/CrimsonPro-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/DMSans-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/IBMPlexMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preconnect" href="https://api.deepseek.com" />
+    <link rel="dns-prefetch" href="https://api.deepseek.com" />
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

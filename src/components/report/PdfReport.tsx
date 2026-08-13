@@ -62,7 +62,7 @@ export const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(function Pdf
         <div className="pt-[18mm] flex flex-col justify-between h-[220mm]">
           <div>
             <p className="report-brand-mark tracking-[0.24em]">LYC PARTNERS — EXECUTIVE ASSESSMENT</p>
-            <h1 className="report-h1 mt-4" style={{ color: accent }}>
+            <h1 className="report-h1 mt-4" style={{ color: accent, fontSize: 'var(--report-text-cover-h1)' }}>
               {data.definition.title}
             </h1>
             <p className="report-lead mt-2 text-[var(--report-text-secondary)]">

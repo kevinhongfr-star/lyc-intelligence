@@ -373,7 +373,7 @@ export function AssessmentCatalogPage() {
           <a
             href="/login"
             onClick={() => trackCTA({ location: 'catalog_nav', label: 'Platform Login', destination: '/login' })}
-            className="cta-glow"
+            className=""
             style={{
               display: 'inline-flex',
               alignItems: 'center',

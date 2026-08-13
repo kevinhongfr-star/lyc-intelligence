@@ -12,8 +12,9 @@
  * Brand continuity with index.css:
  *   - Zero border radius on ALL elements
  *   - Crimson Pro headings, DM Sans body, IBM Plex Mono for data/numbers
- *   - Core accent #C108AB (LYC signature fuchsia) — per-diagnostic accents
- *     apply via --report-accent override scoped to each diagnostic report
+ *   - Core accent #C108AB (LYC signature fuchsia) — the SINGLE brand accent
+ *     across every diagnostic report (#1379 brand compliance: no per-
+ *     diagnostic teal/blue/green secondary accents)
  *
  * USAGE:
  *   - Report pages: <div className="report-shell report-a4"> ... </div>
@@ -86,14 +87,19 @@
     --report-border-subtle:  #F0EEEB;
     --report-divider:        #DDDAD6;
 
+    /* Functional status colors — encode score-band/tier meaning only,
+     * never used as brand accents. Kept muted + print-safe (#1379). */
     --report-success:        #0A7A4E;
-    --report-teal:           #117A8B;
     --report-warning:        #A86A00;
     --report-error:          #9A2336;
     --report-info:           #1E5A9E;
-    --report-sky:            #2D6E9E;
-    --report-lavender:       #5C4E95;
-    --report-cream:          #C6A964;
+    /* #1379 brand compliance: decorative secondary accents removed —
+     * these legacy tokens now resolve to the single LYC fuchsia accent
+     * so no teal/blue/lavender/cream leak into report rendering. */
+    --report-teal:           #C108AB;
+    --report-sky:            #C108AB;
+    --report-lavender:       #C108AB;
+    --report-cream:          #C108AB;
 
     /* ── 3. Spacing (print: 4px/8px rhythm for tight alignment) ─ */
     --report-space-1:  4px;
@@ -107,13 +113,17 @@
     --report-space-12: 48px;
     --report-space-16: 64px;
 
-    /* ── 4. Dimension + gauge palette ──────────────────────── */
-    --report-dim-1: #C108AB;   /* accent: highest-weight dim */
-    --report-dim-2: #117A8B;
-    --report-dim-3: #A86A00;
-    --report-dim-4: #1E5A9E;
-    --report-dim-5: #5C4E95;
-    --report-dim-6: #0A7A4E;
+    /* ── 4. Dimension + gauge palette ────────────────────────
+     *    #1379 brand compliance: ONE accent only (LYC fuchsia).
+     *    All dimension markers resolve to the accent so no teal/
+     *    blue/green/lavender secondary accents appear in the PDF.
+     *    Dimensions are differentiated by label + score, not color. */
+    --report-dim-1: #C108AB;
+    --report-dim-2: #C108AB;
+    --report-dim-3: #C108AB;
+    --report-dim-4: #C108AB;
+    --report-dim-5: #C108AB;
+    --report-dim-6: #C108AB;
 
     /* ── 5. Radius (ZERO) + shadow (very subtle print-safe) ── */
     --report-radius:  0;      /* NEVER override */
@@ -130,15 +140,18 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Diagnostic accents — apply .report-accent-<slug> on .report-shell.
-   * Values per #89 PDF spec (#89 ticket copy):
-   * PRISM=#C108AB SPARK=#FF6B35 FORGE=#1E88E5 BRIDGE=#00B4D8 MOSAIC=#7B2CBF DRIVE=#2D6A4F */
+  /* Diagnostic accent hooks — apply .report-accent-<slug> on .report-shell.
+   * #1379 brand compliance: ECHO Canonical Brand Spec mandates a SINGLE
+   * accent color (LYC fuchsia #C108AB) across every diagnostic report.
+   * The per-diagnostic hooks are retained so reportShellClass() keeps
+   * working, but every hook now resolves to the same fuchsia accent +
+   * CMYK-safe ink. No teal/blue/green/orange secondary accents. */
   .report-accent-prism  { --report-accent: #C108AB; --report-accent-ink: #760568; }
-  .report-accent-spark  { --report-accent: #FF6B35; --report-accent-ink: #C94A15; }
-  .report-accent-forge  { --report-accent: #1E88E5; --report-accent-ink: #0E5AA2; }
-  .report-accent-bridge { --report-accent: #00B4D8; --report-accent-ink: #007B96; }
-  .report-accent-mosaic { --report-accent: #7B2CBF; --report-accent-ink: #4E1682; }
-  .report-accent-drive  { --report-accent: #2D6A4F; --report-accent-ink: #184330; }
+  .report-accent-spark  { --report-accent: #C108AB; --report-accent-ink: #760568; }
+  .report-accent-forge  { --report-accent: #C108AB; --report-accent-ink: #760568; }
+  .report-accent-bridge { --report-accent: #C108AB; --report-accent-ink: #760568; }
+  .report-accent-mosaic { --report-accent: #C108AB; --report-accent-ink: #760568; }
+  .report-accent-drive  { --report-accent: #C108AB; --report-accent-ink: #760568; }
 }
 
 /* ================================================================
@@ -274,7 +287,7 @@
     font-size: 9px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--report-muted);
+    color: #9CA3AF;  /* #1379: section label / eyebrow gray per ECHO brand spec */
   }
 
   /* Data row for KPIs — label + mono number */

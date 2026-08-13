@@ -65,19 +65,19 @@ export const PAGE_META: Record<string, PageMeta> = {
   },
 
   pricing: {
-    title: 'Pricing — LYC Intelligence | Miles & Subscriptions',
+    title: 'Pricing — LYC Intelligence | Leadership Assessments',
     description:
-      'Five subscription tiers from Explorer to Council. Assessment pricing from 99 to 199 miles. USD and CNY. NEXUS AI coaching included. Start with a complimentary introduction.',
+      'Three plans from Complimentary to Council. All 6 leadership assessments, NEXUS AI coaching, and personalised reports. USD and CNY. Start complimentary.',
     path: '/pricing',
     type: 'website',
     structuredData: null,
   },
 
   nexus: {
-    title: 'NEXUS AI — Executive Intelligence Coach | LYC',
+    title: 'NEXUS AI — Your AI Executive Coach | LYC Intelligence',
     description:
-      'NEXUS is your private AI leadership coach. Ask anything — career strategy, assessment insights, positioning. Powered by 11 validated instruments and APAC placement data.',
-    path: '/nexus/chat',
+      'NEXUS is your AI executive coach. It knows all 6 leadership assessments, interprets your results, and gives you personalised leadership advice. 3 complimentary messages.',
+    path: '/nexus',
     type: 'website',
     structuredData: {
       '@context': 'https://schema.org',
@@ -89,7 +89,7 @@ export const PAGE_META: Record<string, PageMeta> = {
         '@type': 'Offer',
         price: '0',
         priceCurrency: 'USD',
-        description: 'Complimentary Executive Introduction tier',
+        description: 'Complimentary tier — 3 NEXUS messages',
       },
       publisher: {
         '@type': 'Organization',
@@ -129,10 +129,10 @@ export const PAGE_META: Record<string, PageMeta> = {
   },
 
   assessments: {
-    title: '11 Leadership Assessments — LYC Intelligence',
+    title: '6 Leadership Assessments — LYC Intelligence',
     description:
-      'CPI, SHIFT suite, and advisory instruments. Validated against 20 years of APAC placement data. Archetype classification, dimension scorecards, and development roadmaps.',
-    path: '/assessment',
+      'Six focused leadership assessments — PRISM, SPARK, FORGE, BRIDGE, MOSAIC, DRIVE. Career branding, AI readiness, sales, China leadership, cultural intelligence, execution. Validated against APAC placement data.',
+    path: '/assessments',
     type: 'website',
     structuredData: null,
   },
@@ -187,7 +187,7 @@ export function getAssessmentMeta(
   totalQuestions: number,
 ): AssessmentMeta {
   const title = `${b2cName} Assessment | LYC Intelligence`;
-  const description = `${tagline || name}. ${durationMinutes} min · ${totalQuestions} questions · ${milesCost} miles. Validated against 20 years of APAC placement data. Archetype classification and development roadmap.`;
+  const description = `${tagline || name}. ${durationMinutes} min · ${totalQuestions} questions. Validated against APAC placement data. Archetype classification and development roadmap.`;
 
   return {
     code,
@@ -195,9 +195,9 @@ export function getAssessmentMeta(
     milesCost,
     title,
     description,
-    path: `/assessment/${code.toLowerCase()}`,
+    path: `/assessments/${code.toLowerCase()}`,
     type: 'product',
-    ogImage: ogImageUrl(b2cName, `${code} · ${milesCost} miles`),
+    ogImage: ogImageUrl(b2cName, `${code} Assessment`),
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'Product',
@@ -210,9 +210,9 @@ export function getAssessmentMeta(
       offers: {
         '@type': 'Offer',
         price: String(milesCost),
-        priceCurrency: 'MILES',
+        priceCurrency: 'USD',
         availability: 'https://schema.org/InStock',
-        url: `${SITE_URL}/assessment/${code.toLowerCase()}`,
+        url: `${SITE_URL}/assessments/${code.toLowerCase()}`,
       },
     },
   };

@@ -11,6 +11,7 @@
  */
 import React from 'react';
 import { ArrowRight, Compass, Home, Search } from 'lucide-react';
+import { SEO } from '@/components/seo/SEO';
 
 export default function NotFoundPage() {
   return (
@@ -24,6 +25,7 @@ export default function NotFoundPage() {
         color: '#000000',
       }}
     >
+      <SEO title="Page Not Found — LYC Intelligence" description="The page you're looking for doesn't exist. Explore LYC Intelligence assessments and NEXUS AI coaching." path="/404" />
       {/* Left column — accent bar + 404 wordmark */}
       <div
         style={{

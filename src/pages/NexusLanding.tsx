@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { Menu, X, ArrowRight, Star, Zap, Target } from 'lucide-react';
+import { SEO } from '@/components/seo/SEO';
+import { NexusChatMockup } from '@/components/visual/ProductMockup';
 
 const ACCENT = '#C108AB';
 const INK = '#0F1115';
@@ -300,6 +302,10 @@ function HowItWorks() {
             </div>
           ))}
         </div>
+        {/* #1370 — CSS-illustrated NEXUS chat preview (premium visual asset) */}
+        <div className="nl-reveal" style={{ marginTop: 56, display: 'flex', justifyContent: 'center' }}>
+          <NexusChatMockup style={{ maxWidth: 420, width: '100%' }} />
+        </div>
       </div>
     </section>
   );
@@ -479,10 +485,11 @@ function Pricing() {
 }
 
 // ── TRUST ──────────────────────────────────────────────────────────
+// #1370 — standardized on lucide-react icons (no mixed emoji/text symbols).
 const TRUST = [
-  { icon: '★', title: 'Backed by LYC Partners', desc: "10+ years of executive search and assessment expertise across China and APAC. We've placed hundreds of senior leaders." },
-  { icon: '⚡', title: 'Powered by LYC Intelligence', desc: 'Multi-agent AI systems, specialized assessment models, and talent market data — all working together behind the scenes.' },
-  { icon: '◎', title: 'Global Benchmarks', desc: "Every diagnostic is benchmarked against executives across 47 markets. You're not just comparing to yourself." },
+  { icon: Star, title: 'Backed by LYC Partners', desc: "10+ years of executive search and assessment expertise across China and APAC. We've placed hundreds of senior leaders." },
+  { icon: Zap, title: 'Powered by LYC Intelligence', desc: 'Multi-agent AI systems, specialized assessment models, and talent market data — all working together behind the scenes.' },
+  { icon: Target, title: 'Global Benchmarks', desc: "Every diagnostic is benchmarked against executives across 47 markets. You're not just comparing to yourself." },
 ];
 function Trust() {
   return (
@@ -493,13 +500,18 @@ function Trust() {
           <h2 className="section-heading" style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 0 }}>Built on real expertise. <em style={{ fontWeight: 400 }}>Validated by real data.</em></h2>
         </div>
         <div className="nl-reveal grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48, textAlign: 'center' }}>
-          {TRUST.map(t => (
+          {TRUST.map(t => {
+            const Icon = t.icon;
+            return (
             <div key={t.title} style={{ padding: '0 16px' }}>
-              <div style={{ width: 48, height: 48, margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${G200}`, fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontSize: 16, color: ACCENT, background: WHITE }}>{t.icon}</div>
+              <div style={{ width: 48, height: 48, margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${G200}`, color: ACCENT, background: WHITE }}>
+                <Icon style={{ width: 22, height: 22, strokeWidth: 1.75 }} aria-hidden="true" />
+              </div>
               <h4 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: 18, marginBottom: 10, fontWeight: 700, color: INK }}>{t.title}</h4>
               <p style={{ color: G600, fontSize: 14, lineHeight: 1.6 }}>{t.desc}</p>
             </div>
-          ))}
+            );
+          })}
         </div>
         <div className="nl-reveal" style={{ textAlign: 'center', marginTop: 64, paddingTop: 48, borderTop: `1px solid ${G200}` }}>
           <span style={{ ...monoStyle, color: G400, marginBottom: 12, display: 'block' }}>The intelligence engine</span>
@@ -587,6 +599,7 @@ export function NexusLanding() {
   useScrollReveal();
   return (
     <div style={{ background: OFF, color: INK, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", lineHeight: 1.6, WebkitFontSmoothing: 'antialiased' }}>
+      <SEO page="nexus" />
       <Nav />
       <main>
         <Hero />

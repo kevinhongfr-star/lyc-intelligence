@@ -1,3 +1,18 @@
+/**
+ * services/reportGenerator.ts — legacy standalone jsPDF generator.
+ *
+ * #1379 brand compliance: all roundedRect calls converted to plain rect
+ * (zero border radius). Accent is LYC fuchsia #C108AB (rgb 193,8,171).
+ *
+ * FONT LIMITATION: text is drawn with jsPDF's built-in Helvetica — the
+ * ECHO brand fonts (Crimson Pro / DM Sans / IBM Plex Mono) cannot be
+ * embedded without bundling font binaries as jsPDF payloads. The canonical
+ * B2C assessment PDF path (pdfExport.ts → html2canvas of PdfReport.tsx)
+ * renders the real brand fonts and is the source of truth for PDFs.
+ *
+ * NOTE: generatePDF() currently has no consumers (superseded by the
+ * html2canvas pipeline). Kept for compliance; presentation-only changes.
+ */
 import type { AssessmentType, AssessmentReport } from '@/types';
 
 declare global {
@@ -61,7 +76,7 @@ export async function generatePDF(assessmentType: AssessmentType, result: { scor
   // Archetype highlight (if present)
   if (result.archetype) { 
     doc.setFillColor(25, 25, 25);
-    doc.roundedRect(margin, y, pw - margin * 2, 20, 4, 4, 'F');
+    doc.rect(margin, y, pw - margin * 2, 20, 'F');
     doc.setTextColor(255, 255, 255); 
     doc.setFontSize(13); 
     doc.setFont('helvetica', 'bold');
@@ -95,12 +110,12 @@ export async function generatePDF(assessmentType: AssessmentType, result: { scor
     for (const [key, val] of entries) {
       // Draw score bar background
       doc.setFillColor(30, 30, 30);
-      doc.roundedRect(margin + 50, y - 4, 100, 5, 2, 2, 'F');
+      doc.rect(margin + 50, y - 4, 100, 5, 'F');
       
       // Draw score fill
       const fillWidth = Math.min(100, (val / 100) * 100);
       doc.setFillColor(193, 8, 171);
-      doc.roundedRect(margin + 50, y - 4, fillWidth, 5, 2, 2, 'F');
+      doc.rect(margin + 50, y - 4, fillWidth, 5, 'F');
       
       doc.text(key, margin, y);
       doc.setTextColor(220, 220, 220);

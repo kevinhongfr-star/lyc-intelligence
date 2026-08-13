@@ -5,6 +5,7 @@ import { ASSESSMENT_CATALOG, FLAGSHIP_KEYS, SHIFT_SUITE_KEYS, ADVISORY_PRODUCT_K
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { SEO } from '@/components/seo/SEO';
 import { trackCTA, trackNexusChatInitiation, trackAssessmentStart } from '@/analytics/eventTracker';
+import { ResultMockup, NexusChatMockup } from '@/components/visual/ProductMockup';
 
 const DS = {
   headingFont: "'Crimson Pro', Georgia, serif",
@@ -613,7 +614,7 @@ export function Landing() {
           <a
             href="/login"
             onClick={() => trackCTA({ location: 'hero', label: 'Platform Login', destination: '/login' })}
-            className="cta-glow"
+            className=""
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -757,7 +758,7 @@ export function Landing() {
             <a
               href="/nexus/chat"
               onClick={() => { trackNexusChatInitiation('hero_cta'); trackCTA({ location: 'hero', label: 'Try NEXUS (primary)', destination: '/nexus/chat' }); }}
-              className="cta-glow"
+              className=""
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -819,7 +820,7 @@ export function Landing() {
       {/* TRUST BAR */}
       <section style={{ background: DS.bgAlt, padding: '44px 32px', borderBottom: `1px solid ${DS.border}` }}>
         <div
-          className="reveal"
+          className="reveal grid-responsive"
           style={{
             maxWidth: '1120px',
             margin: '0 auto',
@@ -878,7 +879,7 @@ export function Landing() {
             One thinking partner.<br />Every executive framework.
           </h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+        <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           {CAPABILITIES.map(c => (
             <a
               key={c.title}
@@ -922,6 +923,46 @@ export function Landing() {
               </span>
             </a>
           ))}
+        </div>
+      </section>
+
+      {/* #1370 — SEE IT IN ACTION: CSS-illustrated product mockups (premium visual assets) */}
+      <section
+        className="reveal section-padding"
+        style={{ maxWidth: '1120px', margin: '0 auto', padding: '96px 32px 48px' }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <div
+            style={{
+              fontFamily: DS.monoFont,
+              fontSize: '10px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.26em',
+              color: '#9CA3AF',
+              marginBottom: '12px',
+            }}
+          >
+            See it in action
+          </div>
+          <h2
+            style={{
+              fontFamily: DS.headingFont,
+              fontSize: 'clamp(26px, 3vw, 34px)',
+              fontWeight: 700,
+              color: DS.text,
+              maxWidth: '680px',
+              margin: '0 auto',
+              lineHeight: 1.18,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Premium reports. AI coaching. One platform.
+          </h2>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', alignItems: 'start', justifyItems: 'center' }}>
+          <ResultMockup style={{ maxWidth: 340, width: '100%' }} />
+          <NexusChatMockup style={{ maxWidth: 340, width: '100%' }} />
         </div>
       </section>
 
@@ -1111,7 +1152,7 @@ export function Landing() {
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a
               href="/nexus/chat"
-              className="cta-glow"
+              className=""
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
