@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { DS } from '@/tokens';
+import { DS, TEAL } from '@/tokens';
 import {
   Card,
   CardContent,
@@ -8,37 +8,30 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 import {
   ASSESSMENT_CATALOG,
+  PILLAR_CATEGORIES,
+  ASSESSMENT_PILLAR,
   type AssessmentInfo,
+  type PillarKey,
 } from '@/assessments/catalog';
 import { SEO } from '@/components/seo/SEO';
 import { trackCTA } from '@/analytics/eventTracker';
 
-type FilterCategory = 'all' | 'self-awareness' | 'leadership-impact' | 'transition-change' | 'team-culture';
+// W2-6 — ONE accent per page. Catalog = neutral product index → teal.
+// Used for badges, active filter tabs, and CTAs so the page carries a single
+// disciplined accent (same rule as the hero landing pages).
+const PAGE_ACCENT = TEAL;
+const PAGE_ACCENT_DARK = '#006B5E';
+
+// W2-7: pillar taxonomy is the single source of truth in @/assessments/catalog.
+// "all" is a filter-only state, not a real pillar.
+type FilterCategory = 'all' | PillarKey;
 
 const CATEGORY_FILTERS: { key: FilterCategory; label: string }[] = [
   { key: 'all', label: 'All' },
-  { key: 'self-awareness', label: 'Self-Awareness' },
-  { key: 'leadership-impact', label: 'Leadership Impact' },
-  { key: 'transition-change', label: 'Transition & Change' },
-  { key: 'team-culture', label: 'Team & Culture' },
+  ...PILLAR_CATEGORIES.map((p) => ({ key: p.key as FilterCategory, label: p.label })),
 ];
-
-const ASSESSMENT_CATEGORIES: Record<string, FilterCategory> = {
-  cpi: 'self-awareness',
-  prism: 'self-awareness',
-  spark: 'self-awareness',
-  coach: 'self-awareness',
-  impact: 'leadership-impact',
-  leap: 'leadership-impact',
-  forge: 'leadership-impact',
-  bridge: 'transition-change',
-  drive: 'transition-change',
-  mosaic: 'transition-change',
-  quest: 'team-culture',
-};
 
 const ALL_11_ORDER = ['CPI', 'LEAP', 'SPARK', 'IMPACT', 'QUEST', 'BRIDGE', 'DRIVE', 'FORGE', 'COACH', 'PRISM', 'MOSAIC'];
 
@@ -71,9 +64,9 @@ function buildCatalogEntry(code: string): CatalogEntry {
     };
   }
   const FALLBACKS: Record<string, Partial<CatalogEntry> & { name: string; benefit: string }> = {
-    CPI: { name: 'China Pipeline Index', benefit: 'Flagship executive positioning diagnostic for APAC markets.', dimensions: 6, archetypes: 12, price: 199, questions: 120, minutes: 45 },
-    LEAP: { name: 'LEAP Transition', benefit: 'Role-transition readiness for executives stepping up or across.', dimensions: 5, archetypes: 16, price: 149, questions: 80, minutes: 30 },
-    IMPACT: { name: 'IMPACT Board', benefit: 'Governance and board-level contribution calibration.', dimensions: 5, archetypes: 9, price: 149, questions: 75, minutes: 25 },
+    CPI: { name: 'Core Professional Insight', benefit: 'The flagship executive self-awareness assessment. 6 dimensions, 6 archetypes, 3 layers of depth — built on two decades of C-suite search methodology.', dimensions: 6, archetypes: 6, price: 199, questions: 30, minutes: 15 },
+    LEAP: { name: 'Leadership Archetype & APAC Translation', benefit: 'Deep leadership self-awareness across five operating dimensions. Seventeen archetypes with an APAC translation overlay.', dimensions: 5, archetypes: 17, price: 149, questions: 30, minutes: 15 },
+    IMPACT: { name: 'Board Effectiveness Assessment', benefit: 'Board and organisational impact calibration. Five dimensions, eight archetypes, APAC mandate credibility.', dimensions: 5, archetypes: 8, price: 149, questions: 30, minutes: 15 },
     QUEST: { name: 'QUEST Leadership', benefit: 'Leadership operating model across six executive dimensions.', dimensions: 6, archetypes: 12, price: 149, questions: 90, minutes: 30 },
     COACH: { name: 'COACH Developmental', benefit: 'Developmental coaching orientation and bilateral capability.', dimensions: 4, archetypes: 8, price: 99, questions: 60, minutes: 20 },
   };
@@ -103,7 +96,7 @@ function FlagshipBadge() {
         fontSize: '10px',
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
-        background: DS.accent,
+        background: PAGE_ACCENT,
         color: DS.bg,
         padding: '4px 10px',
         fontWeight: 600,
@@ -204,16 +197,34 @@ function FlagshipCard() {
                 alignItems: 'center',
               }}
             >
-              <Button
-                variant="primary"
-                size="lg"
+              <a
+                href="/assessment/cpi"
                 onClick={() => {
                   trackCTA({ location: 'catalog_flagship', label: 'Start CPI Assessment', destination: '/assessment/cpi' });
                   window.location.href = '/assessment/cpi';
                 }}
+                style={{
+                  background: PAGE_ACCENT,
+                  color: DS.bg,
+                  border: `1px solid ${PAGE_ACCENT}`,
+                  fontFamily: DS.bodyFont,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.16em',
+                  padding: '16px 28px',
+                  minHeight: 44,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textDecoration: 'none',
+                  transition: DS.transition,
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = PAGE_ACCENT_DARK)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = PAGE_ACCENT)}
               >
                 Start CPI Assessment
-              </Button>
+              </a>
               <LearnMoreLink slug={cpi.slug} />
             </div>
           </div>
@@ -375,14 +386,14 @@ function FilterTabs({
               padding: '12px 16px',
               cursor: 'pointer',
               letterSpacing: '0.02em',
-              borderBottom: isActive ? `2px solid ${DS.accent}` : '2px solid transparent',
+              borderBottom: isActive ? `2px solid ${PAGE_ACCENT}` : '2px solid transparent',
               transition: DS.transition,
               marginBottom: '-1px',
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
                 (e.currentTarget as HTMLButtonElement).style.color = DS.text;
-                (e.currentTarget as HTMLButtonElement).style.borderBottom = `2px solid ${DS.accent}4D`;
+                (e.currentTarget as HTMLButtonElement).style.borderBottom = `2px solid ${PAGE_ACCENT}4D`;
               }
             }}
             onMouseLeave={(e) => {
@@ -486,7 +497,7 @@ export function AssessmentCatalogPage() {
 
   const filteredCatalog = useMemo(() => {
     if (activeFilter === 'all') return FULL_CATALOG;
-    return FULL_CATALOG.filter((e) => ASSESSMENT_CATEGORIES[e.slug] === activeFilter);
+    return FULL_CATALOG.filter((e) => ASSESSMENT_PILLAR[e.code] === activeFilter);
   }, [activeFilter]);
 
   return (
@@ -589,6 +600,106 @@ export function AssessmentCatalogPage() {
             {filteredCatalog.map((entry) => (
               <FullCatalogCard key={entry.code} entry={entry} />
             ))}
+          </div>
+        </section>
+
+        {/* SECTION 4 — NOT SURE WHERE TO START? (CPI recommendation) */}
+        <section style={{ marginTop: '72px', marginBottom: '24px' }}>
+          <div
+            style={{
+              background: DS.bgDark,
+              position: 'relative',
+              overflow: 'hidden',
+              padding: '72px 40px',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: `radial-gradient(circle at 50% 40%, ${PAGE_ACCENT}14 0%, transparent 70%)`,
+                pointerEvents: 'none',
+              }}
+            />
+            <div style={{ position: 'relative', maxWidth: 620, margin: '0 auto' }}>
+              <div
+                style={{
+                  fontFamily: DS.monoFont,
+                  fontSize: '10px',
+                  letterSpacing: '0.24em',
+                  textTransform: 'uppercase',
+                  color: DS.mutedDim,
+                  marginBottom: '14px',
+                  fontWeight: 600,
+                }}
+              >
+                Not sure where to start?
+              </div>
+              <h2
+                style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: 'clamp(26px, 3.4vw, 36px)',
+                  fontWeight: 700,
+                  color: DS.bg,
+                  lineHeight: 1.18,
+                  letterSpacing: '-0.015em',
+                  margin: 0,
+                }}
+              >
+                Start with CPI — our flagship comprehensive assessment.
+              </h2>
+              <p
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: '14.5px',
+                  color: 'rgba(255,255,255,0.66)',
+                  lineHeight: 1.6,
+                  marginTop: '16px',
+                  maxWidth: 480,
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                }}
+              >
+                Six dimensions. Six archetypes. Three layers of depth. CPI is the
+                natural entry point — the complete calibration the rest of the
+                catalog builds on.
+              </p>
+              <div style={{ marginTop: '28px' }}>
+                <a
+                  href="/assessment/cpi"
+                  onClick={() =>
+                    trackCTA({
+                      location: 'catalog_recommender',
+                      label: 'Start CPI Assessment',
+                      destination: '/assessment/cpi',
+                    })
+                  }
+                  style={{
+                    background: PAGE_ACCENT,
+                    color: DS.bg,
+                    border: `1px solid ${PAGE_ACCENT}`,
+                    fontFamily: DS.bodyFont,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.16em',
+                    padding: '16px 32px',
+                    minHeight: 44,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textDecoration: 'none',
+                    transition: DS.transition,
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = PAGE_ACCENT_DARK)}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = PAGE_ACCENT)}
+                >
+                  Start CPI Assessment →
+                </a>
+              </div>
+            </div>
           </div>
         </section>
       </main>

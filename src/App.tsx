@@ -93,6 +93,8 @@ const CpiFlagshipLanding = lazy(() => import('@/pages/CpiFlagshipLanding').then(
 const PrismLanding = lazy(() => import('@/pages/PrismLanding').then(m => ({ default: m.PrismLanding })));
 const PrismResultsPage = lazy(() => import('@/pages/PrismResultsPage').then(m => ({ default: m.PrismResultsPage })));
 const SparkLanding = lazy(() => import('@/pages/SparkLanding').then(m => ({ default: m.SparkLanding })));
+const LeapLanding = lazy(() => import('@/pages/LeapLanding').then(m => ({ default: m.LeapLanding })));
+const ImpactLanding = lazy(() => import('@/pages/ImpactLanding').then(m => ({ default: m.ImpactLanding })));
 const SparkResultsPage = lazy(() => import('@/pages/SparkResultsPage').then(m => ({ default: m.SparkResultsPage })));
 const LeapResultsPage = lazy(() => import('@/pages/LeapResultsPage').then(m => ({ default: m.LeapResultsPage })));
 const QuestResultsPage = lazy(() => import('@/pages/QuestResultsPage').then(m => ({ default: m.QuestResultsPage })));
@@ -276,9 +278,9 @@ export default function App() {
             {/* Explicit redirects for instruments that have no landing data */}
             <Route path="assessment/cpi" element={<CpiFlagshipLanding />} />
             <Route path="assessment/shift" element={<Navigate to="/assessments" replace />} />
-            <Route path="assessment/leap" element={<Navigate to="/assessments" replace />} />
+            <Route path="assessment/leap" element={<LeapLanding />} />
             <Route path="assessment/quest" element={<Navigate to="/assessments" replace />} />
-            <Route path="assessment/impact" element={<Navigate to="/assessments" replace />} />
+            <Route path="assessment/impact" element={<ImpactLanding />} />
             <Route path="assessment/coach" element={<Navigate to="/assessments" replace />} />
             {/* Generic canonical landing for 4 remaining instruments: FORGE, BRIDGE, MOSAIC, DRIVE */}
             <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />

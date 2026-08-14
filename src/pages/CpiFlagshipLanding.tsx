@@ -757,6 +757,80 @@ export function CpiFlagshipLanding() {
             </div>
           </div>
         </section>
+
+        {/* 10. CPI FOR TEAMS — secondary B2B path (#1377 / W2-8)
+            Primary message above is B2C / individual. This block is clearly
+            labeled as a separate organizational offering and uses a contact
+            CTA (not direct sign-up) so it never muddies the B2C flow. */}
+        <section id="cpi-for-teams" style={{ background: DS.bgAlt, padding: '80px 32px' }}>
+          <div style={{ maxWidth: 920, margin: '0 auto' }}>
+            <div
+              style={{
+                background: DS.bg,
+                border: `1px solid ${DS.cardBorder}`,
+                borderLeft: `3px solid ${ACCENT}`,
+                padding: '40px 40px',
+              }}
+            >
+              <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.24em', color: DS.muted, textTransform: 'uppercase', marginBottom: 14, fontWeight: 600 }}>
+                ALSO AVAILABLE FOR TEAMS &amp; ORGANIZATIONS
+              </div>
+              <h2 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(24px, 3vw, 30px)', fontWeight: 700, color: DS.text, lineHeight: 1.2, letterSpacing: '-0.015em', margin: 0 }}>
+                CPI for Teams — the organizational version.
+              </h2>
+              <p style={{ fontFamily: DS.bodyFont, fontSize: 15, color: DS.textSecondary, lineHeight: 1.65, marginTop: 16, maxWidth: 640 }}>
+                The same CPI instrument, configured for executive teams and
+                leadership programs. Adds multi-rater 360° capability so each
+                leader's self-view is calibrated against how peers, reports, and
+                supervisors actually experience their leadership — surfaced as
+                team-level patterns, blind-spot triangulation, and cohort
+                benchmarks rather than a single individual report.
+              </p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '24px 0 0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }}>
+                {[
+                  'Multi-rater 360° input calibrated against self-view',
+                  'Team-level blind-spot and variance analysis',
+                  'Cohort benchmarks for leadership programs',
+                  'Consultant-led debrief and development planning',
+                ].map((point) => (
+                  <li key={point} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                    <span style={{ marginTop: 2 }}><CheckMark /></span>
+                    <span style={{ fontFamily: DS.bodyFont, fontSize: 14, color: DS.text, lineHeight: 1.55 }}>{point}</span>
+                  </li>
+                ))}
+              </ul>
+              <div style={{ marginTop: 32, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+                <a
+                  href="mailto:partners@lyc-partners.ai?subject=CPI%20for%20Teams%20inquiry"
+                  style={{
+                    background: 'transparent',
+                    color: DS.text,
+                    border: `1px solid ${DS.text}`,
+                    fontFamily: DS.bodyFont,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.15em',
+                    padding: '14px 22px',
+                    minHeight: 44,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textDecoration: 'none',
+                    transition: `background ${DS.transition}`,
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = DS.text; e.currentTarget.style.color = DS.bg; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = DS.text; }}
+                >
+                  Talk to us about CPI for Teams
+                </a>
+                <span style={{ fontFamily: DS.monoFont, fontSize: 11, color: DS.muted, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  Separate organizational offering · Not the individual sign-up
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </>
   );

@@ -426,3 +426,86 @@ export const SHIFT_ALIASES: Record<string, string> = {
   BRIDGE: "BRIDGE",
   MOSAIC: "MOSAIC",
 };
+
+// ── W2-7 — Canonical pillar taxonomy (single source of truth) ──────────────
+//
+// AUDIT TRAIL (W2-7): The "content canon v3.4" referenced in the W2 brief is
+// NOT present in this repository. The only upstream canon is
+// /workspace/specs/NEXUS_PRODUCT_SPEC_v3_ALIGNED.md §6, which classifies the
+// 11 instruments along a COMMERCIAL axis (Flagship / SHIFT Suite / Advisory
+// Products) — not a behavioral pillar axis. Because the commercial axis is
+// already expressed via `InstrumentTierGroup` and the catalog's flagship/hero
+// sections, the behavioral pillar scheme below is the de-facto canonical
+// CONTENT taxonomy for the catalog filter + nav.
+//
+// This module is the single source of truth: the catalog page, nav, and any
+// landing-page category labels read from here. To rename a pillar or remap an
+// assessment, edit PILLAR_CATEGORIES / ASSESSMENT_PILLAR only.
+//
+// All 11 assessments are mapped. Mapping rationale is behavioral (what each
+// instrument measures), not commercial tier.
+
+/** Behavioral pillar key (slug form). The literal "all" is reserved for the
+ *  catalog filter's "show everything" state and is NOT a real pillar. */
+export type PillarKey =
+  | "self-awareness"
+  | "leadership-impact"
+  | "transition-change"
+  | "team-culture";
+
+export interface PillarCategory {
+  key: PillarKey;
+  /** Display label shown in filter tabs + nav. */
+  label: string;
+  /** One-line description for nav / recommender copy. */
+  blurb: string;
+}
+
+/** Configurable pillar list. Order = filter tab order. */
+export const PILLAR_CATEGORIES: PillarCategory[] = [
+  {
+    key: "self-awareness",
+    label: "Self-Awareness",
+    blurb: "Individual professional insight and positioning.",
+  },
+  {
+    key: "leadership-impact",
+    label: "Leadership Impact",
+    blurb: "How you lead, operate, and create leverage.",
+  },
+  {
+    key: "transition-change",
+    label: "Transition & Change",
+    blurb: "Moving roles, markets, and mandates.",
+  },
+  {
+    key: "team-culture",
+    label: "Team & Culture",
+    blurb: "Shaping teams, partnerships, and culture.",
+  },
+];
+
+/** Assessment code (UPPERCASE) → pillar key. All 11 mapped. */
+export const ASSESSMENT_PILLAR: Record<string, PillarKey> = {
+  // Self-Awareness — individual insight, brand, readiness
+  CPI: "self-awareness",
+  PRISM: "self-awareness",
+  SPARK: "self-awareness",
+  COACH: "self-awareness",
+  // Leadership Impact — operating patterns, board/mandate contribution
+  LEAP: "leadership-impact",
+  IMPACT: "leadership-impact",
+  FORGE: "leadership-impact",
+  // Transition & Change — cross-border, motivation, mandate integration
+  BRIDGE: "transition-change",
+  DRIVE: "transition-change",
+  MOSAIC: "transition-change",
+  // Team & Culture — operating model + team/architectural leadership
+  QUEST: "team-culture",
+};
+
+export function pillarLabelFor(code: string): string {
+  const key = ASSESSMENT_PILLAR[code.toUpperCase()];
+  const pillar = PILLAR_CATEGORIES.find((p) => p.key === key);
+  return pillar?.label ?? "";
+}

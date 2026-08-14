@@ -35,6 +35,18 @@ export const ACCENT_LIGHT = '#E040C8';
 /** Secondary brand — teal (success / subtle accents, data viz only). */
 export const TEAL = '#00897B';
 
+/**
+ * Hero assessment accent colors (W2 — one accent per hero landing page).
+ * Reserved exclusively for the LEAP / SPARK / IMPACT landing pages so each
+ * hero assessment carries its own disciplined accent. Not used elsewhere.
+ *  - OCEAN        : LEAP   — deep leadership self-awareness
+ *  - AMBER        : SPARK  — focused strategic potential
+ *  - FOREST_GREEN : IMPACT — team & organizational impact
+ */
+export const OCEAN = '#1E4D8C';
+export const AMBER = '#B45309';
+export const FOREST_GREEN = '#166534';
+
 /** Semantic status colors (permitted alongside the single decorative accent). */
 export const SUCCESS = '#16A34A';
 export const WARNING = '#CA8A04';
