@@ -26,9 +26,15 @@ export interface LEAPDimensionBank {
 export const INSTRUMENT = "LEAP";
 export const FULL_NAME = "Leadership Evaluation & Psychological Profiling";
 export const VERSION = "2.0";
-export const TOTAL_QUESTIONS = 15;
-export const SCALE = "1-5 Likert";
-export const DELIVERY_MINUTES = 12;
+// NOTE: questions/leap.ts organises DISC items per-dimension (D/I/S/C), so the
+// same 16 forced-choice item sets appear in 4 parallel dim arrays each. The
+// de-duplicated question list a user actually answers lives in scoring/leap.ts
+// (16 DISC forced-choice + 15 CR Likert + 4 CB cross-border = 35). Keep this
+// constant aligned with scoring/leap.ts TOTAL_QUESTIONS so every consumer
+// (engine progress bar, catalog, QUESTION_BANKS index) sees the real total.
+export const TOTAL_QUESTIONS = 35;
+export const SCALE = "Forced-choice DISC + Likert (mixed)";
+export const DELIVERY_MINUTES = 15;
 
 export const DIMENSIONS: LEAPDimensionBank[] = [
   {

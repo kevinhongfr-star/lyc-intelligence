@@ -3,8 +3,8 @@
  *
  * Edge function using @vercel/og's ImageResponse.
  * Renders 1200×630 PNG with LYC Intelligence brand template:
- *   - LYC logo in corner
- *   - Page title in Crimson Pro
+ *   - LYC wordmark in corner
+ *   - Page title in system serif stack (generic serif family)
  *   - Accent color bar at bottom (#C108AB)
  *   - One template, per-page title variable
  *
@@ -20,7 +20,10 @@ export const config = {
 };
 
 const ACCENT = '#C108AB';
-const HEADING_FONT = 'Crimson Pro';
+// Brand rule: headings use system serif stack (no custom font loading).
+// @vercel/og supports CSS generic families; 'serif' resolves to the default
+// platform serif on the edge runtime (consistent with the marketing surface).
+const HEADING_FONT = 'serif';
 const BODY_FONT = 'DM Sans';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<ImageResponse> {
@@ -148,7 +151,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
               color: '#999999',
             }}
           >
-            lyc-intelligence.app
+            www.lyc-intelligence.app
           </span>
         </div>
 
@@ -167,14 +170,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     {
       width: 1200,
       height: 630,
-      // Fonts loaded via Google Fonts CSS in the edge runtime
+      // Fonts loaded via Google Fonts CSS in the edge runtime.
+      // NOTE: Heading font is the generic 'serif' family — no custom fetch.
       fonts: [
-        {
-          name: HEADING_FONT,
-          data: await fetchFont('Crimson+Pro:wght@700'),
-          weight: 700,
-          style: 'normal',
-        },
         {
           name: BODY_FONT,
           data: await fetchFont('DM+Sans:wght@400;500;700'),
