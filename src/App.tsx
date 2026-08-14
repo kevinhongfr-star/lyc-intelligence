@@ -110,6 +110,14 @@ const DriveResultsPage = lazy(() => import('@/pages/DriveResultsPage').then(m =>
 const CoachResultsPage = lazy(() => import('@/pages/CoachResultsPage').then(m => ({ default: m.CoachResultsPage })));
 const BridgeResultsPage = lazy(() => import('@/pages/BridgeResultsPage').then(m => ({ default: m.BridgeResultsPage })));
 const MosaicResultsPage = lazy(() => import('@/pages/MosaicResultsPage').then(m => ({ default: m.MosaicResultsPage })));
+// X3: Nav 7 take pages
+const PrismTakePage = lazy(() => import('@/pages/PrismTakePage').then(m => ({ default: m.PrismTakePage })));
+const ForgeTakePage = lazy(() => import('@/pages/ForgeTakePage').then(m => ({ default: m.ForgeTakePage })));
+const BridgeTakePage = lazy(() => import('@/pages/BridgeTakePage').then(m => ({ default: m.BridgeTakePage })));
+const DriveTakePage = lazy(() => import('@/pages/DriveTakePage').then(m => ({ default: m.DriveTakePage })));
+const QuestTakePage = lazy(() => import('@/pages/QuestTakePage').then(m => ({ default: m.QuestTakePage })));
+const MosaicTakePage = lazy(() => import('@/pages/MosaicTakePage').then(m => ({ default: m.MosaicTakePage })));
+const CoachTakePage = lazy(() => import('@/pages/CoachTakePage').then(m => ({ default: m.CoachTakePage })));
 
 // ── Phase 7: Canonical diagnostic pages (branching-native engine + #1341 data model) ──
 const DiagnosticLandingPage = lazy(() => import('@/pages/DiagnosticLandingPage').then(m => ({ default: m.DiagnosticLandingPage })));
@@ -281,6 +289,7 @@ export default function App() {
 
             {/* ── Canonical singular assessment landing routes (V3-2) ── */}
             <Route path="assessment/prism" element={<PrismLanding />} />
+            <Route path="assessment/prism/take" element={<PrismTakePage />} />
             <Route path="assessment/spark" element={<SparkLanding />} />
             <Route path="assessment/spark/take" element={<SparkTakePage />} />
             <Route path="assessment/spark/results/:id" element={<SparkResultsPage />} />
@@ -292,10 +301,17 @@ export default function App() {
             <Route path="assessment/leap/take" element={<LeapTakePage />} />
             <Route path="assessment/leap/results/:id" element={<LeapResultsPage />} />
             <Route path="assessment/quest" element={<Navigate to="/assessments" replace />} />
+            <Route path="assessment/quest/take" element={<QuestTakePage />} />
             <Route path="assessment/impact" element={<ImpactLanding />} />
             <Route path="assessment/impact/take" element={<ImpactTakePage />} />
             <Route path="assessment/impact/results/:id" element={<ImpactResultsPage />} />
             <Route path="assessment/coach" element={<Navigate to="/assessments" replace />} />
+            <Route path="assessment/coach/take" element={<CoachTakePage />} />
+            {/* X3: Nav 7 explicit take routes — must come before :code catch-all */}
+            <Route path="assessment/forge/take" element={<ForgeTakePage />} />
+            <Route path="assessment/bridge/take" element={<BridgeTakePage />} />
+            <Route path="assessment/drive/take" element={<DriveTakePage />} />
+            <Route path="assessment/mosaic/take" element={<MosaicTakePage />} />
             {/* Generic canonical landing for 4 remaining instruments: FORGE, BRIDGE, MOSAIC, DRIVE */}
             <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />
 

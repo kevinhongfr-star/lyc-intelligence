@@ -1,15 +1,15 @@
 // ═══════════════════════════════════════════════════════════
-// PRISM Take Page — canonical 30-question, 5-dimension, 12-archetype flow.
-// X2-3: Real content ported from akira_source/prism/.
-// Brand: DS.accent (fuchsia), system serif headings, zero border radius,
+// MOSAIC Take Page — 25-question, 4-dimension, score-only flow.
+// Brand: violet accent "#7C3AED", zero border radius,
 // "complimentary assessment" language (never "free").
 // ═══════════════════════════════════════════════════════════
 import { AssessmentFlow, type AssessmentFlowConfig, type AssessmentQuestion } from '@/components/assessment/flow';
 import { scoreAssessment } from '@/services/assessmentEngine';
-import { DS } from '@/tokens';
-import { DIMENSIONS as PRISM_DIMENSIONS } from '@/services/questions/prism';
+import { DIMENSIONS as MOSAIC_DIMENSIONS } from '@/services/questions/mosaic';
 
-const flowQuestions: AssessmentQuestion[] = PRISM_DIMENSIONS.flatMap((dim) =>
+const ACCENT = '#7C3AED';
+
+const flowQuestions: AssessmentQuestion[] = MOSAIC_DIMENSIONS.flatMap((dim) =>
   dim.questions.map((q) => ({
     id: q.id,
     type: 'likert' as const,
@@ -22,21 +22,21 @@ const flowQuestions: AssessmentQuestion[] = PRISM_DIMENSIONS.flatMap((dim) =>
 );
 
 const config: AssessmentFlowConfig = {
-  code: 'PRISM',
-  name: 'PRISM',
-  accent: DS.accent,
-  prefix: 'prism-take',
-  resultsPath: '/assessment/prism/results',
-  landingPath: '/assessment/prism',
+  code: 'MOSAIC',
+  name: 'MOSAIC',
+  accent: ACCENT,
+  prefix: 'mosaic-take',
+  resultsPath: '/assessment/mosaic/results',
+  landingPath: '/assessment/mosaic',
   intro: {
-    title: 'PRISM — Professional Brand Legibility Assessment',
-    body: 'You will answer 30 questions across five dimensions of professional brand legibility: Brand Clarity, Market Legibility, Identity Consistency, Narrative Power, and Visibility Level. Answer as you actually operate today — not as you intend to.',
-    duration: '~10 minutes',
+    title: 'MOSAIC — Cross-Border Partnership Intelligence',
+    body: 'You will answer 25 questions across four dimensions of cross-border partnership capability: Institutional Trust, Relationship Velocity, Normative Flexibility, and Conflict Resolution. Answer from your actual practice.',
+    duration: '~8 minutes',
     expectations: [
-      '30 questions across Brand Clarity, Market Legibility, Identity Consistency, Narrative Power, and Visibility Level',
+      '25 questions across Institutional Trust, Relationship Velocity, Normative Flexibility, and Conflict Resolution',
       '1–5 Likert scale — answer honestly; some items are reverse-worded on purpose',
       'Your progress auto-saves to this device; resume if interrupted',
-      'On completion: composite score, dimension scorecard, matched archetype, and development priorities',
+      'On completion: composite score, 4-dimension scorecard, and development priorities',
     ],
   },
   onSubmit: async (answers) => {
@@ -46,23 +46,23 @@ const config: AssessmentFlowConfig = {
         if (typeof val === 'number') numericAnswers[qid] = val;
       }
       sessionStorage.setItem(
-        'assessment_answers_PRISM_latest',
+        'assessment_answers_MOSAIC_latest',
         JSON.stringify(numericAnswers),
       );
-      const out = await scoreAssessment('PRISM', numericAnswers, { persist: false });
+      const out = await scoreAssessment('MOSAIC', numericAnswers, { persist: false });
       if (out.ok && out.persisted_id) {
         return { resultId: out.persisted_id };
       }
     } catch (e) {
-      console.warn('[PrismTakePage] client-side scoring fell back to session-only:', e);
+      console.warn('[MosaicTakePage] client-side scoring fell back to session-only:', e);
     }
     return { resultId: null };
   },
   questions: flowQuestions,
 };
 
-export function PrismTakePage() {
+export function MosaicTakePage() {
   return <AssessmentFlow config={config} />;
 }
 
-export default PrismTakePage;
+export default MosaicTakePage;

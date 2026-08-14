@@ -1,36 +1,32 @@
-// ═══════════════════════════════════════════════════════════
-// DRIVE Scoring Config
-// Source of truth: akira_source/diagnostic_portfolio/06_scoring_engine_code/drive_v2_config.json
-// ═══════════════════════════════════════════════════════════
-
 export const INSTRUMENT = "DRIVE";
 export const FULL_NAME = "Motivation Architecture & Engagement Risk Assessment";
 export const VERSION = "2.0";
-export const TOTAL_QUESTIONS = 36;
+export const TOTAL_QUESTIONS = 30;
 export const SCALE = "1-5 Likert";
-export const DELIVERY_MINUTES = 14;
+export const DELIVERY_MINUTES = 10;
 export const TIER = "shift";
 export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 149;
 export const B2C_NAME = "Motivation Architecture & Engagement Risk";
-export const TAGLINE = "Why you lead \u2014 and when you will disengage. Intrinsic \u00d7 extrinsic \u00d7 purpose \u00d7 growth \u00d7 confidence.";
+export const TAGLINE = "Why you lead — and when you will disengage. Intrinsic × extrinsic × purpose × growth × confidence.";
 
 export const DIMENSIONS = [
   {
     id: "D1",
     name: "Intrinsic Motivation",
     question_ids: [
-      "DRIVE_Q01",
-      "DRIVE_Q02",
-      "DRIVE_Q03",
-      "DRIVE_Q04",
-      "DRIVE_Q05",
-      "DRIVE_Q06"
+      "Q01",
+      "Q02",
+      "Q03",
+      "Q04",
+      "Q05",
+      "Q06"
     ],
     reverse_coded: [
-      "DRIVE_Q03"
+      "Q03"
     ],
     raw_max: 30,
+    n_questions: 6,
     sub_dimensions: [
       "Task engagement",
       "Intellectual curiosity",
@@ -40,24 +36,24 @@ export const DIMENSIONS = [
       "APAC intrinsic resonance"
     ],
     normalised_max: 20,
-    normalised_formula: "(raw/30) x 20",
-    n_questions: 6
+    normalised_formula: "(raw/30) x 20"
   },
   {
     id: "D2",
     name: "Extrinsic Motivation",
     question_ids: [
-      "DRIVE_Q07",
-      "DRIVE_Q08",
-      "DRIVE_Q09",
-      "DRIVE_Q10",
-      "DRIVE_Q11",
-      "DRIVE_Q12"
+      "Q07",
+      "Q08",
+      "Q09",
+      "Q10",
+      "Q11",
+      "Q12"
     ],
     reverse_coded: [
-      "DRIVE_Q10"
+      "Q10"
     ],
     raw_max: 30,
+    n_questions: 6,
     sub_dimensions: [
       "Recognition sensitivity",
       "Reward orientation",
@@ -67,24 +63,24 @@ export const DIMENSIONS = [
       "Progression drive"
     ],
     normalised_max: 20,
-    normalised_formula: "(raw/30) x 20",
-    n_questions: 6
+    normalised_formula: "(raw/30) x 20"
   },
   {
     id: "D3",
     name: "Values Alignment",
     question_ids: [
-      "DRIVE_Q13",
-      "DRIVE_Q14",
-      "DRIVE_Q15",
-      "DRIVE_Q16",
-      "DRIVE_Q17",
-      "DRIVE_Q18"
+      "Q13",
+      "Q14",
+      "Q15",
+      "Q16",
+      "Q17",
+      "Q18"
     ],
     reverse_coded: [
-      "DRIVE_Q15"
+      "Q15"
     ],
     raw_max: 30,
+    n_questions: 6,
     sub_dimensions: [
       "Purpose congruence",
       "Values articulacy",
@@ -94,24 +90,24 @@ export const DIMENSIONS = [
       "Sustained purpose"
     ],
     normalised_max: 20,
-    normalised_formula: "(raw/30) x 20",
-    n_questions: 6
+    normalised_formula: "(raw/30) x 20"
   },
   {
     id: "D4",
     name: "Confidence & Self-Efficacy",
     question_ids: [
-      "DRIVE_Q19",
-      "DRIVE_Q20",
-      "DRIVE_Q21",
-      "DRIVE_Q22",
-      "DRIVE_Q23",
-      "DRIVE_Q24"
+      "Q19",
+      "Q20",
+      "Q21",
+      "Q22",
+      "Q23",
+      "Q24"
     ],
     reverse_coded: [
-      "DRIVE_Q21"
+      "Q21"
     ],
     raw_max: 30,
+    n_questions: 6,
     sub_dimensions: [
       "Role-specific confidence",
       "Challenge orientation",
@@ -121,24 +117,24 @@ export const DIMENSIONS = [
       "APAC contextual confidence"
     ],
     normalised_max: 20,
-    normalised_formula: "(raw/30) x 20",
-    n_questions: 6
+    normalised_formula: "(raw/30) x 20"
   },
   {
     id: "D5",
     name: "Growth Orientation",
     question_ids: [
-      "DRIVE_Q25",
-      "DRIVE_Q26",
-      "DRIVE_Q27",
-      "DRIVE_Q28",
-      "DRIVE_Q29",
-      "DRIVE_Q30"
+      "Q25",
+      "Q26",
+      "Q27",
+      "Q28",
+      "Q29",
+      "Q30"
     ],
     reverse_coded: [
-      "DRIVE_Q27"
+      "Q27"
     ],
     raw_max: 30,
+    n_questions: 6,
     sub_dimensions: [
       "Development vs. mastery",
       "Challenge dependency",
@@ -148,8 +144,7 @@ export const DIMENSIONS = [
       "APAC growth appetite"
     ],
     normalised_max: 20,
-    normalised_formula: "(raw/30) x 20",
-    n_questions: 6
+    normalised_formula: "(raw/30) x 20"
   }
 ];
 
@@ -296,42 +291,7 @@ export const ARCHETYPES = [
 export const CORE_QUESTIONS = 30;
 export const ENGAGEMENT_RISK_QUESTIONS = 6;
 export const SHIFT_WEIGHT = 0.15;
-export const ENGAGEMENT_RISK = {
-  id: "ER",
-  name: "Engagement Risk Sub-Score",
-  question_ids: [
-    "DRIVE_Q31",
-    "DRIVE_Q32",
-    "DRIVE_Q33",
-    "DRIVE_Q34",
-    "DRIVE_Q35",
-    "DRIVE_Q36"
-  ],
-  reverse_coded: [
-    "DRIVE_Q34"
-  ],
-  raw_max: 30,
-  states: [
-    {
-      min: 0,
-      max: 30,
-      label: "Low Risk",
-      state: "Fueled"
-    },
-    {
-      min: 31,
-      max: 60,
-      label: "Moderate Risk",
-      state: "Flickering"
-    },
-    {
-      min: 61,
-      max: 100,
-      label: "High Risk",
-      state: "Fading"
-    }
-  ]
-};
+
 export const MOTIVATION_TYPE_RULES = {
   threshold: 10,
   description: "Step1: |D1-D2| >= threshold → Intrinsic or Extrinsic dominant. < threshold → Dual-drive. Step2: If D3 > D1 and D2 → Purpose-driven. If D5 > D1 and D2 → Growth-driven. Step3: Drifter flag if no clear dominant."

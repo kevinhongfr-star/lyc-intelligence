@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOSAIC Question Bank — None
-// Source of truth: akira_source/diagnostic_portfolio/07_question_banks/
+// MOSAIC Question Bank — Cross-Border Partnership Intelligence
+// Source of truth: akira_source/diagnostic_portfolio/07_question_banks/MOSAIC_QB_notion.json
 // ═══════════════════════════════════════════════════════════
 
 export interface MOSAICQuestion {
@@ -28,17 +28,17 @@ export const FULL_NAME = "Cross-Border Partnership Intelligence & Institutional 
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 25;
 export const SCALE = "1-5 Likert";
-export const DELIVERY_MINUTES = 9;
+export const DELIVERY_MINUTES = 8;
 
 export const DIMENSIONS: MOSAICDimensionBank[] = [
   {
     id: "D1",
     name: "INSTITUTIONAL TRUST",
     count: 8,
-    max_raw: null,
-    formula: null,
+    max_raw: 40,
+    formula: "(raw/40) x 20",
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q7"],
     questions: [
       {
         id: "Q1",
@@ -66,7 +66,7 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
       },
       {
         id: "Q4",
-        text: "I actively review my cross-border partnership structures for exposure to institutional trust degradation, as a distinct risk category from relationship risk. [R if scored separately from relational trust]",
+        text: "I actively review my cross-border partnership structures for exposure to institutional trust degradation, as a distinct risk category from relationship risk.",
         type: "likert",
         reverse_coded: false,
         options: null,
@@ -82,7 +82,7 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
       },
       {
         id: "Q6",
-        text: "I have modified how I document cross-border decisions since 2020 to reflect changes in the institutional trust environment. [Behavioural, not attitudinal]",
+        text: "I have modified how I document cross-border decisions since 2020 to reflect changes in the institutional trust environment.",
         type: "likert",
         reverse_coded: false,
         options: null,
@@ -90,7 +90,7 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
       },
       {
         id: "Q7",
-        text: "I rely primarily on formal contractual frameworks to provide the trust scaffolding for my most important cross-border relationships. (Reverse-scored: reliance on contracts alone indicates lower institutional trust sophistication in the current environment.)",
+        text: "I rely primarily on formal contractual frameworks to provide the trust scaffolding for my most important cross-border relationships.",
         type: "likert",
         reverse_coded: true,
         options: null,
@@ -110,10 +110,10 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
     id: "D2",
     name: "RELATIONSHIP VELOCITY",
     count: 7,
-    max_raw: null,
-    formula: null,
+    max_raw: 35,
+    formula: "(raw/35) x 20",
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q13"],
     questions: [
       {
         id: "Q9",
@@ -149,7 +149,7 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
       },
       {
         id: "Q13",
-        text: "I prefer to establish a relationship over an extended period before engaging in significant joint decisions. (Reverse-scored: preference for long establishment timelines indicates lower velocity capacity.)",
+        text: "I prefer to establish a relationship over an extended period before engaging in significant joint decisions.",
         type: "likert",
         reverse_coded: true,
         options: null,
@@ -177,10 +177,10 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
     id: "D3",
     name: "NORMATIVE FLEXIBILITY",
     count: 5,
-    max_raw: null,
-    formula: null,
+    max_raw: 25,
+    formula: "(raw/25) x 20",
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q19"],
     questions: [
       {
         id: "Q16",
@@ -208,7 +208,7 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
       },
       {
         id: "Q19",
-        text: "I find it difficult to operate effectively when I am uncertain about the normative expectations of the environment I am in. (Reverse-scored.)",
+        text: "I find it difficult to operate effectively when I am uncertain about the normative expectations of the environment I am in.",
         type: "likert",
         reverse_coded: true,
         options: null,
@@ -228,10 +228,10 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
     id: "D4",
     name: "CONFLICT RESOLUTION",
     count: 5,
-    max_raw: null,
-    formula: null,
+    max_raw: 25,
+    formula: "(raw/25) x 20",
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q24"],
     questions: [
       {
         id: "Q21",
@@ -259,7 +259,7 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
       },
       {
         id: "Q24",
-        text: "When a cross-border partnership conflict becomes difficult to resolve, I typically escalate it to a higher authority level to resolve. (Reverse-scored: habitual escalation indicates lower personal conflict resolution capacity.)",
+        text: "When a cross-border partnership conflict becomes difficult to resolve, I typically escalate it to a higher authority level to resolve.",
         type: "likert",
         reverse_coded: true,
         options: null,

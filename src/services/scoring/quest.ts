@@ -8,10 +8,10 @@ export const FULL_NAME = "Executive Performance Architecture";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
-export const DELIVERY_MINUTES = 14;
-export const TIER = "shift";
+export const DELIVERY_MINUTES = 12;
+export const TIER = "core";
 export const SCORING_MODE = "matrix";
-export const PRICE_MILES = 149;
+export const PRICE_MILES = 199;
 export const B2C_NAME = "Executive Performance Architecture";
 export const TAGLINE = "Six-executive-dimension architecture. Where are you genuinely strong, and where will your next mandate expose gaps?";
 
@@ -20,15 +20,15 @@ export const DIMENSIONS = [
     id: "D1",
     name: "Strategic Thinking",
     question_ids: [
-      "QUEST_Q01",
-      "QUEST_Q02",
-      "QUEST_Q03",
-      "QUEST_Q04",
-      "QUEST_Q05",
-      "QUEST_Q06"
+      "Q01",
+      "Q02",
+      "Q03",
+      "Q04",
+      "Q05",
+      "Q06"
     ],
     reverse_coded: [
-      "QUEST_Q04"
+      "Q04"
     ],
     raw_max: 30,
     n_questions: 6,
@@ -47,15 +47,15 @@ export const DIMENSIONS = [
     id: "D2",
     name: "Execution Excellence",
     question_ids: [
-      "QUEST_Q07",
-      "QUEST_Q08",
-      "QUEST_Q09",
-      "QUEST_Q10",
-      "QUEST_Q11",
-      "QUEST_Q12"
+      "Q07",
+      "Q08",
+      "Q09",
+      "Q10",
+      "Q11",
+      "Q12"
     ],
     reverse_coded: [
-      "QUEST_Q09"
+      "Q09"
     ],
     raw_max: 30,
     n_questions: 6,
@@ -74,15 +74,15 @@ export const DIMENSIONS = [
     id: "D3",
     name: "Commercial Acumen",
     question_ids: [
-      "QUEST_Q13",
-      "QUEST_Q14",
-      "QUEST_Q15",
-      "QUEST_Q16",
-      "QUEST_Q17",
-      "QUEST_Q18"
+      "Q13",
+      "Q14",
+      "Q15",
+      "Q16",
+      "Q17",
+      "Q18"
     ],
     reverse_coded: [
-      "QUEST_Q15"
+      "Q15"
     ],
     raw_max: 30,
     n_questions: 6,
@@ -101,15 +101,15 @@ export const DIMENSIONS = [
     id: "D4",
     name: "People Leadership",
     question_ids: [
-      "QUEST_Q19",
-      "QUEST_Q20",
-      "QUEST_Q21",
-      "QUEST_Q22",
-      "QUEST_Q23",
-      "QUEST_Q24"
+      "Q19",
+      "Q20",
+      "Q21",
+      "Q22",
+      "Q23",
+      "Q24"
     ],
     reverse_coded: [
-      "QUEST_Q22"
+      "Q22"
     ],
     raw_max: 30,
     n_questions: 6,
@@ -128,16 +128,16 @@ export const DIMENSIONS = [
     id: "D5",
     name: "Adaptive Capacity",
     question_ids: [
-      "QUEST_Q25",
-      "QUEST_Q26",
-      "QUEST_Q27",
-      "QUEST_Q28",
-      "QUEST_Q29",
-      "QUEST_Q30"
+      "Q25",
+      "Q26",
+      "Q27",
+      "Q28",
+      "Q29",
+      "Q30"
     ],
     reverse_coded: [
-      "QUEST_Q27",
-      "QUEST_Q29"
+      "Q27",
+      "Q29"
     ],
     raw_max: 30,
     n_questions: 6,
@@ -156,15 +156,15 @@ export const DIMENSIONS = [
     id: "D6",
     name: "AI Readiness",
     question_ids: [
-      "QUEST_Q31",
-      "QUEST_Q35",
-      "QUEST_Q32",
-      "QUEST_Q33",
-      "QUEST_Q36",
-      "QUEST_Q34"
+      "Q31",
+      "Q32",
+      "Q33",
+      "Q34",
+      "Q35",
+      "Q36"
     ],
     reverse_coded: [
-      "QUEST_Q33"
+      "Q33"
     ],
     raw_max: 30,
     n_questions: 6,
@@ -184,7 +184,7 @@ export const COMPOSITE_BANDS = [
     min: 80,
     max: 100,
     band: "Executive Ready",
-    interpretation: "Strong capability across all five dimensions; operating at senior executive level"
+    interpretation: "Strong capability across all six dimensions; operating at senior executive level"
   },
   {
     min: 60,
@@ -214,20 +214,23 @@ export const COMPOSITE_BANDS = [
 
 export const DIMENSION_VERDICTS = [
   {
+    dim: "all",
     min: 15,
     max: 20,
     verdict: "Strength",
     meaning: "Deployable capability; executive operates at this level consistently and under pressure"
   },
   {
+    dim: "all",
     min: 10,
-    max: 14,
+    max: 14.9,
     verdict: "Developing",
     meaning: "Functional in stable conditions; gaps emerge under pressure or in unfamiliar APAC contexts"
   },
   {
+    dim: "all",
     min: 0,
-    max: 9,
+    max: 9.9,
     verdict: "Gap",
     meaning: "Underdeveloped for the executive's current or target role; primary development priority"
   }

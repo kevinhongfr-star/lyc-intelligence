@@ -1,15 +1,15 @@
 // ═══════════════════════════════════════════════════════════
-// PRISM Take Page — canonical 30-question, 5-dimension, 12-archetype flow.
-// X2-3: Real content ported from akira_source/prism/.
-// Brand: DS.accent (fuchsia), system serif headings, zero border radius,
+// QUEST Take Page — 36-question, 6-dimension, 10-archetype flow.
+// Brand: pink-rose accent "#BE185D", zero border radius,
 // "complimentary assessment" language (never "free").
 // ═══════════════════════════════════════════════════════════
 import { AssessmentFlow, type AssessmentFlowConfig, type AssessmentQuestion } from '@/components/assessment/flow';
 import { scoreAssessment } from '@/services/assessmentEngine';
-import { DS } from '@/tokens';
-import { DIMENSIONS as PRISM_DIMENSIONS } from '@/services/questions/prism';
+import { DIMENSIONS as QUEST_DIMENSIONS } from '@/services/questions/quest';
 
-const flowQuestions: AssessmentQuestion[] = PRISM_DIMENSIONS.flatMap((dim) =>
+const ACCENT = '#BE185D';
+
+const flowQuestions: AssessmentQuestion[] = QUEST_DIMENSIONS.flatMap((dim) =>
   dim.questions.map((q) => ({
     id: q.id,
     type: 'likert' as const,
@@ -22,21 +22,21 @@ const flowQuestions: AssessmentQuestion[] = PRISM_DIMENSIONS.flatMap((dim) =>
 );
 
 const config: AssessmentFlowConfig = {
-  code: 'PRISM',
-  name: 'PRISM',
-  accent: DS.accent,
-  prefix: 'prism-take',
-  resultsPath: '/assessment/prism/results',
-  landingPath: '/assessment/prism',
+  code: 'QUEST',
+  name: 'QUEST',
+  accent: ACCENT,
+  prefix: 'quest-take',
+  resultsPath: '/assessment/quest/results',
+  landingPath: '/assessment/quest',
   intro: {
-    title: 'PRISM — Professional Brand Legibility Assessment',
-    body: 'You will answer 30 questions across five dimensions of professional brand legibility: Brand Clarity, Market Legibility, Identity Consistency, Narrative Power, and Visibility Level. Answer as you actually operate today — not as you intend to.',
-    duration: '~10 minutes',
+    title: 'QUEST — Executive Performance Architecture',
+    body: 'You will answer 36 questions across six dimensions of executive capability: Strategic Thinking, Execution Excellence, Commercial Acumen, People Leadership, Adaptive Capacity, and AI Readiness. Answer as you actually operate today — not as you intend to.',
+    duration: '~12 minutes',
     expectations: [
-      '30 questions across Brand Clarity, Market Legibility, Identity Consistency, Narrative Power, and Visibility Level',
+      '36 questions across Strategic Thinking, Execution Excellence, Commercial Acumen, People Leadership, Adaptive Capacity, and AI Readiness',
       '1–5 Likert scale — answer honestly; some items are reverse-worded on purpose',
       'Your progress auto-saves to this device; resume if interrupted',
-      'On completion: composite score, dimension scorecard, matched archetype, and development priorities',
+      'On completion: composite score, 6-dimension scorecard, matched archetype (one of 10), and development priorities',
     ],
   },
   onSubmit: async (answers) => {
@@ -46,23 +46,23 @@ const config: AssessmentFlowConfig = {
         if (typeof val === 'number') numericAnswers[qid] = val;
       }
       sessionStorage.setItem(
-        'assessment_answers_PRISM_latest',
+        'assessment_answers_QUEST_latest',
         JSON.stringify(numericAnswers),
       );
-      const out = await scoreAssessment('PRISM', numericAnswers, { persist: false });
+      const out = await scoreAssessment('QUEST', numericAnswers, { persist: false });
       if (out.ok && out.persisted_id) {
         return { resultId: out.persisted_id };
       }
     } catch (e) {
-      console.warn('[PrismTakePage] client-side scoring fell back to session-only:', e);
+      console.warn('[QuestTakePage] client-side scoring fell back to session-only:', e);
     }
     return { resultId: null };
   },
   questions: flowQuestions,
 };
 
-export function PrismTakePage() {
+export function QuestTakePage() {
   return <AssessmentFlow config={config} />;
 }
 
-export default PrismTakePage;
+export default QuestTakePage;
