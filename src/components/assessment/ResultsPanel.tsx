@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Download } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Download, Check, Link2, ArrowRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import {
   CPDArchetype,
   DimensionId,
@@ -7,9 +7,12 @@ import {
   ARCHETYPE_INFO,
   DIMENSION_INFO,
 } from '../../services/assessmentEngine';
-import { ASSESSMENT_CATALOG, type AssessmentInfo } from '@/assessments/catalog';
+import { ASSESSMENT_CATALOG, HERO_KEYS, type AssessmentInfo } from '@/assessments/catalog';
 import type { ScoreResult } from '@/lib/akira/engine';
 import { DS, SUCCESS, WARNING, ERROR } from '@/tokens';
+import { saveResultToHistory, getScoreTrend } from '@/services/resultHistory';
+import { buildResultContextForNexus, buildNexusOpeningQuestion } from '@/nexus/resultContextBuilder';
+import { NexusDebriefWidget } from './NexusDebriefWidget';
 
 /* ============================================================
  * ResultsPanel — variable-dimension / variable-archetype renderer.
@@ -78,6 +81,15 @@ interface NormArchetype {
   name: string;
   description: string;
   matchScore?: number;
+  // Carried through from the scoring config archetype entry (CPI has these
+  // explicitly; other assessments derive strengths/growth areas dynamically).
+  tagline?: string;
+  strengths?: string[];
+  growthAreas?: string[];
+  corePattern?: string;
+  primaryRisk?: string;
+  orientation?: string;
+  mandateBand?: string;
 }
 interface NormPriority {
   dimensionName: string;
@@ -109,6 +121,88 @@ function dimensionNarrative(d: NormDimension): string {
   if (pct >= 70) return `Strong — ${pct}%. A clear asset in your profile.`;
   if (pct >= 50) return `Developing — ${pct}%. Solid foundation with room to deepen.`;
   return `Gap — ${pct}%. Priority area for focused development.`;
+}
+
+// ── X2-5: derived content for the deep-dive sections ───────────────
+// Strengths: prefer explicit config fields (CPI carries them); otherwise
+// derive from the user's top-scoring dimensions.
+function deriveStrengths(matched: NormArchetype | undefined, dimensions: NormDimension[]): string[] {
+  if (matched?.strengths && matched.strengths.length > 0) {
+    return matched.strengths.slice(0, 3);
+  }
+  const top = [...dimensions].sort((a, b) => b.percentage - a.percentage).slice(0, 2);
+  return top
+    .filter((d) => d.percentage >= 50)
+    .map((d) => `${d.name} — ${Math.round(d.percentage)}%`);
+}
+
+// Growth areas: prefer explicit config fields (CPI); otherwise derive from
+// the user's lowest-scoring dimensions.
+function deriveGrowthAreas(matched: NormArchetype | undefined, dimensions: NormDimension[]): string[] {
+  if (matched?.growthAreas && matched.growthAreas.length > 0) {
+    return matched.growthAreas.slice(0, 3);
+  }
+  const bottom = [...dimensions].sort((a, b) => a.percentage - b.percentage).slice(0, 2);
+  return bottom
+    .filter((d) => d.percentage < 70)
+    .map((d) => `${d.name} — ${Math.round(d.percentage)}%`);
+}
+
+/** "Your result in 30 seconds" — 3 bullets: finding, strength, growth area. */
+function buildThirtySecondSummary(result: NormResult, strengths: string[], growthAreas: string[]): string[] {
+  const bullets: string[] = [];
+  // Key finding — composite band interpretation, or archetype + composite.
+  const composite = Math.round(result.compositeScore);
+  if (result.compositeBand) {
+    bullets.push(`${result.compositeBand} (overall ${composite}/100). ${result.compositeInterpretation || ''}`.trim());
+  } else if (result.matchedArchetype) {
+    bullets.push(`Overall ${composite}/100 — ${result.matchedArchetype.name}.`);
+  } else {
+    bullets.push(`Overall score ${composite}/100.`);
+  }
+  // Key strength.
+  if (strengths.length > 0) bullets.push(`Strength: ${strengths[0]}.`);
+  // Key growth area.
+  if (growthAreas.length > 0) bullets.push(`Focus area: ${growthAreas[0]}.`);
+  return bullets.slice(0, 3);
+}
+
+/** 3–5 concrete, personalized takeaways. Specific, not generic. */
+function buildKeyInsights(
+  result: NormResult,
+  strengths: string[],
+  growthAreas: string[],
+  weakestDimension: NormDimension | undefined,
+): string[] {
+  const insights: string[] = [];
+  const composite = Math.round(result.compositeScore);
+
+  // 1. Strength leveraged into action.
+  if (strengths.length > 0) {
+    insights.push(`Your strength in ${strengths[0]} is the lever to build your next 90 days around — anchor your positioning here.`);
+  }
+  // 2. Growth area → concrete action.
+  if (weakestDimension) {
+    const pct = Math.round(weakestDimension.percentage);
+    insights.push(`${weakestDimension.name} (${pct}%) is your most immediate development gap. A focused, time-boxed practice plan will move it faster than broad reading.`);
+  }
+  // 3. Composite-band-specific guidance.
+  if (composite >= 70) {
+    insights.push(`With a strong overall score (${composite}), the priority shifts from fixing gaps to compounding strengths — protect what's working before chasing the next dimension.`);
+  } else if (composite >= 50) {
+    insights.push(`Your profile is solid but uneven (${composite}). Closing the gap between your strongest and weakest dimension will lift your composite more than pushing any single score higher.`);
+  } else {
+    insights.push(`Your composite (${composite}) signals foundational work ahead. Start with one dimension, build a visible win, then expand — breadth-first will diffuse your effort.`);
+  }
+  // 4. Archetype-aligned insight.
+  if (result.matchedArchetype) {
+    if (result.matchedArchetype.primaryRisk) {
+      insights.push(`As a ${result.matchedArchetype.name}, watch for: ${result.matchedArchetype.primaryRisk}.`);
+    } else if (growthAreas.length > 1) {
+      insights.push(`Your ${result.matchedArchetype.name} profile means ${growthAreas[1]} deserves deliberate attention before it caps your trajectory.`);
+    }
+  }
+  return insights.slice(0, 5);
 }
 
 // ── Generic path: ScoreResult + catalog → NormResult ───────────────
@@ -143,12 +237,22 @@ function buildFromScoreResult(
     name: a.name,
     description: a.description || '',
     matchScore: a.match_score,
+    tagline: (a as Record<string, unknown>).tagline as string | undefined,
+    strengths: (a as Record<string, unknown>).strengths as string[] | undefined,
+    growthAreas: (a as Record<string, unknown>).growth_areas as string[] | undefined,
   }));
   const matched: NormArchetype | undefined = result.archetype
     ? {
         name: result.archetype.name,
         description: result.archetype.description || '',
         matchScore: result.archetype.match_score,
+        tagline: (result.archetype as Record<string, unknown>).tagline as string | undefined,
+        strengths: (result.archetype as Record<string, unknown>).strengths as string[] | undefined,
+        growthAreas: (result.archetype as Record<string, unknown>).growth_areas as string[] | undefined,
+        corePattern: (result.archetype as Record<string, unknown>).core_pattern as string | undefined,
+        primaryRisk: (result.archetype as Record<string, unknown>).primary_governance_risk as string | undefined,
+        orientation: (result.archetype as Record<string, unknown>).orientation as string | undefined,
+        mandateBand: (result.archetype as Record<string, unknown>).mandate_band as string | undefined,
       }
     : ranked[0];
 
@@ -253,6 +357,249 @@ function ScoreBar({ score, color }: { score: number; color: string }) {
   );
 }
 
+// ── X2-9 (#1322): Archetype monogram — visual badge ────────────────
+// Renders a styled square with the archetype's initials (zero radius,
+// accent-tinted). Gives the matched profile a visual anchor beyond text.
+function ArchetypeMonogram({ name, accent }: { name: string; accent: string }) {
+  // Build initials from the significant words (skip articles like "The").
+  const words = name.replace(/^(The|A|An)\s+/i, '').split(/\s+/).filter(Boolean);
+  let initials: string;
+  if (words.length === 1) {
+    initials = words[0].slice(0, 2).toUpperCase();
+  } else {
+    initials = words.slice(0, 2).map((w) => w[0] || '').join('').toUpperCase();
+  }
+  return (
+    <div style={{
+      width: '56px', height: '56px', flexShrink: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: accent, color: '#FFFFFF',
+      fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700,
+      letterSpacing: '0.02em',
+    }}>
+      {initials}
+    </div>
+  );
+}
+
+// ── X2-9 (#1322): Interactive dimension card (hover/tap for detail) ──
+function DimensionCard({ d, accent }: { d: NormDimension; accent: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const color = scoreColor(d.percentage);
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => setExpanded((v) => !v)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setExpanded((v) => !v);
+        }
+      }}
+      style={{
+        background: DS.bgAlt,
+        border: `1px solid ${hovered || expanded ? `${accent}66` : DS.border}`,
+        padding: '16px',
+        display: 'flex',
+        flexDirection: 'column',
+        cursor: 'pointer',
+        transition: 'border-color 200ms cubic-bezier(0.16,1,0.3,1)',
+      }}
+    >
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'baseline',
+        gap: '8px',
+        marginBottom: '6px',
+      }}>
+        <span style={{
+          fontFamily: DS.headingFont,
+          fontSize: '14px',
+          fontWeight: 700,
+          color: DS.text,
+        }}>
+          {d.name}
+        </span>
+        <span style={{
+          fontFamily: DS.monoFont,
+          fontSize: '15px',
+          fontWeight: 600,
+          color,
+          flexShrink: 0,
+        }}>
+          {Math.round(d.percentage)}%
+        </span>
+      </div>
+      {d.verdict ? (
+        <span style={{ ...monoStyle, fontSize: '10px', color, marginBottom: '10px' }}>
+          {d.verdict}
+        </span>
+      ) : (
+        <span style={{ ...monoStyle, fontSize: '10px', color: DS.muted, marginBottom: '10px' }}>
+          {d.lowLabel} → {d.highLabel}
+        </span>
+      )}
+      <ScoreBar score={d.percentage} color={color} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
+        <span style={{ fontSize: '10px', color: DS.muted }}>{d.lowLabel}</span>
+        <span style={{ fontSize: '10px', color: DS.muted }}>{d.highLabel}</span>
+      </div>
+      {d.description ? (
+        <p style={{
+          fontSize: '12px',
+          color: DS.textSecondary,
+          lineHeight: 1.55,
+          margin: '12px 0 0',
+          maxHeight: expanded ? '200px' : '0',
+          overflow: 'hidden',
+          transition: 'max-height 250ms cubic-bezier(0.16,1,0.3,1)',
+        }}>
+          {d.description}
+        </p>
+      ) : null}
+      <span style={{
+        ...monoStyle, fontSize: '9px', color: accent, marginTop: '10px',
+        opacity: hovered || expanded ? 1 : 0,
+        transition: 'opacity 200ms cubic-bezier(0.16,1,0.3,1)',
+      }}>
+        {expanded ? '− Hide detail' : '+ Tap for detail'}
+      </span>
+    </div>
+  );
+}
+
+// ── X2-9 (#1322): Trend badge — delta vs. previous attempt ─────────
+function TrendBadge({ trend }: {
+  trend: { delta: number; previousAt: string; latestScore: number; previousScore: number };
+}) {
+  const { delta, previousAt, previousScore } = trend;
+  const improved = delta > 0;
+  const flat = Math.abs(delta) < 0.5;
+  const color = flat ? DS.muted : improved ? SUCCESS : ERROR;
+  const Icon = flat ? Minus : improved ? TrendingUp : TrendingDown;
+
+  // Format the previous date as a short locale string.
+  let dateLabel = '';
+  try {
+    dateLabel = new Date(previousAt).toLocaleDateString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric',
+    });
+  } catch {
+    dateLabel = 'your last attempt';
+  }
+
+  const verb = flat ? 'unchanged since' : improved ? 'up' : 'down';
+  const pts = flat ? '' : ` ${Math.abs(delta)} point${Math.abs(delta) === 1 ? '' : 's'}`;
+
+  return (
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', gap: '8px',
+      marginTop: '14px', padding: '8px 14px',
+      border: `1px solid ${color}40`,
+      background: `${color}0D`,
+    }}>
+      <Icon style={{ width: 16, height: 16, color }} />
+      <span style={{ fontSize: '13px', color, fontWeight: 600 }}>
+        {flat ? 'Score unchanged' : `Score ${verb} ${pts}`}
+      </span>
+      <span style={{ ...monoStyle, fontSize: '10px', color: DS.muted }}>
+        since {dateLabel} · was {previousScore}
+      </span>
+    </div>
+  );
+}
+
+// ── X2-5: Next-steps actions (save indicator + share + take another) ──
+// Presentational component. Save indicator reflects that results are
+// auto-saved to the device (sessionStorage, written by each take page).
+// Share copies the current URL to the clipboard with a confirmation.
+// "Take another" surfaces the other hero assessments.
+function NextStepsActions({ assessmentCode, accent }: { assessmentCode?: string; accent: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        // Fallback for environments without the async clipboard API.
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // No-op: clipboard may be unavailable (e.g. insecure context).
+    }
+  };
+
+  const others = HERO_KEYS.filter((k) => k !== (assessmentCode || '').toUpperCase()).slice(0, 3);
+
+  const chipStyle: React.CSSProperties = {
+    display: 'inline-flex', alignItems: 'center', gap: '6px',
+    padding: '8px 14px', fontSize: '12px', fontWeight: 500,
+    border: `1px solid ${DS.border}`, color: DS.textSecondary,
+    background: 'transparent', cursor: 'pointer', textDecoration: 'none',
+    transition: 'border-color 200ms cubic-bezier(0.16,1,0.3,1)',
+  };
+
+  return (
+    <>
+      {/* Save indicator */}
+      <span style={{
+        ...chipStyle, cursor: 'default',
+        borderColor: `${SUCCESS}55`, color: SUCCESS,
+      }}>
+        <Check style={{ width: 14, height: 14 }} /> Saved to your profile
+      </span>
+
+      {/* Share link */}
+      <button
+        type="button"
+        onClick={handleShare}
+        style={{
+          ...chipStyle,
+          borderColor: copied ? `${SUCCESS}55` : DS.border,
+          color: copied ? SUCCESS : DS.textSecondary,
+        }}
+      >
+        <Link2 style={{ width: 14, height: 14 }} />
+        {copied ? 'Link copied' : 'Copy share link'}
+      </button>
+
+      {/* Take another assessment */}
+      {others.map((code) => {
+        const info = ASSESSMENT_CATALOG[code];
+        if (!info) return null;
+        return (
+          <a
+            key={code}
+            href={`/assessment/${code.toLowerCase()}`}
+            style={{
+              ...chipStyle,
+              borderColor: `${accent}40`, color: accent,
+            }}
+          >
+            Take {info.b2cName.split(' ')[0]} <ArrowRight style={{ width: 12, height: 12 }} />
+          </a>
+        );
+      })}
+    </>
+  );
+}
+
 // ── Section primitives (zero radius, brand fonts) ──────────────────
 const sectionStyle: React.CSSProperties = {
   background: DS.card,
@@ -331,6 +678,58 @@ export function ResultsPanel(props: ResultsPanelProps) {
   // Weakest dimension for the NEXUS bridge narrative (graceful when empty).
   const weakestDimension = [...dimensions].sort((a, b) => a.percentage - b.percentage)[0];
 
+  // ── X2-5: derived deep-dive content (works for all 4 hero assessments) ──
+  const strengths = deriveStrengths(matchedArchetype, dimensions);
+  const growthAreas = deriveGrowthAreas(matchedArchetype, dimensions);
+  const thirtySecondSummary = buildThirtySecondSummary(result, strengths, growthAreas);
+  const keyInsights = buildKeyInsights(result, strengths, growthAreas, weakestDimension);
+  // Secondary archetype = next-best match (only when there are alternatives).
+  const secondaryArchetype = rankedAlternatives[0] || undefined;
+
+  // ── X2-9 (#1322): persist result to local history + compute trend ──
+  // Saves once per mounted result (guarded against StrictMode double-invoke).
+  const savedRef = useRef(false);
+  const [trend, setTrend] = useState<{
+    delta: number; previousAt: string; latestScore: number; previousScore: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (savedRef.current) return;
+    if (!isGeneric || !assessmentCode || !scoreResult) return;
+    savedRef.current = true;
+
+    const dimPcts: Record<string, number> = {};
+    const dimNames: Record<string, string> = {};
+    for (const d of dimensions) {
+      dimPcts[d.id] = d.percentage;
+      dimNames[d.id] = d.name;
+    }
+    saveResultToHistory(
+      assessmentCode,
+      result.compositeScore,
+      result.compositeBand,
+      matchedArchetype?.name,
+      dimPcts,
+      dimNames,
+    );
+    setTrend(getScoreTrend(assessmentCode));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── X2-7 (#1279): NEXUS result context + entry URL ────────────────
+  // Build a framework-aware context so NEXUS can discuss the user's exact
+  // results. The opening question embeds key results and is passed via the
+  // `q` param (the only params NEXUS actually consumes — see NEXUSCTA.tsx).
+  const nexusResultContext = isGeneric && assessmentCode && scoreResult
+    ? buildResultContextForNexus(assessmentCode, scoreResult, scoreResult.archetype)
+    : '';
+  const nexusOpeningQuestion = isGeneric && assessmentCode && scoreResult
+    ? buildNexusOpeningQuestion(assessmentCode, scoreResult, scoreResult.archetype)
+    : '';
+  const nexusEntryUrl = nexusOpeningQuestion
+    ? `/nexus?q=${encodeURIComponent(nexusOpeningQuestion)}&code=${encodeURIComponent(assessmentCode || '')}`
+    : '/nexus';
+
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
       {/* ── Success Header ─────────────────────────────────────── */}
@@ -382,9 +781,26 @@ export function ResultsPanel(props: ResultsPanelProps) {
             {result.compositeInterpretation}
           </p>
         ) : null}
+
+        {/* X2-9 (#1322): progress vs. previous attempt */}
+        {trend ? <TrendBadge trend={trend} /> : null}
       </div>
 
-      {/* ── Archetype Badge (conditional) ──────────────────────── */}
+      {/* ── X2-5: Your result in 30 seconds (3 bullets) ───────── */}
+      {thirtySecondSummary.length > 0 ? (
+        <div style={sectionStyle}>
+          <h4 style={headingStyle}>Your result in 30 seconds</h4>
+          <ul style={{ margin: 0, paddingLeft: '20px', color: DS.textSecondary }}>
+            {thirtySecondSummary.map((b, i) => (
+              <li key={i} style={{ marginBottom: '8px', fontSize: '14px', lineHeight: 1.55 }}>
+                {b}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {/* ── Archetype Deep Dive (conditional) ──────────────────── */}
       {hasArchetypes && matchedArchetype ? (
         <div style={{
           background: `${accent}12`,
@@ -392,17 +808,34 @@ export function ResultsPanel(props: ResultsPanelProps) {
           padding: '28px',
           marginBottom: '24px',
         }}>
-          <span style={{ ...monoStyle, color: accent, fontSize: '10px', display: 'block', marginBottom: '8px' }}>
+          <span style={{ ...monoStyle, color: accent, fontSize: '10px', display: 'block', marginBottom: '12px' }}>
             Your Matched Profile
           </span>
-          <h3 style={{
-            fontFamily: DS.headingFont,
-            fontSize: '22px',
-            color: DS.text,
-            margin: '0 0 10px',
-          }}>
-            {matchedArchetype.name}
-          </h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '10px', flexWrap: 'wrap' }}>
+            {/* X2-9: visual archetype badge (monogram) */}
+            <ArchetypeMonogram name={matchedArchetype.name} accent={accent} />
+            <h3 style={{
+              fontFamily: DS.headingFont,
+              fontSize: '22px',
+              color: DS.text,
+              margin: '0',
+              flex: '1 1 auto',
+              minWidth: '120px',
+            }}>
+              {matchedArchetype.name}
+            </h3>
+          </div>
+          {matchedArchetype.tagline ? (
+            <p style={{
+              fontFamily: DS.headingFont,
+              color: accent,
+              fontSize: '14px',
+              margin: '0 0 12px',
+              fontStyle: 'italic',
+            }}>
+              {matchedArchetype.tagline}
+            </p>
+          ) : null}
           {matchedArchetype.description ? (
             <p style={{
               color: DS.textSecondary,
@@ -422,6 +855,102 @@ export function ResultsPanel(props: ResultsPanelProps) {
             }}>
               Match strength · {Math.round(matchedArchetype.matchScore)}%
             </p>
+          ) : null}
+
+          {/* "What this means for you" — plain-language insight */}
+          {matchedArchetype.corePattern || matchedArchetype.primaryRisk || matchedArchetype.orientation ? (
+            <div style={{
+              marginTop: '16px', paddingTop: '16px',
+              borderTop: `1px solid ${accent}26`,
+            }}>
+              <span style={{ ...monoStyle, color: DS.muted, fontSize: '10px', display: 'block', marginBottom: '8px' }}>
+                What this means for you
+              </span>
+              {matchedArchetype.corePattern ? (
+                <p style={{ color: DS.text, fontSize: '14px', lineHeight: 1.6, margin: '0 0 8px' }}>
+                  {matchedArchetype.corePattern}
+                </p>
+              ) : null}
+              {matchedArchetype.orientation ? (
+                <p style={{ color: DS.textSecondary, fontSize: '13px', lineHeight: 1.55, margin: '0 0 8px' }}>
+                  Orientation: {matchedArchetype.orientation}
+                  {matchedArchetype.mandateBand ? ` · ${matchedArchetype.mandateBand} mandate` : ''}
+                </p>
+              ) : null}
+              {matchedArchetype.primaryRisk ? (
+                <p style={{ color: WARNING, fontSize: '13px', lineHeight: 1.55, margin: '0' }}>
+                  Watch for: {matchedArchetype.primaryRisk}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          {/* Strengths & growth areas (explicit config or derived) */}
+          {(strengths.length > 0 || growthAreas.length > 0) ? (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+              gap: '16px',
+              marginTop: '20px', paddingTop: '20px',
+              borderTop: `1px solid ${accent}26`,
+            }}>
+              {strengths.length > 0 ? (
+                <div>
+                  <span style={{ ...monoStyle, color: SUCCESS, fontSize: '10px', display: 'block', marginBottom: '10px' }}>
+                    Strengths
+                  </span>
+                  <ul style={{ margin: 0, paddingLeft: '16px', color: DS.textSecondary }}>
+                    {strengths.map((s, i) => (
+                      <li key={i} style={{ marginBottom: '6px', fontSize: '13px', lineHeight: 1.5 }}>{s}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {growthAreas.length > 0 ? (
+                <div>
+                  <span style={{ ...monoStyle, color: WARNING, fontSize: '10px', display: 'block', marginBottom: '10px' }}>
+                    Growth areas
+                  </span>
+                  <ul style={{ margin: 0, paddingLeft: '16px', color: DS.textSecondary }}>
+                    {growthAreas.map((g, i) => (
+                      <li key={i} style={{ marginBottom: '6px', fontSize: '13px', lineHeight: 1.5 }}>{g}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {/* Secondary archetype (next-best match) */}
+          {secondaryArchetype ? (
+            <div style={{
+              marginTop: '20px', paddingTop: '20px',
+              borderTop: `1px solid ${accent}26`,
+            }}>
+              <span style={{ ...monoStyle, color: DS.muted, fontSize: '10px', display: 'block', marginBottom: '6px' }}>
+                Secondary profile
+              </span>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+                <span style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  color: DS.text,
+                }}>
+                  {secondaryArchetype.name}
+                </span>
+                {typeof secondaryArchetype.matchScore === 'number' ? (
+                  <span style={{ ...monoStyle, fontSize: '11px', color: DS.muted }}>
+                    {Math.round(secondaryArchetype.matchScore)}% match
+                  </span>
+                ) : null}
+              </div>
+              {secondaryArchetype.description ? (
+                <p style={{ color: DS.textSecondary, fontSize: '13px', lineHeight: 1.55, margin: '6px 0 0' }}>
+                  {secondaryArchetype.description}
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </div>
       ) : null}
@@ -459,90 +988,20 @@ export function ResultsPanel(props: ResultsPanelProps) {
         </div>
       </div>
 
-      {/* ── Dimension Cards (responsive grid, auto-fit minmax(200px, 1fr)) ─ */}
+      {/* ── Dimension Detail (interactive cards — hover/tap for detail) ─ */}
       <div style={sectionStyle}>
         <h4 style={headingStyle}>Dimension Detail</h4>
+        <p style={{ fontSize: '12px', color: DS.muted, margin: '0 0 16px' }}>
+          Hover or tap a dimension for the full description.
+        </p>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '16px',
         }}>
-          {dimensions.map((d) => {
-            const color = scoreColor(d.percentage);
-            return (
-              <div key={d.id} style={{
-                background: DS.bgAlt,
-                border: `1px solid ${DS.border}`,
-                padding: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-              }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'baseline',
-                  gap: '8px',
-                  marginBottom: '6px',
-                }}>
-                  <span style={{
-                    fontFamily: DS.headingFont,
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    color: DS.text,
-                  }}>
-                    {d.name}
-                  </span>
-                  <span style={{
-                    fontFamily: DS.monoFont,
-                    fontSize: '15px',
-                    fontWeight: 600,
-                    color,
-                    flexShrink: 0,
-                  }}>
-                    {Math.round(d.percentage)}%
-                  </span>
-                </div>
-                {d.verdict ? (
-                  <span style={{
-                    ...monoStyle,
-                    fontSize: '10px',
-                    color,
-                    marginBottom: '10px',
-                  }}>
-                    {d.verdict}
-                  </span>
-                ) : (
-                  <span style={{
-                    ...monoStyle,
-                    fontSize: '10px',
-                    color: DS.muted,
-                    marginBottom: '10px',
-                  }}>
-                    {d.lowLabel} → {d.highLabel}
-                  </span>
-                )}
-                <ScoreBar score={d.percentage} color={color} />
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginTop: '6px',
-                }}>
-                  <span style={{ fontSize: '10px', color: DS.muted }}>{d.lowLabel}</span>
-                  <span style={{ fontSize: '10px', color: DS.muted }}>{d.highLabel}</span>
-                </div>
-                {d.description ? (
-                  <p style={{
-                    fontSize: '12px',
-                    color: DS.textSecondary,
-                    lineHeight: 1.55,
-                    margin: '12px 0 0',
-                  }}>
-                    {d.description}
-                  </p>
-                ) : null}
-              </div>
-            );
-          })}
+          {dimensions.map((d) => (
+            <DimensionCard key={d.id} d={d} accent={accent} />
+          ))}
         </div>
       </div>
 
@@ -818,14 +1277,49 @@ export function ResultsPanel(props: ResultsPanelProps) {
         </div>
       </div>
 
-      {/* ── Insight bridge to NEXUS (complimentary, no "free") ──── */}
+      {/* ── X2-5: Key Insights (3–5 concrete, personalized takeaways) ── */}
+      {keyInsights.length > 0 ? (
+        <div style={sectionStyle}>
+          <h4 style={headingStyle}>Key Insights</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {keyInsights.map((insight, i) => (
+              <div key={i} style={{
+                display: 'flex',
+                gap: '14px',
+                alignItems: 'flex-start',
+                paddingBottom: i < keyInsights.length - 1 ? '14px' : 0,
+                borderBottom: i < keyInsights.length - 1 ? `1px solid ${DS.border}` : 'none',
+              }}>
+                <span style={{
+                  fontFamily: DS.monoFont,
+                  fontSize: '12px',
+                  color: accent,
+                  flexShrink: 0,
+                  minWidth: '24px',
+                  fontWeight: 600,
+                }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <p style={{ fontSize: '13px', color: DS.text, lineHeight: 1.6, margin: 0 }}>
+                  {insight}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {/* ── Next Steps: NEXUS debrief + take another + save/share ── */}
       {weakestDimension ? (
         <div style={{
           background: `${accent}0D`,
           border: `1px solid ${accent}33`,
-          padding: '20px 24px',
+          padding: '24px',
           marginBottom: '24px',
         }}>
+          <span style={{ ...monoStyle, color: accent, fontSize: '10px', display: 'block', marginBottom: '10px' }}>
+            Next Steps
+          </span>
           <p style={{
             color: DS.text,
             fontSize: '15px',
@@ -836,18 +1330,18 @@ export function ResultsPanel(props: ResultsPanelProps) {
             Your most immediate development area is{' '}
             <strong style={{ color: accent }}>{weakestDimension.name}</strong>.
             {result.compositeScore >= 70
-              ? 'Given your strong overall positioning, this is the gap worth closing first.'
-              : 'Combined with developing scores, this is where to focus your next 90 days.'}
+              ? ' Given your strong overall positioning, this is the gap worth closing first.'
+              : ' Combined with developing scores, this is where to focus your next 90 days.'}
           </p>
+
+          {/* Primary CTA — NEXUS debrief (X2-7: working q+code pattern) */}
           <a
-            href={`/nexus?context=assessment&archetype=${encodeURIComponent(
-              matchedArchetype?.name || ''
-            )}&score=${Math.round(result.compositeScore)}`}
+            href={nexusEntryUrl}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '10px 20px',
+              padding: '12px 22px',
               background: accent,
               color: '#FFFFFF',
               textDecoration: 'none',
@@ -856,9 +1350,29 @@ export function ResultsPanel(props: ResultsPanelProps) {
               transition: 'opacity 200ms cubic-bezier(0.16,1,0.3,1)',
             }}
           >
-            Build your 90-day plan with NEXUS →
+            Continue the full debrief in NEXUS →
           </a>
+
+          {/* Secondary actions — save indicator + share + take another */}
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', gap: '10px',
+            marginTop: '16px', paddingTop: '16px',
+            borderTop: `1px solid ${accent}26`,
+          }}>
+            <NextStepsActions assessmentCode={assessmentCode} accent={accent} />
+          </div>
         </div>
+      ) : null}
+
+      {/* ── X2-8 (#1324): Embedded NEXUS debrief widget ─────────── */}
+      {/* Lightweight inline chat with result context pre-loaded. */}
+      {nexusResultContext ? (
+        <NexusDebriefWidget
+          resultContext={nexusResultContext}
+          assessmentName={result.assessmentName}
+          accent={accent}
+          archetypeName={matchedArchetype?.name}
+        />
       ) : null}
 
       {/* ── Download Report ────────────────────────────────────── */}

@@ -90,6 +90,7 @@ const AssessmentCatalogPage = lazy(() => import('@/pages/AssessmentCatalogPage')
 const CanonicalInstrumentLanding = lazy(() => import('@/pages/CanonicalInstrumentLanding').then(m => ({ default: m.CanonicalInstrumentLanding })));
 const CpiPage = lazy(() => import('@/pages/CpiPage'));
 const CpiResultsPage = lazy(() => import('@/pages/CpiResultsPage').then(m => ({ default: m.CpiResultsPage })));
+const CpiTakePage = lazy(() => import('@/pages/CpiTakePage').then(m => ({ default: m.CpiTakePage })));
 const ShiftPage = lazy(() => import('@/pages/ShiftPage'));
 const CpiFlagshipLanding = lazy(() => import('@/pages/CpiFlagshipLanding').then(m => ({ default: m.CpiFlagshipLanding })));
 const PrismLanding = lazy(() => import('@/pages/PrismLanding').then(m => ({ default: m.PrismLanding })));
@@ -98,9 +99,12 @@ const SparkLanding = lazy(() => import('@/pages/SparkLanding').then(m => ({ defa
 const LeapLanding = lazy(() => import('@/pages/LeapLanding').then(m => ({ default: m.LeapLanding })));
 const ImpactLanding = lazy(() => import('@/pages/ImpactLanding').then(m => ({ default: m.ImpactLanding })));
 const SparkResultsPage = lazy(() => import('@/pages/SparkResultsPage').then(m => ({ default: m.SparkResultsPage })));
+const SparkTakePage = lazy(() => import('@/pages/SparkTakePage').then(m => ({ default: m.SparkTakePage })));
 const LeapResultsPage = lazy(() => import('@/pages/LeapResultsPage').then(m => ({ default: m.LeapResultsPage })));
+const LeapTakePage = lazy(() => import('@/pages/LeapTakePage').then(m => ({ default: m.LeapTakePage })));
 const QuestResultsPage = lazy(() => import('@/pages/QuestResultsPage').then(m => ({ default: m.QuestResultsPage })));
 const ImpactResultsPage = lazy(() => import('@/pages/ImpactResultsPage').then(m => ({ default: m.ImpactResultsPage })));
+const ImpactTakePage = lazy(() => import('@/pages/ImpactTakePage').then(m => ({ default: m.ImpactTakePage })));
 const ForgeResultsPage = lazy(() => import('@/pages/ForgeResultsPage').then(m => ({ default: m.ForgeResultsPage })));
 const DriveResultsPage = lazy(() => import('@/pages/DriveResultsPage').then(m => ({ default: m.DriveResultsPage })));
 const CoachResultsPage = lazy(() => import('@/pages/CoachResultsPage').then(m => ({ default: m.CoachResultsPage })));
@@ -278,12 +282,19 @@ export default function App() {
             {/* ── Canonical singular assessment landing routes (V3-2) ── */}
             <Route path="assessment/prism" element={<PrismLanding />} />
             <Route path="assessment/spark" element={<SparkLanding />} />
+            <Route path="assessment/spark/take" element={<SparkTakePage />} />
+            <Route path="assessment/spark/results/:id" element={<SparkResultsPage />} />
             {/* Explicit redirects for instruments that have no landing data */}
             <Route path="assessment/cpi" element={<CpiFlagshipLanding />} />
+            <Route path="assessment/cpi/take" element={<CpiTakePage />} />
             <Route path="assessment/shift" element={<Navigate to="/assessments" replace />} />
             <Route path="assessment/leap" element={<LeapLanding />} />
+            <Route path="assessment/leap/take" element={<LeapTakePage />} />
+            <Route path="assessment/leap/results/:id" element={<LeapResultsPage />} />
             <Route path="assessment/quest" element={<Navigate to="/assessments" replace />} />
             <Route path="assessment/impact" element={<ImpactLanding />} />
+            <Route path="assessment/impact/take" element={<ImpactTakePage />} />
+            <Route path="assessment/impact/results/:id" element={<ImpactResultsPage />} />
             <Route path="assessment/coach" element={<Navigate to="/assessments" replace />} />
             {/* Generic canonical landing for 4 remaining instruments: FORGE, BRIDGE, MOSAIC, DRIVE */}
             <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />

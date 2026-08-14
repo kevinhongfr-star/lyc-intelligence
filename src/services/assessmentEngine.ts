@@ -270,73 +270,6 @@ function buildInstrumentConfigFromScoring(code: InstrumentKey): InstrumentConfig
   };
 }
 
-function scoreLegacyCPI(
-  numericResponses: Record<string, number>,
-  meta: InstrumentMeta
-): ScoreResult {
-  const dimensionScores: ScoreResult["dimension_scores"] = {};
-  const dimensionsOrdered: string[] = [];
-  const verdicts: Record<string, { verdict: string; meaning: string }> = {};
-
-  for (const dim of meta.dimensions) {
-    dimensionsOrdered.push(dim.id);
-    const pct = 40 + Math.round(Math.random() * 40);
-    dimensionScores[dim.id] = {
-      id: dim.id,
-      name: dim.name,
-      raw_score: Math.round((pct / 100) * (dim.raw_max || 100)),
-      raw_max: dim.raw_max || 100,
-      normalised_score: Math.round((pct / 100) * 20 * 10) / 10,
-      normalised_max: 20,
-      percentage: pct,
-      question_count: dim.question_count,
-    };
-    const matchV = meta.dimension_verdicts.find(v => pct >= v.min && pct <= v.max);
-    verdicts[dim.id] = matchV
-      ? { verdict: matchV.verdict, meaning: matchV.meaning }
-      : { verdict: "Unrated", meaning: "" };
-    dimensionScores[dim.id].verdict = verdicts[dim.id].verdict;
-    dimensionScores[dim.id].verdict_meaning = verdicts[dim.id].meaning;
-  }
-
-  const compositeVal = Math.round(
-    Object.values(dimensionScores).reduce((s, d) => s + d.percentage, 0) /
-      Math.max(1, Object.keys(dimensionScores).length)
-  );
-  const matchBand = meta.composite_bands.find(b => compositeVal >= b.min && compositeVal <= b.max);
-  const top = [...meta.dimensions]
-    .map(d => ({ id: d.id, name: d.name, pct: dimensionScores[d.id].percentage }))
-    .sort((a, b) => a.pct - b.pct);
-
-  return {
-    dimension_scores: dimensionScores,
-    dimensions_ordered: dimensionsOrdered,
-    composite: {
-      score: compositeVal,
-      band: matchBand?.band,
-      interpretation: matchBand?.interpretation,
-    },
-    archetype: meta.archetypes[0]
-      ? { id: meta.archetypes[0].id, name: meta.archetypes[0].name, description: meta.archetypes[0].description, match_score: 85 }
-      : undefined,
-    archetypes_ranked: meta.archetypes.map((a, i) => ({
-      ...a,
-      match_score: 80 - i * 5,
-    })),
-    development_priorities: top.slice(0, 3).map(t => ({
-      dimension_id: t.id,
-      dimension_name: t.name,
-      priority: t.pct < 40 ? "critical" : t.pct < 60 ? "high" : "medium",
-      rationale: `${t.name} scored ${t.pct}% — targeted development recommended.`,
-    })),
-    dimension_verdicts: verdicts,
-    summary: {
-      total_questions_answered: Object.keys(numericResponses).length,
-      completion_rate: meta.total_questions > 0 ? Object.keys(numericResponses).length / meta.total_questions : 0,
-    },
-  };
-}
-
 export async function scoreAssessment(
   code: InstrumentKey | string,
   responses: Record<string, number | string | number[]>,
@@ -350,15 +283,13 @@ export async function scoreAssessment(
     const meta = getInstrumentMeta(key);
     const numericResponses = coerceToNumericResponses(responses);
 
-    let result: ScoreResult;
-
-    if (key === "CPI") {
-      result = scoreLegacyCPI(numericResponses, meta);
-    } else {
-      const config = buildInstrumentConfigFromScoring(key);
-      const scorer = new AkiraScorer(config);
-      result = scorer.score(numericResponses);
-    }
+    // All instruments — including CPI (B2C v1 single-rater port, X2-1) —
+    // flow through the deterministic Akira engine. The legacy random
+    // scoreLegacyCPI was removed; CPI now uses the same scoring path as
+    // every other hero assessment.
+    const config = buildInstrumentConfigFromScoring(key);
+    const scorer = new AkiraScorer(config);
+    const result: ScoreResult = scorer.score(numericResponses);
 
     let persisted_id: string | undefined;
     if (opts.persist) {

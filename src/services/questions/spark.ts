@@ -38,7 +38,7 @@ export const DIMENSIONS: SPARKDimensionBank[] = [
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q03", "Q05", "Q08"],
     questions: [
       {
         id: "Q01",
@@ -121,7 +121,7 @@ export const DIMENSIONS: SPARKDimensionBank[] = [
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q11", "Q14", "Q17"],
     questions: [
       {
         id: "Q10",
@@ -204,7 +204,7 @@ export const DIMENSIONS: SPARKDimensionBank[] = [
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q21", "Q24", "Q26"],
     questions: [
       {
         id: "Q19",

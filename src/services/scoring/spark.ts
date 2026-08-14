@@ -20,20 +20,20 @@ export const DIMENSIONS = [
     id: "D1",
     name: "INDIVIDUAL AI ADOPTION READINESS (IAAR)",
     question_ids: [
-      "SPARK_Q01",
-      "SPARK_Q02",
-      "SPARK_Q03",
-      "SPARK_Q04",
-      "SPARK_Q05",
-      "SPARK_Q06",
-      "SPARK_Q07",
-      "SPARK_Q08",
-      "SPARK_Q09"
+      "Q01",
+      "Q02",
+      "Q03",
+      "Q04",
+      "Q05",
+      "Q06",
+      "Q07",
+      "Q08",
+      "Q09"
     ],
     reverse_coded: [
-      "SPARK_Q03",
-      "SPARK_Q05",
-      "SPARK_Q08"
+      "Q03",
+      "Q05",
+      "Q08"
     ],
     raw_max: 45,
     n_questions: 9,
@@ -55,20 +55,20 @@ export const DIMENSIONS = [
     id: "D2",
     name: "CAPABILITY EXPOSURE ASSESSMENT (CEA)",
     question_ids: [
-      "SPARK_Q10",
-      "SPARK_Q11",
-      "SPARK_Q12",
-      "SPARK_Q13",
-      "SPARK_Q14",
-      "SPARK_Q15",
-      "SPARK_Q16",
-      "SPARK_Q17",
-      "SPARK_Q18"
+      "Q10",
+      "Q11",
+      "Q12",
+      "Q13",
+      "Q14",
+      "Q15",
+      "Q16",
+      "Q17",
+      "Q18"
     ],
     reverse_coded: [
-      "SPARK_Q11",
-      "SPARK_Q14",
-      "SPARK_Q17"
+      "Q11",
+      "Q14",
+      "Q17"
     ],
     raw_max: 45,
     n_questions: 9,
@@ -90,20 +90,20 @@ export const DIMENSIONS = [
     id: "D3",
     name: "ORGANISATIONAL PREPAREDNESS (OP)",
     question_ids: [
-      "SPARK_Q19",
-      "SPARK_Q20",
-      "SPARK_Q21",
-      "SPARK_Q22",
-      "SPARK_Q23",
-      "SPARK_Q24",
-      "SPARK_Q25",
-      "SPARK_Q26",
-      "SPARK_Q27"
+      "Q19",
+      "Q20",
+      "Q21",
+      "Q22",
+      "Q23",
+      "Q24",
+      "Q25",
+      "Q26",
+      "Q27"
     ],
     reverse_coded: [
-      "SPARK_Q21",
-      "SPARK_Q24",
-      "SPARK_Q26"
+      "Q21",
+      "Q24",
+      "Q26"
     ],
     raw_max: 45,
     n_questions: 9,
