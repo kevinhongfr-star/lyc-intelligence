@@ -22,6 +22,7 @@ export const INSTRUMENT = 'CPI';
 export const FULL_NAME = 'Career Positioning Index';
 export const VERSION = '12.0';
 export const TIER = 'flagship';
+export const SCORING_MODE = 'weighted_average';
 export const PRICE_MILES = 199;
 export const TOTAL_QUESTIONS = 25;
 export const SCALE = 'Scenario + structured evidence';
@@ -72,6 +73,7 @@ export const SCORING_CONFIG = {
   SCALE,
   DELIVERY_MINUTES,
   TIER,
+  SCORING_MODE,
   PRICE_MILES,
   B2C_NAME,
   TAGLINE,

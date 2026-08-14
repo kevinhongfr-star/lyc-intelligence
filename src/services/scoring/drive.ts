@@ -10,6 +10,7 @@ export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 14;
 export const TIER = "shift";
+export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 149;
 export const B2C_NAME = "Motivation Architecture & Engagement Risk";
 export const TAGLINE = "Why you lead \u2014 and when you will disengage. Intrinsic \u00d7 extrinsic \u00d7 purpose \u00d7 growth \u00d7 confidence.";

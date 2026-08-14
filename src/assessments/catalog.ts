@@ -292,15 +292,21 @@ function filterArchetypes(instrument: string, archetypes: any[]): any[] {
   return archetypes.filter((a) => !axes.has(a.name));
 }
 
-// ── Phase 9 Batch 6, ticket #1351 — only keep instruments with real diagnostic data.
-// Real 6: PRISM, SPARK, FORGE, BRIDGE, MOSAIC, DRIVE
-// Removed (no JSON data files / not B2C): CPI, LEAP, QUEST, IMPACT, COACH
-const INSTRUMENT_ORDER = ["PRISM", "SPARK", "FORGE", "BRIDGE", "MOSAIC", "DRIVE"] as const;
+// ── Batch A #1387 — all 11 assessments in catalog (single source of truth).
+// Hero lineup per Kevin's decision: CPI (flagship), LEAP, SPARK, IMPACT.
+// Nav/catalog: PRISM, BRIDGE, DRIVE, FORGE, MOSAIC, COACH, QUEST.
+const INSTRUMENT_ORDER = [
+  "CPI", "LEAP", "SPARK", "IMPACT",      // Hero (featured)
+  "PRISM", "BRIDGE", "DRIVE", "FORGE", "MOSAIC", "COACH", "QUEST",  // Nav/catalog
+] as const;
 
-// No flagship or shift-suite entries without data — 6 assessments, all Advisory Products
-export const FLAGSHIP_KEYS: string[] = [];
-export const SHIFT_SUITE_KEYS: string[] = [];
-export const ADVISORY_PRODUCT_KEYS: string[] = ["PRISM", "SPARK", "FORGE", "BRIDGE", "MOSAIC", "DRIVE"];
+// Marketing hero lineup — the 4 featured assessments shown prominently.
+export const HERO_KEYS: string[] = ["CPI", "LEAP", "SPARK", "IMPACT"];
+
+// Tier groups (map to backend pricing / access control)
+export const FLAGSHIP_KEYS: string[] = ["CPI"];
+export const SHIFT_SUITE_KEYS: string[] = ["LEAP", "QUEST", "IMPACT", "DRIVE", "COACH"];
+export const ADVISORY_PRODUCT_KEYS: string[] = ["PRISM", "SPARK", "FORGE", "BRIDGE", "MOSAIC"];
 export const LISTED_INSTRUMENT_KEYS: string[] = [
   ...FLAGSHIP_KEYS,
   ...SHIFT_SUITE_KEYS,
@@ -316,14 +322,15 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = INSTRUMENT_ORD
       scoring.TIER === "flagship" ? "flagship" : scoring.TIER === "shift" ? "shift" : "advisory";
     const tierLabel = TIER_GROUP_LABELS[tierGroup];
 
-    // Phase 9 Batch 6, ticket #1351 — canonical 6 assessment prices.
-    // Standard  ($99 · 99 mi): PRISM, DRIVE, FORGE, MOSAIC
-    // Premium ($149 · 149 mi): SPARK, BRIDGE
+    // Batch A #1387 — canonical pricing for all 11 assessments.
+    // Flagship  ($199 · 199 mi): CPI
+    // Shift      ($149 · 149 mi): LEAP, QUEST, IMPACT, DRIVE, COACH
+    // Standard   ($99 · 99 mi): PRISM, SPARK, FORGE, BRIDGE, MOSAIC
     // Executive Introduction: complimentary
-    // NOTE: tierGroup is now just 'Leadership Assessments' for the 6.
     const CANONICAL_PRICE_MILES: Record<string, number> = {
-      PRISM: 99, DRIVE: 99, FORGE: 99, MOSAIC: 99,
-      SPARK: 149, BRIDGE: 149,
+      CPI: 199,
+      LEAP: 149, QUEST: 149, IMPACT: 149, DRIVE: 149, COACH: 149,
+      PRISM: 99, SPARK: 99, FORGE: 99, BRIDGE: 99, MOSAIC: 99,
     };
     const priceMiles = CANONICAL_PRICE_MILES[code] ?? 99;
 

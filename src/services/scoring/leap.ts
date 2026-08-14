@@ -10,6 +10,7 @@ export const TOTAL_QUESTIONS = 35;
 export const SCALE = "Forced-choice DISC + Likert (mixed)";
 export const DELIVERY_MINUTES = 12;
 export const TIER = "shift";
+export const SCORING_MODE = "forced_choice";
 export const PRICE_MILES = 149;
 export const B2C_NAME = "Leadership Evaluation & Psychological Profiling";
 export const TAGLINE = "35 forced-choice items. DISC \u00d7 Career Readiness \u00d7 APAC cross-border. The SHIFT suite psychological anchor.";

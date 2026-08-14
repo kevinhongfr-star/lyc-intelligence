@@ -261,6 +261,7 @@ function buildInstrumentConfigFromScoring(code: InstrumentKey): InstrumentConfig
     total_questions: cfg.TOTAL_QUESTIONS,
     scale: cfg.SCALE,
     delivery_minutes: cfg.DELIVERY_MINUTES,
+    scoring_mode: cfg.SCORING_MODE || "weighted_average",
     dimensions: Array.isArray(cfg.DIMENSIONS) ? cfg.DIMENSIONS : [],
     composite_bands: Array.isArray(cfg.COMPOSITE_BANDS) ? cfg.COMPOSITE_BANDS : [],
     dimension_verdicts: Array.isArray(cfg.DIMENSION_VERDICTS) ? cfg.DIMENSION_VERDICTS : undefined,

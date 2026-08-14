@@ -10,6 +10,7 @@ export const TOTAL_QUESTIONS = 24;
 export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 9;
 export const TIER = "shift";
+export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 149;
 export const B2C_NAME = "Bilateral Coaching Readiness";
 export const TAGLINE = "Coaching is a bilateral practice, not a top-down one. Do you operate in a developmental system?";

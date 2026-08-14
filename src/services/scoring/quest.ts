@@ -10,6 +10,7 @@ export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 14;
 export const TIER = "shift";
+export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 149;
 export const B2C_NAME = "Executive Performance Architecture";
 export const TAGLINE = "Six-executive-dimension architecture. Where are you genuinely strong, and where will your next mandate expose gaps?";

@@ -10,6 +10,7 @@ export const TOTAL_QUESTIONS = 30;
 export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 10;
 export const TIER = "advisory";
+export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 99;
 export const B2C_NAME = "Professional Brand Legibility";
 export const TAGLINE = "How legible, differentiated and visible are you to the market that should be hiring you?";

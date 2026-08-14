@@ -10,6 +10,7 @@ export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 14;
 export const TIER = "advisory";
+export const SCORING_MODE = "weakest_dim";
 export const PRICE_MILES = 99;
 export const B2C_NAME = "APAC Mandate Execution & Cross-Border Leadership";
 export const TAGLINE = "The APAC mandate map. Cultural fluency, stakeholder navigation, long-game thinking under pressure.";

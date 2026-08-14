@@ -10,6 +10,7 @@ export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 14;
 export const TIER = "advisory";
+export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 99;
 export const B2C_NAME = "Sales Excellence & Revenue Architecture";
 export const TAGLINE = "For revenue-facing leaders. Bilateral context navigation, system thinking, and go-to-market architecture.";

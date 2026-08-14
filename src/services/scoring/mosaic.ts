@@ -10,6 +10,7 @@ export const TOTAL_QUESTIONS = 25;
 export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 9;
 export const TIER = "advisory";
+export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 99;
 export const B2C_NAME = "Cross-Border Partnership Intelligence & Institutional Navigation";
 export const TAGLINE = "JVs, alliances, partnerships, multi-party ecosystems. Institutional trust \u2192 relationship velocity.";

@@ -1,5 +1,15 @@
 export type QuestionType = "likert" | "forced_choice" | "mcq_single" | "mcq_multi";
 
+/**
+ * Scoring mode — determines how dimensions are scored and archetypes are matched.
+ * - `weighted_average`: Standard Likert, weighted composite, generic archetype match.
+ * - `matrix`: Archetype determined by high/low dimension combination (e.g. PRISM foundation × visibility).
+ * - `forced_choice`: Mixed-method (DISC forced-choice + Likert). Archetype by DISC primary × CR band.
+ * - `score_only`: No archetypes. Dimension scores + composite only.
+ * - `weakest_dim`: Archetype determined by weakest dimension (e.g. BRIDGE).
+ */
+export type ScoringMode = "weighted_average" | "matrix" | "forced_choice" | "score_only" | "weakest_dim";
+
 export interface AssessmentQuestion {
   id: string;
   text: string;
@@ -12,9 +22,10 @@ export interface AssessmentQuestion {
 }
 
 export interface InstrumentDimension {
-  id: string;
+  id?: string;
   name: string;
   question_ids?: string[];
+  items?: Array<{ id: string; text?: string }>;
   reverse_coded?: string[];
   raw_max?: number;
   n_questions?: number;
@@ -76,6 +87,7 @@ export interface InstrumentConfig {
   total_questions?: number;
   scale?: string;
   delivery_minutes?: number;
+  scoring_mode?: ScoringMode;
   dimensions: InstrumentDimension[];
   composite_bands: CompositeBand[];
   dimension_verdicts?: DimensionVerdict[];
