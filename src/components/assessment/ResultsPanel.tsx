@@ -13,6 +13,7 @@ import { DS, SUCCESS, WARNING, ERROR } from '@/tokens';
 import { saveResultToHistory, getScoreTrend } from '@/services/resultHistory';
 import { buildResultContextForNexus, buildNexusOpeningQuestion } from '@/nexus/resultContextBuilder';
 import { NexusDebriefWidget } from './NexusDebriefWidget';
+import { ResultExportBar } from './ResultExportBar';
 
 /* ============================================================
  * ResultsPanel — variable-dimension / variable-archetype renderer.
@@ -1353,6 +1354,31 @@ export function ResultsPanel(props: ResultsPanelProps) {
             Continue the full debrief in NEXUS →
           </a>
 
+          {/* Export / Share bar — generic (non-CPI) assessments */}
+          {isGeneric && assessmentCode && scoreResult ? (
+            <div style={{
+              marginTop: '20px', paddingTop: '20px',
+              borderTop: `1px solid ${accent}26`,
+            }}>
+              <ResultExportBar
+                assessmentCode={assessmentCode}
+                scoreResult={scoreResult}
+                matchedArchetype={matchedArchetype ? {
+                  name: matchedArchetype.name,
+                  description: matchedArchetype.description,
+                  key_traits: matchedArchetype.strengths,
+                } : undefined}
+                accent={accent}
+                aiInsights={{
+                  summary: thirtySecondSummary.join(' '),
+                  strengths,
+                  growthAreas,
+                  nextSteps: keyInsights,
+                }}
+              />
+            </div>
+          ) : null}
+
           {/* Secondary actions — save indicator + share + take another */}
           <div style={{
             display: 'flex', flexWrap: 'wrap', gap: '10px',
@@ -1361,6 +1387,36 @@ export function ResultsPanel(props: ResultsPanelProps) {
           }}>
             <NextStepsActions assessmentCode={assessmentCode} accent={accent} />
           </div>
+        </div>
+      ) : null}
+
+      {/* Standalone Export/Share bar — generic flow when no weakest-dimension block renders */}
+      {isGeneric && assessmentCode && scoreResult && !weakestDimension ? (
+        <div style={{
+          background: `${accent}0D`,
+          border: `1px solid ${accent}33`,
+          padding: '24px',
+          marginBottom: '24px',
+        }}>
+          <span style={{ ...monoStyle, color: accent, fontSize: '10px', display: 'block', marginBottom: '14px' }}>
+            Export & Share
+          </span>
+          <ResultExportBar
+            assessmentCode={assessmentCode}
+            scoreResult={scoreResult}
+            matchedArchetype={matchedArchetype ? {
+              name: matchedArchetype.name,
+              description: matchedArchetype.description,
+              key_traits: matchedArchetype.strengths,
+            } : undefined}
+            accent={accent}
+            aiInsights={{
+              summary: thirtySecondSummary.join(' '),
+              strengths,
+              growthAreas,
+              nextSteps: keyInsights,
+            }}
+          />
         </div>
       ) : null}
 

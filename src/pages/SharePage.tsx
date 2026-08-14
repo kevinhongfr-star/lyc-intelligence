@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getShareCard, type ShareCard, type ShareCardType } from '../services/shareCardService';
+import type { SharedAssessmentPayload } from '../services/assessmentShareService';
 import { SEO } from '@/components/seo/SEO';
 import { DS, WHITE } from '@/tokens';
 
@@ -42,7 +43,7 @@ function topDimension(
   return { label: DIMENSION_LABELS[key] || humanizeKey(key), score };
 }
 
-function buildTeaser(card: ShareCard): Teaser {
+function buildTeaserFromCard(card: ShareCard): Teaser {
   const data = card.data || {};
 
   switch (card.type as ShareCardType) {
@@ -125,6 +126,63 @@ function buildTeaser(card: ShareCard): Teaser {
   }
 }
 
+/** Build a teaser from the newer assessment_shares SharedAssessmentPayload shape. */
+function buildTeaserFromPayload(payload: SharedAssessmentPayload): Teaser {
+  const insights: string[] = [];
+  const dims = payload.dimensions || [];
+  const sorted = [...dims].sort(
+    (a, b) => (typeof b.score === 'number' ? b.score : 0) - (typeof a.score === 'number' ? a.score : 0)
+  );
+  if (sorted[0]) {
+    insights.push(
+      `Leading dimension: ${sorted[0].name} (${Math.round(sorted[0].score)}/100).`
+    );
+  }
+  if (payload.composite_interpretation) {
+    insights.push(String(payload.composite_interpretation).slice(0, 240));
+  } else if (sorted[sorted.length - 1]) {
+    const w = sorted[sorted.length - 1];
+    insights.push(
+      `Priority growth: ${w.name} (${Math.round(w.score)}/100).`
+    );
+  }
+
+  const headline = payload.archetype || payload.overall_tier || 'Leadership Profile';
+  const headlineSub = payload.archetype_description
+    ? String(payload.archetype_description).slice(0, 180)
+    : payload.assessment_name || 'Executive Assessment';
+
+  return {
+    eyebrow: payload.assessment_code
+      ? `${payload.assessment_code} · Assessment Result`
+      : 'Assessment Result',
+    name: 'Shared Result',
+    headline,
+    headlineSub,
+    metric: {
+      label: payload.assessment_code ? `${payload.assessment_code} Composite Score` : 'Composite Score',
+      value: `${Math.round(payload.overall_score)}/100${
+        payload.overall_tier ? ` · ${payload.overall_tier}` : ''
+      }`,
+    },
+    insights: insights.slice(0, 2),
+  };
+}
+
+/** SharedAssessmentPayload-aware dimension table rows (extra panel when payload available). */
+interface PayloadDimsRow {
+  label: string;
+  score: number;
+  tier: string;
+}
+function getDimsRows(payload: SharedAssessmentPayload): PayloadDimsRow[] {
+  return (payload.dimensions || []).map((d) => ({
+    label: d.name,
+    score: typeof d.score === 'number' ? d.score : 0,
+    tier: d.tier || '',
+  }));
+}
+
 const eyebrowStyle: React.CSSProperties = {
   fontFamily: DS.monoFont,
   fontSize: '11px',
@@ -142,6 +200,7 @@ export function SharePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [shareCard, setShareCard] = useState<ShareCard | null>(null);
+  const [sharedPayload, setSharedPayload] = useState<SharedAssessmentPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -150,17 +209,39 @@ export function SharePage() {
       navigate('/');
       return;
     }
-    loadShareCard(id);
+    loadShareData(id);
   }, [id]);
 
-  const loadShareCard = async (publicId: string) => {
+  /**
+   * Y1-4 dual-fallback loader:
+   * 1. Legacy share_cards path (public_uuid) — Trident/progress/cards pre-Y1
+   * 2. Newer assessment_shares capability-URL path (/api/assessments/share?token=X)
+   *    — Assessment share links created via createShareLink / POST share endpoint.
+   */
+  const loadShareData = async (publicId: string) => {
     try {
+      // 1. Try legacy share_cards table via supabase direct
       const card = await getShareCard(publicId);
       if (card) {
         setShareCard(card);
-      } else {
-        setError('Share card not found');
+        return;
       }
+
+      // 2. Fallback: assessment_shares capability token via public API
+      const api = await fetch(`/api/assessments/share?token=${encodeURIComponent(publicId)}`);
+      if (api.ok) {
+        const body = await api.json();
+        if (body?.ok && body?.payload) {
+          setSharedPayload(body.payload as SharedAssessmentPayload);
+          return;
+        }
+        if (body?.error) {
+          setError(body.error);
+          return;
+        }
+      }
+
+      setError('Share card not found');
     } catch (e) {
       console.error('Failed to load share card:', e);
       setError('Failed to load share card');
@@ -258,9 +339,15 @@ export function SharePage() {
     );
   }
 
-  const teaser = buildTeaser(shareCard);
-  const seoTitle = `${teaser.name} — ${teaser.headline} | LYC Intelligence`;
-  const seoDescription = `${teaser.name}'s ${teaser.eyebrow.toLowerCase()} profile from LYC Intelligence — a teaser of their cross-border leadership results. Take the assessment yourself to unlock your full report.`;
+  const teaser = shareCard
+    ? buildTeaserFromCard(shareCard)
+    : buildTeaserFromPayload(sharedPayload!);
+  const seoTitle = `${teaser.headline} — ${teaser.eyebrow} | LYC Intelligence`;
+  const seoDescription =
+    `${teaser.eyebrow} from LYC Intelligence — ${teaser.headline}${
+      teaser.metric ? ` · ${teaser.metric.label}: ${teaser.metric.value}` : ''
+    }. Take your complimentary assessment to unlock your full report.`;
+  const payloadDims = sharedPayload ? getDimsRows(sharedPayload) : [];
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bgAlt, padding: '32px 16px 48px' }}>
@@ -430,14 +517,107 @@ export function SharePage() {
             )}
           </div>
 
-          {/* Locked teaser note */}
+          {/* Dimension breakdown (assessment_shares payloads only) */}
+          {payloadDims.length > 0 && (
+            <>
+              <Divider />
+              <div style={{ padding: '24px' }}>
+                <div style={{ ...eyebrowStyle, marginBottom: '14px' }}>Dimension Breakdown</div>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                  }}
+                >
+                  {payloadDims.map((d) => (
+                    <div key={d.label}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'baseline',
+                          gap: '12px',
+                          marginBottom: '6px',
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontFamily: DS.bodyFont,
+                            fontSize: '13px',
+                            fontWeight: 500,
+                            color: DS.text,
+                          }}
+                        >
+                          {d.label}
+                        </span>
+                        <span
+                          style={{
+                            fontFamily: DS.monoFont,
+                            fontSize: '12px',
+                            color: DS.textSecondary,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {Math.round(d.score)}/100{d.tier ? ` · ${d.tier}` : ''}
+                        </span>
+                      </div>
+                      <div
+                        role="presentation"
+                        style={{
+                          width: '100%',
+                          height: '6px',
+                          background: DS.border,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${Math.max(0, Math.min(100, d.score))}%`,
+                            height: '100%',
+                            background: DS.accent,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Privacy / sharer banner — Y1-4 "Privacy: users control what's shared" */}
+          <Divider />
           <div
             style={{
               padding: '14px 24px',
-              background: DS.bgAlt,
-              borderTop: `1px solid ${DS.border}`,
+              background: 'rgba(26,26,26,0.02)',
             }}
           >
+            <p
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: '12px',
+                color: DS.muted,
+                margin: '0 0 4px',
+                lineHeight: 1.5,
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: DS.monoFont,
+                  letterSpacing: '1px',
+                  textTransform: 'uppercase',
+                  fontWeight: 600,
+                  color: DS.eyebrow,
+                  marginRight: '8px',
+                }}
+              >
+                Privacy
+              </span>
+              This share was created by the original assessment owner and contains no
+              personally identifiable information. Share links can be revoked by the owner at
+              any time.
+            </p>
             <p
               style={{
                 fontFamily: DS.bodyFont,
@@ -447,8 +627,8 @@ export function SharePage() {
                 lineHeight: 1.5,
               }}
             >
-              This is a preview. The full report includes all dimensions, narrative analysis,
-              and a development roadmap.
+              This is a preview. Full reports include executive narrative, archetype deep
+              dive, prioritized development roadmap, and a downloadable branded PDF.
             </p>
           </div>
         </article>
