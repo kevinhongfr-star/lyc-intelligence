@@ -824,6 +824,25 @@ export function LandingTemplate(props: LandingTemplateProps) {
                 </React.Fragment>
               ))}
             </div>
+            <a
+              href="/pricing"
+              style={{
+                display: 'inline-block',
+                marginTop: 20,
+                fontFamily: DS.monoFont,
+                fontSize: 11,
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                color: DS.mutedDim,
+                textDecoration: 'underline',
+                textUnderlineOffset: 4,
+                transition: DS.transition,
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = DS.bg)}
+              onMouseLeave={(e) => (e.currentTarget.style.color = DS.mutedDim)}
+            >
+              See all pricing tiers →
+            </a>
           </div>
         </section>
 

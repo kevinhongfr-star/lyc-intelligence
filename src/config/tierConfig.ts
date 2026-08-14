@@ -211,3 +211,130 @@ export function getLockedCTA(slug: string, userTier: string | null | undefined):
 export function getComplimentaryCTA(): { label: string } {
   return { label: 'Start Your Complimentary Assessment' };
 }
+
+// ── W3-1 / W3-4 — Pricing & marketing tier config ─────────────────
+//
+// Single source of truth for ALL pricing surfaces. The 5 backend tiers are
+// configured here; only 3 are shown in marketing (MARKETING_TIERS). Council +
+// Enterprise are hidden, sales/invite-only.
+//
+// Brand rules enforced in this layer:
+//  - Entry tier display = "Executive Introduction" (NEVER "free").
+//  - Complimentary assessments, never "free assessments".
+//  - Premium voice, no SaaS/freemium framing.
+
+export interface TierPricing {
+  /** USD monthly price. Entry tier = 0. */
+  usdMonthly: number;
+  /** CNY monthly price (regional adjustment, ~1/3 of USD rounded). Entry = 0. */
+  cnyMonthly: number;
+  /** Monthly miles allowance. Entry = 0. */
+  monthlyMiles: number;
+  /** Whether the tier earns miles via NEXUS actions. Entry = false. */
+  earnsMiles: boolean;
+}
+
+export const TIER_PRICING: Record<TierKey, TierPricing> = {
+  executive_introduction: { usdMonthly: 0, cnyMonthly: 0, monthlyMiles: 0, earnsMiles: false },
+  professional: { usdMonthly: 25, cnyMonthly: 59, monthlyMiles: 50, earnsMiles: true },
+  executive: { usdMonthly: 99, cnyMonthly: 233, monthlyMiles: 150, earnsMiles: true },
+  council: { usdMonthly: 199, cnyMonthly: 466, monthlyMiles: 300, earnsMiles: true },
+  enterprise: { usdMonthly: 499, cnyMonthly: 1165, monthlyMiles: 600, earnsMiles: true },
+};
+
+export type PricingCurrency = 'USD' | 'CNY';
+
+export type BillingCycle = 'monthly' | 'annual';
+
+/**
+ * Annual = 2 months complimentary (monthly × 10). ~17% saving.
+ * Annual is the default billing cycle on the pricing page (higher value).
+ */
+export const ANNUAL_MONTHS_BILLED = 10;
+export const ANNUAL_SAVE_PERCENT = 17;
+
+/** The 3 tiers visible in marketing UI (in display order). */
+export const MARKETING_TIERS: TierKey[] = [
+  'executive_introduction',
+  'professional',
+  'executive',
+];
+
+/** The recommended / "Most Popular" tier. */
+export const RECOMMENDED_TIER: TierKey = 'professional';
+
+/** Tiers hidden from marketing (sales/invite-only). */
+export const HIDDEN_TIERS: TierKey[] = ['council', 'enterprise'];
+
+/**
+ * Marketing benefit copy per tier (shown on pricing page cards).
+ * Premium voice — no "free", no SaaS jargon.
+ */
+export const TIER_MARKETING_BENEFITS: Record<TierKey, string[]> = {
+  executive_introduction: [
+    '1 complimentary assessment baseline',
+    'Basic NEXUS chat access',
+    'Personal profile & results history',
+    'No credit card required',
+  ],
+  professional: [
+    'All 11 assessments (unlimited retakes)',
+    'Full NEXUS intelligence access',
+    'Complete results history & tracking',
+    'Email support',
+    '50 miles monthly allowance',
+  ],
+  executive: [
+    'Everything in Professional',
+    'Branded PDF reports',
+    'Priority NEXUS responses',
+    'Advanced insights & recommendations',
+    'Priority support · 150 miles monthly',
+  ],
+  council: [
+    'Everything in Executive',
+    'Council community & live sessions',
+    'Quarterly executive workshops',
+    '300 miles monthly allowance',
+  ],
+  enterprise: [
+    'Seat-based deployment with SSO & SCIM',
+    'Custom framework training',
+    'Org-level analytics & dedicated contact',
+    '600 miles monthly allowance',
+  ],
+};
+
+/** CTA label per marketing tier. */
+export const TIER_CTA_LABEL: Record<TierKey, string> = {
+  executive_introduction: 'Start Your Complimentary Baseline',
+  professional: 'Go Professional',
+  executive: 'Go Executive',
+  council: 'Talk to Us',
+  enterprise: 'Talk to Sales',
+};
+
+/**
+ * Compute the display price for a tier given currency + billing cycle.
+ * Entry tier returns { isZero: true } so the card renders "Complimentary".
+ */
+export function computeTierPrice(
+  tier: TierKey,
+  currency: PricingCurrency,
+  cycle: BillingCycle,
+): { isZero: boolean; amount: number; perMonth: number } {
+  const base = currency === 'USD'
+    ? TIER_PRICING[tier].usdMonthly
+    : TIER_PRICING[tier].cnyMonthly;
+  if (base === 0) return { isZero: true, amount: 0, perMonth: 0 };
+  if (cycle === 'annual') {
+    const annualTotal = base * ANNUAL_MONTHS_BILLED;
+    return { isZero: false, amount: annualTotal, perMonth: Math.round(annualTotal / 12) };
+  }
+  return { isZero: false, amount: base, perMonth: base };
+}
+
+export function formatPrice(amount: number, currency: PricingCurrency): string {
+  if (currency === 'CNY') return `¥${amount}`;
+  return `$${amount}`;
+}

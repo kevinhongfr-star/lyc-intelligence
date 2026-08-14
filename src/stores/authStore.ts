@@ -150,19 +150,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     if (!supabase) return { success: false, error: 'Supabase not configured' };
 
     try {
-      const { data, error } = await supabase.auth.signUp({ 
-        email, 
+      const { data, error } = await supabase.auth.signUp({
+        email,
         password,
-        options: { 
-          data: { 
-            tier: 'member', 
+        options: {
+          data: {
+            tier: 'executive_introduction',
             role: 'member',
-            name 
-          } 
+            name
+          }
         }
       });
       if (error) return { success: false, error: error.message };
-      
+
       if (data.user) {
         const referralCode = generateReferralCode();
         const { error: profileError } = await supabase.from('profiles').insert({
@@ -170,7 +170,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           email,
           name,
           icp: icp,
-          tier: 'member',
+          tier: 'executive_introduction',
           role: 'member',
         });
         if (profileError) console.warn('[AuthStore] Profile creation error:', profileError);

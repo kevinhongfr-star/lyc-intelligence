@@ -1,88 +1,95 @@
+/**
+ * PricingPage — W3-4 / #1318 / #1330
+ *
+ * 3 marketing tiers (Executive Introduction / Professional / Executive).
+ * Backend supports 5 tiers; Council + Enterprise are hidden, sales-only.
+ *
+ * Brand rules:
+ *  - Zero border radius everywhere (#1349).
+ *  - System serif headings, DM Sans body, IBM Plex Mono labels.
+ *  - Fuchsia page accent (#C108AB) — conversion moment.
+ *  - NEVER "free" — "Executive Introduction" / "complimentary".
+ *  - Premium voice, no SaaS/freemium framing.
+ *
+ * Config source of truth: @/config/tierConfig.ts (TIER_PRICING, MARKETING_TIERS,
+ * TIER_MARKETING_BENEFITS, computeTierPrice).
+ */
 import React, { useMemo, useState } from 'react';
-import { Check, Crown, Sparkles, ArrowRight, Loader2, Globe, Coins } from 'lucide-react';
+import { Check, ArrowRight, Loader2, Globe, Coins } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { authFetch } from '@/utils/authFetch';
 import { SEO } from '@/components/seo/SEO';
-import {
-  CANONICAL_TIER_ORDER,
-  CANONICAL_TIER_PRICING,
-  CANONICAL_ASSESSMENT_ORDER,
-  CANONICAL_ASSESSMENT_PRICING,
-  RECOMMENDED_TIER,
-  PRICING_PAGE_TIERS,
-  TIER_DISPLAY_NAME,
-  TIER_DISPLAY_BENEFITS,
-  detectUserCurrency,
-  savePreferredCurrency,
-  formatTierPrice,
-  formatAssessmentPrice,
-  type PricingCurrency,
-  type TierKey,
-} from '@/services/monetizationService';
 import { trackUpgradeAttempt, trackCTA, trackBillingView } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
-import { EnterpriseContactForm } from '@/components/billing/EnterpriseContactForm';
-import { DS } from '@/tokens';
+import { DS, TEAL, ERROR } from '@/tokens';
+import {
+  MARKETING_TIERS,
+  RECOMMENDED_TIER,
+  TIER_META,
+  TIER_PRICING,
+  TIER_MARKETING_BENEFITS,
+  TIER_CTA_LABEL,
+  computeTierPrice,
+  formatPrice,
+  normalizeTier,
+  tierMeets,
+  ANNUAL_SAVE_PERCENT,
+  type TierKey,
+  type PricingCurrency,
+  type BillingCycle,
+} from '@/config/tierConfig';
 
 interface PricingPageProps {
   onUpgradeSuccess?: () => void;
 }
 
-const STRIPE_PRICE_ENV: Record<TierKey, string | undefined> = {
-  explorer: undefined,
-  starter: import.meta.env.VITE_STRIPE_PRICE_STARTER as string | undefined,
-  pro: import.meta.env.VITE_STRIPE_PRICE_PRO as string | undefined,
-  executive: import.meta.env.VITE_STRIPE_PRICE_EXECUTIVE as string | undefined,
-  council: import.meta.env.VITE_STRIPE_PRICE_COUNCIL as string | undefined,
+// Stripe price env vars (blocked on Kevin — #1338). Map canonical tier → env.
+const STRIPE_PRICE_ENV: Partial<Record<TierKey, string | undefined>> = {
+  professional: import.meta.env.VITE_STRIPE_PRICE_STARTER as string | undefined,
+  executive: import.meta.env.VITE_STRIPE_PRICE_PRO as string | undefined,
 };
 
 export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
   const { user, profile } = useAuthStore();
 
-  // Track pricing/billing view on mount
   React.useEffect(() => {
     trackBillingView(user ? 'portal_nav' : 'direct_link');
   }, [user]);
 
-  // Currency: explicit toggle > user preference > auto-detect.
-  const detected = useMemo<PricingCurrency>(() => {
-    const pref = (profile as any)?.currency_preference ?? null;
-    return detectUserCurrency({ preference: pref });
-  }, [profile]);
-
-  const [currency, setCurrency] = useState<PricingCurrency>(detected);
-
-  // Ticket #1354: when currency changes via manual toggle, persist to localStorage so subsequent
-  // visits respect the user's explicit choice (overrides auto-detect).
-  React.useEffect(() => {
-    savePreferredCurrency(currency);
-  }, [currency]);
-
+  const [currency, setCurrency] = useState<PricingCurrency>('USD');
+  const [cycle, setCycle] = useState<BillingCycle>('annual');
   const [loadingTier, setLoadingTier] = useState<TierKey | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [enterpriseOpen, setEnterpriseOpen] = useState(false);
+
+  const currentTier = useMemo(
+    () => normalizeTier(profile?.tier) ?? 'executive_introduction',
+    [profile?.tier],
+  );
 
   const handleUpgrade = async (tierKey: TierKey) => {
-    if (tierKey === 'explorer') {
-      // Explorer = Executive Introduction → no checkout, just send to dashboard.
-      trackCTA({ location: 'pricing_tier', label: 'Executive Introduction CTA', destination: user ? '/dashboard' : '/login', context_id: tierKey });
-      if (!user) {
-        window.location.href = '/login';
-      } else {
-        window.location.href = '/dashboard';
-      }
+    setError(null);
+
+    // Entry tier — no checkout, send to dashboard/login.
+    if (tierKey === 'executive_introduction') {
+      trackCTA({
+        location: 'pricing_tier',
+        label: 'Start Complimentary Baseline',
+        destination: user ? '/dashboard' : '/login',
+        context_id: tierKey,
+      });
+      window.location.href = user ? '/dashboard' : '/login';
       return;
     }
 
     trackUpgradeAttempt(tierKey, 'pricing_page');
     setLoadingTier(tierKey);
-    setError(null);
 
     try {
       const priceId = STRIPE_PRICE_ENV[tierKey];
       if (!priceId) {
+        // Stripe keys not configured yet (#1338) — graceful fallback.
         throw new Error(
-          `${CANONICAL_TIER_PRICING[tierKey].label} plan is not configured yet. Please contact support.`,
+          `${TIER_META[tierKey].displayName} checkout is being configured. Please contact LYC Partners to upgrade.`,
         );
       }
       const response = await authFetch('/api/stripe/checkout', {
@@ -91,13 +98,12 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
         body: JSON.stringify({
           priceId,
           tier: tierKey,
+          cycle,
           successUrl: `${window.location.origin}/account/billing?upgraded=true&tier=${tierKey}`,
           cancelUrl: `${window.location.origin}/pricing?canceled=true`,
         }),
       });
-
       const data = await response.json();
-
       if (data.url) {
         window.location.href = data.url;
         onUpgradeSuccess?.();
@@ -113,149 +119,317 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
     }
   };
 
+  const cycleLabel = currency === 'CNY' ? '月' : 'mo';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+    <div style={{ minHeight: '100vh', background: DS.bgAlt }}>
       <SEO page="pricing" />
-      {/* Header */}
-      <div className="max-w-6xl mx-auto px-4 py-16 text-center">
-        {/* Ticket #1355 — light gray eyebrow per v1.2 brand spec */}
+
+      {/* ── HEADER ── */}
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: '80px 24px 40px', textAlign: 'center' }}>
         <div
-          className="mb-3 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: DS.eyebrow, fontFamily: DS.monoFont }}
+          style={{
+            fontFamily: DS.monoFont,
+            fontSize: 11,
+            letterSpacing: '0.24em',
+            textTransform: 'uppercase',
+            color: DS.muted,
+            fontWeight: 600,
+            marginBottom: 14,
+          }}
         >
-          Plans &amp; pricing
+          Plans &amp; Pricing
         </div>
-        <h1 className="text-4xl font-bold text-text-primary mb-4">
-          Choose Your Plan
+        <h1
+          style={{
+            fontFamily: DS.headingFont,
+            fontSize: 'clamp(32px, 4.5vw, 48px)',
+            fontWeight: 700,
+            color: DS.text,
+            lineHeight: 1.12,
+            letterSpacing: '-0.02em',
+            margin: 0,
+          }}
+        >
+          Choose your tier.
         </h1>
-        <p className="text-text-muted text-lg max-w-2xl mx-auto">
-          Five tiers, calibrated to where you are in your executive journey.
-          Pricing shown in {currency === 'CNY' ? 'CNY (China regional pricing)' : 'USD (global pricing)'}.
-          {user && ' Monthly miles are included with every active subscription.'}
+        <p
+          style={{
+            fontFamily: DS.bodyFont,
+            fontSize: 16,
+            color: DS.textSecondary,
+            lineHeight: 1.6,
+            marginTop: 16,
+            maxWidth: 520,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
+          Three tiers, calibrated to where you are in your leadership journey.
+          Start complimentary — upgrade when you're ready for the full catalog.
         </p>
 
-        {/* Currency Toggle */}
-        <div className="mt-6 inline-flex items-center bg-white border border-border">
-          <button
-            onClick={() => setCurrency('USD')}
-            className={`px-4 py-2 text-sm font-medium flex items-center gap-2 transition-colors ${
-              currency === 'USD' ? 'bg-accent text-white' : 'text-text-secondary hover:bg-bg-tertiary'
-            }`}
-            aria-pressed={currency === 'USD'}
-          >
-            <Globe className="w-4 h-4" />
-            Global · USD
-          </button>
-          <button
-            onClick={() => setCurrency('CNY')}
-            className={`px-4 py-2 text-sm font-medium flex items-center gap-2 transition-colors ${
-              currency === 'CNY' ? 'bg-accent text-white' : 'text-text-secondary hover:bg-bg-tertiary'
-            }`}
-            aria-pressed={currency === 'CNY'}
-          >
-            <Coins className="w-4 h-4" />
-            China · CNY
-          </button>
+        {/* Billing cycle toggle — annual default */}
+        <div
+          style={{
+            marginTop: 32,
+            display: 'inline-flex',
+            background: DS.bg,
+            border: `1px solid ${DS.border}`,
+          }}
+        >
+          {(['monthly', 'annual'] as BillingCycle[]).map((c) => {
+            const isActive = cycle === c;
+            return (
+              <button
+                key={c}
+                onClick={() => setCycle(c)}
+                aria-pressed={isActive}
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  padding: '10px 20px',
+                  background: isActive ? DS.accent : 'transparent',
+                  color: isActive ? DS.bg : DS.textSecondary,
+                  border: 'none',
+                  cursor: 'pointer',
+                  textTransform: 'capitalize',
+                  transition: DS.transition,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                {c}
+                {c === 'annual' && (
+                  <span
+                    style={{
+                      fontFamily: DS.monoFont,
+                      fontSize: 10,
+                      letterSpacing: '0.08em',
+                      background: isActive ? 'rgba(255,255,255,0.25)' : `${DS.accent}1A`,
+                      color: isActive ? DS.bg : DS.accent,
+                      padding: '2px 6px',
+                    }}
+                  >
+                    SAVE {ANNUAL_SAVE_PERCENT}%
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
-        <p className="text-xs text-text-muted mt-2">
-          China pricing reflects a 1/3 regional adjustment, shown in CNY.
-        </p>
+
+        {/* Currency toggle */}
+        <div style={{ marginTop: 12, display: 'inline-flex', marginLeft: 8 }}>
+          <div style={{ display: 'inline-flex', background: DS.bg, border: `1px solid ${DS.border}` }}>
+            <button
+              onClick={() => setCurrency('USD')}
+              aria-pressed={currency === 'USD'}
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: 12,
+                fontWeight: 500,
+                padding: '8px 14px',
+                background: currency === 'USD' ? DS.text : 'transparent',
+                color: currency === 'USD' ? DS.bg : DS.textSecondary,
+                border: 'none',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <Globe style={{ width: 13, height: 13 }} /> USD
+            </button>
+            <button
+              onClick={() => setCurrency('CNY')}
+              aria-pressed={currency === 'CNY'}
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: 12,
+                fontWeight: 500,
+                padding: '8px 14px',
+                background: currency === 'CNY' ? DS.text : 'transparent',
+                color: currency === 'CNY' ? DS.bg : DS.textSecondary,
+                border: 'none',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <Coins style={{ width: 13, height: 13 }} /> CNY
+            </button>
+          </div>
+        </div>
+        {currency === 'CNY' && (
+          <p style={{ fontFamily: DS.monoFont, fontSize: 10, color: DS.mutedDim, marginTop: 10, letterSpacing: '0.08em' }}>
+            China regional pricing · ~1/3 of global USD
+          </p>
+        )}
       </div>
 
-      {/* Subscription Tier Cards — #1366 simplified to 3 user-centric tiers.
-          Enterprise (council) is rendered separately below as a B2B section. */}
-      <div className="max-w-5xl mx-auto px-4 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {PRICING_PAGE_TIERS.map((tierKey) => {
-            const tier = CANONICAL_TIER_PRICING[tierKey];
-            const price = formatTierPrice(tierKey, currency);
+      {/* ── TIER CARDS ── */}
+      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 24px 24px' }}>
+        <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+          {MARKETING_TIERS.map((tierKey) => {
+            const meta = TIER_META[tierKey];
             const isRecommended = tierKey === RECOMMENDED_TIER;
-            const isCurrent = profile?.tier === tierKey || profile?.tier === tier.key;
-            const isExplorer = tierKey === 'explorer';
+            const isEntry = tierKey === 'executive_introduction';
+            const isCurrent = tierMeets(currentTier, tierKey) && tierKey === currentTier;
             const isLoading = loadingTier === tierKey;
-            // #1365 — user-centric display name + benefit-focused copy
-            const displayName = TIER_DISPLAY_NAME[tierKey];
-            const displayBenefits = TIER_DISPLAY_BENEFITS[tierKey] ?? tier.benefits;
+            const price = computeTierPrice(tierKey, currency, cycle);
+            const benefits = TIER_MARKETING_BENEFITS[tierKey];
+            const ctaLabel = TIER_CTA_LABEL[tierKey];
 
             return (
               <div
                 key={tierKey}
-                className={`relative border-2 p-6 flex flex-col ${
-                  isRecommended
-                    ? 'border-accent bg-gradient-to-b from-accent/5 to-white shadow-xl'
-                    : 'border-border bg-white shadow-sm hover:shadow-md transition-shadow'
-                }`}
+                style={{
+                  position: 'relative',
+                  background: isRecommended ? DS.bg : isEntry ? DS.bgAlt : DS.bgDark,
+                  border: `1px solid ${isRecommended ? DS.accent : isEntry ? DS.border : 'transparent'}`,
+                  padding: '36px 28px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
               >
+                {/* Most Popular badge */}
                 {isRecommended && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-accent text-white px-4 py-1 text-xs font-semibold flex items-center gap-1 whitespace-nowrap">
-                      <Sparkles className="w-3 h-3" />
-                      Recommended
+                  <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)' }}>
+                    <span
+                      style={{
+                        background: DS.accent,
+                        color: DS.bg,
+                        fontFamily: DS.monoFont,
+                        fontSize: 10,
+                        letterSpacing: '0.16em',
+                        textTransform: 'uppercase',
+                        padding: '5px 14px',
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Most Popular
                     </span>
                   </div>
                 )}
 
                 {isCurrent && (
-                  <div className="absolute -top-4 right-2">
-                    <span className="bg-green-500 text-white px-3 py-1 text-xs font-medium">
-                      Current Plan
+                  <div style={{ position: 'absolute', top: 12, right: 12 }}>
+                    <span
+                      style={{
+                        fontFamily: DS.monoFont,
+                        fontSize: 9,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: isEntry ? DS.muted : DS.bg,
+                        opacity: 0.7,
+                      }}
+                    >
+                      Current
                     </span>
                   </div>
                 )}
 
-                {/* Tier label — #1365 user-centric display name */}
-                <div className="mb-4">
-                  <h3 className="text-xl font-bold text-text-primary">
-                    {displayName}
-                  </h3>
-                  {isExplorer && (
-                    <p className="text-xs text-text-muted uppercase tracking-wide mt-1">
-                      Complimentary access
-                    </p>
-                  )}
-                </div>
+                {/* Tier name */}
+                <h3
+                  style={{
+                    fontFamily: DS.headingFont,
+                    fontSize: 22,
+                    fontWeight: 700,
+                    color: isEntry || isRecommended ? DS.text : DS.bg,
+                    letterSpacing: '-0.01em',
+                    margin: 0,
+                  }}
+                >
+                  {meta.displayName}
+                </h3>
+                <p
+                  style={{
+                    fontFamily: DS.bodyFont,
+                    fontSize: 13,
+                    color: isEntry || isRecommended ? DS.muted : 'rgba(255,255,255,0.6)',
+                    marginTop: 4,
+                  }}
+                >
+                  {isEntry ? 'Complimentary entry' : isRecommended ? 'Most chosen tier' : 'Premium tier'}
+                </p>
 
                 {/* Price */}
-                <div className="mb-4">
+                <div style={{ marginTop: 24, marginBottom: 24, paddingBottom: 24, borderBottom: `1px solid ${isEntry || isRecommended ? DS.border : 'rgba(255,255,255,0.12)'}` }}>
                   {price.isZero ? (
                     <div>
-                      <div className="text-2xl font-bold text-text-primary leading-tight">
+                      <div
+                        style={{
+                          fontFamily: DS.headingFont,
+                          fontSize: 32,
+                          fontWeight: 700,
+                          color: isEntry || isRecommended ? DS.text : DS.bg,
+                          letterSpacing: '-0.02em',
+                        }}
+                      >
                         Complimentary
                       </div>
-                      <div className="text-sm text-text-muted mt-1">
-                        {price.secondary}
+                      <div style={{ fontFamily: DS.bodyFont, fontSize: 12, color: isEntry || isRecommended ? DS.muted : 'rgba(255,255,255,0.5)', marginTop: 4 }}>
+                        No credit card required
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold text-text-primary">
-                        {price.primary}
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                      <span
+                        style={{
+                          fontFamily: DS.headingFont,
+                          fontSize: 40,
+                          fontWeight: 700,
+                          color: isEntry || isRecommended ? DS.text : DS.bg,
+                          letterSpacing: '-0.02em',
+                        }}
+                      >
+                        {formatPrice(price.perMonth, currency)}
                       </span>
-                      <span className="text-sm text-text-muted">
-                        {currency === 'CNY' ? '/ 月' : '/ mo'}
+                      <span style={{ fontFamily: DS.bodyFont, fontSize: 13, color: isEntry || isRecommended ? DS.muted : 'rgba(255,255,255,0.5)' }}>
+                        / {cycleLabel}
                       </span>
+                      {cycle === 'annual' && (
+                        <span style={{ fontFamily: DS.monoFont, fontSize: 10, color: DS.accent, marginLeft: 8, letterSpacing: '0.08em' }}>
+                          billed annually
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {!price.isZero && (
+                    <div style={{ fontFamily: DS.monoFont, fontSize: 10, color: isEntry || isRecommended ? DS.mutedDim : 'rgba(255,255,255,0.4)', marginTop: 6, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                      {TIER_PRICING[tierKey].monthlyMiles} miles monthly
                     </div>
                   )}
                 </div>
 
-                {/* Ticket #1353 — Monthly miles shown muted/secondary (USD is primary).
-                     Logged-in users see the usual, visitors see less emphasis. */}
-                <div className="mb-4 pb-4 border-b border-border">
-                  <div className="text-[10px] uppercase tracking-widest" style={{ color: DS.mutedDim }}>Monthly miles</div>
-                  <div className={`text-xl font-semibold ${user ? 'text-accent' : 'text-text-muted'}`}>
-                    {tier.monthlyMiles === 0 ? '—' : `${tier.monthlyMiles} mi`}
-                  </div>
-                  {tier.earnsMiles && user && (
-                    <div className="text-xs text-text-muted mt-1">Earns miles via NEXUS actions</div>
-                  )}
-                </div>
-
-                {/* Benefits — #1365 benefit-focused copy */}
-                <ul className="space-y-2 mb-6 flex-1">
-                  {displayBenefits.map((benefit, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <Check className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
-                      <span className="text-text-secondary">{benefit}</span>
+                {/* Benefits */}
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {benefits.map((benefit) => (
+                    <li key={benefit} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                      <Check
+                        style={{
+                          width: 15,
+                          height: 15,
+                          color: isRecommended ? DS.accent : isEntry ? TEAL : DS.accentLight,
+                          flexShrink: 0,
+                          marginTop: 2,
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontFamily: DS.bodyFont,
+                          fontSize: 13.5,
+                          color: isEntry || isRecommended ? DS.textSecondary : 'rgba(255,255,255,0.82)',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {benefit}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -264,36 +438,66 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                 <button
                   onClick={() => handleUpgrade(tierKey)}
                   disabled={isLoading || isCurrent}
-                  className={`w-full py-3 px-4 font-medium text-sm flex items-center justify-center gap-2 transition-all ${
-                    isCurrent
-                      ? 'bg-bg-tertiary text-text-muted cursor-default'
+                  style={{
+                    width: '100%',
+                    fontFamily: DS.bodyFont,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.14em',
+                    padding: '14px 20px',
+                    minHeight: 48,
+                    cursor: isCurrent ? 'default' : 'pointer',
+                    background: isCurrent
+                      ? 'transparent'
                       : isRecommended
-                        ? 'bg-accent text-white hover:bg-accent-hover'
-                        : 'bg-bg-tertiary text-text-primary hover:bg-bg-secondary'
-                  } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        ? DS.accent
+                        : isEntry
+                          ? 'transparent'
+                          : DS.bg,
+                    color: isCurrent
+                      ? (isEntry || isRecommended ? DS.mutedDim : 'rgba(255,255,255,0.4)')
+                      : isRecommended
+                        ? DS.bg
+                        : isEntry
+                          ? DS.text
+                          : DS.bgDark,
+                    border: `1px solid ${
+                      isCurrent
+                        ? (isEntry || isRecommended ? DS.border : 'rgba(255,255,255,0.2)')
+                        : isRecommended
+                          ? DS.accent
+                          : isEntry
+                            ? DS.text
+                            : DS.bg
+                    }`,
+                    opacity: isLoading ? 0.6 : 1,
+                    transition: DS.transition,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                  }}
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Processing...
+                      <Loader2 style={{ width: 15, height: 15, animation: 'spin 1s linear infinite' }} />
+                      Processing…
                     </>
                   ) : isCurrent ? (
                     'Current Plan'
-                  ) : isExplorer ? (
-                    <>
-                      Begin
-                      <ArrowRight className="w-4 h-4" />
-                    </>
                   ) : (
                     <>
-                      Upgrade to {displayName}
-                      <ArrowRight className="w-4 h-4" />
+                      {ctaLabel}
+                      <ArrowRight style={{ width: 15, height: 15 }} />
                     </>
                   )}
                 </button>
 
-                {error && !isCurrent && loadingTier === null && !isExplorer && (
-                  <p className="text-red-500 text-xs mt-2 text-center">{error}</p>
+                {error && !isCurrent && loadingTier === null && !isEntry && (
+                  <p style={{ fontFamily: DS.bodyFont, fontSize: 11, color: ERROR, marginTop: 10, textAlign: 'center' }}>
+                    {error}
+                  </p>
                 )}
               </div>
             );
@@ -301,353 +505,138 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
         </div>
       </div>
 
-      {/* Enterprise / Team tier — human contact CTA (#1326) */}
-      <div className="max-w-7xl mx-auto px-4 pb-16">
+      {/* ── ENTERPRISE / TEAMS (hidden tier — separate B2B path) ── */}
+      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '40px 24px' }}>
         <div
-          className="relative border-2 border-accent bg-gradient-to-br from-accent/5 via-white to-white p-8 md:p-10 flex flex-col lg:flex-row items-start lg:items-center gap-8"
-        >
-          <div className="flex-1">
-            <div
-              className="inline-flex items-center gap-1 bg-accent text-white px-3 py-1 text-xs font-semibold mb-4 whitespace-nowrap"
-            >
-              <Sparkles className="w-3 h-3" />
-              For Teams
-            </div>
-            <h3
-              className="text-2xl md:text-3xl font-bold text-text-primary mb-2"
-              style={{ fontFamily: DS.headingFont, letterSpacing: '-0.01em' }}
-            >
-              NEXUS for Teams &amp; Enterprise
-            </h3>
-            <p className="text-text-muted text-base max-w-2xl mb-5 leading-relaxed">
-              Seat-based deployment with SSO, custom framework training, mandate-level
-              confidentiality, and a dedicated point of contact. Built for retained search
-              practices, in-house talent teams, and boards.
-            </p>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 max-w-2xl">
-              {[
-                'SSO, SCIM, SAML & role-based access',
-                'Custom framework training onboarding',
-                'Mandate-level confidentiality controls',
-                'Org-level usage & pipeline analytics',
-                'Dedicated human account contact',
-                'Council-tier seats for every desk',
-              ].map((benefit) => (
-                <li key={benefit} className="flex items-start gap-2 text-sm">
-                  <Check className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
-                  <span className="text-text-secondary">{benefit}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="flex flex-col items-start lg:items-end gap-3 lg:min-w-[220px]">
-            <div
-              className="text-xs text-text-muted uppercase tracking-wide"
-              style={{ fontFamily: DS.monoFont, letterSpacing: '0.2em' }}
-            >
-              Custom pricing
-            </div>
-            <div
-              className="text-3xl font-bold text-text-primary mb-1"
-              style={{ fontFamily: DS.headingFont, letterSpacing: '-0.01em' }}
-            >
-              Talk to sales
-            </div>
-            <button
-              onClick={() => {
-                trackCTA({
-                  location: 'pricing_enterprise',
-                  label: 'Request a demo',
-                  destination: 'enterprise_contact_form',
-                });
-                setEnterpriseOpen(true);
-              }}
-              className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-accent text-white font-semibold hover:bg-accent-hover transition-all"
-              style={{
-                fontFamily: DS.bodyFont,
-                fontSize: '13px',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                minHeight: '48px',
-                transitionDuration: '200ms',
-                transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
-              }}
-            >
-              Request a demo
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <p
-              className="text-xs text-text-muted text-center lg:text-right"
-              style={{ fontFamily: DS.monoFont, letterSpacing: '0.14em', textTransform: 'uppercase' }}
-            >
-              Human follow-up · Not a bot
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Enterprise contact modal (#1326) — human, not NEXUS */}
-      {enterpriseOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Talk to our team"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(10,10,18,0.55)' }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setEnterpriseOpen(false);
+          style={{
+            border: `1px solid ${DS.border}`,
+            background: DS.bg,
+            padding: '40px 40px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: 32,
           }}
         >
-          <div className="w-full max-w-xl max-h-[92vh] overflow-y-auto">
-            <EnterpriseContactForm
-              dismissible
-              onClose={() => setEnterpriseOpen(false)}
-              onSuccess={() => {
-                // Keep the success state visible briefly; modal auto-clears on close.
+          <div style={{ flex: '1 1 320px' }}>
+            <div
+              style={{
+                fontFamily: DS.monoFont,
+                fontSize: 10,
+                letterSpacing: '0.24em',
+                textTransform: 'uppercase',
+                color: DS.muted,
+                fontWeight: 600,
+                marginBottom: 10,
               }}
-            />
+            >
+              For Teams &amp; Organizations
+            </div>
+            <h3
+              style={{
+                fontFamily: DS.headingFont,
+                fontSize: 24,
+                fontWeight: 700,
+                color: DS.text,
+                letterSpacing: '-0.015em',
+                margin: 0,
+              }}
+            >
+              Council &amp; Enterprise tiers
+            </h3>
+            <p style={{ fontFamily: DS.bodyFont, fontSize: 14, color: DS.textSecondary, lineHeight: 1.6, marginTop: 12, maxWidth: 540 }}>
+              Seat-based deployment with SSO, custom framework training, mandate-level
+              confidentiality, and a dedicated point of contact. Built for retained search
+              practices, in-house talent teams, and boards. Not self-serve — talk to us.
+            </p>
           </div>
-        </div>
-      )}
-
-      {/* Assessment Pricing Section */}
-      <div className="max-w-6xl mx-auto px-4 pb-16">
-        <div className="text-center mb-8">
-          {/* Ticket #1355 — light gray eyebrow */}
-          <div
-            className="mb-2 text-xs font-semibold tracking-widest uppercase"
-            style={{ color: DS.eyebrow, fontFamily: DS.monoFont }}
-          >
-            Assessment pricing
+          <div style={{ flex: '0 0 auto' }}>
+            <a
+              href="mailto:partners@lyc-partners.ai?subject=Council%20or%20Enterprise%20tier%20inquiry"
+              onClick={() => trackCTA({ location: 'pricing_enterprise', label: 'Talk to Sales', destination: 'mailto' })}
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: 13,
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                padding: '14px 28px',
+                minHeight: 48,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: 'transparent',
+                color: DS.text,
+                border: `1px solid ${DS.text}`,
+                textDecoration: 'none',
+                transition: DS.transition,
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = DS.text; e.currentTarget.style.color = DS.bg; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = DS.text; }}
+            >
+              Talk to Sales
+              <ArrowRight style={{ width: 15, height: 15 }} />
+            </a>
           </div>
-          <h2 className="text-2xl font-bold text-text-primary mb-2">Individual Assessments</h2>
-          <p className="text-text-muted">
-            Two price tiers across the 6-assessment catalog. Pay once per assessment.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {CANONICAL_ASSESSMENT_ORDER.map((priceTier) => {
-            const p = CANONICAL_ASSESSMENT_PRICING[priceTier];
-            const display = formatAssessmentPrice(priceTier, currency);
-            // Ticket #1351: skip tiers with no instruments (e.g. Custom/Unique — no items currently)
-            if (p.instruments.length === 0) return null;
-            const isUnique = priceTier === 'unique';
-
-            return (
-              <div
-                key={priceTier}
-                className={`border-2 p-6 flex flex-col ${
-                  isUnique
-                    ? 'border-accent bg-gradient-to-b from-accent/5 to-white'
-                    : 'border-border bg-white'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-3">
-                  {isUnique && <Crown className="w-5 h-5 text-accent" />}
-                  <h3 className="text-lg font-bold text-text-primary">{p.label}</h3>
-                </div>
-
-                <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-3xl font-bold text-text-primary">{display.primary}</span>
-                  <span className="text-sm text-text-muted">one-time</span>
-                </div>
-                {/* Ticket #1353 — miles as secondary muted info */}
-                <div className="text-xs font-medium mb-4 tracking-wide" style={{ color: DS.mutedDim }}>
-                  ≈ {display.miles} mi · billed in {currency}
-                </div>
-
-                <div className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                  Assessments
-                </div>
-                <div className="flex flex-wrap gap-1.5 mb-6">
-                  {p.instruments.map((code) => (
-                    <span
-                      key={code}
-                      className="px-2 py-1 text-xs font-medium bg-bg-tertiary text-text-secondary border border-border"
-                    >
-                      {code}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
         </div>
       </div>
 
-      {/* Feature Comparison */}
-      <div className="max-w-6xl mx-auto px-4 pb-16">
-        <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
-          Feature Comparison
+      {/* ── FAQ ── */}
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: '48px 24px 80px' }}>
+        <h2
+          style={{
+            fontFamily: DS.headingFont,
+            fontSize: 28,
+            fontWeight: 700,
+            color: DS.text,
+            textAlign: 'center',
+            letterSpacing: '-0.015em',
+            marginBottom: 32,
+          }}
+        >
+          Frequently asked questions
         </h2>
-        <div className="bg-white border border-border overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-bg-tertiary">
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Feature</th>
-                {CANONICAL_TIER_ORDER.map((tierKey) => {
-                  const isRecommended = tierKey === RECOMMENDED_TIER;
-                  return (
-                    <th
-                      key={tierKey}
-                      className={`px-4 py-3 text-center font-medium ${
-                        isRecommended ? 'text-accent' : 'text-text-secondary'
-                      }`}
-                    >
-                      {TIER_DISPLAY_NAME[tierKey]}
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                {
-                  feature: 'Monthly miles',
-                  values: ['—', '50 mi', '150 mi', '300 mi', '600 mi'],
-                },
-                {
-                  feature: 'NEXUS chat',
-                  values: ['Executive Introduction', 'Standard', 'Priority', 'Priority', 'Unlimited'],
-                },
-                {
-                  feature: 'All 6 leadership assessments',
-                  values: ['Preview only', '✓', '✓', '✓', '✓'],
-                },
-                {
-                  feature: 'Personalised reports',
-                  values: ['—', '✓', '✓', '✓', '✓'],
-                },
-                {
-                  feature: 'Peer benchmarking',
-                  values: ['—', '—', '✓', '✓', '✓'],
-                },
-                {
-                  feature: 'Deliverable workspace',
-                  values: ['—', '—', '✓', '✓', '✓'],
-                },
-                {
-                  feature: 'Executive consultant debriefs',
-                  values: ['—', '—', '—', '✓', '✓'],
-                },
-                {
-                  feature: 'Live event access',
-                  values: ['—', '—', '—', '✓', '✓'],
-                },
-                {
-                  feature: 'Council community & workshops',
-                  values: ['—', '—', '—', '—', '✓'],
-                },
-                {
-                  feature: 'NEXUS miles earning',
-                  values: ['—', '✓', '✓', '✓', '✓'],
-                },
-              ].map((row, i) => (
-                <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-bg-tertiary/50'}>
-                  <td className="px-4 py-3 text-text-secondary">{row.feature}</td>
-                  {row.values.map((val, j) => (
-                    <td key={j} className="px-4 py-3 text-center">
-                      {val === '✓' ? (
-                        <Check className="w-4 h-4 text-accent mx-auto" />
-                      ) : val === '—' ? (
-                        <span className="text-text-muted">—</span>
-                      ) : (
-                        <span
-                          className={`font-medium ${
-                            j === CANONICAL_TIER_ORDER.indexOf(RECOMMENDED_TIER)
-                              ? 'text-accent'
-                              : 'text-text-primary'
-                          }`}
-                        >
-                          {val}
-                        </span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* FAQ */}
-      <div className="max-w-3xl mx-auto px-4 pb-16">
-        <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
-          Frequently Asked Questions
-        </h2>
-        <div className="space-y-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {[
             {
-              question: 'Can I cancel my subscription at any time?',
-              answer:
-                'Yes. You can cancel any paid subscription at any time. You will continue to have access until the end of your current billing period, after which your account returns to Executive Introduction status.',
+              q: 'Can I cancel anytime?',
+              a: 'Yes. Cancel any paid subscription at any time. You keep access until the end of your current billing period, after which your account returns to Executive Introduction status.',
             },
             {
-              question: 'How do miles work?',
-              answer:
-                'Miles are the LYC Intelligence currency. Starter, Pro, Executive, and Council tiers receive a monthly miles allowance on their billing anniversary. You spend miles to run assessments from the 11-instrument catalog. Executive Introduction (Explorer) accounts do not receive a monthly allowance but can still explore the NEXUS chat and assessment previews.',
+              q: 'What is Executive Introduction?',
+              a: 'Executive Introduction is our complimentary entry tier. You get one complimentary assessment baseline, basic NEXUS chat access, and a personal profile — no credit card required. It is the natural starting point before upgrading.',
             },
             {
-              question: 'Can I earn additional miles?',
-              answer:
-                'Yes — subscribers at Starter tier and above earn miles by completing NEXUS framework exploration sessions (+5 mi), guided reflections (+3 mi), and receive a one-time completion refund (+10 mi) per assessment instrument.',
+              q: 'What is the difference between Professional and Executive?',
+              a: 'Professional unlocks all 11 assessments, full NEXUS access, and complete results history. Executive adds branded PDF reports, priority NEXUS responses, and advanced insights. Professional is the most popular tier; Executive is for users who want premium depth.',
             },
             {
-              question: 'Can I upgrade or downgrade my plan?',
-              answer:
-                'Absolutely. You can change tiers at any time. Upgrades take effect immediately; downgrades take effect at the end of your current billing cycle.',
+              q: 'Do you offer team pricing?',
+              a: 'Yes. Our Council and Enterprise tiers are designed for teams and organizations — seat-based deployment, SSO, custom training, and a dedicated contact. These are not self-serve; contact us to discuss your needs.',
             },
             {
-              question: 'Do unused miles roll over?',
-              answer:
-                'Monthly miles allowances reset on your billing anniversary. Miles earned through NEXUS actions (exploration, reflection, completion refunds) remain on your balance until spent.',
+              q: 'How do miles work?',
+              a: 'Miles are the LYC Intelligence currency. Professional and Executive tiers receive a monthly miles allowance on their billing anniversary. You spend miles to run additional assessments and access premium features. Executive Introduction accounts do not receive a monthly allowance but can still explore NEXUS and assessment previews.',
             },
-            {
-              question: 'What payment methods are accepted?',
-              answer:
-                'We accept all major credit cards (Visa, Mastercard, American Express) through Stripe. Apple Pay and Google Pay are supported where available. China-region users may also see local payment options during checkout.',
-            },
-            {
-              question: 'Why is China pricing lower?',
-              answer:
-                'China pricing reflects a regional adjustment (~1/3 of global USD pricing) shown in CNY. This aligns with regional market expectations while keeping the miles economy consistent worldwide.',
-            },
-          ].map((faq, i) => (
-            <div key={i} className="bg-white border border-border p-6">
-              <h3 className="font-semibold text-text-primary mb-2">{faq.question}</h3>
-              <p className="text-text-muted text-sm">{faq.answer}</p>
+          ].map((faq) => (
+            <div key={faq.q} style={{ background: DS.bg, border: `1px solid ${DS.border}`, padding: '24px 24px' }}>
+              <h3
+                style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: DS.text,
+                  margin: 0,
+                  marginBottom: 8,
+                }}
+              >
+                {faq.q}
+              </h3>
+              <p style={{ fontFamily: DS.bodyFont, fontSize: 14, color: DS.textSecondary, lineHeight: 1.6, margin: 0 }}>
+                {faq.a}
+              </p>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div className="max-w-4xl mx-auto px-4 pb-16">
-        <div className="bg-accent p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">Ready to Elevate Your Leadership?</h2>
-          <p className="mb-6 opacity-90">
-            Join {CANONICAL_TIER_PRICING[RECOMMENDED_TIER].label} today and unlock the full NEXUS miles economy.
-          </p>
-          <button
-            onClick={() => handleUpgrade(RECOMMENDED_TIER)}
-            disabled={loadingTier !== null}
-            className="bg-white text-accent px-8 py-3 font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
-          >
-            {loadingTier === RECOMMENDED_TIER ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                Upgrade to {CANONICAL_TIER_PRICING[RECOMMENDED_TIER].label}
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
         </div>
       </div>
     </div>

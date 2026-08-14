@@ -774,6 +774,8 @@ export const NEXUS_MILES_EARNING_ORDER: MilesEarningActionKey[] = [
 export function tierAllowsEarning(tierKey: string | null | undefined): boolean {
   if (!tierKey) return false;
   const t = tierKey.toLowerCase();
-  if (t === 'explorer' || t === 'free' || t === 'intro' || t === 'executive introduction') return false;
+  // W3-3: entry tier never earns miles. Canonical key = executive_introduction;
+  // legacy aliases explorer/intro handled here. Never compare against 'free'.
+  if (t === 'executive_introduction' || t === 'explorer' || t === 'intro') return false;
   return NEXUS_SUBSCRIPTION_TIERS.some((s) => s.key === t);
 }

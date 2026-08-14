@@ -21,9 +21,10 @@ import { useAuthStore } from '../stores/authStore';
  *   2. The legacy API paths `/api/credits/spend`, `/api/credits/earn`,
  *      `/api/credits/daily-reset` are still served by the backend and have
  *      not been renamed.
- *   3. The `tier` column on `credits` holds legacy tier strings ('free',
- *      'basic', 'pro', 'council') that map to the canonical 5-tier model
- *      via the `mapToCanonicalTier` helpers used across the UI.
+ *   3. The `tier` column on `credits` holds legacy tier strings ('executive_introduction',
+ *      'professional', 'executive', 'council') that map to the canonical 5-tier model
+ *      via the `mapToCanonicalTier` helpers used across the UI. W3-3: the historical
+ *      'free' value has been migrated to 'executive_introduction'.
  *
  * Implied database schema (no SQL files in repo — schema is managed externally):
  *   credits
@@ -32,7 +33,7 @@ import { useAuthStore } from '../stores/authStore';
  *     ├── daily_balance  int
  *     ├── total_earned   int
  *     ├── total_spent    int
- *     ├── tier           text  ('free' | 'basic' | 'pro' | 'council')
+ *     ├── tier           text  ('executive_introduction' | 'professional' | 'executive' | 'council')
  *     ├── tier_credits_per_month  int
  *     ├── billing_period_start    timestamptz
  *     └── updated_at     timestamptz
