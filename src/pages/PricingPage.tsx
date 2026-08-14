@@ -608,7 +608,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
             },
             {
               q: 'What is the difference between Professional and Executive?',
-              a: 'Professional unlocks all 11 assessments, full NEXUS access, and complete results history. Executive adds branded PDF reports, priority NEXUS responses, and advanced insights. Professional is the most popular tier; Executive is for users who want premium depth.',
+              a: 'Professional unlocks all 6 leadership assessments, full NEXUS access, and complete results history. Executive adds branded PDF reports, priority NEXUS responses, and advanced insights. Professional is the most popular tier; Executive is for users who want premium depth.',
             },
             {
               q: 'Do you offer team pricing?',

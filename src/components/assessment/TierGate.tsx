@@ -9,13 +9,16 @@ import {
 import { getDiagnostic } from '@/data/diagnostics';
 import { canTakeAssessment } from '@/lib/assessmentAccessEnforcement';
 import { useAuthStore } from '@/stores/authStore';
+// W3.1 Fix 3: share the canonical system serif stack — NO Crimson Pro, no custom font loading.
+import { DS as GLOBAL_DS, ACCENT } from '@/tokens';
 
 const DS = {
-  headingFont: "'Crimson Pro', 'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
-  bodyFont: "'DM Sans', sans-serif",
-  accent: '#C108AB',
-  accentSoft: '#C108AB20',
-  accentBorder: '#C108AB40',
+  headingFont: GLOBAL_DS.headingFont,
+  bodyFont: GLOBAL_DS.bodyFont,
+  monoFont: GLOBAL_DS.monoFont,
+  accent: ACCENT,
+  accentSoft: `${ACCENT}20`,
+  accentBorder: `${ACCENT}40`,
   bg: '#FAFAF8',
   card: '#FFFFFF',
   muted: '#8A8A8A',

@@ -27,7 +27,7 @@ const CAPABILITIES = [
   {
     icon: 'ASSESS',
     title: 'Assessments',
-    desc: '11 leadership assessments with instant results and a NEXUS debrief that connects the dots.',
+    desc: '6 leadership assessments with instant results and a NEXUS debrief that connects the dots.',
   },
   {
     icon: 'ANALYZE',
@@ -75,7 +75,7 @@ const PRICING_CONTEXT = [
   },
   {
     tier: 'Professional',
-    nexus: 'Full NEXUS access + all 11 assessments',
+    nexus: 'Full NEXUS access + all 6 assessments',
     accent: true,
   },
   {
@@ -112,7 +112,7 @@ export function NexusLandingPage() {
     <>
       <SEO
         title="NEXUS — Executive Intelligence System | LYC Intelligence"
-        description="Your always-on intelligence partner for leadership, career, and organizational decisions. Built on two decades of executive search methodology. 11 assessments, analysis, and advisory in one system."
+        description="Your always-on intelligence partner for leadership, career, and organizational decisions. Built on two decades of executive search methodology. 6 assessments, analysis, and advisory in one system."
         path="/nexus"
       />
       <main style={{ background: DS.bgDark, color: DS.bg, minHeight: '100vh' }}>
@@ -319,7 +319,7 @@ export function NexusLandingPage() {
                 Works with every assessment
               </div>
               <h2 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(26px, 3vw, 32px)', fontWeight: 700, color: DS.bg, letterSpacing: '-0.02em', margin: 0 }}>
-                All 11 assessments, one intelligence layer.
+                All 6 assessments, one intelligence layer.
               </h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12 }} className="nx-diag-grid">

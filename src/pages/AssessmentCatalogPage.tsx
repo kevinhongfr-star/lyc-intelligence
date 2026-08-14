@@ -525,7 +525,7 @@ export function AssessmentCatalogPage() {
               textAlign: 'right',
             }}
           >
-            11 ASSESSMENTS · USD PRICING · COMPLIMENTARY INTRO AVAILABLE
+            6 ASSESSMENTS · USD PRICING · COMPLIMENTARY INTRO AVAILABLE
           </div>
         </div>
       </div>

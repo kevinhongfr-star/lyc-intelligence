@@ -278,7 +278,7 @@ export const TIER_MARKETING_BENEFITS: Record<TierKey, string[]> = {
     'No credit card required',
   ],
   professional: [
-    'All 11 assessments (unlimited retakes)',
+    'All 6 assessments (unlimited retakes)',
     'Full NEXUS intelligence access',
     'Complete results history & tracking',
     'Email support',

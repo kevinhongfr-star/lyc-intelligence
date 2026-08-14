@@ -499,7 +499,7 @@ export function NEXUSPage() {
               Unlock the full experience
             </h3>
             <p className="text-sm mb-4 leading-relaxed" style={{ color: TEXT_SECONDARY }}>
-              Create an Executive Introduction profile for full NEXUS access, all 11
+              Create an Executive Introduction profile for full NEXUS access, all 6
               assessments, personalized insights, and saved conversation history.
             </p>
             <Link

@@ -8,10 +8,21 @@ import { SEO } from '@/components/seo/SEO';
 import { trackCTA, trackNexusChatInitiation, trackAssessmentStart } from '@/analytics/eventTracker';
 import { ResultMockup, NexusChatMockup } from '@/components/visual/ProductMockup';
 import { Card, CardContent, CardDescription, CardTitle, CardHeader } from '@/components/ui/Card';
+// W3.1 fix 1: marketing uses 3 tiers — same source of truth as PricingPage.
+import {
+  MARKETING_TIERS,
+  RECOMMENDED_TIER,
+  TIER_META,
+  TIER_PRICING,
+  TIER_MARKETING_BENEFITS,
+  TIER_CTA_LABEL,
+} from '@/config/tierConfig';
 
-// ── 5 Subscription Tiers (Canonical NEXUS Pricing v1.0) ──
+// ── 3 Marketing Tiers (Executive Introduction / Professional / Executive) ──
+// RULE: Marketing surface shows 3 tiers. Backend has 5. Never the twain shall meet.
+type MarketingTierKey = typeof MARKETING_TIERS[number];
 interface PricingTierRow {
-  key: 'explorer' | 'starter' | 'pro' | 'executive' | 'council';
+  key: MarketingTierKey;
   name: string;
   label: string;
   priceUsd: string;
@@ -22,86 +33,32 @@ interface PricingTierRow {
   ctaHref: string;
 }
 
-const SUBSCRIPTION_TIERS: PricingTierRow[] = [
-  {
-    key: 'explorer',
-    name: 'Executive Introduction',
-    label: 'Complimentary access',
-    priceUsd: '—',
-    miles: 0,
-    features: [
-      'NEXUS AI — introductory sessions',
-      'Framework exploration and sample outputs',
-      'Assessment previews (no personalised reports)',
-      'Community forum',
-    ],
-    cta: 'Begin exploration',
-    ctaHref: '/nexus/chat',
-  },
-  {
-    key: 'starter',
-    name: 'Starter',
-    label: 'Engaged executive',
-    priceUsd: '$25',
-    miles: 50,
-    features: [
-      'Unlimited NEXUS AI',
-      'Full framework awareness',
-      'Miles earning enabled',
-      'Full assessments — pay per mile',
-      'Detailed AI reports',
-    ],
-    cta: 'Start with Starter',
-    ctaHref: '/pricing',
-  },
-  {
-    key: 'pro',
-    name: 'Pro',
-    label: 'Serious transition',
-    priceUsd: '$99',
-    miles: 150,
-    features: [
-      'Everything in Starter',
-      '360° rater access',
-      'Peer benchmarking deep',
-      'Historical tracking',
-      'Content library',
-    ],
-    highlight: true,
-    cta: 'Upgrade to Pro',
-    ctaHref: '/pricing',
-  },
-  {
-    key: 'executive',
-    name: 'Executive',
-    label: 'Board and C-suite',
-    priceUsd: '$199',
-    miles: 300,
-    features: [
-      'Everything in Pro',
-      'Executive reviews',
-      'Events access',
-      'Priority support',
-    ],
-    cta: 'Go Executive',
-    ctaHref: '/pricing',
-  },
-  {
-    key: 'council',
-    name: 'Council',
-    label: 'Principal investors + board chairs',
-    priceUsd: '$499',
-    miles: 600,
-    features: [
-      'Everything in Executive',
-      'Council community',
-      'Live sessions / workshops',
-      'Dedicated concierge',
-    ],
-    cta: 'Apply for Council',
-    ctaHref: '/pricing',
-  },
-];
+function buildMarketingTiers(): PricingTierRow[] {
+  return MARKETING_TIERS.map((key) => {
+    const meta = TIER_META[key];
+    const pricing = TIER_PRICING[key];
+    const isEntry = meta.isEntryTier;
+    const isRecommended = key === RECOMMENDED_TIER;
+    const isExecutive = key === 'executive';
+    return {
+      key,
+      name: meta.displayName,
+      label: isEntry ? 'Complimentary entry' : isRecommended ? 'Most chosen tier' : 'Premium tier',
+      priceUsd: isEntry ? 'Complimentary' : `$${pricing.usdMonthly}`,
+      miles: isEntry ? 0 : key === 'professional' ? 50 : 150,
+      features: TIER_MARKETING_BENEFITS[key],
+      highlight: isRecommended,
+      // W3.1: CTA copy per tier spec (Fix 1)
+      cta: isExecutive
+        ? 'Contact Sales'
+        : TIER_CTA_LABEL[key],
+      // Entry → assessment (primary), Professional → signup /pricing, Executive → /pricing contact
+      ctaHref: isEntry ? '/assessment/cpi' : '/pricing',
+    };
+  });
+}
+
+const SUBSCRIPTION_TIERS: PricingTierRow[] = buildMarketingTiers();
 
 // ── 3 Capability cards
 // Phase 9 Batch 6 ticket #1353: remove "Miles economy" from visitor-facing capability cards.
@@ -423,7 +380,7 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
         >
           {t.priceUsd}
         </span>
-        {t.priceUsd !== '—' && (
+        {t.priceUsd !== 'Complimentary' && t.priceUsd !== '—' && (
           <span
             style={{
               fontFamily: DS.bodyFont,
@@ -436,7 +393,7 @@ function PricingTableCard({ t }: { t: PricingTierRow }) {
         )}
       </div>
       {/* Ticket #1353: Miles made secondary (small, muted) — visitor-facing page shows USD as primary */}
-      {t.priceUsd !== '—' && t.miles > 0 && (
+      {t.miles > 0 && (
         <div
           style={{
             fontFamily: DS.monoFont,
@@ -648,7 +605,7 @@ export function Landing() {
                 marginTop: '16px',
               }}
             >
-              11 leadership assessments built on executive search methodology. Powered by NEXUS, LYC's intelligence system.
+              6 leadership assessments built on executive search methodology. Powered by NEXUS, LYC's intelligence system.
             </p>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <a
@@ -1172,7 +1129,7 @@ export function Landing() {
         <div style={{ textAlign: 'right', marginTop: '32px' }}>
           <a
             href="/assessments"
-            onClick={() => trackCTA({ location: 'lineup_seeall', label: 'See all 11 assessments', destination: '/assessments' })}
+            onClick={() => trackCTA({ location: 'lineup_seeall', label: 'See all 6 assessments', destination: '/assessments' })}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -1184,7 +1141,7 @@ export function Landing() {
               textDecoration: 'none',
             }}
           >
-            See all 11 assessments <ArrowRight style={{ width: 14, height: 14 }} />
+            See all 6 assessments <ArrowRight style={{ width: 14, height: 14 }} />
           </a>
         </div>
       </section>
@@ -1629,7 +1586,7 @@ export function Landing() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
             gap: '16px',
             alignItems: 'stretch',
           }}
