@@ -21,7 +21,7 @@
     "framer-motion": "^11.3.0",
     "html2canvas": "^1.4.1",
     "jose": "^6.2.3",
-    "jspdf": "^2.5.1",
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.400.0",
     "papaparse": "^5.5.4",
     "pdf-parse": "^2.4.5",

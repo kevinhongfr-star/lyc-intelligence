@@ -223,13 +223,8 @@
       "permanent": true
     },
     {
-      "source": "/app/billing",
-      "destination": "/member/billing",
-      "permanent": true
-    },
-    {
-      "source": "/nexus",
-      "destination": "/#nexus",
+      "source": "/app/referrals",
+      "destination": "/referral",
       "permanent": true
     },
     {
@@ -349,12 +344,7 @@
     },
     {
       "source": "/platform/nexus",
-      "destination": "/#nexus",
-      "permanent": true
-    },
-    {
-      "source": "/nexus",
-      "destination": "/#nexus",
+      "destination": "/nexus",
       "permanent": true
     },
     {
