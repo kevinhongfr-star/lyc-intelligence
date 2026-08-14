@@ -177,27 +177,15 @@ const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_BACKOFF_MS = 1000;
 
 function readEnvKey(): string | null {
+  // W4-6 / #1291 — server-only key read. NEVER read from import.meta.env
+  // (client bundle) — that would expose the DeepSeek API key to anyone
+  // viewing the built JS. All DeepSeek calls must go through /api/chat
+  // (serverless) which reads process.env at runtime.
   if (typeof process !== 'undefined' && process.env) {
-    const v = process.env.VITE_DEEPSEEK_API_KEY;
+    const v = process.env.VITE_DEEPSEEK_API_KEY || process.env.DEEPSEEK_API_KEY;
     if (v && v.trim()) return v.trim();
   }
-  if (typeof importMetaEnvAvailable()) {
-    try {
-      const v = (import.meta as unknown as { env?: Record<string, string | undefined> }).env?.VITE_DEEPSEEK_API_KEY;
-      if (v && v.trim()) return v.trim();
-    } catch {
-      /* ignore */
-    }
-  }
   return null;
-}
-
-function importMetaEnvAvailable(): boolean {
-  try {
-    return typeof import.meta !== 'undefined';
-  } catch {
-    return false;
-  }
 }
 
 function delayMs(ms: number, signal?: AbortSignal): Promise<void> {

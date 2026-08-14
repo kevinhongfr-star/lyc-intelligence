@@ -77,6 +77,8 @@ const SignupPage = lazy(() => import('@/pages/SignupPage').then(m => ({ default:
 // ── Public product landing pages (Canonical — consolidated IA) ──
 const AssessmentPage = lazy(() => import('@/pages/AssessmentPage').then(m => ({ default: m.AssessmentPage })));
 const B2BLanding = lazy(() => import('@/pages/B2BLanding').then(m => ({ default: m.B2BLanding })));
+// W4-1/W4-3 (#1295) — NEXUS landing page at /nexus (answers "what is NEXUS?")
+const NexusLandingPage = lazy(() => import('@/pages/NexusLandingPage').then(m => ({ default: m.NexusLandingPage })));
 const NexusChatPage = lazy(() => import('@/pages/NexusPage').then(m => ({ default: m.NEXUSPage })));
 const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m.MatchPage })));
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
@@ -258,7 +260,8 @@ export default function App() {
             <Route path="signup" element={<SignupPage />} />
 
             {/* Public product pages */}
-            <Route path="nexus" element={<Navigate to="/#nexus" replace />} />
+            {/* W4-1/W4-3 (#1295) — /nexus renders the NEXUS landing page (what is NEXUS?) */}
+            <Route path="nexus" element={<NexusLandingPage />} />
             <Route path="nexus/chat" element={<NexusChatPage />} />
             <Route path="pricing" element={<PricingPage />} />
             <Route path="b2b" element={<B2BLanding />} />
@@ -482,9 +485,11 @@ export default function App() {
               PHASE 16 · ROUTE 301 REDIRECTS — old flat URLs → new URLs
               ═══════════════════════════════════════════════════════════ */}
 
-          {/* Legacy /nexus shortcuts → canonical marketing or /app/nexus */}
-          <Route path="/nexus" element={<Navigate to="/" replace />} />
-          <Route path="/nexus-landing" element={<Navigate to="/" replace />} />
+          {/* Legacy /nexus shortcuts → canonical marketing or /app/nexus.
+              NOTE: /nexus itself now renders <NexusLandingPage> inside the
+              MarketingLayout block above (W4-1/W4-3). Only the legacy
+              /nexus-landing alias + /b2c shortcut redirect here. */}
+          <Route path="/nexus-landing" element={<Navigate to="/nexus" replace />} />
           <Route path="/b2c" element={<Navigate to="/app/nexus" replace />} />
 
           {/* Legacy instrument root URLs → canonical /assessment/:code */}

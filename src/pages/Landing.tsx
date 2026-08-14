@@ -673,8 +673,8 @@ export function Landing() {
                 Explore Assessments <ArrowRight style={{ width: 14, height: 14 }} />
               </a>
               <a
-                href="#nexus"
-                onClick={() => trackCTA({ location: 'hero_v2', label: 'What is NEXUS?', destination: '#nexus' })}
+                href="/nexus"
+                onClick={() => trackCTA({ location: 'hero_v2', label: 'What is NEXUS?', destination: '/nexus' })}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -1714,8 +1714,9 @@ export function Landing() {
             The intelligent front door is open. NEXUS will ask the questions you haven't yet thought to ask.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            {/* W4-5: primary entry = through complimentary assessment (not empty chat) */}
             <a
-              href="/nexus/chat"
+              href="/assessment/cpi"
               className=""
               style={{
                 display: 'inline-flex',
@@ -1732,10 +1733,11 @@ export function Landing() {
                 textDecoration: 'none',
               }}
             >
-              Try NEXUS <ArrowRight style={{ width: 14, height: 14 }} />
+              Start with a Complimentary Assessment <ArrowRight style={{ width: 14, height: 14 }} />
             </a>
+            {/* W4-5: secondary entry = NEXUS landing page (discovery, not direct chat) */}
             <a
-              href="/assessment"
+              href="/nexus"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1751,7 +1753,7 @@ export function Landing() {
                 textDecoration: 'none',
               }}
             >
-              Browse assessments
+              Meet NEXUS
             </a>
           </div>
         </div>

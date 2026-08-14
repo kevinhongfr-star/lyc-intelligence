@@ -11,7 +11,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, ArrowRight, Sparkles } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getDefaultPortalRoute } from '@/services/portalClassification';
-import { trackCTA, trackNexusChatInitiation, setTrackingUser } from '@/analytics/eventTracker';
+import { trackCTA, setTrackingUser } from '@/analytics/eventTracker';
 import { DS } from '@/tokens';
 import { Logo } from '@/components/ui/Logo';
 
@@ -35,9 +35,9 @@ export function MarketingNav(): React.ReactElement {
       navigate(getDefaultPortalRoute(profile?.role), { replace: true });
       return;
     }
-    trackNexusChatInitiation('nav_cta');
-    trackCTA({ location: 'nav_marketing', label: 'Try NEXUS (guest portal)', destination: '/nexus/chat' });
-    navigate('/nexus/chat');
+    // W4-5: guest nav CTA → /nexus landing page (discovery), not direct chat.
+    trackCTA({ location: 'nav_marketing', label: 'Meet NEXUS (guest portal)', destination: '/nexus' });
+    navigate('/nexus');
   };
 
   const handleSignOut = async () => {
@@ -121,9 +121,10 @@ export function MarketingNav(): React.ReactElement {
                 Sign in
               </Link>
               <button onClick={() => {
-                trackNexusChatInitiation('nav_cta');
-                trackCTA({ location: 'nav_marketing', label: 'Try NEXUS', destination: '/nexus/chat' });
-                navigate('/nexus/chat');
+                // W4-5: nav CTA → /nexus landing page (discovery), not direct
+                // chat. Primary entry is through assessment; nav is secondary.
+                trackCTA({ location: 'nav_marketing', label: 'Meet NEXUS', destination: '/nexus' });
+                navigate('/nexus');
               }} style={{
                 padding: '9px 20px', fontSize: 14, fontWeight: 600,
                 background: DS.accent, color: '#fff', border: 'none', cursor: 'pointer',
@@ -185,10 +186,10 @@ export function MarketingNav(): React.ReactElement {
                 style={{ padding: '12px', textAlign: 'center', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
                 Sign in
               </Link>
-              <Link to="/nexus/chat" onClick={() => {
+              <Link to="/nexus" onClick={() => {
                 setMobileOpen(false);
-                trackNexusChatInitiation('nav_cta_mobile');
-                trackCTA({ location: 'nav_marketing', label: 'Try NEXUS (mobile)', destination: '/nexus/chat' });
+                // W4-5: mobile nav CTA → /nexus landing page (discovery).
+                trackCTA({ location: 'nav_marketing', label: 'Meet NEXUS (mobile)', destination: '/nexus' });
               }}
                 style={{ padding: '12px', textAlign: 'center', background: DS.accent, color: '#fff', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
                 Meet NEXUS

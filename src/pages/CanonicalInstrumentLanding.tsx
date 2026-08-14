@@ -665,7 +665,7 @@ export function CanonicalInstrumentLanding() {
               textDecoration: 'none',
             }}
           >
-            Try NEXUS <ArrowRight style={{ width: 14, height: 14 }} />
+            Chat with NEXUS <ArrowRight style={{ width: 14, height: 14 }} />
           </a>
         </div>
       </section>

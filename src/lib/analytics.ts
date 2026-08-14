@@ -11,9 +11,17 @@ export function initAnalytics() {
     try {
       posthog.init(POSTHOG_KEY, {
         api_host: POSTHOG_HOST,
-        autocapture: true,
+        // W4-7 / #1288 — autocapture DISABLED to prevent PII leakage.
+        // PostHog autocapture captures DOM text on every click/input, which
+        // would capture NEXUS chat messages, assessment results, and form
+        // inputs — bypassing the scrubPII pipeline. Only explicitly-tracked
+        // events (which run through scrubPII) are sent.
+        autocapture: false,
         capture_pageview: false,
-        persistence: 'localStorage'
+        persistence: 'localStorage',
+        // Mask any text inputs / textareas that slip through manual tracking.
+        mask_all_text: true,
+        mask_all_inputs: true,
       });
       analyticsEnabled = true;
     } catch (e) {

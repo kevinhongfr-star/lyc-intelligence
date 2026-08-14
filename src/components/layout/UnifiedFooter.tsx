@@ -200,7 +200,7 @@ export function UnifiedFooter() {
               marginTop: '14px',
             }}
           >
-            3 complimentary messages. No credit card.
+            Executive Introduction · No credit card required
           </p>
         </div>
       </div>

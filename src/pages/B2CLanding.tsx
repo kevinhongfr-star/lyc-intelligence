@@ -28,11 +28,13 @@ export function B2CLanding() {
             Understand your trajectory. Benchmark your leadership. Discover opportunities that match where you're headed.
           </p>
           <div className="cta-row" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/nexus/chat" className="" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
-              Try NEXUS <ArrowRight style={{ width: 16, height: 16 }} />
+            {/* W4-5: primary entry = through complimentary assessment (not empty chat) */}
+            <a href="/assessment/cpi" className="" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+              Start with a Complimentary Assessment <ArrowRight style={{ width: 16, height: 16 }} />
             </a>
-            <a href="/assessments" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
-              Complimentary Assessment
+            {/* W4-5: secondary entry = direct chat (for users who already know NEXUS) */}
+            <a href="/nexus/chat" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', border: '1px solid #000000', color: '#000000', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 500, textDecoration: 'none', minHeight: '44px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
+              Chat with NEXUS
             </a>
           </div>
         </div>

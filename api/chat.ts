@@ -23,6 +23,7 @@ import {
   logServerError,
   rateLimit,
   setRateLimitHeaders,
+  applyStrictCors,
 } from './lib/validate.js';
 import { z } from 'zod';
 
@@ -137,14 +138,8 @@ function clientIp(req: VercelRequest): string {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // ── CORS ──────────────────────────────────────────────────────────────────
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  if (req.method === 'OPTIONS') {
-    res.status(204).end();
-    return;
-  }
+  // ── CORS — W4-6 / #1291 strict origin allowlist (no wildcard) ────────────
+  if (applyStrictCors(req, res)) return;
 
   if (req.method === 'GET') {
     const deepseek = new DeepSeekClient();

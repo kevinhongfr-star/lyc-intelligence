@@ -191,10 +191,10 @@ export function B2BLanding() {
               Try Match Analysis <ArrowRight style={{ width: 15, height: 15 }} />
             </a>
             <a
-              href="/nexus/chat"
+              href="/nexus"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 32px', border: '1px solid rgba(255,255,255,0.28)', color: DS.bg, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', textDecoration: 'none', background: 'rgba(255,255,255,0.04)' }}
             >
-              Launch NEXUS
+              Meet NEXUS
             </a>
           </div>
           <div

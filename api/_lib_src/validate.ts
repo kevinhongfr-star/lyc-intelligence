@@ -725,3 +725,40 @@ export function validateWrite<T>(schema: z.Schema<T>, payload: unknown): T {
   return result.data;
 }
 
+// ── W4-6 / #1291 — CORS hardening ─────────────────────────────────
+//
+// Production must NOT use wildcard `*` on authenticated/credentialed
+// endpoints. This helper echoes a strict origin allowlist and handles the
+// CORS preflight (OPTIONS) short-circuit. Allowed origins:
+//   - localhost (any port) — dev only
+//   - lyc-intelligence.app, www.lyc-intelligence.app — production
+//   - *.vercel.app — preview deployments (Vercel branch deploys)
+//
+// Credentials are NOT enabled (no cookies sent cross-origin); the NEXUS
+// chat endpoint uses the Authorization header (Bearer token), not cookies.
+
+const ALLOWED_ORIGIN_RE =
+  /^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?|https:\/\/(www\.)?lyc-intelligence\.app|https:\/\/[a-z0-9-]+\.vercel\.app)$/i;
+
+/**
+ * Apply strict CORS headers to a response based on the request Origin.
+ * Returns true if the request was an OPTIONS preflight (handler should
+ * short-circuit with 204); false otherwise.
+ */
+export function applyStrictCors(req: VercelRequest, res: VercelResponse): boolean {
+  const origin = (req.headers['origin'] as string | undefined) ?? '';
+  // Only echo the origin if it matches the allowlist. No wildcard.
+  if (origin && ALLOWED_ORIGIN_RE.test(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Max-Age', '86400');
+  }
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return true;
+  }
+  return false;
+}
+

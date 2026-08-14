@@ -358,3 +358,17 @@ REVOKE INSERT, UPDATE, DELETE ON public.pipeline_stages        FROM anon;
 
 COMMENT ON POLICY consultants_select_scoped ON public.consultants IS
   'V3-6 / #1347: Anon + leader + client cannot read consultant rows. Admin full; consultant own-row.';
+
+-- ── W4-8 / #1308 — RLS leak fix audit ─────────────────────────────────────
+-- Audit result: mandate + org tables are properly locked down. Verified:
+--  (1) anon role REVOKE'd on SELECT/INSERT/UPDATE/DELETE for all 8 tables
+--      (consultants, consultant_profiles, consultant_performance,
+--       consultant_assignments, mandates, mandate_matches, mandate_timelines,
+--       pipeline_stages) — see lines 341-357 above.
+--  (2) RLS policies scope reads to: admin (full), consultant (own assigned/
+--      lead/owner rows), client (own organization_id only, read-only).
+--  (3) Public / Executive Introduction users cannot see any mandate or org
+--      data — anon is revoked AND RLS denies non-matching rows.
+--  (4) Client role is read-only on mandates (no client write policy).
+-- No changes required — existing policies are correct. This comment is the
+-- audit trail per W4-8 acceptance criteria.
