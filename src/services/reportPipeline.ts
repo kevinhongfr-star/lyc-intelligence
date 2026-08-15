@@ -255,7 +255,7 @@ export async function renderReport(
       const pct = Math.max(0, Math.min(100, score));
       return `<tr>
         <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;font-size:14px;font-weight:500;">${name}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;text-align:center;font-family:'DejaVu Serif','Georgia','Times New Roman',Times,serif;font-weight:700;font-size:18px;color:${color};">${score}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;text-align:center;font-family:serif;font-weight:700;font-size:18px;color:${color};">${score}</td>
         <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;">
           <div style="width:100%;height:10px;background:#F0F0F0;">
             <div style="height:100%;width:${pct}%;background:${color};"></div>
@@ -285,7 +285,7 @@ export async function renderReport(
   const actionsList = (result.development_actions || [])
     .sort((a, b) => a.priority - b.priority)
     .map((a, i) => `<li style="display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #F0F0F0;font-size:14px;">
-      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:'DejaVu Serif','Georgia','Times New Roman',Times,serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">${i + 1}</span>
+      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">${i + 1}</span>
       <div>
         <div style="font-weight:600;margin-bottom:4px;">${a.dimension}</div>
         <div style="color:#333;line-height:1.6;">${a.action}</div>
@@ -293,7 +293,7 @@ export async function renderReport(
       </div>
     </li>`)
     .join('') || `<li style="display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #F0F0F0;font-size:14px;">
-      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:'DejaVu Serif','Georgia','Times New Roman',Times,serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">1</span>
+      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">1</span>
       <div>
         <div style="font-weight:600;margin-bottom:4px;">Focused Practice</div>
         <div style="color:#333;line-height:1.6;">Identify your lowest-scoring dimension and schedule a weekly 60-minute focused practice for the next 90 days.</div>
@@ -323,9 +323,10 @@ export async function renderReport(
 <title>${instrumentName} — ${result.archetype}</title>
 <style>
   /* #1273: Standalone report HTML — self-hosted font URLs relative to the app root.
-     When exported/saved as a standalone HTML file, fonts fall back to system equivalents. */
-  @font-face { font-family:'DejaVu Serif'; src:url('/fonts/CrimsonPro-Regular.woff2') format('woff2'); font-weight:400 700; font-style:normal; font-display:swap; }
-  @font-face { font-family:'DejaVu Serif'; src:url('/fonts/CrimsonPro-Italic.woff2') format('woff2'); font-weight:400 700; font-style:italic; font-display:swap; }
+     When exported/saved as a standalone HTML file, fonts fall back to system equivalents.
+     X5-13 FIX: Headings use native system serif (generic 'serif'). NO Crimson Pro loaded —
+     prior code claimed 'DejaVu Serif' while actually loading CrimsonPro woff2, a font-face
+     bait-and-switch. Fixed to use actual native serif stack with zero FOIT. */
   @font-face { font-family:'DM Sans'; src:url('/fonts/DMSans-Regular.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }
   @font-face { font-family:'DM Sans'; src:url('/fonts/DMSans-Medium.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap; }
   @font-face { font-family:'DM Sans'; src:url('/fonts/DMSans-SemiBold.woff2') format('woff2'); font-weight:600; font-style:normal; font-display:swap; }
@@ -336,24 +337,24 @@ export async function renderReport(
   body { font-family:'DM Sans',system-ui,sans-serif; color:#1a1a1a; line-height:1.6; background:#FFFFFF; }
   .page { width:210mm; min-height:297mm; padding:22mm 20mm; margin:0 auto; background:#fff; }
   .section { margin-bottom:36px; page-break-inside:avoid; }
-  h1,h2,h3 { font-family:'DejaVu Serif','Georgia','Times New Roman',Times,serif; color:#1a1a1a; }
+  h1,h2,h3 { font-family:serif; color:#1a1a1a; }
   h2 { font-size:22px; border-bottom:2px solid ${accent}; padding-bottom:8px; margin-bottom:16px; }
   h3 { font-size:16px; margin-bottom:8px; }
   .accent { color:${accent}; }
   .mono { font-family:'IBM Plex Mono','Courier New',monospace; }
   .cover { text-align:center; padding:60px 0 40px; border-bottom:3px solid ${accent}; margin-bottom:40px; }
-  .cover .brand { font-family:'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif; font-size:28px; font-weight:700; color:${accent}; letter-spacing:1px; margin-bottom:8px; }
+  .cover .brand { font-family:serif; font-size:28px; font-weight:700; color:${accent}; letter-spacing:1px; margin-bottom:8px; }
   .cover h1 { font-size:32px; margin:16px 0 8px; }
   .cover .subtitle { font-size:15px; color:#666; margin-bottom:24px; }
   .cover .meta { display:inline-block; padding:16px 32px; background:#F5F5F5; border-left:4px solid ${accent}; text-align:left; }
   .cover .meta-row { font-size:14px; margin:4px 0; }
   .cover .meta-label { color:#666; display:inline-block; width:110px; }
-  .archetype-badge { display:inline-block; margin-top:20px; padding:10px 28px; background:${accent}; color:#fff; font-family:'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif; font-size:18px; font-weight:700; }
+  .archetype-badge { display:inline-block; margin-top:20px; padding:10px 28px; background:${accent}; color:#fff; font-family:serif; font-size:18px; font-weight:700; }
   .score-display { display:flex; align-items:center; gap:24px; margin-bottom:16px; }
   .score-circle { width:110px; height:110px; border-radius:0; border:6px solid ${accent}; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; }
-  .score-circle .num { font-family:'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif; font-size:34px; font-weight:700; color:${accent}; line-height:1; }
+  .score-circle .num { font-family:serif; font-size:34px; font-weight:700; color:${accent}; line-height:1; }
   .score-circle .max { font-size:12px; color:#999; }
-  .score-info .tier { font-family:'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif; font-size:20px; color:${accent}; font-weight:700; }
+  .score-info .tier { font-family:serif; font-size:20px; color:${accent}; font-weight:700; }
   .score-info .archetype { font-size:16px; color:#333; margin-top:4px; }
   .score-info .tagline { font-size:13px; color:#666; font-style:italic; margin-top:4px; }
   table.dimensions { width:100%; border-collapse:collapse; }
@@ -423,7 +424,7 @@ export async function renderReport(
     <h2>Cross-Border Readiness</h2>
     <div class="cb-box">
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
-        <div style="font-family:'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif;font-size:28px;font-weight:700;color:${getCrossBorderTier(result.crossBorderScore).color};">
+        <div style="font-family:serif;font-size:28px;font-weight:700;color:${getCrossBorderTier(result.crossBorderScore).color};">
           ${result.crossBorderScore}<span style="font-size:14px;color:#999;"> / 100</span>
         </div>
         <div>

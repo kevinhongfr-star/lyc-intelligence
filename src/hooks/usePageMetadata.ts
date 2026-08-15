@@ -12,7 +12,7 @@
  */
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { resolveMetadata, DEFAULT_META, PageMetadata } from '@/lib/seo/pageMetadata';
+import { resolveMetadata, DEFAULT_META, PageMetadata } from '@/seo/pageMetadata';
 
 /** Upsert (or create) a <meta> tag by property or name selector. */
 function upsertMeta(selector: 'property' | 'name', key: string, content: string | undefined) {

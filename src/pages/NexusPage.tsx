@@ -27,12 +27,7 @@ import { reportError } from '@/analytics/errorMonitor';
 import { buildNexusSystemPrompt, buildNexusFirstResponse, NEXUS_FIRST_RESPONSE_QUICK_REPLIES } from '@/nexus/nexusKnowledge';
 import { buildLocalAssessmentContextForNexus, getAssessmentProgress, recommendNextAssessment } from '@/nexus/resultContextBuilder';
 import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
-import { OCEAN, FONT_DISPLAY, FONT_BODY, FONT_MONO } from '@/tokens';
-
-// ── NEXUS accent (ocean / deep blue) — one accent per page ──
-const ACCENT = OCEAN;            // #1E4D8C
-const ACCENT_DARK = '#163E70';
-const ACCENT_LIGHT = '#3A6BA8';
+import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, FONT_DISPLAY, FONT_BODY, FONT_MONO } from '@/tokens';
 
 // ── Dark surface ramp ──
 const SURFACE_BASE = '#0A0A12';    // page bg (deepest)
@@ -40,7 +35,7 @@ const SURFACE_1 = '#101019';       // header / input well
 const SURFACE_2 = '#16161F';       // NEXUS bubble bg
 const SURFACE_3 = '#1C1C28';       // user bubble bg (slightly lighter)
 const BORDER_SUBTLE = 'rgba(255,255,255,0.08)';
-const BORDER_FOCUS = 'rgba(58,107,168,0.55)'; // ocean-tinted focus border
+const BORDER_FOCUS = 'rgba(224,64,200,0.55)'; // fuchsia-tinted focus border
 const TEXT_PRIMARY = '#FFFFFF';
 const TEXT_SECONDARY = 'rgba(255,255,255,0.66)';
 const TEXT_DIM = 'rgba(255,255,255,0.42)';

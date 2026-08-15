@@ -165,6 +165,10 @@ export interface AssessmentLandingConfig {
   tagline: string;
   /** Short marketing description for hero */
   heroDescription: string;
+  /** X5-7: Outcome-first H1 text (replaces code as H1). If omitted, falls back to name/code. */
+  heroH1?: string;
+  /** X5-7: Eyebrow text for code + full name (e.g. "PRISM · PROFESSIONAL BRAND LEGIBILITY"). If omitted, falls back to tagline/category. */
+  heroEyebrow?: string;
   /** Accent color (hex) */
   accent: string;
   /** CSS class prefix for scroll-reveal isolation */

@@ -8,7 +8,7 @@
  * Brand: ONE accent per page — OCEAN (#1E4D8C), reserved for LEAP only.
  */
 import { LandingTemplate, type LandingDimension, type LandingArchetype } from '@/components/templates/LandingTemplate';
-import { OCEAN } from '@/tokens';
+import { ACCENT, ACCENT_DARK } from '@/tokens';
 
 // ── LEAP DATA (verified against akira_source/leap_config.json) ──────
 // Full name: "Leadership Archetype & APAC Translation"
@@ -132,8 +132,10 @@ export function LeapLanding() {
       heroDescription="The deepest single-instrument leadership profile in the LYC suite. Five dimensions. Seventeen archetypes. A composite profile grounded in how executives actually operate — including APAC translation."
       categoryLabel="Leadership Self-Awareness"
       tierBadge="HERO ASSESSMENT"
-      accent={OCEAN}
-      accentDark="#163E70"
+      heroH1="See the leadership decisions you'll make before you make them"
+      heroEyebrow="LEAP · LEARNING & EXECUTION POTENTIAL"
+      accent={ACCENT}
+      accentDark={ACCENT_DARK}
       dimensions={LEAP_DIMENSIONS}
       archetypes={LEAP_ARCHETYPES}
       methodologySteps={LEAP_METHOD_STEPS}

@@ -14,13 +14,9 @@
  */
 import React, { useState } from 'react';
 import { SEO } from '@/components/seo/SEO';
-import { DS, OCEAN } from '@/tokens';
+import { DS, ACCENT, ACCENT_DARK, ACCENT_LIGHT } from '@/tokens';
 import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
 import { trackCTA } from '@/analytics/eventTracker';
-
-const ACCENT = OCEAN;
-const ACCENT_DARK = '#163E70';
-const ACCENT_LIGHT = '#3A6BA8';
 
 // ── Capability cards ──
 const CAPABILITIES = [

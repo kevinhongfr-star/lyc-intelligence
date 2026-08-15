@@ -47,6 +47,37 @@ export function CanonicalInstrumentLanding() {
       ? 'SHIFT SUITE · 149 MI'
       : 'ADVISORY · 99 MI';
 
+  // X5-7: Outcome-first H1 + code eyebrow overrides per instrument
+  const instrumentCopy: Record<string, { heroH1: string; heroEyebrow: string }> = {
+    FORGE: {
+      heroH1: 'Sell like a founder, scale like a system builder',
+      heroEyebrow: 'FORGE · SALES LEADERSHIP STRENGTHS',
+    },
+    BRIDGE: {
+      heroH1: 'Cross-border mandates that land in-market, not just in-deck',
+      heroEyebrow: 'BRIDGE · CROSS-BORDER LEADERSHIP',
+    },
+    DRIVE: {
+      heroH1: 'Know why you lead — and when you\'ll disengage',
+      heroEyebrow: 'DRIVE · MOTIVATION PROFILE & ENGAGEMENT RISK',
+    },
+    QUEST: {
+      heroH1: 'Performance that compounds, not just accelerates',
+      heroEyebrow: 'QUEST · EXECUTIVE PERFORMANCE',
+    },
+    MOSAIC: {
+      heroH1: 'Partnerships that navigate institutional complexity',
+      heroEyebrow: 'MOSAIC · CROSS-BORDER PARTNERSHIP AGILITY',
+    },
+    COACH: {
+      heroH1: 'The leadership skill every manager actually develops — coaching others',
+      heroEyebrow: 'COACH · MANAGER-AS-COACH CAPABILITY',
+    },
+  };
+  const copy = instrumentCopy[key];
+  const heroH1 = copy?.heroH1 ?? info.name;
+  const heroEyebrow = copy?.heroEyebrow ?? info.code;
+
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
       <SEO assessment={getAssessmentMeta(
@@ -109,15 +140,15 @@ export function CanonicalInstrumentLanding() {
               style={{
                 display: 'inline-block',
                 fontFamily: DS.monoFont,
-                fontSize: '11px',
-                letterSpacing: '0.28em',
-                color: DS.accent,
-                fontWeight: 700,
+                fontSize: '10px',
+                letterSpacing: '0.22em',
+                color: 'rgba(255,255,255,0.55)',
+                fontWeight: 500,
                 textTransform: 'uppercase',
-                marginBottom: '10px',
+                marginBottom: '12px',
               }}
             >
-              {info.code}
+              {heroEyebrow}
             </div>
             <h1
               style={{
@@ -131,7 +162,7 @@ export function CanonicalInstrumentLanding() {
                 maxWidth: '780px',
               }}
             >
-              {info.name}
+              {heroH1}
             </h1>
             <p
               style={{

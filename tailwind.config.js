@@ -87,11 +87,6 @@ export default {
         'card': '0px',
       },
       animation: {
-        'pulse-icon': 'iconPulse 2s ease-in-out infinite',
-        'rotate-icon': 'iconRotate 8s linear infinite',
-        'draw-icon': 'iconDraw 3s ease-in-out infinite',
-        'glow-cta': 'ctaGlow 2.5s ease-in-out infinite',
-        'float': 'dreamyFloat 8s ease-in-out infinite',
         'enter': 'pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'fadeIn': 'fadeIn 0.2s ease-out forwards',
       },

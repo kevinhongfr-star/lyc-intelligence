@@ -15,7 +15,7 @@
  * Brand: ONE accent per page — FOREST_GREEN (#166534), reserved for IMPACT.
  */
 import { LandingTemplate, type LandingDimension, type LandingArchetype } from '@/components/templates/LandingTemplate';
-import { FOREST_GREEN } from '@/tokens';
+import { ACCENT, ACCENT_DARK } from '@/tokens';
 
 // ── IMPACT DATA (verified against akira_source/impact_config.json) ───
 // Full name: "Board Effectiveness Assessment"
@@ -131,8 +131,10 @@ export function ImpactLanding() {
       heroDescription="Benchmark your contribution at the board and organisational level. Five dimensions — strategic oversight, governance rigour, stakeholder intelligence, mandate legacy, and APAC mandate credibility. Eight board-effectiveness archetypes."
       categoryLabel="Board & Team Impact"
       tierBadge="HERO ASSESSMENT"
-      accent={FOREST_GREEN}
-      accentDark="#0E4524"
+      heroH1="A board mandate that's actually built for the governance decisions you face today"
+      heroEyebrow="IMPACT · BOARD EFFECTIVENESS"
+      accent={ACCENT}
+      accentDark={ACCENT_DARK}
       dimensions={IMPACT_DIMENSIONS}
       archetypes={IMPACT_ARCHETYPES}
       methodologySteps={IMPACT_METHOD_STEPS}

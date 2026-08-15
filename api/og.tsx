@@ -20,11 +20,12 @@ export const config = {
 };
 
 const ACCENT = '#C108AB';
-// Brand rule: headings use system serif stack (no custom font loading).
-// @vercel/og supports CSS generic families; 'serif' resolves to the default
-// platform serif on the edge runtime (consistent with the marketing surface).
-const HEADING_FONT = 'serif';
-const BODY_FONT = 'DM Sans';
+// Brand rule: headings use DejaVu Serif / Georgia serif stack (no custom font loading).
+// @vercel/og supports CSS generic families; the generic 'serif' resolver on the
+// edge runtime picks up platform serifs consistent with the marketing surface.
+const HEADING_FONT = 'DejaVu Serif, Georgia, Times, "Times New Roman", serif';
+const BODY_FONT_BASE = 'DM Sans';
+const BODY_FONT = '"DM Sans", system-ui, sans-serif';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<ImageResponse> {
   const { searchParams } = new URL(req.url || 'http://localhost');
@@ -42,6 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
           backgroundColor: '#FFFFFF',
           fontFamily: BODY_FONT,
           position: 'relative',
+          borderRadius: 0,
         }}
       >
         {/* Logo — top left */}
@@ -51,6 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
             alignItems: 'center',
             gap: '12px',
             padding: '48px 56px',
+            borderRadius: 0,
           }}
         >
           <div
@@ -65,6 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
               fontFamily: HEADING_FONT,
               fontWeight: 700,
               fontSize: '22px',
+              borderRadius: 0,
             }}
           >
             L
@@ -90,6 +94,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
             flex: 1,
             padding: '0 56px',
             paddingBottom: '60px',
+            borderRadius: 0,
           }}
         >
           <div
@@ -103,6 +108,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
               WebkitBoxOrient: 'vertical',
               WebkitLineClamp: 3,
               overflow: 'hidden',
+              borderRadius: 0,
             }}
           >
             {title}
@@ -118,6 +124,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
                 WebkitBoxOrient: 'vertical',
                 WebkitLineClamp: 2,
                 overflow: 'hidden',
+                borderRadius: 0,
               }}
             >
               {subtitle}
@@ -133,6 +140,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
             justifyContent: 'space-between',
             padding: '0 56px',
             paddingBottom: '40px',
+            borderRadius: 0,
           }}
         >
           <span
@@ -161,9 +169,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
             display: 'flex',
             height: '8px',
             width: '100%',
+            borderRadius: 0,
           }}
         >
-          <div style={{ flex: 1, backgroundColor: ACCENT }} />
+          <div style={{ flex: 1, backgroundColor: ACCENT, borderRadius: 0 }} />
         </div>
       </div>
     ),
@@ -174,7 +183,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       // NOTE: Heading font is the generic 'serif' family — no custom fetch.
       fonts: [
         {
-          name: BODY_FONT,
+          name: BODY_FONT_BASE,
           data: await fetchFont('DM+Sans:wght@400;500;700'),
           weight: 400,
           style: 'normal',

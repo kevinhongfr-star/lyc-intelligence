@@ -4,7 +4,6 @@ import * as Sentry from '@sentry/react';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
-import './styles/tokens.css';
 import { initAnalytics } from './lib/analytics';
 import { installGlobalErrorHandlers, scrubErrorMessage } from './analytics/errorMonitor';
 

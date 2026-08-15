@@ -11,7 +11,7 @@
  * Brand: ONE accent per page — AMBER (#B45309), reserved for SPARK only.
  */
 import { LandingTemplate, type LandingDimension, type LandingArchetype } from '@/components/templates/LandingTemplate';
-import { AMBER } from '@/tokens';
+import { ACCENT, ACCENT_DARK } from '@/tokens';
 
 // ── SPARK DATA (verified against akira_source/spark_config.json) ─────
 // Full name: "AI Leadership Readiness & Enterprise Governance"
@@ -108,8 +108,10 @@ export function SparkLanding() {
       heroDescription="Assess your readiness to lead in the age of AI. Three dimensions — individual adoption, capability exposure, and organisational preparedness. Four governance archetypes. A clear readiness profile in approximately twelve minutes."
       categoryLabel="AI Leadership Readiness"
       tierBadge="HERO ASSESSMENT"
-      accent={AMBER}
-      accentDark="#8A3D07"
+      heroH1="Know where you stand on AI adoption before it becomes a competitive disadvantage"
+      heroEyebrow="SPARK · AI LEADERSHIP READINESS"
+      accent={ACCENT}
+      accentDark={ACCENT_DARK}
       dimensions={SPARK_DIMENSIONS}
       archetypes={SPARK_ARCHETYPES}
       methodologySteps={SPARK_METHOD_STEPS}

@@ -34,24 +34,42 @@ const VARIANT_BASE: Record<CardVariant, string> = {
 };
 
 const VARIANT_HOVER: Record<CardVariant, string> = {
-  flat: 'hover:border-accent hover:shadow-card-hover',
-  elevated: 'hover:-translate-y-0.5 hover:shadow-card-hover',
+  flat: '',
+  elevated: '',
   accent: '',
 };
 
+const FUCHSIA = '#C108AB';
+
 export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
-  { children, className, variant = 'flat', interactive = true, ...rest },
+  { children, className, variant = 'flat', interactive = true, style, onMouseEnter, onMouseLeave, ...rest },
   ref,
 ) {
+  const baseBorder = variant === 'elevated' ? 'transparent' : undefined;
   return (
     <div
       ref={ref}
       className={cn(
-        'rounded-none transition-colors duration-200 ease-out',
+        'rounded-none',
         VARIANT_BASE[variant],
-        interactive && VARIANT_HOVER[variant],
         className,
       )}
+      style={{
+        transition: 'border-color 150ms ease',
+        ...style,
+      }}
+      onMouseEnter={(e) => {
+        if (interactive) {
+          e.currentTarget.style.borderColor = FUCHSIA;
+        }
+        onMouseEnter?.(e);
+      }}
+      onMouseLeave={(e) => {
+        if (interactive) {
+          e.currentTarget.style.borderColor = baseBorder ?? '';
+        }
+        onMouseLeave?.(e);
+      }}
       {...rest}
     >
       {children}

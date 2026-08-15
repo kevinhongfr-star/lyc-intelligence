@@ -78,12 +78,12 @@ function Hero() {
       {/* Static hero accent line (2px vertical gradient, fuchsia → transparent, ~200px tall, no animation) */}
       <div aria-hidden="true" style={{ position: 'absolute', top: 140, left: '50%', transform: 'translateX(-50%)', width: 2, height: 200, background: `linear-gradient(to bottom, ${DS.accent} 0%, transparent 100%)`, pointerEvents: 'none' }} />
       <div style={containerStyle} className="nl-reveal">
-        <span style={{ ...monoStyle, color: DS.eyebrow, marginBottom: 28, display: 'inline-block' }}>Your AI executive coach</span>
+        <span style={{ ...monoStyle, color: DS.eyebrow, marginBottom: 28, display: 'inline-block' }}>Your executive intelligence companion</span>
         <h1 className="hero-heading" style={{ fontFamily: DS.headingFont, fontWeight: 700, lineHeight: 1.15, color: DS.text, fontSize: 48, maxWidth: 760, margin: '0 auto 24px' }}>
           NEXUS knows your assessments. <br /><em style={{ fontWeight: 400 }}>And what to do next.</em>
         </h1>
         <p className="hero-sub" style={{ fontSize: 18, maxWidth: 620, margin: '0 auto 40px', color: DS.muted, lineHeight: 1.6 }}>
-          NEXUS is your AI executive coach. It knows all six leadership assessments, can interpret your results, and gives you personalised leadership advice based on your profile.
+          NEXUS is your executive intelligence companion. It knows all six leadership assessments, can interpret your results, and gives you personalised leadership guidance based on your profile.
         </p>
         <div className="cta-row" style={{ display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 60, flexWrap: 'wrap' }}>
           <a href="#start" style={btnPrimary} {...ctaCompressHandlers}
@@ -113,9 +113,9 @@ function WhatIs() {
       <div style={containerStyle} className="nl-reveal">
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
           <span style={sectionLabel}>What NEXUS is</span>
-          <h2 className="section-heading" style={{ fontFamily: DS.headingFont, fontWeight: 700, fontSize: 34, lineHeight: 1.2, color: DS.text, marginBottom: 32 }}>A coach that knows <em style={{ fontWeight: 400 }}>your assessments.</em></h2>
-          <p style={{ fontSize: 18, lineHeight: 1.7, color: DS.muted, marginBottom: 24 }}>NEXUS is an AI executive coach built on LYC's assessment methodology and APAC executive placement data. It knows all six leadership assessments, reads your results, and carries your context into every reply — so the guidance is about you, not a template.</p>
-          <p style={{ fontSize: 18, lineHeight: 1.7, color: DS.muted, marginBottom: 24 }}>Ask a question before a hard decision, talk through a transition, or pressure-test a 90-day plan. The coach is there whenever the question appears.</p>
+          <h2 className="section-heading" style={{ fontFamily: DS.headingFont, fontWeight: 700, fontSize: 34, lineHeight: 1.2, color: DS.text, marginBottom: 32 }}>An executive thinking partner that knows <em style={{ fontWeight: 400 }}>your assessments.</em></h2>
+          <p style={{ fontSize: 18, lineHeight: 1.7, color: DS.muted, marginBottom: 24 }}>NEXUS is an executive intelligence system built on LYC's assessment methodology and APAC executive placement data. It knows all six leadership assessments, reads your results, and carries your context into every reply — so the guidance is about you, not a template.</p>
+          <p style={{ fontSize: 18, lineHeight: 1.7, color: DS.muted, marginBottom: 24 }}>Ask a question before a hard decision, talk through a transition, or pressure-test a 90-day plan. NEXUS is available whenever the question appears.</p>
         </div>
       </div>
     </section>
@@ -135,7 +135,7 @@ function Capabilities() {
         <div className="nl-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>What NEXUS does</span>
           <h2 className="section-heading" style={{ fontFamily: DS.headingFont, fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: DS.text, marginBottom: 20 }}>Three things NEXUS <em style={{ fontWeight: 400 }}>actually does</em></h2>
-          <p style={{ fontSize: 17, color: DS.muted, lineHeight: 1.6 }}>Not a chatbot that guesses. A coach that knows your assessments, reads your results, and turns them into a plan.</p>
+          <p style={{ fontSize: 17, color: DS.muted, lineHeight: 1.6 }}>Not a chatbot that guesses. An executive intelligence companion that knows your assessments, reads your results, and turns them into a plan.</p>
         </div>
         <div className="nl-reveal grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: DS.border, border: `1px solid ${DS.border}` }}>
           {CAPS.map((c, i) => (
@@ -163,8 +163,8 @@ function Capabilities() {
 // ── HOW IT WORKS ───────────────────────────────────────────────────
 const STEPS = [
   { n: '01', title: 'Take an assessment', desc: 'Start with one of the six leadership assessments — about 15 to 25 minutes. NEXUS learns your context from the first result.' },
-  { n: '02', title: 'Read it with NEXUS', desc: 'Walk through what your scores mean and where the gaps are, benchmarked against real executive populations. Then ask your coach anything.' },
-  { n: '03', title: 'Act on a plan', desc: 'Turn the read into a concrete 90-day development plan, grounded in LYC placement data. Your coach is there when the next question surfaces.' },
+  { n: '02', title: 'Read it with NEXUS', desc: 'Walk through what your scores mean and where the gaps are, benchmarked against real executive populations. Then ask NEXUS anything.' },
+  { n: '03', title: 'Act on a plan', desc: 'Turn the read into a concrete 90-day development plan, grounded in LYC placement data. NEXUS is available when the next question surfaces.' },
 ];
 
 // ── WHAT YOU CAN ASK ───────────────────────────────────────────────
@@ -181,7 +181,7 @@ function WhatToAsk() {
       <div style={containerStyle}>
         <div className="nl-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 56px' }}>
           <span style={sectionLabel}>What you can ask NEXUS</span>
-          <h2 className="section-heading" style={{ fontFamily: DS.headingFont, fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: DS.text, marginBottom: 16 }}>Ask it like you'd <em style={{ fontWeight: 400 }}>ask a coach</em></h2>
+          <h2 className="section-heading" style={{ fontFamily: DS.headingFont, fontWeight: 700, fontSize: 36, lineHeight: 1.2, color: DS.text, marginBottom: 16 }}>Ask it like you'd <em style={{ fontWeight: 400 }}>ask a trusted advisor</em></h2>
           <p style={{ fontSize: 17, color: DS.muted, lineHeight: 1.6 }}>Real questions, in your own words. NEXUS carries your profile and results into every reply.</p>
         </div>
         <div className="nl-reveal" style={{ maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 1, background: DS.border, border: `1px solid ${DS.border}` }}>
@@ -473,7 +473,7 @@ function Footer() {
             <h4 style={{ fontFamily: DS.headingFont, fontSize: 20, fontWeight: 700, marginBottom: 8, display: 'flex', alignItems: 'baseline', gap: 6, color: DS.text, lineHeight: 1.2 }}>
               NEXUS <span style={{ fontFamily: DS.monoFont, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', color: DS.mutedDim, fontWeight: 400, fontStyle: 'normal' }}>by LYC</span>
             </h4>
-            <p style={{ color: DS.muted, fontSize: 14, maxWidth: 280, marginTop: 16, lineHeight: 1.6 }}>Your AI executive coach — knows your six leadership assessments, reads your results, and plans your next move.</p>
+            <p style={{ color: DS.muted, fontSize: 14, maxWidth: 280, marginTop: 16, lineHeight: 1.6 }}>Your executive intelligence companion — knows your six leadership assessments, reads your results, and plans your next move.</p>
           </div>
           <div>
             <h5 style={{ fontFamily: DS.monoFont, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: DS.mutedDim, marginBottom: 20, fontWeight: 500 }}>Product</h5>

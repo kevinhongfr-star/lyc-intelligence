@@ -137,7 +137,9 @@ function SectionHead({ eyebrow, children }: { eyebrow: string; children: React.R
 // ── HERO ───────────────────────────────────────────────────────────
 function Hero({ config, catalog }: { config: AssessmentLandingConfig; catalog: AssessmentInfo | undefined }) {
   const { prefix, ctaHref } = config;
-  const category = ASSESSMENT_SUBTITLE[config.code] || config.tagline || catalog?.tagline || '';
+  const defaultEyebrow = ASSESSMENT_SUBTITLE[config.code] || config.tagline || catalog?.tagline || '';
+  const eyebrow = config.heroEyebrow ?? defaultEyebrow;
+  const heading = config.heroH1 ?? config.name;
   const tagline = catalog?.tagline || config.heroDescription;
   const duration = catalog?.duration_minutes ?? 10;
   const questions = catalog?.total_questions ?? 0;
@@ -170,14 +172,14 @@ function Hero({ config, catalog }: { config: AssessmentLandingConfig; catalog: A
       <div style={containerStyle} className={`${prefix}-reveal`}>
         <div style={{ width: 48, height: 3, background: ACCENT, marginBottom: 32 }} />
         <div style={{ ...monoStyle, color: EYEBROW_GRAY, marginBottom: 24, letterSpacing: '0.18em' }}>
-          {category}
+          {eyebrow}
         </div>
         <h1 className="hero-heading" style={{
           fontFamily: serif, fontWeight: 700, color: INK,
           fontSize: 'clamp(44px, 7vw, 76px)', lineHeight: 1.05, letterSpacing: '-0.02em',
           margin: '0 0 24px', maxWidth: 820,
         }}>
-          {config.name}
+          {heading}
         </h1>
         <p className="hero-sub" style={{
           fontFamily: sans, fontSize: 'clamp(17px, 2vw, 21px)', color: G600,

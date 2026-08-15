@@ -294,6 +294,15 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   padding: '36px 28px',
                   display: 'flex',
                   flexDirection: 'column',
+                  transition: 'border-color 150ms ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C108AB'; }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = isRecommended
+                    ? DS.accent
+                    : isEntry
+                      ? DS.border
+                      : 'transparent';
                 }}
               >
                 {/* Most Popular badge */}
@@ -600,23 +609,23 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
           {[
             {
               q: 'Can I cancel anytime?',
-              a: 'Yes. Cancel any paid subscription at any time. You keep access until the end of your current billing period, after which your account returns to Executive Introduction status.',
+              a: 'Cancel anytime. You keep access through your current billing period, then return to Executive Introduction.',
             },
             {
               q: 'What is Executive Introduction?',
-              a: 'Executive Introduction is our complimentary entry tier. You get one complimentary assessment baseline, basic NEXUS chat access, and a personal profile — no credit card required. It is the natural starting point before upgrading.',
+              a: 'Complimentary entry tier. One assessment baseline, basic NEXUS chat, personal profile. No credit card required.',
             },
             {
               q: 'What is the difference between Professional and Executive?',
-              a: 'Professional unlocks all 6 leadership assessments, full NEXUS access, and complete results history. Executive adds branded PDF reports, priority NEXUS responses, and advanced insights. Professional is the most popular tier; Executive is for users who want premium depth.',
+              a: 'Professional: all 6 assessments, full NEXUS access, results history. Executive adds branded PDFs, priority NEXUS, advanced insights. Professional is most popular; Executive is premium depth.',
             },
             {
               q: 'Do you offer team pricing?',
-              a: 'Yes. Our Council and Enterprise tiers are designed for teams and organizations — seat-based deployment, SSO, custom training, and a dedicated contact. These are not self-serve; contact us to discuss your needs.',
+              a: 'Yes. Council and Enterprise tiers: seat-based deployment, SSO, custom training, dedicated contact. Not self-serve — contact us.',
             },
             {
               q: 'How do miles work?',
-              a: 'Miles are the LYC Intelligence currency. Professional and Executive tiers receive a monthly miles allowance on their billing anniversary. You spend miles to run additional assessments and access premium features. Executive Introduction accounts do not receive a monthly allowance but can still explore NEXUS and assessment previews.',
+              a: 'Miles are LYC currency. Pro/Executive get a monthly allowance on billing anniversary. Spend on extra assessments and premium features. Executive Intro gets no allowance but can explore NEXUS and previews.',
             },
           ].map((faq) => (
             <div key={faq.q} style={{ background: DS.bg, border: `1px solid ${DS.border}`, padding: '24px 24px' }}>

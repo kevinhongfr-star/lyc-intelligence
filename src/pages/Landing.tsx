@@ -74,7 +74,7 @@ const CAPABILITIES = [
   {
     icon: BadgeDollarSign,
     title: 'Simple transparent pricing',
-    desc: 'Pay for assessments à la carte from $99, or subscribe for a monthly allocation and deeper benefits. No fluff, no hidden fees.',
+    desc: 'Pay for assessments à la carte from $99, or subscribe for a monthly allocation and deeper benefits. Transparent pricing. Clear value.',
     href: '/pricing',
     cta: 'View pricing',
   },
@@ -108,9 +108,67 @@ function TierBadge({ label, color = DS.accent }: { label: string; color?: string
   );
 }
 
+// X5-7: Outcome-first card copy — code → { eyebrow, title }
+const CARD_COPY: Record<string, { eyebrow: string; title: string }> = {
+  CPI: {
+    eyebrow: 'CPI · FLAGSHIP',
+    title: 'Benchmark your C-suite positioning against 10 years of real APAC placements',
+  },
+  LEAP: {
+    eyebrow: 'LEAP · LEADERSHIP',
+    title: 'Map how you decide, under pressure and when stakes are quiet',
+  },
+  SPARK: {
+    eyebrow: 'SPARK · AI READINESS',
+    title: 'See exactly where AI will expose gaps in your leadership mandate',
+  },
+  IMPACT: {
+    eyebrow: 'IMPACT · BOARD',
+    title: 'Know your real boardroom impact before your next committee',
+  },
+  PRISM: {
+    eyebrow: 'PRISM · BRAND',
+    title: 'Get clear on transferable strengths between mandates',
+  },
+  FORGE: {
+    eyebrow: 'FORGE · SALES',
+    title: 'Match your selling strengths to the stage of business you\'re building',
+  },
+  BRIDGE: {
+    eyebrow: 'BRIDGE · CROSS-BORDER',
+    title: 'See where cross-border gaps will derail your next APAC mandate',
+  },
+  DRIVE: {
+    eyebrow: 'DRIVE · MOTIVATION',
+    title: 'Find the incentives that actually keep you engaged',
+  },
+  QUEST: {
+    eyebrow: 'QUEST · PERFORMANCE',
+    title: 'Executive performance that doesn\'t burn out by quarter 3',
+  },
+  MOSAIC: {
+    eyebrow: 'MOSAIC · PARTNERSHIPS',
+    title: 'Read the institutional terrain in your next partnership',
+  },
+  COACH: {
+    eyebrow: 'COACH · MANAGEMENT',
+    title: 'Know exactly what kind of coach you\'ll be for your team',
+  },
+};
+
 function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
   // Phase 9 Batch 6 ticket #1353: USD-first for visitors. Miles ≈ USD.
   const priceUsd = a.priceMiles; // miles and USD are 1:1
+  // X5-7: Use card copy override or fall back to legacy
+  const copy = CARD_COPY[a.code];
+  const eyebrow = copy?.eyebrow ?? a.code;
+  const title = copy?.title ?? a.name;
+  // X5-9: Build price line (not in eyebrow)
+  const isComplimentary = priceUsd <= 0;
+  const priceLine = isComplimentary
+    ? 'Executive Introduction — Complimentary'
+    : `From $${priceUsd} USD`;
+
   return (
     <a
       href={`/assessment/${a.code.toLowerCase()}`}
@@ -124,68 +182,40 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
         textDecoration: 'none',
         background: DS.card,
         border: `1px solid ${DS.cardBorder}`,
- 
         padding: wide ? '32px 28px' : '24px 20px',
         boxShadow: DS.shadow,
-        transition: 'all 0.25s ease',
+        transition: 'border-color 150ms ease',
         height: '100%',
       }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C108AB'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = DS.cardBorder; }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
-        <div>
-          <div
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: '10px',
-              letterSpacing: '0.2em',
-              // Ticket #1355: eyebrow labels are light gray, not accent
-              color: DS.eyebrow,
-              textTransform: 'uppercase',
-              marginBottom: '6px',
-            }}
-          >
-            {a.code}
-          </div>
-          <h3
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: wide ? '22px' : '17px',
-              fontWeight: 700,
-              color: DS.text,
-              margin: 0,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {a.name}
-          </h3>
-        </div>
-        <span
+      <div style={{ marginBottom: '16px' }}>
+        <div
           style={{
-            display: 'inline-flex',
-            alignItems: 'baseline',
-            gap: '2px',
-            fontFamily: DS.headingFont,
-            fontSize: wide ? '28px' : '20px',
-            fontWeight: 700,
-            color: DS.text,
-            lineHeight: 1,
+            fontFamily: DS.monoFont,
+            fontSize: '10px',
+            letterSpacing: '0.2em',
+            // Ticket #1355: eyebrow labels are light gray, not accent
+            color: DS.eyebrow,
+            textTransform: 'uppercase',
+            marginBottom: '6px',
           }}
         >
-          ${priceUsd}
-          <span
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: '9px',
-              letterSpacing: '0.1em',
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              marginLeft: '6px',
-              color: DS.mutedDim,
-            }}
-          >
-            USD
-          </span>
-        </span>
+          {eyebrow}
+        </div>
+        <h3
+          style={{
+            fontFamily: DS.headingFont,
+            fontSize: wide ? '22px' : '17px',
+            fontWeight: 700,
+            color: DS.text,
+            margin: 0,
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {title}
+        </h3>
       </div>
       <p
         style={{
@@ -193,12 +223,26 @@ function AssessmentCard({ a, wide }: { a: AssessmentInfo; wide?: boolean }) {
           fontSize: '13px',
           lineHeight: 1.55,
           color: DS.textSecondary,
-          margin: '0 0 16px',
+          margin: '0 0 12px',
           minHeight: wide ? '48px' : '60px',
         }}
       >
         {a.tagline || `${a.b2cName} — ${a.dimensions.length} dimensions, ${a.archetype_count} archetypes.`}
       </p>
+      {/* X5-9: Price moved under description, small muted */}
+      <div
+        style={{
+          fontFamily: DS.monoFont,
+          fontSize: '10px',
+          letterSpacing: '0.12em',
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          color: DS.muted,
+          marginBottom: '12px',
+        }}
+      >
+        {priceLine}
+      </div>
       <div
         style={{
           display: 'flex',
@@ -309,19 +353,23 @@ function renderTierGroup(label: string, accent: string, keys: string[]) {
 
 function PricingTableCard({ t }: { t: PricingTierRow }) {
   const highlight = !!t.highlight;
+  const baseBorder = highlight ? `2px solid ${DS.accent}` : `1px solid ${DS.cardBorder}`;
   return (
     <div
       className="card-hover"
       style={{
         background: highlight ? DS.bgDark : DS.card,
-        border: highlight ? `2px solid ${DS.accent}` : `1px solid ${DS.cardBorder}`,
+        border: baseBorder,
         padding: '28px 24px',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
         boxShadow: highlight ? `0 0 0 1px ${DS.accent}14, 0 20px 50px ${DS.accent}18` : DS.shadow,
         position: 'relative',
+        transition: 'border-color 150ms ease',
       }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C108AB'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = highlight ? DS.accent : DS.cardBorder; }}
     >
       {highlight && (
         <div
@@ -1408,14 +1456,16 @@ export function Landing() {
               style={{
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
- 
                 padding: '28px 24px',
                 textDecoration: 'none',
                 boxShadow: DS.shadow,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '12px',
+                transition: 'border-color 150ms ease',
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C108AB'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = DS.cardBorder; }}
             >
               <div style={{ display: 'inline-flex', width: '40px', height: '40px', background: `${DS.accent}12`, color: DS.accent, alignItems: 'center', justifyContent: 'center' }}>
                 <c.icon style={{ width: 18, height: 18 }} />

@@ -1,3 +1,6 @@
+// DEAD CODE — X5-23 audit (2026-08-15): No live imports of reportGenerator.ts found across src/ + api/.
+// Ticket X5-23 instructs not to delete yet. Remove after 2 clean releases + engineering sign-off.
+
 /**
  * services/reportGenerator.ts — legacy standalone jsPDF generator.
  *

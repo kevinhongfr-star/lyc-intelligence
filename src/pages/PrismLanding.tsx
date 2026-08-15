@@ -10,6 +10,8 @@ const config: AssessmentLandingConfig = {
   tagline: 'Career & Professional Branding',
   heroDescription:
     'Discover your leadership profile across five core dimensions. Benchmark against real executives. Get a personalized development plan in fifteen minutes.',
+  heroH1: 'A clear professional brand for executives between mandates',
+  heroEyebrow: 'PRISM · PROFESSIONAL BRAND LEGIBILITY',
   accent: DS.accent,
   prefix: 'prism',
   ctaLabel: 'Start the assessment',

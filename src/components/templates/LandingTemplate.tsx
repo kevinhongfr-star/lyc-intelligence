@@ -86,6 +86,10 @@ export interface LandingTemplateProps {
   categoryLabel: string;
   /** Tier badge text, e.g. "HERO ASSESSMENT". */
   tierBadge: string;
+  /** X5-7: Outcome-first H1 (replaces default "name — fullName"). If omitted, uses legacy format. */
+  heroH1?: string;
+  /** X5-7: Small uppercase eyebrow for code + full name. If omitted, uses "CODE · FULLNAME". */
+  heroEyebrow?: string;
 
   /** Page accent (hex). ONE accent per page. */
   accent: string;
@@ -373,6 +377,8 @@ export function LandingTemplate(props: LandingTemplateProps) {
     heroDescription,
     categoryLabel,
     tierBadge,
+    heroH1,
+    heroEyebrow,
     accent,
     accentDark,
     dimensions,
@@ -434,6 +440,19 @@ export function LandingTemplate(props: LandingTemplateProps) {
               >
                 {tierBadge}
               </div>
+              <div
+                style={{
+                  fontFamily: DS.monoFont,
+                  fontSize: 10,
+                  letterSpacing: '0.22em',
+                  color: DS.eyebrow,
+                  textTransform: 'uppercase',
+                  margin: '20px 0 10px',
+                  fontWeight: 500,
+                }}
+              >
+                {heroEyebrow ?? `${code} · ${fullName}`}
+              </div>
               <h1
                 style={{
                   fontFamily: DS.headingFont,
@@ -444,10 +463,9 @@ export function LandingTemplate(props: LandingTemplateProps) {
                   letterSpacing: '-0.02em',
                   maxWidth: 580,
                   margin: 0,
-                  marginTop: 28,
                 }}
               >
-                {name} — {fullName}
+                {heroH1 ?? `${name} — ${fullName}`}
               </h1>
               <p
                 style={{

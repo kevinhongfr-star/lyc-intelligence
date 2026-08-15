@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DS, TEAL, TEAL as ACCENT } from '@/tokens';
+import { DS, TEAL, ACCENT, ACCENT_DARK } from '@/tokens';
 import { Button } from '@/components/ui/Button';
 import { Card, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { SEO } from '@/components/seo/SEO';
@@ -8,7 +8,8 @@ import { Users, Target, TrendingUp, Briefcase, ChevronDown } from 'lucide-react'
 const COLOR_BG = DS.bgDark;
 const COLOR_TEXT_ON_DARK = DS.bg;
 const COLOR_MUTED_ON_DARK = 'rgba(255,255,255,0.62)';
-const ACCENT_DARKER = '#' + '007064';
+const PAGE_ACCENT = TEAL;
+const PAGE_ACCENT_DARKER = '#' + '007064';
 
 const CPI_DIMENSIONS = [
   { slug: 'strategic_orientation', name: 'Strategic Orientation', short: 'Strategic', desc: 'Long-horizon framing and trade-off discipline. Future-back thinking over tactical reaction.', weight: '22%', weightNote: '' },
@@ -46,7 +47,7 @@ function HexIcon({ size = 28 }: { size?: number }) {
       <polygon
         points="20,3 36,12 36,28 20,37 4,28 4,12"
         fill="none"
-        stroke={ACCENT}
+        stroke={PAGE_ACCENT}
         strokeWidth="1.5"
       />
     </svg>
@@ -56,7 +57,7 @@ function HexIcon({ size = 28 }: { size?: number }) {
 function CheckMark() {
   return (
     <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true" fill="none">
-      <path d="M4 10.5L8.5 15L16 6" stroke={ACCENT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 10.5L8.5 15L16 6" stroke={PAGE_ACCENT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -77,7 +78,7 @@ export function CpiFlagshipLanding() {
             from { stroke-dashoffset: 1200; }
             to { stroke-dashoffset: 0; }
           }
-          [data-cpi-page] .bg-accent { background: ${ACCENT} !important; border-color: ${ACCENT} !important; }
+          [data-cpi-page] .bg-accent { background: ${PAGE_ACCENT} !important; border-color: ${PAGE_ACCENT} !important; }
           @media (max-width: 768px) {
             [data-cpi-page] .cpi-hero-grid { grid-template-columns: 1fr !important; }
             [data-cpi-page] .cpi-3layer-svg { display: none !important; }
@@ -94,14 +95,17 @@ export function CpiFlagshipLanding() {
         <section id="cpi-hero" style={{ background: COLOR_BG }}>
           <div className="cpi-hero-grid mx-auto" style={{ maxWidth: 1200, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1.05fr)', gap: 56, padding: '96px 32px' }}>
             <div>
-              <div style={{ background: ACCENT, color: DS.bg, fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.20em', padding: '4px 10px', display: 'inline-block', textTransform: 'uppercase' }}>
+              <div style={{ background: PAGE_ACCENT, color: DS.bg, fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.20em', padding: '4px 10px', display: 'inline-block', textTransform: 'uppercase', fontWeight: 600 }}>
                 LYC FLAGSHIP ASSESSMENT
               </div>
-              <h1 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(40px, 6vw, 68px)', fontWeight: 700, color: COLOR_TEXT_ON_DARK, lineHeight: 1.08, letterSpacing: '-0.02em', maxWidth: 580, marginTop: 28, margin: 0, marginTop: 28 }}>
-                CPI — Core Professional Insight
+              <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.22em', color: DS.eyebrow, textTransform: 'uppercase', margin: '20px 0 10px', fontWeight: 500 }}>
+                CPI · CAREER POSITIONING INDEX
+              </div>
+              <h1 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(40px, 6vw, 68px)', fontWeight: 700, color: COLOR_TEXT_ON_DARK, lineHeight: 1.08, letterSpacing: '-0.02em', maxWidth: 580, margin: 0 }}>
+                The leadership standard boards use to benchmark C-suite positioning
               </h1>
               <p style={{ fontFamily: DS.bodyFont, fontSize: 'clamp(15px, 1.5vw, 17px)', color: COLOR_MUTED_ON_DARK, lineHeight: 1.55, maxWidth: 540, marginTop: 18 }}>
-                The flagship executive self-awareness assessment. 6 dimensions. 6 archetypes. 3 layers of depth.
+                The flagship executive self-awareness assessment — CPI (Core Professional Insight). 6 dimensions. 6 archetypes. 3 layers of depth.
               </p>
               <div style={{ display: 'flex', gap: 12, marginTop: 28, flexWrap: 'wrap' }}>
                 <a
@@ -124,7 +128,7 @@ export function CpiFlagshipLanding() {
                     cursor: 'pointer',
                     transition: `background ${DS.transition}`,
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARKER)}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARK)}
                   onMouseLeave={(e) => (e.currentTarget.style.background = ACCENT)}
                 >
                   Start Your Complimentary Baseline
@@ -187,8 +191,8 @@ export function CpiFlagshipLanding() {
                       const r = values[i];
                       return `${Math.cos(angle) * r},${Math.sin(angle) * r}`;
                     }).join(' ')}
-                    fill={`${ACCENT}2E`}
-                    stroke={ACCENT}
+                    fill={`${PAGE_ACCENT}2E`}
+                    stroke={PAGE_ACCENT}
                     strokeWidth="2"
                   />
 
@@ -203,7 +207,7 @@ export function CpiFlagshipLanding() {
                     const ly = Math.sin(angle) * 240;
                     return (
                       <g key={dim.slug}>
-                        <circle cx={px} cy={py} r={highlight ? 5 : 3.5} fill={highlight ? ACCENT : 'rgba(255,255,255,0.5)'} stroke={highlight ? ACCENT : 'rgba(255,255,255,0.3)'} strokeWidth="1.5" />
+                        <circle cx={px} cy={py} r={highlight ? 5 : 3.5} fill={highlight ? PAGE_ACCENT : 'rgba(255,255,255,0.5)'} stroke={highlight ? PAGE_ACCENT : 'rgba(255,255,255,0.3)'} strokeWidth="1.5" />
                         <text
                           className="cpi-dim-label"
                           x={lx}
@@ -239,10 +243,10 @@ export function CpiFlagshipLanding() {
               {CPI_DIMENSIONS.map((dim) => {
                 const highlighted = dim.slug === 'strategic_orientation' || dim.slug === 'self_awareness';
                 return (
-                  <Card key={dim.slug} variant="flat" interactive={false} style={{ borderLeft: highlighted ? `3px solid ${ACCENT}` : `1px solid ${DS.cardBorder}`, padding: 0 }}>
+                  <Card key={dim.slug} variant="flat" interactive={false} style={{ borderLeft: highlighted ? `3px solid ${PAGE_ACCENT}` : `1px solid ${DS.cardBorder}`, padding: 0 }}>
                     <CardContent style={{ padding: 24 }}>
                       <CardTitle style={{ fontSize: 18, fontWeight: 600, color: DS.text }}>{dim.name}</CardTitle>
-                      <div style={{ fontFamily: DS.monoFont, fontSize: 9, color: ACCENT, textTransform: 'uppercase', letterSpacing: '0.18em', marginTop: 6 }}>
+                      <div style={{ fontFamily: DS.monoFont, fontSize: 9, color: PAGE_ACCENT, textTransform: 'uppercase', letterSpacing: '0.18em', marginTop: 6 }}>
                         {dim.short}
                       </div>
                       <CardDescription style={{ fontSize: 14, color: DS.textSecondary, lineHeight: 1.55, marginTop: 10 }}>
@@ -274,7 +278,7 @@ export function CpiFlagshipLanding() {
               <svg className="cpi-3layer-svg" viewBox="0 0 1100 340" style={{ maxWidth: '100%', display: 'block' }}>
                 <defs>
                   <marker id="cpi-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-                    <path d="M 0 0 L 10 5 L 0 10 z" fill={ACCENT} />
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill={PAGE_ACCENT} />
                   </marker>
                 </defs>
 
@@ -289,9 +293,9 @@ export function CpiFlagshipLanding() {
                   return (
                     <g key={i}>
                       <rect x={x} y="40" width="310" height="260" fill={DS.bg} stroke={DS.cardBorder} strokeWidth="1" />
-                      <circle cx={x + 155} cy="28" r="18" fill={ACCENT} />
+                      <circle cx={x + 155} cy="28" r="18" fill={PAGE_ACCENT} />
                       <text x={x + 155} y="34" textAnchor="middle" fill={DS.bg} fontFamily={DS.monoFont} fontSize="12" fontWeight="600">{i + 1}</text>
-                      <text x={x + 24} y="88" fill={ACCENT} fontFamily={DS.monoFont} fontSize="10" letterSpacing="0.2em" textTransform="uppercase">{l.mono}</text>
+                      <text x={x + 24} y="88" fill={DS.muted} fontFamily={DS.monoFont} fontSize="10" letterSpacing="0.2em" textTransform="uppercase">{l.mono}</text>
                       <foreignObject x={x + 24} y="110" width="262" height="160">
                         <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontFamily: DS.bodyFont }}>
                           <h4 style={{ fontFamily: DS.headingFont, fontSize: 18, fontWeight: 600, color: DS.text, margin: 0, lineHeight: 1.35 }}>{l.title}</h4>
@@ -302,8 +306,8 @@ export function CpiFlagshipLanding() {
                   );
                 })}
 
-                <line x1="350" y1="170" x2="390" y2="170" stroke={ACCENT} strokeWidth="2" markerEnd="url(#cpi-arrow)" />
-                <line x1="700" y1="170" x2="740" y2="170" stroke={ACCENT} strokeWidth="2" markerEnd="url(#cpi-arrow)" />
+                <line x1="350" y1="170" x2="390" y2="170" stroke={PAGE_ACCENT} strokeWidth="2" markerEnd="url(#cpi-arrow)" />
+                <line x1="700" y1="170" x2="740" y2="170" stroke={PAGE_ACCENT} strokeWidth="2" markerEnd="url(#cpi-arrow)" />
               </svg>
 
               <div className="cpi-3layer-stack" style={{ display: 'none', gap: 16, gridTemplateColumns: '1fr' }}>
@@ -315,8 +319,8 @@ export function CpiFlagshipLanding() {
                   <Card key={l.idx} variant="flat" interactive={false}>
                     <CardContent style={{ padding: 24 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                        <div style={{ width: 36, height: 36, background: ACCENT, color: DS.bg, fontFamily: DS.monoFont, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{l.idx}</div>
-                        <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.2em', color: ACCENT, textTransform: 'uppercase' }}>{l.mono}</div>
+                        <div style={{ width: 36, height: 36, background: PAGE_ACCENT, color: DS.bg, fontFamily: DS.monoFont, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{l.idx}</div>
+                        <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.2em', color: DS.muted, textTransform: 'uppercase' }}>{l.mono}</div>
                       </div>
                       <CardTitle style={{ fontSize: 18, fontWeight: 600, color: DS.text, marginTop: 16 }}>{l.title}</CardTitle>
                       <CardDescription style={{ fontSize: 14, color: DS.textSecondary, lineHeight: 1.55, marginTop: 10 }}>{l.body}</CardDescription>
@@ -343,7 +347,7 @@ export function CpiFlagshipLanding() {
                   <Card key={dim.slug} variant="flat" interactive={false}>
                     <CardContent style={{ padding: 24 }}>
                       <CardTitle style={{ fontSize: 18, fontWeight: 600, color: DS.text }}>{dim.name}</CardTitle>
-                      <div style={{ fontFamily: DS.monoFont, fontSize: 11, color: ACCENT, textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: 6 }}>
+                      <div style={{ fontFamily: DS.monoFont, fontSize: 11, color: PAGE_ACCENT, textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: 6 }}>
                         {dim.short} {dim.weight ? `× ${dim.weight}` : ''}
                       </div>
                       {dim.weightNote && (
@@ -379,7 +383,7 @@ export function CpiFlagshipLanding() {
                       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
                         <HexIcon size={32} />
                       </div>
-                      <div style={{ fontFamily: DS.monoFont, fontSize: 22, color: ACCENT, fontWeight: 600 }}>{a.code}</div>
+                      <div style={{ fontFamily: DS.monoFont, fontSize: 22, color: PAGE_ACCENT, fontWeight: 600 }}>{a.code}</div>
                       <CardTitle style={{ fontSize: 16, fontWeight: 600, color: DS.text, marginTop: 4 }}>{a.name}</CardTitle>
                       <CardDescription style={{ fontSize: 12, color: DS.textSecondary, lineHeight: 1.45, marginTop: 8, maxWidth: 170, marginLeft: 'auto', marginRight: 'auto' }}>
                         {a.tagline}
@@ -404,7 +408,7 @@ export function CpiFlagshipLanding() {
                   <svg viewBox="0 0 400 220" style={{ maxWidth: '100%', display: 'block' }} aria-label="CPI composite score 0-100 illustration">
                     <g transform="translate(200, 200)">
                       <path d="M -160 0 A 160 160 0 0 1 160 0" fill="none" stroke={DS.border} strokeWidth="20" strokeLinecap="butt" />
-                      <path d="M -160 0 A 160 160 0 0 1 160 0" fill="none" stroke={ACCENT} strokeWidth="20" strokeLinecap="butt"
+                      <path d="M -160 0 A 160 160 0 0 1 160 0" fill="none" stroke={PAGE_ACCENT} strokeWidth="20" strokeLinecap="butt"
                         strokeDasharray={`${Math.PI * 160} ${Math.PI * 160}`}
                         strokeDashoffset={Math.PI * 160 * 0.24} />
                       {[0, 1, 2, 3, 4, 5].map((i) => {
@@ -429,21 +433,21 @@ export function CpiFlagshipLanding() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
                   <Card variant="flat" interactive={false}>
                     <CardContent style={{ padding: 24 }}>
-                      <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.2em', color: ACCENT, textTransform: 'uppercase' }}>OVERALL</div>
+                      <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.2em', color: DS.muted, textTransform: 'uppercase' }}>OVERALL</div>
                       <CardTitle style={{ fontSize: 17, fontWeight: 600, marginTop: 8 }}>Composite score 0–100</CardTitle>
                       <CardDescription style={{ fontSize: 14, marginTop: 8, lineHeight: 1.55 }}>A single aligned number capturing your full dimensional profile, benchmarked against real executive populations.</CardDescription>
                     </CardContent>
                   </Card>
                   <Card variant="flat" interactive={false}>
                     <CardContent style={{ padding: 24 }}>
-                      <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.2em', color: ACCENT, textTransform: 'uppercase' }}>DIMENSIONS</div>
+                      <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.2em', color: DS.muted, textTransform: 'uppercase' }}>DIMENSIONS</div>
                       <CardTitle style={{ fontSize: 17, fontWeight: 600, marginTop: 8 }}>Individual dimension scores</CardTitle>
                       <CardDescription style={{ fontSize: 14, marginTop: 8, lineHeight: 1.55 }}>Six independent 0–100 dimension scores with written interpretation. See exactly where you stand on each axis.</CardDescription>
                     </CardContent>
                   </Card>
                   <Card variant="flat" interactive={false}>
                     <CardContent style={{ padding: 24 }}>
-                      <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.2em', color: ACCENT, textTransform: 'uppercase' }}>ARCHETYPE</div>
+                      <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.2em', color: DS.muted, textTransform: 'uppercase' }}>ARCHETYPE</div>
                       <CardTitle style={{ fontSize: 17, fontWeight: 600, marginTop: 8 }}>Archetype match strength</CardTitle>
                       <CardDescription style={{ fontSize: 14, marginTop: 8, lineHeight: 1.55 }}>Primary + secondary archetype classification with match confidence and pattern explanations tied to real operating behaviors.</CardDescription>
                     </CardContent>
@@ -477,7 +481,7 @@ export function CpiFlagshipLanding() {
                 const Icon = item.icon;
                 return (
                   <div key={i} style={{ display: 'flex', gap: 20 }}>
-                    <div style={{ flexShrink: 0, color: ACCENT }}>
+                    <div style={{ flexShrink: 0, color: PAGE_ACCENT }}>
                       <Icon size={24} strokeWidth={1.75} />
                     </div>
                     <div>
@@ -513,13 +517,13 @@ export function CpiFlagshipLanding() {
                   target="_blank"
                   rel="noopener"
                   style={{
-                    color: ACCENT,
+                    color: PAGE_ACCENT,
                     fontFamily: DS.bodyFont,
                     fontSize: 13,
                     fontWeight: 600,
                     textTransform: 'uppercase',
                     letterSpacing: '0.16em',
-                    borderBottom: `1px solid ${ACCENT}`,
+                    borderBottom: `1px solid ${PAGE_ACCENT}`,
                     paddingBottom: 2,
                     marginTop: 28,
                     textDecoration: 'none',
@@ -542,7 +546,7 @@ export function CpiFlagshipLanding() {
                     <React.Fragment key={s.label}>
                       <div style={{ textAlign: 'center', flex: 1 }}>
                         <div style={{ fontFamily: DS.headingFont, fontSize: 48, fontWeight: 700, color: COLOR_TEXT_ON_DARK, lineHeight: 1 }}>{s.num}</div>
-                        <div style={{ fontFamily: DS.monoFont, fontSize: 10, color: ACCENT, letterSpacing: '0.18em', textTransform: 'uppercase', marginTop: 8 }}>{s.label}</div>
+                        <div style={{ fontFamily: DS.monoFont, fontSize: 10, color: DS.mutedDim, letterSpacing: '0.18em', textTransform: 'uppercase', marginTop: 8 }}>{s.label}</div>
                         <div style={{ fontFamily: DS.bodyFont, fontSize: 13, color: COLOR_MUTED_ON_DARK, marginTop: 6 }}>{s.sub}</div>
                       </div>
                       {i < 2 && (
@@ -632,7 +636,7 @@ export function CpiFlagshipLanding() {
               textDecoration: 'none',
               transition: `background ${DS.transition}`,
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARKER)}
+            onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARK)}
             onMouseLeave={(e) => (e.currentTarget.style.background = ACCENT)}
           >
             Start Your Complimentary Baseline →
@@ -646,7 +650,7 @@ export function CpiFlagshipLanding() {
             style={{
               position: 'absolute',
               inset: 0,
-              background: `radial-gradient(circle at 50% 40%, ${ACCENT}0F 0%, transparent 70%)`,
+              background: `radial-gradient(circle at 50% 40%, ${PAGE_ACCENT}0F 0%, transparent 70%)`,
               pointerEvents: 'none',
               opacity: 1,
             }}
@@ -678,7 +682,7 @@ export function CpiFlagshipLanding() {
                   textDecoration: 'none',
                   transition: `background ${DS.transition}`,
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARKER)}
+                onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARK)}
                 onMouseLeave={(e) => (e.currentTarget.style.background = ACCENT)}
               >
                 Get Your Complimentary CPI Baseline
@@ -731,7 +735,7 @@ export function CpiFlagshipLanding() {
                       <span style={{ fontFamily: DS.headingFont, fontSize: 17, fontWeight: 600, color: DS.text, lineHeight: 1.4 }}>{item.q}</span>
                       <ChevronDown
                         size={20}
-                        color={open ? ACCENT : DS.muted}
+                        color={open ? PAGE_ACCENT : DS.muted}
                         style={{
                           flexShrink: 0,
                           marginLeft: 16,
@@ -768,7 +772,7 @@ export function CpiFlagshipLanding() {
               style={{
                 background: DS.bg,
                 border: `1px solid ${DS.cardBorder}`,
-                borderLeft: `3px solid ${ACCENT}`,
+                borderLeft: `3px solid ${PAGE_ACCENT}`,
                 padding: '40px 40px',
               }}
             >

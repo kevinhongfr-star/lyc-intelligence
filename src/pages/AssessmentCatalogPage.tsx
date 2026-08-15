@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { DS, TEAL } from '@/tokens';
+import { DS, TEAL, ACCENT, ACCENT_DARK } from '@/tokens';
 import {
   Card,
   CardContent,
@@ -204,9 +204,9 @@ function FlagshipCard() {
                   window.location.href = '/assessment/cpi';
                 }}
                 style={{
-                  background: PAGE_ACCENT,
+                  background: ACCENT,
                   color: DS.bg,
-                  border: `1px solid ${PAGE_ACCENT}`,
+                  border: `1px solid ${ACCENT}`,
                   fontFamily: DS.bodyFont,
                   fontSize: 13,
                   fontWeight: 600,
@@ -220,8 +220,8 @@ function FlagshipCard() {
                   textDecoration: 'none',
                   transition: DS.transition,
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = PAGE_ACCENT_DARK)}
-                onMouseLeave={(e) => (e.currentTarget.style.background = PAGE_ACCENT)}
+                onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARK)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = ACCENT)}
               >
                 Start CPI Assessment
               </a>
@@ -677,9 +677,9 @@ export function AssessmentCatalogPage() {
                     })
                   }
                   style={{
-                    background: PAGE_ACCENT,
+                    background: ACCENT,
                     color: DS.bg,
-                    border: `1px solid ${PAGE_ACCENT}`,
+                    border: `1px solid ${ACCENT}`,
                     fontFamily: DS.bodyFont,
                     fontSize: 13,
                     fontWeight: 600,
@@ -693,8 +693,8 @@ export function AssessmentCatalogPage() {
                     textDecoration: 'none',
                     transition: DS.transition,
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = PAGE_ACCENT_DARK)}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = PAGE_ACCENT)}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARK)}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = ACCENT)}
                 >
                   Start CPI Assessment →
                 </a>
