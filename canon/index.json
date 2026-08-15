@@ -1,0 +1,178 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-08-15",
+  "authority": "Akira — Diagnostic Content Integrity Lead",
+  "description": "Master index of all canonical diagnostic instruments. This is the single source of truth. Engine configs, UI strings, report templates, and all customer-facing surfaces must reference this canon.",
+  "naming_standard": "NAME — short outcome descriptor (em-dash, not hyphen)",
+  "total_instruments": 11,
+  "instruments": [
+    {
+      "code": "CPI",
+      "name": "CPI",
+      "descriptor": "China Leadership Pipeline Index",
+      "category": "Flagship (B2B)",
+      "pillar": "P1 Talent Pipeline Health",
+      "pillar_role": "flagship",
+      "dimensions": 6,
+      "archetypes": 6,
+      "business_model": "B2B Organizational",
+      "canon_file": "canon/instruments/cpi.json",
+      "deep_canon_file": "canon/instruments/cpi.md"
+    },
+    {
+      "code": "PRISM",
+      "name": "PRISM",
+      "descriptor": "professional branding",
+      "category": "Advisory",
+      "pillar": "P3 Strategic & Organizational Impact",
+      "pillar_role": "related",
+      "dimensions": 5,
+      "archetypes": 10,
+      "business_model": "B2C Individual",
+      "canon_file": "canon/instruments/prism.json",
+      "deep_canon_file": "canon/instruments/prism.md"
+    },
+    {
+      "code": "SPARK",
+      "name": "SPARK",
+      "descriptor": "AI leadership readiness",
+      "category": "Advisory",
+      "pillar": "P4 AI-Augmented Leadership",
+      "pillar_role": "flagship",
+      "dimensions": 3,
+      "archetypes": 4,
+      "business_model": "B2C Individual",
+      "canon_file": "canon/instruments/spark.json",
+      "deep_canon_file": "canon/instruments/spark.md"
+    },
+    {
+      "code": "BRIDGE",
+      "name": "BRIDGE",
+      "descriptor": "cross-cultural relational intelligence",
+      "category": "Advisory",
+      "pillar": "P2 Cross-Border Leadership Effectiveness",
+      "pillar_role": "flagship",
+      "dimensions": 6,
+      "archetypes": 6,
+      "business_model": "B2C Individual",
+      "canon_file": "canon/instruments/bridge.json",
+      "deep_canon_file": "canon/instruments/bridge.md"
+    },
+    {
+      "code": "FORGE",
+      "name": "FORGE",
+      "descriptor": "sales excellence capability",
+      "category": "Advisory",
+      "pillar": "P4 AI-Augmented Leadership",
+      "pillar_role": "related",
+      "dimensions": 4,
+      "archetypes": 4,
+      "business_model": "B2C Individual",
+      "canon_file": "canon/instruments/forge.json",
+      "deep_canon_file": "canon/instruments/forge.md"
+    },
+    {
+      "code": "MOSAIC",
+      "name": "MOSAIC",
+      "descriptor": "institutional trust & relationship velocity",
+      "category": "Advisory",
+      "pillar": "P2 Cross-Border Leadership Effectiveness",
+      "pillar_role": "related",
+      "dimensions": 4,
+      "archetypes": 6,
+      "business_model": "B2C Individual",
+      "canon_file": "canon/instruments/mosaic.json",
+      "deep_canon_file": "canon/instruments/mosaic.md"
+    },
+    {
+      "code": "DRIVE",
+      "name": "DRIVE",
+      "descriptor": "motivational alignment",
+      "category": "SHIFT",
+      "pillar": "P2 Cross-Border Leadership Effectiveness",
+      "pillar_role": "related",
+      "dimensions": 5,
+      "archetypes": 10,
+      "archetype_label": "profiles",
+      "business_model": "B2C Individual",
+      "canon_file": "canon/instruments/drive.json",
+      "deep_canon_file": "canon/instruments/drive.md"
+    },
+    {
+      "code": "QUEST",
+      "name": "QUEST",
+      "descriptor": "strategic market positioning",
+      "category": "SHIFT",
+      "pillar": "P3 Strategic & Organizational Impact",
+      "pillar_role": "related",
+      "dimensions": 6,
+      "archetypes": 10,
+      "business_model": "B2C Individual",
+      "canon_file": "canon/instruments/quest.json",
+      "deep_canon_file": "canon/instruments/quest.md"
+    },
+    {
+      "code": "LEAP",
+      "name": "LEAP",
+      "descriptor": "competitive positioning",
+      "category": "SHIFT",
+      "pillar": "P1 Talent Pipeline Health",
+      "pillar_role": "related",
+      "dimensions": 5,
+      "archetypes": 17,
+      "business_model": "B2C Individual",
+      "canon_file": "canon/instruments/leap.json",
+      "deep_canon_file": "canon/instruments/leap.md"
+    },
+    {
+      "code": "COACH",
+      "name": "COACH",
+      "descriptor": "executive coaching fit",
+      "category": "SHIFT",
+      "pillar": "P1 Talent Pipeline Health",
+      "pillar_role": "related",
+      "dimensions": 4,
+      "archetypes": 5,
+      "business_model": "B2C Individual",
+      "canon_file": "canon/instruments/coach.json",
+      "deep_canon_file": "canon/instruments/coach.md"
+    },
+    {
+      "code": "IMPACT",
+      "name": "IMPACT",
+      "descriptor": "board & stakeholder impact",
+      "category": "SHIFT (Composite)",
+      "pillar": "P3 Strategic & Organizational Impact",
+      "pillar_role": "flagship",
+      "dimensions": 5,
+      "archetypes": 8,
+      "business_model": "B2B + B2C",
+      "note": "8 person archetypes + 2 matrix axes (not counted as archetypes)",
+      "canon_file": "canon/instruments/impact.json",
+      "deep_canon_file": "canon/instruments/impact.md"
+    }
+  ],
+  "pillars": {
+    "P1": {
+      "name": "Talent Pipeline Health",
+      "flagship": "CPI",
+      "related": ["COACH", "LEAP", "QUEST"]
+    },
+    "P2": {
+      "name": "Cross-Border Leadership Effectiveness",
+      "flagship": "BRIDGE",
+      "related": ["DRIVE", "MOSAIC"]
+    },
+    "P3": {
+      "name": "Strategic & Organizational Impact",
+      "flagship": "IMPACT",
+      "related": ["PRISM", "QUEST"]
+    },
+    "P4": {
+      "name": "AI-Augmented Leadership",
+      "flagship": "SPARK",
+      "related": ["FORGE"],
+      "note": "QUEST D6 (AI Readiness) also feeds this pillar"
+    }
+  }
+}

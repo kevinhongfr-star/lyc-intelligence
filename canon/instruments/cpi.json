@@ -1,0 +1,177 @@
+{
+  "code": "CPI",
+  "name": "CPI",
+  "full_name": "CPI — China Leadership Pipeline Index",
+  "tagline": "Measure what matters in leadership pipeline health.",
+  "descriptor": "China Leadership Pipeline Index",
+  "short_descriptor": "leadership pipeline index",
+  "category": "Flagship (B2B)",
+  "pillar": "P1 Talent Pipeline Health",
+  "pillar_role": "flagship",
+  "business_model": "B2B Organizational Assessment",
+  "audience": "HR leaders, DEI heads, CHROs, Executive Teams in China-based MNCs and large domestic enterprises",
+  "delivery_format": "Organizational diagnostic (12Q Lite / 36Q Full), consultant-led debrief, written report",
+  "pricing_tier": "Flagship — custom enterprise pricing",
+
+  "outcome_statement": "A clear, benchmarked view of your organization's leadership pipeline health across six dimensions, with a specific pipeline archetype and prioritized action roadmap to close gaps.",
+
+  "use_cases": [
+    "Baseline pipeline health assessment for DEI strategy formulation",
+    "Annual benchmarking against 200-company China database",
+    "Board-level reporting on gender diversity progress",
+    "Pre- and post-intervention measurement of DEI program impact",
+    "M&A due diligence on leadership talent infrastructure"
+  ],
+
+  "scoring_framework": {
+    "method": "Weighted composite score across 6 dimensions",
+    "scale": "0-100 composite CPI score (percentage representation equivalent)",
+    "tier_bands": [
+      { "tier": "Tier 1", "label": "World-Class", "range": "80-100" },
+      { "tier": "Tier 2", "label": "Maturing", "range": "60-79.99" },
+      { "tier": "Tier 3", "label": "Developing", "range": "40-59.99" },
+      { "tier": "Tier 4", "label": "Nascent", "range": "0-39.99" }
+    ],
+    "benchmark": "200 companies, 8 industries, 25,000+ leaders — China market",
+    "response_scales": [
+      "numeric percentage inputs for representation metrics",
+      "5-point Likert for qualitative dimensions (culture, practices)"
+    ]
+  },
+
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "Talent Representation",
+      "short_name": "Representation",
+      "weight": 0.25,
+      "description": "Percentage of women in top leadership layers (ExCo and Senior Leadership Team). The most visible measure of pipeline output.",
+      "question_count": { "lite": 2, "full": 6 },
+      "type": "numeric + attitudinal"
+    },
+    {
+      "id": "D2",
+      "name": "Pipeline Depth",
+      "short_name": "Pipeline",
+      "weight": 0.20,
+      "description": "Depth and readiness of women in mid-to-senior levels, succession slate diversity, and high-potential identification coverage.",
+      "question_count": { "lite": 2, "full": 6 },
+      "type": "numeric + structural"
+    },
+    {
+      "id": "D3",
+      "name": "Development Investment",
+      "short_name": "Development",
+      "weight": 0.15,
+      "description": "Quality and quantity of development programs, stretch assignments, coaching investment, and promotion velocity for women.",
+      "question_count": { "lite": 2, "full": 6 },
+      "type": "numeric + programmatic"
+    },
+    {
+      "id": "D4",
+      "name": "Cultural Alignment",
+      "short_name": "Culture",
+      "weight": 0.15,
+      "description": "Degree of inclusive culture, psychological safety, and sense of belonging for women in the organization.",
+      "question_count": { "lite": 2, "full": 6 },
+      "type": "attitudinal"
+    },
+    {
+      "id": "D5",
+      "name": "Retention Risk",
+      "short_name": "Retention",
+      "weight": 0.15,
+      "description": "Attrition rates of women relative to men at each level, retention program effectiveness, and turnover risk at key career inflection points.",
+      "question_count": { "lite": 2, "full": 6 },
+      "type": "numeric + programmatic"
+    },
+    {
+      "id": "D6",
+      "name": "External Hiring Capability",
+      "short_name": "External Hire",
+      "weight": 0.10,
+      "description": "Organization's ability to attract and hire senior women externally, and the balance between external hiring and internal development.",
+      "question_count": { "lite": 2, "full": 6 },
+      "type": "numeric + strategic"
+    }
+  ],
+
+  "archetypes": [
+    {
+      "id": "A1",
+      "name": "The Glass Ceiling",
+      "pattern": "High D3 (Development Investment), Low D1 (Talent Representation)",
+      "summary": "Strong development velocity through mid-levels, but structural barriers prevent breakthrough to the executive layer.",
+      "primary_strength": "Internal development infrastructure",
+      "primary_gap": "Executive-level advancement barriers"
+    },
+    {
+      "id": "A2",
+      "name": "Shallow Bench",
+      "pattern": "High D1 (Talent Representation), Low D2 (Pipeline Depth)",
+      "summary": "Visible senior representation exists but the pipeline beneath is thin — unsustainable depth.",
+      "primary_strength": "Senior-level visibility and role models",
+      "primary_gap": "Mid-level ready-now talent bench"
+    },
+    {
+      "id": "A3",
+      "name": "Cultural Mismatch",
+      "pattern": "High D1+D2 (Structure), Low D4 (Cultural Alignment)",
+      "summary": "Structural metrics look good on paper, but day-to-day culture is not genuinely inclusive.",
+      "primary_strength": "Formal program infrastructure and representation",
+      "primary_gap": "Psychological safety and belonging"
+    },
+    {
+      "id": "A4",
+      "name": "Leaky Bucket",
+      "pattern": "High D2+D3 (Pipeline + Development), Low D5 (Retention)",
+      "summary": "Strong inflow and development, but disproportionate attrition at key career inflection points.",
+      "primary_strength": "Development velocity and early-career progression",
+      "primary_gap": "Retention at mid-to-senior levels"
+    },
+    {
+      "id": "A5",
+      "name": "External Dependency",
+      "pattern": "High D6 (External Hiring), Low D2 (Pipeline Depth)",
+      "summary": "Senior gaps filled primarily through external hiring — weak internal bench masked by external pipeline.",
+      "primary_strength": "Ability to attract senior external talent",
+      "primary_gap": "Internal development and promotion culture"
+    },
+    {
+      "id": "A6",
+      "name": "World-Class Pipeline",
+      "pattern": "All dimensions ≥ 70th percentile",
+      "summary": "Excellence across all six dimensions — sustainable, high-performing gender-balanced leadership pipeline.",
+      "primary_strength": "Balanced excellence and sustainable depth",
+      "primary_gap": "Complacency risk and intersectionality expansion"
+    }
+  ],
+
+  "fallback_archetype": {
+    "id": "A0",
+    "name": "Balanced Profile",
+    "note": "Fallback when no single archetype pattern dominates. Not counted in the '6 archetypes' product count — it's the residual/default."
+  },
+
+  "pillar_mapping": {
+    "primary_pillar": "P1 Talent Pipeline Health",
+    "cross_pillar_relevance": [
+      "P2 Cross-Border Leadership Effectiveness — Cultural Alignment dimension feeds cross-border inclusion insights"
+    ]
+  },
+
+  "key_methodological_notes": [
+    "Dual-tier: Lite (12Q, 2 per dimension) and Full (36Q, 6 per dimension) share the same scoring engine",
+    "Composite score is weighted (not simple average) — Representation carries the most weight at 25%",
+    "Archetype detection is pattern-based (high/low dimension pairs with minimum gap thresholds), not just highest score",
+    "Benchmark data is China-market specific (200 companies, 8 industries)",
+    "Results include industry comparison, percentile ranking, and priority-ranked action roadmap"
+  ],
+
+  "provenance": {
+    "dimensions": "CPI v2.0 scoring engine — DIMENSION_WEIGHTS constant (lines 23-29), names aligned to canon",
+    "archetypes": "CPI v2.0 scoring engine — ARCHETYPES constant (6 primary + 1 fallback)",
+    "scoring_logic": "cpi_scoring_engine_v2.py — CPIEngine class",
+    "benchmark": "Same source — INDUSTRY_BENCHMARKS constant (8 industries, 200 companies, 25000 profiles)"
+  }
+}

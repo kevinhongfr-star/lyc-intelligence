@@ -1,0 +1,281 @@
+{
+  "meta": {
+    "instrument_code": "COACH",
+    "canon_version": "1.0",
+    "status": "approved",
+    "last_updated": "2026-08-15",
+    "authority": "Akira — Diagnostic Content Integrity Lead",
+    "source_trace": [
+      "Diagnostic Portfolio Master Library — COACH",
+      "COACH scoring engine config (source: diagnostic_portfolio/06_scoring_engine_code/coach_config.json)",
+      "COACH Notion question bank (source: diagnostic_portfolio/07_question_banks/COACH_QB_notion.json)",
+      "4-Pillar Framework v1.4 (official locked version)"
+    ]
+  },
+  "identity": {
+    "code": "COACH",
+    "name": "COACH",
+    "full_name": "COACH — executive coaching fit",
+    "tagline": "Great coaches aren't born. They're calibrated.",
+    "category": "SHIFT",
+    "pillar": {
+      "pillar_code": "P1",
+      "pillar_name": "Talent Pipeline Health",
+      "is_flagship": false
+    },
+    "description": "A 24-item assessment that measures a leader's coaching capability in bilateral (cross-boundary) contexts across four dimensions: developmental orientation, adaptive coaching style, bilateral relationship quality, and coaching under constraints. It evaluates whether leaders can develop talent effectively across organisational and cultural boundaries, not just within their own teams.",
+    "ideal_use_case": "Coaching readiness assessment for leaders in cross-border or matrix roles; bilateral partnership leadership development; identifying leaders with strong coaching capability for talent development roles; coaching skill gap analysis for leadership development programmes."
+  },
+  "instrument_spec": {
+    "total_questions": 24,
+    "response_scale": "5-point Likert (1 = Strongly Disagree, 5 = Strongly Agree)",
+    "administration_time": "8–10 minutes",
+    "delivery_format": "Online self-assessment with instant HTML report",
+    "scoring_method": "Dimension-level normalised scores (0–20 each) + composite percentile (0–100)",
+    "reverse_coded_items": ["Q03", "Q05", "Q08", "Q11", "Q14", "Q17", "Q20", "Q23"]
+  },
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "Cross-Boundary Developmental Orientation",
+      "short_code": "CBDO",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "description": "Measures the degree to which a leader views developing people outside their direct reporting line — bilateral counterparts, partners, and cross-boundary colleagues — as a core responsibility rather than a discretionary investment.",
+      "what_high_means": "The leader invests as much effort in developing bilateral counterparts as their own team, views cross-boundary development as core responsibility, adjusts their approach when counterparts learn at different paces, and sustains developmental orientation even with slower learners.",
+      "what_low_means": "The leader finds it difficult to justify development investment in people outside their team, gets frustrated when counterparts develop slowly, and views cross-boundary development as discretionary rather than essential."
+    },
+    {
+      "id": "D2",
+      "name": "Adaptive Coaching Style",
+      "short_code": "ACS",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "description": "Measures the leader's ability to adapt their coaching approach to different people, contexts, and cultures — including adjusting directness, tone, and structure based on the person's needs and cultural background.",
+      "what_high_means": "The leader uses multiple coaching approaches selected deliberately by context, adapts feedback style to cultural context, can describe specific differences between coaching challenge-need versus support-need people, and has changed their approach based on cultural feedback.",
+      "what_low_means": "The leader uses the same coaching approach with most people regardless of context, applies uniform directness across cultural contexts, and may not be aware that their approach lands differently in different cultures."
+    },
+    {
+      "id": "D3",
+      "name": "Bilateral Developmental Relationship Quality",
+      "short_code": "BDRQ",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "description": "Measures the quality of developmental trust in cross-boundary relationships — whether the leader can build the same level of developmental trust with bilateral counterparts as with their own team, and can hold counterparts accountable for development commitments.",
+      "what_high_means": "The leader has built developmental relationships with bilateral counterparts comparable to their own team, has specific trust-building methods for cross-boundary contexts, holds counterparts accountable for development commitments without damaging relationships, and has effective re-engagement strategies.",
+      "what_low_means": "The leader finds it takes much longer to build developmental trust across boundaries, is less direct about accountability with counterparts than with direct reports, and lacks clear strategies for re-engagement."
+    },
+    {
+      "id": "D4",
+      "name": "Coaching Under Bilateral Constraints",
+      "short_code": "CBC",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "description": "Measures the leader's ability to maintain a coaching stance under pressure, ambiguity, and authority uncertainty in bilateral contexts — where they may not have formal authority over the person they are developing.",
+      "what_high_means": "The leader maintains coaching orientation under performance pressure, knows their own trigger conditions for abandoning coaching and has strategies to prevent it, coaches effectively when authority is ambiguous or shared, and does not let authority uncertainty affect developmental conversations.",
+      "what_low_means": "The leader reverts to telling rather than coaching under pressure, struggles to maintain coaching stance when authority is unclear, and finds it difficult to coach when accountability authority is uncertain."
+    }
+  ],
+  "archetype_framework": {
+    "model_type": "strength-profile classification",
+    "logic": "Archetypes are defined by which dimensions score in the Strong range (16+/20). Combinations of strong dimensions define different coaching capability profiles. The model captures both the breadth (how many dimensions are strong) and the specific pattern of strength.",
+    "n_archetypes": 5
+  },
+  "archetypes": [
+    {
+      "id": "A1",
+      "name": "The Bilateral Developer",
+      "strength_dimensions": [
+        "Cross-Boundary Developmental Orientation",
+        "Adaptive Coaching Style",
+        "Bilateral Developmental Relationship Quality"
+      ],
+      "core_pattern": "Fully developed bilateral coaching capability. Maintains developmental orientation across contexts, adapts coaching style effectively, and builds deep trust with counterparts.",
+      "strengths": [
+        "Sees cross-boundary development as core responsibility, not optional",
+        "Adapts coaching style to person, context, and culture",
+        "Builds deep developmental trust across organisational and cultural boundaries",
+        "Creates lasting developmental relationships that outlast transactions"
+      ],
+      "growth_areas": [
+        "Coaching under constraints may be the weakest dimension — may need pressure-management strategies",
+        "May over-invest in development even when performance pressure requires faster results",
+        "Risk of blurring appropriate boundaries between developmental and accountability relationships"
+      ],
+      "development_focus": "Strengthen coaching under pressure and authority ambiguity; develop boundary-setting between developmental support and performance accountability; build pressure-management tactics that preserve coaching stance.",
+      "organisational_impact": "Can develop leadership talent in any bilateral context. Creates lasting developmental relationships that outlast specific transactions."
+    },
+    {
+      "id": "A2",
+      "name": "The Adaptive Coach",
+      "strength_dimensions": [
+        "Adaptive Coaching Style",
+        "Coaching Under Bilateral Constraints"
+      ],
+      "core_pattern": "Can adapt coaching approach to context and maintain coaching stance under pressure. May not invest as deeply in developmental orientation or relationship building, but effective in volatile contexts.",
+      "strengths": [
+        "Versatile coaching toolkit — multiple approaches for different contexts",
+        "Maintains coaching stance under pressure and ambiguity",
+        "Effective in volatile or rapidly changing bilateral environments",
+        "Culturally adaptive feedback delivery"
+      ],
+      "growth_areas": [
+        "Developmental orientation may be thinner — coaches effectively but doesn't necessarily see it as core responsibility",
+        "Developmental relationship depth may be limited — effective but not necessarily deep",
+        "May be more technique-driven than purpose-driven"
+      ],
+      "development_focus": "Deepen developmental orientation — connect coaching to broader talent development purpose; build deeper developmental relationship investment; develop relationship-building patience alongside technique.",
+      "organisational_impact": "Valuable in contexts where coaching approaches must shift rapidly. Provides coaching continuity during organisational disruption."
+    },
+    {
+      "id": "A3",
+      "name": "The Trust Builder",
+      "strength_dimensions": [
+        "Bilateral Developmental Relationship Quality",
+        "Cross-Boundary Developmental Orientation"
+      ],
+      "core_pattern": "Builds strong developmental relationships and maintains genuine developmental orientation. May be less adaptive in coaching style and struggle under bilateral constraints.",
+      "strengths": [
+        "Builds deep developmental trust across boundaries",
+        "Sees cross-boundary development as core responsibility",
+        "Strong at accountability within relationship context",
+        "Effective re-engagement strategies for off-track development"
+      ],
+      "growth_areas": [
+        "Coaching style may be less adaptive — uses a consistent approach across different people and contexts",
+        "May struggle to maintain coaching stance under pressure",
+        "Effectiveness may drop in high-constraint or authority-ambiguous situations"
+      ],
+      "development_focus": "Build adaptive coaching techniques — develop multiple approaches for different developmental needs; build coaching-under-pressure strategies; develop comfort with authority ambiguity.",
+      "organisational_impact": "Creates deep developmental relationships. Most effective in stable bilateral contexts where trust can develop over time."
+    },
+    {
+      "id": "A4",
+      "name": "The Pressure-Tested Coach",
+      "strength_dimensions": [
+        "Coaching Under Bilateral Constraints"
+      ],
+      "core_pattern": "Can maintain coaching stance under pressure but may lack the developmental orientation, adaptive style, or relationship depth for comprehensive bilateral development.",
+      "strengths": [
+        "Reliable under pressure — doesn't default to telling when stressed",
+        "Comfortable with authority ambiguity",
+        "Strong self-awareness about coaching trigger points",
+        "Effective in constrained or difficult bilateral situations"
+      ],
+      "growth_areas": [
+        "Developmental orientation may be limited — coaches effectively under pressure but doesn't proactively seek development opportunities",
+        "Coaching style may be narrow — one primary approach rather than adaptive repertoire",
+        "Relationship depth may be functional rather than developmental"
+      ],
+      "development_focus": "Build developmental orientation — expand from 'can coach when needed' to 'actively develops talent across boundaries'; build adaptive coaching style repertoire; deepen developmental relationship investment.",
+      "organisational_impact": "Reliable under pressure but limited in scope. Needs complementary coaching capabilities in the team."
+    },
+    {
+      "id": "A5",
+      "name": "The Transactional Developer",
+      "strength_dimensions": ["Adaptive Coaching Style (moderate)"],
+      "low_dimensions": ["Cross-Boundary Developmental Orientation"],
+      "core_pattern": "Applies coaching techniques but views development as discretionary rather than core responsibility. May coach effectively within own team but not across bilateral boundaries.",
+      "strengths": [
+        "Has some coaching technique and capability",
+        "May be effective with their own direct reports",
+        "Can adapt style when motivated to do so"
+      ],
+      "growth_areas": [
+        "Development stops at organisational boundaries — does not invest in developing counterparts",
+        "Views cross-boundary development as discretionary, not core responsibility",
+        "Limited bilateral impact on talent development",
+        "Risk of talent development gaps in partnership contexts"
+      ],
+      "development_focus": "Build developmental orientation for cross-boundary relationships — reframe bilateral development as strategic investment, not favour; build trust-building capability across boundaries; develop accountability methods that work without formal authority.",
+      "organisational_impact": "Limited bilateral impact. Development investment stops at organisational boundaries. Risk of talent development gaps in partnership contexts."
+    }
+  ],
+  "composite_scoring": {
+    "method": "Four-dimension average of normalised scores, converted to 0–100 composite",
+    "formula": "((D1 + D2 + D3 + D4) / 80) × 100",
+    "bands": [
+      {
+        "band": "Mature Coaching Leader",
+        "min": 80,
+        "max": 100,
+        "interpretation": "Demonstrates mature bilateral coaching capability across all dimensions. Can develop leadership talent effectively in cross-boundary contexts."
+      },
+      {
+        "band": "Developing Coaching Leader",
+        "min": 60,
+        "max": 79,
+        "interpretation": "Solid coaching foundation with specific dimensions requiring investment. Effective in familiar contexts but may struggle under bilateral constraints."
+      },
+      {
+        "band": "Emerging Coaching Awareness",
+        "min": 40,
+        "max": 59,
+        "interpretation": "Foundational coaching capability is developing but not yet reliable for bilateral leadership development. Significant risk of talent development gaps."
+      },
+      {
+        "band": "Coaching Capability Gap",
+        "min": 0,
+        "max": 39,
+        "interpretation": "Significant gaps across coaching dimensions. Bilateral talent development is at serious risk without targeted intervention."
+      }
+    ],
+    "dimension_verdicts": [
+      {
+        "verdict": "Strong",
+        "min": 16,
+        "max": 20,
+        "meaning": "Mature bilateral coaching capability"
+      },
+      {
+        "verdict": "Developing",
+        "min": 10,
+        "max": 15.9,
+        "meaning": "Emerging coaching capability with development opportunities"
+      },
+      {
+        "verdict": "Gap",
+        "min": 0,
+        "max": 9.9,
+        "meaning": "Significant coaching capability gap"
+      }
+    ]
+  },
+  "report_output": {
+    "sections": [
+      "Overall Coaching Capability Score (composite percentile)",
+      "Four-dimension coaching profile with verdicts",
+      "Primary coaching archetype with organisational impact narrative",
+      "Dimension-by-dimension strengths and growth areas",
+      "Cross-boundary vs. within-team coaching capability comparison",
+      "Personalised development recommendations"
+    ],
+    "report_format": "Interactive HTML report with visual dimension profile"
+  },
+  "drift_notes": {
+    "source_engine_drift": [
+      {
+        "field": "full_name",
+        "engine_value": "Bilateral Coaching Readiness & Leadership Development Architecture",
+        "canon_value": "COACH — executive coaching fit",
+        "severity": "P0",
+        "note": "Engine full_name was an invented official-sounding name containing banned word 'Architecture'; canonical name follows NAME — descriptor format per Messaging Canon v1.0"
+      },
+      {
+        "field": "dimension labels",
+        "engine_value": "Full uppercase names with abbreviations in labels (e.g., 'CROSS-BOUNDARY DEVELOPMENTAL ORIENTATION (CBDO)')",
+        "canon_value": "Title-case names with short_code field for acronym (e.g., 'Cross-Boundary Developmental Orientation' with short_code: 'CBDO')",
+        "severity": "P2",
+        "note": "Engine uses ALL CAPS dimension names — this is engineering convention, not user-facing. Canonical names use standard title case for all customer-facing usage."
+      }
+    ]
+  }
+}

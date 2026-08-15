@@ -1,0 +1,246 @@
+{
+  "meta": {
+    "instrument_code": "SPARK",
+    "canon_version": "1.0",
+    "status": "approved",
+    "last_updated": "2026-08-15",
+    "authority": "Akira — Diagnostic Content Integrity Lead",
+    "source_trace": [
+      "Diagnostic Portfolio Master Library — SPARK Flagship Build Plan v1.0",
+      "SPARK scoring engine config (source: diagnostic_portfolio/06_scoring_engine_code/spark_config.json)",
+      "SPARK Notion question bank (source: diagnostic_portfolio/07_question_banks/SPARK_QB_notion.json)",
+      "4-Pillar Framework v1.4 (official locked version)"
+    ]
+  },
+  "identity": {
+    "code": "SPARK",
+    "name": "SPARK",
+    "full_name": "SPARK — AI leadership readiness",
+    "tagline": "Know where you stand. Know where to invest.",
+    "category": "Advisory",
+    "pillar": {
+      "pillar_code": "P4",
+      "pillar_name": "AI-Augmented Leadership",
+      "is_flagship": true
+    },
+    "description": "A 27-item assessment that measures a leader's readiness to capture AI productivity gains across three interconnected layers: individual tool adoption, awareness of AI capability shifts in their domain, and organisational governance maturity. Leaders receive a composite AI readiness score, dimension-level verdicts, and a personalised archetype that describes their current relationship with AI at work.",
+    "ideal_use_case": "Leadership teams preparing for AI transformation; senior leaders assessing their own AI fluency gap; organisations benchmarking AI readiness before capability investment; pre-hire or pre-promotion assessment for technology-forward roles."
+  },
+  "instrument_spec": {
+    "total_questions": 27,
+    "response_scale": "5-point Likert (1 = Strongly Disagree, 5 = Strongly Agree)",
+    "administration_time": "8–12 minutes",
+    "delivery_format": "Online self-assessment with instant HTML report",
+    "scoring_method": "Dimension-level normalised scores (0–20 each) + composite percentile (0–100)",
+    "reverse_coded_items": [
+      "Q03", "Q05", "Q08",
+      "Q11", "Q14", "Q17",
+      "Q21", "Q24", "Q26"
+    ]
+  },
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "Individual AI Adoption Readiness",
+      "short_code": "IAAR",
+      "n_questions": 9,
+      "raw_max": 45,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 45) × 20",
+      "description": "Measures how deeply AI tools are integrated into the leader's own professional workflow — from occasional experimentation to systematic adoption, including their judgment to evaluate AI output quality and restructure established workflows.",
+      "what_high_means": "The leader uses AI tools deliberately and systematically, can evaluate output quality independently, and actively restructures workflows around AI capability.",
+      "what_low_means": "AI use remains experimental or absent; the leader has not developed reliable judgment about AI output quality and resists workflow change."
+    },
+    {
+      "id": "D2",
+      "name": "Capability Exposure Assessment",
+      "short_code": "CEA",
+      "n_questions": 9,
+      "raw_max": 45,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 45) × 20",
+      "description": "Measures the leader's awareness of what AI can and cannot do in their specific professional domain — including which of their own capabilities are at risk, which are becoming more valuable, and how their organisation compares to key partners.",
+      "what_high_means": "The leader has a current, detailed understanding of AI capabilities in their domain, has assessed personal and organisational capability exposure, and can identify AI asymmetry with counterpart organisations.",
+      "what_low_means": "The leader is uncertain about AI's current capabilities in their domain, has not assessed which skills are at risk, and is unaware of AI adoption gaps between their organisation and key partners."
+    },
+    {
+      "id": "D3",
+      "name": "Organisational Preparedness",
+      "short_code": "OP",
+      "n_questions": 9,
+      "raw_max": 45,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 45) × 20",
+      "description": "Measures the maturity of the leader's organisation on AI governance — including tool usage policies, output review processes, data infrastructure, workforce capability development, and strategic clarity about which capabilities to build.",
+      "what_high_means": "The organisation has formal AI governance, clear tool policies, output review processes, quality data infrastructure, and invests in workforce AI capability development — not just tool procurement.",
+      "what_low_means": "The organisation lacks formal AI governance, data infrastructure is inadequate for systematic AI deployment, and AI investment focuses on tool access rather than workforce capability building."
+    }
+  ],
+  "archetype_framework": {
+    "matrix_type": "2x2",
+    "axes": [
+      {
+        "axis": "Individual AI Readiness",
+        "description": "Combined signal from D1 (Individual AI Adoption Readiness) and D2 (Capability Exposure Assessment) — the leader's personal fluency and awareness",
+        "high_label": "High Individual AI Fluency",
+        "low_label": "Low Individual AI Fluency"
+      },
+      {
+        "axis": "Organisational AI Governance",
+        "description": "Signal from D3 (Organisational Preparedness) — the maturity of the organisation's AI governance, policy, and capability infrastructure",
+        "high_label": "High Governance Maturity",
+        "low_label": "Low Governance Maturity"
+      }
+    ],
+    "n_archetypes": 4,
+    "note": "The 3rd dimension (Capability Exposure Assessment) feeds into the Individual AI Readiness axis but is reported separately for diagnostic precision."
+  },
+  "archetypes": [
+    {
+      "id": "A1",
+      "name": "AI Champion",
+      "matrix_quadrant": "High Individual Fluency × High Governance Maturity",
+      "core_pattern": "Drives AI adoption as a strategic priority across the organisation",
+      "strengths": [
+        "Personally fluent with AI tools and domain capabilities",
+        "Operates within a mature governance structure",
+        "Can advocate for AI investment with credibility"
+      ],
+      "growth_areas": [
+        "Risk of over-advancing AI ahead of organisational absorption capacity",
+        "May create friction with less-ready stakeholders",
+        "Needs to balance speed with institutional readiness"
+      ],
+      "development_focus": "Channel advocacy into structured change management; build coalition across readiness levels; calibrate pacing to organisational capacity."
+    },
+    {
+      "id": "A2",
+      "name": "Skeptical Expert",
+      "matrix_quadrant": "High Individual Fluency × Low Governance Maturity",
+      "core_pattern": "Understands AI deeply; questions whether the organisation can manage it well",
+      "strengths": [
+        "Strong personal AI judgment and domain fluency",
+        "Realistic about what AI can and cannot do",
+        "Identifies genuine governance and quality risks"
+      ],
+      "growth_areas": [
+        "Skepticism can slow or block legitimate AI adoption",
+        "May undervalue incremental progress toward governance maturity",
+        "Risk of disengagement when organisational policy lags behind capability"
+      ],
+      "development_focus": "Channel critical thinking into building governance structures rather than blocking adoption; become a design partner for AI policy and quality assurance."
+    },
+    {
+      "id": "A3",
+      "name": "Policy-First Adopter",
+      "matrix_quadrant": "Low Individual Fluency × High Governance Maturity",
+      "core_pattern": "Operates in a well-governed AI environment but has not built personal fluency",
+      "strengths": [
+        "Works within clear AI policies and review processes",
+        "Organisation provides structural support for AI adoption",
+        "Lower risk of unregulated AI use"
+      ],
+      "growth_areas": [
+        "Governs or oversees AI without deep personal understanding of what it can do",
+        "May over-rely on process rather than expert judgment",
+        "Risk of falling behind peers who combine fluency with structure"
+      ],
+      "development_focus": "Build hands-on AI fluency in their specific domain; learn to evaluate AI output quality directly; develop personal workflow integration before relying on policy alone."
+    },
+    {
+      "id": "A4",
+      "name": "Unprepared Leader",
+      "matrix_quadrant": "Low Individual Fluency × Low Governance Maturity",
+      "core_pattern": "Neither personally fluent nor supported by organisational structure — significant AI capability gap",
+      "strengths": [
+        "Awareness of the gap is the first step; growth potential is high",
+        "No bad habits to unlearn from ungoverned experimentation"
+      ],
+      "growth_areas": [
+        "At structural disadvantage relative to AI-ready peers",
+        "Risk of making poor decisions about AI investment and policy",
+        "Team and organisational performance will increasingly reflect the gap"
+      ],
+      "development_focus": "Start with foundational AI literacy and personal tool adoption; simultaneously push for basic governance policies; address both individual and organisational levels in parallel."
+    }
+  ],
+  "composite_scoring": {
+    "method": "Three-dimension average of normalised scores, converted to 0–100 composite",
+    "formula": "((D1_normalised + D2_normalised + D3_normalised) / 60) × 100",
+    "bands": [
+      {
+        "band": "AI-Ready Organisation",
+        "min": 80,
+        "max": 100,
+        "interpretation": "Strong individual AI adoption, comprehensive capability awareness, and mature organisational governance. The leader and their organisation are positioned to capture AI productivity gains systematically."
+      },
+      {
+        "band": "Building AI Capability",
+        "min": 60,
+        "max": 79,
+        "interpretation": "Moderate AI readiness with meaningful gaps in at least one domain. Targeted investment needed to close specific capability or governance gaps."
+      },
+      {
+        "band": "Early AI Adoption",
+        "min": 40,
+        "max": 59,
+        "interpretation": "Foundational AI capability is developing but not yet systemic. Risk of falling behind peers who are investing more deliberately in AI adoption."
+      },
+      {
+        "band": "AI Capability Gap",
+        "min": 0,
+        "max": 39,
+        "interpretation": "Significant gaps across individual adoption, capability awareness, and organisational governance. Urgent investment required to avoid structural disadvantage."
+      }
+    ],
+    "dimension_verdicts": [
+      {
+        "verdict": "Strong",
+        "min": 16,
+        "max": 20,
+        "meaning": "Mature capability with demonstrated organisational impact"
+      },
+      {
+        "verdict": "Developing",
+        "min": 10,
+        "max": 15.9,
+        "meaning": "Emerging capability with targeted development opportunities"
+      },
+      {
+        "verdict": "Gap",
+        "min": 0,
+        "max": 9.9,
+        "meaning": "Significant capability gap requiring immediate attention"
+      }
+    ]
+  },
+  "report_output": {
+    "sections": [
+      "Overall AI Readiness Score (composite percentile)",
+      "Three-dimension profile with verdicts",
+      "Archetype assignment with narrative",
+      "Strengths and growth areas per dimension",
+      "Personalised development recommendations",
+      "Organisational context interpretation"
+    ],
+    "report_format": "Interactive HTML report with visual dimension profile"
+  },
+  "drift_notes": {
+    "source_engine_drift": [
+      {
+        "field": "full_name",
+        "engine_value": "AI Leadership Readiness & Enterprise Governance",
+        "canon_value": "SPARK — AI leadership readiness",
+        "severity": "P0",
+        "note": "Engine full_name was an invented official-sounding name; canonical name follows NAME — descriptor format per Messaging Canon v1.0"
+      },
+      {
+        "field": "archetype framing",
+        "engine_value": "Board-level governance framing (board_ai_fluency, Governance Bureaucrat, Disengaged Director)",
+        "canon_value": "Leadership readiness framing across individual fluency × organisational governance",
+        "severity": "P1",
+        "note": "Engine archetype labels used board-specific terminology that does not match the assessment's broader leadership scope; canonical framing aligns with actual item content and intended audience"
+      }
+    ]
+  }
+}
