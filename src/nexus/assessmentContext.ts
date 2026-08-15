@@ -37,7 +37,7 @@ export interface AssessmentResult {
   compositeScore: number | null;
   /** Tier label / band, e.g. "Executive" */
   tierLabel: string | null;
-  /** Archetype classification, e.g. "Strategic Architect" */
+  /** Archetype classification, e.g. "Strategic Builder" */
   archetype: string | null;
   /** Dimension scores keyed by dimension id → score 0-100 */
   dimensionScores: Record<string, number>;

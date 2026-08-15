@@ -25,10 +25,10 @@ const config: AssessmentFlowConfig = {
   landingPath: '/assessment/bridge',
   intro: {
     title: 'BRIDGE — Cross-Border Mandate Readiness',
-    body: 'You will answer 36 questions across six dimensions of APAC cross-border mandate readiness: mandate clarity, stakeholder navigation, communication alignment, pressure resilience, long-game thinking, and cultural fluency. Answer as you actually operate today — not as you intend to.',
+    body: 'You will answer 36 questions across six dimensions of APAC cross-border mandate readiness: Mandate Clarity, Stakeholder Relationship Building, Communication Alignment, Pressure Resilience, Long-Game Thinking, and Cultural Fluency. Answer as you actually operate today — not as you intend to.',
     duration: '~12 minutes',
     expectations: [
-      '36 questions across Mandate Clarity, Stakeholder Navigation, Communication Alignment, Pressure Resilience, Long-Game Thinking, and Cultural Fluency',
+      '36 questions across Mandate Clarity, Stakeholder Relationship Building, Communication Alignment, Pressure Resilience, Long-Game Thinking, and Cultural Fluency',
       '1–5 Likert scale — answer honestly; some items are reverse-worded on purpose',
       'Your progress auto-saves to this device; resume if interrupted',
       'On completion: composite score, dimension scorecard, matched mandate archetype, and targeted development priorities',

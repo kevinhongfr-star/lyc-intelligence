@@ -4,10 +4,8 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "MOSAIC";
-export const FULL_NAME = "MOSAIC — Cross-Border Partnership & Institutional Agility";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = MOSAIC — Cross-Border Partnership & Institutional Agility draft derived from reportPipeline.
-export const B2C_NAME = "MOSAIC — Cross-Border Partnership & Institutional Agility";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = MOSAIC — Cross-Border Partnership & Institutional Agility draft derived from reportPipeline.
+export const FULL_NAME = "MOSAIC — institutional trust & relationship velocity";
+export const B2C_NAME = "MOSAIC — institutional trust & relationship velocity";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 25;
 export const SCALE = "1-5 Likert";
@@ -20,7 +18,7 @@ export const TAGLINE = "JVs, alliances, partnerships, multi-party ecosystems. In
 export const DIMENSIONS = [
   {
     id: "D1",
-    name: "INSTITUTIONAL TRUST",
+    name: "Institutional Trust",
     question_ids: [
       "Q1",
       "Q2",
@@ -42,29 +40,29 @@ export const DIMENSIONS = [
   },
   {
     id: "D2",
-    name: "RELATIONSHIP VELOCITY",
+    name: "Relationship Velocity",
     question_ids: [
       "Q9",
       "Q10",
       "Q11",
       "Q12",
       "Q13",
-      "Q14",
-      "Q15"
+      "Q14"
     ],
     reverse_coded: [
       "Q13"
     ],
-    raw_max: 35,
-    n_questions: 7,
+    raw_max: 30,
+    n_questions: 6,
     sub_dimensions: [],
     normalised_max: 20,
-    normalised_formula: "(raw/35) x 20"
+    normalised_formula: "(raw/30) x 20"
   },
   {
     id: "D3",
-    name: "NORMATIVE FLEXIBILITY",
+    name: "Normative Flexibility",
     question_ids: [
+      "Q15",
       "Q16",
       "Q17",
       "Q18",
@@ -74,15 +72,15 @@ export const DIMENSIONS = [
     reverse_coded: [
       "Q19"
     ],
-    raw_max: 25,
-    n_questions: 5,
+    raw_max: 30,
+    n_questions: 6,
     sub_dimensions: [],
     normalised_max: 20,
-    normalised_formula: "(raw/25) x 20"
+    normalised_formula: "(raw/30) x 20"
   },
   {
     id: "D4",
-    name: "CONFLICT RESOLUTION",
+    name: "Conflict Resolution",
     question_ids: [
       "Q21",
       "Q22",
@@ -106,7 +104,7 @@ export const COMPOSITE_BANDS = [
     band: "Cross-Border Leader",
     min: 80,
     max: 100,
-    interpretation: "Mature cross-border partnership capability. Can navigate institutional complexity, build relationships at speed, and resolve conflicts arising from capability asymmetry."
+    interpretation: "Mature cross-border partnership capability. Can manage institutional complexity, build relationships at speed, and resolve conflicts arising from capability asymmetry."
   },
   {
     band: "Developing Cross-Border Capacity",
@@ -134,7 +132,7 @@ export const DIMENSION_VERDICTS = [
     min: 16,
     max: 20,
     verdict: "Strong",
-    meaning: "Mature cross-border partnership navigation capability"
+    meaning: "Mature cross-border partnership capability"
   },
   {
     dim: "all",
@@ -148,7 +146,7 @@ export const DIMENSION_VERDICTS = [
     min: 0,
     max: 9.9,
     verdict: "Gap",
-    meaning: "Significant cross-border navigation gap"
+    meaning: "Significant cross-border readiness gap"
   }
 ];
 

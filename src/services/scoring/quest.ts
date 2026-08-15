@@ -4,10 +4,8 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "QUEST";
-export const FULL_NAME = "QUEST — Executive Performance & Inquiry Rigour";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = QUEST — Executive Performance & Inquiry Rigour draft derived from reportPipeline.
-export const B2C_NAME = "QUEST — Executive Performance & Inquiry Rigour";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = QUEST — Executive Performance & Inquiry Rigour draft derived from reportPipeline.
+export const FULL_NAME = "QUEST — strategic market positioning";
+export const B2C_NAME = "QUEST — strategic market positioning";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
@@ -15,8 +13,7 @@ export const DELIVERY_MINUTES = 12;
 export const TIER = "core";
 export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 199;
-export const TAGLINE = "Six-executive-dimension framework. Where are you genuinely strong, and where will your next mandate expose gaps?";
-// TODO(Akira - X4-4): removed banned term from TAGLINE; replaced with "framework".
+export const TAGLINE = "Six-executive-dimension model. Where are you genuinely strong, and where will your next mandate expose gaps?";
 
 export const DIMENSIONS = [
   {
@@ -67,7 +64,6 @@ export const DIMENSIONS = [
       "Strategy-to-results conversion",
       "Execution consistency",
       "Performance visibility",
-      // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "structure")
       "Accountability structure",
       "Resource discipline"
     ],
@@ -118,7 +114,6 @@ export const DIMENSIONS = [
     raw_max: 30,
     n_questions: 6,
     sub_dimensions: [
-      // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "structure")
       "Team structure",
       "Succession development",
       "Team independence",
@@ -174,7 +169,6 @@ export const DIMENSIONS = [
     raw_max: 30,
     n_questions: 6,
     sub_dimensions: [
-      // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "Structure")
       "Decision Structure Readiness",
       "Data Governance Awareness",
       "AI Ethics & Risk Oversight",
@@ -244,27 +238,26 @@ export const DIMENSION_VERDICTS = [
 
 export const ARCHETYPES = [
   {
-    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
     name: "The Architect",
     "#": "1",
     profile: "High Strategic Thinking + High Adaptive Capacity, Advanced band",
     core_strength: "Designs robust systems and can pivot them when context changes. Rare combination at senior executive level.",
     key_risk: "Over-engineering; perfectionism slowing delivery; may underinvest in commercial urgency",
-    development_priority: "Delegation discipline; \"good enough\" calibration; commercial acumen deepening"
+    development_priority: "Delegation discipline; \"good enough\" threshold setting; commercial acumen deepening"
   },
   {
     name: "The Catalyst",
     "#": "2",
     profile: "High Commercial Acumen + High Adaptive Capacity, Advanced band",
-    core_strength: "Thrives in complexity and disruption; spots commercial opportunities others miss; acts fast",
-    key_risk: "Impatience with process and governance; may burn out teams; can deprioritise people development",
+    core_strength: "Thrives in complexity and market shifts; spots commercial opportunities others miss; acts fast",
+    key_risk: "Impatience with process and governance; may drain teams; can deprioritise people development",
     development_priority: "Sustainability mindset; team development investment; governance discipline"
   },
   {
     name: "The Diplomat",
     "#": "3",
     profile: "High People Leadership + High Strategic Thinking, Advanced band",
-    core_strength: "Builds coalitions, navigates politics, aligns diverse stakeholders around complex strategy",
+    core_strength: "Builds coalitions, manages stakeholder dynamics, aligns diverse groups around complex strategy",
     key_risk: "May prioritise harmony over hard decisions; can be slow to confront underperformance",
     development_priority: "Decisiveness under pressure; constructive confrontation capability; execution rigour"
   },
@@ -277,7 +270,7 @@ export const ARCHETYPES = [
     development_priority: "People leadership investment; long-term talent pipeline thinking; adaptive capacity"
   },
   {
-    name: "The Navigator",
+    name: "The Steward",
     "#": "5",
     profile: "High Adaptive Capacity + High People Leadership, Developing band",
     core_strength: "Guides teams through change with empathy and consistency; preserves team cohesion in uncertainty",
@@ -290,7 +283,6 @@ export const ARCHETYPES = [
     profile: "High Strategic Thinking, Developing band",
     core_strength: "Sees the big picture clearly; excellent at analysis and direction-setting",
     key_risk: "Execution gaps — vision without delivery mechanism; may rely on others for follow-through",
-    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "structure")
     development_priority: "Execution Excellence; team mobilisation; accountability structure"
   },
   {
@@ -323,7 +315,7 @@ export const ARCHETYPES = [
     profile: "Multiple low dimensions, Emerging band (avg <50)",
     core_strength: "High development potential; early in the executive capability journey; typically high motivation",
     key_risk: "Overwhelm; pursuing development in too many areas simultaneously; wrong sequencing of priorities",
-    development_priority: "Focus on 1–2 highest-leverage dimensions only; structured mentoring; SHIFT-QUEST programme indicated"
+    development_priority: "Focus on 1–2 highest-impact dimensions only; structured mentoring; SHIFT-QUEST programme indicated"
   }
 ];
 

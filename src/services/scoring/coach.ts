@@ -4,10 +4,8 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "COACH";
-export const FULL_NAME = "COACH — Manager-as-Coach Capability";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = COACH — Manager-as-Coach Capability draft derived from reportPipeline.
-export const B2C_NAME = "COACH — Manager-as-Coach Capability";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = COACH — Manager-as-Coach Capability draft derived from reportPipeline.
+export const FULL_NAME = "COACH — executive coaching fit";
+export const B2C_NAME = "COACH — executive coaching fit";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 26;
 export const SCALE = "1-5 Likert";
@@ -19,7 +17,7 @@ export const TAGLINE = "The four pillars of a coaching leader: Mindset → Skill
 export const DIMENSIONS = [
   {
     id: "D1",
-    name: "COACH MINDSET",
+    name: "Developmental Orientation",
     question_ids: [
       "Q1",
       "Q2",
@@ -39,7 +37,7 @@ export const DIMENSIONS = [
   },
   {
     id: "D2",
-    name: "COACH SKILLSET",
+    name: "Adaptive Coaching Style",
     question_ids: [
       "Q6",
       "Q7",
@@ -62,7 +60,7 @@ export const DIMENSIONS = [
   },
   {
     id: "D3",
-    name: "COACH TOOLKIT",
+    name: "Developmental Relationship Quality",
     question_ids: [
       "Q13",
       "Q14",
@@ -78,7 +76,7 @@ export const DIMENSIONS = [
     raw_max: 35,
     n_questions: 7,
     sub_dimensions: [
-      "A. Goal-setting frameworks",
+      "A. Goal-setting models",
       "B. Developmental coaching models",
       "C. Performance & accountability conversations"
     ],
@@ -87,7 +85,7 @@ export const DIMENSIONS = [
   },
   {
     id: "D4",
-    name: "COACH DISCIPLINE",
+    name: "Coaching Under Constraints",
     question_ids: [
       "Q20",
       "Q21",
@@ -164,7 +162,43 @@ export const DIMENSION_VERDICTS = [
   }
 ];
 
-export const ARCHETYPES: unknown[] = [];
+export const ARCHETYPES = [
+  {
+    name: "The Bilateral Developer",
+    "#": "1",
+    focus: "Developmental orientation + relationship quality dominant",
+    description: "Thinks developmentally and builds strong bilateral developmental relationships. Combines orientation with the relational quality that drives actual growth in others.",
+    primary_dim: "D1 + D3",
+  },
+  {
+    name: "The Adaptive Coach",
+    "#": "2",
+    focus: "Adaptive style + developmental orientation dominant",
+    description: "Matches coaching approach to the coachee and context. Flexible, fluid, and able to shift gears between support, challenge, and directiveness as the moment requires.",
+    primary_dim: "D2 + D1",
+  },
+  {
+    name: "The Trust Builder",
+    "#": "3",
+    focus: "Developmental relationship quality dominant",
+    description: "Builds genuine, safe, high-trust coaching relationships. Coachees are willing to bring their real challenges because the relational foundation is strong enough to hold vulnerability.",
+    primary_dim: "D3",
+  },
+  {
+    name: "The Pressure-Tested Coach",
+    "#": "4",
+    focus: "Coaching under constraints + adaptive style dominant",
+    description: "Delivers quality coaching even under time pressure, organisational constraints, and high-stakes contexts. Doesn't abandon coaching discipline when the environment gets tight.",
+    primary_dim: "D4 + D2",
+  },
+  {
+    name: "The Transactional Developer",
+    "#": "5",
+    focus: "Skillset strong but developmental orientation thin",
+    description: "Knows coaching mechanics and can run a competent conversation, but coaching is instrumental and task-focused rather than genuinely developmental. Tools outpace mindset.",
+    primary_dim: "D2 high, D1 developing",
+  },
+];
 
 
 export const SCORING_CONFIG = {

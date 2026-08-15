@@ -4,10 +4,8 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "PRISM";
-export const FULL_NAME = "PRISM — Professional Brand Legibility";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = PRISM — Professional Brand Legibility draft derived from reportPipeline.
-export const B2C_NAME = "PRISM — Professional Brand Legibility";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = PRISM — Professional Brand Legibility draft derived from reportPipeline.
+export const FULL_NAME = "PRISM — professional branding";
+export const B2C_NAME = "PRISM — professional branding";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 30;
 export const SCALE = "1-5 Likert";
@@ -148,7 +146,7 @@ export const DIMENSIONS = [
       "When I describe my career trajectory, people understand why each move made sense and where I am heading.",
       "I find it easier to describe what I have done than to articulate what it says about my leadership or my future value.",
       "My professional story has a through-line — a logic that connects my past to my present to my future that is visible to others.",
-      "I can calibrate my career narrative for different audiences — adjusting the emphasis without losing the coherence or the core story."
+      "I can adjust my career narrative for different audiences — adjusting the emphasis without losing the coherence or the core story."
     ],
     items: [
       { id: "Q19", text: "I can tell my career story in a way that makes clear not just what I did, but why it matters and what it means for my next contribution." },
@@ -156,7 +154,7 @@ export const DIMENSIONS = [
       { id: "Q21", text: "When I describe my career trajectory, people understand why each move made sense and where I am heading." },
       { id: "Q22", text: "I find it easier to describe what I have done than to articulate what it says about my leadership or my future value." },
       { id: "Q23", text: "My professional story has a through-line — a logic that connects my past to my present to my future that is visible to others." },
-      { id: "Q24", text: "I can calibrate my career narrative for different audiences — adjusting the emphasis without losing the coherence or the core story." }
+      { id: "Q24", text: "I can adjust my career narrative for different audiences — adjusting the emphasis without losing the coherence or the core story." }
     ],
     weight: 1,
     normalised_max: 20,
@@ -273,7 +271,7 @@ export const ARCHETYPES = [
     visibility: "High",
     description: "Clear brand, consistent identity, widely recognised. The gold standard — a leader whose brand works for them in rooms they're not in.",
     strengths: "Brand clarity and identity consistency are both high. The professional has a distinctive, recognisable professional signature that the market can read, remember, and advocate for. Network advocacy is active and effective; the Authority is the name that comes up when decision-makers are looking for someone with their profile.",
-    blind_spots: "Staleness risk: the brand that worked for the last decade may not work for the next one. The Authority can become complacent about brand evolution, assuming that legacy recognition will carry them through market shifts. Over time, the brand stops evolving while the market does — creating a quiet credibility lag that takes years to become visible.",
+    blind_spots: "Staleness risk: the brand that worked for the last decade may not work for the next one. The Authority can become complacent about brand evolution, assuming that legacy recognition will carry them through market shifts. Over time, the brand stops evolving while the market does — creating a subtle credibility lag that takes years to become visible.",
     core_dynamic: "Clear brand, consistent identity, widely recognised. The gold standard — a leader whose brand works for them in rooms they're not in.",
     risk_if_unaddressed: "Staleness risk: the brand that worked for the last decade may not work for the next one.",
     development_priority: "Deliberate brand evolution; staying ahead of the market rather than managing legacy",
@@ -312,7 +310,7 @@ export const ARCHETYPES = [
     visibility: "High",
     description: "Adapts to every audience, highly visible — but no consistent centre. Seen everywhere, known by no one. Visibility outpaces substance.",
     strengths: "Strong visibility and narrative energy. The Chameleon is present, active, and visible. They understand intuitively how to show up for different audiences and can be very effective in short-cycle interactions. In contexts where first impressions matter more than sustained relationship, the Chameleon can outperform profiles with stronger substance.",
-    blind_spots: "Brand exhaustion: maintaining different versions for different audiences is unsustainable. Over time, the lack of a centre becomes visible. People who encounter the Chameleon across multiple contexts notice the inconsistency, and trust erodes. The Chameleon eventually burns out from the performance cost of being different people to different audiences.",
+    blind_spots: "Brand exhaustion: maintaining different versions for different audiences is unsustainable. Over time, the lack of a centre becomes visible. People who encounter the Chameleon across multiple contexts notice the inconsistency, and trust erodes. The Chameleon eventually wears down from the performance cost of being different people to different audiences.",
     core_dynamic: "Adapts to every audience, highly visible — but no consistent centre. Seen everywhere, known by no one. Visibility outpaces substance.",
     risk_if_unaddressed: "Brand exhaustion: maintaining different versions for different audiences is unsustainable. Over time, the lack of a centre becomes visible.",
     development_priority: "Identity consolidation; brand clarity work; finding and anchoring the authentic centre",

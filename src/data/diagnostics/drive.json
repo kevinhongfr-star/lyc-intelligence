@@ -2,7 +2,7 @@
   "meta": {
     "id": "drive",
     "title": "DRIVE",
-    "subtitle": "Execution Capability Framework",
+    "subtitle": "Execution Capability Model",
     "accent_color": "#334155",
     "total_questions": 30,
     "total_dimensions": 5,
@@ -39,7 +39,7 @@
     },
     {
       "key": "talent_leverage",
-      "name": "Talent Leverage",
+      "name": "Talent Activation",
       "description": "Getting the right people in the right roles",
       "low_label": "Developing",
       "high_label": "Mastery",
@@ -86,7 +86,7 @@
       "key_traits": [
         "Foundational",
         "Scaling",
-        "Architectural"
+        "Structural"
       ],
       "sort_order": 3
     },
@@ -161,7 +161,7 @@
     {
       "key": "q_004",
       "type": "multi_select",
-      "prompt": "Placeholder question 4 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 4 for Talent Activation dimension. Content team will replace with real diagnostic content.",
       "required": true,
       "dimension_key": "talent_leverage",
       "weight": 1.0,
@@ -267,7 +267,7 @@
     {
       "key": "q_009",
       "type": "scale",
-      "prompt": "Placeholder question 9 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 9 for Talent Activation dimension. Content team will replace with real diagnostic content.",
       "required": true,
       "dimension_key": "talent_leverage",
       "weight": 1.0,
@@ -372,12 +372,12 @@
     {
       "key": "q_014",
       "type": "scenario",
-      "prompt": "Placeholder question 14 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 14 for Talent Activation dimension. Content team will replace with real diagnostic content.",
       "required": true,
       "dimension_key": "talent_leverage",
       "weight": 1.0,
       "sort_order": 14,
-      "scenario": "Scenario context for question 14. You are in a situation that tests your talent leverage capabilities. How do you respond?",
+      "scenario": "Scenario context for question 14. You are in a situation that tests your talent activation capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -478,7 +478,7 @@
     {
       "key": "q_019",
       "type": "scale",
-      "prompt": "Placeholder question 19 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 19 for Talent Activation dimension. Content team will replace with real diagnostic content.",
       "required": true,
       "dimension_key": "talent_leverage",
       "weight": 1.0,
@@ -583,12 +583,12 @@
     {
       "key": "q_024",
       "type": "scenario",
-      "prompt": "Placeholder question 24 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 24 for Talent Activation dimension. Content team will replace with real diagnostic content.",
       "required": true,
       "dimension_key": "talent_leverage",
       "weight": 1.0,
       "sort_order": 24,
-      "scenario": "Scenario context for question 24. You are in a situation that tests your talent leverage capabilities. How do you respond?",
+      "scenario": "Scenario context for question 24. You are in a situation that tests your talent activation capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -689,7 +689,7 @@
     {
       "key": "q_029",
       "type": "scale",
-      "prompt": "Placeholder question 29 for Talent Leverage dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 29 for Talent Activation dimension. Content team will replace with real diagnostic content.",
       "required": true,
       "dimension_key": "talent_leverage",
       "weight": 1.0,

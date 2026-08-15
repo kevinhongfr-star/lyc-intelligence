@@ -4,22 +4,21 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "LEAP";
-export const FULL_NAME = "LEAP — Learning & Execution Potential";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = LEAP — Learning & Execution Potential draft derived from reportPipeline.
-export const B2C_NAME = "LEAP — Learning & Execution Potential";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = LEAP — Learning & Execution Potential draft derived from reportPipeline.
+export const FULL_NAME = "LEAP — competitive positioning";
+export const B2C_NAME = "LEAP — competitive positioning";
 export const VERSION = "2.1";
-export const TOTAL_QUESTIONS = 35;
-export const SCALE = "Forced-choice DISC + Likert (mixed)";
+export const TOTAL_QUESTIONS = 30;
+export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 12;
 export const TIER = "shift";
-export const SCORING_MODE = "forced_choice";
+export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 149;
-export const TAGLINE = "35 forced-choice items. DISC \u00d7 Career Readiness \u00d7 APAC cross-border. The SHIFT suite psychological anchor.";
+export const TAGLINE = "Five competitive positioning dimensions. Market × Capability × Timing × Risk × Impact.";
 
 export const DIMENSIONS = [
   {
-    name: "Positioning",
+    id: "D1",
+    name: "Market",
     weight: 0.25,
     items: [
       {
@@ -32,7 +31,7 @@ export const DIMENSIONS = [
       },
       {
         id: "LEAP_CR03",
-        text: "My professional brand is consistent across all platforms and interactions."
+        text: "My professional brand is consistent across all channels and interactions."
       }
     ],
     reverse_coded: [],
@@ -40,7 +39,8 @@ export const DIMENSIONS = [
     normalised_max: 20
   },
   {
-    name: "Proof",
+    id: "D2",
+    name: "Capability",
     weight: 0.2,
     items: [
       {
@@ -61,7 +61,8 @@ export const DIMENSIONS = [
     normalised_max: 20
   },
   {
-    name: "Visibility",
+    id: "D3",
+    name: "Timing",
     weight: 0.2,
     items: [
       {
@@ -82,7 +83,8 @@ export const DIMENSIONS = [
     normalised_max: 20
   },
   {
-    name: "Move",
+    id: "D4",
+    name: "Risk",
     weight: 0.2,
     items: [
       {
@@ -103,12 +105,13 @@ export const DIMENSIONS = [
     normalised_max: 20
   },
   {
-    name: "Alignment",
+    id: "D5",
+    name: "Impact",
     weight: 0.15,
     items: [
       {
         id: "LEAP_CR13",
-        text: "My current role leverages my natural strengths and behavioural style."
+        text: "My current role uses my natural strengths and behavioural style."
       },
       {
         id: "LEAP_CR14",
@@ -194,7 +197,7 @@ export const ARCHETYPES = [
     cr_band: "B1",
     name: "The Unproven Driver",
     prism_parent: "Overexposed Generalist",
-    narrative: "You lead with force and urgency, but your readiness scores reveal significant gaps in positioning and proof. Your dominant drive is clear, but without a foundation of documented impact and strategic visibility, others may see intensity without substance.",
+    narrative: "You lead with decisive urgency, but your readiness scores reveal significant gaps in positioning and proof. Your dominant drive is clear, but without a foundation of documented impact and strategic visibility, others may see intensity without substance.",
     strengths: [
       "Decisive action under pressure",
       "Clear sense of direction",
@@ -239,7 +242,7 @@ export const ARCHETYPES = [
     ],
     blind_spots: [
       "May accelerate past relationship-building",
-      "Could under-invest in cross-cultural calibration"
+      "Could under-invest in cross-cultural refinement"
     ],
     risk_if_no_action: "Minor risk — main danger is pace outstripping network support"
   },
@@ -265,7 +268,7 @@ export const ARCHETYPES = [
     disc_primary: "I",
     cr_band: "B1",
     name: "The Restless Explorer",
-    prism_parent: "Scattered Navigator",
+    prism_parent: "Scattered Explorer",
     narrative: "You have infectious energy and enthusiasm, but your readiness scores show you haven't yet channelled that energy into a clear direction. You're exploring widely but landing nowhere. Your I-drive makes you engaging, but without positioning or proof, you risk being liked but not taken seriously.",
     strengths: [
       "High energy and adaptability",
@@ -342,7 +345,7 @@ export const ARCHETYPES = [
     strengths: [
       "Deep institutional knowledge",
       "Trusted and dependable",
-      "Stabilising force in teams"
+      "Stabilising presence in teams"
     ],
     blind_spots: [
       "Confuses comfort with satisfaction",
@@ -390,12 +393,12 @@ export const ARCHETYPES = [
   {
     disc_primary: "S",
     cr_band: "B4",
-    name: "The Quiet Powerhouse",
+    name: "The Calm Powerhouse",
     prism_parent: "Invisible Achiever",
-    narrative: "You're fully ready for the next level, with one persistent gap: visibility. Your S-drive means you lead from behind, deliver exceptional results quietly, and wait for recognition. But at the senior levels, recognition doesn't come to those who don't create it. You're a powerhouse — but the 'quiet' part needs to change.",
+    narrative: "You're fully ready for the next level, with one persistent gap: visibility. Your S-drive means you lead from behind, deliver exceptional results steadily, and wait for recognition. But at the senior levels, recognition doesn't come to those who don't create it. You're a powerhouse — but the quiet approach needs to change.",
     strengths: [
       "Maximum readiness with deep expertise",
-      "Quiet authority",
+      "Composed authority",
       "Delivers without drama"
     ],
     blind_spots: [
@@ -607,7 +610,7 @@ export const LAYERS = {
       {
         id: "LEAP_DQ16",
         set: 8,
-        D: "Forceful",
+        D: "Assertive",
         I: "Spontaneous",
         S: "Harmonious",
         C: "Methodical"
@@ -643,7 +646,7 @@ export const LAYERS = {
           },
           {
             id: "LEAP_CR03",
-            text: "My professional brand is consistent across all platforms and interactions."
+            text: "My professional brand is consistent across all channels and interactions."
           }
         ]
       },
@@ -707,7 +710,7 @@ export const LAYERS = {
         items: [
           {
             id: "LEAP_CR13",
-            text: "My current role leverages my natural strengths and behavioural style."
+            text: "My current role uses my natural strengths and behavioural style."
           },
           {
             id: "LEAP_CR14",
@@ -822,12 +825,12 @@ export const LAYERS = {
   prism_rollup: {
     "Invisible Achiever": [
       "Dependable Backbone",
-      "Quiet Powerhouse",
+      "Calm Powerhouse",
       "Meticulous Understudy",
       "Diligent Specialist",
       "Unseen Expert"
     ],
-    "Scattered Navigator": [
+    "Scattered Explorer": [
       "Restless Explorer"
     ],
     "Reluctant Transitioner": [
@@ -847,7 +850,7 @@ export const LAYERS = {
       "Precision Operator"
     ]
   },
-  mixed_profile_rule: "When no dominant DISC drive emerges (spread < 15 points across all 4 dimensions), assign The Scattered Navigator regardless of CR band."
+  mixed_profile_rule: "When no dominant DISC drive emerges (spread < 15 points across all 4 dimensions), assign The Scattered Explorer regardless of CR band."
 };
 
 export const SCORING_CONFIG = {

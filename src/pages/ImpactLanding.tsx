@@ -51,17 +51,17 @@ const IMPACT_DIMENSIONS: LandingDimension[] = [
   },
   {
     id: 'D5',
-    name: 'APAC Mandate Credibility',
-    short: 'APAC',
+    name: 'Executive Presence & Influence',
+    short: 'Presence',
     description:
-      'Your credibility specifically in APAC governance contexts — regulatory awareness, cultural fluency, and relationship capital with APAC-native stakeholders.',
+      'Your ability to command attention, build credibility, and drive influence at the highest organizational levels — including boardroom presence, executive communications, and stakeholder impact.',
   },
 ];
 
 // 8 board-effectiveness archetypes per akira_source/impact_config.json
 // (Axis 1 / Axis 2 are framework modulators, excluded per filterArchetypes).
 const IMPACT_ARCHETYPES: LandingArchetype[] = [
-  { code: '01', name: 'The Architect', tagline: 'Governance + Strategy dominant · High band. Sets the standards and sees the big picture.' },
+  { code: '01', name: 'The Strategic Builder', tagline: 'Governance + Strategy dominant · High band. Sets the standards and sees the big picture.' },
   { code: '02', name: 'The Steward', tagline: 'Governance + Legacy dominant · High band. Protects what is built while building for the future.' },
   { code: '03', name: 'The Networker', tagline: 'Relationship-dominant · High band. Connects stakeholders and reads boardroom dynamics with precision.' },
   { code: '04', name: 'The Guardian', tagline: 'Governance-dominant · Building band. Rigorous on process; strategic contribution still developing.' },
@@ -75,7 +75,7 @@ const IMPACT_METHOD_STEPS = [
   {
     mono: '01 · Self-Assessment',
     title: 'Thirty questions across five governance dimensions.',
-    body: 'Strategic Oversight, Governance Rigour, Stakeholder Intelligence, Mandate Legacy, and APAC Mandate Credibility — six questions each. An honest read of your board contribution.',
+    body: 'Strategic Oversight, Governance Rigour, Stakeholder Intelligence, Mandate Legacy, and Executive Presence & Influence — six questions each. An honest read of your board contribution.',
   },
   {
     mono: '02 · Dimension Verdicts',

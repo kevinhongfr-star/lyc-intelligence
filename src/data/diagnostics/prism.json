@@ -59,7 +59,7 @@
   "archetypes": [
     {
       "key": "the_architect",
-      "name": "The Architect",
+      "name": "The Designer",
       "description": "Builds professional identity with intention and precision",
       "key_traits": [
         "Strategic",
@@ -71,7 +71,7 @@
     {
       "key": "the_connector",
       "name": "The Connector",
-      "description": "Leverages relationships and networks for brand amplification",
+      "description": "Uses relationships and networks for brand amplification",
       "key_traits": [
         "Relational",
         "Amplifying",

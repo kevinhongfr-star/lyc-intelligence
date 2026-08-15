@@ -53,7 +53,7 @@ function buildPersonas(def: DiagnosticDefinition): AssessmentLandingConfig['pers
     },
     {
       title: 'Senior Practitioners',
-      desc: `Experienced executives who want a structured framework to benchmark their ${title} capabilities.`,
+      desc: `Experienced executives who want a structured model to benchmark their ${title} capabilities.`,
     },
   ];
 }

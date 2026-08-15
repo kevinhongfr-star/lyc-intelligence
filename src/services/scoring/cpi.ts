@@ -31,10 +31,8 @@ export interface CPICompositeBand {
 }
 
 export const INSTRUMENT = 'CPI';
-export const FULL_NAME = 'CPI — Career Positioning Index';
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = CPI — Career Positioning Index draft derived from reportPipeline.
-export const B2C_NAME = 'CPI — Career Positioning Index';
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = CPI — Career Positioning Index draft derived from reportPipeline.
+export const FULL_NAME = 'CPI — China Leadership Pipeline Index';
+export const B2C_NAME = 'CPI — China Leadership Pipeline Index';
 export const VERSION = '13.0';
 export const TIER = 'flagship';
 export const SCORING_MODE = 'weighted_average';
@@ -162,8 +160,7 @@ export const COMPOSITE_BANDS: CPICompositeBand[] = [
 export const ARCHETYPES = [
   {
     id: 'A1',
-    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
-    name: 'Strategic Architect',
+    name: 'Strategic Builder',
     description: 'Systemic thinker with future-back orientation. Frames the future, not just the task.',
     primary_dim: 'D1',
     tagline: 'Systemic thinker with future-back orientation.',
@@ -222,7 +219,7 @@ export const TAGLINE = 'The flagship executive self-awareness assessment — six
 export const DIMENSION_VERDICTS = [
   { dim: 'all', min: 80, max: 100, verdict: 'Flagship',     meaning: 'Top-tier executive capability with demonstrable APAC impact.' },
   { dim: 'all', min: 60, max: 79.9, verdict: 'Board-Ready',  meaning: 'Deployable at C-suite / board level; targeted refinements only.' },
-  { dim: 'all', min: 40, max: 59.9, verdict: 'Developing',   meaning: 'Emerging senior capability with clear development leverage points.' },
+  { dim: 'all', min: 40, max: 59.9, verdict: 'Developing',   meaning: 'Emerging senior capability with clear development focus areas.' },
   { dim: 'all', min: 0,  max: 39.9, verdict: 'Gap',          meaning: 'Material positioning work required before next mandate.' },
 ];
 

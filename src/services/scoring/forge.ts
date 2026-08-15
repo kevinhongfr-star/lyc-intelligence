@@ -4,10 +4,8 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "FORGE";
-export const FULL_NAME = "FORGE — Sales Leadership Strengths & System Building";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = FORGE — Sales Leadership Strengths & System Building draft derived from reportPipeline.
-export const B2C_NAME = "FORGE — Sales Leadership Strengths & System Building";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = FORGE — Sales Leadership Strengths & System Building draft derived from reportPipeline.
+export const FULL_NAME = "FORGE — sales excellence capability";
+export const B2C_NAME = "FORGE — sales excellence capability";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
@@ -21,7 +19,7 @@ export const TAGLINE = "36 questions. Sales leadership strengths, system buildin
 export const DIMENSIONS = [
   {
     id: "D1",
-    name: "ADAPTIVE LEARNING ORIENTATION (ALO)",
+    name: "Adaptive Learning Orientation",
     question_ids: [
       "Q01",
       "Q02",
@@ -68,8 +66,7 @@ export const DIMENSIONS = [
   },
   {
     id: "D2",
-    // TODO(Akira - X4-2): swap to exact canonical FORGE D2 descriptor. Placeholder = Selling Systems & Account Coverage (dimension about account coverage, selling system rigour, non-reliance on personal hero-selling).
-    name: "Selling Systems & Account Coverage (SSA)",
+    name: "Market Context Awareness",
     question_ids: [
       "Q10",
       "Q11",
@@ -116,7 +113,7 @@ export const DIMENSIONS = [
   },
   {
     id: "D3",
-    name: "DEVELOPMENT AGENCY (DA)",
+    name: "Development Agency",
     question_ids: [
       "Q19",
       "Q20",
@@ -163,7 +160,7 @@ export const DIMENSIONS = [
   },
   {
     id: "D4",
-    name: "BILATERAL CONTEXT NAVIGATION (BCN)",
+    name: "Bilateral Relationship Quality",
     question_ids: [
       "Q28",
       "Q29",
@@ -191,7 +188,7 @@ export const DIMENSIONS = [
       "I have at least one bilateral counterpart whose capability I am actively working to develop, and I can describe what I am doing and why.",
       "When I am facing multiple simultaneous leadership challenges, I can identify the one that is most structurally significant and prioritise it without attempting to address all challenges at the same pace.",
       "When multiple leadership challenges are active at the same time, I distribute my attention across all of them rather than sequencing them by structural priority.",
-      "I have a framework for deciding which of several concurrent operating challenges warrants the most focused leadership attention, and I apply it consistently."
+      "I have a structured method for deciding which of several concurrent operating challenges warrants the most focused leadership attention, and I apply it consistently."
     ],
     items: [
       { id: "Q28", text: "I function effectively in leadership situations where authority, accountability, and decision rights are genuinely shared and not fully resolved." },
@@ -202,7 +199,7 @@ export const DIMENSIONS = [
       { id: "Q33", text: "I have at least one bilateral counterpart whose capability I am actively working to develop, and I can describe what I am doing and why." },
       { id: "Q34", text: "When I am facing multiple simultaneous leadership challenges, I can identify the one that is most structurally significant and prioritise it without attempting to address all challenges at the same pace." },
       { id: "Q35", text: "When multiple leadership challenges are active at the same time, I distribute my attention across all of them rather than sequencing them by structural priority." },
-      { id: "Q36", text: "I have a framework for deciding which of several concurrent operating challenges warrants the most focused leadership attention, and I apply it consistently." }
+      { id: "Q36", text: "I have a structured method for deciding which of several concurrent operating challenges warrants the most focused leadership attention, and I apply it consistently." }
     ],
     weight: 1,
     normalised_max: 20,
@@ -214,16 +211,13 @@ export const COMPOSITE_BANDS = [
   {
     min: 80,
     max: 100,
-    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
-    band: "Revenue Architect",
-    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
+    band: "Strategic Seller",
     interpretation: "Scalable revenue operating model with strong system leadership. Revenue generation is organisational, not personality-dependent."
   },
   {
     min: 60,
     max: 79,
     band: "Strong Performer",
-    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
     interpretation: "Solid sales leadership with identifiable strengths. Some dimensions need investment to achieve scalable revenue operating model."
   },
   {
@@ -236,7 +230,6 @@ export const COMPOSITE_BANDS = [
     min: 0,
     max: 39,
     band: "Sales Capability Gap",
-    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
     interpretation: "Significant gaps in sales leadership operating model. Revenue generation may be at risk without targeted intervention."
   }
 ];
@@ -247,7 +240,6 @@ export const DIMENSION_VERDICTS = [
     min: 16,
     max: 20,
     verdict: "B4",
-    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
     meaning: "Mature sales leadership with scalable operating model"
   },
   {
@@ -290,26 +282,21 @@ export const ARCHETYPES = [
     name: "System Builder",
     selling_acumen: "Low",
     system_leadership: "High",
-    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
     description: "Scalable revenue operating model without the personal commercial edge. The operator who builds pipelines, processes, and CRM rigour that should generate predictable revenue — but struggles when the machine requires a human touch.",
     strengths: "Process, rigour, and organisational design. The System Builder creates the sales infrastructure that outlasts any individual contributor: pipeline governance, forecast discipline, onboarding playbooks, compensation design, territory segmentation. When the commercial foundation is already strong, the System Builder scales it reliably.",
     blind_spots: "Pipeline is strong on paper; personal deals are weak. The System Builder can design the most elegant revenue machine in the world but cannot personally close a flagship deal when the machine stalls. In high-value B2B or enterprise contexts where relationships and judgment decide large deals, the System Builder's lack of commercial acumen becomes the binding constraint on revenue growth.",
-    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
     core_pattern: "Scalable revenue operating model",
     revenue_risk: "Pipeline is strong; personal deals are weak",
     orientation: "System Leadership dominant, Selling Acumen low",
     quadrant: "Low Selling Acumen / High System Leadership"
   },
   {
-    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
-    name: "Revenue Architect",
+    name: "Strategic Seller",
     selling_acumen: "High",
     system_leadership: "High",
     description: "Full commercial leadership. The rare executive who can personally close a major deal AND build the organisational system that closes a hundred smaller ones without them. The target state for every senior sales leader.",
-    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
-    strengths: "Rare combination of commercial instinct and institutional design capability. The Revenue Architect can lead from the front on a critical enterprise pursuit while simultaneously building the sales machine that makes their personal involvement optional over time. They recruit Rainmakers, train them, institutionalise their methods, and maintain the commercial judgment that keeps the system honest.",
-    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
-    blind_spots: "Risk: under-delegates; creates revenue dependency even with strong system. The Revenue Architect's biggest risk is themselves — their ability to personally fix any deal can become a crutch that the organisation learns to rely on, undermining the very system they're trying to build. The gap between building a system and trusting it is the Revenue Architect's defining tension.",
+    strengths: "Rare combination of commercial instinct and institutional design capability. The Strategic Seller can lead from the front on a critical enterprise pursuit while simultaneously building the sales machine that makes their personal involvement optional over time. They recruit Rainmakers, train them, institutionalise their methods, and maintain the commercial judgment that keeps the system honest.",
+    blind_spots: "Risk: under-delegates; creates revenue dependency even with strong system. The Strategic Seller's biggest risk is themselves — their ability to personally fix any deal can become a crutch that the organisation learns to rely on, undermining the very system they're trying to build. The gap between building a system and trusting it is the Strategic Seller's defining tension.",
     core_pattern: "Full commercial leadership",
     revenue_risk: "Risk: under-delegates; creates revenue dependency",
     orientation: "Selling Acumen + System Leadership balanced (both high)",

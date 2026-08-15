@@ -1,20 +1,19 @@
 /**
- * schemas/diagnostics/forge.ts — #97 FORGE: Sales Excellence
+ * schemas/diagnostics/forge.ts — FORGE: Sales Excellence (canonical)
+ * Canonical: 4 dimensions, 4 archetypes (per canon/instruments/forge.json)
  */
 import type { AssessmentResultSchema } from '../assessmentResult';
 
 export const FORGE_DIMENSION_KEYS = [
-  'discovery',          // qualifying + needs discovery
-  'positioning',        // value framing vs competition
-  'stakeholder_map',    // multi-threaded access + buyer map
-  'negotiation',        // pricing, concessions, deal structuring
-  'pipeline_health',    // pipeline hygiene + forecasting
-  'retention_expand',   // account retention + expansion
+  'adaptive_learning_orientation',
+  'market_context_awareness',
+  'development_agency',
+  'bilateral_relationship_quality',
 ] as const;
 export type ForgeDimensionKey = (typeof FORGE_DIMENSION_KEYS)[number];
 
 export interface ForgeSpecific {
-  deal_stage_presence: Record<string, number>;  // stage → 0-100 self-rated
+  deal_stage_presence: Record<string, number>;
   win_rate_proxy?: number;
   pipeline_gap_analysis: {
     weak_stages: string[];
@@ -31,7 +30,12 @@ export const FORGE_CONTRACT = {
   contract_version: 'b2c.v1' as const,
   dimension_keys: FORGE_DIMENSION_KEYS,
   ei_dimension_cap: 4,
-  archetype_keys: ['the_hunter', 'the_farmer', 'the_closer', 'the_strategist'] as const,
+  archetype_keys: [
+    'the_rainmaker',
+    'the_system_builder',
+    'the_strategic_seller',
+    'the_promoted_seller',
+  ] as const,
 } as const;
 
 export function isForgeSchema(r: AssessmentResultSchema): r is ForgeResultSchema {

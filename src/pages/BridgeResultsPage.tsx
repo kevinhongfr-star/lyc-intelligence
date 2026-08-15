@@ -14,7 +14,7 @@ const toMatched = (a: (typeof BRIDGE_ARCHETYPES)[number], score: number): Matche
   name: a.name,
   description: a.failure_pattern || '',
   weakest_dimension: a.weakest_dimension,
-  three_fires_correlation: a.three_fires_correlation,
+  risk_layer: a.risk_layer,
   failure_pattern: a.failure_pattern,
   match_score: score,
 });

@@ -14,7 +14,7 @@ const toMatched = (a: (typeof DRIVE_ARCHETYPES)[number], score: number): Matched
   name: a.name,
   description: a.pattern || '',
   weakest_dimension: a.risk || '',
-  three_fires_correlation: a.motivation_type || '',
+  motivation_type: a.motivation_type || '',
   failure_pattern: a.profile || '',
   match_score: score,
 });

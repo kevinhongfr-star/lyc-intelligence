@@ -1,15 +1,16 @@
 /**
- * schemas/diagnostics/bridge.ts — #97 BRIDGE: China Leadership Readiness
+ * schemas/diagnostics/bridge.ts — BRIDGE: Cross-Border Mandate Readiness (canonical)
+ * Canonical: 6 dimensions, 6 archetypes (per canon/instruments/bridge.json)
  */
 import type { AssessmentResultSchema } from '../assessmentResult';
 
 export const BRIDGE_DIMENSION_KEYS = [
-  'context_sensitivity',  // guanxi, mianzi, cultural nuance
-  'stakeholder_alignment',// HQ vs China entity alignment
-  'decision_style',       // decision-making style fit (centralised vs consensus)
-  'communication_protocol',// written + verbal (direct vs indirect) bridges
-  'trust_building',       // onshore trust accumulation velocity
-  'crisis_readiness',     // China-specific crisis / gov-relations posture
+  'mandate_clarity',
+  'stakeholder_relationship_building',
+  'communication_alignment',
+  'pressure_resilience',
+  'long_game_thinking',
+  'cultural_fluency',
 ] as const;
 export type BridgeDimensionKey = (typeof BRIDGE_DIMENSION_KEYS)[number];
 
@@ -22,7 +23,7 @@ export interface BridgeSpecific {
   }[];
   cultural_blindspots: Array<{ scenario: string; suggestion: string }>;
   government_readiness_score?: number;
-  tenure_fit_years?: number;  // recommended minimum on-shore tenure
+  tenure_fit_years?: number;
 }
 
 export type BridgeResultSchema = AssessmentResultSchema<BridgeSpecific>;
@@ -32,7 +33,14 @@ export const BRIDGE_CONTRACT = {
   contract_version: 'b2c.v1' as const,
   dimension_keys: BRIDGE_DIMENSION_KEYS,
   ei_dimension_cap: 4,
-  archetype_keys: ['the_bridge', 'the_ambassador', 'the_nativist', 'the_diplomat'] as const,
+  archetype_keys: [
+    'the_envoy',
+    'the_wanderer',
+    'the_chameleon',
+    'the_anchor',
+    'the_sprinter',
+    'the_cultural_operator',
+  ] as const,
 } as const;
 
 export function isBridgeSchema(r: AssessmentResultSchema): r is BridgeResultSchema {

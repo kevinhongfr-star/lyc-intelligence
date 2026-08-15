@@ -99,12 +99,12 @@ function matchImpactArchetype(
     const cfg = findByName('The Nominee');
     matched = toMatched(cfg || REAL_ARCHETYPES[6], 90);
   }
-  // 3. High band archetypes (Architect, Steward, Networker).
+  // 3. High band archetypes (Strategic Builder, Steward, Networker).
   else if (band === 'High') {
-    // Architect: Governance + Strategy dominant (D2 & D1 both top, small spread).
+    // Strategic Builder: Governance + Strategy dominant (D2 & D1 both top, small spread).
     if ((top === 'D2' && second === 'D1') || (top === 'D1' && second === 'D2')) {
       if (spread <= 12) {
-        const cfg = findByName('The Architect');
+        const cfg = findByName('The Strategic Builder');
         matched = toMatched(cfg || REAL_ARCHETYPES[0], 92);
       }
     }
@@ -142,9 +142,9 @@ function matchImpactArchetype(
 
   // Fallback: if no precise match, pick the closest archetype by band.
   if (!matched) {
-    // Default by band: High→Architect, Building→Guardian, Fragile→Nominee.
+    // Default by band: High→Strategic Builder, Building→Guardian, Fragile→Nominee.
     const fallbackName =
-      band === 'High' ? 'The Architect' : band === 'Building' ? 'The Guardian' : 'The Nominee';
+      band === 'High' ? 'The Strategic Builder' : band === 'Building' ? 'The Guardian' : 'The Nominee';
     const cfg = findByName(fallbackName) || REAL_ARCHETYPES[0];
     matched = toMatched(cfg, 70);
   }

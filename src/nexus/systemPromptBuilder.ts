@@ -1,7 +1,7 @@
 /**
  * systemPromptBuilder.ts — NEXUS 5-Layer System Prompt Assembly (#39)
  *
- * 5-layer architecture, assembled in order (bottom → top = layer 1 → 5):
+ * 5-layer structure, assembled in order (bottom → top = layer 1 → 5):
  *   Layer 1: PERSONALITY        — immutable NEXUS identity (from brandGuard)
  *   Layer 2: USER_CONTEXT       — tier, miles balance, assessment history
  *   Layer 3: INTENT_INSTRUCTIONS — per-intent behavior rules

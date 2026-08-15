@@ -75,9 +75,9 @@ function matchForgeArchetype(
 
   let matched: MatchedArchetype | null = null;
 
-  // Quadrant 1: High Selling Acumen AND High System Leadership → Revenue Architect
+  // Quadrant 1: High Selling Acumen AND High System Leadership → Strategic Seller
   if (sellingHigh && systemHigh) {
-    const cfg = findByName('Revenue Architect');
+    const cfg = findByName('Strategic Seller');
     matched = toMatched(cfg || REAL_ARCHETYPES[2], 95);
   }
   // Quadrant 2: High Selling Acumen AND Low System Leadership

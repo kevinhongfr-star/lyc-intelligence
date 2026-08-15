@@ -4,10 +4,8 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "IMPACT";
-export const FULL_NAME = "IMPACT — Board Effectiveness & Executive Presence";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = IMPACT — Board Effectiveness & Executive Presence draft derived from reportPipeline.
-export const B2C_NAME = "IMPACT — Board Effectiveness & Executive Presence";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = IMPACT — Board Effectiveness & Executive Presence draft derived from reportPipeline.
+export const FULL_NAME = "IMPACT — board & stakeholder impact";
+export const B2C_NAME = "IMPACT — board & stakeholder impact";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 30;
 export const SCALE = "1-5 Likert";
@@ -100,7 +98,7 @@ export const DIMENSIONS = [
   },
   {
     id: "D5",
-    name: "APAC Mandate Credibility",
+    name: "Executive Presence & Influence",
     question_ids: [
       "Q25",
       "Q26",
@@ -168,15 +166,14 @@ export const DIMENSION_VERDICTS = [
 // X4-3: ARCHETYPES = person-archetypes only (no matrix axes). See MATRIX_AXES for 2x2 axis definitions.
 export const ARCHETYPES = [
   {
-    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
-    name: "The Architect",
+    name: "The Strategic Builder",
     "#": "1",
     orientation: "Governance + Strategy dominant",
     mandate_band: "High",
     core_dynamic: "Sets the standards and sees the big picture. The board member every chair wants. Rare combination of governance rigour and strategic intelligence operating at full strength.",
     risk_if_unaddressed: "May become the dominant voice — suppressing other directors' contributions. Board monoculture risk.",
     development_priority: "Board chair succession readiness; sponsoring governance uplift in co-directors",
-    apac_modifier_note: "If APAC Mandate Credibility <50, Architect profile may not translate to APAC-native boards — high Western credibility, APAC gap possible"
+    apac_modifier_note: "If Executive Presence & Influence <50, Strategic Builder profile may not translate to APAC-native boards — high Western credibility, APAC gap possible"
   },
   {
     name: "The Steward",
@@ -185,7 +182,7 @@ export const ARCHETYPES = [
     mandate_band: "High",
     core_dynamic: "Protects what has been built while building for the future. The institutional memory keeper. Brings a long-term governance lens that most boards undervalue.",
     risk_if_unaddressed: "May resist necessary change. Over-conservatism can slow board adaptation to market shifts.",
-    development_priority: "Innovation mindset development; engaging constructively with disruption",
+    development_priority: "Innovation mindset development; engaging constructively with market shifts",
     apac_modifier_note: "Strong in Japan and Singapore governance contexts; may have less traction in higher-velocity APAC markets (e.g., SE Asia startups, China state contexts)"
   },
   {
@@ -196,7 +193,7 @@ export const ARCHETYPES = [
     core_dynamic: "Connects dots across stakeholders, surfaces opportunities, reads the boardroom dynamics with exceptional precision.",
     risk_if_unaddressed: "Governance depth may lag relationship breadth. Substance must match style.",
     development_priority: "Deepening governance rigour; building analytical independence to match stakeholder intelligence",
-    apac_modifier_note: "APAC Networkers with government stakeholder relationships are highly valuable — this archetype's APAC Mandate Credibility score is the most important modifier"
+    apac_modifier_note: "APAC Networkers with government stakeholder relationships are highly valuable — this archetype's Executive Presence & Influence score is the most important modifier"
   },
   {
     name: "The Guardian",
@@ -246,7 +243,7 @@ export const ARCHETYPES = [
     core_dynamic: "Attends meetings, votes with the majority, contributes minimally. The board member whose presence does not strengthen the board's collective capability.",
     risk_if_unaddressed: "Continued presence weakens board effectiveness and sets a governance floor that others adapt to.",
     development_priority: "Honest assessment conversation required: targeted development or board exit",
-    apac_modifier_note: "APAC Mandate Credibility is likely very low — limited value in APAC governance contexts without fundamental capability development"
+    apac_modifier_note: "Executive Presence & Influence is likely very low — limited value in APAC governance contexts without fundamental capability development"
   }
 ];
 

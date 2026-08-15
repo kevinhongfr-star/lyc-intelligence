@@ -78,11 +78,11 @@ function matchQuestArchetype(
     const cfg = findByName('The Seedling');
     matched = toMatched(cfg || REAL_ARCHETYPES[9], 90);
   }
-  // 3. Advanced band archetypes (Architect, Catalyst, Diplomat, Commander)
+  // 3. Advanced band archetypes (Strategist, Catalyst, Diplomat, Commander)
   else if (band === 'Advanced') {
-    // Architect: D1 Strategic Thinking + D5 Adaptive Capacity
+    // Strategist: D1 Strategic Thinking + D5 Adaptive Capacity
     if (isTop('D1') && isTop('D5')) {
-      const cfg = findByName('The Architect');
+      const cfg = findByName('The Strategist');
       matched = toMatched(cfg || REAL_ARCHETYPES[0], 92);
     }
     // Catalyst: D3 Commercial Acumen + D5 Adaptive Capacity
@@ -101,7 +101,7 @@ function matchQuestArchetype(
       matched = toMatched(cfg || REAL_ARCHETYPES[3], 88);
     }
   }
-  // 4. Developing band archetypes (Navigator, Strategist, Engine, Entrepreneur)
+  // 4. Developing band archetypes (Navigator, Visionary, Engine, Entrepreneur)
   if (!matched && band === 'Developing') {
     // Navigator: D5 Adaptive Capacity + D4 People Leadership
     if (isTop('D5') && isTop('D4')) {
@@ -113,9 +113,9 @@ function matchQuestArchetype(
       const cfg = findByName('The Entrepreneur');
       matched = toMatched(cfg || REAL_ARCHETYPES[7], 86);
     }
-    // Strategist: D1 Strategic Thinking top
+    // Visionary: D1 Strategic Thinking top
     if (!matched && top2[0]?.id === 'D1') {
-      const cfg = findByName('The Strategist');
+      const cfg = findByName('The Visionary');
       matched = toMatched(cfg || REAL_ARCHETYPES[5], 88);
     }
     // Engine: D2 Execution Excellence top
@@ -128,8 +128,8 @@ function matchQuestArchetype(
   // 5. Cross-band fallbacks based on top dimension
   if (!matched) {
     const topId = top2[0]?.id;
-    let fallbackName = 'The Strategist';
-    if (topId === 'D1') fallbackName = band === 'Advanced' ? 'The Architect' : 'The Strategist';
+    let fallbackName = 'The Visionary';
+    if (topId === 'D1') fallbackName = band === 'Advanced' ? 'The Strategist' : 'The Visionary';
     else if (topId === 'D2') fallbackName = band === 'Advanced' ? 'The Commander' : 'The Engine';
     else if (topId === 'D3') fallbackName = band === 'Advanced' ? 'The Catalyst' : 'The Entrepreneur';
     else if (topId === 'D4') fallbackName = band === 'Advanced' ? 'The Diplomat' : 'The Navigator';

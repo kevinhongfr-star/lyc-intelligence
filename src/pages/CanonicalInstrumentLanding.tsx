@@ -66,7 +66,7 @@ export function CanonicalInstrumentLanding() {
       heroEyebrow: 'QUEST · EXECUTIVE PERFORMANCE',
     },
     MOSAIC: {
-      heroH1: 'Partnerships that navigate institutional complexity',
+      heroH1: 'Partnerships built on institutional trust and relationship velocity',
       heroEyebrow: 'MOSAIC · CROSS-BORDER PARTNERSHIP AGILITY',
     },
     COACH: {

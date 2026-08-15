@@ -1,10 +1,8 @@
 export const INSTRUMENT = "DRIVE";
-export const FULL_NAME = "DRIVE — Motivation Profile & Engagement Risk";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = DRIVE — Motivation Profile & Engagement Risk draft derived from reportPipeline.
-export const B2C_NAME = "DRIVE — Motivation Profile & Engagement Risk";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = DRIVE — Motivation Profile & Engagement Risk draft derived from reportPipeline.
-export const VERSION = "2.0";
-export const TOTAL_QUESTIONS = 30;
+export const FULL_NAME = "DRIVE — motivational alignment";
+export const B2C_NAME = "DRIVE — motivational alignment";
+export const VERSION = "1.2";
+export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 10;
 export const TIER = "shift";
@@ -167,7 +165,6 @@ export const COMPOSITE_BANDS = [
     min: 40,
     max: 59,
     band: "Moderate Drive",
-    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "profile")
     interpretation: "Partial alignment; significant gaps between role and motivational profile"
   },
   {
@@ -190,7 +187,6 @@ export const DIMENSION_VERDICTS = [
     min: 16,
     max: 20,
     verdict: "Strong",
-    // TODO(Akira - X4-4): canonical replacement word review ("motivation Architecture" → "motivational profile")
     meaning: "Mature motivational profile with sustainable engagement"
   },
   {
@@ -205,7 +201,6 @@ export const DIMENSION_VERDICTS = [
     min: 0,
     max: 9.9,
     verdict: "Gap",
-    // TODO(Akira - X4-4): canonical replacement word review ("motivation Architecture" → "motivational profile")
     meaning: "Significant motivational profile gap requiring intervention"
   }
 ];
@@ -216,7 +211,7 @@ export const ARCHETYPES = [
     motivation_type: "Extrinsic-dominant",
     state: "Fueled",
     pattern: "High output, target-driven",
-    risk: "Burns out when recognition dries up",
+    risk: "Wears down when recognition dries up",
     profile: "High Intrinsic Motivation + High Growth Orientation + High Confidence"
   },
   {

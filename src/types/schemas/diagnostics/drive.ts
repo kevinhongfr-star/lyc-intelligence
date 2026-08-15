@@ -1,21 +1,21 @@
 /**
- * schemas/diagnostics/drive.ts — #97 DRIVE: Execution Capability Framework
+ * schemas/diagnostics/drive.ts — DRIVE: Motivation Profile & Engagement Risk (canonical)
+ * Canonical: 5 dimensions, 10 profiles (per canon/instruments/drive.json)
  */
 import type { AssessmentResultSchema } from '../assessmentResult';
 
 export const DRIVE_DIMENSION_KEYS = [
-  'goal_clarity',       // OKR / goal translation
-  'prioritization',     // backlog / priority rigor
-  'velocity',           // throughput + bottleneck management
-  'accountability',     // commitments + follow-through
-  'resource_allocation',// time / energy / team allocation
-  'course_correction',  // feedback loop + pivot speed
+  'purpose_mastery',
+  'impact_orientation',
+  'motivational_diversity',
+  'disengagement_trigger_sensitivity',
+  'sustained_motivational_resilience',
 ] as const;
 export type DriveDimensionKey = (typeof DRIVE_DIMENSION_KEYS)[number];
 
 export interface DriveSpecific {
   operating_rhythm?: 'weekly' | 'bi_weekly' | 'monthly' | 'ad_hoc';
-  priority_distraction_ratio?: number;   // 0-100 higher = more focus
+  priority_distraction_ratio?: number;
   bottleneck_map: {
     dimension: DriveDimensionKey;
     severity: 'low' | 'medium' | 'high';
@@ -35,7 +35,18 @@ export const DRIVE_CONTRACT = {
   contract_version: 'b2c.v1' as const,
   dimension_keys: DRIVE_DIMENSION_KEYS,
   ei_dimension_cap: 4,
-  archetype_keys: ['the_operator', 'the_orchestrator', 'the_firefighter', 'the_macro'] as const,
+  archetype_keys: [
+    'purpose_architect',
+    'impact_catalyst',
+    'growth_weaver',
+    'autonomy_seeker',
+    'contribution_sage',
+    'harmony_champion',
+    'mastery_driven',
+    'extrinsic_high_performer',
+    'balance_first',
+    'risk_first',
+  ] as const,
 } as const;
 
 export function isDriveSchema(r: AssessmentResultSchema): r is DriveResultSchema {

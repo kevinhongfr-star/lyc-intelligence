@@ -1,8 +1,6 @@
 export const INSTRUMENT = "BRIDGE";
-export const FULL_NAME = "BRIDGE — Cross-Border Leadership Execution";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = BRIDGE — Cross-Border Leadership Execution draft derived from reportPipeline.
-export const B2C_NAME = "BRIDGE — Cross-Border Leadership Execution";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = BRIDGE — Cross-Border Leadership Execution draft derived from reportPipeline.
+export const FULL_NAME = "BRIDGE — cross-cultural relational intelligence";
+export const B2C_NAME = "BRIDGE — cross-cultural relational intelligence";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
@@ -10,7 +8,7 @@ export const DELIVERY_MINUTES = 12;
 export const TIER = "shift";
 export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 149;
-export const TAGLINE = "Cross-border mandate readiness. Mandate clarity, stakeholder navigation, cultural fluency, and the resilience to hold under pressure.";
+export const TAGLINE = "Cross-border mandate readiness. Mandate clarity, stakeholder relationship building, cultural fluency, and the resilience to hold under pressure.";
 
 export const DIMENSIONS = [
   {
@@ -35,7 +33,7 @@ export const DIMENSIONS = [
   },
   {
     id: "D2",
-    name: "Stakeholder Navigation",
+    name: "Stakeholder Relationship Building",
     question_ids: [
       "Q07",
       "Q08",
@@ -190,16 +188,16 @@ export const ARCHETYPES = [
   {
     name: "The Envoy",
     "#": "1",
-    weakest_dimension: "Stakeholder Navigation",
-    three_fires_correlation: "Fire 1: Relationship deficit",
+    weakest_dimension: "Stakeholder Relationship Building",
+    risk_layer: "Layer 1 — Expectation & Relationship Risk",
     failure_pattern: "Great on paper, fails in practice because relationships don't form. The mandate dies from isolation.",
     weakest_dim_id: "D2"
   },
   {
-    name: "The Navigator",
+    name: "The Wanderer",
     "#": "2",
     weakest_dimension: "Mandate Clarity",
-    three_fires_correlation: "Fire 1: Expectation gap",
+    risk_layer: "Layer 1 — Expectation & Relationship Risk",
     failure_pattern: "Misunderstands what the role actually requires. Misaligned expectations create early friction.",
     weakest_dim_id: "D1"
   },
@@ -207,7 +205,7 @@ export const ARCHETYPES = [
     name: "The Chameleon",
     "#": "3",
     weakest_dimension: "Communication Alignment",
-    three_fires_correlation: "Fire 2: Communication misfire",
+    risk_layer: "Layer 2 — Delivery & Pressure Risk",
     failure_pattern: "Says all the right things in the wrong way. Message is right but delivery creates friction.",
     weakest_dim_id: "D3"
   },
@@ -215,7 +213,7 @@ export const ARCHETYPES = [
     name: "The Anchor",
     "#": "4",
     weakest_dimension: "Pressure Resilience",
-    three_fires_correlation: "Fire 2: Pressure collapse",
+    risk_layer: "Layer 2 — Delivery & Pressure Risk",
     failure_pattern: "Starts strong, deteriorates under sustained pressure. The mandate doesn't fail in good times — it fails in the first crisis.",
     weakest_dim_id: "D4"
   },
@@ -223,15 +221,15 @@ export const ARCHETYPES = [
     name: "The Sprinter",
     "#": "5",
     weakest_dimension: "Long-Game Thinking",
-    three_fires_correlation: "Fire 3: Short-term trap",
-    failure_pattern: "Wins short-term results but burns long-term relationship capital. The board sees Q1 wins and doesn't notice the damage.",
+    risk_layer: "Layer 3 — Sustained Impact Risk",
+    failure_pattern: "Wins short-term results but erodes long-term relationship capital. The board sees Q1 wins and doesn't notice the damage.",
     weakest_dim_id: "D5"
   },
   {
     name: "The Cultural Operator",
     "#": "6",
     weakest_dimension: "No dim <50, Cultural Fluency >70",
-    three_fires_correlation: "Minimal fire risk",
+    risk_layer: "Lowest overall risk (protective profile)",
     failure_pattern: "The ideal BRIDGE profile. Strong across all dimensions with cultural fluency as a demonstrated strength.",
     weakest_dim_id: "D6"
   }
