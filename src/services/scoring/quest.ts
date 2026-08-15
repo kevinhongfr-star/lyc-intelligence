@@ -4,7 +4,10 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "QUEST";
-export const FULL_NAME = "Executive Performance Architecture";
+export const FULL_NAME = "QUEST — Executive Performance & Inquiry Rigour";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = QUEST — Executive Performance & Inquiry Rigour draft derived from reportPipeline.
+export const B2C_NAME = "QUEST — Executive Performance & Inquiry Rigour";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = QUEST — Executive Performance & Inquiry Rigour draft derived from reportPipeline.
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
@@ -12,8 +15,8 @@ export const DELIVERY_MINUTES = 12;
 export const TIER = "core";
 export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 199;
-export const B2C_NAME = "Executive Performance Architecture";
-export const TAGLINE = "Six-executive-dimension architecture. Where are you genuinely strong, and where will your next mandate expose gaps?";
+export const TAGLINE = "Six-executive-dimension framework. Where are you genuinely strong, and where will your next mandate expose gaps?";
+// TODO(Akira - X4-4): removed banned term from TAGLINE; replaced with "framework".
 
 export const DIMENSIONS = [
   {
@@ -64,7 +67,8 @@ export const DIMENSIONS = [
       "Strategy-to-results conversion",
       "Execution consistency",
       "Performance visibility",
-      "Accountability architecture",
+      // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "structure")
+      "Accountability structure",
       "Resource discipline"
     ],
     normalised_max: 20,
@@ -114,7 +118,8 @@ export const DIMENSIONS = [
     raw_max: 30,
     n_questions: 6,
     sub_dimensions: [
-      "Team architecture",
+      // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "structure")
+      "Team structure",
       "Succession development",
       "Team independence",
       "Dependency risk",
@@ -169,7 +174,8 @@ export const DIMENSIONS = [
     raw_max: 30,
     n_questions: 6,
     sub_dimensions: [
-      "Decision Architecture Readiness",
+      // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "Structure")
+      "Decision Structure Readiness",
       "Data Governance Awareness",
       "AI Ethics & Risk Oversight",
       "Organisational AI Adoption Leadership"
@@ -238,6 +244,7 @@ export const DIMENSION_VERDICTS = [
 
 export const ARCHETYPES = [
   {
+    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
     name: "The Architect",
     "#": "1",
     profile: "High Strategic Thinking + High Adaptive Capacity, Advanced band",
@@ -283,7 +290,8 @@ export const ARCHETYPES = [
     profile: "High Strategic Thinking, Developing band",
     core_strength: "Sees the big picture clearly; excellent at analysis and direction-setting",
     key_risk: "Execution gaps — vision without delivery mechanism; may rely on others for follow-through",
-    development_priority: "Execution Excellence; team mobilisation; accountability architecture"
+    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "structure")
+    development_priority: "Execution Excellence; team mobilisation; accountability structure"
   },
   {
     name: "The Engine",

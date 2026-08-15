@@ -1,5 +1,8 @@
 export const INSTRUMENT = "DRIVE";
-export const FULL_NAME = "Motivation Architecture & Engagement Risk Assessment";
+export const FULL_NAME = "DRIVE — Motivation Profile & Engagement Risk";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = DRIVE — Motivation Profile & Engagement Risk draft derived from reportPipeline.
+export const B2C_NAME = "DRIVE — Motivation Profile & Engagement Risk";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = DRIVE — Motivation Profile & Engagement Risk draft derived from reportPipeline.
 export const VERSION = "2.0";
 export const TOTAL_QUESTIONS = 30;
 export const SCALE = "1-5 Likert";
@@ -7,7 +10,6 @@ export const DELIVERY_MINUTES = 10;
 export const TIER = "shift";
 export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 149;
-export const B2C_NAME = "Motivation Architecture & Engagement Risk";
 export const TAGLINE = "Why you lead — and when you will disengage. Intrinsic × extrinsic × purpose × growth × confidence.";
 
 export const DIMENSIONS = [
@@ -165,7 +167,8 @@ export const COMPOSITE_BANDS = [
     min: 40,
     max: 59,
     band: "Moderate Drive",
-    interpretation: "Partial alignment; significant gaps between role and motivational architecture"
+    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "profile")
+    interpretation: "Partial alignment; significant gaps between role and motivational profile"
   },
   {
     min: 20,
@@ -187,7 +190,8 @@ export const DIMENSION_VERDICTS = [
     min: 16,
     max: 20,
     verdict: "Strong",
-    meaning: "Mature motivation architecture with sustainable engagement"
+    // TODO(Akira - X4-4): canonical replacement word review ("motivation Architecture" → "motivational profile")
+    meaning: "Mature motivational profile with sustainable engagement"
   },
   {
     dim: "all",
@@ -201,7 +205,8 @@ export const DIMENSION_VERDICTS = [
     min: 0,
     max: 9.9,
     verdict: "Gap",
-    meaning: "Significant motivation architecture gap requiring intervention"
+    // TODO(Akira - X4-4): canonical replacement word review ("motivation Architecture" → "motivational profile")
+    meaning: "Significant motivational profile gap requiring intervention"
   }
 ];
 

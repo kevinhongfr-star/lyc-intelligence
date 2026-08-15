@@ -24,7 +24,10 @@ export interface MOSAICDimensionBank {
 }
 
 export const INSTRUMENT = "MOSAIC";
-export const FULL_NAME = "Cross-Border Partnership Intelligence & Institutional Navigation";
+export const FULL_NAME = "MOSAIC — Cross-Border Partnership & Institutional Agility";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = MOSAIC — Cross-Border Partnership & Institutional Agility draft derived from reportPipeline.
+export const B2C_NAME = "MOSAIC — Cross-Border Partnership & Institutional Agility";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = MOSAIC — Cross-Border Partnership & Institutional Agility draft derived from reportPipeline.
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 25;
 export const SCALE = "1-5 Likert";

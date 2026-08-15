@@ -4,7 +4,10 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "FORGE";
-export const FULL_NAME = "Strengths Orientation Assessment";
+export const FULL_NAME = "FORGE — Sales Leadership Strengths & System Building";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = FORGE — Sales Leadership Strengths & System Building draft derived from reportPipeline.
+export const B2C_NAME = "FORGE — Sales Leadership Strengths & System Building";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = FORGE — Sales Leadership Strengths & System Building draft derived from reportPipeline.
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
@@ -12,8 +15,8 @@ export const DELIVERY_MINUTES = 12;
 export const TIER = "advisory";
 export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 99;
-export const B2C_NAME = "Strengths Orientation Assessment";
-export const TAGLINE = "36 questions. Sales leadership strengths, system building orientation, and scalable revenue architecture.";
+export const TAGLINE = "36 questions. Sales leadership strengths, system building orientation, and scalable revenue operating model.";
+// TODO(Akira - X4-4): removed banned term from TAGLINE; replaced revenue structure phrase with "revenue operating model".
 
 export const DIMENSIONS = [
   {
@@ -65,7 +68,8 @@ export const DIMENSIONS = [
   },
   {
     id: "D2",
-    name: "THREE FORCES AWARENESS (TFA)",
+    // TODO(Akira - X4-2): swap to exact canonical FORGE D2 descriptor. Placeholder = Selling Systems & Account Coverage (dimension about account coverage, selling system rigour, non-reliance on personal hero-selling).
+    name: "Selling Systems & Account Coverage (SSA)",
     question_ids: [
       "Q10",
       "Q11",
@@ -210,14 +214,17 @@ export const COMPOSITE_BANDS = [
   {
     min: 80,
     max: 100,
+    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
     band: "Revenue Architect",
-    interpretation: "Scalable revenue architecture with strong system leadership. Revenue generation is organisational, not personality-dependent."
+    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
+    interpretation: "Scalable revenue operating model with strong system leadership. Revenue generation is organisational, not personality-dependent."
   },
   {
     min: 60,
     max: 79,
     band: "Strong Performer",
-    interpretation: "Solid sales leadership with identifiable strengths. Some dimensions need investment to achieve scalable revenue architecture."
+    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
+    interpretation: "Solid sales leadership with identifiable strengths. Some dimensions need investment to achieve scalable revenue operating model."
   },
   {
     min: 40,
@@ -229,7 +236,8 @@ export const COMPOSITE_BANDS = [
     min: 0,
     max: 39,
     band: "Sales Capability Gap",
-    interpretation: "Significant gaps in sales leadership architecture. Revenue generation may be at risk without targeted intervention."
+    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
+    interpretation: "Significant gaps in sales leadership operating model. Revenue generation may be at risk without targeted intervention."
   }
 ];
 
@@ -239,7 +247,8 @@ export const DIMENSION_VERDICTS = [
     min: 16,
     max: 20,
     verdict: "B4",
-    meaning: "Mature sales leadership with scalable architecture"
+    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
+    meaning: "Mature sales leadership with scalable operating model"
   },
   {
     dim: "all",
@@ -281,20 +290,25 @@ export const ARCHETYPES = [
     name: "System Builder",
     selling_acumen: "Low",
     system_leadership: "High",
-    description: "Scalable revenue architecture without the personal commercial edge. The operator who builds pipelines, processes, and CRM rigour that should generate predictable revenue — but struggles when the machine requires a human touch.",
+    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
+    description: "Scalable revenue operating model without the personal commercial edge. The operator who builds pipelines, processes, and CRM rigour that should generate predictable revenue — but struggles when the machine requires a human touch.",
     strengths: "Process, rigour, and organisational design. The System Builder creates the sales infrastructure that outlasts any individual contributor: pipeline governance, forecast discipline, onboarding playbooks, compensation design, territory segmentation. When the commercial foundation is already strong, the System Builder scales it reliably.",
     blind_spots: "Pipeline is strong on paper; personal deals are weak. The System Builder can design the most elegant revenue machine in the world but cannot personally close a flagship deal when the machine stalls. In high-value B2B or enterprise contexts where relationships and judgment decide large deals, the System Builder's lack of commercial acumen becomes the binding constraint on revenue growth.",
-    core_pattern: "Scalable revenue architecture",
+    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "operating model")
+    core_pattern: "Scalable revenue operating model",
     revenue_risk: "Pipeline is strong; personal deals are weak",
     orientation: "System Leadership dominant, Selling Acumen low",
     quadrant: "Low Selling Acumen / High System Leadership"
   },
   {
+    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
     name: "Revenue Architect",
     selling_acumen: "High",
     system_leadership: "High",
     description: "Full commercial leadership. The rare executive who can personally close a major deal AND build the organisational system that closes a hundred smaller ones without them. The target state for every senior sales leader.",
+    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
     strengths: "Rare combination of commercial instinct and institutional design capability. The Revenue Architect can lead from the front on a critical enterprise pursuit while simultaneously building the sales machine that makes their personal involvement optional over time. They recruit Rainmakers, train them, institutionalise their methods, and maintain the commercial judgment that keeps the system honest.",
+    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
     blind_spots: "Risk: under-delegates; creates revenue dependency even with strong system. The Revenue Architect's biggest risk is themselves — their ability to personally fix any deal can become a crutch that the organisation learns to rely on, undermining the very system they're trying to build. The gap between building a system and trusting it is the Revenue Architect's defining tension.",
     core_pattern: "Full commercial leadership",
     revenue_risk: "Risk: under-delegates; creates revenue dependency",

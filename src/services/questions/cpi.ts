@@ -30,13 +30,18 @@ export interface CPIDimensionBank {
 }
 
 export const INSTRUMENT = 'CPI';
-export const FULL_NAME = 'Career Positioning Index';
+export const FULL_NAME = 'CPI — Career Positioning Index';
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = CPI — Career Positioning Index draft derived from reportPipeline.
+export const B2C_NAME = 'CPI — Career Positioning Index';
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = CPI — Career Positioning Index draft derived from reportPipeline.
 export const VERSION = '13.0';
 export const TOTAL_QUESTIONS = 30;
 export const SCALE = '1-5 Likert';
 export const DELIVERY_MINUTES = 15;
 
 export const DIMENSIONS: CPIDimensionBank[] = [
+  // X4-6 CPI dimension drift (see scoring/cpi.ts for full approved divergence note).
+  // B2C CPI uses 6-D self-rater structure — intentionally NOT B2B CPI v2 12-D set.
   {
     id: 'D1',
     name: 'Strategic Orientation',

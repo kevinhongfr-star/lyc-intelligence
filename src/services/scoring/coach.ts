@@ -4,14 +4,16 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "COACH";
-export const FULL_NAME = "Coaching Readiness & Manager-as-Coach Capability";
+export const FULL_NAME = "COACH — Manager-as-Coach Capability";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = COACH — Manager-as-Coach Capability draft derived from reportPipeline.
+export const B2C_NAME = "COACH — Manager-as-Coach Capability";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = COACH — Manager-as-Coach Capability draft derived from reportPipeline.
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 26;
 export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 8;
 export const TIER = "core";
 export const PRICE_MILES = 199;
-export const B2C_NAME = "Coaching Readiness & Manager-as-Coach Capability";
 export const TAGLINE = "The four pillars of a coaching leader: Mindset → Skillset → Toolkit → Discipline.";
 
 export const DIMENSIONS = [

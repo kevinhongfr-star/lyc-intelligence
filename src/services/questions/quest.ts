@@ -24,7 +24,10 @@ export interface QUESTDimensionBank {
 }
 
 export const INSTRUMENT = "QUEST";
-export const FULL_NAME = "Executive Performance Architecture";
+export const FULL_NAME = "QUEST — Executive Performance & Inquiry Rigour";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = QUEST — Executive Performance & Inquiry Rigour draft derived from reportPipeline.
+export const B2C_NAME = "QUEST — Executive Performance & Inquiry Rigour";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = QUEST — Executive Performance & Inquiry Rigour draft derived from reportPipeline.
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
@@ -96,7 +99,8 @@ export const DIMENSIONS: QUESTDimensionBank[] = [
     count: 6,
     max_raw: 30,
     formula: "(raw/30) x 20",
-    sub_dimensions: ["Organisational design for delivery", "Strategy-to-results conversion", "Execution consistency", "Performance visibility", "Accountability architecture", "Resource discipline"],
+    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "structure")
+    sub_dimensions: ["Organisational design for delivery", "Strategy-to-results conversion", "Execution consistency", "Performance visibility", "Accountability structure", "Resource discipline"],
     reverse_coded: ["Q09"],
     questions: [
       {
@@ -214,7 +218,8 @@ export const DIMENSIONS: QUESTDimensionBank[] = [
     count: 6,
     max_raw: 30,
     formula: "(raw/30) x 20",
-    sub_dimensions: ["Team architecture", "Succession development", "Team independence", "Dependency risk", "Individualised development", "High-stakes people decisions"],
+    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "structure")
+    sub_dimensions: ["Team structure", "Succession development", "Team independence", "Dependency risk", "Individualised development", "High-stakes people decisions"],
     reverse_coded: ["Q22"],
     questions: [
       {
@@ -332,7 +337,8 @@ export const DIMENSIONS: QUESTDimensionBank[] = [
     count: 6,
     max_raw: 30,
     formula: "(raw/30) x 20",
-    sub_dimensions: ["Decision Architecture Readiness", "Data Governance Awareness", "AI Ethics & Risk Oversight", "Organisational AI Adoption Leadership"],
+    // TODO(Akira - X4-4): canonical replacement word review ("Architecture" → "Structure")
+    sub_dimensions: ["Decision Structure Readiness", "Data Governance Awareness", "AI Ethics & Risk Oversight", "Organisational AI Adoption Leadership"],
     reverse_coded: ["Q33"],
     questions: [
       {

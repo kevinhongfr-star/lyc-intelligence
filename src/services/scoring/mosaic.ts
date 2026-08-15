@@ -4,7 +4,10 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "MOSAIC";
-export const FULL_NAME = "Cross-Border Partnership Intelligence & Institutional Navigation";
+export const FULL_NAME = "MOSAIC — Cross-Border Partnership & Institutional Agility";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = MOSAIC — Cross-Border Partnership & Institutional Agility draft derived from reportPipeline.
+export const B2C_NAME = "MOSAIC — Cross-Border Partnership & Institutional Agility";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = MOSAIC — Cross-Border Partnership & Institutional Agility draft derived from reportPipeline.
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 25;
 export const SCALE = "1-5 Likert";
@@ -12,7 +15,6 @@ export const DELIVERY_MINUTES = 8;
 export const TIER = "core";
 export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 199;
-export const B2C_NAME = "Cross-Border Partnership Intelligence & Institutional Navigation";
 export const TAGLINE = "JVs, alliances, partnerships, multi-party ecosystems. Institutional trust → relationship velocity.";
 
 export const DIMENSIONS = [

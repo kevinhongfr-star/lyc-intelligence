@@ -4,7 +4,10 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "PRISM";
-export const FULL_NAME = "Professional Brand Legibility";
+export const FULL_NAME = "PRISM — Professional Brand Legibility";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = PRISM — Professional Brand Legibility draft derived from reportPipeline.
+export const B2C_NAME = "PRISM — Professional Brand Legibility";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = PRISM — Professional Brand Legibility draft derived from reportPipeline.
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 30;
 export const SCALE = "1-5 Likert";
@@ -12,7 +15,6 @@ export const DELIVERY_MINUTES = 10;
 export const TIER = "advisory";
 export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 99;
-export const B2C_NAME = "Professional Brand Legibility Assessment";
 export const TAGLINE = "30 questions. Personal brand clarity, market legibility, and visibility.";
 
 export const DIMENSIONS = [
@@ -262,6 +264,7 @@ export const DIMENSION_VERDICTS = [
   }
 ];
 
+// X4-3: ARCHETYPES = person-archetypes only (no matrix axes). See MATRIX_AXES for 2x2 axis definitions.
 export const ARCHETYPES = [
   {
     name: "The Authority",
@@ -391,17 +394,13 @@ export const ARCHETYPES = [
     risk_if_unaddressed: "Without active construction, the blank page gets filled in by others — and rarely in the way the executive would choose.",
     development_priority: "Full brand construction from foundation up: identity, narrative, visibility, in that sequence",
     apac_note: "Post-exit APAC executives (particularly China or complex-market exits) are at high Blank Page risk if the narrative isn't managed"
-  },
-  {
-    name: "Axis 1",
-    description: "Brand Authenticity (Foundation): How strong and consistent is the internal brand foundation? (Strong / Developing / Weak)"
-  },
-  {
-    name: "Axis 2",
-    description: "Market Visibility: How readable and present is the executive to external audiences? (High / Medium / Low)"
   }
 ];
 
+export const MATRIX_AXES = [
+  { name: "Axis 1", description: "Brand Authenticity (Foundation): How strong and consistent is the internal brand foundation? (Strong / Developing / Weak)" },
+  { name: "Axis 2", description: "Market Visibility: How readable and present is the executive to external audiences? (High / Medium / Low)" },
+];
 
 export const SCORING_CONFIG = {
   INSTRUMENT, FULL_NAME, VERSION, TOTAL_QUESTIONS, SCALE, DELIVERY_MINUTES,

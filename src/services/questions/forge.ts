@@ -24,7 +24,10 @@ export interface FORGEDimensionBank {
 }
 
 export const INSTRUMENT = "FORGE";
-export const FULL_NAME = "Strengths Orientation Assessment";
+export const FULL_NAME = "FORGE — Sales Leadership Strengths & System Building";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = FORGE — Sales Leadership Strengths & System Building draft derived from reportPipeline.
+export const B2C_NAME = "FORGE — Sales Leadership Strengths & System Building";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = FORGE — Sales Leadership Strengths & System Building draft derived from reportPipeline.
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
@@ -116,7 +119,8 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
   },
   {
     id: "D2",
-    name: "THREE FORCES AWARENESS (TFA)",
+    // TODO(Akira - X4-2): swap to exact canonical FORGE D2 descriptor. Placeholder = Selling Systems & Account Coverage (dimension about account coverage, selling system rigour, non-reliance on personal hero-selling).
+    name: "Selling Systems & Account Coverage (SSA)",
     count: 9,
     max_raw: 45,
     formula: "(raw/45) x 20",
@@ -368,3 +372,11 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
 export const ALL_QUESTIONS: FORGEQuestion[] = DIMENSIONS.flatMap(d => d.questions);
 
 export const REVERSE_CODED_IDS: string[] = DIMENSIONS.flatMap(d => d.reverse_coded);
+
+// TODO(Akira - X4-2 FLAGGED QUESTION CONTENT):
+// Audit completed — full question text grep for "three" / "force" case-insensitive returned no instances
+// of explicit "three forces" contamination in question body text.
+// Hits observed (non-contaminating):
+// - Line 9: TypeScript literal `forced_choice` (question type, not body text)
+// - Q20 text: "past three years" (count word "three" only — no "force" linkage)
+// No questions require content review at this stage.

@@ -4,7 +4,10 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "LEAP";
-export const FULL_NAME = "Leadership Evaluation & Psychological Profiling";
+export const FULL_NAME = "LEAP — Learning & Execution Potential";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = LEAP — Learning & Execution Potential draft derived from reportPipeline.
+export const B2C_NAME = "LEAP — Learning & Execution Potential";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = LEAP — Learning & Execution Potential draft derived from reportPipeline.
 export const VERSION = "2.1";
 export const TOTAL_QUESTIONS = 35;
 export const SCALE = "Forced-choice DISC + Likert (mixed)";
@@ -12,7 +15,6 @@ export const DELIVERY_MINUTES = 12;
 export const TIER = "shift";
 export const SCORING_MODE = "forced_choice";
 export const PRICE_MILES = 149;
-export const B2C_NAME = "Leadership Evaluation & Psychological Profiling";
 export const TAGLINE = "35 forced-choice items. DISC \u00d7 Career Readiness \u00d7 APAC cross-border. The SHIFT suite psychological anchor.";
 
 export const DIMENSIONS = [
@@ -182,7 +184,11 @@ export const DIMENSION_VERDICTS = [
     meaning: "Fully positioned for strategic career transition"
   }
 ];
-
+// X4-5 LEAP archetype integrity (Akira audit 2026-08-15):
+// 16 archetypes = 4 DISC primaries (D/I/S/C) × 4 Career Readiness bands (B1→B4).
+// Verified: 0 duplicates, 0 placeholders, 0 "Architect (Strategic)" / "LEAP Instrument" entries.
+// Akira's Notion QB reported 17 including a duplicate "Architect (Strategic)" +
+// placeholder "LEAP Instrument" — Notion is stale. Canonical source = this file.
 export const ARCHETYPES = [
   {
     cr_band: "B1",

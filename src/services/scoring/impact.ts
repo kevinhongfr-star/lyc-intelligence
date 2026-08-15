@@ -4,7 +4,10 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "IMPACT";
-export const FULL_NAME = "Board Effectiveness Assessment";
+export const FULL_NAME = "IMPACT — Board Effectiveness & Executive Presence";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = IMPACT — Board Effectiveness & Executive Presence draft derived from reportPipeline.
+export const B2C_NAME = "IMPACT — Board Effectiveness & Executive Presence";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = IMPACT — Board Effectiveness & Executive Presence draft derived from reportPipeline.
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 30;
 export const SCALE = "1-5 Likert";
@@ -12,7 +15,6 @@ export const DELIVERY_MINUTES = 10;
 export const TIER = "shift";
 export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 149;
-export const B2C_NAME = "Board Effectiveness Assessment";
 export const TAGLINE = "Board-ready you. Strategic oversight, governance rigour, stakeholder intelligence, mandate legacy.";
 
 export const DIMENSIONS = [
@@ -163,8 +165,10 @@ export const DIMENSION_VERDICTS = [
   }
 ];
 
+// X4-3: ARCHETYPES = person-archetypes only (no matrix axes). See MATRIX_AXES for 2x2 axis definitions.
 export const ARCHETYPES = [
   {
+    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
     name: "The Architect",
     "#": "1",
     orientation: "Governance + Strategy dominant",
@@ -243,17 +247,13 @@ export const ARCHETYPES = [
     risk_if_unaddressed: "Continued presence weakens board effectiveness and sets a governance floor that others adapt to.",
     development_priority: "Honest assessment conversation required: targeted development or board exit",
     apac_modifier_note: "APAC Mandate Credibility is likely very low — limited value in APAC governance contexts without fundamental capability development"
-  },
-  {
-    name: "Axis 1",
-    description: "Impact Orientation: How does the board member primarily create value? (Governance-dominant / Strategy-dominant / Relationship-dominant / Legacy-dominant / Balanced)"
-  },
-  {
-    name: "Axis 2",
-    description: "Mandate Strength Band: How credibly do they operate in the governance role? (High / Building / Fragile)"
   }
 ];
 
+export const MATRIX_AXES = [
+  { name: "Axis 1", description: "Impact Orientation: How does the board member primarily create value? (Governance-dominant / Strategy-dominant / Relationship-dominant / Legacy-dominant / Balanced)" },
+  { name: "Axis 2", description: "Mandate Strength Band: How credibly do they operate in the governance role? (High / Building / Fragile)" },
+];
 
 export const SCORING_CONFIG = {
   INSTRUMENT, FULL_NAME, VERSION, TOTAL_QUESTIONS, SCALE, DELIVERY_MINUTES,

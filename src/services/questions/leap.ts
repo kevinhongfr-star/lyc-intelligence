@@ -24,7 +24,10 @@ export interface LEAPDimensionBank {
 }
 
 export const INSTRUMENT = "LEAP";
-export const FULL_NAME = "Leadership Evaluation & Psychological Profiling";
+export const FULL_NAME = "LEAP — Learning & Execution Potential";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = LEAP — Learning & Execution Potential draft derived from reportPipeline.
+export const B2C_NAME = "LEAP — Learning & Execution Potential";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = LEAP — Learning & Execution Potential draft derived from reportPipeline.
 export const VERSION = "2.0";
 // NOTE: questions/leap.ts organises DISC items per-dimension (D/I/S/C), so the
 // same 16 forced-choice item sets appear in 4 parallel dim arrays each. The

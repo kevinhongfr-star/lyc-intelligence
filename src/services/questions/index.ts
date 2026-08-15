@@ -1,5 +1,23 @@
 // Generated question-bank barrel — do not hand-edit.
-// Source of truth: akira_source/diagnostic_portfolio/07_question_banks/*
+// Source of truth: this repo's src/services/questions/{instrument}.ts modules.
+//
+// X4-9 Notion QB Data Gap Documentation (Akira audit 2026-08-15):
+// The Notion Diagnostic Portfolio exports are STALE / INCOMPLETE and MUST NOT
+// be used as a reference. The repository src/services/ tree under scoring/ and
+// questions/ is the ONE source of truth. Specific stale Notion observations:
+//   - QUEST Notion QB export: skeleton only (0 questions per dimension)
+//   - LEAP Notion QB export:  skeleton only (0 questions per dimension)
+//   - MOSAIC Notion export:     0 archetype definitions defined
+//   - COACH Notion export:      0 archetype definitions defined
+//   - LEAP Notion archetype list: reports 17 including a duplicate
+//     "Architect (Strategic)" + placeholder "LEAP Instrument" — both
+//     artefacts of stale Notion. The canonical scoring/leap.ts has 16.
+//
+// If Notion must be kept in sync as a reference, that's a manual task —
+// the direction of sync is REPO → NOTION, never the reverse.
+// akira_source/diagnostic_portfolio/07_question_banks/* was the input to
+// X1/X2/X3 content-port runs; after X4 engine remediation pass the repo
+// has diverged and akira_source is also stale.
 
 import * as cpi from './cpi';
 import * as prism from './prism';

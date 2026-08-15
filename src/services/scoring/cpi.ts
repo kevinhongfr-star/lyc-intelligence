@@ -31,7 +31,10 @@ export interface CPICompositeBand {
 }
 
 export const INSTRUMENT = 'CPI';
-export const FULL_NAME = 'Career Positioning Index';
+export const FULL_NAME = 'CPI — Career Positioning Index';
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = CPI — Career Positioning Index draft derived from reportPipeline.
+export const B2C_NAME = 'CPI — Career Positioning Index';
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = CPI — Career Positioning Index draft derived from reportPipeline.
 export const VERSION = '13.0';
 export const TIER = 'flagship';
 export const SCORING_MODE = 'weighted_average';
@@ -44,6 +47,25 @@ export const DELIVERY_MINUTES = 15;
 // dimension. The meta dimension is included in archetype matching but
 // receives reduced composite weight (it modulates interpretation rather
 // than driving the headline score).
+//
+// X4-6 CPI dimension drift (Akira audit 2026-08-15): APPROVED DIVERGENCE.
+// B2C CPI (this file) = 6-D B2C single-rater flagship variant (executive
+// self-assessment surface on lyc-intelligence.app). It is NOT the same
+// instrument as B2B CPI v2 Master Library (12-D multi-rater structure
+// containing Talent Representation, Development Investment, External
+// Hiring Capability, etc.). B2B v2 targets internal enterprise / people
+// analytics teams. The B2C surface deliberately uses a smaller,
+// psychologically self-contained 6-D set:
+//   1. Strategic Orientation
+//   2. Cross-Border Adaptability
+//   3. Stakeholder Influence
+//   4. Execution Discipline
+//   5. Leadership Presence
+//   6. Self-Awareness Quotient
+//
+// If a future cycle ports B2B CPI v2 for the corporate surface, it MUST
+// be a separate instrument key (e.g., CPI_B2B) and NOT merge into the
+// B2C CPI scoring config used here.
 export const DIMENSIONS: CPICfgDimension[] = [
   {
     id: 'D1',
@@ -140,6 +162,7 @@ export const COMPOSITE_BANDS: CPICompositeBand[] = [
 export const ARCHETYPES = [
   {
     id: 'A1',
+    // TODO(Akira - X4-4): confirm archetype-word 'Architect' retention against Architecture-ban policy
     name: 'Strategic Architect',
     description: 'Systemic thinker with future-back orientation. Frames the future, not just the task.',
     primary_dim: 'D1',
@@ -194,7 +217,6 @@ export const ARCHETYPES = [
   },
 ];
 
-export const B2C_NAME = 'Career Positioning Index';
 export const TAGLINE = 'The flagship executive self-awareness assessment — six dimensions, six archetypes, one composite profile.';
 
 export const DIMENSION_VERDICTS = [

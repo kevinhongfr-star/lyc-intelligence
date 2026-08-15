@@ -19,7 +19,10 @@ export interface DRIVEDimensionBank {
 }
 
 export const INSTRUMENT = "DRIVE";
-export const FULL_NAME = "Motivation Architecture & Engagement Risk Assessment";
+export const FULL_NAME = "DRIVE — Motivation Profile & Engagement Risk";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = DRIVE — Motivation Profile & Engagement Risk draft derived from reportPipeline.
+export const B2C_NAME = "DRIVE — Motivation Profile & Engagement Risk";
+// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = DRIVE — Motivation Profile & Engagement Risk draft derived from reportPipeline.
 export const VERSION = "2.0";
 export const TOTAL_QUESTIONS = 30;
 export const SCALE = "1-5 Likert";

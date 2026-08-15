@@ -9,6 +9,13 @@ import { generateCPIReportHTML, type CPIReportData } from './cpiReportRenderer';
 import * as reportService from './reportService';
 import type { ScoreResult as AkiraScoreResult } from '../lib/akira/engine';
 import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
+import { SCORING_CONFIGS } from './scoring';
+
+function getInstrumentDisplayName(key: string): string {
+  const upper = key.toUpperCase() as keyof typeof SCORING_CONFIGS;
+  const cfg = SCORING_CONFIGS[upper];
+  return cfg?.B2C_NAME || cfg?.FULL_NAME || `${key.toUpperCase()} Assessment`;
+}
 
 export type InstrumentKey =
   | 'CPI'
@@ -79,20 +86,6 @@ const INSTRUMENT_ACCENTS: Record<string, string> = {
   FORGE: '#C108AB',
   BRIDGE: '#C108AB',
   MOSAIC: '#C108AB',
-};
-
-const INSTRUMENT_NAMES: Record<string, string> = {
-  CPI: 'China Leadership Pipeline Diagnostic',
-  PRISM: 'PRISM Leadership Diagnostic',
-  SPARK: 'SPARK AI Readiness Diagnostic',
-  LEAP: 'LEAP — Learning & Execution Potential',
-  QUEST: 'QUEST — Questioning & Inquiry Skills',
-  IMPACT: 'IMPACT — Influence & Executive Presence',
-  FORGE: 'FORGE — Performance & Resilience',
-  DRIVE: 'DRIVE — Execution & Delivery Capability',
-  COACH: 'COACH — Coaching & Leadership Development',
-  BRIDGE: 'BRIDGE — Cross-Border Leadership',
-  MOSAIC: 'MOSAIC — Cultural Agility',
 };
 
 export async function scoreAssessment(
@@ -235,7 +228,7 @@ export async function renderReport(
   const key = instrumentKey.toUpperCase();
   const accent = brandOpts?.accent || INSTRUMENT_ACCENTS[key] || '#C108AB';
   const generatedAt = brandOpts?.generatedAt || new Date();
-  const instrumentName = INSTRUMENT_NAMES[key] || `${key} Assessment`;
+  const instrumentName = getInstrumentDisplayName(key);
 
   if (key === 'CPI') {
     const cpiData: CPIReportData = {
@@ -503,7 +496,7 @@ export async function getReportMeta(
   resultId?: string
 ): Promise<ReportMeta> {
   const key = instrumentKey.toUpperCase();
-  const name = INSTRUMENT_NAMES[key] || `${key} Assessment`;
+  const name = getInstrumentDisplayName(key);
   const dateStamp = new Date().toISOString().split('T')[0];
 
   const result = resultId ? await lookupResult(resultId) : undefined;
@@ -541,7 +534,7 @@ async function lookupResult(resultId: string): Promise<Partial<ScoreResult> | nu
 export function instrumentToConfig(instrumentKey: string, result: ScoreResult): AssessmentResultsConfig {
   const key = instrumentKey.toUpperCase();
   const accent = INSTRUMENT_ACCENTS[key] || '#C108AB';
-  const assessmentName = INSTRUMENT_NAMES[key] || key;
+  const assessmentName = getInstrumentDisplayName(key);
   const prefix = `${key.toLowerCase()}-results`;
   const lowerKey = key.toLowerCase();
 
