@@ -1,32 +1,40 @@
 /**
- * /api/setup/assessment-table — One-time migration endpoint.
+ * /api/setup/[task] — Consolidated one-time admin/setup endpoint.
  *
- * Creates the assessment_results table if it doesn't exist.
- * Auth: requires x-setup-key header matching SETUP_SECRET env var.
+ * Replaces the former api/apply-rls.ts and api/setup/assessment-table.ts
+ * (Vercel Hobby plan: 13 → 12 serverless functions per deployment).
+ *
+ * Routes:
+ *   /api/setup/assessment-table → create assessment_results table + RLS policies
+ *   /api/setup/apply-rls        → apply supabase/rls_policies.sql
+ *
+ * Auth differs per task (preserved from originals):
+ *   assessment-table: x-setup-key header matching SETUP_SECRET, POST only
+ *   apply-rls:         Authorization: Bearer <CRON_SECRET>
  *
  * DELETE AFTER USE.
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Pool } from 'pg';
+import fs from 'fs';
+import path from 'path';
 
-const SETUP_SECRET = process.env.SETUP_SECRET || '';
+// --- Shared env ---
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 function buildConnectionString(): string {
-  // Extract project ref from Supabase URL
   const urlMatch = SUPABASE_URL.match(/https?:\/\/([a-z0-9]+)\.supabase\.co/);
   const projectRef = urlMatch ? urlMatch[1] : '';
-  
   if (!projectRef) {
     throw new Error(`Cannot extract Supabase project ref from URL: ${SUPABASE_URL}`);
   }
-  
   const host = `db.${projectRef}.supabase.co`;
   return `postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@${host}:5432/postgres`;
 }
 
+// --- assessment-table SQL (inline, preserved verbatim) ---
 const CREATE_TABLE_SQL = `
 CREATE TABLE IF NOT EXISTS public.assessment_results (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -92,9 +100,14 @@ CREATE POLICY assessment_results_anon_select ON public.assessment_results FOR SE
 );
 `;
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+// ============================================================
+// Task: assessment-table
+// Auth: x-setup-key header matching SETUP_SECRET, POST only
+// ============================================================
+async function runAssessmentTable(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Content-Type', 'application/json');
 
+  const SETUP_SECRET = process.env.SETUP_SECRET || '';
   const key = req.headers['x-setup-key'] || req.headers['X-Setup-Key'];
   if (!key || !SETUP_SECRET || key !== SETUP_SECRET) {
     return res.status(401).json({ error: 'Unauthorized', has_secret: !!SETUP_SECRET });
@@ -104,27 +117,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  if (!SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_URL) {
+    return res.status(500).json({ error: 'Missing Supabase credentials' });
+  }
+
+  let pool: Pool | null = null;
   try {
     const connString = buildConnectionString();
-    // Don't log the full string (contains password)
     const maskedConn = connString.replace(/:.*@/, ':***@');
-    console.log('[setup] Connecting to:', maskedConn);
+    console.log('[setup:assessment-table] Connecting to:', maskedConn);
 
-    const pool = new Pool({
+    pool = new Pool({
       connectionString: connString,
       ssl: { rejectUnauthorized: false },
       connectionTimeoutMillis: 15000,
     });
 
     const client = await pool.connect();
-    console.log('[setup] Connected to DB');
+    console.log('[setup:assessment-table] Connected to DB');
 
     try {
       await client.query('BEGIN');
-      const result = await client.query(CREATE_TABLE_SQL);
+      await client.query(CREATE_TABLE_SQL);
       await client.query('COMMIT');
 
-      // Verify
       const verify = await client.query(
         "SELECT count(*) as cnt FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'assessment_results'"
       );
@@ -146,10 +162,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw queryErr;
     } finally {
       client.release();
-      await pool.end();
     }
   } catch (error: any) {
-    console.error('[setup] Error:', error.message);
+    console.error('[setup:assessment-table] Error:', error.message);
     res.status(500).json({
       error: 'Failed to create table',
       message: error.message,
@@ -157,5 +172,83 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       supabase_url_present: !!SUPABASE_URL,
       service_key_present: !!SUPABASE_SERVICE_ROLE_KEY,
     });
+  } finally {
+    if (pool) {
+      await pool.end();
+    }
   }
+}
+
+// ============================================================
+// Task: apply-rls
+// Auth: Authorization: Bearer <CRON_SECRET>
+// ============================================================
+async function runApplyRls(req: VercelRequest, res: VercelResponse) {
+  const CRON_SECRET = process.env.CRON_SECRET || '';
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== `Bearer ${CRON_SECRET}`) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  if (!SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_URL) {
+    return res.status(500).json({ error: 'Missing Supabase credentials' });
+  }
+
+  let pool: Pool | null = null;
+  try {
+    const connString = buildConnectionString();
+    pool = new Pool({
+      connectionString: connString,
+      ssl: { rejectUnauthorized: false },
+      connectionTimeoutMillis: 10000,
+    });
+
+    const rlsSqlPath = path.join(process.cwd(), 'supabase', 'rls_policies.sql');
+    let rlsSql = '';
+    try {
+      rlsSql = fs.readFileSync(rlsSqlPath, 'utf-8');
+    } catch (e) {
+      return res.status(500).json({ error: 'Cannot read RLS SQL file', path: rlsSqlPath });
+    }
+
+    const result = await pool.query(rlsSql);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'RLS policies applied successfully',
+      rowsAffected: Array.isArray(result) ? result.length : (result.rowCount || 0),
+      note: 'Policies applied. Run a verification query to confirm.',
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Failed to apply RLS policies',
+      message: error.message,
+      stack: error.stack?.split('\n').slice(0, 3),
+    });
+  } finally {
+    if (pool) {
+      await pool.end();
+    }
+  }
+}
+
+// ============================================================
+// Dispatcher
+// ============================================================
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const { task } = req.query;
+
+  if (task === 'assessment-table') {
+    return runAssessmentTable(req, res);
+  }
+  if (task === 'apply-rls') {
+    return runApplyRls(req, res);
+  }
+
+  return res.status(404).json({
+    error: 'Unknown setup task',
+    task: task || null,
+    available: ['assessment-table', 'apply-rls'],
+  });
 }

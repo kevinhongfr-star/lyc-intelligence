@@ -7,7 +7,7 @@
 --  automatically assigned to that consultant.
 --
 --  Run via: Supabase SQL Editor OR psql $DATABASE_URL < this file
---  Then redeploy RLS: POST /api/apply-rls (with CRON_SECRET)
+--  Then redeploy RLS: POST /api/setup/apply-rls (with CRON_SECRET)
 -- ============================================================
 
 -- 1. Add owner_id column (nullable — unowned contacts are admin-only)
