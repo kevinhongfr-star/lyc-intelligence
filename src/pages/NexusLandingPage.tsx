@@ -57,8 +57,8 @@ const DIFFERENTIATORS = [
     body: 'Assessments, analysis, and conversation in one surface. You don\u2019t describe your leadership to NEXUS — you measure it, then discuss what the measurement means.',
   },
   {
-    title: 'Framework-aware.',
-    body: 'Uses validated leadership models (Score Match, composite scores, dimension/archetype mapping). Guidance is grounded in frameworks, not improvised.',
+    title: 'Assessment-literate.',
+    body: 'Uses validated leadership models (Score Match, composite scores, dimension/archetype mapping). Guidance is grounded in real diagnostic structure, not improvised.',
   },
   {
     title: 'Privacy-first.',
@@ -89,7 +89,7 @@ const PRICING_CONTEXT = [
 const FAQ = [
   {
     q: 'Is NEXUS just another AI chatbot?',
-    a: 'No. NEXUS is a multi-agent executive intelligence system built on LYC\u2019s executive search methodology. It combines validated leadership assessments, pattern analysis, and framework-aware advisory — not just open-ended conversation.',
+    a: 'No. NEXUS is a multi-agent executive intelligence system built on LYC\u2019s executive search methodology. It combines validated leadership assessments, pattern analysis, and assessment-literate advisory — not just open-ended conversation.',
   },
   {
     q: 'What can NEXUS help me with?',
@@ -101,7 +101,7 @@ const FAQ = [
   },
   {
     q: 'How is NEXUS different from ChatGPT?',
-    a: 'ChatGPT is a general-purpose language model. NEXUS is calibrated on executive search methodology and carries LYC\u2019s institutional knowledge — 500+ placements across 47 markets. It knows the frameworks, the failure patterns, and the questions most executives skip.',
+    a: 'ChatGPT is a general-purpose language model. NEXUS is grounded in executive search methodology and carries LYC\u2019s institutional knowledge — 500+ placements across 47 markets. It knows the frameworks, the failure patterns, and the questions most executives skip.',
   },
 ];
 

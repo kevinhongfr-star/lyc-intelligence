@@ -51,7 +51,7 @@ const SPARK_ARCHETYPES: LandingArchetype[] = [
 const SPARK_METHOD_STEPS = [
   {
     mono: '01 · Self-Assessment',
-    title: 'Twenty-seven calibrated questions.',
+    title: 'Twenty-seven benchmarked questions.',
     body: 'Three dimensions — individual adoption, capability exposure, organisational preparedness — nine questions each. No technical knowledge required; honest executive reflection is enough.',
   },
   {
@@ -67,16 +67,16 @@ const SPARK_METHOD_STEPS = [
 ];
 
 const SPARK_WHO_FOR = [
-  { title: 'Senior leaders navigating AI transformation', desc: 'Executives who need to understand their AI readiness gaps before they become competitive disadvantages.' },
-  { title: 'Board directors with AI accountability', desc: 'Directors responsible for AI governance who must calibrate fluency against governance maturity, not conflate the two.' },
+  { title: 'Senior leaders steering through AI transformation', desc: 'Executives who need to understand their AI readiness gaps before they become competitive disadvantages.' },
+  { title: 'Board directors with AI accountability', desc: 'Directors responsible for AI governance who must align fluency against governance maturity, not conflate the two.' },
   { title: 'Aspiring AI leaders', desc: 'Managers preparing to lead AI initiatives and wanting to identify which readiness dimension to develop first.' },
 ];
 
 const SPARK_DIFFERENT = [
   'Three focused dimensions, not generic AI literacy. Individual adoption, capability exposure, and organisational preparedness are scored independently.',
   'Four governance archetypes tied to board accountability — pairing AI fluency with governance maturity so the profile reflects real director behaviour.',
-  'Reads both the individual and the organisation. Most AI assessments stop at personal skill; SPARK calibrates whether your enterprise can actually adopt.',
-  'Calibrated to enterprise governance, not consumer tooling. Built for the decisions boards and executives actually face.',
+  'Reads both the individual and the organisation. Most AI assessments stop at personal skill; SPARK benchmarks whether your enterprise can actually adopt.',
+  'Grounded in enterprise governance, not consumer tooling. Built for the decisions boards and executives actually face.',
 ];
 
 const SPARK_FAQ = [

@@ -33,14 +33,14 @@ const LEAP_DIMENSIONS: LandingDimension[] = [
     name: 'Timing',
     short: 'Timing',
     description:
-      'Recognising the right moment, calibrating pace, managing pressure, and aligning to APAC tempo — knowing when to move and when to wait.',
+      'Recognising the right moment, aligning pace, managing pressure, and aligning to APAC tempo — knowing when to move and when to wait.',
   },
   {
     id: 'D4',
     name: 'Risk',
     short: 'Risk',
     description:
-      'Assessing, calibrating, and mitigating risk — including political risk — so exposure is deliberate rather than accidental.',
+      'Assessing, benchmarking, and mitigating risk — including political risk — so exposure is deliberate rather than accidental.',
   },
   {
     id: 'D5',
@@ -54,14 +54,14 @@ const LEAP_DIMENSIONS: LandingDimension[] = [
 // 17 archetypes per akira_source/leap_config.json. Codes assigned A1–A17.
 const LEAP_ARCHETYPES: LandingArchetype[] = [
   { code: 'A1', name: 'Catalyst', tagline: 'Market-Timing dominant: drives change through energy and momentum.' },
-  { code: 'A2', name: 'Architect', tagline: 'Market-Capability dominant: builds systems calibrated to competitive reality.' },
+  { code: 'A2', name: 'Architect', tagline: 'Market-Capability dominant: builds systems grounded in competitive reality.' },
   { code: 'A3', name: 'Pioneer', tagline: 'Timing-Risk dominant: moves into new territory before competitors recognise the opening.' },
   { code: 'A4', name: 'Founder', tagline: 'Capability-Impact dominant: creates something durable from differentiated strength.' },
   { code: 'A5', name: 'Anchor', tagline: 'Risk-Capability dominant: creates stability in turbulent market conditions.' },
   { code: 'A6', name: 'Steward', tagline: 'Capability-Impact dominant: develops and protects organisational capability over time.' },
   { code: 'A7', name: 'Cultivator', tagline: 'Capability-Market dominant: grows capability aligned to market evolution.' },
   { code: 'A8', name: 'Guardian', tagline: 'Risk-Market dominant: maintains positioning integrity under competitive pressure.' },
-  { code: 'A9', name: 'Diplomat', tagline: 'Impact-Risk dominant: navigates complex stakeholder environments with precision.' },
+  { code: 'A9', name: 'Diplomat', tagline: 'Impact-Risk dominant: manages complex stakeholder environments with precision.' },
   { code: 'A10', name: 'Facilitator', tagline: 'Market-Impact dominant: creates alignment across different market and cultural contexts.' },
   { code: 'A11', name: 'Translator', tagline: 'Capability-Market dominant: bridges capability gaps between organisational worlds.' },
   { code: 'A12', name: 'Champion', tagline: 'Impact-Timing dominant: advocates powerfully at the right moment.' },
@@ -76,10 +76,10 @@ const LEAP_METHOD_STEPS = [
   {
     mono: '01 · Self-Assessment',
     title: 'Your own view of your leadership operation.',
-    body: 'Thirty calibrated questions across five dimensions — Market, Capability, Timing, Risk, Impact. The self-view baseline of how you actually operate.',
+    body: 'Thirty benchmarked questions across five dimensions — Market, Capability, Timing, Risk, Impact. The self-view baseline of how you actually operate.',
   },
   {
-    mono: '02 · Dimension Calibration',
+    mono: '02 · Dimension Benchmarking',
     title: 'Each dimension scored and interpreted.',
     body: 'Five independent dimension verdicts — from Strong Primary to Out of Scope — with written meaning tied to real leadership behaviour, not abstract traits.',
   },
@@ -129,7 +129,7 @@ export function LeapLanding() {
       name="LEAP"
       fullName="Leadership Archetype & APAC Translation"
       tagline="Deep leadership self-awareness across five operating dimensions. Seventeen archetypes. Comprehensive multi-phase profiling."
-      heroDescription="The deepest single-instrument leadership profile in the LYC suite. Five dimensions. Seventeen archetypes. A composite profile calibrated to how executives actually operate — including APAC translation."
+      heroDescription="The deepest single-instrument leadership profile in the LYC suite. Five dimensions. Seventeen archetypes. A composite profile grounded in how executives actually operate — including APAC translation."
       categoryLabel="Leadership Self-Awareness"
       tierBadge="HERO ASSESSMENT"
       accent={OCEAN}

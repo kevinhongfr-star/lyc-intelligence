@@ -234,7 +234,7 @@ const DIAGS = [
   { tag: 'Executive Presence', title: 'Executive Presence Diagnostic', desc: 'Assess how you show up — communication clarity, influence style, gravitas, and stakeholder impact.', meta: '4 sub-dimensions · 20 min' },
   { tag: 'People Leadership', title: 'Team Leadership Diagnostic', desc: 'Evaluate how you build teams, develop people, and drive performance through others.', meta: '5 sub-dimensions · 22 min' },
   { tag: 'China & APAC', title: 'China Leadership Pipeline Diagnostic', desc: 'Context-specific assessment for leaders in China and cross-cultural APAC environments. Built on local executive benchmarks.', meta: '5 dimensions · 6 profiles · China/APAC' },
-  { tag: 'Change', title: 'Change Agility Diagnostic', desc: 'Understand how you navigate ambiguity, lead through transition, and adapt under pressure.', meta: '4 sub-dimensions · 18 min' },
+  { tag: 'Change', title: 'Change Agility Diagnostic', desc: 'Understand how you manage ambiguity, lead through transition, and adapt under pressure.', meta: '4 sub-dimensions · 18 min' },
   { tag: 'Commercial', title: 'Commercial Acumen Diagnostic', desc: 'Test your business judgment — P&L orientation, market analysis, and investment decision-making.', meta: '4 sub-dimensions · 20 min' },
 ];
 function Diagnostics() {

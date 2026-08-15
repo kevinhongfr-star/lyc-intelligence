@@ -66,7 +66,7 @@ function buildCatalogEntry(code: string): CatalogEntry {
   const FALLBACKS: Record<string, Partial<CatalogEntry> & { name: string; benefit: string }> = {
     CPI: { name: 'Core Professional Insight', benefit: 'The flagship executive self-awareness assessment. 6 dimensions, 6 archetypes, 3 layers of depth — built on two decades of C-suite search methodology.', dimensions: 6, archetypes: 6, price: 199, questions: 30, minutes: 15 },
     LEAP: { name: 'Leadership Archetype & APAC Translation', benefit: 'Deep leadership self-awareness across five operating dimensions. Seventeen archetypes with an APAC translation overlay.', dimensions: 5, archetypes: 17, price: 149, questions: 30, minutes: 15 },
-    IMPACT: { name: 'Board Effectiveness Assessment', benefit: 'Board and organisational impact calibration. Five dimensions, eight archetypes, APAC mandate credibility.', dimensions: 5, archetypes: 8, price: 149, questions: 30, minutes: 15 },
+    IMPACT: { name: 'Board Effectiveness Assessment', benefit: 'Board and organisational impact benchmarking. Five dimensions, eight archetypes, APAC mandate credibility.', dimensions: 5, archetypes: 8, price: 149, questions: 30, minutes: 15 },
     QUEST: { name: 'QUEST Leadership', benefit: 'Leadership operating model across six executive dimensions.', dimensions: 6, archetypes: 12, price: 149, questions: 90, minutes: 30 },
     COACH: { name: 'COACH Developmental', benefit: 'Developmental coaching orientation and bilateral capability.', dimensions: 4, archetypes: 8, price: 99, questions: 60, minutes: 20 },
   };
@@ -538,7 +538,7 @@ export function AssessmentCatalogPage() {
             <h2 style={SECTION_TITLE}>Flagship Instrument</h2>
             <p style={SECTION_SUB}>
               The CPI is our flagship — validated against two decades of APAC executive placements.
-              For executives who want the complete calibration.
+              For executives who want the complete benchmarking.
             </p>
           </div>
           <div
@@ -663,7 +663,7 @@ export function AssessmentCatalogPage() {
                 }}
               >
                 Six dimensions. Six archetypes. Three layers of depth. CPI is the
-                natural entry point — the complete calibration the rest of the
+                natural entry point — the complete benchmarking the rest of the
                 catalog builds on.
               </p>
               <div style={{ marginTop: '28px' }}>

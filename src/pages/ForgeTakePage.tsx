@@ -31,10 +31,10 @@ const config: AssessmentFlowConfig = {
   landingPath: '/assessment/forge',
   intro: {
     title: 'FORGE — Strengths Orientation Assessment',
-    body: 'You will answer 36 questions across four dimensions of strengths orientation: Adaptive Learning, Three Forces Awareness, Development Agency, and Bilateral Context Navigation. Your responses map to a 2×2 strengths matrix: Selling Acumen vs. System Leadership. Answer as you actually operate today — not as you intend to.',
+    body: 'You will answer 36 questions across four dimensions of strengths orientation: Adaptive Learning, Selling Systems & Account Coverage, Development Agency, and Bilateral Context Navigation. Your responses map to a 2×2 strengths matrix: Selling Acumen vs. System Leadership. Answer as you actually operate today — not as you intend to.',
     duration: '~12 minutes',
     expectations: [
-      '36 questions across Adaptive Learning Orientation, Three Forces Awareness, Development Agency, and Bilateral Context Navigation',
+      '36 questions across Adaptive Learning Orientation, Selling Systems & Account Coverage, Development Agency, and Bilateral Context Navigation',
       '1–5 Likert scale — answer honestly; some items are reverse-worded on purpose',
       'Your progress auto-saves to this device; resume if interrupted',
       'On completion: composite score, dimension scorecard, matched 2×2 quadrant archetype, and development priorities',

@@ -40,7 +40,7 @@ const IMPACT_DIMENSIONS: LandingDimension[] = [
     name: 'Stakeholder Intelligence',
     short: 'Stakeholders',
     description:
-      'How well you read stakeholder ecosystems, navigate boardroom dynamics, and build relationships that create influence beyond formal authority.',
+      'How well you read stakeholder ecosystems, manage boardroom dynamics, and build relationships that create influence beyond formal authority.',
   },
   {
     id: 'D4',
@@ -80,7 +80,7 @@ const IMPACT_METHOD_STEPS = [
   {
     mono: '02 · Dimension Verdicts',
     title: 'Five independent mandate verdicts.',
-    body: 'Each dimension scores from Gap to Strong, with written meaning tied to real board behaviour — calibrated against the governance trade-offs directors actually face.',
+    body: 'Each dimension scores from Gap to Strong, with written meaning tied to real board behaviour — benchmarked against the governance trade-offs directors actually face.',
   },
   {
     mono: '03 · Archetype & Mandate Band',
@@ -90,7 +90,7 @@ const IMPACT_METHOD_STEPS = [
 ];
 
 const IMPACT_WHO_FOR = [
-  { title: 'Board directors', desc: 'Sitting directors calibrating their contribution and identifying the dimension that most limits board effectiveness.' },
+  { title: 'Board directors', desc: 'Sitting directors benchmarking their contribution and identifying the dimension that most limits board effectiveness.' },
   { title: 'Executives preparing board roles', desc: 'Leaders stepping toward governance who need an honest read on governance rigour before the mandate begins.' },
   { title: 'Leaders shaping organisational culture', desc: 'Executives accountable for team and institutional impact, not just personal delivery.' },
 ];
@@ -105,7 +105,7 @@ const IMPACT_DIFFERENT = [
 const IMPACT_FAQ = [
   {
     q: 'What is IMPACT?',
-    a: 'IMPACT (Board Effectiveness Assessment) is a hero assessment calibrating your contribution at the board and organisational level. Five dimensions — strategic oversight, governance rigour, stakeholder intelligence, mandate legacy, and APAC mandate credibility — eight board archetypes, and a composite 0–100 mandate score.',
+    a: 'IMPACT (Board Effectiveness Assessment) is a hero assessment benchmarking your contribution at the board and organisational level. Five dimensions — strategic oversight, governance rigour, stakeholder intelligence, mandate legacy, and APAC mandate credibility — eight board archetypes, and a composite 0–100 mandate score.',
   },
   {
     q: 'Is IMPACT only for sitting directors?',
@@ -127,8 +127,8 @@ export function ImpactLanding() {
       code="IMPACT"
       name="IMPACT"
       fullName="Board Effectiveness Assessment"
-      tagline="Understand your leadership impact on boards, teams, and culture. Five dimensions. Eight archetypes. Governance-level calibration."
-      heroDescription="Calibrate your contribution at the board and organisational level. Five dimensions — strategic oversight, governance rigour, stakeholder intelligence, mandate legacy, and APAC mandate credibility. Eight board-effectiveness archetypes."
+      tagline="Understand your leadership impact on boards, teams, and culture. Five dimensions. Eight archetypes. Governance-level benchmarking."
+      heroDescription="Benchmark your contribution at the board and organisational level. Five dimensions — strategic oversight, governance rigour, stakeholder intelligence, mandate legacy, and APAC mandate credibility. Eight board-effectiveness archetypes."
       categoryLabel="Board & Team Impact"
       tierBadge="HERO ASSESSMENT"
       accent={FOREST_GREEN}
@@ -149,7 +149,7 @@ export function ImpactLanding() {
       finalCtaLabel="Get Your IMPACT Profile"
       finalSubtext="Fifteen minutes. Five mandate verdicts. One board archetype. Your complimentary baseline covers the self-assessment layer and composite mandate score."
       seoTitle="IMPACT — Board Effectiveness Assessment | LYC Intelligence"
-      seoDescription="Calibrate your board and organisational impact. 5 dimensions, 8 board archetypes, APAC mandate credibility. ~15 minutes. Complimentary Executive Introduction baseline."
+      seoDescription="Benchmark your board and organisational impact. 5 dimensions, 8 board archetypes, APAC mandate credibility. ~15 minutes. Complimentary Executive Introduction baseline."
       seoPath="/assessment/impact"
       prefix="impact"
       heroSampleValues={[0.82, 0.70, 0.75, 0.60, 0.55]}

@@ -29,7 +29,7 @@ const config: AssessmentFlowConfig = {
   resultsPath: '/assessment/quest/results',
   landingPath: '/assessment/quest',
   intro: {
-    title: 'QUEST — Executive Performance Architecture',
+    title: 'QUEST — Executive Performance & Inquiry Rigour',
     body: 'You will answer 36 questions across six dimensions of executive capability: Strategic Thinking, Execution Excellence, Commercial Acumen, People Leadership, Adaptive Capacity, and AI Readiness. Answer as you actually operate today — not as you intend to.',
     duration: '~12 minutes',
     expectations: [

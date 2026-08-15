@@ -366,7 +366,8 @@ export function ClientOverviewPage() {
                         className="h-full"
                         style={{
                           width: `${(m.gold_count / total) * 100}%`,
-                          background: 'linear-gradient(135deg,#FFD700,#FFA500)',
+                          background: '#0A0A12',
+                          border: '1px solid #C108AB',
                         }}
                         title={`Gold ${m.gold_count}`}
                       />
@@ -374,7 +375,7 @@ export function ClientOverviewPage() {
                         className="h-full"
                         style={{
                           width: `${(m.silver_count / total) * 100}%`,
-                          background: 'linear-gradient(135deg,#C0C0C0,#808080)',
+                          background: '#C108AB',
                         }}
                         title={`Silver ${m.silver_count}`}
                       />
@@ -382,7 +383,7 @@ export function ClientOverviewPage() {
                         className="h-full"
                         style={{
                           width: `${(m.bronze_count / total) * 100}%`,
-                          background: 'linear-gradient(135deg,#CD7F32,#8B4513)',
+                          background: '#616170',
                         }}
                         title={`Bronze ${m.bronze_count}`}
                       />

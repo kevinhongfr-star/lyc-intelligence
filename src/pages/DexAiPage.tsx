@@ -110,7 +110,7 @@ function Hero() {
 
 // ── ARCHITECTURE (stack diagram + detail cards with staggered reveals) ──
 const ARCH_LAYERS_GRID = [
-  { label: 'Layer 03 — Agents', title: 'Multi-Agent Architecture', desc: 'Specialized AI agents for different tasks — assessment, matching, analysis, advisory chat. Each optimized for its domain.' },
+  { label: 'Layer 03 — Agents', title: 'Multi-Agent System', desc: 'Specialized AI agents for different tasks — assessment, matching, analysis, advisory chat. Each optimized for its domain.' },
   { label: 'Layer 02 — Engines', title: 'Assessment Engines', desc: 'Structured scoring models combined with LLM narrative generation. Built on validated leadership frameworks, not generic AI.' },
   { label: 'Layer 02 — Algorithms', title: 'Matching Algorithms', desc: "Multi-dimensional candidate-role fit with transparent scoring breakdowns. No black boxes — you see why a match scores what it does." },
   { label: 'Layer 01 — Data', title: 'Market Intelligence Layer', desc: 'Structured talent market data from multiple sources — compensation, organizational structure, talent movement across industries.' },
@@ -126,7 +126,7 @@ function Architecture() {
     <section id="architecture" style={{ padding: '100px 0', background: DS.bgAlt }}>
       <div style={containerStyle}>
         <div className="da-reveal" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
-          <span style={sectionLabel}>Architecture</span>
+          <span style={sectionLabel}>System Design</span>
           <h2 style={{ fontFamily: DS.headingFont, fontWeight: 700, fontSize: 38, lineHeight: 1.15, color: DS.text, marginBottom: 20, letterSpacing: '-0.02em' }}>
             How it works <em style={{ fontStyle: 'italic', color: DS.accent, fontWeight: 400 }}>under the hood.</em>
           </h2>
@@ -196,7 +196,7 @@ const TRUST_CARDS = [
   { icon: '\u{1F512}', title: 'Data Privacy', desc: "Your assessment data and personal information belong to you. We don't sell data, we don't train public models on your data.", items: ['Encrypted data storage', 'No training on user data', 'Data portability', 'GDPR-aligned practices'] },
   { icon: '\u{1F6E1}', title: 'Secure Infrastructure', desc: 'Enterprise-grade infrastructure with proper access controls, monitoring, and redundancy built in from day one.', items: ['Cloud infrastructure', 'Role-based access controls', 'Audit logging', 'Regular security reviews'] },
   { icon: '\u2713', title: 'Model Quality & Validation', desc: 'Our AI models are grounded in validated leadership frameworks from LYC Partners — not generic AI trained on internet content.', items: ['LYC framework-validated', 'Benchmarked against real data', 'Transparent scoring methodology', 'Continuous quality monitoring'] },
-  { icon: '\u2605', title: 'LYC Partners Expertise', desc: 'Every model, every assessment, every benchmark is built on 10+ years of real executive search and assessment work.', items: ['Built by practitioners', 'Real assessment frameworks', 'China / APAC specialization', 'Executive-level calibration'] },
+  { icon: '\u2605', title: 'LYC Partners Expertise', desc: 'Every model, every assessment, every benchmark is built on 10+ years of real executive search and assessment work.', items: ['Built by practitioners', 'Real assessment frameworks', 'China / APAC specialization', 'Executive-level benchmarking'] },
 ];
 function TrustSecurity() {
   return (

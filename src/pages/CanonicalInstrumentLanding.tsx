@@ -64,7 +64,7 @@ export function CanonicalInstrumentLanding() {
         style={{
           position: 'relative',
           overflow: 'hidden',
-          background: `linear-gradient(135deg, ${info.is_cpi ? DS.bgDark : DS.bgDark} 0%, ${DS.bgDark} 45%, #1a0c1e 100%)`,
+          background: '#0A0A12',
           color: DS.bg,
         }}
       >
@@ -77,7 +77,7 @@ export function CanonicalInstrumentLanding() {
             transform: 'translateX(-50%)',
             width: '720px',
             height: '440px',
-            background: `radial-gradient(circle, ${DS.accent}1c 0%, transparent 65%)`,
+            background: `radial-gradient(circle, ${DS.accent}0F 0%, transparent 65%)`,
             pointerEvents: 'none',
           }}
         />
@@ -391,7 +391,7 @@ export function CanonicalInstrumentLanding() {
                     display: 'flex',
                     flexDirection: 'column',
                     height: '100%',
-                    boxShadow: highlight ? `0 0 0 1px ${DS.accent}14, 0 20px 50px ${DS.accent}18` : DS.shadow,
+                    boxShadow: highlight ? `0 0 0 1px ${DS.accent}14, 0 20px 50px ${DS.accent}0F` : DS.shadow,
                     position: 'relative',
                   }}
                 >
@@ -421,7 +421,7 @@ export function CanonicalInstrumentLanding() {
                       style={{
                         display: 'inline-block',
                         padding: '4px 10px',
-                        background: highlight ? DS.accent : (info.is_cpi ? `${DS.accent}18` : DS.bgDark),
+                        background: highlight ? DS.accent : (info.is_cpi ? `${DS.accent}0F` : DS.bgDark),
                         color: highlight ? DS.bg : (info.is_cpi ? DS.accent : DS.bg),
                         fontFamily: DS.monoFont,
                         fontSize: '10px',
@@ -591,7 +591,7 @@ export function CanonicalInstrumentLanding() {
           style={{
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(135deg, ${DS.bgDark} 0%, #160c1c 40%, #25122d 70%, #33183f 100%)`,
+            background: '#0A0A12',
           }}
         />
         <div
@@ -603,7 +603,7 @@ export function CanonicalInstrumentLanding() {
             transform: 'translateX(-50%)',
             width: '720px',
             height: '480px',
-            background: 'radial-gradient(circle, rgba(193,8,171,0.18) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(193,8,171,0.06) 0%, transparent 65%)',
             pointerEvents: 'none',
           }}
         />

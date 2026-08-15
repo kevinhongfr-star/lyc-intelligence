@@ -21,7 +21,7 @@ const config: AssessmentLandingConfig = {
     {
       step: '01',
       title: 'Answer 40 questions',
-      desc: 'Scenario-based questions calibrated against real executive populations. No right or wrong answers — just honest ones.',
+      desc: 'Scenario-based questions benchmarked against real executive populations. No right or wrong answers — just honest ones.',
     },
     {
       step: '02',
@@ -45,7 +45,7 @@ const config: AssessmentLandingConfig = {
     },
     {
       title: 'Career transitioners',
-      desc: 'Professionals navigating a pivot. Get clarity on transferable strengths and development priorities.',
+      desc: 'Professionals managing a pivot. Get clarity on transferable strengths and development priorities.',
     },
   ],
   deliverables: [

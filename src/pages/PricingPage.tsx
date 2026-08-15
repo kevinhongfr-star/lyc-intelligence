@@ -165,7 +165,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
             marginRight: 'auto',
           }}
         >
-          Three tiers, calibrated to where you are in your leadership journey.
+          Three tiers, aligned to where you are in your leadership journey.
           Start complimentary — upgrade when you're ready for the full catalog.
         </p>
 

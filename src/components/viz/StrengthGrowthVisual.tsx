@@ -128,7 +128,7 @@ export const StrengthGrowthVisual: React.FC<StrengthGrowthVisualProps> = ({
       />
       <Column
         title="Growth areas"
-        subhead="Highest-leverage actions ahead"
+        subhead="Highest-impact actions ahead"
         items={growthAreas}
         badgeBg={accent}
         headerAccent={accent}

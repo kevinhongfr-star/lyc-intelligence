@@ -14,7 +14,7 @@ const B2B_FEATURES = [
     icon: Users,
     eyebrow: 'NEXUS FOR TEAMS',
     title: 'An intelligent front door for every recruiter',
-    desc: 'Every seat on your talent team uses NEXUS — framework-aware, confidential, tuned to your firm\'s search methodology. Conversations surface shortlist candidates, surface mandate risks, and draft outreach — all in one thinking partner.',
+    desc: 'Every seat on your talent team uses NEXUS — assessment-literate, confidential, tuned to your firm\'s search methodology. Conversations surface shortlist candidates, surface mandate risks, and draft outreach — all in one thinking partner.',
   },
   {
     icon: Target,
@@ -117,7 +117,7 @@ export function B2BLanding() {
             position: 'absolute',
             inset: 0,
             background:
-              'linear-gradient(180deg, rgba(6,5,12,0.86) 0%, rgba(8,5,12,0.72) 35%, rgba(14,8,20,0.72) 60%, rgba(6,5,12,0.95) 100%)',
+              '#0A0A12',
           }}
         />
         <div
@@ -129,7 +129,7 @@ export function B2BLanding() {
             transform: 'translateX(-50%)',
             width: '720px',
             height: '440px',
-            background: 'radial-gradient(circle, rgba(193,8,171,0.14) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(193,8,171,0.06) 0%, transparent 65%)',
             pointerEvents: 'none',
           }}
         />
@@ -650,7 +650,7 @@ export function B2BLanding() {
           style={{
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(135deg, ${DS.bgDark} 0%, #160c1c 40%, #25122d 70%, #33183f 100%)`,
+            background: '#0A0A12',
           }}
         />
         <div
@@ -662,7 +662,7 @@ export function B2BLanding() {
             transform: 'translateX(-50%)',
             width: '720px',
             height: '480px',
-            background: 'radial-gradient(circle, rgba(193,8,171,0.18) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(193,8,171,0.06) 0%, transparent 65%)',
             pointerEvents: 'none',
           }}
         />

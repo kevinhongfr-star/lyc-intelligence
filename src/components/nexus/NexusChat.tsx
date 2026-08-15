@@ -1305,7 +1305,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                   <Shield className="w-5 h-5" style={{ color: DS.accent }} />
                   <div>
                     <p className="font-semibold text-text-primary">Personalised reports</p>
-                    <p className="text-sm text-text-muted">Per-dimension bands, blind-spot mapping, C-suite calibrated.</p>
+                    <p className="text-sm text-text-muted">Per-dimension bands, blind-spot mapping, C-suite benchmarked.</p>
                   </div>
                 </div>
               </div>

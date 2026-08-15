@@ -17,7 +17,7 @@ const DS = {
   text: '#000000',
   textSecondary: '#333333',
   border: '#E5E5E5',
-  radius: '8px',
+  radius: '0',
   success: '#16A34A',
   warning: '#CA8A04',
 };

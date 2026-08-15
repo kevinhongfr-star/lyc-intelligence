@@ -63,7 +63,7 @@ export function DexLandingPage() {
           {[
             { icon: Brain, title: 'Career Strategy', desc: 'Map your next move with placement data from 7,400+ mandates.' },
             { icon: LineChart, title: 'Compensation Benchmarking', desc: 'Know your market worth across China and APAC roles.' },
-            { icon: Compass, title: 'Cross-Border Transitions', desc: 'Navigate moves between Shanghai, Singapore, and Hong Kong.' },
+            { icon: Compass, title: 'Cross-Border Transitions', desc: 'Manage moves between Shanghai, Singapore, and Hong Kong.' },
             { icon: Shield, title: 'Confidential Advisory', desc: 'Private, non-judgmental guidance from a trusted partner.' },
           ].map(f => (
             <div key={f.title} className="p-6 border border-gray-100 hover:border-fuchsia/30 transition-colors">

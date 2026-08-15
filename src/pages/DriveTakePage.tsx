@@ -24,8 +24,8 @@ const config: AssessmentFlowConfig = {
   resultsPath: '/assessment/drive/results',
   landingPath: '/assessment/drive',
   intro: {
-    title: 'DRIVE — Motivation Architecture',
-    body: 'You will answer 30 questions across five dimensions of motivational architecture: intrinsic motivation, extrinsic motivation, values alignment, confidence & self-efficacy, and growth orientation. Answer with candour — motivational assessments reward honesty.',
+    title: 'DRIVE — Motivation Profile & Engagement Risk',
+    body: 'You will answer 30 questions across five dimensions of motivational profile: intrinsic motivation, extrinsic motivation, values alignment, confidence & self-efficacy, and growth orientation. Answer with candour — motivational assessments reward honesty.',
     duration: '~10 minutes',
     expectations: [
       '30 questions across Intrinsic Motivation, Extrinsic Motivation, Values Alignment, Confidence & Self-Efficacy, and Growth Orientation',

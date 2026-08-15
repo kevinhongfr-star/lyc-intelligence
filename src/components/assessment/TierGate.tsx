@@ -77,7 +77,7 @@ export function TierGate({ slug, userTier: userTierProp, children }: TierGatePro
             background: DS.accentSoft,
             border: `1px solid ${DS.accentBorder}`,
             padding: '6px 14px',
-            borderRadius: 999,
+            borderRadius: 0,
             marginBottom: 24,
           }}>
             {def.meta.title.toUpperCase()} — LOCKED
@@ -109,7 +109,7 @@ export function TierGate({ slug, userTier: userTierProp, children }: TierGatePro
           <div style={{
             background: DS.card,
             border: `1px solid ${DS.border}`,
-            borderRadius: 12,
+            borderRadius: 0,
             padding: 28,
             marginBottom: 36,
             textAlign: 'left',
@@ -167,7 +167,7 @@ export function TierGate({ slug, userTier: userTierProp, children }: TierGatePro
                 color: accent,
                 background: 'transparent',
                 border: `1.5px solid ${accent}`,
-                borderRadius: 8,
+                borderRadius: 0,
                 cursor: 'pointer',
                 textDecoration: 'none',
                 transition: 'all 0.15s ease',
@@ -195,7 +195,7 @@ export function TierGate({ slug, userTier: userTierProp, children }: TierGatePro
                 color: '#FFFFFF',
                 background: accent,
                 border: `1.5px solid ${accent}`,
-                borderRadius: 8,
+                borderRadius: 0,
                 cursor: 'pointer',
                 textDecoration: 'none',
                 transition: 'opacity 0.15s ease',

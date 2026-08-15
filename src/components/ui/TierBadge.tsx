@@ -1,14 +1,16 @@
 /**
- * TierBadge — Reusable Gold/Silver/Bronze/Unranked badge (S5-T06)
+ * TierBadge — Brand-aligned typographic tier labels (ECHO v1.2)
  *
- * Visual design per TRAEE_NEXT_SPRINTS spec:
- *   - Gold:   gradient #FFD700 → #FFA500, bold text
- *   - Silver: gradient #C0C0C0 → #808080
- *   - Bronze: gradient #CD7F32 → #8B4513
- *   - Unranked: muted gray
+ * The `Tier` type retains its legacy values ('Gold' | 'Silver' | 'Bronze' |
+ * 'Unranked') for backwards compatibility with existing callers, but the
+ * rendered labels and visual treatment follow the ECHO v1.2 brand system:
  *
- * Reused across Candidate Portal, Client Portal, and Admin views for a
- * consistent visual language.
+ *   - Gold   → "Executive"    — dark ink (#0A0A12) bg, fuchsia accent border
+ *   - Silver → "Professional" — solid fuchsia (#C108AB) bg
+ *   - Bronze → "Core"         — no fill, gray eyebrow label (#616170)
+ *   - Unranked               — muted gray text, no background
+ *
+ * No metallic gradients. No trophy emojis. Typographic tier labels only.
  */
 import React from 'react';
 import { cn } from '@/lib/utils';
@@ -18,42 +20,42 @@ export type Tier = 'Gold' | 'Silver' | 'Bronze' | 'Unranked';
 interface TierBadgeProps {
   tier: Tier | string | null | undefined;
   size?: 'sm' | 'md';
+  /** Kept for API compatibility. Emojis are never rendered (ECHO v1.2). */
   showEmoji?: boolean;
   className?: string;
 }
 
 const TIER_STYLES: Record<Tier, string> = {
-  Gold: 'text-white font-bold border-transparent',
+  Gold: 'text-white font-semibold border-[#C108AB]',
   Silver: 'text-white font-semibold border-transparent',
-  Bronze: 'text-white font-semibold border-transparent',
-  Unranked: 'text-stone-500 font-medium border-stone-300 bg-stone-100',
+  Bronze: 'text-[#616170] uppercase tracking-wide text-xs font-medium border-transparent',
+  Unranked: 'text-stone-500 font-medium border-transparent',
 };
 
+// Solid brand accent backgrounds (no gradients). Named TIER_GRADIENT for
+// backwards compatibility with internal references; values are plain colors.
 const TIER_GRADIENT: Record<Tier, string> = {
-  Gold: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-  Silver: 'linear-gradient(135deg, #C0C0C0 0%, #808080 100%)',
-  Bronze: 'linear-gradient(135deg, #CD7F32 0%, #8B4513 100%)',
-  Unranked: 'none',
+  Gold: '#0A0A12',
+  Silver: '#C108AB',
+  Bronze: 'transparent',
+  Unranked: 'transparent',
 };
 
-const TIER_EMOJI: Record<Tier, string> = {
-  Gold: '🥇',
-  Silver: '🥈',
-  Bronze: '🥉',
-  Unranked: '—',
+const TIER_LABEL: Record<Tier, string> = {
+  Gold: 'Executive',
+  Silver: 'Professional',
+  Bronze: 'Core',
+  Unranked: 'Unranked',
 };
 
-export function TierBadge({ tier, size = 'md', showEmoji = true, className }: TierBadgeProps) {
+export function TierBadge({ tier, size = 'md', className }: TierBadgeProps) {
   const resolvedTier: Tier =
     tier === 'Gold' || tier === 'Silver' || tier === 'Bronze' || tier === 'Unranked'
       ? tier
       : 'Unranked';
 
   const sizeClasses = size === 'sm' ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-0.5 text-xs';
-  const style: React.CSSProperties =
-    resolvedTier === 'Unranked'
-      ? {}
-      : { backgroundImage: TIER_GRADIENT[resolvedTier] };
+  const style: React.CSSProperties = { background: TIER_GRADIENT[resolvedTier] };
 
   return (
     <span
@@ -65,8 +67,7 @@ export function TierBadge({ tier, size = 'md', showEmoji = true, className }: Ti
       )}
       style={style}
     >
-      {showEmoji && <span aria-hidden>{TIER_EMOJI[resolvedTier]}</span>}
-      {resolvedTier}
+      {TIER_LABEL[resolvedTier]}
     </span>
   );
 }

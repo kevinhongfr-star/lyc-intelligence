@@ -60,7 +60,7 @@ const TIER_PRICE = (k: TierKey): string => {
 
 const ELEVATE_BENEFITS = [
   'A monthly miles allowance across the 11-instrument catalog',
-  'Priority NEXUS conversations with deeper, framework-aware reasoning',
+  'Priority NEXUS conversations with deeper, assessment-literate reasoning',
   'Personalised reports you can save, share, and revisit',
   'Earn miles through reflections and guided exploration',
 ];

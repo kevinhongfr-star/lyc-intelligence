@@ -282,7 +282,7 @@ export function CpiFlagshipLanding() {
                   const x = 40 + i * 350;
                   const layers = [
                     { mono: '01 · Self-Assessment', title: 'Your own view of your professional profile.', body: 'How you rate your professional operating patterns across 6 dimensions — the self-view baseline.' },
-                    { mono: '02 · Multi-Rater', title: 'How colleagues and teams see you.', body: 'Organizational version: optional 360° input from peers, reports, and supervisors — calibrated against your self-view.' },
+                    { mono: '02 · Multi-Rater', title: 'How colleagues and teams see you.', body: 'Organizational version: optional 360° input from peers, reports, and supervisors — benchmarked against your self-view.' },
                     { mono: '03 · Deep Analysis', title: 'Patterns, blind spots, archetype matching.', body: 'Composite scoring, dimension variance analysis, archetype classification, and blind-spot triangulation.' },
                   ];
                   const l = layers[i];
@@ -309,7 +309,7 @@ export function CpiFlagshipLanding() {
               <div className="cpi-3layer-stack" style={{ display: 'none', gap: 16, gridTemplateColumns: '1fr' }}>
                 {[
                   { mono: '01 · Self-Assessment', title: 'Your own view of your professional profile.', body: 'How you rate your professional operating patterns across 6 dimensions — the self-view baseline.', idx: 1 },
-                  { mono: '02 · Multi-Rater', title: 'How colleagues and teams see you.', body: 'Organizational version: optional 360° input from peers, reports, and supervisors — calibrated against your self-view.', idx: 2 },
+                  { mono: '02 · Multi-Rater', title: 'How colleagues and teams see you.', body: 'Organizational version: optional 360° input from peers, reports, and supervisors — benchmarked against your self-view.', idx: 2 },
                   { mono: '03 · Deep Analysis', title: 'Patterns, blind spots, archetype matching.', body: 'Composite scoring, dimension variance analysis, archetype classification, and blind-spot triangulation.', idx: 3 },
                 ].map((l) => (
                   <Card key={l.idx} variant="flat" interactive={false}>
@@ -431,7 +431,7 @@ export function CpiFlagshipLanding() {
                     <CardContent style={{ padding: 24 }}>
                       <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.2em', color: ACCENT, textTransform: 'uppercase' }}>OVERALL</div>
                       <CardTitle style={{ fontSize: 17, fontWeight: 600, marginTop: 8 }}>Composite score 0–100</CardTitle>
-                      <CardDescription style={{ fontSize: 14, marginTop: 8, lineHeight: 1.55 }}>A single calibrated number capturing your full dimensional profile, benchmarked against real executive populations.</CardDescription>
+                      <CardDescription style={{ fontSize: 14, marginTop: 8, lineHeight: 1.55 }}>A single aligned number capturing your full dimensional profile, benchmarked against real executive populations.</CardDescription>
                     </CardContent>
                   </Card>
                   <Card variant="flat" interactive={false}>
@@ -781,14 +781,14 @@ export function CpiFlagshipLanding() {
               <p style={{ fontFamily: DS.bodyFont, fontSize: 15, color: DS.textSecondary, lineHeight: 1.65, marginTop: 16, maxWidth: 640 }}>
                 The same CPI instrument, configured for executive teams and
                 leadership programs. Adds multi-rater 360° capability so each
-                leader's self-view is calibrated against how peers, reports, and
+                leader's self-view is benchmarked against how peers, reports, and
                 supervisors actually experience their leadership — surfaced as
                 team-level patterns, blind-spot triangulation, and cohort
                 benchmarks rather than a single individual report.
               </p>
               <ul style={{ listStyle: 'none', padding: 0, margin: '24px 0 0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }}>
                 {[
-                  'Multi-rater 360° input calibrated against self-view',
+                  'Multi-rater 360° input benchmarked against self-view',
                   'Team-level blind-spot and variance analysis',
                   'Cohort benchmarks for leadership programs',
                   'Consultant-led debrief and development planning',

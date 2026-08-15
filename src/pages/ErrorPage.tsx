@@ -68,7 +68,7 @@ export default function ErrorPage() {
               fontWeight: 600,
             }}
           >
-            Temporary market disruption
+            Temporary market transition
           </p>
         </div>
 

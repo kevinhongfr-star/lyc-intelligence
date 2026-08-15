@@ -203,7 +203,7 @@ export function DashboardPage() {
 
         {/* Row 1: Career Summary Card */}
         <div style={{ 
-          background: 'linear-gradient(135deg, rgba(193,8,171,0.15), rgba(99,102,241,0.1))',
+          background: 'linear-gradient(135deg, rgba(193,8,171,0.06), rgba(99,102,241,0.06))',
           border: `1px solid ${DS.accent}40`,
           padding: '24px',
           marginBottom: '24px'

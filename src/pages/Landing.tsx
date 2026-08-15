@@ -66,8 +66,8 @@ const SUBSCRIPTION_TIERS: PricingTierRow[] = buildMarketingTiers();
 const CAPABILITIES = [
   {
     icon: Layers,
-    title: 'Framework-aware conversations',
-    desc: 'NEXUS knows all 6 leadership assessment frameworks end-to-end. Ask about positioning, governance, cross-border fit, or team transitions — it speaks the language of executive leadership, not generic advice.',
+    title: 'Assessment-literate conversations',
+    desc: 'NEXUS knows all 6 leadership assessments end-to-end. Ask about positioning, governance, cross-border fit, or team transitions — it speaks the language of executive leadership, not generic advice.',
     href: '/nexus/chat',
     cta: 'Start a conversation',
   },
@@ -1019,7 +1019,7 @@ export function Landing() {
                   minHeight: '48px',
                 }}
               >
-                Executive and organisational readiness for AI adoption, governance, and leverage.
+                Executive and organisational readiness for AI adoption, governance, and strategic advantage.
               </CardDescription>
               <a
                 href="/assessment/spark"
@@ -1201,7 +1201,7 @@ export function Landing() {
                 marginBottom: '14px',
               }}
             >
-              Every assessment here is calibrated against LYC Partners' 20-year placement database across APAC. Dimensions aren't theoretical — they're the signals that consistently predict retention, promotion, and board-level outcomes for C-suite and VP-level executives.
+              Every assessment here is benchmarked against LYC Partners' 20-year placement database across APAC. Dimensions aren't theoretical — they're the signals that consistently predict retention, promotion, and board-level outcomes for C-suite and VP-level executives.
             </p>
             <p
               style={{
