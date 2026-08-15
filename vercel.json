@@ -1,0 +1,402 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "functions": {
+    "api/events.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/auth/me.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/data/[entity].ts": {
+      "memory": 1024,
+      "maxDuration": 15
+    },
+    "api/assessments/run.ts": {
+      "memory": 1536,
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/(login|signup|reset-password|auth/:path*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/api/auth/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Cross-Origin-Embedder-Policy",
+          "value": "require-corp"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "Cross-Origin-Resource-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "X-Download-Options",
+          "value": "noopen"
+        },
+        {
+          "key": "X-DNS-Prefetch-Control",
+          "value": "off"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.vercel-insights.com https://va.vercel-scripts.com https://us-assets.i.posthog.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https: wss:; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/(manifest.webmanifest|favicon.ico|apple-touch-icon.png|favicon-32.png)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=86400"
+        }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/products",
+      "destination": "/#assessment-catalog",
+      "permanent": true
+    },
+    {
+      "source": "/enterprise",
+      "destination": "/pricing",
+      "permanent": true
+    },
+    {
+      "source": "/pricing-old",
+      "destination": "/pricing",
+      "permanent": true
+    },
+    {
+      "source": "/for-business",
+      "destination": "/b2b",
+      "permanent": true
+    },
+    {
+      "source": "/about/about-us",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/about-us",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/b2b#contact",
+      "destination": "/contact",
+      "permanent": false
+    },
+    {
+      "source": "/contact-us",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/app/pricing",
+      "destination": "/pricing",
+      "permanent": true
+    },
+    {
+      "source": "/app/referrals",
+      "destination": "/referral",
+      "permanent": true
+    },
+    {
+      "source": "/app/dashboard",
+      "destination": "/member/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/app/settings",
+      "destination": "/member/settings",
+      "permanent": true
+    },
+    {
+      "source": "/app/assessments",
+      "destination": "/assessment",
+      "permanent": true
+    },
+    {
+      "source": "/app/profile",
+      "destination": "/member/profile",
+      "permanent": true
+    },
+    {
+      "source": "/app/matches",
+      "destination": "/member/matches",
+      "permanent": true
+    },
+    {
+      "source": "/app/referrals",
+      "destination": "/referral",
+      "permanent": true
+    },
+    {
+      "source": "/portal/candidates",
+      "destination": "/candidate",
+      "permanent": true
+    },
+    {
+      "source": "/portal/mandates",
+      "destination": "/consultant/mandates",
+      "permanent": true
+    },
+    {
+      "source": "/portal/pipeline",
+      "destination": "/consultant/pipeline",
+      "permanent": true
+    },
+    {
+      "source": "/portal/settings",
+      "destination": "/consultant/settings",
+      "permanent": true
+    },
+    {
+      "source": "/portal/clients",
+      "destination": "/client/clients",
+      "permanent": true
+    },
+    {
+      "source": "/portal/admin",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/china-pipeline-index",
+      "destination": "/assessment/cpi",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/cpi-diagnostic",
+      "destination": "/assessment/cpi",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/shift-mobility",
+      "destination": "/assessment/shift",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/career-shift",
+      "destination": "/assessment/shift",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/cross-border",
+      "destination": "/assessment/cross-border",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/executive-scope",
+      "destination": "/assessment/exec-scope",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/geo-fit",
+      "destination": "/assessment/geo-fit",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/board-readiness",
+      "destination": "/assessment/board-readiness",
+      "permanent": true
+    },
+    {
+      "source": "/assessment",
+      "destination": "/assessments",
+      "permanent": true
+    },
+    {
+      "source": "/assessments/:slug",
+      "destination": "/assessment/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/diagnostics/:path*",
+      "destination": "/assessment/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/platform/nexus",
+      "destination": "/nexus",
+      "permanent": true
+    },
+    {
+      "source": "/chat",
+      "destination": "/nexus/chat",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/member/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/settings",
+      "destination": "/member/settings",
+      "permanent": true
+    },
+    {
+      "source": "/login-old",
+      "destination": "/login",
+      "permanent": true
+    },
+    {
+      "source": "/platform",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/trident",
+      "destination": "/assessments",
+      "permanent": true
+    },
+    {
+      "source": "/shift-mobility",
+      "destination": "/assessment/shift",
+      "permanent": true
+    },
+    {
+      "source": "/spark-assessment",
+      "destination": "/assessment/spark",
+      "permanent": true
+    },
+    {
+      "source": "/prism-assessment",
+      "destination": "/assessment/prism",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/((?!api/|assets/|og-image/|sitemap.xml$|robots.txt$|favicon.ico$|favicon\\..*|manifest.webmanifest$).*)",
+      "destination": "/"
+    }
+  ]
+}
