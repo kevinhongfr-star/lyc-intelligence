@@ -215,7 +215,7 @@ export function SharePage() {
   /**
    * Y1-4 dual-fallback loader:
    * 1. Legacy share_cards path (public_uuid) — Trident/progress/cards pre-Y1
-   * 2. Newer assessment_shares capability-URL path (/api/assessments/share?token=X)
+   * 2. Newer assessment_shares capability-URL path (/api/assessments/meta?action=share&token=X)
    *    — Assessment share links created via createShareLink / POST share endpoint.
    */
   const loadShareData = async (publicId: string) => {
@@ -228,7 +228,7 @@ export function SharePage() {
       }
 
       // 2. Fallback: assessment_shares capability token via public API
-      const api = await fetch(`/api/assessments/share?token=${encodeURIComponent(publicId)}`);
+      const api = await fetch(`/api/assessments/meta?action=share&token=${encodeURIComponent(publicId)}`);
       if (api.ok) {
         const body = await api.json();
         if (body?.ok && body?.payload) {

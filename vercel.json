@@ -18,6 +18,10 @@
       "memory": 1024,
       "maxDuration": 15
     },
+    "api/assessments/meta.ts": {
+      "memory": 1024,
+      "maxDuration": 15
+    },
     "api/assessments/run.ts": {
       "memory": 1536,
       "maxDuration": 30
