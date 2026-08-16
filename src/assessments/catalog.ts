@@ -282,7 +282,7 @@ function getArchetypeDescription(archetype: any): string {
     archetype.narrative ||
     archetype.core_pattern ||
     (archetype.traits && archetype.traits[0]) ||
-    (archetype as any).canonName ?? archetype.name ||
+    ((archetype as any).canonName ?? archetype.name) ||
     ""
   );
 }

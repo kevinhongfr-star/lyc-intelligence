@@ -381,5 +381,87 @@ export {
   safeErrorStatus,
   sanitizeObject,
   sanitizeString,
-  setRateLimitHeaders
+  setRateLimitHeaders,
+  // ── V3-7 / #1346 Write rate limiter + Zod validator + strict CORS ───────
+  // Added during Batch1 security pass. Missing in prior compiled artifact;
+  // these exports are referenced by /assessments/run, /assessments/meta,
+  // /reports/pdf, /events, /data/[entity], /chat. Without these symbols the
+  // serverless handler fails to import at cold-start → 404 on every route.
+  // Implementation is line-for-line behavior-compatible with _lib_src/validate.ts.
+  WRITE_RATE_LIMITER_internal,
+  rateLimit,
+  validateWrite,
+  applyStrictCors,
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// V3-7 / #1346 Write rate limiter (20 writes / 60s, sliding window)
+// ═══════════════════════════════════════════════════════════════════════════
+const WRITE_RATE_LIMITER_internal = new RateLimiter(60_000, 20);
+
+/**
+ * @param {any} req Vercel request
+ * @param {string|null|undefined} [userId] authenticated user id (if any)
+ * @returns {{ allowed: boolean, remaining: number, resetAt: number }}
+ */
+function rateLimit(req, userId) {
+  const ip = getClientIp(req);
+  const path = (req.url && req.url.split('?')[0]) || 'unknown';
+  const key = userId ? `${path}:uid:${userId}` : `${path}:ip:${ip}`;
+  return WRITE_RATE_LIMITER_internal.check(key);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// V3-7 / #1346 Zod write-schema validator (throws RequestAuthError 422)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * @template T
+ * @param {{ safeParse: (p: unknown) => { success: boolean, error?: { issues: Array<{path: Array<string|number>, message: string}> } }, data: T }} schema Zod schema
+ * @param {unknown} payload Raw untrusted input
+ * @returns {T}
+ */
+function validateWrite(schema, payload) {
+  const result = schema.safeParse(payload);
+  if (!result.success) {
+    const issues = (result.error?.issues || [])
+      .map((i) => `${(i.path || []).join('.')}: ${i.message}`)
+      .join('; ')
+      .slice(0, 512);
+    const err = new Error(`Invalid input: ${issues || 'validation failed'}`);
+    // Marker so callers can coerce to a RequestAuthError 422.
+    err.name = 'ValidationError';
+    err.status = 422;
+    err.code = 'VALIDATION';
+    throw err;
+  }
+  return result.data;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// W4-6 / #1291 — Strict CORS (no wildcard). Matches _lib_src/validate.ts.
+// ═══════════════════════════════════════════════════════════════════════════
+const ALLOWED_ORIGIN_RE_src =
+  /^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?|https:\/\/(www\.)?lyc-intelligence\.app|https:\/\/[a-z0-9-]+\.vercel\.app)$/i;
+
+/**
+ * Apply strict CORS headers based on request origin.
+ * @param {any} req Vercel request
+ * @param {any} res Vercel response
+ * @returns {boolean} true if caller should short-circuit with 204 (preflight)
+ */
+function applyStrictCors(req, res) {
+  const origin = (req.headers && (req.headers.origin || req.headers.Origin)) || '';
+  if (origin && ALLOWED_ORIGIN_RE_src.test(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-anonymous-id');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Max-Age', '86400');
+  }
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return true;
+  }
+  return false;
+}

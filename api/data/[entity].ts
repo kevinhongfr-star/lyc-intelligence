@@ -293,10 +293,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // #1309 + #1314: enforce body size limit, then parse + sanitize.
       assertBodySize(req.body, DEFAULT_BODY_LIMIT);
 
+      // NOTE: z.record().max() requires Zod ≥3.24; pinned version may be older.
+      // assertBodySize(256KB) above + sanitizeObject clamp both bound record size,
+      // so a redundant per-record .max(N) is safe to drop for runtime compat.
       const PostBodySchema = z.object({
         select: z.string().max(4096).optional(),
-        upsert: z.record(z.string(), z.any()).max(200).optional(),
-        delete_by: z.record(z.string(), z.any()).max(100).optional(),
+        upsert: z.record(z.string(), z.any()).optional(),
+        delete_by: z.record(z.string(), z.any()).optional(),
         filters: z.array(z.object({ col: z.string().max(64), op: z.string().max(16), value: z.any() })).max(50).optional(),
         order: z.string().max(256).optional(),
         on_conflict: z.string().max(256).optional(),

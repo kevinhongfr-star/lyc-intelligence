@@ -290,7 +290,7 @@ export const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(function Pdf
                 aria-hidden="true"
                 className="h-20 w-20 flex items-center justify-center font-[var(--report-font-display)] font-bold text-[26px] text-[var(--report-on-accent)] bg-[var(--report-accent)]"
               >
-                {(data.archetype.canonName ?? data.archetype.name || 'A').slice(0, 1)}
+                {((data.archetype.canonName ?? data.archetype.name) || 'A').slice(0, 1)}
               </div>
               <div className="flex-1">
                 <p className="report-caption text-[var(--report-accent-ink)]">

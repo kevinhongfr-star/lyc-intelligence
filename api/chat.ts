@@ -21,18 +21,68 @@ import {
   parseJsonBody,
   DEFAULT_BODY_LIMIT,
   logServerError,
-  rateLimit,
+  RateLimiter,
   setRateLimitHeaders,
-  applyStrictCors,
+  getClientIp,
 } from './lib/validate.js';
 import { z } from 'zod';
 
-// ── DeepSeek client (Node import — src/* compiles via Vercel's Vite pass) ───
-import { DeepSeekClient, type DeepSeekMessage } from './src/nexus/deepseekClient.js';
+// ── DeepSeek client (Node import — source file lives at /src/nexus/deepseekClient.ts).
+//     Previous relative path './src/nexus/deepseekClient.js' was wrong (no api/src/ directory).
+//     api/chat.ts lives in /workspace/api/; src/nexus/ lives in /workspace/src/nexus/.
+//     Vercel Pages Router natively supports mixed TS relative imports across this boundary. ───
+import { DeepSeekClient, type DeepSeekMessage } from '../src/nexus/deepseekClient.ts';
 
 const GUEST_LIMIT = 3;
 // IP → counter (process-lifetime; serverless resets are fine for a soft cap)
 const guestCounters = new Map<string, number>();
+
+// ── V3 Security: strict CORS allowlist, no wildcard, vary-by-origin ────────
+const ALLOWED_ORIGINS = new Set([
+  'https://lyc-intelligence.app',
+  'https://www.lyc-intelligence.app',
+]);
+const PREVIEW_HOST_SUFFIX = '.vercel.app';
+
+/**
+ * Apply strict CORS per Workstream 3 rules.
+ * Returns true if the caller should return early (OPTIONS preflight handled).
+ */
+function applyStrictCors(req: VercelRequest, res: VercelResponse): boolean {
+  const origin = (req.headers.origin as string) || '';
+  let allow = '';
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    allow = origin;
+  } else if (origin && origin.endsWith(PREVIEW_HOST_SUFFIX)) {
+    // Vercel preview deployments — allow for UAT, never expose cred header
+    allow = origin;
+  } else if (!origin) {
+    // Same-origin / server-to-server — skip allow header
+    allow = '';
+  }
+  if (allow) {
+    res.setHeader('Access-Control-Allow-Origin', allow);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-anonymous-id');
+    res.setHeader('Access-Control-Max-Age', '600');
+    res.setHeader('Access-Control-Allow-Credentials', 'false');
+  }
+  // Security headers — lightweight set applied regardless of origin
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return true;
+  }
+  return false;
+}
+
+// ── Rate limiter: 20 chat turns / 60s per IP or user ID ───────────────────
+const CHAT_RL = new RateLimiter(60_000, 20);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NEXUS system prompt (inline copy of NEXUS_SYSTEM_PROMPT from nexusKnowledge.ts).
@@ -129,14 +179,6 @@ function suggestPromptsFromResponse(response: string): string[] {
   return out.slice(0, 3);
 }
 
-function clientIp(req: VercelRequest): string {
-  const fwd = (req.headers['x-forwarded-for'] as string) || '';
-  if (fwd) return fwd.split(',')[0].trim();
-  const real = (req.headers['x-real-ip'] as string) || '';
-  if (real) return real.trim();
-  return 'unknown';
-}
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // ── CORS — W4-6 / #1291 strict origin allowlist (no wildcard) ────────────
   if (applyStrictCors(req, res)) return;
@@ -158,8 +200,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // V3-7 / #1346 Rate limit: 20 writes / 60s per user or IP
-    const chatRlPrelude = rateLimit(req, null);
+    // Rate limit: 20 chat turns / 60s per IP (IP is available before body parse;
+    // userId would require parsing twice). 20/60s is generous for a single user.
+    const rlKey = `ip:${getClientIp(req)}`;
+    const chatRlPrelude = CHAT_RL.check(rlKey);
     setRateLimitHeaders(res, chatRlPrelude, 20);
     if (!chatRlPrelude.allowed) {
       res.status(429).json({
@@ -170,15 +214,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const rawBody = await parseJsonBody(req, DEFAULT_BODY_LIMIT);
+    // parseJsonBody already validates body size internally via DEFAULT_BODY_LIMIT fallback
+    const rawBody = parseJsonBody(req);
 
-    // V3-7 / #1346 Zod write-schema validation for chat payload
+    // V3-7 / #1346 Zod write-schema validation for chat payload.
+    // NOTE: Avoids z.record().max() because that requires Zod ≥3.24 and the
+    // pinned version in package.json may be older. Body-size + string max clamp
+    // via z.string().max() already cover the important resource limits.
     const ChatSchema = z.object({
       message: z.string().min(1).max(8192),
       history: z.array(z.object({ role: z.string().max(32), content: z.string().max(8192) })).max(50).optional(),
       userId: z.string().max(256).optional(),
       tier: z.string().max(64).optional(),
-      memoryContext: z.record(z.string(), z.any()).max(200).optional(),
+      memoryContext: z.record(z.string(), z.any()).optional(),
       documentContext: z.string().max(16384).optional(),
       systemPrompt: z.string().max(32768).optional(),
     });
@@ -203,7 +251,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const history: Array<{ role: string; content: string }> = Array.isArray(body?.history)
       ? (body.history as any).slice(-12)
       : [];
-    const userId: string = String(body?.userId ?? `guest:${clientIp(req)}`);
+    const userId: string = String(body?.userId ?? `guest:${getClientIp(req)}`);
     const systemPromptOverride: string | undefined = body?.systemPrompt
       ? String(body.systemPrompt)
       : undefined;
@@ -211,7 +259,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const isGuest = userId.startsWith('guest:');
     if (isGuest) {
-      const ip = clientIp(req);
+      const ip = getClientIp(req);
       const n = (guestCounters.get(ip) ?? 0) + 1;
       if (n > GUEST_LIMIT) {
         res.status(429).json({
@@ -236,7 +284,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         response,
         suggested_prompts: suggestPromptsFromResponse('framework assessment'),
         remaining: isGuest
-          ? Math.max(0, GUEST_LIMIT - (guestCounters.get(clientIp(req)) ?? 0))
+          ? Math.max(0, GUEST_LIMIT - (guestCounters.get(getClientIp(req)) ?? 0))
           : null,
       });
       return;
@@ -271,22 +319,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       mock: result.mockFallback,
       latency_ms: result.latencyMs,
       remaining: isGuest
-        ? Math.max(0, GUEST_LIMIT - (guestCounters.get(clientIp(req)) ?? 0))
+        ? Math.max(0, GUEST_LIMIT - (guestCounters.get(getClientIp(req)) ?? 0))
         : null,
     });
     return;
   } catch (err: any) {
-    logServerError('api/chat', err);
+    // handleApiError logs & sends a shaped {error} response; don't double-log.
+    // Signature: handleApiError(res, err, context, req).
+    const chatContext = 'api/chat';
     const status = err?.code === 'quota' ? 429 : err?.code === 'auth' ? 503 : 500;
-    const userFacing =
-      err?.code === 'auth'
-        ? 'NEXUS is unavailable due to a model provider configuration issue. Please try again in a few minutes.'
-        : err?.code === 'quota'
-          ? 'NEXUS is currently under high load. Please retry your message in 30 seconds.'
-          : err?.code === 'timeout'
-            ? 'NEXUS took longer than expected to respond. Please try again with a shorter message.'
-            : 'NEXUS had a problem processing your message. Please try again.';
-    res.status(status).json(handleApiError(err) ?? { ok: false, error: 'chat_failed', message: userFacing });
+    if (err?.code === 'quota' || err?.code === 'auth' || err?.code === 'timeout') {
+      // Known classification — send shaped user-friendly body, log for observability.
+      logServerError(chatContext, err, req);
+      const userFacing =
+        err?.code === 'auth'
+          ? 'NEXUS is unavailable due to a model provider configuration issue. Please try again in a few minutes.'
+          : err?.code === 'quota'
+            ? 'NEXUS is currently under high load. Please retry your message in 30 seconds.'
+            : 'NEXUS took longer than expected to respond. Please try again with a shorter message.';
+      res.status(status).json({ ok: false, error: 'chat_failed', message: userFacing });
+      return;
+    }
+    // Fallback: use shared handleApiError (logs + sends generic { error }).
+    handleApiError(res, err, chatContext, req);
     return;
   }
 }

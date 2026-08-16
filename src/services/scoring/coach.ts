@@ -10,7 +10,7 @@ export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 26;
 export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 8;
-export const TIER = "core";
+export const TIER = "shift";
 export const PRICE_MILES = 199;
 export const TAGLINE = "The four pillars of a coaching leader: Mindset → Skillset → Toolkit → Discipline.";
 

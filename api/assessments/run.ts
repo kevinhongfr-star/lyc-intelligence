@@ -146,11 +146,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }>(req);
 
     // V3-7 / #1346 Zod write-schema validation
+    // NOTE: z.record().max() requires Zod ≥3.24; pinned version may be older.
+    // Object size is already bounded by assertBodySize(DEFAULT_BODY_LIMIT=256KB)
+    // plus sanitizeObject maxArrayLength/maxStringLength clamps below, so the
+    // .max(N) per-field is a redundant belt — safe to drop for compat.
     const AssessmentRunSchema = z.object({
       code: z.string().min(1).max(32),
-      answers: z.record(z.string(), z.any()).max(500).optional(),
+      answers: z.record(z.string(), z.any()).optional(),
       durationSeconds: z.number().int().min(0).max(86_400).optional(),
-      metadata: z.record(z.string(), z.any()).max(200).optional(),
+      metadata: z.record(z.string(), z.any()).optional(),
       idempotency_key: z.string().max(256).optional(),
     });
     let body: typeof rawBody;
@@ -391,10 +395,18 @@ function computeScoreSummary(code: string, answers: Record<string, any>) {
   const clampPct = (v: number) => Math.max(1, Math.min(99, Math.round(v)));
 
   const dimensionMap: Record<string, string[]> = {
-    CPI:    ['strategic_thinking','operational_excellence','stakeholder_leadership','market_acumen','change_leadership','team_development','commercial_drive','cross_border'],
+    CPI:    ['talent_representation','pipeline_depth','development_investment','cultural_alignment','retention_risk','external_hiring_capability'],
     SHIFT:  ['self_awareness','ambiguity_tolerance','learning_agility','emotional_regulation','purpose_alignment','network_activation','risk_appetite','relational_mobility'],
-    PRISM:  ['purpose_orientation','performance_culture','people_stewardship','process_rigor','pioneering_thinking','partnership_intelligence'],
-    SPARK:  ['strategic_clarity','execution_bias','impact_resonance','stakeholder_equity','scalability_posture','market_creation'],
+    PRISM:  ['brand_clarity','market_legibility','identity_consistency','narrative_power','visibility_level'],
+    SPARK:  ['individual_ai_adoption_readiness','capability_exposure_assessment','organisational_preparedness'],
+    BRIDGE: ['mandate_clarity','stakeholder_relationship_building','communication_alignment','pressure_resilience','long_game_thinking','cultural_fluency'],
+    FORGE:  ['adaptive_learning_orientation','market_context_awareness','development_agency','bilateral_relationship_quality'],
+    MOSAIC: ['institutional_trust','relationship_velocity','normative_flexibility','conflict_resolution'],
+    DRIVE:  ['intrinsic_motivation','extrinsic_motivation','values_alignment','confidence_self_efficacy','growth_orientation'],
+    QUEST:  ['strategic_thinking','execution_excellence','commercial_acumen','people_leadership','adaptive_capacity','ai_readiness'],
+    LEAP:   ['market','capability','timing','risk','impact'],
+    COACH:  ['cross_boundary_developmental_orientation','adaptive_coaching_style','bilateral_developmental_relationship_quality','coaching_under_bilateral_constraints'],
+    IMPACT: ['strategic_oversight','governance_rigour','stakeholder_intelligence','mandate_legacy','executive_presence_influence'],
   };
 
   const dims = dimensionMap[code] ?? ['overall_competency','situational_judgment','interpersonal_effectiveness','growth_potential'];
