@@ -157,10 +157,14 @@ export const COMPOSITE_BANDS: CPICompositeBand[] = [
 // 6 archetypes — primary_dim is used for matching (top-scoring dimension).
 // 'Balanced Collaborative' has no primary_dim; matched when no single
 // dimension dominates (top spread below threshold).
+// X4: All 6 archetype `name` fields below follow CPI canon v1.0 character-for-character.
+// Customer-facing labels = The Glass Ceiling / Shallow Bench / Cultural Mismatch / Leaky Bucket /
+// External Dependency / World-Class Pipeline. IDs (A1-A6), primary_dim, strengths, growth_areas,
+// descriptions, taglines retained from engine semantics — only display `name` changed.
 export const ARCHETYPES = [
   {
     id: 'A1',
-    name: 'Strategic Builder',
+    name: 'The Glass Ceiling',
     description: 'Systemic thinker with future-back orientation. Frames the future, not just the task.',
     primary_dim: 'D1',
     tagline: 'Systemic thinker with future-back orientation.',
@@ -169,7 +173,7 @@ export const ARCHETYPES = [
   },
   {
     id: 'A2',
-    name: 'Precision Operator',
+    name: 'Shallow Bench',
     description: 'Reliable delivery through structure and cadence. Flawless execution engine.',
     primary_dim: 'D4',
     tagline: 'Reliable delivery through structure and cadence.',
@@ -178,7 +182,7 @@ export const ARCHETYPES = [
   },
   {
     id: 'A3',
-    name: 'Influential Builder',
+    name: 'Cultural Mismatch',
     description: 'Coalition-based mobilizer of people and plans. Moves stakeholder ecosystems.',
     primary_dim: 'D3',
     tagline: 'Coalition-based mobilizer of people and plans.',
@@ -187,7 +191,7 @@ export const ARCHETYPES = [
   },
   {
     id: 'A4',
-    name: 'Confident Executor',
+    name: 'Leaky Bucket',
     description: 'Inspires confident, decisive execution under pressure. Visible in high-stakes moments.',
     primary_dim: 'D5',
     tagline: 'Inspires confident, decisive execution.',
@@ -196,7 +200,7 @@ export const ARCHETYPES = [
   },
   {
     id: 'A5',
-    name: 'Cross-Border Catalyst',
+    name: 'External Dependency',
     description: 'Bridges cultures, markets, and operating silos. Translates across boundaries.',
     primary_dim: 'D2',
     tagline: 'Bridges cultures, markets, and operating silos.',
@@ -205,7 +209,7 @@ export const ARCHETYPES = [
   },
   {
     id: 'A6',
-    name: 'Balanced Collaborative',
+    name: 'World-Class Pipeline',
     description: 'High floor across all dimensions. Stable integrator who compounds team capability.',
     primary_dim: null,
     tagline: 'High floor across all dimensions. Stable integrator.',

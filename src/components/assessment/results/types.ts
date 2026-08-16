@@ -15,6 +15,13 @@ export interface DimensionResult {
 
 export interface ArchetypeResult {
   name: string;
+  /** Canonical display name per X4 archetype canon package v1.0 (LEAP engine uses
+   *  16 internal computation names, maps to 14 canon customer-facing labels via
+   *  this field).  When populated, consumers SHOULD render canonName in UI
+   *  rather than name to ensure product copy matches the canon exactly.
+   *  Non-LEAP instruments: this field is typically undefined and name already
+   *  equals the canon label. */
+  canonName?: string;
   description: string;
   traits: string[];
 }

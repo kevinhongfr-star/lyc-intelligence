@@ -244,7 +244,7 @@ function buildFromScoreResult(
   }));
   const matched: NormArchetype | undefined = result.archetype
     ? {
-        name: result.archetype.name,
+        name: (result.archetype as any).canonName ?? result.archetype.name,
         description: result.archetype.description || '',
         matchScore: result.archetype.match_score,
         tagline: (result.archetype as Record<string, unknown>).tagline as string | undefined,

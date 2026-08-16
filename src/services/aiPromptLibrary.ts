@@ -118,7 +118,7 @@ function sharedUserPrompt(ctx: PromptBuildCtx, extraFraming: string): string {
     .join('\n');
 
   const archetype = ctx.archetype
-    ? `MATCHED ARCHETYPE: ${ctx.archetype.name} (code=${ctx.archetype.archetype_code}). Description: ${ctx.archetype.description}. Key traits: ${(ctx.archetype.key_traits ?? []).join(', ') || '—'}`
+    ? `MATCHED ARCHETYPE: ${(ctx.archetype as any).canonName ?? ctx.archetype.name} (code=${ctx.archetype.archetype_code}). Description: ${ctx.archetype.description}. Key traits: ${(ctx.archetype.key_traits ?? []).join(', ') || '—'}`
     : '';
 
   const intentKindLine =

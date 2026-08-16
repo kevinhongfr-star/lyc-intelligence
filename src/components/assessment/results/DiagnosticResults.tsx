@@ -610,7 +610,7 @@ export function DiagnosticResults({ slug, resultId, userId }: DiagnosticResultsP
                       marginBottom: 12,
                     }}
                   >
-                    {archetype.name}
+                    {archetype.canonName ?? archetype.name}
                   </h3>
                   <p
                     style={{

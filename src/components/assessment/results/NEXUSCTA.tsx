@@ -22,7 +22,7 @@ export function NEXUSCTA({ config }: Props) {
     ? [...dimensions].sort((a, b) => a.score - b.score)[0]
     : null;
   const contextualQuestion =
-    `I just completed my ${assessmentName} assessment. My archetype is "${archetype.name}" ` +
+    `I just completed my ${assessmentName} assessment. My archetype is "${archetype.canonName ?? archetype.name}" ` +
     `and my overall score is ${overallScore}.` +
     (lowest ? ` My lowest dimension is "${lowest.name}" at ${lowest.score}.` : '') +
     ` Help me understand what to prioritise and build a 90-day development plan.`;
@@ -58,7 +58,7 @@ export function NEXUSCTA({ config }: Props) {
           <p style={{
             fontSize: 17, color: G600, lineHeight: 1.6, marginBottom: 12,
           }}>
-            Your results are now synced with NEXUS. Start from your {archetype.name.toLowerCase()} profile{lowest ? <> and your <em style={{ color: WHITE, fontStyle: 'normal' }}>{lowest.name}</em> dimension</> : null}, and NEXUS will help you turn the diagnostic into a development plan you can act on this quarter.
+            Your results are now synced with NEXUS. Start from your {(archetype.canonName ?? archetype.name).toLowerCase()} profile{lowest ? <> and your <em style={{ color: WHITE, fontStyle: 'normal' }}>{lowest.name}</em> dimension</> : null}, and NEXUS will help you turn the diagnostic into a development plan you can act on this quarter.
           </p>
           <p style={{
             fontSize: 13, color: G600, lineHeight: 1.6, marginBottom: 40, fontStyle: 'italic',

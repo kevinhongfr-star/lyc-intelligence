@@ -404,7 +404,7 @@ export function GenericAkiraResults({
             <div className={`${prefix}-reveal`} style={{ textAlign: 'center' }}>
               <SectionHeading
                 eyebrow={`${assessmentName} · Results`}
-                title={<>Your <em style={{ fontWeight: 400 }}>archetype</em> is {archetype.name}</>}
+                title={<>Your <em style={{ fontWeight: 400 }}>archetype</em> is {archetype.canonName ?? archetype.name}</>}
                 subtitle={summary.verdict}
                 align="center"
                 as="h1"

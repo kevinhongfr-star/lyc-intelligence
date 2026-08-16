@@ -238,7 +238,7 @@ export const DIMENSION_VERDICTS = [
 
 export const ARCHETYPES = [
   {
-    name: "The Strategist",
+    name: "The Architect",
     "#": "1",
     profile: "High Strategic Thinking + High Adaptive Capacity, Advanced band",
     core_strength: "Designs robust systems and can pivot them when context changes. Rare combination at senior executive level.",

@@ -117,7 +117,7 @@ export function DexAssessPage() {
       assessmentType: 'dex_leadership_self',
       answers,
       scores,
-      archetype: archetype.name,
+      archetype: (archetype as any).canonName ?? archetype.name,
       compositeScore: composite,
     });
     setSubmitting(false);
@@ -146,7 +146,7 @@ export function DexAssessPage() {
             >
               Your Leadership Profile
             </h1>
-            <div className="text-fuchsia font-semibold text-xl">{result.archetype.name}</div>
+            <div className="text-fuchsia font-semibold text-xl">{result.archetype.canonName ?? result.archetype.name}</div>
           </div>
           <Card className="mb-6">
             <CardContent className="p-6">

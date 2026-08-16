@@ -22,7 +22,7 @@ export function ArchetypeProfile({ config }: Props) {
             fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20,
           }}>
-            The <em style={{ fontWeight: 400 }}>{archetype.name}</em>
+            The <em style={{ fontWeight: 400 }}>{archetype.canonName ?? archetype.name}</em>
           </h2>
         </div>
 

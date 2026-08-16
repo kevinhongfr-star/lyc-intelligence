@@ -41,7 +41,7 @@ export function deriveExecutiveSummary(config: AssessmentResultsConfig): ExecSum
       label: 'Top strength',
       text: topStrength
         ? `${topStrength.name} (${topStrength.score}/100) — ${topStrength.highLabel}.`
-        : `${archetype.name} profile identified.`,
+        : `${archetype.canonName ?? archetype.name} profile identified.`,
     },
     {
       label: 'Priority gap',
@@ -51,11 +51,11 @@ export function deriveExecutiveSummary(config: AssessmentResultsConfig): ExecSum
     },
     {
       label: 'Signature trait',
-      text: `${archetype.name}: ${archetype.traits[0] || archetype.description.split('.')[0]}.`,
+      text: `${archetype.canonName ?? archetype.name}: ${archetype.traits[0] || archetype.description.split('.')[0]}.`,
     },
   ];
 
-  const verdict = `${band.label} profile — ${archetype.name} archetype with an overall score of ${overallScore}/100. ${
+  const verdict = `${band.label} profile — ${archetype.canonName ?? archetype.name} archetype with an overall score of ${overallScore}/100. ${
     priorityGap && priorityGap.score < 50
       ? `Development priority: ${priorityGap.name}.`
       : 'Strengths outweigh gaps.'

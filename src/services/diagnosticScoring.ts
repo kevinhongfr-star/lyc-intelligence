@@ -178,7 +178,7 @@ export function scoreAttempt(
     overall_level,
     dimension_scores,
     archetype_key: archetype?.key ?? null,
-    archetype_name: archetype?.name ?? null,
+    archetype_name: (archetype as any)?.canonName ?? archetype?.name ?? null,
     insights,
   };
 }

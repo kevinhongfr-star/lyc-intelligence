@@ -276,13 +276,13 @@ export const WebResultPage: React.FC<WebResultPageProps> = ({ data, ctaVariant, 
               className="shrink-0 w-24 h-24 flex items-center justify-center font-[var(--report-font-display)] font-bold text-3xl text-white"
               style={{ background: 'var(--report-accent)' }}
             >
-              {(data.archetype.name || 'A').slice(0, 1)}
+              {(data.archetype.canonName ?? data.archetype.name || 'A').slice(0, 1)}
             </div>
             <div className="flex-1 min-w-0">
               <p className="report-caption tracking-widest" style={{ color: 'var(--report-accent-ink)' }}>
                 MATCHED ARCHETYPE
               </p>
-              <h3 className="report-h2 mt-1 text-[var(--report-ink)]">{data.archetype.name}</h3>
+              <h3 className="report-h2 mt-1 text-[var(--report-ink)]">{data.archetype.canonName ?? data.archetype.name}</h3>
               <p className="report-body mt-2 text-[var(--report-text-secondary)] leading-relaxed">
                 {data.archetype.description}
               </p>

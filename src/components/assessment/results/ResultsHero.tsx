@@ -89,7 +89,7 @@ export function ResultsHero({ config }: Props) {
             fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
             fontSize: 20, fontWeight: 700, color: INK,
           }}>
-            {archetype.name}
+            {archetype.canonName ?? archetype.name}
           </span>
         </div>
 
