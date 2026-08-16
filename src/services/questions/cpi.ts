@@ -29,11 +29,19 @@ export interface CPIDimensionBank {
   questions: CPIQuestion[];
 }
 
+// X4-WARN: B2C CPI engine vs B2B CPI canon — approved intentional divergence.
+// Canon CPI (B2B): "CPI — China Leadership Pipeline Index", 6 org-health dims
+// (Representation, Pipeline Depth, Development, Culture, Retention, External
+// Hiring Capability) × 6 questions each = 36 organisational assessment items.
+// Engine CPI (B2C self-rater port): "CPI — Career Positioning Index", 6
+// executive self-awareness dims (Strategic Orientation, Cross-Border
+// Adaptability, Stakeholder Influence, Execution Discipline, Leadership
+// Presence, Self-Awareness Quotient) × 5 each = 30 single-rater questions.
+// B2C CPI product name, dimension set, and question count are deliberately
+// different from B2B canon CPI. Multi-rater/teams = B2B upsell path.
 export const INSTRUMENT = 'CPI';
 export const FULL_NAME = 'CPI — Career Positioning Index';
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = CPI — Career Positioning Index draft derived from reportPipeline.
 export const B2C_NAME = 'CPI — Career Positioning Index';
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = CPI — Career Positioning Index draft derived from reportPipeline.
 export const VERSION = '13.0';
 export const TOTAL_QUESTIONS = 30;
 export const SCALE = '1-5 Likert';

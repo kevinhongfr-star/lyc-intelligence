@@ -2,113 +2,126 @@
   "meta": {
     "id": "mosaic",
     "title": "MOSAIC",
-    "subtitle": "Cultural Intelligence Diagnostic",
+    "subtitle": "Institutional Trust & Relationship Velocity",
     "accent_color": "#7c3aed",
-    "total_questions": 24,
-    "total_dimensions": 5,
+    "total_questions": 25,
+    "total_dimensions": 4,
     "tier_key": "professional",
     "status": "placeholder"
   },
   "dimensions": [
     {
-      "key": "cognitive_cq",
-      "name": "Cognitive CQ",
-      "description": "Cultural knowledge and patterns",
+      "key": "d1_institutional_trust",
+      "name": "Institutional Trust",
+      "description": "Measures the leader's ability to build and maintain trust in partnerships where institutional frameworks differ",
       "low_label": "Developing",
       "high_label": "Mastery",
       "weight": 1.0,
       "sort_order": 1
     },
     {
-      "key": "motivational_cq",
-      "name": "Motivational CQ",
-      "description": "Drive and interest in cross-cultural work",
+      "key": "d2_relationship_velocity",
+      "name": "Relationship Velocity",
+      "description": "Measures the speed and quality with which a leader can build working trust in cross-border relationships",
       "low_label": "Developing",
       "high_label": "Mastery",
       "weight": 1.0,
       "sort_order": 2
     },
     {
-      "key": "behavioral_cq",
-      "name": "Behavioral CQ",
-      "description": "Ability to adapt behavior appropriately",
+      "key": "d3_normative_flexibility",
+      "name": "Normative Flexibility",
+      "description": "Measures the leader's ability to identify, adapt to, and operate within unstated normative expectations",
       "low_label": "Developing",
       "high_label": "Mastery",
       "weight": 1.0,
       "sort_order": 3
     },
     {
-      "key": "metacognitive_cq",
-      "name": "Meta-Cognitive CQ",
-      "description": "Awareness and self-correction",
+      "key": "d4_conflict_resolution",
+      "name": "Conflict Resolution",
+      "description": "Measures the leader's ability to diagnose and resolve partnership conflict by distinguishing between interpersonal friction, governance misalignment, and capability asymmetry",
       "low_label": "Developing",
       "high_label": "Mastery",
       "weight": 1.0,
       "sort_order": 4
-    },
-    {
-      "key": "relational_cq",
-      "name": "Relational CQ",
-      "description": "Building trust across cultures",
-      "low_label": "Developing",
-      "high_label": "Mastery",
-      "weight": 1.0,
-      "sort_order": 5
     }
   ],
   "archetypes": [
     {
-      "key": "the_explorer",
-      "name": "The Explorer",
-      "description": "Seeks out cultural experiences with curiosity",
+      "key": "a1_institutional_strategist",
+      "name": "The Institutional Strategist",
+      "description": "Reads institutional environments deeply while building relationships at speed.",
       "key_traits": [
-        "Curious",
-        "Adventurous",
-        "Open"
+        "Institutional trust depth",
+        "Relationship velocity",
+        "Cross-border partnership leadership"
       ],
       "sort_order": 1
     },
     {
-      "key": "the_integrator",
-      "name": "The Integrator",
-      "description": "Blends cultural perspectives seamlessly",
+      "key": "a2_deep_connector",
+      "name": "The Deep Connector",
+      "description": "Builds trust quickly and adapts seamlessly to different normative environments.",
       "key_traits": [
-        "Adaptive",
-        "Synthesizing",
-        "Inclusive"
+        "Rapid trust establishment",
+        "Normative adaptation",
+        "Partnership continuity"
       ],
       "sort_order": 2
     },
     {
-      "key": "the_analyst",
-      "name": "The Analyst",
-      "description": "Understands cultural patterns with intellectual rigor",
+      "key": "a3_normative_bridge",
+      "name": "The Normative Bridge",
+      "description": "Reads unstated expectations across cultures and resolves conflicts arising from normative misalignment.",
       "key_traits": [
-        "Observant",
-        "Analytical",
-        "Pattern-seeking"
+        "Normative expectation reading",
+        "Conflict root-cause resolution",
+        "Friction prevention"
       ],
       "sort_order": 3
     },
     {
-      "key": "the_ambassador",
-      "name": "The Ambassador",
-      "description": "Represents and bridges cultures with diplomacy",
+      "key": "a4_capability_broker",
+      "name": "The Capability Broker",
+      "description": "Understands institutional dynamics deeply and resolves capability asymmetry conflicts effectively.",
       "key_traits": [
-        "Diplomatic",
-        "Representative",
-        "Trusted"
+        "Governance analysis",
+        "Capability asymmetry diagnosis",
+        "Structural conflict resolution"
       ],
       "sort_order": 4
+    },
+    {
+      "key": "a5_relationship_specialist",
+      "name": "The Relationship Specialist",
+      "description": "Builds trust quickly but may lack the institutional or normative depth for complex environments.",
+      "key_traits": [
+        "Rapid trust building",
+        "Network maintenance",
+        "Stable context effectiveness"
+      ],
+      "sort_order": 5
+    },
+    {
+      "key": "a6_institutional_analyst",
+      "name": "The Institutional Analyst",
+      "description": "Deep understanding of institutional dynamics but slower to build relationships or adapt normatively.",
+      "key_traits": [
+        "Governance and risk assessment",
+        "Institutional trust analysis",
+        "Partnership design expertise"
+      ],
+      "sort_order": 6
     }
   ],
   "questions": [
     {
       "key": "q_001",
       "type": "scale",
-      "prompt": "Placeholder question 1 for Cognitive CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 1 for D1 Institutional Trust dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "cognitive_cq",
+      "dimension_key": "d1_institutional_trust",
       "weight": 1.0,
       "sort_order": 1,
       "scale_min": 1,
@@ -123,13 +136,12 @@
     },
     {
       "key": "q_002",
-      "type": "scenario",
-      "prompt": "Placeholder question 2 for Motivational CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scale",
+      "prompt": "Placeholder question 2 for D1 Institutional Trust dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "motivational_cq",
+      "dimension_key": "d1_institutional_trust",
       "weight": 1.0,
       "sort_order": 2,
-      "scenario": "Scenario context for question 2. You are in a situation that tests your motivational cq capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -143,9 +155,9 @@
     {
       "key": "q_003",
       "type": "scale",
-      "prompt": "Placeholder question 3 for Behavioral CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 3 for D1 Institutional Trust dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "behavioral_cq",
+      "dimension_key": "d1_institutional_trust",
       "weight": 1.0,
       "sort_order": 3,
       "scale_min": 1,
@@ -161,9 +173,9 @@
     {
       "key": "q_004",
       "type": "scale",
-      "prompt": "Placeholder question 4 for Meta-Cognitive CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 4 for D1 Institutional Trust dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "metacognitive_cq",
+      "dimension_key": "d1_institutional_trust",
       "weight": 1.0,
       "sort_order": 4,
       "scale_min": 1,
@@ -179,12 +191,12 @@
     {
       "key": "q_005",
       "type": "scenario",
-      "prompt": "Placeholder question 5 for Relational CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 5 for D1 Institutional Trust dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "relational_cq",
+      "dimension_key": "d1_institutional_trust",
       "weight": 1.0,
       "sort_order": 5,
-      "scenario": "Scenario context for question 5. You are in a situation that tests your relational cq capabilities. How do you respond?",
+      "scenario": "Scenario context for question 5. You are in a situation that tests your institutional trust capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -197,36 +209,28 @@
     },
     {
       "key": "q_006",
-      "type": "single_select",
-      "prompt": "Placeholder question 6 for Cognitive CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scale",
+      "prompt": "Placeholder question 6 for D1 Institutional Trust dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "cognitive_cq",
+      "dimension_key": "d1_institutional_trust",
       "weight": 1.0,
       "sort_order": 6,
-      "options": [
-        {
-          "value": "a",
-          "label": "Option A",
-          "score": 5
-        },
-        {
-          "value": "b",
-          "label": "Option B",
-          "score": 3
-        },
-        {
-          "value": "c",
-          "label": "Option C",
-          "score": 1
-        }
-      ]
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
     },
     {
       "key": "q_007",
       "type": "scale",
-      "prompt": "Placeholder question 7 for Motivational CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 7 for D1 Institutional Trust dimension (reverse-coded). Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "motivational_cq",
+      "dimension_key": "d1_institutional_trust",
       "weight": 1.0,
       "sort_order": 7,
       "scale_min": 1,
@@ -241,13 +245,12 @@
     },
     {
       "key": "q_008",
-      "type": "scenario",
-      "prompt": "Placeholder question 8 for Behavioral CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scale",
+      "prompt": "Placeholder question 8 for D1 Institutional Trust dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "behavioral_cq",
+      "dimension_key": "d1_institutional_trust",
       "weight": 1.0,
       "sort_order": 8,
-      "scenario": "Scenario context for question 8. You are in a situation that tests your behavioral cq capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -261,9 +264,9 @@
     {
       "key": "q_009",
       "type": "scale",
-      "prompt": "Placeholder question 9 for Meta-Cognitive CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 9 for D2 Relationship Velocity dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "metacognitive_cq",
+      "dimension_key": "d2_relationship_velocity",
       "weight": 1.0,
       "sort_order": 9,
       "scale_min": 1,
@@ -278,12 +281,13 @@
     },
     {
       "key": "q_010",
-      "type": "scale",
-      "prompt": "Placeholder question 10 for Relational CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scenario",
+      "prompt": "Placeholder question 10 for D2 Relationship Velocity dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "relational_cq",
+      "dimension_key": "d2_relationship_velocity",
       "weight": 1.0,
       "sort_order": 10,
+      "scenario": "Scenario context for question 10. You are in a situation that tests your relationship velocity capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -296,13 +300,12 @@
     },
     {
       "key": "q_011",
-      "type": "scenario",
-      "prompt": "Placeholder question 11 for Cognitive CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scale",
+      "prompt": "Placeholder question 11 for D2 Relationship Velocity dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "cognitive_cq",
+      "dimension_key": "d2_relationship_velocity",
       "weight": 1.0,
       "sort_order": 11,
-      "scenario": "Scenario context for question 11. You are in a situation that tests your cognitive cq capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -315,36 +318,28 @@
     },
     {
       "key": "q_012",
-      "type": "single_select",
-      "prompt": "Placeholder question 12 for Motivational CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scale",
+      "prompt": "Placeholder question 12 for D2 Relationship Velocity dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "motivational_cq",
+      "dimension_key": "d2_relationship_velocity",
       "weight": 1.0,
       "sort_order": 12,
-      "options": [
-        {
-          "value": "a",
-          "label": "Option A",
-          "score": 5
-        },
-        {
-          "value": "b",
-          "label": "Option B",
-          "score": 3
-        },
-        {
-          "value": "c",
-          "label": "Option C",
-          "score": 1
-        }
-      ]
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
     },
     {
       "key": "q_013",
       "type": "scale",
-      "prompt": "Placeholder question 13 for Behavioral CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 13 for D2 Relationship Velocity dimension (reverse-coded). Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "behavioral_cq",
+      "dimension_key": "d2_relationship_velocity",
       "weight": 1.0,
       "sort_order": 13,
       "scale_min": 1,
@@ -359,13 +354,12 @@
     },
     {
       "key": "q_014",
-      "type": "scenario",
-      "prompt": "Placeholder question 14 for Meta-Cognitive CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scale",
+      "prompt": "Placeholder question 14 for D2 Relationship Velocity dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "metacognitive_cq",
+      "dimension_key": "d2_relationship_velocity",
       "weight": 1.0,
       "sort_order": 14,
-      "scenario": "Scenario context for question 14. You are in a situation that tests your meta-cognitive cq capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -379,9 +373,9 @@
     {
       "key": "q_015",
       "type": "scale",
-      "prompt": "Placeholder question 15 for Relational CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 15 for D2 Relationship Velocity dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "relational_cq",
+      "dimension_key": "d2_relationship_velocity",
       "weight": 1.0,
       "sort_order": 15,
       "scale_min": 1,
@@ -397,9 +391,9 @@
     {
       "key": "q_016",
       "type": "scale",
-      "prompt": "Placeholder question 16 for Cognitive CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 16 for D3 Normative Flexibility dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "cognitive_cq",
+      "dimension_key": "d3_normative_flexibility",
       "weight": 1.0,
       "sort_order": 16,
       "scale_min": 1,
@@ -415,12 +409,12 @@
     {
       "key": "q_017",
       "type": "scenario",
-      "prompt": "Placeholder question 17 for Motivational CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 17 for D3 Normative Flexibility dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "motivational_cq",
+      "dimension_key": "d3_normative_flexibility",
       "weight": 1.0,
       "sort_order": 17,
-      "scenario": "Scenario context for question 17. You are in a situation that tests your motivational cq capabilities. How do you respond?",
+      "scenario": "Scenario context for question 17. You are in a situation that tests your normative flexibility capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -433,36 +427,28 @@
     },
     {
       "key": "q_018",
-      "type": "single_select",
-      "prompt": "Placeholder question 18 for Behavioral CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scale",
+      "prompt": "Placeholder question 18 for D3 Normative Flexibility dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "behavioral_cq",
+      "dimension_key": "d3_normative_flexibility",
       "weight": 1.0,
       "sort_order": 18,
-      "options": [
-        {
-          "value": "a",
-          "label": "Option A",
-          "score": 5
-        },
-        {
-          "value": "b",
-          "label": "Option B",
-          "score": 3
-        },
-        {
-          "value": "c",
-          "label": "Option C",
-          "score": 1
-        }
-      ]
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
     },
     {
       "key": "q_019",
       "type": "scale",
-      "prompt": "Placeholder question 19 for Meta-Cognitive CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 19 for D3 Normative Flexibility dimension (reverse-coded). Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "metacognitive_cq",
+      "dimension_key": "d3_normative_flexibility",
       "weight": 1.0,
       "sort_order": 19,
       "scale_min": 1,
@@ -477,13 +463,12 @@
     },
     {
       "key": "q_020",
-      "type": "scenario",
-      "prompt": "Placeholder question 20 for Relational CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scale",
+      "prompt": "Placeholder question 20 for D3 Normative Flexibility dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "relational_cq",
+      "dimension_key": "d3_normative_flexibility",
       "weight": 1.0,
       "sort_order": 20,
-      "scenario": "Scenario context for question 20. You are in a situation that tests your relational cq capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -497,9 +482,9 @@
     {
       "key": "q_021",
       "type": "scale",
-      "prompt": "Placeholder question 21 for Cognitive CQ dimension. Content team will replace with real diagnostic content.",
+      "prompt": "Placeholder question 21 for D4 Conflict Resolution dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "cognitive_cq",
+      "dimension_key": "d4_conflict_resolution",
       "weight": 1.0,
       "sort_order": 21,
       "scale_min": 1,
@@ -514,12 +499,13 @@
     },
     {
       "key": "q_022",
-      "type": "scale",
-      "prompt": "Placeholder question 22 for Motivational CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scenario",
+      "prompt": "Placeholder question 22 for D4 Conflict Resolution dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "motivational_cq",
+      "dimension_key": "d4_conflict_resolution",
       "weight": 1.0,
       "sort_order": 22,
+      "scenario": "Scenario context for question 22. You are in a situation that tests your conflict resolution capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -532,13 +518,12 @@
     },
     {
       "key": "q_023",
-      "type": "scenario",
-      "prompt": "Placeholder question 23 for Behavioral CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scale",
+      "prompt": "Placeholder question 23 for D4 Conflict Resolution dimension. Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "behavioral_cq",
+      "dimension_key": "d4_conflict_resolution",
       "weight": 1.0,
       "sort_order": 23,
-      "scenario": "Scenario context for question 23. You are in a situation that tests your behavioral cq capabilities. How do you respond?",
       "scale_min": 1,
       "scale_max": 5,
       "scale_labels": {
@@ -551,29 +536,39 @@
     },
     {
       "key": "q_024",
-      "type": "single_select",
-      "prompt": "Placeholder question 24 for Meta-Cognitive CQ dimension. Content team will replace with real diagnostic content.",
+      "type": "scale",
+      "prompt": "Placeholder question 24 for D4 Conflict Resolution dimension (reverse-coded). Content team will replace with real diagnostic content.",
       "required": true,
-      "dimension_key": "metacognitive_cq",
+      "dimension_key": "d4_conflict_resolution",
       "weight": 1.0,
       "sort_order": 24,
-      "options": [
-        {
-          "value": "a",
-          "label": "Option A",
-          "score": 5
-        },
-        {
-          "value": "b",
-          "label": "Option B",
-          "score": 3
-        },
-        {
-          "value": "c",
-          "label": "Option C",
-          "score": 1
-        }
-      ]
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_025",
+      "type": "scale",
+      "prompt": "Placeholder question 25 for D4 Conflict Resolution dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_conflict_resolution",
+      "weight": 1.0,
+      "sort_order": 25,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
     }
   ],
   "scoring": {
@@ -582,7 +577,7 @@
     "archetype_mapping": "highest_dimension_combo"
   },
   "result_insights": {
-    "high": "Your strengths in this dimension are notable. You demonstrate advanced capabilities that set you apart in MOSAIC.",
+    "high": "Your strengths in this dimension are notable. You demonstrate advanced capabilities that set you apart in MOSAIC partnership contexts.",
     "medium": "You are developing well in this area. With focused effort, you can elevate your MOSAIC capabilities to the next level.",
     "low": "This is an area for growth. Consider targeted development activities to strengthen your MOSAIC foundation."
   }

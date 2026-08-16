@@ -27,10 +27,8 @@ export interface IMPACTDimensionBank {
 }
 
 export const INSTRUMENT = "IMPACT";
-export const FULL_NAME = "IMPACT — Board Effectiveness & Executive Presence";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = IMPACT — Board Effectiveness & Executive Presence draft derived from reportPipeline.
-export const B2C_NAME = "IMPACT — Board Effectiveness & Executive Presence";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = IMPACT — Board Effectiveness & Executive Presence draft derived from reportPipeline.
+export const FULL_NAME = "IMPACT — board & stakeholder impact";
+export const B2C_NAME = "IMPACT — board & stakeholder impact";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 30;
 export const SCALE = "1-5 Likert";
@@ -275,7 +273,7 @@ export const DIMENSIONS: IMPACTDimensionBank[] = [
   },
   {
     id: "D5",
-    name: "APAC Mandate Credibility",
+    name: "Executive Presence & Influence",
     count: 6,
     max_raw: 30,
     formula: null,

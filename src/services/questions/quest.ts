@@ -24,10 +24,8 @@ export interface QUESTDimensionBank {
 }
 
 export const INSTRUMENT = "QUEST";
-export const FULL_NAME = "QUEST — Executive Performance & Inquiry Rigour";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = QUEST — Executive Performance & Inquiry Rigour draft derived from reportPipeline.
-export const B2C_NAME = "QUEST — Executive Performance & Inquiry Rigour";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = QUEST — Executive Performance & Inquiry Rigour draft derived from reportPipeline.
+export const FULL_NAME = "QUEST — strategic market positioning";
+export const B2C_NAME = "QUEST — strategic market positioning";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";

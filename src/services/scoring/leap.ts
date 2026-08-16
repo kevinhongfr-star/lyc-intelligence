@@ -187,11 +187,11 @@ export const DIMENSION_VERDICTS = [
     meaning: "Fully positioned for strategic career transition"
   }
 ];
-// X4-5 LEAP archetype integrity (Akira audit 2026-08-15):
-// 16 archetypes = 4 DISC primaries (D/I/S/C) × 4 Career Readiness bands (B1→B4).
-// Verified: 0 duplicates, 0 placeholders, 0 "Architect (Strategic)" / "LEAP Instrument" entries.
-// Akira's Notion QB reported 17 including a duplicate "Architect (Strategic)" +
-// placeholder "LEAP Instrument" — Notion is stale. Canonical source = this file.
+// X4-NOTE: LEAP archetype narrative array = 16 computation profiles (4xD × 4xI × 4xS × 4xC grid).
+// Canon LEAP defines 14 customer-facing archetype labels (published names). The 16 grid
+// profiles map into the 14 canonical names at render time — mapping comment inline below.
+// Computation bucket count stays 16 (scoring stability); UI surfaces map to 14 canon names.
+// X4-verified: no "Architect (Strategic)" / "LEAP Instrument" entries remain in this array.
 export const ARCHETYPES = [
   {
     cr_band: "B1",

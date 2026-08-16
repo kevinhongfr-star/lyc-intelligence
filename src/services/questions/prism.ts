@@ -24,10 +24,8 @@ export interface PRISMDimensionBank {
 }
 
 export const INSTRUMENT = "PRISM";
-export const FULL_NAME = "PRISM — Professional Brand Legibility";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = PRISM — Professional Brand Legibility draft derived from reportPipeline.
-export const B2C_NAME = "PRISM — Professional Brand Legibility";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = PRISM — Professional Brand Legibility draft derived from reportPipeline.
+export const FULL_NAME = "PRISM — professional branding";
+export const B2C_NAME = "PRISM — professional branding";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 30;
 export const SCALE = "1-5 Likert";

@@ -23,11 +23,13 @@ export interface COACHDimensionBank {
   questions: COACHQuestion[];
 }
 
+// X4-WARN: engine declares 26 questions (2 more than canon COACH total of 24).
+// Per-dimension: D1=5 (canon=6), D2=7 (canon=6), D3=7 (canon=6), D4=7 (canon=6).
+// Questions beyond canon count are editorial add-ons; kept because they have scoring
+// weight but should be reviewed against COACH QB Notion master.
 export const INSTRUMENT = "COACH";
-export const FULL_NAME = "COACH — Manager-as-Coach Capability";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = COACH — Manager-as-Coach Capability draft derived from reportPipeline.
-export const B2C_NAME = "COACH — Manager-as-Coach Capability";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = COACH — Manager-as-Coach Capability draft derived from reportPipeline.
+export const FULL_NAME = "COACH — executive coaching fit";
+export const B2C_NAME = "COACH — executive coaching fit";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 26;
 export const SCALE = "1-5 Likert";
@@ -36,11 +38,11 @@ export const DELIVERY_MINUTES = 8;
 export const DIMENSIONS: COACHDimensionBank[] = [
   {
     id: "D1",
-    name: "COACH MINDSET",
+    name: "Cross-Boundary Developmental Orientation",
     count: 5,
     max_raw: 25,
     formula: "(raw/25) x 20",
-    sub_dimensions: ["A. Belief in potential", "B. Internal locus of control"],
+    sub_dimensions: [],
     reverse_coded: [],
     questions: [
       {
@@ -87,11 +89,11 @@ export const DIMENSIONS: COACHDimensionBank[] = [
   },
   {
     id: "D2",
-    name: "COACH SKILLSET",
+    name: "Adaptive Coaching Style",
     count: 7,
     max_raw: 35,
     formula: "(raw/35) x 20",
-    sub_dimensions: ["A. Active listening & reflecting", "B. Powerful questioning", "C. Contracting, structure & presence"],
+    sub_dimensions: [],
     reverse_coded: [],
     questions: [
       {
@@ -154,11 +156,11 @@ export const DIMENSIONS: COACHDimensionBank[] = [
   },
   {
     id: "D3",
-    name: "COACH TOOLKIT",
+    name: "Bilateral Developmental Relationship Quality",
     count: 7,
     max_raw: 35,
     formula: "(raw/35) x 20",
-    sub_dimensions: ["A. Goal-setting frameworks", "B. Developmental coaching models", "C. Performance & accountability conversations"],
+    sub_dimensions: [],
     reverse_coded: ["Q19"],
     questions: [
       {
@@ -221,11 +223,11 @@ export const DIMENSIONS: COACHDimensionBank[] = [
   },
   {
     id: "D4",
-    name: "COACH DISCIPLINE",
+    name: "Coaching Under Bilateral Constraints",
     count: 7,
     max_raw: 35,
     formula: "(raw/35) x 20",
-    sub_dimensions: ["A. Frequency & consistency", "B. Ownership & boundaries", "C. Measurement & review"],
+    sub_dimensions: [],
     reverse_coded: ["Q25", "Q26"],
     questions: [
       {

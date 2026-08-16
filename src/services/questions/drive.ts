@@ -18,11 +18,14 @@ export interface DRIVEDimensionBank {
   questions: DRIVEQuestion[];
 }
 
+// X4-WARN: questions/drive.ts TOTAL_QUESTIONS = 30 core motivation items.
+// Scoring engine (scoring/drive.ts) declares TOTAL_QUESTIONS = 36 = 30 core
+// + 6 engagement risk sub-score items. 6 Q engagement risk block is appended
+// at scoring time from scoring config. See scoring/drive.ts: CORE_QUESTIONS=30
+// and ENGAGEMENT_RISK_QUESTIONS=6 for the full 36-item canon DRIVE battery.
 export const INSTRUMENT = "DRIVE";
-export const FULL_NAME = "DRIVE — Motivation Profile & Engagement Risk";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = DRIVE — Motivation Profile & Engagement Risk draft derived from reportPipeline.
-export const B2C_NAME = "DRIVE — Motivation Profile & Engagement Risk";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = DRIVE — Motivation Profile & Engagement Risk draft derived from reportPipeline.
+export const FULL_NAME = "DRIVE — motivational alignment";
+export const B2C_NAME = "DRIVE — motivational alignment";
 export const VERSION = "2.0";
 export const TOTAL_QUESTIONS = 30;
 export const SCALE = "1-5 Likert";

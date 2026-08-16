@@ -24,10 +24,8 @@ export interface MOSAICDimensionBank {
 }
 
 export const INSTRUMENT = "MOSAIC";
-export const FULL_NAME = "MOSAIC — Cross-Border Partnership & Institutional Agility";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = MOSAIC — Cross-Border Partnership & Institutional Agility draft derived from reportPipeline.
-export const B2C_NAME = "MOSAIC — Cross-Border Partnership & Institutional Agility";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = MOSAIC — Cross-Border Partnership & Institutional Agility draft derived from reportPipeline.
+export const FULL_NAME = "MOSAIC — institutional trust & relationship velocity";
+export const B2C_NAME = "MOSAIC — institutional trust & relationship velocity";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 25;
 export const SCALE = "1-5 Likert";
@@ -36,7 +34,7 @@ export const DELIVERY_MINUTES = 8;
 export const DIMENSIONS: MOSAICDimensionBank[] = [
   {
     id: "D1",
-    name: "INSTITUTIONAL TRUST",
+    name: "Institutional Trust",
     count: 8,
     max_raw: 40,
     formula: "(raw/40) x 20",
@@ -111,7 +109,7 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
   },
   {
     id: "D2",
-    name: "RELATIONSHIP VELOCITY",
+    name: "Relationship Velocity",
     count: 7,
     max_raw: 35,
     formula: "(raw/35) x 20",
@@ -178,7 +176,7 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
   },
   {
     id: "D3",
-    name: "NORMATIVE FLEXIBILITY",
+    name: "Normative Flexibility",
     count: 5,
     max_raw: 25,
     formula: "(raw/25) x 20",
@@ -229,7 +227,7 @@ export const DIMENSIONS: MOSAICDimensionBank[] = [
   },
   {
     id: "D4",
-    name: "CONFLICT RESOLUTION",
+    name: "Conflict Resolution",
     count: 5,
     max_raw: 25,
     formula: "(raw/25) x 20",

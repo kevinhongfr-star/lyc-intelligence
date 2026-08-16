@@ -19,10 +19,8 @@ export interface BRIDGEDimensionBank {
 }
 
 export const INSTRUMENT = "BRIDGE";
-export const FULL_NAME = "BRIDGE — Cross-Border Leadership Execution";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = BRIDGE — Cross-Border Leadership Execution draft derived from reportPipeline.
-export const B2C_NAME = "BRIDGE — Cross-Border Leadership Execution";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = BRIDGE — Cross-Border Leadership Execution draft derived from reportPipeline.
+export const FULL_NAME = "BRIDGE — cross-cultural relational intelligence";
+export const B2C_NAME = "BRIDGE — cross-cultural relational intelligence";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";

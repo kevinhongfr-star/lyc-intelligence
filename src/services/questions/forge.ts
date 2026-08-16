@@ -24,10 +24,8 @@ export interface FORGEDimensionBank {
 }
 
 export const INSTRUMENT = "FORGE";
-export const FULL_NAME = "FORGE — Sales Leadership Strengths & System Building";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = FORGE — Sales Leadership Strengths & System Building draft derived from reportPipeline.
-export const B2C_NAME = "FORGE — Sales Leadership Strengths & System Building";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = FORGE — Sales Leadership Strengths & System Building draft derived from reportPipeline.
+export const FULL_NAME = "FORGE — sales excellence capability";
+export const B2C_NAME = "FORGE — sales excellence capability";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
@@ -36,7 +34,7 @@ export const DELIVERY_MINUTES = 12;
 export const DIMENSIONS: FORGEDimensionBank[] = [
   {
     id: "D1",
-    name: "ADAPTIVE LEARNING ORIENTATION (ALO)",
+    name: "Adaptive Learning Orientation",
     count: 9,
     max_raw: 45,
     formula: "(raw/45) x 20",
@@ -119,8 +117,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
   },
   {
     id: "D2",
-    // TODO(Akira - X4-2): swap to exact canonical FORGE D2 descriptor. Placeholder = Selling Systems & Account Coverage (dimension about account coverage, selling system rigour, non-reliance on personal hero-selling).
-    name: "Selling Systems & Account Coverage (SSA)",
+    name: "Market Context Awareness",
     count: 9,
     max_raw: 45,
     formula: "(raw/45) x 20",
@@ -203,7 +200,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
   },
   {
     id: "D3",
-    name: "DEVELOPMENT AGENCY (DA)",
+    name: "Development Agency",
     count: 9,
     max_raw: 45,
     formula: "(raw/45) x 20",
@@ -286,7 +283,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
   },
   {
     id: "D4",
-    name: "BILATERAL CONTEXT NAVIGATION (BCN)",
+    name: "Bilateral Relationship Quality",
     count: 9,
     max_raw: 45,
     formula: "(raw/45) x 20",

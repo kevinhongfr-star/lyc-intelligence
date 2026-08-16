@@ -24,10 +24,8 @@ export interface SPARKDimensionBank {
 }
 
 export const INSTRUMENT = "SPARK";
-export const FULL_NAME = "SPARK — AI Leadership Readiness";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = SPARK — AI Leadership Readiness draft derived from reportPipeline.
-export const B2C_NAME = "SPARK — AI Leadership Readiness";
-// TODO(Akira - X4-1): confirm descriptor against Diagnostic Portfolio Master Library. Current = SPARK — AI Leadership Readiness draft derived from reportPipeline.
+export const FULL_NAME = "SPARK — AI leadership readiness";
+export const B2C_NAME = "SPARK — AI leadership readiness";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 27;
 export const SCALE = "1-5 Likert";
@@ -36,7 +34,7 @@ export const DELIVERY_MINUTES = 9;
 export const DIMENSIONS: SPARKDimensionBank[] = [
   {
     id: "D1",
-    name: "INDIVIDUAL AI ADOPTION READINESS (IAAR)",
+    name: "Individual AI Adoption Readiness",
     count: 9,
     max_raw: null,
     formula: null,
@@ -119,7 +117,7 @@ export const DIMENSIONS: SPARKDimensionBank[] = [
   },
   {
     id: "D2",
-    name: "CAPABILITY EXPOSURE ASSESSMENT (CEA)",
+    name: "Capability Exposure Assessment",
     count: 9,
     max_raw: null,
     formula: null,
@@ -202,7 +200,7 @@ export const DIMENSIONS: SPARKDimensionBank[] = [
   },
   {
     id: "D3",
-    name: "ORGANISATIONAL PREPAREDNESS (OP)",
+    name: "Organisational Preparedness",
     count: 9,
     max_raw: null,
     formula: null,
