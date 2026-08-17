@@ -210,11 +210,11 @@ export function auditQuality(text: string): QualityAuditResult {
         notes = 'Diagnostic accuracy checked by guardrail module';
         break;
 
-      case 'model_integration':
-        // Heuristic: does the response reference a diagnostic or pattern?
-        const hasDiagnosticRef = /\b(SPARK|PRISM|MOSAIC|BRIDGE|IMPACT|DRIVE|FORGE|LEAP|QUEST|COACH|CPI)\b/.test(text);
-        score = hasDiagnosticRef ? 4.3 : 3.8;
-        notes = hasDiagnosticRef ? 'References a diagnostic' : 'No diagnostic reference';
+      case 'canon_alignment':
+        // Heuristic: does the response align with approved brand voice, diagnostic canon, and quality guardrails?
+        const hasCanonAlignment = /NEXUS|complimentary|miles|milestones/.test(text);
+        score = hasCanonAlignment ? 4.3 : 3.8;
+        notes = hasCanonAlignment ? 'Aligns with brand voice and canon' : 'Brand voice or canon misalignment';
         break;
 
       case 'question_quality':

@@ -156,11 +156,12 @@ export function buildCpiSoftGate(): SoftGateResult {
 // ═══════════════════════════════════════════════════════════════════════
 
 /**
- * Build the Explorer onboarding message for complimentary assessments.
- * LEAP + PRISM are complimentary tokens on signup — NOT miles.
+ * Build the Explorer onboarding message for complimentary assessment tokens.
+ * P0-8: Canonical term = "complimentary assessment tokens". LEAP + PRISM on
+ * signup — NOT miles, NOT monthly, one-time grant.
  */
 export function buildExplorerOnboardingMessage(): string {
-  return `As part of your complimentary introduction, you have two assessments available: LEAP — competitive positioning, and PRISM — professional branding. No miles required for either. Would you like to start with one of these?`;
+  return `As part of your complimentary introduction, you have 2 complimentary assessment tokens available: LEAP — competitive positioning, and PRISM — professional branding. No miles required for either. Would you like to start with one of these?`;
 }
 
 /**
@@ -182,13 +183,13 @@ export function buildExplorerTokensExhaustedMessage(): string {
 // ═══════════════════════════════════════════════════════════════════════
 
 /**
- * Format the profile credit language for included monthly assessments.
- * Never says "free" or "included" — says "profile credit available".
+ * Format the complimentary assessment token language for included monthly assessments.
+ * P0-8: Never says "free", "included", or "profile credit" — says "complimentary assessment token available".
  */
 export function formatProfileCredit(code: string): string {
   const diag = getDiagnosticDescriptor(code);
   if (!diag) return code;
-  return `${diag.code} — profile credit available this month`;
+  return `${diag.code} — complimentary assessment token available this month`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -268,7 +269,7 @@ export function buildDocUploadTransition(): string {
 export function buildTransitionPromptLayer(): string {
   return `=== TRANSITION PATTERNS ===
 Depth progression: chat → directional read → formal assessment.
-You initiate transitions, not the member. Never present a catalog of diagnostics.
+NEXUS initiates transitions, not the user. Never present a catalog of diagnostics.
 
 LENS INTRODUCTION:
 - First mention: full name + descriptor (e.g., "LEAP — competitive positioning")
@@ -282,8 +283,8 @@ FORMAL DIAGNOSTIC TRANSITION:
 4. State the mile cost
 5. Let the member decide — ask "Want me to run it?"
 
-PROFILE CREDIT:
-- For included monthly assessments, say "profile credit available" — never "free" or "included"
+COMPLIMENTARY ASSESSMENT TOKEN:
+- For included monthly assessments, say "complimentary assessment token available" — never "free", "included", or "profile credit"
 
 SOFT GATES:
 - When a capability is above the member's plan: acknowledge → state specific value → offer best alternative → point to upgrade direction

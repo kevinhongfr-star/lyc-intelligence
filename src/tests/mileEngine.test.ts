@@ -128,7 +128,6 @@ assertEq('legacy "pro" → professional = 5', getMonthlyAllocation('pro'), 5);
 // ═══════════════════════════════════════════════════════════════════════
 console.log('\n--- Instrument costs ---');
 assertEq('SPARK = 1 (Light)', getInstrumentMileCost('SPARK'), 1);
-assertEq('SHIFT = 1 (Light)', getInstrumentMileCost('SHIFT'), 1);
 assertEq('PRISM = 2 (Standard)', getInstrumentMileCost('PRISM'), 2);
 assertEq('IMPACT = 2 (Standard)', getInstrumentMileCost('IMPACT'), 2);
 assertEq('BRIDGE = 2 (Standard)', getInstrumentMileCost('BRIDGE'), 2);
@@ -138,7 +137,7 @@ assertEq('FORGE = 3 (Signature)', getInstrumentMileCost('FORGE'), 3);
 assertEq('LEAP = 3 (Signature)', getInstrumentMileCost('LEAP'), 3);
 assertEq('QUEST = 3 (Signature)', getInstrumentMileCost('QUEST'), 3);
 assertEq('CPI = 5 (Flagship)', getInstrumentMileCost('CPI'), 5);
-assertEq('COACH = 0 (not an assessment)', getInstrumentMileCost('COACH'), 0);
+assertEq('COACH = 1 (Light)', getInstrumentMileCost('COACH'), 1);
 assertEq('UNKNOWN = 0', getInstrumentMileCost('UNKNOWN'), 0);
 
 // Cost tier classification

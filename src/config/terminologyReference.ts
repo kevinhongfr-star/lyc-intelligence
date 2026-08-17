@@ -443,10 +443,10 @@ export const TERMINOLOGY: TerminologyEntry[] = [
     category: 'feature',
     role: 'feature name (NEXUS conversation modes)',
     visibility: 'internal_only',
-    usageContext: 'The 4 NEXUS personas (Guide, Analyst, Architect, Steward). INTERNAL ONLY — members experience persona shifts as NEXUS adapting, not as "switching personas". NEVER mention "persona system" in user-facing copy.',
+    usageContext: 'The 4 NEXUS personas (Guide, Analyst, Strategist, Steward). INTERNAL ONLY — members experience persona shifts as NEXUS adapting, not as "switching personas". NEVER mention "persona system" in user-facing copy.',
     canonicalSource: 'src/config/nexusPersonas.ts',
     commonErrors: ['persona system (user-facing)', 'personas (user-facing)', 'character system', 'mode switching'],
-    examples: ['[internal] "The persona system selects Architect for strategic prompts."'],
+    examples: ['[internal] "The persona system selects Strategist for strategic prompts."'],
   },
   {
     term: 'session memory',
@@ -624,7 +624,7 @@ export const VISIBILITY_MAPPING: VisibilityMapping[] = [
   {
     concept: 'Conversation modes',
     userFacingTerm: 'NEXUS adapts (no label)',
-    internalTerm: 'persona system (Guide, Analyst, Architect, Steward)',
+    internalTerm: 'persona system (Guide, Analyst, Strategist, Steward)',
     notes: 'Personas are internal — members never see persona names.',
   },
   {
@@ -648,7 +648,7 @@ export const VISIBILITY_MAPPING: VisibilityMapping[] = [
   {
     concept: 'Quality scoring',
     userFacingTerm: '(none — never referenced)',
-    internalTerm: '8-dimension model, 3.8/5.0 bar, model_integration dimension',
+    internalTerm: '8-dimension model, 3.8/5.0 bar, canon_alignment dimension',
     notes: 'Internal QA only. Members never see quality scores.',
   },
 ];
@@ -708,11 +708,11 @@ export const BANNED_WORD_SOURCES: BannedWordSource[] = [
 export const BANNED_WORDS_CROSS_REFERENCED: Array<{
   word: string;
   suggestion: string;
-  severity: 'hard' | 'soft';
+  severity: 'hard' | 'soft' | 'warning';
   categories: string[];
   sources: string[];
 }> = (() => {
-  const merged = new Map<string, { word: string; suggestion: string; severity: 'hard' | 'soft'; categories: Set<string>; sources: Set<string> }>();
+  const merged = new Map<string, { word: string; suggestion: string; severity: 'hard' | 'soft' | 'warning'; categories: Set<string>; sources: Set<string> }>();
 
   // Source 1: voiceStandard.ts (array form)
   for (const entry of VOICE_BANNED_WORDS) {

@@ -68,6 +68,11 @@ export const EXPIRY_REMINDER_DAYS = 30;
 
 export type MileCostTier = 'light' | 'standard' | 'signature' | 'flagship';
 
+/**
+ * INTERNAL-ONLY tier category metadata. Used for analytics / grouping only.
+ * NEVER surfaces to users — user-facing labels show mile counts (see getMileLabel).
+ * (P0-4: category names must not leak to UI; primary label = "X miles")
+ */
 export const MILE_COST_TIERS: Record<MileCostTier, { miles: number; label: string }> = {
   light:     { miles: 1, label: 'Light' },
   standard:  { miles: 2, label: 'Standard' },
@@ -76,26 +81,29 @@ export const MILE_COST_TIERS: Record<MileCostTier, { miles: number; label: strin
 };
 
 /**
- * Per-instrument mile cost. The canonical mapping.
- * Spec: All numbers locked.
+ * Per-instrument mile cost. The canonical mapping — single source of truth.
+ * Spec: All numbers locked. (P0-5)
  *
- * Light (1 mile):     SPARK, SHIFT
- * Standard (2 miles): PRISM, IMPACT, BRIDGE, DRIVE, MOSAIC, CANVAS
- * Signature (3 miles): FORGE, LEAP, QUEST
- * Flagship (5 miles): CPI
+ * ┌────────────┬──────────────────────────────────────────────┐
+ * │ Mile Cost  │ Instruments                                  │
+ * ├────────────┼──────────────────────────────────────────────┤
+ * │ 1 mile     │ SPARK, COACH                                 │
+ * │ 2 miles    │ PRISM, IMPACT, BRIDGE, DRIVE, MOSAIC         │
+ * │ 3 miles    │ FORGE, LEAP, QUEST                           │
+ * │ 5 miles    │ CPI                                          │
+ * └────────────┴──────────────────────────────────────────────┘
  *
- * Note: CANVAS is included for future use (not in the 11 active instruments yet).
- * COACH is not an assessment — no mile cost.
+ * All cost displays, gating logic, and NEXUS chat recommendations read from
+ * this table. No hardcoded costs anywhere.
  */
 export const INSTRUMENT_MILE_COST: Record<string, number> = {
   SPARK:   1,
-  SHIFT:   1,
+  COACH:   1,
   PRISM:   2,
   IMPACT:  2,
   BRIDGE:  2,
   DRIVE:   2,
   MOSAIC:  2,
-  CANVAS:  2,
   FORGE:   3,
   LEAP:    3,
   QUEST:   3,
@@ -120,6 +128,16 @@ export function getInstrumentCostTier(instrumentCode: string): MileCostTier {
  */
 export function getInstrumentMileCost(instrumentCode: string): number {
   return INSTRUMENT_MILE_COST[instrumentCode] ?? 0;
+}
+
+/**
+ * Get the USER-FACING mile label for an instrument (P0-4).
+ * Returns "X miles" (or "1 mile" singular). Never returns category names
+ * (light/standard/signature/flagship) — those are internal-only.
+ */
+export function getMileLabel(instrumentCode: string): string {
+  const cost = getInstrumentMileCost(instrumentCode);
+  return `${cost} ${cost === 1 ? 'mile' : 'miles'}`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════

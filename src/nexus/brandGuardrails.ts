@@ -17,7 +17,7 @@ import {
 export interface BrandViolation {
   word: string;
   suggestion: string;
-  severity: 'hard' | 'soft';
+  severity: 'hard' | 'soft' | 'warning';
   category: string;
   position: number;
   context: string;
@@ -108,6 +108,8 @@ export interface BrandAuditResult {
   passed: boolean; // true = zero hard violations
   hardViolations: BrandViolation[];
   softFlags: BrandViolation[];
+  /** WARNING tier — flagged for context evaluation, not blocking. P0-3. */
+  warningFlags: BrandViolation[];
   totalViolations: number;
   summary: string;
 }
@@ -120,13 +122,14 @@ export function auditBrandCompliance(text: string): BrandAuditResult {
   const all = [...banned, ...entity, ...progress];
   const hardViolations = all.filter((v) => v.severity === 'hard');
   const softFlags = all.filter((v) => v.severity === 'soft');
+  const warningFlags = all.filter((v) => v.severity === 'warning');
 
   const passed = hardViolations.length === 0;
   const summary = passed
-    ? `PASS — ${softFlags.length} soft flag(s)`
-    : `BLOCKED — ${hardViolations.length} hard violation(s), ${softFlags.length} soft flag(s)`;
+    ? `PASS — ${softFlags.length} soft flag(s), ${warningFlags.length} warning(s)`
+    : `BLOCKED — ${hardViolations.length} hard violation(s), ${softFlags.length} soft flag(s), ${warningFlags.length} warning(s)`;
 
-  return { passed, hardViolations, softFlags, totalViolations: all.length, summary };
+  return { passed, hardViolations, softFlags, warningFlags, totalViolations: all.length, summary };
 }
 
 /**

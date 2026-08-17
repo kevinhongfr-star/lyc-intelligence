@@ -179,7 +179,7 @@ export async function checkAssessmentAccess(
       if (hasFreeToken) {
         return {
           allowed: true,
-          mileCost: 0, // Free — no miles charged
+          mileCost: 0, // Complimentary token — no miles charged
           balance: totalBalance,
           gate: { reason: 'free_token_available', message: 'Complimentary assessment token available', free_token: true },
         };

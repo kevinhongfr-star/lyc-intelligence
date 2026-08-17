@@ -68,10 +68,10 @@ const personaTests: EvalTestCase[] = [
     ],
   },
   {
-    id: 'persona-architect-01',
+    id: 'persona-strategist-01',
     category: 'persona_consistency',
     prompt: 'How do I position my company for the next 5 years?',
-    goldenResponse: 'Architect persona: strategic, big-picture, challenger questions.',
+    goldenResponse: 'Strategist persona: strategic, big-picture, long-range planning, challenger questions.',
     assertions: [
       (r) => ({ pass: r.includes('?'), detail: 'Should ask strategic questions' }),
       (r) => ({ pass: containsCodenames(r).length === 0, detail: 'No internal codenames' }),
@@ -485,7 +485,7 @@ function runConfigTests() {
   assert('Quality max = 5.0', QUALITY_MAX === 5.0);
 
   // Verify dimension IDs match spec
-  const expectedIds = ['model_integration', 'coach_presence', 'insight_quality', 'question_quality', 'structural_clarity', 'appropriate_depth', 'diagnostic_accuracy', 'brand_compliance'];
+  const expectedIds = ['canon_alignment', 'coach_presence', 'insight_quality', 'question_quality', 'structural_clarity', 'appropriate_depth', 'diagnostic_accuracy', 'brand_compliance'];
   for (const id of expectedIds) {
     assert(`Dimension "${id}" exists`, QUALITY_DIMENSIONS.some(d => d.id === id));
   }
@@ -493,7 +493,7 @@ function runConfigTests() {
   // ── Banned words ──
   console.log('\n--- Banned Words ---');
   const bannedWordList = BANNED_WORDS.map(w => w.word);
-  const requiredBanned = ['free', 'framework', 'platform', 'leverage', 'synergy', 'navigate', 'disrupt', 'flywheel', 'funnel', 'signals', 'stages', 'taxonomy', 'architecture', 'architect'];
+  const requiredBanned = ['free', 'framework', 'platform', 'leverage', 'synergy', 'navigate', 'disrupt', 'flywheel', 'funnel', 'signals', 'stages', 'taxonomy', 'architecture', 'architect', 'warrior', 'hunt', 'war', 'force', 'quiet', 'burn', 'ignite', 'flame', 'forced', 'forcing'];
   for (const word of requiredBanned) {
     assert(`"${word}" is banned`, bannedWordList.includes(word));
   }
@@ -515,7 +515,7 @@ function runConfigTests() {
   assert('PRISM = 2 miles', getInstrumentMileCost('PRISM') === 2);
   assert('FORGE = 3 miles', getInstrumentMileCost('FORGE') === 3);
   assert('CPI = 5 miles', getInstrumentMileCost('CPI') === 5);
-  assert('COACH = 0 miles', getInstrumentMileCost('COACH') === 0);
+  assert('COACH = 1 mile', getInstrumentMileCost('COACH') === 1);
 
   // ── Eval test cases ──
   console.log('\n--- Eval Test Cases ---');

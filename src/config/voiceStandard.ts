@@ -29,7 +29,7 @@ export interface QualityDimension {
 }
 
 export const QUALITY_DIMENSIONS: QualityDimension[] = [
-  { id: 'model_integration',     label: 'Model Integration',     weight: 20, description: 'How well the response connects to LYC diagnostic models without naming internal architecture' },
+  { id: 'canon_alignment',      label: 'Canon Alignment',      weight: 20, description: 'How consistently the response aligns with approved brand voice, diagnostic canon, and quality guardrails' },
   { id: 'coach_presence',        label: 'Coach Presence',        weight: 15, description: 'NEXUS feels like a seasoned executive advisor, not a chatbot or FAQ responder' },
   { id: 'insight_quality',       label: 'Insight Quality',       weight: 15, description: 'Responses surface non-obvious insights — blind spots, patterns, structural issues' },
   { id: 'question_quality',      label: 'Question Quality',      weight: 10, description: 'Questions are diagnostic, specific, and advance the conversation — not generic' },
@@ -120,8 +120,11 @@ export const AI_TELL_PATTERNS: string[] = [
 export interface BannedWordEntry {
   word: string;
   suggestion: string;
-  severity: 'hard' | 'soft';
+  /** 'hard' = no exceptions; 'soft' = flag; 'warning' = context-dependent (see contextRule). */
+  severity: 'hard' | 'soft' | 'warning';
   category: string;
+  /** Optional context rule for WARNING tier words. Describes when the word is acceptable. */
+  contextRule?: string;
 }
 
 export const BANNED_WORDS: BannedWordEntry[] = [
@@ -146,21 +149,37 @@ export const BANNED_WORDS: BannedWordEntry[] = [
   { word: 'leverage', suggestion: 'use, apply, draw on', severity: 'hard', category: 'saas_jargon' },
   { word: 'synergy', suggestion: 'alignment, coordination', severity: 'hard', category: 'saas_jargon' },
   { word: 'move the needle', suggestion: 'create impact, drive results', severity: 'hard', category: 'saas_jargon' },
-  { word: 'navigate', suggestion: 'understand, map, work with, guide', severity: 'soft', category: 'saas_jargon' },
-  { word: 'navigation', suggestion: 'understanding, mapping', severity: 'soft', category: 'saas_jargon' },
+  { word: 'navigate', suggestion: 'understand, map, work with, guide', severity: 'hard', category: 'saas_jargon' },
+  { word: 'navigation', suggestion: 'understanding, mapping, guidance', severity: 'hard', category: 'saas_jargon' },
   { word: 'disrupt', suggestion: 'transform, reshape, change', severity: 'hard', category: 'saas_jargon' },
   { word: 'disruption', suggestion: 'transformation, change', severity: 'hard', category: 'saas_jargon' },
   { word: 'flywheel', suggestion: 'momentum, cycle, system', severity: 'hard', category: 'saas_jargon' },
   { word: 'funnel', suggestion: 'path, journey, progression', severity: 'hard', category: 'saas_jargon' },
-  { word: 'signals', suggestion: 'indicators, markers, patterns', severity: 'soft', category: 'saas_jargon' },
-  { word: 'stages', suggestion: 'phases, progression, journey', severity: 'soft', category: 'saas_jargon' },
+  { word: 'signals', suggestion: 'indicators, markers, patterns', severity: 'hard', category: 'saas_jargon' },
+  { word: 'stages', suggestion: 'phases, progression, journey', severity: 'hard', category: 'saas_jargon' },
   { word: 'dashboard', suggestion: 'overview', severity: 'soft', category: 'saas_jargon' },
   { word: 'seamless', suggestion: 'integrated', severity: 'hard', category: 'saas_jargon' },
   { word: 'empower', suggestion: 'enable, support', severity: 'hard', category: 'saas_jargon' },
   { word: 'streamline', suggestion: 'simplify, improve', severity: 'hard', category: 'saas_jargon' },
-  { word: 'landscape', suggestion: 'context, environment, market setting', severity: 'soft', category: 'saas_jargon' },
-  { word: 'calibrated', suggestion: 'aligned, tailored, adapted', severity: 'soft', category: 'saas_jargon' },
-  { word: 'calibration', suggestion: 'alignment, tailoring, adaptation', severity: 'soft', category: 'saas_jargon' },
+  { word: 'landscape', suggestion: 'context, environment, market setting', severity: 'hard', category: 'saas_jargon' },
+  { word: 'calibrated', suggestion: 'aligned, tailored, adapted', severity: 'hard', category: 'saas_jargon' },
+  { word: 'calibration', suggestion: 'alignment, tailoring, adaptation', severity: 'hard', category: 'saas_jargon' },
+
+  // Brand Master Spec v1.2 — additional Level 1 hard banned words
+  { word: 'warrior', suggestion: 'leader, expert, specialist', severity: 'hard', category: 'saas_jargon' },
+  { word: 'hunt', suggestion: 'pursue, seek, explore', severity: 'hard', category: 'saas_jargon' },
+  { word: 'hunting', suggestion: 'pursuing, seeking, exploring', severity: 'hard', category: 'saas_jargon' },
+  { word: 'war', suggestion: 'challenge, initiative, effort', severity: 'hard', category: 'saas_jargon' },
+  { word: 'force', suggestion: 'drive, influence, momentum', severity: 'hard', category: 'saas_jargon' },
+  { word: 'forced', suggestion: 'directed, guided, focused', severity: 'hard', category: 'saas_jargon' },
+  { word: 'forcing', suggestion: 'directing, guiding, focusing', severity: 'hard', category: 'saas_jargon' },
+  { word: 'quiet', suggestion: 'calm, measured, thoughtful', severity: 'hard', category: 'saas_jargon' },
+  { word: 'burn', suggestion: 'intense, focused, dedicated', severity: 'hard', category: 'saas_jargon' },
+  { word: 'ignite', suggestion: 'start, initiate, begin', severity: 'hard', category: 'saas_jargon' },
+  { word: 'flame', suggestion: 'passion, enthusiasm, drive', severity: 'hard', category: 'saas_jargon' },
+
+  // WARNING tier — flag and evaluate context
+  { word: 'benchmark', suggestion: 'reference point, comparison standard', severity: 'warning', category: 'saas_jargon', contextRule: 'CPI-specific technical contexts OK (e.g. percentile benchmarks, benchmarked placement data). Marketing / general product copy = banned — rephrase as "reference point" or "comparison standard".' },
 
   // Generic hype
   { word: 'revolutionize', suggestion: 'improve, advance', severity: 'hard', category: 'hype' },
@@ -244,7 +263,7 @@ export const APPROVED_DIAGNOSTICS: DiagnosticDescriptor[] = [
   { code: 'FORGE',   fullName: 'FORGE — sales excellence capability',      descriptor: 'sales excellence capability',      tagline: 'Build the sales leader your market needs.',       mileCost: 3, costTier: 'Signature' },
   { code: 'LEAP',    fullName: 'LEAP — competitive positioning',           descriptor: 'competitive positioning',          tagline: 'Know your edge. Know your moment.',               mileCost: 3, costTier: 'Signature' },
   { code: 'QUEST',   fullName: 'QUEST — strategic market positioning',     descriptor: 'strategic market positioning',     tagline: 'Know where you stand. Know where to play.',       mileCost: 3, costTier: 'Signature' },
-  { code: 'COACH',   fullName: 'COACH — executive coaching fit',           descriptor: 'executive coaching fit',           tagline: 'Great coaches are not born. They are calibrated.', mileCost: 0, costTier: '—' },
+  { code: 'COACH',   fullName: 'COACH — executive coaching fit',           descriptor: 'executive coaching fit',           tagline: 'Great coaches are not born. They are calibrated.', mileCost: 1, costTier: 'Light' },
   { code: 'CPI',     fullName: 'CPI — China Leadership Pipeline Index',    descriptor: 'China Leadership Pipeline Index',  tagline: 'Measure what matters in leadership pipeline health.', mileCost: 5, costTier: 'Flagship' },
 ];
 
@@ -285,8 +304,8 @@ export const TRANSITION_PATTERNS = {
     'state_mile_cost',    // State the mile cost
     'user_decides',       // User decides whether to proceed
   ],
-  /** Profile credit language (for included monthly assessments). */
-  profileCredit: 'profile credit available',
+  /** Complimentary assessment token language (for included monthly assessments). P0-8: never "profile credit" or "free". */
+  profileCredit: 'complimentary assessment token available',
   /** Soft gate pattern. */
   softGate: [
     'acknowledge',       // Acknowledge what the member wants

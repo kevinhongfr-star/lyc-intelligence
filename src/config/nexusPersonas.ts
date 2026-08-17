@@ -10,7 +10,7 @@
  * Personas:
  *  - Guide:      Supportive + structured. Default for onboarding + general coaching.
  *  - Analyst:    Data-driven + diagnostic-heavy. Deep analytical work.
- *  - Architect:  Strategic + big-picture. Systems thinking + long-range planning.
+ *  - Strategist: Strategic + big-picture. Systems thinking + long-range planning.
  *  - Steward:    Long-term + developmental. Sustained growth + stewardship.
  *
  * Quality is constant across all personas (3.8/5.0 bar). Personas change
@@ -23,7 +23,7 @@
 
 import { normalizeTier } from './tiers';
 
-export type PersonaKey = 'guide' | 'analyst' | 'architect' | 'steward' | 'custom';
+export type PersonaKey = 'guide' | 'analyst' | 'strategist' | 'steward' | 'custom';
 
 export type QuestioningStyle = 'socratic' | 'directive' | 'reflective' | 'challenger';
 
@@ -103,16 +103,16 @@ export const DEFAULT_PERSONAS: Record<Exclude<PersonaKey, 'custom'>, Persona> = 
     minTier: 'starter',
   },
 
-  architect: {
-    key: 'architect',
-    displayName: 'Architect',
+  strategist: {
+    key: 'strategist',
+    displayName: 'Strategist',
     descriptor: 'Strategic and big-picture',
     useCase: 'Systems thinking, long-range planning, and strategic positioning',
     tone: { warmth: 0.5, directness: 0.7, strategicDepth: 0.95, pace: 0.4 },
     questioningStyle: 'challenger',
     openingPattern: 'Lead with a strategic question that reframes the immediate issue into a systems-level question. Zoom out before diving in.',
     transitionPattern: 'Shift by connecting the current point to the larger system. Use "Stepping back..." or "In the broader picture..." transitions.',
-    promptModifier: `You are in ARCHITECT mode. Your approach is strategic and big-picture.
+    promptModifier: `You are in STRATEGIST mode. Your approach is strategic and big-picture, with long-range planning.
 - Challenge assumptions by reframing issues at a systems level.
 - Connect immediate decisions to long-term structural implications.
 - Ask challenger questions that test the member's strategic logic.
@@ -164,7 +164,7 @@ export function getPersona(key: string | null | undefined): Persona {
 
 /**
  * Get personas available to a given tier.
- * Explorer: Guide only. Starter+: Guide + Analyst. Pro+: + Architect. Exec+: + Steward.
+ * Explorer: Guide only. Starter+: Guide + Analyst. Pro+: + Strategist. Exec+: + Steward.
  */
 export function getAvailablePersonas(tier: string | null | undefined): Persona[] {
   const canonical = normalizeTier(tier) ?? 'explorer';
