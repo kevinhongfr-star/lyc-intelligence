@@ -65,7 +65,7 @@ export const PAGE_META: Record<string, PageMeta> = {
         'Executive Search',
         'Leadership Assessment',
         'Career Advisory',
-        'AI Coaching',
+        'NEXUS Coaching',
         'Talent Matching',
       ],
     },
@@ -74,22 +74,22 @@ export const PAGE_META: Record<string, PageMeta> = {
   pricing: {
     title: 'Pricing — LYC Intelligence | Leadership Assessments',
     description:
-      'Three plans from Complimentary to Council. All 6 leadership assessments, NEXUS AI coaching, and personalised reports. USD and CNY. Start complimentary.',
+      'Three plans from Complimentary to Council. All 6 leadership assessments, NEXUS, and personalised reports. USD and CNY. Start complimentary.',
     path: '/pricing',
     type: 'website',
     structuredData: null,
   },
 
   nexus: {
-    title: 'NEXUS AI — Your AI Executive Coach | LYC Intelligence',
+    title: 'NEXUS — Your Executive Advisor | LYC Intelligence',
     description:
-      'NEXUS is your AI executive coach. It knows all 6 leadership assessments, interprets your results, and gives you personalised leadership advice. 3 complimentary messages.',
+      'NEXUS is your executive advisor. It knows all 6 leadership assessments, interprets your results, and gives you personalised leadership advice. 3 complimentary messages.',
     path: '/nexus',
     type: 'website',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
-      name: 'NEXUS AI',
+      name: 'NEXUS',
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web',
       offers: {
@@ -147,7 +147,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   terms: {
     title: 'Terms of Service — LYC Intelligence',
     description:
-      'Terms governing your use of the LYC Intelligence platform, including assessment usage, NEXUS AI interactions, subscription terms, and data processing agreements.',
+      'Terms governing your use of the LYC Intelligence platform, including assessment usage, NEXUS interactions, subscription terms, and data processing agreements.',
     path: '/terms',
     type: 'website',
     structuredData: null,
@@ -271,7 +271,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
       canonical: u('/'),
       keywords: [
         'LYC CPI flagship assessment APAC',
-        'NEXUS AI executive thinking partner',
+        'NEXUS executive thinking partner',
         'China-APAC leadership benchmark 2026',
         'executive career positioning C-suite',
         'TRIDENT leader matching algorithm',
@@ -306,7 +306,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
       canonical: u('/nexus/chat'),
       noindex: true,
       keywords: [
-        'NEXUS AI thinking partner executive',
+        'NEXUS thinking partner executive',
         'AI leadership advisory copilot China',
         'executive market intelligence chatbot APAC',
         'CPI results AI interpretation tool',
@@ -343,7 +343,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
       keywords: [
         'CPI executive assessment cost 2026',
         'transparent leadership diagnostic pricing USD',
-        'executive NEXUS AI subscription cost',
+        'executive NEXUS subscription cost',
         'LYC Council tier advisory pricing',
         'leadership assessment à la carte $99 USD',
         'APAC executive diagnostic subscription',
@@ -362,7 +362,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
         'LYC Intelligence APAC contact sales',
         'executive assessment inquiry Shanghai',
         'enterprise mandate consultation APAC',
-        'NEXUS AI enterprise pricing contact',
+        'NEXUS enterprise pricing contact',
         'leadership advisory team enquiry Singapore',
       ],
     },
@@ -433,7 +433,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
       keywords: [
         'LYC Intelligence sign in executive',
         'leadership assessment dashboard login',
-        'NEXUS AI chat portal access',
+        'NEXUS chat portal access',
       ],
     },
   },
@@ -446,7 +446,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
       keywords: [
         'LYC Intelligence executive account register',
         'leadership assessment free sign up APAC',
-        'NEXUS AI complimentary account create',
+        'NEXUS complimentary account create',
       ],
     },
   },

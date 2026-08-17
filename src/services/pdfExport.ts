@@ -156,7 +156,7 @@ export async function exportAssessmentPdf({
   pdf.setProperties({
     title: `LYC ${data.definition.title} — Assessment Report`,
     subject: `${data.definition.title} assessment results for ${data.recipient.name}`,
-    author: 'LYC Partners — NEXUS AI Engine',
+    author: 'LYC Partners — NEXUS',
     keywords: [
       'LYC',
       data.definition.assessment_id,

@@ -77,7 +77,7 @@ export const SHARED_PRICING_TIERS: AssessmentPricing[] = [
       "Development roadmap generation",
       "Comparative benchmark percentiles",
       "Priority gap analysis",
-      "NEXUS AI coaching session (30 min)",
+      "NEXUS session (30 min)",
     ],
   },
   {
@@ -123,7 +123,7 @@ const FLAGSHIP_PRICING: AssessmentPricing[] = [
       "Development roadmap generation",
       "Comparative APAC benchmark percentiles",
       "Priority gap analysis",
-      "NEXUS AI coaching session (30 min)",
+      "NEXUS session (30 min)",
     ],
   },
   {

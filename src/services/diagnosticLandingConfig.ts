@@ -32,7 +32,7 @@ function buildHowItWorks(): AssessmentLandingConfig['howItWorks'] {
     {
       step: '03',
       title: 'Discuss with NEXUS',
-      desc: 'Connect with NEXUS AI to explore your results, identify development priorities, and build a growth plan.',
+      desc: 'Connect with NEXUS to explore your results, identify development priorities, and build a growth plan.',
     },
   ];
 }
@@ -77,7 +77,7 @@ function buildDeliverables(def: DiagnosticDefinition): AssessmentLandingConfig['
     },
     {
       title: 'NEXUS Integration',
-      desc: 'Direct link to discuss your results with NEXUS AI for personalized coaching.',
+      desc: 'Direct link to discuss your results with NEXUS for personalized coaching.',
     },
   ];
 }

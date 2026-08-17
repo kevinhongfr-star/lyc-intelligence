@@ -119,12 +119,12 @@ export function NexusChatMockup({ style }: { style?: React.CSSProperties }) {
         ...style,
       }}
       role="img"
-      aria-label="Sample NEXUS AI chat conversation"
+      aria-label="Sample NEXUS chat conversation"
     >
       {/* Header */}
       <div style={{ background: INK, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ width: 8, height: 8, background: ACCENT }} />
-        <span style={{ ...mono, color: WHITE, opacity: 0.8 }}>NEXUS AI</span>
+        <span style={{ ...mono, color: WHITE, opacity: 0.8 }}>NEXUS</span>
         <span style={{ ...mono, color: G400, opacity: 0.5, marginLeft: 'auto' }}>Online</span>
       </div>
 

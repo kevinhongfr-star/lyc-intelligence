@@ -279,7 +279,7 @@ function HowItWorks({ config, catalog }: { config: AssessmentLandingConfig; cata
     {
       step: '03',
       title: 'Unlock the full report',
-      desc: 'The Professional tier adds your development roadmap, benchmark percentiles, and a NEXUS AI coaching session.',
+      desc: 'The Professional tier adds your development roadmap, benchmark percentiles, and a NEXUS session.',
     },
   ];
 

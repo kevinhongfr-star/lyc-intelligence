@@ -717,7 +717,7 @@ export function DiagnosticResults({ slug, resultId, userId }: DiagnosticResultsP
                 }}
               >
                 <MessageSquare style={{ width: 20, height: 20, color: accent }} />
-                <span style={{ ...monoStyle, color: accent }}>NEXUS AI Coach</span>
+                <span style={{ ...monoStyle, color: accent }}>NEXUS</span>
               </div>
               <h2
                 style={{
@@ -731,7 +731,7 @@ export function DiagnosticResults({ slug, resultId, userId }: DiagnosticResultsP
                 Discuss your results with NEXUS
               </h2>
               <p style={{ fontSize: 16, color: G600, marginBottom: 32 }}>
-                Continue the conversation with NEXUS, your AI coach. It carries your{' '}
+                Continue the conversation with NEXUS. It carries your{' '}
                 {definition.meta.title} results into every reply — no need to re-explain your
                 scores.
               </p>

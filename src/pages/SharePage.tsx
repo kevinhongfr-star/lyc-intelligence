@@ -740,7 +740,7 @@ export function SharePage() {
               e.currentTarget.style.color = DS.text;
             }}
           >
-            Discuss your results with NEXUS AI →
+            Discuss your results with NEXUS →
           </Link>
           <div
             style={{

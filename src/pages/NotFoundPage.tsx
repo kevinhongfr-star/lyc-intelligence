@@ -26,7 +26,7 @@ export default function NotFoundPage() {
         color: DS.text,
       }}
     >
-      <SEO title="Page Not Found — LYC Intelligence" description="The page you're looking for doesn't exist. Explore LYC Intelligence assessments and NEXUS AI coaching." path="/404" />
+      <SEO title="Page Not Found — LYC Intelligence" description="The page you're looking for doesn't exist. Explore LYC Intelligence assessments and NEXUS." path="/404" />
       {/* Left column — accent bar + 404 wordmark */}
       <div
         style={{
@@ -189,7 +189,7 @@ export default function NotFoundPage() {
               { href: '/pricing',                  icon: <Search size={15} />,  label: 'Pricing & Tiers',          sub: 'Executive Introduction → Council' },
               { href: '/assessment/prism',         icon: <Search size={15} />,  label: 'PRISM Transition Diagnostic', sub: 'Career transition clarity' },
               { href: '/assessments',              icon: <Search size={15} />,  label: 'All 6 Leadership Assessments', sub: 'Browse the full catalog' },
-              { href: '/nexus',                    icon: <Search size={15} />,  label: 'NEXUS AI',                 sub: 'Conversational leadership advisor' },
+              { href: '/nexus',                    icon: <Search size={15} />,  label: 'NEXUS',                    sub: 'Conversational leadership advisor' },
             ].map((r) => (
               <a
                 key={r.href}

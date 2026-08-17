@@ -165,7 +165,7 @@ export function CandidateInterviewPrepPage() {
               <button className="text-left p-4 border border-border bg-white hover:border-fuchsia transition-colors" style={{ }}>
                 <Video className="w-5 h-5 text-fuchsia mb-2" />
                 <div className="font-medium text-text-primary text-sm">Mock Interview</div>
-                <div className="text-xs text-text-muted mt-1">Practice with NEXUS Coach</div>
+                <div className="text-xs text-text-muted mt-1">Practice with NEXUS</div>
               </button>
               <button className="text-left p-4 border border-border bg-white hover:border-fuchsia transition-colors" style={{ }}>
                 <FileText className="w-5 h-5 text-fuchsia mb-2" />

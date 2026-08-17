@@ -203,7 +203,7 @@ export default function ErrorPage() {
               { href: '/',                      label: 'Homepage',                 sub: 'Start fresh from the top' },
               { href: '/assessments',           label: 'Leadership Assessments',   sub: 'Browse the catalog' },
               { href: '/pricing',               label: 'Pricing & Tiers',          sub: 'See plans & benefits' },
-              { href: '/nexus',                 label: 'NEXUS AI',                 sub: 'Conversational advisor' },
+              { href: '/nexus',                 label: 'NEXUS',                    sub: 'Conversational advisor' },
             ].map((r) => (
               <a
                 key={r.href}

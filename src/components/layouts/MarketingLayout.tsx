@@ -30,7 +30,7 @@ function MarketingFooter(): React.ReactElement {
     {
       title: 'Product',
       links: [
-        { label: 'NEXUS AI', href: '/nexus/chat' },
+        { label: 'NEXUS', href: '/nexus/chat' },
         { label: 'Leadership Assessments', href: '/assessments' },
         { label: 'Pricing', href: '/pricing' },
       ],

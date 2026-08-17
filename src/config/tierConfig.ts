@@ -41,6 +41,8 @@ export interface TierMeta {
   order: number;
   isEntryTier: boolean;
   isB2B: boolean;
+  /** Whether this tier requires an invite (cannot self-serve upgrade to). Council = true. */
+  isInviteOnly: boolean;
 }
 
 export const TIER_META: Record<TierKey, TierMeta> = {
@@ -50,6 +52,7 @@ export const TIER_META: Record<TierKey, TierMeta> = {
     order: 1,
     isEntryTier: true,
     isB2B: false,
+    isInviteOnly: false,
   },
   professional: {
     key: 'professional',
@@ -57,6 +60,7 @@ export const TIER_META: Record<TierKey, TierMeta> = {
     order: 2,
     isEntryTier: false,
     isB2B: false,
+    isInviteOnly: false,
   },
   executive: {
     key: 'executive',
@@ -64,6 +68,7 @@ export const TIER_META: Record<TierKey, TierMeta> = {
     order: 3,
     isEntryTier: false,
     isB2B: false,
+    isInviteOnly: false,
   },
   council: {
     key: 'council',
@@ -71,6 +76,7 @@ export const TIER_META: Record<TierKey, TierMeta> = {
     order: 4,
     isEntryTier: false,
     isB2B: false,
+    isInviteOnly: true,
   },
   enterprise: {
     key: 'enterprise',
@@ -78,6 +84,7 @@ export const TIER_META: Record<TierKey, TierMeta> = {
     order: 5,
     isEntryTier: false,
     isB2B: true,
+    isInviteOnly: false,
   },
 };
 

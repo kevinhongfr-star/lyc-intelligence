@@ -184,6 +184,8 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
               const isProcessing = processingTier === tier.key;
               const tierKey = tier.key as TierKey;
               const canonical = CANONICAL_TIER_PRICING[tierKey];
+              // Batch 1.5 Corrective: invite-only tiers show badge instead of price + CTA.
+              const isInviteOnly = canonical?.isInviteOnly === true;
 
               return (
                 <div
@@ -222,7 +224,14 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
 
                   {/* Price */}
                   <div className="mb-4">
-                    {isIntro ? (
+                    {isInviteOnly ? (
+                      <span
+                        className="inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider"
+                        style={{ background: `${ACCENT}14`, color: ACCENT }}
+                      >
+                        Invite only
+                      </span>
+                    ) : isIntro ? (
                       <span
                         className="text-3xl font-bold"
                         style={{ color: '#000' }}
@@ -242,12 +251,12 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                         </span>
                       </div>
                     )}
-                    {canonical && canonical.monthlyMiles > 0 && (
+                    {canonical && canonical.monthlyMiles > 0 && !isInviteOnly && (
                       <p className="text-xs mt-1" style={{ color: ACCENT }}>
                         {canonical.monthlyMiles} mi / month
                       </p>
                     )}
-                    {canonical && canonical.monthlyMiles === 0 && (
+                    {canonical && canonical.monthlyMiles === 0 && !isInviteOnly && (
                       <p className="text-xs mt-1" style={{ color: '#888' }}>
                         Chat only · no monthly miles
                       </p>
@@ -271,30 +280,44 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
                   </ul>
 
                   {/* CTA */}
-                  <button
-                    onClick={() => (isIntro ? handleSelectIntro() : handleSelect(tierKey))}
-                    disabled={isProcessing}
-                    className={cn(
-                      'w-full py-3 px-4 font-semibold flex items-center justify-center gap-2 transition-colors',
-                      isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
-                    )}
-                    style={{
-                      background: isIntro ? '#F5F5F5' : ACCENT,
-                      color: isIntro ? '#000' : 'white',
-                    }}
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        {isIntro ? 'Begin' : `Choose ${tier.name}`}
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
+                  {isInviteOnly ? (
+                    <button
+                      onClick={() => (window.location.href = '/contact')}
+                      className="w-full py-3 px-4 font-semibold flex items-center justify-center gap-2 transition-colors hover:opacity-90"
+                      style={{
+                        background: '#F5F5F5',
+                        color: '#000',
+                      }}
+                    >
+                      Talk to Us
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => (isIntro ? handleSelectIntro() : handleSelect(tierKey))}
+                      disabled={isProcessing}
+                      className={cn(
+                        'w-full py-3 px-4 font-semibold flex items-center justify-center gap-2 transition-colors',
+                        isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+                      )}
+                      style={{
+                        background: isIntro ? '#F5F5F5' : ACCENT,
+                        color: isIntro ? '#000' : 'white',
+                      }}
+                    >
+                      {isProcessing ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          {isIntro ? 'Begin' : `Choose ${tier.name}`}
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
               );
             })}

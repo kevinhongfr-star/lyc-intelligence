@@ -188,6 +188,8 @@ export interface TierMeta {
   isEntryTier: boolean;
   /** Whether this tier is B2B / sales-only (hidden from self-serve pricing). */
   isB2B: boolean;
+  /** Whether this tier requires an invite (cannot self-serve upgrade to). Council = true. */
+  isInviteOnly: boolean;
   /** Full resolved feature set. */
   features: TierFeatures;
 }
@@ -206,6 +208,7 @@ export const TIERS: Record<TierKey, TierMeta> = (() => {
       order: i + 1,
       isEntryTier: key === 'explorer',
       isB2B: false,
+      isInviteOnly: key === 'council',
       features: resolveTierFeatures(key),
     };
   });
@@ -313,6 +316,16 @@ export function tierFeatures(key: string | null | undefined): TierFeatures {
   return TIERS[canonical].features;
 }
 
+/**
+ * Check if a tier is invite-only (cannot self-serve upgrade to).
+ * Reads from tier config — never hardcode "Council".
+ */
+export function isInviteOnly(key: string | null | undefined): boolean {
+  const canonical = normalizeTier(key);
+  if (!canonical) return false;
+  return TIERS[canonical].isInviteOnly;
+}
+
 // ── Upgrade / downgrade utilities ──────────────────────────────────────
 
 /**
@@ -363,6 +376,16 @@ export function downgradeOptions(tier: TierKey | string | null | undefined): Tie
 export function isUpgrade(from: TierKey | string | null | undefined, to: TierKey): boolean {
   const fromCanonical = normalizeTier(from) ?? DEFAULT_TIER;
   return TIERS[to].order > TIERS[fromCanonical].order;
+}
+
+/**
+ * Check if a self-serve upgrade to `to` is allowed.
+ * Invite-only tiers (e.g. Council) cannot be self-serve upgraded to —
+ * they require a sales/invite flow. Reads from `isInviteOnly` config,
+ * never hardcodes tier names.
+ */
+export function isSelfServeUpgradeAllowed(to: TierKey): boolean {
+  return !TIERS[to].isInviteOnly;
 }
 
 /**

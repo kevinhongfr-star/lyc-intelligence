@@ -99,6 +99,8 @@ export interface CanonicalTierPricing {
   monthlyMiles: number;
   /** Whether this tier earns miles via NEXUS actions. Explorer = false. */
   earnsMiles: boolean;
+  /** Whether this tier requires an invite (cannot self-serve upgrade to). Council = true. */
+  isInviteOnly: boolean;
   /** Headline benefits (canonical copy, no "credits" / no "free"). */
   benefits: string[];
 }
@@ -116,6 +118,7 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
     cnyMonthly: 0,
     monthlyMiles: 0,
     earnsMiles: false,
+    isInviteOnly: false,
     benefits: [
       'Executive Introduction access to NEXUS chat',
       'Framework exploration and sample outputs',
@@ -130,6 +133,7 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
     cnyMonthly: 59,
     monthlyMiles: 50,
     earnsMiles: true,
+    isInviteOnly: false,
     benefits: [
       '50 mi monthly allowance',
       'All 6 leadership assessments unlocked',
@@ -145,6 +149,7 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
     cnyMonthly: 233,
     monthlyMiles: 150,
     earnsMiles: true,
+    isInviteOnly: false,
     benefits: [
       '150 mi monthly allowance',
       'Everything in Professional',
@@ -160,6 +165,7 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
     cnyMonthly: 466,
     monthlyMiles: 300,
     earnsMiles: true,
+    isInviteOnly: true,
     benefits: [
       '300 mi monthly allowance',
       'Everything in Executive',
@@ -175,6 +181,7 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
     cnyMonthly: 1165,
     monthlyMiles: 600,
     earnsMiles: true,
+    isInviteOnly: false,
     benefits: [
       '600 mi monthly allowance',
       'Everything in Council',
@@ -499,6 +506,11 @@ export async function createCheckoutSession(
   tier: TierKey,
   cycle: BillingCycle = 'monthly'
 ): Promise<CheckoutSession> {
+  // Batch 1.5 Corrective: invite-only tiers cannot be self-serve upgraded to.
+  const pricing = CANONICAL_TIER_PRICING[tier];
+  if (pricing?.isInviteOnly) {
+    throw new Error('This tier is invite-only. Contact us to learn more.');
+  }
   return v1Client.post('/billing/checkout', { tier, cycle });
 }
 
@@ -513,6 +525,11 @@ export async function fetchInvoices(): Promise<Invoice[]> {
 export async function upgradeSubscription(
   tier: TierKey
 ): Promise<{ upgraded: boolean }> {
+  // Batch 1.5 Corrective: invite-only tiers cannot be self-serve upgraded to.
+  const pricing = CANONICAL_TIER_PRICING[tier];
+  if (pricing?.isInviteOnly) {
+    throw new Error('This tier is invite-only. Contact us to learn more.');
+  }
   return v1Client.post('/billing/subscription/upgrade', { tier });
 }
 

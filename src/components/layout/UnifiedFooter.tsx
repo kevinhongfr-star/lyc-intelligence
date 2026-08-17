@@ -18,7 +18,7 @@ import { Logo } from '@/components/ui/Logo';
 const links = {
   product: [
     { href: '/assessments', label: 'Leadership Assessments' },
-    { href: '/nexus', label: 'NEXUS AI' },
+    { href: '/nexus', label: 'NEXUS' },
     { href: '/pricing', label: 'Pricing' },
   ],
   resources: [
@@ -77,7 +77,7 @@ export function UnifiedFooter() {
               textTransform: 'uppercase',
             }}
           >
-            6 Assessments · NEXUS AI · APAC
+            6 Assessments · NEXUS · APAC
           </div>
         </div>
 

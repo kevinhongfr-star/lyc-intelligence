@@ -46,7 +46,7 @@ export function NEXUSCTA({ config }: Props) {
               fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.12em',
               color: accent, fontWeight: 500,
             }}>
-              NEXUS AI Coach
+              NEXUS
             </span>
           </div>
           <h2 style={{

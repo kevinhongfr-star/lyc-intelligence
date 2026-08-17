@@ -65,7 +65,7 @@ const config: AssessmentLandingConfig = {
     },
     {
       title: 'NEXUS integration',
-      desc: 'Your results feed directly into NEXUS, so your AI coach always knows your profile.',
+      desc: 'Your results feed directly into NEXUS, so NEXUS always knows your profile.',
     },
   ],
   sampleResult:

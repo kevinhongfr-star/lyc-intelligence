@@ -124,7 +124,7 @@ export function B2CLanding() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <a href="/match">Match Analysis</a>
               <a href="/assessment">Assessments</a>
-              <a href="/nexus/chat">NEXUS AI</a>
+              <a href="/nexus/chat">NEXUS</a>
             </div>
           </div>
           <div>

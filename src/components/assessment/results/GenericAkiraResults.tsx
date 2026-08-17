@@ -597,7 +597,7 @@ export function GenericAkiraResults({
               onMouseEnter={(e) => { e.currentTarget.style.color = ACCENT; }}
               onMouseLeave={(e) => { e.currentTarget.style.color = G600; }}
             >
-              Discuss your results with NEXUS AI
+              Discuss your results with NEXUS
               <ArrowRight style={{ width: 13, height: 13 }} />
             </Link>
           </div>
