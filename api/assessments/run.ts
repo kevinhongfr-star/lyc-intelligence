@@ -52,22 +52,12 @@ import { z } from 'zod';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Canonical costs — source of truth for server-side miles debits.
-// Matches assessments/catalog.ts milesCost values; clients MUST NOT override.
+// Matches src/config/miles.ts INSTRUMENT_MILE_COST — the single source of truth.
+// COACH is not an assessment (0 cost). CANVAS is future (2, same as Standard).
 // ═══════════════════════════════════════════════════════════════════════════
-const ASSESSMENT_COSTS: Record<string, number> = {
-  CPI:     80,
-  SHIFT:   60,
-  PRISM:   50,
-  SPARK:   50,
-  LEAP:    45,
-  QUEST:   45,
-  IMPACT:  45,
-  FORGE:   45,
-  DRIVE:   45,
-  COACH:   45,
-  BRIDGE:  45,
-  MOSAIC:  45,
-};
+import { INSTRUMENT_MILE_COST } from '../../src/config/miles';
+
+const ASSESSMENT_COSTS: Record<string, number> = INSTRUMENT_MILE_COST;
 
 const IDEMPOTENCY_TTL_SECONDS = 86_400; // 24h
 
@@ -230,7 +220,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           : (async () => {
               const { data: creditsNow } = await supabase
                 .from('credits')
-                .select('balance')
+                .select('miles, balance')
                 .eq('user_id', ctx.userId)
                 .limit(1)
                 .maybeSingle();
@@ -262,33 +252,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .maybeSingle();
       if (cErr) throw new RequestAuthError(`Credits lookup error: ${cErr.message}`, 500);
 
-      if (!creditRow || Number(creditRow.balance) < cost) {
+      if (!creditRow || Number(creditRow.miles ?? creditRow.balance) < cost) {
         return res.status(402).json({
           error: 'Insufficient miles balance',
           required: cost,
-          current: Number(creditRow?.balance ?? 0),
+          current: Number(creditRow?.miles ?? creditRow?.balance ?? 0),
         });
       }
 
-      // 2) Atomic decrement using balance = balance - cost WHERE balance >= cost.
+      // 2) Atomic decrement using deduct_miles_balanced (new mile engine RPC).
+      //    Falls back to decrement_credits_balanced if migration not yet applied.
       const { data: after, error: decErr } = await supabase
-        .rpc('decrement_credits_balanced', {
+        .rpc('deduct_miles_balanced', {
           p_user_id: ctx.userId,
           p_amount: cost,
+          p_instrument_code: code,
+          p_assessment_id: idem || null,
+          p_description: `Assessment: ${code}`,
         }) as any;
       if (!after && !decErr) {
-        // Fallback if RPC not yet installed: do eq+gte update with .select()
-        const { data: uData, error: uErr } = await supabase
-          .from('credits')
-          .update({ balance: Number(creditRow.balance) - cost, updated_at: new Date().toISOString() })
-          .eq('id', creditRow.id)
-          .gte('balance', cost)
-          .select('balance')
-          .maybeSingle();
-        if (uErr || !uData) {
-          throw new RequestAuthError('Concurrent miles debit race — try again', 409);
+        // Fallback: try old RPC
+        const { data: after2, error: decErr2 } = await supabase
+          .rpc('decrement_credits_balanced', {
+            p_user_id: ctx.userId,
+            p_amount: cost,
+          }) as any;
+        if (!after2 && !decErr2) {
+          // Final fallback: direct update with .select()
+          const { data: uData, error: uErr } = await supabase
+            .from('credits')
+            .update({ miles: Number(creditRow.miles ?? creditRow.balance) - cost, updated_at: new Date().toISOString() })
+            .eq('id', creditRow.id)
+            .gte('miles', cost)
+            .select('miles')
+            .maybeSingle();
+          if (uErr || !uData) {
+            throw new RequestAuthError('Concurrent miles debit race — try again', 409);
+          }
+          remainingBalance = Number(uData.miles);
+        } else {
+          remainingBalance = Number(after2 ?? 0);
         }
-        remainingBalance = Number(uData.balance);
       } else {
         remainingBalance = Number(after ?? 0);
       }
@@ -318,7 +322,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .eq('user_id', ctx.userId)
         .limit(1)
         .maybeSingle();
-      remainingBalance = Number(creditsNow?.balance ?? 0);
+      remainingBalance = Number(creditsNow?.miles ?? creditsNow?.balance ?? 0);
     }
 
     // ── Compute score summary ─────────────────────────────────────────
@@ -354,10 +358,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Best-effort refund (if we already debited) to avoid stuck-loss.
       if (chargeMiles) {
         try {
-          await supabase.rpc('increment_credits_balanced', {
+          // Try new refund RPC first, fall back to old
+          const { error: refundErr } = await supabase.rpc('refund_miles_balanced', {
             p_user_id: ctx.userId,
             p_amount: cost,
+            p_instrument_code: code,
+            p_assessment_id: idem || null,
+            p_description: `Assessment failed: ${code} (refund)`,
           });
+          if (refundErr) {
+            // Fallback to old RPC
+            await supabase.rpc('increment_credits_balanced', {
+              p_user_id: ctx.userId,
+              p_amount: cost,
+            });
+          }
         } catch { /* ignore — ops alert */ }
       }
       // #1314: don't leak insErr.message — log server-side, return safe msg.
