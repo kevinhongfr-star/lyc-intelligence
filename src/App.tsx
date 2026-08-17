@@ -85,6 +85,12 @@ const MatchPage = lazy(() => import('@/pages/MatchPage').then(m => ({ default: m
 const PricingPage = lazy(() => import('@/pages/PricingPage').then(m => ({ default: m.PricingPage })));
 const AssessmentCatalogPage = lazy(() => import('@/pages/AssessmentCatalogPage').then(m => ({ default: m.AssessmentCatalogPage })));
 
+// ── Batch 5 · Debrief booking system (11 tickets) ──
+const DebriefLandingPage = lazy(() => import('@/pages/DebriefLandingPage').then(m => ({ default: m.DebriefLandingPage })));
+const BookDebriefPage = lazy(() => import('@/pages/BookDebriefPage').then(m => ({ default: m.BookDebriefPage })));
+const AssessmentDepthPage = lazy(() => import('@/pages/AssessmentDepthPage').then(m => ({ default: m.AssessmentDepthPage })));
+const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage').then(m => ({ default: m.MyBookingsPage })));
+
 // ── Assessment canonical routes (6 real instruments — PRISM, SPARK, FORGE, BRIDGE, MOSAIC, DRIVE) ──
 // Mixed exports in this codebase; use `.default` for named-default pages and
 // direct member exports for named ones.
@@ -284,6 +290,10 @@ export default function App() {
             {/* DEX B2C public landing. DEX /app/dex/* routes are auth'd. */}
             <Route path="dex" element={<DexLandingPage />} />
 
+            {/* ── Batch 5 · Debrief booking system (public marketing surfaces) ── */}
+            <Route path="debrief" element={<DebriefLandingPage />} />
+            <Route path="debrief/book" element={<BookDebriefPage />} />
+
             {/* Assessment catalog — #1363 canonical URL is /assessments (plural, user-centric).
                 /assessment and /diagnostics kept as redirects so no link or bookmark 404s. */}
             <Route path="assessments" element={<AssessmentCatalogPage />} />
@@ -316,6 +326,8 @@ export default function App() {
             <Route path="assessment/mosaic/take" element={<MosaicTakePage />} />
             {/* Generic canonical landing for 4 remaining instruments: FORGE, BRIDGE, MOSAIC, DRIVE */}
             <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />
+            {/* Batch 5 · W4-T10 — Assessment depth pages (deep-link only, not browsable from nav). 11 instances, data-driven from canon. */}
+            <Route path="assessment/:code/deep" element={<AssessmentDepthPage />} />
 
             {/* Results routes — post-assessment (shareable / bookmarkable) */}
             {/* Keep all results routes — bookmarks from prior sessions must not break. */}
@@ -366,6 +378,10 @@ export default function App() {
             {/* Billing + subscription self-serve */}
             <Route path="billing" element={<BillingDashboard />} />
             <Route path="subscription" element={<Navigate to="billing" replace />} />
+
+            {/* Batch 5 · Human debrief bookings (B2C leader portal) */}
+            <Route path="bookings" element={<MyBookingsPage />} />
+            <Route path="debrief/book" element={<BookDebriefPage />} />
 
             {/* DEX B2C — SPRINT 2 authenticated routes */}
             <Route path="dex/chat" element={<DexChatPage />} />
