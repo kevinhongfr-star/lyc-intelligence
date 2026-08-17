@@ -165,7 +165,7 @@ function CategoryGroup({ category }: { category: string }) {
 
 function FeatureRowComponent({ row }: { row: FeatureRow }) {
   return (
-    <tr style={{ borderBottom: `1px solid ${DS.divider}` }}>
+    <tr style={{ borderBottom: `1px solid ${DS.border}` }}>
       {/* Feature label */}
       <td
         style={{
