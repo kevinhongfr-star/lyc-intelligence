@@ -29,7 +29,7 @@ export interface QualityDimension {
 }
 
 export const QUALITY_DIMENSIONS: QualityDimension[] = [
-  { id: 'framework_integration', label: 'Framework Integration', weight: 20, description: 'How well the response connects to LYC diagnostic frameworks without naming internal architecture' },
+  { id: 'model_integration',     label: 'Model Integration',     weight: 20, description: 'How well the response connects to LYC diagnostic models without naming internal architecture' },
   { id: 'coach_presence',        label: 'Coach Presence',        weight: 15, description: 'NEXUS feels like a seasoned executive advisor, not a chatbot or FAQ responder' },
   { id: 'insight_quality',       label: 'Insight Quality',       weight: 15, description: 'Responses surface non-obvious insights — blind spots, patterns, structural issues' },
   { id: 'question_quality',      label: 'Question Quality',      weight: 10, description: 'Questions are diagnostic, specific, and advance the conversation — not generic' },

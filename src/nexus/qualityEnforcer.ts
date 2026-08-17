@@ -210,7 +210,7 @@ export function auditQuality(text: string): QualityAuditResult {
         notes = 'Diagnostic accuracy checked by guardrail module';
         break;
 
-      case 'framework_integration':
+      case 'model_integration':
         // Heuristic: does the response reference a diagnostic or pattern?
         const hasDiagnosticRef = /\b(SPARK|PRISM|MOSAIC|BRIDGE|IMPACT|DRIVE|FORGE|LEAP|QUEST|COACH|CPI)\b/.test(text);
         score = hasDiagnosticRef ? 4.3 : 3.8;

@@ -181,7 +181,7 @@ export async function checkAssessmentAccess(
           allowed: true,
           mileCost: 0, // Free — no miles charged
           balance: totalBalance,
-          gate: { reason: 'free_token_available', message: 'Free assessment token available', free_token: true },
+          gate: { reason: 'free_token_available', message: 'Complimentary assessment token available', free_token: true },
         };
       }
     }
@@ -505,7 +505,7 @@ export async function useExplorerFreeToken(
     amount: 0,
     type: 'spend',
     balance_type: 'free',
-    description: `${instrumentCode} free assessment token used`,
+    description: `${instrumentCode} complimentary assessment token used`,
     instrument_code: instrumentCode,
     assessment_id: assessmentId ?? null,
   });

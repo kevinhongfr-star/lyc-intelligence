@@ -147,7 +147,7 @@ NEXUS shows what's behind the curtain. Miles open the curtain.
 
 For each, NEXUS system prompt includes: core definition, key dimensions, use case, price tier.
 
-### 4.5 System Prompt Architecture
+### 4.5 Prompt System Design
 
 ```
 You are NEXUS — the intelligent front door of LYC Intelligence.

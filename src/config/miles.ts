@@ -7,7 +7,7 @@
  * Miles are the product's internal unit. The UI says "miles" plainly.
  *
  * Consumption order: allocated miles → purchased miles.
- * Explorer free tokens are independent (not miles).
+ * Explorer complimentary tokens are independent (not miles).
  */
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -18,7 +18,7 @@ import { type TierKey, normalizeTier } from './tiers';
 
 /**
  * Monthly mile allocation per tier.
- * Explorer gets 0 monthly (they get one-time free tokens instead — Ticket 2).
+ * Explorer gets 0 monthly (they get one-time complimentary tokens instead — Ticket 2).
  */
 export const MONTHLY_ALLOCATION: Record<TierKey, number> = {
   explorer: 0,
@@ -123,12 +123,12 @@ export function getInstrumentMileCost(instrumentCode: string): number {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// Explorer free assessments
+// Explorer complimentary assessments
 // ═══════════════════════════════════════════════════════════════════════
 
 /**
- * Explorer tier gets LEAP + PRISM free as one-time onboarding tokens.
- * These are NOT miles — they're free assessment tokens.
+ * Explorer tier gets LEAP + PRISM complimentary as one-time onboarding tokens.
+ * These are NOT miles — they're complimentary assessment tokens.
  * No rollover, no expiry (one-time signup bonus).
  */
 export const EXPLORER_FREE_ASSESSMENTS: string[] = ['LEAP', 'PRISM'];

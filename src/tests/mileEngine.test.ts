@@ -148,13 +148,13 @@ assertEq('FORGE cost tier = signature', getInstrumentCostTier('FORGE'), 'signatu
 assertEq('CPI cost tier = flagship', getInstrumentCostTier('CPI'), 'flagship');
 
 // ═══════════════════════════════════════════════════════════════════════
-// 6. Explorer free assessments
+// 6. Explorer complimentary assessments
 // ═══════════════════════════════════════════════════════════════════════
-console.log('\n--- Explorer free assessments ---');
+console.log('\n--- Explorer complimentary assessments ---');
 assert('LEAP is in EXPLORER_FREE_ASSESSMENTS', EXPLORER_FREE_ASSESSMENTS.includes('LEAP'));
 assert('PRISM is in EXPLORER_FREE_ASSESSMENTS', EXPLORER_FREE_ASSESSMENTS.includes('PRISM'));
 assert('CPI is NOT in EXPLORER_FREE_ASSESSMENTS', !EXPLORER_FREE_ASSESSMENTS.includes('CPI'));
-assertEq('Exactly 2 free assessments', EXPLORER_FREE_ASSESSMENTS.length, 2);
+assertEq('Exactly 2 complimentary assessments', EXPLORER_FREE_ASSESSMENTS.length, 2);
 
 // ═══════════════════════════════════════════════════════════════════════
 // 7. CPI gating — Council-only

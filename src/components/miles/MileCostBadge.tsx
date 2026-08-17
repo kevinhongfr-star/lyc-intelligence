@@ -19,9 +19,9 @@ export function MileCostBadge({ instrumentCode, overrideCost, variant = 'inline'
 
   if (cost === 0) {
     if (variant === 'badge') {
-      return <span style={badgeStyle('#2D7A3E')}>Free</span>;
+      return <span style={badgeStyle('#2D7A3E')}>Complimentary</span>;
     }
-    return <span style={{ fontSize: 13, color: '#2D7A3E', fontWeight: 600 }}>Free</span>;
+    return <span style={{ fontSize: 13, color: '#2D7A3E', fontWeight: 600 }}>Complimentary</span>;
   }
 
   if (variant === 'badge') {

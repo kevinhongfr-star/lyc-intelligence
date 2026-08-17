@@ -157,21 +157,21 @@ export function buildCpiSoftGate(): SoftGateResult {
 
 /**
  * Build the Explorer onboarding message for complimentary assessments.
- * LEAP + PRISM are free tokens on signup — NOT miles.
+ * LEAP + PRISM are complimentary tokens on signup — NOT miles.
  */
 export function buildExplorerOnboardingMessage(): string {
   return `As part of your complimentary introduction, you have two assessments available: LEAP — competitive positioning, and PRISM — professional branding. No miles required for either. Would you like to start with one of these?`;
 }
 
 /**
- * Check if a diagnostic is available as a free Explorer token.
+ * Check if a diagnostic is available as a complimentary Explorer token.
  */
 export function isExplorerFreeAssessment(code: string): boolean {
   return EXPLORER_FREE_ASSESSMENTS.includes(code.toUpperCase());
 }
 
 /**
- * Build the "all free tokens used" soft gate for Explorer.
+ * Build the "all complimentary tokens used" soft gate for Explorer.
  */
 export function buildExplorerTokensExhaustedMessage(): string {
   return `You've completed both complimentary assessments. To continue with deeper diagnostics, you can expand your access. I can point you to the right place if you'd like.`;

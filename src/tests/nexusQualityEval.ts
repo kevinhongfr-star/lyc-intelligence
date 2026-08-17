@@ -181,7 +181,7 @@ const explorerTests: EvalTestCase[] = [
     id: 'explorer-02',
     category: 'explorer_onboarding',
     prompt: 'I already did LEAP and PRISM, what else can I do?',
-    goldenResponse: 'Should soft gate — no more free tokens, point to expanded access.',
+    goldenResponse: 'Should soft gate — no more complimentary tokens, point to expanded access.',
     assertions: [
       (r) => ({ pass: containsTierNames(r).length === 0, detail: 'No tier names' }),
       (r) => ({ pass: !r.toLowerCase().includes("you can't"), detail: 'No hard block' }),
@@ -485,7 +485,7 @@ function runConfigTests() {
   assert('Quality max = 5.0', QUALITY_MAX === 5.0);
 
   // Verify dimension IDs match spec
-  const expectedIds = ['framework_integration', 'coach_presence', 'insight_quality', 'question_quality', 'structural_clarity', 'appropriate_depth', 'diagnostic_accuracy', 'brand_compliance'];
+  const expectedIds = ['model_integration', 'coach_presence', 'insight_quality', 'question_quality', 'structural_clarity', 'appropriate_depth', 'diagnostic_accuracy', 'brand_compliance'];
   for (const id of expectedIds) {
     assert(`Dimension "${id}" exists`, QUALITY_DIMENSIONS.some(d => d.id === id));
   }

@@ -42,7 +42,7 @@ export function buildRecommendation(
  */
 export function formatMileCostInline(rec: AssessmentRecommendation): string {
   const costStr = rec.mileCost === 0
-    ? 'Free'
+    ? 'Complimentary'
     : `${rec.mileCost} ${rec.mileCost === 1 ? 'mile' : 'miles'}`;
   const balanceStr = `You have ${rec.userBalance} ${rec.userBalance === 1 ? 'mile' : 'miles'} remaining`;
   return `${rec.instrumentName} — ${costStr} · ${balanceStr}`;

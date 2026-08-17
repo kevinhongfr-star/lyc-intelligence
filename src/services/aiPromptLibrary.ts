@@ -224,7 +224,7 @@ export function normalizeBrandPhrases(copy: string): string {
   // Entry tier language: never "free"
   let c = copy;
   c = c.replace(/\bfree (assessment|report|tier|preview|plan|version|tier)\b/gi, 'complimentary $1');
-  c = c.replace(/\bfree assessment\b/gi, 'Executive Introduction assessment');
+  c = c.replace(/\bfree assessment\b/gi, 'complimentary assessment');
   c = c.replace(/\bfree trial\b/gi, 'complimentary Executive Introduction');
   c = c.replace(/\bno cost\b/gi, 'complimentary');
   c = c.replace(/\b0 cost\b/gi, 'complimentary');
