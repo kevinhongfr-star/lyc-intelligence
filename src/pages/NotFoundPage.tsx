@@ -184,8 +184,8 @@ export default function NotFoundPage() {
           >
             {[
               { href: '/pricing',                  icon: <Search size={15} />,  label: 'Pricing & Tiers',          sub: 'Explorer → Executive → Council' },
-              { href: '/assessment/cpi',           icon: <Search size={15} />,  label: 'CPI Diagnostic',          sub: 'China Leadership Pipeline' },
-              { href: '/assessment/shift',         icon: <Search size={15} />,  label: 'SHIFT Mobility',          sub: 'Career transition radar' },
+              { href: '/assessment/cpi',           icon: <Search size={15} />,  label: 'CPI Diagnostic',          sub: 'China Leadership Pipeline Index' },
+              { href: '/assessment',               icon: <Search size={15} />,  label: 'Career Core Diagnostics', sub: 'Career transition radar & more' },
               { href: '/b2b',                      icon: <Search size={15} />,  label: 'Executive Search (B2B)',  sub: 'Client / consultant portal' },
             ].map((r) => (
               <a
@@ -224,7 +224,7 @@ export default function NotFoundPage() {
             fontFamily: "'IBM Plex Mono', ui-monospace, monospace",
           }}
         >
-          HTTP 404 · NotFoundRoute · if you believe this is a platform error, contact{' '}
+          HTTP 404 · NotFoundRoute · if you believe this is a system error, contact{' '}
           <a
             href="mailto:ops@lyc-intelligence.app"
             style={{ color: '#C108AB', textDecoration: 'none' }}

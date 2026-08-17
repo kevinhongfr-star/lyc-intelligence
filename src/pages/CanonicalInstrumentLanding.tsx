@@ -49,15 +49,15 @@ export function CanonicalInstrumentLanding() {
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, padding: '32px' }}>
         <div style={{ textAlign: 'center', maxWidth: '480px' }}>
           <div style={{ fontFamily: DS.monoFont, fontSize: '11px', letterSpacing: '0.2em', color: DS.accent, marginBottom: '12px', textTransform: 'uppercase' }}>Instrument not found</div>
-          <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', marginBottom: '16px', color: DS.text }}>This assessment does not exist.</h1>
+          <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', marginBottom: '16px', color: DS.text }}>This diagnostic does not exist.</h1>
           <p style={{ color: DS.muted, marginBottom: '28px', lineHeight: 1.6 }}>
-            The instrument code "{code}" is not in the canonical catalog. Return to the assessment catalog to browse all 11 diagnostics.
+            The instrument code "{code}" is not in the canonical catalog. Return to the diagnostic portfolio to browse all 11 diagnostics.
           </p>
           <a
             href="/assessment"
             style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', textDecoration: 'none', fontFamily: DS.bodyFont, fontSize: '12px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', borderRadius: DS.radius }}
           >
-            <ArrowLeft style={{ width: 13, height: 13 }} /> Browse assessments
+            <ArrowLeft style={{ width: 13, height: 13 }} /> Browse diagnostics
           </a>
         </div>
       </div>
@@ -66,13 +66,13 @@ export function CanonicalInstrumentLanding() {
 
   const tierColor = info.is_cpi ? DS.accent : '#15151E';
   const tierEyebrow = info.is_cpi
-    ? 'FLAGSHIP · 199 MI'
+    ? `FLAGSHIP · ${info.priceMiles} MI`
     : info.is_shift
-      ? 'SHIFT SUITE · 149 MI'
-      : 'ADVISORY · 99 MI';
+      ? `CAREER CORE · ${info.priceMiles} MI`
+      : `ADVISORY · ${info.priceMiles} MI`;
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/assessment', label: 'Assessments' },
+    { href: '/assessment', label: 'Diagnostics' },
     { href: '/match', label: 'Match Analysis' },
     { href: '/pricing', label: 'Pricing' },
   ];
@@ -128,7 +128,7 @@ export function CanonicalInstrumentLanding() {
             className="cta-glow"
             style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
           >
-            <Lock style={{ width: 14, height: 14 }} /> Platform
+            <Lock style={{ width: 14, height: 14 }} /> Sign in
           </a>
         </div>
         <button className="nav-toggle" onClick={() => setMobileOpen(true)} aria-label="Open menu">
@@ -145,7 +145,7 @@ export function CanonicalInstrumentLanding() {
           <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)} style={{ color: DS.textSecondary, borderBottom: `1px solid ${DS.border}` }}>{l.label}</a>
         ))}
         <a href="/nexus/chat" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, borderBottom: `1px solid ${DS.border}` }}>Try NEXUS →</a>
-        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.text, borderBottom: `1px solid ${DS.border}` }}>Platform</a>
+        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.text, borderBottom: `1px solid ${DS.border}` }}>Sign in</a>
       </div>
 
       {/* HERO */}

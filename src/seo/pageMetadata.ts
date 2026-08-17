@@ -39,7 +39,7 @@ export function ogImageUrl(title: string, subtitle?: string): string {
 
 export const PAGE_META: Record<string, PageMeta> = {
   landing: {
-    title: 'LYC Intelligence — Executive Intelligence Platform',
+    title: 'LYC Intelligence — Executive Intelligence',
     description:
       'Know where you stand. Know where to go. Leadership intelligence for every stage — from career positioning to executive matching. 500+ placements across 47 markets.',
     path: '/',
@@ -51,12 +51,12 @@ export const PAGE_META: Record<string, PageMeta> = {
       url: SITE_URL,
       logo: `${SITE_URL}/apple-touch-icon.png`,
       description:
-        'Executive intelligence platform — advisory, assessments, and talent search for high-achieving leaders.',
+        'Executive intelligence — advisory, diagnostics, and talent search for high-achieving leaders.',
       foundingDate: '2024',
       areaServed: 'Asia-Pacific',
       knowsAbout: [
         'Executive Search',
-        'Leadership Assessment',
+        'Leadership Diagnostic',
         'Career Advisory',
         'AI Coaching',
         'Talent Matching',
@@ -102,7 +102,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   b2b: {
     title: 'For Firms — Executive Search & Match Analysis | LYC',
     description:
-      'Mandates, candidate scoring, and organizational intelligence for search firms and enterprises. GRID pipeline, TRIDENT scoring, CANVAS analytics. 500+ placements across 47 markets.',
+      'Mandates, candidate scoring, and organizational intelligence for search firms and enterprises. Pipeline management, candidate scoring, profile analytics. 500+ placements across 47 markets.',
     path: '/b2b',
     type: 'website',
     structuredData: {
@@ -129,9 +129,9 @@ export const PAGE_META: Record<string, PageMeta> = {
   },
 
   assessments: {
-    title: '11 Leadership Assessments — LYC Intelligence',
+    title: '11 Leadership Diagnostics — LYC Intelligence',
     description:
-      'CPI, SHIFT suite, and advisory instruments. Validated against 20 years of APAC placement data. Archetype classification, dimension scorecards, and development roadmaps.',
+      'CPI, Career Core diagnostics, and advisory instruments. Validated against 20 years of APAC placement data. Archetype classification, dimension scorecards, and development roadmaps.',
     path: '/assessment',
     type: 'website',
     structuredData: null,
@@ -140,7 +140,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   terms: {
     title: 'Terms of Service — LYC Intelligence',
     description:
-      'Terms governing your use of the LYC Intelligence platform, including assessment usage, NEXUS AI interactions, subscription terms, and data processing agreements.',
+      'Terms governing your use of LYC Intelligence, including diagnostic usage, NEXUS AI interactions, subscription terms, and data processing agreements.',
     path: '/terms',
     type: 'website',
     structuredData: null,
@@ -158,7 +158,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   cookies: {
     title: 'Cookie Policy — LYC Intelligence',
     description:
-      'Cookie usage on the LYC Intelligence platform. Essential, analytics, and marketing cookies explained. Manage your consent preferences at any time.',
+      'Cookie usage on LYC Intelligence. Essential, analytics, and marketing cookies explained. Manage your consent preferences at any time.',
     path: '/cookies',
     type: 'website',
     structuredData: null,
@@ -186,7 +186,7 @@ export function getAssessmentMeta(
   durationMinutes: number,
   totalQuestions: number,
 ): AssessmentMeta {
-  const title = `${b2cName} Assessment | LYC Intelligence`;
+  const title = `${b2cName} Diagnostic | LYC Intelligence`;
   const description = `${tagline || name}. ${durationMinutes} min · ${totalQuestions} questions · ${milesCost} miles. Validated against 20 years of APAC placement data. Archetype classification and development roadmap.`;
 
   return {

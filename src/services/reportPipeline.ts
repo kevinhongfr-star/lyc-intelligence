@@ -76,7 +76,7 @@ const INSTRUMENT_ACCENTS: Record<string, string> = {
 };
 
 const INSTRUMENT_NAMES: Record<string, string> = {
-  CPI: 'China Leadership Pipeline Diagnostic',
+  CPI: 'China Leadership Pipeline Index',
   PRISM: 'PRISM Leadership Diagnostic',
   SPARK: 'SPARK AI Readiness Diagnostic',
   LEAP: 'LEAP — Learning & Execution Potential',

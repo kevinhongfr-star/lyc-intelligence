@@ -46,7 +46,7 @@ export const CPI_DIMENSIONS: CPIBankDimension[] = [
 ];
 
 export const INSTRUMENT = 'CPI';
-export const FULL_NAME = 'China Leadership Pipeline Diagnostic';
+export const FULL_NAME = 'China Leadership Pipeline Index';
 export const VERSION = '1.0';
 export const TOTAL_QUESTIONS = 25;
 export const SCALE = 'Scenario + structured evidence';

@@ -57,9 +57,9 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
     meta: {
       title: 'LYC Intelligence — Leadership Intelligence for China Operating Leaders',
       description:
-        'The intelligence layer for China operating leaders. NEXUS advisory copilot, CPI & SHIFT diagnostics, and TRIDENT leader matching — in one seat.',
+        'The intelligence layer for China operating leaders. NEXUS advisory copilot, CPI & Career Core diagnostics, and candidate matching — in one seat.',
       canonical: u('/'),
-      keywords: [...DEFAULT_META.keywords!, 'NEXUS', 'CPI', 'SHIFT', 'TRIDENT'],
+      keywords: [...DEFAULT_META.keywords!, 'NEXUS', 'CPI', 'career core', 'candidate scoring'],
     },
   },
   // ── About
@@ -135,11 +135,11 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/assessment/shift',
     meta: {
-      title: 'SHIFT Mobility | Career Transition Radar for China Leaders',
+      title: 'Career Mobility Diagnostic | Career Transition Radar for China Leaders',
       description:
-        'SHIFT maps your adjacent career moves across industry, function, and stage — with 5 ranked paths and LYC likelihood scores. 12 minutes, data-driven.',
+        'Maps your adjacent career moves across industry, function, and stage — with 5 ranked paths and LYC likelihood scores. 12 minutes, data-driven.',
       canonical: u('/assessment/shift'),
-      keywords: [...DEFAULT_META.keywords!, 'SHIFT', 'career mobility', 'career transition'],
+      keywords: [...DEFAULT_META.keywords!, 'career mobility', 'career transition', 'adjacent moves'],
     },
   },
   {
@@ -227,9 +227,9 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
     meta: {
       title: 'All 11 Leadership Diagnostics | LYC Intelligence',
       description:
-        'Every LYC diagnostic in one place. CPI, SHIFT, Comp Negotiation, Board Readiness and 8 more — start in under 60 seconds, pay only for the ones you run.',
+        'Every LYC diagnostic in one place. CPI, Career Core, Comp Negotiation, Board Readiness and 8 more — start in under 60 seconds, pay only for the ones you run.',
       canonical: u('/assessment'),
-      keywords: [...DEFAULT_META.keywords!, 'diagnostics', 'assessment list'],
+      keywords: [...DEFAULT_META.keywords!, 'diagnostics', 'diagnostic list'],
     },
   },
 
@@ -272,7 +272,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
     pattern: '/consultant',
     meta: {
       title: 'Consultant Portal | LYC Intelligence',
-      description: 'Retained-search consultant workspace: mandates, candidate pipeline, TRIDENT matches, and client billing.',
+      description: 'Retained-search consultant workspace: mandates, candidate pipeline, scoring matches, and client billing.',
       noindex: true,
     },
   },
@@ -295,7 +295,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/admin',
     meta: {
-      title: 'Admin | LYC Intelligence Platform Control',
+      title: 'Admin | LYC Intelligence System Admin',
       description: 'Internal LYC admin — diagnostics usage, user support, billing, and compliance.',
       noindex: true,
     },
@@ -307,7 +307,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
     meta: {
       title: 'Refer Leaders, Earn Miles | LYC Intelligence',
       description:
-        'Refer China operating leaders to LYC Intelligence and earn miles redeemable against diagnostics, TRIDENT matches, and Council membership.',
+        'Refer China operating leaders to LYC Intelligence and earn miles redeemable against diagnostics, candidate matches, and Council membership.',
       canonical: u('/referral'),
       keywords: [...DEFAULT_META.keywords!, 'referral', 'miles', 'refer-a-leader'],
     },

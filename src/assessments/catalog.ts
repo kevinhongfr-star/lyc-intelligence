@@ -95,9 +95,9 @@ export const SHARED_PRICING_TIERS: AssessmentPricing[] = [
 ];
 
 export const TIER_GROUP_LABELS: Record<InstrumentTierGroup, string> = {
-  flagship: "Flagship",
-  shift: "SHIFT Suite",
-  advisory: "Advisory Products",
+  flagship: "Flagship Diagnostic",
+  shift: "Career Core Diagnostics",
+  advisory: "Advisory Diagnostics",
 };
 
 const FLAGSHIP_PRICING: AssessmentPricing[] = [
@@ -312,18 +312,21 @@ export const ASSESSMENT_CATALOG: Record<string, AssessmentInfo> = INSTRUMENT_ORD
       scoring.TIER === "flagship" ? "flagship" : scoring.TIER === "shift" ? "shift" : "advisory";
     const tierLabel = TIER_GROUP_LABELS[tierGroup];
 
-    // Phase 15.5 / ticket #1303 — canonical 3-tier assessment pricing.
-    // Standard (99 mi): LEAP, DRIVE, PRISM, MOSAIC, FORGE
-    // Premium (149 mi): QUEST, COACH, IMPACT, BRIDGE, SPARK
-    // Unique  (199 mi): CPI
+    // Batch 6 P0-3 / ticket #1303 — LOCKED CANON mile cost table (Kevin).
+    // 1 mi Light:     LEAP
+    // 2 mi Standard:  PRISM, IMPACT, COACH, DRIVE, QUEST
+    // 3 mi Signature: BRIDGE, MOSAIC, SPARK, FORGE
+    // 5 mi Flagship:  CPI
     // NOTE: tierGroup (flagship/shift/advisory) is the catalog grouping,
-    // NOT the price tier. Pricing is per-instrument per the canonical spec.
+    // NOT the price tier. Pricing is per-instrument per the locked canon.
+    // SOURCE: src/constants/miles.ts → INSTRUMENT_MILE_COST
     const CANONICAL_PRICE_MILES: Record<string, number> = {
-      LEAP: 99, DRIVE: 99, PRISM: 99, MOSAIC: 99, FORGE: 99,
-      QUEST: 149, COACH: 149, IMPACT: 149, BRIDGE: 149, SPARK: 149,
-      CPI: 199,
+      LEAP: 1,
+      PRISM: 2, IMPACT: 2, COACH: 2, DRIVE: 2, QUEST: 2,
+      BRIDGE: 3, MOSAIC: 3, SPARK: 3, FORGE: 3,
+      CPI: 5,
     };
-    const priceMiles = CANONICAL_PRICE_MILES[code] ?? 99;
+    const priceMiles = CANONICAL_PRICE_MILES[code] ?? 2;
 
     const is_cpi = tierGroup === "flagship";
     const is_shift = tierGroup === "shift";
