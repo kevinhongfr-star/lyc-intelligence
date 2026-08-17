@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /account/
+Disallow: /portal/
+Disallow: /app/
+Disallow: /client/
+Disallow: /candidate/
+Disallow: /share/
+
+# Crawl-delay (seconds) for non-well-behaved bots
+Crawl-delay: 2
+
+# Sitemap
+Sitemap: https://lyc-intelligence.app/sitemap.xml

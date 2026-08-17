@@ -280,7 +280,7 @@ const DIAGS = [
   { tag: 'Strategic', title: 'Strategic Thinking Diagnostic', desc: 'Measure your ability to frame complex problems, anticipate market shifts, and make decisions under uncertainty.', meta: '4 sub-dimensions · 25 min' },
   { tag: 'Executive Presence', title: 'Executive Presence Diagnostic', desc: 'Assess how you show up — communication clarity, influence style, gravitas, and stakeholder impact.', meta: '4 sub-dimensions · 20 min' },
   { tag: 'People Leadership', title: 'Team Leadership Diagnostic', desc: 'Evaluate how you build teams, develop people, and drive performance through others.', meta: '5 sub-dimensions · 22 min' },
-  { tag: 'China & APAC', title: 'China Leadership Pipeline Diagnostic', desc: 'Context-specific assessment for leaders in China and cross-cultural APAC environments. Built on local executive benchmarks.', meta: '5 dimensions · 6 profiles · China/APAC' },
+  { tag: 'China & APAC', title: 'China Leadership Pipeline Index', desc: 'Context-specific assessment for leaders in China and cross-cultural APAC environments. Built on local executive benchmarks.', meta: '5 dimensions · 6 profiles · China/APAC' },
   { tag: 'Change', title: 'Change Agility Diagnostic', desc: 'Understand how you navigate ambiguity, lead through transition, and adapt under pressure.', meta: '4 sub-dimensions · 18 min' },
   { tag: 'Commercial', title: 'Commercial Acumen Diagnostic', desc: 'Test your business judgment — P&L orientation, market analysis, and investment decision-making.', meta: '4 sub-dimensions · 20 min' },
 ];
@@ -382,7 +382,7 @@ function B2BTeaser() {
 
 // ── PRICING ────────────────────────────────────────────────────────
 const PLANS = [
-  { label: 'Start', title: 'Executive Introduction', price: '', small: null, desc: 'Get your first leadership diagnostic and initial advisory session. No credit card.', bullets: ['China Leadership Pipeline Diagnostic', 'Full narrative report', 'Initial advisory conversation', 'Basic profile'], cta: 'Start — Executive Introduction', href: '#start', featured: false },
+  { label: 'Start', title: 'Executive Introduction', price: '', small: null, desc: 'Get your first leadership diagnostic and initial advisory session. No credit card.', bullets: ['China Leadership Pipeline Index', 'Full narrative report', 'Initial advisory conversation', 'Basic profile'], cta: 'Start — Executive Introduction', href: '#start', featured: false },
   { label: 'Most Popular', title: 'Executive Access', price: 'From $29', small: '/month', desc: 'Full access to all diagnostics, unlimited advisory chat, and role fit analysis.', bullets: ['All 6 leadership diagnostics', 'Unlimited AI advisory chat', 'Role Fit Analysis — unlimited', 'Development tracking', 'Market intelligence access'], cta: 'Start Executive Access', href: '#start', featured: true },
   { label: 'Enterprise', title: 'For Teams & Firms', price: 'Custom', small: null, desc: 'Full platform for organizations, search firms, and talent teams.', bullets: ['Bulk candidate screening', 'Team pipeline diagnostics', 'Custom benchmarking', 'Dedicated support', 'API access'], cta: 'Talk to Sales', href: '#for-business', featured: false },
 ];

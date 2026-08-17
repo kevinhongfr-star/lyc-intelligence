@@ -1,0 +1,1 @@
+const l=["SWEEP","CANVA","GRID","LENS","PLACED"],e={SWEEP:{label:"Sweep",color:"#00897B"},CANVA:{label:"Scorecard Builder",color:"#F59E0B"},GRID:{label:"Market Intelligence",color:"#10B981"},LENS:{label:"Lens",color:"#EC4899"},PLACED:{label:"Placed",color:"#8B5CF6"}};export{l as S,e as a};
