@@ -39,6 +39,7 @@ import React, { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { CreditProvider } from '@/contexts/CreditContext';
+import { TierProvider } from '@/components/tier/TierProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CookieConsent } from '@/components/CookieConsent';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
@@ -252,6 +253,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
+    <TierProvider>
     <CreditProvider>
       <ToastContainer />
       <CookieConsent />
@@ -625,6 +627,7 @@ export default function App() {
         </Routes>
       </Suspense>
     </CreditProvider>
+    </TierProvider>
     </ErrorBoundary>
   );
 }

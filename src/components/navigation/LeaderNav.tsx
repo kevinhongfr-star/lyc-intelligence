@@ -51,7 +51,7 @@ export function LeaderNav({ variant = 'sidebar' }: LeaderNavProps): React.ReactE
   const items = [
     { path: '/app/nexus', label: 'NEXUS Chat', icon: MessageSquare, end: true },
     { path: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/assessment', label: 'Assessments', icon: ClipboardList },
+    { path: '/assessments', label: 'Assessments', icon: ClipboardList },
     { path: '/app/results', label: 'My Results', icon: TrendingUp },
     { path: '/app/documents', label: 'Documents', icon: FileText },
     { path: '/app/profile', label: 'Profile', icon: User },

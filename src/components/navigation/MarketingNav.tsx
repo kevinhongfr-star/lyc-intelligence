@@ -1,8 +1,11 @@
 /**
  * Phase 16 — MarketingNav (public / marketing identity).
  *
- * No auth required. Brand: premium marketing nav.
- * Links: Home, Assessments, NEXUS, Pricing + Meet NEXUS CTA.
+ * Batch 1.5 / Ticket 3: Simplified nav. Primary = NEXUS, Assessments, Pricing.
+ * Logo click → Home (no separate Home link). Tier-aware: authenticated users
+ * see "My Portal" + tier badge; guests see "Sign in" + "Meet NEXUS".
+ * URL: /assessments/ (not /assessment/).
+ *
  * Visual: lots of whitespace, serif-heavy brand feel.
  * Zero radius, font trio, accent #C108AB.
  */
@@ -14,11 +17,13 @@ import { getDefaultPortalRoute } from '@/services/portalClassification';
 import { trackCTA, setTrackingUser } from '@/analytics/eventTracker';
 import { DS } from '@/tokens';
 import { Logo } from '@/components/ui/Logo';
+import { useTier } from '@/components/tier/TierProvider';
 
 export function MarketingNav(): React.ReactElement {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut } = useAuthStore();
+  const { displayName: tierName, isEntryTier } = useTier();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -35,7 +40,6 @@ export function MarketingNav(): React.ReactElement {
       navigate(getDefaultPortalRoute(profile?.role), { replace: true });
       return;
     }
-    // W4-5: guest nav CTA → /nexus landing page (discovery), not direct chat.
     trackCTA({ location: 'nav_marketing', label: 'Meet NEXUS (guest portal)', destination: '/nexus' });
     navigate('/nexus');
   };
@@ -46,7 +50,15 @@ export function MarketingNav(): React.ReactElement {
     navigate('/', { replace: true });
   };
 
-  const isHome = location.pathname === '/' && !location.hash;
+  // Primary nav items — NEXUS, Assessments, Pricing (per Batch 1.5 spec)
+  const navItems = [
+    { href: '/nexus', label: 'NEXUS' },
+    { href: '/assessments', label: 'Assessments' },
+    { href: '/pricing', label: 'Pricing' },
+  ];
+
+  const isActive = (href: string) =>
+    location.pathname === href || location.pathname.startsWith(href + '/');
 
   return (
     <header
@@ -61,41 +73,42 @@ export function MarketingNav(): React.ReactElement {
       }}
     >
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
-        {/* Logo — shared component (#1356) */}
-        <Logo size="md" variant="light" />
+        {/* Logo — click → Home (replaces separate Home link) */}
+        <Link to="/" onClick={() => trackCTA({ location: 'nav_marketing', label: 'Logo → Home', destination: '/' })}>
+          <Logo size="md" variant="light" />
+        </Link>
 
-        {/* Desktop nav */}
+        {/* Desktop nav — 3 primary items */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }} className="hidden md:flex">
-          <Link to="/"
-            onClick={() => trackCTA({ location: 'nav_marketing', label: 'Home', destination: '/' })}
-            style={{
-              fontSize: 14, fontWeight: 500,
-              color: isHome ? DS.text : DS.textSecondary,
-              textDecoration: 'none', fontFamily: DS.bodyFont,
-            }}>
-            Home
-          </Link>
-
-          <Link to="/assessments"
-            onClick={() => trackCTA({ location: 'nav_marketing', label: 'Assessments', destination: '/assessments' })}
-            style={{ fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none', fontFamily: DS.bodyFont }}>
-            Assessments
-          </Link>
-
-          <Link to="/#nexus"
-            onClick={() => trackCTA({ location: 'nav_marketing', label: 'NEXUS', destination: '/#nexus' })}
-            style={{ fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none', fontFamily: DS.bodyFont }}>
-            NEXUS
-          </Link>
-
-          <Link to="/pricing"
-            onClick={() => trackCTA({ location: 'nav_marketing', label: 'Pricing', destination: '/pricing' })}
-            style={{ fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none', fontFamily: DS.bodyFont }}>
-            Pricing
-          </Link>
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              onClick={() => trackCTA({ location: 'nav_marketing', label: item.label, destination: item.href })}
+              style={{
+                fontSize: 14,
+                fontWeight: 500,
+                color: isActive(item.href) ? DS.text : DS.textSecondary,
+                textDecoration: 'none',
+                fontFamily: DS.bodyFont,
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
 
           {user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {/* Tier badge — tier-aware nav */}
+              {!isEntryTier && (
+                <span style={{
+                  fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
+                  textTransform: 'uppercase', color: DS.accent,
+                  padding: '4px 8px', border: `1px solid ${DS.accent}`,
+                }}>
+                  {tierName}
+                </span>
+              )}
               <button onClick={handlePortalEntry} style={{
                 padding: '9px 18px', fontSize: 14, fontWeight: 600,
                 background: 'transparent', color: DS.accent,
@@ -121,8 +134,6 @@ export function MarketingNav(): React.ReactElement {
                 Sign in
               </Link>
               <button onClick={() => {
-                // W4-5: nav CTA → /nexus landing page (discovery), not direct
-                // chat. Primary entry is through assessment; nav is secondary.
                 trackCTA({ location: 'nav_marketing', label: 'Meet NEXUS', destination: '/nexus' });
                 navigate('/nexus');
               }} style={{
@@ -146,31 +157,37 @@ export function MarketingNav(): React.ReactElement {
         </button>
       </div>
 
-      {/* Mobile panel */}
+      {/* Mobile panel — same 3 primary items */}
       {mobileOpen && (
         <div className="md:hidden" style={{
           borderTop: `1px solid ${DS.border}`, padding: '16px 32px 24px',
           background: DS.bg, display: 'flex', flexDirection: 'column', gap: 12,
         }}>
-          <Link to="/" onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: 'Home (mobile)', destination: '/' }); }}
-            style={{ padding: '10px 0', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
-            Home
-          </Link>
-          <Link to="/assessments" onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: 'Assessments (mobile)', destination: '/assessments' }); }}
-            style={{ padding: '10px 0', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
-            Assessments
-          </Link>
-          <Link to="/#nexus" onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: 'NEXUS (mobile)', destination: '/#nexus' }); }}
-            style={{ padding: '10px 0', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
-            NEXUS
-          </Link>
-          <Link to="/pricing" onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: 'Pricing (mobile)', destination: '/pricing' }); }}
-            style={{ padding: '10px 0', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
-            Pricing
-          </Link>
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              onClick={() => {
+                setMobileOpen(false);
+                trackCTA({ location: 'nav_marketing', label: `${item.label} (mobile)`, destination: item.href });
+              }}
+              style={{
+                padding: '10px 0', fontSize: 15,
+                color: isActive(item.href) ? DS.accent : DS.text,
+                textDecoration: 'none',
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
           <div style={{ borderTop: `1px solid ${DS.border}`, marginTop: 4, paddingTop: 12 }} />
           {user ? (
             <>
+              {!isEntryTier && (
+                <span style={{ fontSize: 11, fontWeight: 600, color: DS.accent, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  {tierName} tier
+                </span>
+              )}
               <button onClick={() => { setMobileOpen(false); handlePortalEntry(); }}
                 style={{ marginTop: 8, padding: '12px', background: DS.accent, color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
                 My Portal
@@ -188,7 +205,6 @@ export function MarketingNav(): React.ReactElement {
               </Link>
               <Link to="/nexus" onClick={() => {
                 setMobileOpen(false);
-                // W4-5: mobile nav CTA → /nexus landing page (discovery).
                 trackCTA({ location: 'nav_marketing', label: 'Meet NEXUS (mobile)', destination: '/nexus' });
               }}
                 style={{ padding: '12px', textAlign: 'center', background: DS.accent, color: '#fff', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
