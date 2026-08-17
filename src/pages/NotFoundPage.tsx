@@ -227,7 +227,7 @@ export default function NotFoundPage() {
             fontFamily: DS.monoFont,
           }}
         >
-          HTTP 404 · NotFoundRoute · if you believe this is a platform error, contact{' '}
+          HTTP 404 · NotFoundRoute · if you believe this is a system error, contact{' '}
           <a
             href="mailto:ops@lyc-intelligence.app"
             style={{ color: DS.accent, textDecoration: 'none' }}

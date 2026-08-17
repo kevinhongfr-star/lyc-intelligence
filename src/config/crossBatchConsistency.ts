@@ -70,12 +70,12 @@ export const CONSISTENCY_CRITERIA: ConsistencyCriterion[] = [
   {
     id: 'tier_display',
     label: 'Tier Display Names',
-    rule: 'Canonical display names from tiers.ts: Explorer, Starter, Professional, Executive, Council. Capitalization, positioning one-liners, and price formatting consistent across pricing, settings, onboarding, email.',
+    rule: 'Canonical display names from tiers.ts: Explorer, Starter, Pro, Executive, Council. Capitalization, positioning one-liners, and price formatting consistent across pricing, settings, onboarding, email. NOTE: "Pro" is the canonical DISPLAY name (per Batch 6 P0-7); "professional" is the backend tier_key only and must NEVER appear in user-facing copy.',
     canonicalSource: 'terminologyReference.ts → tiers (TIER_KEYS, TIERS) + tiers.ts → TIER_PRICING',
     affectedSurfaces: ['pricing_page', 'settings_account', 'onboarding_flow', 'landing_pages', 'email_templates', 'navigation_footer'],
-    verifyMethod: 'Grep for tier display names across surfaces; cross-check against tiers.ts. Verify "Professional" never "Pro" in user-facing copy. Verify price formatting uses computeTierPrice() + formatPrice().',
+    verifyMethod: 'Grep for tier display names across surfaces; cross-check against tiers.ts. Verify "Pro" is the canonical display name (never "Professional" in user-facing copy — "professional" is the backend tier_key only). Verify price formatting uses computeTierPrice() + formatPrice().',
     commonFailures: [
-      '"Pro" in pricing card, "Professional" in settings',
+      '"Professional" in pricing card (should be "Pro"), "Pro" and "Professional" used inconsistently',
       '"Enterprise" appears (collapsed into Council)',
       'Inconsistent annual discount math across surfaces',
       'Raw tier_key ("explorer") displayed instead of "Explorer"',
@@ -93,7 +93,7 @@ export const CONSISTENCY_CRITERIA: ConsistencyCriterion[] = [
       '"Free" instead of "Complimentary" for 0-mile assessments',
       '"credits" in legacy billing components',
       'Wrong pluralization ("1 miles")',
-      'Wrong mile cost stated (e.g. LEAP=2 instead of 3)',
+      'Wrong mile cost stated (e.g. LEAP=3 instead of 1, or SPARK=1 instead of 3 — see INSTRUMENT_MILE_COST for the locked canon)',
     ],
     severity: 'blocker',
   },
@@ -114,12 +114,12 @@ export const CONSISTENCY_CRITERIA: ConsistencyCriterion[] = [
   {
     id: 'upgrade_path_language',
     label: 'Upgrade Path Language',
-    rule: 'Soft gate consistency. No tier names in NEXUS chat (platform layer handles upgrade direction). Soft gates use acknowledge → specific value → best alternative → upgrade direction pattern.',
+    rule: 'Soft gate consistency. Tier names HARD BANNED in casual/diagnostic NEXUS chat (NEXUS should not reference the user\'s tier or other tiers during normal coaching — breaks immersion). Tier names ALLOWED in explicit upgrade/recommendation context (e.g. "If you upgrade to Pro, you\'d get X"), pricing surfaces, account/billing pages, and comparison tables. Soft gates use acknowledge → specific value → best alternative → upgrade direction pattern.',
     canonicalSource: 'terminologyReference.ts → tiers (visibility) + voiceStandard.ts → TRANSITION_PATTERNS.softGate',
     affectedSurfaces: ['chat_responses', 'assessment_pages', 'mile_balance_packs', 'pricing_page'],
-    verifyMethod: 'Runtime: brandGuard.canonicalTierNameCheck() on chat corpus. Verify soft gate copy follows the 4-step pattern. Verify no tier names in chat responses.',
+    verifyMethod: 'Runtime: brandGuard.canonicalTierNameCheck() on chat corpus. Verify soft gate copy follows the 4-step pattern. Verify no tier names in CASUAL chat responses, but tier names ARE allowed in explicit upgrade/recommendation contexts.',
     commonFailures: [
-      '"Upgrade to Professional tier" in chat (should be direction without name)',
+      '"Upgrade to Professional tier" in chat (use "Pro" not "Professional" — and only in explicit upgrade context, not casual chat)',
       'Hard wall instead of soft gate',
       'Inconsistent soft gate copy across surfaces',
     ],
@@ -333,7 +333,7 @@ export const BRAND_VOICE_RUBRIC: BrandVoiceRubricItem[] = [
   {
     dimension: 'Terminology Consistency',
     score5Description: 'All terms match terminologyReference.ts. "miles" not "credits", "milestones" not "bookmarks", "profile" not "account", canonical tier names.',
-    score1Description: 'Multiple terminology violations (credits, bookmarks, account, "Pro" instead of Professional).',
+    score1Description: 'Multiple terminology violations (credits, bookmarks, account, "Professional" instead of Pro).',
     weight: 20,
   },
   {
@@ -567,7 +567,7 @@ export const FINAL_PASS_PROCESS: FinalPassPhase[] = [
       'Verify tier_display: canonical names from tiers.ts everywhere',
       'Verify mile_cost_format: "X miles" / "Complimentary" everywhere',
       'Verify cta_consistency: TIER_CTA_LABEL used across surfaces',
-      'Verify upgrade_path_language: no tier names in chat, soft gates consistent',
+      'Verify upgrade_path_language: no tier names in CASUAL chat (allowed in explicit upgrade/recommendation context), soft gates consistent',
       'Verify tone_consistency: register matches context per surface',
       'Verify format_consistency: no emoji, no exclamation, capitalization rules',
     ],

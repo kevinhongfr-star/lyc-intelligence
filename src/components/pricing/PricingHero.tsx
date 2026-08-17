@@ -5,8 +5,9 @@
  * positioning doc sections. Components: eyebrow, headline, subheadline,
  * body copy, primary CTA, billing cycle toggle.
  *
- * Positioning: "Executive Intelligence Platform" — coach first, diagnostics
- * as tools. Tagline: "Executive Intelligence for a Changing China".
+ * Positioning: "Executive Intelligence" — coach first, diagnostics as tools.
+ * Tagline: "Executive Intelligence for a Changing China".
+ * NOTE: "platform" is a Level 1 hard banned word — never "Executive Intelligence Platform".
  */
 import React from 'react';
 import { DS } from '@/tokens';
@@ -54,7 +55,7 @@ export function PricingHero({ cycle, onCycleChange, onPrimaryCta }: PricingHeroP
             maxWidth: 800,
           }}
         >
-          [Emily: hero headline — "Executive Intelligence Platform" positioning]
+          [Emily: hero headline — "Executive Intelligence" positioning (NOTE: "platform" is banned — never "Executive Intelligence Platform")]
         </h1>
 
         {/* Subheadline */}

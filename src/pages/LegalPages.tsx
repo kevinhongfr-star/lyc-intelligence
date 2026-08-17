@@ -66,7 +66,7 @@ export function TermsPage() {
   const sections: Section[] = [
     {
       heading: 'Service Description',
-      body: <p>LYC Intelligence ("the Service") is an executive intelligence platform operated by LYC Partners Shanghai, providing AI-powered advisory (LYC Intelligence), candidate-client matching, assessment tools, and coaching services for China-APAC executives and the organizations that hire them.</p>,
+      body: <p>LYC Intelligence ("the Service") is an executive intelligence service operated by LYC Partners Shanghai, providing AI-powered advisory (LYC Intelligence), candidate-client matching, assessment tools, and coaching services for China-APAC executives and the organizations that hire them.</p>,
     },
     {
       heading: 'User Accounts',

@@ -197,13 +197,22 @@ export interface TierMeta {
 /**
  * Complete tier metadata. `features` is pre-resolved with inheritance.
  * This is the single lookup table — all UI + gating reads from here.
+ *
+ * Display name overrides: most tiers use Title-Case of the key, but the
+ * "professional" tier's canonical DISPLAY name is "Pro" (per Batch 6 P0-7).
+ * The tier_key remains "professional" for backend stability.
  */
+export const TIER_DISPLAY_NAME_OVERRIDES: Partial<Record<TierKey, string>> = {
+  professional: 'Pro',
+};
+
 export const TIERS: Record<TierKey, TierMeta> = (() => {
   const result = {} as Record<TierKey, TierMeta>;
   TIER_KEYS.forEach((key, i) => {
+    const override = TIER_DISPLAY_NAME_OVERRIDES[key];
     result[key] = {
       key,
-      displayName: key.charAt(0).toUpperCase() + key.slice(1),
+      displayName: override ?? (key.charAt(0).toUpperCase() + key.slice(1)),
       tagline: `[${key} tier tagline — placeholder]`,
       order: i + 1,
       isEntryTier: key === 'explorer',

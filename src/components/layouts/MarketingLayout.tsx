@@ -73,7 +73,7 @@ function MarketingFooter(): React.ReactElement {
               </span>
             </Link>
             <p style={{ fontSize: 14, color: DS.muted, lineHeight: 1.6, maxWidth: 320, margin: 0 }}>
-              Executive intelligence for high-achieving leaders. Advisory, assessments, and talent search in one private platform.
+              Executive intelligence for high-achieving leaders. Advisory, assessments, and talent search in one private service.
             </p>
           </div>
           {columns.map((col) => (

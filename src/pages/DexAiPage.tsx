@@ -92,7 +92,7 @@ function Hero() {
           Multi-agent AI systems, specialized assessment models, and talent market data — all working together to power leadership intelligence for executives on the move.
         </p>
         <div style={{ fontFamily: DS.monoFont, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: DS.mutedDim, marginBottom: 40 }}>
-          LYC Intelligence is the platform. NEXUS is the experience.
+          LYC Intelligence is the service. NEXUS is the experience.
         </div>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to="/nexus" style={btnPrimary} {...ctaCompressHandlers}

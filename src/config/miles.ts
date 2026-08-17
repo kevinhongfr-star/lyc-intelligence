@@ -82,14 +82,14 @@ export const MILE_COST_TIERS: Record<MileCostTier, { miles: number; label: strin
 
 /**
  * Per-instrument mile cost. The canonical mapping — single source of truth.
- * Spec: All numbers locked. (P0-5)
+ * Spec: All numbers locked per Akira canon audit (Batch 6 P0-3).
  *
  * ┌────────────┬──────────────────────────────────────────────┐
  * │ Mile Cost  │ Instruments                                  │
  * ├────────────┼──────────────────────────────────────────────┤
- * │ 1 mile     │ SPARK, COACH                                 │
- * │ 2 miles    │ PRISM, IMPACT, BRIDGE, DRIVE, MOSAIC         │
- * │ 3 miles    │ FORGE, LEAP, QUEST                           │
+ * │ 1 mile     │ LEAP                                         │
+ * │ 2 miles    │ PRISM, IMPACT, COACH, DRIVE, QUEST           │
+ * │ 3 miles    │ BRIDGE, MOSAIC, SPARK, FORGE                 │
  * │ 5 miles    │ CPI                                          │
  * └────────────┴──────────────────────────────────────────────┘
  *
@@ -97,16 +97,16 @@ export const MILE_COST_TIERS: Record<MileCostTier, { miles: number; label: strin
  * this table. No hardcoded costs anywhere.
  */
 export const INSTRUMENT_MILE_COST: Record<string, number> = {
-  SPARK:   1,
-  COACH:   1,
+  LEAP:    1,
   PRISM:   2,
   IMPACT:  2,
-  BRIDGE:  2,
+  COACH:   2,
   DRIVE:   2,
-  MOSAIC:  2,
+  QUEST:   2,
+  BRIDGE:  3,
+  MOSAIC:  3,
+  SPARK:   3,
   FORGE:   3,
-  LEAP:    3,
-  QUEST:   3,
   CPI:     5,
 };
 

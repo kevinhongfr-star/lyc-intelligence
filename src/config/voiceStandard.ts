@@ -254,16 +254,18 @@ export interface DiagnosticDescriptor {
 }
 
 export const APPROVED_DIAGNOSTICS: DiagnosticDescriptor[] = [
-  { code: 'SPARK',   fullName: 'SPARK — AI leadership readiness',          descriptor: 'AI leadership readiness',          tagline: 'Know where you stand. Know where to invest.',     mileCost: 1, costTier: 'Light' },
+  // Mile costs locked per Akira canon audit (Batch 6 P0-3).
+  // 1mi: LEAP · 2mi: PRISM, IMPACT, COACH, DRIVE, QUEST · 3mi: BRIDGE, MOSAIC, SPARK, FORGE · 5mi: CPI
+  { code: 'SPARK',   fullName: 'SPARK — AI leadership readiness',          descriptor: 'AI leadership readiness',          tagline: 'Know where you stand. Know where to invest.',     mileCost: 3, costTier: 'Signature' },
   { code: 'PRISM',   fullName: 'PRISM — professional branding',            descriptor: 'professional branding',            tagline: 'See how the world sees your professional brand.', mileCost: 2, costTier: 'Standard' },
   { code: 'IMPACT',  fullName: 'IMPACT — board & stakeholder impact',      descriptor: 'board and stakeholder impact',     tagline: 'Understand your influence at the highest levels.', mileCost: 2, costTier: 'Standard' },
-  { code: 'BRIDGE',  fullName: 'BRIDGE — cross-cultural relational intelligence', descriptor: 'cross-cultural relational intelligence', tagline: 'Cross-border mandate success starts with relational intelligence.', mileCost: 2, costTier: 'Standard' },
+  { code: 'BRIDGE',  fullName: 'BRIDGE — cross-cultural relational intelligence', descriptor: 'cross-cultural relational intelligence', tagline: 'Cross-border mandate success starts with relational intelligence.', mileCost: 3, costTier: 'Signature' },
   { code: 'DRIVE',   fullName: 'DRIVE — motivational alignment',           descriptor: 'motivational alignment',           tagline: 'Know what fuels you. Know what fades you.',       mileCost: 2, costTier: 'Standard' },
-  { code: 'MOSAIC',  fullName: 'MOSAIC — institutional trust & relationship velocity', descriptor: 'institutional trust and relationship velocity', tagline: 'Partnerships work when trust moves at the speed of business.', mileCost: 2, costTier: 'Standard' },
+  { code: 'MOSAIC',  fullName: 'MOSAIC — institutional trust & relationship velocity', descriptor: 'institutional trust and relationship velocity', tagline: 'Partnerships work when trust moves at the speed of business.', mileCost: 3, costTier: 'Signature' },
   { code: 'FORGE',   fullName: 'FORGE — sales excellence capability',      descriptor: 'sales excellence capability',      tagline: 'Build the sales leader your market needs.',       mileCost: 3, costTier: 'Signature' },
-  { code: 'LEAP',    fullName: 'LEAP — competitive positioning',           descriptor: 'competitive positioning',          tagline: 'Know your edge. Know your moment.',               mileCost: 3, costTier: 'Signature' },
-  { code: 'QUEST',   fullName: 'QUEST — strategic market positioning',     descriptor: 'strategic market positioning',     tagline: 'Know where you stand. Know where to play.',       mileCost: 3, costTier: 'Signature' },
-  { code: 'COACH',   fullName: 'COACH — executive coaching fit',           descriptor: 'executive coaching fit',           tagline: 'Great coaches are not born. They are calibrated.', mileCost: 1, costTier: 'Light' },
+  { code: 'LEAP',    fullName: 'LEAP — competitive positioning',           descriptor: 'competitive positioning',          tagline: 'Know your edge. Know your moment.',               mileCost: 1, costTier: 'Light' },
+  { code: 'QUEST',   fullName: 'QUEST — strategic market positioning',     descriptor: 'strategic market positioning',     tagline: 'Know where you stand. Know where to play.',       mileCost: 2, costTier: 'Standard' },
+  { code: 'COACH',   fullName: 'COACH — executive coaching fit',           descriptor: 'executive coaching fit',           tagline: 'Great coaches are not born. They are calibrated.', mileCost: 2, costTier: 'Standard' },
   { code: 'CPI',     fullName: 'CPI — China Leadership Pipeline Index',    descriptor: 'China Leadership Pipeline Index',  tagline: 'Measure what matters in leadership pipeline health.', mileCost: 5, costTier: 'Flagship' },
 ];
 

@@ -1526,7 +1526,7 @@ export function Landing() {
               letterSpacing: '-0.01em',
             }}
           >
-            Premium reports. NEXUS. One platform.
+            Premium reports. NEXUS. One experience.
           </h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', alignItems: 'start', justifyItems: 'center' }}>

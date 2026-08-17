@@ -46,7 +46,7 @@ export function ogImageUrl(title: string, subtitle?: string): string {
 
 export const PAGE_META: Record<string, PageMeta> = {
   landing: {
-    title: 'LYC Intelligence — Executive Intelligence Platform',
+    title: 'LYC Intelligence — Executive Intelligence',
     description:
       'Know where you stand. Know where to go. Leadership intelligence for every stage — from career positioning to executive matching. 500+ placements across 47 markets.',
     path: '/',
@@ -58,7 +58,7 @@ export const PAGE_META: Record<string, PageMeta> = {
       url: SITE_URL,
       logo: `${SITE_URL}/apple-touch-icon.png`,
       description:
-        'Executive intelligence platform — advisory, assessments, and talent search for high-achieving leaders.',
+        'Executive intelligence — advisory, assessments, and talent search for high-achieving leaders.',
       foundingDate: '2024',
       areaServed: 'Asia-Pacific',
       knowsAbout: [
@@ -109,7 +109,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   b2b: {
     title: 'For Firms — Executive Search & Match Analysis | LYC',
     description:
-      'Mandates, candidate scoring, and organizational intelligence for search firms and enterprises. GRID pipeline, TRIDENT scoring, CANVAS analytics. 500+ placements across 47 markets.',
+      'Mandates, candidate scoring, and organizational intelligence for search firms and enterprises. Candidate pipeline, leader scoring, organizational analytics. 500+ placements across 47 markets.',
     path: '/b2b',
     type: 'website',
     structuredData: {
@@ -267,14 +267,14 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
     meta: {
       title: 'LYC Intelligence — Leadership Intelligence for China Operating Leaders',
       description:
-        'The intelligence layer for China operating leaders. NEXUS advisory copilot, CPI & SHIFT diagnostics, and TRIDENT leader matching — in one seat.',
+        'The intelligence layer for China operating leaders. NEXUS advisory copilot, CPI diagnostics, and leader matching — in one seat.',
       canonical: u('/'),
       keywords: [
         'LYC CPI flagship assessment APAC',
         'NEXUS executive thinking partner',
         'China-APAC leadership benchmark 2026',
         'executive career positioning C-suite',
-        'TRIDENT leader matching algorithm',
+        'LYC leader matching algorithm',
         'Shanghai executive placement data',
       ],
     },
@@ -324,11 +324,11 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
       canonical: u('/b2b'),
       keywords: [
         'GRID executive search pipeline APAC',
-        'TRIDENT candidate scoring China search firms',
-        'CANVAS organisational diagnostics enterprise',
+        'LYC candidate scoring China search firms',
+        'organisational diagnostics enterprise',
         'executive mandate intelligence dashboard',
         'retained search candidate matching tool',
-        'APAC talent mapping analytics platform',
+        'APAC talent mapping analytics',
       ],
     },
   },
@@ -391,17 +391,17 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/assessment/shift',
     meta: {
-      title: 'SHIFT Mobility | Career Transition Radar for China Leaders',
+      title: 'Career Transition Radar for China Leaders | LYC Intelligence',
       description:
-        'SHIFT maps your adjacent career moves across industry, function, and stage — with 5 ranked paths and LYC likelihood scores. 12 minutes, data-driven.',
+        'The Career Transition Radar maps your adjacent career moves across industry, function, and stage — with 5 ranked paths and LYC likelihood scores. 12 minutes, data-driven.',
       canonical: u('/assessment/shift'),
       keywords: [
-        'SHIFT career mobility assessment APAC executive',
+        'career mobility assessment APAC executive',
         'China leader career transition radar 5 paths',
         'executive industry pivot likelihood score',
         'cross-functional move assessment C-suite',
         'career stage transition diagnostic Shenzhen',
-        'LYC SHIFT mobility benchmark executive',
+        'LYC career mobility benchmark executive',
       ],
     },
   },
@@ -482,11 +482,11 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
     pattern: '/consultant',
     meta: {
       title: 'Consultant Portal | LYC Intelligence',
-      description: 'Retained-search consultant workspace: mandates, candidate pipeline, TRIDENT matches, and client billing.',
+      description: 'Retained-search consultant workspace: mandates, candidate pipeline, leader matches, and client billing.',
       noindex: true,
       keywords: [
         'executive search consultant workspace mandate pipeline',
-        'TRIDENT candidate scoring portal consultant',
+        'LYC candidate scoring portal consultant',
         'LYC search firm consultant billing analytics',
       ],
     },
@@ -520,12 +520,12 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/admin',
     meta: {
-      title: 'Admin | LYC Intelligence Platform Control',
+      title: 'Admin | LYC Intelligence Control',
       description: 'Internal LYC admin — diagnostics usage, user support, billing, and compliance.',
       noindex: true,
       keywords: [
         'LYC Intelligence admin diagnostic usage reporting',
-        'platform admin user support billing compliance',
+        'admin user support billing compliance',
         'internal LYC admin portal operations dashboard',
       ],
     },
@@ -537,10 +537,10 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
     meta: {
       title: 'Refer Leaders, Earn Miles | LYC Intelligence',
       description:
-        'Refer China operating leaders to LYC Intelligence and earn miles redeemable against diagnostics, TRIDENT matches, and Council membership.',
+        'Refer China operating leaders to LYC Intelligence and earn miles redeemable against diagnostics, leader matches, and Council membership.',
       canonical: u('/referral'),
       keywords: [
-        'LYC referral miles redeem diagnostics TRIDENT',
+        'LYC referral miles redeem diagnostics leader matching',
         'executive refer-a-leader program APAC',
         'China operating leader referral reward miles',
         'Council membership referral discount LYC',

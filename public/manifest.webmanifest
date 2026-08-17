@@ -1,7 +1,7 @@
 {
   "name": "LYC Intelligence",
   "short_name": "LYC Intel",
-  "description": "Executive intelligence platform — leadership assessments, career positioning, and executive matching.",
+  "description": "Executive intelligence — leadership assessments, career positioning, and executive matching.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFFFF",

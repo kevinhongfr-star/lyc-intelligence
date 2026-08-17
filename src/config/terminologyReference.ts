@@ -77,7 +77,7 @@ export type { TierKey, MileCostTier, VoiceBannedWordEntry };
 
 export type TerminologyCategory =
   | 'product_name'      // NEXUS entity name
-  | 'tier'              // Explorer, Starter, Professional, Executive, Council
+  | 'tier'              // Explorer, Starter, Pro, Executive, Council (canonical DISPLAY names; backend tier_key for Pro is "professional")
   | 'currency'          // miles (product/UI only)
   | 'progress'          // milestones
   | 'diagnostic'        // 11 assessment instruments
@@ -155,15 +155,15 @@ export const TERMINOLOGY: TerminologyEntry[] = [
     examples: ['"Starter members receive 2 miles each month."'],
   },
   {
-    term: 'Professional',
+    term: 'Pro',
     category: 'tier',
     role: 'tier display name (3rd, recommended)',
     visibility: 'user_facing',
-    usageContext: 'Third tier. Recommended tier ("Most Popular"). Canonical key = "professional". Full catalog access, unlimited retakes. NEVER "Pro" in user-facing copy — "Pro" is internal shorthand only.',
-    canonicalSource: 'src/config/tiers.ts → TIERS.professional.displayName',
-    acceptedVariants: ['professional', 'Pro (internal shorthand only — never user-facing)'],
-    commonErrors: ['Pro', 'Pro tier', 'Premium', 'Premium plan'],
-    examples: ['"Professional unlocks the full 11-instrument catalog."'],
+    usageContext: 'Third tier. Recommended tier ("Most Popular"). Canonical DISPLAY name = "Pro". Backend tier_key = "professional" (unchanged for backend stability, NEVER shown to users). Full catalog access, unlimited retakes. NEVER "Professional" in user-facing copy — "Professional" is the backend key only.',
+    canonicalSource: 'src/config/tiers.ts → TIER_DISPLAY_NAME_OVERRIDES.professional = "Pro"',
+    acceptedVariants: ['Pro', 'professional (backend tier_key only — never user-facing)'],
+    commonErrors: ['Professional', 'Professional tier', 'Professional plan', 'Premium', 'Premium plan'],
+    examples: ['"Pro unlocks the full 11-instrument catalog."'],
   },
   {
     term: 'Executive',
@@ -228,6 +228,16 @@ export const TERMINOLOGY: TerminologyEntry[] = [
     commonErrors: ['credit pack', 'token pack', 'top-up', 'refill'],
     examples: ['"Purchase a 5-mile pack for $199."'],
   },
+  {
+    term: 'diagnostic',
+    category: 'product_name',
+    role: 'noun (default user-facing term for the 11 instruments)',
+    visibility: 'user_facing',
+    usageContext: 'CANONICAL user-facing term for the 11 instruments (SPARK, PRISM, IMPACT, BRIDGE, DRIVE, MOSAIC, FORGE, LEAP, QUEST, COACH, CPI). Default to "diagnostic" in all user-facing copy: "run a diagnostic", "your diagnostic results", "diagnostic catalog". Use "diagnostic assessment" only when disambiguation is needed. "Assessment" is acceptable in TECHNICAL/INTERNAL contexts only (e.g. "assessment engine", "assessment completion", "assessment service") and should be avoided in user-facing copy. NEVER "test", "quiz", "survey", "questionnaire", "exam".',
+    canonicalSource: 'src/config/voiceStandard.ts → APPROVED_DIAGNOSTICS + Batch 6 P0-5',
+    commonErrors: ['test', 'quiz', 'survey', 'questionnaire', 'exam', 'assessment (in user-facing copy — use "diagnostic" instead)'],
+    examples: ['"Run the LEAP diagnostic to find your competitive edge."', '"Your diagnostic results are ready."'],
+  },
 
   // ── Progress tracking ─────────────────────────────────────────────
   {
@@ -247,7 +257,7 @@ export const TERMINOLOGY: TerminologyEntry[] = [
   {
     term: 'SPARK',
     category: 'diagnostic',
-    role: 'instrument code (Light, 1 mile)',
+    role: 'instrument code (Signature, 3 miles)',
     visibility: 'user_facing',
     usageContext: 'AI leadership readiness. First mention: "SPARK — AI leadership readiness". Subsequent: "SPARK". Always ALL CAPS.',
     canonicalSource: 'src/config/voiceStandard.ts → APPROVED_DIAGNOSTICS',
@@ -267,7 +277,7 @@ export const TERMINOLOGY: TerminologyEntry[] = [
   {
     term: 'MOSAIC',
     category: 'diagnostic',
-    role: 'instrument code (Standard, 2 miles)',
+    role: 'instrument code (Signature, 3 miles)',
     visibility: 'user_facing',
     usageContext: 'Institutional trust & relationship velocity. First mention: "MOSAIC — institutional trust and relationship velocity".',
     canonicalSource: 'src/config/voiceStandard.ts → APPROVED_DIAGNOSTICS',
@@ -277,7 +287,7 @@ export const TERMINOLOGY: TerminologyEntry[] = [
   {
     term: 'BRIDGE',
     category: 'diagnostic',
-    role: 'instrument code (Standard, 2 miles)',
+    role: 'instrument code (Signature, 3 miles)',
     visibility: 'user_facing',
     usageContext: 'Cross-cultural relational intelligence. First mention: "BRIDGE — cross-cultural relational intelligence".',
     canonicalSource: 'src/config/voiceStandard.ts → APPROVED_DIAGNOSTICS',
@@ -317,7 +327,7 @@ export const TERMINOLOGY: TerminologyEntry[] = [
   {
     term: 'LEAP',
     category: 'diagnostic',
-    role: 'instrument code (Signature, 3 miles)',
+    role: 'instrument code (Light, 1 mile)',
     visibility: 'user_facing',
     usageContext: 'Competitive positioning. First mention: "LEAP — competitive positioning". Complimentary for Explorer onboarding.',
     canonicalSource: 'src/config/voiceStandard.ts → APPROVED_DIAGNOSTICS',
@@ -327,7 +337,7 @@ export const TERMINOLOGY: TerminologyEntry[] = [
   {
     term: 'QUEST',
     category: 'diagnostic',
-    role: 'instrument code (Signature, 3 miles)',
+    role: 'instrument code (Standard, 2 miles)',
     visibility: 'user_facing',
     usageContext: 'Strategic market positioning. First mention: "QUEST — strategic market positioning".',
     canonicalSource: 'src/config/voiceStandard.ts → APPROVED_DIAGNOSTICS',
@@ -337,11 +347,11 @@ export const TERMINOLOGY: TerminologyEntry[] = [
   {
     term: 'COACH',
     category: 'diagnostic',
-    role: 'instrument code (0 miles — coaching fit, not an assessment)',
+    role: 'instrument code (Standard, 2 miles — coaching fit diagnostic)',
     visibility: 'user_facing',
-    usageContext: 'Executive coaching fit. 0 miles (not a paid assessment). First mention: "COACH — executive coaching fit".',
+    usageContext: 'Executive coaching fit. 2 miles (Standard). First mention: "COACH — executive coaching fit".',
     canonicalSource: 'src/config/voiceStandard.ts → APPROVED_DIAGNOSTICS',
-    commonErrors: ['Coach', 'coach', 'COACH assessment (it is a fit-checker, not an assessment)'],
+    commonErrors: ['Coach', 'coach', 'COACH assessment (it is a fit-checker, not a paid assessment)'],
     examples: ['"COACH calibrates your executive coaching fit."'],
   },
   {
@@ -351,7 +361,7 @@ export const TERMINOLOGY: TerminologyEntry[] = [
     visibility: 'user_facing',
     usageContext: 'China Leadership Pipeline Index. Flagship — Council tier only. First mention: "CPI — China Leadership Pipeline Index".',
     canonicalSource: 'src/config/voiceStandard.ts → APPROVED_DIAGNOSTICS',
-    commonErrors: ['Cpi', 'cpi', 'CPI Index (redundant)'],
+    commonErrors: ['Cpi', 'cpi', 'CPI Index (redundant)', 'Council Performance Insight (wrong — correct is China Leadership Pipeline Index)'],
     examples: ['"CPI measures leadership pipeline health."'],
   },
 
@@ -497,9 +507,9 @@ export const TERMINOLOGY: TerminologyEntry[] = [
     category: 'internal',
     role: 'internal project codename',
     visibility: 'internal_only',
-    usageContext: 'TRIDENT, MERIDIAN, CANVAS, SHIFT, AKIRA. NEVER user-facing. Detected by voiceStandard.ts BANNED_WORDS (codename category).',
+    usageContext: 'TRIDENT, MERIDIAN, CANVAS, SHIFT, AKIRA. NEVER user-facing. Detected by voiceStandard.ts BANNED_WORDS (codename category). NOTE: codenames may appear in internal metadata fields (e.g. JSON `"category": "SHIFT"`) — this is internal-only and acceptable as long as it never surfaces to users. The 11 user-facing diagnostic codes are: LEAP, PRISM, IMPACT, COACH, DRIVE, QUEST, BRIDGE, MOSAIC, SPARK, FORGE, CPI.',
     canonicalSource: 'src/config/voiceStandard.ts → BANNED_WORDS[codename]',
-    commonErrors: ['TRIDENT (user-facing)', 'MERIDIAN (user-facing)', 'CANVAS (user-facing)', 'SHIFT (user-facing)'],
+    commonErrors: ['TRIDENT in user-facing copy', 'MERIDIAN in user-facing copy', 'CANVAS in user-facing copy', 'SHIFT in user-facing copy', 'Using SHIFT as a diagnostic name (correct user-facing term is LEAP/QUEST/IMPACT/DRIVE/COACH)'],
     examples: ['[internal only]'],
   },
   {
