@@ -859,7 +859,7 @@ export function Landing() {
               lineHeight: 1.6,
             }}
           >
-            The flagship CPI for general executives, plus three targeted diagnostics for career transitions, AI readiness, and board governance.
+            The flagship China Leadership Pipeline Index for China-based executives, plus three targeted diagnostics for career transitions, AI readiness, and board governance.
           </p>
         </div>
 
@@ -906,7 +906,7 @@ export function Landing() {
                   letterSpacing: '-0.01em',
                 }}
               >
-                Leadership Composite Index
+                China Leadership Pipeline Index
               </CardTitle>
             </CardHeader>
             <CardContent style={{ padding: '0 24px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
@@ -919,7 +919,7 @@ export function Landing() {
                   margin: '0 0 24px',
                 }}
               >
-                General executive positioning across 5 validated leadership dimensions.
+                Benchmark your leadership pipeline against China's executive talent pool across 5 validated dimensions.
               </CardDescription>
               <div style={{ marginTop: 'auto' }}>
                 <a
