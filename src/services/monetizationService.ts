@@ -101,7 +101,7 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
     benefits: [
       'Executive Introduction access to NEXUS chat',
       'Framework exploration and sample outputs',
-      'Assessment previews (no personalised reports)',
+      'Diagnostic previews (no personalised reports)',
       'Community forum',
     ],
   },
@@ -113,9 +113,9 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
     monthlyMiles: 50,
     earnsMiles: true,
     benefits: [
-      '50 mi monthly allowance',
-      'All 11 assessments unlocked',
-      'Personalised assessment reports',
+      '50 mi monthly diagnostic allowance',
+      'All 11 diagnostics unlocked',
+      'Personalised diagnostic reports',
       'NEXUS miles earning (exploration +5, reflection +3)',
       'PDF report export',
     ],
@@ -176,83 +176,120 @@ export const CANONICAL_TIER_ORDER: TierKey[] = [
 export const RECOMMENDED_TIER: TierKey = 'pro';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ASSESSMENT PRICING — 3 tiers (Standard / Premium / Unique)
-// Miles cost mirrors USD pricing (~1 mile = $1).
+// DIAGNOSTIC PRICING — 3 service levels (Executive Introduction / Professional Deep-Dive / Executive Advisory)
+// Diagnostic mile costs locked to 1/2/3/5 canon (per-instrument, not tied to USD).
+// Assessment* names retained below as deprecated re-exports for backwards compatibility.
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** Kept as a stable alias — service levels still enumerate the same 3 tiers. */
 export type AssessmentPriceTier = 'standard' | 'premium' | 'unique';
 
-export interface CanonicalAssessmentPricing {
+export interface CanonicalDiagnosticPricing {
   tier: AssessmentPriceTier;
   label: string;
-  /** USD price (also = miles cost, since 1 mi ≈ $1). */
+  /** User-facing diagnostic cohort label (replaces internal assessment_label). */
+  diagnostic_label: string;
+  /** USD price for the debrief / service level (kept at locked service levels). */
   usd: number;
-  /** CNY price (1/3 of USD, rounded to nearest whole). */
+  /** CNY price for the debrief / service level (1/3 of USD, rounded). */
   cny: number;
-  /** Miles cost (same as USD). */
+  /** Diagnostic mile cohort (1/2/3/5 canon range, NOT equal to USD). */
   miles: number;
-  /** Instruments in this price tier. */
+  /** Instruments in this diagnostic cohort (maps to 1/2/3/5 mile costs individually). */
   instruments: string[];
 }
 
 /**
- * CANONICAL_ASSESSMENT_PRICING — the 3-tier assessment pricing table.
- * Source: Phase 15.5 spec / NEXUS_Pricing_Canonical_v1.0.
+ * CANONICAL_DIAGNOSTIC_PRICING — 3-tier diagnostic service level table.
+ * Service-level USD pricing locked: Executive Introduction $99, Professional Deep-Dive $149, Executive Advisory $249.
+ * Per-instrument mile costs live in DIAGNOSTIC_MILES_COSTS (canon 1/2/3/5 — see constants/miles.ts).
  */
-export const CANONICAL_ASSESSMENT_PRICING: Record<
+export const CANONICAL_DIAGNOSTIC_PRICING: Record<
   AssessmentPriceTier,
-  CanonicalAssessmentPricing
+  CanonicalDiagnosticPricing
 > = {
   standard: {
     tier: 'standard',
-    label: 'Standard',
+    label: 'Executive Introduction',
+    diagnostic_label: '1mi – 2mi Career Core cohort',
     usd: 99,
     cny: 33,
-    miles: 99,
-    instruments: ['LEAP', 'DRIVE', 'PRISM', 'MOSAIC', 'FORGE'],
+    miles: 2,
+    instruments: ['LEAP', 'IMPACT', 'COACH', 'DRIVE', 'QUEST'],
   },
   premium: {
     tier: 'premium',
-    label: 'Premium',
+    label: 'Professional Deep-Dive',
+    diagnostic_label: '2mi – 3mi Standard / Advisory cohort',
     usd: 149,
     cny: 50,
-    miles: 149,
-    instruments: ['QUEST', 'COACH', 'IMPACT', 'BRIDGE', 'SPARK'],
+    miles: 3,
+    instruments: ['PRISM', 'BRIDGE', 'MOSAIC', 'SPARK', 'FORGE'],
   },
   unique: {
     tier: 'unique',
-    label: 'Unique',
-    usd: 199,
+    label: 'Executive Advisory',
+    diagnostic_label: '5mi Flagship / Signature cohort',
+    usd: 249,
     cny: 66,
-    miles: 199,
+    miles: 5,
     instruments: ['CPI'],
   },
 };
 
-export const CANONICAL_ASSESSMENT_ORDER: AssessmentPriceTier[] = [
+export const CANONICAL_DIAGNOSTIC_ORDER: AssessmentPriceTier[] = [
   'standard', 'premium', 'unique',
 ];
 
 /**
- * Map instrument code → its canonical assessment price tier.
- * Built from CANONICAL_ASSESSMENT_PRICING so there is one source of truth.
+ * DIAGNOSTIC_MILES_COSTS — per-instrument mile costs.
+ * LOCKED CANON 1/2/3/5 (Kevin, Batch 6 audit). Overwrites old 99/149/199 values.
+ * Authoritative source: src/constants/miles.ts INSTRUMENT_MILE_COST.
+ */
+export const DIAGNOSTIC_MILES_COSTS: Record<string, number> = {
+  LEAP: 1,
+  PRISM: 2,
+  IMPACT: 2,
+  COACH: 2,
+  BRIDGE: 3,
+  MOSAIC: 3,
+  SPARK: 3,
+  DRIVE: 2,
+  FORGE: 3,
+  QUEST: 2,
+  CPI: 5,
+};
+
+/**
+ * Map instrument code → its canonical diagnostic price tier.
+ * Built from CANONICAL_DIAGNOSTIC_PRICING so there is one source of truth.
  */
 export const INSTRUMENT_PRICE_TIER: Record<string, AssessmentPriceTier> =
   Object.fromEntries(
-    Object.values(CANONICAL_ASSESSMENT_PRICING).flatMap((p) =>
+    Object.values(CANONICAL_DIAGNOSTIC_PRICING).flatMap((p) =>
       p.instruments.map((code) => [code, p.tier] as const),
     ),
   );
 
-/**
- * ASSESSMENT_MILES_COSTS — per-instrument miles cost.
- * Derived from CANONICAL_ASSESSMENT_PRICING (99 / 149 / 199).
- */
-export const ASSESSMENT_MILES_COSTS: Record<string, number> = Object.fromEntries(
-  Object.values(CANONICAL_ASSESSMENT_PRICING).flatMap((p) =>
-    p.instruments.map((code) => [code, p.miles] as const),
-  ),
-);
+// ─────────────────────────────────────────────────────────────────────────────
+// DEPRECATED RE-EXPORTS — assessment-era names retained for backwards compat.
+// Prefer the CanonicalDiagnosticPricing / DIAGNOSTIC_* variants above.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** @deprecated Use CanonicalDiagnosticPricing instead. */
+export type CanonicalAssessmentPricing = CanonicalDiagnosticPricing;
+
+/** @deprecated Use CANONICAL_DIAGNOSTIC_PRICING instead. */
+export const CANONICAL_ASSESSMENT_PRICING: Record<
+  AssessmentPriceTier,
+  CanonicalAssessmentPricing
+> = CANONICAL_DIAGNOSTIC_PRICING;
+
+/** @deprecated Use CANONICAL_DIAGNOSTIC_ORDER instead. */
+export const CANONICAL_ASSESSMENT_ORDER: AssessmentPriceTier[] = CANONICAL_DIAGNOSTIC_ORDER;
+
+/** @deprecated Use DIAGNOSTIC_MILES_COSTS instead. */
+export const ASSESSMENT_MILES_COSTS: Record<string, number> = DIAGNOSTIC_MILES_COSTS;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CURRENCY DETECTION & FORMATTING (Phase 15.5, ticket #1303 — China pricing)
@@ -343,14 +380,26 @@ export function formatTierPrice(
 }
 
 /**
- * Format an assessment price for display.
- * Standard / Premium / Unique tiers, USD or CNY.
+ * Format a diagnostic service-level price for display.
+ * Executive Introduction / Professional Deep-Dive / Executive Advisory tiers, USD or CNY.
+ * @deprecated Prefer formatDiagnosticPrice (same signature, updated naming).
  */
 export function formatAssessmentPrice(
   priceTier: AssessmentPriceTier,
   currency: PricingCurrency = 'USD',
 ): { primary: string; miles: number } {
-  const p = CANONICAL_ASSESSMENT_PRICING[priceTier];
+  return formatDiagnosticPrice(priceTier, currency);
+}
+
+/**
+ * Format a diagnostic service-level price for display.
+ * Executive Introduction / Professional Deep-Dive / Executive Advisory tiers, USD or CNY.
+ */
+export function formatDiagnosticPrice(
+  priceTier: AssessmentPriceTier,
+  currency: PricingCurrency = 'USD',
+): { primary: string; miles: number } {
+  const p = CANONICAL_DIAGNOSTIC_PRICING[priceTier];
   if (!p) return { primary: '—', miles: 0 };
   const primary = currency === 'CNY' ? `¥${p.cny}` : `$${p.usd}`;
   return { primary, miles: p.miles };
@@ -358,10 +407,10 @@ export function formatAssessmentPrice(
 
 /**
  * Convenience: get the miles cost for a specific instrument code.
- * Falls back to 99 (Standard tier) if the code is not in the catalog.
+ * Locks to the 1/2/3/5 diagnostic canon. Falls back to 2 (Standard) if unknown.
  */
 export function getInstrumentMilesCost(instrumentCode: string): number {
-  return ASSESSMENT_MILES_COSTS[instrumentCode] ?? 99;
+  return DIAGNOSTIC_MILES_COSTS[instrumentCode] ?? 2;
 }
 
 export async function fetchTiers(): Promise<Tier[]> {

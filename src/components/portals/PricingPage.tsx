@@ -130,7 +130,8 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
             Unlock Your Leadership Potential
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: '#666' }}>
-            From Executive Introduction to Enterprise, pick the tier that matches your ambitions.
+            From Executive Introduction to Council, pick the tier that matches your ambitions.
+            Executive Intelligence — diagnostics, debriefs, and NEXUS miles.
           </p>
 
           {/* Cycle toggle */}
@@ -350,7 +351,7 @@ export function PricingPage({ initialCycle = 'monthly', className }: PricingPage
               {[
                 { feature: 'Monthly miles', values: ['—', '50 mi', '150 mi', '300 mi', '600 mi'] },
                 { feature: 'NEXUS chat', values: ['Executive Introduction', 'Standard', 'Priority', 'Priority', 'Unlimited'] },
-                { feature: 'All 11 assessments', values: ['Preview only', '✓', '✓', '✓', '✓'] },
+                { feature: 'All 11 diagnostics', values: ['Preview only', '✓', '✓', '✓', '✓'] },
                 { feature: 'Personalised reports', values: ['—', '✓', '✓', '✓', '✓'] },
                 { feature: 'Peer benchmarking', values: ['—', '—', '✓', '✓', '✓'] },
                 { feature: 'Deliverable workspace', values: ['—', '—', '✓', '✓', '✓'] },

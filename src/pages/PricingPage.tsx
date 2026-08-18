@@ -15,6 +15,10 @@ import {
   type PricingCurrency,
   type TierKey,
 } from '@/services/monetizationService';
+
+const DIAGNOSTIC_PRICING_ORDER = CANONICAL_ASSESSMENT_ORDER;
+const DIAGNOSTIC_PRICING = CANONICAL_ASSESSMENT_PRICING;
+const formatDiagnosticPrice = formatAssessmentPrice;
 import { trackUpgradeAttempt, trackCTA, trackBillingView } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
 
@@ -109,7 +113,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
         </h1>
         <p className="text-text-muted text-lg max-w-2xl mx-auto">
           Five tiers, calibrated to where you are in your executive journey.
-          Currency is <span className="font-medium">miles</span> — earn monthly, spend on assessments.
+          Currency is <span className="font-medium">miles</span> — earn monthly, spend on diagnostics.
         </p>
 
         {/* Currency Toggle */}
@@ -274,19 +278,19 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
         </div>
       </div>
 
-      {/* Assessment Pricing Section */}
+      {/* Diagnostic Pricing Section */}
       <div className="max-w-6xl mx-auto px-4 pb-16">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-text-primary mb-2">Assessment Pricing</h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-2">Diagnostic Pricing</h2>
           <p className="text-text-muted">
-            Three price tiers across the 11-instrument catalog. Pay once per assessment — miles or fiat.
+            Three price tiers across the 11-instrument catalog. Pay once per diagnostic — miles or fiat.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {CANONICAL_ASSESSMENT_ORDER.map((priceTier) => {
-            const p = CANONICAL_ASSESSMENT_PRICING[priceTier];
-            const display = formatAssessmentPrice(priceTier, currency);
+          {DIAGNOSTIC_PRICING_ORDER.map((priceTier) => {
+            const p = DIAGNOSTIC_PRICING[priceTier];
+            const display = formatDiagnosticPrice(priceTier, currency);
             const isUnique = priceTier === 'unique';
 
             return (
@@ -367,7 +371,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                   values: ['Executive Introduction', 'Standard', 'Priority', 'Priority', 'Unlimited'],
                 },
                 {
-                  feature: 'All 11 assessments',
+                  feature: 'All 11 diagnostics',
                   values: ['Preview only', '✓', '✓', '✓', '✓'],
                 },
                 {
@@ -442,12 +446,12 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
             {
               question: 'How do miles work?',
               answer:
-                'Miles are the LYC Intelligence currency. Starter, Pro, Executive, and Council tiers receive a monthly miles allowance on their billing anniversary. You spend miles to run assessments from the 11-instrument catalog. Executive Introduction (Explorer) accounts do not receive a monthly allowance but can still explore the NEXUS chat and assessment previews.',
+                'Miles are the LYC Intelligence currency. Starter, Pro, Executive, and Council tiers receive a monthly miles allowance on their billing anniversary. You spend miles to run diagnostics from the 11-instrument catalog. Executive Introduction (Explorer) accounts do not receive a monthly allowance but can still explore the NEXUS chat and diagnostic previews.',
             },
             {
               question: 'Can I earn additional miles?',
               answer:
-                'Yes — subscribers at Starter tier and above earn miles by completing NEXUS framework exploration sessions (+5 mi), guided reflections (+3 mi), and receive a one-time completion refund (+10 mi) per assessment instrument.',
+                'Yes — subscribers at Starter tier and above earn miles by completing NEXUS framework exploration sessions (+5 mi), guided reflections (+3 mi), and receive a one-time completion refund (+10 mi) per diagnostic instrument.',
             },
             {
               question: 'Can I upgrade or downgrade my plan?',
@@ -483,7 +487,7 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
         <div className="bg-accent p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Ready to Elevate Your Leadership?</h2>
           <p className="mb-6 opacity-90">
-            Join {CANONICAL_TIER_PRICING[RECOMMENDED_TIER].label} today and unlock the full NEXUS miles economy.
+            Join {CANONICAL_TIER_PRICING[RECOMMENDED_TIER].label} today and unlock Executive Intelligence with the full NEXUS miles economy.
           </p>
           <button
             onClick={() => handleUpgrade(RECOMMENDED_TIER)}
