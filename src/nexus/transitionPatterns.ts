@@ -13,10 +13,10 @@ import {
   getDiagnosticDescriptor,
   ENTITY_NAME,
   PROGRESS_TERM,
-} from '@/config/voiceStandard';
-import { getInstrumentMileCost, EXPLORER_FREE_ASSESSMENTS } from '@/config/miles';
-import { normalizeTier, tierMeets, type TierKey } from '@/config/tiers';
-import { CPI_REQUIRED_TIER } from '@/config/miles';
+} from '../config/voiceStandard';
+import { getInstrumentMileCost, EXPLORER_FREE_ASSESSMENTS } from '../config/miles';
+import { normalizeTier, tierMeets, type TierKey } from '../config/tiers';
+import { CPI_REQUIRED_TIER } from '../config/miles';
 
 // ═══════════════════════════════════════════════════════════════════════
 // Conversational depth model
