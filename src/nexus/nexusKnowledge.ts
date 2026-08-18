@@ -596,10 +596,10 @@ What are you navigating right now?`;
 export const NEXUS_FIRST_RESPONSE = `Welcome{NAME}. I'm NEXUS, your executive intelligence partner — built on two decades of LYC executive search methodology.
 
 I can help you with:
-- Take a leadership assessment and establish your baseline
-- Discuss your assessment results in depth
-- Work through specific leadership challenges
-- Explore all 6 assessments
+- Navigate a career transition or cross-border move
+- Benchmark your leadership against APAC executives
+- Build a narrative for board, investors, or stakeholders
+- Take a complimentary leadership assessment
 
 Where would you like to start?`;
 
@@ -608,10 +608,10 @@ Where would you like to start?`;
  * Specific, framework-aware options — not open-ended.
  */
 export const NEXUS_FIRST_RESPONSE_QUICK_REPLIES: string[] = [
-  'Take an assessment',
-  'Explore all assessments',
-  'Help with a leadership challenge',
-  'What can you do?',
+  'Navigate a career transition',
+  'Benchmark my leadership',
+  'Help with a specific challenge',
+  'Take a complimentary assessment',
 ];
 
 /**
