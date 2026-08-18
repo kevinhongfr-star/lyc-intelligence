@@ -681,7 +681,9 @@ const DEEPSEEK_PROXY_KEY =
   process.env.VITE_DEEPSEEK_PROXY_KEY ||
   'nexus-deepseek-proxy-2026';
 const DEEPSEEK_BASE_URL =
-  process.env.DEEPSEEK_BASE_URL || 'https://deepseek-v4-proxy.vercel.app/api/deepseek';
+  process.env.DEEPSEEK_BASE_URL ||
+  process.env.VITE_DEEPSEEK_BASE_URL ||
+  'https://deepseek-v4-proxy.vercel.app/api/deepseek';
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
 const CHAT_GUEST_LIMIT = 3;
 
@@ -790,18 +792,31 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     messages.push({ role: 'user', content: message });
 
     // Call DeepSeek API
-    // Build endpoint URL — handle base URLs with or without /v1 or /chat/completions suffix
-    const base = DEEPSEEK_BASE_URL.replace(/\/+$/, '');
+    // Determine which endpoint to use
+    // If proxy key is available, use the proxy (direct DeepSeek key is often depleted)
+    const useProxy =
+      process.env.CHAT_USE_PROXY === '1' ||
+      process.env.CHAT_USE_PROXY === 'true' ||
+      !!DEEPSEEK_PROXY_KEY ||
+      DEEPSEEK_BASE_URL.includes('proxy');
+
+    const PROXY_URL = 'https://deepseek-v4-proxy.vercel.app/api/deepseek/chat/completions';
+
     let endpoint: string;
-    if (base.endsWith('/chat/completions')) {
-      endpoint = base;
-    } else if (base.endsWith('/v1') || base.endsWith('/v1/')) {
-      endpoint = `${base}/chat/completions`;
-    } else if (base.includes('/deepseek')) {
-      // Proxy-style URL (e.g. https://proxy.example.com/api/deepseek)
-      endpoint = `${base}/chat/completions`;
+    if (useProxy && DEEPSEEK_PROXY_KEY) {
+      endpoint = PROXY_URL;
     } else {
-      endpoint = `${base}/v1/chat/completions`;
+      // Build from DEEPSEEK_BASE_URL
+      const base = DEEPSEEK_BASE_URL.replace(/\/+$/, '');
+      if (base.endsWith('/chat/completions')) {
+        endpoint = base;
+      } else if (base.endsWith('/v1') || base.endsWith('/v1/')) {
+        endpoint = `${base}/chat/completions`;
+      } else if (base.includes('/deepseek')) {
+        endpoint = `${base}/chat/completions`;
+      } else {
+        endpoint = `${base}/v1/chat/completions`;
+      }
     }
 
     const apiResponse = await fetch(endpoint, {
