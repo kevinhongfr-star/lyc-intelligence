@@ -25,6 +25,35 @@ export function SkipToContent({
     <a
       href={`#${targetId}`}
       onClick={handleClick}
+      style={{
+        position: 'absolute',
+        left: '-9999px',
+        top: 'auto',
+        width: '1px',
+        height: '1px',
+        overflow: 'hidden',
+      }}
+      onFocus={(e) => {
+        const el = e.currentTarget;
+        el.style.position = 'fixed';
+        el.style.left = '50%';
+        el.style.top = '8px';
+        el.style.width = 'auto';
+        el.style.height = 'auto';
+        el.style.overflow = 'visible';
+        el.style.transform = 'translateX(-50%)';
+        el.style.zIndex = '10000';
+      }}
+      onBlur={(e) => {
+        const el = e.currentTarget;
+        el.style.position = 'absolute';
+        el.style.left = '-9999px';
+        el.style.top = 'auto';
+        el.style.width = '1px';
+        el.style.height = '1px';
+        el.style.overflow = 'hidden';
+        el.style.transform = 'none';
+      }}
       className={cn(
         'echo-skip-link',
         'sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-1/2',
