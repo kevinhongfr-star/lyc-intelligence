@@ -851,7 +851,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
           error: 'Chat service unavailable',
           upstream_status: apiResponse.status,
           upstream_error: errorText.slice(0, 200),
-          base_url: DEEPSEEK_BASE_URL,
+          endpoint,
         });
     }
 
