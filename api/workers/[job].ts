@@ -679,11 +679,11 @@ const DEEPSEEK_API_KEY =
 const DEEPSEEK_PROXY_KEY =
   process.env.DEEPSEEK_PROXY_KEY ||
   process.env.VITE_DEEPSEEK_PROXY_KEY ||
-  'nexus-deepseek-proxy-2026';
+  '';
 const DEEPSEEK_BASE_URL =
   process.env.DEEPSEEK_BASE_URL ||
   process.env.VITE_DEEPSEEK_BASE_URL ||
-  'https://deepseek-v4-proxy.vercel.app/api/deepseek';
+  'https://api.deepseek.com/v1';
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
 const CHAT_GUEST_LIMIT = 3;
 
@@ -797,8 +797,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     const useProxy =
       process.env.CHAT_USE_PROXY === '1' ||
       process.env.CHAT_USE_PROXY === 'true' ||
-      !!DEEPSEEK_PROXY_KEY ||
-      DEEPSEEK_BASE_URL.includes('proxy');
+      (!!DEEPSEEK_PROXY_KEY && DEEPSEEK_BASE_URL.includes('proxy'));
 
     const PROXY_URL = 'https://deepseek-v4-proxy.vercel.app/api/deepseek/chat/completions';
 
