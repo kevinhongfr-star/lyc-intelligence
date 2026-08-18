@@ -1,20 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import { initScrollReveal } from '@/lib/utils';
-import { ArrowRight, Users, Target, Gauge, Building2, ClipboardList, MessageSquarePlus } from 'lucide-react';
+import { ArrowRight, Menu, X, Lock, Users, Target, Gauge, Building2, ClipboardList, MessageSquarePlus } from 'lucide-react';
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 import { SEO } from '@/components/seo/SEO';
-import { EnterpriseContactForm } from '@/components/billing/EnterpriseContactForm';
-import { DS } from '@/tokens';
+
+const DS = {
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
+  monoFont: "'IBM Plex Mono', ui-monospace, monospace",
+  accent: '#C108AB',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  bgAlt: '#F7F6F3',
+  card: '#FFFFFF',
+  cardBorder: '#E9E7E1',
+  text: '#0A0A12',
+  textSecondary: '#2B2B3A',
+  muted: '#616170',
+  border: '#E9E7E1',
+  radius: '0px',
+  shadow: '0 1px 2px rgba(10,10,18,0.06), 0 1px 1px rgba(10,10,18,0.04)',
+  shadowHover: '0 12px 30px rgba(10,10,18,0.08)',
+};
 
 const B2B_HERO_POSTER = 'https://www.lyc-partners.ai/images/heroes/hero-b2b-boardroom.webp';
+
+const NAV_LINKS = [
+  { href: '/match', label: 'Match Analysis' },
+  { href: '/assessment', label: 'Assessments' },
+  { href: '/pricing', label: 'Pricing' },
+  { href: '/', label: 'For Leaders' },
+];
 
 const B2B_FEATURES = [
   {
     icon: Users,
     eyebrow: 'NEXUS FOR TEAMS',
     title: 'An intelligent front door for every recruiter',
-    desc: 'Every seat on your talent team uses NEXUS — assessment-literate, confidential, tuned to your firm\'s search methodology. Conversations surface shortlist candidates, surface mandate risks, and draft outreach — all in one thinking partner.',
+    desc: 'Every seat on your talent team uses NEXUS — framework-aware, confidential, tuned to your firm\'s search methodology. Conversations surface shortlist candidates, surface mandate risks, and draft outreach — all in one thinking partner.',
   },
   {
     icon: Target,
@@ -36,57 +60,79 @@ const MATCH_DIMENSIONS = [
   { code: 'D3', name: 'Organizational Fit', desc: 'Cultural alignment, stakeholder mapping, transformation readiness, board dynamics.' },
 ];
 
+function Nav({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen: (v: boolean) => void }) {
+  return (
+    <>
+      <nav
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 40,
+          background: 'rgba(255,255,255,0.92)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '14px 32px',
+          borderBottom: `1px solid ${DS.border}`,
+        }}
+      >
+        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none', letterSpacing: '-0.01em' }}>LYC Intelligence</a>
+        <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {NAV_LINKS.map(l => (
+            <a
+              key={l.href}
+              href={l.href}
+              style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', padding: '10px 14px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', fontWeight: 500 }}
+            >{l.label}</a>
+          ))}
+          <a
+            href="/nexus/chat"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 18px', marginLeft: '8px', color: DS.text, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
+          >
+            Try NEXUS <ArrowRight style={{ width: 12, height: 12 }} />
+          </a>
+          <a
+            href="/login"
+            className="cta-glow"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
+          >
+            <Lock style={{ width: 14, height: 14 }} /> Platform
+          </a>
+        </div>
+        <button className="nav-toggle" onClick={() => setMobileOpen(true)} aria-label="Open menu"><Menu style={{ color: DS.text }} /></button>
+      </nav>
+      <div className={`nav-mobile-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
+      <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`} style={{ background: DS.bg }}>
+        <button className="nav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu"><X style={{ width: 24, height: 24, color: DS.text }} /></button>
+        {NAV_LINKS.map(l => (
+          <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)} style={{ color: DS.textSecondary, borderBottom: `1px solid ${DS.border}` }}>{l.label}</a>
+        ))}
+        <a href="/nexus/chat" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, borderBottom: `1px solid ${DS.border}` }}>Try NEXUS →</a>
+        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.text, borderBottom: `1px solid ${DS.border}` }}>Platform</a>
+      </div>
+    </>
+  );
+}
+
 export function B2BLanding() {
-  // #1326: Enterprise contact form modal — human handoff, NOT NEXUS bot.
-  // Mirrors the pricing page pattern so B2B "Talk to sales" routes to the
-  // same human channel everywhere, not into NEXUS.
-  const [enterpriseOpen, setEnterpriseOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const observer = initScrollReveal();
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
-      {/* Phase 9 Batch 6 ticket #1357 — B2B pages can be reached directly; provide B2C return path */}
-      <div
-        style={{
-          background: DS.bgDark,
-          padding: '10px 32px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 12,
-          flexWrap: 'wrap',
-          fontSize: 13,
-          fontFamily: DS.bodyFont,
-        }}
-      >
-        <span style={{ color: DS.bg }}>
-          <span style={{ fontFamily: DS.monoFont, textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: 8, color: DS.accent }}>B2B · Client Portal</span>
-          This page is for search-firm &amp; talent clients. Individual leaders — visit the main B2C experience.
-        </span>
-        <a
-          href="/"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '6px 14px',
-            border: `1px solid ${DS.accent}`,
-            color: DS.accent,
-            textDecoration: 'none',
-            fontWeight: 600,
-            fontSize: 12,
-            minHeight: 28,
-          }}
-        >
-          Go to B2C site <ArrowRight size={12} />
-        </a>
-      </div>
-
       <SEO page="b2b" />
+      <Nav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
       {/* HERO — NEXUS for Teams */}
       <section
@@ -117,7 +163,7 @@ export function B2BLanding() {
             position: 'absolute',
             inset: 0,
             background:
-              '#0A0A12',
+              'linear-gradient(180deg, rgba(6,5,12,0.86) 0%, rgba(8,5,12,0.72) 35%, rgba(14,8,20,0.72) 60%, rgba(6,5,12,0.95) 100%)',
           }}
         />
         <div
@@ -129,7 +175,7 @@ export function B2BLanding() {
             transform: 'translateX(-50%)',
             width: '720px',
             height: '440px',
-            background: 'radial-gradient(circle, rgba(193,8,171,0.06) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(193,8,171,0.14) 0%, transparent 65%)',
             pointerEvents: 'none',
           }}
         />
@@ -161,7 +207,7 @@ export function B2BLanding() {
               fontFamily: DS.headingFont,
               fontSize: 'clamp(34px, 5.6vw, 56px)',
               fontWeight: 700,
-              color: DS.bg,
+              color: '#FFFFFF',
               margin: '0 auto 16px',
               lineHeight: 1.08,
               letterSpacing: '-0.015em',
@@ -186,15 +232,15 @@ export function B2BLanding() {
             <a
               href="/match"
               className="cta-glow"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 36px', background: DS.accent, color: DS.bg, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 36px', background: '#C108AB', color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', borderRadius: DS.radius }}
             >
               Try Match Analysis <ArrowRight style={{ width: 15, height: 15 }} />
             </a>
             <a
-              href="/nexus"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 32px', border: '1px solid rgba(255,255,255,0.28)', color: DS.bg, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', textDecoration: 'none', background: 'rgba(255,255,255,0.04)' }}
+              href="/nexus/chat"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '18px 32px', border: '1px solid rgba(255,255,255,0.28)', color: '#FFFFFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', textDecoration: 'none', borderRadius: DS.radius, background: 'rgba(255,255,255,0.04)' }}
             >
-              Meet NEXUS
+              Launch NEXUS
             </a>
           </div>
           <div
@@ -250,7 +296,7 @@ export function B2BLanding() {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.26em',
-              color: DS.eyebrow,
+              color: DS.accent,
               marginBottom: '12px',
             }}
           >
@@ -279,7 +325,7 @@ export function B2BLanding() {
               style={{
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
- 
+                borderRadius: DS.radius,
                 padding: '28px 24px',
                 boxShadow: DS.shadow,
                 display: 'flex',
@@ -287,7 +333,7 @@ export function B2BLanding() {
                 gap: '12px',
               }}
             >
-              <div style={{ display: 'inline-flex', width: '40px', height: '40px', background: `${DS.accent}12`, color: DS.accent, alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ display: 'inline-flex', width: '40px', height: '40px', background: `${DS.accent}12`, color: DS.accent, alignItems: 'center', justifyContent: 'center', borderRadius: DS.radius }}>
                 <f.icon style={{ width: 18, height: 18 }} />
               </div>
               <div
@@ -295,7 +341,7 @@ export function B2BLanding() {
                   fontFamily: DS.monoFont,
                   fontSize: '10px',
                   letterSpacing: '0.2em',
-                  color: DS.eyebrow,
+                  color: DS.accent,
                   textTransform: 'uppercase',
                   fontWeight: 700,
                 }}
@@ -331,7 +377,7 @@ export function B2BLanding() {
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.26em',
-                color: DS.eyebrow,
+                color: DS.accent,
                 marginBottom: '12px',
               }}
             >
@@ -374,7 +420,7 @@ export function B2BLanding() {
                 style={{
                   background: DS.card,
                   border: `1px solid ${DS.cardBorder}`,
- 
+                  borderRadius: DS.radius,
                   padding: '28px 24px',
                   boxShadow: DS.shadow,
                 }}
@@ -385,14 +431,14 @@ export function B2BLanding() {
                       width: '36px',
                       height: '36px',
                       background: DS.accent,
-                      color: DS.bg,
+                      color: '#FFF',
                       fontFamily: DS.monoFont,
                       fontSize: '12px',
                       fontWeight: 700,
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
- 
+                      borderRadius: DS.radius,
                     }}
                   >
                     {String(i + 1).padStart(2, '0')}
@@ -443,7 +489,7 @@ export function B2BLanding() {
               padding: '20px 24px',
               background: DS.card,
               border: `1px solid ${DS.cardBorder}`,
- 
+              borderRadius: DS.radius,
               display: 'flex',
               alignItems: 'flex-start',
               gap: '14px',
@@ -456,7 +502,7 @@ export function B2BLanding() {
                 height: '40px',
                 background: `${DS.accent}14`,
                 color: DS.accent,
- 
+                borderRadius: DS.radius,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -504,7 +550,7 @@ export function B2BLanding() {
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.26em',
-                color: DS.eyebrow,
+                color: DS.accent,
                 marginBottom: '12px',
               }}
             >
@@ -550,33 +596,20 @@ export function B2BLanding() {
               ))}
             </ul>
             <div style={{ marginTop: '28px' }}>
-              <button
-                type="button"
-                onClick={() => setEnterpriseOpen(true)}
+              <a
+                href="/nexus/chat"
                 className="cta-glow"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '16px 32px', background: DS.accent, color: DS.bg, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '16px 32px', background: '#C108AB', color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', borderRadius: DS.radius }}
               >
                 Talk to sales <ArrowRight style={{ width: 14, height: 14 }} />
-              </button>
-              <p
-                style={{
-                  marginTop: '10px',
-                  fontFamily: DS.monoFont,
-                  fontSize: '10px',
-                  color: DS.muted,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Human follow-up · Not a bot
-              </p>
+              </a>
             </div>
           </div>
           <div
             className="card-hover"
             style={{
-              background: DS.bgDark,
- 
+              background: '#0A0A12',
+              borderRadius: DS.radius,
               padding: '32px',
               border: `1px solid ${DS.accent}22`,
               boxShadow: `0 30px 70px ${DS.accent}16`,
@@ -588,9 +621,9 @@ export function B2BLanding() {
             </div>
             <div
               style={{
-                background: DS.bgDark,
+                background: '#12121E',
                 padding: '16px',
- 
+                borderRadius: DS.radius,
                 marginBottom: '12px',
                 border: `1px solid ${DS.accent}22`,
               }}
@@ -604,7 +637,7 @@ export function B2BLanding() {
               style={{
                 background: `${DS.accent}14`,
                 padding: '16px',
- 
+                borderRadius: DS.radius,
                 border: `1px solid ${DS.accent}22`,
               }}
             >
@@ -626,9 +659,9 @@ export function B2BLanding() {
                 letterSpacing: '0.14em',
               }}
             >
-              <span style={{ padding: '4px 8px', background: DS.bgDark }}>GOV</span>
-              <span style={{ padding: '4px 8px', background: DS.bgDark }}>APAC</span>
-              <span style={{ padding: '4px 8px', background: DS.bgDark }}>VERDICT</span>
+              <span style={{ padding: '4px 8px', background: '#1a1a27', borderRadius: DS.radius }}>GOV</span>
+              <span style={{ padding: '4px 8px', background: '#1a1a27', borderRadius: DS.radius }}>APAC</span>
+              <span style={{ padding: '4px 8px', background: '#1a1a27', borderRadius: DS.radius }}>VERDICT</span>
             </div>
           </div>
         </div>
@@ -650,7 +683,7 @@ export function B2BLanding() {
           style={{
             position: 'absolute',
             inset: 0,
-            background: '#0A0A12',
+            background: 'linear-gradient(135deg, #0a0812 0%, #160c1c 40%, #25122d 70%, #33183f 100%)',
           }}
         />
         <div
@@ -662,7 +695,7 @@ export function B2BLanding() {
             transform: 'translateX(-50%)',
             width: '720px',
             height: '480px',
-            background: 'radial-gradient(circle, rgba(193,8,171,0.06) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(193,8,171,0.18) 0%, transparent 65%)',
             pointerEvents: 'none',
           }}
         />
@@ -685,7 +718,7 @@ export function B2BLanding() {
               fontFamily: DS.headingFont,
               fontSize: 'clamp(28px, 4vw, 40px)',
               fontWeight: 700,
-              color: DS.bg,
+              color: '#FFFFFF',
               margin: '0 0 16px',
               lineHeight: 1.15,
               letterSpacing: '-0.01em',
@@ -715,31 +748,6 @@ export function B2BLanding() {
       </section>
 
       <UnifiedFooter />
-
-      {/* #1326 — Enterprise contact modal (human, not NEXUS bot). Mirrors
-          the pricing page pattern so B2B "Talk to sales" lands in the same
-          human channel everywhere. */}
-      {enterpriseOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Talk to our team"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(10,10,18,0.55)' }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setEnterpriseOpen(false);
-          }}
-        >
-          <div className="w-full max-w-xl max-h-[92vh] overflow-y-auto">
-            <EnterpriseContactForm
-              dismissible
-              onClose={() => setEnterpriseOpen(false)}
-              heading="Talk to our team"
-              subheading={'Tell us about your firm and we\u2019ll design a NEXUS for Teams deployment that fits \u2014 seats, SSO, custom framework training, and a dedicated point of contact. You\u2019ll hear from a human, not a bot.'}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,21 +1,3 @@
-/**
- * services/LENSReportRenderer.ts — LENS T1/T2/T3 candidate & talent-mapping
- * PDF reports (B2B/internal, consultant-facing).
- *
- * #1379 brand compliance: zero border radius on every drawn element (all
- * roundedRect calls converted to plain rect) and the LYC brand mark / accent
- * rules now use the single fuchsia accent #C108AB (rgb 193,8,171) instead of
- * the legacy gold. Functional verdict/score colors (green/amber/red traffic-
- * light semantics) are intentionally retained — they encode match verdict
- * meaning, not brand accent.
- *
- * FONT LIMITATION: this renderer draws text via jsPDF's built-in Helvetica.
- * The ECHO brand fonts (System serif / DM Sans / IBM Plex Mono) cannot be
- * embedded here without bundling the woff2 binaries as jsPDF font payloads.
- * The B2C assessment PDF path (pdfExport.ts → html2canvas(PdfReport.tsx))
- * renders real brand fonts because it rasterises live HTML; this B2B LENS
- * path does not. Leaving as-is per ticket scope (presentation-only fixes).
- */
 import { jsPDF } from 'jspdf';
 import type { LENSReportData, LENSReportCandidate } from '@/services/supabaseApi';
 
@@ -89,7 +71,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     const badgeHeight = 12;
     
     doc.setFillColor(getScoreColor(score));
-    doc.rect(x, y, badgeWidth, badgeHeight, 'F');
+    doc.roundedRect(x, y, badgeWidth, badgeHeight, 2, 2, 'F');
     
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
@@ -103,7 +85,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     const badgeHeight = 10;
     
     doc.setFillColor(getVerdictBg(verdict));
-    doc.rect(x, y, badgeWidth, badgeHeight, 'F');
+    doc.roundedRect(x, y, badgeWidth, badgeHeight, 2, 2, 'F');
     
     doc.setTextColor(getVerdictColor(verdict));
     doc.setFontSize(9);
@@ -117,7 +99,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     const boxHeight = 25;
     
     doc.setFillColor(248, 249, 250);
-    doc.rect(x, y, boxWidth, boxHeight, 'F');
+    doc.roundedRect(x, y, boxWidth, boxHeight, 3, 3, 'F');
     
     doc.setFontSize(9);
     doc.setTextColor(113, 128, 150);
@@ -167,7 +149,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     doc.text(`${reportData.mandate.client || 'Client'} | ${generatedDate}`, PAGE_WIDTH / 2, 180, { align: 'center' });
     
     doc.setFontSize(12);
-    doc.setTextColor(193, 8, 171);
+    doc.setTextColor(138, 111, 58);
     doc.text('LYC Intelligence', PAGE_WIDTH / 2, 220, { align: 'center' });
     
     addFooter(1, totalPages);
@@ -305,7 +287,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
 
       // DISC Profile
       doc.setFillColor(248, 249, 250);
-      doc.rect(MARGIN, y, CONTENT_WIDTH, 20, 'F');
+      doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 20, 3, 3, 'F');
       doc.setFontSize(10);
       doc.setTextColor(74, 85, 104);
       doc.text('DISC Profile:', MARGIN + 5, y + 8);
@@ -315,8 +297,8 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
 
       // Recommendation
       doc.setFillColor(237, 242, 247);
-      doc.rect(MARGIN, y, CONTENT_WIDTH, 25, 'F');
-      doc.setDrawColor(193, 8, 171);
+      doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 25, 3, 3, 'F');
+      doc.setDrawColor(138, 111, 58);
       doc.setLineWidth(1);
       doc.line(MARGIN, y, MARGIN, y + 25);
 
@@ -406,7 +388,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     doc.text(`${reportData.mandate.title || 'Mandate'} | ${generatedDate}`, PAGE_WIDTH / 2, 180, { align: 'center' });
     
     doc.setFontSize(12);
-    doc.setTextColor(193, 8, 171);
+    doc.setTextColor(138, 111, 58);
     doc.text('LYC Intelligence | LENS T2', PAGE_WIDTH / 2, 220, { align: 'center' });
     
     addFooter(1, totalPages);
@@ -419,7 +401,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
 
     // Profile header box
     doc.setFillColor(248, 249, 250);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 35, 'F');
+    doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 35, 4, 4, 'F');
 
     doc.setFontSize(16);
     doc.setTextColor(26, 26, 26);
@@ -478,7 +460,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
       }
 
       doc.setFillColor(248, 249, 250);
-      doc.rect(MARGIN, y, CONTENT_WIDTH, 30, 'F');
+      doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 30, 3, 3, 'F');
 
       doc.setFontSize(12);
       doc.setTextColor(26, 26, 26);
@@ -517,7 +499,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
       }
 
       doc.setFillColor(248, 249, 250);
-      doc.rect(MARGIN, y, CONTENT_WIDTH / 2 - 5, 15, 'F');
+      doc.roundedRect(MARGIN, y, CONTENT_WIDTH / 2 - 5, 15, 2, 2, 'F');
       
       doc.setFontSize(10);
       doc.setTextColor(26, 26, 26);
@@ -537,7 +519,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     y += 8;
 
     doc.setFillColor(248, 249, 250);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 40, 'F');
+    doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 40, 3, 3, 'F');
 
     const discScores = candidate?.disc_scores || { D: 0, I: 0, S: 0, C: 0 };
     const discLabels = ['D', 'I', 'S', 'C'];
@@ -569,8 +551,8 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     y = 40;
 
     doc.setFillColor(237, 242, 247);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 50, 'F');
-    doc.setDrawColor(193, 8, 171);
+    doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 50, 4, 4, 'F');
+    doc.setDrawColor(138, 111, 58);
     doc.setLineWidth(2);
     doc.line(MARGIN, y, MARGIN, y + 50);
 
@@ -607,7 +589,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     doc.text(`${reportData.mandate.client || 'Client'} | ${generatedDate}`, PAGE_WIDTH / 2, 180, { align: 'center' });
     
     doc.setFontSize(12);
-    doc.setTextColor(193, 8, 171);
+    doc.setTextColor(138, 111, 58);
     doc.text('LYC Intelligence | LENS T3', PAGE_WIDTH / 2, 220, { align: 'center' });
     
     addFooter(1, totalPages);
@@ -635,7 +617,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     stats.forEach((stat, i) => {
       const statX = MARGIN + i * 45;
       doc.setFillColor(248, 249, 250);
-      doc.rect(statX, y, 40, 25, 'F');
+      doc.roundedRect(statX, y, 40, 25, 3, 3, 'F');
       
       doc.setFontSize(9);
       doc.setTextColor(113, 128, 150);
@@ -715,7 +697,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
       const startX = MARGIN + i * (CONTENT_WIDTH / reportData.candidates.length);
       
       doc.setFillColor(248, 249, 250);
-      doc.rect(startX, y, CONTENT_WIDTH / reportData.candidates.length - 5, 40, 'F');
+      doc.roundedRect(startX, y, CONTENT_WIDTH / reportData.candidates.length - 5, 40, 3, 3, 'F');
       
       doc.setFontSize(10);
       doc.setTextColor(26, 26, 26);
@@ -740,7 +722,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
       const startX = MARGIN + i * (CONTENT_WIDTH / reportData.candidates.length);
       
       doc.setFillColor(248, 249, 250);
-      doc.rect(startX, y, CONTENT_WIDTH / reportData.candidates.length - 5, 30, 'F');
+      doc.roundedRect(startX, y, CONTENT_WIDTH / reportData.candidates.length - 5, 30, 3, 3, 'F');
       
       doc.setFontSize(10);
       doc.setTextColor(26, 26, 26);
@@ -769,8 +751,8 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
       }
 
       doc.setFillColor(248, 249, 250);
-      doc.rect(MARGIN, y, CONTENT_WIDTH, 35, 'F');
-      doc.setDrawColor(193, 8, 171);
+      doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 35, 3, 3, 'F');
+      doc.setDrawColor(138, 111, 58);
       doc.setLineWidth(1);
       doc.line(MARGIN, y, MARGIN, y + 35);
 
@@ -792,8 +774,8 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     // Overall recommendation
     y += 10;
     doc.setFillColor(237, 242, 247);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 30, 'F');
-    doc.setDrawColor(193, 8, 171);
+    doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 30, 4, 4, 'F');
+    doc.setDrawColor(138, 111, 58);
     doc.setLineWidth(2);
     doc.line(MARGIN, y, MARGIN, y + 30);
 

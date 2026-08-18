@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { getSupabase } from '@/services/supabaseApi';
 import { useAuthStore } from '@/stores/authStore';
 
-export type CreditTier = 'explorer' | 'starter' | 'pro' | 'executive' | 'council';
+export type CreditTier = 'free' | 'basic' | 'pro' | 'enterprise';
 
 export interface CreditInfo {
   balance: number;
@@ -25,16 +25,15 @@ interface CreditContextType {
 }
 
 const CreditLimits: Record<CreditTier, { daily: number; monthly: number }> = {
-  explorer: { daily: 5, monthly: 0 },
-  starter: { daily: 0, monthly: 20 },
+  free: { daily: 5, monthly: 0 },
+  basic: { daily: 0, monthly: 20 },
   pro: { daily: 0, monthly: 50 },
-  executive: { daily: 0, monthly: 100 },
-  council: { daily: 0, monthly: Infinity },
+  enterprise: { daily: 0, monthly: Infinity },
 };
 
 const defaultCredit: CreditInfo = {
   balance: 5,
-  tier: 'explorer',
+  tier: 'free',
   totalEarned: 5,
   totalSpent: 0,
   isLoading: true,
@@ -68,27 +67,27 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
       if (error || !data) {
         const { data: newData, error: insertError } = await supabase
           .from('credits')
-          .insert({ user_id: effectiveUserId, miles: 5, tier: 'explorer', total_earned: 5, total_spent: 0 })
+          .insert({ user_id: effectiveUserId, balance: 5, tier: 'free', total_earned: 5, total_spent: 0 })
           .select()
           .single();
 
         if (insertError) throw insertError;
         setCredit({
-          balance: newData.miles,
+          balance: newData.balance,
           tier: newData.tier as CreditTier,
           totalEarned: newData.total_earned,
           totalSpent: newData.total_spent,
           isLoading: false,
         });
       } else {
-        const limits = CreditLimits[data.tier as CreditTier] || CreditLimits.explorer;
-        let balance = data.miles;
+        const limits = CreditLimits[data.tier as CreditTier] || CreditLimits.free;
+        let balance = data.balance;
 
-        if (data.tier === 'explorer' && balance < 5) {
+        if (data.tier === 'free' && balance < 5) {
           balance = 5;
           await supabase
             .from('credits')
-            .update({ miles: 5, updated_at: new Date().toISOString() })
+            .update({ balance: 5, updated_at: new Date().toISOString() })
             .eq('user_id', effectiveUserId);
         }
 
@@ -116,7 +115,7 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
       await supabase
         .from('credits')
         .update({
-          miles: newBalance,
+          balance: newBalance,
           total_spent: credit.totalSpent + amount,
           updated_at: new Date().toISOString(),
         })
@@ -159,7 +158,7 @@ export function CreditProvider({ children, userId }: { children: React.ReactNode
       await supabase
         .from('credits')
         .update({
-          miles: newBalance,
+          balance: newBalance,
           total_spent: Math.max(0, credit.totalSpent - amount),
           updated_at: new Date().toISOString(),
         })
@@ -220,7 +219,7 @@ export function useCredits() {
       refreshCredits: async () => {},
       deductCredit: async () => false,
       hasCredits: () => true,
-      tier: 'explorer' as CreditTier,
+      tier: 'free' as CreditTier,
       miles: defaultCredit.balance,
       deductMiles: async () => false,
       refundMiles: async () => false,

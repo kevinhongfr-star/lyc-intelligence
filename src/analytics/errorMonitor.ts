@@ -18,50 +18,31 @@
  *   warning   — non-fatal (API 4xx under load, failed secondary call)
  */
 
-import { trackEvent, scrubPII } from './eventTracker';
+import { trackEvent } from './eventTracker';
 
 export type ErrorSeverity = 'critical' | 'error' | 'warning';
 
 export interface ReportedErrorContext {
+  /** Where the error happened (component name, function, api path) */
   scope?: string;
+  /** React component stack — populated by error boundary */
   componentStack?: string;
+  /** Fetch URL / status when applicable */
   api?: { url: string; status?: number; method?: string };
+  /** Role / user id snapshot (if available) */
   user?: { id?: string; role?: string };
+  /** Free-form context */
   extra?: Record<string, unknown>;
+  /** Severity override. Default: 'error' */
   severity?: ErrorSeverity;
-}
-
-// ── V3-5 / #1345 Error-message PII scrubbers ────────────────────────
-const RE_EMAIL = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-const RE_UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
-const RE_LONG_ASSESSMENT_BLOB = /\b(assessment|result|profile|answers|dimension)[:\s]*["']?\{[^]{120,}\}/gi;
-
-function shortHash(s: string): string {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return ('0000000' + Math.abs(h >>> 0).toString(16)).slice(-8);
-}
-
-export function scrubErrorMessage(raw: string): string {
-  if (!raw) return raw;
-  let out = String(raw);
-  out = out.replace(RE_EMAIL, '[email scrubbed]');
-  out = out.replace(RE_UUID, (m) => `[uuid_${shortHash(m)}]`);
-  out = out.replace(RE_LONG_ASSESSMENT_BLOB, (m) => `[assessment_results len=${m.length} scrubbed]`);
-  return out;
 }
 
 function normalizeError(err: unknown): { name: string; message: string; stack?: string } {
   if (err instanceof Error) {
-    const msg = scrubErrorMessage(err.message);
-    const stack = err.stack ? scrubErrorMessage(err.stack) : undefined;
-    return { name: err.name, message: msg, stack };
+    return { name: err.name, message: err.message, stack: err.stack };
   }
   const str = typeof err === 'string' ? err : JSON.stringify(err ?? null);
-  return { name: 'UnknownError', message: scrubErrorMessage(str) };
+  return { name: 'UnknownError', message: str };
 }
 
 /** Sampled reporting — warning-level errors only fire on ~10% of sessions. */
@@ -91,26 +72,12 @@ export function reportError(err: unknown, ctx: ReportedErrorContext = {}): void 
 
   const { name, message, stack } = normalizeError(err);
 
+  // Always log for local debugging (filtered by browser)
   if (severity === 'warning') {
-    console.warn('[lyc:warn]', name, message, scrubPII(ctx));
+    console.warn('[lyc:warn]', name, message, ctx);
   } else {
-    console.error('[lyc:error]', name, message, scrubPII(ctx));
+    console.error('[lyc:error]', name, message, ctx);
   }
-
-  const safeCtx = scrubPII(ctx);
-  const safeApi = ctx.api
-    ? {
-        url: scrubErrorMessage(ctx.api.url || ''),
-        status: ctx.api.status,
-        method: ctx.api.method,
-      }
-    : undefined;
-  const safeUser = ctx.user
-    ? {
-        id: ctx.user.id ? `[user_${shortHash(ctx.user.id)}]` : undefined,
-        role: ctx.user.role,
-      }
-    : undefined;
 
   const props: Record<string, unknown> = {
     error_name: name,
@@ -118,11 +85,10 @@ export function reportError(err: unknown, ctx: ReportedErrorContext = {}): void 
     stack,
     severity,
   };
-  if (safeCtx.scope) props.scope = safeCtx.scope;
-  if (ctx.componentStack) props.component_stack = scrubErrorMessage(ctx.componentStack);
-  if (safeApi) props.api = safeApi;
-  if (safeCtx.extra) props.extra = safeCtx.extra;
-  if (safeUser) props.user = safeUser;
+  if (ctx.scope) props.scope = ctx.scope;
+  if (ctx.componentStack) props.component_stack = ctx.componentStack;
+  if (ctx.api) props.api = ctx.api;
+  if (ctx.extra) props.extra = ctx.extra;
 
   trackEvent(
     severity === 'critical' ? 'client_error_critical' : 'client_error',

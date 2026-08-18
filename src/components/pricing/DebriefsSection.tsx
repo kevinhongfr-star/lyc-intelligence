@@ -1,446 +1,201 @@
-/**
- * DebriefsSection.tsx — Human debrief sessions section (Batch 3 / Ticket 8).
- *
- * 4 session types: 30min $149, 45min $249, 60min $349, 90min CPI $599.
- * Tier session discount display (10/15/20/25% off by tier).
- * Annual +10% stacking note (sessions only, not mile packs).
- * Executive free session (1×30min/mo) + Council free sessions (2×60min/mo) highlights.
- *
- * All prices from DEBRIEF_SESSIONS in pricingData.ts. Tier discounts from
- * TIER_SESSION_DISCOUNT_PCT. Free session allowances from TIER_FREE_SESSIONS.
- */
 import React from 'react';
-import { DS } from '@/tokens';
 import {
-  DEBRIEF_SESSIONS,
-  TIER_ORDER,
-  TIERS,
-  ANNUAL_SESSION_STACKING_BONUS_PCT,
-  computeDebriefPrice,
-  type DebriefSessionType,
-} from '@/config/pricingData';
-import type { BillingCycle, PricingCurrency } from '@/config/tiers';
+  Calendar,
+  Clock,
+  Users,
+  Briefcase,
+  Crown,
+  ArrowRight,
+  UserCheck,
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { cn } from '@/lib/utils';
+import type { PricingCurrency } from '@/config/pricingData';
 
-export function DebriefsSection({
-  cycle = 'monthly',
-  currency = 'USD',
-}: {
-  cycle?: BillingCycle;
-  currency?: PricingCurrency;
-}) {
+export interface DebriefsSectionProps {
+  currency: PricingCurrency;
+}
+
+interface DebriefSession {
+  key: string;
+  duration: string;
+  title: string;
+  cohort: string;
+  cohortDetails: string[];
+  pricing: { usd: number; cny: number };
+  tierTag: 'all_paid' | 'pro_plus' | 'executive_plus' | 'council_plus';
+  icon: React.ComponentType<{ className?: string }>;
+  isFlagship?: boolean;
+}
+
+const DEBRIEF_SESSIONS: DebriefSession[] = [
+  {
+    key: 'career_core',
+    duration: '30 min',
+    title: 'Career Core Debrief',
+    cohort: '1mi – 2mi cohort',
+    cohortDetails: ['LEAP (1mi)', 'IMPACT (2mi)', 'COACH (2mi)', 'DRIVE (2mi)', 'QUEST (2mi)'],
+    pricing: { usd: 99, cny: 33 },
+    tierTag: 'pro_plus',
+    icon: Users,
+  },
+  {
+    key: 'standard_advisory',
+    duration: '45 min',
+    title: 'Standard / Advisory Debrief',
+    cohort: '2mi cohort',
+    cohortDetails: ['PRISM (2mi)', 'BRIDGE (3mi)', 'MOSAIC (3mi)', 'SPARK (3mi)', 'FORGE (3mi)'],
+    pricing: { usd: 149, cny: 50 },
+    tierTag: 'pro_plus',
+    icon: Briefcase,
+  },
+  {
+    key: 'signature',
+    duration: '60 min',
+    title: 'Signature Debrief',
+    cohort: '3mi cohort',
+    cohortDetails: ['BRIDGE (3mi)', 'MOSAIC (3mi)', 'SPARK (3mi)', 'FORGE (3mi)'],
+    pricing: { usd: 249, cny: 66 },
+    tierTag: 'executive_plus',
+    icon: UserCheck,
+  },
+  {
+    key: 'cpi_executive',
+    duration: '90 min',
+    title: 'CPI Executive Debrief',
+    cohort: '5mi cohort',
+    cohortDetails: [
+      'CPI — China Leadership Pipeline Index',
+      'Flagship 5mi diagnostic',
+      'Full pipeline report review',
+      'China market benchmarking walkthrough',
+    ],
+    pricing: { usd: 499, cny: 116 },
+    tierTag: 'council_plus',
+    icon: Crown,
+    isFlagship: true,
+  },
+];
+
+const TIER_TAG_LABELS: Record<DebriefSession['tierTag'], { label: string; variant: 'default' | 'info' | 'warning' | 'success' }> = {
+  all_paid: { label: 'Starter +', variant: 'default' },
+  pro_plus: { label: 'Pro +', variant: 'info' },
+  executive_plus: { label: 'Executive +', variant: 'warning' },
+  council_plus: { label: 'Council +', variant: 'success' },
+};
+
+export const DebriefsSection: React.FC<DebriefsSectionProps> = ({ currency }) => {
   return (
-    <section
-      style={{
-        background: DS.bgAlt,
-        padding: '64px 24px',
-      }}
-    >
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        {/* Section heading */}
-        <div style={{ marginBottom: 16 }}>
-          <div
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: 12,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: DS.eyebrow,
-              marginBottom: 16,
-            }}
-          >
-            [Emily: debriefs eyebrow]
-          </div>
-          <h2
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: 36,
-              lineHeight: 1.2,
-              color: DS.text,
-              margin: 0,
-              fontWeight: 600,
-            }}
-          >
-            [Emily: debriefs headline]
+    <section className="py-16 md:py-20 bg-gradient-to-b from-white via-bg-secondary/30 to-white">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <Badge variant="warning" size="md" className="mb-4 gap-1.5">
+            <Calendar className="h-3 w-3" aria-hidden="true" />
+            Consultant sessions
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-text-primary mb-4">
+            Executive debrief sessions
           </h2>
-          <p
-            style={{
-              fontFamily: DS.bodyFont,
-              fontSize: 16,
-              lineHeight: 1.5,
-              color: DS.textSecondary,
-              marginTop: 16,
-              maxWidth: 640,
-            }}
-          >
-            [Emily: debriefs subhead — human coaches, what to expect.
-            Mapped to positioning doc §debriefs.]
+          <p className="text-lg text-text-muted max-w-2xl mx-auto">
+            Book consultant-led debriefs aligned to your diagnostic mile cohort.
+            Every diagnostic can be paired with a dedicated session at the matching tier.
           </p>
         </div>
 
-        {/* Session cards */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: 24,
-            marginTop: 48,
-          }}
-        >
-          {DEBRIEF_SESSIONS.map((session) => (
-            <DebriefSessionCard
-              key={session.id}
-              session={session}
-              cycle={cycle}
-              currency={currency}
-            />
-          ))}
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {DEBRIEF_SESSIONS.map((session) => {
+            const Icon = session.icon;
+            const price = currency === 'CNY'
+              ? `¥${session.pricing.cny}`
+              : `$${session.pricing.usd}`;
+            const tag = TIER_TAG_LABELS[session.tierTag];
+            return (
+              <Card
+                key={session.key}
+                className={cn(
+                  'h-full flex flex-col transition-all',
+                  session.isFlagship && 'ring-2 ring-tier-4/40 shadow-lg',
+                )}
+              >
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={cn(
+                          'w-11 h-11 rounded-lg flex items-center justify-center shrink-0',
+                          session.isFlagship ? 'bg-tier-4/15' : 'bg-accent/10',
+                        )}
+                      >
+                        <Icon
+                          className={cn(
+                            'h-5 w-5',
+                            session.isFlagship ? 'text-tier-4' : 'text-accent',
+                          )}
+                          aria-hidden="true"
+                        />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg leading-tight">
+                          {session.title}
+                        </CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="default" size="sm" className="gap-1">
+                            <Clock className="h-3 w-3" aria-hidden="true" />
+                            {session.duration}
+                          </Badge>
+                          <Badge variant={tag.variant} size="sm">
+                            {tag.label}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-serif font-bold text-text-primary">
+                        {price}
+                      </div>
+                      <div className="text-xs text-text-muted mt-0.5">per session</div>
+                    </div>
+                  </div>
 
-        {/* Tier discounts + free sessions */}
-        <div style={{ marginTop: 64, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48 }}>
-          <DiscountsTable cycle={cycle} currency={currency} />
-          <FreeSessionsHighlight />
-        </div>
+                  <CardDescription className="pt-3">
+                    <div className="flex items-center gap-1.5 text-sm font-medium text-text-secondary mb-2">
+                      <Users className="h-3.5 w-3.5" aria-hidden="true" />
+                      {session.cohort}
+                    </div>
+                  </CardDescription>
+                </CardHeader>
 
-        {/* Annual stacking note */}
-        <div
-          style={{
-            marginTop: 48,
-            padding: '16px 24px',
-            background: DS.bgDark,
-            color: DS.bg,
-            fontFamily: DS.bodyFont,
-            fontSize: 15,
-            textAlign: 'center',
-          }}
-        >
-          Annual billing — +{ANNUAL_SESSION_STACKING_BONUS_PCT}% session stacking bonus
-          <span style={{ color: DS.muted, marginLeft: 12, fontSize: 13 }}>
-            (applied to debrief sessions only, not mile packs)
-          </span>
+                <CardContent className="pt-0 flex-1 flex flex-col">
+                  <ul className="space-y-2 mb-5 flex-1">
+                    {session.cohortDetails.map((detail, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-text-muted">
+                        <span
+                          className={cn(
+                            'mt-1.5 h-1.5 w-1.5 rounded-full shrink-0',
+                            session.isFlagship ? 'bg-tier-4' : 'bg-accent',
+                          )}
+                          aria-hidden="true"
+                        />
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    variant={session.isFlagship ? 'default' : 'outline'}
+                    size="default"
+                    className="w-full"
+                  >
+                    Book {session.duration} session
+                    <ArrowRight className="h-4 w-4 ml-1" aria-hidden="true" />
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </section>
   );
-}
-
-function DebriefSessionCard({
-  session,
-  cycle,
-  currency,
-}: {
-  session: DebriefSessionType;
-  cycle: BillingCycle;
-  currency: PricingCurrency;
-}) {
-  // Show the list price on the marketing surface; tier discounts in the table below.
-  const listPrice = currency === 'USD' ? session.priceUsd : session.priceCny;
-  const symbol = currency === 'USD' ? '$' : '¥';
-
-  return (
-    <div
-      style={{
-        background: DS.card,
-        border: `1px solid ${DS.border}`,
-        padding: 32,
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* Duration */}
-      <div
-        style={{
-          fontFamily: DS.headingFont,
-          fontSize: 24,
-          fontWeight: 600,
-          color: DS.text,
-          marginBottom: 4,
-        }}
-      >
-        {session.durationMinutes}-minute
-        {session.isCpi && (
-          <span
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: 12,
-              marginLeft: 8,
-              color: DS.accent,
-              letterSpacing: '0.05em',
-            }}
-          >
-            CPI
-          </span>
-        )}
-      </div>
-
-      {/* Label */}
-      <div
-        style={{
-          fontFamily: DS.bodyFont,
-          fontSize: 14,
-          color: DS.textSecondary,
-          marginBottom: 16,
-        }}
-      >
-        {session.label}
-      </div>
-
-      {/* Price */}
-      <div
-        style={{
-          fontFamily: DS.headingFont,
-          fontSize: 32,
-          fontWeight: 600,
-          color: DS.text,
-          marginBottom: 20,
-        }}
-      >
-        {symbol}{listPrice}
-      </div>
-
-      {/* Coach type — placeholder */}
-      <div
-        style={{
-          fontFamily: DS.bodyFont,
-          fontSize: 14,
-          color: DS.textSecondary,
-          marginBottom: 12,
-        }}
-      >
-        {session.coachTypePlaceholder}
-      </div>
-
-      {/* Description — placeholder */}
-      <p
-        style={{
-          fontFamily: DS.bodyFont,
-          fontSize: 13,
-          lineHeight: 1.6,
-          color: DS.muted,
-          margin: 0,
-          flex: 1,
-        }}
-      >
-        {session.descriptionPlaceholder}
-      </p>
-
-      {/* Book CTA */}
-      <button
-        style={{
-          marginTop: 24,
-          fontFamily: DS.bodyFont,
-          fontSize: 15,
-          fontWeight: 600,
-          color: DS.text,
-          background: DS.bg,
-          border: `1px solid ${DS.borderStrong}`,
-          padding: '14px 24px',
-          cursor: 'pointer',
-          transition: DS.transition,
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = DS.accent;
-          e.currentTarget.style.color = DS.accent;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = DS.borderStrong;
-          e.currentTarget.style.color = DS.text;
-        }}
-      >
-        [Emily: book CTA]
-      </button>
-    </div>
-  );
-}
-
-/** Tier-based session discount table. */
-function DiscountsTable({ cycle, currency }: { cycle: BillingCycle; currency: PricingCurrency }) {
-  const sampleSession = DEBRIEF_SESSIONS.find((s) => s.id === 'debrief_60')!;
-  const symbol = currency === 'USD' ? '$' : '¥';
-
-  return (
-    <div>
-      <h3
-        style={{
-          fontFamily: DS.headingFont,
-          fontSize: 22,
-          fontWeight: 600,
-          color: DS.text,
-          margin: '0 0 20px',
-        }}
-      >
-        Tier session discounts
-      </h3>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
-        <thead>
-          <tr style={{ borderBottom: `2px solid ${DS.borderStrong}` }}>
-            <th
-              style={{
-                textAlign: 'left',
-                padding: '10px 12px',
-                fontFamily: DS.monoFont,
-                fontSize: 12,
-                letterSpacing: '0.05em',
-                textTransform: 'uppercase',
-                color: DS.eyebrow,
-                fontWeight: 400,
-              }}
-            >
-              Tier
-            </th>
-            <th
-              style={{
-                textAlign: 'right',
-                padding: '10px 12px',
-                fontFamily: DS.monoFont,
-                fontSize: 12,
-                letterSpacing: '0.05em',
-                textTransform: 'uppercase',
-                color: DS.eyebrow,
-                fontWeight: 400,
-              }}
-            >
-              Discount
-            </th>
-            <th
-              style={{
-                textAlign: 'right',
-                padding: '10px 12px',
-                fontFamily: DS.monoFont,
-                fontSize: 12,
-                letterSpacing: '0.05em',
-                textTransform: 'uppercase',
-                color: DS.eyebrow,
-                fontWeight: 400,
-              }}
-            >
-              60-min from
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {TIER_ORDER.map((tierKey) => {
-            const { discountPct, effectivePrice } = computeDebriefPrice(
-              sampleSession,
-              tierKey,
-              cycle,
-              currency,
-            );
-            return (
-              <tr key={tierKey} style={{ borderBottom: `1px solid ${DS.border}` }}>
-                <td
-                  style={{
-                    padding: '12px',
-                    fontFamily: DS.bodyFont,
-                    color: DS.text,
-                    fontWeight: 500,
-                  }}
-                >
-                  {TIERS[tierKey].displayName}
-                </td>
-                <td
-                  style={{
-                    padding: '12px',
-                    textAlign: 'right',
-                    fontFamily: DS.bodyFont,
-                    color: discountPct > 0 ? DS.accent : DS.muted,
-                    fontWeight: 600,
-                  }}
-                >
-                  {discountPct > 0 ? `${discountPct}% off` : 'List price'}
-                </td>
-                <td
-                  style={{
-                    padding: '12px',
-                    textAlign: 'right',
-                    fontFamily: DS.bodyFont,
-                    color: DS.text,
-                    fontWeight: 600,
-                  }}
-                >
-                  {symbol}{effectivePrice}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-/** Highlights Executive + Council free session allowances. */
-function FreeSessionsHighlight() {
-  return (
-    <div>
-      <h3
-        style={{
-          fontFamily: DS.headingFont,
-          fontSize: 22,
-          fontWeight: 600,
-          color: DS.text,
-          margin: '0 0 20px',
-        }}
-      >
-        Included sessions
-      </h3>
-      <div
-        style={{
-          background: DS.card,
-          border: `1px solid ${DS.border}`,
-          padding: 24,
-        }}
-      >
-        <div style={{ marginBottom: 20 }}>
-          <div
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: 18,
-              fontWeight: 600,
-              color: DS.text,
-              marginBottom: 4,
-            }}
-          >
-            Executive
-          </div>
-          <div
-            style={{
-              fontFamily: DS.bodyFont,
-              fontSize: 15,
-              color: DS.textSecondary,
-            }}
-          >
-            1 × 30-minute debrief / month, complimentary
-          </div>
-        </div>
-        <div
-          style={{
-            borderTop: `1px solid ${DS.border}`,
-            paddingTop: 20,
-          }}
-        >
-          <div
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: 18,
-              fontWeight: 600,
-              color: DS.accent,
-              marginBottom: 4,
-            }}
-          >
-            Council
-          </div>
-          <div
-            style={{
-              fontFamily: DS.bodyFont,
-              fontSize: 15,
-              color: DS.textSecondary,
-            }}
-          >
-            2 × 60-minute debriefs / month, complimentary
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+};

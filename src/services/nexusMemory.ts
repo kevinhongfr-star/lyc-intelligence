@@ -1,8 +1,8 @@
 /**
- * NEXUS Memory Service
+ * Nexus Memory Service
  * Cross-session memory reconstruction for returning users
  * 
- * When a user returns to NEXUS, this service:
+ * When a user returns to Nexus, this service:
  * 1. Fetches their last N chat sessions from Supabase
  * 2. Extracts key topics, decisions, and action items
  * 3. Builds a "session-start ritual" that reconstructs continuity
@@ -110,7 +110,7 @@ export async function buildMemoryContext(userId: string, userName?: string): Pro
 
 /**
  * Build the session-start ritual message
- * This is what NEXUS says when a returning user starts a new session
+ * This is what Nexus says when a returning user starts a new session
  */
 function buildContinuityMessage(session: SessionSummary, userName?: string, totalSessions?: number): string {
   const greeting = userName ? `Welcome back, ${userName}.` : 'Welcome back.';

@@ -8,13 +8,6 @@
  * Env vars (client-safe, VITE_ prefix):
  *   VITE_SUPABASE_URL       — Supabase project URL
  *   VITE_SUPABASE_ANON_KEY  — Supabase anon/public key
- *
- * Security config (#1311):
- *   - persistSession: true — refresh token in localStorage (SSOT for client)
- *   - autoRefreshToken: true — SDK refreshes access tokens transparently
- *   - detectSessionInUrl: true — handles OAuth/magic-link redirects
- *   - flowType: 'pkce' — PKCE flow for OAuth (more secure than implicit)
- *   - storageKey: 'lyc-auth' — namespaced key (avoid default 'sb-...')
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -46,11 +39,6 @@ export const supabase: SupabaseClient = createClient(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      // #1311: PKCE flow — defends against authorization code interception.
-      flowType: 'pkce',
-      // #1311: namespaced storage key (don't collide with other apps on
-      // the same domain if/when we add a marketing site).
-      storageKey: 'lyc-auth-session',
     },
   },
 );

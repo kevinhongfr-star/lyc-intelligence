@@ -1,53 +1,71 @@
+// ═══════════════════════════════════════════════════════════
+// BRIDGE Scoring Config
+// Source of truth: akira_source/diagnostic_portfolio/06_scoring_engine_code/bridge_config.json
+// ═══════════════════════════════════════════════════════════
+
 export const INSTRUMENT = "BRIDGE";
-export const FULL_NAME = "BRIDGE — cross-cultural relational intelligence";
-export const B2C_NAME = "BRIDGE — cross-cultural relational intelligence";
+export const FULL_NAME = "APAC Mandate Execution & Cross-Border Leadership Readiness";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
-export const DELIVERY_MINUTES = 12;
+export const DELIVERY_MINUTES = 14;
 export const TIER = "advisory";
-export const SCORING_MODE = "matrix";
-export const PRICE_MILES = 149;
-export const TAGLINE = "Cross-border mandate readiness. Mandate clarity, stakeholder relationship building, cultural fluency, and the resilience to hold under pressure.";
+export const PRICE_MILES = 99;
+export const B2C_NAME = "APAC Mandate Execution & Cross-Border Leadership";
+export const TAGLINE = "The APAC mandate map. Cultural fluency, stakeholder navigation, long-game thinking under pressure.";
 
 export const DIMENSIONS = [
   {
     id: "D1",
     name: "Mandate Clarity",
     question_ids: [
-      "Q01",
-      "Q02",
-      "Q03",
-      "Q04",
-      "Q05",
-      "Q06"
+      "BRIDGE_Q01",
+      "BRIDGE_Q02",
+      "BRIDGE_Q03",
+      "BRIDGE_Q04",
+      "BRIDGE_Q05",
+      "BRIDGE_Q06"
     ],
     reverse_coded: [
-      "Q04"
+      "BRIDGE_Q04"
     ],
     raw_max: 30,
     n_questions: 6,
-    sub_dimensions: [],
+    sub_dimensions: [
+      "I have a specific, detailed understanding of what this manda...",
+      "I can articulate how this mandate is different from any prev...",
+      "I have had direct conversations with the board or key princi...",
+      "I find that my understanding of what the mandate requires be...",
+      "I understand the specific organisational history, stakeholde...",
+      "I can identify the two or three things that, if I get them w..."
+    ],
     normalised_max: 20,
     normalised_formula: "(raw/30) x 20"
   },
   {
     id: "D2",
-    name: "Stakeholder Relationship Building",
+    name: "Stakeholder Navigation",
     question_ids: [
-      "Q07",
-      "Q08",
-      "Q09",
-      "Q10",
-      "Q11",
-      "Q12"
+      "BRIDGE_Q07",
+      "BRIDGE_Q08",
+      "BRIDGE_Q09",
+      "BRIDGE_Q10",
+      "BRIDGE_Q11",
+      "BRIDGE_Q12"
     ],
     reverse_coded: [
-      "Q10"
+      "BRIDGE_Q10"
     ],
     raw_max: 30,
     n_questions: 6,
-    sub_dimensions: [],
+    sub_dimensions: [
+      "I have a structured approach to mapping the key stakeholders...",
+      "In high-context APAC business environments, I invest deliber...",
+      "I have maintained a key APAC stakeholder relationship throug...",
+      "I find transactional relationship-building (connecting when ...",
+      "I can read the informal power structures in an APAC organisa...",
+      "I approach APAC government or political stakeholder relation..."
+    ],
     normalised_max: 20,
     normalised_formula: "(raw/30) x 20"
   },
@@ -55,19 +73,26 @@ export const DIMENSIONS = [
     id: "D3",
     name: "Communication Alignment",
     question_ids: [
-      "Q13",
-      "Q14",
-      "Q15",
-      "Q16",
-      "Q17",
-      "Q18"
+      "BRIDGE_Q13",
+      "BRIDGE_Q14",
+      "BRIDGE_Q15",
+      "BRIDGE_Q16",
+      "BRIDGE_Q17",
+      "BRIDGE_Q18"
     ],
     reverse_coded: [
-      "Q16"
+      "BRIDGE_Q16"
     ],
     raw_max: 30,
     n_questions: 6,
-    sub_dimensions: [],
+    sub_dimensions: [
+      "I have adapted my natural communication style significantly ...",
+      "I understand how my natural communication style — specifical...",
+      "I check for understanding and alignment in APAC stakeholder ...",
+      "I default to my natural communication style under pressure, ...",
+      "I can deliver difficult messages — performance feedback, str...",
+      "I read silence, indirection, and non-verbal cues in APAC sta..."
+    ],
     normalised_max: 20,
     normalised_formula: "(raw/30) x 20"
   },
@@ -75,19 +100,26 @@ export const DIMENSIONS = [
     id: "D4",
     name: "Pressure Resilience",
     question_ids: [
-      "Q19",
-      "Q20",
-      "Q21",
-      "Q22",
-      "Q23",
-      "Q24"
+      "BRIDGE_Q19",
+      "BRIDGE_Q20",
+      "BRIDGE_Q21",
+      "BRIDGE_Q22",
+      "BRIDGE_Q23",
+      "BRIDGE_Q24"
     ],
     reverse_coded: [
-      "Q22"
+      "BRIDGE_Q22"
     ],
     raw_max: 30,
     n_questions: 6,
-    sub_dimensions: [],
+    sub_dimensions: [
+      "I can identify, in advance, the specific types of mandate pr...",
+      "When a key stakeholder relationship fails or significantly d...",
+      "Under sustained pressure from headquarters, the local team, ...",
+      "When the mandate becomes politically difficult, I become mor...",
+      "I can sustain my mandate focus and performance through an ex...",
+      "I have specific early-warning indicators that tell me when m..."
+    ],
     normalised_max: 20,
     normalised_formula: "(raw/30) x 20"
   },
@@ -95,19 +127,26 @@ export const DIMENSIONS = [
     id: "D5",
     name: "Long-Game Thinking",
     question_ids: [
-      "Q25",
-      "Q26",
-      "Q27",
-      "Q28",
-      "Q29",
-      "Q30"
+      "BRIDGE_Q25",
+      "BRIDGE_Q26",
+      "BRIDGE_Q27",
+      "BRIDGE_Q28",
+      "BRIDGE_Q29",
+      "BRIDGE_Q30"
     ],
     reverse_coded: [
-      "Q28"
+      "BRIDGE_Q28"
     ],
     raw_max: 30,
     n_questions: 6,
-    sub_dimensions: [],
+    sub_dimensions: [
+      "I am comfortable investing in APAC relationships and trust-b...",
+      "I resist pressure — from headquarters, from myself, or from ...",
+      "I can articulate specific examples of decisions I have made ...",
+      "I find it difficult to invest in relationships or initiative...",
+      "I understand that in APAC's relationship economy, my reputat...",
+      "I can work patiently within a 3–5 year trust-building cycle ..."
+    ],
     normalised_max: 20,
     normalised_formula: "(raw/30) x 20"
   },
@@ -115,19 +154,26 @@ export const DIMENSIONS = [
     id: "D6",
     name: "Cultural Fluency",
     question_ids: [
-      "Q31",
-      "Q32",
-      "Q33",
-      "Q34",
-      "Q35",
-      "Q36"
+      "BRIDGE_Q31",
+      "BRIDGE_Q32",
+      "BRIDGE_Q33",
+      "BRIDGE_Q34",
+      "BRIDGE_Q35",
+      "BRIDGE_Q36"
     ],
     reverse_coded: [
-      "Q35"
+      "BRIDGE_Q35"
     ],
     raw_max: 30,
     n_questions: 6,
-    sub_dimensions: [],
+    sub_dimensions: [
+      "I have a specific, current understanding of the cultural nor...",
+      "When I have made a cultural misstep in an APAC context, I ha...",
+      "I understand how decision-making operates in the specific AP...",
+      "I treat cultural differences in the target APAC market as co...",
+      "I find that my instinctive approach to leadership — my defau...",
+      "I have built genuine relationships with APAC-native colleagu..."
+    ],
     normalised_max: 20,
     normalised_formula: "(raw/30) x 20"
   }
@@ -188,52 +234,47 @@ export const ARCHETYPES = [
   {
     name: "The Envoy",
     "#": "1",
-    weakest_dimension: "Stakeholder Relationship Building",
-    risk_layer: "Layer 1 — Expectation & Relationship Risk",
-    failure_pattern: "Great on paper, fails in practice because relationships don't form. The mandate dies from isolation.",
-    weakest_dim_id: "D2"
+    weakest_dimension: "Stakeholder Navigation",
+    three_fires_correlation: "Fire 1: Relationship deficit",
+    failure_pattern: "Great on paper, fails in practice because relationships don't form. The mandate dies from isolation."
   },
   {
-    name: "The Wanderer",
+    name: "The Navigator",
     "#": "2",
     weakest_dimension: "Mandate Clarity",
-    risk_layer: "Layer 1 — Expectation & Relationship Risk",
-    failure_pattern: "Misunderstands what the role actually requires. Misaligned expectations create early friction.",
-    weakest_dim_id: "D1"
+    three_fires_correlation: "Fire 1: Expectation gap",
+    failure_pattern: "Misunderstands what the role actually requires. Misaligned expectations create early friction."
   },
   {
     name: "The Chameleon",
     "#": "3",
     weakest_dimension: "Communication Alignment",
-    risk_layer: "Layer 2 — Delivery & Pressure Risk",
-    failure_pattern: "Says all the right things in the wrong way. Message is right but delivery creates friction.",
-    weakest_dim_id: "D3"
+    three_fires_correlation: "Fire 2: Communication misfire",
+    failure_pattern: "Says all the right things in the wrong way. Message is right but delivery creates friction."
   },
   {
     name: "The Anchor",
     "#": "4",
     weakest_dimension: "Pressure Resilience",
-    risk_layer: "Layer 2 — Delivery & Pressure Risk",
-    failure_pattern: "Starts strong, deteriorates under sustained pressure. The mandate doesn't fail in good times — it fails in the first crisis.",
-    weakest_dim_id: "D4"
+    three_fires_correlation: "Fire 2: Pressure collapse",
+    failure_pattern: "Starts strong, deteriorates under sustained pressure. The mandate doesn't fail in good times — it fails in the first crisis."
   },
   {
     name: "The Sprinter",
     "#": "5",
     weakest_dimension: "Long-Game Thinking",
-    risk_layer: "Layer 3 — Sustained Impact Risk",
-    failure_pattern: "Wins short-term results but erodes long-term relationship capital. The board sees Q1 wins and doesn't notice the damage.",
-    weakest_dim_id: "D5"
+    three_fires_correlation: "Fire 3: Short-term trap",
+    failure_pattern: "Wins short-term results but burns long-term relationship capital. The board sees Q1 wins and doesn't notice the damage."
   },
   {
     name: "The Cultural Operator",
     "#": "6",
     weakest_dimension: "No dim <50, Cultural Fluency >70",
-    risk_layer: "Lowest overall risk (protective profile)",
-    failure_pattern: "The ideal BRIDGE profile. Strong across all dimensions with cultural fluency as a demonstrated strength.",
-    weakest_dim_id: "D6"
+    three_fires_correlation: "Minimal fire risk",
+    failure_pattern: "The ideal BRIDGE profile. Strong across all dimensions with cultural fluency as a demonstrated strength."
   }
 ];
+
 
 export const SCORING_CONFIG = {
   INSTRUMENT, FULL_NAME, VERSION, TOTAL_QUESTIONS, SCALE, DELIVERY_MINUTES,

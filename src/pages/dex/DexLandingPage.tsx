@@ -15,18 +15,18 @@ export function DexLandingPage() {
       <section className="bg-white text-gray-900">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-fuchsia/10 text-fuchsia text-xs font-semibold uppercase tracking-wide mb-5">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 text-teal-600 text-xs font-semibold uppercase tracking-wide mb-5">
               <Sparkles className="w-3 h-3" />
               Executive Introduction · 5 Complimentary Messages
             </div>
             <h1
               className="text-4xl md:text-5xl font-bold leading-tight mb-4"
-              style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
+              style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
             >
               AI-powered executive advisory for China-APAC leaders
             </h1>
             <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8 max-w-2xl">
-              LYC Intelligence is your always-on advisor for career strategy, compensation benchmarking, and
+              DEX AI is your always-on advisor for career strategy, compensation benchmarking, and
               cross-border transitions — trained on LYC Partners' placement intelligence across 7,400+
               executive mandates.
             </p>
@@ -51,19 +51,19 @@ export function DexLandingPage() {
         <div className="text-center max-w-2xl mx-auto mb-12">
           <h2
             className="text-3xl md:text-4xl font-bold text-[#1A1A2E] mb-3"
-            style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
+            style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
           >
-            What LYC Intelligence can do for you
+            What DEX AI can do for you
           </h2>
           <p className="text-sm text-gray-600">
-            Four dimensions of executive intelligence, available the moment you need them.
+            Four pillars of executive intelligence, available the moment you need them.
           </p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { icon: Brain, title: 'Career Strategy', desc: 'Map your next move with placement data from 7,400+ mandates.' },
             { icon: LineChart, title: 'Compensation Benchmarking', desc: 'Know your market worth across China and APAC roles.' },
-            { icon: Compass, title: 'Cross-Border Transitions', desc: 'Manage moves between Shanghai, Singapore, and Hong Kong.' },
+            { icon: Compass, title: 'Cross-Border Transitions', desc: 'Navigate moves between Shanghai, Singapore, and Hong Kong.' },
             { icon: Shield, title: 'Confidential Advisory', desc: 'Private, non-judgmental guidance from a trusted partner.' },
           ].map(f => (
             <div key={f.title} className="p-6 border border-gray-100 hover:border-fuchsia/30 transition-colors">
@@ -83,7 +83,7 @@ export function DexLandingPage() {
           <div className="text-center mb-10">
             <h2
               className="text-3xl md:text-4xl font-bold text-[#1A1A2E] mb-3"
-              style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
+              style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
             >
               Simple, miles-based access
             </h2>
@@ -93,7 +93,7 @@ export function DexLandingPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { name: 'Executive Introduction', price: 'Complimentary', detail: '5 messages to experience LYC Intelligence', cta: 'Start Now', href: '/dex/chat' },
+              { name: 'Executive Introduction', price: 'Complimentary', detail: '5 messages to experience DEX AI', cta: 'Start Now', href: '/dex/chat' },
               { name: 'Miles Pack', price: 'Pay as you go', detail: '1 mile per message — buy what you need', cta: 'Get Miles', href: '/dex/credits' },
               { name: 'Monthly Pro', price: 'Subscription', detail: '100 mi/month + priority responses', cta: 'View Plans', href: '/dex/credits' },
             ].map(p => (
@@ -114,7 +114,7 @@ export function DexLandingPage() {
       <section className="max-w-4xl mx-auto px-4 md:px-6 py-16 md:py-20 text-center">
         <h2
           className="text-3xl md:text-4xl font-bold text-[#1A1A2E] mb-4"
-          style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
+          style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
         >
           Ready for 1:1 guidance?
         </h2>

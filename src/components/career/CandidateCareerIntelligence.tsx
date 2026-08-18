@@ -253,7 +253,7 @@ export function CandidateCareerIntelligence({ contactId, contactData }: Candidat
           <textarea
             value={conversationText}
             onChange={e => setConversationText(e.target.value)}
-            placeholder="Paste or type the conversation content here. Our system will extract signals, preferences, and update the candidate profile."
+            placeholder="Paste or type the conversation content here. The AI will extract signals, preferences, and update the candidate profile."
             className="w-full h-32 p-3 border border-border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           />
           <div className="flex justify-end gap-2 mt-3">

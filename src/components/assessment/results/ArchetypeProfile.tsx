@@ -19,10 +19,10 @@ export function ArchetypeProfile({ config }: Props) {
         <div className={`${prefix}-reveal`} style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Your archetype</span>
           <h2 className="section-heading" style={{
-            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
+            fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20,
           }}>
-            The <em style={{ fontWeight: 400 }}>{archetype.canonName ?? archetype.name}</em>
+            The <em style={{ fontWeight: 400 }}>{archetype.name}</em>
           </h2>
         </div>
 
@@ -37,7 +37,7 @@ export function ArchetypeProfile({ config }: Props) {
               width: 48, height: 3, background: accent, marginBottom: 24,
             }} />
             <h3 style={{
-              fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+              fontFamily: "'Libre Baskerville', Georgia, serif",
               fontSize: 22, fontWeight: 700, color: INK, marginBottom: 16, lineHeight: 1.25,
             }}>
               What this means

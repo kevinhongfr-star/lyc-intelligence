@@ -14,7 +14,7 @@ import { toast } from '@/stores/toastStore';
 import { FileText, Trash2, Calendar, ExternalLink, X, Check } from 'lucide-react';
 
 const DS = {
-  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+  headingFont: "'Libre Baskerville', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',
@@ -26,8 +26,8 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '0',
-  radiusSm: '0',
+  radius: '12px',
+  radiusSm: '8px',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
@@ -40,9 +40,9 @@ export function DocumentsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const tier = profile?.tier || 'explorer';
+  const tier = profile?.tier || 'free';
   const maxDocs = getMaxDocumentsForTier(tier);
-  const canUpload = tier !== 'explorer' && documents.length < maxDocs;
+  const canUpload = tier !== 'free' && documents.length < maxDocs;
 
   useEffect(() => {
     if (!user) {
@@ -104,7 +104,7 @@ export function DocumentsPage() {
     setDeletingId(null);
   };
 
-  if (tier === 'explorer') {
+  if (tier === 'free') {
     return (
       <div style={{ minHeight: '100vh', background: DS.bg, padding: '48px 24px' }}>
         <div style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>

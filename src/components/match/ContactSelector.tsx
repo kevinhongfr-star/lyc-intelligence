@@ -10,8 +10,8 @@ const DS = {
   text: '#000000',
   textSecondary: '#333333',
   muted: '#666666',
-  radius: '0',
-  radiusSm: '0',
+  radius: '12px',
+  radiusSm: '8px',
 };
 
 interface DbContact {
@@ -132,7 +132,7 @@ export function ContactSelector({ open, onClose, onSelect, multi = true }: Conta
       }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <h3 style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontSize: '18px', fontWeight: 700, margin: 0 }}>
+          <h3 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '18px', fontWeight: 700, margin: 0 }}>
             Select Candidates from Database
           </h3>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>

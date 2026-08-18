@@ -117,7 +117,7 @@ export function SavedSearchList({ orgId, userId, onSelectSearch, onEditSearch }:
         <Card className="p-8 text-center">
           <Search className="w-12 h-12 text-text-muted mx-auto" />
           <p className="text-text-muted mt-4">No saved searches</p>
-          <p className="text-sm text-text-muted mt-2">Save your first search to begin</p>
+          <p className="text-sm text-text-muted mt-2">Save your first search to get started</p>
         </Card>
       ) : (
         <div className="space-y-2">

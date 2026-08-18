@@ -29,7 +29,7 @@ function InstrumentCard({ key, assessment, fullWidth }: { key?: string | number;
       className={`bg-bg-primary border border-bg-tertiary p-5 flex flex-col hover:bg-bg-secondary transition-colors ${
         fullWidth ? 'col-span-1 md:col-span-2 lg:col-span-3' : ''
       }`}
-      style={{ }}
+      style={{ borderRadius: 0 }}
     >
       <div className="flex items-center justify-between mb-3">
         <span
@@ -95,7 +95,7 @@ function InstrumentCard({ key, assessment, fullWidth }: { key?: string | number;
         <Link
           to={`/assessment/${assessment.code.toLowerCase()}`}
           className="text-sm text-text-primary px-3 py-1.5 border border-bg-tertiary hover:bg-bg-tertiary transition-colors whitespace-nowrap"
-          style={{ }}
+          style={{ borderRadius: 0 }}
         >
           Explore →
         </Link>

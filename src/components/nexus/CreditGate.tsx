@@ -5,14 +5,14 @@ import { useAuthStore } from '@/stores/authStore';
 
 interface CreditGateProps {
   messageCount: number;
-  onApproved: (reason: 'intro_tier' | 'credit_deducted') => void;
+  onApproved: (reason: 'free_trial' | 'credit_deducted') => void;
   onUpgrade: () => void;
   onCancel: () => void;
 }
 
 interface CreditCheckResult {
   allowed: boolean;
-  reason: 'intro_tier' | 'credit_deducted' | 'insufficient_credits';
+  reason: 'free_trial' | 'credit_deducted' | 'insufficient_credits';
   balance?: number;
 }
 
@@ -22,16 +22,16 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
   const [result, setResult] = useState<CreditCheckResult | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const INTRO_TIER_LIMIT = 5;
+  const FREE_TRIAL_LIMIT = 5;
 
   useEffect(() => {
     const checkCredits = async () => {
       setLoading(true);
       
       try {
-        if (messageCount <= INTRO_TIER_LIMIT) {
-          setResult({ allowed: true, reason: 'intro_tier' });
-          onApproved('intro_tier');
+        if (messageCount <= FREE_TRIAL_LIMIT) {
+          setResult({ allowed: true, reason: 'free_trial' });
+          onApproved('free_trial');
           return;
         }
 
@@ -100,7 +100,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
               </h3>
               <p className="text-text-muted text-sm">
                 {r.balance === 0 
-                  ? 'Executive Introduction conversations are limited. Add a Starter plan to unlock miles and open all 6 leadership assessments.'
+                  ? 'Executive Introduction conversations are limited. Add a Starter plan to unlock miles and open the 11 instruments.'
                   : `You have ${r.balance} mi remaining.`
                 }
               </p>
@@ -136,7 +136,7 @@ export function CreditGate({ messageCount, onApproved, onUpgrade, onCancel }: Cr
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-accent" />
-                All 6 leadership assessments unlocked
+                All 11 assessments unlocked
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-accent" />

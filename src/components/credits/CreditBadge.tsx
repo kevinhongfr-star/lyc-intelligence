@@ -25,10 +25,10 @@ interface CreditBadgeProps {
 
 export function CreditBadge({ showBalance = true, size = 'md', unit = 'miles' }: CreditBadgeProps) {
   const { profile } = useAuthStore();
-  const balance = profile?.credits?.miles ?? profile?.credits?.balance ?? 0;
-  const tier = profile?.tier || 'explorer';
+  const balance = profile?.credits?.balance ?? 0;
+  const tier = profile?.tier || 'free';
 
-  const isLow = balance <= 5 && tier === 'explorer';
+  const isLow = balance <= 5 && tier === 'free';
   const colors = isLow
     ? { bg: `${DS.warning}20`, border: `${DS.warning}40`, text: DS.warning }
     : { bg: `${DS.accent}20`, border: `${DS.accent}40`, text: DS.accent };
@@ -64,7 +64,7 @@ export function CreditBadge({ showBalance = true, size = 'md', unit = 'miles' }:
           {balance} {size !== 'sm' ? unitLabel : ''}
         </span>
       )}
-      {tier !== 'explorer' && (
+      {tier !== 'free' && (
         <span style={{
           fontSize: '11px',
           fontWeight: 600,

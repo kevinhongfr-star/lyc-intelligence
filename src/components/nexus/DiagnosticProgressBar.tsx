@@ -2,7 +2,7 @@ import React from 'react';
 import { CheckCircle2, Circle } from 'lucide-react';
 
 const DS = {
-  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+  headingFont: "'Libre Baskerville', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',
@@ -139,7 +139,7 @@ export function DiagnosticProgressBar({ dimensions, progress, className }: Diagn
   );
 }
 
-// Default dimensions for NEXUS diagnostic
+// Default dimensions for Nexus diagnostic
 export const DEFAULT_DIAGNOSTIC_DIMENSIONS: DiagnosticDimension[] = [
   { id: 'role', label: 'Role — Mandate, scope, authority', complete: false },
   { id: 'situation', label: 'Situation — Context, market position', complete: false },

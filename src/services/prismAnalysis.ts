@@ -27,7 +27,7 @@ export interface PRISMSubmitResponse {
  * POST /api/scoring/prism
  */
 export async function submitPRISMAssessment(
-  answers: Record<string, number | number[] | string>,
+  answers: Record<string, number | number[]>,
   context?: { role?: string; industry?: string; yearsExperience?: number },
   userId?: string
 ): Promise<PRISMSubmitResponse> {

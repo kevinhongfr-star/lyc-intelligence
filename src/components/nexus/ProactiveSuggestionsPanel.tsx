@@ -3,7 +3,7 @@
  *
  * Surfaces pending proactive suggestions (stage changes, new matches, assessment
  * milestones, profile strengths, stale-conversation nudges) to the user inside
- * the NEXUS chat surface. Each suggestion has a CTA + dismiss action.
+ * the Nexus chat surface. Each suggestion has a CTA + dismiss action.
  *
  * Data source: GET /api/nexus/suggestions (RBAC-authenticated).
  */

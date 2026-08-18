@@ -36,7 +36,7 @@ const CREDIT_PACKS: CreditPackPlan[] = [
     name: 'Professional Pack',
     price: '$39.99',
     credits: '500 mi',
-    features: ['1 mile per DEX message', 'Optimal miles per purchase', 'No expiry'],
+    features: ['1 mile per DEX message', 'Best value per mile', 'No expiry'],
     featured: true,
   },
   {
@@ -116,10 +116,10 @@ export function CreditStorePage() {
     }
   };
 
-  // `tier` from useCredits() is typed as canonical CreditTier
-  // ('explorer'|'starter'|'pro'|'executive'|'council'). Council members get
-  // unlimited miles — check the canonical value.
-  const isCouncil = (tier as string) === 'council';
+  // `tier` from useCredits() is typed as CreditTier ('free'|'basic'|'pro'|'enterprise'),
+  // but the Stripe webhook may set the profile tier to 'council' at runtime, so cast
+  // for the membership check.
+  const isCouncil = (tier as string) === 'council' || tier === 'enterprise';
 
   return (
     <div className="min-h-screen bg-white">
@@ -134,7 +134,7 @@ export function CreditStorePage() {
           </div>
           <h1
             className="text-3xl font-bold text-[#1A1A2E] mb-2"
-            style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
+            style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
           >
             Miles & Plans
           </h1>

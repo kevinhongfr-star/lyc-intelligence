@@ -117,7 +117,7 @@ export function DexAssessPage() {
       assessmentType: 'dex_leadership_self',
       answers,
       scores,
-      archetype: (archetype as any).canonName ?? archetype.name,
+      archetype: archetype.name,
       compositeScore: composite,
     });
     setSubmitting(false);
@@ -142,11 +142,11 @@ export function DexAssessPage() {
             </div>
             <h1
               className="text-3xl font-bold text-[#1A1A2E] mb-2"
-              style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
+              style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
             >
               Your Leadership Profile
             </h1>
-            <div className="text-fuchsia font-semibold text-xl">{result.archetype.canonName ?? result.archetype.name}</div>
+            <div className="text-fuchsia font-semibold text-xl">{result.archetype.name}</div>
           </div>
           <Card className="mb-6">
             <CardContent className="p-6">
@@ -190,7 +190,7 @@ export function DexAssessPage() {
           </div>
           <h1
             className="text-3xl font-bold text-[#1A1A2E] mb-2"
-            style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
+            style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
           >
             Executive Leadership Self-Assessment
           </h1>

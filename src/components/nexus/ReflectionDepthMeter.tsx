@@ -3,7 +3,7 @@ import { TrendingUp, ChevronUp } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 const DS = {
-  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+  headingFont: "'Libre Baskerville', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',
@@ -112,7 +112,7 @@ export function ReflectionDepthMeter({
               right: 0,
               height: `${fillPercent}%`,
               background: `linear-gradient(180deg, ${DS.accent} 0%, ${DS.accentHover} 100%)`,
-              transition: 'height 350ms cubic-bezier(0.4, 0, 0.2, 1)',
+              transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
           {DEPTH_LEVELS.map((_, i) => {

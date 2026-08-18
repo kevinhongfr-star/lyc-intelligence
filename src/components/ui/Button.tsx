@@ -1,45 +1,25 @@
 /**
- * Design system: Button (#1355).
+ * Design system: Button
  *
- * Single shared Button component for the entire surface. 3 canonical variants
- * × 3 sizes, plus semantic `success`/`danger` (status only, not decorative).
+ * Strengthened from the Phase 0 version. Adds:
+ *   - `loading` state (renders a spinner, disables interaction)
+ *   - `leftIcon` / `rightIcon` slots
+ *   - `forwardRef` for ref forwarding
+ *   - Full `ButtonHTMLAttributes` passthrough
  *
- * Brand rules:
- *  - Zero border radius (#1349).
- *  - DM Sans body font, font-weight medium.
- *  - 150ms ease-out hover/transition (#1367) — no default "ease".
- *  - Min 44px touch target.
- *  - Fuchsia accent reserved for the Primary variant only.
- *
- * Variant aliases (`primary`/`secondary`/`ghost`) are the canonical ECHO v1.2
- * names; `default`/`outline` are retained as backwards-compatible aliases so
- * existing call sites keep rendering unchanged.
- *
- * Also adds: `loading` state, `leftIcon`/`rightIcon` slots, `forwardRef`, and
- * full `ButtonHTMLAttributes` passthrough.
+ * Variant keys (`default | outline | ghost | success`) are kept identical to
+ * the Phase 0 Button so existing call sites keep rendering unchanged.
  */
 import React, { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
-export type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'ghost'
-  | 'default'
-  | 'outline'
-  | 'success'
-  | 'danger';
+export type ButtonVariant = 'default' | 'outline' | 'ghost' | 'success' | 'danger';
 export type ButtonSize = 'sm' | 'default' | 'lg';
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  // Canonical ECHO v1.2 variants (#1355)
-  primary: 'bg-accent hover:bg-accent-hover text-white',
-  secondary: 'bg-[var(--color-bg-dark)] text-white border border-[var(--color-bg-dark)] hover:opacity-90',
-  ghost: 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary',
-  // Backwards-compatible aliases
   default: 'bg-accent hover:bg-accent-light text-white',
   outline: 'border border-bg-tertiary text-text-primary hover:bg-bg-tertiary',
-  // Semantic status variants (permitted alongside the single decorative accent)
+  ghost: 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary',
   success: 'bg-tier-1 hover:bg-tier-1/80 text-white',
   danger: 'bg-red-600 hover:bg-red-700 text-white',
 };
@@ -84,8 +64,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       disabled={isDisabled}
       aria-busy={loading || undefined}
       className={cn(
-        'inline-flex items-center justify-center gap-2 font-sans font-medium',
-        'rounded-none transition-colors duration-200 ease-out min-h-[44px]',
+        'inline-flex items-center justify-center gap-2 font-medium transition-colors min-h-[44px]',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
         VARIANTS[variant],

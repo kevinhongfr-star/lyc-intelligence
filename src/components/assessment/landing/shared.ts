@@ -1,36 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
-// #1351 / #1353 — canonical tokens from the single source of truth.
-import { ACCENT, EYEBROW } from '@/tokens';
 
 // ── DESIGN TOKENS ──────────────────────────────────────────────────
-// Re-exported here so existing call sites (`INK`, `G400`, etc.) keep working,
-// but the canonical values now flow from `@/tokens`.
 export const INK = '#0F1115';
 export const OFF = '#F5F5F3';
 export const G100 = '#FAFAFA';
 export const G200 = '#E8E8E5';
 export const G300 = '#D4D4D1';
-export const G400 = '#9CA3AF';   /* gray-400 — fainter metadata only */
+export const G400 = '#9CA3AF';
 export const G600 = '#4B5563';
 export const WHITE = '#FFFFFF';
-
-// #1376 / #1353 — ECHO brand spec v1.2. ONE accent (LYC fuchsia #C108AB),
-// reserved for CTAs + key highlights only. Section eyebrows use the canonical
-// light gray #616170 (gray-500 / EYEBROW token), NOT #9CA3AF and NOT accent.
-export const BRAND_ACCENT = ACCENT;
-export const EYEBROW_GRAY = EYEBROW;   /* #616170 — canonical eyebrow color */
-
-// #1376 — canonical category labels for the 6 assessments. Mirrors the subtitle
-// system on the catalog page so every landing shows the same descriptive label
-// regardless of which caller built the config (PrismLanding vs DiagnosticLandingPage).
-export const ASSESSMENT_SUBTITLE: Record<string, string> = {
-  PRISM: 'Career & Professional Branding',
-  SPARK: 'AI Leadership Readiness',
-  FORGE: 'Sales Excellence',
-  BRIDGE: 'China Leadership Readiness',
-  MOSAIC: 'Cultural Intelligence',
-  DRIVE: 'Execution Capability',
-};
 
 export const monoStyle: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
@@ -68,11 +46,8 @@ export function makeBtnPrimary(accent: string): React.CSSProperties {
 export function makeBtnSecondary(accent: string): React.CSSProperties {
   return { ...btnBase, background: 'transparent', color: INK, borderColor: INK };
 }
-export function makeSectionLabel(_accent: string): React.CSSProperties {
-  // #1353 — brand v1.2 spec: eyebrow/section labels use the canonical light
-  // gray #616170 (EYEBROW token / gray-500), NOT #9CA3AF and NOT the accent.
-  // Accent is reserved for CTAs + interactive key highlights only.
-  return { ...monoStyle, color: EYEBROW, marginBottom: 20, display: 'inline-block' };
+export function makeSectionLabel(accent: string): React.CSSProperties {
+  return { ...monoStyle, color: accent, marginBottom: 20, display: 'inline-block' };
 }
 
 // ── MOTION HOOKS ───────────────────────────────────────────────────
@@ -165,10 +140,6 @@ export interface AssessmentLandingConfig {
   tagline: string;
   /** Short marketing description for hero */
   heroDescription: string;
-  /** X5-7: Outcome-first H1 text (replaces code as H1). If omitted, falls back to name/code. */
-  heroH1?: string;
-  /** X5-7: Eyebrow text for code + full name (e.g. "PRISM · PROFESSIONAL BRAND LEGIBILITY"). If omitted, falls back to tagline/category. */
-  heroEyebrow?: string;
   /** Accent color (hex) */
   accent: string;
   /** CSS class prefix for scroll-reveal isolation */

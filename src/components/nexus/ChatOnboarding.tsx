@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/stores/authStore';
-import { NEXUSChat } from './NexusChat';
+import { NexusChat } from './NexusChat';
 import { SignupPrompt } from './SignupPrompt';
 import { ProfileCompletion } from './ProfileCompletion';
 import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditService';
@@ -105,7 +105,7 @@ export function ChatOnboarding({ onComplete }: ChatOnboardingProps) {
 
       {/* Chat interface */}
       <div className="relative">
-        <NEXUSChat
+        <NexusChat
           showHeader={true}
           onMessageSent={handleMessageSent}
           onCreditCheck={handleCreditBalance}

@@ -40,11 +40,11 @@ interface PastResult {
 }
 
 const DIMENSION_DISPLAY: Array<{ id: DimensionId; icon: typeof Compass; color: string }> = [
-  { id: 'strategic_orientation', icon: Compass, color: 'bg-[#C108AB]' },
-  { id: 'cross_border_adaptability', icon: Globe, color: 'bg-[#C108AB]' },
-  { id: 'stakeholder_influence', icon: Users, color: 'bg-[#C108AB]' },
-  { id: 'execution_discipline', icon: Target, color: 'bg-[#C108AB]' },
-  { id: 'leadership_presence', icon: Award, color: 'bg-[#C108AB]' },
+  { id: 'strategic_orientation', icon: Compass, color: 'bg-indigo-500' },
+  { id: 'cross_border_adaptability', icon: Globe, color: 'bg-blue-500' },
+  { id: 'stakeholder_influence', icon: Users, color: 'bg-emerald-500' },
+  { id: 'execution_discipline', icon: Target, color: 'bg-amber-500' },
+  { id: 'leadership_presence', icon: Award, color: 'bg-rose-500' },
 ];
 
 const CPI_CREDITS = 5;
@@ -60,8 +60,8 @@ export default function CpiPage() {
 
   const startAssessment = () => {
     startTimeRef.current = Date.now();
-    trackCTA({ location: 'assessment_landing', label: 'Start CPI Assessment', destination: undefined, context_id: 'CPI' });
-    trackAssessmentStart('CPI', 'China Leadership Pipeline Diagnostic', 'landing');
+    trackCTA({ location: 'assessment_landing', label: 'Start CPI Diagnostic', destination: undefined, context_id: 'CPI' });
+    trackAssessmentStart('CPI', 'China Leadership Pipeline Index', 'landing');
     setMode('assessment');
   };
 
@@ -104,14 +104,14 @@ export default function CpiPage() {
         if (data.success) {
           setLastResult(data.result);
           // Assessment completion tracking
-          trackAssessmentComplete('CPI', 'China Leadership Pipeline Diagnostic', durationSeconds, 'completed');
+          trackAssessmentComplete('CPI', 'China Leadership Pipeline Index', durationSeconds, 'completed');
           // Purchase/credits tracking for CPI
-          trackAssessmentPurchase('CPI', 'China Leadership Pipeline Diagnostic', CPI_CREDITS, 'miles');
+          trackAssessmentPurchase('CPI', 'China Leadership Pipeline Index', CPI_CREDITS, 'miles');
         }
       }
     } catch (e) {
       reportError(e, { scope: 'cpi:analyze', severity: 'error' });
-      trackAssessmentComplete('CPI', 'China Leadership Pipeline Diagnostic', durationSeconds, 'partial');
+      trackAssessmentComplete('CPI', 'China Leadership Pipeline Index', durationSeconds, 'partial');
       // non-blocking — local results already shown by wizard
     } finally {
       setPersisting(false);
@@ -149,7 +149,7 @@ export default function CpiPage() {
       // Fallback: download as .html file
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Pipeline_Diagnostic_Report_${Date.now()}.html`;
+      a.download = `China_Leadership_Pipeline_Index_Report_${Date.now()}.html`;
       a.click();
     }
     setTimeout(() => URL.revokeObjectURL(url), 5000);
@@ -163,7 +163,7 @@ export default function CpiPage() {
           onClick={() => setMode('landing')}
           className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Pipeline Diagnostic
+          <ArrowLeft className="w-4 h-4" /> Back to China Leadership Pipeline Index
         </button>
         <AssessmentWizard
           prefillEmail={user?.email}
@@ -194,12 +194,12 @@ export default function CpiPage() {
   // ── Landing mode ──
   return (
     <div className="space-y-8">
-      <SEO assessment={getAssessmentMeta('CPI', 'China Leadership Pipeline Diagnostic', 'CPI', 'Flagship leadership pipeline diagnostic validated against 20 years of APAC placement data.', 199, 15, 60)} />
+      <SEO assessment={getAssessmentMeta('CPI', 'China Leadership Pipeline Index', 'CPI', 'Flagship leadership pipeline index validated against 20 years of APAC placement data.', 5, 25, 25)} />
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">China Leadership Pipeline Diagnostic</h1>
+        <h1 className="text-2xl font-bold text-slate-900">China Leadership Pipeline Index</h1>
         <p className="text-sm text-slate-500 mt-1 max-w-2xl">
-          A comprehensive executive leadership assessment measuring five critical dimensions of leadership
+          A comprehensive executive leadership diagnostic measuring five critical dimensions of leadership
           capability for cross-border and China-focused roles. Identify your leadership profile and receive
           a personalized development narrative.
         </p>
@@ -209,7 +209,7 @@ export default function CpiPage() {
       <div className="bg-gradient-to-r from-fuchsia-600 to-purple-700 p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Ready to assess your leadership pipeline readiness?</h2>
+            <h2 className="text-lg font-semibold">Ready to measure your leadership pipeline readiness?</h2>
             <p className="text-sm text-fuchsia-100 mt-1">
               20 scenario questions + 5 cross-border readiness questions · {CPI_CREDITS} mi
             </p>
@@ -218,7 +218,7 @@ export default function CpiPage() {
             onClick={startAssessment}
             className="bg-white text-fuchsia-700 px-6 py-3 font-semibold text-sm hover:bg-fuchsia-50 transition-colors flex items-center gap-2 whitespace-nowrap"
           >
-            Start Assessment <ChevronRight className="w-4 h-4" />
+            Start Diagnostic <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -266,7 +266,7 @@ export default function CpiPage() {
 
       {/* Past results */}
       <div>
-        <h2 className="text-lg font-semibold text-slate-900 mb-3">Assessment History</h2>
+        <h2 className="text-lg font-semibold text-slate-900 mb-3">Diagnostic History</h2>
         {loadingHistory ? (
           <div className="flex items-center text-slate-400 text-sm">
             <Loader2 className="w-4 h-4 animate-spin mr-2" /> Loading…

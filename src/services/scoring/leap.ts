@@ -4,21 +4,19 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "LEAP";
-export const FULL_NAME = "LEAP — competitive positioning";
-export const B2C_NAME = "LEAP — competitive positioning";
+export const FULL_NAME = "Leadership Evaluation & Psychological Profiling";
 export const VERSION = "2.1";
-export const TOTAL_QUESTIONS = 30;
-export const SCALE = "1-5 Likert";
+export const TOTAL_QUESTIONS = 35;
+export const SCALE = "Forced-choice DISC + Likert (mixed)";
 export const DELIVERY_MINUTES = 12;
 export const TIER = "shift";
-export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 149;
-export const TAGLINE = "Five competitive positioning dimensions. Market × Capability × Timing × Risk × Impact.";
+export const B2C_NAME = "Leadership Evaluation & Psychological Profiling";
+export const TAGLINE = "35 forced-choice items. DISC \u00d7 Career Readiness \u00d7 APAC cross-border. The SHIFT suite psychological anchor.";
 
 export const DIMENSIONS = [
   {
-    id: "D1",
-    name: "Market",
+    name: "Positioning",
     weight: 0.25,
     items: [
       {
@@ -31,7 +29,7 @@ export const DIMENSIONS = [
       },
       {
         id: "LEAP_CR03",
-        text: "My professional brand is consistent across all channels and interactions."
+        text: "My professional brand is consistent across all platforms and interactions."
       }
     ],
     reverse_coded: [],
@@ -39,8 +37,7 @@ export const DIMENSIONS = [
     normalised_max: 20
   },
   {
-    id: "D2",
-    name: "Capability",
+    name: "Proof",
     weight: 0.2,
     items: [
       {
@@ -61,8 +58,7 @@ export const DIMENSIONS = [
     normalised_max: 20
   },
   {
-    id: "D3",
-    name: "Timing",
+    name: "Visibility",
     weight: 0.2,
     items: [
       {
@@ -83,8 +79,7 @@ export const DIMENSIONS = [
     normalised_max: 20
   },
   {
-    id: "D4",
-    name: "Risk",
+    name: "Move",
     weight: 0.2,
     items: [
       {
@@ -105,13 +100,12 @@ export const DIMENSIONS = [
     normalised_max: 20
   },
   {
-    id: "D5",
-    name: "Impact",
+    name: "Alignment",
     weight: 0.15,
     items: [
       {
         id: "LEAP_CR13",
-        text: "My current role uses my natural strengths and behavioural style."
+        text: "My current role leverages my natural strengths and behavioural style."
       },
       {
         id: "LEAP_CR14",
@@ -187,26 +181,13 @@ export const DIMENSION_VERDICTS = [
     meaning: "Fully positioned for strategic career transition"
   }
 ];
-// X4-NOTE: LEAP archetype narrative array = 16 computation profiles (4xD × 4xI × 4xS × 4xC grid).
-// Canon LEAP defines 14 customer-facing archetype labels (published names). The 16 grid
-// profiles map into the 14 canonical names via the explicit `canonName` field on each entry
-// below.  Two computation buckets share one canon label with their semantic peers:
-//   · Pioneer  → applies to D B2 (Assertive Contender) + I B1 (Restless Explorer)
-//   · Convener → applies to D B3 (Rising Commander) + I B3 (Connected Mobilizer)
-// The remaining 12 canon labels (14-2) each map to exactly one computation bucket,
-// yielding full coverage of all 14 canon names (Catalyst, Market Strategist, Pioneer,
-// Founder, Anchor, Steward, Cultivator, Guardian, Diplomat, Convener, Translator,
-// Champion, Analyst, Visionary).  Computation bucket count stays 16 (scoring stability);
-// UI surfaces surface canonName for customer-facing rendering and `name` stays as the
-// internal engineering label.
-// X4-verified: no "Architect (Strategic)" / "LEAP Instrument" entries remain in this array.
+
 export const ARCHETYPES = [
   {
     cr_band: "B1",
     name: "The Unproven Driver",
-    canonName: "Visionary",
     prism_parent: "Overexposed Generalist",
-    narrative: "You lead with decisive urgency, but your readiness scores reveal significant gaps in positioning and proof. Your dominant drive is clear, but without a foundation of documented impact and strategic visibility, others may see intensity without substance.",
+    narrative: "You lead with force and urgency, but your readiness scores reveal significant gaps in positioning and proof. Your dominant drive is clear, but without a foundation of documented impact and strategic visibility, others may see intensity without substance.",
     strengths: [
       "Decisive action under pressure",
       "Clear sense of direction",
@@ -224,7 +205,6 @@ export const ARCHETYPES = [
     disc_primary: "D",
     cr_band: "B2",
     name: "The Assertive Contender",
-    canonName: "Pioneer",
     prism_parent: "Overexposed Generalist",
     narrative: "Your D-drive gives you presence and authority. You're building readiness but still have visible gaps — particularly in proof depth or network quality. You're asserting yourself into rooms you're not yet fully credentialed for.",
     strengths: [
@@ -243,7 +223,6 @@ export const ARCHETYPES = [
     disc_primary: "D",
     cr_band: "B3",
     name: "The Rising Commander",
-    canonName: "Convener",
     prism_parent: "Strategic Mover",
     narrative: "You combine decisive leadership with solid readiness foundations. Your positioning is clear, your proof is building, and your move readiness is active. You're on the ascent — the question is execution pace, not direction.",
     strengths: [
@@ -253,7 +232,7 @@ export const ARCHETYPES = [
     ],
     blind_spots: [
       "May accelerate past relationship-building",
-      "Could under-invest in cross-cultural refinement"
+      "Could under-invest in cross-cultural calibration"
     ],
     risk_if_no_action: "Minor risk — main danger is pace outstripping network support"
   },
@@ -261,7 +240,6 @@ export const ARCHETYPES = [
     disc_primary: "D",
     cr_band: "B4",
     name: "The Decisive Strategist",
-    canonName: "Champion",
     prism_parent: "Strategic Mover",
     narrative: "You are the complete package: decisive, positioned, proven, and ready. Your D-drive gives you the authority to command rooms, and your readiness scores confirm you've done the work to back it up. You're market-ready for significant moves.",
     strengths: [
@@ -280,8 +258,7 @@ export const ARCHETYPES = [
     disc_primary: "I",
     cr_band: "B1",
     name: "The Restless Explorer",
-    canonName: "Pioneer",
-    prism_parent: "Scattered Explorer",
+    prism_parent: "Scattered Navigator",
     narrative: "You have infectious energy and enthusiasm, but your readiness scores show you haven't yet channelled that energy into a clear direction. You're exploring widely but landing nowhere. Your I-drive makes you engaging, but without positioning or proof, you risk being liked but not taken seriously.",
     strengths: [
       "High energy and adaptability",
@@ -299,7 +276,6 @@ export const ARCHETYPES = [
     disc_primary: "I",
     cr_band: "B2",
     name: "The Visible Broadcaster",
-    canonName: "Catalyst",
     prism_parent: "Overexposed Generalist",
     narrative: "You're highly visible and engaging, and you're building readiness — but your proof doesn't yet match your presence. You're known, people know your name, but when they look deeper, the substance isn't there yet. Your I-drive creates opportunities that your C-gap may fail to convert.",
     strengths: [
@@ -318,7 +294,6 @@ export const ARCHETYPES = [
     disc_primary: "I",
     cr_band: "B3",
     name: "The Connected Mobilizer",
-    canonName: "Convener",
     prism_parent: "Strategic Mover",
     narrative: "You combine influence with action. Your readiness scores show you're not just visible — you're building real proof and moving strategically. Your I-drive creates natural network advantages, and you're leveraging them effectively.",
     strengths: [
@@ -337,7 +312,6 @@ export const ARCHETYPES = [
     disc_primary: "I",
     cr_band: "B4",
     name: "The Magnetic Closer",
-    canonName: "Market Strategist",
     prism_parent: "Strategic Mover",
     narrative: "You are market-ready with a powerful combination: magnetic influence, documented proof, strategic positioning, and active move readiness. You can open doors AND walk through them. This is the archetype that gets hired for roles they weren't even applied to.",
     strengths: [
@@ -356,13 +330,12 @@ export const ARCHETYPES = [
     disc_primary: "S",
     cr_band: "B1",
     name: "The Anchored Loyalist",
-    canonName: "Guardian",
     prism_parent: "Reluctant Transitioner",
     narrative: "You are deeply steady and committed, but your readiness scores indicate you haven't begun the positioning work needed for a career transition. You're anchored — comfortable, reliable, and invisible to opportunities. Your S-drive creates stability but also inertia.",
     strengths: [
       "Deep institutional knowledge",
       "Trusted and dependable",
-      "Stabilising presence in teams"
+      "Stabilising force in teams"
     ],
     blind_spots: [
       "Confuses comfort with satisfaction",
@@ -375,7 +348,6 @@ export const ARCHETYPES = [
     disc_primary: "S",
     cr_band: "B2",
     name: "The Cautious Steward",
-    canonName: "Steward",
     prism_parent: "Reluctant Transitioner",
     narrative: "You're building readiness carefully and methodically, but your S-drive makes you hesitant to act. You'd rather be over-prepared than under-prepared, which can mean missed windows. You're a reliable steward who needs to learn that calculated risk is part of career progression.",
     strengths: [
@@ -394,7 +366,6 @@ export const ARCHETYPES = [
     disc_primary: "S",
     cr_band: "B3",
     name: "The Dependable Backbone",
-    canonName: "Anchor",
     prism_parent: "Invisible Achiever",
     narrative: "You're ready and capable, but your S-drive means you don't naturally promote yourself. Your readiness scores are solid, but your visibility gap is the bottleneck. You deliver consistently, but decision-makers may not connect your name to the next-level role.",
     strengths: [
@@ -412,13 +383,12 @@ export const ARCHETYPES = [
   {
     disc_primary: "S",
     cr_band: "B4",
-    name: "The Calm Powerhouse",
-    canonName: "Translator",
+    name: "The Quiet Powerhouse",
     prism_parent: "Invisible Achiever",
-    narrative: "You're fully ready for the next level, with one persistent gap: visibility. Your S-drive means you lead from behind, deliver exceptional results steadily, and wait for recognition. But at the senior levels, recognition doesn't come to those who don't create it. You're a powerhouse — but the quiet approach needs to change.",
+    narrative: "You're fully ready for the next level, with one persistent gap: visibility. Your S-drive means you lead from behind, deliver exceptional results quietly, and wait for recognition. But at the senior levels, recognition doesn't come to those who don't create it. You're a powerhouse — but the 'quiet' part needs to change.",
     strengths: [
       "Maximum readiness with deep expertise",
-      "Composed authority",
+      "Quiet authority",
       "Delivers without drama"
     ],
     blind_spots: [
@@ -432,7 +402,6 @@ export const ARCHETYPES = [
     disc_primary: "C",
     cr_band: "B1",
     name: "The Meticulous Understudy",
-    canonName: "Analyst",
     prism_parent: "Invisible Achiever",
     narrative: "You're thorough, precise, and deeply knowledgeable — but you haven't yet translated that into career positioning. Your C-drive makes you a perfectionist who waits until everything is 'ready' before putting yourself forward. That moment never fully arrives.",
     strengths: [
@@ -451,7 +420,6 @@ export const ARCHETYPES = [
     disc_primary: "C",
     cr_band: "B2",
     name: "The Diligent Specialist",
-    canonName: "Cultivator",
     prism_parent: "Invisible Achiever",
     narrative: "You're building readiness with methodical precision, and your C-drive ensures quality in everything you do. But specialists get pigeonholed. Your proof may be deep but narrow, and your visibility may be limited to technical audiences. The market needs to see breadth, not just depth.",
     strengths: [
@@ -470,7 +438,6 @@ export const ARCHETYPES = [
     disc_primary: "C",
     cr_band: "B3",
     name: "The Unseen Expert",
-    canonName: "Diplomat",
     prism_parent: "Invisible Achiever",
     narrative: "Your readiness is rising, your expertise is deep, but you remain under the radar. Your C-drive means you value substance over style — but at senior levels, style is how substance gets recognised. You need to learn that strategic self-promotion is not bragging — it's professional responsibility.",
     strengths: [
@@ -489,7 +456,6 @@ export const ARCHETYPES = [
     disc_primary: "C",
     cr_band: "B4",
     name: "The Precision Operator",
-    canonName: "Founder",
     prism_parent: "Strategic Mover",
     narrative: "You combine analytical precision with full readiness. This is the rarest combination: someone who is both rigorous AND market-ready. Your C-drive ensures you move deliberately and with evidence. You're ready — the question is whether you'll step into the spotlight.",
     strengths: [
@@ -634,7 +600,7 @@ export const LAYERS = {
       {
         id: "LEAP_DQ16",
         set: 8,
-        D: "Assertive",
+        D: "Forceful",
         I: "Spontaneous",
         S: "Harmonious",
         C: "Methodical"
@@ -670,7 +636,7 @@ export const LAYERS = {
           },
           {
             id: "LEAP_CR03",
-            text: "My professional brand is consistent across all channels and interactions."
+            text: "My professional brand is consistent across all platforms and interactions."
           }
         ]
       },
@@ -734,7 +700,7 @@ export const LAYERS = {
         items: [
           {
             id: "LEAP_CR13",
-            text: "My current role uses my natural strengths and behavioural style."
+            text: "My current role leverages my natural strengths and behavioural style."
           },
           {
             id: "LEAP_CR14",
@@ -849,12 +815,12 @@ export const LAYERS = {
   prism_rollup: {
     "Invisible Achiever": [
       "Dependable Backbone",
-      "Calm Powerhouse",
+      "Quiet Powerhouse",
       "Meticulous Understudy",
       "Diligent Specialist",
       "Unseen Expert"
     ],
-    "Scattered Explorer": [
+    "Scattered Navigator": [
       "Restless Explorer"
     ],
     "Reluctant Transitioner": [
@@ -874,7 +840,7 @@ export const LAYERS = {
       "Precision Operator"
     ]
   },
-  mixed_profile_rule: "When no dominant DISC drive emerges (spread < 15 points across all 4 dimensions), assign The Scattered Explorer regardless of CR band."
+  mixed_profile_rule: "When no dominant DISC drive emerges (spread < 15 points across all 4 dimensions), assign The Scattered Navigator regardless of CR band."
 };
 
 export const SCORING_CONFIG = {

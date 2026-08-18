@@ -1,3 +1,8 @@
+// ═══════════════════════════════════════════════════════════
+// BRIDGE Question Bank — None
+// Source of truth: akira_source/diagnostic_portfolio/07_question_banks/
+// ═══════════════════════════════════════════════════════════
+
 export interface BRIDGEQuestion {
   id: string;
   text: string;
@@ -19,12 +24,11 @@ export interface BRIDGEDimensionBank {
 }
 
 export const INSTRUMENT = "BRIDGE";
-export const FULL_NAME = "BRIDGE — cross-cultural relational intelligence";
-export const B2C_NAME = "BRIDGE — cross-cultural relational intelligence";
+export const FULL_NAME = "APAC Mandate Execution & Cross-Border Leadership Readiness";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
-export const DELIVERY_MINUTES = 12;
+export const DELIVERY_MINUTES = 14;
 
 export const DIMENSIONS: BRIDGEDimensionBank[] = [
   {
@@ -34,7 +38,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: ["Q04"],
+    reverse_coded: [],
     questions: [
       {
         id: "Q01",
@@ -62,7 +66,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
       },
       {
         id: "Q04",
-        text: "I find that my understanding of what the mandate requires becomes clearer as I go, rather than having a clear picture at the outset.",
+        text: "I find that my understanding of what the mandate requires becomes clearer as I go, rather than having a clear picture at the outset. [R]",
         type: "likert",
         reverse_coded: true,
         options: null,
@@ -93,7 +97,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: ["Q10"],
+    reverse_coded: [],
     questions: [
       {
         id: "Q07",
@@ -121,7 +125,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
       },
       {
         id: "Q10",
-        text: "I find transactional relationship-building (connecting when I need something) more natural than investing in relationships before a specific need arises.",
+        text: "I find transactional relationship-building (connecting when I need something) more natural than investing in relationships before a specific need arises. [R]",
         type: "likert",
         reverse_coded: true,
         options: null,
@@ -152,7 +156,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: ["Q16"],
+    reverse_coded: [],
     questions: [
       {
         id: "Q13",
@@ -180,7 +184,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
       },
       {
         id: "Q16",
-        text: "I default to my natural communication style under pressure, even when I know it creates friction in the APAC context I am operating in.",
+        text: "I default to my natural communication style under pressure, even when I know it creates friction in the APAC context I am operating in. [R]",
         type: "likert",
         reverse_coded: true,
         options: null,
@@ -211,7 +215,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: ["Q22"],
+    reverse_coded: [],
     questions: [
       {
         id: "Q19",
@@ -239,7 +243,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
       },
       {
         id: "Q22",
-        text: "When the mandate becomes politically difficult, I become more risk-averse and less willing to have the conversations that are needed.",
+        text: "When the mandate becomes politically difficult, I become more risk-averse and less willing to have the conversations that are needed. [R]",
         type: "likert",
         reverse_coded: true,
         options: null,
@@ -270,7 +274,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: ["Q28"],
+    reverse_coded: [],
     questions: [
       {
         id: "Q25",
@@ -298,7 +302,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
       },
       {
         id: "Q28",
-        text: "I find it difficult to invest in relationships or initiatives where the return is more than 12 months away, particularly when short-term results are under pressure.",
+        text: "I find it difficult to invest in relationships or initiatives where the return is more than 12 months away, particularly when short-term results are under pressure. [R]",
         type: "likert",
         reverse_coded: true,
         options: null,
@@ -329,7 +333,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: ["Q35"],
+    reverse_coded: [],
     questions: [
       {
         id: "Q31",
@@ -365,7 +369,7 @@ export const DIMENSIONS: BRIDGEDimensionBank[] = [
       },
       {
         id: "Q35",
-        text: "I find that my instinctive approach to leadership — my default behaviours under pressure — is culturally compatible with the APAC market I am entering.",
+        text: "I find that my instinctive approach to leadership — my default behaviours under pressure — is culturally compatible with the APAC market I am entering. [R]",
         type: "likert",
         reverse_coded: true,
         options: null,

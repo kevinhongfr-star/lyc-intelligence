@@ -28,11 +28,10 @@ interface OrgRow {
 }
 
 const PLAN_TIERS = [
-  { value: 'explorer', label: 'Executive Introduction', seats: 3, color: 'bg-gray-100 text-gray-700' },
+  { value: 'free', label: 'Executive Introduction', seats: 3, color: 'bg-gray-100 text-gray-700' },
   { value: 'starter', label: 'Starter', seats: 10, color: 'bg-blue-100 text-blue-700' },
-  { value: 'pro', label: 'Pro', seats: 50, color: 'bg-fuchsia/10 text-fuchsia' },
-  { value: 'executive', label: 'Executive', seats: 200, color: 'bg-purple-100 text-purple-700' },
-  { value: 'council', label: 'Council', seats: 500, color: 'bg-amber-100 text-amber-700' },
+  { value: 'growth', label: 'Growth', seats: 50, color: 'bg-fuchsia/10 text-fuchsia' },
+  { value: 'enterprise', label: 'Enterprise', seats: 500, color: 'bg-purple-100 text-purple-700' },
 ];
 
 const OrgSettings: React.FC = () => {
@@ -41,7 +40,7 @@ const OrgSettings: React.FC = () => {
   const [editingOrg, setEditingOrg] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<OrgRow>>({});
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newOrg, setNewOrg] = useState({ name: '', plan: 'explorer', billing_email: '' });
+  const [newOrg, setNewOrg] = useState({ name: '', plan: 'free', billing_email: '' });
 
   useEffect(() => {
     loadOrgs();
@@ -106,7 +105,7 @@ const OrgSettings: React.FC = () => {
         billing_email: newOrg.billing_email || undefined,
       });
       setShowCreateModal(false);
-      setNewOrg({ name: '', plan: 'explorer', billing_email: '' });
+      setNewOrg({ name: '', plan: 'free', billing_email: '' });
       loadOrgs();
     } catch (err) {
       alert('Failed to create:' + (err as Error).message);

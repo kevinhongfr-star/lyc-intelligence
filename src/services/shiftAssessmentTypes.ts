@@ -99,8 +99,8 @@ export const SHIFT_ARCHETYPES: Record<string, SHIFTArchetype> = (() => {
       "Seek executive coach for cross-border mastery",
     ],
   };
-  out["Strategic Builder"] = {
-    name: "Strategic Builder",
+  out["Strategic Architect"] = {
+    name: "Strategic Architect",
     description: "Systemic thinker who designs long-horizon strategies.",
     strengths: ["Long-horizon strategic framing", "Complex systems mapping", "Trade-off discipline"],
     development: ["Tighten execution cadence", "Balance big-picture with ground-level detail", "Strengthen stakeholder co-creation"],

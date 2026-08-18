@@ -9,7 +9,7 @@ const DS = {
   textSecondary: '#CCCCCC',
   success: '#10B981',
   warning: '#F59E0B',
-  radius: '0'
+  radius: '12px'
 };
 
 interface Props {
@@ -38,7 +38,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
     left: 0,
     right: 0,
     bottom: 0,
-    background: `radial-gradient(circle at 10% 20%, ${DS.accent}20 0%, transparent 50%), radial-gradient(circle at 90% 80%, #C108AB18 0%, transparent 50%)`
+    background: `radial-gradient(circle at 10% 20%, ${DS.accent}20 0%, transparent 50%), radial-gradient(circle at 90% 80%, #00897B20 0%, transparent 50%)`
   };
 
   switch (type) {

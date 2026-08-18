@@ -22,7 +22,7 @@ export function DimensionsDetail({ config }: Props) {
         <div className={`${prefix}-reveal`} style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Dimension detail</span>
           <h2 className="section-heading" style={{
-            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
+            fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20,
           }}>
             What each dimension <em style={{ fontWeight: 400 }}>really means</em>
@@ -57,7 +57,7 @@ export function DimensionsDetail({ config }: Props) {
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <span style={{
-                      fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+                      fontFamily: "'Libre Baskerville', Georgia, serif",
                       fontSize: 20, fontWeight: 700, color: INK,
                     }}>
                       {d.name}

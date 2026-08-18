@@ -16,8 +16,8 @@
 export const TYPE_SCALE = {
   font: {
     sans: "'DM Sans', system-ui, -apple-system, sans-serif",
-    serif: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
-    mono: "'IBM Plex Mono', ui-monospace, 'Courier New', monospace",
+    serif: "'Libre Baskerville', Georgia, serif",
+    mono: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace",
   },
   scale: {
     display: {
@@ -363,9 +363,9 @@ export const MOTION = {
       slow: '300ms',
     },
     complex: {
-      fast: '300ms',
-      base: '350ms',
-      slow: '350ms',
+      fast: '400ms',
+      base: '500ms',
+      slow: '600ms',
     },
   },
   easing: {

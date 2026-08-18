@@ -8,14 +8,6 @@ import {
 import { generateCPIReportHTML, type CPIReportData } from './cpiReportRenderer';
 import * as reportService from './reportService';
 import type { ScoreResult as AkiraScoreResult } from '../lib/akira/engine';
-import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
-import { SCORING_CONFIGS } from './scoring';
-
-function getInstrumentDisplayName(key: string): string {
-  const upper = key.toUpperCase() as keyof typeof SCORING_CONFIGS;
-  const cfg = SCORING_CONFIGS[upper];
-  return cfg?.B2C_NAME || cfg?.FULL_NAME || `${key.toUpperCase()} Assessment`;
-}
 
 export type InstrumentKey =
   | 'CPI'
@@ -69,23 +61,32 @@ export interface ReportMeta {
   generatedAt?: Date;
 }
 
-// #1379 brand compliance (ECHO Canonical Brand Spec): a SINGLE accent
-// color is permitted across all reports — LYC fuchsia #C108AB. The legacy
-// per-instrument teal/blue/green/amber/purple secondary accents have been
-// collapsed to the fuchsia accent so no secondary brand color leaks into
-// the rendered HTML/PDF reports.
 const INSTRUMENT_ACCENTS: Record<string, string> = {
   CPI: '#C108AB',
   PRISM: '#C108AB',
-  SPARK: '#C108AB',
-  LEAP: '#C108AB',
-  QUEST: '#C108AB',
-  DRIVE: '#C108AB',
-  COACH: '#C108AB',
-  IMPACT: '#C108AB',
-  FORGE: '#C108AB',
-  BRIDGE: '#C108AB',
-  MOSAIC: '#C108AB',
+  SPARK: '#0D9488',
+  LEAP: '#6366F1',
+  QUEST: '#3B82F6',
+  DRIVE: '#F59E0B',
+  COACH: '#10B981',
+  IMPACT: '#F43F5E',
+  FORGE: '#8B5CF6',
+  BRIDGE: '#EC4899',
+  MOSAIC: '#14B8A6',
+};
+
+const INSTRUMENT_NAMES: Record<string, string> = {
+  CPI: 'China Leadership Pipeline Index',
+  PRISM: 'PRISM Leadership Diagnostic',
+  SPARK: 'SPARK AI Readiness Diagnostic',
+  LEAP: 'LEAP — Learning & Execution Potential',
+  QUEST: 'QUEST — Questioning & Inquiry Skills',
+  IMPACT: 'IMPACT — Influence & Executive Presence',
+  FORGE: 'FORGE — Performance & Resilience',
+  DRIVE: 'DRIVE — Execution & Delivery Capability',
+  COACH: 'COACH — Coaching & Leadership Development',
+  BRIDGE: 'BRIDGE — Cross-Border Leadership',
+  MOSAIC: 'MOSAIC — Cultural Agility',
 };
 
 export async function scoreAssessment(
@@ -228,7 +229,7 @@ export async function renderReport(
   const key = instrumentKey.toUpperCase();
   const accent = brandOpts?.accent || INSTRUMENT_ACCENTS[key] || '#C108AB';
   const generatedAt = brandOpts?.generatedAt || new Date();
-  const instrumentName = getInstrumentDisplayName(key);
+  const instrumentName = INSTRUMENT_NAMES[key] || `${key} Assessment`;
 
   if (key === 'CPI') {
     const cpiData: CPIReportData = {
@@ -255,7 +256,7 @@ export async function renderReport(
       const pct = Math.max(0, Math.min(100, score));
       return `<tr>
         <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;font-size:14px;font-weight:500;">${name}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;text-align:center;font-family:serif;font-weight:700;font-size:18px;color:${color};">${score}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;text-align:center;font-family:Georgia,serif;font-weight:700;font-size:18px;color:${color};">${score}</td>
         <td style="padding:10px 12px;border-bottom:1px solid #F0F0F0;">
           <div style="width:100%;height:10px;background:#F0F0F0;">
             <div style="height:100%;width:${pct}%;background:${color};"></div>
@@ -285,7 +286,7 @@ export async function renderReport(
   const actionsList = (result.development_actions || [])
     .sort((a, b) => a.priority - b.priority)
     .map((a, i) => `<li style="display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #F0F0F0;font-size:14px;">
-      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">${i + 1}</span>
+      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">${i + 1}</span>
       <div>
         <div style="font-weight:600;margin-bottom:4px;">${a.dimension}</div>
         <div style="color:#333;line-height:1.6;">${a.action}</div>
@@ -293,7 +294,7 @@ export async function renderReport(
       </div>
     </li>`)
     .join('') || `<li style="display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #F0F0F0;font-size:14px;">
-      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">1</span>
+      <span style="flex-shrink:0;width:32px;height:32px;background:${accent};color:#fff;font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;">1</span>
       <div>
         <div style="font-weight:600;margin-bottom:4px;">Focused Practice</div>
         <div style="color:#333;line-height:1.6;">Identify your lowest-scoring dimension and schedule a weekly 60-minute focused practice for the next 90 days.</div>
@@ -322,39 +323,29 @@ export async function renderReport(
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${instrumentName} — ${result.archetype}</title>
 <style>
-  /* #1273: Standalone report HTML — self-hosted font URLs relative to the app root.
-     When exported/saved as a standalone HTML file, fonts fall back to system equivalents.
-     X5-13 FIX: Headings use native system serif (generic 'serif'). NO Crimson Pro loaded —
-     prior code claimed 'DejaVu Serif' while actually loading CrimsonPro woff2, a font-face
-     bait-and-switch. Fixed to use actual native serif stack with zero FOIT. */
-  @font-face { font-family:'DM Sans'; src:url('/fonts/DMSans-Regular.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }
-  @font-face { font-family:'DM Sans'; src:url('/fonts/DMSans-Medium.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap; }
-  @font-face { font-family:'DM Sans'; src:url('/fonts/DMSans-SemiBold.woff2') format('woff2'); font-weight:600; font-style:normal; font-display:swap; }
-  @font-face { font-family:'DM Sans'; src:url('/fonts/DMSans-Bold.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }
-  @font-face { font-family:'IBM Plex Mono'; src:url('/fonts/IBMPlexMono-Regular.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }
-  @font-face { font-family:'IBM Plex Mono'; src:url('/fonts/IBMPlexMono-Medium.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap; }
-  * { margin:0; padding:0; box-sizing:border-box; border-radius:0 !important; }
+  @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'DM Sans',system-ui,sans-serif; color:#1a1a1a; line-height:1.6; background:#FFFFFF; }
   .page { width:210mm; min-height:297mm; padding:22mm 20mm; margin:0 auto; background:#fff; }
   .section { margin-bottom:36px; page-break-inside:avoid; }
-  h1,h2,h3 { font-family:serif; color:#1a1a1a; }
+  h1,h2,h3 { font-family:'Libre Baskerville',Georgia,serif; color:#1a1a1a; }
   h2 { font-size:22px; border-bottom:2px solid ${accent}; padding-bottom:8px; margin-bottom:16px; }
   h3 { font-size:16px; margin-bottom:8px; }
   .accent { color:${accent}; }
   .mono { font-family:'IBM Plex Mono','Courier New',monospace; }
   .cover { text-align:center; padding:60px 0 40px; border-bottom:3px solid ${accent}; margin-bottom:40px; }
-  .cover .brand { font-family:serif; font-size:28px; font-weight:700; color:${accent}; letter-spacing:1px; margin-bottom:8px; }
+  .cover .brand { font-family:'Libre Baskerville',serif; font-size:28px; font-weight:700; color:${accent}; letter-spacing:1px; margin-bottom:8px; }
   .cover h1 { font-size:32px; margin:16px 0 8px; }
   .cover .subtitle { font-size:15px; color:#666; margin-bottom:24px; }
   .cover .meta { display:inline-block; padding:16px 32px; background:#F5F5F5; border-left:4px solid ${accent}; text-align:left; }
   .cover .meta-row { font-size:14px; margin:4px 0; }
   .cover .meta-label { color:#666; display:inline-block; width:110px; }
-  .archetype-badge { display:inline-block; margin-top:20px; padding:10px 28px; background:${accent}; color:#fff; font-family:serif; font-size:18px; font-weight:700; }
+  .archetype-badge { display:inline-block; margin-top:20px; padding:10px 28px; background:${accent}; color:#fff; font-family:'Libre Baskerville',serif; font-size:18px; font-weight:700; }
   .score-display { display:flex; align-items:center; gap:24px; margin-bottom:16px; }
-  .score-circle { width:110px; height:110px; border-radius:0; border:6px solid ${accent}; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; }
-  .score-circle .num { font-family:serif; font-size:34px; font-weight:700; color:${accent}; line-height:1; }
+  .score-circle { width:110px; height:110px; border-radius:50%; border:6px solid ${accent}; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; }
+  .score-circle .num { font-family:'Libre Baskerville',serif; font-size:34px; font-weight:700; color:${accent}; line-height:1; }
   .score-circle .max { font-size:12px; color:#999; }
-  .score-info .tier { font-family:serif; font-size:20px; color:${accent}; font-weight:700; }
+  .score-info .tier { font-family:'Libre Baskerville',serif; font-size:20px; color:${accent}; font-weight:700; }
   .score-info .archetype { font-size:16px; color:#333; margin-top:4px; }
   .score-info .tagline { font-size:13px; color:#666; font-style:italic; margin-top:4px; }
   table.dimensions { width:100%; border-collapse:collapse; }
@@ -424,7 +415,7 @@ export async function renderReport(
     <h2>Cross-Border Readiness</h2>
     <div class="cb-box">
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
-        <div style="font-family:serif;font-size:28px;font-weight:700;color:${getCrossBorderTier(result.crossBorderScore).color};">
+        <div style="font-family:'Libre Baskerville',serif;font-size:28px;font-weight:700;color:${getCrossBorderTier(result.crossBorderScore).color};">
           ${result.crossBorderScore}<span style="font-size:14px;color:#999;"> / 100</span>
         </div>
         <div>
@@ -497,7 +488,7 @@ export async function getReportMeta(
   resultId?: string
 ): Promise<ReportMeta> {
   const key = instrumentKey.toUpperCase();
-  const name = getInstrumentDisplayName(key);
+  const name = INSTRUMENT_NAMES[key] || `${key} Assessment`;
   const dateStamp = new Date().toISOString().split('T')[0];
 
   const result = resultId ? await lookupResult(resultId) : undefined;
@@ -535,54 +526,18 @@ async function lookupResult(resultId: string): Promise<Partial<ScoreResult> | nu
 export function instrumentToConfig(instrumentKey: string, result: ScoreResult): AssessmentResultsConfig {
   const key = instrumentKey.toUpperCase();
   const accent = INSTRUMENT_ACCENTS[key] || '#C108AB';
-  const assessmentName = getInstrumentDisplayName(key);
+  const assessmentName = INSTRUMENT_NAMES[key] || key;
   const prefix = `${key.toLowerCase()}-results`;
   const lowerKey = key.toLowerCase();
 
-  // P1 #1322 — pull real dimension metadata from the canonical catalog instead
-  // of generic "Low/High" placeholders, and auto-generate the "why it matters"
-  // + "what to do next" layers from score bands so every instrument gets the
-  // progressive-reveal treatment without per-page wiring.
-  const catalogEntry = ASSESSMENT_CATALOG[key];
-  const catalogDimsById = new Map(
-    (catalogEntry?.dimensions || []).map((d) => [d.id, d])
-  );
-
-  const dimensions = Object.entries(result.dimensionScores).map(([id, score]) => {
-    const cat = catalogDimsById.get(id);
-    const name = result.dimensionNames[id] || cat?.name || id;
-    const description = cat?.description || `${name} dimension score`;
-    const lowLabel = cat?.lowLabel || 'Developing';
-    const highLabel = cat?.highLabel || 'Established';
-
-    // Score-band-derived "why it matters" + action suggestion (#1322).
-    let whyItMatters: string;
-    let actionSuggestion: string;
-    if (score >= 75) {
-      whyItMatters = `${name} is a signature strength in your profile. At this level it compounds your other dimensions and is a credible differentiator in executive positioning conversations.`;
-      actionSuggestion = `Lead with ${name} in board and search narratives. Look for mandates where this strength is the primary lever, and use it to offset adjacent gaps rather than over-investing here.`;
-    } else if (score >= 50) {
-      whyItMatters = `${name} is functional but not yet a differentiator. In executive contexts, peers at this band blend in rather than stand out — the gap to the next band is where competitive positioning is won.`;
-      actionSuggestion = `Targeted development on ${name}: identify one high-stakes context per quarter where you deliberately stretch this dimension, and seek feedback from a counterpart who models the high band.`;
-    } else if (score >= 35) {
-      whyItMatters = `${name} is a material gap relative to executive benchmarks. At this band it can quietly cap your readiness for broader mandates — decision-makers will sense it before they can name it.`;
-      actionSuggestion = `Treat ${name} as a primary development priority. Pair a structured 90-day plan with coaching or a NEXUS deep-dive, and revisit with a re-assessment to confirm movement.`;
-    } else {
-      whyItMatters = `${name} is a foundational gap. At this level it is likely already affecting outcomes in your current mandate, not just future ones — it warrants attention before broader positioning work.`;
-      actionSuggestion = `Prioritise ${name} immediately. Start with the development actions below, consider a consultant-matched debrief, and defer high-stakes contexts that depend heavily on this dimension until you see movement.`;
-    }
-
-    return {
-      id,
-      name,
-      score,
-      lowLabel,
-      highLabel,
-      description,
-      whyItMatters,
-      actionSuggestion,
-    };
-  });
+  const dimensions = Object.entries(result.dimensionScores).map(([id, score]) => ({
+    id,
+    name: result.dimensionNames[id] || id,
+    score,
+    lowLabel: 'Low',
+    highLabel: 'High',
+    description: `${result.dimensionNames[id] || id} dimension score`,
+  }));
 
   return {
     assessmentCode: key,

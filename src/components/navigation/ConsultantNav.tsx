@@ -17,7 +17,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { isClientRole, isInternalStaff } from '@/services/portalClassification';
 
 const DS = {
-  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+  headingFont: "'Libre Baskerville', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',

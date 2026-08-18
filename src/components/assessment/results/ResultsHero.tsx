@@ -65,7 +65,7 @@ export function ResultsHero({ config }: Props) {
         {/* Overall score — large, prominent */}
         <div style={{ marginBottom: 32 }}>
           <div style={{
-            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+            fontFamily: "'Libre Baskerville', Georgia, serif",
             fontSize: 96, fontWeight: 700, lineHeight: 1, color: scoreColor,
           }}>
             {animatedScore}
@@ -86,10 +86,10 @@ export function ResultsHero({ config }: Props) {
         }}>
           <span style={{ ...monoStyle, color: accent, fontSize: 10 }}>Archetype</span>
           <span style={{
-            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+            fontFamily: "'Libre Baskerville', Georgia, serif",
             fontSize: 20, fontWeight: 700, color: INK,
           }}>
-            {archetype.canonName ?? archetype.name}
+            {archetype.name}
           </span>
         </div>
 

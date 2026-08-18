@@ -85,10 +85,10 @@ export function BillingDashboard() {
         setMilesBalance(creditInfo.balance);
       }
 
-      const tier = profile?.tier || 'explorer';
+      const tier = profile?.tier || 'member';
       const subStatus = profile?.stripe_subscription_status;
 
-      if (tier !== 'explorer' && subStatus === 'active') {
+      if (tier !== 'member' && tier !== 'free' && subStatus === 'active') {
         setSubscriptionStatus('active');
         const nextDate = new Date();
         nextDate.setDate(nextDate.getDate() + 30);

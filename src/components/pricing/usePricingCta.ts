@@ -1,163 +1,94 @@
-/**
- * usePricingCta.ts — CTA funnel logic for the pricing page (Batch 3 / Ticket 9).
- *
- * Encapsulates the per-tier CTA mapping:
- *  - Explorer  → free signup (no credit card), redirect to /dashboard or /login
- *  - Starter/Pro/Executive → Stripe checkout (monthly or annual)
- *  - Council   → application flow (invite-only, never self-serve signup)
- *
- * Also handles the Explorer → Starter upgrade nudge (triggered after
- * complimentary assessments are used) and money-back guarantee placement.
- */
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/stores/authStore';
-import { authFetch } from '@/utils/authFetch';
-import { trackUpgradeAttempt, trackCTA } from '@/analytics/eventTracker';
-import { reportError } from '@/analytics/errorMonitor';
-import {
-  TIERS,
-  isSelfServeUpgradeAllowed,
-  type TierKey,
-  type BillingCycle,
-} from '@/config/tiers';
+import { TIERS, RECOMMENDED_TIER } from '@/config/pricingData';
+import type { TierKey } from '@/config/pricingData';
 
-/** Stripe price env var mapping per paid tier. */
-const STRIPE_PRICE_ENV: Partial<Record<TierKey, string | undefined>> = {
-  starter: import.meta.env.VITE_STRIPE_PRICE_STARTER as string | undefined,
-  professional: import.meta.env.VITE_STRIPE_PRICE_PRO as string | undefined,
-  executive: import.meta.env.VITE_STRIPE_PRICE_EXECUTIVE as string | undefined,
-  council: import.meta.env.VITE_STRIPE_PRICE_COUNCIL as string | undefined,
-};
-
-export type CtaAction = 'free_signup' | 'stripe_checkout' | 'apply' | 'current';
-
-export interface CtaConfig {
-  action: CtaAction;
-  label: string;
-  /** Whether the button is disabled (e.g. current tier). */
-  disabled: boolean;
+export interface UpgradeCTA {
+  ctaText: string;
+  shortText: string;
+  targetTier: TierKey;
+  targetDisplayName: string;
+  targetMonthlyMiles: number;
+  deltaMiles: number;
+  recommendedHighlight: boolean;
 }
 
-/**
- * Determine the CTA config for a tier given the user's current tier.
- * Council is always "Apply" (invite-only). Explorer is always "Start complimentary".
- * Paid tiers are "Choose X" via Stripe, disabled if it's the current tier.
- */
-export function getCtaConfig(tierKey: TierKey, currentTier: TierKey): CtaConfig {
-  if (tierKey === currentTier) {
-    return { action: 'current', label: 'Current plan', disabled: true };
-  }
-  if (tierKey === 'explorer') {
-    return { action: 'free_signup', label: 'Start complimentary', disabled: false };
-  }
-  if (tierKey === 'council' || !isSelfServeUpgradeAllowed(tierKey)) {
-    return { action: 'apply', label: 'Request invite', disabled: false };
-  }
-  return {
-    action: 'stripe_checkout',
-    label: `Choose ${TIERS[tierKey].displayName}`,
-    disabled: false,
-  };
+const TIERS_BY_KEY = Object.fromEntries(TIERS.map((t) => [t.tier_key, t]));
+
+function orderOf(key: TierKey): number {
+  return TIERS_BY_KEY[key]?.order ?? -1;
 }
 
-export interface UsePricingCtaResult {
-  /** Get the CTA config for a tier. */
-  getCta: (tierKey: TierKey) => CtaConfig;
-  /** Execute the CTA action for a tier. */
-  handleSelectTier: (tierKey: TierKey, cycle: BillingCycle) => Promise<void>;
-  /** Current user tier (normalized). */
-  currentTier: TierKey;
+function nextPaidTier(currentOrder: number): TierKey {
+  const next = TIERS.find((t) => t.order > currentOrder && t.monthlyMiles > 0);
+  if (next) return next.tier_key;
+  return RECOMMENDED_TIER;
 }
 
-/**
- * Pricing CTA hook. Manages Stripe checkout, free signup redirect, and
- * Council application flow. Used by the pricing page and tier cards.
- */
-export function usePricingCta(onUpgradeSuccess?: () => void): UsePricingCtaResult {
-  const navigate = useNavigate();
-  const { user, profile } = useAuthStore();
+export function usePricingCta() {
+  const getUpgradeCTA = useCallback((tierKey: TierKey | null | undefined): UpgradeCTA => {
+    const current = tierKey ? TIERS_BY_KEY[tierKey] : null;
+    const currentOrder = current ? orderOf(current.tier_key) : -1;
 
-  const currentTier: TierKey = (() => {
-    const raw = profile?.tier as string | undefined;
-    const normalized = raw === 'starter' || raw === 'professional' || raw === 'executive' || raw === 'council' || raw === 'explorer'
-      ? (raw as TierKey)
-      : 'explorer';
-    return normalized;
-  })();
+    if (!current) {
+      const target = TIERS_BY_KEY[RECOMMENDED_TIER];
+      return {
+        ctaText: `Upgrade to ${target.display_name}`,
+        shortText: `Choose ${target.display_name}`,
+        targetTier: target.tier_key,
+        targetDisplayName: target.display_name,
+        targetMonthlyMiles: target.monthlyMiles,
+        deltaMiles: target.monthlyMiles,
+        recommendedHighlight: true,
+      };
+    }
 
-  const handleSelectTier = useCallback(
-    async (tierKey: TierKey, cycle: BillingCycle) => {
-      const config = getCtaConfig(tierKey, currentTier);
-      if (config.disabled) return;
+    if (current.tier_key === 'council') {
+      return {
+        ctaText: 'You are on Council — our highest tier',
+        shortText: 'Current: Council',
+        targetTier: 'council',
+        targetDisplayName: 'Council',
+        targetMonthlyMiles: current.monthlyMiles,
+        deltaMiles: 0,
+        recommendedHighlight: false,
+      };
+    }
 
-      // ── Free signup (Explorer) ──
-      if (config.action === 'free_signup') {
-        trackCTA({
-          location: 'pricing_tier',
-          label: 'Start Complimentary',
-          destination: user ? '/dashboard' : '/login',
-          context_id: tierKey,
-        });
-        navigate(user ? '/dashboard' : '/login');
-        return;
-      }
+    const targetKey =
+      orderOf(current.tier_key) < orderOf(RECOMMENDED_TIER)
+        ? RECOMMENDED_TIER
+        : nextPaidTier(currentOrder);
+    const target = TIERS_BY_KEY[targetKey];
 
-      // ── Council application flow (invite-only) ──
-      if (config.action === 'apply') {
-        trackCTA({
-          location: 'pricing_tier',
-          label: 'Request Invite',
-          destination: '/council/apply',
-          context_id: tierKey,
-        });
-        // Route to application page (or contact fallback).
-        navigate('/council/apply');
-        return;
-      }
+    const delta = target.monthlyMiles - current.monthlyMiles;
+    const isRec = targetKey === RECOMMENDED_TIER;
 
-      // ── Stripe checkout (paid tiers) ──
-      trackUpgradeAttempt(tierKey, 'pricing_page');
+    if (current.tier_key === 'explorer') {
+      return {
+        ctaText: isRec
+          ? `Start with ${target.display_name} — recommended`
+          : `Upgrade to ${target.display_name}`,
+        shortText: `Get ${target.display_name}`,
+        targetTier: target.tier_key,
+        targetDisplayName: target.display_name,
+        targetMonthlyMiles: target.monthlyMiles,
+        deltaMiles: target.monthlyMiles,
+        recommendedHighlight: isRec,
+      };
+    }
 
-      try {
-        const priceId = STRIPE_PRICE_ENV[tierKey];
-        if (!priceId) {
-          // Stripe keys not configured yet (#1338) — graceful fallback.
-          throw new Error(
-            `${TIERS[tierKey].displayName} checkout is being configured. Please contact LYC Partners to upgrade.`,
-          );
-        }
-        const response = await authFetch('/api/stripe/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            priceId,
-            tier: tierKey,
-            cycle,
-            successUrl: `${window.location.origin}/account/billing?upgraded=true&tier=${tierKey}`,
-            cancelUrl: `${window.location.origin}/pricing?canceled=true`,
-          }),
-        });
-        const data = await response.json();
-        if (data.url) {
-          window.location.href = data.url;
-          onUpgradeSuccess?.();
-        } else {
-          throw new Error(data.error || 'Failed to create checkout session');
-        }
-      } catch (e: any) {
-        console.error('Upgrade error:', e);
-        reportError(e, { scope: 'pricing:checkout', severity: 'error', extra: { tier: tierKey } });
-        alert(e.message || 'Failed to start upgrade');
-      }
-    },
-    [currentTier, user, navigate, onUpgradeSuccess],
-  );
+    return {
+      ctaText: isRec
+        ? `Upgrade to ${target.display_name} (recommended)`
+        : `Upgrade to ${target.display_name}`,
+      shortText: `Upgrade to ${target.display_name}`,
+      targetTier: target.tier_key,
+      targetDisplayName: target.display_name,
+      targetMonthlyMiles: target.monthlyMiles,
+      deltaMiles: delta,
+      recommendedHighlight: isRec,
+    };
+  }, []);
 
-  const getCta = useCallback(
-    (tierKey: TierKey) => getCtaConfig(tierKey, currentTier),
-    [currentTier],
-  );
-
-  return { getCta, handleSelectTier, currentTier };
+  return { getUpgradeCTA };
 }

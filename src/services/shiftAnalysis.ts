@@ -48,7 +48,7 @@ export async function analyzeSHIFT(
     const dimEntries = Object.entries(fallbackScores).sort((a, b) => b[1] - a[1]);
     const topDimId = dimEntries[0]?.[0] || "balanced";
     const archetypeName =
-      topDimId.includes("strategic") ? "Strategic Builder" :
+      topDimId.includes("strategic") ? "Strategic Architect" :
       topDimId.includes("execution") || topDimId.includes("discipline") ? "Precision Operator" :
       topDimId.includes("influence") || topDimId.includes("stakeholder") ? "Influential Builder" :
       topDimId.includes("adapt") || topDimId.includes("cross") ? "Cross-Border Catalyst" :

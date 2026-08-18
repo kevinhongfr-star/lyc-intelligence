@@ -8,10 +8,9 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import MarketingNav from '@/components/navigation/MarketingNav';
-import { SkipToContent } from '@/components/a11y/SkipToContent';
 
 const DS = {
-  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+  headingFont: "'Libre Baskerville', Georgia, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   bg: '#FFFFFF',
@@ -24,14 +23,13 @@ const DS = {
 
 function MarketingFooter(): React.ReactElement {
   const year = new Date().getFullYear();
-  // Phase 9 Batch 6, ticket #1352 — B2C marketing footer only. Remove B2B Match link.
-  // Replace "For Business" with "About" only; keep /b2b as direct-access route but not in footer.
   const columns = [
     {
       title: 'Product',
       links: [
-        { label: 'NEXUS', href: '/nexus/chat' },
-        { label: 'Leadership Assessments', href: '/assessments' },
+        { label: 'NEXUS AI', href: '/nexus/chat' },
+        { label: 'Assessments', href: '/assessment' },
+        { label: 'Match Analysis', href: '/match' },
         { label: 'Pricing', href: '/pricing' },
       ],
     },
@@ -39,6 +37,7 @@ function MarketingFooter(): React.ReactElement {
       title: 'Company',
       links: [
         { label: 'About', href: '/#about' },
+        { label: 'For Business', href: '/b2b' },
         { label: 'Contact', href: 'mailto:hello@lycintelligence.com' },
       ],
     },
@@ -73,7 +72,7 @@ function MarketingFooter(): React.ReactElement {
               </span>
             </Link>
             <p style={{ fontSize: 14, color: DS.muted, lineHeight: 1.6, maxWidth: 320, margin: 0 }}>
-              Executive intelligence for high-achieving leaders. Advisory, assessments, and talent search in one private service.
+              Executive intelligence for high-achieving leaders. Advisory, assessments, and talent search in one private platform.
             </p>
           </div>
           {columns.map((col) => (
@@ -125,11 +124,10 @@ export function MarketingLayout(): React.ReactElement {
       display: 'flex', flexDirection: 'column', minHeight: '100vh',
       background: DS.bg, fontFamily: DS.bodyFont,
     }} data-portal-kind="marketing">
-      <SkipToContent targetId="main-content" />
       <MarketingNav />
-      <main id="main-content" aria-label="Main content" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Outlet />
-      </main>
+      </div>
       <MarketingFooter />
     </div>
   );

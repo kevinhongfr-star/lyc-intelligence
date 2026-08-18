@@ -1,297 +1,117 @@
-/**
- * MilePacksSection.tsx — Mile pack purchase section (Batch 3 / Ticket 7).
- *
- * 3 pack sizes: 1mi $49, 5mi $199, 15mi $499. Savings % display (18% / 33%).
- * 12-month expiry note. "How miles work" explainer.
- *
- * All pricing from MILE_PACKS in miles.ts — no hardcoded numbers.
- * Annual stacking bonus does NOT apply to mile packs (sessions only).
- */
 import React from 'react';
-import { DS } from '@/tokens';
-import {
-  MILE_PACKS,
-  PURCHASED_MILES_EXPIRY_MONTHS,
-  INSTRUMENT_MILE_COST,
-  type MilePack,
-} from '@/config/pricingData';
-import { computeMilePackSavings } from '@/config/pricingData';
+import { Coins, Sparkles, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { cn } from '@/lib/utils';
+import type { MilePack, PricingCurrency } from '@/config/pricingData';
 
-export function MilePacksSection() {
+export interface MilePacksSectionProps {
+  packs: MilePack[];
+  currency: PricingCurrency;
+}
+
+export const MilePacksSection: React.FC<MilePacksSectionProps> = ({ packs, currency }) => {
   return (
-    <section
-      style={{
-        background: DS.bg,
-        padding: '64px 24px',
-      }}
-    >
-      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        {/* Section heading */}
-        <div style={{ marginBottom: 16 }}>
-          <div
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: 12,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: DS.eyebrow,
-              marginBottom: 16,
-            }}
-          >
-            [Emily: mile packs eyebrow]
-          </div>
-          <h2
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: 36,
-              lineHeight: 1.2,
-              color: DS.text,
-              margin: 0,
-              fontWeight: 600,
-            }}
-          >
-            [Emily: mile packs headline]
+    <section className="py-16 md:py-20">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <Badge variant="warning" size="md" className="mb-4 gap-1.5">
+            <Sparkles className="h-3 w-3" aria-hidden="true" />
+            Top up anytime
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-text-primary mb-4">
+            Diagnostic mile packs
           </h2>
-          <p
-            style={{
-              fontFamily: DS.bodyFont,
-              fontSize: 16,
-              lineHeight: 1.5,
-              color: DS.textSecondary,
-              marginTop: 16,
-              maxWidth: 640,
-            }}
-          >
-            [Emily: mile packs subhead — value-first framing, miles as premium currency.
-            Mapped to Pricing Strategy v1.1 §mile-packs.]
+          <p className="text-lg text-text-muted max-w-2xl mx-auto">
+            Running out of diagnostic miles? Top up instantly. Packs never expire
+            and stack alongside your monthly subscription allocation.
           </p>
         </div>
 
-        {/* Pack cards */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: 24,
-            marginTop: 48,
-          }}
-        >
-          {MILE_PACKS.map((pack) => (
-            <MilePackCard key={pack.id} pack={pack} />
-          ))}
-        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {packs.map((pack, idx) => {
+            const isPopular = pack.miles === 250;
+            const price = currency === 'CNY' ? `¥${pack.cny}` : `$${pack.usd}`;
+            return (
+              <Card
+                key={pack.pack_key}
+                className={cn(
+                  'relative flex flex-col h-full transition-all',
+                  isPopular && 'ring-2 ring-tier-2 shadow-lg',
+                )}
+              >
+                {isPopular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge variant="warning" size="md" className="shadow-sm">
+                      Most Popular
+                    </Badge>
+                  </div>
+                )}
 
-        {/* Expiry note */}
-        <div
-          style={{
-            marginTop: 32,
-            padding: '16px 24px',
-            background: DS.bgAlt,
-            fontFamily: DS.bodyFont,
-            fontSize: 14,
-            color: DS.textSecondary,
-            textAlign: 'center',
-          }}
-        >
-          Purchased miles expire {PURCHASED_MILES_EXPIRY_MONTHS} months after purchase.
-          Mile packs are one-time purchases — not a subscription.
-        </div>
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <CardTitle className="text-lg font-serif">
+                      {pack.miles} miles
+                    </CardTitle>
+                    <div className="w-10 h-10 rounded-full bg-tier-2/10 flex items-center justify-center">
+                      <Coins className="h-5 w-5 text-tier-2" aria-hidden="true" />
+                    </div>
+                  </div>
 
-        {/* "How miles work" explainer */}
-        <HowMilesWorkExplainer />
+                  <div className="mt-2">
+                    <span className="text-3xl font-serif font-bold text-text-primary">
+                      {price}
+                    </span>
+                  </div>
+
+                  <CardDescription className="mt-4 min-h-[48px]">
+                    {pack.valueExample}
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="pt-0 mt-auto">
+                  <ul className="space-y-2.5 mb-5 text-sm text-text-muted">
+                    <li className="flex items-start gap-2">
+                      <span className="text-tier-2 mt-1">•</span>
+                      <span>
+                        {pack.miles >= 100
+                          ? `${Math.floor(pack.miles / 2)} Standard diagnostics (2mi each)`
+                          : `${Math.floor(pack.miles / 2)} Standard diagnostics (2mi each)`}
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-tier-2 mt-1">•</span>
+                      <span>
+                        {Math.floor(pack.miles / 3)} Signature diagnostics (3mi each)
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-tier-2 mt-1">•</span>
+                      <span>
+                        {Math.floor(pack.miles / 5)} CPI flagship runs (5mi each)
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-tier-2 mt-1">•</span>
+                      <span>Never expire — carry-forward balance</span>
+                    </li>
+                  </ul>
+
+                  <Button
+                    variant={isPopular ? 'default' : 'outline'}
+                    size="default"
+                    className="w-full"
+                  >
+                    Buy {pack.miles} mi
+                    <ArrowRight className="h-4 w-4 ml-1" aria-hidden="true" />
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
-}
-
-function MilePackCard({ pack }: { pack: MilePack }) {
-  const savings = computeMilePackSavings(pack);
-  const isBestValue = pack.miles === 15;
-
-  return (
-    <div
-      style={{
-        background: DS.card,
-        border: isBestValue ? `2px solid ${DS.accent}` : `1px solid ${DS.border}`,
-        padding: 32,
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-      }}
-    >
-      {isBestValue && (
-        <div
-          style={{
-            position: 'absolute',
-            top: -1,
-            left: -1,
-            right: -1,
-            background: DS.accent,
-            color: DS.bg,
-            fontFamily: DS.monoFont,
-            fontSize: 11,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            textAlign: 'center',
-            padding: '6px 0',
-          }}
-        >
-          Best Value
-        </div>
-      )}
-
-      <div
-        style={{
-          padding: isBestValue ? '24px 0 0' : '0',
-        }}
-      >
-        {/* Pack size */}
-        <div
-          style={{
-            fontFamily: DS.headingFont,
-            fontSize: 28,
-            fontWeight: 600,
-            color: DS.text,
-            marginBottom: 4,
-          }}
-        >
-          {pack.miles} {pack.miles === 1 ? 'mile' : 'miles'}
-        </div>
-
-        {/* Price */}
-        <div
-          style={{
-            fontFamily: DS.headingFont,
-            fontSize: 36,
-            fontWeight: 600,
-            color: DS.text,
-            marginBottom: 8,
-          }}
-        >
-          ${pack.priceUsd}
-        </div>
-
-        {/* Savings */}
-        {savings > 0 && (
-          <div
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: 12,
-              color: DS.accent,
-              marginBottom: 24,
-            }}
-          >
-            Save {savings}%
-          </div>
-        )}
-
-        {/* CTA */}
-        <button
-          style={{
-            fontFamily: DS.bodyFont,
-            fontSize: 15,
-            fontWeight: 600,
-            color: DS.bg,
-            background: isBestValue ? DS.accent : DS.bgDark,
-            border: 'none',
-            padding: '14px 24px',
-            cursor: 'pointer',
-            transition: DS.transition,
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = isBestValue ? DS.accentHover : DS.text)}
-          onMouseLeave={(e) => (e.currentTarget.style.background = isBestValue ? DS.accent : DS.bgDark)}
-        >
-          [Emily: purchase CTA]
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function HowMilesWorkExplainer() {
-  return (
-    <div
-      style={{
-        marginTop: 64,
-        padding: '40px 32px',
-        background: DS.bgAlt,
-        border: `1px solid ${DS.border}`,
-      }}
-    >
-      <h3
-        style={{
-          fontFamily: DS.headingFont,
-          fontSize: 22,
-          fontWeight: 600,
-          color: DS.text,
-          margin: '0 0 24px',
-        }}
-      >
-        [Emily: "How miles work" heading]
-      </h3>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 32,
-        }}
-      >
-        {/* Mile cost tiers — displayed as mile counts, NOT category names (P0-4) */}
-        <div>
-          <div
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: 12,
-              color: DS.eyebrow,
-              marginBottom: 12,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-            }}
-          >
-            Assessment costs
-          </div>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <li style={{ fontFamily: DS.bodyFont, fontSize: 14, color: DS.textSecondary }}>
-              1 mile — SPARK, COACH
-            </li>
-            <li style={{ fontFamily: DS.bodyFont, fontSize: 14, color: DS.textSecondary }}>
-              2 miles — PRISM, IMPACT, BRIDGE, DRIVE, MOSAIC
-            </li>
-            <li style={{ fontFamily: DS.bodyFont, fontSize: 14, color: DS.textSecondary }}>
-              3 miles — FORGE, LEAP, QUEST
-            </li>
-            <li style={{ fontFamily: DS.bodyFont, fontSize: 14, color: DS.textSecondary }}>
-              5 miles — CPI
-            </li>
-          </ul>
-        </div>
-        <div>
-          <div
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: 12,
-              color: DS.eyebrow,
-              marginBottom: 12,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-            }}
-          >
-            [Emily: explainer column 2 heading]
-          </div>
-          <p
-            style={{
-              fontFamily: DS.bodyFont,
-              fontSize: 14,
-              lineHeight: 1.6,
-              color: DS.textSecondary,
-              margin: 0,
-            }}
-          >
-            [Emily: miles explainer copy — monthly allocation, rollover, purchasing packs.
-            Mapped to Pricing Strategy v1.1 §mile-packs.]
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
+};

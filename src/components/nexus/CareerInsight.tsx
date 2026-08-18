@@ -89,7 +89,7 @@ export function CareerInsight({ messageCount, conversationHistory, onUpgrade }: 
         'Diversity, equity, and inclusion are table stakes for EU-based leadership positions.',
       ],
       'US market strategy': [
-        'Silicon Valley values rapid execution and transformation over traditional credentials.',
+        'Silicon Valley values rapid execution and disruption over traditional credentials.',
         'Network density in major US hubs correlates strongly with executive opportunities.',
         'Board composition expectations differ significantly between public and private companies.',
       ],

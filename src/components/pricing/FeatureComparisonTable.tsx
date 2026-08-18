@@ -1,221 +1,215 @@
-/**
- * FeatureComparisonTable.tsx — Full feature comparison table (Batch 3 / Ticket 3).
- *
- * Feature-by-feature comparison across all 5 tiers. Categories: NEXUS Chat,
- * Assessment Miles, Human Debriefs, Document Upload, Reports, Ensemble/Advanced,
- * Support. Sticky tier headers on scroll. Mobile: horizontal scroll.
- *
- * All values come from FEATURE_ROWS in pricingData.ts — no hardcoded numbers.
- */
 import React from 'react';
-import { DS } from '@/tokens';
-import {
-  PRICING_TIERS,
-  FEATURE_ROWS,
-  FEATURE_CATEGORIES,
-  type FeatureRow,
-  type FeatureCellValue,
-  type FeatureCellRender,
-} from '@/config/pricingData';
+import { Check, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { PricingTier, InstrumentUserFacing, PricingCurrency, TierKey } from '@/config/pricingData';
 
-export function FeatureComparisonTable() {
+export interface FeatureComparisonTableProps {
+  tiers: PricingTier[];
+  instruments: Record<string, InstrumentUserFacing>;
+  currency: PricingCurrency;
+}
+
+const TOTAL_DIAGNOSTICS = 11;
+
+const FEATURE_ROWS: Array<{
+  rowKey: string;
+  label: React.ReactNode;
+  description?: string;
+  check: (tier: PricingTier, instruments: Record<string, InstrumentUserFacing>) => boolean | string | number;
+}> = [
+  {
+    rowKey: 'monthly_miles',
+    label: 'Monthly diagnostic miles',
+    description: 'Miles allocation per billing cycle',
+    check: (tier) => tier.monthlyMiles,
+  },
+  {
+    rowKey: 'diagnostic_access',
+    label: `Diagnostic access (${TOTAL_DIAGNOSTICS} total)`,
+    description: 'All 11 diagnostics unlocked',
+    check: (tier) => tier.tier_key !== 'explorer',
+  },
+  {
+    rowKey: 'cpi_access',
+    label: 'CPI — China Leadership Pipeline Index (Flagship, 5mi)',
+    description: 'Flagship China leadership diagnostic',
+    check: (tier) => tier.tier_key !== 'explorer',
+  },
+  {
+    rowKey: 'career_core',
+    label: 'Career Core diagnostics access (1mi – 2mi)',
+    description: 'LEAP, IMPACT, COACH, DRIVE, QUEST',
+    check: (tier) => tier.tier_key !== 'explorer',
+  },
+  {
+    rowKey: 'advisory',
+    label: 'Advisory diagnostics access (2mi – 3mi)',
+    description: 'PRISM, BRIDGE, MOSAIC, SPARK, FORGE',
+    check: (tier) => tier.tier_key !== 'explorer',
+  },
+  {
+    rowKey: 'personalised_reports',
+    label: 'Personalised diagnostic reports',
+    description: 'PDF export of every diagnostic',
+    check: (tier) => tier.tier_key !== 'explorer',
+  },
+  {
+    rowKey: 'benchmarking',
+    label: 'Peer benchmarking (regional C-suite)',
+    description: 'Against executive peer datasets',
+    check: (tier) =>
+      tier.tier_key === 'pro' || tier.tier_key === 'executive' || tier.tier_key === 'council',
+  },
+  {
+    rowKey: 'workspace',
+    label: 'Deliverable workspace',
+    description: 'Canvas, grid, and save outputs',
+    check: (tier) =>
+      tier.tier_key === 'pro' || tier.tier_key === 'executive' || tier.tier_key === 'council',
+  },
+  {
+    rowKey: 'debriefs',
+    label: 'Executive consultant debriefs',
+    description: 'Paid sessions on-demand',
+    check: (tier) => tier.tier_key === 'executive' || tier.tier_key === 'council',
+  },
+  {
+    rowKey: 'live_events',
+    label: 'Live event access',
+    description: 'Executive briefings & workshops',
+    check: (tier) => tier.tier_key === 'executive' || tier.tier_key === 'council',
+  },
+  {
+    rowKey: 'council_community',
+    label: 'Council community & quarterly workshops',
+    description: 'Invite-only Council tier',
+    check: (tier) => tier.tier_key === 'council',
+  },
+  {
+    rowKey: 'priority_support',
+    label: 'Priority support',
+    description: 'Dedicated response SLA',
+    check: (tier) =>
+      tier.tier_key === 'pro' || tier.tier_key === 'executive' || tier.tier_key === 'council',
+  },
+];
+
+export const FeatureComparisonTable: React.FC<FeatureComparisonTableProps> = ({
+  tiers,
+  instruments,
+  currency,
+}) => {
+  const orderedTiers = [...tiers].sort((a, b) => a.order - b.order);
+
   return (
-    <section
-      style={{
-        background: DS.bg,
-        padding: '64px 24px',
-      }}
-    >
-      <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-        {/* Section heading */}
-        <div style={{ marginBottom: 48 }}>
-          <div
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: 12,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: DS.eyebrow,
-              marginBottom: 16,
-            }}
-          >
-            [Emily: comparison table eyebrow]
-          </div>
-          <h2
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: 36,
-              lineHeight: 1.2,
-              color: DS.text,
-              margin: 0,
-              fontWeight: 600,
-            }}
-          >
-            [Emily: comparison table headline]
-          </h2>
-        </div>
-
-        {/* Table — horizontal scroll on mobile */}
-        <div
-          style={{
-            overflowX: 'auto',
-            border: `1px solid ${DS.border}`,
-          }}
-        >
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontFamily: DS.bodyFont,
-              minWidth: 800,
-            }}
-          >
-            {/* Sticky header row */}
-            <thead>
-              <tr style={{ position: 'sticky', top: 0, zIndex: 1 }}>
+    <div className="w-full overflow-x-auto">
+      <table className="w-full min-w-[720px] border-collapse">
+        <thead>
+          <tr className="bg-bg-secondary">
+            <th className="text-left p-4 border-b border-bg-tertiary sticky left-0 bg-bg-secondary z-10 min-w-[220px]">
+              <span className="text-sm font-semibold text-text-primary">Features</span>
+            </th>
+            {orderedTiers.map((tier) => {
+              const isRec = tier.tier_key === 'pro';
+              return (
                 <th
-                  style={{
-                    background: DS.bgDark,
-                    color: DS.bg,
-                    padding: '16px 20px',
-                    textAlign: 'left',
-                    fontFamily: DS.monoFont,
-                    fontSize: 12,
-                    letterSpacing: '0.05em',
-                    textTransform: 'uppercase',
-                    width: '30%',
-                  }}
+                  key={tier.tier_key}
+                  className={cn(
+                    'text-center p-4 border-b border-bg-tertiary min-w-[130px]',
+                    isRec && 'bg-accent/5',
+                  )}
                 >
-                  Feature
-                </th>
-                {PRICING_TIERS.map((tier) => (
-                  <th
-                    key={tier.key}
-                    style={{
-                      background: tier.isRecommended ? DS.accent : DS.bgDark,
-                      color: DS.bg,
-                      padding: '16px 20px',
-                      textAlign: 'center',
-                      fontFamily: DS.headingFont,
-                      fontSize: 16,
-                      fontWeight: 600,
-                    }}
-                  >
-                    {tier.displayName}
-                    {tier.isInviteOnly && (
-                      <div
-                        style={{
-                          fontFamily: DS.monoFont,
-                          fontSize: 10,
-                          fontWeight: 400,
-                          letterSpacing: '0.1em',
-                          marginTop: 4,
-                          opacity: 0.8,
-                        }}
-                      >
-                        Invite Only
-                      </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <span
+                      className={cn(
+                        'font-serif font-bold',
+                        isRec ? 'text-accent text-lg' : 'text-text-primary',
+                      )}
+                    >
+                      {tier.display_name}
+                    </span>
+                    {tier.tier_key === 'explorer' ? (
+                      <span className="text-xs text-text-muted">{tier.alias}</span>
+                    ) : (
+                      <span className="text-xs text-text-muted">
+                        {currency === 'CNY' ? `¥${tier.cnyMonthly}` : `$${tier.usdMonthly}`}
+                        {currency === 'CNY' ? ' / 月' : ' / mo'}
+                      </span>
                     )}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-
-            <tbody>
-              {FEATURE_CATEGORIES.map((category) => (
-                <CategoryGroup key={category} category={category} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+                    <span className="text-[11px] text-text-secondary">
+                      {tier.monthlyMiles} mi / mo
+                    </span>
+                  </div>
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {FEATURE_ROWS.map((row, rowIdx) => (
+            <tr
+              key={row.rowKey}
+              className={cn(rowIdx % 2 === 0 ? 'bg-white' : 'bg-bg-secondary/40')}
+            >
+              <td className="p-4 border-b border-bg-tertiary sticky left-0 bg-inherit z-10">
+                <div className="text-sm font-medium text-text-primary">{row.label}</div>
+                {row.description && (
+                  <div className="text-xs text-text-muted mt-1">{row.description}</div>
+                )}
+              </td>
+              {orderedTiers.map((tier) => {
+                const value = row.check(tier, instruments);
+                const isRec = tier.tier_key === 'pro';
+                return (
+                  <td
+                    key={tier.tier_key}
+                    className={cn(
+                      'p-4 border-b border-bg-tertiary text-center align-middle',
+                      isRec && 'bg-accent/5',
+                    )}
+                  >
+                    {typeof value === 'number' ? (
+                      <span
+                        className={cn(
+                          'font-bold',
+                          value === 0 ? 'text-text-muted' : 'text-text-primary',
+                        )}
+                      >
+                        {value === 0 ? '—' : value}
+                      </span>
+                    ) : typeof value === 'boolean' ? (
+                      value ? (
+                        <div className="flex justify-center">
+                          <span
+                            className={cn(
+                              'inline-flex items-center justify-center w-6 h-6 rounded-full',
+                              isRec ? 'bg-accent/15' : 'bg-tier-1Bg',
+                            )}
+                          >
+                            <Check
+                              className={cn(
+                                'h-4 w-4',
+                                isRec ? 'text-accent' : 'text-tier-1',
+                              )}
+                              aria-hidden="true"
+                            />
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex justify-center">
+                          <X className="h-5 w-5 text-text-muted/60" aria-hidden="true" />
+                        </div>
+                      )
+                    ) : (
+                      <span className="text-sm text-text-secondary">{value}</span>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
-}
-
-function CategoryGroup({ category }: { category: string }) {
-  const rows = FEATURE_ROWS.filter((r) => r.category === category);
-  return (
-    <>
-      {/* Category header row */}
-      <tr>
-        <td
-          colSpan={6}
-          style={{
-            background: DS.bgAlt,
-            padding: '12px 20px',
-            fontFamily: DS.monoFont,
-            fontSize: 11,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            color: DS.accent,
-            borderBottom: `1px solid ${DS.border}`,
-            borderTop: `2px solid ${DS.borderStrong}`,
-          }}
-        >
-          {category}
-        </td>
-      </tr>
-      {rows.map((row, i) => (
-        <FeatureRowComponent key={i} row={row} />
-      ))}
-    </>
-  );
-}
-
-function FeatureRowComponent({ row }: { row: FeatureRow }) {
-  return (
-    <tr style={{ borderBottom: `1px solid ${DS.border}` }}>
-      {/* Feature label */}
-      <td
-        style={{
-          padding: '14px 20px',
-          fontFamily: DS.bodyFont,
-          fontSize: 14,
-          color: DS.textSecondary,
-        }}
-      >
-        {row.label}
-      </td>
-      {/* Per-tier values */}
-      {PRICING_TIERS.map((tier) => (
-        <td
-          key={tier.key}
-          style={{
-            padding: '14px 20px',
-            textAlign: 'center',
-            fontFamily: DS.bodyFont,
-            fontSize: 14,
-            color: DS.text,
-          }}
-        >
-          <FeatureCell value={row.values[tier.key]} render={row.render} suffix={row.suffix} />
-        </td>
-      ))}
-    </tr>
-  );
-}
-
-function FeatureCell({
-  value,
-  render,
-  suffix,
-}: {
-  value: FeatureCellValue;
-  render: FeatureCellRender;
-  suffix?: string;
-}) {
-  if (render === 'check') {
-    return value ? <span style={{ color: DS.accent, fontWeight: 600 }}>✓</span> : <span style={{ color: DS.mutedDim }}>—</span>;
-  }
-  if (render === 'unlimited') {
-    if (value === null || value === undefined) return <span style={{ fontWeight: 600 }}>Unlimited</span>;
-    return <span>{`${value}${suffix ?? ''}`}</span>;
-  }
-  if (render === 'number') {
-    if (value === 0 || value === null || value === undefined) return <span style={{ color: DS.mutedDim }}>—</span>;
-    return <span>{`${value}${suffix ?? ''}`}</span>;
-  }
-  // text
-  return <span>{String(value)}</span>;
-}
+};

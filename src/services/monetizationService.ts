@@ -8,22 +8,6 @@ export interface Tier {
   features: string[];
 }
 
-// ── Canonical tier_key → display name mapping (#1318) ──
-// Internal keys are stable IDs (never shown to users). Display labels are
-// the canonical brand names per #1318 / brand master.
-//   explorer  → Executive Introduction (complimentary entry)
-//   starter   → Professional
-//   pro       → Executive
-//   executive → Council
-//   council   → Enterprise (B2B / custom)
-export const TIER_DISPLAY_NAMES: Record<TierKey, string> = {
-  explorer: 'Executive Introduction',
-  starter: 'Professional',
-  pro: 'Executive',
-  executive: 'Council',
-  council: 'Enterprise',
-};
-
 export interface MilesBalance {
   balance: number;
   total_earned: number;
@@ -73,13 +57,11 @@ export const TIER_KEYS = ['explorer', 'starter', 'pro', 'executive', 'council'] 
 export type TierKey = typeof TIER_KEYS[number];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CANONICAL PRICING — single source of truth (#1318 / Phase 15.5 / #1303)
+// CANONICAL PRICING — single source of truth (Phase 15.5, ticket #1303)
 //
 // Reference: specs/NEXUS_PRODUCT_SPEC_v3_ALIGNED.md §2
-// 5-tier model (canonical display names per #1318):
-//   Executive Introduction / Professional / Executive / Council / Enterprise
-// Internal tier_key values are stable IDs, never shown to users.
-// Currency = miles. Entry tier = "Executive Introduction" (never "free").
+// 5-tier model: Explorer / Starter / Pro / Executive / Council
+// Currency = miles. Explorer tier = "Executive Introduction" (never "free").
 // China pricing: 1/3 of global, displayed in CNY (USD * 7 / 3, rounded).
 // Assessment pricing: 3 tiers (Standard $99 / Premium $149 / Unique $199).
 // ─────────────────────────────────────────────────────────────────────────────
@@ -99,8 +81,6 @@ export interface CanonicalTierPricing {
   monthlyMiles: number;
   /** Whether this tier earns miles via NEXUS actions. Explorer = false. */
   earnsMiles: boolean;
-  /** Whether this tier requires an invite (cannot self-serve upgrade to). Council = true. */
-  isInviteOnly: boolean;
   /** Headline benefits (canonical copy, no "credits" / no "free"). */
   benefits: string[];
 }
@@ -112,47 +92,44 @@ export interface CanonicalTierPricing {
 export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
   explorer: {
     key: 'explorer',
-    label: 'Executive Introduction',
+    label: 'Explorer',
     alias: 'Executive Introduction',
     usdMonthly: 0,
     cnyMonthly: 0,
     monthlyMiles: 0,
     earnsMiles: false,
-    isInviteOnly: false,
     benefits: [
       'Executive Introduction access to NEXUS chat',
       'Framework exploration and sample outputs',
-      'Assessment previews (no personalised reports)',
+      'Diagnostic previews (no personalised reports)',
       'Community forum',
     ],
   },
   starter: {
     key: 'starter',
-    label: 'Professional',
+    label: 'Starter',
     usdMonthly: 25,
     cnyMonthly: 59,
     monthlyMiles: 50,
     earnsMiles: true,
-    isInviteOnly: false,
     benefits: [
-      '50 mi monthly allowance',
-      'All 6 leadership assessments unlocked',
-      'Personalised assessment reports',
+      '50 mi monthly diagnostic allowance',
+      'All 11 diagnostics unlocked',
+      'Personalised diagnostic reports',
       'NEXUS miles earning (exploration +5, reflection +3)',
       'PDF report export',
     ],
   },
   pro: {
     key: 'pro',
-    label: 'Executive',
+    label: 'Pro',
     usdMonthly: 99,
     cnyMonthly: 233,
     monthlyMiles: 150,
     earnsMiles: true,
-    isInviteOnly: false,
     benefits: [
       '150 mi monthly allowance',
-      'Everything in Professional',
+      'Everything in Starter',
       'Peer benchmarking across regional C-suite',
       'Deliverable workspace (canvas, grid)',
       'Priority NEXUS responses',
@@ -160,34 +137,32 @@ export const CANONICAL_TIER_PRICING: Record<TierKey, CanonicalTierPricing> = {
   },
   executive: {
     key: 'executive',
-    label: 'Council',
+    label: 'Executive',
     usdMonthly: 199,
     cnyMonthly: 466,
     monthlyMiles: 300,
     earnsMiles: true,
-    isInviteOnly: true,
     benefits: [
       '300 mi monthly allowance',
-      'Everything in Executive',
-      'Council community and live sessions',
-      'Quarterly executive workshops',
+      'Everything in Pro',
+      'Executive consultant debriefs',
+      'Live event access',
       'Priority support',
     ],
   },
   council: {
     key: 'council',
-    label: 'Enterprise',
+    label: 'Council',
     usdMonthly: 499,
     cnyMonthly: 1165,
     monthlyMiles: 600,
     earnsMiles: true,
-    isInviteOnly: false,
     benefits: [
       '600 mi monthly allowance',
-      'Everything in Council',
-      'SSO, SCIM & role-based access',
-      'Custom framework training',
-      'Dedicated account contact',
+      'Everything in Executive',
+      'Council community and live sessions',
+      'Quarterly executive workshops',
+      'Unlimited NEXUS conversations',
     ],
   },
 };
@@ -201,143 +176,120 @@ export const CANONICAL_TIER_ORDER: TierKey[] = [
 export const RECOMMENDED_TIER: TierKey = 'pro';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// #1365 — Tier DISPLAY names (user-centric). Internal tier_key IDs are stable
-// and preserved for billing/credits/database; this layer only changes what
-// visitors see. Simplifies 5 internal tiers to 3 + complimentary + enterprise.
-//   explorer  → Complimentary   (was "Executive Introduction" — kept as legal alias)
-//   starter   → Professional     (internal low tier, not shown on main pricing grid)
-//   pro       → Professional     (the featured middle tier shown on pricing)
-//   executive → Council
-//   council   → Enterprise       (B2B, separate funnel)
-// Brand rule: never "free" — use "Complimentary".
-// ─────────────────────────────────────────────────────────────────────────────
-export const TIER_DISPLAY_NAME: Record<TierKey, string> = {
-  explorer: 'Complimentary',
-  starter: 'Professional',
-  pro: 'Professional',
-  executive: 'Council',
-  council: 'Enterprise',
-};
-
-/** Tiers shown on the main pricing grid (3 user-centric tiers).
- *  Enterprise (council) is rendered separately as a B2B section.
- *  Starter is folded into Professional and not shown standalone. */
-export const PRICING_PAGE_TIERS: TierKey[] = ['explorer', 'pro', 'executive'];
-
-/** Benefit-focused display copy (replaces feature-list benefits on visitor
- *  pricing surfaces). Keyed by internal tier id. */
-export const TIER_DISPLAY_BENEFITS: Record<TierKey, string[]> = {
-  explorer: [
-    'Try any assessment with a complimentary report',
-    '3 NEXUS messages to get a read on your situation',
-    'Preview the full assessment catalog',
-  ],
-  starter: [
-    'All 6 leadership assessments unlocked',
-    'Personalised assessment reports',
-    'NEXUS coaching on your results',
-  ],
-  pro: [
-    'All 6 leadership assessments with personalised reports',
-    'See how you compare to regional C-suite peers',
-    'Unlimited NEXUS coaching on your results',
-    'Export PDF reports for your own use',
-  ],
-  executive: [
-    'Everything in Professional, plus executive depth',
-    'Join the Council — quarterly workshops with peers',
-    'Priority NEXUS responses and dedicated support',
-    'Full historical tracking across assessments',
-  ],
-  council: [
-    'Seat-based deployment with SSO and SCIM',
-    'Custom assessment training for your team',
-    'Org-level analytics and a dedicated contact',
-    'Council-tier seats for every desk',
-  ],
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ASSESSMENT PRICING — 3 tiers (Standard / Premium / Unique)
-// Miles cost mirrors USD pricing (~1 mile = $1).
+// DIAGNOSTIC PRICING — 3 service levels (Executive Introduction / Professional Deep-Dive / Executive Advisory)
+// Diagnostic mile costs locked to 1/2/3/5 canon (per-instrument, not tied to USD).
+// Assessment* names retained below as deprecated re-exports for backwards compatibility.
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** Kept as a stable alias — service levels still enumerate the same 3 tiers. */
 export type AssessmentPriceTier = 'standard' | 'premium' | 'unique';
 
-export interface CanonicalAssessmentPricing {
+export interface CanonicalDiagnosticPricing {
   tier: AssessmentPriceTier;
   label: string;
-  /** USD price (also = miles cost, since 1 mi ≈ $1). */
+  /** User-facing diagnostic cohort label (replaces internal assessment_label). */
+  diagnostic_label: string;
+  /** USD price for the debrief / service level (kept at locked service levels). */
   usd: number;
-  /** CNY price (1/3 of USD, rounded to nearest whole). */
+  /** CNY price for the debrief / service level (1/3 of USD, rounded). */
   cny: number;
-  /** Miles cost (same as USD). */
+  /** Diagnostic mile cohort (1/2/3/5 canon range, NOT equal to USD). */
   miles: number;
-  /** Instruments in this price tier. */
+  /** Instruments in this diagnostic cohort (maps to 1/2/3/5 mile costs individually). */
   instruments: string[];
 }
 
 /**
- * CANONICAL_ASSESSMENT_PRICING — assessment pricing table (Phase 9 Batch 6 ticket #1351).
- * Only real 6 B2C instruments with data files.
- * Standard ($99 USD): DRIVE, PRISM, FORGE, MOSAIC
- * Premium ($149 USD): SPARK, BRIDGE
- * Unique tier removed (CPI removed).
+ * CANONICAL_DIAGNOSTIC_PRICING — 3-tier diagnostic service level table.
+ * Service-level USD pricing locked: Executive Introduction $99, Professional Deep-Dive $149, Executive Advisory $249.
+ * Per-instrument mile costs live in DIAGNOSTIC_MILES_COSTS (canon 1/2/3/5 — see constants/miles.ts).
  */
-export const CANONICAL_ASSESSMENT_PRICING: Record<
+export const CANONICAL_DIAGNOSTIC_PRICING: Record<
   AssessmentPriceTier,
-  CanonicalAssessmentPricing
+  CanonicalDiagnosticPricing
 > = {
   standard: {
     tier: 'standard',
-    label: 'Standard',
+    label: 'Executive Introduction',
+    diagnostic_label: '1mi – 2mi Career Core cohort',
     usd: 99,
     cny: 33,
-    miles: 99,
-    instruments: ['DRIVE', 'PRISM', 'FORGE', 'MOSAIC'],
+    miles: 2,
+    instruments: ['LEAP', 'IMPACT', 'COACH', 'DRIVE', 'QUEST'],
   },
   premium: {
     tier: 'premium',
-    label: 'Premium',
+    label: 'Professional Deep-Dive',
+    diagnostic_label: '2mi – 3mi Standard / Advisory cohort',
     usd: 149,
     cny: 50,
-    miles: 149,
-    instruments: ['SPARK', 'BRIDGE'],
+    miles: 3,
+    instruments: ['PRISM', 'BRIDGE', 'MOSAIC', 'SPARK', 'FORGE'],
   },
   unique: {
     tier: 'unique',
-    label: 'Custom',
-    usd: 199,
+    label: 'Executive Advisory',
+    diagnostic_label: '5mi Flagship / Signature cohort',
+    usd: 249,
     cny: 66,
-    miles: 199,
-    instruments: [], // No real unique-tier B2C instruments at this time.
+    miles: 5,
+    instruments: ['CPI'],
   },
 };
 
-export const CANONICAL_ASSESSMENT_ORDER: AssessmentPriceTier[] = [
+export const CANONICAL_DIAGNOSTIC_ORDER: AssessmentPriceTier[] = [
   'standard', 'premium', 'unique',
 ];
 
 /**
- * Map instrument code → its canonical assessment price tier.
- * Built from CANONICAL_ASSESSMENT_PRICING so there is one source of truth.
+ * DIAGNOSTIC_MILES_COSTS — per-instrument mile costs.
+ * LOCKED CANON 1/2/3/5 (Kevin, Batch 6 audit). Overwrites old 99/149/199 values.
+ * Authoritative source: src/constants/miles.ts INSTRUMENT_MILE_COST.
+ */
+export const DIAGNOSTIC_MILES_COSTS: Record<string, number> = {
+  LEAP: 1,
+  PRISM: 2,
+  IMPACT: 2,
+  COACH: 2,
+  BRIDGE: 3,
+  MOSAIC: 3,
+  SPARK: 3,
+  DRIVE: 2,
+  FORGE: 3,
+  QUEST: 2,
+  CPI: 5,
+};
+
+/**
+ * Map instrument code → its canonical diagnostic price tier.
+ * Built from CANONICAL_DIAGNOSTIC_PRICING so there is one source of truth.
  */
 export const INSTRUMENT_PRICE_TIER: Record<string, AssessmentPriceTier> =
   Object.fromEntries(
-    Object.values(CANONICAL_ASSESSMENT_PRICING).flatMap((p) =>
+    Object.values(CANONICAL_DIAGNOSTIC_PRICING).flatMap((p) =>
       p.instruments.map((code) => [code, p.tier] as const),
     ),
   );
 
-/**
- * ASSESSMENT_MILES_COSTS — per-instrument miles cost.
- * Derived from CANONICAL_ASSESSMENT_PRICING (99 / 149 / 199).
- */
-export const ASSESSMENT_MILES_COSTS: Record<string, number> = Object.fromEntries(
-  Object.values(CANONICAL_ASSESSMENT_PRICING).flatMap((p) =>
-    p.instruments.map((code) => [code, p.miles] as const),
-  ),
-);
+// ─────────────────────────────────────────────────────────────────────────────
+// DEPRECATED RE-EXPORTS — assessment-era names retained for backwards compat.
+// Prefer the CanonicalDiagnosticPricing / DIAGNOSTIC_* variants above.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** @deprecated Use CanonicalDiagnosticPricing instead. */
+export type CanonicalAssessmentPricing = CanonicalDiagnosticPricing;
+
+/** @deprecated Use CANONICAL_DIAGNOSTIC_PRICING instead. */
+export const CANONICAL_ASSESSMENT_PRICING: Record<
+  AssessmentPriceTier,
+  CanonicalAssessmentPricing
+> = CANONICAL_DIAGNOSTIC_PRICING;
+
+/** @deprecated Use CANONICAL_DIAGNOSTIC_ORDER instead. */
+export const CANONICAL_ASSESSMENT_ORDER: AssessmentPriceTier[] = CANONICAL_DIAGNOSTIC_ORDER;
+
+/** @deprecated Use DIAGNOSTIC_MILES_COSTS instead. */
+export const ASSESSMENT_MILES_COSTS: Record<string, number> = DIAGNOSTIC_MILES_COSTS;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CURRENCY DETECTION & FORMATTING (Phase 15.5, ticket #1303 — China pricing)
@@ -345,14 +297,13 @@ export const ASSESSMENT_MILES_COSTS: Record<string, number> = Object.fromEntries
 
 /**
  * Detect the user's preferred currency.
- * Priority order (#1354 update):
- *   1. localStorage['preferredCurrency'] (manual toggle saved across sessions, pre-auth)
- *   2. Explicit user setting (profile.currency_preference) — 'USD' | 'CNY'
- *   3. Browser timezone (Asia/Shanghai, Asia/Beijing, Asia/Urumqi, Asia/Chongqing)
- *   4. navigator.language (zh-CN, zh-Hans → CNY; zh-Hant / HK/TW/MO stay USD)
- *   5. Default: 'USD'
+ * Priority order:
+ *   1. Explicit user setting (profile.currency_preference) — 'USD' | 'CNY'
+ *   2. Browser timezone (Asia/Shanghai, Asia/Beijing, Asia/Hong_Kong*, etc.)
+ *   3. navigator.language (zh-CN, zh-Hans, zh-*)
+ *   4. Default: 'USD'
  *
- * Note: Hong Kong / Macau / Taiwan are NOT mainland China — we treat them as USD
+ * *Hong Kong / Macau / Taiwan are NOT mainland China — we treat them as USD
  * for pricing purposes unless the user explicitly opts into CNY.
  */
 export function detectUserCurrency(opts?: {
@@ -360,13 +311,7 @@ export function detectUserCurrency(opts?: {
   locale?: string | null;
   preference?: string | null;
 }): PricingCurrency {
-  // 0. localStorage manual override (pre-auth)
-  if (typeof localStorage !== 'undefined') {
-    const saved = localStorage.getItem('preferredCurrency')?.toUpperCase();
-    if (saved === 'CNY' || saved === 'USD') return saved as PricingCurrency;
-  }
-
-  // 1. Explicit preference (profile.currency_preference)
+  // 1. Explicit preference
   const pref = opts?.preference?.toUpperCase();
   if (pref === 'CNY' || pref === 'CN' || pref === 'RMB') return 'CNY';
   if (pref === 'USD' || pref === 'US' || pref === 'GLOBAL') return 'USD';
@@ -385,23 +330,6 @@ export function detectUserCurrency(opts?: {
 
   // 4. Default
   return 'USD';
-}
-
-/**
- * Save the user's manual currency choice to localStorage (used by manual toggle).
- * User's manual toggle always overrides auto-detect (#1354).
- */
-export function savePreferredCurrency(currency: PricingCurrency): void {
-  if (typeof localStorage === 'undefined') return;
-  localStorage.setItem('preferredCurrency', currency.toUpperCase());
-}
-
-/**
- * Clear manual currency override, fall back to geo/timezone/locale detection.
- */
-export function clearPreferredCurrency(): void {
-  if (typeof localStorage === 'undefined') return;
-  localStorage.removeItem('preferredCurrency');
 }
 
 /**
@@ -452,14 +380,26 @@ export function formatTierPrice(
 }
 
 /**
- * Format an assessment price for display.
- * Standard / Premium / Unique tiers, USD or CNY.
+ * Format a diagnostic service-level price for display.
+ * Executive Introduction / Professional Deep-Dive / Executive Advisory tiers, USD or CNY.
+ * @deprecated Prefer formatDiagnosticPrice (same signature, updated naming).
  */
 export function formatAssessmentPrice(
   priceTier: AssessmentPriceTier,
   currency: PricingCurrency = 'USD',
 ): { primary: string; miles: number } {
-  const p = CANONICAL_ASSESSMENT_PRICING[priceTier];
+  return formatDiagnosticPrice(priceTier, currency);
+}
+
+/**
+ * Format a diagnostic service-level price for display.
+ * Executive Introduction / Professional Deep-Dive / Executive Advisory tiers, USD or CNY.
+ */
+export function formatDiagnosticPrice(
+  priceTier: AssessmentPriceTier,
+  currency: PricingCurrency = 'USD',
+): { primary: string; miles: number } {
+  const p = CANONICAL_DIAGNOSTIC_PRICING[priceTier];
   if (!p) return { primary: '—', miles: 0 };
   const primary = currency === 'CNY' ? `¥${p.cny}` : `$${p.usd}`;
   return { primary, miles: p.miles };
@@ -467,10 +407,10 @@ export function formatAssessmentPrice(
 
 /**
  * Convenience: get the miles cost for a specific instrument code.
- * Falls back to 99 (Standard tier) if the code is not in the catalog.
+ * Locks to the 1/2/3/5 diagnostic canon. Falls back to 2 (Standard) if unknown.
  */
 export function getInstrumentMilesCost(instrumentCode: string): number {
-  return ASSESSMENT_MILES_COSTS[instrumentCode] ?? 99;
+  return DIAGNOSTIC_MILES_COSTS[instrumentCode] ?? 2;
 }
 
 export async function fetchTiers(): Promise<Tier[]> {
@@ -506,11 +446,6 @@ export async function createCheckoutSession(
   tier: TierKey,
   cycle: BillingCycle = 'monthly'
 ): Promise<CheckoutSession> {
-  // Batch 1.5 Corrective: invite-only tiers cannot be self-serve upgraded to.
-  const pricing = CANONICAL_TIER_PRICING[tier];
-  if (pricing?.isInviteOnly) {
-    throw new Error('This tier is invite-only. Contact us to learn more.');
-  }
   return v1Client.post('/billing/checkout', { tier, cycle });
 }
 
@@ -525,11 +460,6 @@ export async function fetchInvoices(): Promise<Invoice[]> {
 export async function upgradeSubscription(
   tier: TierKey
 ): Promise<{ upgraded: boolean }> {
-  // Batch 1.5 Corrective: invite-only tiers cannot be self-serve upgraded to.
-  const pricing = CANONICAL_TIER_PRICING[tier];
-  if (pricing?.isInviteOnly) {
-    throw new Error('This tier is invite-only. Contact us to learn more.');
-  }
   return v1Client.post('/billing/subscription/upgrade', { tier });
 }
 

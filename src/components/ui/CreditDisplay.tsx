@@ -17,7 +17,7 @@ const DS = {
   text: '#000000',
   textSecondary: '#333333',
   border: '#E5E5E5',
-  radius: '0',
+  radius: '8px',
   success: '#16A34A',
   warning: '#CA8A04',
 };
@@ -31,22 +31,20 @@ export function CreditDisplay({ showTier = false, unit = 'miles' }: CreditDispla
 
   const getTierColor = () => {
     switch (credit.tier) {
-      case 'council':
-        return DS.accent;
-      case 'executive':
-        return DS.accent;
       case 'pro':
+        return DS.accent;
+      case 'basic':
         return DS.success;
-      case 'starter':
-        return DS.success;
+      case 'enterprise':
+        return DS.accent;
       default:
         return DS.textSecondary;
     }
   };
 
   const getBalanceColor = () => {
-    if (credit.tier === 'council') return DS.accent;
-    if (credit.tier === 'executive' || credit.tier === 'pro') return DS.success;
+    if (credit.tier === 'enterprise') return DS.accent;
+    if (credit.tier === 'pro' || credit.tier === 'basic') return DS.success;
     if (credit.balance <= 0) return '#DC2626';
     if (credit.balance <= 2) return DS.warning;
     return DS.text;
@@ -67,7 +65,7 @@ export function CreditDisplay({ showTier = false, unit = 'miles' }: CreditDispla
       ) : (
         <>
           <span style={{ fontSize: '13px', fontWeight: 600, color: getBalanceColor() }}>
-            {credit.tier === 'council' ? '∞' : credit.balance}
+            {credit.tier === 'enterprise' ? '∞' : credit.balance}
           </span>
           <span style={{ fontSize: '11px', color: DS.muted }}>
             {unitLabel(unit)}

@@ -27,7 +27,7 @@ export interface SPARKSubmitResponse {
  * POST /api/scoring/spark
  */
 export async function submitSPARKAssessment(
-  answers: Record<string, number | number[] | string>,
+  answers: Record<string, number | number[]>,
   context?: { role?: string; industry?: string; yearsExperience?: number },
   userId?: string
 ): Promise<SPARKSubmitResponse> {

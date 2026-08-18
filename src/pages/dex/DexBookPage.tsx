@@ -9,8 +9,6 @@ import { ArrowLeft, Calendar, CheckCircle2, Mail, AlertCircle, Clock } from 'luc
 import { Button, Card, CardContent, Badge, EmptyState } from '@/components/ui';
 import { useCredits } from '@/contexts/CreditContext';
 import { getSupabase } from '@/services/supabaseApi';
-import { useAuthStore } from '@/stores/authStore';
-import { isAdminRole, isConsultantRole } from '@/services/portalClassification';
 
 interface Consultant {
   id: string;
@@ -38,7 +36,6 @@ const TIME_SLOTS = [
 
 export function DexBookPage() {
   const { credit, deductCredit, refreshCredits } = useCredits();
-  const { profile, user } = useAuthStore();
   const [consultants, setConsultants] = useState<Consultant[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [slot, setSlot] = useState<string>('');
@@ -52,19 +49,6 @@ export function DexBookPage() {
     (async () => {
       try {
         setError(null);
-
-        // ── V3-6 / #1347: Consultant data = B2B/internal only. ──
-        // B2C unauthenticated OR non-staff (no admin/consultant role)
-        // → silently empty, trigger EmptyState. No 404, no crash.
-        const role = profile?.role ?? null;
-        const isAuthenticated = !!user;
-        const canAccessConsultants = isAuthenticated && (isAdminRole(role) || isConsultantRole(role));
-        if (!canAccessConsultants) {
-          if (cancelled) return;
-          setConsultants([]);
-          return;
-        }
-
         const sb = getSupabase();
         const { data, error: sbError } = await sb
           .from('consultants')
@@ -73,24 +57,22 @@ export function DexBookPage() {
           .order('name', { ascending: true });
         if (cancelled) return;
         if (sbError) {
-          // Don't surface RLS 403 to the user — empty list instead.
-          console.warn('[DexBookPage] consultants fetch skipped (scoped):', sbError.message);
-          setConsultants([]);
+          console.warn('[DexBookPage] consultants fetch failed:', sbError.message);
+          setError('Unable to load coaching team right now.');
         } else {
           setConsultants((data as Consultant[]) ?? []);
         }
       } catch (e) {
         if (!cancelled) {
-          // Swallow: just empty list
-          console.warn('[DexBookPage] consultants fetch skipped (caught)');
-          setConsultants([]);
+          console.warn('[DexBookPage] error:', e);
+          setError('Unable to load coaching team right now.');
         }
       } finally {
         if (!cancelled) setLoading(false);
       }
     })();
     return () => { cancelled = true; };
-  }, [profile?.role, user]);
+  }, []);
 
   const selectedConsultant = consultants.find(c => c.id === selectedId) ?? null;
 
@@ -125,7 +107,7 @@ export function DexBookPage() {
           </div>
           <h1
             className="text-3xl font-bold text-[#1A1A2E] mb-2"
-            style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
+            style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
           >
             Session Booked
           </h1>
@@ -173,7 +155,7 @@ export function DexBookPage() {
           </div>
           <h1
             className="text-3xl font-bold text-[#1A1A2E] mb-2"
-            style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
+            style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
           >
             Book a 1:1 Coaching Session
           </h1>

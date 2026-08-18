@@ -18,7 +18,7 @@ const NAV_ITEMS = [
   { path: '/platform/metrix', icon: IconSpark, label: 'Performance Metrics' },
   { path: '/platform/scoring-runs', icon: ClipboardList, label: 'Scoring Runs' },
   { type: 'divider' as const, label: 'Tools' },
-  { path: '/platform/chat', icon: IconQuest, label: 'NEXUS' },
+  { path: '/platform/chat', icon: IconQuest, label: 'Nexus' },
   { path: '/platform/scheduler', icon: Calendar, label: 'Scheduler' },
   { path: '/platform/documents', icon: IconPrism, label: 'Documents' },
   { path: '/platform/notifications', icon: Bell, label: 'Alerts' },

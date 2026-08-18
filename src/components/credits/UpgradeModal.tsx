@@ -249,7 +249,7 @@ export function UpgradeModal({ onClose, requiredCredits, currentCredits, unit }:
                       Redirecting...
                     </>
                   ) : isExplorer ? (
-                    'Begin'
+                    'Get Started'
                   ) : (
                     <>
                       Upgrade to {tier.label}

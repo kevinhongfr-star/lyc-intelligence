@@ -13,7 +13,7 @@ const DS = {
   border: '#222222',
   error: '#EF4444',
   success: '#10B981',
-  radius: '0'
+  radius: '12px'
 };
 
 interface Props {

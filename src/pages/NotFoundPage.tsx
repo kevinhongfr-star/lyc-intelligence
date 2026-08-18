@@ -3,7 +3,7 @@
  *
  * Visual contract with LYC brand rollout:
  *   - Accent #C108AB (magenta) for primary CTA / accent bar
- *   - Display headings: System serif stack (DejaVu Serif / Georgia / Times)
+ *   - Display headings: Libre Baskerville serif
  *   - Body copy: DM Sans
  *   - Zero radius everywhere (no rounded corners)
  *   - No drop-shadow chrome — flat premium
@@ -11,33 +11,30 @@
  */
 import React from 'react';
 import { ArrowRight, Compass, Home, Search } from 'lucide-react';
-import { SEO } from '@/components/seo/SEO';
-import { DS, WHITE } from '@/tokens';
 
 export default function NotFoundPage() {
   return (
     <div
       style={{
         minHeight: '100vh',
-        background: DS.bg,
+        background: '#FFFFFF',
         display: 'flex',
         alignItems: 'stretch',
-        fontFamily: DS.bodyFont,
-        color: DS.text,
+        fontFamily: "'DM Sans', system-ui, sans-serif",
+        color: '#000000',
       }}
     >
-      <SEO title="Page Not Found — LYC Intelligence" description="The page you're looking for doesn't exist. Explore LYC Intelligence assessments and NEXUS." path="/404" />
       {/* Left column — accent bar + 404 wordmark */}
       <div
         style={{
           width: 'clamp(220px, 32vw, 440px)',
-          background: DS.bgDark,
-          color: WHITE,
+          background: '#0A0A0A',
+          color: '#FFFFFF',
           padding: 'clamp(32px, 6vw, 72px)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          borderRight: `3px solid ${DS.accent}`,
+          borderRight: `3px solid #C108AB`,
         }}
       >
         <div>
@@ -47,13 +44,13 @@ export default function NotFoundPage() {
               display: 'inline-block',
               height: 6,
               width: 96,
-              background: DS.accent,
+              background: '#C108AB',
               marginBottom: 40,
             }}
           />
           <div
             style={{
-              fontFamily: DS.headingFont,
+              fontFamily: "'Libre Baskerville', Georgia, serif",
               fontSize: 'clamp(72px, 12vw, 160px)',
               lineHeight: 0.92,
               fontWeight: 700,
@@ -65,11 +62,11 @@ export default function NotFoundPage() {
           </div>
           <p
             style={{
-              fontFamily: DS.bodyFont,
+              fontFamily: "'DM Sans', system-ui, sans-serif",
               fontSize: 14,
               textTransform: 'uppercase',
               letterSpacing: '0.18em',
-              color: DS.eyebrow,
+              color: '#C108AB',
               marginTop: 32,
               marginBottom: 0,
               fontWeight: 600,
@@ -98,12 +95,12 @@ export default function NotFoundPage() {
       >
         <h1
           style={{
-            fontFamily: DS.headingFont,
+            fontFamily: "'Libre Baskerville', Georgia, serif",
             fontSize: 'clamp(28px, 3.4vw, 44px)',
             lineHeight: 1.15,
             fontWeight: 700,
             margin: 0,
-            color: DS.text,
+            color: '#000000',
             maxWidth: 640,
           }}
         >
@@ -114,7 +111,7 @@ export default function NotFoundPage() {
           style={{
             fontSize: 17,
             lineHeight: 1.55,
-            color: DS.textSecondary,
+            color: '#444444',
             maxWidth: 560,
             marginTop: 24,
             marginBottom: 48,
@@ -133,8 +130,8 @@ export default function NotFoundPage() {
               alignItems: 'center',
               gap: 10,
               padding: '14px 22px',
-              background: DS.accent,
-              color: WHITE,
+              background: '#C108AB',
+              color: '#FFFFFF',
               textDecoration: 'none',
               fontWeight: 600,
               fontSize: 15,
@@ -151,8 +148,8 @@ export default function NotFoundPage() {
               alignItems: 'center',
               gap: 10,
               padding: '14px 22px',
-              border: `1.5px solid ${DS.text}`,
-              color: DS.text,
+              border: '1.5px solid #000000',
+              color: '#000000',
               textDecoration: 'none',
               fontWeight: 600,
               fontSize: 15,
@@ -171,7 +168,7 @@ export default function NotFoundPage() {
               fontWeight: 700,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-              color: DS.eyebrow,
+              color: '#666666',
               marginBottom: 16,
             }}
           >
@@ -186,33 +183,33 @@ export default function NotFoundPage() {
             }}
           >
             {[
-              { href: '/pricing',                  icon: <Search size={15} />,  label: 'Pricing & Tiers',          sub: 'Executive Introduction → Council' },
-              { href: '/assessment/prism',         icon: <Search size={15} />,  label: 'PRISM Transition Diagnostic', sub: 'Career transition clarity' },
-              { href: '/assessments',              icon: <Search size={15} />,  label: 'All 6 Leadership Assessments', sub: 'Browse the full catalog' },
-              { href: '/nexus',                    icon: <Search size={15} />,  label: 'NEXUS',                    sub: 'Conversational leadership advisor' },
+              { href: '/pricing',                  icon: <Search size={15} />,  label: 'Pricing & Tiers',          sub: 'Explorer → Executive → Council' },
+              { href: '/assessment/cpi',           icon: <Search size={15} />,  label: 'CPI Diagnostic',          sub: 'China Leadership Pipeline Index' },
+              { href: '/assessment',               icon: <Search size={15} />,  label: 'Career Core Diagnostics', sub: 'Career transition radar & more' },
+              { href: '/b2b',                      icon: <Search size={15} />,  label: 'Executive Search (B2B)',  sub: 'Client / consultant portal' },
             ].map((r) => (
               <a
                 key={r.href}
                 href={r.href}
                 style={{
                   padding: '16px 18px',
-                  border: `1px solid ${DS.border}`,
+                  border: '1px solid #E5E5E5',
                   textDecoration: 'none',
-                  color: DS.text,
+                  color: '#000000',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 4,
                   transition: 'border-color 120ms ease',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = DS.accent)}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = DS.border)}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#C108AB')}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#E5E5E5')}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}>
                   {r.icon}
                   <span>{r.label}</span>
-                  <ArrowRight size={14} style={{ marginLeft: 'auto', color: DS.accent }} />
+                  <ArrowRight size={14} style={{ marginLeft: 'auto', color: '#C108AB' }} />
                 </div>
-                <div style={{ fontSize: 13, color: DS.muted }}>{r.sub}</div>
+                <div style={{ fontSize: 13, color: '#666666' }}>{r.sub}</div>
               </a>
             ))}
           </div>
@@ -223,14 +220,14 @@ export default function NotFoundPage() {
           style={{
             marginTop: 64,
             fontSize: 12,
-            color: DS.mutedDim,
-            fontFamily: DS.monoFont,
+            color: '#AAAAAA',
+            fontFamily: "'IBM Plex Mono', ui-monospace, monospace",
           }}
         >
           HTTP 404 · NotFoundRoute · if you believe this is a system error, contact{' '}
           <a
             href="mailto:ops@lyc-intelligence.app"
-            style={{ color: DS.accent, textDecoration: 'none' }}
+            style={{ color: '#C108AB', textDecoration: 'none' }}
           >
             ops@lyc-intelligence.app
           </a>

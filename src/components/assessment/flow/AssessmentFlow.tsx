@@ -50,71 +50,7 @@ function isAnswered(q: AssessmentQuestion, answers: AnswerMap): boolean {
   const val = answers[q.id];
   if (val === undefined || val === null) return false;
   if (q.type === 'mcq_multi') return Array.isArray(val) && val.length > 0;
-  if (q.type === 'forced_choice') return typeof val === 'string' && val.length > 0;
-  // likert, slider, mcq_single all store a number
   return typeof val === 'number';
-}
-
-// ── #1323: SKIP LOGIC & BRANCHING HELPERS ──────────────────────────
-
-/** Check if a question should be skipped given current answers. */
-function shouldSkip(q: AssessmentQuestion, answers: AnswerMap): boolean {
-  return q.skipIf ? q.skipIf(answers) : false;
-}
-
-/**
- * Get the effective next index considering branch + skip.
- * Returns questions.length to signal "go to review".
- */
-function getNextIndex(
-  questions: AssessmentQuestion[],
-  currentIndex: number,
-  answers: AnswerMap,
-): number {
-  const currentQ = questions[currentIndex];
-
-  // Check branch first — explicit routing overrides linear progression.
-  if (currentQ?.branch) {
-    const targetId = currentQ.branch(answers);
-    if (targetId) {
-      const targetIdx = questions.findIndex((q) => q.id === targetId);
-      if (targetIdx >= 0 && !shouldSkip(questions[targetIdx], answers)) {
-        return targetIdx;
-      }
-    }
-  }
-
-  // Default: find the next non-skipped question.
-  for (let i = currentIndex + 1; i < questions.length; i++) {
-    if (!shouldSkip(questions[i], answers)) {
-      return i;
-    }
-  }
-
-  // No more non-skipped questions — signal review phase.
-  return questions.length;
-}
-
-/** Get the effective previous index (skip over skipped questions). */
-function getPrevIndex(
-  questions: AssessmentQuestion[],
-  currentIndex: number,
-  answers: AnswerMap,
-): number {
-  for (let i = currentIndex - 1; i >= 0; i--) {
-    if (!shouldSkip(questions[i], answers)) {
-      return i;
-    }
-  }
-  return 0;
-}
-
-/** Get the list of active (non-skipped) questions for the current answers. */
-function getActiveQuestions(
-  questions: AssessmentQuestion[],
-  answers: AnswerMap,
-): AssessmentQuestion[] {
-  return questions.filter((q) => !shouldSkip(q, answers));
 }
 
 // ── LIKERT QUESTION ────────────────────────────────────────────────
@@ -129,10 +65,7 @@ function LikertQuestion({
   onSelect: (score: number) => void;
   accent: string;
 }) {
-  const scaleMax = question.scaleMax ?? 5;
-  const scaleMin = question.scaleMin ?? 1;
-  const scale: number[] = [];
-  for (let n = scaleMin; n <= scaleMax; n++) scale.push(n);
+  const scale = [1, 2, 3, 4, 5];
   const labels = question.scaleLabels || ['Low', 'High'];
 
   return (
@@ -331,163 +264,40 @@ function McqMultiQuestion({
   );
 }
 
-// ── FORCED CHOICE (e.g. LEAP DISC) ─────────────────────────────────
-function ForcedChoiceQuestion({
-  question,
-  value,
-  onSelect,
-  accent,
-}: {
-  question: AssessmentQuestion;
-  value: string | undefined;
-  onSelect: (value: string) => void;
-  accent: string;
-}) {
-  const options = question.options ?? [];
-  return (
-    <div role="radiogroup" aria-label={question.text} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {options.map((opt, i) => {
-        const optionValue = opt.value ?? opt.label;
-        const selected = value === optionValue;
-        return (
-          <button
-            key={i}
-            type="button"
-            aria-pressed={selected}
-            aria-label={`${String.fromCharCode(65 + i)}. ${opt.label}`}
-            onClick={() => onSelect(optionValue)}
-            style={{
-              width: '100%',
-              padding: '20px 24px',
-              background: selected ? accent : WHITE,
-              border: `1px solid ${selected ? accent : G200}`,
-              cursor: 'pointer',
-              fontFamily: "'DM Sans', system-ui, sans-serif",
-              fontSize: 15,
-              fontWeight: 500,
-              color: selected ? WHITE : INK,
-              textAlign: 'left',
-              transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 16,
-            }}
-            onMouseEnter={(e) => {
-              if (!selected) {
-                e.currentTarget.style.borderColor = accent;
-                e.currentTarget.style.background = G100;
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!selected) {
-                e.currentTarget.style.borderColor = G200;
-                e.currentTarget.style.background = WHITE;
-              }
-            }}
-          >
-            <span style={{
-              width: 28, height: 28, flexShrink: 0,
-              border: `1px solid ${selected ? WHITE : G300}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-              fontSize: 11, fontWeight: 500,
-              color: selected ? WHITE : G600,
-            }}>
-              {String.fromCharCode(65 + i)}
-            </span>
-            <span style={{ flex: 1 }}>{opt.label}</span>
-            {selected && <Check style={{ width: 18, height: 18, color: WHITE }} />}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-// ── SLIDER ─────────────────────────────────────────────────────────
-function SliderQuestion({
-  question,
-  value,
-  onChange,
-  accent,
-}: {
-  question: AssessmentQuestion;
-  value: number | undefined;
-  onChange: (n: number) => void;
-  accent: string;
-}) {
-  const min = question.scaleMin ?? 1;
-  const max = question.scaleMax ?? 10;
-  const step = question.scaleStep ?? 1;
-  const labels = question.scaleLabels || ['Low', 'High'];
-  const current = value ?? min;
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, padding: '0 4px' }}>
-        <span style={{ ...monoStyle, color: G600, fontSize: 10 }}>{labels[0]}</span>
-        <span style={{ ...monoStyle, color: accent, fontSize: 10 }}>{labels[1]}</span>
-      </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={current}
-        onChange={(e) => onChange(parseInt(e.target.value, 10))}
-        aria-label={question.text}
-        style={{ width: '100%', accentColor: accent }}
-      />
-      <div style={{ textAlign: 'center', marginTop: 12 }}>
-        <span style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontSize: 28, fontWeight: 700, color: accent }}>{current}</span>
-        <span style={{ ...monoStyle, color: G400, fontSize: 10 }}> / {max}</span>
-      </div>
-    </div>
-  );
-}
-
 // ── REVIEW SCREEN ──────────────────────────────────────────────────
 function ReviewScreen({
   config,
   answers,
   onEdit,
   accent,
-  activeQuestions,
 }: {
   config: AssessmentFlowConfig;
   answers: AnswerMap;
   onEdit: (index: number) => void;
   accent: string;
-  // #1323: active (non-skipped) questions — defaults to config.questions.
-  activeQuestions?: AssessmentQuestion[];
 }) {
-  const questions = activeQuestions ?? config.questions;
-  const answered = questions.filter((q) => isAnswered(q, answers)).length;
+  const answered = config.questions.filter((q) => isAnswered(q, answers)).length;
 
   return (
     <div style={{ maxWidth: 680, margin: '0 auto' }}>
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
         <div style={{ ...monoStyle, color: accent, marginBottom: 16 }}>Review</div>
         <h1 style={{
-          fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+          fontFamily: "'Libre Baskerville', Georgia, serif",
           fontSize: 32, fontWeight: 700, color: INK, lineHeight: 1.2, marginBottom: 12,
         }}>
           Ready to submit?
         </h1>
         <p style={{ fontSize: 16, color: G600, lineHeight: 1.6 }}>
-          {answered} of {questions.length} questions answered. Review your responses below before submitting.
+          {answered} of {config.questions.length} questions answered. Review your responses below before submitting.
         </p>
       </div>
       <div style={{ border: `1px solid ${G200}`, background: WHITE }}>
-        {questions.map((q, i) => {
+        {config.questions.map((q, i) => {
           const val = answers[q.id];
           let display = '—';
           if (q.type === 'likert' && typeof val === 'number') {
-            display = `${val} / ${q.scaleMax ?? 5}`;
-          } else if (q.type === 'slider' && typeof val === 'number') {
-            display = `${val} / ${q.scaleMax ?? 10}`;
-          } else if (q.type === 'forced_choice' && typeof val === 'string') {
-            const opt = q.options?.find((o) => (o.value ?? o.label) === val);
-            display = opt?.label || val;
+            display = `${val} / 5`;
           } else if (q.type === 'mcq_single' && typeof val === 'number') {
             const opt = q.options?.find((o) => o.score === val);
             display = opt?.label || '—';
@@ -502,7 +312,7 @@ function ReviewScreen({
                 width: '100%', padding: '20px 24px',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 background: 'none', border: 'none',
-                borderBottom: i < questions.length - 1 ? `1px solid ${G200}` : 'none',
+                borderBottom: i < config.questions.length - 1 ? `1px solid ${G200}` : 'none',
                 cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
               }}
             >
@@ -538,7 +348,7 @@ function SubmittingScreen({ accent }: { accent: string }) {
         animation: 'spin 1s linear infinite',
       }} />
       <h2 style={{
-        fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+        fontFamily: "'Libre Baskerville', Georgia, serif",
         fontSize: 24, fontWeight: 700, color: INK, marginTop: 32, marginBottom: 8,
       }}>
         Analyzing your responses…
@@ -559,10 +369,7 @@ export function AssessmentFlow({ config }: Props) {
   // State
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [currentIndex, setCurrentIndex] = useState(0);
-  // #1323: 'intro' phase shows the entry expectation screen before questions.
-  const [phase, setPhase] = useState<'intro' | 'questions' | 'review' | 'submitting'>(
-    config.intro ? 'intro' : 'questions',
-  );
+  const [phase, setPhase] = useState<'questions' | 'review' | 'submitting'>('questions');
   const [hydrated, setHydrated] = useState(false);
 
   // Storage key
@@ -574,8 +381,6 @@ export function AssessmentFlow({ config }: Props) {
     if (saved && saved.status === 'in_progress') {
       setAnswers(saved.answers);
       setCurrentIndex(Math.min(saved.currentIndex, questions.length - 1));
-      // #1323: skip intro when resuming a saved session.
-      setPhase('questions');
     }
     setHydrated(true);
   }, [code, questions.length]);
@@ -594,46 +399,34 @@ export function AssessmentFlow({ config }: Props) {
 
   // Current question
   const currentQ = questions[currentIndex];
-  // #1323: active questions = non-skipped questions for current answers.
-  const activeQuestions = getActiveQuestions(questions, answers);
-  const answeredCount = activeQuestions.filter((q) => isAnswered(q, answers)).length;
-  // isLast: no more non-skipped questions after current (or branch leads to review).
-  const nextIdx = phase === 'questions' ? getNextIndex(questions, currentIndex, answers) : -1;
-  const isLast = nextIdx >= questions.length;
-  // Progress = (current position) / (total questions) — works for any count (24–36).
-  // answeredCount is still surfaced separately as "X answered".
-  const progress = phase === 'review'
-    ? 100
-    : ((currentIndex + 1) / Math.max(1, questions.length)) * 100;
+  const isLast = currentIndex === questions.length - 1;
+  const answeredCount = questions.filter((q) => isAnswered(q, answers)).length;
+  const progress = ((phase === 'review' ? questions.length : currentIndex) / questions.length) * 100;
 
   // Answer handlers
   const handleLikert = useCallback((score: number) => {
-    const newAnswers = { ...answers, [currentQ.id]: score };
-    setAnswers(newAnswers);
-    // #1323: auto-advance using skip/branch logic.
+    setAnswers((prev) => ({ ...prev, [currentQ.id]: score }));
+    // Auto-advance after a brief delay
     setTimeout(() => {
-      const nextIndex = getNextIndex(questions, currentIndex, newAnswers);
-      if (nextIndex >= questions.length) {
-        setPhase('review');
+      if (currentIndex < questions.length - 1) {
+        setCurrentIndex((prev) => prev + 1);
       } else {
-        setCurrentIndex(nextIndex);
+        setPhase('review');
       }
     }, 250);
-  }, [currentQ, currentIndex, questions.length, answers]);
+  }, [currentQ, currentIndex, questions.length]);
 
   const handleMcqSingle = useCallback((score: number) => {
-    const newAnswers = { ...answers, [currentQ.id]: score };
-    setAnswers(newAnswers);
-    // #1323: auto-advance using skip/branch logic.
+    setAnswers((prev) => ({ ...prev, [currentQ.id]: score }));
+    // Auto-advance
     setTimeout(() => {
-      const nextIndex = getNextIndex(questions, currentIndex, newAnswers);
-      if (nextIndex >= questions.length) {
-        setPhase('review');
+      if (currentIndex < questions.length - 1) {
+        setCurrentIndex((prev) => prev + 1);
       } else {
-        setCurrentIndex(nextIndex);
+        setPhase('review');
       }
     }, 250);
-  }, [currentQ, currentIndex, questions.length, answers]);
+  }, [currentQ, currentIndex, questions.length]);
 
   const handleMcqMulti = useCallback((score: number) => {
     setAnswers((prev) => {
@@ -647,43 +440,20 @@ export function AssessmentFlow({ config }: Props) {
     });
   }, [currentQ]);
 
-  // forced_choice: store the chosen option value (e.g. "A"/"B" or DISC "D") and auto-advance.
-  const handleForcedChoice = useCallback((val: string) => {
-    const newAnswers = { ...answers, [currentQ.id]: val };
-    setAnswers(newAnswers);
-    // #1323: auto-advance using skip/branch logic.
-    setTimeout(() => {
-      const nextIndex = getNextIndex(questions, currentIndex, newAnswers);
-      if (nextIndex >= questions.length) {
-        setPhase('review');
-      } else {
-        setCurrentIndex(nextIndex);
-      }
-    }, 250);
-  }, [currentQ, currentIndex, questions.length, answers]);
-
-  // slider: store the numeric value; manual advance via Next (see navigation).
-  const handleSlider = useCallback((n: number) => {
-    setAnswers((prev) => ({ ...prev, [currentQ.id]: n }));
-  }, [currentQ]);
-
   // Navigation
   const goNext = useCallback(() => {
-    // #1323: use skip/branch-aware next index.
-    const nextIndex = getNextIndex(questions, currentIndex, answers);
-    if (nextIndex >= questions.length) {
-      setPhase('review');
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
     } else {
-      setCurrentIndex(nextIndex);
+      setPhase('review');
     }
-  }, [currentIndex, questions.length, answers]);
+  }, [currentIndex, questions.length]);
 
   const goBack = useCallback(() => {
-    // #1323: skip over skipped questions when going back.
     if (currentIndex > 0) {
-      setCurrentIndex(getPrevIndex(questions, currentIndex, answers));
+      setCurrentIndex((prev) => prev - 1);
     }
-  }, [currentIndex, questions.length, answers]);
+  }, [currentIndex]);
 
   // Keyboard support
   useEffect(() => {
@@ -695,14 +465,7 @@ export function AssessmentFlow({ config }: Props) {
         goNext();
       } else if (currentQ.type === 'likert') {
         const n = parseInt(e.key, 10);
-        const max = currentQ.scaleMax ?? 5;
-        if (n >= 1 && n <= max) handleLikert(n);
-      } else if (currentQ.type === 'forced_choice' && currentQ.options) {
-        const n = parseInt(e.key, 10);
-        if (n >= 1 && n <= currentQ.options.length) {
-          const opt = currentQ.options[n - 1];
-          handleForcedChoice(opt.value ?? opt.label);
-        }
+        if (n >= 1 && n <= 5) handleLikert(n);
       } else if (currentQ.type === 'mcq_single' && currentQ.options) {
         const n = parseInt(e.key, 10);
         if (n >= 1 && n <= currentQ.options.length) {
@@ -712,7 +475,7 @@ export function AssessmentFlow({ config }: Props) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, currentIndex, currentQ, answers, goBack, goNext, handleLikert, handleForcedChoice, handleMcqSingle]);
+  }, [phase, currentIndex, currentQ, answers, goBack, goNext, handleLikert, handleMcqSingle]);
 
   // Submit
   const handleSubmit = useCallback(async () => {
@@ -768,7 +531,7 @@ export function AssessmentFlow({ config }: Props) {
       }}>
         <div style={{ ...containerStyle, padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Link to={landingPath} style={{
-            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+            fontFamily: "'Libre Baskerville', Georgia, serif",
             fontSize: 16, fontWeight: 700, color: INK, textDecoration: 'none',
             display: 'flex', alignItems: 'baseline', gap: 6,
           }}>
@@ -799,74 +562,6 @@ export function AssessmentFlow({ config }: Props) {
 
       {/* ── CONTENT ────────────────────────────────────────────── */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 32px' }}>
-        {/* #1323: Intro / entry expectation screen */}
-        {phase === 'intro' && config.intro && (
-          <div style={{ maxWidth: 680, width: '100%' }}>
-            <div style={{ textAlign: 'center', marginBottom: 48 }}>
-              <div style={{ ...monoStyle, color: accent, fontSize: 10, marginBottom: 16 }}>
-                {config.code} Assessment
-              </div>
-              <h1 style={{
-                fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
-                fontSize: 32, fontWeight: 700, color: INK, lineHeight: 1.2, marginBottom: 16,
-              }}>
-                {config.intro.title}
-              </h1>
-              <p style={{ fontSize: 16, color: G600, lineHeight: 1.6, maxWidth: 480, margin: '0 auto' }}>
-                {config.intro.body}
-              </p>
-            </div>
-            {config.intro.expectations && config.intro.expectations.length > 0 && (
-              <div style={{ border: `1px solid ${G200}`, background: WHITE, marginBottom: 40 }}>
-                {config.intro.expectations.map((exp, i) => (
-                  <div key={i} style={{
-                    padding: '20px 24px',
-                    display: 'flex', alignItems: 'flex-start', gap: 16,
-                    borderBottom: i < config.intro!.expectations!.length - 1 ? `1px solid ${G200}` : 'none',
-                  }}>
-                    <span style={{
-                      width: 28, height: 28, flexShrink: 0,
-                      border: `1px solid ${accent}`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-                      fontSize: 11, fontWeight: 500, color: accent,
-                    }}>
-                      {i + 1}
-                    </span>
-                    <span style={{ fontSize: 15, color: INK, lineHeight: 1.5, flex: 1 }}>
-                      {exp}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
-              <span style={{ ...monoStyle, color: G400, fontSize: 10 }}>
-                ~{Math.max(1, Math.round(questions.length / 3))} minutes · {questions.length} questions
-              </span>
-              <button
-                onClick={() => setPhase('questions')}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '14px 32px', background: accent, border: 'none',
-                  cursor: 'pointer',
-                  fontFamily: "'DM Sans', system-ui, sans-serif",
-                  fontSize: 15, fontWeight: 600, color: WHITE,
-                  transition: 'all 200ms cubic-bezier(0.4,0,0.2,1)',
-                }}
-                onMouseDown={(e) => {
-                  e.currentTarget.style.transform = 'scale(0.98)';
-                  e.currentTarget.style.transition = 'transform 120ms cubic-bezier(0.4,0,0.2,1)';
-                }}
-                onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-              >
-                Begin assessment <ArrowRight style={{ width: 18, height: 18 }} />
-              </button>
-            </div>
-          </div>
-        )}
-
         {phase === 'questions' && currentQ && (
           <div style={{ maxWidth: 680, width: '100%' }}>
             {/* Progress label */}
@@ -877,35 +572,14 @@ export function AssessmentFlow({ config }: Props) {
               <span style={{ ...monoStyle, color: G400, fontSize: 10 }}>
                 Question {currentIndex + 1} of {questions.length}
               </span>
-              {/* #1323: show active count when skip logic reduces questions */}
               <span style={{ ...monoStyle, color: accent, fontSize: 10 }}>
                 {answeredCount} answered
               </span>
             </div>
 
-            {/* #1323: Scenario context block (shown above prompt when present) */}
-            {currentQ.scenario && (
-              <div style={{
-                marginBottom: 28,
-                padding: '20px 24px',
-                background: G100,
-                borderLeft: `3px solid ${accent}`,
-              }}>
-                <span style={{ ...monoStyle, color: accent, fontSize: 9, marginBottom: 8, display: 'block' }}>
-                  Scenario
-                </span>
-                <p style={{
-                  fontSize: 16, color: G600, lineHeight: 1.65, margin: 0,
-                  fontFamily: "'DM Sans', system-ui, sans-serif",
-                }}>
-                  {currentQ.scenario}
-                </p>
-              </div>
-            )}
-
             {/* Question text */}
             <h1 style={{
-              fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
+              fontFamily: "'Libre Baskerville', Georgia, serif",
               fontSize: 28, fontWeight: 700, color: INK,
               lineHeight: 1.3, marginBottom: 8,
             }}>
@@ -943,22 +617,6 @@ export function AssessmentFlow({ config }: Props) {
                 accent={accent}
               />
             )}
-            {currentQ.type === 'forced_choice' && (
-              <ForcedChoiceQuestion
-                question={currentQ}
-                value={answers[currentQ.id] as string | undefined}
-                onSelect={handleForcedChoice}
-                accent={accent}
-              />
-            )}
-            {currentQ.type === 'slider' && (
-              <SliderQuestion
-                question={currentQ}
-                value={answers[currentQ.id] as number | undefined}
-                onChange={handleSlider}
-                accent={accent}
-              />
-            )}
 
             {/* Navigation */}
             <div style={{
@@ -981,8 +639,8 @@ export function AssessmentFlow({ config }: Props) {
                 <ArrowLeft style={{ width: 16, height: 16 }} /> Back
               </button>
 
-              {/* For mcq_multi / slider (manual advance), show Next button */}
-              {(currentQ.type === 'mcq_multi' || currentQ.type === 'slider') && (
+              {/* For mcq_multi and non-auto-advancing, show Next button */}
+              {currentQ.type === 'mcq_multi' && (
                 <button
                   onClick={goNext}
                   disabled={!isAnswered(currentQ, answers)}
@@ -1001,8 +659,8 @@ export function AssessmentFlow({ config }: Props) {
                 </button>
               )}
 
-              {/* For likert/mcq_single/forced_choice (auto-advance): show "review" on last question */}
-              {currentQ.type !== 'mcq_multi' && currentQ.type !== 'slider' && isLast && isAnswered(currentQ, answers) && (
+              {/* For likert/mcq_single: show "skip to review" on last question */}
+              {currentQ.type !== 'mcq_multi' && isLast && isAnswered(currentQ, answers) && (
                 <button
                   onClick={() => setPhase('review')}
                   style={{
@@ -1018,11 +676,6 @@ export function AssessmentFlow({ config }: Props) {
                 </button>
               )}
             </div>
-            {(currentQ.type === 'mcq_multi' || currentQ.type === 'slider') && !isAnswered(currentQ, answers) && (
-              <div style={{ textAlign: 'right', marginTop: 12, ...monoStyle, color: G400, fontSize: 9 }}>
-                {currentQ.type === 'mcq_multi' ? 'Select an option to continue' : 'Set a value to continue'}
-              </div>
-            )}
           </div>
         )}
 
@@ -1031,17 +684,8 @@ export function AssessmentFlow({ config }: Props) {
             <ReviewScreen
               config={config}
               answers={answers}
-              onEdit={(i) => {
-                // #1323: map active-question index back to full questions array.
-                const qId = activeQuestions[i]?.id;
-                const origIdx = questions.findIndex((q) => q.id === qId);
-                if (origIdx >= 0) {
-                  setCurrentIndex(origIdx);
-                  setPhase('questions');
-                }
-              }}
+              onEdit={(i) => { setCurrentIndex(i); setPhase('questions'); }}
               accent={accent}
-              activeQuestions={activeQuestions}
             />
             {/* Submit bar */}
             <div style={{
@@ -1049,15 +693,7 @@ export function AssessmentFlow({ config }: Props) {
               marginTop: 48,
             }}>
               <button
-                onClick={() => {
-                  // #1323: go back to last active (non-skipped) question.
-                  const lastActive = activeQuestions[activeQuestions.length - 1];
-                  const lastIdx = questions.findIndex((q) => q.id === lastActive?.id);
-                  if (lastIdx >= 0) {
-                    setCurrentIndex(lastIdx);
-                    setPhase('questions');
-                  }
-                }}
+                onClick={() => { setCurrentIndex(questions.length - 1); setPhase('questions'); }}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 8,
                   padding: '12px 20px', background: 'none', border: 'none',

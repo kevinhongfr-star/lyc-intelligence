@@ -90,7 +90,7 @@ export const MOCK_ROLES = [
 ];
 
 export const MOCK_FEATURE_FLAGS = [
-  { id: 'ff1', key: 'nexus_streaming', label: 'NEXUS Streaming Mode', enabled: true, portals: ['admin', 'b2b_client', 'b2c_leader', 'candidate'] },
+  { id: 'ff1', key: 'nexus_streaming', label: 'Nexus Streaming Mode', enabled: true, portals: ['admin', 'b2b_client', 'b2c_leader', 'candidate'] },
   { id: 'ff2', key: 'org_health_v2', label: 'Org Health V2 Algorithm', enabled: false, portals: ['admin'] },
   { id: 'ff3', key: 'credit_system', label: 'Miles Gating', enabled: true, portals: ['b2c_leader', 'candidate'] },
   { id: 'ff4', key: 'dark_mode', label: 'Dark Mode', enabled: false, portals: ['admin', 'b2b_client', 'b2c_leader', 'candidate'] },
@@ -136,7 +136,7 @@ export const MOCK_TASKS = [
   { id: 'tk5', title: 'Prepare client presentation for Meridian', assignee: 'Emily Park', status: 'todo' as TaskStatus, priority: 'medium', deadline: '2026-01-28', source: 'manual', mandate: 'Meridian MD' },
   { id: 'tk6', title: 'Review salary benchmarks — APAC Q1 2026', assignee: 'Michael Tan', status: 'in_progress' as TaskStatus, priority: 'low', deadline: '2026-01-30', source: 'auto', mandate: null },
   { id: 'tk7', title: 'Onboard new B2B client — Delta Partners', assignee: 'Kevin Zhang', status: 'todo' as TaskStatus, priority: 'high', deadline: '2026-01-23', source: 'manual', mandate: 'Delta Partners CFO' },
-  { id: 'tk8', title: 'Audit NEXUS conversation quality', assignee: 'Sarah Lim', status: 'todo' as TaskStatus, priority: 'medium', deadline: '2026-02-01', source: 'auto', mandate: null },
+  { id: 'tk8', title: 'Audit Nexus conversation quality', assignee: 'Sarah Lim', status: 'todo' as TaskStatus, priority: 'medium', deadline: '2026-02-01', source: 'auto', mandate: null },
 ];
 
 export const MOCK_TASK_TEMPLATES = [

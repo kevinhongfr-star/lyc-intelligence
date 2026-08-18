@@ -1,162 +1,128 @@
-// ═══════════════════════════════════════════════════════════
-// PRISM Results Page — dynamic ResultsPanel driven by Akira ScoreResult.
-// X2-3: Reads answers from sessionStorage (written by PrismTakePage),
-// scores client-side, and renders via the generic ResultsPanel.
-// Brand: DS.accent (fuchsia), system serif headings, zero border radius.
-// ═══════════════════════════════════════════════════════════
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ArrowRight, RotateCcw } from 'lucide-react';
-import { ResultsPanel } from '@/components/assessment/ResultsPanel';
-import { scoreAssessment } from '@/services/assessmentEngine';
-import type { ScoreResult } from '@/lib/akira/engine';
-import { DS, GRAY_600, GRAY_300, INK } from '@/tokens';
+import { useParams } from 'react-router-dom';
+import { AssessmentResults, type AssessmentResultsConfig } from '@/components/assessment/results';
+import { getPRISMResult, type PRISMAnalysisResult } from '@/services/prismAnalysis';
 
-const SESSION_KEY = 'assessment_answers_PRISM_latest';
-const ACCENT = DS.accent;
+// ── MOCK DATA (fallback when no backend result is available) ───────
+const mockConfig: AssessmentResultsConfig = {
+  assessmentCode: 'PRISM',
+  assessmentName: 'PRISM',
+  accent: '#C108AB',
+  prefix: 'prism-results',
+  overallScore: 72,
+  archetype: {
+    name: 'Strategic Architect',
+    description:
+      'You see the big picture and build systems to get there. Your strength lies in translating vision into structured plans, but you may sometimes overlook the human element in execution. Your peers rely on you for direction in ambiguity.',
+    traits: [
+      'Thinks in systems and frameworks, not just tasks',
+      'Naturally gravitates toward long-term planning',
+      'Comfortable making decisions with incomplete information',
+      'May under-invest in relationship building',
+    ],
+  },
+  dimensions: [
+    { id: 'vision', name: 'Vision', score: 85, lowLabel: 'Tactical', highLabel: 'Visionary', description: 'Ability to see and articulate a compelling future state.' },
+    { id: 'resilience', name: 'Resilience', score: 68, lowLabel: 'Sensitive', highLabel: 'Resilient', description: 'Capacity to maintain composure and recover from setbacks.' },
+    { id: 'influence', name: 'Influence', score: 74, lowLabel: 'Reserved', highLabel: 'Influential', description: 'Ability to persuade and mobilize others toward your vision.' },
+    { id: 'strategy', name: 'Strategy', score: 91, lowLabel: 'Reactive', highLabel: 'Strategic', description: 'Skill in formulating and executing multi-step plans.' },
+    { id: 'mastery', name: 'Mastery', score: 42, lowLabel: 'Generalist', highLabel: 'Expert', description: 'Depth of expertise in your core domain.' },
+  ],
+  insights: [
+    { type: 'strength', title: 'Strategy is your superpower', text: 'At the 91st percentile, your strategic thinking places you in the top quartile of senior executives. You naturally see patterns and connections others miss.' },
+    { type: 'strength', title: 'Vision aligns with strategy', text: 'Your Vision score (85) and Strategy score (91) are both exceptionally high, making you a natural architect of change.' },
+    { type: 'gap', title: 'Mastery needs attention', text: 'Your lowest dimension (42) suggests you may be spreading yourself too thin. Consider deepening expertise in one or two core domains.' },
+    { type: 'gap', title: 'Resilience under pressure', text: 'At 68, your resilience is solid but not elite. High-stakes environments may test your composure.' },
+  ],
+  developmentActions: [
+    { priority: 1, dimension: 'Mastery', action: 'Identify one domain where you can go from competent to expert. Dedicate 4 hours per week to deliberate practice for the next 90 days.', timeline: '90 days' },
+    { priority: 2, dimension: 'Resilience', action: 'Build a daily 10-minute mindfulness or reflection practice. Track your composure in high-stakes meetings.', timeline: '30 days' },
+    { priority: 3, dimension: 'Influence', action: 'Schedule 3 cross-functional conversations per month. Practice the "consult before deciding" pattern.', timeline: '60 days' },
+  ],
+  retakePath: '/prism/take',
+  nexusPath: '/nexus/chat',
+};
 
-function LoadingScreen() {
-  return (
-    <div style={{
-      background: DS.bgAlt, minHeight: '100vh', display: 'flex',
-      alignItems: 'center', justifyContent: 'center',
-      fontFamily: DS.bodyFont,
-    }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{
-          width: 32, height: 32, border: `2px solid ${GRAY_300}`,
-          borderTopColor: ACCENT,
-          animation: 'spin 350ms linear infinite',
-          margin: '0 auto 24px',
-        }} />
-        <p style={{ color: GRAY_600, fontSize: 14 }}>Scoring your PRISM results…</p>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    </div>
-  );
-}
+// ── CONVERT backend result → results config ────────────────────────
+function resultToConfig(result: PRISMAnalysisResult): AssessmentResultsConfig {
+  const dimNames: Record<string, { name: string; desc: string; low: string; high: string }> = {
+    vision: { name: 'Vision', desc: 'Ability to see and articulate a compelling future state.', low: 'Tactical', high: 'Visionary' },
+    resilience: { name: 'Resilience', desc: 'Capacity to maintain composure and recover from setbacks.', low: 'Sensitive', high: 'Resilient' },
+    influence: { name: 'Influence', desc: 'Ability to persuade and mobilize others toward your vision.', low: 'Reserved', high: 'Influential' },
+    strategy: { name: 'Strategy', desc: 'Skill in formulating and executing multi-step plans.', low: 'Reactive', high: 'Strategic' },
+    mastery: { name: 'Mastery', desc: 'Depth of expertise in your core domain.', low: 'Generalist', high: 'Expert' },
+  };
 
-function EmptyState() {
-  return (
-    <div style={{
-      background: DS.bgAlt, minHeight: '100vh', color: INK,
-      fontFamily: DS.bodyFont, display: 'flex',
-      alignItems: 'center', justifyContent: 'center', padding: '48px 32px',
-    }}>
-      <div style={{ maxWidth: 480, textAlign: 'center' }}>
-        <div style={{
-          fontFamily: DS.monoFont, textTransform: 'uppercase',
-          letterSpacing: '0.08em', color: ACCENT, fontSize: 10, marginBottom: 16,
-        }}>
-          PRISM · No results yet
-        </div>
-        <h1 style={{
-          fontFamily: DS.headingFont, fontSize: 28, fontWeight: 700,
-          color: INK, lineHeight: 1.25, marginBottom: 16,
-        }}>
-          Take the assessment to see your results
-        </h1>
-        <p style={{ fontSize: 15, color: GRAY_600, lineHeight: 1.6, marginBottom: 32 }}>
-          Your PRISM results will appear here once you complete the complimentary assessment. It takes about ten minutes.
-        </p>
-        <Link
-          to="/assessment/prism/take"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            padding: '14px 28px', background: ACCENT, color: '#FFFFFF',
-            textDecoration: 'none', fontWeight: 600, fontSize: 15,
-          }}
-        >
-          Begin PRISM assessment <ArrowRight style={{ width: 18, height: 18 }} />
-        </Link>
-      </div>
-    </div>
-  );
+  return {
+    assessmentCode: 'PRISM',
+    assessmentName: 'PRISM',
+    accent: '#C108AB',
+    prefix: 'prism-results',
+    overallScore: result.composite_score,
+    archetype: {
+      name: result.archetype,
+      description: result.archetype_description,
+      traits: result.archetype_traits,
+    },
+    dimensions: Object.entries(result.dimension_scores).map(([id, score]) => ({
+      id,
+      name: dimNames[id]?.name || id,
+      score,
+      lowLabel: dimNames[id]?.low || 'Low',
+      highLabel: dimNames[id]?.high || 'High',
+      description: dimNames[id]?.desc || '',
+    })),
+    insights: [
+      ...result.strengths.map(s => ({ title: s.title, text: s.text, type: 'strength' as const })),
+      ...result.gaps.map(g => ({ title: g.title, text: g.text, type: 'gap' as const })),
+    ],
+    developmentActions: result.development_actions,
+    retakePath: '/prism/take',
+    nexusPath: '/nexus/chat',
+  };
 }
 
 export function PrismResultsPage() {
   const { id } = useParams<{ id: string }>();
-  const [state, setState] = useState<{
-    loading: boolean;
-    result: ScoreResult | null;
-    hasAnswers: boolean;
-  }>({ loading: true, result: null, hasAnswers: false });
+  const [config, setConfig] = useState<AssessmentResultsConfig | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      const scopedKey = `assessment_answers_PRISM_${id}`;
-      const raw = sessionStorage.getItem(scopedKey) || sessionStorage.getItem(SESSION_KEY);
-      if (!raw) {
-        if (!cancelled) setState({ loading: false, result: null, hasAnswers: false });
-        return;
-      }
-      try {
-        const answers = JSON.parse(raw) as Record<string, number>;
-        const out = await scoreAssessment('PRISM', answers, { persist: false });
-        if (!cancelled) {
-          if (out.ok) {
-            setState({ loading: false, result: out.result, hasAnswers: true });
-          } else {
-            setState({ loading: false, result: null, hasAnswers: false });
-          }
+    // If we have an ID, try to fetch real results
+    if (id) {
+      getPRISMResult(id).then((result) => {
+        if (result) {
+          setConfig(resultToConfig(result));
+        } else {
+          setConfig(mockConfig); // fallback to mock
         }
-      } catch {
-        if (!cancelled) setState({ loading: false, result: null, hasAnswers: false });
-      }
+      });
+    } else {
+      setConfig(mockConfig); // no ID — show mock data
     }
-    load();
-    return () => { cancelled = true; };
   }, [id]);
 
-  const handleDownloadPDF = () => {
-  };
-
-  if (state.loading) return <LoadingScreen />;
-  if (!state.hasAnswers || !state.result) return <EmptyState />;
-
-  return (
-    <div style={{
-      background: DS.bgAlt, minHeight: '100vh', color: INK,
-      fontFamily: DS.bodyFont, padding: '48px 32px 80px',
-    }}>
-      <div style={{ maxWidth: 800, margin: '0 auto', width: '100%' }}>
-        <ResultsPanel
-          assessmentCode="PRISM"
-          scoreResult={state.result}
-          accentColor={ACCENT}
-          onDownloadPDF={handleDownloadPDF}
-          isGeneratingPDF={false}
-        />
-        <div style={{
-          display: 'flex', justifyContent: 'center', gap: 24,
-          marginTop: 32, flexWrap: 'wrap',
-        }}>
-          <Link
-            to="/assessment/prism/take"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '12px 24px', background: 'transparent',
-              border: `1px solid ${GRAY_300}`, color: INK,
-              textDecoration: 'none', fontWeight: 500, fontSize: 14,
-            }}
-          >
-            <RotateCcw style={{ width: 16, height: 16 }} /> Retake assessment
-          </Link>
-          <Link
-            to="/assessment/prism"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '12px 24px', color: GRAY_600,
-              textDecoration: 'none', fontWeight: 500, fontSize: 14,
-            }}
-          >
-            Back to PRISM overview <ArrowRight style={{ width: 16, height: 16 }} />
-          </Link>
+  if (!config) {
+    return (
+      <div style={{
+        background: '#F5F5F3', minHeight: '100vh', display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+        fontFamily: "'DM Sans', system-ui, sans-serif",
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: 32, height: 32, border: '2px solid #E8E8E5',
+            borderTopColor: '#C108AB',
+            animation: 'spin 0.8s linear infinite',
+            margin: '0 auto 24px',
+          }} />
+          <p style={{ color: '#4B5563', fontSize: 14 }}>Loading your results…</p>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return <AssessmentResults config={config} />;
 }
 
 export default PrismResultsPage;

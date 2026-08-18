@@ -1,47 +1,7 @@
 // Phase 0.5: Audit Logger Utility
 // Structured audit logging for all data mutations
-// V3-5 / #1345: All third-party sinks are scrubbed of PII before writing.
 
 import type { SupabaseClient } from '@supabase/supabase-js';
-
-const RE_EMAIL = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-const RE_UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
-
-function shortHash(s: string): string {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = ((h << 5) - h) + s.charCodeAt(i) | 0;
-  return ('0000000' + Math.abs(h).toString(16)).slice(-8);
-}
-
-function scrubPIIString(v: string): string {
-  let out = v;
-  out = out.replace(RE_EMAIL, '[email scrubbed]');
-  out = out.replace(RE_UUID, (m) => `[uuid_${shortHash(m)}]`);
-  return out;
-}
-
-const PII_KEYS = ['name', 'email', 'phone', 'address', 'company', 'ip', 'session', 'result', 'score', 'profile', 'chat', 'message'];
-
-function scrubObject<T>(v: T): T {
-  if (v === null || v === undefined) return v;
-  if (typeof v === 'string') return scrubPIIString(v) as unknown as T;
-  if (typeof v === 'number' || typeof v === 'boolean') return v;
-  if (Array.isArray(v)) return v.map(scrubObject) as unknown as T;
-  if (typeof v === 'object') {
-    const out: Record<string, unknown> = {};
-    for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
-      const lk = k.toLowerCase();
-      const isPii = PII_KEYS.some(p => lk.includes(p));
-      if (isPii && typeof val === 'string') {
-        out[k] = `[${k} scrubbed]`;
-      } else {
-        out[k] = scrubObject(val);
-      }
-    }
-    return out as unknown as T;
-  }
-  return v;
-}
 
 export interface AuditLogParams {
   userId: string;
@@ -75,71 +35,22 @@ export interface AuditLogEntry {
   created_at: string;
 }
 
-export interface AuditWriteEntry {
-  actor: string | null;
-  action: string;
-  recordCount?: number;
-  timestamp?: string;
-  entity?: string;
-  metadata?: Record<string, unknown>;
-}
-
-let supabaseClientRef: SupabaseClient | null = null;
-export function _setAuditSupabaseRef(c: SupabaseClient | null) {
-  supabaseClientRef = c;
-}
-
-export async function auditWrite(entry: AuditWriteEntry): Promise<void> {
-  try {
-    const safeMeta = entry.metadata ? scrubObject(entry.metadata) : undefined;
-    const ts = entry.timestamp || new Date().toISOString();
-    const payload = {
-      user_id: entry.actor,
-      action: entry.action,
-      entity_type: entry.entity || 'unknown',
-      entity_id: null,
-      organization_id: null,
-      details: {
-        record_count: entry.recordCount ?? 1,
-        ...(safeMeta || {}),
-      },
-      created_at: ts,
-    } as any;
-    if (supabaseClientRef) {
-      try {
-        await supabaseClientRef.from('audit_logs').insert(payload);
-      } catch {
-        // swallow — audit must never fail endpoint
-      }
-    }
-  } catch (e: any) {
-    try {
-      console.warn('[auditLogger] auditWrite non-fatal:', (e && e.message) || e);
-    } catch { /* noop */ }
-  }
-}
-
 /**
  * Log an audit event for a data mutation.
  * Every INSERT/UPDATE/DELETE should call this.
- * V3-5: changes, metadata, ip, ua are scrubbed before insert.
  */
 export async function logAuditEvent(
   supabase: SupabaseClient,
   params: AuditLogParams
 ): Promise<void> {
   try {
-    const safeMetadata = params.metadata ? scrubObject(params.metadata) : undefined;
-    const safeChanges = params.changes ? scrubObject(params.changes) : undefined;
     const details: Record<string, unknown> = {
-      ...(safeMetadata || {}),
+      ...(params.metadata || {}),
     };
-    if (safeChanges) {
-      details.changes = safeChanges;
-    }
 
-    const safeIp = params.ipAddress ? scrubPIIString(params.ipAddress) : null;
-    const safeUa = params.userAgent ? scrubPIIString(params.userAgent) : null;
+    if (params.changes) {
+      details.changes = params.changes;
+    }
 
     const { error } = await supabase.from('audit_logs').insert({
       user_id: params.userId,
@@ -148,17 +59,16 @@ export async function logAuditEvent(
       entity_type: params.resourceType,
       entity_id: params.resourceId,
       details,
-      ip_address: safeIp,
-      user_agent: safeUa,
+      ip_address: params.ipAddress || null,
+      user_agent: params.userAgent || null,
     });
 
     if (error) {
-      console.error('[auditLogger] Failed to write audit log:', scrubObject(error));
+      console.error('[auditLogger] Failed to write audit log:', error);
     }
-  } catch (err: any) {
-    try {
-      console.warn('[auditLogger] Audit log error (swallowed):', scrubPIIString(String(err?.message || err)));
-    } catch { /* noop */ }
+  } catch (err) {
+    // Never let audit logging fail the main operation
+    console.error('[auditLogger] Audit log error:', err);
   }
 }
 
@@ -172,35 +82,27 @@ export async function logAuditEvents(
   if (events.length === 0) return;
 
   try {
-    const inserts = events.map(params => {
-      const safeMetadata = params.metadata ? scrubObject(params.metadata) : undefined;
-      const safeChanges = params.changes ? scrubObject(params.changes) : undefined;
-      const safeIp = params.ipAddress ? scrubPIIString(params.ipAddress) : null;
-      const safeUa = params.userAgent ? scrubPIIString(params.userAgent) : null;
-      return {
-        user_id: params.userId,
-        organization_id: params.orgId,
-        action: params.action,
-        entity_type: params.resourceType,
-        entity_id: params.resourceId || null,
-        details: {
-          ...(safeMetadata || {}),
-          ...(safeChanges ? { changes: safeChanges } : {}),
-        },
-        ip_address: safeIp,
-        user_agent: safeUa,
-      };
-    });
+    const inserts = events.map(params => ({
+      user_id: params.userId,
+      organization_id: params.orgId,
+      action: params.action,
+      entity_type: params.resourceType,
+      entity_id: params.resourceId || null,
+      details: {
+        ...(params.metadata || {}),
+        ...(params.changes ? { changes: params.changes } : {}),
+      },
+      ip_address: params.ipAddress || null,
+      user_agent: params.userAgent || null,
+    }));
 
     const { error } = await supabase.from('audit_logs').insert(inserts);
 
     if (error) {
-      console.error('[auditLogger] Failed to batch write audit logs:', scrubObject(error));
+      console.error('[auditLogger] Failed to batch write audit logs:', error);
     }
-  } catch (err: any) {
-    try {
-      console.warn('[auditLogger] Batch audit log error (swallowed):', scrubPIIString(String(err?.message || err)));
-    } catch { /* noop */ }
+  } catch (err) {
+    console.error('[auditLogger] Batch audit log error:', err);
   }
 }
 

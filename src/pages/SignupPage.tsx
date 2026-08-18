@@ -1,18 +1,26 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, User, Building } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from '@/stores/toastStore';
 import { trackSignupSuccess } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
-import {
-  validatePasswordStrength,
-  passwordScoreLabel,
-  passwordScoreColor,
-} from '@/lib/auth/passwordPolicy';
-import { captureUTMParams, captureAndStoreUTM } from '@/utils/utmTracking';
-import { DS } from '@/tokens';
-import { Logo } from '@/components/ui/Logo';
+
+const DS = {
+  headingFont: "'Libre Baskerville', Georgia, serif",
+  bodyFont: "'DM Sans', system-ui, sans-serif",
+  accent: '#C108AB',
+  accentHover: '#A00790',
+  bg: '#FFFFFF',
+  card: '#FFFFFF',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#333333',
+  muted: '#666666',
+  border: '#E5E5E5',
+  radius: '12px',
+  shadow: '0 1px 3px rgba(0,0,0,0.08)',
+};
 
 export function SignupPage() {
   const navigate = useNavigate();
@@ -25,18 +33,6 @@ export function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // #1312: live password strength evaluation
-  const pwdStrength = useMemo(
-    () => validatePasswordStrength(password, { email, name }),
-    [password, email, name],
-  );
-
-  // #1326: capture UTM/source params on first mount so they survive the
-  // email-verification redirect. Persisted to sessionStorage for later write.
-  useEffect(() => {
-    captureUTMParams();
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -44,12 +40,7 @@ export function SignupPage() {
     if (!email.trim()) { setError('Email is required'); return; }
     if (!name.trim()) { setError('Name is required'); return; }
     if (!password) { setError('Password is required'); return; }
-    // #1312: enforce password policy (min 12 chars, mix of classes,
-    // not in common-password list, no personal info).
-    if (!pwdStrength.passes) {
-      setError(pwdStrength.warnings[0] || 'Please choose a stronger password');
-      return;
-    }
+    if (password.length < 8) { setError('Password must be at least 8 characters'); return; }
     if (password !== confirmPassword) { setError('Passwords do not match'); return; }
 
     setLoading(true);
@@ -60,13 +51,6 @@ export function SignupPage() {
       // Fire signup_success before navigation so the event is flushed
       trackSignupSuccess('email', 'professional');
       toast.success('Account created successfully');
-      // #1326: persist first-touch UTM/source onto the new profile.
-      const userId = useAuthStore.getState().user?.id;
-      if (userId) {
-        captureAndStoreUTM(userId).catch((e) => {
-          reportError(e, { scope: 'utm:store', severity: 'warning', extra: { userId } });
-        });
-      }
       navigate('/platform');
     } else {
       reportError(new Error(result.error || 'Signup failed'), { scope: 'auth:signup', severity: 'warning', extra: { email: email.trim() } });
@@ -77,7 +61,9 @@ export function SignupPage() {
   return (
     <div style={{ minHeight: '100vh', background: DS.bg }}>
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <Logo size="md" variant="light" />
+        <Link to="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>
+          LYC Intelligence
+        </Link>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
           <Link to="/login" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Already have an account? Sign in</Link>
         </div>
@@ -150,39 +136,15 @@ export function SignupPage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 12 characters"
+                    placeholder="At least 8 characters"
                     autoComplete="new-password"
                     style={{
                       width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`,
+                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
                       color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
                       fontFamily: DS.bodyFont, boxSizing: 'border-box',
                     }}
                   />
-                </div>
-                {/* #1312: live password strength meter — zero border radius per brand rule */}
-                <div style={{ marginTop: '8px' }}>
-                  <div style={{ display: 'flex', height: '4px', background: '#E5E5E5' }}>
-                    {[0, 1, 2, 3, 4].map((level) => (
-                      <div
-                        key={level}
-                        style={{
-                          width: '20%',
-                          background: level < pwdStrength.score ? passwordScoreColor(pwdStrength.score) : 'transparent',
-                          borderRight: level < 4 ? '1px solid #FFFFFF' : 'none',
-                          transition: 'background-color 200ms cubic-bezier(0.4,0,0.2,1)',
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: '4px', fontFamily: DS.bodyFont }}>
-                    <span style={{ color: passwordScoreColor(pwdStrength.score) }}>
-                      {pwdStrength.score > 0 ? passwordScoreLabel(pwdStrength.score) : ' '}
-                    </span>
-                    {pwdStrength.warnings.length > 0 && (
-                      <span style={{ color: '#B91C1C' }}>{pwdStrength.warnings[0]}</span>
-                    )}
-                  </div>
                 </div>
               </div>
 

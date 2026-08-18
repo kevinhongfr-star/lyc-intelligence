@@ -13,7 +13,6 @@ import { Loader2, Lock } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { isConsultantRole, isClientRole, isInternalStaff } from '@/services/portalClassification';
 import ConsultantNav from '@/components/navigation/ConsultantNav';
-import { SkipToContent } from '@/components/a11y/SkipToContent';
 
 const DS = {
   bodyFont: "'DM Sans', system-ui, sans-serif",
@@ -78,7 +77,6 @@ export function ConsultantPortalLayout(): React.ReactElement {
       display: 'flex', minHeight: '100vh',
       background: DS.pageBg, fontFamily: DS.bodyFont,
     }} data-portal-kind="consultant">
-      <SkipToContent targetId="consultant-main" />
       <ConsultantNav />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <main
@@ -124,7 +122,6 @@ export function ClientPortalLayout(): React.ReactElement {
       display: 'flex', minHeight: '100vh',
       background: DS.pageBg, fontFamily: DS.bodyFont,
     }} data-portal-kind="client">
-      <SkipToContent targetId="client-main" />
       <ConsultantNav />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <main

@@ -156,7 +156,7 @@ export const EMPTY_STATES = {
     zero: {
       title: 'No assessments yet',
       description:
-        'Send assessment invitations to candidates to get started with a diagnostic.',
+        'Send assessment invitations to candidates to get started with TRIDENT, GRID, or SHIFT.',
       action: 'Send Assessment',
       icon: 'psychology',
     },
