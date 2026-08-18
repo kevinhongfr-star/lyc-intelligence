@@ -681,7 +681,7 @@ const DEEPSEEK_PROXY_KEY =
   process.env.VITE_DEEPSEEK_PROXY_KEY ||
   '';
 const DEEPSEEK_BASE_URL =
-  process.env.DEEPSEEK_BASE_URL || 'https://deepseek-v4-proxy.vercel.app/api/deepseek';
+  process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1';
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
 const CHAT_GUEST_LIMIT = 3;
 
@@ -814,11 +814,18 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       console.error(
         '[chat] DeepSeek API error:',
         apiResponse.status,
-        errorText.slice(0, 300),
+        apiResponse.url,
+        errorText.slice(0, 500),
       );
       return res
         .status(502)
-        .json({ ok: false, error: 'Chat service unavailable' });
+        .json({
+          ok: false,
+          error: 'Chat service unavailable',
+          upstream_status: apiResponse.status,
+          upstream_error: errorText.slice(0, 200),
+          base_url: DEEPSEEK_BASE_URL,
+        });
     }
 
     const data = await apiResponse.json();
