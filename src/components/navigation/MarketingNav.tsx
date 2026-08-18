@@ -52,7 +52,7 @@ export function MarketingNav(): React.ReactElement {
 
   // Primary nav items — NEXUS, Assessments, Pricing (per Batch 1.5 spec)
   const navItems = [
-    { href: '/nexus', label: 'NEXUS' },
+    { href: '/nexus/chat', label: 'Chat' },
     { href: '/assessments', label: 'Assessments' },
     { href: '/pricing', label: 'Pricing' },
   ];
@@ -134,8 +134,8 @@ export function MarketingNav(): React.ReactElement {
                 Sign in
               </Link>
               <button onClick={() => {
-                trackCTA({ location: 'nav_marketing', label: 'Meet NEXUS', destination: '/nexus' });
-                navigate('/nexus');
+                trackCTA({ location: 'nav_marketing', label: 'Try NEXUS', destination: '/nexus/chat' });
+                navigate('/nexus/chat');
               }} style={{
                 padding: '9px 20px', fontSize: 14, fontWeight: 600,
                 background: DS.accent, color: '#fff', border: 'none', cursor: 'pointer',
@@ -143,7 +143,7 @@ export function MarketingNav(): React.ReactElement {
                 display: 'inline-flex', alignItems: 'center', gap: 8,
               }}>
                 <Sparkles size={15} />
-                Meet NEXUS
+                Try NEXUS
                 <ArrowRight size={15} />
               </button>
             </div>
@@ -205,10 +205,10 @@ export function MarketingNav(): React.ReactElement {
               </Link>
               <Link to="/nexus" onClick={() => {
                 setMobileOpen(false);
-                trackCTA({ location: 'nav_marketing', label: 'Meet NEXUS (mobile)', destination: '/nexus' });
+                trackCTA({ location: 'nav_marketing', label: 'Try NEXUS Chat (mobile)', destination: '/nexus/chat' });
               }}
                 style={{ padding: '12px', textAlign: 'center', background: DS.accent, color: '#fff', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
-                Meet NEXUS
+                Try NEXUS
               </Link>
             </>
           )}
