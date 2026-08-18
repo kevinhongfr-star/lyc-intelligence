@@ -644,12 +644,13 @@ html {
    touch targets, safe-area insets for notched devices, fluid type. */
 html, body {
   max-width: 100%;
-  overflow-x: hidden;
   /* Respect device safe areas (notch / dynamic island). */
   padding-left: env(safe-area-inset-left, 0);
   padding-right: env(safe-area-inset-right, 0);
 }
+/* overflow-x on body only — putting it on html breaks vertical scroll in Firefox for Android */
 body {
+  overflow-x: hidden;
   /* Prevent pull-to-refresh interfering with scrollable panels. */
   overscroll-behavior-y: none;
   -webkit-text-size-adjust: 100%;
