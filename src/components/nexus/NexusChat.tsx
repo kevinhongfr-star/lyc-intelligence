@@ -114,7 +114,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "I'm NEXUS — LYC's executive intelligence system. I ask the questions most executives skip. Tell me a little about where you are, and we'll find the right framework for you. Or try the complimentary CPI assessment first.",
+      content: "I'm NEXUS — LYC's executive intelligence system. I ask the questions most executives skip. Tell me a little about where you are, and we'll work through it together.",
     },
   ]);
   /**
@@ -690,7 +690,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
     setSessionId(newId);
     setMessages([{
       role: 'assistant',
-      content: "I'm NEXUS — LYC's executive intelligence system. I ask the questions most executives skip. Tell me a little about where you are, and we'll find the right framework for you. Or try the complimentary CPI assessment first.",
+      content: "I'm NEXUS — LYC's executive intelligence system. I ask the questions most executives skip. Tell me a little about where you are, and we'll work through it together.",
     }]);
     setMessageCount(0);
     setShowSidebar(false);
