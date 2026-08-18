@@ -790,9 +790,21 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     messages.push({ role: 'user', content: message });
 
     // Call DeepSeek API
-    const apiResponse = await fetch(
-      `${DEEPSEEK_BASE_URL}/chat/completions`,
-      {
+    // Build endpoint URL — handle base URLs with or without /v1 or /chat/completions suffix
+    const base = DEEPSEEK_BASE_URL.replace(/\/+$/, '');
+    let endpoint: string;
+    if (base.endsWith('/chat/completions')) {
+      endpoint = base;
+    } else if (base.endsWith('/v1') || base.endsWith('/v1/')) {
+      endpoint = `${base}/chat/completions`;
+    } else if (base.includes('/deepseek')) {
+      // Proxy-style URL (e.g. https://proxy.example.com/api/deepseek)
+      endpoint = `${base}/chat/completions`;
+    } else {
+      endpoint = `${base}/v1/chat/completions`;
+    }
+
+    const apiResponse = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -814,7 +826,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       console.error(
         '[chat] DeepSeek API error:',
         apiResponse.status,
-        apiResponse.url,
+        endpoint,
         errorText.slice(0, 500),
       );
       return res
