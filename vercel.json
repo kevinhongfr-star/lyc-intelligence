@@ -25,6 +25,10 @@
     "api/assessments/run.ts": {
       "memory": 1536,
       "maxDuration": 30
+    },
+    "api/workers/[job].ts": {
+      "memory": 1024,
+      "maxDuration": 30
     }
   },
   "headers": [
@@ -398,6 +402,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/api/chat",
+      "destination": "/api/workers/chat"
+    },
     {
       "source": "/((?!api/|assets/|og-image/|sitemap.xml$|robots.txt$|favicon.ico$|favicon\\..*|manifest.webmanifest$).*)",
       "destination": "/"
