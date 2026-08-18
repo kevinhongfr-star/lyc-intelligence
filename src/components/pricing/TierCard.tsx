@@ -1,134 +1,272 @@
+/**
+ * TierCard.tsx — Reusable tier card component (Batch 3 / Ticket 2).
+ *
+ * Renders a single tier card for the pricing page. 5 instances on the page.
+ * Fields: tier name, positioning one-liner, price (monthly/annual toggle),
+ * CTA button, key feature highlights, "Most Popular" badge (Pro),
+ * "Invite Only" badge (Council).
+ *
+ * All data comes from pricingData.ts — no hardcoded numbers.
+ * Mobile: cards stack vertically (handled by parent grid).
+ */
 import React from 'react';
-import { Check, Crown, Sparkles, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { cn } from '@/lib/utils';
-import type { PricingTier, PricingCurrency, TierKey } from '@/config/pricingData';
+import { DS } from '@/tokens';
+import {
+  computeTierPrice,
+  formatPrice,
+  type BillingCycle,
+  type PricingCurrency,
+} from '@/config/tiers';
+import type { PricingTier } from '@/config/pricingData';
+import type { CtaConfig } from './usePricingCta';
 
 export interface TierCardProps {
   tier: PricingTier;
+  cycle: BillingCycle;
   currency: PricingCurrency;
-  isRecommended?: boolean;
-  isCurrent?: boolean;
-  loading?: boolean;
-  onUpgrade?: (tierKey: TierKey) => void;
+  cta: CtaConfig;
+  onSelect: () => void;
 }
 
-export const TierCard: React.FC<TierCardProps> = ({
-  tier,
-  currency,
-  isRecommended = false,
-  isCurrent = false,
-  loading = false,
-  onUpgrade,
-}) => {
-  const isExplorer = tier.tier_key === 'explorer';
-  const pricePrimary = isExplorer
-    ? tier.alias ?? 'Executive Introduction'
-    : currency === 'CNY'
-      ? `¥${tier.cnyMonthly}`
-      : `$${tier.usdMonthly}`;
-  const priceSecondary = isExplorer
-    ? 'Complimentary access'
-    : currency === 'CNY'
-      ? '/ 月'
-      : '/ mo';
+export function TierCard({ tier, cycle, currency, cta, onSelect }: TierCardProps) {
+  const price = computeTierPrice(tier.key, currency, cycle);
 
   return (
-    <Card
-      className={cn(
-        'relative flex flex-col h-full transition-all duration-300',
-        isRecommended && 'ring-2 ring-accent shadow-xl scale-[1.02]',
-        isCurrent && 'border-tier-1',
-      )}
+    <div
+      style={{
+        background: DS.card,
+        border: tier.isRecommended
+          ? `2px solid ${DS.accent}`
+          : `1px solid ${DS.border}`,
+        padding: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        transition: DS.transition,
+      }}
     >
-      {isRecommended && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <Badge variant="info" size="md" className="shadow-md flex items-center gap-1">
-            <Sparkles className="h-3 w-3" />
-            Recommended
-          </Badge>
-        </div>
-      )}
-
-      {isCurrent && (
-        <div className="absolute -top-3 right-4">
-          <Badge variant="success" size="md" className="shadow-md">
-            Current Plan
-          </Badge>
-        </div>
-      )}
-
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between mb-2">
-          <CardTitle className="text-xl font-serif">
-            {tier.display_name}
-          </CardTitle>
-          {tier.tier_key === 'council' && (
-            <Crown className="h-5 w-5 text-tier-4" aria-hidden="true" />
-          )}
-        </div>
-
-        <div className="mt-4">
-          <div className="flex items-baseline gap-1">
-            <span
-              className={cn(
-                'font-serif font-bold tracking-tight',
-                isExplorer ? 'text-2xl text-text-secondary' : 'text-4xl text-text-primary',
-              )}
-            >
-              {pricePrimary}
-            </span>
-            {!isExplorer && (
-              <span className="text-text-muted text-sm">{priceSecondary}</span>
-            )}
-          </div>
-          {isExplorer && (
-            <CardDescription className="mt-1">{priceSecondary}</CardDescription>
-          )}
-        </div>
-
-        <div className="mt-4 flex items-center gap-2 text-sm text-text-secondary">
-          <span className="font-semibold text-text-primary">{tier.monthlyMiles}</span>
-          <span>diagnostic miles / month</span>
-        </div>
-      </CardHeader>
-
-      <CardContent className="flex-1 flex flex-col pt-4">
-        <ul className="space-y-3 mb-6 flex-1">
-          {tier.features.map((feature, idx) => (
-            <li key={idx} className="flex items-start gap-3 text-sm">
-              <Check
-                className={cn(
-                  'h-4 w-4 mt-0.5 shrink-0',
-                  isRecommended ? 'text-accent' : 'text-tier-1',
-                )}
-                aria-hidden="true"
-              />
-              <span className="text-text-secondary leading-relaxed">{feature}</span>
-            </li>
-          ))}
-        </ul>
-
-        <Button
-          variant={isRecommended ? 'default' : 'outline'}
-          size="lg"
-          className="w-full"
-          loading={loading}
-          disabled={isCurrent}
-          onClick={() => onUpgrade?.(tier.tier_key)}
+      {/* Badges */}
+      {tier.isRecommended && (
+        <div
+          style={{
+            position: 'absolute',
+            top: -1,
+            left: -1,
+            right: -1,
+            background: DS.accent,
+            color: DS.bg,
+            fontFamily: DS.monoFont,
+            fontSize: 11,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            textAlign: 'center',
+            padding: '6px 0',
+          }}
         >
-          {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
-          {isCurrent
-            ? 'Current Plan'
-            : isExplorer
-              ? 'Get Started'
-              : isRecommended
-                ? `Upgrade to ${tier.display_name}`
-                : `Choose ${tier.display_name}`}
-        </Button>
-      </CardContent>
-    </Card>
+          Most Popular
+        </div>
+      )}
+      {tier.isInviteOnly && !tier.isRecommended && (
+        <div
+          style={{
+            position: 'absolute',
+            top: -1,
+            left: -1,
+            right: -1,
+            background: DS.bgDark,
+            color: DS.bg,
+            fontFamily: DS.monoFont,
+            fontSize: 11,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            textAlign: 'center',
+            padding: '6px 0',
+          }}
+        >
+          Invite Only
+        </div>
+      )}
+
+      <div
+        style={{
+          padding: tier.isRecommended || tier.isInviteOnly ? '40px 24px 24px' : '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+        }}
+      >
+        {/* Tier name */}
+        <div
+          style={{
+            fontFamily: DS.headingFont,
+            fontSize: 24,
+            fontWeight: 600,
+            color: DS.text,
+            marginBottom: 4,
+          }}
+        >
+          {tier.displayName}
+        </div>
+
+        {/* Positioning one-liner — placeholder */}
+        <p
+          style={{
+            fontFamily: DS.bodyFont,
+            fontSize: 14,
+            lineHeight: 1.5,
+            color: DS.textSecondary,
+            margin: '0 0 24px',
+            minHeight: 42,
+          }}
+        >
+          {tier.positioningOneLiner}
+        </p>
+
+        {/* Price */}
+        <div style={{ marginBottom: 24 }}>
+          {price.isZero ? (
+            <div
+              style={{
+                fontFamily: DS.headingFont,
+                fontSize: 36,
+                fontWeight: 600,
+                color: DS.text,
+              }}
+            >
+              Complimentary
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span
+                style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: 36,
+                  fontWeight: 600,
+                  color: DS.text,
+                }}
+              >
+                {formatPrice(price.perMonth, currency)}
+              </span>
+              <span
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: 14,
+                  color: DS.muted,
+                }}
+              >
+                / month
+              </span>
+            </div>
+          )}
+
+          {/* Billing cycle note */}
+          {!price.isZero && (
+            <div
+              style={{
+                fontFamily: DS.monoFont,
+                fontSize: 12,
+                color: cycle === 'annual' ? DS.accent : DS.muted,
+                marginTop: 4,
+              }}
+            >
+              {cycle === 'annual'
+                ? `${formatPrice(price.amount, currency)} billed annually · Save 15%`
+                : 'Billed monthly'}
+            </div>
+          )}
+          {price.isZero && (
+            <div
+              style={{
+                fontFamily: DS.monoFont,
+                fontSize: 12,
+                color: DS.muted,
+                marginTop: 4,
+              }}
+            >
+              No credit card required
+            </div>
+          )}
+        </div>
+
+        {/* CTA button */}
+        <button
+          onClick={onSelect}
+          disabled={cta.disabled}
+          style={{
+            fontFamily: DS.bodyFont,
+            fontSize: 15,
+            fontWeight: 600,
+            color: cta.disabled ? DS.muted : DS.bg,
+            background: cta.disabled ? DS.bgAlt : tier.isRecommended ? DS.accent : DS.bgDark,
+            border: `1px solid ${cta.disabled ? DS.border : 'transparent'}`,
+            padding: '14px 24px',
+            cursor: cta.disabled ? 'default' : 'pointer',
+            transition: DS.transition,
+            marginBottom: 24,
+          }}
+          onMouseEnter={(e) => {
+            if (!cta.disabled) e.currentTarget.style.background = tier.isRecommended ? DS.accentHover : DS.text;
+          }}
+          onMouseLeave={(e) => {
+            if (!cta.disabled) e.currentTarget.style.background = tier.isRecommended ? DS.accent : DS.bgDark;
+          }}
+        >
+          {cta.label}
+        </button>
+
+        {/* Feature highlights — 3-5 bullets */}
+        <div
+          style={{
+            borderTop: `1px solid ${DS.border}`,
+            paddingTop: 20,
+            flex: 1,
+          }}
+        >
+          <ul
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+            }}
+          >
+            {tier.highlightPlaceholders.map((highlight, i) => (
+              <li
+                key={i}
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: 14,
+                  lineHeight: 1.5,
+                  color: DS.textSecondary,
+                  display: 'flex',
+                  gap: 10,
+                }}
+              >
+                <span style={{ color: DS.accent, flexShrink: 0 }}>✓</span>
+                <span>{highlight}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Explorer complimentary tokens note */}
+        {tier.isEntryTier && tier.complimentaryTokens.length > 0 && (
+          <div
+            style={{
+              marginTop: 20,
+              padding: '12px 16px',
+              background: DS.bgAlt,
+              fontFamily: DS.bodyFont,
+              fontSize: 13,
+              color: DS.textSecondary,
+            }}
+          >
+            Includes {tier.complimentaryTokens.join(' + ')} — 2 complimentary diagnostic tokens on signup
+          </div>
+        )}
+      </div>
+    </div>
   );
-};
+}

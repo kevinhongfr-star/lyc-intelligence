@@ -21,7 +21,7 @@ export function WhatItMeasures({ config }: Props) {
         <div className={`${prefix}-reveal`} style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>What it measures</span>
           <h2 className="section-heading" style={{
-            fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700,
+            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20,
           }}>
             Five dimensions, <em style={{ fontWeight: 400 }}>one picture</em>

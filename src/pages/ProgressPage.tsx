@@ -8,7 +8,7 @@ import { useAuthStore } from '../stores/authStore';
 import { getSupabase } from '../services/supabaseApi';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',
@@ -20,8 +20,8 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
+  radius: '0',
+  radiusSm: '0',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
@@ -284,7 +284,7 @@ export function ProgressPage() {
               <>
                 {/* Current Assessment Card */}
                 <div style={{ 
-                  background: 'linear-gradient(135deg, rgba(193,8,171,0.15), rgba(99,102,241,0.1))',
+                  background: 'linear-gradient(135deg, rgba(193,8,171,0.06), rgba(99,102,241,0.06))',
                   border: `1px solid ${DS.accent}40`,
                   padding: '32px',
                   marginBottom: '24px'
@@ -364,7 +364,7 @@ export function ProgressPage() {
                               height: '100%',
                               width: `${score}%`,
                               background: color,
-                              transition: 'width 0.5s ease'
+                              transition: 'width 350ms ease'
                             }} />
                           </div>
                         </div>

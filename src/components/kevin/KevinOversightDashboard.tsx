@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',

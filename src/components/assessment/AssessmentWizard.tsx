@@ -12,7 +12,7 @@ import { StyleSelector } from './StyleSelector';
 import { ResultsPanel } from './ResultsPanel';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',
@@ -24,8 +24,8 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
+  radius: '0',
+  radiusSm: '0',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
   error: '#EF4444',
@@ -257,7 +257,7 @@ function GateStep({ state, setState, onSubmit, error }: any) {
   return (
     <div style={{ maxWidth: '500px', margin: '0 auto', padding: '24px' }}>
       <h1 style={{ fontFamily: DS.headingFont, color: DS.text, fontSize: '28px', marginBottom: '12px' }}>
-        Let's get started
+        Begin your assessment
       </h1>
       <p style={{ color: DS.muted, marginBottom: '32px' }}>
         Enter your details to start your assessment.

@@ -4,35 +4,36 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "SPARK";
-export const FULL_NAME = "AI Leadership Readiness & Enterprise Governance";
+export const FULL_NAME = "SPARK — AI leadership readiness";
+export const B2C_NAME = "SPARK — AI leadership readiness";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 27;
 export const SCALE = "1-5 Likert";
 export const DELIVERY_MINUTES = 9;
 export const TIER = "advisory";
+export const SCORING_MODE = "matrix";
 export const PRICE_MILES = 99;
-export const B2C_NAME = "AI Leadership Readiness & Enterprise Governance";
 export const TAGLINE = "Do you and your organisation actually have the AI governance foundations the next board mandate will require?";
 
 export const DIMENSIONS = [
   {
     id: "D1",
-    name: "INDIVIDUAL AI ADOPTION READINESS (IAAR)",
+    name: "Individual AI Adoption Readiness",
     question_ids: [
-      "SPARK_Q01",
-      "SPARK_Q02",
-      "SPARK_Q03",
-      "SPARK_Q04",
-      "SPARK_Q05",
-      "SPARK_Q06",
-      "SPARK_Q07",
-      "SPARK_Q08",
-      "SPARK_Q09"
+      "Q01",
+      "Q02",
+      "Q03",
+      "Q04",
+      "Q05",
+      "Q06",
+      "Q07",
+      "Q08",
+      "Q09"
     ],
     reverse_coded: [
-      "SPARK_Q03",
-      "SPARK_Q05",
-      "SPARK_Q08"
+      "Q03",
+      "Q05",
+      "Q08"
     ],
     raw_max: 45,
     n_questions: 9,
@@ -52,22 +53,22 @@ export const DIMENSIONS = [
   },
   {
     id: "D2",
-    name: "CAPABILITY EXPOSURE ASSESSMENT (CEA)",
+    name: "Capability Exposure Assessment",
     question_ids: [
-      "SPARK_Q10",
-      "SPARK_Q11",
-      "SPARK_Q12",
-      "SPARK_Q13",
-      "SPARK_Q14",
-      "SPARK_Q15",
-      "SPARK_Q16",
-      "SPARK_Q17",
-      "SPARK_Q18"
+      "Q10",
+      "Q11",
+      "Q12",
+      "Q13",
+      "Q14",
+      "Q15",
+      "Q16",
+      "Q17",
+      "Q18"
     ],
     reverse_coded: [
-      "SPARK_Q11",
-      "SPARK_Q14",
-      "SPARK_Q17"
+      "Q11",
+      "Q14",
+      "Q17"
     ],
     raw_max: 45,
     n_questions: 9,
@@ -87,22 +88,22 @@ export const DIMENSIONS = [
   },
   {
     id: "D3",
-    name: "ORGANISATIONAL PREPAREDNESS (OP)",
+    name: "Organisational Preparedness",
     question_ids: [
-      "SPARK_Q19",
-      "SPARK_Q20",
-      "SPARK_Q21",
-      "SPARK_Q22",
-      "SPARK_Q23",
-      "SPARK_Q24",
-      "SPARK_Q25",
-      "SPARK_Q26",
-      "SPARK_Q27"
+      "Q19",
+      "Q20",
+      "Q21",
+      "Q22",
+      "Q23",
+      "Q24",
+      "Q25",
+      "Q26",
+      "Q27"
     ],
     reverse_coded: [
-      "SPARK_Q21",
-      "SPARK_Q24",
-      "SPARK_Q26"
+      "Q21",
+      "Q24",
+      "Q26"
     ],
     raw_max: 45,
     n_questions: 9,
@@ -178,29 +179,29 @@ export const ARCHETYPES = [
     name: "AI Champion",
     board_ai_fluency: "High",
     governance_maturity: "High",
-    core_pattern: "Drives AI governance as board imperative",
-    primary_governance_risk: "Over-advances; creates board friction"
+    core_pattern: "Drives AI adoption as a strategic priority across the organisation",
+    primary_governance_risk: "Over-advances AI ahead of organisational absorption capacity"
   },
   {
-    name: "Skeptical Director",
+    name: "Skeptical Expert",
     board_ai_fluency: "High",
     governance_maturity: "Low",
-    core_pattern: "Understands AI; distrusts governance structures",
-    primary_governance_risk: "Valuable perspective without accountability"
+    core_pattern: "Understands AI deeply; questions whether the organisation can manage it well",
+    primary_governance_risk: "Skepticism can slow or block legitimate AI adoption"
   },
   {
-    name: "Governance Bureaucrat",
+    name: "Policy-First Adopter",
     board_ai_fluency: "Low",
     governance_maturity: "High",
-    core_pattern: "Process-compliant; AI-unaware",
-    primary_governance_risk: "Governs AI without understanding it"
+    core_pattern: "Operates in a well-governed AI environment but has not built personal fluency",
+    primary_governance_risk: "Governs or oversees AI without deep personal understanding of what it can do"
   },
   {
-    name: "Disengaged Director",
+    name: "Unprepared Leader",
     board_ai_fluency: "Low",
     governance_maturity: "Low",
-    core_pattern: "Absent from AI governance entirely",
-    primary_governance_risk: "Board-level AI risk unmanaged"
+    core_pattern: "Neither personally fluent nor supported by organisational structure — significant AI capability gap",
+    primary_governance_risk: "At structural disadvantage relative to AI-ready peers"
   }
 ];
 

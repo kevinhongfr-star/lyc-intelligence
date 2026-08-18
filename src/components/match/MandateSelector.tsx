@@ -89,7 +89,7 @@ export function MandateSelector({ open, onClose, onSelect }: MandateSelectorProp
       }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <h3 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '18px', fontWeight: 700, margin: 0 }}>
+          <h3 style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontSize: '18px', fontWeight: 700, margin: 0 }}>
             Select a Mandate (JD)
           </h3>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>

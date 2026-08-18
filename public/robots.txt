@@ -1,16 +1,27 @@
 User-agent: *
-Allow: /
+Allow: /$
+Allow: /assessments$
+Allow: /assessment/[a-z-]+$
+Allow: /pricing$
+Allow: /b2b$
+Allow: /dex$
+Allow: /terms$
+Allow: /privacy$
+Allow: /cookies$
 Disallow: /api/
-Disallow: /admin/
-Disallow: /account/
-Disallow: /portal/
 Disallow: /app/
-Disallow: /client/
+Disallow: /member/
+Disallow: /admin/
+Disallow: /consultant/
 Disallow: /candidate/
+Disallow: /client/
+Disallow: /login$
+Disallow: /signup$
+Disallow: /reset-password$
 Disallow: /share/
+Disallow: /nexus/chat$
+Disallow: /assessment/*/take
+Disallow: /assessment/*/results
+Disallow: /*?*
 
-# Crawl-delay (seconds) for non-well-behaved bots
-Crawl-delay: 2
-
-# Sitemap
-Sitemap: https://lyc-intelligence.app/sitemap.xml
+Sitemap: /sitemap.xml

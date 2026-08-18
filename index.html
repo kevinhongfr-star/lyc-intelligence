@@ -4,16 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Phase 17 / T01 — Default SEO meta (overridden per-page by <SEO /> component) -->
+    <!-- Phase 17 / T01 — Default SEO meta (overridden per-page by <SEO /> component).
+         NOTE: "platform" is a Level 1 hard banned word per Brand Master v1.2.
+         Positioning line = "Executive Intelligence" (per Batch 6 P0-4). -->
     <title>LYC Intelligence — Executive Intelligence</title>
     <meta name="description" content="Know where you stand. Know where to go. Leadership intelligence for every stage — from career positioning to executive matching. 500+ placements across 47 markets." />
 
     <!-- Open Graph (default — landing page) -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://lyc-intelligence.app" />
+    <meta property="og:url" content="https://www.lyc-intelligence.app" />
     <meta property="og:title" content="LYC Intelligence — Executive Intelligence" />
     <meta property="og:description" content="Know where you stand. Know where to go. Leadership intelligence for every stage — from career positioning to executive matching. 500+ placements across 47 markets." />
-    <meta property="og:image" content="https://lyc-intelligence.app/api/og?title=LYC+Intelligence+%E2%80%94+Executive+Intelligence" />
+    <meta property="og:image" content="https://www.lyc-intelligence.app/api/og?title=LYC+Intelligence+%E2%80%94+Executive+Intelligence" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="LYC Intelligence" />
@@ -22,18 +24,24 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="LYC Intelligence — Executive Intelligence" />
     <meta name="twitter:description" content="Know where you stand. Know where to go. Leadership intelligence for every stage." />
-    <meta name="twitter:image" content="https://lyc-intelligence.app/api/og?title=LYC+Intelligence+%E2%80%94+Executive+Intelligence" />
+    <meta name="twitter:image" content="https://www.lyc-intelligence.app/api/og?title=LYC+Intelligence+%E2%80%94+Executive+Intelligence" />
 
     <!-- Canonical -->
-    <link rel="canonical" href="https://lyc-intelligence.app" />
+    <link rel="canonical" href="https://www.lyc-intelligence.app" />
 
-    <!-- Google Fonts — LYC Brand Typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <!-- #1273: Brand font stack — zero CDN dependencies.
+         Headings use the system serif stack (DejaVu Serif / Georgia / Times New Roman / Times) —
+         no custom font loading. Body uses DM Sans, monospace uses IBM Plex Mono —
+         both self-hosted as woff2 Latin subsets in /public/fonts/ with local @font-face in index.css.
+         #1378: preload critical weights + preconnect third-party APIs. -->
+    <link rel="preload" href="/fonts/DMSans-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/IBMPlexMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preconnect" href="https://api.deepseek.com" />
+    <link rel="dns-prefetch" href="https://api.deepseek.com" />
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="icon" type="image/png" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
   </head>
   <body class="bg-bg-primary text-text-primary">
     <div id="root"></div>

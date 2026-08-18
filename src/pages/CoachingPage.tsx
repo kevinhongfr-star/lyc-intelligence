@@ -39,7 +39,7 @@ const HUB_CARDS: HubCard[] = [
   {
     id: 'session',
     title: 'Coaching Sessions',
-    description: 'Engage in multi-agent coaching conversations with expert AI coaches.',
+    description: 'Engage in multi-agent coaching conversations with NEXUS.',
     icon: <MessageCircle className="w-6 h-6" />,
     color: 'bg-blue-600',
     count: '5 scheduled',
@@ -248,7 +248,7 @@ export function CoachingPage() {
                 <MessageCircle className="w-5 h-5 text-blue-600" />
                 <div>
                   <div className="text-sm font-semibold text-[#1a1a1a]">Book a Session</div>
-                  <div className="text-xs text-[#555]">Chat with an AI coach</div>
+                  <div className="text-xs text-[#555]">Chat with NEXUS</div>
                 </div>
               </button>
               <button

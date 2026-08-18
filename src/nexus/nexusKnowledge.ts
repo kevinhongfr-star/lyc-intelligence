@@ -484,6 +484,55 @@ export function runRecommendationEngine(userMessage: string): RecommendationResu
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 2b. LYC METHODOLOGY KNOWLEDGE — coaching frameworks behind the instruments
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * LYC methodology knowledge — the executive-coaching frameworks that underpin
+ * each instrument. Grounds NEXUS in LYC's intellectual property so it can speak
+ * to the methodology (not just the surface catalog) when a user asks "what does
+ * this framework actually measure?". Derived from the canonical catalog/KB.
+ */
+export const NEXUS_METHODOLOGY_KB: Record<string, { framework: string; methodology: string }> = {
+  PRISM: {
+    framework: 'Career & Professional Branding',
+    methodology:
+      'PRISM audits whether the market can read your value the way you intend. Five dimensions — brand clarity, market legibility, identity consistency, narrative power, visibility — isolate where the market misreads you. The methodology assumes most senior profiles fail on legibility first, not quality of experience, so it front-loads a legibility diagnostic before narrative rewrite work.',
+  },
+  SPARK: {
+    framework: 'AI Leadership Readiness',
+    methodology:
+      'SPARK measures executive AI readiness along individual adoption, organisational capability exposure, and structural preparedness (governance, infrastructure, investment posture). The methodology is built on the observation that executives fail first on the second dimension — they do not see where AI is already changing the organisation around them — so it surfaces exposure gaps before prescribing a personal workflow plan.',
+  },
+  FORGE: {
+    framework: 'Sales & Bilateral Partnership Operating',
+    methodology:
+      'FORGE is built for bilateral contexts where authority is ambiguous — sales alliances, JVs, shared mandates. It tests adaptive learning orientation, awareness of the three structural forces (AI asymmetry, tempo acceleration, governance/succession), development agency, and bilateral navigation. The methodology distinguishes personal capability gaps from structural forces so the user does not over-attribute partnership friction to themselves.',
+  },
+  BRIDGE: {
+    framework: 'APAC / China Inbound Leadership',
+    methodology:
+      'BRIDGE is the APAC-inbound executive diagnostic: mandate specificity, stakeholder navigation, communication adaptation, pressure resilience, long-term trust orientation, and target-market cultural fluency. The methodology is calibrated to the 1-in-3 cross-border placement failure rate within 18 months — it surfaces the specific failure mode before the assignment is taken, not after.',
+  },
+  MOSAIC: {
+    framework: 'Cross-Border Cultural Intelligence',
+    methodology:
+      'MOSAIC diagnoses cross-institutional partnerships where governance and trust operate differently on each side. Four dimensions — institutional dynamics, relationship-building velocity, normative fit, root-cause conflict resolution. The methodology\'s core thesis: most partnership conflicts are misdiagnosed as personal when they are actually structural or normative, so it forces a root-cause classification before prescribing a fix.',
+  },
+  DRIVE: {
+    framework: 'Execution & Motivational Sustainability',
+    methodology:
+      'DRIVE diagnoses where a leader\'s motivation actually comes from — intrinsic craft, extrinsic recognition, values alignment, confidence under pressure, growth orientation. The methodology assumes plateaus are usually one dimension slipping while others compensate, and that the wrong fix (title, comp) does not address the specific slipping dimension. It prescribes corrective experiments matched to the failing dimension.',
+  },
+};
+
+function buildMethodologyBulkForSystemPrompt(): string {
+  return Object.entries(NEXUS_METHODOLOGY_KB).map(([code, m]) => {
+    return `- ${code} · ${m.framework}\n      Methodology: ${m.methodology}`;
+  }).join('\n');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 3. FRAMEWORK-AWARE SYSTEM PROMPT
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -533,6 +582,48 @@ One in three cross-border executive moves fails within 18 months. Usually for th
 What are you navigating right now?`;
 
 /**
+ * W4-2 / First-response quality — the first message NEXUS sends when a user
+ * opens the chat. Framework-aware, specific, executive tone. NOT a generic
+ * "how can I help you?".
+ *
+ * Acceptance:
+ *  - Greets by name if available.
+ *  - States what NEXUS is in 1 sentence.
+ *  - Offers SPECIFIC options (not open-ended).
+ *  - Demonstrates assessment + framework awareness.
+ *  - Premium, confident, slightly formal — not overly friendly.
+ */
+export const NEXUS_FIRST_RESPONSE = `Welcome{NAME}. I'm NEXUS, your executive intelligence partner — built on two decades of LYC executive search methodology.
+
+I can help you with:
+- Take a leadership assessment and establish your baseline
+- Discuss your assessment results in depth
+- Work through specific leadership challenges
+- Explore all 6 assessments
+
+Where would you like to start?`;
+
+/**
+ * Quick-reply chips shown below the NEXUS first response (W4-2).
+ * Specific, framework-aware options — not open-ended.
+ */
+export const NEXUS_FIRST_RESPONSE_QUICK_REPLIES: string[] = [
+  'Take an assessment',
+  'Explore all assessments',
+  'Help with a leadership challenge',
+  'What can you do?',
+];
+
+/**
+ * Build the personalized first response. Inserts the user's name if known.
+ * W4-2: "Welcome, [Name]." when name available, else "Welcome."
+ */
+export function buildNexusFirstResponse(displayName?: string | null): string {
+  const name = displayName && String(displayName).trim();
+  return NEXUS_FIRST_RESPONSE.replace('{NAME}', name ? `, ${name}` : '');
+}
+
+/**
  * First-touch starter questions — surface the framework choices without
  * overwhelming. These are real scenarios that feed directly into assessments.
  */
@@ -547,18 +638,29 @@ export const NEXUS_INTRO_QUESTIONS: string[] = [
  * Build a system prompt context object plus the opening greeting and the
  * 11-assessment knowledge payload. This lets the chat agent hydrate its
  * persona per turn without re-importing everything.
+ *
+ * #1324: `assessmentContext` (from buildAssessmentContextForNexus) is appended
+ * to the system prompt when provided, so NEXUS can reference the user's actual
+ * assessment results during the conversation.
  */
-export function buildNexusSystemPrompt(): {
+export function buildNexusSystemPrompt(assessmentContext?: string): {
   openingGreeting: string;
   systemPrompt: string;
   subscriptionTiers: typeof NEXUS_SUBSCRIPTION_TIERS;
   assessmentKBCount: number;
+  /** True when a user assessment context was injected into the prompt */
+  hasUserAssessmentContext: boolean;
 } {
+  const hasContext = Boolean(assessmentContext && assessmentContext.trim());
+  const systemPrompt = hasContext
+    ? `${NEXUS_SYSTEM_PROMPT}\n\n${assessmentContext!.trim()}`
+    : NEXUS_SYSTEM_PROMPT;
   return {
     openingGreeting: NEXUS_OPENING_GREETING,
-    systemPrompt: NEXUS_SYSTEM_PROMPT,
+    systemPrompt,
     subscriptionTiers: NEXUS_SUBSCRIPTION_TIERS,
     assessmentKBCount: NEXUS_KB_CODES_ORDERED.length,
+    hasUserAssessmentContext: hasContext,
   };
 }
 
@@ -619,10 +721,16 @@ Directors, VPs, C-suite, board members, expats entering APAC, and executives in 
 - Unique tier (199 mi): CPI
 Higher tiers (Professional Deep-Dive, Executive Advisory) add percentile benchmarks, coaching sessions, and consultant debriefs. Never explain these as free.
 
-=== 11 CANONICAL ASSESSMENTS — KNOWLEDGE BASE ===
+=== CANONICAL ASSESSMENTS — KNOWLEDGE BASE ===
 LYC Intelligence catalog below. You know all of these. You reference them with their code when recommending.
+Active: 6 assessments in the public catalog (ADVISORY_PRODUCT_KEYS below).
 
 ${buildKnowledgeBulkForSystemPrompt()}
+
+=== LYC METHODOLOGY KNOWLEDGE — coaching frameworks behind the instruments ===
+When a user asks what a framework actually measures or why it is built the way it is, ground your answer in the methodology below. Speak to the coaching thesis, not just the dimension list.
+
+${buildMethodologyBulkForSystemPrompt()}
 
 === CONFIDENTIALITY PROMISE — embedded in identity ===
 Every conversation is treated as confidential. Nothing the user shares in this conversation is shared outside LYC Intelligence, is never used to train public-facing models, and does not appear in any example or template without written consent. You keep a confidence the way an executive coach keeps a confidence.
@@ -633,6 +741,14 @@ Every conversation is treated as confidential. Nothing the user shares in this c
 3. After a recommendation, offer three follow-up questions the user should be asking themselves — even if they don't take the assessment today. Users remember the questions.
 4. If the user's subscription tier matters, mention it naturally: "at Executive Introduction this is 149 mi", not "you'll need to pay".
 5. Miles earning: framework exploration sessions earn miles, reflection engagement earns miles, and completing an assessment refunds bonus miles (once per instrument) for Starter tier and above. Executive Introduction (Explorer) users do not earn miles.
+
+=== FIRST-RESPONSE GUARDRAILS (W4-2) — strict, no exceptions ===
+The opening message is shown to the user automatically (it is NOT generated by you — it is a fixed template). But your FIRST generated response must also demonstrate framework awareness:
+- NEVER open with "How can I help you?", "What can I do for you?", "Hi there!", or any generic chatbot opener.
+- Lead with substance: reference a specific assessment, framework dimension, or leadership scenario.
+- Offer specific options tied to the assessment catalog — not open-ended questions.
+- If the user's first message is vague ("hi", "hello", "test"), respond with a framework-aware redirect: name 2-3 assessments relevant to common executive scenarios and ask which dimension they want to explore.
+- Tone: confident, slightly formal, executive-level. Not overly friendly, not casual, no exclamation marks.
 
 === PROHIBITED LANGUAGE — FILTER ALL OUTPUT ===
 - ❌ "free" (any form). Use "Executive Introduction" instead.
@@ -709,6 +825,8 @@ export const NEXUS_MILES_EARNING_ORDER: MilesEarningActionKey[] = [
 export function tierAllowsEarning(tierKey: string | null | undefined): boolean {
   if (!tierKey) return false;
   const t = tierKey.toLowerCase();
-  if (t === 'explorer' || t === 'free' || t === 'intro' || t === 'executive introduction') return false;
+  // W3-3: entry tier never earns miles. Canonical key = executive_introduction;
+  // legacy aliases explorer/intro handled here. Never compare against 'free'.
+  if (t === 'executive_introduction' || t === 'explorer' || t === 'intro') return false;
   return NEXUS_SUBSCRIPTION_TIERS.some((s) => s.key === t);
 }

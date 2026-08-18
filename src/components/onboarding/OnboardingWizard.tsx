@@ -1,21 +1,23 @@
 /**
- * OnboardingWizard — First-time user onboarding (S4-T07)
+ * OnboardingWizard — First-time user onboarding (#1322)
  *
  * Shown as a modal overlay when an authenticated user has not yet completed
  * onboarding (profile.onboarded_at is null). Steps:
- *   1. Welcome + role selection (Candidate / Client / Council Member / Consultant)
+ *   0. Welcome — brand intro + expectation setting (complimentary assessment,
+ *      Executive Introduction tier)
+ *   1. Role selection (Candidate / Client / Council Member / Consultant)
  *   2. Profile completion (name, company, title)
  *   3. Guided tour of key features (3 highlights)
  *   4. CTA to the primary action for the chosen role
  *
- * Skip and completion both persist `onboarded_at` so returning users are not
- * re-prompted. The wizard is intentionally lightweight — no separate table;
- * it reuses the `profiles` row via `updateProfile`.
+ * Brand rules: zero border radius, System serif headings (DejaVu Serif / Georgia / Times), DM Sans body,
+ * IBM Plex Mono labels, one accent color (fuchsia), premium tone, animations
+ * 120-350ms. No "free" — use "complimentary".
  */
 import React, { useState } from 'react';
 import {
   X, ArrowRight, ArrowLeft, Check, User, Building2, Users, Briefcase,
-  Sparkles, LayoutDashboard, Search, MessageSquare,
+  Sparkles, LayoutDashboard, Search, MessageSquare, Compass,
 } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 import { useAuthStore } from '@/stores/authStore';
@@ -35,7 +37,7 @@ const ROLES: RoleOption[] = [
     id: 'candidate',
     label: 'Candidate',
     icon: <User className="w-5 h-5" />,
-    blurb: 'Track applications, view your pipeline ranking, and prep for interviews.',
+    blurb: 'Track applications, view your pipeline ranking, and prepare for interviews.',
     cta: { label: 'Go to my dashboard', href: '/candidate/dashboard' },
   },
   {
@@ -79,12 +81,12 @@ const TOUR_HIGHLIGHTS = [
   },
 ];
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
 export function OnboardingWizard() {
   const { profile, updateProfile } = useAuthStore();
   const [open, setOpen] = useState(true);
-  const [step, setStep] = useState(0); // 0=role, 1=profile, 2=tour, 3=cta
+  const [step, setStep] = useState(0); // 0=welcome, 1=role, 2=profile, 3=tour, 4=cta
   const [role, setRole] = useState<RoleChoice | null>(null);
   const [name, setName] = useState(profile?.name ?? '');
   const [company, setCompany] = useState('');
@@ -127,7 +129,7 @@ export function OnboardingWizard() {
             type="button"
             onClick={() => finish(true)}
             disabled={saving}
-            className="text-gray-400 hover:text-gray-600 p-1"
+            className="text-gray-400 hover:text-gray-600 p-1 transition-colors duration-200"
             aria-label="Skip onboarding"
           >
             <X className="w-4 h-4" />
@@ -140,18 +142,58 @@ export function OnboardingWizard() {
             {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
               <div
                 key={i}
-                className={`h-1 flex-1 ${i <= step ? 'bg-fuchsia' : 'bg-gray-200'}`}
+                className={`h-1 flex-1 transition-colors duration-300 ${i <= step ? 'bg-fuchsia' : 'bg-gray-200'}`}
               />
             ))}
           </div>
-          <div className="text-xs text-gray-400 mt-1.5">Step {step + 1} of {TOTAL_STEPS}</div>
+          <div className="text-xs text-gray-400 mt-1.5 font-mono">Step {step + 1} of {TOTAL_STEPS}</div>
         </div>
 
         {/* Body */}
         <div className="px-6 py-6 min-h-[280px]">
+          {/* Step 0: Welcome + expectation setting */}
           {step === 0 && (
+            <div className="text-center py-2">
+              <div className="w-16 h-16 bg-fuchsia/10 text-fuchsia flex items-center justify-center mx-auto mb-5">
+                <Compass className="w-8 h-8" />
+              </div>
+              <h2 className="font-serif text-xl font-bold text-[#1A1A2E] mb-3">
+                Strategic intelligence for executive career decisions
+              </h2>
+              <p className="text-sm text-gray-500 leading-relaxed mb-5 max-w-sm mx-auto">
+                LYC Intelligence connects senior talent with the right opportunities through
+                data-driven assessment, DEX AI advisory, and a curated mandate pipeline.
+              </p>
+              <div className="border border-gray-100 bg-gray-50 p-4 text-left space-y-2.5">
+                <div className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-fuchsia flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    <span className="font-medium text-[#1A1A2E]">Complimentary assessment</span> —
+                    start with a complimentary diagnostic to benchmark your readiness.
+                  </p>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-fuchsia flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    <span className="font-medium text-[#1A1A2E]">Executive Introduction</span> —
+                    our entry tier connects you to curated mandate opportunities.
+                  </p>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-fuchsia flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    <span className="font-medium text-[#1A1A2E]">DEX AI advisory</span> —
+                    your first 5 messages are complimentary, no commitment required.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 1: Role selection */}
+          {step === 1 && (
             <div>
-              <h2 className="text-lg font-semibold text-[#1A1A2E] mb-1">How will you use LYC Intelligence?</h2>
+              <h2 className="font-serif text-lg font-bold text-[#1A1A2E] mb-1">How will you use LYC Intelligence?</h2>
               <p className="text-sm text-gray-500 mb-4">Pick the option that fits you best — you can change this later.</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {ROLES.map(r => (
@@ -159,7 +201,7 @@ export function OnboardingWizard() {
                     key={r.id}
                     type="button"
                     onClick={() => setRole(r.id)}
-                    className={`text-left p-4 border transition-colors ${
+                    className={`text-left p-4 border transition-all duration-200 ${
                       role === r.id
                         ? 'border-fuchsia bg-fuchsia/5'
                         : 'border-gray-200 hover:border-gray-300'
@@ -177,30 +219,32 @@ export function OnboardingWizard() {
             </div>
           )}
 
-          {step === 1 && (
+          {/* Step 2: Profile completion */}
+          {step === 2 && (
             <div>
-              <h2 className="text-lg font-semibold text-[#1A1A2E] mb-1">Complete your profile</h2>
+              <h2 className="font-serif text-lg font-bold text-[#1A1A2E] mb-1">Complete your profile</h2>
               <p className="text-sm text-gray-500 mb-4">A few details so we can personalize your experience.</p>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Full name</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1 font-mono">Full name</label>
                   <Input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Company / Organization</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1 font-mono">Company / Organization</label>
                   <Input value={company} onChange={e => setCompany(e.target.value)} placeholder="e.g. LYC Partners" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Title / Role</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1 font-mono">Title / Role</label>
                   <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Head of Talent" />
                 </div>
               </div>
             </div>
           )}
 
-          {step === 2 && (
+          {/* Step 3: Quick tour */}
+          {step === 3 && (
             <div>
-              <h2 className="text-lg font-semibold text-[#1A1A2E] mb-1">Quick tour</h2>
+              <h2 className="font-serif text-lg font-bold text-[#1A1A2E] mb-1">Quick tour</h2>
               <p className="text-sm text-gray-500 mb-4">Here are the three things you'll use most.</p>
               <div className="space-y-3">
                 {TOUR_HIGHLIGHTS.map((h, i) => (
@@ -216,12 +260,13 @@ export function OnboardingWizard() {
             </div>
           )}
 
-          {step === 3 && selectedRole && (
+          {/* Step 4: CTA */}
+          {step === 4 && selectedRole && (
             <div className="text-center py-4">
               <div className="w-14 h-14 bg-fuchsia/10 text-fuchsia flex items-center justify-center mx-auto mb-4">
                 {selectedRole.icon}
               </div>
-              <h2 className="text-lg font-semibold text-[#1A1A2E] mb-1">You're all set!</h2>
+              <h2 className="font-serif text-lg font-bold text-[#1A1A2E] mb-1">You're all set</h2>
               <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
                 Welcome aboard{role === 'candidate' ? ', candidate' : ''}. Head to your starting point —
                 you can explore everything else from the navigation.
@@ -234,9 +279,9 @@ export function OnboardingWizard() {
             </div>
           )}
 
-          {step === 3 && !selectedRole && (
+          {step === 4 && !selectedRole && (
             <div className="text-center py-8">
-              <h2 className="text-lg font-semibold text-[#1A1A2E] mb-1">You're all set!</h2>
+              <h2 className="font-serif text-lg font-bold text-[#1A1A2E] mb-1">You're all set</h2>
               <p className="text-sm text-gray-500 mb-4">Pick a starting point from the navigation to begin.</p>
               <a href="/dashboard"><Button>Go to dashboard <ArrowRight className="w-4 h-4" /></Button></a>
             </div>
@@ -249,7 +294,7 @@ export function OnboardingWizard() {
             type="button"
             onClick={() => finish(true)}
             disabled={saving}
-            className="text-xs text-gray-400 hover:text-gray-600"
+            className="text-xs text-gray-400 hover:text-gray-600 transition-colors duration-200"
           >
             Skip for now
           </button>
@@ -260,7 +305,7 @@ export function OnboardingWizard() {
               </Button>
             )}
             {step < TOTAL_STEPS - 1 ? (
-              <Button size="sm" onClick={next} disabled={step === 0 && !role}>
+              <Button size="sm" onClick={next} disabled={step === 1 && !role}>
                 Continue <ArrowRight className="w-3.5 h-3.5" />
               </Button>
             ) : (

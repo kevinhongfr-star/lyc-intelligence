@@ -23,12 +23,19 @@ export interface LEAPDimensionBank {
   questions: LEAPQuestion[];
 }
 
+// X4-NOTE: LEAP question bank organises DISC items per-dimension (D/I/S/C), so
+// the same 16 forced-choice item sets appear in 4 parallel dim arrays each. The
+// de-duplicated question list a user actually answers lives in scoring/leap.ts
+// (16 DISC forced-choice + 15 CR Likert + 4 CB cross-border = 35). Canon LEAP
+// scoring schema defines 30 items across 5 dimensions (Market/Capability/Timing/
+// Risk/Impact); this file captures the expanded 35-item B2C DISC+CR+CB battery.
 export const INSTRUMENT = "LEAP";
-export const FULL_NAME = "Leadership Evaluation & Psychological Profiling";
+export const FULL_NAME = "LEAP — competitive positioning";
+export const B2C_NAME = "LEAP — competitive positioning";
 export const VERSION = "2.0";
-export const TOTAL_QUESTIONS = 15;
-export const SCALE = "1-5 Likert";
-export const DELIVERY_MINUTES = 12;
+export const TOTAL_QUESTIONS = 35;
+export const SCALE = "Forced-choice DISC + Likert (mixed)";
+export const DELIVERY_MINUTES = 15;
 
 export const DIMENSIONS: LEAPDimensionBank[] = [
   {

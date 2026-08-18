@@ -1,106 +1,214 @@
+/**
+ * PricingHero.tsx — Pricing page hero section (Batch 3 / Ticket 4).
+ *
+ * Structural layout only. All copy is placeholder, mapped to Emily's
+ * positioning doc sections. Components: eyebrow, headline, subheadline,
+ * body copy, primary CTA, billing cycle toggle.
+ *
+ * Positioning: "Executive Intelligence" — coach first, diagnostics as tools.
+ * Tagline: "Executive Intelligence for a Changing China".
+ * NOTE: "platform" is a Level 1 hard banned word — never "Executive Intelligence Platform".
+ */
 import React from 'react';
-import { Globe, Coins, Calendar } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { cn } from '@/lib/utils';
-import type { PricingCurrency, BillingCycle } from '@/config/pricingData';
+import { DS } from '@/tokens';
+import type { BillingCycle } from '@/config/tiers';
 
 export interface PricingHeroProps {
-  currency: PricingCurrency;
-  onCurrencyChange: (currency: PricingCurrency) => void;
-  billingCycle: BillingCycle;
-  onBillingCycleChange: (cycle: BillingCycle) => void;
+  cycle: BillingCycle;
+  onCycleChange: (cycle: BillingCycle) => void;
+  onPrimaryCta: () => void;
 }
 
-export const PricingHero: React.FC<PricingHeroProps> = ({
-  currency,
-  onCurrencyChange,
-  billingCycle,
-  onBillingCycleChange,
-}) => {
+export function PricingHero({ cycle, onCycleChange, onPrimaryCta }: PricingHeroProps) {
   return (
-    <section className="relative py-16 md:py-20 overflow-hidden">
-      <div
-        className="absolute inset-0 bg-gradient-to-br from-accent/5 via-tier-1Bg/40 to-white pointer-events-none"
-        aria-hidden="true"
-      />
-      <div className="relative max-w-5xl mx-auto px-4 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium mb-6">
-          <Coins className="h-3.5 w-3.5" aria-hidden="true" />
-          Executive Intelligence — Currency is diagnostic miles
+    <section
+      style={{
+        background: DS.bg,
+        padding: '96px 24px 64px',
+        borderBottom: `1px solid ${DS.border}`,
+      }}
+    >
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        {/* Eyebrow — gray, never accent (#1353) */}
+        <div
+          style={{
+            fontFamily: DS.monoFont,
+            fontSize: 12,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: DS.eyebrow,
+            marginBottom: 24,
+          }}
+        >
+          [Emily: eyebrow — "Executive Intelligence for a Changing China"]
         </div>
 
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-text-primary mb-6">
-          Executive Intelligence
+        {/* Headline — system serif */}
+        <h1
+          style={{
+            fontFamily: DS.headingFont,
+            fontSize: 48,
+            lineHeight: 1.1,
+            color: DS.text,
+            margin: '0 0 24px',
+            fontWeight: 600,
+            maxWidth: 800,
+          }}
+        >
+          [Emily: hero headline — "Executive Intelligence" positioning (NOTE: "platform" is banned — never "Executive Intelligence Platform")]
         </h1>
 
-        <p className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto mb-8 leading-relaxed">
-          Five tiers, calibrated to where you are in your executive journey.
-          Earn diagnostic miles monthly, spend them on diagnostics across the
-          complete portfolio.
+        {/* Subheadline */}
+        <p
+          style={{
+            fontFamily: DS.bodyFont,
+            fontSize: 22,
+            lineHeight: 1.5,
+            color: DS.textSecondary,
+            margin: '0 0 32px',
+            maxWidth: 720,
+          }}
+        >
+          [Emily: hero subheadline — coach-first, diagnostics as tools framing]
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
-          <div
-            className="inline-flex items-center rounded-lg border border-bg-tertiary bg-white p-1 shadow-sm"
-            role="group"
-            aria-label="Currency selection"
-          >
-            <Button
-              variant={currency === 'USD' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onCurrencyChange('USD')}
-              className="gap-1.5"
-              aria-pressed={currency === 'USD'}
-            >
-              <Globe className="h-3.5 w-3.5" aria-hidden="true" />
-              USD
-            </Button>
-            <Button
-              variant={currency === 'CNY' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onCurrencyChange('CNY')}
-              className="gap-1.5"
-              aria-pressed={currency === 'CNY'}
-            >
-              <span className="text-sm">¥</span>
-              CNY
-            </Button>
-          </div>
+        {/* Body copy */}
+        <p
+          style={{
+            fontFamily: DS.bodyFont,
+            fontSize: 16,
+            lineHeight: 1.6,
+            color: DS.muted,
+            margin: '0 0 40px',
+            maxWidth: 640,
+          }}
+        >
+          [Emily: hero body copy — 2-3 sentences expanding on positioning.
+          Mapped to positioning doc §hero.]
+        </p>
 
-          <div
-            className="inline-flex items-center rounded-lg border border-bg-tertiary bg-white p-1 shadow-sm"
-            role="group"
-            aria-label="Billing cycle"
+        {/* Primary CTA + billing toggle */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 32,
+            alignItems: 'center',
+          }}
+        >
+          <button
+            onClick={onPrimaryCta}
+            style={{
+              fontFamily: DS.bodyFont,
+              fontSize: 16,
+              fontWeight: 600,
+              color: DS.bg,
+              background: DS.accent,
+              border: 'none',
+              padding: '16px 32px',
+              cursor: 'pointer',
+              transition: DS.transition,
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = DS.accentHover)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = DS.accent)}
           >
-            <Button
-              variant={billingCycle === 'monthly' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onBillingCycleChange('monthly')}
-              className="gap-1.5"
-              aria-pressed={billingCycle === 'monthly'}
-            >
-              <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
-              Monthly
-            </Button>
-            <Button
-              variant={billingCycle === 'annual' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onBillingCycleChange('annual')}
-              className="gap-1.5"
-              aria-pressed={billingCycle === 'annual'}
-            >
-              Annual
-              <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-tier-1Bg text-tier-1 font-semibold">
-                −20%
-              </span>
-            </Button>
-          </div>
+            [Emily: primary CTA text]
+          </button>
+
+          {/* Monthly / Annual toggle */}
+          <BillingCycleToggle cycle={cycle} onCycleChange={onCycleChange} />
         </div>
-
-        <p className="text-xs text-text-muted">
-          Pro is the recommended tier — 150 diagnostic miles monthly for active executives.
-        </p>
       </div>
     </section>
   );
-};
+}
+
+/** Monthly/annual billing toggle with "Save 15%" badge on annual. */
+function BillingCycleToggle({
+  cycle,
+  onCycleChange,
+}: {
+  cycle: BillingCycle;
+  onCycleChange: (c: BillingCycle) => void;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+      }}
+    >
+      <span
+        style={{
+          fontFamily: DS.bodyFont,
+          fontSize: 14,
+          fontWeight: cycle === 'monthly' ? 600 : 400,
+          color: cycle === 'monthly' ? DS.text : DS.muted,
+          cursor: 'pointer',
+          transition: DS.transition,
+        }}
+        onClick={() => onCycleChange('monthly')}
+      >
+        Monthly
+      </span>
+      <button
+        onClick={() => onCycleChange(cycle === 'monthly' ? 'annual' : 'monthly')}
+        style={{
+          width: 48,
+          height: 24,
+          border: `1px solid ${DS.borderStrong}`,
+          background: cycle === 'annual' ? DS.accent : DS.bgAlt,
+          cursor: 'pointer',
+          padding: 0,
+          position: 'relative',
+          transition: DS.transition,
+        }}
+        aria-label="Toggle billing cycle"
+      >
+        <span
+          style={{
+            position: 'absolute',
+            top: 2,
+            left: cycle === 'annual' ? 26 : 2,
+            width: 18,
+            height: 18,
+            background: DS.bg,
+            border: `1px solid ${DS.borderStrong}`,
+            transition: DS.transition,
+          }}
+        />
+      </button>
+      <span
+        style={{
+          fontFamily: DS.bodyFont,
+          fontSize: 14,
+          fontWeight: cycle === 'annual' ? 600 : 400,
+          color: cycle === 'annual' ? DS.text : DS.muted,
+          cursor: 'pointer',
+          transition: DS.transition,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+        onClick={() => onCycleChange('annual')}
+      >
+        Annual
+        {cycle === 'annual' && (
+          <span
+            style={{
+              fontFamily: DS.monoFont,
+              fontSize: 11,
+              letterSpacing: '0.05em',
+              color: DS.accent,
+              border: `1px solid ${DS.accent}`,
+              padding: '2px 6px',
+            }}
+          >
+            SAVE 15%
+          </span>
+        )}
+      </span>
+    </div>
+  );
+}

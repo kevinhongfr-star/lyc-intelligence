@@ -2,7 +2,7 @@ import React from 'react';
 import { Briefcase, FileText, Lightbulb } from 'lucide-react';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',
@@ -14,8 +14,8 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
+  radius: '0',
+  radiusSm: '0',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
@@ -63,7 +63,7 @@ Example:
           lineHeight: 1.6,
           resize: 'vertical',
           outline: 'none',
-          fontFamily: 'Inter, sans-serif'
+          fontFamily: "'DM Sans', system-ui, sans-serif"
         }}
       />
 

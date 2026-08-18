@@ -2,6 +2,7 @@ import { AssessmentLanding, type AssessmentLandingConfig } from '@/components/as
 import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
 import { SEO } from '@/components/seo/SEO';
 import { getAssessmentMeta } from '@/seo/pageMetadata';
+import { DS } from '@/tokens';
 
 const config: AssessmentLandingConfig = {
   code: 'PRISM',
@@ -9,7 +10,9 @@ const config: AssessmentLandingConfig = {
   tagline: 'Career & Professional Branding',
   heroDescription:
     'Discover your leadership profile across five core dimensions. Benchmark against real executives. Get a personalized development plan in fifteen minutes.',
-  accent: '#C108AB',
+  heroH1: 'A clear professional brand for executives between mandates',
+  heroEyebrow: 'PRISM · PROFESSIONAL BRAND LEGIBILITY',
+  accent: DS.accent,
   prefix: 'prism',
   ctaLabel: 'Start the assessment',
   ctaHref: '/prism/take',
@@ -20,7 +23,7 @@ const config: AssessmentLandingConfig = {
     {
       step: '01',
       title: 'Answer 40 questions',
-      desc: 'Scenario-based questions calibrated against real executive populations. No right or wrong answers — just honest ones.',
+      desc: 'Scenario-based questions benchmarked against real executive populations. No right or wrong answers — just honest ones.',
     },
     {
       step: '02',
@@ -44,7 +47,7 @@ const config: AssessmentLandingConfig = {
     },
     {
       title: 'Career transitioners',
-      desc: 'Professionals navigating a pivot. Get clarity on transferable strengths and development priorities.',
+      desc: 'Professionals managing a pivot. Get clarity on transferable strengths and development priorities.',
     },
   ],
   deliverables: [
@@ -62,7 +65,7 @@ const config: AssessmentLandingConfig = {
     },
     {
       title: 'NEXUS integration',
-      desc: 'Your results feed directly into NEXUS, so your AI coach always knows your profile.',
+      desc: 'Your results feed directly into NEXUS, so NEXUS always knows your profile.',
     },
   ],
   sampleResult:

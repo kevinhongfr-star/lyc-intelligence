@@ -1,513 +1,274 @@
-import React, { useMemo, useState } from 'react';
-import { Check, Crown, Sparkles, ArrowRight, Loader2, Globe, Coins } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
-import { authFetch } from '@/utils/authFetch';
+/**
+ * PricingPage.tsx — Batch 3 full pricing page assembly (9 tickets).
+ *
+ * Section order:
+ *  1. Hero (T4) — eyebrow, headline, CTA, billing cycle toggle
+ *  2. Tier Value Props (T5) — 5 tier blocks + upgrade ladder framing
+ *  3. Tier Cards (T2) — 5 cards with monthly/annual toggle, badges, CTA
+ *  4. Feature Comparison Table (T3) — all tiers × all features
+ *  5. Mile Packs (T7) — 3 packs (1/5/15 mi), savings, explainer
+ *  6. Human Debriefs (T8) — 4 session types, tier discounts, free sessions
+ *  7. FAQ (T6) — 8-12 questions, accordion
+ *
+ * CTA funnel (T9):
+ *  - Explorer  → free signup (/login or /dashboard)
+ *  - Paid tiers → Stripe checkout (monthly/annual)
+ *  - Council   → application flow (/council/apply)
+ *
+ * Copy = plug-in later. All marketing copy placeholders prefixed [Emily: ...].
+ * All numbers from pricingData.ts / tiers.ts / miles.ts — no hardcoded values.
+ */
+import React, { useState, useCallback } from 'react';
 import { SEO } from '@/components/seo/SEO';
-import {
-  CANONICAL_TIER_ORDER,
-  CANONICAL_TIER_PRICING,
-  CANONICAL_ASSESSMENT_ORDER,
-  CANONICAL_ASSESSMENT_PRICING,
-  RECOMMENDED_TIER,
-  detectUserCurrency,
-  formatTierPrice,
-  formatAssessmentPrice,
-  type PricingCurrency,
-  type TierKey,
-} from '@/services/monetizationService';
+import { trackBillingView } from '@/analytics/eventTracker';
+import { useAuthStore } from '@/stores/authStore';
+import { DS } from '@/tokens';
+import { PRICING_TIERS } from '@/config/pricingData';
+import type { BillingCycle, PricingCurrency } from '@/config/tiers';
 
-const DIAGNOSTIC_PRICING_ORDER = CANONICAL_ASSESSMENT_ORDER;
-const DIAGNOSTIC_PRICING = CANONICAL_ASSESSMENT_PRICING;
-const formatDiagnosticPrice = formatAssessmentPrice;
-import { trackUpgradeAttempt, trackCTA, trackBillingView } from '@/analytics/eventTracker';
-import { reportError } from '@/analytics/errorMonitor';
+import { PricingHero } from '@/components/pricing/PricingHero';
+import { TierValueProps } from '@/components/pricing/TierValueProps';
+import { TierCard } from '@/components/pricing/TierCard';
+import { FeatureComparisonTable } from '@/components/pricing/FeatureComparisonTable';
+import { MilePacksSection } from '@/components/pricing/MilePacksSection';
+import { DebriefsSection } from '@/components/pricing/DebriefsSection';
+import { PricingFAQ } from '@/components/pricing/PricingFAQ';
+import { usePricingCta } from '@/components/pricing/usePricingCta';
 
 interface PricingPageProps {
   onUpgradeSuccess?: () => void;
 }
 
-const STRIPE_PRICE_ENV: Record<TierKey, string | undefined> = {
-  explorer: undefined,
-  starter: import.meta.env.VITE_STRIPE_PRICE_STARTER as string | undefined,
-  pro: import.meta.env.VITE_STRIPE_PRICE_PRO as string | undefined,
-  executive: import.meta.env.VITE_STRIPE_PRICE_EXECUTIVE as string | undefined,
-  council: import.meta.env.VITE_STRIPE_PRICE_COUNCIL as string | undefined,
-};
-
 export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
-  const { user, profile } = useAuthStore();
+  const { user } = useAuthStore();
 
-  // Track pricing/billing view on mount
   React.useEffect(() => {
     trackBillingView(user ? 'portal_nav' : 'direct_link');
   }, [user]);
 
-  // Currency: explicit toggle > user preference > auto-detect.
-  const detected = useMemo<PricingCurrency>(() => {
-    const pref = (profile as any)?.currency_preference ?? null;
-    return detectUserCurrency({ preference: pref });
-  }, [profile]);
+  const [cycle, setCycle] = useState<BillingCycle>('monthly');
+  const [currency] = useState<PricingCurrency>('USD');
 
-  const [currency, setCurrency] = useState<PricingCurrency>(detected);
-  const [loadingTier, setLoadingTier] = useState<TierKey | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // CTA funnel logic (T9)
+  const { getCta, handleSelectTier, currentTier } = usePricingCta(onUpgradeSuccess);
 
-  const handleUpgrade = async (tierKey: TierKey) => {
-    if (tierKey === 'explorer') {
-      // Explorer = Executive Introduction → no checkout, just send to dashboard.
-      trackCTA({ location: 'pricing_tier', label: 'Explorer CTA', destination: user ? '/dashboard' : '/login', context_id: tierKey });
-      if (!user) {
-        window.location.href = '/login';
-      } else {
-        window.location.href = '/dashboard';
-      }
-      return;
-    }
-
-    trackUpgradeAttempt(tierKey, 'pricing_page');
-    setLoadingTier(tierKey);
-    setError(null);
-
-    try {
-      const priceId = STRIPE_PRICE_ENV[tierKey];
-      if (!priceId) {
-        throw new Error(
-          `${CANONICAL_TIER_PRICING[tierKey].label} plan is not configured yet. Please contact support.`,
-        );
-      }
-      const response = await authFetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          priceId,
-          tier: tierKey,
-          successUrl: `${window.location.origin}/account/billing?upgraded=true&tier=${tierKey}`,
-          cancelUrl: `${window.location.origin}/pricing?canceled=true`,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.url) {
-        window.location.href = data.url;
-        onUpgradeSuccess?.();
-      } else {
-        throw new Error(data.error || 'Failed to create checkout session');
-      }
-    } catch (e: any) {
-      console.error('Upgrade error:', e);
-      reportError(e, { scope: 'pricing:checkout', severity: 'error', extra: { tier: tierKey } });
-      setError(e.message || 'Failed to start upgrade');
-    } finally {
-      setLoadingTier(null);
-    }
-  };
+  const onPrimaryCta = useCallback(() => {
+    // Hero CTA → scroll to tier cards
+    const cards = document.getElementById('pricing-tier-cards');
+    if (cards) cards.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+    <>
       <SEO page="pricing" />
-      {/* Header */}
-      <div className="max-w-6xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-4xl font-bold text-text-primary mb-4">
-          Choose Your Plan
-        </h1>
-        <p className="text-text-muted text-lg max-w-2xl mx-auto">
-          Five tiers, calibrated to where you are in your executive journey.
-          Currency is <span className="font-medium">miles</span> — earn monthly, spend on diagnostics.
-        </p>
 
-        {/* Currency Toggle */}
-        <div className="mt-6 inline-flex items-center bg-white border border-border">
-          <button
-            onClick={() => setCurrency('USD')}
-            className={`px-4 py-2 text-sm font-medium flex items-center gap-2 transition-colors ${
-              currency === 'USD' ? 'bg-accent text-white' : 'text-text-secondary hover:bg-bg-tertiary'
-            }`}
-            aria-pressed={currency === 'USD'}
-          >
-            <Globe className="w-4 h-4" />
-            Global · USD
-          </button>
-          <button
-            onClick={() => setCurrency('CNY')}
-            className={`px-4 py-2 text-sm font-medium flex items-center gap-2 transition-colors ${
-              currency === 'CNY' ? 'bg-accent text-white' : 'text-text-secondary hover:bg-bg-tertiary'
-            }`}
-            aria-pressed={currency === 'CNY'}
-          >
-            <Coins className="w-4 h-4" />
-            China · CNY
-          </button>
-        </div>
-        <p className="text-xs text-text-muted mt-2">
-          China pricing reflects a 1/3 regional adjustment, shown in CNY.
-        </p>
-      </div>
+      {/* T4: Hero */}
+      <PricingHero cycle={cycle} onCycleChange={setCycle} onPrimaryCta={onPrimaryCta} />
 
-      {/* Subscription Tier Cards */}
-      <div className="max-w-7xl mx-auto px-4 pb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {CANONICAL_TIER_ORDER.map((tierKey) => {
-            const tier = CANONICAL_TIER_PRICING[tierKey];
-            const price = formatTierPrice(tierKey, currency);
-            const isRecommended = tierKey === RECOMMENDED_TIER;
-            const isCurrent = profile?.tier === tierKey || profile?.tier === tier.key;
-            const isExplorer = tierKey === 'explorer';
-            const isLoading = loadingTier === tierKey;
+      {/* T5: Tier Value Props */}
+      <TierValueProps />
 
-            return (
-              <div
-                key={tierKey}
-                className={`relative border-2 p-6 flex flex-col ${
-                  isRecommended
-                    ? 'border-accent bg-gradient-to-b from-accent/5 to-white shadow-xl'
-                    : 'border-border bg-white shadow-sm hover:shadow-md transition-shadow'
-                }`}
-              >
-                {isRecommended && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-accent text-white px-4 py-1 text-xs font-semibold flex items-center gap-1 whitespace-nowrap">
-                      <Sparkles className="w-3 h-3" />
-                      Recommended
-                    </span>
-                  </div>
-                )}
-
-                {isCurrent && (
-                  <div className="absolute -top-4 right-2">
-                    <span className="bg-green-500 text-white px-3 py-1 text-xs font-medium">
-                      Current Plan
-                    </span>
-                  </div>
-                )}
-
-                {/* Tier label */}
-                <div className="mb-4">
-                  <h3 className="text-xl font-bold text-text-primary">
-                    {isExplorer ? tier.alias : tier.label}
-                  </h3>
-                  {isExplorer && (
-                    <p className="text-xs text-text-muted uppercase tracking-wide mt-1">
-                      Explorer tier
-                    </p>
-                  )}
-                </div>
-
-                {/* Price */}
-                <div className="mb-4">
-                  {price.isZero ? (
-                    <div>
-                      <div className="text-2xl font-bold text-text-primary leading-tight">
-                        Executive Introduction
-                      </div>
-                      <div className="text-sm text-text-muted mt-1">
-                        {price.secondary}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold text-text-primary">
-                        {price.primary}
-                      </span>
-                      <span className="text-sm text-text-muted">
-                        {currency === 'CNY' ? '/ 月' : '/ mo'}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Monthly miles */}
-                <div className="mb-4 pb-4 border-b border-border">
-                  <div className="text-xs text-text-muted uppercase tracking-wide">Monthly miles</div>
-                  <div className="text-2xl font-semibold text-accent">
-                    {tier.monthlyMiles === 0 ? '—' : `${tier.monthlyMiles} mi`}
-                  </div>
-                  {tier.earnsMiles && (
-                    <div className="text-xs text-text-muted mt-1">Earns miles via NEXUS actions</div>
-                  )}
-                </div>
-
-                {/* Benefits */}
-                <ul className="space-y-2 mb-6 flex-1">
-                  {tier.benefits.map((benefit, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <Check className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
-                      <span className="text-text-secondary">{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* CTA */}
-                <button
-                  onClick={() => handleUpgrade(tierKey)}
-                  disabled={isLoading || isCurrent}
-                  className={`w-full py-3 px-4 font-medium text-sm flex items-center justify-center gap-2 transition-all ${
-                    isCurrent
-                      ? 'bg-bg-tertiary text-text-muted cursor-default'
-                      : isRecommended
-                        ? 'bg-accent text-white hover:bg-accent-hover'
-                        : 'bg-bg-tertiary text-text-primary hover:bg-bg-secondary'
-                  } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : isCurrent ? (
-                    'Current Plan'
-                  ) : isExplorer ? (
-                    <>
-                      Get Started
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  ) : (
-                    <>
-                      Upgrade to {tier.label}
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-
-                {error && !isCurrent && loadingTier === null && !isExplorer && (
-                  <p className="text-red-500 text-xs mt-2 text-center">{error}</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Diagnostic Pricing Section */}
-      <div className="max-w-6xl mx-auto px-4 pb-16">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-text-primary mb-2">Diagnostic Pricing</h2>
-          <p className="text-text-muted">
-            Three price tiers across the 11-instrument catalog. Pay once per diagnostic — miles or fiat.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {DIAGNOSTIC_PRICING_ORDER.map((priceTier) => {
-            const p = DIAGNOSTIC_PRICING[priceTier];
-            const display = formatDiagnosticPrice(priceTier, currency);
-            const isUnique = priceTier === 'unique';
-
-            return (
-              <div
-                key={priceTier}
-                className={`border-2 p-6 flex flex-col ${
-                  isUnique
-                    ? 'border-accent bg-gradient-to-b from-accent/5 to-white'
-                    : 'border-border bg-white'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-3">
-                  {isUnique && <Crown className="w-5 h-5 text-accent" />}
-                  <h3 className="text-lg font-bold text-text-primary">{p.label}</h3>
-                </div>
-
-                <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-3xl font-bold text-text-primary">{display.primary}</span>
-                  <span className="text-sm text-text-muted">one-time</span>
-                </div>
-                <div className="text-sm text-accent font-medium mb-4">
-                  {display.miles} mi
-                </div>
-
-                <div className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                  Instruments
-                </div>
-                <div className="flex flex-wrap gap-1.5 mb-6">
-                  {p.instruments.map((code) => (
-                    <span
-                      key={code}
-                      className="px-2 py-1 text-xs font-medium bg-bg-tertiary text-text-secondary border border-border"
-                    >
-                      {code}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Feature Comparison */}
-      <div className="max-w-6xl mx-auto px-4 pb-16">
-        <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
-          Feature Comparison
-        </h2>
-        <div className="bg-white border border-border overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-bg-tertiary">
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Feature</th>
-                {CANONICAL_TIER_ORDER.map((tierKey) => {
-                  const tier = CANONICAL_TIER_PRICING[tierKey];
-                  const isRecommended = tierKey === RECOMMENDED_TIER;
-                  return (
-                    <th
-                      key={tierKey}
-                      className={`px-4 py-3 text-center font-medium ${
-                        isRecommended ? 'text-accent' : 'text-text-secondary'
-                      }`}
-                    >
-                      {tierKey === 'explorer' ? tier.alias : tier.label}
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                {
-                  feature: 'Monthly miles',
-                  values: ['—', '50 mi', '150 mi', '300 mi', '600 mi'],
-                },
-                {
-                  feature: 'NEXUS chat',
-                  values: ['Executive Introduction', 'Standard', 'Priority', 'Priority', 'Unlimited'],
-                },
-                {
-                  feature: 'All 11 diagnostics',
-                  values: ['Preview only', '✓', '✓', '✓', '✓'],
-                },
-                {
-                  feature: 'Personalised reports',
-                  values: ['—', '✓', '✓', '✓', '✓'],
-                },
-                {
-                  feature: 'Peer benchmarking',
-                  values: ['—', '—', '✓', '✓', '✓'],
-                },
-                {
-                  feature: 'Deliverable workspace',
-                  values: ['—', '—', '✓', '✓', '✓'],
-                },
-                {
-                  feature: 'Executive consultant debriefs',
-                  values: ['—', '—', '—', '✓', '✓'],
-                },
-                {
-                  feature: 'Live event access',
-                  values: ['—', '—', '—', '✓', '✓'],
-                },
-                {
-                  feature: 'Council community & workshops',
-                  values: ['—', '—', '—', '—', '✓'],
-                },
-                {
-                  feature: 'NEXUS miles earning',
-                  values: ['—', '✓', '✓', '✓', '✓'],
-                },
-              ].map((row, i) => (
-                <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-bg-tertiary/50'}>
-                  <td className="px-4 py-3 text-text-secondary">{row.feature}</td>
-                  {row.values.map((val, j) => (
-                    <td key={j} className="px-4 py-3 text-center">
-                      {val === '✓' ? (
-                        <Check className="w-4 h-4 text-accent mx-auto" />
-                      ) : val === '—' ? (
-                        <span className="text-text-muted">—</span>
-                      ) : (
-                        <span
-                          className={`font-medium ${
-                            j === CANONICAL_TIER_ORDER.indexOf(RECOMMENDED_TIER)
-                              ? 'text-accent'
-                              : 'text-text-primary'
-                          }`}
-                        >
-                          {val}
-                        </span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* FAQ */}
-      <div className="max-w-3xl mx-auto px-4 pb-16">
-        <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
-          Frequently Asked Questions
-        </h2>
-        <div className="space-y-4">
-          {[
-            {
-              question: 'Can I cancel my subscription at any time?',
-              answer:
-                'Yes. You can cancel any paid subscription at any time. You will continue to have access until the end of your current billing period, after which your account returns to Executive Introduction status.',
-            },
-            {
-              question: 'How do miles work?',
-              answer:
-                'Miles are the LYC Intelligence currency. Starter, Pro, Executive, and Council tiers receive a monthly miles allowance on their billing anniversary. You spend miles to run diagnostics from the 11-instrument catalog. Executive Introduction (Explorer) accounts do not receive a monthly allowance but can still explore the NEXUS chat and diagnostic previews.',
-            },
-            {
-              question: 'Can I earn additional miles?',
-              answer:
-                'Yes — subscribers at Starter tier and above earn miles by completing NEXUS framework exploration sessions (+5 mi), guided reflections (+3 mi), and receive a one-time completion refund (+10 mi) per diagnostic instrument.',
-            },
-            {
-              question: 'Can I upgrade or downgrade my plan?',
-              answer:
-                'Absolutely. You can change tiers at any time. Upgrades take effect immediately; downgrades take effect at the end of your current billing cycle.',
-            },
-            {
-              question: 'Do unused miles roll over?',
-              answer:
-                'Monthly miles allowances reset on your billing anniversary. Miles earned through NEXUS actions (exploration, reflection, completion refunds) remain on your balance until spent.',
-            },
-            {
-              question: 'What payment methods are accepted?',
-              answer:
-                'We accept all major credit cards (Visa, Mastercard, American Express) through Stripe. Apple Pay and Google Pay are supported where available. China-region users may also see local payment options during checkout.',
-            },
-            {
-              question: 'Why is China pricing lower?',
-              answer:
-                'China pricing reflects a regional adjustment (~1/3 of global USD pricing) shown in CNY. This aligns with regional market expectations while keeping the miles economy consistent worldwide.',
-            },
-          ].map((faq, i) => (
-            <div key={i} className="bg-white border border-border p-6">
-              <h3 className="font-semibold text-text-primary mb-2">{faq.question}</h3>
-              <p className="text-text-muted text-sm">{faq.answer}</p>
+      {/* T2: Tier Cards */}
+      <section
+        id="pricing-tier-cards"
+        style={{
+          background: DS.bg,
+          padding: '64px 24px',
+        }}
+      >
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          {/* Section heading */}
+          <div style={{ marginBottom: 48, textAlign: 'center' }}>
+            <div
+              style={{
+                fontFamily: DS.monoFont,
+                fontSize: 12,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: DS.eyebrow,
+                marginBottom: 16,
+              }}
+            >
+              [Emily: tier cards eyebrow]
             </div>
-          ))}
-        </div>
-      </div>
+            <h2
+              style={{
+                fontFamily: DS.headingFont,
+                fontSize: 36,
+                lineHeight: 1.2,
+                color: DS.text,
+                margin: 0,
+                fontWeight: 600,
+              }}
+            >
+              [Emily: tier cards headline]
+            </h2>
+          </div>
 
-      {/* CTA */}
-      <div className="max-w-4xl mx-auto px-4 pb-16">
-        <div className="bg-accent p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">Ready to Elevate Your Leadership?</h2>
-          <p className="mb-6 opacity-90">
-            Join {CANONICAL_TIER_PRICING[RECOMMENDED_TIER].label} today and unlock Executive Intelligence with the full NEXUS miles economy.
-          </p>
-          <button
-            onClick={() => handleUpgrade(RECOMMENDED_TIER)}
-            disabled={loadingTier !== null}
-            className="bg-white text-accent px-8 py-3 font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
+          {/* Billing toggle (duplicate from hero for convenience) */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom: 48,
+            }}
           >
-            {loadingTier === RECOMMENDED_TIER ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                Upgrade to {CANONICAL_TIER_PRICING[RECOMMENDED_TIER].label}
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
+            <BillingToggleMini cycle={cycle} onChange={setCycle} />
+          </div>
+
+          {/* Tier cards grid — 5-col desktop, 2-col tablet, 1-col mobile */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(5, 1fr)',
+              gap: 20,
+            }}
+          >
+            {PRICING_TIERS.map((tier) => (
+              <TierCard
+                key={tier.key}
+                tier={tier}
+                cycle={cycle}
+                currency={currency}
+                cta={getCta(tier.key)}
+                onSelect={() => handleSelectTier(tier.key, cycle)}
+              />
+            ))}
+          </div>
+
+          {/* Money-back guarantee note */}
+          <div
+            style={{
+              marginTop: 40,
+              textAlign: 'center',
+              fontFamily: DS.bodyFont,
+              fontSize: 14,
+              color: DS.muted,
+            }}
+          >
+            [Emily: guarantee text — 7/14/30-day money-back. Mapped to positioning doc §guarantee.]
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* T3: Feature Comparison */}
+      <FeatureComparisonTable />
+
+      {/* T7: Mile Packs */}
+      <MilePacksSection />
+
+      {/* T8: Human Debriefs */}
+      <DebriefsSection cycle={cycle} currency={currency} />
+
+      {/* T6: FAQ */}
+      <PricingFAQ />
+
+      {/* Mobile responsive CSS override — tier card grid breakpoints */}
+      <style>{`
+        @media (max-width: 1024px) {
+          #pricing-tier-cards > div > div[style*="grid-template-columns: repeat(5"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+        }
+        @media (max-width: 768px) {
+          #pricing-tier-cards > div > div[style*="grid-template-columns: repeat(5"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+        @media (max-width: 600px) {
+          #pricing-tier-cards > div > div[style*="grid-template-columns: repeat(5"] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+    </>
+  );
+}
+
+/** Compact billing toggle used above the tier cards grid. */
+function BillingToggleMini({
+  cycle,
+  onChange,
+}: {
+  cycle: BillingCycle;
+  onChange: (c: BillingCycle) => void;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 16,
+        padding: '6px 16px',
+        background: DS.bgAlt,
+        border: `1px solid ${DS.border}`,
+      }}
+    >
+      <span
+        style={{
+          fontFamily: DS.bodyFont,
+          fontSize: 14,
+          fontWeight: cycle === 'monthly' ? 600 : 400,
+          color: cycle === 'monthly' ? DS.text : DS.muted,
+          cursor: 'pointer',
+        }}
+        onClick={() => onChange('monthly')}
+      >
+        Monthly
+      </span>
+      <button
+        onClick={() => onChange(cycle === 'monthly' ? 'annual' : 'monthly')}
+        style={{
+          width: 48,
+          height: 24,
+          border: 'none',
+          background: cycle === 'annual' ? DS.accent : DS.borderStrong,
+          cursor: 'pointer',
+          padding: 0,
+          position: 'relative',
+          transition: DS.transition,
+        }}
+        aria-label="Toggle billing cycle"
+      >
+        <span
+          style={{
+            position: 'absolute',
+            top: 2,
+            left: cycle === 'annual' ? 26 : 2,
+            width: 18,
+            height: 18,
+            background: DS.bg,
+            transition: DS.transition,
+          }}
+        />
+      </button>
+      <span
+        style={{
+          fontFamily: DS.bodyFont,
+          fontSize: 14,
+          fontWeight: cycle === 'annual' ? 600 : 400,
+          color: cycle === 'annual' ? DS.text : DS.muted,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+        onClick={() => onChange('annual')}
+      >
+        Annual
+        <span
+          style={{
+            fontFamily: DS.monoFont,
+            fontSize: 11,
+            letterSpacing: '0.05em',
+            color: DS.accent,
+            border: `1px solid ${DS.accent}`,
+            padding: '2px 6px',
+          }}
+        >
+          SAVE 15%
+        </span>
+      </span>
     </div>
   );
 }

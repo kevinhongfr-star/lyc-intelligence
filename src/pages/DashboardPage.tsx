@@ -12,7 +12,7 @@ import { getMemoryContextForUser, formatAssessmentForInjection } from '../servic
 import { getSupabase } from '../services/supabaseApi';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   accent: '#C108AB',
   accentHover: '#A00790',
@@ -24,8 +24,8 @@ const DS = {
   textSecondary: '#333333',
   muted: '#666666',
   border: '#E5E5E5',
-  radius: '12px',
-  radiusSm: '8px',
+  radius: '0',
+  radiusSm: '0',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1)',
 };
@@ -203,7 +203,7 @@ export function DashboardPage() {
 
         {/* Row 1: Career Summary Card */}
         <div style={{ 
-          background: 'linear-gradient(135deg, rgba(193,8,171,0.15), rgba(99,102,241,0.1))',
+          background: 'linear-gradient(135deg, rgba(193,8,171,0.06), rgba(99,102,241,0.06))',
           border: `1px solid ${DS.accent}40`,
           padding: '24px',
           marginBottom: '24px'
@@ -243,17 +243,17 @@ export function DashboardPage() {
                 {getNextAction()}
               </p>
             </div>
-            {/* Phase 11.2 — Nexus CTA after assessment */}
+            {/* Phase 11.2 — NEXUS CTA after assessment */}
             {assessment && (
               <div style={{ background: `${DS.accent}08`, border: `1px solid ${DS.accent}25`,  padding: '20px', marginTop: '16px' }}>
                 <p style={{ color: DS.textSecondary, fontSize: '14px', margin: '0 0 12px', fontFamily: DS.headingFont }}>
-                  Nexus has context from your assessment. Ask it anything about your results or next steps.
+                  NEXUS has context from your assessment. Ask it anything about your results or next steps.
                 </p>
                 <a
                   href={`/nexus?context=dashboard&archetype=${encodeURIComponent(assessment.archetype || '')}`}
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', background: DS.accent, color: '#fff',  textDecoration: 'none', fontWeight: 600, fontSize: '13px' }}
                 >
-                  Continue with Nexus →
+                  Continue with NEXUS →
                 </a>
               </div>
             )}
@@ -265,7 +265,7 @@ export function DashboardPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
           <ActionCard
             icon={MessageSquare}
-            title="Continue with Nexus"
+            title="Continue with NEXUS"
             description="Get personalized advice based on your profile"
             color={DS.accent}
             onClick={() => navigate('/nexus')}
@@ -387,12 +387,12 @@ export function DashboardPage() {
           </div>
         </div>
 
-        {/* Row 4: Nexus Suggestions */}
+        {/* Row 4: NEXUS Suggestions */}
         {suggestions.length > 0 && (
           <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '20px', marginBottom: '24px' }}>
             <h3 style={{ fontFamily: DS.headingFont, fontSize: '16px', fontWeight: 600, color: DS.text, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Sparkles style={{ width: 18, height: 18, color: DS.accent }} />
-              Suggested by Nexus
+              Suggested by NEXUS
             </h3>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {suggestions.map((suggestion, i) => (

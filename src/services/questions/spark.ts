@@ -24,7 +24,8 @@ export interface SPARKDimensionBank {
 }
 
 export const INSTRUMENT = "SPARK";
-export const FULL_NAME = "AI Leadership Readiness & Enterprise Governance";
+export const FULL_NAME = "SPARK — AI leadership readiness";
+export const B2C_NAME = "SPARK — AI leadership readiness";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 27;
 export const SCALE = "1-5 Likert";
@@ -33,12 +34,12 @@ export const DELIVERY_MINUTES = 9;
 export const DIMENSIONS: SPARKDimensionBank[] = [
   {
     id: "D1",
-    name: "INDIVIDUAL AI ADOPTION READINESS (IAAR)",
+    name: "Individual AI Adoption Readiness",
     count: 9,
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q03", "Q05", "Q08"],
     questions: [
       {
         id: "Q01",
@@ -116,12 +117,12 @@ export const DIMENSIONS: SPARKDimensionBank[] = [
   },
   {
     id: "D2",
-    name: "CAPABILITY EXPOSURE ASSESSMENT (CEA)",
+    name: "Capability Exposure Assessment",
     count: 9,
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q11", "Q14", "Q17"],
     questions: [
       {
         id: "Q10",
@@ -199,12 +200,12 @@ export const DIMENSIONS: SPARKDimensionBank[] = [
   },
   {
     id: "D3",
-    name: "ORGANISATIONAL PREPAREDNESS (OP)",
+    name: "Organisational Preparedness",
     count: 9,
     max_raw: null,
     formula: null,
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q21", "Q24", "Q26"],
     questions: [
       {
         id: "Q19",

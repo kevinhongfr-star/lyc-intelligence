@@ -1,0 +1,795 @@
+{
+  "meta": {
+    "id": "prism",
+    "title": "PRISM",
+    "subtitle": "Career & Professional Branding Diagnostic",
+    "accent_color": "#0f172a",
+    "total_questions": 30,
+    "total_dimensions": 5,
+    "tier_key": "executive_introduction",
+    "status": "placeholder"
+  },
+  "dimensions": [
+    {
+      "key": "d1_brand_clarity",
+      "name": "Brand Clarity",
+      "description": "How clearly defined and articulated your professional brand identity is — do you know what you stand for and can you articulate it?",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 1
+    },
+    {
+      "key": "d2_market_legibility",
+      "name": "Market Legibility",
+      "description": "How easily your target audience can understand what you do, what value you offer, and where you fit in the market.",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 2
+    },
+    {
+      "key": "d3_identity_consistency",
+      "name": "Identity Consistency",
+      "description": "How consistent your brand is across channels, contexts, and interactions — does your LinkedIn match your in-person presence match your work output?",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 3
+    },
+    {
+      "key": "d4_narrative_power",
+      "name": "Narrative Power",
+      "description": "How compelling and memorable your professional story is — can you communicate your value in a way that resonates and sticks?",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 4
+    },
+    {
+      "key": "d5_visibility_level",
+      "name": "Visibility Level",
+      "description": "How visible you are to your target audience — both in terms of presence in relevant spaces and recognition for your expertise.",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 5
+    }
+  ],
+  "archetypes": [
+    {
+      "key": "the_authority",
+      "name": "The Authority",
+      "description": "Established expert with a clear, consistent brand that's widely recognized in their field.",
+      "key_traits": [
+        "Credibility",
+        "Recognition",
+        "Market position"
+      ],
+      "sort_order": 1
+    },
+    {
+      "key": "the_signal",
+      "name": "The Signal",
+      "description": "Highly visible professional whose brand cuts through the noise, though the message may be scattered.",
+      "key_traits": [
+        "Visibility",
+        "Reach",
+        "Ability to get attention"
+      ],
+      "sort_order": 2
+    },
+    {
+      "key": "the_monument",
+      "name": "The Monument",
+      "description": "Well-known but with a brand that feels dated, static, or misaligned with current goals.",
+      "key_traits": [
+        "Name recognition",
+        "Track record"
+      ],
+      "sort_order": 3
+    },
+    {
+      "key": "the_chameleon",
+      "name": "The Chameleon",
+      "description": "Adaptable professional with a strong but context-dependent brand — fits in everywhere but lacks a distinct signature.",
+      "key_traits": [
+        "Adaptability",
+        "Cross-context fit",
+        "Likability"
+      ],
+      "sort_order": 4
+    },
+    {
+      "key": "the_amplifier",
+      "name": "The Amplifier",
+      "description": "Solid professional brand with good visibility and growing clarity — on the cusp of breaking through.",
+      "key_traits": [
+        "Momentum",
+        "Balanced profile",
+        "Growth trajectory"
+      ],
+      "sort_order": 5
+    },
+    {
+      "key": "the_operator",
+      "name": "The Operator",
+      "description": "Competent behind-the-scenes operator whose brand doesn't match their actual capability.",
+      "key_traits": [
+        "Substance",
+        "Delivery",
+        "Results"
+      ],
+      "sort_order": 6
+    },
+    {
+      "key": "the_ghost",
+      "name": "The Ghost",
+      "description": "Clear, consistent brand that almost no one sees — high substance, low visibility.",
+      "key_traits": [
+        "Clarity",
+        "Consistency",
+        "Authenticity"
+      ],
+      "sort_order": 7
+    },
+    {
+      "key": "the_mask",
+      "name": "The Mask",
+      "description": "Professional whose public persona feels like a performance — careful, controlled, but not fully authentic.",
+      "key_traits": [
+        "Polish",
+        "Professionalism",
+        "Risk avoidance"
+      ],
+      "sort_order": 8
+    },
+    {
+      "key": "the_static",
+      "name": "The Static",
+      "description": "Brand is scattered and hard to see — mixed signals across channels and no clear positioning.",
+      "key_traits": [
+        "Growth potential",
+        "Blank canvas opportunity"
+      ],
+      "sort_order": 9
+    },
+    {
+      "key": "the_blank_page",
+      "name": "The Blank Page",
+      "description": "Early-stage professional or career changer who hasn't yet built a defined professional brand.",
+      "key_traits": [
+        "Fresh start",
+        "Unlimited potential"
+      ],
+      "sort_order": 10
+    }
+  ],
+  "questions": [
+    {
+      "key": "q_001",
+      "type": "scale",
+      "prompt": "Placeholder question 1 for Brand Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_brand_clarity",
+      "weight": 1.0,
+      "sort_order": 1,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_002",
+      "type": "scale",
+      "prompt": "Placeholder question 2 for Market Legibility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_market_legibility",
+      "weight": 1.0,
+      "sort_order": 2,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_003",
+      "type": "single_select",
+      "prompt": "Placeholder question 3 for Identity Consistency dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_identity_consistency",
+      "weight": 1.0,
+      "sort_order": 3,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ],
+      "skip_logic": [
+        {
+          "condition": {
+            "question_id": "q_003",
+            "operator": "equals",
+            "value": "c"
+          },
+          "action": "jump_to",
+          "target": "q_007"
+        }
+      ]
+    },
+    {
+      "key": "q_004",
+      "type": "scale",
+      "prompt": "Placeholder question 4 for Narrative Power dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_narrative_power",
+      "weight": 1.0,
+      "sort_order": 4,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_005",
+      "type": "single_select",
+      "prompt": "Placeholder question 5 for Visibility Level dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_visibility_level",
+      "weight": 1.0,
+      "sort_order": 5,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_006",
+      "type": "scale",
+      "prompt": "Placeholder question 6 for Brand Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_brand_clarity",
+      "weight": 1.0,
+      "sort_order": 6,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_007",
+      "type": "scale",
+      "prompt": "Placeholder question 7 for Market Legibility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_market_legibility",
+      "weight": 1.0,
+      "sort_order": 7,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_008",
+      "type": "single_select",
+      "prompt": "Placeholder question 8 for Identity Consistency dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_identity_consistency",
+      "weight": 1.0,
+      "sort_order": 8,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_009",
+      "type": "scale",
+      "prompt": "Placeholder question 9 for Narrative Power dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_narrative_power",
+      "weight": 1.0,
+      "sort_order": 9,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_010",
+      "type": "single_select",
+      "prompt": "Placeholder question 10 for Visibility Level dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_visibility_level",
+      "weight": 1.0,
+      "sort_order": 10,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_011",
+      "type": "scale",
+      "prompt": "Placeholder question 11 for Brand Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_brand_clarity",
+      "weight": 1.0,
+      "sort_order": 11,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_012",
+      "type": "scale",
+      "prompt": "Placeholder question 12 for Market Legibility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_market_legibility",
+      "weight": 1.0,
+      "sort_order": 12,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_013",
+      "type": "single_select",
+      "prompt": "Placeholder question 13 for Identity Consistency dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_identity_consistency",
+      "weight": 1.0,
+      "sort_order": 13,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_014",
+      "type": "scale",
+      "prompt": "Placeholder question 14 for Narrative Power dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_narrative_power",
+      "weight": 1.0,
+      "sort_order": 14,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_015",
+      "type": "single_select",
+      "prompt": "Placeholder question 15 for Visibility Level dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_visibility_level",
+      "weight": 1.0,
+      "sort_order": 15,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_016",
+      "type": "scale",
+      "prompt": "Placeholder question 16 for Brand Clarity dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_brand_clarity",
+      "weight": 1.0,
+      "sort_order": 16,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_017",
+      "type": "scale",
+      "prompt": "Placeholder question 17 for Market Legibility dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_market_legibility",
+      "weight": 1.0,
+      "sort_order": 17,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_018",
+      "type": "single_select",
+      "prompt": "Placeholder question 18 for Identity Consistency dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_identity_consistency",
+      "weight": 1.0,
+      "sort_order": 18,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_019",
+      "type": "scale",
+      "prompt": "Placeholder question 19 for Narrative Power dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_narrative_power",
+      "weight": 1.0,
+      "sort_order": 19,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_020",
+      "type": "single_select",
+      "prompt": "Placeholder question 20 for Visibility Level dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_visibility_level",
+      "weight": 1.0,
+      "sort_order": 20,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 5
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 3
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "key": "q_021",
+      "type": "scale",
+      "prompt": "TODO: Add missing question 21 for dimension D1 (Brand Clarity) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_brand_clarity",
+      "weight": 1.0,
+      "sort_order": 21,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_022",
+      "type": "scale",
+      "prompt": "TODO: Add missing question 22 for dimension D1 (Brand Clarity) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_brand_clarity",
+      "weight": 1.0,
+      "sort_order": 22,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_023",
+      "type": "scale",
+      "prompt": "TODO: Add missing question 23 for dimension D2 (Market Legibility) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_market_legibility",
+      "weight": 1.0,
+      "sort_order": 23,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_024",
+      "type": "scale",
+      "prompt": "TODO: Add missing question 24 for dimension D2 (Market Legibility) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_market_legibility",
+      "weight": 1.0,
+      "sort_order": 24,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_025",
+      "type": "scale",
+      "prompt": "TODO: Add missing question 25 for dimension D3 (Identity Consistency) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_identity_consistency",
+      "weight": 1.0,
+      "sort_order": 25,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_026",
+      "type": "scale",
+      "prompt": "TODO: Add missing question 26 for dimension D3 (Identity Consistency) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_identity_consistency",
+      "weight": 1.0,
+      "sort_order": 26,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_027",
+      "type": "scale",
+      "prompt": "TODO: Add missing question 27 for dimension D4 (Narrative Power) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_narrative_power",
+      "weight": 1.0,
+      "sort_order": 27,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_028",
+      "type": "scale",
+      "prompt": "TODO: Add missing question 28 for dimension D4 (Narrative Power) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_narrative_power",
+      "weight": 1.0,
+      "sort_order": 28,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_029",
+      "type": "scale",
+      "prompt": "TODO: Add missing question 29 for dimension D5 (Visibility Level) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_visibility_level",
+      "weight": 1.0,
+      "sort_order": 29,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_030",
+      "type": "scale",
+      "prompt": "TODO: Add missing question 30 for dimension D5 (Visibility Level) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_visibility_level",
+      "weight": 1.0,
+      "sort_order": 30,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    }
+  ],
+  "scoring": {
+    "method": "weighted_average",
+    "overall_formula": "dimension_weighted_avg",
+    "archetype_mapping": "highest_dimension_combo"
+  },
+  "result_insights": {
+    "high": "Your strengths in this dimension are notable. You demonstrate advanced capabilities that set you apart in PRISM.",
+    "medium": "You are developing well in this area. With focused effort, you can elevate your PRISM capabilities to the next level.",
+    "low": "This is an area for growth. Consider targeted development activities to strengthen your PRISM foundation."
+  }
+}

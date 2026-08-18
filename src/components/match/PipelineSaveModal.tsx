@@ -168,7 +168,7 @@ export function PipelineSaveModal({ open, onClose, result, contactId, candidateN
           <>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <h3 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '18px', fontWeight: 700, margin: 0 }}>
+              <h3 style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontSize: '18px', fontWeight: 700, margin: 0 }}>
                 Save to Pipeline
               </h3>
               <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>

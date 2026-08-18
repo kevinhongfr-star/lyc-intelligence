@@ -1,32 +1,30 @@
 import React from 'react';
+import { DS } from '@/tokens';
+import { Logo } from '@/components/ui/Logo';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  monoFont: "'IBM Plex Mono', ui-monospace, monospace",
-  accent: '#C108AB',
-  bg: '#0A0A12',
-  border: '#1E1E2C',
-  text: '#FFFFFF',
-  muted: 'rgba(255,255,255,0.55)',
-  mutedDarker: 'rgba(255,255,255,0.35)',
-  radius: '0px',
-};
+/**
+ * #1377 — Footer redesign (premium, B2C-focused).
+ *
+ * Brand spec v1.2:
+ *   - Light background (#F9FAFB) with dark text — clean, modern, not SaaS-y
+ *   - Column headers as light-gray eyebrows (#9CA3AF), not accent color
+ *   - Zero border radius (global CSS enforces this)
+ *   - official LYC wordmark image, DM Sans body, IBM Plex Mono bottom bar
+ *   - One accent (#C108AB) used only for the CTA button
+ *   - B2B links removed from main columns; tiny "For Business" in bottom bar
+ *   - Mobile-responsive: single-column stack below 768px
+ */
 
 const links = {
-  brand: [
-    { href: '/', label: 'LYC Intelligence' },
-  ],
-  platform: [
-    { href: '/nexus/chat', label: 'NEXUS AI' },
-    { href: '/assessment', label: 'Assessments (11)' },
-    { href: '/match', label: 'Match Analysis' },
-  ],
-  company: [
-    { href: 'https://lyc-partners.ai', label: 'LYC Partners', external: true },
+  product: [
+    { href: '/assessments', label: 'Leadership Assessments' },
+    { href: '/nexus', label: 'NEXUS' },
     { href: '/pricing', label: 'Pricing' },
+  ],
+  resources: [
     { href: '/terms', label: 'Terms' },
     { href: '/privacy', label: 'Privacy' },
+    { href: '/cookies', label: 'Cookies' },
   ],
 };
 
@@ -37,88 +35,82 @@ export function UnifiedFooter() {
       style={{
         background: DS.bg,
         borderTop: `1px solid ${DS.border}`,
-        padding: '64px 32px 24px',
+        padding: '56px 32px 24px',
         margin: 0,
         width: '100%',
+        fontFamily: DS.bodyFont,
       }}
     >
       <div
         style={{
-          maxWidth: '1120px',
+          maxWidth: '1080px',
           margin: '0 auto',
           display: 'grid',
           gridTemplateColumns: '1.5fr 1fr 1fr 1fr',
-          gap: '48px',
+          gap: '40px',
         }}
+        className="footer-grid"
       >
         {/* Brand */}
         <div>
-          <a
-            href="/"
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: '20px',
-              fontWeight: 700,
-              color: DS.text,
-              textDecoration: 'none',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            LYC Intelligence
-          </a>
+          {/* V1.1 FIX 2: Footer bg is DS.bg (light mist) → light variant = dark wordmark */}
+          <Logo variant="light" size="lg" />
           <p
             style={{
-              fontFamily: DS.bodyFont,
               fontSize: '13px',
               color: DS.muted,
-              marginTop: '16px',
+              marginTop: '14px',
               lineHeight: 1.6,
-              maxWidth: '280px',
+              maxWidth: '260px',
             }}
           >
-            The intelligent front door to leadership intelligence. Assessment-driven insight for executives,
-            boards, and the firms that advise them.
+            Assessment-driven leadership intelligence for executives navigating
+            cross-border careers and senior transitions.
           </p>
           <div
             style={{
-              marginTop: '20px',
+              marginTop: '18px',
               fontFamily: DS.monoFont,
-              fontSize: '11px',
-              color: DS.mutedDarker,
-              letterSpacing: '0.08em',
+              fontSize: '10px',
+              color: DS.eyebrow,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
             }}
           >
-            NEXUS · 11 INSTRUMENTS · MILES ECONOMY
+            6 Assessments · NEXUS · APAC
           </div>
         </div>
 
-        {/* Platform */}
+        {/* Product */}
         <div>
           <div
             style={{
-              fontFamily: DS.bodyFont,
+              fontFamily: DS.monoFont,
               fontSize: '10px',
-              fontWeight: 700,
+              fontWeight: 500,
               textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: DS.accent,
+              letterSpacing: '0.12em',
+              color: DS.eyebrow,
               marginBottom: '16px',
             }}
           >
-            Platform
+            Product
           </div>
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {links.platform.map(l => (
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }} aria-label="Product">
+            {links.product.map(l => (
               <a
                 key={l.href}
                 href={l.href}
                 style={{
-                  fontFamily: DS.bodyFont,
                   fontSize: '13px',
-                  color: DS.muted,
+                  color: DS.textSecondary,
                   textDecoration: 'none',
-                  transition: 'color 0.2s ease',
+                  transition: 'color 200ms cubic-bezier(0.4,0,0.2,1)',
+                  minHeight: '20px',
+                  display: 'inline-block',
                 }}
+                onMouseEnter={e => (e.currentTarget.style.color = DS.accent)}
+                onMouseLeave={e => (e.currentTarget.style.color = DS.textSecondary)}
               >
                 {l.label}
               </a>
@@ -126,35 +118,36 @@ export function UnifiedFooter() {
           </nav>
         </div>
 
-        {/* Company */}
+        {/* Resources */}
         <div>
           <div
             style={{
-              fontFamily: DS.bodyFont,
+              fontFamily: DS.monoFont,
               fontSize: '10px',
-              fontWeight: 700,
+              fontWeight: 500,
               textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: DS.accent,
+              letterSpacing: '0.12em',
+              color: DS.eyebrow,
               marginBottom: '16px',
             }}
           >
-            Company
+            Legal
           </div>
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {links.company.map(l => (
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }} aria-label="Legal">
+            {links.resources.map(l => (
               <a
                 key={l.href}
                 href={l.href}
-                target={l.external ? '_blank' : undefined}
-                rel={l.external ? 'noopener noreferrer' : undefined}
                 style={{
-                  fontFamily: DS.bodyFont,
                   fontSize: '13px',
-                  color: DS.muted,
+                  color: DS.textSecondary,
                   textDecoration: 'none',
-                  transition: 'color 0.2s ease',
+                  transition: 'color 200ms cubic-bezier(0.4,0,0.2,1)',
+                  minHeight: '20px',
+                  display: 'inline-block',
                 }}
+                onMouseEnter={e => (e.currentTarget.style.color = DS.accent)}
+                onMouseLeave={e => (e.currentTarget.style.color = DS.textSecondary)}
               >
                 {l.label}
               </a>
@@ -162,57 +155,61 @@ export function UnifiedFooter() {
           </nav>
         </div>
 
-        {/* Contact / CTA */}
+        {/* CTA */}
         <div>
           <div
             style={{
-              fontFamily: DS.bodyFont,
+              fontFamily: DS.monoFont,
               fontSize: '10px',
-              fontWeight: 700,
+              fontWeight: 500,
               textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: DS.accent,
+              letterSpacing: '0.12em',
+              color: DS.eyebrow,
               marginBottom: '16px',
             }}
           >
-            Start
+            Get Started
           </div>
           <a
-            href="/nexus/chat"
+            href="/nexus"
             style={{
-              display: 'inline-block',
-              fontFamily: DS.bodyFont,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               fontSize: '13px',
-              fontWeight: 700,
+              fontWeight: 600,
               color: '#FFFFFF',
               background: DS.accent,
-              padding: '12px 20px',
+              padding: '12px 22px',
               textDecoration: 'none',
-              letterSpacing: '0.08em',
+              letterSpacing: '0.06em',
               textTransform: 'uppercase',
-              borderRadius: DS.radius,
-              marginBottom: '16px',
+              minHeight: '44px',
+              transition: 'background 200ms cubic-bezier(0.4,0,0.2,1)',
             }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#A00790')}
+            onMouseLeave={e => (e.currentTarget.style.background = DS.accent)}
           >
-            Try NEXUS
+            Meet NEXUS
           </a>
-          <div
+          <p
             style={{
-              fontFamily: DS.bodyFont,
               fontSize: '12px',
-              color: DS.mutedDarker,
+              color: DS.muted,
               lineHeight: 1.6,
+              marginTop: '14px',
             }}
           >
-            Executive intelligence on demand. One click from anywhere.
-          </div>
+            Executive Introduction · No credit card required
+          </p>
         </div>
       </div>
 
+      {/* Bottom bar */}
       <div
         style={{
-          maxWidth: '1120px',
-          margin: '56px auto 0',
+          maxWidth: '1080px',
+          margin: '48px auto 0',
           paddingTop: '20px',
           borderTop: `1px solid ${DS.border}`,
           display: 'flex',
@@ -222,24 +219,36 @@ export function UnifiedFooter() {
           gap: '12px',
         }}
       >
-        <div
-          style={{
-            fontFamily: DS.bodyFont,
-            fontSize: '12px',
-            color: DS.mutedDarker,
-          }}
-        >
-          © {new Date().getFullYear()} LYC Intelligence by LYC Partners.
+        <div style={{ fontSize: '12px', color: DS.muted }}>
+          &copy; {new Date().getFullYear()} LYC Intelligence by LYC Partners.
         </div>
-        <div
-          style={{
-            fontFamily: DS.monoFont,
-            fontSize: '11px',
-            color: DS.mutedDarker,
-            letterSpacing: '0.08em',
-          }}
-        >
-          KNOW WHERE YOU STAND. KNOW WHERE TO GO.
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <a
+            href="/b2b"
+            style={{
+              fontFamily: DS.monoFont,
+              fontSize: '10px',
+              color: DS.eyebrow,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+              transition: 'color 200ms cubic-bezier(0.4,0,0.2,1)',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = DS.textSecondary)}
+            onMouseLeave={e => (e.currentTarget.style.color = DS.eyebrow)}
+          >
+            For Business
+          </a>
+          <div
+            style={{
+              fontFamily: DS.monoFont,
+              fontSize: '10px',
+              color: DS.eyebrow,
+              letterSpacing: '0.12em',
+            }}
+          >
+            Know where you stand. Know where to go.
+          </div>
         </div>
       </div>
     </footer>

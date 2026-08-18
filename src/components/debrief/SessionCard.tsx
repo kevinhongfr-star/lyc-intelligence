@@ -1,154 +1,552 @@
-import React from 'react';
-import { Clock, Users, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
+/**
+ * W1-T2 — SessionCard.tsx
+ *
+ * Reusable session card component for the debrief booking system.
+ * 4 instances for 4 session types in SESSION_CATALOG.
+ *
+ * Follows TierCard.tsx patterns:
+ *  - Inline style objects, no Tailwind
+ *  - Radius = 0 always (brand rule)
+ *  - Font trio: serif headings, sans body, mono labels
+ *  - DS/ACCENT tokens from @/tokens
+ *  - ALL pricing math via calculateSessionPrice() from sessions.ts
+ *  - All copy/data from sessions.ts config — no hardcoded descriptions
+ *
+ * Fields:
+ *  - Session name, duration, coach type label
+ *  - Base price (strikethrough when userTier + discount apply)
+ *  - Tier-discounted price with "% off" badge (when userTier provided)
+ *  - Annual stacking indicator: "Extra 10% off with annual plan"
+ *  - Free session indicator: "You have X free session(s) this month"
+ *  - "Best for" bullets (3) from session.bestForPlaceholders
+ *  - "What you get" collapsed section from session.whatYouGetPlaceholders
+ *  - CPI deep-dive = flagship badge + border accent
+ *  - Council-only soft gate: "Council-only" + upgrade CTA
+ */
+import React, { useState } from 'react';
+import { DS, ACCENT } from '@/tokens';
 import {
-  SESSION_BUCKETS,
-  SESSION_TYPES,
-  type SessionKey,
-  type SessionTypeKey,
+  type SessionType,
+  type BillingCycle,
+  type PricingCurrency,
+  calculateSessionPrice,
+  formatSessionPrice,
+  COACH_TYPES,
+  getComplimentaryAllocation,
+  allocationCoversSession,
 } from '@/config/sessions';
-import { INSTRUMENT_MILE_COST, getMileCostTier } from '@/constants/miles';
-import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
+import { tierMeets, tierDisplayName, type TierKey } from '@/config/tiers';
 
 export interface SessionCardProps {
-  session: SessionKey;
-  instrument: string;
-  currency?: 'USD' | 'CNY';
-  onBook?: (sessionKey: SessionKey, sessionType: SessionTypeKey) => void;
+  session: SessionType;
+  userTier?: TierKey | string | null | undefined;
+  billingCycle?: BillingCycle;
+  currency?: PricingCurrency;
+  showCta?: boolean;
+  onBookClick?: (session: SessionType) => void;
+  complimentaryRemaining?: number;
 }
 
-function getInstrumentDisplayName(code: string): { name: string; miles: number; tierLabel: string } {
-  const isCPI = code === 'CPI';
-  const miles = INSTRUMENT_MILE_COST[code] ?? 2;
-  const tier = getMileCostTier(code);
-  const catalog = ASSESSMENT_CATALOG[code];
-  const name = isCPI ? 'China Leadership Pipeline Index' : catalog?.b2cName || catalog?.name || code;
-  const tierLabel = tier?.label ?? 'Standard';
-  return { name, miles, tierLabel };
-}
+export function SessionCard({
+  session,
+  userTier = null,
+  billingCycle = 'monthly',
+  currency = 'USD',
+  showCta = true,
+  onBookClick,
+  complimentaryRemaining,
+}: SessionCardProps) {
+  const [whatYouGetOpen, setWhatYouGetOpen] = useState(false);
 
-export function SessionCard({ session, instrument, currency = 'USD', onBook }: SessionCardProps) {
-  const config = SESSION_BUCKETS[session];
-  const instrumentInfo = getInstrumentDisplayName(instrument);
-  const isCPI = instrument === 'CPI';
-  const recommendedTypes: readonly SessionTypeKey[] = (SESSION_BUCKETS as any)[session]
-    ? (() => {
-        const recs: Record<string, readonly SessionTypeKey[]> = {
-          light_30: ['expert'],
-          standard_45: ['coach', 'expert'],
-          signature_60: ['consultant', 'coach'],
-          flagship_90: ['cpi_specialist', 'consultant'],
-        };
-        return recs[session] ?? ['expert'];
-      })()
-    : ['expert'];
+  const pricing = calculateSessionPrice({
+    session,
+    userTier,
+    billingCycle,
+    currency,
+  });
 
-  const headline = isCPI
-    ? `${instrumentInfo.name} — ${config.durationMinutes}-min Flagship Debrief`
-    : `${instrumentInfo.name} — ${config.durationMinutes}-min ${config.label.replace(' Debrief', '')} Debrief`;
+  const coachMeta = COACH_TYPES[session.coachType];
+  const userMeetsTier = tierMeets(userTier, session.requiredTier);
+
+  const alloc = getComplimentaryAllocation(userTier);
+  const coverageStatus = alloc ? allocationCoversSession(alloc, session) : 'none';
+  const isEligibleComplimentary =
+    session.eligibleForComplimentary && coverageStatus !== 'none';
+  const showFreeIndicator =
+    isEligibleComplimentary &&
+    complimentaryRemaining !== undefined &&
+    complimentaryRemaining > 0;
+
+  const isCpiFlagship = session.isCpiFlagship;
 
   return (
-    <Card className={cn(
-      'w-full h-full flex flex-col transition-all hover:shadow-lg',
-      config.bucket === 'flagship' && 'ring-2 ring-accent'
-    )}>
-      <CardHeader>
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <Badge variant="info" size="sm">
-              {config.label}
-            </Badge>
-            {config.bucket === 'flagship' && (
-              <Badge variant="success" size="sm">
-                Recommended for CPI
-              </Badge>
+    <div
+      style={{
+        background: DS.card,
+        border: isCpiFlagship
+          ? `2px solid ${ACCENT}`
+          : `1px solid ${DS.border}`,
+        padding: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        transition: DS.transition,
+        boxShadow: isCpiFlagship ? DS.shadowLg : DS.shadow,
+      }}
+    >
+      {isCpiFlagship && (
+        <div
+          style={{
+            position: 'absolute',
+            top: -1,
+            left: -1,
+            right: -1,
+            background: ACCENT,
+            color: DS.bg,
+            fontFamily: DS.monoFont,
+            fontSize: 11,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            textAlign: 'center',
+            padding: '6px 0',
+            fontWeight: 600,
+          }}
+        >
+          Flagship
+        </div>
+      )}
+
+      <div
+        style={{
+          padding: isCpiFlagship ? '40px 24px 24px' : '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+        }}
+      >
+        {/* Session name */}
+        <div
+          style={{
+            fontFamily: DS.headingFont,
+            fontSize: 22,
+            fontWeight: 600,
+            color: DS.text,
+            marginBottom: 4,
+            lineHeight: 1.25,
+          }}
+        >
+          {session.displayName}
+        </div>
+
+        {/* Short descriptor */}
+        <p
+          style={{
+            fontFamily: DS.bodyFont,
+            fontSize: 14,
+            lineHeight: 1.5,
+            color: DS.textSecondary,
+            margin: '0 0 16px',
+          }}
+        >
+          {session.shortDescriptor}
+        </p>
+
+        {/* Duration + Coach type meta row */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+            alignItems: 'center',
+            marginBottom: 20,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: DS.monoFont,
+              fontSize: 11,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: DS.muted,
+              padding: '4px 10px',
+              background: DS.bgAlt,
+              border: `1px solid ${DS.border}`,
+            }}
+          >
+            {session.durationMinutes} MIN
+          </div>
+          <div
+            style={{
+              fontFamily: DS.monoFont,
+              fontSize: 11,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: ACCENT,
+              padding: '4px 10px',
+              background: `${ACCENT}14`,
+              border: `1px solid ${ACCENT}40`,
+            }}
+          >
+            {coachMeta.displayName}
+          </div>
+        </div>
+
+        {/* Pricing block */}
+        <div style={{ marginBottom: 20 }}>
+          {pricing.isFullyComplimentary ? (
+            <div
+              style={{
+                fontFamily: DS.headingFont,
+                fontSize: 32,
+                fontWeight: 600,
+                color: DS.text,
+              }}
+            >
+              Complimentary
+            </div>
+          ) : (
+            <>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+                {/* Base price (strikethrough if any discount applies) */}
+                {pricing.hasAnyDiscount && (
+                  <span
+                    style={{
+                      fontFamily: DS.bodyFont,
+                      fontSize: 16,
+                      color: DS.mutedDim,
+                      textDecoration: 'line-through',
+                    }}
+                  >
+                    {formatSessionPrice(pricing.basePrice, currency)}
+                  </span>
+                )}
+
+                {/* Final price */}
+                <span
+                  style={{
+                    fontFamily: DS.headingFont,
+                    fontSize: 32,
+                    fontWeight: 600,
+                    color: DS.text,
+                  }}
+                >
+                  {formatSessionPrice(pricing.finalPrice, currency)}
+                </span>
+
+                {/* Tier discount badge */}
+                {pricing.tierDiscountPercent > 0 && (
+                  <span
+                    style={{
+                      fontFamily: DS.monoFont,
+                      fontSize: 11,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      color: DS.bg,
+                      background: ACCENT,
+                      padding: '4px 10px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {pricing.tierDiscountLabel}
+                  </span>
+                )}
+              </div>
+
+              {/* No-discount base price display */}
+              {!pricing.hasAnyDiscount && (
+                <div
+                  style={{
+                    fontFamily: DS.monoFont,
+                    fontSize: 12,
+                    color: DS.muted,
+                    marginTop: 4,
+                  }}
+                >
+                  Base price
+                </div>
+              )}
+
+              {/* Annual stacking note */}
+              {billingCycle === 'annual' && pricing.annualDiscountPercent > 0 && (
+                <div
+                  style={{
+                    fontFamily: DS.monoFont,
+                    fontSize: 12,
+                    color: ACCENT,
+                    marginTop: 6,
+                  }}
+                >
+                  Extra {pricing.annualDiscountPercent}% off with annual plan
+                </div>
+              )}
+
+              {/* Tier discount breakdown note */}
+              {pricing.tierDiscountPercent > 0 && userTier && (
+                <div
+                  style={{
+                    fontFamily: DS.monoFont,
+                    fontSize: 12,
+                    color: DS.muted,
+                    marginTop: 4,
+                  }}
+                >
+                  {tierDisplayName(userTier)} member pricing
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Complimentary sessions remaining */}
+          {showFreeIndicator && (
+            <div
+              style={{
+                marginTop: 12,
+                padding: '10px 14px',
+                background: `${ACCENT}14`,
+                border: `1px solid ${ACCENT}40`,
+                fontFamily: DS.bodyFont,
+                fontSize: 13,
+                color: DS.text,
+              }}
+            >
+              You have{' '}
+              <span style={{ fontWeight: 600, color: ACCENT }}>
+                {complimentaryRemaining}
+              </span>{' '}
+              free session{complimentaryRemaining > 1 ? 's' : ''} this month
+            </div>
+          )}
+        </div>
+
+        {/* Council-only soft gate OR Book CTA */}
+        {showCta && (
+          <div style={{ marginBottom: 20 }}>
+            {!userMeetsTier ? (
+              <div
+                style={{
+                  padding: '16px',
+                  background: DS.bgAlt,
+                  border: `1px solid ${DS.border}`,
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: DS.monoFont,
+                    fontSize: 11,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: DS.muted,
+                    fontWeight: 600,
+                    marginBottom: 6,
+                  }}
+                >
+                  {tierDisplayName(session.requiredTier)}-only
+                </div>
+                <div
+                  style={{
+                    fontFamily: DS.bodyFont,
+                    fontSize: 14,
+                    color: DS.textSecondary,
+                    lineHeight: 1.5,
+                    marginBottom: 12,
+                  }}
+                >
+                  This session is available exclusively to{' '}
+                  <span style={{ fontWeight: 600, color: DS.text }}>
+                    {tierDisplayName(session.requiredTier)}
+                  </span>{' '}
+                  members.
+                </div>
+                <a
+                  href="/pricing"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: DS.bodyFont,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: DS.bg,
+                    background: DS.bgDark,
+                    border: `1px solid ${DS.bgDark}`,
+                    padding: '10px 20px',
+                    textDecoration: 'none',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.12em',
+                    cursor: 'pointer',
+                    transition: DS.transition,
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = DS.text)}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = DS.bgDark)}
+                >
+                  Upgrade to {tierDisplayName(session.requiredTier)} →
+                </a>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onBookClick?.(session)}
+                style={{
+                  width: '100%',
+                  fontFamily: DS.bodyFont,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: DS.bg,
+                  background: isCpiFlagship ? ACCENT : DS.bgDark,
+                  border: `1px solid ${isCpiFlagship ? ACCENT : DS.bgDark}`,
+                  padding: '14px 24px',
+                  cursor: 'pointer',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.12em',
+                  transition: DS.transition,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = isCpiFlagship ? DS.accentHover : DS.text;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = isCpiFlagship ? ACCENT : DS.bgDark;
+                }}
+              >
+                Book {session.durationMinutes}-Min Session
+              </button>
             )}
           </div>
-          <div className="flex items-center gap-1 text-text-muted text-sm">
-            <Clock className="w-4 h-4" />
-            <span>{config.durationMinutes} min</span>
-          </div>
-        </div>
-        <CardTitle className="text-lg">{headline}</CardTitle>
-        <CardDescription>
-          Expert-led diagnostic debrief with personalised interpretation and actionable next steps.
-        </CardDescription>
-      </CardHeader>
+        )}
 
-      <CardContent className="flex-1 space-y-4">
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-1.5 text-text-secondary">
-            <Users className="w-4 h-4" />
-            <span>{config.recommendedInstruments.length} diagnostic{config.recommendedInstruments.length > 1 ? 's' : ''}</span>
+        {/* "Best for" bullets */}
+        <div
+          style={{
+            borderTop: `1px solid ${DS.border}`,
+            paddingTop: 16,
+            marginBottom: 16,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: DS.monoFont,
+              fontSize: 10,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: DS.muted,
+              fontWeight: 600,
+              marginBottom: 12,
+            }}
+          >
+            Best For
           </div>
-          <div className="text-text-muted">
-            {instrumentInfo.tierLabel} tier · {instrumentInfo.miles} mi cost
-          </div>
+          <ul
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 10,
+            }}
+          >
+            {session.bestForPlaceholders.slice(0, 3).map((bullet, i) => (
+              <li
+                key={i}
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: 14,
+                  lineHeight: 1.5,
+                  color: DS.textSecondary,
+                  display: 'flex',
+                  gap: 10,
+                }}
+              >
+                <span style={{ color: ACCENT, flexShrink: 0 }}>✓</span>
+                <span>{bullet}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <div>
-          <div className="text-xs font-medium text-text-muted uppercase tracking-wide mb-2">
-            Specialist types
-          </div>
-          <div className="space-y-2">
-            {recommendedTypes.map((typeKey) => {
-              const st = SESSION_TYPES[typeKey];
-              return (
-                <div key={typeKey} className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
-                  <div className="text-sm">
-                    <div className="font-medium text-text-primary">{st.title}</div>
-                    <div className="text-text-muted text-xs mt-0.5">{st.description}</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div>
-          <div className="text-xs font-medium text-text-muted uppercase tracking-wide mb-2">
-            Covered diagnostics
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {config.recommendedInstruments.map((code) => {
-              const info = getInstrumentDisplayName(code);
-              return (
-                <Badge key={code} variant="default" size="sm">
-                  {code} — {info.tierLabel}
-                </Badge>
-              );
-            })}
-          </div>
-        </div>
-      </CardContent>
-
-      <CardFooter>
-        <div className="w-full space-y-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-text-muted">Diagnostic debrief fee</span>
-            <span className="font-semibold text-text-primary">
-              {config.durationMinutes} min session
-            </span>
-          </div>
-          {recommendedTypes.map((typeKey, idx) => (
-            <Button
-              key={typeKey}
-              variant={idx === 0 ? 'default' : 'outline'}
-              size="default"
-              className="w-full"
-              rightIcon={<ArrowRight className="w-4 h-4" />}
-              onClick={() => onBook?.(session, typeKey)}
+        {/* "What you get" collapsible section */}
+        <div style={{ marginTop: 'auto', borderTop: `1px solid ${DS.border}` }}>
+          <button
+            type="button"
+            onClick={() => setWhatYouGetOpen(!whatYouGetOpen)}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '14px 0',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: DS.transition,
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = DS.bgAlt)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          >
+            <span
+              style={{
+                fontFamily: DS.monoFont,
+                fontSize: 10,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: DS.text,
+                fontWeight: 600,
+              }}
             >
-              Book with {SESSION_TYPES[typeKey].title.split(' ').slice(0, 2).join(' ')}
-            </Button>
-          ))}
+              What You Get
+            </span>
+            <span
+              style={{
+                fontFamily: DS.monoFont,
+                fontSize: 11,
+                color: DS.muted,
+                transition: `transform ${DS.transition}`,
+                transform: whatYouGetOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                display: 'inline-block',
+              }}
+            >
+              ▾
+            </span>
+          </button>
+          <div
+            style={{
+              maxHeight: whatYouGetOpen ? 400 : 0,
+              overflow: 'hidden',
+              transition: `max-height ${DS.transition}`,
+              paddingBottom: whatYouGetOpen ? 4 : 0,
+            }}
+          >
+            <ul
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+              }}
+            >
+              {session.whatYouGetPlaceholders.map((item, i) => (
+                <li
+                  key={i}
+                  style={{
+                    fontFamily: DS.bodyFont,
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                    color: DS.textSecondary,
+                    display: 'flex',
+                    gap: 10,
+                  }}
+                >
+                  <span style={{ color: ACCENT, flexShrink: 0 }}>•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }
 

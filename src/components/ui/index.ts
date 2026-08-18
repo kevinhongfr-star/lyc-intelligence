@@ -1,77 +1,63 @@
 /**
- * Design system index — single import surface for all UI primitives.
+ * #33 Barrel export for the ECHO v6.0 Design System component library.
  *
- *   import { Button, Card, Input, Modal, Toast, useToast } from '@/components/ui';
- *
- * Backwards-compatible re-exports keep existing imports from
- * `@/components/ui/{Button,Card,...}` working.
+ * Import like: import { Button, Input, Card } from '@/components/ui';
+ * This barrel deliberately re-exports from both ui/* AND shared chromes
+ * under portals/* so call sites have ONE import path for the design system.
  */
 
-// Core primitives
-export { Button } from './Button';
-export type { ButtonProps, ButtonVariant, ButtonSize } from './Button';
+/* ── Tokens (TS mirror of CSS custom properties) ───────────────── */
+export * from './tokens';
 
+/* ── Core atomic components ────────────────────────────────────── */
+export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button';
+export { Logo, type LogoProps, type LogoVariant, type LogoSize } from './Logo';
+export { Input, type InputProps } from './Input';
+export { Textarea, type TextareaProps } from './Textarea';
+export { Select, type SelectOption, type SelectProps } from './Select';
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
+  type CardProps, type CardHeaderProps, type CardTitleProps,
+  type CardDescriptionProps, type CardContentProps, type CardFooterProps,
+} from './Card';
 export {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from './Card';
-export type {
-  CardProps,
-  CardHeaderProps,
-  CardTitleProps,
-  CardDescriptionProps,
-  CardContentProps,
-  CardFooterProps,
-} from './Card';
-
-export { Input } from './Input';
-export type { InputProps } from './Input';
-
-export { Textarea } from './Textarea';
-export type { TextareaProps } from './Textarea';
-
-export { Select } from './Select';
-export type { SelectProps, SelectOption } from './Select';
-
-export { Badge } from './Badge';
-export type { BadgeProps, BadgeVariant, BadgeSize } from './Badge';
-
-export { Modal } from './Modal';
-export type { ModalProps, ModalSize } from './Modal';
-
-export { Table } from './Table';
-export type { TableProps, Column, ColumnAlign } from './Table';
-
-export { Skeleton } from './Skeleton';
-export type { SkeletonProps, SkeletonVariant } from './Skeleton';
-
-// Backwards-compat re-export — old call sites import LoadingSkeleton
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption,
+  type TableProps, type TableRowProps, type TableCellProps,
+} from './Table';
+export { Modal,
+  type ModalProps,
+} from './Modal';
+// Toast helpers: static toast, useToast() hook, ToastProvider, ToastContainer
+export { toast, useToast, ToastProvider, type ToastHelpers } from './Toast';
+export type { ToastType } from './Toast';
+export { ToastContainer } from './ToastContainer';
+export { Badge, type BadgeProps, type BadgeVariant, type BadgeSize } from './Badge';
+export { TierBadge, type Tier } from './TierBadge';
+export { Progress, type ProgressProps, type ProgressVariant, type ProgressSize } from './Progress';
+export { EmptyState, type EmptyStateProps, type EmptyStateVariant } from './EmptyState';
+export { Skeleton, type SkeletonProps } from './Skeleton';
+export { LoadingSpinner, type LoadingSpinnerProps } from './LoadingSpinner';
 export { LoadingSkeleton } from './LoadingSkeleton';
-export type { LoadingSkeletonVariant } from './LoadingSkeleton';
 
-export { EmptyState } from './EmptyState';
-export type { EmptyStateProps } from './EmptyState';
+/* ── #33: Newly added for NEXUS Layer + shared chrome ─────────── */
+export { Avatar, AvatarGroup, type AvatarProps, type AvatarSize } from './Avatar';
+export { Tooltip, type TooltipProps } from '../Tooltip';
+export { NotificationCenter,
+  type NotificationCenterProps, type NotificationItem, type NotificationType,
+} from './NotificationCenter';
+export { CommandPalette,
+  type CommandPaletteProps, type CommandItem,
+} from './CommandPalette';
+export { LoadingState, ErrorState,
+  type LoadingStateProps, type LoadingStateSize, type ErrorStateProps,
+} from './ContentStates';
 
-export { Progress } from './Progress';
-export type { ProgressProps, ProgressVariant, ProgressSize } from './Progress';
+/* ── #1360: Section / typography primitives ──────────────────── */
+export {
+  Container, SectionHeading, Text, Eyebrow,
+  type ContainerProps, type SectionHeadingProps, type TextProps, type TextVariant,
+} from './Section';
 
-// Toast system
-export { ToastProvider, useToast, toast } from './Toast';
-export type { ToastHelpers, ToastType } from './Toast';
-
-// Phase 5: Design Excellence — ECHO v6.0
-export { ThemeToggle } from './ThemeToggle';
-export type { ThemeToggleProps } from './ThemeToggle';
-
-export { LoadingSpinner } from './LoadingSpinner';
-export type { LoadingSpinnerProps, SpinnerSize, SpinnerVariant } from './LoadingSpinner';
-
-// Existing specialized components (kept for backwards compat)
-export { UpgradeBanner } from './UpgradeBanner';
-export { CreditDisplay } from './CreditDisplay';
-export { TierBadge } from './TierBadge';
-export type { Tier } from './TierBadge';
+/* ── Shared layout chrome (portal components, re-exported) ───── */
+export { TopBar, type TopBarProps } from '../portals/TopBar';
+export { Sidebar, type SidebarProps, type SidebarItem } from '../portals/Sidebar';
+export { Breadcrumbs, type BreadcrumbItem, type BreadcrumbsProps } from '../portals/Breadcrumbs';

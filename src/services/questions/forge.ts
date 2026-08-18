@@ -24,21 +24,22 @@ export interface FORGEDimensionBank {
 }
 
 export const INSTRUMENT = "FORGE";
-export const FULL_NAME = "Sales Excellence & Revenue Architecture";
+export const FULL_NAME = "FORGE — sales excellence capability";
+export const B2C_NAME = "FORGE — sales excellence capability";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
-export const DELIVERY_MINUTES = 14;
+export const DELIVERY_MINUTES = 12;
 
 export const DIMENSIONS: FORGEDimensionBank[] = [
   {
     id: "D1",
-    name: "ADAPTIVE LEARNING ORIENTATION (ALO)",
+    name: "Adaptive Learning Orientation",
     count: 9,
-    max_raw: null,
-    formula: null,
+    max_raw: 45,
+    formula: "(raw/45) x 20",
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q03", "Q05", "Q09"],
     questions: [
       {
         id: "Q01",
@@ -46,7 +47,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q02",
@@ -54,7 +55,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q03",
@@ -62,7 +63,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q04",
@@ -70,7 +71,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q05",
@@ -78,7 +79,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q06",
@@ -86,7 +87,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q07",
@@ -94,7 +95,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q08",
@@ -102,7 +103,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q09",
@@ -110,18 +111,18 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       }
     ]
   },
   {
     id: "D2",
-    name: "THREE FORCES AWARENESS (TFA)",
+    name: "Market Context Awareness",
     count: 9,
-    max_raw: null,
-    formula: null,
+    max_raw: 45,
+    formula: "(raw/45) x 20",
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q12", "Q15", "Q17"],
     questions: [
       {
         id: "Q10",
@@ -129,7 +130,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q11",
@@ -137,7 +138,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q12",
@@ -145,7 +146,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q13",
@@ -153,7 +154,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q14",
@@ -161,7 +162,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q15",
@@ -169,7 +170,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q16",
@@ -177,7 +178,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q17",
@@ -185,7 +186,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q18",
@@ -193,18 +194,18 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       }
     ]
   },
   {
     id: "D3",
-    name: "DEVELOPMENT AGENCY (DA)",
+    name: "Development Agency",
     count: 9,
-    max_raw: null,
-    formula: null,
+    max_raw: 45,
+    formula: "(raw/45) x 20",
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q20", "Q23", "Q26"],
     questions: [
       {
         id: "Q19",
@@ -212,7 +213,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q20",
@@ -220,7 +221,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q21",
@@ -228,7 +229,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q22",
@@ -236,7 +237,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q23",
@@ -244,7 +245,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q24",
@@ -252,7 +253,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q25",
@@ -260,7 +261,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q26",
@@ -268,7 +269,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q27",
@@ -276,18 +277,18 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       }
     ]
   },
   {
     id: "D4",
-    name: "BILATERAL CONTEXT NAVIGATION (BCN)",
+    name: "Bilateral Relationship Quality",
     count: 9,
-    max_raw: null,
-    formula: null,
+    max_raw: 45,
+    formula: "(raw/45) x 20",
     sub_dimensions: [],
-    reverse_coded: [],
+    reverse_coded: ["Q29", "Q32", "Q35"],
     questions: [
       {
         id: "Q28",
@@ -295,7 +296,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q29",
@@ -303,7 +304,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q30",
@@ -311,7 +312,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q31",
@@ -319,7 +320,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q32",
@@ -327,7 +328,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q33",
@@ -335,7 +336,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q34",
@@ -343,7 +344,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q35",
@@ -351,7 +352,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: true,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       },
       {
         id: "Q36",
@@ -359,7 +360,7 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
         type: "likert",
         reverse_coded: false,
         options: null,
-        scale_labels: null
+        scale_labels: ["Strongly disagree", "Strongly agree"]
       }
     ]
   }
@@ -368,3 +369,11 @@ export const DIMENSIONS: FORGEDimensionBank[] = [
 export const ALL_QUESTIONS: FORGEQuestion[] = DIMENSIONS.flatMap(d => d.questions);
 
 export const REVERSE_CODED_IDS: string[] = DIMENSIONS.flatMap(d => d.reverse_coded);
+
+// TODO(Akira - X4-2 FLAGGED QUESTION CONTENT):
+// Audit completed — full question text grep for "three" / "force" case-insensitive returned no instances
+// of explicit "three forces" contamination in question body text.
+// Hits observed (non-contaminating):
+// - Line 9: TypeScript literal `forced_choice` (question type, not body text)
+// - Q20 text: "past three years" (count word "three" only — no "force" linkage)
+// No questions require content review at this stage.

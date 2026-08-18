@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, Unlock, Loader2, AlertCircle } from 'lucide-react';
+import { Lock, Loader2, AlertCircle, ArrowUpRight } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { UpgradeModal } from './UpgradeModal';
+// W3.1 Fix 3: share the canonical system serif stack — NO Crimson Pro, no custom font loading.
+import { DS as GLOBAL_DS, ACCENT, AMBER } from '@/tokens';
 
 const DS = {
-  headingFont: 'Georgia, serif',
-  accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
-  success: '#10B981',
-  warning: '#F59E0B',
-  error: '#EF4444'
+  headingFont: GLOBAL_DS.headingFont,
+  bodyFont: GLOBAL_DS.bodyFont,
+  monoFont: GLOBAL_DS.monoFont,
+  accent: ACCENT,
+  accentSoft: `${ACCENT}14`,
+  accentBorder: `${ACCENT}40`,
+  bg: '#FAFAF8',
+  card: '#FFFFFF',
+  muted: '#8A8A8A',
+  text: '#0A0A0A',
+  textSecondary: '#555555',
+  border: '#E8E8E5',
+  warning: AMBER,
+  warningSoft: '#FEF3C7',
 };
 
 export type ActionType =
@@ -48,8 +53,6 @@ export const ACTION_LABELS: Record<ActionType, string> = {
   document_upload: 'Document Upload'
 };
 
-const ASSESSMENT_ACTIONS: ActionType[] = ['assessment', 'pdf_report'];
-
 interface CreditGateProps {
   action: ActionType;
   children: React.ReactNode;
@@ -66,9 +69,9 @@ export function CreditGate({ action, children, onSuccess, disabled = false, unit
   const [hasCredits, setHasCredits] = useState(false);
   const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
 
-  const credits = profile?.credits?.balance ?? 0;
+  const credits = profile?.credits?.balance ?? profile?.miles_balance ?? 0;
   const cost = CREDIT_COSTS[action];
-  const tier = profile?.tier || 'free';
+  const tier = profile?.tier || 'explorer';
 
   const unitNoun = effectiveUnit === 'miles' ? 'Miles' : 'Credits';
   const unitNounLower = effectiveUnit === 'miles' ? 'miles' : 'credits';
@@ -84,7 +87,7 @@ export function CreditGate({ action, children, onSuccess, disabled = false, unit
       return;
     }
 
-    if (tier !== 'free') {
+    if (tier !== 'explorer' && tier !== 'executive_introduction') {
       setHasCredits(true);
       return;
     }
@@ -136,17 +139,22 @@ export function CreditGate({ action, children, onSuccess, disabled = false, unit
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '8px',
-        padding: '16px',
-        background: `${DS.accent}20`,
-        border: `1px solid ${DS.accent}40`,
-        color: DS.text
+        gap: '10px',
+        padding: '20px 24px',
+        background: DS.accentSoft,
+        border: `1px solid ${DS.accentBorder}`,
+        borderRadius: 0,
+        color: DS.text,
+        fontFamily: DS.bodyFont,
+        fontSize: 14,
       }}>
-        <Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} />
+        <Loader2 style={{ width: 18, height: 18, color: DS.accent, animation: 'spin 1s linear infinite' }} />
         Processing...
       </div>
     );
   }
+
+  const accent = DS.accent;
 
   return (
     <>
@@ -155,43 +163,93 @@ export function CreditGate({ action, children, onSuccess, disabled = false, unit
           children
         ) : (
           <div style={{
-            padding: '32px',
-            background: showInsufficientCredits ? `${DS.warning}10` : `${DS.muted}10`,
-            border: `1px solid ${showInsufficientCredits ? DS.warning : DS.muted}`,
-            textAlign: 'center'
+            padding: '36px 28px',
+            background: showInsufficientCredits ? DS.warningSoft : DS.bg,
+            border: `1px solid ${showInsufficientCredits ? DS.warning : DS.border}`,
+            borderRadius: 0,
+            textAlign: 'center',
+            color: DS.text,
           }}>
             {showInsufficientCredits ? (
               <>
-                <AlertCircle style={{ width: 48, height: 48, color: DS.warning, margin: '0 auto 16px' }} />
-                <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', color: DS.text, marginBottom: '8px' }}>
+                <AlertCircle style={{ width: 44, height: 44, color: DS.warning, margin: '0 auto 14px' }} />
+                <h3 style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: '22px',
+                  color: DS.text,
+                  marginBottom: '8px',
+                  fontWeight: 500,
+                }}>
                   Insufficient {unitNoun}
                 </h3>
-                <p style={{ color: DS.textSecondary, marginBottom: '16px' }}>
+                <p style={{
+                  fontFamily: DS.bodyFont,
+                  color: DS.textSecondary,
+                  marginBottom: '22px',
+                  fontSize: 14,
+                  lineHeight: 1.55,
+                }}>
                   This action requires <strong>{cost} {unitShort}</strong>, but you only have <strong>{credits}</strong>.
+                  Top up or upgrade your tier to continue.
                 </p>
               </>
             ) : (
               <>
-                <Lock style={{ width: 48, height: 48, color: DS.muted, margin: '0 auto 16px' }} />
-                <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', color: DS.text, marginBottom: '8px' }}>
+                <Lock style={{ width: 40, height: 40, color: accent, margin: '0 auto 14px' }} />
+                <h3 style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: '22px',
+                  color: DS.text,
+                  marginBottom: '8px',
+                  fontWeight: 500,
+                }}>
                   Premium Feature
                 </h3>
-                <p style={{ color: DS.textSecondary, marginBottom: '16px' }}>
-                  This action requires {cost} {unitShort}
+                <p style={{
+                  fontFamily: DS.bodyFont,
+                  color: DS.textSecondary,
+                  marginBottom: '22px',
+                  fontSize: 14,
+                  lineHeight: 1.55,
+                }}>
+                  {ACTION_LABELS[action]} requires <strong>{cost} {unitShort}</strong>.
+                  Executive Introduction covers one complimentary leadership assessment (CPI).
+                  Upgrade for unlimited access to the full suite.
                 </p>
               </>
             )}
+
             <div style={{
               display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 24px',
-              background: DS.accent,
-              color: '#FFF',
-              fontSize: '14px',
-              fontWeight: 600
+              gap: 10,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
             }}>
-              {credits >= cost ? `Use ${unitNoun}` : 'Upgrade to Continue'}
+              <a
+                href="/pricing"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                  padding: '12px 22px',
+                  background: accent,
+                  color: '#FFFFFF',
+                  fontFamily: DS.bodyFont,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  borderRadius: 0,
+                  textDecoration: 'none',
+                  border: `1.5px solid ${accent}`,
+                  cursor: 'pointer',
+                  transition: 'opacity 0.15s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+              >
+                View Pricing
+                <ArrowUpRight style={{ width: 14, height: 14 }} />
+              </a>
             </div>
           </div>
         )}

@@ -159,7 +159,7 @@ export const SURFACE_CONFIG: SurfaceConfig[] = [
       { path: '/candidate/assessments', label: 'Assessments', working: true },
       { path: '/candidate/career-dev', label: 'Career Development', working: false },
       { path: '/candidate/community', label: 'Community', working: true },
-      { path: '/candidate/nexus-coach', label: 'NEXUS Coach', working: false },
+      { path: '/candidate/nexus-coach', label: 'NEXUS', working: false },
       { path: '/candidate/profile', label: 'Candidate Profile', working: false },
       { path: '/candidate/advanced-assessments', label: 'Advanced Assessments', working: false },
       { path: '/candidate/settings-plus', label: 'Settings+', working: false },

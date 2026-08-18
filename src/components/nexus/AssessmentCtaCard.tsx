@@ -6,7 +6,7 @@
  *  - Instrument name, 1-line value prop, price in miles
  *  - "Take assessment" button → starts the flow (or gated modal if miles insufficient)
  *
- * Brand rules enforced: no border radius, font trio (Libre Baskerville / DM Sans / IBM Plex Mono),
+ * Brand rules enforced: no border radius, font trio (System serif / DM Sans / IBM Plex Mono),
  * accent #C108AB, no "free" word, currency = miles (mi suffix).
  */
 import React, { useState } from 'react';
@@ -22,7 +22,7 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   monoFont: "'IBM Plex Mono', ui-monospace, monospace",
   accent: '#C108AB',
@@ -131,7 +131,7 @@ export function AssessmentCtaCard({
         maxWidth: '540px',
         background: DS.bg,
         border: `2px solid ${DS.accent}`,
-        borderRadius: DS.radius,
+ 
         boxShadow: `0 0 0 1px ${DS.accent}14, 0 16px 40px ${DS.accent}14`,
       }}
     >
@@ -273,7 +273,7 @@ export function AssessmentCtaCard({
               textTransform: 'uppercase',
               cursor: flowState === 'spending' ? 'wait' : 'pointer',
               opacity: flowState === 'spending' ? 0.7 : 1,
-              borderRadius: DS.radius,
+ 
             }}
           >
             {flowState === 'spending' ? (
@@ -298,7 +298,7 @@ export function AssessmentCtaCard({
               textDecoration: 'none',
               background: 'transparent',
               border: `1px solid ${DS.border}`,
-              borderRadius: DS.radius,
+ 
             }}
           >
             Learn more
@@ -351,7 +351,7 @@ export function AssessmentCtaCard({
             style={{
               background: '#FFF',
               border: `2px solid ${DS.accent}`,
-              borderRadius: DS.radius,
+ 
               padding: '20px',
               maxWidth: '420px',
               width: '100%',
@@ -433,7 +433,7 @@ export function AssessmentCtaCard({
                   letterSpacing: '0.18em',
                   textTransform: 'uppercase',
                   textDecoration: 'none',
-                  borderRadius: DS.radius,
+ 
                 }}
               >
                 Add miles
@@ -449,7 +449,7 @@ export function AssessmentCtaCard({
                   fontWeight: 600,
                   letterSpacing: '0.1em',
                   border: `1px solid ${DS.border}`,
-                  borderRadius: DS.radius,
+ 
                   cursor: 'pointer',
                 }}
               >
@@ -473,7 +473,7 @@ function Fact({ icon: Icon, label }: { icon: any; label: string }) {
         padding: '6px 8px',
         background: '#FAF8F5',
         border: `1px solid ${DS.border}`,
-        borderRadius: DS.radius,
+ 
         fontFamily: DS.monoFont,
         fontSize: '11px',
         color: '#2A2A36',

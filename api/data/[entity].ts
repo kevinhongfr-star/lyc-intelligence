@@ -18,7 +18,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '../lib/supabase-rest.js';
 import {
   AuthContext,
   enforceScope,
@@ -26,9 +26,54 @@ import {
   isClientRole,
   isAdminRole,
   isConsultantRole,
+  isScopedConsultantRole,
   isLeaderRole,
   RequestAuthError,
-} from '../_lib/auth';
+} from '../lib/auth.js';
+import {
+  assertBodySize,
+  assertColumnName,
+  assertEntityName,
+  assertUrlLength,
+  DEFAULT_BODY_LIMIT,
+  handleApiError,
+  logServerError,
+  parseFilters,
+  parseJsonBody,
+  parseOrderParam,
+  parseSelectList,
+  safeErrorMessage,
+  safeErrorStatus,
+  sanitizeObject,
+  rateLimit,
+  setRateLimitHeaders,
+} from '../lib/validate.js';
+import { z } from 'zod';
+
+// ── V3-6 / #1347 Consultant-entity block list ─────────────────────────────
+// Consultant / B2B-internal entities are NEVER exposed to the public or
+// B2C unauthenticated users. These tables require auth + admin OR
+// consultant role — leader/candidate/client viewer always 403.
+
+const CONSULTANT_ONLY_ENTITIES = new Set([
+  'consultants',
+  'consultant_profiles',
+  'consultant_performance',
+  'consultant_assignments',
+  'mandates',
+  'mandate_matches',
+  'pipeline_stages',
+  'mandate_timelines',
+]);
+
+function isConsultantOnlyEntity(entity: string): boolean {
+  if (CONSULTANT_ONLY_ENTITIES.has(entity)) return true;
+  // Also guard mandate_matches / consultant_* wildcard variants
+  if (entity.startsWith('consultant_')) return true;
+  if (entity.startsWith('mandate_match')) return true;
+  if (entity === 'pipeline_stages') return true;
+  return false;
+}
 
 // ── Entity access control list ──────────────────────────────────────────────
 // Each allowlisted entity => { read: roles allowed to READ,
@@ -39,17 +84,22 @@ import {
 type Acl = {
   read: Array<'admin' | 'consultant' | 'client' | 'leader'>;
   write?: Array<'admin' | 'consultant' | 'client' | 'leader'>;
-  selfColumn?: string;  // e.g. 'user_id', 'owner_id', 'requester_id', 'subject_id', 'id'
-  orgColumn?: string;   // e.g. 'organization_id', 'org_id'
+  selfColumn?: string;
+  consultantColumn?: string;
+  orgColumn?: string;
 };
 const ENTITY_ACL: Record<string, Acl> = {
-  profiles:             { read: ['admin','consultant','client','leader'], write: ['admin','leader'], selfColumn: 'id', orgColumn: 'organization_id' },
+  // #1313: profiles write is admin-only. Leaders update their own profile
+  // via Supabase client-side RLS (updateProfile in authStore), NOT through
+  // this endpoint. This prevents non-admins from creating profile rows
+  // (i.e., "inviting" users) or assigning organization_id / role / tier.
+  profiles:             { read: ['admin','consultant','client','leader'], write: ['admin'], selfColumn: 'id', orgColumn: 'organization_id' },
   credits:              { read: ['admin','leader'],                  write: ['admin','leader'],  selfColumn: 'user_id' },
   credit_transactions:  { read: ['admin','leader'],                  write: ['admin'],            selfColumn: 'user_id' },
   organizations:        { read: ['admin','consultant','client'],     write: ['admin','consultant'], orgColumn: 'id' },
-  mandates:             { read: ['admin','consultant','client'],     write: ['admin','consultant'], orgColumn: 'organization_id' },
+  mandates:             { read: ['admin','consultant','client'],     write: ['admin','consultant'], consultantColumn: 'lead_consultant_id', orgColumn: 'organization_id' },
   mandate_timelines:    { read: ['admin','consultant','client'],     write: ['admin','consultant'] },
-  contacts:             { read: ['admin','consultant','client','leader'], write: ['admin','consultant'], selfColumn: 'id', orgColumn: 'organization_id' },
+  contacts:             { read: ['admin','consultant','client','leader'], write: ['admin','consultant'], selfColumn: 'id', consultantColumn: 'owner_id', orgColumn: 'organization_id' },
   documents:            { read: ['admin','consultant','client','leader'], write: ['admin','consultant','leader'], selfColumn: 'owner_id', orgColumn: 'organization_id' },
   assessment_results:   { read: ['admin','consultant','leader'],     write: ['admin','leader'],   selfColumn: 'user_id' },
   memories:             { read: ['admin','leader'],                  write: ['admin','leader'],   selfColumn: 'user_id' },
@@ -84,13 +134,16 @@ const ENTITY_ACL: Record<string, Acl> = {
   data_consents:        { read: ['admin','consultant','client','leader'], write: ['admin','consultant','leader'], selfColumn: 'subject_id', orgColumn: 'organization_id' },
   cross_border_transfers: { read: ['admin','consultant'],            write: ['admin','consultant'] },
   automation_rules:     { read: ['admin','consultant','leader'],     write: ['admin','consultant','leader'], selfColumn: 'owner_id' },
+  // Phase 2 Amendments / #1334 + #1337
+  assessments:           { read: ['admin','consultant','client','leader'], write: ['admin'] },
+  user_assessment_progress: { read: ['admin','leader'], write: ['admin','leader'], selfColumn: 'user_id' },
+  assessment_shares:     { read: ['admin','leader'], write: ['admin','leader'], selfColumn: 'owner_id' },
 };
 
 function parseColumnCsv(s?: string | string[]): string[] {
-  if (!s) return ['*'];
-  const raw = Array.isArray(s) ? s[0] : s;
-  const cols = raw.split(',').map(c => c.trim()).filter(Boolean);
-  return cols.length ? cols : ['*'];
+  // #1309: delegate to validated parser. Rejects anything that isn't
+  // a safe identifier (or '*'). Throws RequestAuthError(422) on bad input.
+  return parseSelectList(s);
 }
 
 function applyRoleFilters(
@@ -103,7 +156,15 @@ function applyRoleFilters(
     query = query.eq(acl.orgColumn, ctx.organizationId);
   }
 
-  // 2) Leader rows: if table has an owner/user column AND caller isn't admin/consultant,
+  // 2) Scoped consultants (NOT admins): filter by consultantColumn when defined.
+  //    This restricts consultants to their own mandates (lead_consultant_id)
+  //    and contacts (owner_id). Admins bypass this — they see everything.
+  //    Ticket #1306, #1307 — Phase 3 consultant RLS scoping.
+  if (isScopedConsultantRole(ctx.role) && acl.consultantColumn) {
+    query = query.eq(acl.consultantColumn, ctx.userId);
+  }
+
+  // 3) Leader rows: if table has an owner/user column AND caller isn't admin/consultant,
   //    scope to self (admins/consultants can see broader, they're internal).
   if (acl.selfColumn && !isAdminRole(ctx.role) && !isConsultantRole(ctx.role) && !isClientRole(ctx.role)) {
     // Leaders / candidates only see their own rows.
@@ -129,13 +190,50 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // #1314: reject oversized URLs before any processing — avoids 500s
+    // from attackers stuffing payloads into query params.
+    assertUrlLength(req);
+
     const ctx = await getAuthorizedContext(req, false);
     if (!ctx) return res.status(401).json({ error: 'Unauthorized' });
 
     const entity = (req.query?.entity as string) || '';
+    try {
+      assertEntityName(entity);
+    } catch {
+      return res.status(404).json({ error: `Entity not accessible` });
+    }
+
+    // ── V3-6 / #1347: Consultant / B2B entities are B2B/internal-only. ──
+    // Public (B2C unauth) users MUST NOT fetch consultant entities.
+    // If the caller is NOT admin and NOT consultant role → 403.
+    if (isConsultantOnlyEntity(entity)) {
+      const roleOk = isAdminRole(ctx.role) || isConsultantRole(ctx.role);
+      if (!roleOk) {
+        return res.status(403).json({
+          ok: false,
+          code: 'FORBIDDEN',
+          message: 'Consultant data not available to public users',
+        });
+      }
+    }
+
     const acl = ENTITY_ACL[entity];
     if (!acl) {
       return res.status(404).json({ error: `Entity "${entity}" not accessible through this endpoint` });
+    }
+
+    // ── V3-7 / #1346 Write rate limit (global 20 writes / 60s per user) ─
+    if (req.method === 'POST') {
+      const rl = rateLimit(req, ctx.userId);
+      setRateLimitHeaders(res, rl, 20);
+      if (!rl.allowed) {
+        return res.status(429).json({
+          ok: false,
+          code: 'RATE_LIMITED',
+          message: 'Too many write requests — please retry in a moment',
+        });
+      }
     }
 
     const supabase = createClient();
@@ -148,34 +246,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const selectCols = parseColumnCsv(q.select as any).join(',');
       let query = supabase.from(entity).select(selectCols, { count: 'exact' });
 
-      // Simple filter params: eq=col:val  neq=col:val  gt=col:val  lt=col:val  in=col:a|b|c
-      for (const [op, paramName] of [
-        ['eq', 'eq'], ['neq', 'neq'], ['gt', 'gt'], ['lt', 'lt'],
-        ['gte', 'gte'], ['lte', 'lte'], ['in', 'in'], ['like', 'like'],
-      ] as const) {
-        const raw = q[paramName];
-        if (!raw) continue;
-        const pairs = Array.isArray(raw) ? raw : [raw as string];
-        for (const pair of pairs) {
-          const [col, val] = (pair as string).split(':');
-          if (!col || val === undefined) continue;
-          if (op === 'in') {
-            query = query.in(col, val.split('|'));
-          } else if (op === 'like') {
-            query = query.like(col, val);
-          } else {
-            query = (query as any)[op](col, val);
-          }
+      // #1309: parse & validate all filter params in one pass.
+      // parseFilters throws RequestAuthError(422) on invalid column names.
+      const filters = parseFilters(q as Record<string, string | string[] | undefined>);
+      for (const f of filters) {
+        if (f.op === 'in') {
+          query = query.in(f.column, f.value.split('|'));
+        } else if (f.op === 'like') {
+          query = query.like(f.column, f.value);
+        } else {
+          query = (query as any)[f.op](f.column, f.value);
         }
       }
 
-      if (q.order) {
-        const [col, dir = 'asc'] = (q.order as string).split(':');
-        query = query.order(col, { ascending: dir !== 'desc' });
+      const order = parseOrderParam(q.order as string | undefined);
+      if (order) {
+        query = query.order(order.column, { ascending: order.ascending });
       } else {
-        const hasCreated = true; // heuristic — most tables have created_at
+        // heuristic — most tables have created_at; ignore if not present
         try { query = query.order('created_at', { ascending: false }); } catch { /* ignore */ }
-        void hasCreated;
       }
 
       const limit = Math.min(Number(q.limit) || 100, 500);
@@ -186,7 +275,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       query = applyRoleFilters(query, ctx, acl);
 
       const { data, error, count } = await query;
-      if (error) throw new RequestAuthError(`DB error: ${error.message}`, 500);
+      if (error) {
+        // #1310: log full error server-side, return safe message to client.
+        logServerError('api/data/[entity] GET', error, req);
+        throw new RequestAuthError(safeErrorMessage(error, 'Failed to fetch data'), safeErrorStatus(error, 500));
+      }
       if (req.method === 'HEAD') {
         res.setHeader('X-Total-Count', String(count ?? 0));
         return res.status(204).end();
@@ -197,13 +290,67 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // ── POST: { filters, upsert, delete_by } ──────────────────────────
     if (req.method === 'POST') {
-      const body = req.body || {};
+      // #1309 + #1314: enforce body size limit, then parse + sanitize.
+      assertBodySize(req.body, DEFAULT_BODY_LIMIT);
+
+      // NOTE: z.record().max() requires Zod ≥3.24; pinned version may be older.
+      // assertBodySize(256KB) above + sanitizeObject clamp both bound record size,
+      // so a redundant per-record .max(N) is safe to drop for runtime compat.
+      const PostBodySchema = z.object({
+        select: z.string().max(4096).optional(),
+        upsert: z.record(z.string(), z.any()).optional(),
+        delete_by: z.record(z.string(), z.any()).optional(),
+        filters: z.array(z.object({ col: z.string().max(64), op: z.string().max(16), value: z.any() })).max(50).optional(),
+        order: z.string().max(256).optional(),
+        on_conflict: z.string().max(256).optional(),
+        limit: z.number().int().min(0).max(500).optional(),
+        offset: z.number().int().min(0).optional(),
+      });
+
+      const rawBody = parseJsonBody<{
+        select?: string;
+        upsert?: Record<string, unknown>;
+        delete_by?: Record<string, unknown>;
+        filters?: Array<{ col: string; op: string; value: unknown }>;
+        order?: string;
+        on_conflict?: string;
+        limit?: number;
+        offset?: number;
+      }>(req);
+
+      // V3-7: zod-validate the write shape before processing
+      const needsWrite = !!rawBody.upsert || !!rawBody.delete_by;
+      const body = needsWrite ? (function () {
+        try { return PostBodySchema.parse(rawBody); } catch (zErr: any) {
+          const first = zErr?.issues?.[0];
+          const msg = first
+            ? `Invalid input at ${first.path.join('.')}: ${first.message}`
+            : 'Invalid write body';
+          throw new RequestAuthError(msg.slice(0, 256), 422);
+        }
+      })() : rawBody;
+
       // Write access check first.
       if (body.upsert || body.delete_by) {
         if (!acl.write || acl.write.length === 0) {
           throw new RequestAuthError(`Write not permitted on "${entity}"`, 403);
         }
         enforceScope(ctx, { allow: acl.write });
+
+        // #1313: Defense-in-depth — privileged fields on profiles (role,
+        // tier, organization_id) require admin even if the caller somehow
+        // passes the write ACL. The DB trigger also enforces this, but we
+        // reject early with a clear 403 before hitting the database.
+        if (entity === 'profiles' && body.upsert) {
+          const privilegedFields = ['role', 'tier', 'organization_id', 'is_admin', 'is_staff'];
+          const attempted = privilegedFields.filter(f => body.upsert![f] !== undefined);
+          if (attempted.length > 0 && !isAdminRole(ctx.role)) {
+            throw new RequestAuthError(
+              `Permission denied: setting ${attempted.join(', ')} requires admin role`,
+              403,
+            );
+          }
+        }
       } else {
         // Read-only POST (filters only)
         enforceScope(ctx, { allow: acl.read });
@@ -222,10 +369,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         }
         let dq = supabase.from(entity).delete({ count: 'exact' });
-        for (const [k, v] of Object.entries(body.delete_by)) dq = dq.eq(k, v);
+        // #1309: validate every column name in delete_by before applying.
+        for (const [k, v] of Object.entries(body.delete_by)) {
+          assertColumnName(k);
+          dq = dq.eq(k, v as any);
+        }
         dq = applyRoleFilters(dq, ctx, acl);
         const { error, count: delCount } = await dq;
-        if (error) throw new RequestAuthError(`DB delete error: ${error.message}`, 500);
+        if (error) {
+          logServerError('api/data/[entity] DELETE', error, req);
+          throw new RequestAuthError(safeErrorMessage(error, 'Failed to delete'), safeErrorStatus(error, 500));
+        }
+
+        // V3-7 audit write (best-effort — never fail on audit errors)
+        try {
+          await supabase.from('audit_logs').insert({
+            actor_user_id: ctx.userId,
+            action: `DELETE:${entity}`,
+            entity,
+            record_count: delCount ?? 0,
+            details: { columns: Object.keys(body.delete_by ?? {}) },
+            ip_address: null,
+            user_agent: null,
+          });
+        } catch (_auditErr) { /* swallow */ }
+
         return res.status(200).json({ ok: true, deleted: delCount ?? 0 });
       }
 
@@ -241,6 +409,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             body.upsert[acl.selfColumn] = ctx.userId;
           }
         }
+        // Consultant scoping: scoped consultants must own the rows they write.
+        // Ticket #1306, #1307.
+        if (isScopedConsultantRole(ctx.role) && acl.consultantColumn) {
+          const colVal = body.upsert[acl.consultantColumn];
+          if (colVal !== undefined && String(colVal) !== String(ctx.userId)) {
+            throw new RequestAuthError(`Cannot set ${acl.consultantColumn} to another user`, 403);
+          }
+          if (colVal === undefined) {
+            body.upsert[acl.consultantColumn] = ctx.userId;
+          }
+        }
         // Client-org scoping: enforce org id on upserted rows.
         if (isClientRole(ctx.role) && acl.orgColumn && ctx.organizationId) {
           const orgVal = body.upsert[acl.orgColumn];
@@ -249,12 +428,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
           body.upsert[acl.orgColumn] = ctx.organizationId;
         }
+        // #1309: validate on_conflict column name if provided.
+        if (body.on_conflict) {
+          for (const c of String(body.on_conflict).split(',')) {
+            assertColumnName(c.trim());
+          }
+        }
 
         const { data, error } = await supabase
           .from(entity)
           .upsert(body.upsert, { onConflict: body.on_conflict || undefined })
           .select(selectCols);
-        if (error) throw new RequestAuthError(`DB upsert error: ${error.message}`, 500);
+        if (error) {
+          logServerError('api/data/[entity] UPSERT', error, req);
+          throw new RequestAuthError(safeErrorMessage(error, 'Failed to save'), safeErrorStatus(error, 500));
+        }
+
+        // V3-7 audit write (best-effort — never fail on audit errors)
+        try {
+          await supabase.from('audit_logs').insert({
+            actor_user_id: ctx.userId,
+            action: `POST:${entity}`,
+            entity,
+            record_count: data?.length ?? 0,
+            details: { upsert_keys: Object.keys(body.upsert ?? {}) },
+            ip_address: null,
+            user_agent: null,
+          });
+        } catch (_auditErr) { /* swallow */ }
+
         return res.status(200).json({ ok: true, data });
       }
 
@@ -262,12 +464,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       let query = supabase.from(entity).select(selectCols, { count: 'exact' });
       for (const f of (body.filters || [])) {
         if (!f?.col || !f?.op) continue;
-        if (f.op === 'in') query = query.in(f.col, f.value || []);
+        // #1309: validate column + op before applying.
+        try {
+          assertColumnName(f.col);
+        } catch {
+          continue;  // skip invalid filter
+        }
+        if (!['eq','neq','gt','lt','gte','lte','in','like'].includes(f.op)) continue;
+        if (f.op === 'in') query = query.in(f.col, (f.value as any[]) || []);
         else query = (query as any)[f.op]?.(f.col, f.value) ?? query;
       }
       if (body.order) {
-        const [col, dir = 'asc'] = (body.order as string).split(':');
-        query = query.order(col, { ascending: dir !== 'desc' });
+        const order = parseOrderParam(body.order);
+        if (order) query = query.order(order.column, { ascending: order.ascending });
       }
       const limit = Math.min(Number(body.limit) || 100, 500);
       query = query.limit(limit);
@@ -275,17 +484,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       query = applyRoleFilters(query, ctx, acl);
       const { data, error, count } = await query;
-      if (error) throw new RequestAuthError(`DB error: ${error.message}`, 500);
+      if (error) {
+        logServerError('api/data/[entity] POST filter', error, req);
+        throw new RequestAuthError(safeErrorMessage(error, 'Failed to fetch data'), safeErrorStatus(error, 500));
+      }
       res.setHeader('X-Total-Count', String(count ?? 0));
       return res.status(200).json({ ok: true, data, count });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (e: any) {
-    if (e instanceof RequestAuthError) {
-      return res.status(e.status).json({ error: e.message });
-    }
-    console.error('[api/data/[entity]] unexpected:', e);
-    return res.status(500).json({ error: 'Internal server error' });
+    // #1314: centralized error handling — never leaks stack traces.
+    handleApiError(res, e, 'api/data/[entity] unexpected', req);
+    return;
   }
 }

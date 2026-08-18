@@ -20,7 +20,7 @@ export function WhatYouGet({ config }: Props) {
         <div className={`${prefix}-reveal`} style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>What you get</span>
           <h2 className="section-heading" style={{
-            fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700,
+            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20,
           }}>
             A clear picture, <em style={{ fontWeight: 400 }}>not a generic report</em>
@@ -33,7 +33,7 @@ export function WhatYouGet({ config }: Props) {
           {/* Deliverables list */}
           <div className={`${prefix}-reveal`} style={{ background: WHITE, padding: '40px 36px' }}>
             <h3 style={{
-              fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700,
+              fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
               fontSize: 20, marginBottom: 24, color: INK,
             }}>
               Your deliverables
@@ -73,7 +73,7 @@ export function WhatYouGet({ config }: Props) {
                 Sample result preview
               </div>
               <div style={{
-                fontFamily: "'Libre Baskerville', Georgia, serif",
+                fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
                 fontSize: 24, fontWeight: 400, fontStyle: 'italic',
                 color: WHITE, lineHeight: 1.5, marginBottom: 32,
               }}>

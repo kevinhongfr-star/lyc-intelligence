@@ -1,7 +1,7 @@
 /**
  * src/pages/dex/DexJourneyPage.tsx — S7-T06 (N6)
  *
- * Journey Dashboard: a unified visual timeline of the user's Nexus journey.
+ * Journey Dashboard: a unified visual timeline of the user's NEXUS journey.
  * Aggregates conversations, insights, pipeline milestones, and proactive
  * suggestions into a single chronological view, with summary KPIs at the top.
  *
@@ -131,18 +131,18 @@ export function DexJourneyPage() {
             <Link
               to="/dex/chat"
               className="p-2 -ml-2 text-[#666] hover:text-[#1A1A2E] transition-colors"
-              aria-label="Back to Nexus"
+              aria-label="Back to NEXUS"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <div>
-              <h1 className="font-serif text-xl text-[#1A1A2E]" style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}>
+              <h1 className="font-serif text-xl text-[#1A1A2E]" style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}>
                 Your Journey
               </h1>
               <p className="text-xs text-[#666]">
                 {summary?.first_interaction_at
                   ? `Since ${formatDate(summary.first_interaction_at)}`
-                  : 'A timeline of your progress with Nexus'}
+                  : 'A timeline of your progress with NEXUS'}
               </p>
             </div>
           </div>
@@ -150,7 +150,7 @@ export function DexJourneyPage() {
             to="/dex/chat"
             className="text-sm text-[#C108AB] hover:text-[#A00790] font-medium"
           >
-            Continue with Nexus →
+            Continue with NEXUS →
           </Link>
         </div>
       </header>
@@ -233,7 +233,7 @@ function SummaryKpis({ summary }: { summary: JourneySummary }) {
                 {k.label}
               </span>
             </div>
-            <div className="text-2xl font-semibold text-[#1A1A2E]" style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}>
+            <div className="text-2xl font-semibold text-[#1A1A2E]" style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}>
               {k.value}
             </div>
           </div>
@@ -286,11 +286,11 @@ function EmptyJourney() {
   return (
     <div className="text-center py-20">
       <Clock className="w-10 h-10 text-[#C108AB] mx-auto mb-4" />
-      <h2 className="font-serif text-xl text-[#1A1A2E] mb-2" style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}>
+      <h2 className="font-serif text-xl text-[#1A1A2E] mb-2" style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}>
         Your journey starts here
       </h2>
       <p className="text-sm text-[#666] mb-6 max-w-md mx-auto">
-        Once you start chatting with Nexus, applying to mandates, or completing
+        Once you start chatting with NEXUS, applying to mandates, or completing
         assessments, your timeline will populate here.
       </p>
       <Link

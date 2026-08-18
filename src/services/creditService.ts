@@ -21,9 +21,10 @@ import { useAuthStore } from '../stores/authStore';
  *   2. The legacy API paths `/api/credits/spend`, `/api/credits/earn`,
  *      `/api/credits/daily-reset` are still served by the backend and have
  *      not been renamed.
- *   3. The `tier` column on `credits` holds legacy tier strings ('free',
- *      'basic', 'pro', 'council') that map to the canonical 5-tier model
- *      via the `mapToCanonicalTier` helpers used across the UI.
+ *   3. The `tier` column on `credits` holds legacy tier strings ('executive_introduction',
+ *      'professional', 'executive', 'council') that map to the canonical 5-tier model
+ *      via the `mapToCanonicalTier` helpers used across the UI. W3-3: the historical
+ *      'free' value has been migrated to 'executive_introduction'.
  *
  * Implied database schema (no SQL files in repo — schema is managed externally):
  *   credits
@@ -32,7 +33,7 @@ import { useAuthStore } from '../stores/authStore';
  *     ├── daily_balance  int
  *     ├── total_earned   int
  *     ├── total_spent    int
- *     ├── tier           text  ('free' | 'basic' | 'pro' | 'council')
+ *     ├── tier           text  ('executive_introduction' | 'professional' | 'executive' | 'council')
  *     ├── tier_credits_per_month  int
  *     ├── billing_period_start    timestamptz
  *     └── updated_at     timestamptz
@@ -86,9 +87,10 @@ export const CREDIT_EARNING_ACTIONS = {
 } as const;
 
 export const TIER_CREDITS = {
-  free: 0,
-  basic: 50,
+  explorer: 0,
+  starter: 50,
   pro: 200,
+  executive: 300,
   council: 999999
 } as const;
 
@@ -110,7 +112,7 @@ export async function getCreditBalance(userId: string): Promise<CreditInfo | nul
       dailyBalance: data.daily_balance,
       totalEarned: data.total_earned,
       totalSpent: data.total_spent,
-      tier: data.tier || 'free',
+      tier: data.tier || 'explorer',
       tierCreditsPerMonth: data.tier_credits_per_month || 0,
       billingPeriodStart: data.billing_period_start
     };
@@ -193,7 +195,7 @@ export async function getTransactionHistory(
 }
 
 export function getLowCreditWarning(balance: number, tier: string): boolean {
-  if (tier !== 'free') return false;
+  if (tier !== 'explorer') return false;
   return balance <= 5;
 }
 
@@ -274,12 +276,12 @@ export interface MilesTransaction {
 export async function milesBalance(userId?: string): Promise<MilesInfo> {
   const effectiveUserId = userId || useAuthStore.getState().user?.id;
   if (!effectiveUserId) {
-    return { miles: 0, tier: 'free' };
+    return { miles: 0, tier: 'explorer' };
   }
   const info = await getCreditBalance(effectiveUserId);
   return {
     miles: info?.balance ?? 0,
-    tier: info?.tier ?? 'free'
+    tier: info?.tier ?? 'explorer'
   };
 }
 

@@ -46,7 +46,18 @@ $$ LANGUAGE plpgsql IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION public.is_consultant_role(r text) RETURNS boolean AS $$
 BEGIN
-  RETURN COALESCE(r, '') IN ('consultant','lyc_consultant','admin','lyc_admin','super_admin');
+  -- Includes admins for backward compat (many tables grant blanket staff access).
+  -- Per-user scoping for mandates/contacts uses is_scoped_consultant() instead.
+  RETURN COALESCE(r, '') IN ('consultant','lyc_consultant','team_lead','admin','lyc_admin','super_admin');
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+-- Scoped consultant: internal staff who are NOT admins. These users see only
+-- their own mandates (lead_consultant_id) and contacts (owner_id).
+-- Ticket #1306, #1307 — Phase 3 consultant RLS scoping.
+CREATE OR REPLACE FUNCTION public.is_scoped_consultant(r text) RETURNS boolean AS $$
+BEGIN
+  RETURN COALESCE(r, '') IN ('consultant','lyc_consultant','team_lead');
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
@@ -74,6 +85,11 @@ CREATE POLICY profiles_select_self ON public.profiles
   );
 
 -- Profiles can UPDATE their own row only; admins full
+-- NOTE: privileged columns (role, tier, organization_id, subtype,
+-- miles_balance, billing/advisory fields) are protected by a
+-- BEFORE INSERT/UPDATE trigger — see
+-- supabase/migrations/20260812_role_escalation_prevention.sql
+-- (Ticket #1308 — Phase 3 role escalation prevention).
 DROP POLICY IF EXISTS profiles_update_self ON public.profiles;
 CREATE POLICY profiles_update_self ON public.profiles
   FOR UPDATE USING (
@@ -146,19 +162,23 @@ ALTER TABLE IF EXISTS public.mandate_timelines ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS mandates_read ON public.mandates;
 CREATE POLICY mandates_read ON public.mandates FOR SELECT USING (
   is_admin_role(current_user_role())
-  OR is_consultant_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND lead_consultant_id = auth.uid())
   OR (is_client_role(current_user_role()) AND organization_id = current_user_org())
 );
 DROP POLICY IF EXISTS mandates_write ON public.mandates;
 CREATE POLICY mandates_write ON public.mandates FOR ALL USING (
-  is_admin_role(current_user_role()) OR is_consultant_role(current_user_role())
+  is_admin_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND lead_consultant_id = auth.uid())
 );
 
 -- mandate_timelines mirrors mandates' scoping via join to mandates
 DROP POLICY IF EXISTS mandate_tl_read ON public.mandate_timelines;
 CREATE POLICY mandate_tl_read ON public.mandate_timelines FOR SELECT USING (
   is_admin_role(current_user_role())
-  OR is_consultant_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND EXISTS (
+    SELECT 1 FROM public.mandates m
+    WHERE m.id = mandate_timelines.mandate_id AND m.lead_consultant_id = auth.uid()
+  ))
   OR (
     is_client_role(current_user_role())
     AND EXISTS (
@@ -169,7 +189,11 @@ CREATE POLICY mandate_tl_read ON public.mandate_timelines FOR SELECT USING (
 );
 DROP POLICY IF EXISTS mandate_tl_write ON public.mandate_timelines;
 CREATE POLICY mandate_tl_write ON public.mandate_timelines FOR ALL USING (
-  is_admin_role(current_user_role()) OR is_consultant_role(current_user_role())
+  is_admin_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND EXISTS (
+    SELECT 1 FROM public.mandates m
+    WHERE m.id = mandate_timelines.mandate_id AND m.lead_consultant_id = auth.uid()
+  ))
 );
 
 -- ============================================================
@@ -180,13 +204,14 @@ ALTER TABLE IF EXISTS public.contacts ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS contacts_read ON public.contacts;
 CREATE POLICY contacts_read ON public.contacts FOR SELECT USING (
   is_admin_role(current_user_role())
-  OR is_consultant_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND owner_id = auth.uid())
   OR (is_client_role(current_user_role()) AND organization_id = current_user_org())
   OR id::text = auth.uid()::text   -- candidate reading their own contact
 );
 DROP POLICY IF EXISTS contacts_write ON public.contacts;
 CREATE POLICY contacts_write ON public.contacts FOR ALL USING (
-  is_admin_role(current_user_role()) OR is_consultant_role(current_user_role())
+  is_admin_role(current_user_role())
+  OR (is_scoped_consultant(current_user_role()) AND owner_id = auth.uid())
 );
 
 -- ============================================================
@@ -210,7 +235,7 @@ CREATE POLICY docs_write ON public.documents FOR ALL USING (
 -- ============================================================
 
 -- ============================================================
---  TABLE CREATION: assessment_results (added 2026-08-11 P0 fix)
+--  TABLE CREATION: assessment_results (P0 fix 2026-08-11)
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.assessment_results (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -229,6 +254,7 @@ CREATE TABLE IF NOT EXISTS public.assessment_results (
 );
 
 CREATE INDEX IF NOT EXISTS idx_assessment_results_user_id ON public.assessment_results(user_id);
+CREATE INDEX IF NOT EXISTS idx_assessment_results_anonymous_id ON public.assessment_results(anonymous_id);
 CREATE INDEX IF NOT EXISTS idx_assessment_results_code ON public.assessment_results(assessment_code);
 CREATE INDEX IF NOT EXISTS idx_assessment_results_idempotency ON public.assessment_results(idempotency_key);
 CREATE INDEX IF NOT EXISTS idx_assessment_results_org ON public.assessment_results(organization_id);
@@ -674,3 +700,57 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 COMMENT ON FUNCTION public.promote_candidate_to_leader IS
 'Candidate → Leader identity migration (PHASE 16). Requires explicit consent flag. Writes audit trail. SECURITY DEFINER so consent enforcement is always enforced.';
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- Phase 2 Amendments / Ticket #1334 + #1337 — Assessment metadata + shares
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- assessments catalog: public read on published, admin-only write
+ALTER TABLE public.assessments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS assessments_read ON public.assessments;
+CREATE POLICY assessments_read ON public.assessments FOR SELECT USING (
+  is_published = true
+  OR is_admin_role(current_user_role())
+);
+DROP POLICY IF EXISTS assessments_write ON public.assessments;
+CREATE POLICY assessments_write ON public.assessments FOR ALL USING (
+  is_admin_role(current_user_role())
+);
+
+-- user_assessment_progress: user-scoped (user_id = auth.uid())
+ALTER TABLE public.user_assessment_progress ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS uap_read ON public.user_assessment_progress;
+CREATE POLICY uap_read ON public.user_assessment_progress FOR SELECT USING (
+  user_id = auth.uid()
+  OR is_admin_role(current_user_role())
+);
+DROP POLICY IF EXISTS uap_insert ON public.user_assessment_progress;
+CREATE POLICY uap_insert ON public.user_assessment_progress FOR INSERT WITH CHECK (
+  user_id = auth.uid()
+);
+DROP POLICY IF EXISTS uap_update ON public.user_assessment_progress;
+CREATE POLICY uap_update ON public.user_assessment_progress FOR UPDATE USING (
+  user_id = auth.uid()
+);
+DROP POLICY IF EXISTS uap_delete ON public.user_assessment_progress;
+CREATE POLICY uap_delete ON public.user_assessment_progress FOR DELETE USING (
+  user_id = auth.uid()
+  OR is_admin_role(current_user_role())
+);
+
+-- assessment_shares: owner CRUD + public read by token (capability URL)
+ALTER TABLE public.assessment_shares ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS shares_owner_all ON public.assessment_shares;
+CREATE POLICY shares_owner_all ON public.assessment_shares FOR ALL USING (
+  owner_id = auth.uid()
+  OR is_admin_role(current_user_role())
+);
+-- Public read: the share_token IS the auth (capability URL pattern).
+-- RLS allows SELECT on active (non-revoked, non-expired) shares.
+-- The API layer validates the token matches the request.
+DROP POLICY IF EXISTS shares_public_read ON public.assessment_shares;
+CREATE POLICY shares_public_read ON public.assessment_shares FOR SELECT USING (
+  revoked_at IS NULL
+  AND expires_at > now()
+  AND (max_views IS NULL OR view_count < max_views)
+);

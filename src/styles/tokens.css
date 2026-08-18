@@ -1,17 +1,21 @@
 /**
  * DEX AI Design Tokens — Mockup v14
- * CSS custom properties for consistent theming
+ * CSS custom properties for consistent theming.
+ *
+ * X5-6: Scoped under .dex-app to prevent vitrine leakage.
+ * Canonical source of truth = src/tokens/index.ts (ECHO v1.2).
+ * Values below are aligned to canonical tokens. Radius = 0 (brand rule).
  */
 
-:root {
-  /* Base colors */
-  --white: #fff;
-  --bg: #fafafa;
-  --bg-warm: #f7f6f4;
-  --border: #e8e6e3;
-  --text-primary: #1a1a1a;
-  --text-secondary: #555;
-  --text-muted: #999;
+.dex-app {
+  /* Base colors — aligned to ECHO v1.2 canonical (src/tokens/index.ts) */
+  --white: #FFFFFF;
+  --bg: #FAFAFA;
+  --bg-warm: #F7F6F3;       /* GRAY_200 in canonical */
+  --border: #E9E7E1;        /* GRAY_300 in canonical */
+  --text-primary: #0A0A12;  /* TEXT in canonical */
+  --text-secondary: #2B2B3A;/* TEXT_SECONDARY in canonical */
+  --text-muted: #616170;    /* MUTED / GRAY_500 — eyebrow color in canonical */
 
   /* Brand */
   --fuchsia: #C108AB;
@@ -19,14 +23,14 @@
   --fuchsia-10: rgba(193,8,171,.1);
   --fuchsia-20: rgba(193,8,171,.2);
 
-  /* Semantic */
-  --green: #2d8a4e;
-  --amber: #b8860b;
-  --red: #c0392b;
-  --blue: #2c5282;
+  /* Semantic — aligned to canonical */
+  --green: #00897B;          /* TEAL in canonical */
+  --amber: #CA8A04;          /* WARNING in canonical */
+  --red: #DC2626;            /* ERROR in canonical */
+  --blue: #2563EB;           /* INFO in canonical */
 
   /* Typography */
-  --font-serif: 'Libre Baskerville', Georgia, serif;
+  --font-serif: 'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif;
   --font-sans: 'DM Sans', system-ui, sans-serif;
 
   /* Shadows */
@@ -34,41 +38,42 @@
   --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.1);
   --shadow-modal: 0 8px 32px rgba(0,0,0,0.15);
 
-  /* Border radius */
-  --radius-card: 12px;
-  --radius-sm: 8px;
-  --radius-full: 9999px;
+  /* Border radius — X5-1: zero per brand rule */
+  --radius-card: 0px;
+  --radius-sm: 0px;
+  --radius-full: 9999px;    /* preserved ONLY for genuinely circular elements */
 }
 
-body {
+/* DEX-scoped body / typography overrides */
+.dex-app body {
   font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text-primary);
   line-height: 1.6;
 }
 
-h1, h2, h3, h4, h5, h6 {
+.dex-app h1, .dex-app h2, .dex-app h3, .dex-app h4, .dex-app h5, .dex-app h6 {
   font-family: var(--font-serif);
   font-weight: 700;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
+/* Scrollbar styling — scoped to DEX */
+.dex-app ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-::-webkit-scrollbar-track {
+.dex-app ::-webkit-scrollbar-track {
   background: var(--bg);
 }
-::-webkit-scrollbar-thumb {
+.dex-app ::-webkit-scrollbar-thumb {
   background: var(--border);
 }
-::-webkit-scrollbar-thumb:hover {
+.dex-app ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
 
-/* Selection */
-::selection {
+/* Selection — scoped to DEX */
+.dex-app ::selection {
   background: var(--fuchsia-light);
   color: var(--fuchsia);
 }

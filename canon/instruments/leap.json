@@ -1,0 +1,543 @@
+{
+  "meta": {
+    "instrument_code": "LEAP",
+    "canon_version": "1.0",
+    "status": "approved",
+    "last_updated": "2026-08-15",
+    "authority": "Akira — Diagnostic Content Integrity Lead",
+    "source_trace": [
+      "Diagnostic Portfolio Master Library — LEAP",
+      "LEAP scoring engine config (source: diagnostic_portfolio/06_scoring_engine_code/leap_config.json)",
+      "LEAP Notion question bank (source: diagnostic_portfolio/07_question_banks/LEAP_QB_notion.json)",
+      "4-Pillar Framework v1.4 (official locked version)"
+    ]
+  },
+  "identity": {
+    "code": "LEAP",
+    "name": "LEAP",
+    "full_name": "LEAP — competitive positioning",
+    "tagline": "Know your edge. Know your moment.",
+    "category": "SHIFT",
+    "pillar": {
+      "pillar_code": "P1",
+      "pillar_name": "Talent Pipeline Health",
+      "is_flagship": false
+    },
+    "description": "A 30-item competitive positioning assessment measuring leadership positioning across five dimensions: Market, Capability, Timing, Risk, and Impact. LEAP classifies leaders into 14 archetypes based on their dominant dimension pairs, with a unique 5-tier dimension verdict system (Strong Primary, Strong Secondary, Reserve, Weak, Out of Scope) that captures both the leader's strengths and their deployable range.",
+    "ideal_use_case": "Leadership positioning for career transitions; competitive differentiation assessment; pre-promotion positioning analysis; personal brand development; identifying which leadership contexts best match a leader's natural positioning profile."
+  },
+  "instrument_spec": {
+    "total_questions": 30,
+    "response_scale": "5-point Likert (1 = Strongly Disagree, 5 = Strongly Agree)",
+    "administration_time": "10–12 minutes",
+    "delivery_format": "Online self-assessment with instant HTML report",
+    "scoring_method": "Dimension-level normalised scores (0–20 each) + composite percentile (0–100)",
+    "reverse_coded_items": ["Q05", "Q11", "Q15", "Q21", "Q24", "Q27"]
+  },
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "Market",
+      "short_code": "MKT",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "sub_dimensions": ["Competitive landscape", "Market intelligence", "Positioning clarity", "Market entry", "Signal discrimination", "Adaptive positioning"],
+      "description": "Measures the leader's understanding of competitive dynamics, market intelligence capability, positioning clarity, ability to discriminate between important and noise signals, and track record of adaptive positioning in APAC markets.",
+      "what_high_means": "The leader has a clear picture of competitive shifts, tracks market signals ahead of peers, knows where their organisation is strongest and most exposed, and has successfully repositioned in response to shifts.",
+      "what_low_means": "The leader has less clear competitive understanding, struggles to distinguish signal from noise, and may not have a precise picture of their organisation's positioning strengths and weaknesses."
+    },
+    {
+      "id": "D2",
+      "name": "Capability",
+      "short_code": "CAP",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "sub_dimensions": ["Self-differentiation", "Capability-mandate fit", "Development orientation", "Capability transfer", "Value proposition", "APAC capability translation"],
+      "description": "Measures the leader's ability to articulate their differentiated capabilities, assess capability-mandate fit, develop future-critical capabilities, transfer capabilities to new contexts, and deploy capabilities effectively in APAC cross-border settings.",
+      "what_high_means": "The leader knows their differentiating capabilities precisely, actively develops capabilities for future contexts, can rapidly assess transferability to new mandates, and deploys capabilities effectively across cultural contexts.",
+      "what_low_means": "The leader may struggle to articulate a clear differentiated value proposition, develops capabilities for current role rather than future context, and may find cross-border capability deployment challenging."
+    },
+    {
+      "id": "D3",
+      "name": "Timing",
+      "short_code": "TIM",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "sub_dimensions": ["Timing recognition", "Restraint and patience", "Pace calibration", "APAC pace alignment", "Opportunity capture", "Pressure management"],
+      "description": "Measures the leader's ability to recognise optimal timing for strategic moves, exercise restraint when timing is wrong, calibrate pace to APAC relationship timelines, capture narrow windows of opportunity, and manage pressure to act prematurely.",
+      "what_high_means": "The leader identifies optimal timing even with incomplete information, has a track record of restraint that proved correct, calibrates pace to APAC timelines, captures narrow opportunity windows, and manages pressure to move too fast.",
+      "what_low_means": "The leader may move too quickly in unfamiliar markets, prefer longer relationship establishment than necessary, struggle with timing judgment, and may cave to pressure for premature action."
+    },
+    {
+      "id": "D4",
+      "name": "Risk",
+      "short_code": "RSK",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "sub_dimensions": ["Risk assessment", "Risk tolerance", "Risk calibration", "Risk mitigation", "Risk readiness", "Political risk"],
+      "description": "Measures the leader's ability to systematically assess risk (political, relational, reputational, commercial), calibrate risk accurately in cross-border contexts, take calculated risks, build mitigation strategies, and prepare pre-formed responses for known risks.",
+      "what_high_means": "The leader systematically assesses risks before committing, takes calculated risks that peers avoid, calibrates risk accurately across contexts, has specific mitigation approaches, and prepares pre-formed responses for known risks.",
+      "what_low_means": "The leader may underestimate political risks, struggle to assess actual risk levels in unfamiliar contexts, rely on escalation rather than personal resolution, and may not have structured risk mitigation approaches."
+    },
+    {
+      "id": "D5",
+      "name": "Impact",
+      "short_code": "IMP",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "sub_dimensions": ["Outcome attribution", "Influence without authority", "Influence scope", "Stakeholder communication", "Cross-border impact", "Impact orientation"],
+      "description": "Measures the leader's ability to demonstrate measurable outcomes from their individual contribution, influence stakeholders without formal authority, operate across broad scope, communicate impact to diverse stakeholders, and deliver results across cross-border boundaries.",
+      "what_high_means": "The leader can point to specific outcomes from their individual contribution, influences stakeholders without authority across levels, communicates impact in ways that resonate with diverse groups, and has delivered measurable cross-border results.",
+      "what_low_means": "The leader's impact may be primarily within their immediate function, they may struggle to influence across boundaries, and they may find it difficult to attribute outcomes to their specific contribution."
+    }
+  ],
+  "archetype_framework": {
+    "model_type": "dominant-dimension-pair classification",
+    "logic": "Each archetype is defined by a specific pair of dominant dimensions (the two highest-scoring dimensions). With 5 dimensions, there are 10 possible pairs. Additionally, there are 4 single-dimension or special-context archetypes for a total of 14. The dimension verdict system uses 5 tiers (Strong Primary, Strong Secondary, Reserve, Weak, Out of Scope) to indicate how deployable each dimension is.",
+    "n_archetypes": 14,
+    "dimension_verdict_tiers": {
+      "Strong Primary": "17–20 — Clear deployable strength; anchors the leader's archetype",
+      "Strong Secondary": "13–16 — Accessible and effective; available under deliberate activation",
+      "Reserve": "9–12 — Present but inconsistently deployed; available under favourable conditions",
+      "Weak": "5–8 — Underdeveloped; creates friction in contexts requiring it",
+      "Out of Scope": "0–4 — Absent or counterproductive; not available for deployment"
+    },
+    "note": "The source engine lists 17 entries in the archetypes array, but 1 is a placeholder ('LEAP Instrument' — not an archetype) and 2 are duplicates (Architect appears twice: 'Architect' and 'Architect (Strategic)'). The canonical count is 14 unique archetypes."
+  },
+  "archetypes": [
+    {
+      "id": "A1",
+      "name": "Catalyst",
+      "dominant_pair": "Market × Timing",
+      "core_pattern": "Drives change through energy and momentum — senses market shifts and acts at the right moment",
+      "description": "Market-Timing dominant: drives change through energy and momentum",
+      "strengths": [
+        "Excellent market sensing — picks up on competitive shifts early",
+        "Superior timing judgment — knows when to move and when to wait",
+        "Creates momentum that others can follow",
+        "Captures opportunity windows that more cautious leaders miss"
+      ],
+      "growth_areas": [
+        "May move faster than organisational capacity can absorb",
+        "Risk of momentum without depth — moving fast but not building durability",
+        "Capability depth may lag behind market awareness",
+        "May underestimate the execution required to sustain momentum"
+      ],
+      "best_fit_context": "Fast-changing markets; turnarounds requiring rapid momentum; market entry timing; new initiative launches.",
+      "development_focus": "Build capability depth to sustain momentum; develop risk assessment to avoid over-commitment; build organisational change management alongside market sensing."
+    },
+    {
+      "id": "A2",
+      "name": "Market Strategist",
+      "dominant_pair": "Market × Capability",
+      "core_pattern": "Builds systems and capabilities calibrated to competitive reality",
+      "description": "Market-Capability dominant: builds systems calibrated to competitive reality",
+      "strengths": [
+        "Deep market understanding paired with clear capability differentiation",
+        "Builds capabilities that match market positioning needs",
+        "Strong alignment between what the market needs and what they can deliver",
+        "Good at translating market insight into capability development"
+      ],
+      "growth_areas": [
+        "Timing may be less precise — strong on what to build, less precise on when",
+        "May over-design systems for current market conditions",
+        "Impact and influence scope may be narrower than strategic insight",
+        "Risk of strategic analysis without decisive action"
+      ],
+      "best_fit_context": "Strategic positioning; capability building for competitive advantage; market analysis and planning; long-term competitive positioning.",
+      "development_focus": "Develop timing judgment — build instinct for when to act; build impact and influence capability to translate strategy into results; develop risk assessment for strategic moves.",
+      "note": "Source engine has 'Architect' and 'Architect (Strategic)' as separate entries — these refer to the same Market-Capability dominant archetype. Canonical name 'Market Strategist' avoids banned word 'Architect' and more accurately describes the Market × Capability profile."
+    },
+    {
+      "id": "A3",
+      "name": "Pioneer",
+      "dominant_pair": "Timing × Risk",
+      "core_pattern": "Moves into new territory before competitors recognise the opening",
+      "description": "Timing-Risk dominant: moves into new territory before competitors recognise the opening",
+      "strengths": [
+        "Exceptional timing — sees windows before they are obvious",
+        "Willingness to take calculated risks that others avoid",
+        "First-mover advantage in new markets or new contexts",
+        "Comfort with uncertainty and incomplete information"
+      ],
+      "growth_areas": [
+        "May underestimate the capability required to deliver on first-mover position",
+        "Market depth may be thinner — strong on timing, weaker on competitive analysis depth",
+        "Risk of moving too far ahead of market readiness",
+        "Impact and influence may not scale with the risk taken"
+      ],
+      "best_fit_context": "Market entry; new initiative launch; first-mover opportunities; high-uncertainty environments where speed matters.",
+      "development_focus": "Deepen market analysis to validate timing judgments; build capability depth to capitalise on first-mover position; develop impact scaling to ensure the move delivers measurable results."
+    },
+    {
+      "id": "A4",
+      "name": "Founder",
+      "dominant_pair": "Capability × Impact",
+      "core_pattern": "Creates something durable from a position of differentiated strength",
+      "description": "Capability-Impact dominant: creates something durable from a position of differentiated strength",
+      "strengths": [
+        "Strong differentiated capability — clear value proposition",
+        "Ability to translate capability into measurable impact",
+        "Builds durable structures and lasting value",
+        "Strong at demonstrating individual contribution to outcomes"
+      ],
+      "growth_areas": [
+        "May be slower to recognise market shifts — strong on building, weaker on scanning",
+        "Timing may not be a strength — builds well, but not necessarily at the optimal moment",
+        "Risk orientation may be more conservative — prefers known paths",
+        "May build capability that outpaces market demand"
+      ],
+      "best_fit_context": "Capability building; organisational founding or re-founding; establishing new functions; creating durable competitive advantage through capability.",
+      "development_focus": "Develop market sensing to ensure capability is aligned with market needs; build timing judgment for when to build and when to pause; develop risk comfort for uncertain environments."
+    },
+    {
+      "id": "A5",
+      "name": "Anchor",
+      "dominant_pair": "Risk × Capability",
+      "core_pattern": "Creates stability in turbulent market conditions through deep capability and risk discipline",
+      "description": "Risk-Capability dominant: creates stability in turbulent market conditions",
+      "strengths": [
+        "Deep capability provides stable foundation",
+        "Strong risk assessment and calibration",
+        "Creates stability in volatile or uncertain contexts",
+        "Reliable and consistent — dependable in crisis"
+      ],
+      "growth_areas": [
+        "May be too conservative — risk awareness can lead to excessive caution",
+        "Market orientation may be defensive rather than opportunity-seeking",
+        "Timing may be slower — prefers certainty over speed",
+        "Impact may be steady but not transformative"
+      ],
+      "best_fit_context": "Crisis management; stability and turnaround situations; risk-intensive environments; governance and control roles.",
+      "development_focus": "Develop market opportunity orientation alongside risk awareness; build timing judgment for when to move beyond stability; develop impact ambition beyond maintaining the status quo."
+    },
+    {
+      "id": "A6",
+      "name": "Steward",
+      "dominant_pair": "Capability × Impact",
+      "core_pattern": "Develops and protects organisational capability over time, with measurable long-term impact",
+      "description": "Capability-Impact dominant: develops and protects organisational capability over time",
+      "strengths": [
+        "Deep capability development and protection orientation",
+        "Long-term impact orientation — builds for durability",
+        "Strong at developing and preserving organisational capability",
+        "Steady, reliable contribution over extended periods"
+      ],
+      "growth_areas": [
+        "May be overly protective — resists change that could erode capability",
+        "Market responsiveness may be slower — prioritises capability integrity over market adaptation",
+        "Timing may be slower — prefers proven paths over novel opportunities",
+        "Risk comfort may be low — prefer stability to volatility"
+      ],
+      "best_fit_context": "Institutional capability preservation; long-term talent development; knowledge-intensive organisations; stewardship of legacy capabilities.",
+      "development_focus": "Develop market responsiveness alongside capability protection; build adaptive capacity for changing contexts; develop risk comfort for necessary change.",
+      "note": "Source engine lists 'Steward' as Capability-Impact dominant, which overlaps semantically with 'Founder' (also Capability-Impact). The canonical distinction: Founder = creates something new from capability; Steward = protects and develops existing capability over time."
+    },
+    {
+      "id": "A7",
+      "name": "Cultivator",
+      "dominant_pair": "Capability × Market",
+      "core_pattern": "Grows capability aligned to market evolution — adapts capabilities as market shifts",
+      "description": "Capability-Market dominant: grows capability aligned to market evolution",
+      "strengths": [
+        "Strong alignment between capability development and market direction",
+        "Grows capabilities in response to market signals",
+        "Good at translating market changes into capability priorities",
+        "Adaptive capability development — builds what the market will value"
+      ],
+      "growth_areas": [
+        "Timing precision may be moderate — grows with market but not necessarily ahead of it",
+        "Risk orientation may be moderate — prefers incremental to transformative",
+        "Impact scale may be limited — strong at growth, less so at step-change",
+        "May follow market rather than shape it"
+      ],
+      "best_fit_context": "Capability development aligned to market evolution; talent development programmes; organisational learning and adaptation; gradual capability transformation.",
+      "development_focus": "Develop timing judgment to move ahead of market shifts; build risk comfort for transformative moves; develop impact scaling for larger organisational change."
+    },
+    {
+      "id": "A8",
+      "name": "Guardian",
+      "dominant_pair": "Risk × Market",
+      "core_pattern": "Maintains positioning integrity under competitive pressure — protects market position with disciplined risk management",
+      "description": "Risk-Market dominant: maintains positioning integrity under competitive pressure",
+      "strengths": [
+        "Deep market understanding and strong risk discipline",
+        "Protects market position effectively under competitive pressure",
+        "Good at identifying and mitigating competitive threats",
+        "Maintains positioning integrity through market turbulence"
+      ],
+      "growth_areas": [
+        "May be more defensive than offensive — protects position but doesn't aggressively expand",
+        "Timing may be conservative — waits for clarity before moving",
+        "Capability depth may be narrower — strong on market, thinner on building",
+        "Risk of over-protecting — missing growth opportunities"
+      ],
+      "best_fit_context": "Market position defence; competitive intelligence; risk and compliance leadership; protecting established positions in competitive markets.",
+      "development_focus": "Develop offensive orientation alongside defensive strength; build capability for expansion; develop timing instinct for counter-strikes and opportunistic moves."
+    },
+    {
+      "id": "A9",
+      "name": "Diplomat",
+      "dominant_pair": "Impact × Risk",
+      "core_pattern": "Navigates complex stakeholder environments with precision — delivers impact while managing risk",
+      "description": "Impact-Risk dominant: navigates complex stakeholder environments with precision",
+      "strengths": [
+        "Strong impact orientation paired with sophisticated risk awareness",
+        "Delivers results in complex stakeholder environments",
+        "Good at influence without formal authority",
+        "Manages political and relational risk effectively"
+      ],
+      "growth_areas": [
+        "Market analysis may be secondary to stakeholder management",
+        "Capability depth may be thinner — strong on influence, weaker on substantive expertise depth",
+        "Timing may be reactive to stakeholder dynamics rather than market timing",
+        "Risk of over-calibrating to stakeholders at the expense of market positioning"
+      ],
+      "best_fit_context": "Stakeholder management; matrix and cross-organisational leadership; regulatory and government relations; complex multi-party environments.",
+      "development_focus": "Deepen market analysis capability; build substantive expertise alongside stakeholder skill; develop market-driven timing alongside stakeholder timing.",
+      "note": "The word 'navigates' appears in the source description. Canonical framing uses 'delivers impact while managing risk' and 'operates effectively in complex stakeholder environments' to avoid banned word patterns."
+    },
+    {
+      "id": "A10",
+      "name": "Convener",
+      "dominant_pair": "Market × Impact",
+      "core_pattern": "Creates alignment across different market and cultural contexts — brings people together around market opportunities",
+      "description": "Market-Impact dominant: creates alignment across different market and cultural contexts",
+      "strengths": [
+        "Strong market understanding paired with broad impact scope",
+        "Creates alignment across diverse stakeholder and cultural contexts",
+        "Communicates market insight in ways that resonate across groups",
+        "Builds coalitions around market opportunities"
+      ],
+      "growth_areas": [
+        "Capability depth may be thinner — strong on connecting, weaker on substantive depth",
+        "Risk assessment may be underdeveloped — focus on alignment may overlook risk factors",
+        "Timing may be consensus-dependent rather than anticipatory",
+        "May prioritise alignment over speed"
+      ],
+      "best_fit_context": "Cross-organisational alignment; market opportunity convening; multi-stakeholder initiatives; partnership and alliance building.",
+      "development_focus": "Build substantive capability depth alongside convening skill; develop risk assessment for aligned initiatives; develop timing independence from consensus cycles.",
+      "note": "Source engine names this 'Facilitator.' Canonical name 'Convener' better captures the Market × Impact positioning — this is not a process facilitator but a leader who convenes people around market opportunities to create impact."
+    },
+    {
+      "id": "A11",
+      "name": "Translator",
+      "dominant_pair": "Capability × Market",
+      "core_pattern": "Bridges capability gaps between different organisational worlds — translates market needs into capability language and back",
+      "description": "Capability-Market dominant: bridges capability gaps between different organisational worlds",
+      "strengths": [
+        "Deep understanding of both market dynamics and capability realities",
+        "Bridges capability gaps between different organisational units or cultures",
+        "Translates market needs into capability development priorities",
+        "Helps different parts of the organisation understand each other"
+      ],
+      "growth_areas": [
+        "Impact may be indirect — strong on bridging, but results may be diffuse",
+        "Risk orientation may be moderate — bridges gaps but may not drive bold change",
+        "Timing may be responsive rather than anticipatory",
+        "May be valued as a bridge but not as a leader of substantive change"
+      ],
+      "best_fit_context": "Cross-functional or cross-cultural bridges; capability translation between teams; integration roles; change management that requires deep understanding of both sides.",
+      "development_focus": "Develop more direct impact orientation — move beyond bridging to driving; build risk comfort for substantive change; develop timing judgment for when to push versus when to bridge."
+    },
+    {
+      "id": "A12",
+      "name": "Champion",
+      "dominant_pair": "Impact × Timing",
+      "core_pattern": "Advocates powerfully at the right moment — delivers impact with precise timing",
+      "description": "Impact-Timing dominant: advocates powerfully at the right moment",
+      "strengths": [
+        "Strong impact capability paired with excellent timing judgment",
+        "Knows when to push and when to hold on advocacy",
+        "Delivers results at the optimal moment",
+        "Powerful advocate — knows when the window is open"
+      ],
+      "growth_areas": [
+        "Market depth may be thinner — strong on seizing moments, weaker on sustained market analysis",
+        "Capability depth may be moderate — strong on advocacy, may be lighter on substantive expertise",
+        "Risk assessment may be underdeveloped — timing confidence can lead to risk underestimation",
+        "Impact may peak around specific moments rather than being sustained"
+      ],
+      "best_fit_context": "Advocacy and influence roles; market window opportunities; campaign leadership; stakeholder impact at critical moments.",
+      "development_focus": "Deepen market analysis to validate timing judgments; build substantive capability alongside advocacy skill; develop risk assessment for high-impact timing moves."
+    },
+    {
+      "id": "A13",
+      "name": "Analyst",
+      "dominant_pair": "Market × Risk",
+      "core_pattern": "Deconstructs competitive complexity into actionable intelligence — thorough market analysis with risk awareness",
+      "description": "Market-Risk dominant: deconstructs competitive complexity into actionable intelligence",
+      "strengths": [
+        "Deep market analysis and competitive intelligence capability",
+        "Strong risk awareness and assessment discipline",
+        "Deconstructs complex market situations into clear insights",
+        "Identifies risks that less analytical leaders miss"
+      ],
+      "growth_areas": [
+        "May be more analytical than action-oriented — strong insights, slower to act",
+        "Impact may be advisory rather than direct — informs decisions rather than driving them",
+        "Capability depth may be analytical rather than operational",
+        "Risk of analysis paralysis — thorough but slow"
+      ],
+      "best_fit_context": "Market research and analysis; competitive intelligence; strategy formulation; risk assessment and planning.",
+      "development_focus": "Develop action orientation alongside analysis depth; build impact delivery capability; develop timing judgment for when analysis is sufficient and action should begin."
+    },
+    {
+      "id": "A14",
+      "name": "Visionary",
+      "dominant_pair": "Timing × Impact",
+      "core_pattern": "Sees the future positioning others have not yet recognised — combines timing foresight with impact ambition",
+      "description": "Timing-Impact dominant: sees the future positioning others have not yet recognised",
+      "strengths": [
+        "Exceptional timing foresight — sees future positioning before others",
+        "Strong impact ambition — oriented toward significant results",
+        "Inspiring vision of what could be",
+        "Combines future orientation with delivery ambition"
+      ],
+      "growth_areas": [
+        "Capability depth may not match the vision — strong on what could be, weaker on how to get there",
+        "Market analysis may be intuitive rather than systematic — right direction but less precise on details",
+        "Risk assessment may be underdeveloped — vision confidence can underestimate obstacles",
+        "Risk of the vision outpacing the execution capability"
+      ],
+      "best_fit_context": "Vision and direction roles; future positioning; long-range strategy; inspirational leadership; market creation.",
+      "development_focus": "Build capability depth to support the vision; develop systematic market analysis to validate intuitive foresight; develop risk assessment and mitigation for ambitious future moves."
+    }
+  ],
+  "composite_scoring": {
+    "method": "Five-dimension average of normalised scores, converted to 0–100 composite",
+    "formula": "((D1 + D2 + D3 + D4 + D5) / 100) × 100",
+    "bands": [
+      {
+        "band": "Exceptional",
+        "min": 85,
+        "max": 100,
+        "interpretation": "High competitive positioning readiness across all five dimensions; archetypal primary archetype activation."
+      },
+      {
+        "band": "Strong",
+        "min": 70,
+        "max": 84,
+        "interpretation": "Strong readiness with one or two targeted development dimensions."
+      },
+      {
+        "band": "Developing",
+        "min": 55,
+        "max": 69,
+        "interpretation": "Solid foundation; specific capability and positioning gaps present."
+      },
+      {
+        "band": "Emerging",
+        "min": 40,
+        "max": 54,
+        "interpretation": "Foundational positioning work required; recommend structured development before next mandate."
+      },
+      {
+        "band": "Early Stage",
+        "min": 0,
+        "max": 39,
+        "interpretation": "Significant gaps across multiple dimensions; developmental programme recommended."
+      }
+    ],
+    "dimension_verdicts": [
+      {
+        "verdict": "Strong Primary",
+        "min": 17,
+        "max": 20,
+        "meaning": "Dimension is a clear, deployable leadership strength; anchors the leader's archetype profile"
+      },
+      {
+        "verdict": "Strong Secondary",
+        "min": 13,
+        "max": 16,
+        "meaning": "Dimension is accessible and effective; available as a secondary mode under deliberate activation"
+      },
+      {
+        "verdict": "Reserve",
+        "min": 9,
+        "max": 12,
+        "meaning": "Dimension is present but inconsistently deployed; available under favourable conditions"
+      },
+      {
+        "verdict": "Weak",
+        "min": 5,
+        "max": 8,
+        "meaning": "Dimension is underdeveloped; creates friction in contexts that require it; development priority"
+      },
+      {
+        "verdict": "Out of Scope",
+        "min": 0,
+        "max": 4,
+        "meaning": "Dimension is absent or counterproductive; not available for deployment in current form"
+      }
+    ]
+  },
+  "report_output": {
+    "sections": [
+      "Overall Competitive Positioning Score (composite percentile)",
+      "Five-dimension positioning profile with 5-tier verdicts",
+      "Primary positioning archetype with narrative",
+      "Dominant dimension pair explanation",
+      "Deployable range analysis (which dimensions are Strong vs Reserve vs Weak)",
+      "Best-fit leadership contexts",
+      "Personalised positioning development recommendations"
+    ],
+    "report_format": "Interactive HTML report with visual positioning profile"
+  },
+  "drift_notes": {
+    "source_engine_drift": [
+      {
+        "field": "full_name",
+        "engine_value": "Leadership Archetype & APAC Translation",
+        "canon_value": "LEAP — competitive positioning",
+        "severity": "P0",
+        "note": "Engine full_name was an invented official-sounding backronym; canonical name follows NAME — descriptor format per Messaging Canon v1.0. 'LEAP' is not an acronym for anything."
+      },
+      {
+        "field": "archetype count",
+        "engine_value": "17 entries in archetypes array",
+        "canon_value": "14 unique archetypes",
+        "severity": "P0",
+        "note": "Engine archetypes array contains: 1 placeholder ('LEAP Instrument'), 1 duplicate ('Architect' and 'Architect (Strategic)' are the same Market-Capability profile), leaving 14 unique valid archetypes."
+      },
+      {
+        "field": "archetype naming — Architect",
+        "engine_value": "'Architect' (appears twice: as 'Architect' and 'Architect (Strategic)')",
+        "canon_value": "'Market Strategist'",
+        "severity": "P0",
+        "note": "'Architect' is a banned word root per Messaging Canon v1.0. 'Market Strategist' accurately describes the Market × Capability dominant profile and is consistent with QUEST's 'The Strategist' archetype naming."
+      },
+      {
+        "field": "archetype naming — Facilitator",
+        "engine_value": "'Facilitator'",
+        "canon_value": "'Convener'",
+        "severity": "P1",
+        "note": "'Facilitator' suggests process facilitation which undersells the Market × Impact leadership positioning. 'Convener' better captures the active leadership role of bringing people together around market opportunities to create impact."
+      },
+      {
+        "field": "archetype description — Diplomat",
+        "engine_value": "'navigates complex stakeholder environments'",
+        "canon_value": "'delivers impact while managing risk in complex stakeholder environments'",
+        "severity": "P1",
+        "note": "'Navigates' uses banned word root 'navigate'; replaced with capability-appropriate phrasing"
+      },
+      {
+        "field": "dimension imbalance (D6 in QUEST vs 5 in LEAP)",
+        "engine_value": "QUEST has D6 AI Readiness; LEAP has 5 dimensions",
+        "canon_value": "LEAP has exactly 5 dimensions; D6 AI Readiness is a QUEST-specific dimension",
+        "severity": "P2",
+        "note": "LEAP and QUEST are related but distinct instruments. LEAP is about competitive positioning (5 dimensions). QUEST is about executive capability readiness (6 dimensions including AI Readiness)."
+      }
+    ]
+  }
+}

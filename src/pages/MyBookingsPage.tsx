@@ -1,128 +1,93 @@
-import React from 'react';
-import { Calendar, Clock, CheckCircle2, Video, MapPin, ArrowRight } from 'lucide-react';
-import { SEO } from '@/components/seo/SEO';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
-import { INSTRUMENT_MILE_COST, getMileCostTier } from '@/constants/miles';
-import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
+import React, { useState } from 'react';
+import {
+  SESSION_CATALOG,
+  type SessionType,
+  COACH_ROSTER,
+  type CoachRosterEntry,
+  type BookingStatus,
+  CANCELLATION_FREE_HOURS_BEFORE,
+} from '@/config/sessions';
+import { DS } from '@/tokens';
 
-type BookingStatus = 'upcoming' | 'past' | 'cancelled';
+type Tab = 'upcoming' | 'past';
 
-interface MockBooking {
+interface MockBookingItem {
   id: string;
-  instrumentCode: string;
-  sessionType: string;
+  sessionSlug: string;
+  coachId: string;
+  dateIso: string;
+  timeSlot: string;
   durationMinutes: number;
   status: BookingStatus;
-  dateISO: string;
-  time: string;
-  specialistName: string;
-  specialistRole: string;
-  modality: 'video' | 'in-person';
-  location?: string;
-  joinUrl?: string;
+  notesPlaceholder?: string;
 }
 
-const TODAY = new Date();
-
-function addDays(d: Date, n: number) {
-  const nd = new Date(d);
-  nd.setDate(d.getDate() + n);
-  return nd;
-}
-
-const MOCK_BOOKINGS: readonly MockBooking[] = [
+const MOCK_UPCOMING: MockBookingItem[] = [
   {
-    id: 'bk-cpi-001',
-    instrumentCode: 'CPI',
-    sessionType: 'CPI (China Leadership Pipeline Index) Specialist',
-    durationMinutes: 90,
-    status: 'upcoming',
-    dateISO: addDays(TODAY, 5).toISOString().split('T')[0],
-    time: '10:00',
-    specialistName: 'Dr. Wei Zhang',
-    specialistRole: 'CPI Specialist & Senior Consultant',
-    modality: 'video',
-    joinUrl: '#join-cpi',
-  },
-  {
-    id: 'bk-prism-002',
-    instrumentCode: 'PRISM',
-    sessionType: 'Leadership Coach',
-    durationMinutes: 45,
-    status: 'upcoming',
-    dateISO: addDays(TODAY, 10).toISOString().split('T')[0],
-    time: '14:30',
-    specialistName: 'Sarah Chen',
-    specialistRole: 'Leadership Coach',
-    modality: 'video',
-    joinUrl: '#join-prism',
-  },
-  {
-    id: 'bk-spark-003',
-    instrumentCode: 'SPARK',
-    sessionType: 'Senior Consultant',
-    durationMinutes: 60,
-    status: 'upcoming',
-    dateISO: addDays(TODAY, 15).toISOString().split('T')[0],
-    time: '11:00',
-    specialistName: 'Marcus Lee',
-    specialistRole: 'Senior Consultant',
-    modality: 'in-person',
-    location: 'Singapore · Marina Bay Financial Centre',
-  },
-  {
-    id: 'bk-leap-004',
-    instrumentCode: 'LEAP',
-    sessionType: 'Executive Diagnostic Specialist',
+    id: 'BK-ABC123',
+    sessionSlug: 'career-30',
+    coachId: 'coach_1',
+    dateIso: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+    timeSlot: '10:00',
     durationMinutes: 30,
-    status: 'past',
-    dateISO: addDays(TODAY, -12).toISOString().split('T')[0],
-    time: '09:30',
-    specialistName: 'Ananya Rao',
-    specialistRole: 'Executive Diagnostic Specialist',
-    modality: 'video',
+    status: 'scheduled',
   },
   {
-    id: 'bk-bridge-005',
-    instrumentCode: 'BRIDGE',
-    sessionType: 'Senior Consultant',
-    durationMinutes: 60,
-    status: 'past',
-    dateISO: addDays(TODAY, -22).toISOString().split('T')[0],
-    time: '15:00',
-    specialistName: 'Kevin O\'Connor',
-    specialistRole: 'Senior Consultant',
-    modality: 'video',
-  },
-  {
-    id: 'bk-quest-006',
-    instrumentCode: 'QUEST',
-    sessionType: 'Leadership Coach',
+    id: 'BK-DEF456',
+    sessionSlug: 'executive-45',
+    coachId: 'coach_2',
+    dateIso: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    timeSlot: '14:30',
     durationMinutes: 45,
-    status: 'past',
-    dateISO: addDays(TODAY, -34).toISOString().split('T')[0],
-    time: '13:00',
-    specialistName: 'Sarah Chen',
-    specialistRole: 'Leadership Coach',
-    modality: 'video',
+    status: 'scheduled',
   },
-] as const;
+  {
+    id: 'BK-GHI789',
+    sessionSlug: 'leadership-60',
+    coachId: 'coach_3',
+    dateIso: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+    timeSlot: '11:00',
+    durationMinutes: 60,
+    status: 'rescheduled',
+  },
+];
 
-function getInstrumentDisplay(code: string) {
-  const isCPI = code === 'CPI';
-  const miles = INSTRUMENT_MILE_COST[code] ?? 2;
-  const tier = getMileCostTier(code);
-  const catalog = ASSESSMENT_CATALOG[code];
-  const name = isCPI ? 'China Leadership Pipeline Index' : catalog?.b2cName || catalog?.name || code;
-  const tierLabel = tier?.label ?? 'Standard';
-  return { name, tierLabel, miles, isCPI };
+const MOCK_PAST: MockBookingItem[] = [
+  {
+    id: 'BK-PAST001',
+    sessionSlug: 'career-30',
+    coachId: 'coach_1',
+    dateIso: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    timeSlot: '15:00',
+    durationMinutes: 30,
+    status: 'completed',
+    notesPlaceholder:
+      '[Session notes placeholder — post-debrief summary, action items, and coach recommendations will appear here.]',
+  },
+  {
+    id: 'BK-PAST002',
+    sessionSlug: 'leadership-60',
+    coachId: 'coach_3',
+    dateIso: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
+    timeSlot: '09:30',
+    durationMinutes: 60,
+    status: 'cancelled',
+  },
+];
+
+function getSession(slug: string): SessionType {
+  return (
+    SESSION_CATALOG.find((s) => s.slug === slug) ??
+    SESSION_CATALOG[0]
+  );
 }
 
-function formatDateLong(dateStr: string) {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', {
+function getCoach(id: string): CoachRosterEntry {
+  return COACH_ROSTER.find((c) => c.id === id) ?? COACH_ROSTER[0];
+}
+
+function formatDateLong(date: Date): string {
+  return date.toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -130,269 +95,786 @@ function formatDateLong(dateStr: string) {
   });
 }
 
-function formatDateShort(dateStr: string) {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', {
-    weekday: 'short',
+function formatDateShort(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
     month: 'short',
     day: 'numeric',
   });
 }
 
-export interface MyBookingsPageProps {
-  bookings?: readonly MockBooking[];
-  onBookNew?: () => void;
-  onJoin?: (bookingId: string, url?: string) => void;
-  onReschedule?: (bookingId: string) => void;
+function formatTime12h(time24: string): string {
+  const [h, m] = time24.split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h % 12 || 12;
+  return `${hour12}:${m.toString().padStart(2, '0')} ${period}`;
 }
 
-export function MyBookingsPage({
-  bookings = MOCK_BOOKINGS,
-  onBookNew,
-  onJoin,
-  onReschedule,
-}: MyBookingsPageProps) {
-  const upcoming = bookings.filter((b) => b.status === 'upcoming');
-  const past = bookings.filter((b) => b.status === 'past' || b.status === 'cancelled');
+const INFO = '#2563EB';
+const SUCCESS = '#16A34A';
+const WARNING = '#CA8A04';
+const ERROR = '#DC2626';
+const INK = '#0F1115';
+
+const STATUS_STYLES: Record<BookingStatus, { bg: string; color: string; label: string }> = {
+  scheduled:   { bg: `${INFO}12`,    color: INFO,    label: 'Scheduled' },
+  completed:   { bg: `${SUCCESS}12`, color: SUCCESS, label: 'Completed' },
+  cancelled:   { bg: `${ERROR}12`,   color: ERROR,   label: 'Cancelled' },
+  rescheduled: { bg: `${WARNING}12`, color: WARNING, label: 'Rescheduled' },
+  no_show:     { bg: `${INK}10`,     color: INK,     label: 'No-show' },
+};
+
+export function MyBookingsPage() {
+  const [tab, setTab] = useState<Tab>('upcoming');
+
+  const upcomingList = MOCK_UPCOMING;
+  const pastList = MOCK_PAST;
 
   return (
-    <>
-      <SEO
-        title="Your Diagnostic Debriefs | LYC Intelligence"
-        description="Manage your upcoming and past executive diagnostic debriefs. Join video sessions, view specialist details, and book new debriefs."
-        path="/my-bookings"
-        type="website"
-      />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-white">
-        <header className="max-w-6xl mx-auto px-4 pt-16 pb-10">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Badge variant="info" size="md">
-                  My Bookings
-                </Badge>
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">
-                Your Diagnostic Debriefs
-              </h1>
-              <p className="text-text-muted max-w-2xl">
-                Track upcoming specialist debriefs, review past sessions, and book new 1:1
-                diagnostic walkthroughs across the 11-instrument Executive Intelligence catalog.
-              </p>
-            </div>
-            <Button
-              variant="default"
-              size="lg"
-              leftIcon={<Calendar className="w-4 h-4" />}
-              rightIcon={<ArrowRight className="w-4 h-4" />}
-              onClick={onBookNew}
-            >
-              Book New Debrief
-            </Button>
-          </div>
-        </header>
+    <div style={{ maxWidth: 960, margin: '0 auto', padding: '32px 24px' }}>
+      {/* Admin booking management — placeholder for admin view where team ops can see/edit all org bookings, filter by coach/status/date, and manually schedule */}
 
-        <main className="max-w-6xl mx-auto px-4 pb-20 space-y-12">
-          <section>
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-2xl font-bold text-text-primary">
-                Upcoming Debriefs
-              </h2>
-              <Badge variant="info" size="md">
-                {upcoming.length} session{upcoming.length === 1 ? '' : 's'}
-              </Badge>
-            </div>
-            {upcoming.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Calendar className="w-12 h-12 text-text-muted mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-semibold text-text-primary mb-1">
-                    No upcoming diagnostic debriefs
-                  </h3>
-                  <p className="text-text-muted mb-5 max-w-md mx-auto">
-                    Book your first 1:1 debrief today and get personalised interpretation
-                    of your executive diagnostic results.
-                  </p>
-                  <Button
-                    variant="default"
-                    rightIcon={<ArrowRight className="w-4 h-4" />}
-                    onClick={onBookNew}
-                  >
-                    Book a Diagnostic Debrief
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {upcoming.map((b) => {
-                  const info = getInstrumentDisplay(b.instrumentCode);
-                  return (
-                    <Card key={b.id} className={info.isCPI ? 'ring-2 ring-accent' : ''}>
-                      <CardHeader>
-                        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge variant="success" size="sm">
-                              Confirmed
-                            </Badge>
-                            <Badge variant={info.isCPI ? 'success' : 'info'} size="sm">
-                              {info.tierLabel} Tier
-                            </Badge>
-                            <Badge variant="default" size="sm">
-                              {info.miles} mi · {b.durationMinutes} min
-                            </Badge>
-                          </div>
-                          <Badge variant={b.modality === 'video' ? 'info' : 'default'} size="sm">
-                            {b.modality === 'video' ? <Video className="w-3 h-3 mr-1" /> : <MapPin className="w-3 h-3 mr-1" />}
-                            {b.modality === 'video' ? 'Video' : 'In-person'}
-                          </Badge>
-                        </div>
-                        <CardTitle className="text-lg">
-                          {info.isCPI
-                            ? `China Leadership Pipeline Index — Flagship Debrief`
-                            : `${info.name} — ${info.tierLabel} Debrief`}
-                        </CardTitle>
-                        <CardDescription>
-                          {b.sessionType} · Led by {b.specialistName}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4 p-4 bg-bg-tertiary/50">
-                          <div>
-                            <div className="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">
-                              Date
-                            </div>
-                            <div className="font-semibold text-text-primary">{formatDateLong(b.dateISO)}</div>
-                          </div>
-                          <div>
-                            <div className="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">
-                              Time
-                            </div>
-                            <div className="font-semibold text-text-primary flex items-center gap-1.5">
-                              <Clock className="w-4 h-4 text-text-muted" />
-                              {b.time} ({b.durationMinutes} min)
-                            </div>
-                          </div>
-                        </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          marginBottom: 28,
+          flexWrap: 'wrap',
+          gap: 16,
+        }}
+      >
+        <div>
+          <h1
+            style={{
+              fontFamily: DS.headingFont,
+              fontSize: 32,
+              fontWeight: 600,
+              color: DS.text,
+              margin: '0 0 6px',
+            }}
+          >
+            My Sessions
+          </h1>
+          <p
+            style={{
+              fontFamily: DS.bodyFont,
+              fontSize: 15,
+              color: DS.muted,
+              margin: 0,
+              maxWidth: 520,
+              lineHeight: 1.5,
+            }}
+          >
+            View and manage your upcoming and past debrief sessions.
+          </p>
+        </div>
 
-                        <div>
-                          <div className="text-xs font-medium text-text-muted uppercase tracking-wide mb-1.5">
-                            Specialist
-                          </div>
-                          <div className="flex items-start gap-2 text-sm">
-                            <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
-                            <div>
-                              <div className="font-medium text-text-primary">{b.specialistName}</div>
-                              <div className="text-text-muted">{b.specialistRole}</div>
-                              {b.modality === 'in-person' && b.location && (
-                                <div className="text-text-muted text-xs mt-1 flex items-center gap-1">
-                                  <MapPin className="w-3 h-3" />
-                                  {b.location}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                          {b.modality === 'video' && b.joinUrl && (
-                            <Button
-                              variant="default"
-                              className="flex-1"
-                              rightIcon={<Video className="w-4 h-4" />}
-                              onClick={() => onJoin?.(b.id, b.joinUrl)}
-                            >
-                              Join Video Session
-                            </Button>
-                          )}
-                          <Button
-                            variant="outline"
-                            className={b.modality === 'video' && b.joinUrl ? 'flex-1' : 'w-full'}
-                            onClick={() => onReschedule?.(b.id)}
-                          >
-                            Reschedule
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-
-          <section>
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-2xl font-bold text-text-primary">
-                Past Debriefs
-              </h2>
-              <Badge variant="default" size="md">
-                {past.length} session{past.length === 1 ? '' : 's'}
-              </Badge>
-            </div>
-            {past.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <CheckCircle2 className="w-12 h-12 text-text-muted mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-semibold text-text-primary mb-1">
-                    No past diagnostic debriefs yet
-                  </h3>
-                  <p className="text-text-muted max-w-md mx-auto">
-                    Completed debriefs will appear here with specialist notes and session summaries.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-                <CardContent className="p-0">
-                  <div className="divide-y divide-border">
-                    {past.map((b) => {
-                      const info = getInstrumentDisplay(b.instrumentCode);
-                      return (
-                        <div
-                          key={b.id}
-                          className="p-5 grid grid-cols-1 md:grid-cols-12 gap-4 items-start"
-                        >
-                          <div className="md:col-span-3">
-                            <div className="text-sm text-text-muted">{formatDateShort(b.dateISO)}</div>
-                            <div className="text-xs text-text-muted flex items-center gap-1 mt-1">
-                              <Clock className="w-3 h-3" />
-                              {b.time} · {b.durationMinutes} min
-                            </div>
-                          </div>
-                          <div className="md:col-span-6">
-                            <div className="flex items-center gap-2 flex-wrap mb-1">
-                              <span className="font-semibold text-text-primary">
-                                {info.isCPI ? 'China Leadership Pipeline Index' : info.name}
-                              </span>
-                              <Badge variant="default" size="sm">{info.tierLabel}</Badge>
-                            </div>
-                            <div className="text-sm text-text-secondary">{b.sessionType}</div>
-                            <div className="text-xs text-text-muted mt-0.5">
-                              {b.specialistName} · {b.specialistRole}
-                            </div>
-                          </div>
-                          <div className="md:col-span-3 md:text-right">
-                            <Badge variant="default" size="sm">
-                              {b.status === 'cancelled' ? 'Cancelled' : 'Completed'}
-                            </Badge>
-                            <div className="mt-2">
-                              <Button variant="ghost" size="sm">
-                                View Notes
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </section>
-        </main>
+        <button
+          onClick={() => alert('Open BookingFlow — placeholder')}
+          style={{
+            fontFamily: DS.bodyFont,
+            fontSize: 15,
+            fontWeight: 600,
+            color: DS.bg,
+            background: DS.accent,
+            border: 'none',
+            padding: '12px 22px',
+            cursor: 'pointer',
+            transition: DS.transition,
+            whiteSpace: 'nowrap',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = DS.accentDark;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = DS.accent;
+          }}
+        >
+          + Book New Session
+        </button>
       </div>
-    </>
+
+      <div
+        style={{
+          borderBottom: `1px solid ${DS.border}`,
+          marginBottom: 24,
+          display: 'flex',
+          gap: 0,
+        }}
+      >
+        <TabButton
+          label="Upcoming"
+          count={upcomingList.length}
+          active={tab === 'upcoming'}
+          onClick={() => setTab('upcoming')}
+        />
+        <TabButton
+          label="Past"
+          count={pastList.length}
+          active={tab === 'past'}
+          onClick={() => setTab('past')}
+        />
+      </div>
+
+      {tab === 'upcoming' ? (
+        upcomingList.length === 0 ? (
+          <EmptyState
+            title="No upcoming sessions"
+            description="Book a debrief session to get started with 1:1 coaching."
+            ctaLabel="Book a Session"
+          />
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {upcomingList.map((b) => (
+              <UpcomingBookingCard key={b.id} booking={b} />
+            ))}
+          </div>
+        )
+      ) : pastList.length === 0 ? (
+        <EmptyState
+          title="No past sessions"
+          description="Your completed and cancelled sessions will appear here."
+        />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {pastList.map((b) => (
+            <PastBookingCard key={b.id} booking={b} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
-export default MyBookingsPage;
+function TabButton({
+  label,
+  count,
+  active,
+  onClick,
+}: {
+  label: string;
+  count: number;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        position: 'relative',
+        background: 'transparent',
+        border: 'none',
+        padding: '12px 20px',
+        fontFamily: DS.bodyFont,
+        fontSize: 14,
+        fontWeight: active ? 600 : 400,
+        color: active ? DS.text : DS.muted,
+        cursor: 'pointer',
+        transition: DS.transition,
+        marginBottom: -1,
+      }}
+    >
+      {label}
+      <span
+        style={{
+          marginLeft: 6,
+          fontFamily: DS.monoFont,
+          fontSize: 11,
+          padding: '1px 6px',
+          background: active ? `${DS.accent}16` : DS.bgAlt,
+          color: active ? DS.accent : DS.muted,
+        }}
+      >
+        {count}
+      </span>
+      {active && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: -1,
+            left: 16,
+            right: 16,
+            height: 2,
+            background: DS.accent,
+          }}
+        />
+      )}
+    </button>
+  );
+}
+
+function StatusBadge({ status }: { status: BookingStatus }) {
+  const style = STATUS_STYLES[status];
+  return (
+    <span
+      style={{
+        display: 'inline-block',
+        fontFamily: DS.monoFont,
+        fontSize: 10,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+        padding: '3px 8px',
+        background: style.bg,
+        color: style.color,
+        fontWeight: 600,
+      }}
+    >
+      {style.label}
+    </span>
+  );
+}
+
+function UpcomingBookingCard({ booking }: { booking: MockBookingItem }) {
+  const session = getSession(booking.sessionSlug);
+  const coach = getCoach(booking.coachId);
+  const date = new Date(booking.dateIso);
+  const now = new Date();
+  const hoursDiff = (date.getTime() - now.getTime()) / (1000 * 60 * 60);
+  const canCancelFree = hoursDiff >= CANCELLATION_FREE_HOURS_BEFORE;
+
+  return (
+    <div
+      style={{
+        border: `1px solid ${DS.border}`,
+        background: DS.card,
+        padding: 20,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 16,
+        transition: DS.transition,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, minWidth: 0 }}>
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              flexShrink: 0,
+              background: DS.bgAlt,
+              border: `1px solid ${DS.border}`,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: DS.monoFont,
+                fontSize: 10,
+                textTransform: 'uppercase',
+                color: DS.muted,
+                letterSpacing: '0.05em',
+              }}
+            >
+              {date.toLocaleDateString('en-US', { month: 'short' })}
+            </span>
+            <span
+              style={{
+                fontFamily: DS.headingFont,
+                fontSize: 22,
+                fontWeight: 600,
+                color: DS.text,
+                lineHeight: 1,
+              }}
+            >
+              {date.getDate()}
+            </span>
+          </div>
+
+          <div style={{ minWidth: 0 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                marginBottom: 4,
+                flexWrap: 'wrap',
+              }}
+            >
+              <h3
+                style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: 17,
+                  fontWeight: 600,
+                  color: DS.text,
+                  margin: 0,
+                }}
+              >
+                {session.displayName}
+              </h3>
+              <StatusBadge status={booking.status} />
+            </div>
+            <div
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: 14,
+                color: DS.textSecondary,
+                marginBottom: 4,
+              }}
+            >
+              {formatDateLong(date)} · {formatTime12h(booking.timeSlot)} ({booking.durationMinutes} min)
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                flexWrap: 'wrap',
+              }}
+            >
+              <div
+                style={{
+                  width: 24,
+                  height: 24,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: DS.bgAlt,
+                  fontFamily: DS.headingFont,
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: DS.text,
+                  borderRadius: '9999px',
+                }}
+              >
+                {coach.avatarInitials}
+              </div>
+              <span
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: 13,
+                  color: DS.muted,
+                }}
+              >
+                with {coach.name}
+              </span>
+              <span
+                style={{
+                  fontFamily: DS.monoFont,
+                  fontSize: 11,
+                  padding: '2px 8px',
+                  background: DS.bgAlt,
+                  color: DS.muted,
+                }}
+              >
+                #{booking.id}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          flexWrap: 'wrap',
+          paddingTop: 12,
+          borderTop: `1px solid ${DS.border}`,
+        }}
+      >
+        <ActionButton
+          label="Reschedule"
+          variant="secondary"
+          onClick={() => alert(`Reschedule ${booking.id} — placeholder`)}
+        />
+        <ActionButton
+          label={canCancelFree ? 'Cancel' : 'Cancel (50% fee)'}
+          variant="danger"
+          onClick={() => alert(`Cancel ${booking.id} — placeholder`)}
+        />
+        <ActionButton
+          label="Add to Calendar"
+          variant="outline"
+          onClick={() => alert(`Download .ics for ${booking.id} — placeholder`)}
+        />
+      </div>
+    </div>
+  );
+}
+
+function PastBookingCard({ booking }: { booking: MockBookingItem }) {
+  const session = getSession(booking.sessionSlug);
+  const coach = getCoach(booking.coachId);
+  const date = new Date(booking.dateIso);
+  const [showNotes, setShowNotes] = useState(false);
+
+  return (
+    <div
+      style={{
+        border: `1px solid ${DS.border}`,
+        background: booking.status === 'cancelled' ? `${DS.bgAlt}88'` : DS.card,
+        opacity: booking.status === 'cancelled' ? 0.9 : 1,
+        padding: 20,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 16,
+        transition: DS.transition,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, minWidth: 0 }}>
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              flexShrink: 0,
+              background: DS.bgAlt,
+              border: `1px solid ${DS.border}`,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: booking.status === 'cancelled' ? 0.6 : 1,
+            }}
+          >
+            <span
+              style={{
+                fontFamily: DS.monoFont,
+                fontSize: 10,
+                textTransform: 'uppercase',
+                color: DS.muted,
+                letterSpacing: '0.05em',
+              }}
+            >
+              {date.toLocaleDateString('en-US', { month: 'short' })}
+            </span>
+            <span
+              style={{
+                fontFamily: DS.headingFont,
+                fontSize: 22,
+                fontWeight: 600,
+                color: booking.status === 'cancelled' ? DS.muted : DS.text,
+                lineHeight: 1,
+                textDecoration: booking.status === 'cancelled' ? 'line-through' : 'none',
+              }}
+            >
+              {date.getDate()}
+            </span>
+          </div>
+
+          <div style={{ minWidth: 0 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                marginBottom: 4,
+                flexWrap: 'wrap',
+              }}
+            >
+              <h3
+                style={{
+                  fontFamily: DS.headingFont,
+                  fontSize: 17,
+                  fontWeight: 600,
+                  color: booking.status === 'cancelled' ? DS.muted : DS.text,
+                  margin: 0,
+                  textDecoration: booking.status === 'cancelled' ? 'line-through' : 'none',
+                }}
+              >
+                {session.displayName}
+              </h3>
+              <StatusBadge status={booking.status} />
+            </div>
+            <div
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: 14,
+                color: DS.muted,
+                marginBottom: 4,
+              }}
+            >
+              {formatDateShort(date)}
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                flexWrap: 'wrap',
+              }}
+            >
+              <div
+                style={{
+                  width: 24,
+                  height: 24,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: DS.bgAlt,
+                  fontFamily: DS.headingFont,
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: DS.text,
+                  borderRadius: '9999px',
+                }}
+              >
+                {coach.avatarInitials}
+              </div>
+              <span
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: 13,
+                  color: DS.muted,
+                }}
+              >
+                with {coach.name}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {booking.status === 'completed' && booking.notesPlaceholder && (
+        <div
+          style={{
+            border: `1px solid ${DS.border}`,
+            background: DS.bgAlt,
+            overflow: 'hidden',
+          }}
+        >
+          <button
+            onClick={() => setShowNotes((s) => !s)}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 14px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              textAlign: 'left',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: 13,
+                fontWeight: 600,
+                color: DS.text,
+              }}
+            >
+              Session notes
+            </span>
+            <span
+              style={{
+                fontFamily: DS.bodyFont,
+                fontSize: 13,
+                color: DS.muted,
+                transition: DS.transition,
+                transform: showNotes ? 'rotate(180deg)' : 'rotate(0deg)',
+              }}
+            >
+              ▾
+            </span>
+          </button>
+          {showNotes && (
+            <div
+              style={{
+                padding: '0 14px 14px',
+                borderTop: `1px solid ${DS.border}`,
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: DS.bodyFont,
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                  color: DS.textSecondary,
+                  margin: '12px 0 0',
+                }}
+              >
+                {booking.notesPlaceholder}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          flexWrap: 'wrap',
+          paddingTop: 12,
+          borderTop: `1px solid ${DS.border}`,
+        }}
+      >
+        {booking.status === 'completed' && (
+          <ActionButton
+            label="Rebook same type"
+            variant="primary"
+            onClick={() => alert(`Rebook ${session.slug} — open BookingFlow placeholder`)}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ActionButton({
+  label,
+  onClick,
+  variant,
+}: {
+  label: string;
+  onClick: () => void;
+  variant: 'primary' | 'secondary' | 'outline' | 'danger';
+}) {
+  const base: React.CSSProperties = {
+    fontFamily: DS.bodyFont,
+    fontSize: 13,
+    fontWeight: 500,
+    padding: '8px 14px',
+    cursor: 'pointer',
+    border: '1px solid',
+    transition: DS.transition,
+  };
+
+  const variants: Record<string, React.CSSProperties> = {
+    primary: {
+      background: DS.accent,
+      color: DS.bg,
+      borderColor: DS.accent,
+    },
+    secondary: {
+      background: DS.bgDark,
+      color: DS.bg,
+      borderColor: DS.bgDark,
+    },
+    outline: {
+      background: 'transparent',
+      color: DS.textSecondary,
+      borderColor: DS.borderStrong,
+    },
+    danger: {
+      background: 'transparent',
+      color: ERROR,
+      borderColor: `${ERROR}44`,
+    },
+  };
+
+  const hover: Record<string, React.CSSProperties> = {
+    primary:   { background: DS.accentDark,  borderColor: DS.accentDark,  color: DS.bg },
+    secondary: { background: DS.text,       borderColor: DS.text,       color: DS.bg },
+    outline:   { borderColor: DS.accent,    color: DS.accent },
+    danger:    { background: `${ERROR}0F`,  borderColor: ERROR },
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      style={{ ...base, ...variants[variant] }}
+      onMouseEnter={(e) => Object.assign(e.currentTarget.style, hover[variant])}
+      onMouseLeave={(e) => Object.assign(e.currentTarget.style, variants[variant])}
+    >
+      {label}
+    </button>
+  );
+}
+
+function EmptyState({
+  title,
+  description,
+  ctaLabel,
+}: {
+  title: string;
+  description: string;
+  ctaLabel?: string;
+}) {
+  return (
+    <div
+      style={{
+        padding: '64px 24px',
+        textAlign: 'center',
+        border: `1px dashed ${DS.border}`,
+        background: DS.card,
+      }}
+    >
+      <div
+        style={{
+          width: 56,
+          height: 56,
+          margin: '0 auto 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: DS.bgAlt,
+          fontFamily: DS.headingFont,
+          fontSize: 24,
+          color: DS.muted,
+        }}
+      >
+        ○
+      </div>
+      <h3
+        style={{
+          fontFamily: DS.headingFont,
+          fontSize: 18,
+          fontWeight: 600,
+          color: DS.text,
+          margin: '0 0 8px',
+        }}
+      >
+        {title}
+      </h3>
+      <p
+        style={{
+          fontFamily: DS.bodyFont,
+          fontSize: 14,
+          color: DS.muted,
+          margin: '0 auto 20px',
+          maxWidth: 420,
+          lineHeight: 1.5,
+        }}
+      >
+        {description}
+      </p>
+      {ctaLabel && (
+        <button
+          onClick={() => alert('Open BookingFlow — placeholder')}
+          style={{
+            fontFamily: DS.bodyFont,
+            fontSize: 14,
+            fontWeight: 600,
+            color: DS.bg,
+            background: DS.accent,
+            border: 'none',
+            padding: '10px 22px',
+            cursor: 'pointer',
+            transition: DS.transition,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = DS.accentDark;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = DS.accent;
+          }}
+        >
+          {ctaLabel}
+        </button>
+      )}
+    </div>
+  );
+}

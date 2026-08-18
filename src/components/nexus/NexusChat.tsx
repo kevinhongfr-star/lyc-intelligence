@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from '@/stores/toastStore';
 import {
   ArrowRight, Shield, Loader2, RefreshCw, Paperclip,
@@ -7,6 +8,10 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { getCreditBalance, checkAndGrantDailyCredits } from '@/services/creditService';
 import { supabase } from '@/lib/supabase';
+import {
+  getUserAssessmentContext,
+  buildAssessmentContextForNexus,
+} from '@/nexus/assessmentContext';
 import { CreditGate } from './CreditGate';
 import { CareerInsight } from './CareerInsight';
 import { CouncilUpsell } from './CouncilUpsell';
@@ -34,9 +39,10 @@ import {
   ExplorationEarningTracker,
   isCompletedReflection,
 } from '@/nexus/nexusMilesService';
+import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
 
 const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
+  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
   bodyFont: "'DM Sans', system-ui, sans-serif",
   monoFont: "'IBM Plex Mono', ui-monospace, monospace",
   accent: '#C108AB',
@@ -79,7 +85,7 @@ interface ChatSession {
   updatedAt: number;
 }
 
-interface NexusChatProps {
+interface NEXUSChatProps {
   showHeader?: boolean;
   initialPrompts?: string[];
   onMessageSent?: () => void;
@@ -102,14 +108,21 @@ function mapToCanonicalTier(tierStr: string | null | undefined): TIER_KEYS_CANON
   return TIER_KEYS_CANONICAL.EXPLORER;
 }
 
-export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: NexusChatProps) {
+export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: NEXUSChatProps) {
   const { user, profile } = useAuthStore();
+  const [searchParams] = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: buildNexusSystemPrompt().openingGreeting,
+      content: "I'm NEXUS — LYC's executive intelligence system. I ask the questions most executives skip. Tell me a little about where you are, and we'll find the right framework for you. Or try the complimentary CPI assessment first.",
     },
   ]);
+  /**
+   * #1324: Assessment context string for the user (built from their actual
+   * assessment_results). Injected into the NEXUS system prompt and forwarded
+   * to the chat API so NEXUS can reference the user's real scores.
+   */
+  const [assessmentContextStr, setAssessmentContextStr] = useState<string>('');
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [aiState, setAiState] = useState<'idle' | 'thinking' | 'error'>('idle');
@@ -118,11 +131,43 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     initialPrompts || NEXUS_INTRO_QUESTIONS,
   );
   const [creditBalance, setCreditBalance] = useState(0);
-  const [creditTier, setCreditTier] = useState('free');
+  const [creditTier, setCreditTier] = useState('explorer');
   /** Canonical tier key used by miles economy & tier gating */
   const canonicalTier = useMemo<TIER_KEYS_CANONICAL>(
     () => mapToCanonicalTier(creditTier),
     [creditTier],
+  );
+  /**
+   * #1324: Enriched NEXUS system prompt. When the user's assessment context
+   * is available, it is appended to the prompt so NEXUS can reference the
+   * user's actual results during the conversation. When the user arrives via
+   * an "Ask NEXUS" CTA with a `code` param, the specific instrument's
+   * framework context is also injected so NEXUS grounds its answer in the
+   * right methodology.
+   */
+  const codeParam = searchParams.get('code');
+  const frameworkContext = useMemo(() => {
+    if (!codeParam) return '';
+    const info = ASSESSMENT_CATALOG[codeParam.toUpperCase()];
+    if (!info) return '';
+    const dimList = info.dimensions.map(d => `${d.name} (${d.lowLabel} → ${d.highLabel})`).join('; ');
+    return [
+      `=== CURRENT ASSESSMENT CONTEXT ===`,
+      `The user is asking about their ${info.name} (${info.code}) results.`,
+      `Instrument measures ${info.dimensions.length} dimensions: ${dimList}.`,
+      `Tagline: ${info.tagline}`,
+      `Ground your answer in this instrument's framework. Reference the specific dimensions by name when explaining findings.`,
+    ].join('\n');
+  }, [codeParam]);
+
+  const combinedContext = useMemo(
+    () => [frameworkContext, assessmentContextStr].filter(Boolean).join('\n\n'),
+    [frameworkContext, assessmentContextStr],
+  );
+
+  const nexusPrompt = useMemo(
+    () => buildNexusSystemPrompt(combinedContext || undefined),
+    [combinedContext],
   );
   /** Miles balance, fetched on mount + CTA actions. */
   const [milesBalance, setMilesBalance] = useState<number | null>(null);
@@ -183,7 +228,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
   
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const FREE_TRIAL_LIMIT = 5;
+  const INTRO_TIER_LIMIT = 5;
 
   // ── Chat Persistence Helpers ──
   async function createChatSession(userId: string, title?: string) {
@@ -268,7 +313,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
           const mb = await fetchMilesBalance();
           setMilesBalance(mb.balance);
         } catch (e) {
-          console.warn('[NexusChat] fetchMilesBalance failed (will retry on CTA):', e);
+          console.warn('[NEXUSChat] fetchMilesBalance failed (will retry on CTA):', e);
         }
         
         const savedSession = localStorage.getItem(`nexus_chat_${user.id}`);
@@ -279,7 +324,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             setSessionId(parsed.sessionId);
             setMessageCount(parsed.messageCount || 0);
           } catch (e) {
-            console.error('[NexusChat] Failed to load saved session:', e);
+            console.error('[NEXUSChat] Failed to load saved session:', e);
           }
         } else {
           const newId = `session_${Date.now()}`;
@@ -289,6 +334,38 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     };
     loadSession();
   }, [user?.id]);
+
+  // #1324: Load the user's assessment context on mount so NEXUS can reference
+  // their actual assessment_results. Built into the system prompt (see
+  // nexusPrompt memo) and forwarded to the chat API (see sendMessage body).
+  useEffect(() => {
+    let cancelled = false;
+    if (!user?.id) {
+      setAssessmentContextStr('');
+      return;
+    }
+    getUserAssessmentContext(user.id)
+      .then((results) => {
+        if (cancelled) return;
+        const ctx = buildAssessmentContextForNexus(results);
+        setAssessmentContextStr(ctx.contextString);
+      })
+      .catch((e) => {
+        console.warn('[NEXUSChat] assessment context load failed (non-fatal):', e);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  // #1324: Pre-fill the input from the `q` query param (e.g. arriving from an
+  // "Ask NEXUS about this" CTA on the results page). Only pre-fills — the user
+  // reviews and sends, so credits are never spent without intent.
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q) setInput(q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   useEffect(() => {
     if (user?.id && sessionId) {
@@ -314,7 +391,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     const timeout = setTimeout(() => controller.abort(), 30000);
 
     try {
-      const res = await fetch('/api/nexus/chat', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -333,6 +410,9 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
           },
           tier: profile?.tier || creditTier,
           stream: false, // Use non-streaming for reliable tag parsing
+          // #1324: forward the user's assessment context so the server-side
+          // persona can inject the user's actual results into the system prompt.
+          assessment_context: combinedContext || undefined,
         }),
         signal: controller.signal,
       });
@@ -353,13 +433,13 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
       clearTimeout(timeout);
       console.error('Chat failed:', e);
       const isAbort = e?.name === 'AbortError';
+      setAiState('error');
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: isAbort
-          ? 'The request took too long. Please try a shorter question or try again.'
-          : `Sorry, something went wrong: ${e?.message || 'Unknown error'}`
+          ? 'NEXUS is temporarily unavailable — please retry in a moment. If the issue persists, reload the page.'
+          : 'NEXUS is temporarily unavailable — please retry in a moment. If the issue persists, reload the page.'
       }]);
-      setAiState('idle');
       setStreamingContent(null);
     } finally {
       setLoading(false);
@@ -488,7 +568,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     }
   };
 
-  const handleCreditApproval = (reason: 'free_trial' | 'credit_deducted') => {
+  const handleCreditApproval = (reason: 'intro_tier' | 'credit_deducted') => {
     setPendingApproval(false);
     if (reason === 'credit_deducted' && user?.id) {
       getCreditBalance(user.id).then(info => {
@@ -537,7 +617,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
       ]);
     }
     
-    if (newMessageCount > FREE_TRIAL_LIMIT && canonicalTier === TIER_KEYS_CANONICAL.EXPLORER && creditBalance < 1) {
+    if (newMessageCount > INTRO_TIER_LIMIT && canonicalTier === TIER_KEYS_CANONICAL.EXPLORER && creditBalance < 1) {
       setPendingApproval(true);
       return;
     }
@@ -568,7 +648,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     // Run earnings in background
     if (promisedEarnings) {
       Promise.resolve(promisedEarnings).catch((e) =>
-        console.warn('[NexusChat] earning award failed (non-fatal):', e),
+        console.warn('[NEXUSChat] earning award failed (non-fatal):', e),
       );
     }
     
@@ -596,31 +676,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
         return;
       }
 
-      setLoading(true);
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', 'document');
-      
-      try {
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await response.json();
-        if (data.text) {
-          setMessages(prev => [...prev, {
-            role: 'user',
-            content: `I've uploaded a document: ${file.name}. Please analyze it and help me understand its content.`
-          }]);
-          setMessageCount(prev => prev + 1);
-          await sendMessage(`Please analyze this document: ${file.name}`);
-        }
-      } catch (error) {
-        console.error('Upload failed:', error);
-        toast.error('Failed to upload document');
-      } finally {
-        setLoading(false);
-      }
+      toast.warning('Document upload unavailable — please retry later');
     };
     input.click();
   }, [sendMessage]);
@@ -634,7 +690,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     setSessionId(newId);
     setMessages([{
       role: 'assistant',
-      content: buildNexusSystemPrompt().openingGreeting,
+      content: "I'm NEXUS — LYC's executive intelligence system. I ask the questions most executives skip. Tell me a little about where you are, and we'll find the right framework for you. Or try the complimentary CPI assessment first.",
     }]);
     setMessageCount(0);
     setShowSidebar(false);
@@ -645,7 +701,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
     // "free" tier internally maps to Explorer (Executive Introduction); keep the
     // existing gating but use "Executive Introduction" copy in UI.
     if (canonicalTier !== TIER_KEYS_CANONICAL.EXPLORER) return null;
-    if (messageCount === FREE_TRIAL_LIMIT) return 'trial' as const;
+    if (messageCount === INTRO_TIER_LIMIT) return 'trial' as const;
     if (messageCount > 0 && messageCount % 5 === 0) return 'insight' as const;
     if (messageCount >= 10) return 'usage' as const;
     return null;
@@ -744,7 +800,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               <MessageSquare className="w-5 h-5 text-accent" />
             </div>
             <div>
-              <h3 className="font-semibold text-text-primary">Nexus</h3>
+              <h3 className="font-semibold text-text-primary">NEXUS</h3>
               <p className="text-xs text-text-muted">{sessions.length} conversations</p>
             </div>
           </div>
@@ -802,7 +858,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                     border: `1px solid ${
                       canonicalTier === TIER_KEYS_CANONICAL.EXPLORER ? `${DS.accent}40` : '#FED7AA'
                     }`,
-                    borderRadius: DS.radius,
+ 
                   }}
                 >
                   <Crown
@@ -834,7 +890,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 <div
                   title={`Intent: ${lastIntentLabel} (${lastIntent})`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#F3F0FF]"
-                  style={{ border: '1px solid #EDE9FE', borderRadius: DS.radius }}
+                  style={{ border: '1px solid #EDE9FE' }}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#7C3AED]" />
                   <span className="text-xs font-medium text-[#6D28D9]">{lastIntentLabel}</span>
@@ -842,9 +898,9 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               )}
               {budgetStatus && (
                 <div
-                  title={`Daily Nexus budget: ¥${budgetStatus.spent_cny.toFixed(2)} / ¥${budgetStatus.budget_cny.toFixed(2)} (${budgetStatus.utilization_pct.toFixed(0)}%)`}
+                  title={`Daily NEXUS budget: ¥${budgetStatus.spent_cny.toFixed(2)} / ¥${budgetStatus.budget_cny.toFixed(2)} (${budgetStatus.utilization_pct.toFixed(0)}%)`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100"
-                  style={{ border: '1px solid #E5E7EB', borderRadius: DS.radius }}
+                  style={{ border: '1px solid #E5E7EB' }}
                 >
                   <Zap className="w-3.5 h-3.5 text-gray-600" />
                   <span className="text-xs font-medium text-gray-700">
@@ -862,7 +918,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                       : ''
                   }${userContextMeta.active_mandates > 0 ? ` | Active mandates: ${userContextMeta.active_mandates}` : ''} | Conversations: ${userContextMeta.conversation_count}`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#FFF7ED]"
-                  style={{ border: '1px solid #FED7AA', borderRadius: DS.radius }}
+                  style={{ border: '1px solid #FED7AA' }}
                 >
                   <Crown className="w-3.5 h-3.5 text-[#C2410C]" />
                   <span className="text-xs font-medium text-[#9A3412] capitalize">
@@ -885,9 +941,9 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               )}
               {retrievedMemories !== null && retrievedMemories > 0 && (
                 <div
-                  title={`Nexus retrieved ${retrievedMemories} relevant memor${retrievedMemories === 1 ? 'y' : 'ies'} from past conversations`}
+                  title={`NEXUS retrieved ${retrievedMemories} relevant memor${retrievedMemories === 1 ? 'y' : 'ies'} from past conversations`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#ECFDF5]"
-                  style={{ border: '1px solid #A7F3D0', borderRadius: DS.radius }}
+                  style={{ border: '1px solid #A7F3D0' }}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#059669]" />
                   <span className="text-xs font-medium text-[#047857]">
@@ -899,7 +955,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 <div
                   title={`Grounded on ${citations.length} source${citations.length === 1 ? '' : 's'} from the LYC content library:\n${citations.map((c, i) =>`[${i + 1}] ${c.title}${c.source ? ` — ${c.source}` : ''} (${(c.score * 100).toFixed(0)}%)`).join('\n')}`}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#EFF6FF]"
-                  style={{ border: '1px solid #BFDBFE', borderRadius: DS.radius }}
+                  style={{ border: '1px solid #BFDBFE' }}
                 >
                   <Shield className="w-3.5 h-3.5 text-[#2563EB]" />
                   <span className="text-xs font-medium text-[#1D4ED8]">
@@ -908,7 +964,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 </div>
               )}
               <a href="/b2b" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Firms</a>
-              <a href="/b2c" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Leaders</a>
+              <a href="/assessment" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Assessments</a>
               <a href="/match" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Score Match</a>
             </div>
           </nav>
@@ -919,9 +975,9 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             <div style={{ textAlign: 'center', padding: '32px 0 20px' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: `${DS.accent}15`,  marginBottom: '12px' }}>
                 <span className="nexus-pulse-dot" />
-                <span style={{ fontSize: '12px', color: DS.accent, fontWeight: 600 }}>Nexus</span>
+                <span style={{ fontSize: '12px', color: DS.accent, fontWeight: 600 }}>NEXUS</span>
               </div>
-              <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>Nexus</h1>
+              <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>NEXUS</h1>
               <p style={{ fontSize: '14px', color: DS.muted }}>Know where you stand. Know where to go.</p>
             </div>
           )}
@@ -990,7 +1046,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                       padding: '6px 12px',
                       background: `${DS.accent}12`,
                       border: `1px solid ${DS.accent}40`,
-                      borderRadius: DS.radius,
+ 
                       fontFamily: DS.monoFont,
                       fontSize: '11px',
                       letterSpacing: '0.06em',
@@ -1023,7 +1079,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                       fontSize: '14px',
                       lineHeight: '1.6',
                       wordBreak: 'break-word',
-                      borderRadius: DS.radius,
+ 
                       whiteSpace: 'pre-wrap',
                     }}
                   >
@@ -1066,9 +1122,26 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
             />
 
             {aiState === 'thinking' && !streamingContent && (
-              <div style={{ alignSelf: 'flex-start', padding: '12px 16px', background: DS.card, border: `1px solid ${DS.cardBorder}`,  color: DS.muted, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
-                Thinking...
+              <div
+                style={{
+                  alignSelf: 'flex-start',
+                  maxWidth: '80%',
+                }}
+              >
+                <div
+                  style={{
+                    padding: '14px 18px',
+                    background: DS.card,
+                    border: `1px solid ${DS.cardBorder}`,
+                    color: DS.muted,
+                    fontSize: '14px',
+                    lineHeight: '1.6',
+                    fontFamily: DS.monoFont,
+                    letterSpacing: '0.15em',
+                  }}
+                >
+                  <span className="animate-pulse">···</span>
+                </div>
               </div>
             )}
 
@@ -1199,7 +1272,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
 
       {showUpgradeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white max-w-lg w-full overflow-hidden shadow-2xl" style={{ borderRadius: DS.radius }}>
+          <div className="bg-white max-w-lg w-full overflow-hidden shadow-2xl" style={{ }}>
             <div className="p-6 text-white" style={{ background: `linear-gradient(135deg, ${DS.accent} 0%, #8B067B 100%)` }}>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-white/20 flex items-center justify-center">
@@ -1207,7 +1280,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 </div>
                 <div>
                   <h3 className="text-xl font-bold" style={{ fontFamily: DS.headingFont }}>Starter & Pro — add miles to your plan</h3>
-                  <p className="text-white/80 text-sm">Move past Executive Introduction. Open the 11 instruments with miles.</p>
+                  <p className="text-white/80 text-sm">Move past Executive Introduction. Open all 6 leadership assessments with miles.</p>
                 </div>
               </div>
             </div>
@@ -1224,15 +1297,15 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                 <div className="flex items-center gap-3">
                   <Award className="w-5 h-5" style={{ color: DS.accent }} />
                   <div>
-                    <p className="font-semibold text-text-primary">All 11 instruments</p>
-                    <p className="text-sm text-text-muted">CPI Flagship, the full SHIFT Suite, and Advisory products.</p>
+                    <p className="font-semibold text-text-primary">All 6 leadership assessments</p>
+                    <p className="text-sm text-text-muted">Standard and Premium tiers, covering transition, execution, AI readiness, cross-border, and global navigation.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Shield className="w-5 h-5" style={{ color: DS.accent }} />
                   <div>
                     <p className="font-semibold text-text-primary">Personalised reports</p>
-                    <p className="text-sm text-text-muted">Per-dimension bands, blind-spot mapping, C-suite calibrated.</p>
+                    <p className="text-sm text-text-muted">Per-dimension bands, blind-spot mapping, C-suite benchmarked.</p>
                   </div>
                 </div>
               </div>
@@ -1248,7 +1321,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
                   window.open('/pricing', '_blank');
                 }}
                 className="w-full py-3 px-4 bg-accent text-white font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
-                style={{ borderRadius: DS.radius }}
+                style={{ }}
               >
                 Add miles to plan
                 <ArrowRight className="w-4 h-4" />
@@ -1257,7 +1330,7 @@ export function NexusChat({ showHeader = true, initialPrompts, onMessageSent }: 
               <button
                 onClick={() => setShowUpgradeModal(false)}
                 className="w-full mt-3 py-3 px-4 bg-bg-tertiary text-text-primary font-medium hover:bg-bg-secondary transition-colors"
-                style={{ borderRadius: DS.radius }}
+                style={{ }}
               >
                 Keep exploring
               </button>

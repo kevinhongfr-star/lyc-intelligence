@@ -4,30 +4,31 @@
 // ═══════════════════════════════════════════════════════════
 
 export const INSTRUMENT = "QUEST";
-export const FULL_NAME = "Executive Performance Architecture";
+export const FULL_NAME = "QUEST — strategic market positioning";
+export const B2C_NAME = "QUEST — strategic market positioning";
 export const VERSION = "1.0";
 export const TOTAL_QUESTIONS = 36;
 export const SCALE = "1-5 Likert";
-export const DELIVERY_MINUTES = 14;
+export const DELIVERY_MINUTES = 12;
 export const TIER = "shift";
-export const PRICE_MILES = 149;
-export const B2C_NAME = "Executive Performance Architecture";
-export const TAGLINE = "Six-executive-dimension architecture. Where are you genuinely strong, and where will your next mandate expose gaps?";
+export const SCORING_MODE = "matrix";
+export const PRICE_MILES = 199;
+export const TAGLINE = "Six-executive-dimension model. Where are you genuinely strong, and where will your next mandate expose gaps?";
 
 export const DIMENSIONS = [
   {
     id: "D1",
     name: "Strategic Thinking",
     question_ids: [
-      "QUEST_Q01",
-      "QUEST_Q02",
-      "QUEST_Q03",
-      "QUEST_Q04",
-      "QUEST_Q05",
-      "QUEST_Q06"
+      "Q01",
+      "Q02",
+      "Q03",
+      "Q04",
+      "Q05",
+      "Q06"
     ],
     reverse_coded: [
-      "QUEST_Q04"
+      "Q04"
     ],
     raw_max: 30,
     n_questions: 6,
@@ -46,15 +47,15 @@ export const DIMENSIONS = [
     id: "D2",
     name: "Execution Excellence",
     question_ids: [
-      "QUEST_Q07",
-      "QUEST_Q08",
-      "QUEST_Q09",
-      "QUEST_Q10",
-      "QUEST_Q11",
-      "QUEST_Q12"
+      "Q07",
+      "Q08",
+      "Q09",
+      "Q10",
+      "Q11",
+      "Q12"
     ],
     reverse_coded: [
-      "QUEST_Q09"
+      "Q09"
     ],
     raw_max: 30,
     n_questions: 6,
@@ -63,7 +64,7 @@ export const DIMENSIONS = [
       "Strategy-to-results conversion",
       "Execution consistency",
       "Performance visibility",
-      "Accountability architecture",
+      "Accountability structure",
       "Resource discipline"
     ],
     normalised_max: 20,
@@ -73,15 +74,15 @@ export const DIMENSIONS = [
     id: "D3",
     name: "Commercial Acumen",
     question_ids: [
-      "QUEST_Q13",
-      "QUEST_Q14",
-      "QUEST_Q15",
-      "QUEST_Q16",
-      "QUEST_Q17",
-      "QUEST_Q18"
+      "Q13",
+      "Q14",
+      "Q15",
+      "Q16",
+      "Q17",
+      "Q18"
     ],
     reverse_coded: [
-      "QUEST_Q15"
+      "Q15"
     ],
     raw_max: 30,
     n_questions: 6,
@@ -100,20 +101,20 @@ export const DIMENSIONS = [
     id: "D4",
     name: "People Leadership",
     question_ids: [
-      "QUEST_Q19",
-      "QUEST_Q20",
-      "QUEST_Q21",
-      "QUEST_Q22",
-      "QUEST_Q23",
-      "QUEST_Q24"
+      "Q19",
+      "Q20",
+      "Q21",
+      "Q22",
+      "Q23",
+      "Q24"
     ],
     reverse_coded: [
-      "QUEST_Q22"
+      "Q22"
     ],
     raw_max: 30,
     n_questions: 6,
     sub_dimensions: [
-      "Team architecture",
+      "Team structure",
       "Succession development",
       "Team independence",
       "Dependency risk",
@@ -127,16 +128,16 @@ export const DIMENSIONS = [
     id: "D5",
     name: "Adaptive Capacity",
     question_ids: [
-      "QUEST_Q25",
-      "QUEST_Q26",
-      "QUEST_Q27",
-      "QUEST_Q28",
-      "QUEST_Q29",
-      "QUEST_Q30"
+      "Q25",
+      "Q26",
+      "Q27",
+      "Q28",
+      "Q29",
+      "Q30"
     ],
     reverse_coded: [
-      "QUEST_Q27",
-      "QUEST_Q29"
+      "Q27",
+      "Q29"
     ],
     raw_max: 30,
     n_questions: 6,
@@ -155,20 +156,20 @@ export const DIMENSIONS = [
     id: "D6",
     name: "AI Readiness",
     question_ids: [
-      "QUEST_Q31",
-      "QUEST_Q35",
-      "QUEST_Q32",
-      "QUEST_Q33",
-      "QUEST_Q36",
-      "QUEST_Q34"
+      "Q31",
+      "Q32",
+      "Q33",
+      "Q34",
+      "Q35",
+      "Q36"
     ],
     reverse_coded: [
-      "QUEST_Q33"
+      "Q33"
     ],
     raw_max: 30,
     n_questions: 6,
     sub_dimensions: [
-      "Decision Architecture Readiness",
+      "Decision Structure Readiness",
       "Data Governance Awareness",
       "AI Ethics & Risk Oversight",
       "Organisational AI Adoption Leadership"
@@ -183,7 +184,7 @@ export const COMPOSITE_BANDS = [
     min: 80,
     max: 100,
     band: "Executive Ready",
-    interpretation: "Strong capability across all five dimensions; operating at senior executive level"
+    interpretation: "Strong capability across all six dimensions; operating at senior executive level"
   },
   {
     min: 60,
@@ -213,20 +214,23 @@ export const COMPOSITE_BANDS = [
 
 export const DIMENSION_VERDICTS = [
   {
+    dim: "all",
     min: 15,
     max: 20,
     verdict: "Strength",
     meaning: "Deployable capability; executive operates at this level consistently and under pressure"
   },
   {
+    dim: "all",
     min: 10,
-    max: 14,
+    max: 14.9,
     verdict: "Developing",
     meaning: "Functional in stable conditions; gaps emerge under pressure or in unfamiliar APAC contexts"
   },
   {
+    dim: "all",
     min: 0,
-    max: 9,
+    max: 9.9,
     verdict: "Gap",
     meaning: "Underdeveloped for the executive's current or target role; primary development priority"
   }
@@ -239,21 +243,21 @@ export const ARCHETYPES = [
     profile: "High Strategic Thinking + High Adaptive Capacity, Advanced band",
     core_strength: "Designs robust systems and can pivot them when context changes. Rare combination at senior executive level.",
     key_risk: "Over-engineering; perfectionism slowing delivery; may underinvest in commercial urgency",
-    development_priority: "Delegation discipline; \"good enough\" calibration; commercial acumen deepening"
+    development_priority: "Delegation discipline; \"good enough\" threshold setting; commercial acumen deepening"
   },
   {
     name: "The Catalyst",
     "#": "2",
     profile: "High Commercial Acumen + High Adaptive Capacity, Advanced band",
-    core_strength: "Thrives in complexity and disruption; spots commercial opportunities others miss; acts fast",
-    key_risk: "Impatience with process and governance; may burn out teams; can deprioritise people development",
+    core_strength: "Thrives in complexity and market shifts; spots commercial opportunities others miss; acts fast",
+    key_risk: "Impatience with process and governance; may drain teams; can deprioritise people development",
     development_priority: "Sustainability mindset; team development investment; governance discipline"
   },
   {
     name: "The Diplomat",
     "#": "3",
     profile: "High People Leadership + High Strategic Thinking, Advanced band",
-    core_strength: "Builds coalitions, navigates politics, aligns diverse stakeholders around complex strategy",
+    core_strength: "Builds coalitions, manages stakeholder dynamics, aligns diverse groups around complex strategy",
     key_risk: "May prioritise harmony over hard decisions; can be slow to confront underperformance",
     development_priority: "Decisiveness under pressure; constructive confrontation capability; execution rigour"
   },
@@ -266,7 +270,7 @@ export const ARCHETYPES = [
     development_priority: "People leadership investment; long-term talent pipeline thinking; adaptive capacity"
   },
   {
-    name: "The Navigator",
+    name: "The Steward",
     "#": "5",
     profile: "High Adaptive Capacity + High People Leadership, Developing band",
     core_strength: "Guides teams through change with empathy and consistency; preserves team cohesion in uncertainty",
@@ -279,7 +283,7 @@ export const ARCHETYPES = [
     profile: "High Strategic Thinking, Developing band",
     core_strength: "Sees the big picture clearly; excellent at analysis and direction-setting",
     key_risk: "Execution gaps — vision without delivery mechanism; may rely on others for follow-through",
-    development_priority: "Execution Excellence; team mobilisation; accountability architecture"
+    development_priority: "Execution Excellence; team mobilisation; accountability structure"
   },
   {
     name: "The Engine",
@@ -311,7 +315,7 @@ export const ARCHETYPES = [
     profile: "Multiple low dimensions, Emerging band (avg <50)",
     core_strength: "High development potential; early in the executive capability journey; typically high motivation",
     key_risk: "Overwhelm; pursuing development in too many areas simultaneously; wrong sequencing of priorities",
-    development_priority: "Focus on 1–2 highest-leverage dimensions only; structured mentoring; SHIFT-QUEST programme indicated"
+    development_priority: "Focus on 1–2 highest-impact dimensions only; structured mentoring; SHIFT-QUEST programme indicated"
   }
 ];
 

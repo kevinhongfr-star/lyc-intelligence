@@ -80,7 +80,7 @@ function ScoringPanel({ contact }: { contact: Contact }) {
                 <span className="text-xs font-bold font-mono" style={{ color: meta.color }}>{val.score}</span>
               </div>
               <div className="h-1.5 bg-bg-tertiary overflow-hidden">
-                <div className="h-full transition-all duration-500" style={{ width: `${val.score}%`, backgroundColor: meta.color }} />
+                <div className="h-full transition-all duration-300" style={{ width: `${val.score}%`, backgroundColor: meta.color }} />
               </div>
               <p className="text-[10px] text-text-muted leading-relaxed">{val.rationale}</p>
             </div>

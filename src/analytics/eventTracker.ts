@@ -31,6 +31,98 @@ import { useEffect } from 'react';
 import { analyticsEnabled, trackPageView as posthogTrackPageView } from '@/lib/analytics';
 import posthog from 'posthog-js';
 
+// ── V3-5 / #1345 PII Scrubber ───────────────────────────────────────
+// Universal recursive scrubber. Redacts fields whose key (case-insensitive,
+// partial match) hits known PII buckets. Also scrubs values that match
+// email or UUID patterns on any key.
+
+const PII_KEY_PATTERNS: RegExp[] = [
+  /name/i,
+  /email/i,
+  /phone/i,
+  /^result/i, /score/i,
+  /profile/i,
+  /^chat/i, /message/i,
+  /ip/i,
+  /session/i,
+  /passport/i,
+  /address/i,
+  /^company$/i,
+];
+
+const RE_EMAIL = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+const RE_UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+
+function shortSha1Like(s: string): string {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = ((h << 5) - h) + s.charCodeAt(i);
+    h |= 0;
+  }
+  return ('0000000' + Math.abs(h).toString(16)).slice(-8);
+}
+
+function scrubStringValue(val: string, keyHint: string): string {
+  let out = val;
+  out = out.replace(RE_EMAIL, '[email scrubbed]');
+  out = out.replace(RE_UUID, (m) => `[uuid_${shortSha1Like(m)}]`);
+  const lowerKey = keyHint.toLowerCase();
+  if (
+    lowerKey.includes('assessment') ||
+    lowerKey.includes('result') ||
+    lowerKey.includes('profile') ||
+    lowerKey.includes('message') ||
+    lowerKey.includes('chat')
+  ) {
+    if (out.length > 80) {
+      const prefix = lowerKey.includes('assessment') ? 'assessment_results'
+        : lowerKey.includes('message') ? 'message_bubble'
+        : lowerKey.includes('profile') ? 'profile_string'
+        : 'blob';
+      return `[${prefix} len=${out.length} scrubbed]`;
+    }
+  }
+  return out;
+}
+
+function isPiiKey(key: string): boolean {
+  for (const r of PII_KEY_PATTERNS) {
+    if (r.test(key)) return true;
+  }
+  return false;
+}
+
+export function scrubPII<T>(obj: T): T {
+  function walk(v: unknown, key: string): unknown {
+    if (v === null || v === undefined) return v;
+    if (typeof v === 'string') {
+      if (isPiiKey(key)) {
+        if (key.toLowerCase() === 'company' && v.length < 100) {
+          return '[company scrubbed]';
+        }
+        if (v.length > 64) {
+          return `[${key}_len=${v.length}_scrubbed]`;
+        }
+        return `[${key} scrubbed]`;
+      }
+      return scrubStringValue(v, key);
+    }
+    if (typeof v === 'number' || typeof v === 'boolean') return v;
+    if (Array.isArray(v)) {
+      return v.map((item, i) => walk(item, `${key}[${i}]`));
+    }
+    if (typeof v === 'object') {
+      const out: Record<string, unknown> = {};
+      for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
+        out[k] = walk(val, k);
+      }
+      return out;
+    }
+    return null;
+  }
+  return walk(obj, '') as T;
+}
+
 // ── Event definitions (typed string unions for autocomplete) ─────────
 
 export type ConversionEventName =
@@ -264,6 +356,10 @@ export interface TrackOptions {
  * Emit one analytics event. Persists to localStorage buffer, then flushes
  * asynchronously to /api/events. Mirrors the event to window.va when the
  * Vercel Analytics runtime is installed.
+ *
+ * V3-5 / #1345: All event payloads are run through scrubPII() to remove
+ * emails, UUIDs (replaced with truncated hash), names, phones, IPs,
+ * session IDs, assessment results, chat message text, and company fields.
  */
 export function trackEvent(
   name: string,
@@ -273,13 +369,25 @@ export function trackEvent(
   const { funnelStep, path, mirrorToVercelAnalytics = true } = opts;
 
   const funnel = funnelStep ? advanceFunnel(funnelStep) : undefined;
+  const rawUser = getCurrentUser();
+
+  const cleanProps = Object.keys(props).length ? scrubPII(props) : undefined;
+  const cleanCtx = scrubPII(buildCtx(path));
+  const cleanUser: BaseEvent['user'] = rawUser
+    ? scrubPII<BaseEvent['user']>({
+        id: rawUser.id ? `[user_${shortSha1Like(rawUser.id)}]` : undefined,
+        role: rawUser.role,
+      })
+    : undefined;
+  const cleanFunnel = funnel ? scrubPII(funnel) : undefined;
+
   const event: BaseEvent = {
     name,
     timestamp: new Date().toISOString(),
-    props: Object.keys(props).length ? props : undefined,
-    user: getCurrentUser(),
-    ctx: buildCtx(path),
-    funnel,
+    props: cleanProps,
+    user: cleanUser,
+    ctx: cleanCtx,
+    funnel: cleanFunnel,
   };
 
   buffer.push(event);
@@ -296,7 +404,7 @@ export function trackEvent(
         va?: (method: string, event: string, props?: Record<string, unknown>) => void;
       };
       if (typeof wAny.va === 'function') {
-        const vaProps: Record<string, unknown> = { ...props };
+        const vaProps: Record<string, unknown> = scrubPII({ ...props });
         if (funnel) vaProps.funnel = funnel;
         wAny.va('event', name, vaProps);
       }

@@ -1,0 +1,918 @@
+{
+  "meta": {
+    "id": "drive",
+    "title": "DRIVE",
+    "subtitle": "Motivational Alignment & Engagement Risk",
+    "accent_color": "#334155",
+    "total_questions": 36,
+    "total_dimensions": 5,
+    "tier_key": "executive",
+    "status": "placeholder"
+  },
+  "dimensions": [
+    {
+      "key": "d1_intrinsic_motivation",
+      "name": "Intrinsic Motivation",
+      "description": "Measures the degree to which the individual is motivated by the inherent satisfaction of the work itself — curiosity, craft, autonomy, and flow — rather than external rewards or recognition.",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 1
+    },
+    {
+      "key": "d2_extrinsic_motivation",
+      "name": "Extrinsic Motivation",
+      "description": "Measures the degree to which the individual is motivated by external rewards, recognition, status, visibility, and career progression.",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 2
+    },
+    {
+      "key": "d3_values_alignment",
+      "name": "Values Alignment",
+      "description": "Measures the degree of alignment between the individual's personal values, sense of purpose, and the organisation's mission and ethics.",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 3
+    },
+    {
+      "key": "d4_confidence_self_efficacy",
+      "name": "Confidence & Self-Efficacy",
+      "description": "Measures the individual's belief in their own capability to succeed in their role — including confidence under pressure, ability to adapt, and conviction in their own skills.",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 4
+    },
+    {
+      "key": "d5_growth_orientation",
+      "name": "Growth Orientation",
+      "description": "Measures the degree to which the individual is motivated by growth, development, learning, and new challenges — versus mastery, stability, and doing what they already do well.",
+      "low_label": "Developing",
+      "high_label": "Mastery",
+      "weight": 1.0,
+      "sort_order": 5
+    }
+  ],
+  "engagement_risk": {
+    "key": "er_engagement_risk",
+    "name": "Engagement Risk Sub-Score",
+    "n_questions": 6,
+    "description": "6 supplemental items measuring engagement risk. Reported separately as Fueled / Flickering / Fading state; NOT included in core motivation composite."
+  },
+  "archetypes": [
+    {
+      "key": "a1_achiever",
+      "name": "Achiever",
+      "description": "Extrinsic-dominant, Fueled. The Achiever is driven by recognition, progression, and visible results. They set ambitious targets, seek advancement, and thrive when their contributions are acknowledged and rewarded.",
+      "key_traits": [
+        "Results-oriented and high-output",
+        "Strong drive for progression and visibility",
+        "High confidence in their capabilities"
+      ],
+      "sort_order": 1
+    },
+    {
+      "key": "a2_craftsman",
+      "name": "Craftsman",
+      "description": "Intrinsic-dominant, Fueled. The Craftsman is deeply motivated by the quality and craft of the work itself. They find satisfaction in doing work well, in mastery of their discipline, and in alignment between their values and their work.",
+      "key_traits": [
+        "Deep work satisfaction independent of external rewards",
+        "Commitment to quality and craftsmanship",
+        "Strong values alignment with their work"
+      ],
+      "sort_order": 2
+    },
+    {
+      "key": "a3_champion",
+      "name": "Champion",
+      "description": "Relational-dominant, Fueled. The Champion is energised by developing others and building team capability. They thrive when they can see their impact through the growth and success of people around them.",
+      "key_traits": [
+        "Strong people development orientation",
+        "High confidence that inspires others",
+        "Recognition from team success fuels sustained effort"
+      ],
+      "sort_order": 3
+    },
+    {
+      "key": "a4_explorer",
+      "name": "Explorer",
+      "description": "Intrinsic-dominant, Fueled. The Explorer is motivated by novelty, challenge, and new contexts. They thrive on steep learning curves, new environments, and the excitement of figuring things out.",
+      "key_traits": [
+        "Thrives in new and challenging situations",
+        "Rapid learning capability",
+        "Comfortable with ambiguity and change"
+      ],
+      "sort_order": 4
+    },
+    {
+      "key": "a5_stalwart",
+      "name": "Stalwart",
+      "description": "Purpose-driven, Fueled. The Stalwart is anchored in strong values alignment and intrinsic motivation, with lower growth orientation. They are loyal, steady, and deeply committed to the mission and purpose of the organisation.",
+      "key_traits": [
+        "Deep institutional loyalty and commitment",
+        "Strong values alignment with the organisation",
+        "Reliable and consistent over long periods"
+      ],
+      "sort_order": 5
+    },
+    {
+      "key": "a6_restless",
+      "name": "Restless",
+      "description": "Growth-driven, Flickering. The Restless has strong capability and high ambition but feels misaligned with the role's purpose or values. They are capable but not fully engaged.",
+      "key_traits": [
+        "High capability and ambition",
+        "Strong growth orientation",
+        "Driven by progression and recognition"
+      ],
+      "sort_order": 6
+    },
+    {
+      "key": "a7_golden_handcuffs",
+      "name": "Golden Handcuffs",
+      "description": "Extrinsic-dominant, Flickering. The Golden Handcuffs profile stays primarily for the rewards and compensation, but finds little intrinsic satisfaction in the work itself. They are reliable but not energised.",
+      "key_traits": [
+        "Reliable performer — will meet expectations",
+        "Values alignment prevents active disengagement",
+        "Stable presence in the organisation"
+      ],
+      "sort_order": 7
+    },
+    {
+      "key": "a8_drifter",
+      "name": "Drifter",
+      "description": "No clear dominant, Flickering. The Drifter lacks a clear dominant motivation source. They are not strongly driven by intrinsic satisfaction, external rewards, purpose alignment, or growth.",
+      "key_traits": [
+        "Often capable — the issue is motivation, not ability",
+        "May be in a transition period between motivational phases",
+        "Flexible — not locked into one motivational pattern"
+      ],
+      "sort_order": 8
+    },
+    {
+      "key": "a9_burned_out",
+      "name": "Burned-Out",
+      "description": "Depleted, Fading. The Burned-Out profile shows structural depletion across intrinsic motivation, confidence, and growth orientation. Serious engagement state requiring immediate attention.",
+      "key_traits": [
+        "Often were high performers before depletion set in",
+        "Recovery is possible with the right intervention",
+        "Typically have deep capability and institutional knowledge"
+      ],
+      "sort_order": 9
+    },
+    {
+      "key": "a10_frozen_asset",
+      "name": "Frozen Asset",
+      "description": "Blocked, Fading. The Frozen Asset has strong values alignment but low confidence and low growth orientation have led to a state of structural paralysis. They are capable but stuck.",
+      "key_traits": [
+        "Strong values alignment — genuinely committed to the organisation's mission",
+        "Often significant untapped capability beneath the paralysis",
+        "Loyal and stable — will not leave easily"
+      ],
+      "sort_order": 10
+    }
+  ],
+  "questions": [
+    {
+      "key": "q_001",
+      "type": "scale",
+      "prompt": "Placeholder question 1 for D1 Intrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_intrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 1,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_002",
+      "type": "scenario",
+      "prompt": "Placeholder question 2 for D2 Extrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_extrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 2,
+      "scenario": "Scenario context for question 2. You are in a situation that tests your extrinsic motivation capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_003",
+      "type": "scale",
+      "prompt": "Placeholder question 3 for D3 Values Alignment dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_values_alignment",
+      "weight": 1.0,
+      "sort_order": 3,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_004",
+      "type": "multi_select",
+      "prompt": "Placeholder question 4 for D4 Confidence & Self-Efficacy dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_confidence_self_efficacy",
+      "weight": 1.0,
+      "sort_order": 4,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 2
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 2
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 2
+        },
+        {
+          "value": "d",
+          "label": "Option D",
+          "score": 2
+        }
+      ],
+      "max_selections": 2
+    },
+    {
+      "key": "q_005",
+      "type": "scale",
+      "prompt": "Placeholder question 5 for D5 Growth Orientation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_growth_orientation",
+      "weight": 1.0,
+      "sort_order": 5,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_006",
+      "type": "scenario",
+      "prompt": "Placeholder question 6 for D1 Intrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_intrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 6,
+      "scenario": "Scenario context for question 6. You are in a situation that tests your intrinsic motivation capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_007",
+      "type": "scale",
+      "prompt": "Placeholder question 7 for D2 Extrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_extrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 7,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_008",
+      "type": "scenario",
+      "prompt": "Placeholder question 8 for D3 Values Alignment dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_values_alignment",
+      "weight": 1.0,
+      "sort_order": 8,
+      "scenario": "Scenario context for question 8. You are in a situation that tests your values alignment capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_009",
+      "type": "scale",
+      "prompt": "Placeholder question 9 for D4 Confidence & Self-Efficacy dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_confidence_self_efficacy",
+      "weight": 1.0,
+      "sort_order": 9,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_010",
+      "type": "multi_select",
+      "prompt": "Placeholder question 10 for D5 Growth Orientation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_growth_orientation",
+      "weight": 1.0,
+      "sort_order": 10,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 2
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 2
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 2
+        },
+        {
+          "value": "d",
+          "label": "Option D",
+          "score": 2
+        }
+      ],
+      "max_selections": 2
+    },
+    {
+      "key": "q_011",
+      "type": "scale",
+      "prompt": "Placeholder question 11 for D1 Intrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_intrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 11,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_012",
+      "type": "scenario",
+      "prompt": "Placeholder question 12 for D2 Extrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_extrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 12,
+      "scenario": "Scenario context for question 12. You are in a situation that tests your extrinsic motivation capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_013",
+      "type": "scale",
+      "prompt": "Placeholder question 13 for D3 Values Alignment dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_values_alignment",
+      "weight": 1.0,
+      "sort_order": 13,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_014",
+      "type": "scenario",
+      "prompt": "Placeholder question 14 for D4 Confidence & Self-Efficacy dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_confidence_self_efficacy",
+      "weight": 1.0,
+      "sort_order": 14,
+      "scenario": "Scenario context for question 14. You are in a situation that tests your confidence and self-efficacy capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_015",
+      "type": "scale",
+      "prompt": "Placeholder question 15 for D5 Growth Orientation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_growth_orientation",
+      "weight": 1.0,
+      "sort_order": 15,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_016",
+      "type": "multi_select",
+      "prompt": "Placeholder question 16 for D1 Intrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_intrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 16,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 2
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 2
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 2
+        },
+        {
+          "value": "d",
+          "label": "Option D",
+          "score": 2
+        }
+      ],
+      "max_selections": 2
+    },
+    {
+      "key": "q_017",
+      "type": "scale",
+      "prompt": "Placeholder question 17 for D2 Extrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_extrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 17,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_018",
+      "type": "scenario",
+      "prompt": "Placeholder question 18 for D3 Values Alignment dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_values_alignment",
+      "weight": 1.0,
+      "sort_order": 18,
+      "scenario": "Scenario context for question 18. You are in a situation that tests your values alignment capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_019",
+      "type": "scale",
+      "prompt": "Placeholder question 19 for D4 Confidence & Self-Efficacy dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_confidence_self_efficacy",
+      "weight": 1.0,
+      "sort_order": 19,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_020",
+      "type": "scenario",
+      "prompt": "Placeholder question 20 for D5 Growth Orientation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_growth_orientation",
+      "weight": 1.0,
+      "sort_order": 20,
+      "scenario": "Scenario context for question 20. You are in a situation that tests your growth orientation capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_021",
+      "type": "scale",
+      "prompt": "Placeholder question 21 for D1 Intrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_intrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 21,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_022",
+      "type": "multi_select",
+      "prompt": "Placeholder question 22 for D2 Extrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_extrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 22,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 2
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 2
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 2
+        },
+        {
+          "value": "d",
+          "label": "Option D",
+          "score": 2
+        }
+      ],
+      "max_selections": 2
+    },
+    {
+      "key": "q_023",
+      "type": "scale",
+      "prompt": "Placeholder question 23 for D3 Values Alignment dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_values_alignment",
+      "weight": 1.0,
+      "sort_order": 23,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_024",
+      "type": "scenario",
+      "prompt": "Placeholder question 24 for D4 Confidence & Self-Efficacy dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_confidence_self_efficacy",
+      "weight": 1.0,
+      "sort_order": 24,
+      "scenario": "Scenario context for question 24. You are in a situation that tests your confidence and self-efficacy capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_025",
+      "type": "scale",
+      "prompt": "Placeholder question 25 for D5 Growth Orientation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_growth_orientation",
+      "weight": 1.0,
+      "sort_order": 25,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_026",
+      "type": "scenario",
+      "prompt": "Placeholder question 26 for D1 Intrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d1_intrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 26,
+      "scenario": "Scenario context for question 26. You are in a situation that tests your intrinsic motivation capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_027",
+      "type": "scale",
+      "prompt": "Placeholder question 27 for D2 Extrinsic Motivation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d2_extrinsic_motivation",
+      "weight": 1.0,
+      "sort_order": 27,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_028",
+      "type": "multi_select",
+      "prompt": "Placeholder question 28 for D3 Values Alignment dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d3_values_alignment",
+      "weight": 1.0,
+      "sort_order": 28,
+      "options": [
+        {
+          "value": "a",
+          "label": "Option A",
+          "score": 2
+        },
+        {
+          "value": "b",
+          "label": "Option B",
+          "score": 2
+        },
+        {
+          "value": "c",
+          "label": "Option C",
+          "score": 2
+        },
+        {
+          "value": "d",
+          "label": "Option D",
+          "score": 2
+        }
+      ],
+      "max_selections": 2
+    },
+    {
+      "key": "q_029",
+      "type": "scale",
+      "prompt": "Placeholder question 29 for D4 Confidence & Self-Efficacy dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d4_confidence_self_efficacy",
+      "weight": 1.0,
+      "sort_order": 29,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_030",
+      "type": "scenario",
+      "prompt": "Placeholder question 30 for D5 Growth Orientation dimension. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "d5_growth_orientation",
+      "weight": 1.0,
+      "sort_order": 30,
+      "scenario": "Scenario context for question 30. You are in a situation that tests your growth orientation capabilities. How do you respond?",
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_031",
+      "type": "scale",
+      "prompt": "TODO: Add missing engagement risk question 31 (Engagement Risk Sub-Score item 1 of 6) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "er_engagement_risk",
+      "weight": 1.0,
+      "sort_order": 31,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_032",
+      "type": "scale",
+      "prompt": "TODO: Add missing engagement risk question 32 (Engagement Risk Sub-Score item 2 of 6) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "er_engagement_risk",
+      "weight": 1.0,
+      "sort_order": 32,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_033",
+      "type": "scale",
+      "prompt": "TODO: Add missing engagement risk question 33 (Engagement Risk Sub-Score item 3 of 6) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "er_engagement_risk",
+      "weight": 1.0,
+      "sort_order": 33,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_034",
+      "type": "scale",
+      "prompt": "TODO: Add missing engagement risk question 34 (Engagement Risk Sub-Score item 4 of 6) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "er_engagement_risk",
+      "weight": 1.0,
+      "sort_order": 34,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_035",
+      "type": "scale",
+      "prompt": "TODO: Add missing engagement risk question 35 (Engagement Risk Sub-Score item 5 of 6) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "er_engagement_risk",
+      "weight": 1.0,
+      "sort_order": 35,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    },
+    {
+      "key": "q_036",
+      "type": "scale",
+      "prompt": "TODO: Add missing engagement risk question 36 (Engagement Risk Sub-Score item 6 of 6) per canon count. Content team will replace with real diagnostic content.",
+      "required": true,
+      "dimension_key": "er_engagement_risk",
+      "weight": 1.0,
+      "sort_order": 36,
+      "scale_min": 1,
+      "scale_max": 5,
+      "scale_labels": {
+        "1": "Strongly disagree",
+        "2": "Disagree",
+        "3": "Neutral",
+        "4": "Agree",
+        "5": "Strongly agree"
+      }
+    }
+  ],
+  "scoring": {
+    "method": "weighted_average",
+    "overall_formula": "dimension_weighted_avg",
+    "archetype_mapping": "highest_dimension_combo",
+    "engagement_risk_separate": true
+  },
+  "result_insights": {
+    "high": "Your strengths in this motivation dimension are notable. You demonstrate advanced motivational architecture that supports sustained engagement.",
+    "medium": "You are developing in this motivation area. With targeted reflection, you can strengthen your motivational alignment to the next level.",
+    "low": "This is an area for growth. Consider targeted development activities or coaching intervention to strengthen your motivational foundation."
+  }
+}

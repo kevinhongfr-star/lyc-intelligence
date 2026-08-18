@@ -66,15 +66,18 @@ export class AkiraScorer {
 
     for (const dim of dimensions) {
       const dimResult = this.scoreDimension(dim, responses);
-      dimensionScores[dim.id] = dimResult.score;
-      dimensionsOrdered.push(dim.id);
-      dimensionVerdicts[dim.id] = dimResult.verdict;
+      const dimKey = dim.id || dim.name;
+      dimensionScores[dimKey] = dimResult.score;
+      dimensionsOrdered.push(dimKey);
+      dimensionVerdicts[dimKey] = dimResult.verdict;
       totalQuestionsAnswered += dimResult.answered_count;
       totalConfiguredQuestions += dimResult.configured_count;
     }
 
     const composite = this.scoreComposite(dimensionScores);
-    const { archetype, archetypesRanked } = this.matchArchetype(dimensionScores);
+    const mode = this.config.scoring_mode || "weighted_average";
+    const { archetype, archetypesRanked } =
+      mode === "score_only" ? { archetype: undefined, archetypesRanked: [] } : this.matchArchetype(dimensionScores);
     const developmentPriorities = this.deriveDevelopmentPriorities(dimensionScores, dimensionVerdicts);
 
     return {
@@ -96,7 +99,8 @@ export class AkiraScorer {
     dim: InstrumentDimension,
     responses: Record<string, number>
   ): { score: DimensionScore; verdict: { verdict: string; meaning: string }; answered_count: number; configured_count: number } {
-    const questionIds = dim.question_ids || [];
+    // #1383: Support both `question_ids` (standard configs) and `items` (LEAP-style configs).
+    const questionIds = dim.question_ids || (dim.items || []).map(it => it.id);
     const reverseCoded = new Set(dim.reverse_coded || []);
     const scaleMax = this.inferScaleMax();
     let rawSum = 0;
@@ -121,11 +125,12 @@ export class AkiraScorer {
     const percentage = rawMax > 0 ? (rawSum / rawMax) * 100 : 0;
     const normalisedScore = rawMax > 0 ? (rawSum / rawMax) * normalisedMax : 0;
 
-    const verdict = this.lookupDimensionVerdict(percentage, dim.id);
+    const dimKey = dim.id || dim.name;
+    const verdict = this.lookupDimensionVerdict(percentage, dimKey);
 
     const score: DimensionScore = {
-      id: dim.id,
-      name: dim.name || dim.id,
+      id: dimKey,
+      name: dim.name || dimKey,
       raw_score: rawSum,
       raw_max: rawMax,
       normalised_score: Math.round(normalisedScore * 100) / 100,
@@ -206,8 +211,23 @@ export class AkiraScorer {
       Object.entries(dimensionScores).map(([k, v]) => [k, v.percentage])
     );
 
+    const mode = this.config.scoring_mode || "weighted_average";
+
     const ranked: MatchedArchetype[] = archetypes.map((arch, idx) => {
-      const matchScore = this.computeArchetypeMatch(arch, percentages, idx);
+      let matchScore: number;
+      switch (mode) {
+        case "weakest_dim":
+          matchScore = this.matchWeakestDim(arch, dimensionScores);
+          break;
+        case "forced_choice":
+          matchScore = this.matchForcedChoice(arch, percentages);
+          break;
+        case "matrix":
+          matchScore = this.matchMatrix(arch, percentages, idx);
+          break;
+        default:
+          matchScore = this.matchWeightedAverage(arch, percentages, idx);
+      }
       return {
         ...arch,
         id: arch.id ?? idx,
@@ -216,12 +236,214 @@ export class AkiraScorer {
     });
 
     ranked.sort((a, b) => b.match_score - a.match_score);
-    return { archetype: ranked[0], archetypesRanked: ranked };  }
+    return { archetype: ranked[0], archetypesRanked: ranked };
+  }
 
-  private computeArchetypeMatch(
+  // ── weighted_average mode: generic heuristic using mean/std ──
+  private matchWeightedAverage(
     arch: Archetype,
     percentages: Record<string, number>,
-    _idx: number
+    idx: number
+  ): number {
+    return this.computeGenericMatch(arch, percentages, idx);
+  }
+
+  // ── matrix mode: pattern-based matching using archetype-specific fields ──
+  private matchMatrix(
+    arch: Archetype,
+    percentages: Record<string, number>,
+    idx: number
+  ): number {
+    // If the archetype has foundation/visibility (PRISM-style), use that.
+    if (typeof arch.foundation === "string" || typeof arch.visibility === "string") {
+      return this.computeFoundationVisibilityMatch(arch, percentages);
+    }
+    // If the archetype has board_ai_fluency/governance_maturity (SPARK-style), use that.
+    if (typeof arch.board_ai_fluency === "string" || typeof arch.governance_maturity === "string") {
+      return this.compute2x2MatrixMatch(
+        arch,
+        percentages,
+        "board_ai_fluency",
+        "governance_maturity"
+      );
+    }
+    // If the archetype has selling_acumen/system_leadership (FORGE-style), use that.
+    if (typeof arch.selling_acumen === "string" || typeof arch.system_leadership === "string") {
+      return this.compute2x2MatrixMatch(
+        arch,
+        percentages,
+        "selling_acumen",
+        "system_leadership"
+      );
+    }
+    // If the archetype has a profile text (MOSAIC/QUEST/COACH/DRIVE-style),
+    // parse "High X + High Y" patterns from the profile text.
+    if (typeof arch.profile === "string" && arch.profile.length > 0) {
+      return this.computeProfileMatch(arch.profile, percentages);
+    }
+    // If the archetype has an orientation text (IMPACT-style), parse keywords.
+    if (typeof arch.orientation === "string" && arch.orientation.length > 0) {
+      return this.computeProfileMatch(arch.orientation, percentages);
+    }
+    // Fallback: generic heuristic.
+    return this.computeGenericMatch(arch, percentages, idx);
+  }
+
+  // ── forced_choice mode: DISC primary × CR band (LEAP) ──
+  private matchForcedChoice(
+    arch: Archetype,
+    percentages: Record<string, number>
+  ): number {
+    const vals = Object.values(percentages);
+    const mean = vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 50;
+
+    // DISC primary: check if the archetype's disc_primary matches the highest-scoring dimension.
+    const discPrimary = arch.disc_primary as string | undefined;
+    if (discPrimary) {
+      // Find the dimension with the highest percentage.
+      const sortedDims = Object.entries(percentages).sort((a, b) => b[1] - a[1]);
+      const topDim = sortedDims[0]?.[0] || "";
+      // Map DISC letters to dimension names (LEAP uses dimension names like "Positioning", "Proof", etc.
+      // The disc_primary field is "D", "I", "S", "C".
+      // Since LEAP's career_readiness dimensions are separate from DISC items,
+      // we use a heuristic: match by CR band level.
+      const crBand = arch.cr_band as string | undefined;
+      if (crBand) {
+        // Map CR bands to score ranges: B1 (low) → B4 (high).
+        const bandRanges: Record<string, [number, number]> = {
+          B1: [0, 39], B2: [40, 59], B3: [60, 79], B4: [80, 100],
+        };
+        const range = bandRanges[crBand];
+        if (range && mean >= range[0] && mean <= range[1]) {
+          return 80 + Math.round(Math.random() * 10);
+        }
+      }
+    }
+    return this.computeGenericMatch(arch, percentages, 0);
+  }
+
+  // ── weakest_dim mode: archetype determined by weakest dimension (BRIDGE) ──
+  private matchWeakestDim(
+    arch: Archetype,
+    dimensionScores: Record<string, DimensionScore>
+  ): number {
+    const weakestDimField = arch.weakest_dimension as string | undefined;
+    if (!weakestDimField) return 30;
+
+    // Find the actual weakest dimension from scores.
+    const sortedDims = Object.entries(dimensionScores).sort(
+      (a, b) => a[1].percentage - b[1].percentage
+    );
+    const weakestActual = sortedDims[0];
+    if (!weakestActual) return 30;
+
+    // Check if the archetype's weakest_dimension matches the actual weakest.
+    const weakestName = weakestActual[1].name.toLowerCase();
+    const archWeakestName = weakestDimField.toLowerCase();
+    if (weakestName.includes(archWeakestName) || archWeakestName.includes(weakestName)) {
+      return 90;
+    }
+    // Partial match: check if any word overlaps.
+    const weakestWords = weakestName.split(/\s+/);
+    const archWords = archWeakestName.split(/\s+/);
+    const overlap = weakestWords.some(w => w.length > 3 && archWords.includes(w));
+    return overlap ? 60 : 20;
+  }
+
+  // ── Foundation × Visibility match (PRISM) ──
+  private computeFoundationVisibilityMatch(
+    arch: Archetype,
+    percentages: Record<string, number>
+  ): number {
+    const dimIds = Object.keys(percentages);
+    const half = Math.ceil(dimIds.length / 2);
+    const sorted = [...dimIds].sort((a, b) => percentages[b] - percentages[a]);
+    const topHalfAvg = sorted.slice(0, half).reduce((a, id) => a + percentages[id], 0) / Math.max(1, half);
+    const bottomHalfAvg = sorted.slice(half).reduce((a, id) => a + percentages[id], 0) / Math.max(1, dimIds.length - half);
+    const vals = Object.values(percentages);
+    const mean = vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 50;
+
+    let score = 50;
+    if (arch.foundation === "Strong") score += topHalfAvg * 0.3;
+    else if (arch.foundation === "Weak") score += (100 - topHalfAvg) * 0.3;
+    else score += mean * 0.15;
+
+    if (arch.visibility === "High") score += bottomHalfAvg * 0.3;
+    else if (arch.visibility === "Low") score += (100 - bottomHalfAvg) * 0.3;
+    else score += mean * 0.15;
+
+    return Math.min(100, Math.max(0, Math.round(score)));
+  }
+
+  // ── Generic 2×2 matrix match (SPARK board_ai_fluency × governance_maturity, FORGE selling_acumen × system_leadership) ──
+  private compute2x2MatrixMatch(
+    arch: Archetype,
+    percentages: Record<string, number>,
+    fieldA: string,
+    fieldB: string
+  ): number {
+    const dimIds = Object.keys(percentages);
+    const half = Math.ceil(dimIds.length / 2);
+    const sorted = [...dimIds].sort((a, b) => percentages[b] - percentages[a]);
+    const topHalfAvg = sorted.slice(0, half).reduce((a, id) => a + percentages[id], 0) / Math.max(1, half);
+    const bottomHalfAvg = sorted.slice(half).reduce((a, id) => a + percentages[id], 0) / Math.max(1, dimIds.length - half);
+
+    const valA = (arch as Record<string, unknown>)[fieldA] as string | undefined;
+    const valB = (arch as Record<string, unknown>)[fieldB] as string | undefined;
+
+    let score = 50;
+    if (valA === "High") score += topHalfAvg * 0.3;
+    else if (valA === "Low") score += (100 - topHalfAvg) * 0.3;
+
+    if (valB === "High") score += bottomHalfAvg * 0.3;
+    else if (valB === "Low") score += (100 - bottomHalfAvg) * 0.3;
+
+    return Math.min(100, Math.max(0, Math.round(score)));
+  }
+
+  // ── Profile text match: parse "High X + High Y" patterns (MOSAIC, QUEST, COACH) ──
+  private computeProfileMatch(
+    profileText: string,
+    percentages: Record<string, number>
+  ): number {
+    // Build a lookup of dimension ID → name from config.
+    const dimLookup = (this.config.dimensions || []).map(d => ({
+      id: d.id || d.name,
+      name: d.name,
+      pct: percentages[d.id || d.name] ?? 0,
+    }));
+
+    let score = 50;
+    // Parse "High X" and "Low X" patterns from the profile text.
+    const highMatches = profileText.match(/High\s+([A-Z][A-Za-z\s&/]+?)(?=\s*[+,)]|\s+and\s|$)/g);
+    const lowMatches = profileText.match(/Low\s+([A-Z][A-Za-z\s&/]+?)(?=\s*[+,)]|\s+and\s|$)/g);
+
+    if (highMatches) {
+      for (const hm of highMatches) {
+        const dimName = hm.replace(/^High\s+/, "").trim().toLowerCase();
+        const matched = dimLookup.find(d => d.name.toLowerCase().includes(dimName) || dimName.includes(d.name.toLowerCase()));
+        if (matched) {
+          score += matched.pct > 60 ? 15 : matched.pct > 40 ? 5 : -10;
+        }
+      }
+    }
+    if (lowMatches) {
+      for (const lm of lowMatches) {
+        const dimName = lm.replace(/^Low\s+/, "").trim().toLowerCase();
+        const matched = dimLookup.find(d => d.name.toLowerCase().includes(dimName) || dimName.includes(d.name.toLowerCase()));
+        if (matched) {
+          score += matched.pct < 40 ? 15 : matched.pct < 60 ? 5 : -10;
+        }
+      }
+    }
+    return Math.min(100, Math.max(0, Math.round(score)));
+  }
+
+  // ── Generic heuristic fallback (mean/std based) ──
+  private computeGenericMatch(
+    arch: Archetype,
+    percentages: Record<string, number>,
+    idx: number
   ): number {
     const vals = Object.values(percentages);
     if (vals.length === 0) return 50;
@@ -229,29 +451,12 @@ export class AkiraScorer {
     const variance = vals.reduce((a, b) => a + (b - mean) ** 2, 0) / vals.length;
     const std = Math.sqrt(variance);
 
-    const hasFoundation = typeof arch.foundation === "string";
-    const hasVisibility = typeof arch.visibility === "string";
-
-    if (hasFoundation || hasVisibility) {
-      const dimIds = Object.keys(percentages);
-      const half = Math.ceil(dimIds.length / 2);
-      const sorted = [...dimIds].sort((a, b) => percentages[b] - percentages[a]);
-      const topHalfAvg = sorted.slice(0, half).reduce((a, id) => a + percentages[id], 0) / Math.max(1, half);
-      const bottomHalfAvg = sorted.slice(half).reduce((a, id) => a + percentages[id], 0) / Math.max(1, dimIds.length - half);
-
-      let score = 50;
-      if (arch.foundation === "Strong") score += topHalfAvg * 0.3;
-      else if (arch.foundation === "Weak") score += (100 - topHalfAvg) * 0.3;
-      else score += mean * 0.15;
-
-      if (arch.visibility === "High") score += bottomHalfAvg * 0.3;
-      else if (arch.visibility === "Low") score += (100 - bottomHalfAvg) * 0.3;
-      else score += mean * 0.15;
-
-      return Math.min(100, Math.max(0, Math.round(score)));
+    // Try foundation/visibility first (backward compat).
+    if (typeof arch.foundation === "string" || typeof arch.visibility === "string") {
+      return this.computeFoundationVisibilityMatch(arch, percentages);
     }
 
-    const pseudo = 50 + (mean - 50) * 0.5 + (std - 20) * 0.5 + ((_idx % 7) - 3) * 2;
+    const pseudo = 50 + (mean - 50) * 0.5 + (std - 20) * 0.5 + ((idx % 7) - 3) * 2;
     return Math.min(100, Math.max(0, Math.round(pseudo)));
   }
 

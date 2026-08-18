@@ -261,78 +261,12 @@ function buildInstrumentConfigFromScoring(code: InstrumentKey): InstrumentConfig
     total_questions: cfg.TOTAL_QUESTIONS,
     scale: cfg.SCALE,
     delivery_minutes: cfg.DELIVERY_MINUTES,
+    scoring_mode: cfg.SCORING_MODE || "weighted_average",
     dimensions: Array.isArray(cfg.DIMENSIONS) ? cfg.DIMENSIONS : [],
     composite_bands: Array.isArray(cfg.COMPOSITE_BANDS) ? cfg.COMPOSITE_BANDS : [],
     dimension_verdicts: Array.isArray(cfg.DIMENSION_VERDICTS) ? cfg.DIMENSION_VERDICTS : undefined,
     archetypes: Array.isArray(cfg.ARCHETYPES) ? cfg.ARCHETYPES : undefined,
     ...(cfg.engagement_risk ? { engagement_risk: cfg.engagement_risk } : {}),
-  };
-}
-
-function scoreLegacyCPI(
-  numericResponses: Record<string, number>,
-  meta: InstrumentMeta
-): ScoreResult {
-  const dimensionScores: ScoreResult["dimension_scores"] = {};
-  const dimensionsOrdered: string[] = [];
-  const verdicts: Record<string, { verdict: string; meaning: string }> = {};
-
-  for (const dim of meta.dimensions) {
-    dimensionsOrdered.push(dim.id);
-    const pct = 40 + Math.round(Math.random() * 40);
-    dimensionScores[dim.id] = {
-      id: dim.id,
-      name: dim.name,
-      raw_score: Math.round((pct / 100) * (dim.raw_max || 100)),
-      raw_max: dim.raw_max || 100,
-      normalised_score: Math.round((pct / 100) * 20 * 10) / 10,
-      normalised_max: 20,
-      percentage: pct,
-      question_count: dim.question_count,
-    };
-    const matchV = meta.dimension_verdicts.find(v => pct >= v.min && pct <= v.max);
-    verdicts[dim.id] = matchV
-      ? { verdict: matchV.verdict, meaning: matchV.meaning }
-      : { verdict: "Unrated", meaning: "" };
-    dimensionScores[dim.id].verdict = verdicts[dim.id].verdict;
-    dimensionScores[dim.id].verdict_meaning = verdicts[dim.id].meaning;
-  }
-
-  const compositeVal = Math.round(
-    Object.values(dimensionScores).reduce((s, d) => s + d.percentage, 0) /
-      Math.max(1, Object.keys(dimensionScores).length)
-  );
-  const matchBand = meta.composite_bands.find(b => compositeVal >= b.min && compositeVal <= b.max);
-  const top = [...meta.dimensions]
-    .map(d => ({ id: d.id, name: d.name, pct: dimensionScores[d.id].percentage }))
-    .sort((a, b) => a.pct - b.pct);
-
-  return {
-    dimension_scores: dimensionScores,
-    dimensions_ordered: dimensionsOrdered,
-    composite: {
-      score: compositeVal,
-      band: matchBand?.band,
-      interpretation: matchBand?.interpretation,
-    },
-    archetype: meta.archetypes[0]
-      ? { id: meta.archetypes[0].id, name: meta.archetypes[0].name, description: meta.archetypes[0].description, match_score: 85 }
-      : undefined,
-    archetypes_ranked: meta.archetypes.map((a, i) => ({
-      ...a,
-      match_score: 80 - i * 5,
-    })),
-    development_priorities: top.slice(0, 3).map(t => ({
-      dimension_id: t.id,
-      dimension_name: t.name,
-      priority: t.pct < 40 ? "critical" : t.pct < 60 ? "high" : "medium",
-      rationale: `${t.name} scored ${t.pct}% — targeted development recommended.`,
-    })),
-    dimension_verdicts: verdicts,
-    summary: {
-      total_questions_answered: Object.keys(numericResponses).length,
-      completion_rate: meta.total_questions > 0 ? Object.keys(numericResponses).length / meta.total_questions : 0,
-    },
   };
 }
 
@@ -349,15 +283,13 @@ export async function scoreAssessment(
     const meta = getInstrumentMeta(key);
     const numericResponses = coerceToNumericResponses(responses);
 
-    let result: ScoreResult;
-
-    if (key === "CPI") {
-      result = scoreLegacyCPI(numericResponses, meta);
-    } else {
-      const config = buildInstrumentConfigFromScoring(key);
-      const scorer = new AkiraScorer(config);
-      result = scorer.score(numericResponses);
-    }
+    // All instruments — including CPI (B2C v1 single-rater port, X2-1) —
+    // flow through the deterministic Akira engine. The legacy random
+    // scoreLegacyCPI was removed; CPI now uses the same scoring path as
+    // every other hero assessment.
+    const config = buildInstrumentConfigFromScoring(key);
+    const scorer = new AkiraScorer(config);
+    const result: ScoreResult = scorer.score(numericResponses);
 
     let persisted_id: string | undefined;
     if (opts.persist) {
@@ -432,7 +364,7 @@ export function getCrossBorderTier(composite: number): CrossBorderTierInfo {
 
 export type DimensionId = "strategic_orientation" | "cross_border_adaptability" | "stakeholder_influence" | "execution_discipline" | "leadership_presence";
 export type CPDArchetype =
-  | "Strategic Architect"
+  | "Strategic Builder"
   | "Precision Operator"
   | "Influential Builder"
   | "Adaptive Visionary"
@@ -463,7 +395,7 @@ export const CPD_SCENARIOS: CPDScenario[] = [
     dimension: "strategic_orientation",
     prompt: "Your division is given a new 3-year mandate. The board wants both growth and margin expansion.",
     options: [
-      { label: "Define three strategic pillars with measurable guardrails before execution.", value: 5, archetype_bias: "Strategic Architect" },
+      { label: "Define three strategic pillars with measurable guardrails before execution.", value: 5, archetype_bias: "Strategic Builder" },
       { label: "Frame a bold vision and empower direct reports to design the path.", value: 4, archetype_bias: "Adaptive Visionary" },
       { label: "Start with a 90-day execution sprint and refine from data.", value: 3, archetype_bias: "Precision Operator" },
       { label: "Interview key stakeholders to co-create the mandate together.", value: 4, archetype_bias: "Influential Builder" },
@@ -477,7 +409,7 @@ export const CPD_SCENARIOS: CPDScenario[] = [
       { label: "Reset the plan with weekly tracking, owners, and clear milestones.", value: 5, archetype_bias: "Precision Operator" },
       { label: "Hold a team workshop to rebuild commitments collaboratively.", value: 3, archetype_bias: "Influential Builder" },
       { label: "Escalate the two biggest blockers to stakeholders personally.", value: 4, archetype_bias: "Cross-Border Catalyst" },
-      { label: "Revisit the success metrics and narrow the scope.", value: 4, archetype_bias: "Strategic Architect" },
+      { label: "Revisit the success metrics and narrow the scope.", value: 4, archetype_bias: "Strategic Builder" },
     ],
   },
   {
@@ -488,7 +420,7 @@ export const CPD_SCENARIOS: CPDScenario[] = [
       { label: "Tailor a one-page story to their incentives, then a short call.", value: 5, archetype_bias: "Influential Builder" },
       { label: "Send a data-heavy deck with supporting evidence.", value: 3, archetype_bias: "Precision Operator" },
       { label: "Find a peer they trust to warm the relationship first.", value: 4, archetype_bias: "Cross-Border Catalyst" },
-      { label: "Anchor the proposal in the board's latest strategic themes.", value: 4, archetype_bias: "Strategic Architect" },
+      { label: "Anchor the proposal in the board's latest strategic themes.", value: 4, archetype_bias: "Strategic Builder" },
     ],
   },
   {
@@ -499,7 +431,7 @@ export const CPD_SCENARIOS: CPDScenario[] = [
       { label: "Acknowledge uncertainty, share a clear narrative, and invite questions.", value: 5, archetype_bias: "Adaptive Visionary" },
       { label: "Lay out the concrete next 30 days to restore confidence.", value: 4, archetype_bias: "Grounded Executor" },
       { label: "Run small-team listening sessions before company-wide messaging.", value: 4, archetype_bias: "Influential Builder" },
-      { label: "Frame it as a strategic inflection point with clear upside.", value: 4, archetype_bias: "Strategic Architect" },
+      { label: "Frame it as a strategic inflection point with clear upside.", value: 4, archetype_bias: "Strategic Builder" },
     ],
   },
   {
@@ -592,7 +524,7 @@ export const DIMENSION_WEIGHTS: Record<DimensionId, number> = {
 };
 
 export const DIMENSION_INFO: Record<DimensionId, { name: string; description: string; low: string; high: string }> = {
-  strategic_orientation: { name: "Strategic Orientation", description: "Long-horizon framing and trade-off discipline.", low: "Tactical / reactive", high: "Architectural / future-back" },
+  strategic_orientation: { name: "Strategic Orientation", description: "Long-horizon framing and trade-off discipline.", low: "Tactical / reactive", high: "Strategic / future-back" },
   cross_border_adaptability: { name: "Cross-Border Adaptability", description: "Agility across cultures, markets, and structures.", low: "Local / homogeneous", high: "Global / boundary-spanning" },
   stakeholder_influence: { name: "Stakeholder Influence", description: "Mobilizing ecosystem actors without formal authority.", low: "Self-reliant", high: "Coalition-building" },
   execution_discipline: { name: "Execution Discipline", description: "Reliable delivery through structure and cadence.", low: "Unstructured", high: "Disciplined operator" },
@@ -600,8 +532,8 @@ export const DIMENSION_INFO: Record<DimensionId, { name: string; description: st
 };
 
 export const ARCHETYPE_INFO: Record<CPDArchetype, { name: CPDArchetype; tagline: string; description: string; strengths: string[]; development: string[]; color: string }> = {
-  "Strategic Architect": {
-    name: "Strategic Architect",
+  "Strategic Builder": {
+    name: "Strategic Builder",
     tagline: "Designs the playing field.",
     description: "Systemic thinker with future-back orientation and trade-off discipline.",
     strengths: ["Long-horizon strategy", "Complex systems mapping", "Trade-off rigor"],
@@ -628,7 +560,7 @@ export const ARCHETYPE_INFO: Record<CPDArchetype, { name: CPDArchetype; tagline:
     name: "Adaptive Visionary",
     tagline: "Inspires confident execution.",
     description: "Presence-led leader with strong narrative and composure under pressure.",
-    strengths: ["Executive presence", "Inspiring narrative", "Grace under fire"],
+    strengths: ["Executive presence", "Inspiring narrative", "Grace under pressure"],
     development: ["Ground vision in milestones", "Strengthen execution rhythm", "Deepen 1:1 coaching"],
     color: "#8B5CF6",
   },
@@ -653,7 +585,7 @@ export const ARCHETYPE_INFO: Record<CPDArchetype, { name: CPDArchetype; tagline:
     tagline: "Cross-dimensional balance.",
     description: "No critical blind spots — strong adaptive baseline across all dimensions.",
     strengths: ["Balance across all dimensions", "Contextual agility", "Stable collaboration"],
-    development: ["Identify 2 signature strengths to compound", "Target weakest dimension over 90 days", "Hire executive coach for leverage"],
+    development: ["Identify 2 signature strengths to compound", "Target weakest dimension over 90 days", "Hire executive coach for accelerated development"],
     color: "#C108AB",
   },
 };
@@ -710,7 +642,7 @@ export const ASSESSMENT_ENGINE = {
     const entries = Object.entries(dimScores).sort((a, b) => b[1] - a[1]) as [DimensionId, number][];
     const top = entries[0]?.[0] || "strategic_orientation";
     const second = entries[1]?.[0] || "execution_discipline";
-    if (top === "strategic_orientation") return "Strategic Architect";
+    if (top === "strategic_orientation") return "Strategic Builder";
     if (top === "execution_discipline") return "Precision Operator";
     if (top === "stakeholder_influence") return second === "cross_border_adaptability" ? "Cross-Border Catalyst" : "Influential Builder";
     if (top === "cross_border_adaptability") return "Cross-Border Catalyst";

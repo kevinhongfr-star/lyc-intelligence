@@ -1,45 +1,21 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Menu, X, Lock, Layers, Clock, HelpCircle, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Layers, Clock, HelpCircle, Sparkles } from 'lucide-react';
 import { initScrollReveal } from '@/lib/utils';
+import { DS } from '@/tokens';
 import { ASSESSMENT_CATALOG, type AssessmentInfo } from '@/assessments/catalog';
 import { UnifiedFooter } from '@/components/layout/UnifiedFooter';
 import { SEO } from '@/components/seo/SEO';
 import { getAssessmentMeta } from '@/seo/pageMetadata';
 
-const DS = {
-  headingFont: "'Libre Baskerville', Georgia, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  monoFont: "'IBM Plex Mono', ui-monospace, monospace",
-  accent: '#C108AB',
-  accentHover: '#A00790',
-  bg: '#FFFFFF',
-  bgAlt: '#F7F6F3',
-  card: '#FFFFFF',
-  cardBorder: '#E9E7E1',
-  text: '#0A0A12',
-  textSecondary: '#2B2B3A',
-  muted: '#616170',
-  border: '#E9E7E1',
-  radius: '0px',
-  shadow: '0 1px 2px rgba(10,10,18,0.06), 0 1px 1px rgba(10,10,18,0.04)',
-  shadowHover: '0 12px 30px rgba(10,10,18,0.08)',
-};
-
 export function CanonicalInstrumentLanding() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
 
   useEffect(() => {
     const observer = initScrollReveal();
     return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
 
   const key = (code || '').toUpperCase();
   const info: AssessmentInfo | undefined = ASSESSMENT_CATALOG[key];
@@ -48,34 +24,59 @@ export function CanonicalInstrumentLanding() {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, padding: '32px' }}>
         <div style={{ textAlign: 'center', maxWidth: '480px' }}>
-          <div style={{ fontFamily: DS.monoFont, fontSize: '11px', letterSpacing: '0.2em', color: DS.accent, marginBottom: '12px', textTransform: 'uppercase' }}>Instrument not found</div>
-          <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', marginBottom: '16px', color: DS.text }}>This diagnostic does not exist.</h1>
+          <div style={{ fontFamily: DS.monoFont, fontSize: '11px', letterSpacing: '0.2em', color: DS.eyebrow, marginBottom: '12px', textTransform: 'uppercase' }}>Instrument not found</div>
+          <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', marginBottom: '16px', color: DS.text }}>This assessment does not exist.</h1>
           <p style={{ color: DS.muted, marginBottom: '28px', lineHeight: 1.6 }}>
-            The instrument code "{code}" is not in the canonical catalog. Return to the diagnostic portfolio to browse all 11 diagnostics.
+            The instrument code "{code}" is not in the canonical catalog. Return to the assessment catalog to browse all 6 leadership assessments.
           </p>
           <a
             href="/assessment"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: '#FFF', textDecoration: 'none', fontFamily: DS.bodyFont, fontSize: '12px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', borderRadius: DS.radius }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: DS.accent, color: DS.bg, textDecoration: 'none', fontFamily: DS.bodyFont, fontSize: '12px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}
           >
-            <ArrowLeft style={{ width: 13, height: 13 }} /> Browse diagnostics
+            <ArrowLeft style={{ width: 13, height: 13 }} /> Browse assessments
           </a>
         </div>
       </div>
     );
   }
 
-  const tierColor = info.is_cpi ? DS.accent : '#15151E';
+  const tierColor = info.is_cpi ? DS.accent : DS.bgDark;
   const tierEyebrow = info.is_cpi
-    ? `FLAGSHIP · ${info.priceMiles} MI`
+    ? 'FLAGSHIP · 199 MI'
     : info.is_shift
-      ? `CAREER CORE · ${info.priceMiles} MI`
-      : `ADVISORY · ${info.priceMiles} MI`;
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/assessment', label: 'Diagnostics' },
-    { href: '/match', label: 'Match Analysis' },
-    { href: '/pricing', label: 'Pricing' },
-  ];
+      ? 'SHIFT SUITE · 149 MI'
+      : 'ADVISORY · 99 MI';
+
+  // X5-7: Outcome-first H1 + code eyebrow overrides per instrument
+  const instrumentCopy: Record<string, { heroH1: string; heroEyebrow: string }> = {
+    FORGE: {
+      heroH1: 'Sell like a founder, scale like a system builder',
+      heroEyebrow: 'FORGE · SALES LEADERSHIP STRENGTHS',
+    },
+    BRIDGE: {
+      heroH1: 'Cross-border mandates that land in-market, not just in-deck',
+      heroEyebrow: 'BRIDGE · CROSS-BORDER LEADERSHIP',
+    },
+    DRIVE: {
+      heroH1: 'Know why you lead — and when you\'ll disengage',
+      heroEyebrow: 'DRIVE · MOTIVATION PROFILE & ENGAGEMENT RISK',
+    },
+    QUEST: {
+      heroH1: 'Performance that compounds, not just accelerates',
+      heroEyebrow: 'QUEST · EXECUTIVE PERFORMANCE',
+    },
+    MOSAIC: {
+      heroH1: 'Partnerships built on institutional trust and relationship velocity',
+      heroEyebrow: 'MOSAIC · CROSS-BORDER PARTNERSHIP AGILITY',
+    },
+    COACH: {
+      heroH1: 'The leadership skill every manager actually develops — coaching others',
+      heroEyebrow: 'COACH · MANAGER-AS-COACH CAPABILITY',
+    },
+  };
+  const copy = instrumentCopy[key];
+  const heroH1 = copy?.heroH1 ?? info.name;
+  const heroEyebrow = copy?.heroEyebrow ?? info.code;
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
@@ -88,73 +89,14 @@ export function CanonicalInstrumentLanding() {
         info.duration_minutes,
         info.total_questions,
       )} />
-      {/* NAV */}
-      <nav
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 40,
-          background: 'rgba(255,255,255,0.92)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '14px 32px',
-          borderBottom: `1px solid ${DS.border}`,
-        }}
-      >
-        <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none', letterSpacing: '-0.01em' }}>
-          LYC Intelligence
-        </a>
-        <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {navLinks.map(l => (
-            <a
-              key={l.href}
-              href={l.href}
-              style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, textDecoration: 'none', padding: '10px 14px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', fontWeight: 500 }}
-            >
-              {l.label}
-            </a>
-          ))}
-          <a
-            href="/nexus/chat"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 18px', marginLeft: '8px', color: DS.text, fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
-          >
-            Try NEXUS <ArrowRight style={{ width: 12, height: 12 }} />
-          </a>
-          <a
-            href="/login"
-            className="cta-glow"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: DS.accent, color: '#FFF', fontFamily: DS.bodyFont, fontSize: '13px', fontWeight: 600, textDecoration: 'none', minHeight: '44px' }}
-          >
-            <Lock style={{ width: 14, height: 14 }} /> Sign in
-          </a>
-        </div>
-        <button className="nav-toggle" onClick={() => setMobileOpen(true)} aria-label="Open menu">
-          <Menu style={{ color: DS.text }} />
-        </button>
-      </nav>
-
-      <div className={`nav-mobile-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
-      <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`} style={{ background: DS.bg }}>
-        <button className="nav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu">
-          <X style={{ width: 24, height: 24, color: '#000' }} />
-        </button>
-        {navLinks.map(l => (
-          <a key={l.href} href={l.href} onClick={() => setMobileOpen(false)} style={{ color: DS.textSecondary, borderBottom: `1px solid ${DS.border}` }}>{l.label}</a>
-        ))}
-        <a href="/nexus/chat" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.accent, borderBottom: `1px solid ${DS.border}` }}>Try NEXUS →</a>
-        <a href="/login" onClick={() => setMobileOpen(false)} style={{ fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, color: DS.text, borderBottom: `1px solid ${DS.border}` }}>Sign in</a>
-      </div>
 
       {/* HERO */}
       <section
         style={{
           position: 'relative',
           overflow: 'hidden',
-          background: `linear-gradient(135deg, ${info.is_cpi ? '#140a1a' : '#0c0c18'} 0%, #0a0812 45%, #1a0c1e 100%)`,
-          color: '#FFF',
+          background: '#0A0A12',
+          color: DS.bg,
         }}
       >
         <div
@@ -166,7 +108,7 @@ export function CanonicalInstrumentLanding() {
             transform: 'translateX(-50%)',
             width: '720px',
             height: '440px',
-            background: `radial-gradient(circle, ${DS.accent}1c 0%, transparent 65%)`,
+            background: `radial-gradient(circle, ${DS.accent}0F 0%, transparent 65%)`,
             pointerEvents: 'none',
           }}
         />
@@ -176,7 +118,7 @@ export function CanonicalInstrumentLanding() {
               href="/assessment"
               style={{ fontFamily: DS.monoFont, fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
-              <ArrowLeft style={{ width: 12, height: 12 }} /> All 11 instruments
+              <ArrowLeft style={{ width: 12, height: 12 }} /> All 6 assessments
             </a>
             <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
             <div
@@ -198,29 +140,29 @@ export function CanonicalInstrumentLanding() {
               style={{
                 display: 'inline-block',
                 fontFamily: DS.monoFont,
-                fontSize: '11px',
-                letterSpacing: '0.28em',
-                color: DS.accent,
-                fontWeight: 700,
+                fontSize: '10px',
+                letterSpacing: '0.22em',
+                color: 'rgba(255,255,255,0.55)',
+                fontWeight: 500,
                 textTransform: 'uppercase',
-                marginBottom: '10px',
+                marginBottom: '12px',
               }}
             >
-              {info.code}
+              {heroEyebrow}
             </div>
             <h1
               style={{
                 fontFamily: DS.headingFont,
                 fontSize: 'clamp(32px, 5vw, 52px)',
                 fontWeight: 700,
-                color: '#FFF',
+                color: DS.bg,
                 margin: '0 0 10px',
                 lineHeight: 1.1,
                 letterSpacing: '-0.015em',
                 maxWidth: '780px',
               }}
             >
-              {info.name}
+              {heroH1}
             </h1>
             <p
               style={{
@@ -252,15 +194,15 @@ export function CanonicalInstrumentLanding() {
                 alignItems: 'center',
                 gap: '10px',
                 padding: '18px 36px',
-                background: '#C108AB',
-                color: '#FFF',
+                background: DS.accent,
+                color: DS.bg,
                 fontFamily: DS.bodyFont,
                 fontSize: '13px',
                 fontWeight: 700,
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
                 textDecoration: 'none',
-                borderRadius: DS.radius,
+ 
               }}
             >
               Begin with NEXUS <ArrowRight style={{ width: 15, height: 15 }} />
@@ -272,12 +214,75 @@ export function CanonicalInstrumentLanding() {
                 gap: '4px',
                 padding: '14px 24px',
                 border: '1px solid rgba(255,255,255,0.18)',
-                borderRadius: DS.radius,
+ 
               }}
             >
               <span style={{ fontFamily: DS.headingFont, fontSize: '26px', fontWeight: 700, color: DS.accent, lineHeight: 1 }}>{info.priceMiles}</span>
               <span style={{ fontFamily: DS.monoFont, fontSize: '10px', letterSpacing: '0.16em', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginLeft: '4px' }}>mi · executive introduction</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* #1323: WHAT YOU'LL GET + SAMPLE QUESTION — entry expectation setting */}
+      <section className="reveal" style={{ background: DS.bgAlt, borderBottom: `1px solid ${DS.border}`, padding: '72px 32px' }}>
+        <div style={{ maxWidth: '1120px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '48px', alignItems: 'start' }}>
+          {/* What you'll get */}
+          <div>
+            <div style={{ fontFamily: DS.monoFont, fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.26em', color: DS.eyebrow, marginBottom: '14px' }}>
+              What you'll get
+            </div>
+            <h2 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(22px, 2.6vw, 28px)', fontWeight: 700, color: DS.text, margin: '0 0 24px', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+              A consulting-grade deliverable, not a survey result.
+            </h2>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {[
+                { icon: '01', title: 'Executive summary', text: 'A one-line verdict and three key findings you can grasp in 30 seconds.' },
+                { icon: '02', title: `${info.dimensions.length}-dimension scorecard`, text: 'Each dimension scored 0–100 against executive benchmarks, with progressive-reveal interpretation.' },
+                { icon: '03', title: `${info.archetype_count} archetypes`, text: `Your leadership archetype identified, with defining traits and how it plays in APAC contexts.` },
+                { icon: '04', title: 'Development roadmap', text: 'Prioritised actions with timelines — not generic advice, but targeted next steps.' },
+                { icon: '05', title: 'NEXUS deep-dive access', text: 'Ask NEXUS to explain any finding, synthesise across diagnostics, or pressure-test a decision.' },
+              ].map((item) => (
+                <li key={item.icon} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                  <span style={{ fontFamily: DS.monoFont, fontSize: '11px', color: DS.accent, fontWeight: 600, flexShrink: 0, paddingTop: '2px' }}>{item.icon}</span>
+                  <div>
+                    <div style={{ fontFamily: DS.headingFont, fontSize: '15px', fontWeight: 700, color: DS.text, marginBottom: '3px' }}>{item.title}</div>
+                    <div style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.muted, lineHeight: 1.55 }}>{item.text}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Sample question preview */}
+          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, boxShadow: DS.shadow, padding: '32px 28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+              <span style={{ fontFamily: DS.monoFont, fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: DS.eyebrow }}>Sample question</span>
+              <span style={{ fontFamily: DS.monoFont, fontSize: '10px', color: DS.muted, letterSpacing: '0.1em' }}>~{Math.max(1, Math.round(info.duration_minutes / info.total_questions))} min · 1 of {info.total_questions}</span>
+            </div>
+            <div style={{ padding: '16px 18px', background: DS.bgAlt, borderLeft: `3px solid ${DS.accent}`, marginBottom: '20px' }}>
+              <span style={{ fontFamily: DS.monoFont, fontSize: '9px', color: DS.accent, marginBottom: '6px', display: 'block' }}>Scenario</span>
+              <p style={{ fontFamily: DS.bodyFont, fontSize: '13px', color: DS.textSecondary, lineHeight: 1.6, margin: 0 }}>
+                You're six months into an APAC mandate. Headquarters is pushing for a quarterly win; your local team is asking you to protect a 3-year relationship that hasn't yet converted to revenue.
+              </p>
+            </div>
+            <h3 style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, lineHeight: 1.35, margin: '0 0 20px' }}>
+              How do you frame the decision back to headquarters?
+            </h3>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+              {['1', '2', '3', '4', '5'].map((n, i) => (
+                <div key={n} style={{ flex: 1, height: '44px', border: `1px solid ${DS.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DS.bodyFont, fontSize: '15px', fontWeight: 600, background: i === 3 ? DS.accent : DS.card, borderColor: i === 3 ? DS.accent : DS.cardBorder, color: i === 3 ? DS.bg : DS.muted }}>
+                  {n}
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 4px' }}>
+              <span style={{ fontFamily: DS.monoFont, fontSize: '9px', color: DS.muted }}>Defer to short-term</span>
+              <span style={{ fontFamily: DS.monoFont, fontSize: '9px', color: DS.accent }}>Protect long-term</span>
+            </div>
+            <p style={{ fontFamily: DS.bodyFont, fontSize: '12px', color: DS.muted, lineHeight: 1.5, margin: '20px 0 0', borderTop: `1px solid ${DS.border}`, paddingTop: '16px' }}>
+              Scenario-based items replace abstract self-report. You answer in context, not in theory — the way executives actually decide.
+            </p>
           </div>
         </div>
       </section>
@@ -292,7 +297,7 @@ export function CanonicalInstrumentLanding() {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.26em',
-              color: DS.accent,
+              color: DS.eyebrow,
               marginBottom: '12px',
             }}
           >
@@ -322,7 +327,7 @@ export function CanonicalInstrumentLanding() {
               style={{
                 background: DS.card,
                 border: `1px solid ${DS.cardBorder}`,
-                borderRadius: DS.radius,
+ 
                 padding: '22px 20px',
                 boxShadow: DS.shadow,
               }}
@@ -332,15 +337,15 @@ export function CanonicalInstrumentLanding() {
                   style={{
                     width: '32px',
                     height: '32px',
-                    background: info.is_cpi ? DS.accent : '#15151E',
-                    color: '#FFF',
+                    background: info.is_cpi ? DS.accent : DS.bgDark,
+                    color: DS.bg,
                     fontFamily: DS.monoFont,
                     fontSize: '11px',
                     fontWeight: 700,
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderRadius: DS.radius,
+ 
                   }}
                 >
                   {String(i + 1).padStart(2, '0')}
@@ -378,7 +383,7 @@ export function CanonicalInstrumentLanding() {
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.26em',
-                color: DS.accent,
+                color: DS.eyebrow,
                 marginBottom: '12px',
               }}
             >
@@ -410,14 +415,14 @@ export function CanonicalInstrumentLanding() {
                   key={p.tier}
                   className="card-hover"
                   style={{
-                    background: highlight ? '#0A0A12' : DS.card,
+                    background: highlight ? DS.bgDark : DS.card,
                     border: highlight ? `2px solid ${DS.accent}` : `1px solid ${DS.cardBorder}`,
-                    borderRadius: DS.radius,
+ 
                     padding: '28px 24px',
                     display: 'flex',
                     flexDirection: 'column',
                     height: '100%',
-                    boxShadow: highlight ? `0 0 0 1px ${DS.accent}14, 0 20px 50px ${DS.accent}18` : DS.shadow,
+                    boxShadow: highlight ? `0 0 0 1px ${DS.accent}14, 0 20px 50px ${DS.accent}0F` : DS.shadow,
                     position: 'relative',
                   }}
                 >
@@ -429,14 +434,14 @@ export function CanonicalInstrumentLanding() {
                         right: '24px',
                         transform: 'translateY(-50%)',
                         background: DS.accent,
-                        color: '#FFF',
+                        color: DS.bg,
                         fontFamily: DS.monoFont,
                         fontSize: '9px',
                         fontWeight: 600,
                         letterSpacing: '0.2em',
                         padding: '4px 10px',
                         textTransform: 'uppercase',
-                        borderRadius: DS.radius,
+ 
                       }}
                     >
                       Recommended
@@ -447,20 +452,20 @@ export function CanonicalInstrumentLanding() {
                       style={{
                         display: 'inline-block',
                         padding: '4px 10px',
-                        background: highlight ? DS.accent : (info.is_cpi ? `${DS.accent}18` : '#1a1a25'),
-                        color: highlight ? '#FFF' : (info.is_cpi ? DS.accent : '#FFF'),
+                        background: highlight ? DS.accent : (info.is_cpi ? `${DS.accent}0F` : DS.bgDark),
+                        color: highlight ? DS.bg : (info.is_cpi ? DS.accent : DS.bg),
                         fontFamily: DS.monoFont,
                         fontSize: '10px',
                         fontWeight: 500,
                         textTransform: 'uppercase',
                         letterSpacing: '0.16em',
-                        borderRadius: DS.radius,
+ 
                       }}
                     >
                       {p.tier.toUpperCase()}
                     </span>
                   </div>
-                  <div style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, color: highlight ? '#FFF' : DS.text, marginBottom: '4px' }}>
+                  <div style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, color: highlight ? DS.bg : DS.text, marginBottom: '4px' }}>
                     {p.name}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '20px' }}>
@@ -499,15 +504,15 @@ export function CanonicalInstrumentLanding() {
                       gap: '8px',
                       width: '100%',
                       padding: '14px 18px',
-                      background: highlight ? DS.accent : '#0A0A12',
-                      color: '#FFF',
+                      background: highlight ? DS.accent : DS.bgDark,
+                      color: DS.bg,
                       textDecoration: 'none',
                       fontFamily: DS.bodyFont,
                       fontSize: '12px',
                       fontWeight: 700,
                       textTransform: 'uppercase',
                       letterSpacing: '0.16em',
-                      borderRadius: DS.radius,
+ 
                       boxSizing: 'border-box',
                     }}
                   >
@@ -531,7 +536,7 @@ export function CanonicalInstrumentLanding() {
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.26em',
-                color: DS.accent,
+                color: DS.eyebrow,
                 marginBottom: '12px',
               }}
             >
@@ -563,7 +568,7 @@ export function CanonicalInstrumentLanding() {
                 style={{
                   background: DS.card,
                   border: `1px solid ${DS.cardBorder}`,
-                  borderRadius: DS.radius,
+ 
                   padding: '20px 18px',
                   boxShadow: DS.shadow,
                 }}
@@ -587,7 +592,7 @@ export function CanonicalInstrumentLanding() {
                           padding: '3px 8px',
                           background: `${DS.accent}10`,
                           color: DS.accent,
-                          borderRadius: DS.radius,
+ 
                         }}
                       >
                         {t.slice(0, 36)}
@@ -617,7 +622,7 @@ export function CanonicalInstrumentLanding() {
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(135deg, #0a0812 0%, #160c1c 40%, #25122d 70%, #33183f 100%)',
+            background: '#0A0A12',
           }}
         />
         <div
@@ -629,7 +634,7 @@ export function CanonicalInstrumentLanding() {
             transform: 'translateX(-50%)',
             width: '720px',
             height: '480px',
-            background: 'radial-gradient(circle, rgba(193,8,171,0.18) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(193,8,171,0.06) 0%, transparent 65%)',
             pointerEvents: 'none',
           }}
         />
@@ -652,7 +657,7 @@ export function CanonicalInstrumentLanding() {
               fontFamily: DS.headingFont,
               fontSize: 'clamp(26px, 4vw, 38px)',
               fontWeight: 700,
-              color: '#FFFFFF',
+              color: DS.bg,
               margin: '0 0 16px',
               lineHeight: 1.15,
               letterSpacing: '-0.01em',
@@ -680,9 +685,9 @@ export function CanonicalInstrumentLanding() {
               alignItems: 'center',
               gap: '10px',
               padding: '18px 36px',
-              background: '#C108AB',
-              color: '#FFFFFF',
-              borderRadius: '0px',
+              background: DS.accent,
+              color: DS.bg,
+ 
               fontFamily: DS.bodyFont,
               fontSize: '13px',
               fontWeight: 700,
@@ -691,7 +696,7 @@ export function CanonicalInstrumentLanding() {
               textDecoration: 'none',
             }}
           >
-            Try NEXUS <ArrowRight style={{ width: 14, height: 14 }} />
+            Chat with NEXUS <ArrowRight style={{ width: 14, height: 14 }} />
           </a>
         </div>
       </section>
@@ -708,18 +713,18 @@ function Stat({ icon: Icon, value, label }: { icon: any; value: string; label: s
         style={{
           width: '40px',
           height: '40px',
-          background: 'rgba(193,8,171,0.12)',
+          background: `${DS.accent}1F`,
           color: DS.accent,
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: DS.radius,
+ 
         }}
       >
         <Icon style={{ width: 18, height: 18 }} />
       </div>
       <div>
-        <div style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, lineHeight: 1, color: '#FFF' }}>{value}</div>
+        <div style={{ fontFamily: DS.headingFont, fontSize: '22px', fontWeight: 700, lineHeight: 1, color: DS.bg }}>{value}</div>
         <div style={{ fontFamily: DS.monoFont, fontSize: '9.5px', letterSpacing: '0.16em', color: 'rgba(255,255,255,0.45)', marginTop: '4px', textTransform: 'uppercase' }}>{label}</div>
       </div>
     </div>

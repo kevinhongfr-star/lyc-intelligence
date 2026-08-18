@@ -77,6 +77,8 @@ export interface Contact {
   match_score_best: number | null; trident_composite: number | null;
   trident_d1: number | null; trident_d2: number | null; trident_d3: number | null;
   engagement_score: number; notion_id: string | null; source: string; created_at: string; updated_at: string;
+  owner_id?: string | null;             // Phase 3 / #1307 — per-consultant ownership
+  organization_id?: string | null;       // client-org scoping
   company?: Company | null;
 }
 
@@ -94,6 +96,8 @@ export interface Mandate {
   client_first_name: string | null; total_candidates: number; tier1_count: number; tier2_count: number;
   shortlisted_count: number; interview_count: number; placed_count: number;
   notion_id: string | null; source: string; created_at: string; updated_at: string;
+  lead_consultant_id?: string | null;     // Phase 3 / #1306 — per-consultant ownership
+  organization_id?: string | null;         // client-org scoping
   // PHI fields
   phi_urgency: number | null; phi_strategic: number | null; phi_value: number | null;
   phi_retainer: number | null; phi_decision: number | null; phi_composite: number | null;
@@ -125,7 +129,9 @@ export interface CandidatePipeline {
 export async function searchContacts(params: { query?: string; seniority?: string[]; skills?: string[]; country?: string; limit?: number; offset?: number; userId?: string; }): Promise<{ data: Contact[]; count: number }> {
   const sb = getSupabase();
 
-  // If userId provided, route through API for server-side mandate-based filtering
+  // Route through the API gateway for server-side consultant scoping (ticket #1307).
+  // The gateway resolves the caller from the JWT and applies consultantColumn
+  // filtering (owner_id = auth.uid()) — no need to forward userId as a param.
   if (params.userId) {
     const qp = new URLSearchParams();
     if (params.query) qp.set('search', params.query);
@@ -133,8 +139,7 @@ export async function searchContacts(params: { query?: string; seniority?: strin
     if (params.country) qp.set('country', params.country);
     qp.set('limit', String(params.limit ?? 50));
     qp.set('offset', String(params.offset ?? 0));
-    qp.set('user_id', params.userId);
-    const res = await authFetch(`/api/data/contact?${qp}`);
+    const res = await authFetch(`/api/data/contacts?${qp}`);
     const json = await res.json();
     const contacts = (json.data || []) as Contact[];
     // Apply heuristic trident enrichment
@@ -145,7 +150,7 @@ export async function searchContacts(params: { query?: string; seniority?: strin
       }
       return c;
     });
-    return { data: enriched, count: json.total ?? enriched.length };
+    return { data: enriched, count: json.count ?? enriched.length };
   }
 
   let q = sb.from('contacts').select('*, company:companies(*)', { count: 'exact' });
@@ -180,15 +185,18 @@ export async function getMandates(params?: { status?: string; limit?: number; of
   const queryParams = new URLSearchParams();
   if (params?.limit) queryParams.set('limit', params.limit.toString());
   if (params?.offset) queryParams.set('offset', params.offset.toString());
-  if (params?.userId) queryParams.set('user_id', params.userId);
   if (params?.organizationId) queryParams.set('organization_id', params.organizationId);
-  
+  // userId is no longer forwarded as a query param — the API gateway resolves
+  // the caller from the JWT and applies consultantColumn scoping server-side
+  // (ticket #1306). Passing it as a param was dead weight that the endpoint
+  // never read.
+
   try {
-    const res = await authFetch(`/api/data/mandate?${queryParams.toString()}`);
+    const res = await authFetch(`/api/data/mandates?${queryParams.toString()}`);
     const result = await res.json();
-    if (result.success) {
+    if (result.ok) {
       const mandates = (result.data || []).map((m: any) => ({ ...m, title: cleanMandateTitle(m.title, m.company?.name) }));
-      return { data: mandates, count: mandates.length };
+      return { data: mandates, count: result.count ?? mandates.length };
     }
     console.error('[API] getMandates failed:', result.error);
     return { data: [], count: 0 };
@@ -1312,9 +1320,9 @@ export async function sendInviteEmails(workshopId: string): Promise<boolean> {
 
 export async function getMandatesForOrg(orgId: string): Promise<Mandate[]> {
   try {
-    const res = await authFetch(`/api/data/mandates?org_id=${orgId}`);
+    const res = await authFetch(`/api/data/mandates?eq=organization_id:${orgId}`);
     const result = await res.json();
-    if (result.success) {
+    if (result.ok) {
       return (result.data || []).map((m: any) => ({ ...m, title: cleanMandateTitle(m.title) }));
     }
     return [];
@@ -1622,15 +1630,18 @@ export async function getTargetCompaniesByMandate(mandateId: string): Promise<Ta
 }
 
 export async function getMandateById(mandateId: string): Promise<Mandate | null> {
+  // Direct Supabase query — RLS enforces per-consultant scoping (ticket #1306).
+  // The previous /api/data/mandate/${mandateId} route was a two-segment path
+  // that didn't match the [entity].ts catch-all and silently 404'd.
   try {
-    const res = await authFetch(`/api/data/mandate/${mandateId}`);
-    if (!res.ok) return null;
-
-    const result = await res.json();
-    if (result.success) {
-      return result.data as Mandate;
-    }
-    return null;
+    const { data, error } = await getSupabase()
+      .from('mandates')
+      .select('*, company:companies(*)')
+      .eq('id', mandateId)
+      .maybeSingle();
+    if (error || !data) return null;
+    const m = data as Mandate;
+    return { ...m, title: cleanMandateTitle(m.title, m.company?.name) };
   } catch (e) {
     console.error('[Mandate] getMandateById error:', e);
     return null;
@@ -2600,20 +2611,21 @@ export interface MandateCandidate {
 }
 
 export async function getMandateCandidates(mandateId: string): Promise<MandateCandidate[]> {
+  // Direct Supabase query via candidates_pipeline — RLS enforces per-consultant
+  // scoping on the underlying mandate (ticket #1306). The previous API route
+  // passed `mandate` as a query param the gateway never read.
   try {
-    const res = await authFetch(`/api/data/contacts?mandate=${mandateId}`);
-    if (!res.ok) return [];
-
-    const result = await res.json();
-    if (result.success) {
-      return result.data.map((c: any) => ({
-        id: c.id,
-        name: c.name || c.email,
-        email: c.email,
-        stage: c.stage || 'applied',
-      }));
-    }
-    return [];
+    const { data, error } = await getSupabase()
+      .from('candidates_pipeline')
+      .select('id, stage, contact:contacts(id, name, email)')
+      .eq('mandate_id', mandateId);
+    if (error || !data) return [];
+    return (data as any[]).map((row) => ({
+      id: row.contact?.id ?? row.id,
+      name: row.contact?.name ?? row.contact?.email ?? 'Unknown',
+      email: row.contact?.email ?? '',
+      stage: row.stage || 'applied',
+    }));
   } catch (e) {
     console.error('[Interview] getMandateCandidates error:', e);
     return [];

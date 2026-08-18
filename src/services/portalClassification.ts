@@ -22,7 +22,7 @@ export type PortalIdentity = 'marketing' | 'leader' | 'consultant' | 'admin';
  * Returns the HIGHEST-privilege portal the user qualifies for.
  *
  * - null/undefined → marketing (public)
- * - candidate/member/council/null/basic/pro/enterprise/free (any unknown B2C tier) → leader
+ * - candidate/council/explorer/starter/pro/executive/enterprise (any unknown B2C tier) → leader
  * - client_viewer/client_admin → consultant (client sub-portal)
  * - lyc_consultant/team_lead → consultant
  * - admin/lyc_admin/super_admin → admin
@@ -40,12 +40,13 @@ export function classifyPortal(role: string | null | undefined): PortalIdentity 
     case 'client_viewer':
       return 'consultant';
     case 'council':
-    case 'member':
     case 'candidate':
-    case 'free':
-    case 'basic':
+    case 'explorer':
+    case 'starter':
     case 'pro':
+    case 'executive':
     case 'enterprise':
+    case 'leader':
     default:
       return 'leader';
   }
@@ -102,7 +103,7 @@ export function isLeaderRole(role: string | null | undefined): boolean {
     case 'candidate':
     case 'member':
     case 'council':
-    case 'free':
+    case 'explorer':
     case 'basic':
     case 'pro':
     case 'enterprise':
@@ -139,7 +140,7 @@ export function getDefaultPortalRoute(role: string | null | undefined): string {
       return '/candidate/dashboard';
     case 'member':
     case 'council':
-    case 'free':
+    case 'explorer':
     case 'basic':
     case 'pro':
     case 'enterprise':

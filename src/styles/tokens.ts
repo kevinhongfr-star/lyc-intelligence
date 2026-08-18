@@ -69,8 +69,8 @@ export type SpacingKey = keyof typeof SPACING;
 
 export const TYPOGRAPHY = {
   fontFamily: {
-    sans: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    mono: 'JetBrains Mono, Fira Code, "Courier New", monospace',
+    sans: "'DM Sans', system-ui, -apple-system, sans-serif",
+    mono: "'IBM Plex Mono', ui-monospace, monospace",
   },
   fontSize: {
     xs: 12,
@@ -103,12 +103,12 @@ export const TYPOGRAPHY = {
 
 export const RADII = {
   none: 0,
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  '2xl': 24,
-  full: 9999,
+  sm: 0,
+  md: 0,
+  lg: 0,
+  xl: 0,
+  '2xl': 0,
+  full: 0,
 } as const;
 
 export type RadiusKey = keyof typeof RADII;
@@ -154,7 +154,7 @@ export const TRANSITIONS = {
   fast: '150ms ease-in-out',
   normal: '200ms ease-in-out',
   slow: '300ms ease-in-out',
-  slower: '500ms ease-in-out',
+  slower: '350ms ease-in-out',
 } as const;
 
 export type TransitionKey = keyof typeof TRANSITIONS;

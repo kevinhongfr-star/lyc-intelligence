@@ -21,7 +21,7 @@ export function WhoItsFor({ config }: Props) {
         <div className={`${prefix}-reveal`} style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 64px' }}>
           <span style={sectionLabel}>Who it's for</span>
           <h2 className="section-heading" style={{
-            fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700,
+            fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
             fontSize: 36, lineHeight: 1.2, color: INK, marginBottom: 20,
           }}>
             Built for leaders <em style={{ fontWeight: 400 }}>at every stage</em>
@@ -44,7 +44,7 @@ export function WhoItsFor({ config }: Props) {
                 width: 48, height: 3, background: accent, marginBottom: 24,
               }} />
               <h3 style={{
-                fontFamily: "'Libre Baskerville', Georgia, serif", fontWeight: 700,
+                fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif", fontWeight: 700,
                 fontSize: 22, marginBottom: 12, lineHeight: 1.25, color: INK,
               }}>
                 {p.title}

@@ -104,7 +104,11 @@ export function DexChatPage() {
 
     // API tier hint
     const apiTier =
-      gateState === 'intro' ? 'intro' : credit.tier === 'enterprise' ? 'pro' : 'standard';
+      gateState === 'intro'
+        ? 'intro'
+        : credit.tier === 'executive' || credit.tier === 'council'
+          ? 'pro'
+          : 'standard';
 
     let replyText = '';
     try {
@@ -186,7 +190,7 @@ export function DexChatPage() {
               </div>
               <h2
                 className="text-2xl font-bold mb-2"
-                style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}
+                style={{ fontFamily: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif" }}
               >
                 Welcome to your Executive Introduction
               </h2>

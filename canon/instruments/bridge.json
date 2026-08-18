@@ -1,0 +1,348 @@
+{
+  "meta": {
+    "instrument_code": "BRIDGE",
+    "canon_version": "1.0",
+    "status": "approved",
+    "last_updated": "2026-08-15",
+    "authority": "Akira — Diagnostic Content Integrity Lead",
+    "source_trace": [
+      "Diagnostic Portfolio Master Library — BRIDGE Core Info Pack v2.1",
+      "BRIDGE scoring engine config (source: diagnostic_portfolio/06_scoring_engine_code/bridge_config.json)",
+      "BRIDGE Notion question bank (source: diagnostic_portfolio/07_question_banks/BRIDGE_QB_notion.json)",
+      "4-Pillar Framework v1.4 (official locked version)",
+      "BRIDGE Baseline Alignment Sign-Off v1.0"
+    ]
+  },
+  "identity": {
+    "code": "BRIDGE",
+    "name": "BRIDGE",
+    "full_name": "BRIDGE — cross-cultural relational intelligence",
+    "tagline": "Cross-border mandate success starts with relational intelligence.",
+    "category": "Advisory",
+    "pillar": {
+      "pillar_code": "P2",
+      "pillar_name": "Cross-Border Leadership Effectiveness",
+      "is_flagship": true
+    },
+    "description": "A 36-item assessment that measures a leader's readiness to succeed in cross-border APAC mandates across six interconnected dimensions of relational and execution capability. Leaders receive a composite mandate readiness score, dimension-level verdicts, a primary archetype identifying their highest-risk failure pattern, and personalised development guidance.",
+    "ideal_use_case": "Pre-appointment assessment for APAC cross-border leadership roles; existing mandate health check; expatriate and local-national leader development; succession planning for China/APAC regional leadership roles."
+  },
+  "instrument_spec": {
+    "total_questions": 36,
+    "response_scale": "5-point Likert (1 = Strongly Disagree, 5 = Strongly Agree)",
+    "administration_time": "12–15 minutes",
+    "delivery_format": "Online self-assessment with instant HTML report + consultant debrief",
+    "scoring_method": "Dimension-level normalised scores (0–20 each) + composite percentile (0–100)",
+    "reverse_coded_items": [
+      "Q04", "Q10", "Q16", "Q22", "Q28", "Q35"
+    ]
+  },
+  "dimensions": [
+    {
+      "id": "D1",
+      "name": "Mandate Clarity",
+      "short_code": "MC",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "description": "Measures the leader's specific, detailed understanding of what their mandate actually requires — including success criteria, stakeholder expectations, organisational history, and the 2–3 things that, if wrong in the first 90 days, make recovery much harder.",
+      "what_high_means": "The leader has had direct conversations with principals about success, understands the mandate's distinguishing features, and can identify the critical early risks.",
+      "what_low_means": "The leader's understanding is general rather than specific; they expect clarity to emerge over time rather than seeking it proactively at the outset."
+    },
+    {
+      "id": "D2",
+      "name": "Stakeholder Relationship Building",
+      "short_code": "SRB",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "description": "Measures the leader's ability to identify, invest in, and maintain key stakeholder relationships in high-context APAC environments — including informal power structures, relationship brokers, and government stakeholders — before those relationships are needed for specific transactions.",
+      "what_high_means": "The leader invests in relationships proactively, reads informal power structures accurately, and maintains stakeholder relationships through tension and misalignment.",
+      "what_low_means": "The leader defaults to transactional relationship-building, underestimates the importance of pre-investment, and may struggle to identify who has real influence."
+    },
+    {
+      "id": "D3",
+      "name": "Communication Alignment",
+      "short_code": "CA",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "description": "Measures the leader's ability to adapt their natural communication style for APAC contexts — including directness, assertiveness, delivery of difficult messages, reading silence and indirection, and checking for genuine alignment rather than assuming agreement from the absence of objection.",
+      "what_high_means": "The leader has adapted their communication style deliberately, checks for understanding, can deliver difficult messages effectively, and reads non-verbal cues as information.",
+      "what_low_means": "The leader defaults to their natural style under pressure, may create friction through unadapted directness, and may mistake silence for agreement."
+    },
+    {
+      "id": "D4",
+      "name": "Pressure Resilience",
+      "short_code": "PR",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "description": "Measures the leader's ability to sustain decision quality and mandate focus under the simultaneous pressures of headquarters expectations, local team dynamics, and market conditions — including recovery from relationship setbacks and early-warning self-awareness.",
+      "what_high_means": "The leader's decision quality holds under sustained pressure, they recover quickly from setbacks, and they have personal early-warning systems for performance degradation.",
+      "what_low_means": "The leader becomes more risk-averse under political pressure, struggles with prolonged uncertainty, and may not notice their own performance degradation until it is visible to others."
+    },
+    {
+      "id": "D5",
+      "name": "Long-Game Thinking",
+      "short_code": "LGT",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "description": "Measures the leader's comfort with investing in relationships and trust-building over 3–5 year timelines without immediate transactional return, and their ability to resist short-term pressure that would erode long-term relationship capital.",
+      "what_high_means": "The leader prioritises long-term relationship trust over short-term wins, operates comfortably within multi-year trust-building cycles, and has a track record of sacrificing short-term results for long-term relationship health.",
+      "what_low_means": "The leader is uncomfortable with delayed returns, focuses on near-term results under pressure, and may deplete relationship capital without noticing until damage is done."
+    },
+    {
+      "id": "D6",
+      "name": "Cultural Fluency",
+      "short_code": "CF",
+      "n_questions": 6,
+      "raw_max": 30,
+      "normalised_max": 20,
+      "normalised_formula": "(raw / 30) × 20",
+      "description": "Measures the leader's specific understanding of cultural norms (hierarchy, consensus, face-saving, relationship-first communication) in their target APAC market, their ability to recover from cultural missteps, and the depth of their genuine cross-cultural relationships.",
+      "what_high_means": "The leader has current, specific cultural knowledge, understands how decisions are made in context, has repaired relationships after cultural missteps, and has built genuine mutual cross-cultural relationships.",
+      "what_low_means": "The leader treats cultural differences as friction to overcome, assumes their default leadership style is culturally compatible, and may have primarily transactional rather than genuine cross-cultural relationships."
+    }
+  ],
+  "archetype_framework": {
+    "model_type": "weakest-dimension classification with strength override",
+    "logic": "Each archetype is defined by the leader's lowest-scoring dimension. The Cultural Operator is an exception profile: no dimension below 50th percentile AND Cultural Fluency above 70th percentile.",
+    "n_archetypes": 6,
+    "risk_model": "Three Layers of Mandate Risk",
+    "risk_layers": [
+      {
+        "layer": "Layer 1 — Expectation & Relationship Risk",
+        "description": "Risk arising from misaligned expectations and insufficient stakeholder connection. Associated with Mandate Clarity and Stakeholder Relationship Building weaknesses.",
+        "archetypes": ["The Wanderer", "The Envoy"]
+      },
+      {
+        "layer": "Layer 2 — Delivery & Pressure Risk",
+        "description": "Risk arising from communication friction and performance degradation under pressure. Associated with Communication Alignment and Pressure Resilience weaknesses.",
+        "archetypes": ["The Chameleon", "The Anchor"]
+      },
+      {
+        "layer": "Layer 3 — Sustained Impact Risk",
+        "description": "Risk arising from short-term orientation and insufficient cultural depth. Associated with Long-Game Thinking and Cultural Fluency weaknesses.",
+        "archetypes": ["The Sprinter", "The Cultural Operator (protective)"]
+      }
+    ]
+  },
+  "archetypes": [
+    {
+      "id": "A1",
+      "name": "The Envoy",
+      "weakest_dimension": "Stakeholder Relationship Building",
+      "risk_layer": "Layer 1 — Expectation & Relationship Risk",
+      "core_pattern": "Great on paper, fails in practice because relationships don't form. The mandate dies from isolation.",
+      "strengths": [
+        "Clear mandate understanding",
+        "Strong communication skills",
+        "Good pressure resilience"
+      ],
+      "growth_areas": [
+        "Treats relationship-building as transactional rather than strategic",
+        "Underestimates how much time and patience APAC stakeholder relationships require",
+        "May fail to identify informal power structures and key relationship brokers"
+      ],
+      "development_focus": "Invest in relationship-building before it is needed; develop structured stakeholder mapping including informal influence networks; approach government and institutional stakeholders with the same patience as commercial stakeholders."
+    },
+    {
+      "id": "A2",
+      "name": "The Wanderer",
+      "weakest_dimension": "Mandate Clarity",
+      "risk_layer": "Layer 1 — Expectation & Relationship Risk",
+      "core_pattern": "Misunderstands what the role actually requires. Misaligned expectations create early friction.",
+      "strengths": [
+        "Strong stakeholder relationship capability",
+        "Good cultural adaptation",
+        "Resilient under pressure"
+      ],
+      "growth_areas": [
+        "Assumes mandate clarity will emerge over time rather than proactively seeking it",
+        "May not have had direct success-definition conversations with principals",
+        "Risk of executing efficiently on the wrong priorities"
+      ],
+      "development_focus": "Conduct explicit success-definition conversations with all key principals within the first 30 days; identify the 2–3 make-or-break factors for the first 90 days; build an organisational history and stakeholder politics map."
+    },
+    {
+      "id": "A3",
+      "name": "The Chameleon",
+      "weakest_dimension": "Communication Alignment",
+      "risk_layer": "Layer 2 — Delivery & Pressure Risk",
+      "core_pattern": "Says all the right things in the wrong way. Message is right but delivery creates friction.",
+      "strengths": [
+        "Good mandate understanding",
+        "Strong stakeholder relationships",
+        "Resilient under pressure"
+      ],
+      "growth_areas": [
+        "Natural communication style (directness, assertiveness, debate orientation) creates friction in APAC contexts",
+        "Reverts to default style under pressure, undoing adaptive efforts",
+        "May mistake silence for agreement and miss real alignment signals"
+      ],
+      "development_focus": "Build specific adaptive communication techniques for APAC contexts; practice delivering difficult messages in culturally effective ways; develop active checking-for-understanding habits rather than assuming alignment from silence."
+    },
+    {
+      "id": "A4",
+      "name": "The Anchor",
+      "weakest_dimension": "Pressure Resilience",
+      "risk_layer": "Layer 2 — Delivery & Pressure Risk",
+      "core_pattern": "Starts strong, deteriorates under sustained pressure. The mandate doesn't fail in good times — it fails in the first crisis.",
+      "strengths": [
+        "Clear mandate understanding",
+        "Good communication and relationship skills",
+        "Strong cultural fluency"
+      ],
+      "growth_areas": [
+        "Decision quality degrades under simultaneous pressure from HQ, local team, and market",
+        "Becomes more risk-averse when the mandate becomes politically difficult",
+        "May not have early-warning systems for personal performance degradation"
+      ],
+      "development_focus": "Identify personal pressure triggers and early-warning indicators; build specific coping strategies for each high-pressure pattern; develop recovery routines after relationship setbacks or political shocks."
+    },
+    {
+      "id": "A5",
+      "name": "The Sprinter",
+      "weakest_dimension": "Long-Game Thinking",
+      "risk_layer": "Layer 3 — Sustained Impact Risk",
+      "core_pattern": "Wins short-term results but burns long-term relationship capital. The board sees Q1 wins and doesn't notice the damage.",
+      "strengths": [
+        "Strong delivery and execution capability",
+        "Good pressure resilience",
+        "Clear communication"
+      ],
+      "growth_areas": [
+        "Prioritises short-term results over long-term relationship health",
+        "Uncomfortable with 3–5 year relationship investment timelines",
+        "May deplete relationship capital faster than they realise, with delayed consequences"
+      ],
+      "development_focus": "Build explicit long-horizon relationship investment plans; identify specific short-term pressures that create long-term damage; develop reputation-conscious decision frameworks for quarterly results pressure."
+    },
+    {
+      "id": "A6",
+      "name": "The Cultural Operator",
+      "weakest_dimension": "No dimension below 50th percentile; Cultural Fluency above 70th percentile",
+      "risk_layer": "Lowest overall risk (protective profile)",
+      "core_pattern": "The ideal BRIDGE profile. Strong across all dimensions with cultural fluency as a demonstrated strength.",
+      "strengths": [
+        "Balanced capability across all six mandate dimensions",
+        "Cultural fluency as a demonstrated strength, not just baseline competence",
+        "Genuine mutual cross-cultural relationships rather than one-directional adaptation"
+      ],
+      "growth_areas": [
+        "Risk of complacency — strong all-around scores can mask specific sub-threshold weaknesses",
+        "May underestimate the rate at which new cross-border challenges emerge",
+        "May need to develop mentorship capability to help build cultural fluency in others"
+      ],
+      "development_focus": "Use cultural fluency as a platform for mentoring others; identify nuanced or emerging cultural shifts that may not yet be visible in standard assessment; develop advanced cross-border influence capabilities."
+    }
+  ],
+  "composite_scoring": {
+    "method": "Six-dimension average of normalised scores, converted to 0–100 composite",
+    "formula": "((D1 + D2 + D3 + D4 + D5 + D6) / 120) × 100",
+    "bands": [
+      {
+        "band": "High Mandate Readiness",
+        "min": 80,
+        "max": 100,
+        "interpretation": "Strong readiness across all 6 dimensions; mandate risk is low."
+      },
+      {
+        "band": "Ready with Monitoring",
+        "min": 65,
+        "max": 79,
+        "interpretation": "Solid foundation with specific dimensions requiring attention. Proactive development recommended."
+      },
+      {
+        "band": "Development Needed",
+        "min": 45,
+        "max": 64,
+        "interpretation": "Multiple dimensions require deliberate investment before mandate effectiveness can be expected. Early intervention critical."
+      },
+      {
+        "band": "Mandate Risk",
+        "min": 0,
+        "max": 44,
+        "interpretation": "Significant gaps across mandate dimensions. Without targeted support, mandate failure probability is high."
+      }
+    ],
+    "dimension_verdicts": [
+      {
+        "verdict": "Strong",
+        "min": 16,
+        "max": 20,
+        "meaning": "Mature mandate execution capability"
+      },
+      {
+        "verdict": "Developing",
+        "min": 10,
+        "max": 15.9,
+        "meaning": "Emerging mandate capability with targeted development needs"
+      },
+      {
+        "verdict": "Gap",
+        "min": 0,
+        "max": 9.9,
+        "meaning": "Significant mandate execution gap"
+      }
+    ]
+  },
+  "report_output": {
+    "sections": [
+      "Overall Mandate Readiness Score (composite percentile)",
+      "Six-dimension profile with verdicts",
+      "Primary archetype with failure pattern and risk layer",
+      "Three Layers of Mandate Risk visualisation",
+      "Dimension-by-dimension strengths and growth areas",
+      "Personalised development recommendations with prioritisation",
+      "90-day action planning framework"
+    ],
+    "report_format": "Interactive HTML report with visual dimension profile + consultant debrief guide"
+  },
+  "drift_notes": {
+    "source_engine_drift": [
+      {
+        "field": "full_name",
+        "engine_value": "APAC Mandate Execution & Cross-Border Leadership Readiness",
+        "canon_value": "BRIDGE — cross-cultural relational intelligence",
+        "severity": "P0",
+        "note": "Engine full_name was an invented official-sounding name; canonical name follows NAME — descriptor format per Messaging Canon v1.0"
+      },
+      {
+        "field": "dimension D2 name",
+        "engine_value": "Stakeholder Navigation",
+        "canon_value": "Stakeholder Relationship Building",
+        "severity": "P0",
+        "note": "'Navigate' is a banned word per Messaging Canon v1.0; renamed to reflect the actual dimension content (proactive relationship investment in high-context environments)"
+      },
+      {
+        "field": "archetype A2 name",
+        "engine_value": "The Navigator",
+        "canon_value": "The Wanderer",
+        "severity": "P1",
+        "note": "'Navigator' derives from banned word 'navigate'; 'The Wanderer' captures the same core pattern (lack of clear direction / mandate clarity gap) without the banned root"
+      },
+      {
+        "field": "internal framework name",
+        "engine_value": "Three Fires",
+        "canon_value": "Three Layers of Mandate Risk",
+        "severity": "P0",
+        "note": "'Fire' and all fire/burn/ignite/flame terms are banned per Messaging Canon v1.0. Official approved naming is 'Three Layers of Mandate Risk' — an internal diagnostic model, not customer-facing copy."
+      },
+      {
+        "field": "archetype field name",
+        "engine_value": "three_fires_correlation",
+        "canon_value": "risk_layer (mapped to Three Layers of Mandate Risk)",
+        "severity": "P0",
+        "note": "Field name reflects banned framework terminology; canonical field uses approved risk layer naming"
+      }
+    ]
+  }
+}

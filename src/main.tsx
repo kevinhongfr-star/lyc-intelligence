@@ -4,9 +4,8 @@ import * as Sentry from '@sentry/react';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
-import './styles/tokens.css';
 import { initAnalytics } from './lib/analytics';
-import { installGlobalErrorHandlers } from './analytics/errorMonitor';
+import { installGlobalErrorHandlers, scrubErrorMessage } from './analytics/errorMonitor';
 
 // ── Sentry Error Monitoring (S4-T02) ──
 // Only activate when a DSN is explicitly configured. In dev/preview this is
@@ -32,9 +31,38 @@ if (sentryDsn) {
     release: (import.meta.env.VITE_APP_RELEASE as string | undefined) ?? 'dev',
     enabled: true,
     beforeSend(event) {
-      // Strip any auth cookies or local auth tokens from tags/extra if present.
+      // W4-7 / #1288 — PII scrubbing on every Sentry event.
+      // Sentry's automatic capture (window.onerror etc.) runs in parallel
+      // to our reportError() pipeline, so we must scrub here too.
       if (event.tags) {
         delete (event.tags as Record<string, unknown>).auth;
+      }
+      // Scrub exception messages + stacktrace frames (may contain user input
+      // e.g. "Failed to process: <chat message>").
+      if (event.exception?.values) {
+        for (const ex of event.exception.values) {
+          if (ex.value) ex.value = scrubErrorMessage(ex.value);
+          if (ex.stacktrace?.frames) {
+            for (const frame of ex.stacktrace.frames) {
+              if (frame.vars) {
+                for (const key of Object.keys(frame.vars)) {
+                  frame.vars[key] = scrubErrorMessage(String(frame.vars[key]));
+                }
+              }
+            }
+          }
+        }
+      }
+      // Scrub breadcrumb messages (may contain navigation params with PII).
+      if (event.breadcrumbs) {
+        for (const crumb of event.breadcrumbs) {
+          if (crumb.message) crumb.message = scrubErrorMessage(crumb.message);
+          if (crumb.data) {
+            for (const key of Object.keys(crumb.data)) {
+              crumb.data[key] = scrubErrorMessage(String(crumb.data[key]));
+            }
+          }
+        }
       }
       return event;
     },
