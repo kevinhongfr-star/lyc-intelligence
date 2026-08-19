@@ -1,13 +1,5 @@
-/**
- * CookieConsent — Bottom-of-page consent banner (S4-T03)
- *
- * Shows a cookie consent banner with three options:
- *   - "Essential Only" (reject non-essential)
- *   - "Accept All" (accept analytics + marketing)
- *   - Persisted in localStorage; never re-shown once decided.
- */
 import React, { useEffect, useState } from 'react';
-import { Cookie, X } from 'lucide-react';
+import { V1 } from '@/styles/v1-tokens';
 
 const STORAGE_KEY = 'lyc_cookie_consent_v1';
 
@@ -30,11 +22,46 @@ function getStoredConsent(): ConsentRecord | null {
 
 function storeConsent(choice: ConsentChoice) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ choice, decidedAt: new Date().toISOString() }));
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ choice, decidedAt: new Date().toISOString() })
+    );
   } catch {
     /* ignore */
   }
 }
+
+const DECLINE_STYLE: React.CSSProperties = {
+  fontFamily: V1.monoFont,
+  fontSize: '0.65rem',
+  letterSpacing: V1.trackingMono,
+  textTransform: 'uppercase',
+  backgroundColor: 'transparent',
+  color: V1.ink700,
+  border: `1px solid ${V1.ink300}`,
+  borderRadius: 0,
+  padding: '12px 16px',
+  cursor: 'pointer',
+  lineHeight: V1.leadingLabel,
+  fontWeight: V1.fwMedium,
+  transition: 'background-color 150ms ease-out',
+};
+
+const ACCEPT_STYLE: React.CSSProperties = {
+  fontFamily: V1.monoFont,
+  fontSize: '0.65rem',
+  letterSpacing: V1.trackingMono,
+  textTransform: 'uppercase',
+  backgroundColor: V1.teal800,
+  color: V1.white,
+  border: 'none',
+  borderRadius: 0,
+  padding: '12px 16px',
+  cursor: 'pointer',
+  lineHeight: V1.leadingLabel,
+  fontWeight: V1.fwMedium,
+  transition: 'opacity 150ms ease-out',
+};
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
@@ -42,7 +69,6 @@ export function CookieConsent() {
   useEffect(() => {
     const stored = getStoredConsent();
     if (!stored || stored.choice === null) {
-      // Small delay so it doesn't flash on initial paint
       const t = setTimeout(() => setVisible(true), 800);
       return () => clearTimeout(t);
     }
@@ -56,39 +82,96 @@ export function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#1A1A2E] text-white border-t border-[#2A2A45] shadow-lg">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div className="flex items-start gap-3 flex-1">
-          <Cookie className="w-5 h-5 text-fuchsia flex-shrink-0 mt-0.5" />
-          <div className="text-xs sm:text-sm text-[#B8B8C8] leading-relaxed">
-            We use cookies to operate this site and improve your experience. Essential cookies are always on.
-            Analytics cookies help us understand usage. See our{''}
-            <a href="/cookies" className="text-fuchsia hover:underline">Cookie Policy</a> and{''}
-            <a href="/privacy" className="text-fuchsia hover:underline">Privacy Policy</a>.
-          </div>
+    <div
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        backgroundColor: V1.cream,
+        borderTop: `1px solid ${V1.border}`,
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1320,
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          padding: '12px 16px',
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 16,
+          justifyContent: 'space-between',
+        }}
+      >
+        <div
+          style={{
+            fontFamily: V1.bodyFont,
+            fontSize: 13,
+            color: V1.ink600,
+            lineHeight: V1.leadingBody,
+            flex: 1,
+            minWidth: 260,
+          }}
+        >
+          We use cookies to improve your experience.{' '}
+          <a
+            href="/cookies"
+            style={{
+              color: V1.teal600,
+              fontWeight: V1.fwMedium,
+              textDecoration: 'none',
+            }}
+          >
+            Cookie policy →
+          </a>{' '}
+          <a
+            href="/privacy"
+            style={{
+              color: V1.teal600,
+              fontWeight: V1.fwMedium,
+              textDecoration: 'none',
+            }}
+          >
+            Privacy →
+          </a>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            flexShrink: 0,
+          }}
+        >
           <button
             type="button"
+            style={DECLINE_STYLE}
             onClick={() => handleChoice('essential')}
-            className="px-4 py-2 text-xs font-medium text-[#B8B8C8] border border-[#3A3A52] hover:bg-[#252540] transition-colors"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = V1.ink50;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
           >
-            Essential Only
+            Decline
           </button>
           <button
             type="button"
+            style={ACCEPT_STYLE}
             onClick={() => handleChoice('all')}
-            className="px-4 py-2 text-xs font-medium text-white bg-fuchsia hover:opacity-90 transition-opacity"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '0.9';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '1';
+            }}
           >
-            Accept All
-          </button>
-          <button
-            type="button"
-            onClick={() => handleChoice('essential')}
-            aria-label="Dismiss"
-            className="p-2 text-[#6A6A80] hover:text-white"
-          >
-            <X className="w-4 h-4" />
+            Accept
           </button>
         </div>
       </div>
@@ -96,7 +179,6 @@ export function CookieConsent() {
   );
 }
 
-/** Returns the user's stored consent choice (for gating analytics scripts). */
 export function getConsentChoice(): ConsentChoice {
   return getStoredConsent()?.choice ?? null;
 }

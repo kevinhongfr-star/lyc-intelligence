@@ -7,6 +7,7 @@
 @import './styles/motion.css';
 @import './styles/dark-mode.css';
 @import './styles/reportTokens.css';   /* #61 Report design tokens (B2C: PDF/Print/Email) */
+@import './styles/v1-motion.css';     /* V5.1 · V1 editorial motion system */
 
 /* V1 VISUAL REWORK — Body font: Inter (loaded from Google Fonts CDN; falls
    back to system sans if offline). Crimson Pro + IBM Plex Mono are self-host. */

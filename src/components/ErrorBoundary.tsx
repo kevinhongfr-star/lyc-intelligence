@@ -1,32 +1,12 @@
-/**
- * ErrorBoundary — class-based React error boundary.
- *
- * Phase 3 strengthening of the minimal Phase 0 boundary. Adds:
- *   - `fallback` render prop (receives error + reset)
- *   - `onError` callback for logging/Sentry
- *   - `resetKeys` auto-reset on prop change
- *   - `level` ('page' | 'section') presentation toggle
- *   - Accessible default fallback (role="alert", aria-live="assertive")
- *
- * Phase 17 / T02 (#1288) — all errors captured by the boundary are also
- * reported via reportError() to the analytics/error sink (/api/events).
- *
- * Default export name kept as `ErrorBoundary`; named export also available.
- */
 import React from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui';
+import { V1 } from '@/styles/v1-tokens';
 import { reportError } from '@/analytics/errorMonitor';
 
 export interface ErrorBoundaryProps {
   children: React.ReactNode;
-  /** Custom fallback render. Receives the error + a reset() callback. */
   fallback?: (error: Error, reset: () => void) => React.ReactNode;
-  /** Called when an error is caught (for logging/Sentry). */
   onError?: (error: Error, info: React.ErrorInfo) => void;
-  /** When any of these values change, the boundary auto-resets. */
   resetKeys?: unknown[];
-  /** Level affects presentation: 'page' (full page) vs 'section' (inline card). Default 'section'. */
   level?: 'page' | 'section';
 }
 
@@ -54,7 +34,6 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, State> {
   }
 
   componentDidUpdate(prevProps: ErrorBoundaryProps): void {
-    // Only auto-reset when currently in an error state.
     if (!this.state.hasError) return;
 
     const prev = prevProps.resetKeys ?? [];
@@ -99,19 +78,125 @@ interface DefaultFallbackProps {
   reset: () => void;
 }
 
+const TRIANGLE_SVG = (
+  <svg
+    width="48"
+    height="48"
+    viewBox="0 0 48 48"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <polygon
+      points="24,4 44,44 4,44"
+      stroke={V1.teal600}
+      strokeWidth="2"
+      strokeLinejoin="miter"
+      fill="none"
+    />
+    <line
+      x1="24"
+      y1="18"
+      x2="24"
+      y2="30"
+      stroke={V1.teal600}
+      strokeWidth="2"
+      strokeLinecap="square"
+    />
+    <line
+      x1="24"
+      y1="34"
+      x2="24"
+      y2="38"
+      stroke={V1.teal600}
+      strokeWidth="2"
+      strokeLinecap="square"
+    />
+  </svg>
+);
+
+const BUTTON_PRIMARY_STYLE: React.CSSProperties = {
+  fontFamily: V1.monoFont,
+  fontSize: '0.7rem',
+  letterSpacing: V1.trackingMono,
+  textTransform: 'uppercase',
+  backgroundColor: V1.teal800,
+  color: V1.white,
+  border: 'none',
+  borderRadius: 0,
+  padding: '10px 16px',
+  cursor: 'pointer',
+  lineHeight: V1.leadingLabel,
+  fontWeight: V1.fwMedium,
+};
+
+const BUTTON_OUTLINE_STYLE: React.CSSProperties = {
+  fontFamily: V1.monoFont,
+  fontSize: '0.7rem',
+  letterSpacing: V1.trackingMono,
+  textTransform: 'uppercase',
+  backgroundColor: 'transparent',
+  color: V1.teal800,
+  border: `1px solid ${V1.teal800}`,
+  borderRadius: 0,
+  padding: '10px 16px',
+  cursor: 'pointer',
+  lineHeight: V1.leadingLabel,
+  fontWeight: V1.fwMedium,
+};
+
+const TITLE_STYLE: React.CSSProperties = {
+  fontFamily: V1.displayFont,
+  fontSize: V1.textH3,
+  color: V1.text,
+  fontWeight: V1.fwSemibold,
+  lineHeight: V1.leadingHeading,
+  margin: 0,
+};
+
+const BODY_STYLE: React.CSSProperties = {
+  fontFamily: V1.bodyFont,
+  fontSize: V1.textBodySm,
+  color: V1.textSecondary,
+  lineHeight: V1.leadingBody,
+  margin: 0,
+};
+
+const ERROR_PREVIEW_STYLE: React.CSSProperties = {
+  fontFamily: V1.monoFont,
+  fontSize: '0.75rem',
+  color: V1.ink700,
+  border: `1px solid ${V1.ink200}`,
+  backgroundColor: V1.white,
+  padding: '10px 12px',
+  maxHeight: 240,
+  overflow: 'auto',
+  whiteSpace: 'pre-wrap',
+  wordBreak: 'break-all',
+  margin: 0,
+  lineHeight: 1.5,
+};
+
 function DefaultFallback({ error, level, reset }: DefaultFallbackProps) {
   const actions = (
-    <div className={level === 'page' ? 'mt-4 flex gap-2' : 'mt-3 flex gap-2'}>
-      <Button
-        variant="default"
-        leftIcon={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
+    <div
+      style={{
+        display: 'flex',
+        gap: 8,
+        flexWrap: 'wrap',
+        marginTop: level === 'page' ? 16 : 12,
+      }}
+    >
+      <button
+        type="button"
+        style={BUTTON_PRIMARY_STYLE}
         onClick={() => window.location.reload()}
       >
         Reload page
-      </Button>
-      <Button variant="outline" onClick={reset}>
+      </button>
+      <button type="button" style={BUTTON_OUTLINE_STYLE} onClick={reset}>
         Try again
-      </Button>
+      </button>
     </div>
   );
 
@@ -120,16 +205,34 @@ function DefaultFallback({ error, level, reset }: DefaultFallbackProps) {
       <div
         role="alert"
         aria-live="assertive"
-        className="min-h-screen flex items-center justify-center bg-bg-primary p-6"
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: V1.cream,
+          padding: 24,
+        }}
       >
-        <div className="w-full max-w-lg border border-bg-tertiary bg-bg-secondary p-6">
-          <AlertTriangle className="h-8 w-8 text-red-600" aria-hidden="true" />
-          <h1 className="mt-3 text-xl font-semibold text-text-primary">
-            Something went wrong
-          </h1>
-          <pre className="mt-3 max-h-48 overflow-auto whitespace-pre-wrap break-words bg-bg-tertiary p-3 text-sm text-red-600">
-            {error.message}
-          </pre>
+        <div
+          style={{
+            width: '100%',
+            maxWidth: 512,
+            border: `1px solid ${V1.ink200}`,
+            backgroundColor: V1.white,
+            padding: 32,
+          }}
+        >
+          {TRIANGLE_SVG}
+          <div style={{ height: 16 }} />
+          <h1 style={TITLE_STYLE}>Something went wrong</h1>
+          <div style={{ height: 8 }} />
+          <p style={BODY_STYLE}>
+            An unexpected error occurred. You can try reloading the page or
+            retrying the action.
+          </p>
+          <div style={{ height: 16 }} />
+          <pre style={ERROR_PREVIEW_STYLE}>{error.message}</pre>
           {actions}
         </div>
       </div>
@@ -140,18 +243,76 @@ function DefaultFallback({ error, level, reset }: DefaultFallbackProps) {
     <div
       role="alert"
       aria-live="assertive"
-      className="border border-red-600/40 bg-bg-secondary p-4"
+      style={{
+        border: `1px solid ${V1.teal600}`,
+        backgroundColor: V1.teal50,
+        padding: 16,
+      }}
     >
-      <div className="flex items-center gap-2">
-        <AlertTriangle className="h-5 w-5 text-red-600" aria-hidden="true" />
-        <h2 className="text-base font-semibold text-text-primary">
-          Something went wrong
-        </h2>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+        <div style={{ flexShrink: 0 }}>
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 48 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <polygon
+              points="24,4 44,44 4,44"
+              stroke={V1.teal600}
+              strokeWidth="2"
+              strokeLinejoin="miter"
+              fill="none"
+            />
+            <line
+              x1="24"
+              y1="18"
+              x2="24"
+              y2="30"
+              stroke={V1.teal600}
+              strokeWidth="2"
+              strokeLinecap="square"
+            />
+            <line
+              x1="24"
+              y1="34"
+              x2="24"
+              y2="38"
+              stroke={V1.teal600}
+              strokeWidth="2"
+              strokeLinecap="square"
+            />
+          </svg>
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h2
+            style={{
+              fontFamily: V1.displayFont,
+              fontSize: 18,
+              color: V1.text,
+              fontWeight: V1.fwSemibold,
+              lineHeight: V1.leadingHeading,
+              margin: 0,
+            }}
+          >
+            Something went wrong
+          </h2>
+          <div style={{ height: 8 }} />
+          <pre
+            style={{
+              ...ERROR_PREVIEW_STYLE,
+              maxHeight: 128,
+              fontSize: '0.7rem',
+              padding: '8px 10px',
+            }}
+          >
+            {error.message}
+          </pre>
+          {actions}
+        </div>
       </div>
-      <pre className="mt-2 max-h-32 overflow-auto whitespace-pre-wrap break-words bg-bg-tertiary p-2 text-xs text-red-600">
-        {error.message}
-      </pre>
-      {actions}
     </div>
   );
 }

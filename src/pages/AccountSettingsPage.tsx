@@ -20,24 +20,28 @@
  *                 account summary (plan, miles, coaching, lenses, milestones,
  *                 member since), Security badge (teal border, E2E encrypted)
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, Suspense, lazy } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SEO } from '@/components/seo/SEO';
 import { SkipToContent } from '@/components/a11y/SkipToContent';
 import { useAuthStore } from '@/stores/authStore';
 import { V1 } from '@/styles/v1-tokens';
 
+// V5.1 Personas tab — 5th settings tab
+const PersonasSettingsTab = lazy(() => import('@/pages/nexus/PersonasSettingsTab'));
+
 // ── V1 motion ──
 const EASE_OUT = V1.ease;
 const REVEAL_MS = V1.durNormal;
 
-type SettingsTab = 'profile' | 'privacy' | 'plan' | 'notifications';
+type SettingsTab = 'profile' | 'privacy' | 'plan' | 'notifications' | 'personas';
 
 const TABS: { key: SettingsTab; label: string }[] = [
   { key: 'profile', label: 'Profile' },
   { key: 'privacy', label: 'Privacy' },
   { key: 'plan', label: 'Plan' },
   { key: 'notifications', label: 'Notifications' },
+  { key: 'personas', label: 'Personas' },
 ];
 
 export function AccountSettingsPage() {
@@ -278,6 +282,11 @@ export function AccountSettingsPage() {
               {activeTab === 'privacy' && <PrivacyTab toggles={toggles} onToggle={toggle} />}
               {activeTab === 'plan' && <PlanTab onNavigate={navigate} />}
               {activeTab === 'notifications' && <NotificationsTab toggles={toggles} onToggle={toggle} />}
+              {activeTab === 'personas' && (
+                <Suspense fallback={<div className="v1-mono" style={{ padding: 24, color: V1.textDim }}>Loading personas →</div>}>
+                  <PersonasSettingsTab />
+                </Suspense>
+              )}
             </div>
           </div>
         </main>

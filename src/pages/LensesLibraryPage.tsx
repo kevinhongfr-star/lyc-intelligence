@@ -30,7 +30,7 @@
  * Available. No invented completion state.
  */
 import React, { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { SEO } from '@/components/seo/SEO';
 import { initScrollReveal } from '@/lib/utils';
 import { V1 } from '@/styles/v1-tokens';
@@ -177,11 +177,27 @@ function LensRow({ lens, completedCodes }: { lens: Lens; completedCodes: Set<str
   );
 }
 
+const PRACTICE_FILTER_MAP: Record<string, string[]> = {
+  positioning: ['PRISM', 'IMPACT', 'QUEST', 'CPI', 'LEAP'],
+  influence: ['BRIDGE', 'MOSAIC', 'COACH'],
+  transition: ['DRIVE', 'IMPACT', 'COACH'],
+  'enterprise-china': ['CPI', 'BRIDGE', 'MOSAIC'],
+};
+
+const PRACTICE_NAME_MAP: Record<string, string> = {
+  positioning: 'Positioning',
+  influence: 'Influence',
+  transition: 'Transition',
+  'enterprise-china': 'Enterprise China',
+};
+
 /* ── 3-column app shell (mirrors NexusPage layout) ── */
 export function LensesLibraryPage() {
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
   const [completedCodes, setCompletedCodes] = useState<Set<string>>(new Set());
   const { user } = useAuthStore();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const practiceFilter = searchParams.get('practice');
 
   useEffect(() => { initScrollReveal(); }, []);
 
@@ -208,9 +224,14 @@ export function LensesLibraryPage() {
   }, []);
 
   const filteredLenses = useMemo(() => {
-    if (activeFilter === 'all') return LENSES;
-    return LENSES.filter(l => l.pillar === activeFilter);
-  }, [activeFilter]);
+    let list = LENSES;
+    if (practiceFilter && PRACTICE_FILTER_MAP[practiceFilter]) {
+      const allowedCodes = PRACTICE_FILTER_MAP[practiceFilter];
+      list = list.filter(l => allowedCodes.includes(l.code.toUpperCase()));
+    }
+    if (activeFilter === 'all') return list;
+    return list.filter(l => l.pillar === activeFilter);
+  }, [activeFilter, practiceFilter]);
 
   // Group filtered lenses by pillar for display
   const grouped = useMemo(() => {
@@ -278,6 +299,48 @@ export function LensesLibraryPage() {
         {/* ── MAIN ── */}
         <main className="v1-appshell-main" style={{ padding: `${V1.shellPad}px`, overflow: 'auto' }}>
           <div style={{ maxWidth: 760 }}>
+            {/* Active practice filter banner */}
+            {practiceFilter && PRACTICE_NAME_MAP[practiceFilter] && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                border: `1px solid ${V1.teal200}`,
+                background: V1.teal50,
+                padding: 16,
+                marginBottom: 24,
+              }}>
+                <span style={{
+                  fontFamily: V1.monoFont,
+                  fontSize: V1.textCaption,
+                  letterSpacing: V1.trackingMono,
+                  textTransform: 'uppercase',
+                  color: V1.teal700,
+                  fontWeight: V1.fwSemibold,
+                }}>
+                  Filtering by practice · {PRACTICE_NAME_MAP[practiceFilter]}
+                </span>
+                <Link
+                  to="/app/nexus/lenses"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const newParams = new URLSearchParams(searchParams);
+                    newParams.delete('practice');
+                    setSearchParams(newParams, { replace: true });
+                  }}
+                  style={{
+                    fontFamily: V1.bodyFont,
+                    fontSize: V1.textBodySm,
+                    color: V1.teal700,
+                    textDecoration: 'none',
+                    fontWeight: V1.fwMedium,
+                  }}
+                >
+                  Clear filter →
+                </Link>
+              </div>
+            )}
+
             {/* Page header */}
             <header style={{ marginBottom: 40, paddingBottom: 24, borderBottom: `1px solid ${V1.dividerStrong}` }}>
               <div className="v1-eyebrow">Diagnostic lenses</div>

@@ -1,35 +1,32 @@
 /**
- * Phase 16 — LeaderPortalLayout (B2C identity, /app/*).
+ * V5.1 — LeaderPortalLayout (B2C identity, /app/*).
  *
- * Auth required. Chrome: LeaderNav sidebar (NEXUS Chat / Assessments /
- * Results / Profile / Dashboard / Documents / Billing).
- * Visual: clean, focused, tool-like but still premium. Miles badge prominent.
- * Zero radius, font trio, accent #C108AB.
+ * Auth required. Chrome: LeaderNavV5 canonical sidebar (220px).
+ * 3-column shell: LeaderNavV5 (sidebar) + main content + optional right rail.
+ * DEX pages (/app/dex/*) live inside the same shell.
+ * Zero radius, V1 tokens, no lucide icons.
  */
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { isConsultantRole } from '@/services/portalClassification';
-import LeaderNav from '@/components/navigation/LeaderNav';
+import LeaderNavV5 from '@/components/navigation/LeaderNavV5';
 import { SkipToContent } from '@/components/a11y/SkipToContent';
-
-const DS = {
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  bg: '#FFFFFF',
-  pageBg: '#FAFAFA',
-  border: '#E5E5E5',
-  text: '#000000',
-  muted: '#666666',
-};
+import { V1 } from '@/styles/v1-tokens';
 
 function Loading() {
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      minHeight: '60vh', fontFamily: DS.bodyFont, color: DS.muted, fontSize: 14, gap: 10,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '60vh',
+      fontFamily: V1.monoFont,
+      color: V1.textDim,
+      fontSize: V1.textBodySm,
+      letterSpacing: V1.trackingMono,
+      textTransform: 'uppercase',
     }}>
-      <Loader2 className="w-5 h-5 animate-spin" />
       Loading…
     </div>
   );
@@ -41,29 +38,26 @@ export function LeaderPortalLayout(): React.ReactElement {
   if (isLoading) return <Loading />;
   if (!user) return <Navigate to="/login" replace />;
 
-  // Role check: block pure B2B consultants. Leader + internal staff are fine
-  // (internal staff can still access leader portal as a "view B2C as user" mode,
-  // but pure client/consultant roles bounce to their portal).
   const role = profile?.role;
   if (role && isConsultantRole(role)) {
-    // Consultants get their own portal. Redirect.
     return <Navigate to="/portal/dashboard" replace />;
   }
 
   return (
     <div style={{
-      display: 'flex', minHeight: '100vh',
-      background: DS.pageBg, fontFamily: DS.bodyFont,
-    }} data-portal-kind="leader">
+      display: 'flex',
+      minHeight: '100vh',
+      background: V1.bg,
+    }} data-portal-kind="leader-v5">
       <SkipToContent targetId="leader-main" />
-      <LeaderNav variant="sidebar" />
+      <LeaderNavV5 />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        {/* Top spacer for mobile */}
         <main
           id="leader-main"
           aria-label="Main content"
           style={{
-            flex: 1, overflowY: 'auto',
+            flex: 1,
+            overflowY: 'auto',
             padding: 'clamp(16px,3vw,32px)',
             minWidth: 0,
           }}

@@ -152,7 +152,36 @@ const LensTakeFlowPage = lazy(() => import('@/pages/LensTakeFlowPage').then(m =>
 const MilestonesDashboardPage = lazy(() => import('@/pages/MilestonesDashboardPage').then(m => ({ default: m.MilestonesDashboardPage })));
 const HumanDepthPage = lazy(() => import('@/pages/HumanDepthPage').then(m => ({ default: m.HumanDepthPage })));
 const AccountSettingsPage = lazy(() => import('@/pages/AccountSettingsPage').then(m => ({ default: m.AccountSettingsPage })));
-const InsightsPage = lazy(() => import('@/pages/InsightsPage').then(m => ({ default: m.InsightsPage })));
+const InsightsPageLegacy = lazy(() => import('@/pages/InsightsPage').then(m => ({ default: m.InsightsPage })));
+
+// ── V5.1 IA — In-app NEXUS workspace pages
+const NexusChatPageV5 = lazy(() => import('@/pages/nexus/NexusChatPageV5').then(m => ({ default: m.NexusChatPageV5 })));
+const LensDetailPage = lazy(() => import('@/pages/nexus/LensDetailPage'));
+const ReadoutsListPage = lazy(() => import('@/pages/nexus/ReadoutsListPage'));
+const CoachingBookingFlowPage = lazy(() => import('@/pages/nexus/CoachingBookingFlowPage'));
+const BillingPageV5 = lazy(() => import('@/pages/nexus/BillingPage'));
+const InsightsPageV5 = lazy(() => import('@/pages/nexus/InsightsPage'));
+const AdvisorySessionsPage = lazy(() => import('@/pages/nexus/AdvisorySessionsPage'));
+const QuarterlyDeepReviewPage = lazy(() => import('@/pages/nexus/QuarterlyDeepReviewPage'));
+
+// ── V5.1 IA — Public SEO lens landing pages (11 lenses)
+const PrismSEOPage = lazy(() => import('@/pages/nexus/PublicLensLandingTemplate').then(m => ({ default: m.PrismSEOPage })));
+const CpiSEOPage = lazy(() => import('@/pages/nexus/PublicLensLandingTemplate').then(m => ({ default: m.CpiSEOPage })));
+const LeapSEOPage = lazy(() => import('@/pages/nexus/PublicLensLandingTemplate').then(m => ({ default: m.LeapSEOPage })));
+const ImpactSEOPage = lazy(() => import('@/pages/nexus/PublicLensLandingTemplate').then(m => ({ default: m.ImpactSEOPage })));
+const SparkSEOPage = lazy(() => import('@/pages/nexus/PublicLensLandingTemplate').then(m => ({ default: m.SparkSEOPage })));
+const BridgeSEOPage = lazy(() => import('@/pages/nexus/PublicLensLandingTemplate').then(m => ({ default: m.BridgeSEOPage })));
+const MosaicSEOPage = lazy(() => import('@/pages/nexus/PublicLensLandingTemplate').then(m => ({ default: m.MosaicSEOPage })));
+const DriveSEOPage = lazy(() => import('@/pages/nexus/PublicLensLandingTemplate').then(m => ({ default: m.DriveSEOPage })));
+const QuestSEOPage = lazy(() => import('@/pages/nexus/PublicLensLandingTemplate').then(m => ({ default: m.QuestSEOPage })));
+const CoachSEOPage = lazy(() => import('@/pages/nexus/PublicLensLandingTemplate').then(m => ({ default: m.CoachSEOPage })));
+const ForgeSEOPage = lazy(() => import('@/pages/nexus/PublicLensLandingTemplate').then(m => ({ default: m.ForgeSEOPage })));
+
+// ── V5.1 IA — Email flow utility pages
+const EmailVerificationConfirmedPage = lazy(() => import('@/pages/EmailFlowPages').then(m => ({ default: m.EmailVerificationConfirmedPage })));
+const PasswordResetConfirmedPage = lazy(() => import('@/pages/EmailFlowPages').then(m => ({ default: m.PasswordResetConfirmedPage })));
+const PasswordExpiredPage = lazy(() => import('@/pages/EmailFlowPages').then(m => ({ default: m.PasswordExpiredPage })));
+const MagicLinkLandingPage = lazy(() => import('@/pages/EmailFlowPages').then(m => ({ default: m.MagicLinkLandingPage })));
 
 // ── V3 IA — Legacy redirect helpers ──
 // React Router v6 <Navigate> does not auto-substitute route params, so we use
@@ -319,6 +348,12 @@ export default function App() {
             <Route path="reset-password" element={<ResetPasswordPage />} />
             <Route path="signup" element={<SignupPage />} />
 
+            {/* V5.1 IA — Email flow utility pages (same card pattern as auth) */}
+            <Route path="email-verified" element={<EmailVerificationConfirmedPage />} />
+            <Route path="password-reset-done" element={<PasswordResetConfirmedPage />} />
+            <Route path="password-expired" element={<PasswordExpiredPage />} />
+            <Route path="magic-link" element={<MagicLinkLandingPage />} />
+
             {/* Public product pages */}
             {/* W4-1/W4-3 (#1295) — /nexus renders the NEXUS landing page (what is NEXUS?) */}
             <Route path="nexus" element={<NexusLandingPage />} />
@@ -326,30 +361,31 @@ export default function App() {
             {/* V2 IA — canonical NEXUS workspace URLs. Sidebar links from /nexus/chat.
                 Lenses = assessment catalog (public). Milestones = dashboard (auth'd). */}
             <Route path="nexus/lenses" element={<LensesLibraryPage />} />
-            {/* V3 IA — canonical lens detail + readout. /nexus/lenses/:code delegates
-                to the existing specialized landing by code where one exists; the
-                catch-all falls through to CanonicalInstrumentLanding (canon-driven,
-                handles all 11). /nexus/lenses/:code/readout/:resultId is the V1
-                presentation layer over the existing diagnosticScoring getResult() API. */}
-            <Route path="nexus/lenses/prism" element={<PrismLanding />} />
-            <Route path="nexus/lenses/spark" element={<SparkLanding />} />
-            <Route path="nexus/lenses/cpi" element={<CpiFlagshipLanding />} />
-            <Route path="nexus/lenses/leap" element={<LeapLanding />} />
-            <Route path="nexus/lenses/impact" element={<ImpactLanding />} />
+            {/* V5.1 IA — Public SEO lens landing pages (11 lenses).
+                /nexus/lenses/[code] now renders the V5.1 marketing landing page.
+                Old /assessment/[code] routes continue to 301 here so bookmarks
+                and links don't 404. */}
+            <Route path="nexus/lenses/prism" element={<PrismSEOPage />} />
+            <Route path="nexus/lenses/spark" element={<SparkSEOPage />} />
+            <Route path="nexus/lenses/cpi" element={<CpiSEOPage />} />
+            <Route path="nexus/lenses/leap" element={<LeapSEOPage />} />
+            <Route path="nexus/lenses/impact" element={<ImpactSEOPage />} />
+            <Route path="nexus/lenses/bridge" element={<BridgeSEOPage />} />
+            <Route path="nexus/lenses/mosaic" element={<MosaicSEOPage />} />
+            <Route path="nexus/lenses/drive" element={<DriveSEOPage />} />
+            <Route path="nexus/lenses/quest" element={<QuestSEOPage />} />
+            <Route path="nexus/lenses/coach" element={<CoachSEOPage />} />
+            <Route path="nexus/lenses/forge" element={<ForgeSEOPage />} />
             <Route path="nexus/lenses/:code" element={<CanonicalInstrumentLanding />} />
-            {/* V3.5 IA — canonical lens-taking flow (V1 line-art wizard). Sits
-                between the lenses library and the readout. 100% presentation
-                layer over diagnosticApi (getDiagnostic / createAttempt /
-                saveResponse / completeAttempt / resumeAnonAttempt). */}
+            {/* V3.5 IA — canonical lens-taking flow (V1 line-art wizard). */}
             <Route path="nexus/lenses/:code/take" element={<LensTakeFlowPage />} />
             <Route path="nexus/lenses/:code/readout/:resultId" element={<LensReadoutPage />} />
-            {/* V4 IA — NEXUS workspace product pages inside marketing chrome so
-                unauthenticated users can preview the surfaces; LeaderPortalLayout
-                also mounts the same pages under /app/nexus/* for auth'd users. */}
+            {/* V4/V5.1 IA — NEXUS workspace product pages inside marketing chrome so
+                unauthenticated users can preview the surfaces. */}
             <Route path="nexus/milestones" element={<MilestonesDashboardPage />} />
             <Route path="nexus/coaching" element={<HumanDepthPage />} />
             <Route path="nexus/settings" element={<AccountSettingsPage />} />
-            <Route path="nexus/insights" element={<InsightsPage />} />
+            <Route path="nexus/insights" element={<InsightsPageLegacy />} />
             <Route path="pricing" element={<PricingPage />} />
             <Route path="b2b" element={<B2BLanding />} />
             <Route path="match" element={<MatchPage />} />
@@ -449,20 +485,29 @@ export default function App() {
               ═══════════════════════════════════════════════════════════ */}
           <Route path="/app" element={<LeaderPortalLayout />}>
             <Route index element={<Navigate to="nexus" replace />} />
-            <Route path="nexus" element={<NexusChatPage />} />
-            {/* V4 IA — /app/nexus/* canonical NEXUS workspace. Keeps chat at
-                /app/nexus (above) and ships V4 product sub-pages here so
-                LeaderPortalLayout auth guards apply. */}
+            <Route path="nexus" element={<NexusChatPageV5 />} />
+            {/* V4/V5.1 IA — /app/nexus/* canonical NEXUS workspace. */}
             <Route path="nexus/milestones" element={<MilestonesDashboardPage />} />
             <Route path="nexus/coaching" element={<HumanDepthPage />} />
+            <Route path="nexus/coaching/book" element={<CoachingBookingFlowPage />} />
             <Route path="nexus/settings" element={<AccountSettingsPage />} />
-            <Route path="nexus/insights" element={<InsightsPage />} />
+            <Route path="nexus/insights" element={<InsightsPageV5 />} />
+            <Route path="nexus/advisory" element={<AdvisorySessionsPage />} />
+            <Route path="nexus/quarterly-review" element={<QuarterlyDeepReviewPage />} />
+            <Route path="nexus/billing" element={<BillingPageV5 />} />
+            {/* V3 IA — Lenses library + in-app detail, take, readout */}
+            <Route path="nexus/lenses" element={<LensesLibraryPage />} />
+            <Route path="nexus/lenses/:code" element={<LensDetailPage />} />
+            <Route path="nexus/lenses/:code/take" element={<LensTakeFlowPage />} />
+            <Route path="nexus/lenses/:code/readout/:resultId" element={<LensReadoutPage />} />
+            {/* V5.1 IA — Readouts history (completed diagnostics) */}
+            <Route path="nexus/readouts" element={<ReadoutsListPage />} />
             <Route path="chat" element={<Navigate to="nexus" replace />} />
 
             {/* Exec user workspace — V4 legacy redirects. Old route names kept
                 as 301-style `replace` redirects so bookmarks don't 404. */}
             <Route path="dashboard" element={<Navigate to="nexus/milestones" replace />} />
-            <Route path="results" element={<Navigate to="nexus/milestones" replace />} />
+            <Route path="results" element={<Navigate to="nexus/readouts" replace />} />
             <Route path="profile" element={<Navigate to="nexus/settings" replace />} />
             <Route path="documents" element={<DocumentsPage />} />
 
@@ -470,13 +515,12 @@ export default function App() {
             <Route path="assessments" element={<AssessmentPage />} />
             <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />
 
-            {/* Billing + subscription self-serve — V4 IA: consolidated into
-                /nexus/settings → Plan tab. Stripe/Stripe callbacks and admin
-                surfaces keep the legacy BillingDashboard live via
-                /app/billing-legacy. Canon user entry is now Settings → Plan. */}
-            <Route path="billing" element={<Navigate to="nexus/settings" replace />} />
+            {/* Billing + subscription self-serve — V5.1: /app/nexus/billing is
+                the full management page. Settings → Plan is a summary. Legacy
+                /app/billing now redirects to the full billing page. */}
+            <Route path="billing" element={<Navigate to="nexus/billing" replace />} />
             <Route path="billing-legacy" element={<BillingDashboard />} />
-            <Route path="subscription" element={<Navigate to="nexus/settings" replace />} />
+            <Route path="subscription" element={<Navigate to="nexus/billing" replace />} />
 
             {/* Batch 5 · Human debrief bookings (B2C leader portal) */}
             <Route path="bookings" element={<MyBookingsPage />} />

@@ -1,0 +1,115 @@
+/* ===========================================================
+   V1 MOTION SYSTEM
+   Minimal. Editorial. Never flashy. 150–300ms window only.
+   All animations disable on prefers-reduced-motion: reduce.
+   =========================================================== */
+
+/* 1. Chat message entry — fade-in + 4px slide-up from bottom */
+@keyframes v1-msg-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.v1-msg-in { animation: v1-msg-in 200ms cubic-bezier(0.16,1,0.3,1) both; }
+
+/* 2. Typing indicator 3-dot bouncing — teal squares */
+@keyframes v1-dot-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40%           { transform: translateY(-3px); opacity: 1; }
+}
+.v1-dot {
+  display: inline-block;
+  width: 4px; height: 4px;
+  background: #00897B;
+  margin-right: 4px;
+}
+.v1-dot-1 { animation: v1-dot-bounce 1s 0s     infinite ease-in-out; }
+.v1-dot-2 { animation: v1-dot-bounce 1s 0.15s  infinite ease-in-out; }
+.v1-dot-3 { animation: v1-dot-bounce 1s 0.3s   infinite ease-in-out; }
+
+/* 3. Route transition — page crossfade */
+@keyframes v1-route-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.v1-route-in { animation: v1-route-in 200ms cubic-bezier(0.16,1,0.3,1) both; }
+
+/* 4. Modal/drawer — fade bg + slide content 250ms ease-out */
+@keyframes v1-modal-bg {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to   { opacity: 1; backdrop-filter: blur(4px); }
+}
+@keyframes v1-modal-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.v1-modal-bg    { animation: v1-modal-bg 250ms cubic-bezier(0.16,1,0.3,1) both; }
+.v1-modal-panel { animation: v1-modal-in  250ms cubic-bezier(0.16,1,0.3,1) both; }
+
+/* 5. System card appearance — fade + subtle scale-in 300ms (from 98%) */
+@keyframes v1-syscard-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.v1-syscard-in { animation: v1-syscard-in 300ms cubic-bezier(0.16,1,0.3,1) both; transform-origin: left center; }
+
+/* 6. Milestone update highlight pulse — teal glow 1s 0.4→0 fade */
+@keyframes v1-milestone-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(0,137,123, 0.4); }
+  70%  { box-shadow: 0 0 0 6px rgba(0,137,123, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,137,123, 0); }
+}
+.v1-milestone-pulse { animation: v1-milestone-pulse 1s cubic-bezier(0.4,0,0.2,1) 1; }
+
+/* 7. Loading skeletons shimmer — 1.5s (already in Skeleton.tsx, duplicate here) */
+@keyframes v1-skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes v1-skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+.v1-skeleton-shimmer { animation: v1-skeleton-shimmer 1.5s ease-in-out infinite; }
+.v1-skeleton-pulse   { animation: v1-skeleton-pulse   1.5s ease-in-out infinite; }
+
+/* 8. Sidebar active dot color transition 200ms */
+@keyframes v1-dot-color {
+  from { background-color: #E8E7E4; }
+  to   { background-color: #00897B; }
+}
+.v1-sidebar-dot { transition: background-color 200ms cubic-bezier(0.16,1,0.3,1); }
+
+/* 9. Scroll reveal (marketing pages) — fade-in on scroll */
+@keyframes v1-reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.v1-reveal { animation: v1-reveal 300ms cubic-bezier(0.16,1,0.3,1) both; }
+
+/* 10. Toast slide-in top-right 250ms */
+@keyframes v1-toast-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes v1-toast-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(12px); }
+}
+.v1-toast-in  { animation: v1-toast-in  250ms cubic-bezier(0.16,1,0.3,1) both; }
+.v1-toast-out { animation: v1-toast-out 200ms cubic-bezier(0.4,0,1,1) both; }
+
+/* 11. Page-level content fade-in (not route-level, already in route-in) */
+.v1-fade-in { animation: v1-route-in 200ms ease both; }
+
+/* 12. Lens question crossfade between questions (200ms) */
+.v1-question-fade { animation: v1-route-in 200ms ease both; }
+
+/* GLOBAL PREFERS-REDUCED-MOTION — DISABLE EVERYTHING */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
