@@ -283,6 +283,10 @@ export default function App() {
             {/* W4-1/W4-3 (#1295) — /nexus renders the NEXUS landing page (what is NEXUS?) */}
             <Route path="nexus" element={<NexusLandingPage />} />
             <Route path="nexus/chat" element={<NexusChatPage />} />
+            {/* V2 IA — canonical NEXUS workspace URLs. Sidebar links from /nexus/chat.
+                Lenses = assessment catalog (public). Milestones = dashboard (auth'd). */}
+            <Route path="nexus/lenses" element={<AssessmentCatalogPage />} />
+            <Route path="nexus/milestones" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="pricing" element={<PricingPage />} />
             <Route path="b2b" element={<B2BLanding />} />
             <Route path="match" element={<MatchPage />} />
@@ -294,10 +298,11 @@ export default function App() {
             <Route path="debrief" element={<DebriefLandingPage />} />
             <Route path="debrief/book" element={<BookDebriefPage />} />
 
-            {/* Assessment catalog — #1363 canonical URL is /assessments (plural, user-centric).
-                /assessment and /diagnostics kept as redirects so no link or bookmark 404s. */}
-            <Route path="assessments" element={<AssessmentCatalogPage />} />
-            <Route path="assessment" element={<Navigate to="/assessments" replace />} />
+            {/* Assessment catalog — V2 IA: canonical URL is now /nexus/lenses.
+                /assessments + /assessment + /diagnostics kept as redirects so no
+                link or bookmark 404s. */}
+            <Route path="assessments" element={<Navigate to="/nexus/lenses" replace />} />
+            <Route path="assessment" element={<Navigate to="/nexus/lenses" replace />} />
 
             {/* ── Canonical singular assessment landing routes (V3-2) ── */}
             <Route path="assessment/prism" element={<PrismLanding />} />
@@ -536,6 +541,8 @@ export default function App() {
               /nexus-landing alias + /b2c shortcut redirect here. */}
           <Route path="/nexus-landing" element={<Navigate to="/nexus" replace />} />
           <Route path="/b2c" element={<Navigate to="/app/nexus" replace />} />
+          {/* V2 IA — legacy /nexus/dashboard → /nexus/milestones (renamed in chat sidebar). */}
+          <Route path="/nexus/dashboard" element={<Navigate to="/nexus/milestones" replace />} />
 
           {/* Legacy instrument root URLs → canonical /assessment/:code */}
           <Route path="/cpi" element={<Navigate to="/assessment/cpi" replace />} />

@@ -1,21 +1,27 @@
 /**
- * NEXUSPage — W4-4 / NEXUS chat UI polish
+ * NEXUSPage — V2 VISUAL REWORK (V1 foundation)
  *
- * Premium dark chat interface. Distinctive, not a generic chat widget.
+ * 3-column app shell (V1 line-art system):
+ *   LEFT  (220)  — Workspace / Depth / Human Layer nav groups
+ *                  First-session (Day 1): "Getting started" checklist instead
+ *   MAIN        — chat: welcome block, message flow, lens activation card,
+ *                  milestone inline badge, option chips, input bar
+ *   RIGHT (280) — context panel: active lens, what we're working on,
+ *                  what we've learned, thinking style, privacy note
+ *                  First-session: progress checklist
  *
- * Brand rules (W4-4):
- *  - Zero border radius everywhere.
- *  - System serif headings, DM Sans body, IBM Plex Mono labels.
- *  - NEXUS accent = OCEAN / deep blue (#1E4D8C) — one accent per page.
- *  - Dark premium aesthetic.
- *  - Motion: 120–350ms, ease-out, purposeful only.
- *  - Loading = 3 subtle pulsing dots (NOT bouncing dots / spinner).
- *  - Response reveal = smooth fade-in (200ms ease-out), NO typewriter.
- *  - Error state = calm, premium, retry button, NOT red/alarming.
- *  - Mobile = full-screen, safe-area handling, keyboard-aware input.
+ * Chat logic (send / retry / system prompt / guest limit / query params) is
+ * preserved verbatim — this is a visual re-skin, not a backend change.
+ *
+ * Naming rules (enforced):
+ *  - "NEXUS" always by name — never "the AI" / "the coach"
+ *  - "Lenses" not "Assessments" / "Diagnostics"
+ *  - No "Platform" / "Architecture" anywhere.
+ *  - Lens activation = coach-recommended opt-in, NOT auto-activate.
+ *  - Miles are a UI unit, never marketed.
  */
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { Send, Sparkles, ArrowRight, LogIn, RefreshCw } from 'lucide-react';
+import { Send, ArrowRight, LogIn, RefreshCw, Sparkles, Shield, Compass, Check } from 'lucide-react';
 import { sendChatMessage } from '@/services/coze';
 import { useAuthStore } from '@/stores/authStore';
 import { SEO } from '@/components/seo/SEO';
@@ -27,108 +33,44 @@ import { reportError } from '@/analytics/errorMonitor';
 import { buildNexusSystemPrompt, buildNexusFirstResponse, NEXUS_FIRST_RESPONSE_QUICK_REPLIES } from '@/nexus/nexusKnowledge';
 import { buildLocalAssessmentContextForNexus, getAssessmentProgress, recommendNextAssessment } from '@/nexus/resultContextBuilder';
 import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
-import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, FONT_DISPLAY, FONT_BODY, FONT_MONO } from '@/tokens';
+import { V1 } from '@/styles/v1-tokens';
 
-// ── Dark surface ramp ──
-const SURFACE_BASE = '#0A0A12';    // page bg (deepest)
-const SURFACE_1 = '#101019';       // header / input well
-const SURFACE_2 = '#16161F';       // NEXUS bubble bg
-const SURFACE_3 = '#1C1C28';       // user bubble bg (slightly lighter)
-const BORDER_SUBTLE = 'rgba(255,255,255,0.08)';
-const BORDER_FOCUS = 'rgba(224,64,200,0.55)'; // fuchsia-tinted focus border
-const TEXT_PRIMARY = '#FFFFFF';
-const TEXT_SECONDARY = 'rgba(255,255,255,0.66)';
-const TEXT_DIM = 'rgba(255,255,255,0.42)';
-
-// ── Motion tokens (V1 micro-interactions: 120–350ms, ease-out) ──
-const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)';
-const REVEAL_MS = 200;
+// ── V1 motion tokens ──
+const EASE_OUT = V1.ease;
+const REVEAL_MS = V1.durNormal;
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
-  suggested_prompts?: string[];
   isError?: boolean;
-  /** The user text that triggered this assistant message (for retry). */
   promptText?: string;
 }
 
 const GUEST_MESSAGE_LIMIT = 3;
 const GUEST_STORAGE_KEY = 'nexus_guest_messages';
 
-// W4-2: quick-reply chips shown below the NEXUS first response. Specific,
-// framework-aware — not open-ended "how can I help?". Sourced from
-// nexusKnowledge so the system prompt + UI stay in sync.
 const QUICK_REPLIES = NEXUS_FIRST_RESPONSE_QUICK_REPLIES;
 
-// ── Markdown components tuned for dark premium chat ──
+/* ── Markdown components tuned for V1 light chat ── */
 const customComponents = {
-  table: ({ children }: any) => (
-    <div className="overflow-x-auto my-4">
-      <table className="min-w-full border-collapse" style={{ border: `1px solid ${BORDER_SUBTLE}` }}>{children}</table>
-    </div>
-  ),
-  th: ({ children }: any) => (
-    <th
-      className="px-4 py-2 font-semibold text-sm text-left"
-      style={{ border: `1px solid ${BORDER_SUBTLE}`, background: SURFACE_3 }}
-    >
-      {children}
-    </th>
-  ),
-  td: ({ children }: any) => (
-    <td className="px-4 py-2 text-sm" style={{ border: `1px solid ${BORDER_SUBTLE}`, color: TEXT_SECONDARY }}>
-      {children}
-    </td>
-  ),
-  tr: ({ children }: any) => <tr>{children}</tr>,
-  code: ({ inline, className, children, ...props }: any) => {
-    if (inline) {
-      return (
-        <code
-          className="px-1.5 py-0.5 text-xs"
-          style={{ background: SURFACE_3, color: ACCENT_LIGHT, fontFamily: FONT_MONO }}
-          {...props}
-        >
-          {children}
-        </code>
-      );
-    }
-    return (
-      <pre
-        className="p-4 overflow-x-auto my-3 text-xs"
-        style={{ background: SURFACE_BASE, color: 'rgba(255,255,255,0.85)', fontFamily: FONT_MONO, border: `1px solid ${BORDER_SUBTLE}` }}
-      >
-        <code className={className} {...props}>{children}</code>
-      </pre>
-    );
-  },
-  ul: ({ children }: any) => <ul className="list-disc pl-5 space-y-1.5 my-2" style={{ color: TEXT_SECONDARY }}>{children}</ul>,
-  ol: ({ children }: any) => <ol className="list-decimal pl-5 space-y-1.5 my-2" style={{ color: TEXT_SECONDARY }}>{children}</ol>,
-  li: ({ children }: any) => <li style={{ color: TEXT_SECONDARY }}>{children}</li>,
   a: ({ href, children }: any) => (
-    <a href={href} style={{ color: ACCENT_LIGHT, textDecoration: 'underline' }} target="_blank" rel="noopener noreferrer">{children}</a>
+    <a href={href} style={{ color: V1.teal700, textDecoration: 'underline' }} target="_blank" rel="noopener noreferrer">{children}</a>
   ),
-  p: ({ children }: any) => <p className="mb-3 last:mb-0 leading-relaxed" style={{ color: TEXT_PRIMARY }}>{children}</p>,
-  h1: ({ children }: any) => <h1 className="text-xl font-bold mb-3 mt-4" style={{ fontFamily: FONT_DISPLAY, color: TEXT_PRIMARY }}>{children}</h1>,
-  h2: ({ children }: any) => <h2 className="text-lg font-bold mb-2 mt-4" style={{ fontFamily: FONT_DISPLAY, color: TEXT_PRIMARY }}>{children}</h2>,
-  h3: ({ children }: any) => <h3 className="text-base font-semibold mb-1.5 mt-3" style={{ color: TEXT_PRIMARY }}>{children}</h3>,
-  strong: ({ children }: any) => <strong className="font-semibold" style={{ color: TEXT_PRIMARY }}>{children}</strong>,
-  em: ({ children }: any) => <em style={{ color: TEXT_SECONDARY }}>{children}</em>,
+  p: ({ children }: any) => <p style={{ margin: '0 0 10px', lineHeight: V1.leadingBody, color: V1.text, fontFamily: V1.bodyFont, fontSize: V1.textBody }}>{children}</p>,
+  h1: ({ children }: any) => <h1 style={{ fontFamily: V1.displayFont, color: V1.text, fontSize: V1.textH3, margin: '4px 0 10px', lineHeight: V1.leadingDisplay }}>{children}</h1>,
+  h2: ({ children }: any) => <h2 style={{ fontFamily: V1.displayFont, color: V1.text, fontSize: 18, margin: '4px 0 8px' }}>{children}</h2>,
+  h3: ({ children }: any) => <h3 style={{ fontFamily: V1.displayFont, color: V1.text, fontSize: 15, margin: '4px 0 6px' }}>{children}</h3>,
+  strong: ({ children }: any) => <strong style={{ color: V1.text, fontWeight: V1.fwSemibold }}>{children}</strong>,
+  em: ({ children }: any) => <em style={{ color: V1.textSecondary }}>{children}</em>,
+  ul: ({ children }: any) => <ul style={{ margin: '0 0 10px', paddingLeft: 18 }}>{children}</ul>,
+  li: ({ children }: any) => <li style={{ color: V1.text, fontFamily: V1.bodyFont, fontSize: V1.textBody, lineHeight: V1.leadingBody, marginBottom: 4 }}>{children}</li>,
 };
 
 function getGuestCount(): number {
-  try {
-    return parseInt(localStorage.getItem(GUEST_STORAGE_KEY) || '0', 10);
-  } catch {
-    return 0;
-  }
+  try { return parseInt(localStorage.getItem(GUEST_STORAGE_KEY) || '0', 10); } catch { return 0; }
 }
-
 function setGuestCount(count: number) {
-  try {
-    localStorage.setItem(GUEST_STORAGE_KEY, String(count));
-  } catch {}
+  try { localStorage.setItem(GUEST_STORAGE_KEY, String(count)); } catch {}
 }
 
 export function NEXUSPage() {
@@ -136,28 +78,17 @@ export function NEXUSPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // X2-8 (#1324): Compute assessment progress + next recommendation up front
-  // so the opening greeting can surface them. Runs once on mount (device-local
-  // history from resultHistory.ts — works without auth).
   const assessmentProgress = useMemo(() => getAssessmentProgress(), []);
   const nextRecommendation = useMemo(() => recommendNextAssessment(), []);
 
-  // W4-2: NEXUS speaks first. The opening message is a fixed, framework-aware
-  // template (NOT generated by the LLM) so the first impression is always
-  // specific and premium — never "How can I help you?". Greeted by name if
-  // the profile is known. Lazy initializer runs once on mount.
-  // X2-8 (#1324): when the user has prior results on this device, append a
-  // progress line + next-assessment recommendation to the greeting.
   const [messages, setMessages] = useState<Message[]>(() => {
     const base = buildNexusFirstResponse(profile?.name);
     let greeting = base;
     if (assessmentProgress.completed > 0) {
-      const progressLine =
-        `\n\nYou've completed ${assessmentProgress.completed} of ${assessmentProgress.total} assessments on this device.`;
+      const progressLine = `\n\nYou've completed ${assessmentProgress.completed} of ${assessmentProgress.total} assessments on this device.`;
       let recLine = '';
       if (nextRecommendation) {
-        recLine =
-          `\nBased on your history, I'd suggest **${nextRecommendation.name}** next — ${nextRecommendation.reason}`;
+        recLine = `\nBased on your history, I'd suggest **${nextRecommendation.name}** next — ${nextRecommendation.reason}`;
       }
       greeting = base + progressLine + recLine;
     }
@@ -170,18 +101,12 @@ export function NEXUSPage() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const firstMessageSentRef = useRef(false);
 
-  // #1324: Pre-fill the input when arriving with a `q` query param (e.g. from
-  // an "Ask NEXUS about this" CTA on the assessment results page).
   useEffect(() => {
     const q = searchParams.get('q');
-    if (q) {
-      setInput(q);
-      setTimeout(() => inputRef.current?.focus(), 0);
-    }
+    if (q) { setInput(q); setTimeout(() => inputRef.current?.focus(), 0); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  // #1324: Consume the `code` query param — inject assessment framework context.
   const codeParam = searchParams.get('code');
   const frameworkContext = useMemo(() => {
     if (!codeParam) return undefined;
@@ -197,40 +122,20 @@ export function NEXUSPage() {
     ].join('\n');
   }, [codeParam]);
 
-  // X2-7 (#1279): inject the user's local assessment history (device-local
-  // results from resultHistory.ts) so NEXUS can reference completed
-  // assessments, cross-assessment patterns, and progress tracking. This
-  // complements the frameworkContext above and the Supabase-backed path
-  // in NexusChat — works for the B2C single-rater flow without auth.
   const localAssessmentContext = useMemo(() => buildLocalAssessmentContextForNexus(), []);
-  const combinedContext = [frameworkContext, localAssessmentContext.contextString]
-    .filter(Boolean)
-    .join('\n\n');
-
-  const systemPrompt = useMemo(
-    () => buildNexusSystemPrompt(combinedContext).systemPrompt,
-    [combinedContext]
-  );
+  const combinedContext = [frameworkContext, localAssessmentContext.contextString].filter(Boolean).join('\n\n');
+  const systemPrompt = useMemo(() => buildNexusSystemPrompt(combinedContext).systemPrompt, [combinedContext]);
 
   const isGuest = !user;
   const remaining = isGuest ? Math.max(0, GUEST_MESSAGE_LIMIT - guestCount) : Infinity;
   const showGuestLimit = isGuest && guestCount >= GUEST_MESSAGE_LIMIT;
 
-  useEffect(() => {
-    trackNexusChatInitiation('direct_link');
-  }, []);
+  // First-session (Day 1) = no user message sent yet on this device.
+  const isFirstSession = !firstMessageSentRef.current && messages.length <= 1;
 
-  useEffect(() => {
-    if (isGuest) {
-      setGuestCountState(getGuestCount());
-    }
-  }, [isGuest]);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
-
-  // Auto-resize textarea
+  useEffect(() => { trackNexusChatInitiation('direct_link'); }, []);
+  useEffect(() => { if (isGuest) setGuestCountState(getGuestCount()); }, [isGuest]);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.style.height = 'auto';
@@ -241,19 +146,11 @@ export function NEXUSPage() {
   const send = async (messageText?: string) => {
     const text = messageText || input.trim();
     if (!text || loading) return;
-    if (showGuestLimit) {
-      navigate('/signup');
-      return;
-    }
-
-    if (messageText) {
-      trackCTA({ location: 'nexus_chat', label: 'Quick Reply', destination: undefined, context_id: messageText.slice(0, 80) });
-    }
-
+    if (showGuestLimit) { navigate('/signup'); return; }
+    if (messageText) trackCTA({ location: 'nexus_chat', label: 'Quick Reply', destination: undefined, context_id: messageText.slice(0, 80) });
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: text }]);
     setLoading(true);
-
     try {
       const response = await sendChatMessage(
         text,
@@ -262,342 +159,342 @@ export function NEXUSPage() {
         systemPrompt ? { systemPrompt } : undefined
       );
       setMessages(prev => [...prev, { role: 'assistant', content: response, promptText: text }]);
-
-      if (!firstMessageSentRef.current) {
-        firstMessageSentRef.current = true;
-        trackNexusFirstMessageSent('coze-gpt-4o');
-      }
+      if (!firstMessageSentRef.current) { firstMessageSentRef.current = true; trackNexusFirstMessageSent('coze-gpt-4o'); }
     } catch (e) {
       reportError(e, { scope: 'nexus:sendChatMessage', severity: 'warning' });
-      // W4-4: calm, premium error state — not red/alarming.
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: 'Something went wrong. Try again?',
-        isError: true,
-        promptText: text,
-      }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Something went wrong. Try again?', isError: true, promptText: text }]);
     }
     setLoading(false);
-
-    if (isGuest) {
-      const newCount = guestCount + 1;
-      setGuestCountState(newCount);
-      setGuestCount(newCount);
-    }
+    if (isGuest) { const n = guestCount + 1; setGuestCountState(n); setGuestCount(n); }
   };
 
-  // W4-4: Retry the failed message — re-send the original prompt text.
   const retry = (failedMessage: Message) => {
     if (!failedMessage.promptText || loading) return;
-    // Remove the error bubble, then re-send.
     setMessages(prev => prev.filter(m => m !== failedMessage));
     send(failedMessage.promptText);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      send();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   };
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: SURFACE_BASE, fontFamily: FONT_BODY }}
-    >
+    <div className="v1-scope" style={{ minHeight: '100vh', background: V1.bg }}>
       <SEO page="nexus" />
-
-      {/* Inline keyframes: message fade-in reveal (200ms ease-out) + pulsing dots */}
       <style>{`
-        @keyframes nexus-reveal {
-          from { opacity: 0; transform: translateY(6px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes nexus-reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .nexus-msg-enter { animation: nexus-reveal ${REVEAL_MS}ms ${EASE_OUT} both; }
-        @keyframes nexus-pulse {
-          0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
-          40%           { opacity: 1;    transform: scale(1); }
-        }
-        .nexus-dot { animation: nexus-pulse 1.4s ease-in-out infinite; }
+        @keyframes nexus-pulse { 0%,80%,100% { opacity: 0.25; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+        .nexus-dot { animation: nexus-pulse 1.4s ease-in-out infinite; display: inline-block; }
         .nexus-dot:nth-child(2) { animation-delay: 0.16s; }
         .nexus-dot:nth-child(3) { animation-delay: 0.32s; }
       `}</style>
 
-      {/* Header — clean, minimal, ocean accent indicator */}
-      <header
-        className="sticky top-0 z-10"
-        style={{
-          background: SURFACE_1,
-          borderBottom: `1px solid ${BORDER_SUBTLE}`,
-          paddingTop: 'env(safe-area-inset-top)',
-        }}
-      >
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 flex items-center justify-center"
-              style={{ background: ACCENT }}
-            >
-              <Sparkles className="w-4 h-4" style={{ color: TEXT_PRIMARY }} />
-            </div>
-            <div>
-              <h1 className="text-base font-bold leading-tight" style={{ fontFamily: FONT_DISPLAY, color: TEXT_PRIMARY }}>
-                NEXUS
-              </h1>
-              <p className="text-[10px] tracking-[0.22em] uppercase" style={{ fontFamily: FONT_MONO, color: TEXT_DIM }}>
-                Executive Intelligence
-              </p>
-            </div>
+      {/* ══════════ NAV (fixed, translucent cream, Day 1 label for first session) ══════════ */}
+      <nav className="v1-nav" aria-label="Primary">
+        <div className="v1-nav-inner">
+          <Link to="/" className="v1-wordmark" aria-label="NEXUS home">NEXUS<span className="v1-dot">.</span></Link>
+          <div className="v1-nav-links v1-hidden-mobile">
+            <Link to="/nexus/chat">Chat</Link>
+            <Link to="/nexus/lenses">Lenses</Link>
+            <Link to="/nexus/milestones">Milestones</Link>
           </div>
-          <div className="flex items-center gap-4">
-            {isGuest ? (
-              <Link
-                to="/login"
-                onClick={() => trackCTA({ location: 'nexus_chat', label: 'Sign in (header)', destination: '/login' })}
-                className="text-sm flex items-center gap-1.5 transition-colors"
-                style={{ color: TEXT_SECONDARY }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = TEXT_PRIMARY)}
-                onMouseLeave={(e) => (e.currentTarget.style.color = TEXT_SECONDARY)}
-              >
-                <LogIn className="w-4 h-4" />
-                Sign in
+          <div className="v1-nav-cta">
+            {isFirstSession ? (
+              <span className="v1-mono v1-mono-teal" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <span className="v1-status-dot v1-status-dot-teal" /> Day 1
+              </span>
+            ) : isGuest ? (
+              <Link to="/login" className="v1-btn v1-btn-secondary" onClick={() => trackCTA({ location: 'nexus_chat', label: 'Sign in (header)', destination: '/login' })}>
+                <LogIn size={15} /> Sign in
               </Link>
             ) : (
-              <div className="text-sm" style={{ color: TEXT_DIM }}>
-                {profile?.name || user?.email}
-              </div>
+              <span className="v1-avatar v1-avatar-sm" title={profile?.name || user?.email || ''}>
+                {(profile?.name || user?.email || 'U').slice(0, 1).toUpperCase()}
+              </span>
             )}
           </div>
         </div>
-      </header>
+      </nav>
 
-      {/* Chat area */}
-      <main
-        className="flex-1 flex flex-col max-w-4xl w-full mx-auto px-6 py-8"
-        style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}
-      >
-        {/* Messages — NEXUS speaks first (W4-2 first response is pre-injected) */}
-        <div className="flex-1 space-y-6 pb-6">
-          {messages.map((m, i) => (
-            <div
-              key={i}
-              className={`flex nexus-msg-enter ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className={`max-w-[85%] ${m.role === 'user' ? 'order-1' : ''}`}>
-                {m.role === 'assistant' && (
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <div
-                      className="w-5 h-5 flex items-center justify-center"
-                      style={{ background: `${ACCENT}22` }}
-                    >
-                      <Sparkles className="w-3 h-3" style={{ color: ACCENT_LIGHT }} />
+      {/* ══════════ 3-COLUMN APP SHELL ══════════ */}
+      <div className="v1-appshell" style={{ marginTop: V1.navHeight, height: `calc(100vh - ${V1.navHeight})` }}>
+
+        {/* ── LEFT SIDEBAR ── */}
+        <aside className="v1-appshell-col">
+          <div className="v1-sidebar-sticky">
+            {isFirstSession ? (
+              <div className="v1-sidebar-section">
+                <div className="v1-sidebar-label">Getting started</div>
+                <div className="v1-timeline" style={{ marginTop: 8 }}>
+                  {[
+                    { t: 'Start the conversation', done: false, active: true },
+                    { t: 'Add your first lens', done: false, active: false },
+                    { t: 'See your first insight', done: false, active: false },
+                    { t: 'Carry the thread forward', done: false, active: false },
+                  ].map((s, i) => (
+                    <div className={`v1-timeline-item ${s.active ? 'v1-active' : ''}`} key={i}>
+                      <div className="v1-timeline-marker" />
+                      <div style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: s.active ? V1.teal700 : V1.textSecondary, fontWeight: s.active ? V1.fwMedium : V1.fwRegular }}>
+                        {s.t}
+                      </div>
                     </div>
-                    <span
-                      className="text-[10px] font-semibold uppercase tracking-[0.18em]"
-                      style={{ fontFamily: FONT_MONO, color: TEXT_DIM }}
-                    >
-                      NEXUS
-                    </span>
-                  </div>
-                )}
-                {/* W4-4 chat bubbles — zero radius, dark premium
-                    User: dark bg + ocean accent left border (indicator)
-                    NEXUS: slightly lighter dark bg + clean white text */}
-                <div
-                  className="px-5 py-3.5 text-sm leading-relaxed"
-                  style={
-                    m.role === 'user'
-                      ? {
-                          background: SURFACE_3,
-                          borderLeft: `3px solid ${ACCENT}`,
-                          color: TEXT_PRIMARY,
-                          fontFamily: FONT_BODY,
-                        }
-                      : m.isError
-                        ? {
-                            background: SURFACE_2,
-                            border: `1px solid ${BORDER_SUBTLE}`,
-                            color: TEXT_SECONDARY,
-                            fontStyle: 'italic',
-                            fontFamily: FONT_BODY,
-                          }
-                        : {
-                            background: SURFACE_2,
-                            border: `1px solid ${BORDER_SUBTLE}`,
-                            color: TEXT_PRIMARY,
-                            fontFamily: FONT_BODY,
-                          }
-                  }
-                >
-                  {m.role === 'assistant' && !m.isError ? (
-                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={customComponents}>
-                      {m.content}
-                    </ReactMarkdown>
-                  ) : (
-                    m.content
-                  )}
-                </div>
-                {/* W4-4: calm error state — retry button, not red/alarming */}
-                {m.isError && (
-                  <button
-                    onClick={() => retry(m)}
-                    disabled={loading}
-                    className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-2 transition-all disabled:opacity-40"
-                    style={{
-                      background: 'transparent',
-                      border: `1px solid ${ACCENT}55`,
-                      color: ACCENT_LIGHT,
-                      fontFamily: FONT_BODY,
-                    }}
-                    onMouseEnter={(e) => { if (!loading) { e.currentTarget.style.background = `${ACCENT}1A`; } }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                  >
-                    <RefreshCw className="w-3 h-3" />
-                    Try again
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-          {/* W4-4 loading: 3 subtle pulsing dots — NOT a spinner, NOT bouncing dots */}
-          {loading && (
-            <div className="flex justify-start nexus-msg-enter">
-              <div className="max-w-[85%]">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div className="w-5 h-5 flex items-center justify-center" style={{ background: `${ACCENT}22` }}>
-                    <Sparkles className="w-3 h-3" style={{ color: ACCENT_LIGHT }} />
-                  </div>
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ fontFamily: FONT_MONO, color: TEXT_DIM }}>
-                    NEXUS
-                  </span>
-                </div>
-                <div
-                  className="px-5 py-4 flex items-center gap-1.5"
-                  style={{ background: SURFACE_2, border: `1px solid ${BORDER_SUBTLE}` }}
-                >
-                  <span className="nexus-dot inline-block w-1.5 h-1.5" style={{ background: ACCENT_LIGHT }} />
-                  <span className="nexus-dot inline-block w-1.5 h-1.5" style={{ background: ACCENT_LIGHT }} />
-                  <span className="nexus-dot inline-block w-1.5 h-1.5" style={{ background: ACCENT_LIGHT }} />
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
-          {/* W4-2: Quick-reply chips below the first response (only the greeting,
-              no user messages yet). Specific, framework-aware — not open-ended. */}
-          {messages.length === 1 && !loading && !showGuestLimit && (
-            <div className="flex flex-wrap gap-2.5 justify-start pl-1 nexus-msg-enter">
-              {QUICK_REPLIES.map((reply, i) => (
-                <button
-                  key={i}
-                  onClick={() => send(reply)}
-                  className="text-left px-4 py-2.5 text-sm font-medium transition-all group inline-flex items-center gap-2"
-                  style={{
-                    background: SURFACE_2,
-                    border: `1px solid ${BORDER_SUBTLE}`,
-                    color: TEXT_SECONDARY,
-                    fontFamily: FONT_BODY,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = SURFACE_3;
-                    e.currentTarget.style.borderColor = `${ACCENT}66`;
-                    e.currentTarget.style.color = TEXT_PRIMARY;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = SURFACE_2;
-                    e.currentTarget.style.borderColor = BORDER_SUBTLE;
-                    e.currentTarget.style.color = TEXT_SECONDARY;
-                  }}
-                >
-                  {reply}
-                  <ArrowRight className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100" style={{ color: ACCENT_LIGHT }} />
-                </button>
+            ) : (
+              <>
+                <div className="v1-sidebar-section">
+                  <div className="v1-sidebar-label">Workspace</div>
+                  <Link to="/nexus/chat" className="v1-sidebar-link v1-active">Chat</Link>
+                  <Link to="/nexus/lenses" className="v1-sidebar-link">Lenses</Link>
+                  <Link to="/nexus/milestones" className="v1-sidebar-link">Milestones</Link>
+                  <Link to="/app/documents" className="v1-sidebar-link">Documents</Link>
+                  <Link to="/app/billing" className="v1-sidebar-link">Billing</Link>
+                </div>
+                <div className="v1-sidebar-section">
+                  <div className="v1-sidebar-label">Depth</div>
+                  {['PRISM', 'SPARK', 'BRIDGE', 'IMPACT'].map(code => (
+                    <Link to="/nexus/lenses" key={code} className="v1-sidebar-link">{code}<span className="v1-sidebar-meta">lens</span></Link>
+                  ))}
+                  <Link to="/nexus/lenses" className="v1-sidebar-link">All 11 lenses</Link>
+                </div>
+                <div className="v1-sidebar-section">
+                  <div className="v1-sidebar-label">Human Layer</div>
+                  <Link to="/debrief/book" className="v1-sidebar-link">Book a debrief</Link>
+                  <Link to="/nexus/chat" className="v1-sidebar-link">Coaching packages</Link>
+                </div>
+              </>
+            )}
+          </div>
+        </aside>
+
+        {/* ── MAIN CHAT ── */}
+        <main className="v1-appshell-main" style={{ display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: `${V1.shellPad}px ${V1.shellPad}px 0` }}>
+            <div style={{ maxWidth: 720, margin: '0 auto', paddingBottom: 24 }}>
+
+              {/* Welcome block (first session only) */}
+              {isFirstSession && (
+                <div className="v1-card v1-card-focus nexus-msg-enter" style={{ marginBottom: 24, padding: 28 }}>
+                  <div className="v1-eyebrow" style={{ marginBottom: 12 }}>Welcome</div>
+                  <h1 className="v1-display" style={{ fontSize: V1.textH1, margin: '0 0 12px' }}>
+                    Start wherever you want. No form to fill out first.
+                  </h1>
+                  <p style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodyLg, lineHeight: V1.leadingBody, color: V1.textSecondary, margin: 0 }}>
+                    NEXUS speaks first. Say what is on your mind — a decision, a friction, a question you have been avoiding — and the thread begins.
+                  </p>
+                </div>
+              )}
+
+              {/* Message flow */}
+              {messages.map((m, i) => (
+                <div key={i} className={`nexus-msg-enter ${m.role === 'user' ? 'flex justify-end' : 'flex justify-start'}`} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start', marginBottom: 20 }}>
+                  <div style={{ maxWidth: '85%' }}>
+                    {m.role === 'assistant' && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                        <span className="v1-avatar v1-avatar-sm" style={{ width: 20, height: 20, fontSize: 9 }}>N</span>
+                        <span className="v1-mono" style={{ color: V1.textMuted }}>NEXUS</span>
+                      </div>
+                    )}
+                    <div style={
+                      m.role === 'user'
+                        ? { background: V1.ink900, color: V1.onDark, padding: '12px 16px', fontFamily: V1.bodyFont, fontSize: V1.textBody, lineHeight: V1.leadingBody, borderLeft: `3px solid ${V1.teal600}` }
+                        : m.isError
+                          ? { background: V1.surface, border: `1px solid ${V1.border}`, padding: '12px 16px', color: V1.textSecondary, fontStyle: 'italic', fontFamily: V1.bodyFont, fontSize: V1.textBody }
+                          : { background: V1.surface, border: `1px solid ${V1.border}`, padding: '12px 16px', color: V1.text, fontFamily: V1.bodyFont, fontSize: V1.textBody }
+                    }>
+                      {m.role === 'assistant' && !m.isError ? (
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={customComponents}>{m.content}</ReactMarkdown>
+                      ) : m.content}
+                    </div>
+                    {m.isError && (
+                      <button onClick={() => retry(m)} disabled={loading}
+                        className="v1-btn v1-btn-secondary" style={{ marginTop: 8, padding: '6px 12px', fontSize: 12, minHeight: 'auto' }}>
+                        <RefreshCw size={12} /> Try again
+                      </button>
+                    )}
+                  </div>
+                </div>
               ))}
-            </div>
-          )}
-          <div ref={bottomRef} />
-        </div>
 
-        {/* Guest limit banner — calm, premium */}
-        {showGuestLimit && (
-          <div className="p-6 mb-4 nexus-msg-enter" style={{ background: SURFACE_2, border: `1px solid ${ACCENT}33` }}>
-            <h3 className="text-lg font-bold mb-2" style={{ fontFamily: FONT_DISPLAY, color: TEXT_PRIMARY }}>
-              Unlock the full experience
-            </h3>
-            <p className="text-sm mb-4 leading-relaxed" style={{ color: TEXT_SECONDARY }}>
-              Create an Executive Introduction profile for full NEXUS access, all 6
-              assessments, personalized insights, and saved conversation history.
-            </p>
-            <Link
-              to="/signup"
-              onClick={() => trackCTA({ location: 'nexus_chat', label: 'Create Account (guest limit CTA)', destination: '/signup' })}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold transition-all"
-              style={{ background: ACCENT, color: TEXT_PRIMARY, fontFamily: FONT_BODY }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARK)}
-              onMouseLeave={(e) => (e.currentTarget.style.background = ACCENT)}
-            >
-              Create profile <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        )}
+              {/* Loading — 3 subtle pulsing dots */}
+              {loading && (
+                <div className="nexus-msg-enter" style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 20 }}>
+                  <div style={{ maxWidth: '85%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <span className="v1-avatar v1-avatar-sm" style={{ width: 20, height: 20, fontSize: 9 }}>N</span>
+                      <span className="v1-mono" style={{ color: V1.textMuted }}>NEXUS</span>
+                    </div>
+                    <div style={{ background: V1.surface, border: `1px solid ${V1.border}`, padding: '14px 16px', display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <span className="nexus-dot" style={{ width: 6, height: 6, background: V1.teal600 }} />
+                      <span className="nexus-dot" style={{ width: 6, height: 6, background: V1.teal600 }} />
+                      <span className="nexus-dot" style={{ width: 6, height: 6, background: V1.teal600 }} />
+                    </div>
+                  </div>
+                </div>
+              )}
 
-        {/* Input area — clean, minimal border, ocean send button, zero radius */}
-        <div className="mt-auto">
-          {isGuest && remaining > 0 && remaining < GUEST_MESSAGE_LIMIT && (
-            <div className="text-xs mb-2 text-center" style={{ color: TEXT_DIM }}>
-              {remaining} complimentary message{remaining === 1 ? '' : 's'} remaining
-            </div>
-          )}
-          <div
-            className="relative transition-colors"
-            style={{
-              background: SURFACE_1,
-              border: `1px solid ${BORDER_SUBTLE}`,
-              marginBottom: 'env(keyboard-inset-height, 0px)',
-            }}
-          >
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={
-                showGuestLimit
-                  ? 'Create a profile to continue...'
-                  : 'Ask about your results, leadership challenges, or assessments...'
-              }
-              disabled={showGuestLimit || loading}
-              rows={1}
-              className="w-full px-4 py-3.5 bg-transparent text-sm focus:outline-none resize-none disabled:opacity-50 leading-relaxed"
-              style={{
-                color: TEXT_PRIMARY,
-                fontFamily: FONT_BODY,
-                minHeight: '52px',
-                maxHeight: '150px',
-                caretColor: ACCENT_LIGHT,
-              }}
-              onFocus={(e) => { e.currentTarget.parentElement!.style.borderColor = BORDER_FOCUS; }}
-              onBlur={(e) => { e.currentTarget.parentElement!.style.borderColor = BORDER_SUBTLE; }}
-            />
-            <div className="absolute right-2.5 bottom-2.5">
-              <button
-                onClick={() => send()}
-                disabled={loading || !input.trim() || showGuestLimit}
-                className="w-9 h-9 flex items-center justify-center transition-all disabled:opacity-30"
-                style={{ background: ACCENT, color: TEXT_PRIMARY }}
-                onMouseEnter={(e) => { if (!loading && input.trim()) e.currentTarget.style.background = ACCENT_DARK; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = ACCENT; }}
-                aria-label="Send message"
-              >
-                <Send className="w-4 h-4" />
-              </button>
+              {/* First-session: lens activation card (coach-recommended opt-in) */}
+              {isFirstSession && !loading && (
+                <div className="v1-card v1-card-system nexus-msg-enter" style={{ marginBottom: 20, padding: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <Compass size={16} style={{ color: V1.onDark }} strokeWidth={1.4} />
+                    <span className="v1-mono v1-mono-on-dark">NEXUS proposes a lens</span>
+                  </div>
+                  <h3 className="v1-display" style={{ fontSize: V1.textH3, margin: '0 0 6px', color: V1.onDark }}>PRISM — professional branding</h3>
+                  <p style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.onDarkMuted, margin: '0 0 14px', lineHeight: V1.leadingBody }}>
+                    Adding PRISM would sharpen where you stand and how you are seen. You opt in deliberately — it costs 2 miles.
+                  </p>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <button className="v1-btn v1-btn-primary v1-on-dark" style={{ padding: '8px 16px', minHeight: 36, fontSize: 13 }}>Activate lens</button>
+                    <button className="v1-btn v1-btn-link" style={{ color: V1.onDarkMuted, fontSize: 13, minHeight: 36 }}>Not now</button>
+                  </div>
+                </div>
+              )}
+
+              {/* First-session: milestone inline badge */}
+              {isFirstSession && !loading && (
+                <div className="v1-milestone-badge nexus-msg-enter" style={{ marginBottom: 20, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <Check size={16} style={{ color: V1.fuchsia600, marginTop: 2 }} />
+                  <div>
+                    <div className="v1-mono" style={{ color: V1.fuchsia600, marginBottom: 2 }}>Milestone</div>
+                    <div style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.text, lineHeight: V1.leadingBody }}>
+                      First conversation begun. Your thread is now private and persistent.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Option chips / quick replies (first response only) */}
+              {messages.length === 1 && !loading && !showGuestLimit && (
+                <div className="nexus-msg-enter" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                  {QUICK_REPLIES.map((reply, i) => (
+                    <button key={i} onClick={() => send(reply)} className="v1-chip" style={{ minHeight: 36 }}>
+                      {reply} <ArrowRight size={13} />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Guest limit banner */}
+              {showGuestLimit && (
+                <div className="v1-card v1-card-addon nexus-msg-enter" style={{ marginBottom: 20, padding: 24 }}>
+                  <h3 className="v1-display" style={{ fontSize: V1.textH3, margin: '0 0 8px' }}>Unlock the full experience</h3>
+                  <p style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary, margin: '0 0 16px', lineHeight: V1.leadingBody }}>
+                    Create a profile for full NEXUS access, the 11-lens catalog, and saved conversation history.
+                  </p>
+                  <Link to="/signup" onClick={() => trackCTA({ location: 'nexus_chat', label: 'Create Account (guest limit CTA)', destination: '/signup' })} className="v1-btn v1-btn-primary">
+                    Create profile <ArrowRight size={15} />
+                  </Link>
+                </div>
+              )}
+
+              <div ref={bottomRef} />
             </div>
           </div>
-          <p className="text-xs text-center mt-2" style={{ color: TEXT_DIM }}>
-            NEXUS may produce inaccurate information. Verify critical decisions.
-          </p>
-        </div>
-      </main>
+
+          {/* Input bar */}
+          <div style={{ borderTop: `1px solid ${V1.border}`, background: V1.surface, padding: `${V1.shellPad}px`, paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))' }}>
+            <div style={{ maxWidth: 720, margin: '0 auto' }}>
+              {isGuest && remaining > 0 && remaining < GUEST_MESSAGE_LIMIT && (
+                <div className="v1-mono" style={{ textAlign: 'center', marginBottom: 8, color: V1.textDim }}>
+                  {remaining} complimentary message{remaining === 1 ? '' : 's'} remaining
+                </div>
+              )}
+              <div className="v1-input-row">
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={showGuestLimit ? 'Create a profile to continue...' : 'Ask NEXUS about a decision, a friction, or a question you have been avoiding...'}
+                  disabled={showGuestLimit || loading}
+                  rows={1}
+                  className="v1-textarea"
+                  style={{ minHeight: 40, maxHeight: 150 }}
+                />
+                <button onClick={() => send()} disabled={loading || !input.trim() || showGuestLimit} className="v1-send-btn" aria-label="Send message">
+                  <Send size={16} />
+                </button>
+              </div>
+              <p className="v1-mono" style={{ textAlign: 'center', marginTop: 8, color: V1.textDim }}>
+                NEXUS may produce inaccurate information. Verify critical decisions.
+              </p>
+            </div>
+          </div>
+        </main>
+
+        {/* ── RIGHT SIDEBAR — context panel ── */}
+        <aside className="v1-appshell-col">
+          <div className="v1-sidebar-sticky">
+            {isFirstSession ? (
+              <>
+                <div className="v1-sidebar-section">
+                  <div className="v1-sidebar-label">First-session progress</div>
+                  <div className="v1-timeline" style={{ marginTop: 8 }}>
+                    {[
+                      { t: 'Conversation started', done: true },
+                      { t: 'First lens activated', done: false, active: false },
+                      { t: 'First insight captured', done: false, active: false },
+                      { t: 'Thread saved', done: false, active: false },
+                    ].map((s, i) => (
+                      <div className={`v1-timeline-item ${s.done ? 'v1-completed' : ''}`} key={i}>
+                        <div className="v1-timeline-marker" />
+                        <div style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: s.done ? V1.text : V1.textSecondary }}>
+                          {s.t}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="v1-progress" style={{ marginTop: 16 }}>
+                    <div className="v1-progress-fill" style={{ width: '25%' }} />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="v1-sidebar-section">
+                  <div className="v1-sidebar-label">Active lens</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span className="v1-status-dot v1-status-dot-teal" />
+                    <span className="v1-display" style={{ fontSize: 18 }}>PRISM</span>
+                  </div>
+                  <p style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary, margin: 0, lineHeight: V1.leadingBody }}>
+                    professional branding · 2 miles
+                  </p>
+                </div>
+                <div className="v1-sidebar-section">
+                  <div className="v1-sidebar-label">What we're working on</div>
+                  <p style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary, margin: 0, lineHeight: V1.leadingBody }}>
+                    How you are perceived relative to where you want to go next.
+                  </p>
+                </div>
+                <div className="v1-sidebar-section">
+                  <div className="v1-sidebar-label">What we've learned</div>
+                  <p style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary, margin: 0, lineHeight: V1.leadingBody }}>
+                    No insights captured yet. They will collect here as the thread grows.
+                  </p>
+                </div>
+                <div className="v1-sidebar-section">
+                  <div className="v1-sidebar-label">Thinking style</div>
+                  <p style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary, margin: 0, lineHeight: V1.leadingBody }}>
+                    Socratic. NEXUS asks before it advises.
+                  </p>
+                </div>
+              </>
+            )}
+            <div className="v1-sidebar-section">
+              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                <Shield size={14} style={{ color: V1.teal600, marginTop: 2, flexShrink: 0 }} strokeWidth={1.4} />
+                <p className="v1-mono" style={{ color: V1.textMuted, lineHeight: V1.leadingLabel, textTransform: 'none', letterSpacing: 0, fontFamily: V1.bodyFont, fontSize: 11 }}>
+                  Your context stays yours. Nothing leaves this thread without your say.
+                </p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }
