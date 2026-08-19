@@ -131,6 +131,13 @@ const DiagnosticLandingPage = lazy(() => import('@/pages/DiagnosticLandingPage')
 const DiagnosticTakePage = lazy(() => import('@/pages/DiagnosticTakePage').then(m => ({ default: m.DiagnosticTakePage })));
 const DiagnosticResultsPage = lazy(() => import('@/pages/DiagnosticResultsPage').then(m => ({ default: m.DiagnosticResultsPage })));
 
+// ── V3 IA — Lenses library + post-diagnostic readout (V1 line-art system) ──
+// Replaces AssessmentCatalogPage at /nexus/lenses; LensReadoutPage is the V1
+// presentation layer over the existing diagnosticScoring getResult() API
+// (scoring logic untouched — 100% presentation re-skin).
+const LensesLibraryPage = lazy(() => import('@/pages/LensesLibraryPage').then(m => ({ default: m.LensesLibraryPage })));
+const LensReadoutPage = lazy(() => import('@/pages/LensReadoutPage').then(m => ({ default: m.LensReadoutPage })));
+
 // ── Authenticated user pages — shared across leader / (in future) candidate ──
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
@@ -285,7 +292,19 @@ export default function App() {
             <Route path="nexus/chat" element={<NexusChatPage />} />
             {/* V2 IA — canonical NEXUS workspace URLs. Sidebar links from /nexus/chat.
                 Lenses = assessment catalog (public). Milestones = dashboard (auth'd). */}
-            <Route path="nexus/lenses" element={<AssessmentCatalogPage />} />
+            <Route path="nexus/lenses" element={<LensesLibraryPage />} />
+            {/* V3 IA — canonical lens detail + readout. /nexus/lenses/:code delegates
+                to the existing specialized landing by code where one exists; the
+                catch-all falls through to CanonicalInstrumentLanding (canon-driven,
+                handles all 11). /nexus/lenses/:code/readout/:resultId is the V1
+                presentation layer over the existing diagnosticScoring getResult() API. */}
+            <Route path="nexus/lenses/prism" element={<PrismLanding />} />
+            <Route path="nexus/lenses/spark" element={<SparkLanding />} />
+            <Route path="nexus/lenses/cpi" element={<CpiFlagshipLanding />} />
+            <Route path="nexus/lenses/leap" element={<LeapLanding />} />
+            <Route path="nexus/lenses/impact" element={<ImpactLanding />} />
+            <Route path="nexus/lenses/:code" element={<CanonicalInstrumentLanding />} />
+            <Route path="nexus/lenses/:code/readout/:resultId" element={<LensReadoutPage />} />
             <Route path="nexus/milestones" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="pricing" element={<PricingPage />} />
             <Route path="b2b" element={<B2BLanding />} />
@@ -305,24 +324,28 @@ export default function App() {
             <Route path="assessment" element={<Navigate to="/nexus/lenses" replace />} />
 
             {/* ── Canonical singular assessment landing routes (V3-2) ── */}
-            <Route path="assessment/prism" element={<PrismLanding />} />
+            {/* V3 IA — landing routes redirect to /nexus/lenses/[code] (new canonical).
+                The specialized landing components (PrismLanding, CpiFlagshipLanding,
+                etc.) are now rendered at /nexus/lenses/[code] (see NEXUS workspace
+                block above). Take + results routes untouched. */}
+            <Route path="assessment/prism" element={<Navigate to="/nexus/lenses/prism" replace />} />
             <Route path="assessment/prism/take" element={<PrismTakePage />} />
-            <Route path="assessment/spark" element={<SparkLanding />} />
+            <Route path="assessment/spark" element={<Navigate to="/nexus/lenses/spark" replace />} />
             <Route path="assessment/spark/take" element={<SparkTakePage />} />
             <Route path="assessment/spark/results/:id" element={<SparkResultsPage />} />
             {/* Explicit redirects for instruments that have no landing data */}
-            <Route path="assessment/cpi" element={<CpiFlagshipLanding />} />
+            <Route path="assessment/cpi" element={<Navigate to="/nexus/lenses/cpi" replace />} />
             <Route path="assessment/cpi/take" element={<CpiTakePage />} />
             <Route path="assessment/shift" element={<Navigate to="/assessments" replace />} />
-            <Route path="assessment/leap" element={<LeapLanding />} />
+            <Route path="assessment/leap" element={<Navigate to="/nexus/lenses/leap" replace />} />
             <Route path="assessment/leap/take" element={<LeapTakePage />} />
             <Route path="assessment/leap/results/:id" element={<LeapResultsPage />} />
-            <Route path="assessment/quest" element={<Navigate to="/assessments" replace />} />
+            <Route path="assessment/quest" element={<Navigate to="/nexus/lenses/quest" replace />} />
             <Route path="assessment/quest/take" element={<QuestTakePage />} />
-            <Route path="assessment/impact" element={<ImpactLanding />} />
+            <Route path="assessment/impact" element={<Navigate to="/nexus/lenses/impact" replace />} />
             <Route path="assessment/impact/take" element={<ImpactTakePage />} />
             <Route path="assessment/impact/results/:id" element={<ImpactResultsPage />} />
-            <Route path="assessment/coach" element={<Navigate to="/assessments" replace />} />
+            <Route path="assessment/coach" element={<Navigate to="/nexus/lenses/coach" replace />} />
             <Route path="assessment/coach/take" element={<CoachTakePage />} />
             {/* X3: Nav 7 explicit take routes — must come before :code catch-all */}
             <Route path="assessment/forge/take" element={<ForgeTakePage />} />
@@ -330,9 +353,15 @@ export default function App() {
             <Route path="assessment/drive/take" element={<DriveTakePage />} />
             <Route path="assessment/mosaic/take" element={<MosaicTakePage />} />
             {/* Generic canonical landing for 4 remaining instruments: FORGE, BRIDGE, MOSAIC, DRIVE */}
-            <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />
+            <Route path="assessment/:code" element={<Navigate to="/nexus/lenses/:code" replace />} />
             {/* Batch 5 · W4-T10 — Assessment depth pages (deep-link only, not browsable from nav). 11 instances, data-driven from canon. */}
             <Route path="assessment/:code/deep" element={<AssessmentDepthPage />} />
+            {/* V3 IA — redirect legacy :id-style results URLs to the V1 readout page.
+                Catches /assessment/leap/results/:id, /assessment/spark/results/:id,
+                /assessment/impact/results/:id, and any future :id-style results URL.
+                (No-id variants like /assessment/cpi/results stay as-is — they have
+                their own specialized results components with bespoke loading logic.) */}
+            <Route path="assessment/:code/results/:id" element={<Navigate to="/nexus/lenses/:code/readout/:id" replace />} />
 
             {/* Results routes — post-assessment (shareable / bookmarkable) */}
             {/* Keep all results routes — bookmarks from prior sessions must not break. */}
