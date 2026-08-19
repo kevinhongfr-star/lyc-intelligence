@@ -146,6 +146,14 @@ const LensReadoutPage = lazy(() => import('@/pages/LensReadoutPage').then(m => (
 // all untouched.
 const LensTakeFlowPage = lazy(() => import('@/pages/LensTakeFlowPage').then(m => ({ default: m.LensTakeFlowPage })));
 
+// ── V4 IA — Milestones dashboard + Human Depth coaching + Settings + Insights
+// Presentation-layer rebuilds. Route spec locked; milestone/booking/billing
+// engines untouched.
+const MilestonesDashboardPage = lazy(() => import('@/pages/MilestonesDashboardPage').then(m => ({ default: m.MilestonesDashboardPage })));
+const HumanDepthPage = lazy(() => import('@/pages/HumanDepthPage').then(m => ({ default: m.HumanDepthPage })));
+const AccountSettingsPage = lazy(() => import('@/pages/AccountSettingsPage').then(m => ({ default: m.AccountSettingsPage })));
+const InsightsPage = lazy(() => import('@/pages/InsightsPage').then(m => ({ default: m.InsightsPage })));
+
 // ── V3 IA — Legacy redirect helpers ──
 // React Router v6 <Navigate> does not auto-substitute route params, so we use
 // small wrapper components that read useParams() and construct the target
@@ -335,7 +343,13 @@ export default function App() {
                 saveResponse / completeAttempt / resumeAnonAttempt). */}
             <Route path="nexus/lenses/:code/take" element={<LensTakeFlowPage />} />
             <Route path="nexus/lenses/:code/readout/:resultId" element={<LensReadoutPage />} />
-            <Route path="nexus/milestones" element={<Navigate to="/app/dashboard" replace />} />
+            {/* V4 IA — NEXUS workspace product pages inside marketing chrome so
+                unauthenticated users can preview the surfaces; LeaderPortalLayout
+                also mounts the same pages under /app/nexus/* for auth'd users. */}
+            <Route path="nexus/milestones" element={<MilestonesDashboardPage />} />
+            <Route path="nexus/coaching" element={<HumanDepthPage />} />
+            <Route path="nexus/settings" element={<AccountSettingsPage />} />
+            <Route path="nexus/insights" element={<InsightsPage />} />
             <Route path="pricing" element={<PricingPage />} />
             <Route path="b2b" element={<B2BLanding />} />
             <Route path="match" element={<MatchPage />} />
@@ -343,8 +357,12 @@ export default function App() {
             {/* DEX B2C public landing. DEX /app/dex/* routes are auth'd. */}
             <Route path="dex" element={<DexLandingPage />} />
 
-            {/* ── Batch 5 · Debrief booking system (public marketing surfaces) ── */}
-            <Route path="debrief" element={<DebriefLandingPage />} />
+            {/* ── Batch 5 · Debrief booking system (public marketing surfaces) ──
+                 V4 IA: /debrief (marketing) → /nexus/coaching (in-app page). The
+                 legacy DebriefLandingPage still serves /debrief/book via the
+                 booking flow below; the main marketing entry now routes to the
+                 canonical coaching product page. */}
+            <Route path="debrief" element={<Navigate to="/nexus/coaching" replace />} />
             <Route path="debrief/book" element={<BookDebriefPage />} />
 
             {/* Assessment catalog — V2 IA: canonical URL is now /nexus/lenses.
@@ -432,21 +450,33 @@ export default function App() {
           <Route path="/app" element={<LeaderPortalLayout />}>
             <Route index element={<Navigate to="nexus" replace />} />
             <Route path="nexus" element={<NexusChatPage />} />
+            {/* V4 IA — /app/nexus/* canonical NEXUS workspace. Keeps chat at
+                /app/nexus (above) and ships V4 product sub-pages here so
+                LeaderPortalLayout auth guards apply. */}
+            <Route path="nexus/milestones" element={<MilestonesDashboardPage />} />
+            <Route path="nexus/coaching" element={<HumanDepthPage />} />
+            <Route path="nexus/settings" element={<AccountSettingsPage />} />
+            <Route path="nexus/insights" element={<InsightsPage />} />
             <Route path="chat" element={<Navigate to="nexus" replace />} />
 
-            {/* Exec user workspace */}
-            <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="results" element={<ProgressPage />} />
-            <Route path="profile" element={<ProfilePage />} />
+            {/* Exec user workspace — V4 legacy redirects. Old route names kept
+                as 301-style `replace` redirects so bookmarks don't 404. */}
+            <Route path="dashboard" element={<Navigate to="nexus/milestones" replace />} />
+            <Route path="results" element={<Navigate to="nexus/milestones" replace />} />
+            <Route path="profile" element={<Navigate to="nexus/settings" replace />} />
             <Route path="documents" element={<DocumentsPage />} />
 
             {/* Assessment flow deep-links (auth'd access to take/purchase) */}
             <Route path="assessments" element={<AssessmentPage />} />
             <Route path="assessment/:code" element={<CanonicalInstrumentLanding />} />
 
-            {/* Billing + subscription self-serve */}
-            <Route path="billing" element={<BillingDashboard />} />
-            <Route path="subscription" element={<Navigate to="billing" replace />} />
+            {/* Billing + subscription self-serve — V4 IA: consolidated into
+                /nexus/settings → Plan tab. Stripe/Stripe callbacks and admin
+                surfaces keep the legacy BillingDashboard live via
+                /app/billing-legacy. Canon user entry is now Settings → Plan. */}
+            <Route path="billing" element={<Navigate to="nexus/settings" replace />} />
+            <Route path="billing-legacy" element={<BillingDashboard />} />
+            <Route path="subscription" element={<Navigate to="nexus/settings" replace />} />
 
             {/* Batch 5 · Human debrief bookings (B2C leader portal) */}
             <Route path="bookings" element={<MyBookingsPage />} />
