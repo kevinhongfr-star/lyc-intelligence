@@ -1,12 +1,21 @@
+/**
+ * V4.5.1 — AUTH PAGE (Login)
+ *
+ * Route: /login
+ *
+ * Centered card on cream background, marketing page layout (not app shell).
+ * V1 line-art system: bordered card, no shadow, 0px radius, teal primary,
+ * mono labels, serif display title.
+ *
+ * Auth logic, validation, OAuth — all stay the same. 100% visual re-skin.
+ */
 import React, { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Shield } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { getDefaultRoute } from '@/components/auth/PostLoginRedirect';
 import { trackLoginSuccess } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
-import { DS } from '@/tokens';
-import { Logo } from '@/components/ui/Logo';
+import { V1 } from '@/styles/v1-tokens';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -58,129 +67,200 @@ export function LoginPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg }}>
-      {/* Header */}
-      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <Logo size="md" variant="light" />
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <Link to="/" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Back to site</Link>
-        </div>
+    <div className="v1-scope" style={{ minHeight: '100vh', background: V1.bg }}>
+      <style>{`
+        .v1-scope input:focus {
+          border-color: ${V1.teal600} !important;
+          outline: none;
+        }
+        .v1-scope input::placeholder { color: ${V1.textDim}; }
+        @keyframes auth-reveal { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .auth-enter { animation: auth-reveal ${V1.durNormal}ms ${V1.ease} both; }
+      `}</style>
+
+      {/* ── Nav: minimal, wordmark + back link ── */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0,
+        height: V1.navHeight,
+        background: V1.bg,
+        borderBottom: `1px solid ${V1.border}`,
+        zIndex: 100,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: `0 ${V1.shellPad}px`,
+      }}>
+        <Link to="/" className="v1-wordmark" aria-label="NEXUS home">
+          NEXUS<span className="v1-dot">.</span>
+        </Link>
+        <Link to="/" style={{
+          fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+          color: V1.textMuted, textDecoration: 'none',
+        }}>
+          Back to site
+        </Link>
       </nav>
 
-      {/* Login Form */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 24px' }}>
-        <div style={{ maxWidth: '400px', width: '100%' }}>
+      {/* ── Centered card ── */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '64px 24px',
+        minHeight: '100vh',
+      }}>
+        <div className="auth-enter" style={{ maxWidth: 400, width: '100%' }}>
 
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div style={{ width: '48px', height: '48px',  background: `${DS.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-              <Shield style={{ width: 24, height: 24, color: DS.accent }} />
+          {/* Brand wordmark + tagline */}
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <div style={{
+              fontFamily: V1.displayFont, fontSize: 28, color: V1.teal700,
+              letterSpacing: V1.trackingTight, marginBottom: 4,
+            }}>
+              NEXUS<span style={{ color: V1.fuchsia600 }}>.</span>
             </div>
-            <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
-              Platform Access
-            </h1>
-            <p style={{ fontSize: '14px', color: DS.muted, lineHeight: 1.6 }}>
-              Leadership Intelligence Platform
-            </p>
+            <div className="v1-mono" style={{
+              fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+              textTransform: 'uppercase', color: V1.textMuted,
+            }}>
+              Executive intelligence
+            </div>
           </div>
 
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '32px', boxShadow: DS.shadow }}>
-            <form onSubmit={handleSubmit}
-              onMouseEnter={handleMouseEnter}
-            >
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+          {/* Page title */}
+          <h1 style={{
+            fontFamily: V1.displayFont, fontSize: 30, color: V1.text,
+            fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+            lineHeight: V1.leadingDisplay, margin: '0 0 8px', textAlign: 'center',
+          }}>
+            Sign in
+          </h1>
+          <p style={{
+            fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary,
+            lineHeight: 1.5, textAlign: 'center', margin: '0 0 32px',
+          }}>
+            Your workspace is where you left it.
+          </p>
+
+          {/* Card */}
+          <div style={{
+            border: `1px solid ${V1.border}`,
+            padding: 32,
+            background: V1.surface,
+          }}>
+            <form onSubmit={handleSubmit} onMouseEnter={handleMouseEnter}>
+
+              {/* Email */}
+              <div style={{ marginBottom: 20 }}>
+                <label className="v1-mono" style={{
+                  display: 'block', fontSize: V1.textMonoPx,
+                  letterSpacing: V1.trackingMono, textTransform: 'uppercase',
+                  color: V1.textMuted, marginBottom: 8,
+                }}>
                   Email
                 </label>
-                <div style={{ position: 'relative' }}>
-                  <Mail style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: 18, height: 18, color: DS.muted }} />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@company.com"
-                    autoComplete="email"
-                    style={{
-                      width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
-                      color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
-                      fontFamily: DS.bodyFont,
-                    }}
-                  />
-                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  autoComplete="email"
+                  style={{
+                    width: '100%', padding: '12px 16px',
+                    background: V1.bg, border: `1px solid ${V1.borderStrong}`,
+                    color: V1.text, fontSize: 15, outline: 'none',
+                    minHeight: 44, fontFamily: V1.bodyFont,
+                    boxSizing: 'border-box',
+                  }}
+                />
               </div>
 
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+              {/* Password */}
+              <div style={{ marginBottom: 20 }}>
+                <label className="v1-mono" style={{
+                  display: 'block', fontSize: V1.textMonoPx,
+                  letterSpacing: V1.trackingMono, textTransform: 'uppercase',
+                  color: V1.textMuted, marginBottom: 8,
+                }}>
                   Password
                 </label>
-                <div style={{ position: 'relative' }}>
-                  <Lock style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: 18, height: 18, color: DS.muted }} />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
-                    style={{
-                      width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
-                      color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
-                      fontFamily: DS.bodyFont,
-                    }}
-                  />
-                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  style={{
+                    width: '100%', padding: '12px 16px',
+                    background: V1.bg, border: `1px solid ${V1.borderStrong}`,
+                    color: V1.text, fontSize: 15, outline: 'none',
+                    minHeight: 44, fontFamily: V1.bodyFont,
+                    boxSizing: 'border-box',
+                  }}
+                />
               </div>
 
+              {/* Error */}
               {error && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: '#FEF2F2',  color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
-                  <AlertCircle style={{ width: 18, height: 18, flexShrink: 0 }} />
+                <div style={{
+                  padding: '12px 16px',
+                  border: `1px solid ${V1.fuchsia600}`,
+                  background: V1.fuchsia50,
+                  color: V1.fuchsia700,
+                  fontSize: V1.textBodySm, fontFamily: V1.bodyFont,
+                  marginBottom: 20, lineHeight: 1.4,
+                }}>
                   {error}
                 </div>
               )}
 
+              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
-                className="cta-glow"
                 style={{
                   width: '100%', padding: '14px',
-                  background: DS.accent, color: '#FFFFFF',
-                  border: 'none', 
-                  fontSize: '15px', fontWeight: 600,
+                  background: V1.teal800, color: V1.white,
+                  border: 'none', fontSize: 15, fontWeight: V1.fwSemibold,
                   cursor: loading ? 'not-allowed' : 'pointer',
                   opacity: loading ? 0.7 : 1,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  minHeight: '48px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
-                  fontFamily: DS.bodyFont,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  minHeight: 48, fontFamily: V1.bodyFont,
+                  transition: `background ${V1.durFast}ms ${V1.ease}`,
                 }}
+                onMouseEnter={(e) => !loading && (e.currentTarget.style.background = V1.teal900)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = V1.teal800)}
               >
-                {loading ? (
-                  <><Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} />Signing in...</>
-                ) : (
-                  <>Sign In <ArrowRight style={{ width: 18, height: 18 }} /></>
-                )}
+                {loading ? 'Signing in...' : 'Sign in →'}
               </button>
-              <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
-                  <Link to="/reset-password" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none', fontFamily: DS.bodyFont }}>
-                    Forgot password?
-                  </Link>
-                  <span style={{ fontSize: '13px', color: DS.border }}>·</span>
-                  <Link to="/signup" style={{ fontSize: '13px', color: DS.accent, textDecoration: 'none', fontFamily: DS.bodyFont, fontWeight: 500 }}>
-                    Create account
-                  </Link>
-                </div>
+
+              {/* Footer links */}
+              <div style={{
+                display: 'flex', justifyContent: 'center', gap: 16,
+                marginTop: 16,
+              }}>
+                <Link to="/reset-password" style={{
+                  fontSize: V1.textBodySm, color: V1.textMuted,
+                  textDecoration: 'none', fontFamily: V1.bodyFont,
+                }}>
+                  Forgot password?
+                </Link>
+                <span style={{ fontSize: V1.textBodySm, color: V1.border }}>.</span>
+                <Link to="/signup" style={{
+                  fontSize: V1.textBodySm, color: V1.teal700,
+                  textDecoration: 'none', fontFamily: V1.bodyFont,
+                  fontWeight: V1.fwMedium,
+                }}>
+                  Create account
+                </Link>
               </div>
             </form>
           </div>
 
-          <p style={{ fontSize: '12px', color: DS.muted, textAlign: 'center', marginTop: '20px', lineHeight: 1.5 }}>
-            Sign in to access LYC Intelligence.
+          <p style={{
+            fontSize: 12, color: V1.textMuted, textAlign: 'center',
+            marginTop: 20, lineHeight: 1.5, fontFamily: V1.bodyFont,
+          }}>
+            Your context stays yours.
           </p>
         </div>
       </div>
-
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; } input::placeholder { color: ${DS.muted}; }`}</style>
     </div>
   );
 }

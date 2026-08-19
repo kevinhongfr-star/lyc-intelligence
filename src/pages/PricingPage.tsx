@@ -85,6 +85,9 @@ const LANDING_TIERS: LandingTier[] = [
 /* ── Feature comparison table (3 visible tiers × rows) ──
  * Rows are factual capability comparisons — no "unlimited", no marketing fluff.
  * Tier values: '—' (not included) / specific value.
+ *
+ * V4.5.6: rows organized by category (AI Coaching, Diagnostics / Lenses,
+ * Memory & Context, Human Depth, Support) — grouped headers + 1px rules.
  */
 interface ComparisonRow {
   feature: string;
@@ -92,16 +95,51 @@ interface ComparisonRow {
   professional: string;
   executive: string;
 }
+interface ComparisonCategory {
+  label: string;
+  rows: ComparisonRow[];
+}
 
-const COMPARISON_ROWS: ComparisonRow[] = [
-  { feature: 'NEXUS messages / day',     explorer: '20',         professional: 'No cap',          executive: 'No cap, priority' },
-  { feature: 'Lens catalog',            explorer: 'PRISM + LEAP', professional: 'All 11 lenses',  executive: 'All 11 lenses' },
-  { feature: 'Miles / month',           explorer: '2',           professional: '5',               executive: '15' },
-  { feature: 'PDF readouts',             explorer: 'Plain',       professional: 'Branded',         executive: 'Branded + shareable' },
-  { feature: 'Percentile benchmarking',  explorer: '—',           professional: 'Standard',       executive: 'Full' },
-  { feature: 'Consultant debriefs',      explorer: '—',          professional: 'Add-on',          executive: 'Quarterly included' },
-  { feature: 'Council eligibility',      explorer: '—',          professional: '—',               executive: 'Yes' },
-  { feature: 'Human coaching add-on',    explorer: '—',          professional: 'Optional',        executive: 'Optional' },
+const COMPARISON_CATEGORIES: ComparisonCategory[] = [
+  {
+    label: 'AI Coaching',
+    rows: [
+      { feature: 'NEXUS messages / day',  explorer: '20',           professional: 'No cap',          executive: 'No cap, priority' },
+      { feature: 'Priority NEXUS responses', explorer: '—',        professional: '—',               executive: 'Yes' },
+      { feature: 'Advisory frameworks',  explorer: 'Basic',         professional: 'Full',            executive: 'Full + custom' },
+    ],
+  },
+  {
+    label: 'Diagnostics / Lenses',
+    rows: [
+      { feature: 'Lens catalog',         explorer: 'PRISM + LEAP', professional: 'All 11 lenses',   executive: 'All 11 lenses' },
+      { feature: 'Miles / month',        explorer: '2',            professional: '5',               executive: '15' },
+      { feature: 'Percentile benchmarking', explorer: '—',         professional: 'Standard',       executive: 'Full' },
+    ],
+  },
+  {
+    label: 'Memory & Context',
+    rows: [
+      { feature: 'Conversation memory',  explorer: '7 days',       professional: 'Unlimited',      executive: 'Unlimited' },
+      { feature: 'Cross-assessment memory', explorer: '—',          professional: 'Yes',            executive: 'Yes + composite' },
+      { feature: 'Document enrichment',   explorer: '1 document',   professional: '25 documents',   executive: 'Unlimited' },
+    ],
+  },
+  {
+    label: 'Human Depth',
+    rows: [
+      { feature: 'PDF readouts',          explorer: 'Plain',        professional: 'Branded',         executive: 'Branded + shareable' },
+      { feature: 'Consultant debriefs',   explorer: '—',            professional: 'Add-on',          executive: 'Quarterly included' },
+      { feature: 'Human coaching add-on', explorer: '—',            professional: 'Optional',        executive: 'Optional' },
+    ],
+  },
+  {
+    label: 'Support',
+    rows: [
+      { feature: 'Council eligibility',   explorer: '—',            professional: '—',               executive: 'Yes' },
+      { feature: 'Response window',       explorer: 'Standard',    professional: 'Standard',       executive: 'Priority' },
+    ],
+  },
 ];
 
 /* ── Human Depth add-on packages (Bronze / Silver / Gold) ──
@@ -299,13 +337,35 @@ export function PricingPage({ onUpgradeSuccess }: PricingPageProps) {
                 </tr>
               </thead>
               <tbody>
-                {COMPARISON_ROWS.map((row, i) => (
-                  <tr key={row.feature} style={{ borderBottom: `1px solid ${V1.dividerRow}` }}>
-                    <td style={{ padding: '14px 12px', color: V1.text, fontWeight: V1.fwMedium }}>{row.feature}</td>
-                    <td style={{ padding: '14px 12px', color: row.explorer === '—' ? V1.textDim : V1.textSecondary }}>{row.explorer}</td>
-                    <td style={{ padding: '14px 12px', color: row.professional === '—' ? V1.textDim : V1.textSecondary }}>{row.professional}</td>
-                    <td style={{ padding: '14px 12px', color: row.executive === '—' ? V1.textDim : V1.textSecondary }}>{row.executive}</td>
-                  </tr>
+                {COMPARISON_CATEGORIES.map(cat => (
+                  <React.Fragment key={cat.label}>
+                    {/* Category subhead row — spans all 4 columns */}
+                    <tr style={{ background: V1.surfaceAlt }}>
+                      <td
+                        colSpan={4}
+                        style={{
+                          padding: '12px 12px 8px',
+                          fontFamily: V1.monoFont,
+                          fontSize: V1.textCaption,
+                          letterSpacing: V1.trackingMono,
+                          textTransform: 'uppercase',
+                          color: V1.teal700,
+                          fontWeight: V1.fwSemibold,
+                          borderBottom: `1px solid ${V1.dividerRow}`,
+                        }}
+                      >
+                        {cat.label}
+                      </td>
+                    </tr>
+                    {cat.rows.map((row) => (
+                      <tr key={row.feature} style={{ borderBottom: `1px solid ${V1.dividerRow}` }}>
+                        <td style={{ padding: '14px 12px', color: V1.text, fontWeight: V1.fwMedium }}>{row.feature}</td>
+                        <td style={{ padding: '14px 12px', color: row.explorer === '—' ? V1.textDim : V1.textSecondary }}>{row.explorer}</td>
+                        <td style={{ padding: '14px 12px', color: row.professional === '—' ? V1.textDim : V1.textSecondary }}>{row.professional}</td>
+                        <td style={{ padding: '14px 12px', color: row.executive === '—' ? V1.textDim : V1.textSecondary }}>{row.executive}</td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

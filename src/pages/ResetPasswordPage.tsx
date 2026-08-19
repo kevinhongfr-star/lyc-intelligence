@@ -1,14 +1,27 @@
+/**
+ * V4.5.1 — AUTH PAGE (Reset password / Set new password)
+ *
+ * Route: /reset-password
+ *
+ * Dual-mode: if arrived via PASSWORD_RECOVERY email link → "set new password"
+ * form. Otherwise → "request reset link" form + confirmation screens.
+ *
+ * Centered card on cream background, marketing page layout (not app shell).
+ * V1 line-art system: bordered card, no shadow, 0px radius, teal primary,
+ * mono labels, serif display title, text symbols (no Lucide), editorial
+ * success cards (no decorative checkmarks).
+ *
+ * Auth logic, validation, OAuth — all stay the same. 100% visual re-skin.
+ */
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Lock, ArrowLeft, ArrowRight, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import {
   validatePasswordStrength,
   passwordScoreLabel,
   passwordScoreColor,
 } from '@/lib/auth/passwordPolicy';
-import { DS } from '@/tokens';
-import { Logo } from '@/components/ui/Logo';
+import { V1 } from '@/styles/v1-tokens';
 
 type Mode = 'request' | 'reset';
 
@@ -88,146 +101,203 @@ export function ResetPasswordPage() {
   // ── Success screens ────────────────────────────────────────────────
   if (mode === 'request' && sent) {
     return (
-      <div style={{ minHeight: '100vh', background: DS.bg }}>
-        <Nav />
+      <Shell>
         <Center>
-          <Header
-            title="Check Your Email"
-            subtitle="If an account exists, you'll receive a reset link shortly."
+          <BrandMast />
+          <PageTitle
+            title="Check your email"
+            sub="If an account exists, you'll receive a reset link shortly."
           />
-          <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', padding: '32px', textAlign: 'center' }}>
-            <CheckCircle style={{ width: 48, height: 48, color: '#16A34A', margin: '0 auto 16px' }} />
-            <p style={{ fontSize: '15px', color: '#166534', fontFamily: DS.bodyFont, lineHeight: 1.6 }}>
-              If an account exists for <strong>{email}</strong>, a reset link is on its way. The link expires in 60 minutes for security.
+          <Card>
+            <div className="v1-mono" style={{
+              fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+              textTransform: 'uppercase', color: V1.teal700,
+              textAlign: 'center', marginBottom: 12,
+            }}>
+              Sent
+            </div>
+            <p style={{
+              fontSize: V1.textBodySm, color: V1.text,
+              fontFamily: V1.bodyFont, lineHeight: V1.leadingBody,
+              textAlign: 'center', margin: 0,
+            }}>
+              If an account exists for <strong>{email}</strong>, a reset link is
+              on its way. The link expires in 60 minutes for security.
             </p>
-            <Link to="/login" style={{ display: 'inline-block', marginTop: '20px', color: DS.accent, fontSize: '14px', fontFamily: DS.bodyFont }}>
-              Return to login
-            </Link>
-          </div>
+            <div style={{
+              borderTop: `1px solid ${V1.dividerSubtle}`,
+              marginTop: 24, paddingTop: 20, textAlign: 'center',
+            }}>
+              <Link to="/login" style={footerLinkStyle}>
+                Return to login →
+              </Link>
+            </div>
+          </Card>
         </Center>
-      </div>
+      </Shell>
     );
   }
 
   if (mode === 'reset' && updated) {
     return (
-      <div style={{ minHeight: '100vh', background: DS.bg }}>
-        <Nav />
+      <Shell>
         <Center>
-          <Header
-            title="Password Updated"
-            subtitle="Your account is secured with your new password."
+          <BrandMast />
+          <PageTitle
+            title="Password updated"
+            sub="Your account is secured with your new password."
           />
-          <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', padding: '32px', textAlign: 'center' }}>
-            <CheckCircle style={{ width: 48, height: 48, color: '#16A34A', margin: '0 auto 16px' }} />
-            <p style={{ fontSize: '15px', color: '#166534', fontFamily: DS.bodyFont, lineHeight: 1.6 }}>
-              Your password has been updated successfully. You can now sign in with your new credentials.
+          <Card>
+            <div className="v1-mono" style={{
+              fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+              textTransform: 'uppercase', color: V1.teal700,
+              textAlign: 'center', marginBottom: 12,
+            }}>
+              Done
+            </div>
+            <p style={{
+              fontSize: V1.textBodySm, color: V1.text,
+              fontFamily: V1.bodyFont, lineHeight: V1.leadingBody,
+              textAlign: 'center', margin: 0,
+            }}>
+              Your password has been updated successfully. You can now sign in
+              with your new credentials.
             </p>
-            <Link to="/login" style={{ display: 'inline-block', marginTop: '20px', color: DS.accent, fontSize: '14px', fontFamily: DS.bodyFont }}>
-              Continue to login
-            </Link>
-          </div>
+            <div style={{
+              borderTop: `1px solid ${V1.dividerSubtle}`,
+              marginTop: 24, paddingTop: 20, textAlign: 'center',
+            }}>
+              <Link to="/login" style={footerLinkStyle}>
+                Continue to login →
+              </Link>
+            </div>
+          </Card>
         </Center>
-      </div>
+      </Shell>
     );
   }
 
   // ── Form screens ───────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg }}>
-      <Nav />
+    <Shell>
       <Center>
-        <Header
-          title={mode === 'reset' ? 'Set New Password' : 'Reset Password'}
-          subtitle={
+        <BrandMast />
+        <PageTitle
+          title={mode === 'reset' ? 'Set new password' : 'Reset password'}
+          sub={
             mode === 'reset'
               ? 'Choose a strong password to secure your account'
               : 'Enter your email to receive a password reset link'
           }
         />
 
-        <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`, padding: '32px' }}>
+        <Card>
           {mode === 'request' ? (
             <form onSubmit={handleRequest}>
               <Field label="Email">
-                <InputWithIcon icon={<Mail style={{ width: 18, height: 18, color: DS.muted }} />}>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@company.com"
-                    autoComplete="email"
-                    style={inputStyle()}
-                  />
-                </InputWithIcon>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  autoComplete="email"
+                  style={inputStyle()}
+                />
               </Field>
 
               {error && <ErrorBanner>{error}</ErrorBanner>}
 
-              <SubmitButton loading={loading} label="Send Reset Link" />
+              <SubmitButton loading={loading} label="Send reset link" />
             </form>
           ) : (
             <form onSubmit={handleReset}>
-              <Field label="New Password">
-                <InputWithIcon icon={<Lock style={{ width: 18, height: 18, color: DS.muted }} />}>
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="At least 12 characters"
-                    autoComplete="new-password"
-                    style={inputStyle()}
-                  />
-                </InputWithIcon>
+              <Field label="New password">
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="At least 12 characters"
+                  autoComplete="new-password"
+                  style={inputStyle()}
+                />
               </Field>
 
               {/* #1312: password strength meter */}
-              <PasswordStrengthMeter strength={pwdStrength} />
+              {newPassword && (
+                <PasswordStrengthMeter strength={pwdStrength} />
+              )}
 
-              <Field label="Confirm New Password" style={{ marginTop: '16px' }}>
-                <InputWithIcon icon={<Lock style={{ width: 18, height: 18, color: DS.muted }} />}>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Re-enter your new password"
-                    autoComplete="new-password"
-                    style={inputStyle()}
-                  />
-                </InputWithIcon>
+              <Field label="Confirm new password" style={{ marginTop: 20 }}>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-enter your new password"
+                  autoComplete="new-password"
+                  style={inputStyle()}
+                />
               </Field>
 
               {error && <ErrorBanner>{error}</ErrorBanner>}
 
-              <SubmitButton loading={loading} label="Update Password" icon />
+              <SubmitButton loading={loading} label="Update password" />
             </form>
           )}
-        </div>
+        </Card>
 
         {mode === 'reset' && (
-          <p style={{ fontSize: '12px', color: DS.muted, textAlign: 'center', marginTop: '20px', lineHeight: 1.5, fontFamily: DS.bodyFont }}>
-            Reset links expire after 60 minutes. If your link has expired, request a new one from the login page.
+          <p style={{
+            fontSize: 12, color: V1.textMuted, textAlign: 'center',
+            marginTop: 20, lineHeight: 1.5, fontFamily: V1.bodyFont,
+          }}>
+            Reset links expire after 60 minutes. If your link has expired,
+            request a new one from the login page.
           </p>
         )}
       </Center>
-
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; }
-        input::placeholder { color: ${DS.muted}; }
-      `}</style>
-    </div>
+    </Shell>
   );
 }
 
 // ── Inline subcomponents (kept local — single-use) ──────────────────
 
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="v1-scope" style={{ minHeight: '100vh', background: V1.bg }}>
+      <style>{`
+        .v1-scope input:focus {
+          border-color: ${V1.teal600} !important;
+          outline: none;
+        }
+        .v1-scope input::placeholder { color: ${V1.textDim}; }
+        @keyframes auth-reveal { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .auth-enter { animation: auth-reveal ${V1.durNormal}ms ${V1.ease} both; }
+      `}</style>
+      <Nav />
+      {children}
+    </div>
+  );
+}
+
 function Nav() {
   return (
-    <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
-      <Logo size="md" variant="light" />
-      <Link to="/login" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: DS.muted, textDecoration: 'none', fontFamily: DS.bodyFont }}>
-        <ArrowLeft style={{ width: 14, height: 14 }} /> Back to login
+    <nav style={{
+      position: 'fixed', top: 0, left: 0, right: 0,
+      height: V1.navHeight,
+      background: V1.bg,
+      borderBottom: `1px solid ${V1.border}`,
+      zIndex: 100,
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: `0 ${V1.shellPad}px`,
+    }}>
+      <Link to="/" className="v1-wordmark" aria-label="NEXUS home">
+        NEXUS<span className="v1-dot">.</span>
+      </Link>
+      <Link to="/login" style={{
+        fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+        color: V1.textMuted, textDecoration: 'none',
+      }}>
+        Back to login
       </Link>
     </nav>
   );
@@ -235,42 +305,85 @@ function Nav() {
 
 function Center({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 24px' }}>
-      <div style={{ maxWidth: '420px', width: '100%' }}>{children}</div>
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '64px 24px', minHeight: '100vh',
+    }}>
+      <div className="auth-enter" style={{ maxWidth: 400, width: '100%' }}>
+        {children}
+      </div>
     </div>
   );
 }
 
-function Header({ title, subtitle }: { title: string; subtitle: string }) {
+function BrandMast() {
   return (
-    <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-      <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
+    <div style={{ textAlign: 'center', marginBottom: 32 }}>
+      <div style={{
+        fontFamily: V1.displayFont, fontSize: 28, color: V1.teal700,
+        letterSpacing: V1.trackingTight, marginBottom: 4,
+      }}>
+        NEXUS<span style={{ color: V1.fuchsia600 }}>.</span>
+      </div>
+      <div className="v1-mono" style={{
+        fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+        textTransform: 'uppercase', color: V1.textMuted,
+      }}>
+        Executive intelligence
+      </div>
+    </div>
+  );
+}
+
+function PageTitle({ title, sub }: { title: string; sub: string }) {
+  return (
+    <div style={{ textAlign: 'center', marginBottom: 32 }}>
+      <h1 style={{
+        fontFamily: V1.displayFont, fontSize: 30, color: V1.text,
+        fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+        lineHeight: V1.leadingDisplay, margin: '0 0 8px',
+      }}>
         {title}
       </h1>
-      <p style={{ fontSize: '14px', color: DS.muted, lineHeight: 1.6, fontFamily: DS.bodyFont }}>
-        {subtitle}
+      <p style={{
+        fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+        color: V1.textSecondary, lineHeight: 1.5, margin: 0,
+      }}>
+        {sub}
       </p>
     </div>
   );
 }
 
-function Field({ label, children, style }: { label: string; children: React.ReactNode; style?: React.CSSProperties }) {
+function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: '16px', ...style }}>
-      <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px', fontFamily: DS.bodyFont }}>
-        {label}
-      </label>
+    <div style={{
+      border: `1px solid ${V1.border}`,
+      padding: 32, background: V1.surface,
+    }}>
       {children}
     </div>
   );
 }
 
-function InputWithIcon({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+const footerLinkStyle: React.CSSProperties = {
+  fontFamily: V1.bodyFont,
+  fontSize: V1.textBodySm,
+  color: V1.teal700,
+  textDecoration: 'none',
+  fontWeight: V1.fwMedium,
+};
+
+function Field({ label, children, style }: { label: string; children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ position: 'relative' }}>
-      <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
-        {icon}
-      </div>
+    <div style={{ marginBottom: 20, ...style }}>
+      <label className="v1-mono" style={{
+        display: 'block', fontSize: V1.textMonoPx,
+        letterSpacing: V1.trackingMono, textTransform: 'uppercase',
+        color: V1.textMuted, marginBottom: 8,
+      }}>
+        {label}
+      </label>
       {children}
     </div>
   );
@@ -279,28 +392,36 @@ function InputWithIcon({ icon, children }: { icon: React.ReactNode; children: Re
 function inputStyle(): React.CSSProperties {
   return {
     width: '100%',
-    padding: '12px 16px 12px 44px',
-    background: DS.bg,
-    border: `1px solid ${DS.cardBorder}`,
-    color: DS.text,
-    fontSize: '15px',
+    padding: '12px 16px',
+    background: V1.bg,
+    border: `1px solid ${V1.borderStrong}`,
+    color: V1.text,
+    fontSize: 15,
     outline: 'none',
-    minHeight: '44px',
-    fontFamily: DS.bodyFont,
+    minHeight: 44,
+    fontFamily: V1.bodyFont,
     boxSizing: 'border-box',
   };
 }
 
 function ErrorBanner({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: '#FEF2F2', color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
-      <AlertCircle style={{ width: 18, height: 18, flexShrink: 0 }} />
+    <div style={{
+      padding: '12px 16px',
+      border: `1px solid ${V1.fuchsia600}`,
+      background: V1.fuchsia50,
+      color: V1.fuchsia700,
+      fontSize: V1.textBodySm,
+      fontFamily: V1.bodyFont,
+      marginBottom: 20,
+      lineHeight: 1.4,
+    }}>
       {children}
     </div>
   );
 }
 
-function SubmitButton({ loading, label, icon }: { loading: boolean; label: string; icon?: boolean }) {
+function SubmitButton({ loading, label }: { loading: boolean; label: string }) {
   return (
     <button
       type="submit"
@@ -308,56 +429,63 @@ function SubmitButton({ loading, label, icon }: { loading: boolean; label: strin
       style={{
         width: '100%',
         padding: '14px',
-        background: DS.accent,
-        color: '#FFFFFF',
+        background: V1.teal800,
+        color: V1.white,
         border: 'none',
-        fontSize: '15px',
-        fontWeight: 600,
+        fontSize: 15,
+        fontWeight: V1.fwSemibold,
         cursor: loading ? 'not-allowed' : 'pointer',
         opacity: loading ? 0.7 : 1,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '8px',
-        minHeight: '48px',
-        transition: 'background-color 200ms cubic-bezier(0.4,0,0.2,1)',
-        fontFamily: DS.bodyFont,
+        gap: 8,
+        minHeight: 48,
+        fontFamily: V1.bodyFont,
+        transition: `background ${V1.durFast}ms ${V1.ease}`,
       }}
+      onMouseEnter={(e) => !loading && (e.currentTarget.style.background = V1.teal900)}
+      onMouseLeave={(e) => (e.currentTarget.style.background = V1.teal800)}
     >
-      {loading ? (
-        <><Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} />{label}...</>
-      ) : (
-        <>
-          {label}
-          {icon && <ArrowRight style={{ width: 18, height: 18 }} />}
-        </>
-      )}
+      {loading ? `${label}...` : `${label} →`}
     </button>
   );
 }
 
 function PasswordStrengthMeter({ strength }: { strength: ReturnType<typeof validatePasswordStrength> }) {
   return (
-    <div style={{ marginTop: '8px', marginBottom: '4px' }}>
-      <div style={{ display: 'flex', height: '4px', background: '#E5E5E5' }}>
+    <div style={{ marginTop: 10, marginBottom: 4 }}>
+      <div style={{
+        display: 'flex', height: 2, background: V1.dividerRow,
+      }}>
         {[0, 1, 2, 3, 4].map((level) => (
           <div
             key={level}
             style={{
               width: '20%',
-              background: level < strength.score ? passwordScoreColor(strength.score) : 'transparent',
-              borderRight: level < 4 ? '1px solid #FFFFFF' : 'none',
-              transition: 'background-color 200ms cubic-bezier(0.4,0,0.2,1)',
+              background: level < strength.score
+                ? passwordScoreColor(strength.score)
+                : 'transparent',
+              borderRight: level < 4 ? `1px solid ${V1.surface}` : 'none',
+              transition: `background-color ${V1.durNormal}ms ${V1.ease}`,
             }}
           />
         ))}
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: '4px', fontFamily: DS.bodyFont }}>
-        <span style={{ color: passwordScoreColor(strength.score) }}>
+      <div style={{
+        display: 'flex', justifyContent: 'space-between',
+        fontSize: V1.textCaption, marginTop: 6, fontFamily: V1.bodyFont,
+      }}>
+        <span className="v1-mono" style={{
+          letterSpacing: V1.trackingMono, textTransform: 'uppercase',
+          color: V1.textMuted,
+        }}>
           {strength.score > 0 ? passwordScoreLabel(strength.score) : ' '}
         </span>
         {strength.warnings.length > 0 && (
-          <span style={{ color: '#B91C1C' }}>{strength.warnings[0]}</span>
+          <span style={{ color: V1.fuchsia700 }}>
+            {strength.warnings[0]}
+          </span>
         )}
       </div>
     </div>

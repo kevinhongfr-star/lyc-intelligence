@@ -1,20 +1,14 @@
-
+/**
+ * V4.5.2 — Document uploader (V1 re-skin)
+ *
+ * Shared drop-zone + type selector. All upload logic, file validation,
+ * type catalog, and drag/drop behavior preserved verbatim. Only the
+ * rendering surface changes (V1 line-art system: dashed border, text
+ * symbols, mono labels, teal primary, 0px radius, no shadows).
+ */
 import React, { useState } from 'react';
-import { Upload, X, FileText, AlertCircle, Loader2 } from 'lucide-react';
 import { DocumentType, DOCUMENT_TYPE_LABELS } from '../../services/documentService';
-
-const DS = {
-  accent: '#C108AB',
-  bg: '#0A0A0A',
-  card: '#111111',
-  muted: '#888888',
-  text: '#FFFFFF',
-  textSecondary: '#CCCCCC',
-  border: '#222222',
-  error: '#EF4444',
-  success: '#10B981',
-  radius: '0'
-};
+import { V1 } from '@/styles/v1-tokens';
 
 interface Props {
   onUpload: (file: File, type: DocumentType) => void;
@@ -23,11 +17,11 @@ interface Props {
   maxSizeMB?: number;
 }
 
-export function DocumentUploader({ 
-  onUpload, 
-  isUploading, 
+export function DocumentUploader({
+  onUpload,
+  isUploading,
   accept = '.pdf,.docx,.txt',
-  maxSizeMB = 10 
+  maxSizeMB = 10,
 }: Props) {
   const [dragOver, setDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -56,7 +50,7 @@ export function DocumentUploader({
 
   const validateAndSelectFile = (file: File) => {
     setError(null);
-    
+
     // Size check
     const maxSize = maxSizeMB * 1024 * 1024;
     if (file.size > maxSize) {
@@ -83,40 +77,74 @@ export function DocumentUploader({
   };
 
   return (
-    <div style={{ background: DS.card, border: `1px solid ${DS.border}`,  padding: '24px' }}>
+    <div className="v1-scope" style={{ background: V1.surface, border: `1px solid ${V1.border}` }}>
       {selectedFile ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '16px', background: DS.bg, border: `1px solid ${DS.border}` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <FileText style={{ width: 24, height: 24, color: DS.accent }} />
-              <div>
-                <p style={{ fontSize: '14px', color: DS.text, margin: 0, fontWeight: 500 }}>{selectedFile.name}</p>
-                <p style={{ fontSize: '12px', color: DS.muted, margin: '4px 0 0' }}>
+        <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Selected file row */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 12, padding: '14px 16px',
+            background: V1.bg, border: `1px solid ${V1.border}`,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+              <div className="v1-mono" style={{
+                width: 32, height: 32, flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: `1px solid ${V1.borderStrong}`,
+                color: V1.teal700, fontSize: 14,
+              }} aria-hidden="true">
+                ↑
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <p style={{
+                  fontSize: 14, color: V1.text, margin: 0,
+                  fontWeight: V1.fwMedium, fontFamily: V1.bodyFont,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>{selectedFile.name}</p>
+                <p className="v1-mono" style={{
+                  fontSize: V1.textCaption, color: V1.textMuted,
+                  margin: '4px 0 0', letterSpacing: V1.trackingMono,
+                }}>
                   {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                 </p>
               </div>
             </div>
-            <button onClick={() => setSelectedFile(null)} disabled={isUploading} style={{ background: 'none', border: 'none', color: DS.muted, cursor: 'pointer', padding: '4px' }}>
-              <X style={{ width: 18, height: 18 }} />
+            <button
+              onClick={() => setSelectedFile(null)}
+              disabled={isUploading}
+              aria-label="Remove file"
+              className="v1-mono"
+              style={{
+                background: 'none', border: 'none',
+                color: V1.textMuted, cursor: isUploading ? 'not-allowed' : 'pointer',
+                padding: '4px 8px', fontSize: V1.textBodySm,
+                fontFamily: V1.bodyFont,
+              }}
+            >
+              Remove
             </button>
           </div>
 
+          {/* Type selector */}
           <div>
-            <label style={{ fontSize: '12px', color: DS.muted, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Document Type
+            <label className="v1-mono" style={{
+              display: 'block', fontSize: V1.textMonoPx,
+              letterSpacing: V1.trackingMono, textTransform: 'uppercase',
+              color: V1.textMuted, marginBottom: 8,
+            }}>
+              Document type
             </label>
-            <select 
+            <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value as DocumentType)}
               disabled={isUploading}
               style={{
-                width: '100%',
-                padding: '10px 14px',
-                background: DS.bg,
-                border: `1px solid ${DS.border}`,
-                color: DS.text,
-                fontSize: '14px',
-                cursor: 'pointer'
+                width: '100%', padding: '12px 16px',
+                background: V1.bg, border: `1px solid ${V1.borderStrong}`,
+                color: V1.text, fontSize: 15, outline: 'none',
+                minHeight: 44, fontFamily: V1.bodyFont,
+                boxSizing: 'border-box', cursor: 'pointer',
+                appearance: 'none', WebkitAppearance: 'none',
               }}
             >
               {(Object.entries(DOCUMENT_TYPE_LABELS) as [DocumentType, string][]).map(([key, label]) => (
@@ -126,38 +154,35 @@ export function DocumentUploader({
           </div>
 
           {error && (
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '10px 14px', background: `${DS.error}15`, border: `1px solid ${DS.error}30` }}>
-              <AlertCircle style={{ width: 16, height: 16, color: DS.error }} />
-              <span style={{ fontSize: '13px', color: DS.textSecondary }}>{error}</span>
+            <div style={{
+              padding: '12px 16px',
+              border: `1px solid ${V1.fuchsia600}`,
+              background: V1.fuchsia50,
+              color: V1.fuchsia700,
+              fontSize: V1.textBodySm, fontFamily: V1.bodyFont,
+              lineHeight: 1.4,
+            }}>
+              {error}
             </div>
           )}
 
-          <button 
-            onClick={handleSubmit} 
+          <button
+            onClick={handleSubmit}
             disabled={isUploading}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '12px 24px',
-              background: DS.accent,
-              color: '#FFF',
-              border: 'none',
-              fontSize: '14px',
-              fontWeight: 600,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              padding: '14px 24px',
+              background: V1.teal800, color: V1.white,
+              border: 'none', fontSize: 15, fontWeight: V1.fwSemibold,
               cursor: isUploading ? 'not-allowed' : 'pointer',
-              opacity: isUploading ? 0.6 : 1
+              opacity: isUploading ? 0.7 : 1,
+              minHeight: 48, fontFamily: V1.bodyFont,
+              transition: `background ${V1.durFast}ms ${V1.ease}`,
             }}
+            onMouseEnter={(e) => !isUploading && (e.currentTarget.style.background = V1.teal900)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = V1.teal800)}
           >
-            {isUploading ? (
-              <>
-                <Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />
-                Uploading...
-              </>
-            ) : (
-              'Upload Document'
-            )}
+            {isUploading ? 'Uploading...' : 'Upload document →'}
           </button>
         </div>
       ) : (
@@ -166,36 +191,49 @@ export function DocumentUploader({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           style={{
-            border: `2px dashed ${dragOver ? DS.accent : DS.border}`,
+            border: `1px dashed ${dragOver ? V1.teal600 : V1.borderStrong}`,
             padding: '48px 24px',
             textAlign: 'center',
-            background: dragOver ? `${DS.accent}10` : 'transparent',
-            transition: 'all 0.2s ease'
+            background: dragOver ? V1.teal50 : V1.surface,
+            transition: `border-color ${V1.durFast}ms ${V1.ease}, background ${V1.durFast}ms ${V1.ease}`,
           }}
         >
-          <Upload style={{ width: 36, height: 36, color: dragOver ? DS.accent : DS.muted, marginBottom: '16px' }} />
-          <p style={{ fontSize: '14px', color: DS.text, marginBottom: '8px' }}>
-            Drag and drop your file here, or
-          </p>
-          <label style={{
-            display: 'inline-block',
-            padding: '8px 20px',
-            background: `${DS.accent}20`,
-            color: DS.accent,
-            fontSize: '14px',
-            fontWeight: 600,
-            cursor: 'pointer'
+          {/* Line-art upload mark */}
+          <div aria-hidden="true" style={{
+            width: 48, height: 48, margin: '0 auto 16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            border: `1px solid ${V1.borderStrong}`,
+            color: dragOver ? V1.teal700 : V1.textMuted,
+            fontFamily: V1.monoFont, fontSize: 20,
           }}>
-            Browse Files
-            <input type="file" accept={accept} hidden onChange={handleFileSelect} />
-          </label>
-          <p style={{ fontSize: '12px', color: DS.muted, marginTop: '16px' }}>
-            PDF, DOCX, or TXT (max {maxSizeMB}MB)
+            ↑
+          </div>
+          <p style={{
+            fontFamily: V1.bodyFont, fontSize: V1.textBody,
+            color: V1.text, margin: '0 0 12px',
+          }}>
+            Drag files here or{' '}
+            <label style={{
+              display: 'inline-block',
+              color: V1.teal700,
+              fontWeight: V1.fwMedium,
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+            }}>
+              click to upload
+              <input type="file" accept={accept} hidden onChange={handleFileSelect} />
+            </label>
+          </p>
+          <p className="v1-mono" style={{
+            fontSize: V1.textCaption, color: V1.textMuted,
+            letterSpacing: V1.trackingMono, textTransform: 'uppercase',
+            margin: 0,
+          }}>
+            PDF, DOCX, TXT · max {maxSizeMB}MB
           </p>
         </div>
       )}
-
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

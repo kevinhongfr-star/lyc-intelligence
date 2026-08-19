@@ -1,62 +1,192 @@
 /**
- * LegalPages — Terms of Service, Privacy Policy, Cookie Policy (S4-T03)
+ * V4.5.7 — LEGAL PAGES (V1 re-skin)
  *
- * Public legal compliance pages required before production launch.
- * Content covers the key sections specified in the Legal Pages spec,
- * including GDPR + PIPL user rights, third-party processors
- * (DeepSeek, Supabase, Stripe), and PRC/Shanghai governing law.
+ * Routes: /terms, /privacy, /cookies
+ *
+ * Marketing layout, light mode.
+ *  - Header: wordmark + nav (minimal)
+ *  - Mono eyebrow: page title (e.g. "Terms of Service")
+ *  - Display title
+ *  - Body content (existing legal text — unchanged)
+ *  - Proper heading hierarchy (h1 → h2)
+ *  - Minimal footer
+ *
+ * V1 rules: 0px radius, no shadows, cream background, serif display, mono
+ * labels, teal primary. Text labels for status (no red/green backgrounds).
+ * Privacy actions panel: bordered boxes, no spinner, no destructive-red chrome.
+ *
+ * All legal content, GDPR/PIPL rights text, third-party processors, PRC
+ * governing law, and self-service export/delete logic stays the same.
  */
 import React, { useState } from 'react';
-import { ArrowLeft, FileText, Shield, Cookie, Download, Trash2, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { authFetch } from '@/utils/authFetch';
 import { SEO } from '@/components/seo/SEO';
-import { DS } from '@/tokens';
+import { V1 } from '@/styles/v1-tokens';
 
 interface Section {
   heading: string;
   body: React.ReactNode;
 }
 
-function LegalLayout({ title, icon, intro, sections, lastUpdated, actions }: {
+const LEGAL_NAV = [
+  { to: '/terms', label: 'Terms' },
+  { to: '/privacy', label: 'Privacy' },
+  { to: '/cookies', label: 'Cookies' },
+];
+
+function LegalLayout({ title, eyebrow, intro, sections, lastUpdated, actions }: {
   title: string;
-  icon: React.ReactNode;
+  eyebrow: string;
   intro: string;
   sections: Section[];
   lastUpdated: string;
   actions?: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-3xl mx-auto px-4 md:px-6 py-12">
-        <a href="/" className="flex items-center gap-1 text-sm text-gray-500 hover:text-fuchsia mb-8">
-          <ArrowLeft className="w-4 h-4" /> Back to home
-        </a>
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-fuchsia/10 text-fuchsia flex items-center justify-center">{icon}</div>
-          <h1
-            className="text-3xl font-bold"
-            style={{ color: DS.text, fontFamily: DS.headingFont }}
-          >
-            {title}
-          </h1>
+    <div className="v1-scope" style={{ minHeight: '100vh', background: V1.bg, color: V1.text }}>
+      <style>{`
+        @keyframes v1-fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .v1-enter { animation: v1-fade-up ${V1.durNormal}ms ${V1.ease} both; }
+        .v1-prose p, .v1-prose li { font-family: ${V1.bodyFont}; font-size: ${V1.textBodySm}px; line-height: 1.65; color: ${V1.textSecondary}; }
+        .v1-prose ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+        .v1-prose strong { color: ${V1.text}; font-weight: ${V1.fwSemibold}; }
+        .v1-prose a { color: ${V1.teal700}; text-decoration: none; border-bottom: 1px solid ${V1.teal600}; padding-bottom: 1px; }
+      `}</style>
+
+      {/* ── Minimal header: wordmark + nav (Terms / Privacy / Cookies) ── */}
+      <nav style={{
+        position: 'sticky', top: 0, zIndex: 50,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: `20px ${V1.shellPad}px`,
+        background: V1.bg, borderBottom: `1px solid ${V1.border}`,
+      }}>
+        <Link to="/" className="v1-wordmark" aria-label="NEXUS home">
+          NEXUS<span className="v1-dot">.</span>
+        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          {LEGAL_NAV.map(item => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="v1-mono"
+              style={{
+                fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: item.label === eyebrow ? V1.text : V1.textMuted,
+                textDecoration: 'none',
+                borderBottom: item.label === eyebrow ? `1px solid ${V1.text}` : '1px solid transparent',
+                paddingBottom: 2,
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
-        <p className="text-xs text-gray-400 mb-6">Last updated: {lastUpdated}</p>
-        <p className="text-sm text-gray-600 leading-relaxed mb-8">{intro}</p>
-        <div className="space-y-8">
+      </nav>
+
+      {/* ── Main content ── */}
+      <main className="v1-enter" style={{
+        maxWidth: 760, margin: '0 auto',
+        padding: `${V1.marketingPadY}px 24px ${V1.marketingPadYSm}px`,
+      }}>
+        {/* Back link */}
+        <Link to="/" className="v1-mono" style={{
+          display: 'inline-block', marginBottom: 32,
+          fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+          textTransform: 'uppercase', color: V1.textMuted, textDecoration: 'none',
+          borderBottom: `1px solid ${V1.border}`, paddingBottom: 2,
+          transition: `border-color ${V1.durFast}ms ${V1.ease}, color ${V1.durFast}ms ${V1.ease}`,
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.borderColor = V1.teal600; e.currentTarget.style.color = V1.teal700; }}
+        onMouseLeave={(e) => { e.currentTarget.style.borderColor = V1.border; e.currentTarget.style.color = V1.textMuted; }}>
+          ← Back to home
+        </Link>
+
+        {/* Mono eyebrow — page title */}
+        <div className="v1-mono" style={{
+          fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+          textTransform: 'uppercase', color: V1.textMuted, marginBottom: 12,
+        }}>
+          {eyebrow}
+        </div>
+
+        {/* Display title */}
+        <h1 style={{
+          fontFamily: V1.displayFont, fontSize: V1.textH1, color: V1.text,
+          fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+          lineHeight: V1.leadingDisplay, margin: '0 0 8px',
+        }}>
+          {title}
+        </h1>
+
+        {/* Last updated + intro */}
+        <div className="v1-mono" style={{
+          fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+          textTransform: 'uppercase', color: V1.textDim, marginBottom: 24,
+        }}>
+          Last updated · {lastUpdated}
+        </div>
+        <p className="v1-prose" style={{
+          fontSize: V1.textBody, lineHeight: 1.6, color: V1.textSecondary,
+          margin: '0 0 48px',
+        }}>
+          {intro}
+        </p>
+
+        {/* Sections — proper heading hierarchy */}
+        <div style={{
+          borderTop: `1px solid ${V1.border}`,
+        }}>
           {sections.map((s, i) => (
-            <section key={i}>
-              <h2 className="font-semibold mb-2" style={{ color: DS.text }}>{i + 1}. {s.heading}</h2>
-              <div className="text-sm text-gray-700 leading-relaxed space-y-2">{s.body}</div>
+            <section key={i} style={{
+              padding: '32px 0',
+              borderBottom: `1px solid ${V1.borderSubtle}`,
+            }}>
+              <h2 style={{
+                fontFamily: V1.displayFont, fontSize: V1.textH3, color: V1.text,
+                fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                lineHeight: V1.leadingHeading, margin: '0 0 16px',
+                display: 'flex', alignItems: 'baseline', gap: 12,
+              }}>
+                <span className="v1-mono" style={{
+                  fontSize: V1.textCaption, color: V1.textDim,
+                  letterSpacing: V1.trackingMono, fontWeight: V1.fwSemibold,
+                }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span>{s.heading}</span>
+              </h2>
+              <div className="v1-prose">{s.body}</div>
             </section>
           ))}
         </div>
+
+        {/* Optional actions (privacy export/delete panel) */}
         {actions}
-        <div className="mt-12 pt-6 border-t border-gray-100 text-xs text-gray-400">
-          LYC Partners Shanghai · For questions about this policy, contact{''}
-          <a href="mailto:legal@lyc-intelligence.app" className="text-fuchsia hover:underline">legal@lyc-intelligence.app</a>
-        </div>
-      </div>
+
+        {/* Footer — minimal */}
+        <footer style={{
+          marginTop: 64, paddingTop: 24, borderTop: `1px solid ${V1.border}`,
+          display: 'flex', flexDirection: 'column', gap: 8,
+        }}>
+          <div className="v1-mono" style={{
+            fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+            textTransform: 'uppercase', color: V1.textMuted,
+          }}>
+            LYC Partners Shanghai
+          </div>
+          <div style={{
+            fontFamily: V1.bodyFont, fontSize: V1.textCaption, color: V1.textDim, lineHeight: 1.5,
+          }}>
+            For questions about this policy, contact{' '}
+            <a href="mailto:legal@lyc-intelligence.app" style={{
+              color: V1.teal700, textDecoration: 'none',
+              borderBottom: `1px solid ${V1.teal600}`, paddingBottom: 1,
+            }}>legal@lyc-intelligence.app</a>.
+          </div>
+        </footer>
+      </main>
     </div>
   );
 }
@@ -106,7 +236,7 @@ export function TermsPage() {
       <SEO page="terms" />
       <LegalLayout
         title="Terms of Service"
-        icon={<FileText className="w-5 h-5" />}
+        eyebrow="Terms"
         intro="These Terms govern your use of LYC Intelligence. By accessing or using the Service, you agree to be bound by these Terms."
         sections={sections}
         lastUpdated="August 4, 2026"
@@ -120,12 +250,12 @@ export function PrivacyPage() {
   const sections: Section[] = [
     {
       heading: 'Data Controller',
-      body: <p>LYC Partners Shanghai is the data controller responsible for your personal data. Contact us at <a href="mailto:privacy@lyc-intelligence.app" className="text-fuchsia hover:underline">privacy@lyc-intelligence.app</a> for privacy inquiries.</p>,
+      body: <p>LYC Partners Shanghai is the data controller responsible for your personal data. Contact us at <a href="mailto:privacy@lyc-intelligence.app">privacy@lyc-intelligence.app</a> for privacy inquiries.</p>,
     },
     {
       heading: 'Data We Collect',
       body: (
-        <ul className="list-disc pl-5 space-y-1">
+        <ul>
           <li><strong>Account data:</strong> name, email, password (hashed), role, organization.</li>
           <li><strong>Profile data:</strong> title, company, industry, seniority, location, resume.</li>
           <li><strong>Activity data:</strong> assessment answers, chat history, applications, bookings.</li>
@@ -140,7 +270,7 @@ export function PrivacyPage() {
     {
       heading: 'Third-Party Processors',
       body: (
-        <ul className="list-disc pl-5 space-y-1">
+        <ul>
           <li><strong>Supabase</strong> — database, authentication, and file storage (Netherlands).</li>
           <li><strong>DeepSeek</strong> — AI language model processing for LYC Intelligence responses.</li>
           <li><strong>Stripe</strong> — payment processing (PCI-DSS compliant).</li>
@@ -159,7 +289,7 @@ export function PrivacyPage() {
     {
       heading: 'Your Rights (GDPR / PIPL)',
       body: (
-        <ul className="list-disc pl-5 space-y-1">
+        <ul>
           <li>Access, correct, or delete your personal data.</li>
           <li>Restrict or object to processing.</li>
           <li>Data portability (receive your data in a structured format).</li>
@@ -170,7 +300,7 @@ export function PrivacyPage() {
     },
     {
       heading: 'Data Export & Deletion',
-      body: <p>To exercise your rights, contact <a href="mailto:privacy@lyc-intelligence.app" className="text-fuchsia hover:underline">privacy@lyc-intelligence.app</a>. We will respond within 30 days. Account deletion initiates a soft delete followed by a hard delete after 30 days.</p>,
+      body: <p>To exercise your rights, contact <a href="mailto:privacy@lyc-intelligence.app">privacy@lyc-intelligence.app</a>. We will respond within 30 days. Account deletion initiates a soft delete followed by a hard delete after 30 days.</p>,
     },
     {
       heading: 'Security',
@@ -182,7 +312,7 @@ export function PrivacyPage() {
       <SEO page="privacy" />
       <LegalLayout
         title="Privacy Policy"
-        icon={<Shield className="w-5 h-5" />}
+        eyebrow="Privacy"
         intro="This Privacy Policy explains how LYC Partners Shanghai collects, uses, and protects your personal data when you use LYC Intelligence."
         sections={sections}
         lastUpdated="August 4, 2026"
@@ -225,7 +355,7 @@ export function CookiesPage() {
       <SEO page="cookies" />
       <LegalLayout
         title="Cookie Policy"
-        icon={<Cookie className="w-5 h-5" />}
+        eyebrow="Cookies"
         intro="This policy explains how LYC Intelligence uses cookies and similar technologies, and how you can control them."
         sections={sections}
         lastUpdated="August 4, 2026"
@@ -237,6 +367,8 @@ export function CookiesPage() {
 export default LegalLayout;
 
 // ── Self-service privacy actions (data export + account deletion) ──
+// V1 re-skin: bordered boxes, text labels for status (no red/green backgrounds),
+// no spinner — V1 uses skeleton/disabled state on the button itself.
 function PrivacyActionsPanel() {
   const user = useAuthStore(s => s.user);
   const [exporting, setExporting] = useState(false);
@@ -293,49 +425,114 @@ function PrivacyActionsPanel() {
   // Not signed in — nudge to login rather than showing dead buttons.
   if (!user) {
     return (
-      <div className="mt-12 p-5 border border-gray-200 bg-gray-50 text-sm text-gray-600 leading-relaxed">
-        <div className="flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
-          <span>
-            To download your personal data or request account deletion, please{''}
-            <a href="/login" className="text-fuchsia hover:underline font-medium">sign in</a>{''}
-            first. You may also email{''}
-            <a href="mailto:privacy@lyc-intelligence.app" className="text-fuchsia hover:underline">privacy@lyc-intelligence.app</a>.
-          </span>
+      <div style={{
+        marginTop: 48, padding: 24,
+        border: `1px solid ${V1.border}`, background: V1.surfaceAlt,
+      }}>
+        <div className="v1-mono" style={{
+          fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+          textTransform: 'uppercase', color: V1.textMuted, marginBottom: 8,
+        }}>
+          Sign in required
         </div>
+        <p style={{
+          fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary,
+          lineHeight: 1.55, margin: 0,
+        }}>
+          To download your personal data or request account deletion, please{' '}
+          <Link to="/login" style={{
+            color: V1.teal700, textDecoration: 'none',
+            borderBottom: `1px solid ${V1.teal600}`, paddingBottom: 1,
+          }}>sign in</Link>{' '}
+          first. You may also email{' '}
+          <a href="mailto:privacy@lyc-intelligence.app" style={{
+            color: V1.teal700, textDecoration: 'none',
+            borderBottom: `1px solid ${V1.teal600}`, paddingBottom: 1,
+          }}>privacy@lyc-intelligence.app</a>.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="mt-12 p-5 border border-gray-200 bg-gray-50">
-      <h3 className="font-semibold mb-1" style={{ color: DS.text }}>Exercise your rights</h3>
-      <p className="text-xs text-gray-500 mb-4">
+    <div style={{
+      marginTop: 48, padding: 24,
+      border: `1px solid ${V1.border}`, background: V1.surface,
+    }}>
+      <div className="v1-mono" style={{
+        fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+        textTransform: 'uppercase', color: V1.teal700, marginBottom: 8,
+        fontWeight: V1.fwSemibold,
+      }}>
+        Exercise your rights
+      </div>
+      <p style={{
+        fontFamily: V1.bodyFont, fontSize: V1.textCaption, color: V1.textMuted,
+        lineHeight: 1.55, margin: '0 0 24px',
+      }}>
         Download a copy of your personal data (right to portability) or request account deletion.
       </p>
 
+      {/* Status — text labels, not color-coded backgrounds */}
       {error && (
-        <div className="mb-3 flex items-start gap-2 p-3 bg-red-50 border border-red-200 text-xs text-red-700">
-          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-          <span>{error}</span>
+        <div style={{
+          marginBottom: 16, padding: '12px 16px',
+          border: `1px solid ${V1.fuchsia600}`, background: V1.fuchsia50,
+        }}>
+          <div className="v1-mono" style={{
+            fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+            textTransform: 'uppercase', color: V1.fuchsia700,
+            fontWeight: V1.fwSemibold, marginBottom: 4,
+          }}>
+            Error
+          </div>
+          <div style={{
+            fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.fuchsia700,
+            lineHeight: 1.5,
+          }}>
+            {error}
+          </div>
         </div>
       )}
       {success && (
-        <div className="mb-3 flex items-start gap-2 p-3 bg-green-50 border border-green-200 text-xs text-green-700">
-          <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" />
-          <span>{success}</span>
+        <div style={{
+          marginBottom: 16, padding: '12px 16px',
+          border: `1px solid ${V1.teal600}`, background: V1.teal50,
+        }}>
+          <div className="v1-mono" style={{
+            fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+            textTransform: 'uppercase', color: V1.teal700,
+            fontWeight: V1.fwSemibold, marginBottom: 4,
+          }}>
+            Done
+          </div>
+          <div style={{
+            fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.teal700,
+            lineHeight: 1.5,
+          }}>
+            {success}
+          </div>
         </div>
       )}
 
-      <div className="flex flex-wrap gap-3">
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
         <button
           type="button"
           onClick={handleExport}
           disabled={exporting || deleting}
-          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-fuchsia hover:opacity-90 disabled:opacity-50 transition-opacity"
+          style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            minHeight: 40, padding: '10px 18px',
+            background: V1.teal800, color: V1.white,
+            border: 'none', fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+            fontWeight: V1.fwSemibold, cursor: exporting || deleting ? 'not-allowed' : 'pointer',
+            opacity: exporting || deleting ? 0.6 : 1,
+            transition: `background ${V1.durFast}ms ${V1.ease}`,
+          }}
+          onMouseEnter={(e) => { if (!exporting && !deleting) e.currentTarget.style.background = V1.teal900; }}
+          onMouseLeave={(e) => { if (!exporting && !deleting) e.currentTarget.style.background = V1.teal800; }}
         >
-          {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-          Download my data
+          {exporting ? 'Preparing…' : 'Download my data ↓'}
         </button>
 
         {!confirming ? (
@@ -343,28 +540,61 @@ function PrivacyActionsPanel() {
             type="button"
             onClick={() => { setConfirming(true); setError(null); setSuccess(null); }}
             disabled={exporting || deleting}
-            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-red-700 border border-red-300 bg-white hover:bg-red-50 disabled:opacity-50 transition-colors"
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              minHeight: 40, padding: '10px 18px',
+              background: 'transparent', color: V1.text,
+              border: `1px solid ${V1.borderStrong}`, fontFamily: V1.bodyFont,
+              fontSize: V1.textBodySm, fontWeight: V1.fwMedium,
+              cursor: exporting || deleting ? 'not-allowed' : 'pointer',
+              opacity: exporting || deleting ? 0.6 : 1,
+              transition: `border-color ${V1.durFast}ms ${V1.ease}, color ${V1.durFast}ms ${V1.ease}`,
+            }}
+            onMouseEnter={(e) => { if (!exporting && !deleting) { e.currentTarget.style.borderColor = V1.fuchsia600; e.currentTarget.style.color = V1.fuchsia700; } }}
+            onMouseLeave={(e) => { if (!exporting && !deleting) { e.currentTarget.style.borderColor = V1.borderStrong; e.currentTarget.style.color = V1.text; } }}
           >
-            <Trash2 className="w-3.5 h-3.5" />
             Delete my account
           </button>
         ) : (
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-red-700">This schedules permanent deletion in 30 days. Confirm?</span>
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12,
+            padding: '10px 16px', border: `1px solid ${V1.fuchsia600}`, background: V1.fuchsia50,
+          }}>
+            <span style={{
+              fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.fuchsia700,
+              fontWeight: V1.fwMedium,
+            }}>
+              This schedules permanent deletion in 30 days. Confirm?
+            </span>
             <button
               type="button"
               onClick={handleDelete}
               disabled={deleting}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors"
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                minHeight: 36, padding: '8px 16px',
+                background: V1.fuchsia600, color: V1.white,
+                border: 'none', fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+                fontWeight: V1.fwSemibold, cursor: deleting ? 'not-allowed' : 'pointer',
+                opacity: deleting ? 0.6 : 1,
+                transition: `background ${V1.durFast}ms ${V1.ease}`,
+              }}
+              onMouseEnter={(e) => { if (!deleting) e.currentTarget.style.background = V1.fuchsia700; }}
+              onMouseLeave={(e) => { if (!deleting) e.currentTarget.style.background = V1.fuchsia600; }}
             >
-              {deleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-              Yes, delete
+              {deleting ? 'Scheduling…' : 'Yes, delete'}
             </button>
             <button
               type="button"
               onClick={() => setConfirming(false)}
               disabled={deleting}
-              className="px-4 py-2 text-xs font-medium text-gray-600 border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50"
+              style={{
+                minHeight: 36, padding: '8px 16px',
+                background: 'transparent', color: V1.textSecondary,
+                border: `1px solid ${V1.border}`, fontFamily: V1.bodyFont,
+                fontSize: V1.textBodySm, fontWeight: V1.fwMedium,
+                cursor: deleting ? 'not-allowed' : 'pointer',
+              }}
             >
               Cancel
             </button>

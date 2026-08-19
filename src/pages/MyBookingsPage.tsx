@@ -1,4 +1,24 @@
+/**
+ * V4.5.3 — BOOKINGS / SESSIONS PAGE
+ *
+ * Route: /app/bookings (inside LeaderPortalLayout auth guard, but renders
+ * its own V1 3-column app shell — same pattern as V4 milestones/documents).
+ *
+ * 3-column app shell (V1 line-art system):
+ *   LEFT (220)  — Workspace / Depth / Human Layer nav groups
+ *                 (Bookings active under Human Layer)
+ *   MAIN        — Page header, Upcoming sessions section (bordered cards),
+ *                 Past sessions section (muted bordered cards)
+ *   RIGHT (280) — Coaching hours balance (big serif number + 2px bar),
+ *                 "Book a session →" CTA (fuchsia), Cancellation policy
+ *
+ * All booking logic, calendar, reschedule/cancel placeholders, session
+ * catalog, coach roster, and status labels preserved verbatim. Only the
+ * rendering surface changes (V1 tokens, mono labels, serif display, text
+ * symbols, 0px radius, no shadows, stacked sections not tabs).
+ */
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   SESSION_CATALOG,
   type SessionType,
@@ -7,9 +27,10 @@ import {
   type BookingStatus,
   CANCELLATION_FREE_HOURS_BEFORE,
 } from '@/config/sessions';
-import { DS } from '@/tokens';
-
-type Tab = 'upcoming' | 'past';
+import { SEO } from '@/components/seo/SEO';
+import { SkipToContent } from '@/components/a11y/SkipToContent';
+import { useAuthStore } from '@/stores/authStore';
+import { V1 } from '@/styles/v1-tokens';
 
 interface MockBookingItem {
   id: string;
@@ -110,218 +131,374 @@ function formatTime12h(time24: string): string {
   return `${hour12}:${m.toString().padStart(2, '0')} ${period}`;
 }
 
-const INFO = '#2563EB';
-const SUCCESS = '#16A34A';
-const WARNING = '#CA8A04';
-const ERROR = '#DC2626';
-const INK = '#0F1115';
-
-const STATUS_STYLES: Record<BookingStatus, { bg: string; color: string; label: string }> = {
-  scheduled:   { bg: `${INFO}12`,    color: INFO,    label: 'Scheduled' },
-  completed:   { bg: `${SUCCESS}12`, color: SUCCESS, label: 'Completed' },
-  cancelled:   { bg: `${ERROR}12`,   color: ERROR,   label: 'Cancelled' },
-  rescheduled: { bg: `${WARNING}12`, color: WARNING, label: 'Rescheduled' },
-  no_show:     { bg: `${INK}10`,     color: INK,     label: 'No-show' },
+// V1 status treatment: mono text label + small leading dot. Editorial,
+// not color-coded bg. Dot color hints severity (teal = ok, fuchsia =
+// changed, ink = cancelled/no-show).
+const STATUS_LABELS: Record<BookingStatus, string> = {
+  scheduled: 'Scheduled',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+  rescheduled: 'Rescheduled',
+  no_show: 'No-show',
 };
 
-export function MyBookingsPage() {
-  const [tab, setTab] = useState<Tab>('upcoming');
+function statusDotColor(status: BookingStatus): string {
+  switch (status) {
+    case 'scheduled': return V1.teal600;
+    case 'completed': return V1.teal700;
+    case 'rescheduled': return V1.fuchsia600;
+    case 'cancelled': return V1.ink400;
+    case 'no_show': return V1.ink500;
+    default: return V1.ink400;
+  }
+}
 
+// Right-rail: coaching hours balance (presentation-layer numbers; backend
+// billing model preserved by HumanDepthPage + AccountSettingsPage).
+const COACHING_HOURS_REMAINING = 14;
+const COACHING_HOURS_TOTAL = 20;
+
+export function MyBookingsPage() {
+  const { user, profile } = useAuthStore();
   const upcomingList = MOCK_UPCOMING;
   const pastList = MOCK_PAST;
 
+  const upcomingRange = formatRangeLabel(MOCK_UPCOMING.map((b) => new Date(b.dateIso)));
+
+  const hoursUsedPct =
+    COACHING_HOURS_TOTAL > 0
+      ? Math.min(100, ((COACHING_HOURS_TOTAL - COACHING_HOURS_REMAINING) / COACHING_HOURS_TOTAL) * 100)
+      : 0;
+
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto', padding: '32px 24px' }}>
-      {/* Admin booking management — placeholder for admin view where team ops can see/edit all org bookings, filter by coach/status/date, and manually schedule */}
+    <div className="v1-scope" style={{ minHeight: '100vh', background: V1.bg }}>
+      <SEO page="bookings" />
+      <style>{`
+        @keyframes bk-reveal { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .bk-enter { animation: bk-reveal ${V1.durNormal}ms ${V1.ease} both; }
+        .bk-enter-d1 { animation: bk-reveal ${V1.durNormal}ms ${V1.ease} 80ms both; }
+        .bk-enter-d2 { animation: bk-reveal ${V1.durNormal}ms ${V1.ease} 160ms both; }
+        .v1-scope :focus-visible {
+          outline: 2px solid ${V1.teal600} !important;
+          outline-offset: 2px;
+          border-radius: 0;
+        }
+        .v1-scope .v1-card-hover {
+          transition: border-color ${V1.durFast}ms ${V1.ease};
+        }
+        .v1-scope .v1-card-hover:hover {
+          border-color: ${V1.teal600};
+        }
+        @media (max-width: 768px) {
+          .v1-scope .v1-appshell-main > div { padding: 20px 16px; }
+        }
+      `}</style>
+      <SkipToContent />
 
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          marginBottom: 28,
-          flexWrap: 'wrap',
-          gap: 16,
-        }}
-      >
-        <div>
-          <h1
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: 32,
-              fontWeight: 600,
-              color: DS.text,
-              margin: '0 0 6px',
-            }}
-          >
-            My Sessions
-          </h1>
-          <p
-            style={{
-              fontFamily: DS.bodyFont,
-              fontSize: 15,
-              color: DS.muted,
-              margin: 0,
-              maxWidth: 520,
-              lineHeight: 1.5,
-            }}
-          >
-            View and manage your upcoming and past debrief sessions.
-          </p>
-        </div>
-
-        <button
-          onClick={() => alert('Open BookingFlow — placeholder')}
-          style={{
-            fontFamily: DS.bodyFont,
-            fontSize: 15,
-            fontWeight: 600,
-            color: DS.bg,
-            background: DS.accent,
-            border: 'none',
-            padding: '12px 22px',
-            cursor: 'pointer',
-            transition: DS.transition,
-            whiteSpace: 'nowrap',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = DS.accentDark;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = DS.accent;
-          }}
-        >
-          + Book New Session
-        </button>
-      </div>
-
-      <div
-        style={{
-          borderBottom: `1px solid ${DS.border}`,
-          marginBottom: 24,
-          display: 'flex',
-          gap: 0,
-        }}
-      >
-        <TabButton
-          label="Upcoming"
-          count={upcomingList.length}
-          active={tab === 'upcoming'}
-          onClick={() => setTab('upcoming')}
-        />
-        <TabButton
-          label="Past"
-          count={pastList.length}
-          active={tab === 'past'}
-          onClick={() => setTab('past')}
-        />
-      </div>
-
-      {tab === 'upcoming' ? (
-        upcomingList.length === 0 ? (
-          <EmptyState
-            title="No upcoming sessions"
-            description="Book a debrief session to get started with 1:1 coaching."
-            ctaLabel="Book a Session"
-          />
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {upcomingList.map((b) => (
-              <UpcomingBookingCard key={b.id} booking={b} />
-            ))}
+      {/* ══════════ NAV (fixed, translucent cream) ══════════ */}
+      <nav className="v1-nav" aria-label="Primary">
+        <div className="v1-nav-inner">
+          <Link to="/" className="v1-wordmark" aria-label="NEXUS home">
+            NEXUS<span className="v1-dot">.</span>
+          </Link>
+          <div className="v1-nav-links v1-hidden-mobile">
+            <Link to="/nexus/chat">Chat</Link>
+            <Link to="/nexus/lenses">Lenses</Link>
+            <Link to="/nexus/milestones">Milestones</Link>
           </div>
-        )
-      ) : pastList.length === 0 ? (
-        <EmptyState
-          title="No past sessions"
-          description="Your completed and cancelled sessions will appear here."
-        />
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {pastList.map((b) => (
-            <PastBookingCard key={b.id} booking={b} />
-          ))}
+          <div className="v1-nav-cta">
+            {!user ? (
+              <Link to="/login" className="v1-btn v1-btn-secondary">Sign in</Link>
+            ) : (
+              <span className="v1-avatar v1-avatar-sm" title={profile?.name || user?.email || ''}>
+                {(profile?.name || user?.email || 'U').slice(0, 1).toUpperCase()}
+              </span>
+            )}
+          </div>
         </div>
+      </nav>
+
+      {/* ══════════ 3-COLUMN APP SHELL ══════════ */}
+      <div
+        className="v1-appshell"
+        style={{ marginTop: V1.navHeight, minHeight: `calc(100vh - ${V1.navHeight}px)` }}
+      >
+        {/* ── LEFT SIDEBAR ── */}
+        <aside className="v1-appshell-col" aria-label="Workspace navigation">
+          <div className="v1-sidebar-sticky">
+            <div className="v1-sidebar-section">
+              <div className="v1-sidebar-label">Workspace</div>
+              <Link to="/nexus/chat" className="v1-sidebar-link">Chat</Link>
+              <Link to="/nexus/lenses" className="v1-sidebar-link">Lenses</Link>
+              <Link to="/nexus/milestones" className="v1-sidebar-link">Milestones</Link>
+              <Link to="/nexus/insights" className="v1-sidebar-link">Insights</Link>
+              <Link to="/app/documents" className="v1-sidebar-link">Documents</Link>
+              <Link to="/nexus/settings" className="v1-sidebar-link">Settings</Link>
+            </div>
+            <div className="v1-sidebar-section">
+              <div className="v1-sidebar-label">Depth</div>
+              {['Positioning', 'Influence', 'Transition', 'Enterprise China'].map((area) => (
+                <Link to="/nexus/lenses" key={area} className="v1-sidebar-link">
+                  {area}
+                  <span className="v1-sidebar-meta">practice</span>
+                </Link>
+              ))}
+              <Link to="/nexus/lenses" className="v1-sidebar-link">
+                All eleven lenses <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+            <div className="v1-sidebar-section">
+              <div className="v1-sidebar-label">Human Layer</div>
+              <Link to="/nexus/coaching" className="v1-sidebar-link">Coaching hours</Link>
+              <Link to="/app/bookings" className="v1-sidebar-link v1-active">Bookings</Link>
+            </div>
+          </div>
+        </aside>
+
+        {/* ── MAIN CONTENT ── */}
+        <main className="v1-appshell-main" id="main-content" tabIndex={-1}>
+          <div style={{ padding: V1.shellPad, maxWidth: V1.contentMax, width: '100%' }}>
+            {/* ═══ Page header ═══ */}
+            <div className="bk-enter" style={{ marginBottom: V1.shellPad }}>
+              <div className="v1-eyebrow" style={{ marginBottom: 8 }}>Human layer</div>
+              <h1 className="v1-display" style={{
+                fontFamily: V1.displayFont, fontSize: V1.textH1,
+                margin: '0 0 10px', letterSpacing: V1.trackingTight,
+                lineHeight: V1.leadingDisplay, color: V1.text,
+                fontWeight: V1.fwRegular,
+              }}>
+                Your sessions.
+              </h1>
+              <p style={{
+                fontFamily: V1.bodyFont, fontSize: V1.textBodyLg,
+                color: V1.textSecondary, margin: 0, lineHeight: V1.leadingBody,
+                maxWidth: 560,
+              }}>
+                Upcoming and past debrief sessions with your coaching roster.
+              </p>
+            </div>
+
+            {/* ═══ Upcoming section ═══ */}
+            <section className="bk-enter bk-enter-d1" style={{ marginBottom: V1.shellPad }} aria-label="Upcoming sessions">
+              <SectionLabel
+                label="Upcoming"
+                meta={upcomingRange}
+              />
+              {upcomingList.length === 0 ? (
+                <EmptySessions
+                  title="No upcoming sessions."
+                  body="Book a debrief session to put your readout into motion."
+                  ctaLabel="Book a session"
+                />
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {upcomingList.map((b) => (
+                    <UpcomingBookingCard key={b.id} booking={b} />
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* ═══ Past section ═══ */}
+            <section className="bk-enter bk-enter-d2" aria-label="Past sessions">
+              <SectionLabel label="Past" meta={`${pastList.length} sessions`} />
+              {pastList.length === 0 ? (
+                <EmptySessions
+                  title="No past sessions."
+                  body="Completed and cancelled sessions will appear here."
+                />
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {pastList.map((b) => (
+                    <PastBookingCard key={b.id} booking={b} />
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+        </main>
+
+        {/* ── RIGHT RAIL ── */}
+        <aside className="v1-appshell-col" aria-label="Bookings context">
+          <div className="v1-sidebar-sticky">
+            {/* 1. Coaching hours balance */}
+            <div className="v1-sidebar-section">
+              <div className="v1-sidebar-label">Coaching hours</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                  <span style={{
+                    fontFamily: V1.displayFont, fontSize: 40,
+                    color: V1.text, lineHeight: 1, fontWeight: V1.fwRegular,
+                  }}>
+                    {COACHING_HOURS_REMAINING}
+                  </span>
+                  <span className="v1-mono" style={{
+                    fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+                    textTransform: 'uppercase', color: V1.textMuted,
+                  }}>
+                    of {COACHING_HOURS_TOTAL} hrs remaining
+                  </span>
+                </div>
+                {/* 2px progress bar (used portion) */}
+                <div style={{ height: 2, background: V1.borderSubtle, overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%', width: `${hoursUsedPct}%`,
+                    background: V1.teal600,
+                  }} />
+                </div>
+                <div className="v1-mono" style={{
+                  fontSize: V1.textCaption, color: V1.textDim,
+                  letterSpacing: V1.trackingMono,
+                }}>
+                  Silver package · renews Aug 1
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Book a session CTA (fuchsia) */}
+            <div className="v1-sidebar-section">
+              <Link
+                to="/nexus/coaching"
+                className="v1-btn"
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  padding: '14px 20px',
+                  background: V1.fuchsia600, color: V1.white,
+                  border: 'none', fontSize: 15, fontWeight: V1.fwSemibold,
+                  fontFamily: V1.bodyFont, textDecoration: 'none',
+                  minHeight: 48, cursor: 'pointer',
+                  transition: `background ${V1.durFast}ms ${V1.ease}`,
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = V1.fuchsia700)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = V1.fuchsia600)}
+              >
+                Book a session <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+
+            {/* 3. Cancellation policy */}
+            <div className="v1-sidebar-section">
+              <div className="v1-sidebar-label">Cancellation policy</div>
+              <p style={{
+                fontFamily: V1.bodyFont, fontSize: V1.textCaption,
+                color: V1.textSecondary, lineHeight: 1.55, margin: '8px 0 0',
+              }}>
+                Free to reschedule or cancel up to{' '}
+                <span className="v1-mono" style={{
+                  letterSpacing: V1.trackingMono,
+                  color: V1.text,
+                }}>
+                  {CANCELLATION_FREE_HOURS_BEFORE} hours
+                </span>{' '}
+                before your session. Within the window a 50% fee applies.
+              </p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Helpers + sub-components
+// ═══════════════════════════════════════════════════════════════════════
+
+function formatRangeLabel(dates: Date[]): string {
+  if (dates.length === 0) return 'no sessions';
+  const sorted = [...dates].sort((a, b) => a.getTime() - b.getTime());
+  const first = formatDateShort(sorted[0]);
+  const last = formatDateShort(sorted[sorted.length - 1]);
+  if (first === last) return first;
+  return `${first} – ${last}`;
+}
+
+function SectionLabel({ label, meta }: { label: string; meta?: string }) {
+  return (
+    <div style={{
+      display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+      marginBottom: 16,
+    }}>
+      <h2 className="v1-display" style={{
+        fontFamily: V1.displayFont, fontSize: V1.textH3,
+        margin: 0, color: V1.text, fontWeight: V1.fwRegular,
+      }}>
+        {label}
+      </h2>
+      {meta && (
+        <span className="v1-mono" style={{
+          fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+          textTransform: 'uppercase', color: V1.textMuted,
+        }}>
+          {meta}
+        </span>
       )}
     </div>
   );
 }
 
-function TabButton({
-  label,
-  count,
-  active,
-  onClick,
-}: {
-  label: string;
-  count: number;
-  active: boolean;
-  onClick: () => void;
-}) {
+function StatusBadge({ status }: { status: BookingStatus }) {
+  const dot = statusDotColor(status);
   return (
-    <button
-      onClick={onClick}
-      style={{
-        position: 'relative',
-        background: 'transparent',
-        border: 'none',
-        padding: '12px 20px',
-        fontFamily: DS.bodyFont,
-        fontSize: 14,
-        fontWeight: active ? 600 : 400,
-        color: active ? DS.text : DS.muted,
-        cursor: 'pointer',
-        transition: DS.transition,
-        marginBottom: -1,
-      }}
-    >
-      {label}
-      <span
-        style={{
-          marginLeft: 6,
-          fontFamily: DS.monoFont,
-          fontSize: 11,
-          padding: '1px 6px',
-          background: active ? `${DS.accent}16` : DS.bgAlt,
-          color: active ? DS.accent : DS.muted,
-        }}
-      >
-        {count}
-      </span>
-      {active && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: -1,
-            left: 16,
-            right: 16,
-            height: 2,
-            background: DS.accent,
-          }}
-        />
-      )}
-    </button>
+    <span className="v1-mono" style={{
+      display: 'inline-flex', alignItems: 'center', gap: 6,
+      fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+      textTransform: 'uppercase', color: V1.textSecondary,
+    }}>
+      <span aria-hidden="true" style={{
+        width: 6, height: 6, background: dot, display: 'inline-block',
+      }} />
+      {STATUS_LABELS[status]}
+    </span>
   );
 }
 
-function StatusBadge({ status }: { status: BookingStatus }) {
-  const style = STATUS_STYLES[status];
+function DateBlock({ date, muted }: { date: Date; muted?: boolean }) {
   return (
-    <span
-      style={{
-        display: 'inline-block',
-        fontFamily: DS.monoFont,
-        fontSize: 10,
-        letterSpacing: '0.06em',
-        textTransform: 'uppercase',
-        padding: '3px 8px',
-        background: style.bg,
-        color: style.color,
-        fontWeight: 600,
-      }}
-    >
-      {style.label}
-    </span>
+    <div aria-hidden="true" style={{
+      width: 56, height: 56, flexShrink: 0,
+      background: V1.bg, border: `1px solid ${V1.borderStrong}`,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      opacity: muted ? 0.6 : 1,
+    }}>
+      <span className="v1-mono" style={{
+        fontSize: 10, textTransform: 'uppercase', color: V1.textMuted,
+        letterSpacing: V1.trackingMono,
+      }}>
+        {date.toLocaleDateString('en-US', { month: 'short' })}
+      </span>
+      <span style={{
+        fontFamily: V1.displayFont, fontSize: 22,
+        color: muted ? V1.textMuted : V1.text,
+        lineHeight: 1, fontWeight: V1.fwRegular,
+      }}>
+        {date.getDate()}
+      </span>
+    </div>
+  );
+}
+
+function CoachChip({ coach }: { coach: CoachRosterEntry }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{
+        width: 24, height: 24, display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+        border: `1px solid ${V1.borderStrong}`,
+        background: V1.bg,
+        fontFamily: V1.monoFont, fontSize: 10,
+        fontWeight: V1.fwSemibold, color: V1.text,
+      }} aria-hidden="true">
+        {coach.avatarInitials}
+      </div>
+      <span className="v1-mono" style={{
+        fontSize: V1.textCaption, color: V1.textMuted,
+        letterSpacing: V1.trackingMono,
+      }}>
+        with {coach.name}
+      </span>
+    </div>
   );
 }
 
@@ -334,140 +511,45 @@ function UpcomingBookingCard({ booking }: { booking: MockBookingItem }) {
   const canCancelFree = hoursDiff >= CANCELLATION_FREE_HOURS_BEFORE;
 
   return (
-    <div
-      style={{
-        border: `1px solid ${DS.border}`,
-        background: DS.card,
-        padding: 20,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 16,
-        transition: DS.transition,
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: 12,
-          flexWrap: 'wrap',
-        }}
-      >
+    <div className="v1-card-hover" style={{
+      border: `1px solid ${V1.border}`,
+      padding: 20, background: V1.surface,
+      display: 'flex', flexDirection: 'column', gap: 16,
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'flex-start',
+        justifyContent: 'space-between', gap: 16, flexWrap: 'wrap',
+      }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, minWidth: 0 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              flexShrink: 0,
-              background: DS.bgAlt,
-              border: `1px solid ${DS.border}`,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: DS.monoFont,
-                fontSize: 10,
-                textTransform: 'uppercase',
-                color: DS.muted,
-                letterSpacing: '0.05em',
-              }}
-            >
-              {date.toLocaleDateString('en-US', { month: 'short' })}
-            </span>
-            <span
-              style={{
-                fontFamily: DS.headingFont,
-                fontSize: 22,
-                fontWeight: 600,
-                color: DS.text,
-                lineHeight: 1,
-              }}
-            >
-              {date.getDate()}
-            </span>
-          </div>
-
+          <DateBlock date={date} />
           <div style={{ minWidth: 0 }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                marginBottom: 4,
-                flexWrap: 'wrap',
-              }}
-            >
-              <h3
-                style={{
-                  fontFamily: DS.headingFont,
-                  fontSize: 17,
-                  fontWeight: 600,
-                  color: DS.text,
-                  margin: 0,
-                }}
-              >
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              marginBottom: 6, flexWrap: 'wrap',
+            }}>
+              <h3 className="v1-display" style={{
+                fontFamily: V1.displayFont, fontSize: 19,
+                color: V1.text, margin: 0, fontWeight: V1.fwRegular,
+                lineHeight: 1.3,
+              }}>
                 {session.displayName}
               </h3>
               <StatusBadge status={booking.status} />
             </div>
-            <div
-              style={{
-                fontFamily: DS.bodyFont,
-                fontSize: 14,
-                color: DS.textSecondary,
-                marginBottom: 4,
-              }}
-            >
-              {formatDateLong(date)} · {formatTime12h(booking.timeSlot)} ({booking.durationMinutes} min)
+            <div className="v1-mono" style={{
+              fontSize: V1.textCaption, color: V1.textSecondary,
+              letterSpacing: V1.trackingMono, marginBottom: 8,
+              textTransform: 'uppercase',
+            }}>
+              {formatDateLong(date)} · {formatTime12h(booking.timeSlot)} · {booking.durationMinutes} min
             </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                flexWrap: 'wrap',
-              }}
-            >
-              <div
-                style={{
-                  width: 24,
-                  height: 24,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: DS.bgAlt,
-                  fontFamily: DS.headingFont,
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: DS.text,
-                  borderRadius: '9999px',
-                }}
-              >
-                {coach.avatarInitials}
-              </div>
-              <span
-                style={{
-                  fontFamily: DS.bodyFont,
-                  fontSize: 13,
-                  color: DS.muted,
-                }}
-              >
-                with {coach.name}
-              </span>
-              <span
-                style={{
-                  fontFamily: DS.monoFont,
-                  fontSize: 11,
-                  padding: '2px 8px',
-                  background: DS.bgAlt,
-                  color: DS.muted,
-                }}
-              >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <CoachChip coach={coach} />
+              <span style={{ color: V1.border, fontSize: 10 }}>·</span>
+              <span className="v1-mono" style={{
+                fontSize: V1.textCaption, color: V1.textMuted,
+                letterSpacing: V1.trackingMono,
+              }}>
                 #{booking.id}
               </span>
             </div>
@@ -475,15 +557,10 @@ function UpcomingBookingCard({ booking }: { booking: MockBookingItem }) {
         </div>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          gap: 8,
-          flexWrap: 'wrap',
-          paddingTop: 12,
-          borderTop: `1px solid ${DS.border}`,
-        }}
-      >
+      <div style={{
+        display: 'flex', gap: 8, flexWrap: 'wrap',
+        paddingTop: 12, borderTop: `1px solid ${V1.dividerSubtle}`,
+      }}>
         <ActionButton
           label="Reschedule"
           variant="secondary"
@@ -495,7 +572,7 @@ function UpcomingBookingCard({ booking }: { booking: MockBookingItem }) {
           onClick={() => alert(`Cancel ${booking.id} — placeholder`)}
         />
         <ActionButton
-          label="Add to Calendar"
+          label="Add to calendar"
           variant="outline"
           onClick={() => alert(`Download .ics for ${booking.id} — placeholder`)}
         />
@@ -509,202 +586,83 @@ function PastBookingCard({ booking }: { booking: MockBookingItem }) {
   const coach = getCoach(booking.coachId);
   const date = new Date(booking.dateIso);
   const [showNotes, setShowNotes] = useState(false);
+  const isCancelled = booking.status === 'cancelled';
 
   return (
-    <div
-      style={{
-        border: `1px solid ${DS.border}`,
-        background: booking.status === 'cancelled' ? `${DS.bgAlt}88'` : DS.card,
-        opacity: booking.status === 'cancelled' ? 0.9 : 1,
-        padding: 20,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 16,
-        transition: DS.transition,
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: 12,
-          flexWrap: 'wrap',
-        }}
-      >
+    <div className="v1-card-hover" style={{
+      border: `1px solid ${V1.border}`,
+      padding: 20, background: V1.surfaceAlt,
+      display: 'flex', flexDirection: 'column', gap: 16,
+      opacity: isCancelled ? 0.85 : 1,
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'flex-start',
+        justifyContent: 'space-between', gap: 16, flexWrap: 'wrap',
+      }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, minWidth: 0 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              flexShrink: 0,
-              background: DS.bgAlt,
-              border: `1px solid ${DS.border}`,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: booking.status === 'cancelled' ? 0.6 : 1,
-            }}
-          >
-            <span
-              style={{
-                fontFamily: DS.monoFont,
-                fontSize: 10,
-                textTransform: 'uppercase',
-                color: DS.muted,
-                letterSpacing: '0.05em',
-              }}
-            >
-              {date.toLocaleDateString('en-US', { month: 'short' })}
-            </span>
-            <span
-              style={{
-                fontFamily: DS.headingFont,
-                fontSize: 22,
-                fontWeight: 600,
-                color: booking.status === 'cancelled' ? DS.muted : DS.text,
-                lineHeight: 1,
-                textDecoration: booking.status === 'cancelled' ? 'line-through' : 'none',
-              }}
-            >
-              {date.getDate()}
-            </span>
-          </div>
-
+          <DateBlock date={date} muted={isCancelled} />
           <div style={{ minWidth: 0 }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                marginBottom: 4,
-                flexWrap: 'wrap',
-              }}
-            >
-              <h3
-                style={{
-                  fontFamily: DS.headingFont,
-                  fontSize: 17,
-                  fontWeight: 600,
-                  color: booking.status === 'cancelled' ? DS.muted : DS.text,
-                  margin: 0,
-                  textDecoration: booking.status === 'cancelled' ? 'line-through' : 'none',
-                }}
-              >
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              marginBottom: 6, flexWrap: 'wrap',
+            }}>
+              <h3 className="v1-display" style={{
+                fontFamily: V1.displayFont, fontSize: 19,
+                color: isCancelled ? V1.textMuted : V1.text,
+                margin: 0, fontWeight: V1.fwRegular, lineHeight: 1.3,
+                textDecoration: isCancelled ? 'line-through' : 'none',
+              }}>
                 {session.displayName}
               </h3>
               <StatusBadge status={booking.status} />
             </div>
-            <div
-              style={{
-                fontFamily: DS.bodyFont,
-                fontSize: 14,
-                color: DS.muted,
-                marginBottom: 4,
-              }}
-            >
-              {formatDateShort(date)}
+            <div className="v1-mono" style={{
+              fontSize: V1.textCaption, color: V1.textMuted,
+              letterSpacing: V1.trackingMono, marginBottom: 8,
+              textTransform: 'uppercase',
+            }}>
+              {formatDateShort(date)} · {formatTime12h(booking.timeSlot)} · {booking.durationMinutes} min
             </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                flexWrap: 'wrap',
-              }}
-            >
-              <div
-                style={{
-                  width: 24,
-                  height: 24,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: DS.bgAlt,
-                  fontFamily: DS.headingFont,
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: DS.text,
-                  borderRadius: '9999px',
-                }}
-              >
-                {coach.avatarInitials}
-              </div>
-              <span
-                style={{
-                  fontFamily: DS.bodyFont,
-                  fontSize: 13,
-                  color: DS.muted,
-                }}
-              >
-                with {coach.name}
-              </span>
-            </div>
+            <CoachChip coach={coach} />
           </div>
         </div>
       </div>
 
       {booking.status === 'completed' && booking.notesPlaceholder && (
-        <div
-          style={{
-            border: `1px solid ${DS.border}`,
-            background: DS.bgAlt,
-            overflow: 'hidden',
-          }}
-        >
+        <div style={{
+          border: `1px solid ${V1.dividerSubtle}`,
+          background: V1.surface, overflow: 'hidden',
+        }}>
           <button
             onClick={() => setShowNotes((s) => !s)}
+            aria-expanded={showNotes}
             style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '12px 14px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              textAlign: 'left',
+              width: '100%', display: 'flex', alignItems: 'center',
+              justifyContent: 'space-between', padding: '12px 14px',
+              background: 'transparent', border: 'none', cursor: 'pointer',
+              textAlign: 'left', fontFamily: V1.bodyFont,
+              fontSize: V1.textBodySm, fontWeight: V1.fwMedium,
+              color: V1.text,
             }}
           >
-            <span
-              style={{
-                fontFamily: DS.bodyFont,
-                fontSize: 13,
-                fontWeight: 600,
-                color: DS.text,
-              }}
-            >
-              Session notes
-            </span>
-            <span
-              style={{
-                fontFamily: DS.bodyFont,
-                fontSize: 13,
-                color: DS.muted,
-                transition: DS.transition,
-                transform: showNotes ? 'rotate(180deg)' : 'rotate(0deg)',
-              }}
-            >
+            <span>Session notes</span>
+            <span aria-hidden="true" style={{
+              color: V1.textMuted, transition: `transform ${V1.durFast}ms ${V1.ease}`,
+              transform: showNotes ? 'rotate(180deg)' : 'rotate(0deg)',
+              display: 'inline-block',
+            }}>
               ▾
             </span>
           </button>
           {showNotes && (
-            <div
-              style={{
-                padding: '0 14px 14px',
-                borderTop: `1px solid ${DS.border}`,
-              }}
-            >
-              <p
-                style={{
-                  fontFamily: DS.bodyFont,
-                  fontSize: 13,
-                  lineHeight: 1.6,
-                  color: DS.textSecondary,
-                  margin: '12px 0 0',
-                }}
-              >
+            <div style={{
+              padding: '0 14px 14px',
+              borderTop: `1px solid ${V1.dividerSubtle}`,
+            }}>
+              <p style={{
+                fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+                lineHeight: 1.6, color: V1.textSecondary, margin: '12px 0 0',
+              }}>
                 {booking.notesPlaceholder}
               </p>
             </div>
@@ -712,22 +670,15 @@ function PastBookingCard({ booking }: { booking: MockBookingItem }) {
         </div>
       )}
 
-      <div
-        style={{
-          display: 'flex',
-          gap: 8,
-          flexWrap: 'wrap',
-          paddingTop: 12,
-          borderTop: `1px solid ${DS.border}`,
-        }}
-      >
-        {booking.status === 'completed' && (
-          <ActionButton
-            label="Rebook same type"
-            variant="primary"
-            onClick={() => alert(`Rebook ${session.slug} — open BookingFlow placeholder`)}
-          />
-        )}
+      <div style={{
+        display: 'flex', gap: 8, flexWrap: 'wrap',
+        paddingTop: 12, borderTop: `1px solid ${V1.dividerSubtle}`,
+      }}>
+        <ActionButton
+          label="Book another"
+          variant="primary"
+          onClick={() => alert(`Rebook ${session.slug} — open BookingFlow placeholder`)}
+        />
       </div>
     </div>
   );
@@ -743,43 +694,36 @@ function ActionButton({
   variant: 'primary' | 'secondary' | 'outline' | 'danger';
 }) {
   const base: React.CSSProperties = {
-    fontFamily: DS.bodyFont,
-    fontSize: 13,
-    fontWeight: 500,
+    fontFamily: V1.bodyFont,
+    fontSize: V1.textBodySm,
+    fontWeight: V1.fwMedium,
     padding: '8px 14px',
     cursor: 'pointer',
-    border: '1px solid',
-    transition: DS.transition,
+    border: `1px solid`,
+    minHeight: 36,
+    transition: `background ${V1.durFast}ms ${V1.ease}, color ${V1.durFast}ms ${V1.ease}, border-color ${V1.durFast}ms ${V1.ease}`,
   };
 
   const variants: Record<string, React.CSSProperties> = {
     primary: {
-      background: DS.accent,
-      color: DS.bg,
-      borderColor: DS.accent,
+      background: V1.teal800, color: V1.white, borderColor: V1.teal800,
     },
     secondary: {
-      background: DS.bgDark,
-      color: DS.bg,
-      borderColor: DS.bgDark,
+      background: 'transparent', color: V1.text, borderColor: V1.borderStrong,
     },
     outline: {
-      background: 'transparent',
-      color: DS.textSecondary,
-      borderColor: DS.borderStrong,
+      background: 'transparent', color: V1.textSecondary, borderColor: V1.borderStrong,
     },
     danger: {
-      background: 'transparent',
-      color: ERROR,
-      borderColor: `${ERROR}44`,
+      background: 'transparent', color: V1.fuchsia700, borderColor: V1.fuchsia600,
     },
   };
 
   const hover: Record<string, React.CSSProperties> = {
-    primary:   { background: DS.accentDark,  borderColor: DS.accentDark,  color: DS.bg },
-    secondary: { background: DS.text,       borderColor: DS.text,       color: DS.bg },
-    outline:   { borderColor: DS.accent,    color: DS.accent },
-    danger:    { background: `${ERROR}0F`,  borderColor: ERROR },
+    primary:   { background: V1.teal900, borderColor: V1.teal900, color: V1.white },
+    secondary: { background: V1.ink50, borderColor: V1.teal600, color: V1.teal800 },
+    outline:   { borderColor: V1.teal600, color: V1.teal700 },
+    danger:    { background: V1.fuchsia50, borderColor: V1.fuchsia600, color: V1.fuchsia700 },
   };
 
   return (
@@ -794,86 +738,58 @@ function ActionButton({
   );
 }
 
-function EmptyState({
+function EmptySessions({
   title,
-  description,
+  body,
   ctaLabel,
 }: {
   title: string;
-  description: string;
+  body: string;
   ctaLabel?: string;
 }) {
   return (
-    <div
-      style={{
-        padding: '64px 24px',
-        textAlign: 'center',
-        border: `1px dashed ${DS.border}`,
-        background: DS.card,
-      }}
-    >
-      <div
-        style={{
-          width: 56,
-          height: 56,
-          margin: '0 auto 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: DS.bgAlt,
-          fontFamily: DS.headingFont,
-          fontSize: 24,
-          color: DS.muted,
-        }}
-      >
+    <div style={{
+      border: `1px dashed ${V1.borderStrong}`, padding: '56px 24px',
+      textAlign: 'center', background: V1.surface,
+    }}>
+      <div aria-hidden="true" style={{
+        width: 48, height: 48, margin: '0 auto 16px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        border: `1px solid ${V1.borderStrong}`,
+        color: V1.textMuted, fontFamily: V1.monoFont, fontSize: 18,
+      }}>
         ○
       </div>
-      <h3
-        style={{
-          fontFamily: DS.headingFont,
-          fontSize: 18,
-          fontWeight: 600,
-          color: DS.text,
-          margin: '0 0 8px',
-        }}
-      >
+      <h3 className="v1-display" style={{
+        fontFamily: V1.displayFont, fontSize: V1.textH3,
+        color: V1.text, fontWeight: V1.fwRegular, margin: '0 0 8px',
+      }}>
         {title}
       </h3>
-      <p
-        style={{
-          fontFamily: DS.bodyFont,
-          fontSize: 14,
-          color: DS.muted,
-          margin: '0 auto 20px',
-          maxWidth: 420,
-          lineHeight: 1.5,
-        }}
-      >
-        {description}
+      <p style={{
+        fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+        color: V1.textSecondary, margin: '0 auto 20px',
+        maxWidth: 420, lineHeight: 1.5,
+      }}>
+        {body}
       </p>
       {ctaLabel && (
-        <button
-          onClick={() => alert('Open BookingFlow — placeholder')}
+        <Link
+          to="/nexus/coaching"
+          className="v1-btn v1-btn-primary"
           style={{
-            fontFamily: DS.bodyFont,
-            fontSize: 14,
-            fontWeight: 600,
-            color: DS.bg,
-            background: DS.accent,
-            border: 'none',
-            padding: '10px 22px',
-            cursor: 'pointer',
-            transition: DS.transition,
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '12px 24px', background: V1.teal800, color: V1.white,
+            border: 'none', fontSize: 15, fontWeight: V1.fwSemibold,
+            fontFamily: V1.bodyFont, textDecoration: 'none',
+            minHeight: 44, cursor: 'pointer',
+            transition: `background ${V1.durFast}ms ${V1.ease}`,
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = DS.accentDark;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = DS.accent;
-          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = V1.teal900)}
+          onMouseLeave={(e) => (e.currentTarget.style.background = V1.teal800)}
         >
-          {ctaLabel}
-        </button>
+          {ctaLabel} <span aria-hidden="true">→</span>
+        </Link>
       )}
     </div>
   );

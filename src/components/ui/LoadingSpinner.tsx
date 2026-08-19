@@ -1,18 +1,22 @@
 /**
- * Phase 5: ECHO v6.0 Loading Spinner
+ * V1 Design System — Loading Spinner (LEGACY)
  *
- * Design-aligned spinner with the ECHO #C108AB accent color.
- * Supports multiple sizes and thicknesses.
+ * V4.5.9d note: V1 prefers Skeleton (shimmer) over spinners. New V1 surfaces
+ * should use `<Skeleton />` from `@/components/ui` for loading states.
+ * This spinner is retained for backwards compatibility — color tokens
+ * updated to V1 palette (teal-600 accent, ink-500 track) so any existing
+ * call site at least renders V1-consistent colors.
  *
- * Uses an SVG circle animation for crisp rendering at any size.
- * Automatically respects `prefers-reduced-motion` via the
- * motion.css keyframes.
+ * Supports multiple sizes and thicknesses, respects prefers-reduced-motion.
  *
  * @example
- * ```tsx * <LoadingSpinner size="md" label="Loading content" /> *```
+ * ```tsx
+ * <LoadingSpinner size="md" label="Loading content" />
+ * ```
  */
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { V1 } from '@/styles/v1-tokens';
 
 export type SpinnerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type SpinnerVariant = 'accent' | 'current' | 'white';
@@ -26,15 +30,15 @@ const SIZE_CONFIG: Record<SpinnerSize, { dimension: number; stroke: number; labe
 };
 
 const VARIANT_COLORS: Record<SpinnerVariant, string> = {
-  accent: '#C108AB',
+  accent: V1.teal600, // V1 primary teal (was fuchsia #C108AB)
   current: 'currentColor',
-  white: '#FFFFFF',
+  white: V1.white,
 };
 
 export interface LoadingSpinnerProps {
   /** Visual size preset. */
   size?: SpinnerSize;
-  /** Color variant. 'accent' uses the #C108AB brand color. */
+  /** Color variant. 'accent' uses the V1 teal-600 brand color. */
   variant?: SpinnerVariant;
   /** Accessible label. Required for screen readers. */
   label?: string;
@@ -43,11 +47,8 @@ export interface LoadingSpinnerProps {
 }
 
 /**
- * ECHO v6.0 design-aligned loading spinner.
- *
- * Renders a rotating SVG circle with the brand accent color by default.
- * The spinner is accessible: it uses `role="status"` and `aria-busy`,
- * and includes a visually-hidden label for screen readers.
+ * Legacy spinner (V1 prefers `<Skeleton />`). Renders a rotating SVG circle.
+ * Accessible: role="status", aria-busy, visually-hidden label.
  */
 export function LoadingSpinner({
   size = 'md',
@@ -66,10 +67,15 @@ export function LoadingSpinner({
       aria-live="polite"
       aria-busy="true"
       aria-label={label}
-      className={cn('inline-flex items-center justify-center', config.label, className)}
+      className={cn('v1-scope inline-flex items-center justify-center', config.label, className)}
     >
+      <style>{`
+        @media (prefers-reduced-motion: reduce) {
+          .v1-spinner-rotate { animation: none !important; }
+        }
+      `}</style>
       <svg
-        className="animate-spin"
+        className="v1-spinner-rotate animate-spin"
         width={config.dimension}
         height={config.dimension}
         viewBox={`0 0 ${config.dimension} ${config.dimension}`}
@@ -77,15 +83,17 @@ export function LoadingSpinner({
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
       >
+        {/* Track — V1 ink-200 (was echo-text-primary/20) */}
         <circle
           cx={config.dimension / 2}
           cy={config.dimension / 2}
           r={radius}
-          stroke={color}
+          stroke={V1.border}
           strokeWidth={config.stroke}
-          opacity={0.2}
+          opacity={1}
           fill="none"
         />
+        {/* Spinner arc — V1 teal-600 accent */}
         <circle
           cx={config.dimension / 2}
           cy={config.dimension / 2}

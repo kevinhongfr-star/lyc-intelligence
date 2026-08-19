@@ -1,22 +1,45 @@
 /**
- * Phase 5: ECHO v6.0 Toast System
+ * V1 Design System — Toast / Notification
  *
- * Accessible toast notification system with:
- *   - ToastProvider — mount once near the root
- *   - useToast() — returns toast helpers
- *   - toast — static helpers callable outside React
+ * V4.5.9c — re-skinned to V1 brand rules:
+ *   - Slide-in from top-right (V1 motion: 250ms ease).
+ *   - Bordered (1px ink-200), cream bg, no shadow, 0px radius.
+ *   - Text labels for status (NOT color-coded backgrounds). Mono label,
+ *     uppercase: SUCCESS / ERROR / INFO / WARNING.
+ *   - Message body: Inter.
+ *   - Optional action link (teal-600).
+ *   - Close: text "×" (not Lucide icon).
+ *   - Teal-600 focus ring (keyboard-only).
+ *
+ * Accessibility preserved:
+ *   - role="status" / "alert" + aria-live per type
+ *   - Auto-dismiss with pause-on-hover
+ *   - Keyboard dismissible
  *
  * Builds on the existing zustand toastStore for data.
- * Uses ECHO v6.0 design: zero border-radius, #C108AB accent,
- * motion.css animations, and full ARIA compliance.
  *
  * @example
- * ```tsx * // Root setup * <ToastProvider> * <App /> * </ToastProvider> * * // In any component * const toast = useToast(); * toast.success('Saved successfully'); *```
+ * ```tsx
+ * <ToastProvider>
+ *   <App />
+ * </ToastProvider>
+ *
+ * const toast = useToast();
+ * toast.success('Saved successfully');
+ * ```
  */
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { CheckCircle, XCircle, Info, AlertTriangle, X } from 'lucide-react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { cn } from '@/lib/utils';
 import { useToastStore, type ToastType } from '@/stores/toastStore';
+import { V1 } from '@/styles/v1-tokens';
 
 export type { ToastType } from '@/stores/toastStore';
 
@@ -30,11 +53,12 @@ export interface ToastHelpers {
 
 const ToastContext = createContext<ToastHelpers | null>(null);
 
-const TYPE_ICONS: Record<ToastType, React.ReactNode> = {
-  success: <CheckCircle className="w-4 h-4" aria-hidden="true" />,
-  error: <XCircle className="w-4 h-4" aria-hidden="true" />,
-  info: <Info className="w-4 h-4" aria-hidden="true" />,
-  warning: <AlertTriangle className="w-4 h-4" aria-hidden="true" />,
+// V1 status labels — text, not color-coded. Mono uppercase.
+const TYPE_LABEL: Record<ToastType, string> = {
+  success: 'SUCCESS',
+  error: 'ERROR',
+  info: 'INFO',
+  warning: 'WARNING',
 };
 
 const TYPE_ROLE: Record<ToastType, 'status' | 'alert'> = {
@@ -51,36 +75,9 @@ const TYPE_LIVE: Record<ToastType, 'polite' | 'assertive'> = {
   error: 'assertive',
 };
 
-const TYPE_BORDER: Record<ToastType, string> = {
-  success: 'border-[var(--echo-success)]',
-  error: 'border-[var(--echo-error)]',
-  info: 'border-[var(--echo-info)]',
-  warning: 'border-[var(--echo-warning)]',
-};
-
-const TYPE_BG: Record<ToastType, string> = {
-  success: 'bg-[var(--echo-success-soft)]',
-  error: 'bg-[var(--echo-error-soft)]',
-  info: 'bg-[var(--echo-info-soft)]',
-  warning: 'bg-[var(--echo-warning-soft)]',
-};
-
-const TYPE_ICON_COLOR: Record<ToastType, string> = {
-  success: 'text-[var(--echo-success)]',
-  error: 'text-[var(--echo-error)]',
-  info: 'text-[var(--echo-info)]',
-  warning: 'text-[var(--echo-warning)]',
-};
-
-const TYPE_PROGRESS: Record<ToastType, string> = {
-  success: 'bg-[var(--echo-success)]',
-  error: 'bg-[var(--echo-error)]',
-  info: 'bg-[var(--echo-info)]',
-  warning: 'bg-[var(--echo-warning)]',
-};
-
 /**
- * Individual toast item with exit animation and progress bar.
+ * Individual toast item with exit animation.
+ * V1: bordered cream card, mono status label, no shadow.
  */
 interface ToastItemProps {
   id: string;
@@ -128,51 +125,121 @@ function ToastItem({ id, type, message, duration, onDismiss }: ToastItemProps) {
     }
   }, [duration, handleDismiss, isExiting]);
 
+  // V1 toast card: bordered cream, 0 radius, no shadow
+  const cardStyle: React.CSSProperties = {
+    pointerEvents: 'auto',
+    display: 'flex',
+    width: '100%',
+    maxWidth: '24rem',
+    alignItems: 'flex-start',
+    gap: 12,
+    background: V1.cream,
+    border: `1px solid ${V1.border}`,
+    borderRadius: V1.radius,
+    boxShadow: 'none',
+    padding: '12px 14px',
+    color: V1.text,
+    fontFamily: V1.bodyFont,
+    animation: isExiting
+      ? `v1-toast-out ${V1.durNormal}ms cubic-bezier(0.4,0,1,1) forwards`
+      : `v1-toast-in 250ms ${V1.ease} forwards`,
+  };
+
+  // Mono status label — text, not color-coded
+  const labelStyle: React.CSSProperties = {
+    flexShrink: 0,
+    fontFamily: V1.monoFont,
+    fontSize: V1.textMonoPx,
+    fontWeight: V1.fwSemibold,
+    letterSpacing: V1.trackingMono,
+    textTransform: 'uppercase',
+    color: V1.text,
+    paddingTop: 1,
+    minWidth: '4.5em',
+  };
+
+  // Vertical rule between label and message — V1 1px divider
+  const dividerStyle: React.CSSProperties = {
+    flexShrink: 0,
+    width: 1,
+    alignSelf: 'stretch',
+    background: V1.border,
+  };
+
+  const messageStyle: React.CSSProperties = {
+    flex: 1,
+    fontSize: V1.textBodySm,
+    lineHeight: V1.leadingBody,
+    color: V1.text,
+    wordBreak: 'break-word',
+  };
+
+  const closeButtonStyle: React.CSSProperties = {
+    flexShrink: 0,
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 20,
+    height: 20,
+    padding: 0,
+    background: 'transparent',
+    border: 'none',
+    color: V1.textMuted,
+    fontFamily: V1.bodyFont,
+    fontSize: 18,
+    lineHeight: 1,
+    cursor: 'pointer',
+    borderRadius: V1.radius,
+    transition: `color ${V1.durFast}ms ease`,
+  };
+
   return (
-    <div
-      role={TYPE_ROLE[type]}
-      aria-live={TYPE_LIVE[type]}
-      className={cn(
-        'pointer-events-auto flex w-full max-w-sm items-start gap-3 border-l-4 px-4 py-3 shadow-md',
-        'bg-[var(--echo-surface)] text-[var(--echo-text-primary)]',
-        TYPE_BORDER[type],
-        TYPE_BG[type],
-        isExiting
-          ? 'animate-[echo-toast-out_200ms_cubic-bezier(0.4,0,1,1)_forwards]'
-          : 'animate-[echo-toast-in_250ms_cubic-bezier(0.16,1,0.3,1)_forwards]',
-      )}
-      onMouseEnter={pauseTimer}
-      onMouseLeave={resumeTimer}
-      onFocus={pauseTimer}
-      onBlur={resumeTimer}
-    >
-      <span className={cn('mt-0.5 shrink-0', TYPE_ICON_COLOR[type])}>
-        {TYPE_ICONS[type]}
-      </span>
-
-      <p className="flex-1 text-sm leading-relaxed break-words">{message}</p>
-
-      <button
-        type="button"
-        onClick={handleDismiss}
-        aria-label="Dismiss notification"
-        className={cn(
-          'shrink-0 -mr-1 -mt-1 p-1 text-[var(--echo-text-muted)]',
-          'hover:text-[var(--echo-text-primary)] transition-colors',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--echo-accent)]',
-        )}
+    <>
+      <style>{`
+        @keyframes v1-toast-in {
+          from { opacity: 0; transform: translateX(16px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes v1-toast-out {
+          from { opacity: 1; transform: translateX(0); }
+          to { opacity: 0; transform: translateX(16px); }
+        }
+        .v1-toast-close:focus-visible {
+          outline: 2px solid ${V1.teal600};
+          outline-offset: 2px;
+        }
+        .v1-toast-close:hover { color: ${V1.text}; }
+      `}</style>
+      <div
+        role={TYPE_ROLE[type]}
+        aria-live={TYPE_LIVE[type]}
+        style={cardStyle}
+        onMouseEnter={pauseTimer}
+        onMouseLeave={resumeTimer}
+        onFocus={pauseTimer}
+        onBlur={resumeTimer}
       >
-        <X className="w-3.5 h-3.5" aria-hidden="true" />
-      </button>
-    </div>
+        <span style={labelStyle}>{TYPE_LABEL[type]}</span>
+        <span style={dividerStyle} aria-hidden="true" />
+        <p style={messageStyle}>{message}</p>
+        <button
+          type="button"
+          onClick={handleDismiss}
+          aria-label="Dismiss notification"
+          className="v1-toast-close"
+          style={closeButtonStyle}
+        >
+          ×
+        </button>
+      </div>
+    </>
   );
 }
 
 /**
  * Provider — mounts the toast viewport. Place near the root once.
  *
- * @example
- * ```tsx * function App() { * return ( * <ToastProvider> * <YourApp /> * </ToastProvider> * ); * } *```
+ * V1 viewport: top-right, fixed, pointer-events none on container.
  */
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const { toasts, addToast, removeToast } = useToastStore();
@@ -188,26 +255,38 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     [addToast, removeToast],
   );
 
+  const viewportStyle: React.CSSProperties = {
+    pointerEvents: 'none',
+    position: 'fixed',
+    top: 16,
+    right: 16,
+    zIndex: 1080,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    width: '100%',
+    maxWidth: '24rem',
+  };
+
   return (
     <ToastContext.Provider value={helpers}>
       {children}
       <div
         role="region"
         aria-label="Notifications"
-        className="pointer-events-none fixed inset-x-0 top-4 z-[1080] flex flex-col items-center gap-2 px-4 sm:items-end sm:right-4 sm:left-auto sm:inset-x-auto"
+        className={cn('v1-scope')}
+        style={viewportStyle}
       >
-        <div className="flex w-full max-w-sm flex-col gap-2">
-          {toasts.map((t) => (
-            <ToastItem
-              key={t.id}
-              id={t.id}
-              type={t.type}
-              message={t.message}
-              duration={t.duration ?? 4000}
-              onDismiss={removeToast}
-            />
-          ))}
-        </div>
+        {toasts.map((t) => (
+          <ToastItem
+            key={t.id}
+            id={t.id}
+            type={t.type}
+            message={t.message}
+            duration={t.duration ?? 4000}
+            onDismiss={removeToast}
+          />
+        ))}
       </div>
     </ToastContext.Provider>
   );

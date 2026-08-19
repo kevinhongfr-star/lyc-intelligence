@@ -1,22 +1,24 @@
 /**
- * NexusLandingPage — W4-1 / W4-3 / #1295
+ * V4.5.5 — /NEXUS PRODUCT LANDING PAGE (V1 re-skin)
  *
- * The NEXUS landing page at /nexus. Answers "what is NEXUS?" and "how is it
- * different from ChatGPT?" — premium, dark aesthetic, ocean blue accent.
+ * Route: /nexus
+ * Product-focused landing. "/" is the Board Brief / brand story.
+ * /nexus is "see the product" — chat preview, how it works, lenses,
+ * membership tiers, dark teal final CTA, minimal footer.
  *
- * Brand rules:
- *  - Zero border radius everywhere (#1349).
- *  - System serif headings, DM Sans body, IBM Plex Mono labels.
- *  - NEXUS accent = OCEAN / deep blue (#1E4D8C) — one accent per page.
- *  - "complimentary assessment" not "free" · "Executive Introduction" not "free tier".
- *  - Premium not SaaS — confident, specific, no hype.
- *  - Gradients/glows only subtle (2-8% opacity), never structural.
+ * V1 rules: 0px radius, no shadows, no gradients, rule lines, mono labels,
+ * serif display, cream background, teal primary, fuchsia accent sparingly
+ * (recommended/flagship only — used here for the "Professional" tier badge +
+ * the complimentary-baseline CTA marker).
+ *
+ * All copy, links, and tracking stay the same.
  */
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { SEO } from '@/components/seo/SEO';
-import { DS, ACCENT, ACCENT_DARK, ACCENT_LIGHT } from '@/tokens';
 import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
 import { trackCTA } from '@/analytics/eventTracker';
+import { V1 } from '@/styles/v1-tokens';
 
 // ── Capability cards ──
 const CAPABILITIES = [
@@ -42,6 +44,25 @@ const CAPABILITIES = [
   },
 ];
 
+// ── How it works (3 steps) ──
+const STEPS = [
+  {
+    n: '01',
+    title: 'Take a lens.',
+    body: 'Start with the complimentary CPI baseline or any of the 6 executive assessments. ~15 minutes, instant results.',
+  },
+  {
+    n: '02',
+    title: 'NEXUS analyzes.',
+    body: 'Your results are parsed into dimensions, archetypes, and patterns — and connected to every other assessment you take.',
+  },
+  {
+    n: '03',
+    title: 'Discuss with NEXUS.',
+    body: 'Ask NEXUS about positioning, transitions, board readiness, team dynamics. The conversation is grounded in your measurement — not improvised.',
+  },
+];
+
 // ── Differentiators ──
 const DIFFERENTIATORS = [
   {
@@ -62,24 +83,41 @@ const DIFFERENTIATORS = [
   },
 ];
 
-// ── Pricing context ──
+// ── Pricing context — 3 tiers as cards ──
 const PRICING_CONTEXT = [
   {
     tier: 'Executive Introduction',
-    nexus: 'Basic NEXUS access + 1 complimentary assessment',
+    blurb: 'Basic NEXUS access + 1 complimentary assessment.',
+    features: ['1 complimentary assessment', 'Basic NEXUS chat', 'Standard readouts', 'No credit card required'],
     accent: false,
+    ctaLabel: 'Start complimentary',
+    ctaHref: '/assessment/cpi',
   },
   {
     tier: 'Professional',
-    nexus: 'Full NEXUS access + all 6 assessments',
+    blurb: 'Full NEXUS access + all 6 assessments.',
+    features: ['All 6 assessments', 'Full NEXUS chat', 'Advanced analysis', 'Composite scoring', 'Cross-assessment memory'],
     accent: true,
+    ctaLabel: 'See membership',
+    ctaHref: '/pricing',
   },
   {
     tier: 'Executive',
-    nexus: 'Priority NEXUS + advanced insights + PDF reports',
+    blurb: 'Priority NEXUS + advanced insights + PDF reports.',
+    features: ['Everything in Professional', 'Priority NEXUS', 'PDF reports', 'Human Depth add-ons', 'Coaching hours included'],
     accent: false,
+    ctaLabel: 'See membership',
+    ctaHref: '/pricing',
   },
 ];
+
+// ── Chat preview — static mock of a NEXUS exchange ──
+const CHAT_PREVIEW = {
+  eyebrow: 'NEXUS · Conversation',
+  userMsg: 'What does my CPI score mean for a board role?',
+  nexusMsg:
+    'Your composite is 72/100 — Strong. Stakeholder Influence is your leading dimension (84). For a board role, the gap is Cross-border Adaptability (61). Two directors I\u2019ve placed with similar profiles used their first 90 days on the board to reframe governance questions as stakeholder questions. Want me to map that approach to your specific context?',
+};
 
 // ── FAQ ──
 const FAQ = [
@@ -105,174 +143,248 @@ export function NexusLandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   return (
-    <>
+    <div className="v1-scope" style={{ minHeight: '100vh', background: V1.bg, color: V1.text }}>
+      <style>{`
+        @keyframes v1-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .nx-enter { animation: v1-fade-up ${V1.durNormal}ms ${V1.ease} both; }
+        @media (max-width: 880px) {
+          .nx-hero-grid { grid-template-columns: 1fr !important; }
+          .nx-cap-grid { grid-template-columns: 1fr 1fr !important; }
+          .nx-diag-grid { grid-template-columns: repeat(3, 1fr) !important; }
+          .nx-tier-grid { grid-template-columns: 1fr !important; }
+          .nx-diff-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 540px) {
+          .nx-cap-grid { grid-template-columns: 1fr !important; }
+          .nx-diag-grid { grid-template-columns: 1fr 1fr !important; }
+          .nx-step-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+
       <SEO
         title="NEXUS — Executive Intelligence System | LYC Intelligence"
         description="Your always-on intelligence partner for leadership, career, and organizational decisions. Built on two decades of executive search methodology. 6 assessments, analysis, and advisory in one system."
         path="/nexus"
       />
-      <main style={{ background: DS.bgDark, color: DS.bg, minHeight: '100vh' }}>
-        {/* ── 1. HERO ── */}
-        <section style={{ position: 'relative', overflow: 'hidden', padding: '120px 32px 80px' }}>
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: `radial-gradient(circle at 30% 20%, ${ACCENT}14 0%, transparent 60%)`,
-              pointerEvents: 'none',
-            }}
-          />
-          <div style={{ maxWidth: 1080, margin: '0 auto', position: 'relative', display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 48, alignItems: 'center' }} className="nx-hero-grid">
+
+      {/* ── Minimal nav: wordmark + sign-in link ── */}
+      <nav style={{
+        position: 'sticky', top: 0, zIndex: 50,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: `20px ${V1.shellPad}px`,
+        background: V1.bg, borderBottom: `1px solid ${V1.border}`,
+      }}>
+        <Link to="/" className="v1-wordmark" aria-label="NEXUS home">
+          NEXUS<span className="v1-dot">.</span>
+        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          <Link to="/pricing" className="v1-mono" style={{
+            fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+            textTransform: 'uppercase', color: V1.textMuted, textDecoration: 'none',
+          }}>
+            Membership
+          </Link>
+          <Link to="/login" style={{
+            fontFamily: V1.bodyFont, fontSize: V1.textBodySm, fontWeight: V1.fwMedium,
+            color: V1.text, textDecoration: 'none',
+            borderBottom: `1px solid ${V1.text}`,
+            paddingBottom: 2,
+          }}>
+            Sign in
+          </Link>
+        </div>
+      </nav>
+
+      <main>
+        {/* ── 1. HERO: product headline + chat preview card ── */}
+        <section className="nx-enter" style={{
+          padding: `${V1.marketingPadY}px ${V1.shellPad}px ${V1.marketingPadYSm}px`,
+        }}>
+          <div className="nx-hero-grid" style={{
+            maxWidth: 1120, margin: '0 auto',
+            display: 'grid', gridTemplateColumns: '1.05fr 0.95fr',
+            gap: 56, alignItems: 'center',
+          }}>
             <div>
-              <div style={{ fontFamily: DS.monoFont, fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: ACCENT_LIGHT, fontWeight: 600, marginBottom: 16 }}>
+              <div className="v1-mono" style={{
+                fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.textMuted, marginBottom: 16,
+              }}>
                 Executive Intelligence System
               </div>
-              <h1 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 700, lineHeight: 1.08, letterSpacing: '-0.025em', margin: 0, color: DS.bg }}>
+              <h1 style={{
+                fontFamily: V1.displayFont, fontSize: V1.textDisplay, color: V1.text,
+                fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                lineHeight: V1.leadingDisplay, margin: '0 0 20px',
+              }}>
                 Meet NEXUS.
               </h1>
-              <p style={{ fontFamily: DS.bodyFont, fontSize: 'clamp(16px, 1.6vw, 19px)', color: 'rgba(255,255,255,0.72)', lineHeight: 1.55, marginTop: 20, maxWidth: 480 }}>
+              <p style={{
+                fontFamily: V1.bodyFont, fontSize: V1.textBodyLg, color: V1.textSecondary,
+                lineHeight: 1.55, margin: '0 0 32px', maxWidth: 480,
+              }}>
                 Your always-on intelligence partner for leadership, career, and organizational decisions. Built on two decades of LYC executive search methodology.
               </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 36 }}>
-                <a
-                  href="/assessment/cpi"
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+                <Link
+                  to="/assessment/cpi"
                   onClick={() => trackCTA({ location: 'nexus_landing_hero', label: 'Start with a Complimentary Assessment', destination: '/assessment/cpi' })}
                   style={{
-                    background: ACCENT,
-                    color: DS.bg,
-                    border: `1px solid ${ACCENT}`,
-                    fontFamily: DS.bodyFont,
-                    fontSize: 13,
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.14em',
-                    padding: '16px 28px',
-                    minHeight: 48,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    textDecoration: 'none',
-                    transition: DS.transition,
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    minHeight: 48, padding: '14px 24px',
+                    background: V1.teal800, color: V1.white,
+                    border: 'none', fontFamily: V1.bodyFont, fontSize: 15, fontWeight: V1.fwSemibold,
+                    textDecoration: 'none', boxSizing: 'border-box',
+                    transition: `background ${V1.durFast}ms ${V1.ease}`,
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARK)}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = ACCENT)}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = V1.teal900)}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = V1.teal800)}
                 >
-                  Start with a Complimentary Assessment
-                </a>
+                  Start with a complimentary assessment →
+                </Link>
                 <a
                   href="#capabilities"
                   style={{
-                    background: 'transparent',
-                    color: DS.bg,
-                    border: `1px solid rgba(255,255,255,0.3)`,
-                    fontFamily: DS.bodyFont,
-                    fontSize: 13,
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.14em',
-                    padding: '16px 24px',
-                    minHeight: 48,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    textDecoration: 'none',
-                    transition: DS.transition,
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    minHeight: 48, padding: '14px 24px',
+                    background: 'transparent', color: V1.text,
+                    border: `1px solid ${V1.borderStrong}`, fontFamily: V1.bodyFont,
+                    fontSize: 15, fontWeight: V1.fwMedium, textDecoration: 'none',
+                    boxSizing: 'border-box',
+                    transition: `border-color ${V1.durFast}ms ${V1.ease}, color ${V1.durFast}ms ${V1.ease}`,
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = DS.bg)}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)')}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = V1.teal600; e.currentTarget.style.color = V1.teal700; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = V1.borderStrong; e.currentTarget.style.color = V1.text; }}
                 >
-                  See What It Can Do
+                  See what it can do
                 </a>
               </div>
-              <p style={{ fontFamily: DS.monoFont, fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 16, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              <div className="v1-mono" style={{
+                fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.textDim, marginTop: 16,
+              }}>
                 Executive Introduction · No credit card required
-              </p>
+              </div>
             </div>
 
-            {/* NEXUS system visualization — pure SVG, multi-agent nodes */}
-            <div style={{ display: 'flex', justifyContent: 'center' }} className="nx-hero-visual">
-              <svg viewBox="0 0 400 400" style={{ width: '100%', maxWidth: 360, height: 'auto' }} aria-hidden="true">
-                {/* Outer ring */}
-                <circle cx="200" cy="200" r="180" fill="none" stroke={`${ACCENT}33`} strokeWidth="1" />
-                <circle cx="200" cy="200" r="130" fill="none" stroke={`${ACCENT}22`} strokeWidth="1" strokeDasharray="4 6" />
-                {/* Connection lines from center to nodes */}
-                {[0, 72, 144, 216, 288].map((angle) => {
-                  const rad = (angle * Math.PI) / 180;
-                  const x2 = 200 + Math.cos(rad) * 130;
-                  const y2 = 200 + Math.sin(rad) * 130;
-                  return <line key={angle} x1="200" y1="200" x2={x2} y2={y2} stroke={`${ACCENT}40`} strokeWidth="1" />;
-                })}
-                {/* Center node — NEXUS core */}
-                <circle cx="200" cy="200" r="40" fill={`${ACCENT}1A`} stroke={ACCENT} strokeWidth="1.5" />
-                <text x="200" y="195" textAnchor="middle" fontFamily={DS.monoFont} fontSize="9" fill={ACCENT_LIGHT} letterSpacing="0.2em">NEXUS</text>
-                <text x="200" y="210" textAnchor="middle" fontFamily={DS.monoFont} fontSize="7" fill="rgba(255,255,255,0.4)" letterSpacing="0.15em">CORE</text>
-                {/* Agent nodes */}
-                {['ASSESS', 'ANALYZE', 'ADVISE', 'CONNECT', 'MEMORY'].map((label, i) => {
-                  const angle = i * 72;
-                  const rad = (angle * Math.PI) / 180;
-                  const x = 200 + Math.cos(rad) * 130;
-                  const y = 200 + Math.sin(rad) * 130;
-                  return (
-                    <g key={label}>
-                      <circle cx={x} cy={y} r="22" fill={`${ACCENT}12`} stroke={`${ACCENT}66`} strokeWidth="1" />
-                      <text x={x} y={y + 3} textAnchor="middle" fontFamily={DS.monoFont} fontSize="6.5" fill="rgba(255,255,255,0.7)" letterSpacing="0.1em">{label}</text>
-                    </g>
-                  );
-                })}
-                {/* Data points floating */}
-                <circle cx="80" cy="120" r="2" fill={ACCENT_LIGHT} opacity="0.6" />
-                <circle cx="340" cy="150" r="2" fill={ACCENT_LIGHT} opacity="0.5" />
-                <circle cx="100" cy="320" r="2" fill={ACCENT_LIGHT} opacity="0.4" />
-                <circle cx="320" cy="300" r="2" fill={ACCENT_LIGHT} opacity="0.5" />
-              </svg>
+            {/* ── Chat preview card ── */}
+            <div style={{
+              border: `1px solid ${V1.border}`, background: V1.surface,
+              padding: 24,
+            }}>
+              <div className="v1-mono" style={{
+                fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.textMuted, marginBottom: 20,
+              }}>
+                {CHAT_PREVIEW.eyebrow}
+              </div>
+
+              {/* User message — right-aligned bubble */}
+              <div style={{
+                display: 'flex', justifyContent: 'flex-end', marginBottom: 16,
+              }}>
+                <div style={{
+                  maxWidth: '78%', padding: '12px 16px',
+                  background: V1.teal50, color: V1.text,
+                  fontFamily: V1.bodyFont, fontSize: V1.textBodySm, lineHeight: 1.5,
+                }}>
+                  {CHAT_PREVIEW.userMsg}
+                </div>
+              </div>
+
+              {/* NEXUS message — left-aligned with rule bar */}
+              <div style={{
+                display: 'flex', gap: 12, alignItems: 'flex-start',
+              }}>
+                <div className="v1-mono" style={{
+                  fontSize: V1.textCaption, color: V1.teal700,
+                  fontWeight: V1.fwSemibold, letterSpacing: V1.trackingMono,
+                  flexShrink: 0, paddingTop: 12,
+                }}>
+                  NEXUS
+                </div>
+                <div style={{
+                  flex: 1, paddingTop: 12,
+                  borderTop: `1px solid ${V1.borderSubtle}`,
+                  fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary,
+                  lineHeight: 1.6,
+                }}>
+                  {CHAT_PREVIEW.nexusMsg}
+                </div>
+              </div>
+
+              {/* Mock input row */}
+              <div style={{
+                marginTop: 24, padding: '12px 16px',
+                border: `1px solid ${V1.border}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                gap: 12,
+              }}>
+                <span style={{
+                  fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+                  color: V1.textDim,
+                }}>
+                  Ask NEXUS anything…
+                </span>
+                <span className="v1-mono" style={{
+                  fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+                  color: V1.textMuted, textTransform: 'uppercase',
+                }}>
+                  Send →
+                </span>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* ── 2. WHAT IS NEXUS? ── */}
-        <section style={{ padding: '80px 32px', background: DS.bgDark }}>
-          <div style={{ maxWidth: 760, margin: '0 auto' }}>
-            <div style={{ fontFamily: DS.monoFont, fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: ACCENT_LIGHT, fontWeight: 600, marginBottom: 16 }}>
-              What is NEXUS?
-            </div>
-            <p style={{ fontFamily: DS.headingFont, fontSize: 'clamp(22px, 2.6vw, 28px)', fontWeight: 600, lineHeight: 1.35, color: DS.bg, letterSpacing: '-0.01em', margin: 0 }}>
-              Not a chatbot. A multi-agent executive intelligence system.
-            </p>
-            <p style={{ fontFamily: DS.bodyFont, fontSize: 16, color: 'rgba(255,255,255,0.66)', lineHeight: 1.7, marginTop: 20 }}>
-              NEXUS is built on LYC executive search methodology — two decades of placing C-suite leaders across 47 markets. It combines assessments, analysis, and conversation in one surface, so you don\u2019t have to describe your leadership to it. You measure it, then discuss what the measurement means. Think of it as having a leadership advisor available 24/7 — one that already knows the frameworks, the failure patterns, and the questions most executives skip.
-            </p>
-          </div>
-        </section>
-
-        {/* ── 3. WHAT NEXUS CAN DO ── */}
-        <section id="capabilities" style={{ padding: '80px 32px', background: '#0F1118' }}>
-          <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+        {/* ── 2. WHAT NEXUS CAN DO (capabilities, 4 cards) ── */}
+        <section id="capabilities" style={{
+          padding: `${V1.marketingPadY}px ${V1.shellPad}px`,
+          borderTop: `1px solid ${V1.border}`,
+        }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto' }}>
             <div style={{ marginBottom: 48 }}>
-              <div style={{ fontFamily: DS.monoFont, fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: ACCENT_LIGHT, fontWeight: 600, marginBottom: 12 }}>
+              <div className="v1-mono" style={{
+                fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.textMuted, marginBottom: 12,
+              }}>
                 Capabilities
               </div>
-              <h2 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(28px, 3.5vw, 36px)', fontWeight: 700, color: DS.bg, letterSpacing: '-0.02em', margin: 0 }}>
+              <h2 style={{
+                fontFamily: V1.displayFont, fontSize: V1.textH1, color: V1.text,
+                fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                lineHeight: V1.leadingHeading, margin: 0,
+              }}>
                 What NEXUS can do.
               </h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }} className="nx-cap-grid">
+            <div className="nx-cap-grid" style={{
+              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24,
+            }}>
               {CAPABILITIES.map((cap) => (
-                <div
-                  key={cap.title}
-                  style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: `1px solid rgba(255,255,255,0.08)`,
-                    padding: '32px 24px',
-                    transition: DS.transition,
-                  }}
-                >
-                  <div style={{ fontFamily: DS.monoFont, fontSize: 10, letterSpacing: '0.2em', color: ACCENT_LIGHT, marginBottom: 16, fontWeight: 600 }}>
+                <div key={cap.title} style={{
+                  border: `1px solid ${V1.border}`,
+                  background: V1.surface, padding: 28,
+                  display: 'flex', flexDirection: 'column',
+                }}>
+                  <div className="v1-mono" style={{
+                    fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+                    textTransform: 'uppercase', color: V1.teal700, marginBottom: 16,
+                    fontWeight: V1.fwSemibold,
+                  }}>
                     {cap.icon}
                   </div>
-                  <h3 style={{ fontFamily: DS.headingFont, fontSize: 20, fontWeight: 600, color: DS.bg, margin: 0, marginBottom: 10, letterSpacing: '-0.01em' }}>
+                  <h3 style={{
+                    fontFamily: V1.displayFont, fontSize: 22, color: V1.text,
+                    fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                    lineHeight: V1.leadingHeading, margin: '0 0 10px',
+                  }}>
                     {cap.title}
                   </h3>
-                  <p style={{ fontFamily: DS.bodyFont, fontSize: 14, color: 'rgba(255,255,255,0.6)', lineHeight: 1.55, margin: 0 }}>
+                  <p style={{
+                    fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+                    color: V1.textSecondary, lineHeight: 1.55, margin: 0,
+                  }}>
                     {cap.desc}
                   </p>
                 </div>
@@ -281,24 +393,100 @@ export function NexusLandingPage() {
           </div>
         </section>
 
-        {/* ── 4. HOW IT'S DIFFERENT ── */}
-        <section style={{ padding: '80px 32px', background: DS.bgDark }}>
-          <div style={{ maxWidth: 860, margin: '0 auto' }}>
-            <div style={{ marginBottom: 48, textAlign: 'center' }}>
-              <div style={{ fontFamily: DS.monoFont, fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: ACCENT_LIGHT, fontWeight: 600, marginBottom: 12 }}>
-                How it\u2019s different
+        {/* ── 3. HOW IT WORKS (3 steps) ── */}
+        <section style={{
+          padding: `${V1.marketingPadY}px ${V1.shellPad}px`,
+          background: V1.surfaceAlt, borderTop: `1px solid ${V1.border}`,
+          borderBottom: `1px solid ${V1.border}`,
+        }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+            <div style={{ marginBottom: 48 }}>
+              <div className="v1-mono" style={{
+                fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.textMuted, marginBottom: 12,
+              }}>
+                How it works
               </div>
-              <h2 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(28px, 3.5vw, 36px)', fontWeight: 700, color: DS.bg, letterSpacing: '-0.02em', margin: 0 }}>
+              <h2 style={{
+                fontFamily: V1.displayFont, fontSize: V1.textH1, color: V1.text,
+                fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                lineHeight: V1.leadingHeading, margin: 0,
+              }}>
+                Measure. Analyze. Discuss.
+              </h2>
+            </div>
+            <div className="nx-step-grid" style={{
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0,
+              borderTop: `1px solid ${V1.border}`,
+            }}>
+              {STEPS.map((s, i) => (
+                <div key={s.n} style={{
+                  padding: '32px 28px',
+                  borderRight: i < STEPS.length - 1 ? `1px solid ${V1.border}` : 'none',
+                  background: V1.bg,
+                }}>
+                  <div className="v1-mono" style={{
+                    fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+                    textTransform: 'uppercase', color: V1.teal600, marginBottom: 16,
+                    fontWeight: V1.fwSemibold,
+                  }}>
+                    Step {s.n}
+                  </div>
+                  <h3 style={{
+                    fontFamily: V1.displayFont, fontSize: V1.textH3, color: V1.text,
+                    fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                    lineHeight: V1.leadingHeading, margin: '0 0 12px',
+                  }}>
+                    {s.title}
+                  </h3>
+                  <p style={{
+                    fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+                    color: V1.textSecondary, lineHeight: 1.6, margin: 0,
+                  }}>
+                    {s.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 4. HOW IT'S DIFFERENT ── */}
+        <section style={{ padding: `${V1.marketingPadY}px ${V1.shellPad}px` }}>
+          <div style={{ maxWidth: 920, margin: '0 auto' }}>
+            <div style={{ marginBottom: 48, textAlign: 'center' }}>
+              <div className="v1-mono" style={{
+                fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.textMuted, marginBottom: 12,
+              }}>
+                How it&rsquo;s different
+              </div>
+              <h2 style={{
+                fontFamily: V1.displayFont, fontSize: V1.textH1, color: V1.text,
+                fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                lineHeight: V1.leadingHeading, margin: 0,
+              }}>
                 Not a wrapper around a chatbot.
               </h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 }} className="nx-diff-grid">
+            <div className="nx-diff-grid" style={{
+              display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32,
+            }}>
               {DIFFERENTIATORS.map((d) => (
-                <div key={d.title} style={{ borderLeft: `2px solid ${ACCENT}`, paddingLeft: 24 }}>
-                  <h3 style={{ fontFamily: DS.headingFont, fontSize: 18, fontWeight: 600, color: DS.bg, margin: 0, marginBottom: 8 }}>
+                <div key={d.title} style={{
+                  borderLeft: `2px solid ${V1.teal600}`, paddingLeft: 24,
+                }}>
+                  <h3 style={{
+                    fontFamily: V1.displayFont, fontSize: 20, color: V1.text,
+                    fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                    lineHeight: V1.leadingHeading, margin: '0 0 10px',
+                  }}>
                     {d.title}
                   </h3>
-                  <p style={{ fontFamily: DS.bodyFont, fontSize: 14, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, margin: 0 }}>
+                  <p style={{
+                    fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+                    color: V1.textSecondary, lineHeight: 1.6, margin: 0,
+                  }}>
                     {d.body}
                   </p>
                 </div>
@@ -307,34 +495,56 @@ export function NexusLandingPage() {
           </div>
         </section>
 
-        {/* ── 5. DIAGNOSTICS GRID ── */}
-        <section style={{ padding: '80px 32px', background: '#0F1118' }}>
-          <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+        {/* ── 5. LENSES PREVIEW (6 assessments) ── */}
+        <section style={{
+          padding: `${V1.marketingPadY}px ${V1.shellPad}px`,
+          background: V1.surfaceAlt, borderTop: `1px solid ${V1.border}`,
+          borderBottom: `1px solid ${V1.border}`,
+        }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto' }}>
             <div style={{ marginBottom: 40, textAlign: 'center' }}>
-              <div style={{ fontFamily: DS.monoFont, fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: ACCENT_LIGHT, fontWeight: 600, marginBottom: 12 }}>
+              <div className="v1-mono" style={{
+                fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.textMuted, marginBottom: 12,
+              }}>
                 Works with every assessment
               </div>
-              <h2 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(26px, 3vw, 32px)', fontWeight: 700, color: DS.bg, letterSpacing: '-0.02em', margin: 0 }}>
-                All 6 assessments, one intelligence layer.
+              <h2 style={{
+                fontFamily: V1.displayFont, fontSize: V1.textH2, color: V1.text,
+                fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                lineHeight: V1.leadingHeading, margin: '0 0 8px',
+              }}>
+                All 6 lenses, one intelligence layer.
               </h2>
+              <Link to="/assessments" className="v1-mono" style={{
+                fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.teal700,
+                textDecoration: 'none',
+                borderBottom: `1px solid ${V1.teal600}`, paddingBottom: 2,
+              }}>
+                See all lenses →
+              </Link>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12 }} className="nx-diag-grid">
+            <div className="nx-diag-grid" style={{
+              display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12,
+            }}>
               {Object.values(ASSESSMENT_CATALOG).map((a) => (
                 <a
                   key={a.code}
                   href={`/assessment/${a.code.toLowerCase()}`}
                   style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: `1px solid rgba(255,255,255,0.08)`,
-                    padding: '20px 12px',
-                    textAlign: 'center',
-                    textDecoration: 'none',
-                    transition: DS.transition,
+                    border: `1px solid ${V1.border}`,
+                    background: V1.surface, padding: '24px 12px',
+                    textAlign: 'center', textDecoration: 'none',
+                    transition: `border-color ${V1.durFast}ms ${V1.ease}`,
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${ACCENT}66`; e.currentTarget.style.background = `${ACCENT}0A`; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = V1.teal600)}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = V1.border)}
                 >
-                  <div style={{ fontFamily: DS.headingFont, fontSize: 15, fontWeight: 600, color: DS.bg, letterSpacing: '0.02em' }}>
+                  <div style={{
+                    fontFamily: V1.displayFont, fontSize: 22, color: V1.text,
+                    fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                  }}>
                     {a.code}
                   </div>
                 </a>
@@ -343,148 +553,175 @@ export function NexusLandingPage() {
           </div>
         </section>
 
-        {/* ── 6. PRICING TIER CONTEXT ── */}
-        <section style={{ padding: '80px 32px', background: DS.bgDark }}>
-          <div style={{ maxWidth: 760, margin: '0 auto' }}>
-            <div style={{ marginBottom: 32, textAlign: 'center' }}>
-              <div style={{ fontFamily: DS.monoFont, fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: ACCENT_LIGHT, fontWeight: 600, marginBottom: 12 }}>
-                Pricing
+        {/* ── 6. MEMBERSHIP / PRICING (3 tiers as cards) ── */}
+        <section style={{ padding: `${V1.marketingPadY}px ${V1.shellPad}px` }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+            <div style={{ marginBottom: 48, textAlign: 'center' }}>
+              <div className="v1-mono" style={{
+                fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.textMuted, marginBottom: 12,
+              }}>
+                Membership
               </div>
-              <h2 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(26px, 3vw, 32px)', fontWeight: 700, color: DS.bg, letterSpacing: '-0.02em', margin: 0 }}>
+              <h2 style={{
+                fontFamily: V1.displayFont, fontSize: V1.textH2, color: V1.text,
+                fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                lineHeight: V1.leadingHeading, margin: 0,
+              }}>
                 NEXUS access, by tier.
               </h2>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: 'rgba(255,255,255,0.06)' }}>
-              {PRICING_CONTEXT.map((p) => (
-                <div
-                  key={p.tier}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: 24,
-                    background: p.accent ? `${ACCENT}14` : DS.bgDark,
-                    borderLeft: p.accent ? `2px solid ${ACCENT}` : '2px solid transparent',
-                    padding: '20px 24px',
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  <div style={{ fontFamily: DS.headingFont, fontSize: 16, fontWeight: 600, color: p.accent ? ACCENT_LIGHT : DS.bg, minWidth: 180 }}>
+            <div className="nx-tier-grid" style={{
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0,
+              border: `1px solid ${V1.border}`, background: V1.surface,
+            }}>
+              {PRICING_CONTEXT.map((p, i) => (
+                <div key={p.tier} style={{
+                  padding: 32,
+                  borderRight: i < PRICING_CONTEXT.length - 1 ? `1px solid ${V1.border}` : 'none',
+                  background: p.accent ? V1.fuchsia50 : V1.surface,
+                  display: 'flex', flexDirection: 'column',
+                }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12,
+                  }}>
+                    <span className="v1-mono" style={{
+                      fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+                      textTransform: 'uppercase', color: V1.textMuted,
+                    }}>
+                      {p.accent ? 'Recommended' : `Tier 0${i + 1}`}
+                    </span>
+                    {p.accent && (
+                      <span style={{
+                        width: 6, height: 6, background: V1.fuchsia600, display: 'inline-block',
+                      }} aria-hidden="true" />
+                    )}
+                  </div>
+                  <h3 style={{
+                    fontFamily: V1.displayFont, fontSize: 26, color: p.accent ? V1.fuchsia700 : V1.text,
+                    fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                    lineHeight: V1.leadingHeading, margin: '0 0 8px',
+                  }}>
                     {p.tier}
-                  </div>
-                  <div style={{ fontFamily: DS.bodyFont, fontSize: 14, color: 'rgba(255,255,255,0.66)', flex: 1 }}>
-                    {p.nexus}
-                  </div>
+                  </h3>
+                  <p style={{
+                    fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+                    color: V1.textSecondary, lineHeight: 1.55, margin: '0 0 24px',
+                  }}>
+                    {p.blurb}
+                  </p>
+                  <ul style={{
+                    listStyle: 'none', margin: 0, padding: 0,
+                    display: 'flex', flexDirection: 'column', gap: 10,
+                    flex: 1,
+                  }}>
+                    {p.features.map((f) => (
+                      <li key={f} style={{
+                        display: 'flex', gap: 10, alignItems: 'flex-start',
+                        fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+                        color: V1.text, lineHeight: 1.5,
+                      }}>
+                        <span aria-hidden="true" style={{
+                          flexShrink: 0, width: 6, height: 6,
+                          background: V1.teal600, marginTop: 8,
+                        }} />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    to={p.ctaHref}
+                    onClick={() => trackCTA({ location: 'nexus_landing_tier', label: p.ctaLabel, destination: p.ctaHref })}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      minHeight: 48, padding: '14px 24px', marginTop: 24,
+                      background: p.accent ? V1.teal800 : 'transparent',
+                      color: p.accent ? V1.white : V1.text,
+                      border: p.accent ? 'none' : `1px solid ${V1.borderStrong}`,
+                      fontFamily: V1.bodyFont, fontSize: 15, fontWeight: V1.fwSemibold,
+                      textDecoration: 'none', boxSizing: 'border-box',
+                      transition: `background ${V1.durFast}ms ${V1.ease}, border-color ${V1.durFast}ms ${V1.ease}`,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (p.accent) e.currentTarget.style.background = V1.teal900;
+                      else { e.currentTarget.style.borderColor = V1.teal600; e.currentTarget.style.color = V1.teal700; }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (p.accent) e.currentTarget.style.background = V1.teal800;
+                      else { e.currentTarget.style.borderColor = V1.borderStrong; e.currentTarget.style.color = V1.text; }
+                    }}
+                  >
+                    {p.ctaLabel} →
+                  </Link>
                 </div>
               ))}
             </div>
             <div style={{ textAlign: 'center', marginTop: 28 }}>
-              <a
-                href="/pricing"
-                style={{
-                  fontFamily: DS.monoFont,
-                  fontSize: 11,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.14em',
-                  color: ACCENT_LIGHT,
-                  textDecoration: 'underline',
-                  textUnderlineOffset: 4,
-                }}
-              >
-                See full pricing →
-              </a>
+              <Link to="/pricing" className="v1-mono" style={{
+                fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.teal700, textDecoration: 'none',
+                borderBottom: `1px solid ${V1.teal600}`, paddingBottom: 2,
+              }}>
+                See full pricing & feature comparison →
+              </Link>
             </div>
           </div>
         </section>
 
-        {/* ── 7. TRY NEXUS ── */}
-        <section style={{ padding: '96px 32px', background: '#0F1118', position: 'relative', overflow: 'hidden' }}>
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: `radial-gradient(circle at 50% 50%, ${ACCENT}12 0%, transparent 60%)`,
-              pointerEvents: 'none',
-            }}
-          />
-          <div style={{ maxWidth: 620, margin: '0 auto', textAlign: 'center', position: 'relative' }}>
-            <h2 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(28px, 3.5vw, 40px)', fontWeight: 700, color: DS.bg, letterSpacing: '-0.02em', lineHeight: 1.2, margin: 0 }}>
-              Start with a complimentary CPI baseline.
-            </h2>
-            <p style={{ fontFamily: DS.bodyFont, fontSize: 16, color: 'rgba(255,255,255,0.66)', lineHeight: 1.6, marginTop: 18, maxWidth: 460, marginLeft: 'auto', marginRight: 'auto' }}>
-              Take the flagship assessment, then let NEXUS walk you through what your results actually mean — and what to do next.
-            </p>
-            <div style={{ marginTop: 32 }}>
-              <a
-                href="/assessment/cpi"
-                onClick={() => trackCTA({ location: 'nexus_landing_try', label: 'Start Complimentary CPI Baseline', destination: '/assessment/cpi' })}
-                style={{
-                  background: ACCENT,
-                  color: DS.bg,
-                  border: `1px solid ${ACCENT}`,
-                  fontFamily: DS.bodyFont,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.14em',
-                  padding: '18px 36px',
-                  minHeight: 52,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  textDecoration: 'none',
-                  transition: DS.transition,
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_DARK)}
-                onMouseLeave={(e) => (e.currentTarget.style.background = ACCENT)}
-              >
-                Start Your Complimentary Baseline
-              </a>
-            </div>
-            <p style={{ fontFamily: DS.monoFont, fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 16, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              ~15 minutes · Executive Introduction · No credit card
-            </p>
-          </div>
-        </section>
-
-        {/* ── 8. FAQ ── */}
-        <section style={{ padding: '80px 32px 120px', background: DS.bgDark }}>
-          <div style={{ maxWidth: 720, margin: '0 auto' }}>
-            <h2 style={{ fontFamily: DS.headingFont, fontSize: 'clamp(26px, 3vw, 32px)', fontWeight: 700, color: DS.bg, letterSpacing: '-0.02em', textAlign: 'center', marginBottom: 40 }}>
+        {/* ── 7. FAQ ── */}
+        <section style={{
+          padding: `${V1.marketingPadY}px ${V1.shellPad}px`,
+          background: V1.surfaceAlt, borderTop: `1px solid ${V1.border}`,
+          borderBottom: `1px solid ${V1.border}`,
+        }}>
+          <div style={{ maxWidth: 760, margin: '0 auto' }}>
+            <h2 style={{
+              fontFamily: V1.displayFont, fontSize: V1.textH2, color: V1.text,
+              fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+              lineHeight: V1.leadingHeading, textAlign: 'center', margin: '0 0 40px',
+            }}>
               Frequently asked questions
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: 'rgba(255,255,255,0.06)' }}>
+            <div style={{
+              borderTop: `1px solid ${V1.border}`,
+              background: V1.surface,
+            }}>
               {FAQ.map((item, i) => {
                 const isOpen = openFaq === i;
                 return (
-                  <div key={i} style={{ background: DS.bgDark }}>
+                  <div key={i} style={{
+                    borderBottom: `1px solid ${V1.border}`,
+                  }}>
                     <button
                       onClick={() => setOpenFaq(isOpen ? null : i)}
                       aria-expanded={isOpen}
                       style={{
-                        width: '100%',
-                        textAlign: 'left',
-                        background: 'transparent',
-                        border: 'none',
-                        padding: '20px 24px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
+                        width: '100%', textAlign: 'left',
+                        background: 'transparent', border: 'none',
+                        padding: '20px 24px', cursor: 'pointer',
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                         gap: 16,
                       }}
                     >
-                      <span style={{ fontFamily: DS.headingFont, fontSize: 16, fontWeight: 600, color: DS.bg }}>
+                      <span style={{
+                        fontFamily: V1.bodyFont, fontSize: V1.textBody, color: V1.text,
+                        fontWeight: V1.fwMedium,
+                      }}>
                         {item.q}
                       </span>
-                      <span style={{ fontFamily: DS.monoFont, fontSize: 14, color: ACCENT_LIGHT, flexShrink: 0 }}>
+                      <span className="v1-mono" style={{
+                        fontSize: V1.textBody, color: V1.teal700, flexShrink: 0,
+                        fontWeight: V1.fwSemibold,
+                      }}>
                         {isOpen ? '\u2212' : '+'}
                       </span>
                     </button>
                     {isOpen && (
                       <div style={{ padding: '0 24px 24px' }}>
-                        <p style={{ fontFamily: DS.bodyFont, fontSize: 14.5, color: 'rgba(255,255,255,0.66)', lineHeight: 1.65, margin: 0 }}>
+                        <p style={{
+                          fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+                          color: V1.textSecondary, lineHeight: 1.65, margin: 0,
+                        }}>
                           {item.a}
                         </p>
                       </div>
@@ -495,7 +732,108 @@ export function NexusLandingPage() {
             </div>
           </div>
         </section>
+
+        {/* ── 8. FINAL CTA — dark teal ── */}
+        <section style={{
+          padding: `${V1.marketingPadY}px ${V1.shellPad}px`,
+          background: V1.teal900, color: V1.onDark,
+          textAlign: 'center',
+        }}>
+          <div style={{ maxWidth: 640, margin: '0 auto' }}>
+            <div className="v1-mono" style={{
+              fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+              textTransform: 'uppercase', color: V1.onDarkMuted, marginBottom: 16,
+            }}>
+              The full version
+            </div>
+            <h2 style={{
+              fontFamily: V1.displayFont, fontSize: 40, color: V1.onDark,
+              fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+              lineHeight: V1.leadingHeading, margin: '0 0 20px',
+            }}>
+              Start with a complimentary CPI baseline.
+            </h2>
+            <p style={{
+              fontFamily: V1.bodyFont, fontSize: V1.textBody, color: V1.onDarkMuted,
+              lineHeight: 1.6, margin: '0 0 32px', maxWidth: 480,
+              marginLeft: 'auto', marginRight: 'auto',
+            }}>
+              Take the flagship assessment, then let NEXUS walk you through what your results actually mean — and what to do next.
+            </p>
+            <Link
+              to="/assessment/cpi"
+              onClick={() => trackCTA({ location: 'nexus_landing_try', label: 'Start Complimentary CPI Baseline', destination: '/assessment/cpi' })}
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                minHeight: 52, padding: '16px 36px',
+                background: V1.white, color: V1.teal900,
+                border: 'none', fontFamily: V1.bodyFont, fontSize: 15, fontWeight: V1.fwSemibold,
+                textDecoration: 'none', boxSizing: 'border-box',
+                transition: `background ${V1.durFast}ms ${V1.ease}`,
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = V1.teal50)}
+              onMouseLeave={(e) => (e.currentTarget.style.background = V1.white)}
+            >
+              Start your complimentary baseline →
+            </Link>
+            <div className="v1-mono" style={{
+              fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+              textTransform: 'uppercase', color: V1.onDarkMuted, marginTop: 16,
+            }}>
+              ~15 minutes · Executive Introduction · No credit card
+            </div>
+          </div>
+        </section>
+
+        {/* ── 9. Footer (minimal) ── */}
+        <footer style={{
+          padding: '40px 32px',
+          background: V1.bg, borderTop: `1px solid ${V1.border}`,
+          textAlign: 'center',
+        }}>
+          <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
+          }}>
+            <Link to="/" className="v1-wordmark" aria-label="NEXUS home">
+              NEXUS<span className="v1-dot">.</span>
+            </Link>
+            <div className="v1-mono" style={{
+              fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+              textTransform: 'uppercase', color: V1.textMuted,
+            }}>
+              Executive Intelligence System
+            </div>
+            <div style={{
+              display: 'flex', gap: 24, marginTop: 8,
+            }}>
+              <Link to="/pricing" className="v1-mono" style={{
+                fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.textMuted, textDecoration: 'none',
+              }}>
+                Membership
+              </Link>
+              <Link to="/terms" className="v1-mono" style={{
+                fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.textMuted, textDecoration: 'none',
+              }}>
+                Terms
+              </Link>
+              <Link to="/privacy" className="v1-mono" style={{
+                fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+                textTransform: 'uppercase', color: V1.textMuted, textDecoration: 'none',
+              }}>
+                Privacy
+              </Link>
+            </div>
+            <div style={{
+              fontFamily: V1.bodyFont, fontSize: V1.textCaption,
+              color: V1.textDim, marginTop: 8,
+            }}>
+              © 2026 LYC Intelligence
+            </div>
+          </div>
+        </footer>
       </main>
-    </>
+    </div>
   );
 }

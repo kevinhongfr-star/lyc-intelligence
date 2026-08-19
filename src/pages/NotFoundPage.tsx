@@ -1,239 +1,160 @@
 /**
- * Phase 17 / P2-1 — Branded 404 — on-brand, useful links, never drops traffic.
+ * V4.5.8 — ERROR PAGE (404) — V1 re-skin
  *
- * Visual contract with LYC brand rollout:
- *   - Accent #C108AB (magenta) for primary CTA / accent bar
- *   - Display headings: System serif stack (DejaVu Serif / Georgia / Times)
- *   - Body copy: DM Sans
- *   - Zero radius everywhere (no rounded corners)
- *   - No drop-shadow chrome — flat premium
- *   - Tone: warm + deterministic (not cutesy) — this is for executives
+ * Route: /404 (and unmatched routes)
+ *
+ * Centered marketing layout. Editorial, restrained.
+ *  - Mono eyebrow: "404"
+ *  - Display title: understated, not cutesy
+ *  - Sub: one line
+ *  - CTA button: "Go back home →"
+ *
+ * V1 rules: 0px radius, no shadows, cream background, serif display,
+ * mono labels, teal primary. No illustrations, no emoji, no silly copy.
+ *
+ * All routing, SEO, and escape-hatch logic stays the same.
  */
 import React from 'react';
-import { ArrowRight, Compass, Home, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { SEO } from '@/components/seo/SEO';
-import { DS, WHITE } from '@/tokens';
+import { V1 } from '@/styles/v1-tokens';
+
+const POPULAR_ROUTES = [
+  { href: '/nexus', label: 'NEXUS', sub: 'Conversational leadership advisor' },
+  { href: '/assessments', label: 'Assessments', sub: 'Browse all 6 lenses' },
+  { href: '/pricing', label: 'Membership', sub: 'Executive Introduction → Council' },
+  { href: '/login', label: 'Sign in', sub: 'Return to your workspace' },
+];
 
 export default function NotFoundPage() {
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: DS.bg,
-        display: 'flex',
-        alignItems: 'stretch',
-        fontFamily: DS.bodyFont,
-        color: DS.text,
-      }}
-    >
-      <SEO title="Page Not Found — LYC Intelligence" description="The page you're looking for doesn't exist. Explore LYC Intelligence assessments and NEXUS." path="/404" />
-      {/* Left column — accent bar + 404 wordmark */}
-      <div
-        style={{
-          width: 'clamp(220px, 32vw, 440px)',
-          background: DS.bgDark,
-          color: WHITE,
-          padding: 'clamp(32px, 6vw, 72px)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          borderRight: `3px solid ${DS.accent}`,
-        }}
-      >
-        <div>
-          <div
-            aria-hidden
-            style={{
-              display: 'inline-block',
-              height: 6,
-              width: 96,
-              background: DS.accent,
-              marginBottom: 40,
-            }}
-          />
-          <div
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: 'clamp(72px, 12vw, 160px)',
-              lineHeight: 0.92,
-              fontWeight: 700,
-              letterSpacing: '-0.04em',
-              margin: 0,
-            }}
-          >
-            404
+    <div className="v1-scope" style={{
+      minHeight: '100vh', background: V1.bg,
+      display: 'flex', flexDirection: 'column',
+      fontFamily: V1.bodyFont, color: V1.text,
+    }}>
+      <style>{`
+        @keyframes v1-fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .v1-enter { animation: v1-fade-up ${V1.durNormal}ms ${V1.ease} both; }
+      `}</style>
+
+      <SEO
+        title="Page Not Found — NEXUS"
+        description="The page you're looking for doesn't exist. Explore NEXUS assessments and the executive intelligence system."
+        path="/404"
+      />
+
+      {/* Minimal top bar — wordmark only */}
+      <nav style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: `20px ${V1.shellPad}px`, borderBottom: `1px solid ${V1.border}`,
+      }}>
+        <Link to="/" className="v1-wordmark" aria-label="NEXUS home">
+          NEXUS<span className="v1-dot">.</span>
+        </Link>
+      </nav>
+
+      {/* Centered editorial 404 */}
+      <main className="v1-enter" style={{
+        flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', textAlign: 'center',
+        padding: `${V1.marketingPadY}px 24px`,
+      }}>
+        <div style={{ maxWidth: 560, width: '100%' }}>
+          {/* Mono eyebrow */}
+          <div className="v1-mono" style={{
+            fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+            textTransform: 'uppercase', color: V1.textMuted,
+            marginBottom: 24,
+          }}>
+            404 · Not found
           </div>
-          <p
-            style={{
-              fontFamily: DS.bodyFont,
-              fontSize: 14,
-              textTransform: 'uppercase',
-              letterSpacing: '0.18em',
-              color: DS.eyebrow,
-              marginTop: 32,
-              marginBottom: 0,
-              fontWeight: 600,
-            }}
-          >
-            Route not in market
+
+          {/* Display title — understated */}
+          <h1 style={{
+            fontFamily: V1.displayFont, fontSize: V1.textH1, color: V1.text,
+            fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+            lineHeight: V1.leadingHeading, margin: '0 0 16px',
+          }}>
+            This page isn&rsquo;t here.
+          </h1>
+
+          {/* Sub — one line */}
+          <p style={{
+            fontFamily: V1.bodyFont, fontSize: V1.textBody, color: V1.textSecondary,
+            lineHeight: 1.55, margin: '0 0 40px',
+          }}>
+            The link may be out of date, mistyped, or moved during our last reorganization.
           </p>
-        </div>
 
-        <div style={{ opacity: 0.72, fontSize: 12, letterSpacing: '0.02em' }}>
-          <div style={{ marginBottom: 8 }}>LYC Intelligence</div>
-          <div>lyc-intelligence.app</div>
-        </div>
-      </div>
-
-      {/* Right column — narrative + CTAs */}
-      <main
-        style={{
-          flex: 1,
-          padding: 'clamp(32px, 6vw, 88px)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          minWidth: 0,
-        }}
-      >
-        <h1
-          style={{
-            fontFamily: DS.headingFont,
-            fontSize: 'clamp(28px, 3.4vw, 44px)',
-            lineHeight: 1.15,
-            fontWeight: 700,
-            margin: 0,
-            color: DS.text,
-            maxWidth: 640,
+          {/* Primary CTA */}
+          <Link to="/" style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            minHeight: 48, padding: '14px 28px',
+            background: V1.teal800, color: V1.white,
+            border: 'none', fontFamily: V1.bodyFont, fontSize: 15, fontWeight: V1.fwSemibold,
+            textDecoration: 'none', boxSizing: 'border-box',
+            transition: `background ${V1.durFast}ms ${V1.ease}`,
           }}
-        >
-          The page you were looking for doesn&rsquo;t trade here anymore.
-        </h1>
+            onMouseEnter={(e) => (e.currentTarget.style.background = V1.teal900)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = V1.teal800)}>
+            Go back home →
+          </Link>
 
-        <p
-          style={{
-            fontSize: 17,
-            lineHeight: 1.55,
-            color: DS.textSecondary,
-            maxWidth: 560,
-            marginTop: 24,
-            marginBottom: 48,
-          }}
-        >
-          The link may be out of date, mis-typed, or the page may have moved during our
-          portal re-organisation. We don&rsquo;t want to lose you — try one of the paths below.
-        </p>
-
-        {/* Primary CTA */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 56 }}>
-          <a
-            href="/"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '14px 22px',
-              background: DS.accent,
-              color: WHITE,
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: 15,
-            }}
-          >
-            <Home size={16} />
-            Return home
-            <ArrowRight size={16} />
-          </a>
-          <a
-            href="/nexus/chat"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '14px 22px',
-              border: `1.5px solid ${DS.text}`,
-              color: DS.text,
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: 15,
-            }}
-          >
-            <Compass size={16} />
-            Ask NEXUS where to go
-          </a>
-        </div>
-
-        {/* Suggested routes — 4 useful escape hatches */}
-        <div>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              color: DS.eyebrow,
-              marginBottom: 16,
-            }}
-          >
-            Popular routes
+          {/* Popular routes — restrained, useful escape hatches */}
+          <div style={{ marginTop: 80 }}>
+            <div className="v1-mono" style={{
+              fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+              textTransform: 'uppercase', color: V1.textMuted, marginBottom: 20,
+            }}>
+              Or continue to
+            </div>
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1,
+              background: V1.border, border: `1px solid ${V1.border}`,
+              maxWidth: 560, margin: '0 auto',
+            }}>
+              {POPULAR_ROUTES.map((r) => (
+                <Link
+                  key={r.href}
+                  to={r.href}
+                  style={{
+                    padding: '20px 24px', background: V1.surface,
+                    textDecoration: 'none', color: V1.text,
+                    display: 'flex', flexDirection: 'column', gap: 4,
+                    transition: `background ${V1.durFast}ms ${V1.ease}`,
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = V1.surfaceAlt)}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = V1.surface)}
+                >
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+                    fontWeight: V1.fwSemibold, color: V1.text,
+                  }}>
+                    <span>{r.label}</span>
+                    <span aria-hidden="true" style={{
+                      marginLeft: 'auto', color: V1.teal700, fontSize: V1.textBodySm,
+                    }}>→</span>
+                  </div>
+                  <div className="v1-mono" style={{
+                    fontSize: V1.textCaption, color: V1.textMuted,
+                    letterSpacing: V1.trackingMono,
+                  }}>
+                    {r.sub}
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: 12,
-              maxWidth: 720,
-            }}
-          >
-            {[
-              { href: '/pricing',                  icon: <Search size={15} />,  label: 'Pricing & Tiers',          sub: 'Executive Introduction → Council' },
-              { href: '/assessment/prism',         icon: <Search size={15} />,  label: 'PRISM Transition Diagnostic', sub: 'Career transition clarity' },
-              { href: '/assessments',              icon: <Search size={15} />,  label: 'All 6 Leadership Assessments', sub: 'Browse the full catalog' },
-              { href: '/nexus',                    icon: <Search size={15} />,  label: 'NEXUS',                    sub: 'Conversational leadership advisor' },
-            ].map((r) => (
-              <a
-                key={r.href}
-                href={r.href}
-                style={{
-                  padding: '16px 18px',
-                  border: `1px solid ${DS.border}`,
-                  textDecoration: 'none',
-                  color: DS.text,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 4,
-                  transition: 'border-color 120ms ease',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = DS.accent)}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = DS.border)}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}>
-                  {r.icon}
-                  <span>{r.label}</span>
-                  <ArrowRight size={14} style={{ marginLeft: 'auto', color: DS.accent }} />
-                </div>
-                <div style={{ fontSize: 13, color: DS.muted }}>{r.sub}</div>
-              </a>
-            ))}
-          </div>
-        </div>
 
-        {/* Error signature footer */}
-        <div
-          style={{
-            marginTop: 64,
-            fontSize: 12,
-            color: DS.mutedDim,
-            fontFamily: DS.monoFont,
-          }}
-        >
-          HTTP 404 · NotFoundRoute · if you believe this is a system error, contact{' '}
-          <a
-            href="mailto:ops@lyc-intelligence.app"
-            style={{ color: DS.accent, textDecoration: 'none' }}
-          >
-            ops@lyc-intelligence.app
-          </a>
+          {/* Error signature — mono, small, restrained */}
+          <div className="v1-mono" style={{
+            marginTop: 64, fontSize: V1.textCaption, color: V1.textDim,
+            letterSpacing: V1.trackingMono,
+          }}>
+            HTTP 404 · NotFoundRoute
+          </div>
         </div>
       </main>
     </div>

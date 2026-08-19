@@ -1,5 +1,26 @@
+/**
+ * V1 Design System — Skeleton / Loading
+ *
+ * V4.5.9d — re-skinned to V1 brand rules:
+ *   - Subtle shimmer: light-gray gradient (ink-50 → ink-100 → ink-50).
+ *   - Same shape as loaded content (card / text / table / chart / avatar).
+ *   - Zero border radius everywhere.
+ *   - No spinners — shimmer only.
+ *   - V1 motion: 1.5s ease-in-out infinite shimmer sweep.
+ *   - Respects prefers-reduced-motion (CSS handles fallback).
+ *
+ * Variants: block | card | text | table | chart | avatar | shimmer
+ * Animations: pulse | shimmer | none (default: shimmer)
+ *
+ * @example
+ * ```tsx
+ * <Skeleton variant="card" />
+ * <Skeleton variant="text" />
+ * ```
+ */
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { V1 } from '@/styles/v1-tokens';
 
 export type SkeletonVariant = 'block' | 'card' | 'text' | 'table' | 'chart' | 'avatar' | 'shimmer';
 export type SkeletonAnimation = 'pulse' | 'shimmer' | 'none';
@@ -13,13 +34,41 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   height?: string | number;
 }
 
-const SHIMMER_BG =
-  'bg-[linear-gradient(90deg,var(--echo-bg-surface-active,var(--color-bg-tertiary))_25%,var(--echo-bg-surface-hover,var(--color-bg-hover))_50%,var(--echo-bg-surface-active,var(--color-bg-tertiary))_75%)] bg-[length:200%_100%]';
+// V1 subtle shimmer gradient — light gray sweep across ink-50 → ink-100 → ink-50.
+// Defined once here so all skeleton blocks share the same keyframe + gradient.
+const SHIMMER_KEYFRAMES = `
+  @keyframes v1-skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @keyframes v1-skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .v1-skeleton-shimmer,
+    .v1-skeleton-pulse {
+      animation: none !important;
+    }
+  }
+`;
 
-const ANIMATION_CLASS: Record<SkeletonAnimation, string> = {
-  pulse: 'animate-pulse',
-  shimmer: 'animate-[echo-shimmer_1.5s_ease-in-out_infinite]',
-  none: '',
+// V1 shimmer background — linear gradient on ink-50/ink-100.
+const SHIMMER_BG = `linear-gradient(90deg, ${V1.ink50} 25%, ${V1.ink100} 50%, ${V1.ink50} 75%)`;
+
+const ANIMATION_STYLE: Record<SkeletonAnimation, React.CSSProperties> = {
+  pulse: { animation: `v1-skeleton-pulse 1.5s ease-in-out infinite` },
+  shimmer: {
+    background: SHIMMER_BG,
+    backgroundSize: '200% 100%',
+    animation: `v1-skeleton-shimmer 1.5s ease-in-out infinite`,
+  },
+  none: {},
+};
+
+const BLOCK_BASE: React.CSSProperties = {
+  background: V1.ink50,
+  borderRadius: V1.radius,
 };
 
 function resolveDim(value: string | number | undefined, fallback: string): string {
@@ -27,68 +76,153 @@ function resolveDim(value: string | number | undefined, fallback: string): strin
   return typeof value === 'number' ? `${value}px` : value;
 }
 
-function ShimmerSkeleton({ className, style }: { className?: string; style?: React.CSSProperties }) {
+function ShimmerSkeleton({
+  className,
+  style,
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+}) {
   return (
     <div
-      className={cn('bg-bg-tertiary', SHIMMER_BG, 'echo-skeleton h-4 w-full', className)}
-      style={style}
+      className={cn('v1-skeleton v1-skeleton-shimmer', className)}
+      style={{
+        ...BLOCK_BASE,
+        ...ANIMATION_STYLE.shimmer,
+        height: 16,
+        width: '100%',
+        ...style,
+      }}
       aria-hidden="true"
     />
   );
 }
 
-function CardSkeleton({ animation, className }: { animation: SkeletonAnimation; className?: string }) {
+function CardSkeleton({
+  animation,
+  className,
+}: {
+  animation: SkeletonAnimation;
+  className?: string;
+}) {
   return (
-    <div className={cn('w-full h-48 space-y-3', className)} aria-hidden="true">
-      <div className={cn('h-8 w-2/3 bg-bg-tertiary', ANIMATION_CLASS[animation])} />
-      <div className={cn('h-4 w-full bg-bg-tertiary', ANIMATION_CLASS[animation])} />
-      <div className={cn('h-4 w-5/6 bg-bg-tertiary', ANIMATION_CLASS[animation])} />
-      <div className={cn('h-16 w-full bg-bg-tertiary mt-4', ANIMATION_CLASS[animation])} />
+    <div
+      className={cn('v1-scope w-full', className)}
+      style={{ height: 192, display: 'flex', flexDirection: 'column', gap: 12 }}
+      aria-hidden="true"
+    >
+      <style>{SHIMMER_KEYFRAMES}</style>
+      <div style={{ ...BLOCK_BASE, ...ANIMATION_STYLE[animation], height: 32, width: '66%' }} />
+      <div style={{ ...BLOCK_BASE, ...ANIMATION_STYLE[animation], height: 16, width: '100%' }} />
+      <div style={{ ...BLOCK_BASE, ...ANIMATION_STYLE[animation], height: 16, width: '83%' }} />
+      <div style={{ ...BLOCK_BASE, ...ANIMATION_STYLE[animation], height: 64, width: '100%', marginTop: 16 }} />
     </div>
   );
 }
 
-function TextSkeleton({ animation, className }: { animation: SkeletonAnimation; className?: string }) {
+function TextSkeleton({
+  animation,
+  className,
+}: {
+  animation: SkeletonAnimation;
+  className?: string;
+}) {
   return (
-    <div className={cn('w-full space-y-3', className)} aria-hidden="true">
-      <div className={cn('h-4 w-full bg-bg-tertiary', ANIMATION_CLASS[animation])} />
-      <div className={cn('h-4 w-3/4 bg-bg-tertiary', ANIMATION_CLASS[animation])} />
-      <div className={cn('h-4 w-1/2 bg-bg-tertiary', ANIMATION_CLASS[animation])} />
+    <div
+      className={cn('v1-scope w-full', className)}
+      style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+      aria-hidden="true"
+    >
+      <style>{SHIMMER_KEYFRAMES}</style>
+      <div style={{ ...BLOCK_BASE, ...ANIMATION_STYLE[animation], height: 16, width: '100%' }} />
+      <div style={{ ...BLOCK_BASE, ...ANIMATION_STYLE[animation], height: 16, width: '75%' }} />
+      <div style={{ ...BLOCK_BASE, ...ANIMATION_STYLE[animation], height: 16, width: '50%' }} />
     </div>
   );
 }
 
-function TableSkeleton({ animation, rows = 5, className }: { animation: SkeletonAnimation; rows?: number; className?: string }) {
+function TableSkeleton({
+  animation,
+  rows = 5,
+  className,
+}: {
+  animation: SkeletonAnimation;
+  rows?: number;
+  className?: string;
+}) {
   return (
-    <div className={cn('w-full space-y-2', className)} aria-hidden="true">
+    <div
+      className={cn('v1-scope w-full', className)}
+      style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
+      aria-hidden="true"
+    >
+      <style>{SHIMMER_KEYFRAMES}</style>
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className={cn('h-10 w-full bg-bg-tertiary', ANIMATION_CLASS[animation])} />
-      ))}
-    </div>
-  );
-}
-
-function ChartSkeleton({ animation, className }: { animation: SkeletonAnimation; className?: string }) {
-  return (
-    <div className={cn('w-full flex items-end gap-3 h-48', className)} aria-hidden="true">
-      {[60, 80, 45, 90, 70, 55, 85].map((h, i) => (
         <div
           key={i}
-          className={cn('flex-1 bg-bg-tertiary', ANIMATION_CLASS[animation])}
-          style={{ height: `${h}%` }}
+          style={{ ...BLOCK_BASE, ...ANIMATION_STYLE[animation], height: 40, width: '100%' }}
         />
       ))}
     </div>
   );
 }
 
-function AvatarSkeleton({ animation, className }: { animation: SkeletonAnimation; className?: string }) {
+function ChartSkeleton({
+  animation,
+  className,
+}: {
+  animation: SkeletonAnimation;
+  className?: string;
+}) {
+  const heights = [60, 80, 45, 90, 70, 55, 85];
   return (
-    <div className="flex items-center gap-3" aria-hidden="true">
-      <div className={cn('w-10 h-10 bg-bg-tertiary', ANIMATION_CLASS[animation])} />
-      <div className="flex-1 space-y-2">
-        <div className={cn('h-3 w-24 bg-bg-tertiary', ANIMATION_CLASS[animation])} />
-        <div className={cn('h-2 w-16 bg-bg-tertiary', ANIMATION_CLASS[animation])} />
+    <div
+      className={cn('v1-scope w-full', className)}
+      style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 192 }}
+      aria-hidden="true"
+    >
+      <style>{SHIMMER_KEYFRAMES}</style>
+      {heights.map((h, i) => (
+        <div
+          key={i}
+          style={{
+            ...BLOCK_BASE,
+            ...ANIMATION_STYLE[animation],
+            flex: 1,
+            height: `${h}%`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function AvatarSkeleton({
+  animation,
+  className,
+}: {
+  animation: SkeletonAnimation;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn('v1-scope', className)}
+      style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+      aria-hidden="true"
+    >
+      <style>{SHIMMER_KEYFRAMES}</style>
+      <div
+        style={{
+          ...BLOCK_BASE,
+          ...ANIMATION_STYLE[animation],
+          width: 40,
+          height: 40,
+          borderRadius: V1.radiusFull, // avatars may be circular (V1 exception)
+        }}
+      />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ ...BLOCK_BASE, ...ANIMATION_STYLE[animation], height: 12, width: 96 }} />
+        <div style={{ ...BLOCK_BASE, ...ANIMATION_STYLE[animation], height: 8, width: 64 }} />
       </div>
     </div>
   );
@@ -96,7 +230,7 @@ function AvatarSkeleton({ animation, className }: { animation: SkeletonAnimation
 
 export function Skeleton({
   variant = 'block',
-  animation = 'pulse',
+  animation = 'shimmer',
   circle = false,
   rows,
   width,
@@ -111,28 +245,47 @@ export function Skeleton({
 
   if (variant === 'card') return <CardSkeleton animation={animation} className={className} />;
   if (variant === 'text') return <TextSkeleton animation={animation} className={className} />;
-  if (variant === 'table') return <TableSkeleton animation={animation} rows={rows} className={className} />;
+  if (variant === 'table')
+    return <TableSkeleton animation={animation} rows={rows} className={className} />;
   if (variant === 'chart') return <ChartSkeleton animation={animation} className={className} />;
-  if (variant === 'avatar') return <AvatarSkeleton animation={animation} className={className} />;
+  if (variant === 'avatar')
+    return <AvatarSkeleton animation={animation} className={className} />;
 
   if (variant === 'block') {
     if (circle) {
       return (
-        <div
-          className={cn('bg-bg-tertiary', ANIMATION_CLASS[animation], className)}
-          style={{ width: width ?? '2.5rem', height: height ?? '2.5rem', ...style }}
-          aria-hidden="true"
-          {...rest}
-        />
+        <div className={cn('v1-scope', className)}>
+          <style>{SHIMMER_KEYFRAMES}</style>
+          <div
+            style={{
+              ...BLOCK_BASE,
+              ...ANIMATION_STYLE[animation],
+              width: width ?? 40,
+              height: height ?? 40,
+              borderRadius: V1.radiusFull, // circular-only (avatars/rings)
+              ...style,
+            }}
+            aria-hidden="true"
+            {...rest}
+          />
+        </div>
       );
     }
     return (
-      <div
-        className={cn('bg-bg-tertiary', ANIMATION_CLASS[animation], className)}
-        style={{ width: resolveDim(width, '100%'), height: resolveDim(height, '1rem'), ...style }}
-        aria-hidden="true"
-        {...rest}
-      />
+      <div className={cn('v1-scope', className)}>
+        <style>{SHIMMER_KEYFRAMES}</style>
+        <div
+          style={{
+            ...BLOCK_BASE,
+            ...ANIMATION_STYLE[animation],
+            width: resolveDim(width, '100%'),
+            height: resolveDim(height, '16px'),
+            ...style,
+          }}
+          aria-hidden="true"
+          {...rest}
+        />
+      </div>
     );
   }
 

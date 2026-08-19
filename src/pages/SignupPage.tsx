@@ -1,6 +1,16 @@
+/**
+ * V4.5.1 — AUTH PAGE (Signup)
+ *
+ * Route: /signup
+ *
+ * Centered card on cream background, marketing page layout (not app shell).
+ * V1 line-art system: bordered card, no shadow, 0px radius, teal primary,
+ * mono labels, serif display title, text symbols (no Lucide).
+ *
+ * Auth logic, validation, OAuth — all stay the same. 100% visual re-skin.
+ */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Loader2, AlertCircle, User, Building } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from '@/stores/toastStore';
 import { trackSignupSuccess } from '@/analytics/eventTracker';
@@ -11,8 +21,7 @@ import {
   passwordScoreColor,
 } from '@/lib/auth/passwordPolicy';
 import { captureUTMParams, captureAndStoreUTM } from '@/utils/utmTracking';
-import { DS } from '@/tokens';
-import { Logo } from '@/components/ui/Logo';
+import { V1 } from '@/styles/v1-tokens';
 
 export function SignupPage() {
   const navigate = useNavigate();
@@ -75,177 +84,282 @@ export function SignupPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg }}>
-      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
-        <Logo size="md" variant="light" />
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <Link to="/login" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Already have an account? Sign in</Link>
-        </div>
+    <div className="v1-scope" style={{ minHeight: '100vh', background: V1.bg }}>
+      <style>{`
+        .v1-scope input:focus {
+          border-color: ${V1.teal600} !important;
+          outline: none;
+        }
+        .v1-scope input::placeholder { color: ${V1.textDim}; }
+        @keyframes auth-reveal { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .auth-enter { animation: auth-reveal ${V1.durNormal}ms ${V1.ease} both; }
+        @keyframes v1-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      `}</style>
+
+      {/* ── Nav: minimal, wordmark + back link ── */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0,
+        height: V1.navHeight,
+        background: V1.bg,
+        borderBottom: `1px solid ${V1.border}`,
+        zIndex: 100,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: `0 ${V1.shellPad}px`,
+      }}>
+        <Link to="/" className="v1-wordmark" aria-label="NEXUS home">
+          NEXUS<span className="v1-dot">.</span>
+        </Link>
+        <Link to="/login" style={{
+          fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+          color: V1.textMuted, textDecoration: 'none',
+        }}>
+          Have an account? Sign in
+        </Link>
       </nav>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 24px' }}>
-        <div style={{ maxWidth: '420px', width: '100%' }}>
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h1 style={{ fontFamily: DS.headingFont, fontSize: '28px', fontWeight: 600, color: DS.text, margin: '0 0 8px' }}>
-              Create Account
-            </h1>
-            <p style={{ fontSize: '14px', color: DS.muted, lineHeight: 1.6 }}>
-              Join the LYC Intelligence Platform
-            </p>
+      {/* ── Centered card ── */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '64px 24px',
+        minHeight: '100vh',
+      }}>
+        <div className="auth-enter" style={{ maxWidth: 400, width: '100%' }}>
+
+          {/* Brand wordmark + tagline */}
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <div style={{
+              fontFamily: V1.displayFont, fontSize: 28, color: V1.teal700,
+              letterSpacing: V1.trackingTight, marginBottom: 4,
+            }}>
+              NEXUS<span style={{ color: V1.fuchsia600 }}>.</span>
+            </div>
+            <div className="v1-mono" style={{
+              fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+              textTransform: 'uppercase', color: V1.textMuted,
+            }}>
+              Executive intelligence
+            </div>
           </div>
 
-          <div style={{ background: DS.card, border: `1px solid ${DS.cardBorder}`,  padding: '32px', boxShadow: DS.shadow }}>
+          {/* Page title */}
+          <h1 style={{
+            fontFamily: V1.displayFont, fontSize: 30, color: V1.text,
+            fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+            lineHeight: V1.leadingDisplay, margin: '0 0 8px', textAlign: 'center',
+          }}>
+            Create account
+          </h1>
+          <p style={{
+            fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary,
+            lineHeight: 1.5, textAlign: 'center', margin: '0 0 32px',
+          }}>
+            Your workspace starts here.
+          </p>
+
+          {/* Card */}
+          <div style={{
+            border: `1px solid ${V1.border}`,
+            padding: 32,
+            background: V1.surface,
+          }}>
             <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
-                  Full Name
+
+              {/* Name */}
+              <div style={{ marginBottom: 20 }}>
+                <label className="v1-mono" style={{
+                  display: 'block', fontSize: V1.textMonoPx,
+                  letterSpacing: V1.trackingMono, textTransform: 'uppercase',
+                  color: V1.textMuted, marginBottom: 8,
+                }}>
+                  Name
                 </label>
-                <div style={{ position: 'relative' }}>
-                  <User style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: 18, height: 18, color: DS.muted }} />
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Your name"
-                    autoComplete="name"
-                    style={{
-                      width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
-                      color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
-                      fontFamily: DS.bodyFont, boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your full name"
+                  autoComplete="name"
+                  style={{
+                    width: '100%', padding: '12px 16px',
+                    background: V1.bg, border: `1px solid ${V1.borderStrong}`,
+                    color: V1.text, fontSize: 15, outline: 'none',
+                    minHeight: 44, fontFamily: V1.bodyFont,
+                    boxSizing: 'border-box',
+                  }}
+                />
               </div>
 
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+              {/* Email */}
+              <div style={{ marginBottom: 20 }}>
+                <label className="v1-mono" style={{
+                  display: 'block', fontSize: V1.textMonoPx,
+                  letterSpacing: V1.trackingMono, textTransform: 'uppercase',
+                  color: V1.textMuted, marginBottom: 8,
+                }}>
                   Email
                 </label>
-                <div style={{ position: 'relative' }}>
-                  <Mail style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: 18, height: 18, color: DS.muted }} />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@company.com"
-                    autoComplete="email"
-                    style={{
-                      width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
-                      color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
-                      fontFamily: DS.bodyFont, boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  autoComplete="email"
+                  style={{
+                    width: '100%', padding: '12px 16px',
+                    background: V1.bg, border: `1px solid ${V1.borderStrong}`,
+                    color: V1.text, fontSize: 15, outline: 'none',
+                    minHeight: 44, fontFamily: V1.bodyFont,
+                    boxSizing: 'border-box',
+                  }}
+                />
               </div>
 
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
+              {/* Password */}
+              <div style={{ marginBottom: 20 }}>
+                <label className="v1-mono" style={{
+                  display: 'block', fontSize: V1.textMonoPx,
+                  letterSpacing: V1.trackingMono, textTransform: 'uppercase',
+                  color: V1.textMuted, marginBottom: 8,
+                }}>
                   Password
                 </label>
-                <div style={{ position: 'relative' }}>
-                  <Lock style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: 18, height: 18, color: DS.muted }} />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 12 characters"
-                    autoComplete="new-password"
-                    style={{
-                      width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`,
-                      color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
-                      fontFamily: DS.bodyFont, boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
-                {/* #1312: live password strength meter — zero border radius per brand rule */}
-                <div style={{ marginTop: '8px' }}>
-                  <div style={{ display: 'flex', height: '4px', background: '#E5E5E5' }}>
-                    {[0, 1, 2, 3, 4].map((level) => (
-                      <div
-                        key={level}
-                        style={{
-                          width: '20%',
-                          background: level < pwdStrength.score ? passwordScoreColor(pwdStrength.score) : 'transparent',
-                          borderRight: level < 4 ? '1px solid #FFFFFF' : 'none',
-                          transition: 'background-color 200ms cubic-bezier(0.4,0,0.2,1)',
-                        }}
-                      />
-                    ))}
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="At least 12 characters"
+                  autoComplete="new-password"
+                  style={{
+                    width: '100%', padding: '12px 16px',
+                    background: V1.bg, border: `1px solid ${V1.borderStrong}`,
+                    color: V1.text, fontSize: 15, outline: 'none',
+                    minHeight: 44, fontFamily: V1.bodyFont,
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+                {/* #1312: live password strength meter — V1 line-art */}
+                {password && (
+                  <div style={{ marginTop: 10 }}>
+                    <div style={{
+                      display: 'flex', height: 2,
+                      background: V1.dividerRow,
+                    }}>
+                      {[0, 1, 2, 3, 4].map((level) => (
+                        <div
+                          key={level}
+                          style={{
+                            width: '20%',
+                            background: level < pwdStrength.score
+                              ? passwordScoreColor(pwdStrength.score)
+                              : 'transparent',
+                            borderRight: level < 4 ? `1px solid ${V1.surface}` : 'none',
+                            transition: `background-color ${V1.durNormal}ms ${V1.ease}`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <div style={{
+                      display: 'flex', justifyContent: 'space-between',
+                      fontSize: V1.textCaption, marginTop: 6,
+                      fontFamily: V1.bodyFont,
+                    }}>
+                      <span className="v1-mono" style={{
+                        letterSpacing: V1.trackingMono, textTransform: 'uppercase',
+                        color: V1.textMuted,
+                      }}>
+                        {pwdStrength.score > 0 ? passwordScoreLabel(pwdStrength.score) : ' '}
+                      </span>
+                      {pwdStrength.warnings.length > 0 && (
+                        <span style={{ color: V1.fuchsia700 }}>
+                          {pwdStrength.warnings[0]}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: '4px', fontFamily: DS.bodyFont }}>
-                    <span style={{ color: passwordScoreColor(pwdStrength.score) }}>
-                      {pwdStrength.score > 0 ? passwordScoreLabel(pwdStrength.score) : ' '}
-                    </span>
-                    {pwdStrength.warnings.length > 0 && (
-                      <span style={{ color: '#B91C1C' }}>{pwdStrength.warnings[0]}</span>
-                    )}
-                  </div>
-                </div>
+                )}
               </div>
 
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: DS.textSecondary, marginBottom: '8px' }}>
-                  Confirm Password
+              {/* Confirm */}
+              <div style={{ marginBottom: 20 }}>
+                <label className="v1-mono" style={{
+                  display: 'block', fontSize: V1.textMonoPx,
+                  letterSpacing: V1.trackingMono, textTransform: 'uppercase',
+                  color: V1.textMuted, marginBottom: 8,
+                }}>
+                  Confirm password
                 </label>
-                <div style={{ position: 'relative' }}>
-                  <Lock style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: 18, height: 18, color: DS.muted }} />
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your password"
-                    autoComplete="new-password"
-                    style={{
-                      width: '100%', padding: '12px 16px 12px 44px',
-                      background: DS.bg, border: `1px solid ${DS.cardBorder}`, 
-                      color: DS.text, fontSize: '15px', outline: 'none', minHeight: '44px',
-                      fontFamily: DS.bodyFont, boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-enter your password"
+                  autoComplete="new-password"
+                  style={{
+                    width: '100%', padding: '12px 16px',
+                    background: V1.bg, border: `1px solid ${V1.borderStrong}`,
+                    color: V1.text, fontSize: 15, outline: 'none',
+                    minHeight: 44, fontFamily: V1.bodyFont,
+                    boxSizing: 'border-box',
+                  }}
+                />
               </div>
 
+              {/* Error */}
               {error && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: '#FEF2F2',  color: '#DC2626', fontSize: '14px', marginBottom: '20px', fontFamily: DS.bodyFont }}>
-                  <AlertCircle style={{ width: 18, height: 18, flexShrink: 0 }} />
+                <div style={{
+                  padding: '12px 16px',
+                  border: `1px solid ${V1.fuchsia600}`,
+                  background: V1.fuchsia50,
+                  color: V1.fuchsia700,
+                  fontSize: V1.textBodySm, fontFamily: V1.bodyFont,
+                  marginBottom: 20, lineHeight: 1.4,
+                }}>
                   {error}
                 </div>
               )}
 
+              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
                 style={{
                   width: '100%', padding: '14px',
-                  background: DS.accent, color: '#FFFFFF',
-                  border: 'none', 
-                  fontSize: '15px', fontWeight: 600,
+                  background: V1.teal800, color: V1.white,
+                  border: 'none', fontSize: 15, fontWeight: V1.fwSemibold,
                   cursor: loading ? 'not-allowed' : 'pointer',
                   opacity: loading ? 0.7 : 1,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  minHeight: '48px', transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
-                  fontFamily: DS.bodyFont,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  minHeight: 48, fontFamily: V1.bodyFont,
+                  transition: `background ${V1.durFast}ms ${V1.ease}`,
                 }}
+                onMouseEnter={(e) => !loading && (e.currentTarget.style.background = V1.teal900)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = V1.teal800)}
               >
-                {loading ? (
-                  <><Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} />Creating account...</>
-                ) : (
-                  <>Create Account <ArrowRight style={{ width: 18, height: 18 }} /></>
-                )}
+                {loading ? 'Creating account...' : 'Create account →'}
               </button>
             </form>
           </div>
 
-          <p style={{ fontSize: '12px', color: DS.muted, textAlign: 'center', marginTop: '20px', lineHeight: 1.5 }}>
-            By creating an account, you agree to our Terms of Service and Privacy Policy.
+          {/* Footer: terms */}
+          <p style={{
+            fontSize: 12, color: V1.textMuted, textAlign: 'center',
+            marginTop: 20, lineHeight: 1.5, fontFamily: V1.bodyFont,
+          }}>
+            By creating an account, you agree to our{' '}
+            <Link to="/terms" style={{
+              color: V1.teal700, textDecoration: 'none',
+            }}>
+              Terms
+            </Link>{' '}and{' '}
+            <Link to="/privacy" style={{
+              color: V1.teal700, textDecoration: 'none',
+            }}>
+              Privacy Policy
+            </Link>.
           </p>
         </div>
       </div>
-
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } input:focus { border-color: ${DS.accent} !important; box-shadow: 0 0 0 2px rgba(193,8,171,0.2) !important; } input::placeholder { color: ${DS.muted}; }`}</style>
     </div>
   );
 }

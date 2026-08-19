@@ -1,10 +1,26 @@
-
+/**
+ * V4.5.4 — SHARE / PUBLIC READOUT PAGE (V1 re-skin)
+ *
+ * Route: /share/[id]
+ * Standalone page — NOT in app shell. Public-facing.
+ *
+ * Layout:
+ *  - Header: NEXUS wordmark (small, top-left) + "Shared readout" (mono, top-right)
+ *  - Main: readout content (simplified, no right rail)
+ *  - Footer: "Shared by [name] · [date]" (mono, small)
+ *  - CTA bar at bottom: "Experience the full version →" (links to /nexus)
+ *
+ * V1 rules: 0px radius, no shadows, rule lines, mono labels, serif display,
+ * cream background, teal primary, fuchsia accent sparingly.
+ *
+ * Share logic, access control, readout data — all stay the same.
+ */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getShareCard, type ShareCard, type ShareCardType } from '../services/shareCardService';
 import type { SharedAssessmentPayload } from '../services/assessmentShareService';
 import { SEO } from '@/components/seo/SEO';
-import { DS, WHITE } from '@/tokens';
+import { V1 } from '@/styles/v1-tokens';
 
 interface Teaser {
   eyebrow: string;
@@ -13,6 +29,9 @@ interface Teaser {
   headlineSub?: string;
   metric?: { label: string; value: string };
   insights: string[];
+  /** Sharer attribution — surfaced in the V1 footer ("Shared by · · ·"). */
+  sharedBy?: string;
+  sharedAt?: string;
 }
 
 const DIMENSION_LABELS: Record<string, string> = {
@@ -43,8 +62,24 @@ function topDimension(
   return { label: DIMENSION_LABELS[key] || humanizeKey(key), score };
 }
 
+function fmtDate(value?: string | number | null): string | undefined {
+  if (!value) return undefined;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return undefined;
+  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
 function buildTeaserFromCard(card: ShareCard): Teaser {
   const data = card.data || {};
+  const sharedBy =
+    (typeof data.owner_name === 'string' && data.owner_name) ||
+    (typeof data.sharer_name === 'string' && data.sharer_name) ||
+    (typeof data.author_name === 'string' && data.author_name) ||
+    undefined;
+  const sharedAt =
+    fmtDate(card.created_at) ||
+    fmtDate(data.shared_at) ||
+    fmtDate(data.created_at);
 
   switch (card.type as ShareCardType) {
     case 'trident': {
@@ -62,6 +97,8 @@ function buildTeaserFromCard(card: ShareCard): Teaser {
             ? { label: 'Composite Score', value: `${data.composite_score}/100` }
             : undefined,
         insights: insights.slice(0, 2),
+        sharedBy,
+        sharedAt,
       };
     }
 
@@ -88,6 +125,8 @@ function buildTeaserFromCard(card: ShareCard): Teaser {
         headlineSub: 'Cross-border readiness, 3-month change',
         metric: undefined,
         insights: insights.slice(0, 2),
+        sharedBy,
+        sharedAt,
       };
     }
 
@@ -121,6 +160,8 @@ function buildTeaserFromCard(card: ShareCard): Teaser {
             }
           : undefined,
         insights: insights.slice(0, 2),
+        sharedBy,
+        sharedAt,
       };
     }
   }
@@ -166,6 +207,13 @@ function buildTeaserFromPayload(payload: SharedAssessmentPayload): Teaser {
       }`,
     },
     insights: insights.slice(0, 2),
+    sharedBy:
+      (typeof (payload as { sharer_name?: string }).sharer_name === 'string' &&
+        (payload as { sharer_name?: string }).sharer_name) ||
+      undefined,
+    sharedAt:
+      fmtDate((payload as { shared_at?: string }).shared_at) ||
+      fmtDate((payload as { created_at?: string }).created_at),
   };
 }
 
@@ -183,17 +231,13 @@ function getDimsRows(payload: SharedAssessmentPayload): PayloadDimsRow[] {
   }));
 }
 
-const eyebrowStyle: React.CSSProperties = {
-  fontFamily: DS.monoFont,
-  fontSize: '11px',
-  letterSpacing: '2px',
-  textTransform: 'uppercase',
-  color: DS.eyebrow,
-  fontWeight: 600,
-};
-
-function Divider() {
-  return <div style={{ height: '1px', background: DS.border }} />;
+function V1Divider({ subtle = false }: { subtle?: boolean }) {
+  return (
+    <div
+      role="presentation"
+      style={{ height: 1, background: subtle ? V1.borderSubtle : V1.border }}
+    />
+  );
 }
 
 export function SharePage() {
@@ -250,91 +294,121 @@ export function SharePage() {
     }
   };
 
+  // ── Loading: V1 skeleton, no spinner ──────────────────────────────
   if (isLoading) {
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          background: DS.bgAlt,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '24px',
-          gap: '20px',
-        }}
-      >
-        <div
-          role="status"
-          aria-busy="true"
-          aria-label="Preparing profile"
-          style={{
-            width: '40px',
-            height: '40px',
-            border: `3px solid ${DS.border}`,
-            borderTopColor: DS.accent,
-            animation: 'echo-spin 1s linear infinite',
-          }}
-        />
-        <div style={{ ...eyebrowStyle, color: DS.muted }}>Preparing profile</div>
+      <div className="v1-scope" style={{ minHeight: '100vh', background: V1.bg }}>
+        <style>{`
+          @keyframes v1-shimmer {
+            0% { background-position: -480px 0; }
+            100% { background-position: 480px 0; }
+          }
+          .v1-skel {
+            background: linear-gradient(90deg, ${V1.surfaceAlt} 0%, ${V1.borderSubtle} 50%, ${V1.surfaceAlt} 100%);
+            background-size: 960px 100%;
+            animation: v1-shimmer 1.4s linear infinite;
+          }
+          @keyframes v1-fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+          .v1-enter { animation: v1-fade-in ${V1.durNormal}ms ${V1.ease} both; }
+        `}</style>
+
+        {/* Header */}
+        <header style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: `20px ${V1.shellPad}px`, borderBottom: `1px solid ${V1.border}`,
+        }}>
+          <Link to="/" className="v1-wordmark" aria-label="NEXUS home">
+            NEXUS<span className="v1-dot">.</span>
+          </Link>
+          <span className="v1-mono" style={{
+            fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+            textTransform: 'uppercase', color: V1.textMuted,
+          }}>
+            Shared readout
+          </span>
+        </header>
+
+        {/* Skeleton body */}
+        <main style={{
+          maxWidth: 640, margin: '0 auto',
+          padding: `${V1.marketingPadY}px 24px`,
+        }}>
+          <div className="v1-skel" style={{ height: 12, width: 140, marginBottom: 24 }} />
+          <div className="v1-skel" style={{ height: 32, width: '70%', marginBottom: 12 }} />
+          <div className="v1-skel" style={{ height: 20, width: '50%', marginBottom: 32 }} />
+          <div style={{
+            border: `1px solid ${V1.border}`, background: V1.surface, padding: 32,
+          }}>
+            <div className="v1-skel" style={{ height: 12, width: 120, marginBottom: 16 }} />
+            <div className="v1-skel" style={{ height: 24, width: '60%', marginBottom: 10 }} />
+            <div className="v1-skel" style={{ height: 16, width: '40%', marginBottom: 24 }} />
+            <div style={{ height: 1, background: V1.border, margin: '0 -32px 24px' }} />
+            <div className="v1-skel" style={{ height: 12, width: 100, marginBottom: 14 }} />
+            <div className="v1-skel" style={{ height: 14, width: '90%', marginBottom: 8 }} />
+            <div className="v1-skel" style={{ height: 14, width: '75%' }} />
+          </div>
+        </main>
       </div>
     );
   }
 
-  if (error || !shareCard) {
+  // ── Error / not found: V1 EmptyState ──────────────────────────────
+  if (error || (!shareCard && !sharedPayload)) {
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          background: DS.bgAlt,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '24px',
-          textAlign: 'center',
-        }}
-      >
-        <div style={{ maxWidth: '420px' }}>
-          <div style={{ ...eyebrowStyle, marginBottom: '12px' }}>LYC Intelligence</div>
-          <h1
-            style={{
-              fontFamily: DS.headingFont,
-              fontSize: '28px',
-              fontWeight: 700,
-              color: DS.text,
-              marginBottom: '8px',
-              margin: '0 0 8px',
-            }}
-          >
-            Profile unavailable
-          </h1>
-          <p style={{ fontFamily: DS.bodyFont, fontSize: '14px', color: DS.muted, marginBottom: '24px' }}>
-            {error || 'This share card may have expired or been removed.'}
-          </p>
-          <Link
-            to="/"
-            style={{
-              display: 'inline-block',
-              minHeight: '44px',
-              padding: '12px 24px',
-              background: DS.accent,
-              color: WHITE,
-              border: 'none',
-              fontFamily: DS.bodyFont,
-              fontSize: '14px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              lineHeight: '20px',
-              boxSizing: 'border-box',
-              transition: `background ${DS.transition}`,
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.background = DS.accentHover)}
-            onMouseOut={(e) => (e.currentTarget.style.background = DS.accent)}
-          >
-            Go Home
+      <div className="v1-scope" style={{ minHeight: '100vh', background: V1.bg }}>
+        <header style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: `20px ${V1.shellPad}px`, borderBottom: `1px solid ${V1.border}`,
+        }}>
+          <Link to="/" className="v1-wordmark" aria-label="NEXUS home">
+            NEXUS<span className="v1-dot">.</span>
           </Link>
-        </div>
+          <span className="v1-mono" style={{
+            fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+            textTransform: 'uppercase', color: V1.textMuted,
+          }}>
+            Shared readout
+          </span>
+        </header>
+
+        <main style={{
+          maxWidth: 480, margin: '0 auto',
+          padding: `${V1.marketingPadY}px 24px`,
+          textAlign: 'center',
+        }}>
+          <div className="v1-mono" style={{
+            fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+            textTransform: 'uppercase', color: V1.textMuted,
+            marginBottom: 16,
+          }}>
+            404 · Readout unavailable
+          </div>
+          <h1 style={{
+            fontFamily: V1.displayFont, fontSize: V1.textH2, color: V1.text,
+            fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+            lineHeight: V1.leadingHeading, margin: '0 0 12px',
+          }}>
+            This readout can&rsquo;t be shown
+          </h1>
+          <p style={{
+            fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary,
+            lineHeight: 1.5, margin: '0 0 32px',
+          }}>
+            {error || 'This share link may have expired or been revoked by the original owner.'}
+          </p>
+          <Link to="/" style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            minHeight: 48, padding: '14px 24px',
+            background: V1.teal800, color: V1.white,
+            border: 'none', fontFamily: V1.bodyFont, fontSize: 15, fontWeight: V1.fwSemibold,
+            textDecoration: 'none', boxSizing: 'border-box',
+            transition: `background ${V1.durFast}ms ${V1.ease}`,
+          }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = V1.teal900)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = V1.teal800)}>
+            Go home →
+          </Link>
+        </main>
       </div>
     );
   }
@@ -342,176 +416,153 @@ export function SharePage() {
   const teaser = shareCard
     ? buildTeaserFromCard(shareCard)
     : buildTeaserFromPayload(sharedPayload!);
-  const seoTitle = `${teaser.headline} — ${teaser.eyebrow} | LYC Intelligence`;
+  const seoTitle = `${teaser.headline} — ${teaser.eyebrow} | NEXUS`;
   const seoDescription =
-    `${teaser.eyebrow} from LYC Intelligence — ${teaser.headline}${
+    `${teaser.eyebrow} from NEXUS — ${teaser.headline}${
       teaser.metric ? ` · ${teaser.metric.label}: ${teaser.metric.value}` : ''
-    }. Take your complimentary assessment to unlock your full report.`;
+    }. Experience the full version to unlock your complete report.`;
   const payloadDims = sharedPayload ? getDimsRows(sharedPayload) : [];
 
+  const sharedByLine = teaser.sharedBy
+    ? `Shared by ${teaser.sharedBy}${teaser.sharedAt ? ` · ${teaser.sharedAt}` : ''}`
+    : teaser.sharedAt
+      ? `Shared · ${teaser.sharedAt}`
+      : 'Shared readout';
+
   return (
-    <div style={{ minHeight: '100vh', background: DS.bgAlt, padding: '32px 16px 48px' }}>
+    <div className="v1-scope" style={{ minHeight: '100vh', background: V1.bg }}>
+      <style>{`
+        @keyframes v1-fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .v1-enter { animation: v1-fade-in ${V1.durNormal}ms ${V1.ease} both; }
+      `}</style>
+
       <SEO
         title={seoTitle}
         description={seoDescription}
         path={`/share/${id}`}
-        ogImage={shareCard.image_url || undefined}
+        ogImage={shareCard?.image_url || undefined}
       />
 
-      <div
-        style={{
-          maxWidth: '560px',
-          margin: '0 auto',
-          animation: 'echo-fade-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both',
-        }}
-      >
-        {/* Brand wordmark */}
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <span
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: '11px',
-              letterSpacing: '3px',
-              textTransform: 'uppercase',
-              color: DS.text,
-              fontWeight: 600,
-            }}
-          >
-            LYC Intelligence
-          </span>
+      {/* ── Header: wordmark (left) + "Shared readout" (right, mono) ── */}
+      <header style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: `20px ${V1.shellPad}px`, borderBottom: `1px solid ${V1.border}`,
+      }}>
+        <Link to="/" className="v1-wordmark" aria-label="NEXUS home">
+          NEXUS<span className="v1-dot">.</span>
+        </Link>
+        <span className="v1-mono" style={{
+          fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+          textTransform: 'uppercase', color: V1.textMuted,
+        }}>
+          Shared readout
+        </span>
+      </header>
+
+      {/* ── Main: readout content (simplified, no right rail) ── */}
+      <main className="v1-enter" style={{
+        maxWidth: 640, margin: '0 auto',
+        padding: `${V1.marketingPadY}px 24px 48px`,
+      }}>
+        {/* Eyebrow */}
+        <div className="v1-mono" style={{
+          fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+          textTransform: 'uppercase', color: V1.textMuted,
+          marginBottom: 16,
+        }}>
+          {teaser.eyebrow}
         </div>
 
-        {/* Report card */}
-        <article
-          style={{
-            background: DS.card,
-            border: `1px solid ${DS.cardBorder}`,
-            boxShadow: DS.shadow,
-            animation: 'echo-slide-in-up 300ms cubic-bezier(0.16, 1, 0.3, 1) both',
-          }}
-        >
-          {/* Header */}
-          <div style={{ padding: '28px 24px 24px' }}>
-            <div style={{ ...eyebrowStyle, marginBottom: '12px' }}>{teaser.eyebrow}</div>
-            <h1
-              style={{
-                fontFamily: DS.headingFont,
-                fontSize: 'clamp(28px, 8vw, 36px)',
-                fontWeight: 700,
-                lineHeight: 1.1,
-                color: DS.text,
-                margin: '0 0 10px',
-              }}
-            >
-              {teaser.name}
-            </h1>
-            <div
-              style={{
-                fontFamily: DS.headingFont,
-                fontSize: '22px',
-                fontWeight: 600,
-                color: DS.accent,
-                lineHeight: 1.2,
-              }}
-            >
-              {teaser.headline}
-            </div>
-            {teaser.headlineSub && (
-              <div
-                style={{
-                  fontFamily: DS.bodyFont,
-                  fontSize: '14px',
-                  color: DS.muted,
-                  marginTop: '8px',
-                  lineHeight: 1.5,
-                }}
-              >
-                {teaser.headlineSub}
-              </div>
-            )}
-          </div>
+        {/* Name (serif display) */}
+        <h1 style={{
+          fontFamily: V1.displayFont, fontSize: 44, color: V1.text,
+          fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+          lineHeight: V1.leadingDisplay, margin: '0 0 10px',
+        }}>
+          {teaser.name}
+        </h1>
 
-          {/* Metric */}
+        {/* Headline (teal accent, serif) */}
+        <div style={{
+          fontFamily: V1.displayFont, fontSize: 22, color: V1.teal700,
+          fontWeight: V1.fwRegular, lineHeight: 1.3, marginBottom: 8,
+        }}>
+          {teaser.headline}
+        </div>
+
+        {/* Headline sub (inter, secondary) */}
+        {teaser.headlineSub && (
+          <p style={{
+            fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary,
+            lineHeight: 1.5, margin: '0 0 32px',
+          }}>
+            {teaser.headlineSub}
+          </p>
+        )}
+
+        {/* ── Readout card ── */}
+        <article style={{
+          border: `1px solid ${V1.border}`,
+          background: V1.surface,
+        }}>
+          {/* Metric row */}
           {teaser.metric && (
             <>
-              <Divider />
-              <div
-                style={{
-                  padding: '18px 24px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'baseline',
-                  gap: '12px',
-                }}
-              >
-                <span style={eyebrowStyle}>{teaser.metric.label}</span>
-                <span
-                  style={{
-                    fontFamily: DS.headingFont,
-                    fontSize: '20px',
-                    fontWeight: 700,
-                    color: DS.text,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
+              <div style={{
+                padding: '20px 24px',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+                gap: 12,
+              }}>
+                <span className="v1-mono" style={{
+                  fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+                  textTransform: 'uppercase', color: V1.textMuted,
+                }}>
+                  {teaser.metric.label}
+                </span>
+                <span style={{
+                  fontFamily: V1.displayFont, fontSize: 22, color: V1.text,
+                  fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+                  whiteSpace: 'nowrap',
+                }}>
                   {teaser.metric.value}
                 </span>
               </div>
+              <V1Divider />
             </>
           )}
 
           {/* Key insights */}
-          <Divider />
           <div style={{ padding: '24px' }}>
-            <div style={{ ...eyebrowStyle, marginBottom: '14px' }}>Key Insights</div>
+            <div className="v1-mono" style={{
+              fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+              textTransform: 'uppercase', color: V1.textMuted, marginBottom: 14,
+            }}>
+              Key insights
+            </div>
             {teaser.insights.length > 0 ? (
-              <ul
-                style={{
-                  listStyle: 'none',
-                  margin: '0',
-                  padding: '0',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '10px',
-                }}
-              >
+              <ul style={{
+                listStyle: 'none', margin: 0, padding: 0,
+                display: 'flex', flexDirection: 'column', gap: 12,
+              }}>
                 {teaser.insights.map((insight, i) => (
-                  <li
-                    key={i}
-                    style={{
-                      display: 'flex',
-                      gap: '10px',
-                      alignItems: 'flex-start',
-                      fontFamily: DS.bodyFont,
-                      fontSize: '14px',
-                      lineHeight: 1.55,
-                      color: DS.textSecondary,
-                    }}
-                  >
-                    <span
-                      aria-hidden="true"
-                      style={{
-                        flexShrink: 0,
-                        width: '6px',
-                        height: '6px',
-                        background: DS.accent,
-                        marginTop: '7px',
-                      }}
-                    />
+                  <li key={i} style={{
+                    display: 'flex', gap: 12, alignItems: 'flex-start',
+                    fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+                    lineHeight: 1.55, color: V1.textSecondary,
+                  }}>
+                    <span aria-hidden="true" style={{
+                      flexShrink: 0, width: 6, height: 6,
+                      background: V1.teal600, marginTop: 8,
+                    }} />
                     <span>{insight}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p
-                style={{
-                  fontFamily: DS.bodyFont,
-                  fontSize: '14px',
-                  color: DS.muted,
-                  margin: '0',
-                  lineHeight: 1.55,
-                }}
-              >
+              <p style={{
+                fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textMuted,
+                margin: 0, lineHeight: 1.55,
+              }}>
                 A preview of this profile is available in the full report.
               </p>
             )}
@@ -520,63 +571,45 @@ export function SharePage() {
           {/* Dimension breakdown (assessment_shares payloads only) */}
           {payloadDims.length > 0 && (
             <>
-              <Divider />
+              <V1Divider />
               <div style={{ padding: '24px' }}>
-                <div style={{ ...eyebrowStyle, marginBottom: '14px' }}>Dimension Breakdown</div>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                  }}
-                >
+                <div className="v1-mono" style={{
+                  fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+                  textTransform: 'uppercase', color: V1.textMuted, marginBottom: 14,
+                }}>
+                  Dimension breakdown
+                </div>
+                <div style={{
+                  display: 'flex', flexDirection: 'column', gap: 14,
+                }}>
                   {payloadDims.map((d) => (
                     <div key={d.label}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'baseline',
-                          gap: '12px',
-                          marginBottom: '6px',
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontFamily: DS.bodyFont,
-                            fontSize: '13px',
-                            fontWeight: 500,
-                            color: DS.text,
-                          }}
-                        >
+                      <div style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+                        gap: 12, marginBottom: 6,
+                      }}>
+                        <span style={{
+                          fontFamily: V1.bodyFont, fontSize: 13,
+                          fontWeight: V1.fwMedium, color: V1.text,
+                        }}>
                           {d.label}
                         </span>
-                        <span
-                          style={{
-                            fontFamily: DS.monoFont,
-                            fontSize: '12px',
-                            color: DS.textSecondary,
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
+                        <span className="v1-mono" style={{
+                          fontSize: V1.textCaption, color: V1.textSecondary,
+                          whiteSpace: 'nowrap', letterSpacing: V1.trackingMono,
+                        }}>
                           {Math.round(d.score)}/100{d.tier ? ` · ${d.tier}` : ''}
                         </span>
                       </div>
-                      <div
-                        role="presentation"
-                        style={{
-                          width: '100%',
-                          height: '6px',
-                          background: DS.border,
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: `${Math.max(0, Math.min(100, d.score))}%`,
-                            height: '100%',
-                            background: DS.accent,
-                          }}
-                        />
+                      {/* 2px progress bar — V1 standard */}
+                      <div role="presentation" style={{
+                        width: '100%', height: 2, background: V1.borderSubtle,
+                        overflow: 'hidden',
+                      }}>
+                        <div style={{
+                          width: `${Math.max(0, Math.min(100, d.score))}%`,
+                          height: '100%', background: V1.teal600,
+                        }} />
                       </div>
                     </div>
                   ))}
@@ -585,174 +618,101 @@ export function SharePage() {
             </>
           )}
 
-          {/* Privacy / sharer banner — Y1-4 "Privacy: users control what's shared" */}
-          <Divider />
-          <div
-            style={{
-              padding: '14px 24px',
-              background: 'rgba(26,26,26,0.02)',
-            }}
-          >
-            <p
-              style={{
-                fontFamily: DS.bodyFont,
-                fontSize: '12px',
-                color: DS.muted,
-                margin: '0 0 4px',
-                lineHeight: 1.5,
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: DS.monoFont,
-                  letterSpacing: '1px',
-                  textTransform: 'uppercase',
-                  fontWeight: 600,
-                  color: DS.eyebrow,
-                  marginRight: '8px',
-                }}
-              >
-                Privacy
-              </span>
+          {/* Privacy / sharer banner */}
+          <V1Divider subtle />
+          <div style={{ padding: '16px 24px', background: V1.surfaceAlt }}>
+            <p className="v1-mono" style={{
+              fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+              textTransform: 'uppercase', color: V1.textMuted,
+              margin: '0 0 6px', fontWeight: V1.fwSemibold,
+            }}>
+              Privacy
+            </p>
+            <p style={{
+              fontFamily: V1.bodyFont, fontSize: V1.textCaption, color: V1.textMuted,
+              margin: '0 0 6px', lineHeight: 1.5,
+            }}>
               This share was created by the original assessment owner and contains no
               personally identifiable information. Share links can be revoked by the owner at
               any time.
             </p>
-            <p
-              style={{
-                fontFamily: DS.bodyFont,
-                fontSize: '12px',
-                color: DS.muted,
-                margin: '0',
-                lineHeight: 1.5,
-              }}
-            >
+            <p style={{
+              fontFamily: V1.bodyFont, fontSize: V1.textCaption, color: V1.textMuted,
+              margin: 0, lineHeight: 1.5,
+            }}>
               This is a preview. Full reports include executive narrative, archetype deep
               dive, prioritized development roadmap, and a downloadable branded PDF.
             </p>
           </div>
         </article>
 
-        {/* Primary CTA */}
-        <div style={{ marginTop: '24px' }}>
-          <Link
-            to="/assessments"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              minHeight: '48px',
-              padding: '14px 24px',
-              background: DS.accent,
-              color: WHITE,
-              border: 'none',
-              fontFamily: DS.bodyFont,
-              fontSize: '15px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              boxSizing: 'border-box',
-              transition: `background ${DS.transition}`,
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.background = DS.accentHover)}
-            onMouseOut={(e) => (e.currentTarget.style.background = DS.accent)}
-          >
-            Take this assessment yourself →
-          </Link>
-        </div>
-
-        {/* Sign-in prompt */}
-        <div style={{ marginTop: '12px' }}>
-          <Link
-            to="/login"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: '48px',
-              padding: '13px 24px',
-              background: 'transparent',
-              color: DS.textSecondary,
-              border: `1px solid ${DS.cardBorder}`,
-              fontFamily: DS.bodyFont,
-              fontSize: '14px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              boxSizing: 'border-box',
-              transition: `border-color ${DS.transition}, color ${DS.transition}`,
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.borderColor = DS.accent;
-              e.currentTarget.style.color = DS.accent;
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.borderColor = DS.cardBorder;
-              e.currentTarget.style.color = DS.textSecondary;
-            }}
-          >
-            Sign in to unlock your full report
-          </Link>
-        </div>
-
-        {/* Footer */}
-        <footer
-          style={{
-            marginTop: '32px',
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '8px',
+        {/* Secondary text link — Sign in to unlock full report */}
+        <div style={{ marginTop: 24, textAlign: 'center' }}>
+          <Link to="/login" style={{
+            display: 'inline-block', padding: '11px 16px',
+            fontFamily: V1.bodyFont, fontSize: V1.textBodySm, fontWeight: V1.fwMedium,
+            color: V1.text, textDecoration: 'none',
+            borderBottom: `1px solid ${V1.border}`,
+            transition: `border-color ${V1.durFast}ms ${V1.ease}, color ${V1.durFast}ms ${V1.ease}`,
           }}
-        >
-          <div
-            style={{
-              fontFamily: DS.monoFont,
-              fontSize: '11px',
-              letterSpacing: '1.5px',
-              textTransform: 'uppercase',
-              color: DS.muted,
-            }}
-          >
-            Powered by LYC Intelligence
-          </div>
-          <Link
-            to="/nexus/chat"
-            style={{
-              display: 'inline-block',
-              minHeight: '44px',
-              padding: '11px 16px',
-              fontFamily: DS.bodyFont,
-              fontSize: '13px',
-              fontWeight: 500,
-              color: DS.text,
-              textDecoration: 'none',
-              borderBottom: `1px solid ${DS.border}`,
-              boxSizing: 'border-box',
-              transition: `border-color ${DS.transition}, color ${DS.transition}`,
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.borderColor = DS.accent;
-              e.currentTarget.style.color = DS.accent;
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.borderColor = DS.border;
-              e.currentTarget.style.color = DS.text;
-            }}
-          >
-            Discuss your results with NEXUS →
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = V1.teal600;
+            e.currentTarget.style.color = V1.teal700;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = V1.border;
+            e.currentTarget.style.color = V1.text;
+          }}>
+            Sign in to unlock the full report →
           </Link>
-          <div
-            style={{
-              fontFamily: DS.bodyFont,
-              fontSize: '11px',
-              color: DS.muted,
-              marginTop: '4px',
-            }}
-          >
-            © 2026 LYC Intelligence
-          </div>
-        </footer>
+        </div>
+      </main>
+
+      {/* ── Footer: "Shared by [name] · [date]" (mono, small) ── */}
+      <footer style={{
+        borderTop: `1px solid ${V1.border}`,
+        padding: `20px ${V1.shellPad}px`,
+        textAlign: 'center',
+      }}>
+        <div className="v1-mono" style={{
+          fontSize: V1.textCaption, letterSpacing: V1.trackingMono,
+          textTransform: 'uppercase', color: V1.textMuted,
+        }}>
+          {sharedByLine}
+        </div>
+      </footer>
+
+      {/* ── CTA bar at bottom: "Experience the full version →" (links to /nexus) ── */}
+      <div style={{
+        background: V1.teal900, padding: '32px 24px',
+        textAlign: 'center',
+      }}>
+        <div className="v1-mono" style={{
+          fontSize: V1.textMonoPx, letterSpacing: V1.trackingMono,
+          textTransform: 'uppercase', color: V1.onDarkMuted,
+          marginBottom: 10,
+        }}>
+          The full version
+        </div>
+        <h2 style={{
+          fontFamily: V1.displayFont, fontSize: 28, color: V1.onDark,
+          fontWeight: V1.fwRegular, letterSpacing: V1.trackingTight,
+          lineHeight: V1.leadingHeading, margin: '0 0 20px',
+        }}>
+          See what NEXUS sees.
+        </h2>
+        <Link to="/nexus" style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          minHeight: 48, padding: '14px 28px',
+          background: V1.white, color: V1.teal900,
+          border: 'none', fontFamily: V1.bodyFont, fontSize: 15, fontWeight: V1.fwSemibold,
+          textDecoration: 'none', boxSizing: 'border-box',
+          transition: `background ${V1.durFast}ms ${V1.ease}`,
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = V1.teal50)}
+        onMouseLeave={(e) => (e.currentTarget.style.background = V1.white)}>
+          Experience the full version →
+        </Link>
       </div>
     </div>
   );
