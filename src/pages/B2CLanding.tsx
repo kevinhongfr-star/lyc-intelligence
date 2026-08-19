@@ -2,8 +2,8 @@
  * B2CLanding — V2 VISUAL REWORK (V1 foundation)
  *
  * Light-mode line-art system. 8 sections top→bottom:
- *   1. Nav          — How it works / Lenses / Pricing / Chat · CTA "Try NEXUS"
- *   2. Hero         — cream bg, "Executive intelligence that moves with you."
+ *   1. Nav          — How it works / Lenses / Membership · CTA "Begin with your positioning"
+ *   2. Hero         — cream bg, "The leadership playbook you were given was written for a different world."
  *   3. Recognition   — teal-900 dark, credibility marks
  *   4. How it works — 3 numbered steps (01/02/03), rule lines between
  *   5. Lenses       — 11 lens grid, flagship dark callout (CPI), featured entry (PRISM)
@@ -12,7 +12,7 @@
  *   8. Footer       — minimal, brand + "Your context stays yours."
  *
  * Naming rules (enforced):
- *  - "Membership" not "Pricing" in section eyebrow (nav link keeps "Pricing")
+ *  - "Membership" not "Pricing" everywhere (nav link + eyebrow aligned)
  *  - "Lenses" not "Assessments" / "Diagnostics"
  *  - "NEXUS" always by name — never "the AI" / "the coach"
  *  - No "Platform" anywhere (hard ban). No "Architecture" / "architect".
@@ -25,7 +25,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { initScrollReveal } from '@/lib/utils';
 import { V1 } from '@/styles/v1-tokens';
-import { ArrowRight, Compass } from 'lucide-react';
+// FIX 7 — no icon library. Typographic symbols only.
 
 /* ── Canon lens data (11 total — from canon/index.json + miles.ts) ──
  * Descriptors are the canon "descriptor" field. Mile costs are canon-locked.
@@ -82,8 +82,8 @@ const TIERS = [
     price: 99,
     priceLabel: '$99/mo',
     recommended: true,
-    blurb: 'Unlimited NEXUS. The full 11-lens catalog. Branded reports, advanced insights, peer benchmarking.',
-    features: ['Unlimited NEXUS messages', 'Full 11-lens catalog access', 'Branded PDF reports', '5 miles / month'],
+    blurb: 'NEXUS, always on. The full 11-lens catalog. Branded reports, advanced insights, peer benchmarking.',
+    features: ['NEXUS messages, no cap', 'Full 11-lens catalog access', 'Branded PDF reports', '5 miles / month'],
   },
   {
     name: 'Executive',
@@ -111,12 +111,11 @@ export function B2CLanding() {
           <div className="v1-nav-links v1-hidden-mobile">
             <a href="#how-it-works">How it works</a>
             <a href="#lenses">Lenses</a>
-            <a href="#membership">Pricing</a>
-            <Link to="/nexus/chat">Chat</Link>
+            <a href="#membership">Membership</a>
           </div>
           <div className="v1-nav-cta">
             <Link to="/nexus/chat" className="v1-btn v1-btn-primary">
-              Try NEXUS <ArrowRight size={15} />
+              Begin with your positioning <span aria-hidden="true">→</span>
             </Link>
           </div>
         </div>
@@ -130,18 +129,18 @@ export function B2CLanding() {
         <div style={{ maxWidth: 880, margin: '0 auto', textAlign: 'center' }}>
           <div className="v1-eyebrow" style={{ textAlign: 'center' }}>For Senior Leaders</div>
           <h1 className="v1-display reveal" style={{ fontSize: V1.textDisplay, margin: '0 0 24px' }}>
-            Executive intelligence that moves with you.
+            The leadership playbook you were given was written for a different world.
           </h1>
           <p className="reveal" style={{
             fontFamily: V1.bodyFont, fontSize: V1.textBodyLg, lineHeight: V1.leadingBody,
             color: V1.textSecondary, maxWidth: 600, margin: '0 auto 40px',
           }}>
             NEXUS asks the questions most executives skip. Lenses reveal where you actually stand.
-            One private thread, eleven diagnostics, a trajectory you can shape.
+            One private thread, eleven lenses, a trajectory you can shape.
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link to="/nexus/chat" className="v1-btn v1-btn-primary">
-              Start a conversation <ArrowRight size={15} />
+              Begin with your positioning <span aria-hidden="true">→</span>
             </Link>
             <a href="#lenses" className="v1-btn v1-btn-secondary">Explore the lenses</a>
           </div>
@@ -264,11 +263,12 @@ export function B2CLanding() {
           {/* CPI flagship — dark system callout (full width) */}
           {(() => {
             const cpi = LENSES.find(l => l.code === 'CPI')!;
+            const pillarName = PILLARS.find(p => p.id === cpi.pillar)!.name;
             return (
               <Link to="/nexus/chat" className="reveal" style={{ textDecoration: 'none', display: 'block', marginBottom: 24 }}>
                 <div className="v1-card v1-card-system v1-card-hover" style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
                   <div style={{ flex: '0 0 auto' }}>
-                    <div className="v1-mono v1-mono-on-dark" style={{ marginBottom: 8 }}>Flagship · {cpi.pillar}</div>
+                    <div className="v1-mono v1-mono-on-dark" style={{ marginBottom: 8 }}>Flagship · {pillarName}</div>
                     <h3 className="v1-display" style={{ fontSize: V1.textH2, margin: 0 }}>{cpi.code}</h3>
                   </div>
                   <div style={{ flex: '1 1 320px', minWidth: 220 }}>
@@ -314,7 +314,7 @@ export function B2CLanding() {
 
           <div style={{ marginTop: 40 }}>
             <Link to="/nexus/chat" className="v1-btn v1-btn-link">
-              Explore all lenses <ArrowRight size={15} className="v1-arrow" />
+              Explore all lenses <span className="v1-arrow" aria-hidden="true">→</span>
             </Link>
           </div>
         </div>
@@ -361,7 +361,7 @@ export function B2CLanding() {
                 </ul>
                 <div style={{ marginTop: 'auto', paddingTop: 8 }}>
                   <Link to="/nexus/chat" className={`v1-btn ${tier.recommended ? 'v1-btn-primary' : 'v1-btn-secondary'}`} style={{ width: '100%' }}>
-                    {tier.price === 0 ? 'Start free' : `Choose ${tier.name}`} <ArrowRight size={15} />
+                    {tier.price === 0 ? 'Start free' : `Choose ${tier.name}`} <span aria-hidden="true">→</span>
                   </Link>
                 </div>
               </div>
@@ -377,7 +377,12 @@ export function B2CLanding() {
       <section className="v1-section-dark" style={{ padding: '96px 0', textAlign: 'center' }}>
         <div className="v1-marketing">
           <div style={{ maxWidth: 640, margin: '0 auto' }}>
-            <Compass size={28} style={{ color: V1.onDark, marginBottom: 16 }} strokeWidth={1.4} />
+            {/* Editorial ornament — CSS circle + cross (typographic, no icon library) */}
+            <div aria-hidden="true" style={{ width: 28, height: 28, margin: '0 auto 16px', position: 'relative' }}>
+              <div style={{ position: 'absolute', inset: 0, border: `1px solid ${V1.onDark}`, borderRadius: '50%' }} />
+              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1, background: V1.onDark }} />
+              <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 1, background: V1.onDark }} />
+            </div>
             <h2 className="v1-display" style={{ fontSize: V1.textH1, margin: '0 0 16px' }}>
               Open the thread. See where it leads.
             </h2>
@@ -385,7 +390,7 @@ export function B2CLanding() {
               Start wherever you want. No form to fill out first.
             </p>
             <Link to="/nexus/chat" className="v1-btn v1-btn-primary v1-on-dark" style={{ padding: '14px 28px' }}>
-              Try NEXUS <ArrowRight size={15} />
+              Begin with your positioning <span aria-hidden="true">→</span>
             </Link>
           </div>
         </div>

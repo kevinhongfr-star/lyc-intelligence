@@ -599,7 +599,7 @@ I can help you with:
 - Navigate a career transition or cross-border move
 - Benchmark your leadership against APAC executives
 - Build a narrative for board, investors, or stakeholders
-- Take a complimentary leadership assessment
+- Take a complimentary leadership lens
 
 Where would you like to start?`;
 
@@ -611,7 +611,7 @@ export const NEXUS_FIRST_RESPONSE_QUICK_REPLIES: string[] = [
   'Navigate a career transition',
   'Benchmark my leadership',
   'Help with a specific challenge',
-  'Take a complimentary assessment',
+  'Add a complimentary lens',
 ];
 
 /**

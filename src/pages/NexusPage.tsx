@@ -21,7 +21,7 @@
  *  - Miles are a UI unit, never marketed.
  */
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { Send, ArrowRight, LogIn, RefreshCw, Sparkles, Shield, Compass, Check } from 'lucide-react';
+// FIX 7 — no icon library. Typographic symbols only (→, ✓, ◆, ↻, etc.).
 import { sendChatMessage } from '@/services/coze';
 import { useAuthStore } from '@/stores/authStore';
 import { SEO } from '@/components/seo/SEO';
@@ -108,22 +108,22 @@ export function NEXUSPage() {
   }, [searchParams]);
 
   const codeParam = searchParams.get('code');
-  const frameworkContext = useMemo(() => {
+  const lensContext = useMemo(() => {
     if (!codeParam) return undefined;
     const info = ASSESSMENT_CATALOG[codeParam.toUpperCase()];
     if (!info) return undefined;
     const dimList = info.dimensions.map(d => `${d.name} (${d.lowLabel} → ${d.highLabel})`).join('; ');
     return [
-      `=== CURRENT ASSESSMENT CONTEXT ===`,
+      `=== CURRENT LENS CONTEXT ===`,
       `The user is asking about their ${info.name} (${info.code}) results.`,
       `Instrument measures ${info.dimensions.length} dimensions: ${dimList}.`,
       `Tagline: ${info.tagline}`,
-      `Ground your answer in this instrument's framework. Reference the specific dimensions by name when explaining findings.`,
+      `Ground your answer in this instrument. Reference the specific dimensions by name when explaining findings.`,
     ].join('\n');
   }, [codeParam]);
 
   const localAssessmentContext = useMemo(() => buildLocalAssessmentContextForNexus(), []);
-  const combinedContext = [frameworkContext, localAssessmentContext.contextString].filter(Boolean).join('\n\n');
+  const combinedContext = [lensContext, localAssessmentContext.contextString].filter(Boolean).join('\n\n');
   const systemPrompt = useMemo(() => buildNexusSystemPrompt(combinedContext).systemPrompt, [combinedContext]);
 
   const isGuest = !user;
@@ -206,7 +206,7 @@ export function NEXUSPage() {
               </span>
             ) : isGuest ? (
               <Link to="/login" className="v1-btn v1-btn-secondary" onClick={() => trackCTA({ location: 'nexus_chat', label: 'Sign in (header)', destination: '/login' })}>
-                <LogIn size={15} /> Sign in
+                Sign in
               </Link>
             ) : (
               <span className="v1-avatar v1-avatar-sm" title={profile?.name || user?.email || ''}>
@@ -249,15 +249,16 @@ export function NEXUSPage() {
                   <Link to="/nexus/chat" className="v1-sidebar-link v1-active">Chat</Link>
                   <Link to="/nexus/lenses" className="v1-sidebar-link">Lenses</Link>
                   <Link to="/nexus/milestones" className="v1-sidebar-link">Milestones</Link>
+                  <Link to="/nexus/insights" className="v1-sidebar-link">Insights</Link>
                   <Link to="/app/documents" className="v1-sidebar-link">Documents</Link>
                   <Link to="/app/billing" className="v1-sidebar-link">Billing</Link>
                 </div>
                 <div className="v1-sidebar-section">
                   <div className="v1-sidebar-label">Depth</div>
-                  {['PRISM', 'SPARK', 'BRIDGE', 'IMPACT'].map(code => (
-                    <Link to="/nexus/lenses" key={code} className="v1-sidebar-link">{code}<span className="v1-sidebar-meta">lens</span></Link>
+                  {['Positioning', 'Influence', 'Transition', 'Enterprise China'].map(area => (
+                    <Link to="/nexus/lenses" key={area} className="v1-sidebar-link">{area}<span className="v1-sidebar-meta">practice</span></Link>
                   ))}
-                  <Link to="/nexus/lenses" className="v1-sidebar-link">All 11 lenses</Link>
+                  <Link to="/nexus/lenses" className="v1-sidebar-link">All eleven lenses <span aria-hidden="true">→</span></Link>
                 </div>
                 <div className="v1-sidebar-section">
                   <div className="v1-sidebar-label">Human Layer</div>
@@ -311,7 +312,7 @@ export function NEXUSPage() {
                     {m.isError && (
                       <button onClick={() => retry(m)} disabled={loading}
                         className="v1-btn v1-btn-secondary" style={{ marginTop: 8, padding: '6px 12px', fontSize: 12, minHeight: 'auto' }}>
-                        <RefreshCw size={12} /> Try again
+                        <span aria-hidden="true">↻</span> Try again
                       </button>
                     )}
                   </div>
@@ -339,7 +340,11 @@ export function NEXUSPage() {
               {isFirstSession && !loading && (
                 <div className="v1-card v1-card-system nexus-msg-enter" style={{ marginBottom: 20, padding: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                    <Compass size={16} style={{ color: V1.onDark }} strokeWidth={1.4} />
+                    {/* CSS editorial ornament instead of icon library */}
+                    <span aria-hidden="true" style={{ display: 'inline-block', width: 14, height: 14, border: `1px solid ${V1.onDark}`, position: 'relative', borderRadius: '50%' }}>
+                      <span style={{ position: 'absolute', inset: 'auto auto auto -1px', top: '50%', width: 16, height: 1, background: V1.onDark }} />
+                      <span style={{ position: 'absolute', inset: '0 auto auto 50%', left: '50%', width: 1, height: 16, background: V1.onDark, top: '-1px' }} />
+                    </span>
                     <span className="v1-mono v1-mono-on-dark">NEXUS proposes a lens</span>
                   </div>
                   <h3 className="v1-display" style={{ fontSize: V1.textH3, margin: '0 0 6px', color: V1.onDark }}>PRISM — professional branding</h3>
@@ -356,7 +361,7 @@ export function NEXUSPage() {
               {/* First-session: milestone inline badge */}
               {isFirstSession && !loading && (
                 <div className="v1-milestone-badge nexus-msg-enter" style={{ marginBottom: 20, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <Check size={16} style={{ color: V1.fuchsia600, marginTop: 2 }} />
+                  <span aria-hidden="true" style={{ color: V1.fuchsia600, marginTop: 2, fontWeight: 700 }}>✓</span>
                   <div>
                     <div className="v1-mono" style={{ color: V1.fuchsia600, marginBottom: 2 }}>Milestone</div>
                     <div style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.text, lineHeight: V1.leadingBody }}>
@@ -371,7 +376,7 @@ export function NEXUSPage() {
                 <div className="nexus-msg-enter" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
                   {QUICK_REPLIES.map((reply, i) => (
                     <button key={i} onClick={() => send(reply)} className="v1-chip" style={{ minHeight: 36 }}>
-                      {reply} <ArrowRight size={13} />
+                      {reply} <span aria-hidden="true">→</span>
                     </button>
                   ))}
                 </div>
@@ -385,7 +390,7 @@ export function NEXUSPage() {
                     Create a profile for full NEXUS access, the 11-lens catalog, and saved conversation history.
                   </p>
                   <Link to="/signup" onClick={() => trackCTA({ location: 'nexus_chat', label: 'Create Account (guest limit CTA)', destination: '/signup' })} className="v1-btn v1-btn-primary">
-                    Create profile <ArrowRight size={15} />
+                    Create profile <span aria-hidden="true">→</span>
                   </Link>
                 </div>
               )}
@@ -415,7 +420,7 @@ export function NEXUSPage() {
                   style={{ minHeight: 40, maxHeight: 150 }}
                 />
                 <button onClick={() => send()} disabled={loading || !input.trim() || showGuestLimit} className="v1-send-btn" aria-label="Send message">
-                  <Send size={16} />
+                  <span aria-hidden="true">→</span>
                 </button>
               </div>
               <p className="v1-mono" style={{ textAlign: 'center', marginTop: 8, color: V1.textDim }}>
@@ -486,7 +491,7 @@ export function NEXUSPage() {
             )}
             <div className="v1-sidebar-section">
               <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                <Shield size={14} style={{ color: V1.teal600, marginTop: 2, flexShrink: 0 }} strokeWidth={1.4} />
+                <span aria-hidden="true" style={{ color: V1.teal600, marginTop: 1, flexShrink: 0, fontSize: 14, lineHeight: 1 }}>◆</span>
                 <p className="v1-mono" style={{ color: V1.textMuted, lineHeight: V1.leadingLabel, textTransform: 'none', letterSpacing: 0, fontFamily: V1.bodyFont, fontSize: 11 }}>
                   Your context stays yours. Nothing leaves this thread without your say.
                 </p>
