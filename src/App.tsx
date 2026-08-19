@@ -138,6 +138,31 @@ const DiagnosticResultsPage = lazy(() => import('@/pages/DiagnosticResultsPage')
 const LensesLibraryPage = lazy(() => import('@/pages/LensesLibraryPage').then(m => ({ default: m.LensesLibraryPage })));
 const LensReadoutPage = lazy(() => import('@/pages/LensReadoutPage').then(m => ({ default: m.LensReadoutPage })));
 
+// ── V3.5 IA — Lens taking flow (V1 line-art system) ──
+// The diagnostic/lens-taking wizard: intro screen → 5 question types →
+// completion → readout transition. 100% presentation layer over the existing
+// diagnosticApi (getDiagnostic / createAttempt / saveResponse / completeAttempt
+// / resumeAnonAttempt). Engine, question content, scoring, mile deductions
+// all untouched.
+const LensTakeFlowPage = lazy(() => import('@/pages/LensTakeFlowPage').then(m => ({ default: m.LensTakeFlowPage })));
+
+// ── V3 IA — Legacy redirect helpers ──
+// React Router v6 <Navigate> does not auto-substitute route params, so we use
+// small wrapper components that read useParams() and construct the target
+// URL. This keeps /assessment/:code and /assessment/:code/results/:id working.
+function LegacyAssessmentLandingRedirect() {
+  const { code } = useParams<{ code: string }>();
+  return <Navigate to={`/nexus/lenses/${(code || '').toLowerCase()}`} replace />;
+}
+function LegacyAssessmentReadoutRedirect() {
+  const { code, id } = useParams<{ code: string; id: string }>();
+  return <Navigate to={`/nexus/lenses/${(code || '').toLowerCase()}/readout/${id}`} replace />;
+}
+function LegacyAssessmentTakeRedirect() {
+  const { code } = useParams<{ code: string }>();
+  return <Navigate to={`/nexus/lenses/${(code || '').toLowerCase()}/take`} replace />;
+}
+
 // ── Authenticated user pages — shared across leader / (in future) candidate ──
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
@@ -304,6 +329,11 @@ export default function App() {
             <Route path="nexus/lenses/leap" element={<LeapLanding />} />
             <Route path="nexus/lenses/impact" element={<ImpactLanding />} />
             <Route path="nexus/lenses/:code" element={<CanonicalInstrumentLanding />} />
+            {/* V3.5 IA — canonical lens-taking flow (V1 line-art wizard). Sits
+                between the lenses library and the readout. 100% presentation
+                layer over diagnosticApi (getDiagnostic / createAttempt /
+                saveResponse / completeAttempt / resumeAnonAttempt). */}
+            <Route path="nexus/lenses/:code/take" element={<LensTakeFlowPage />} />
             <Route path="nexus/lenses/:code/readout/:resultId" element={<LensReadoutPage />} />
             <Route path="nexus/milestones" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="pricing" element={<PricingPage />} />
@@ -352,8 +382,13 @@ export default function App() {
             <Route path="assessment/bridge/take" element={<BridgeTakePage />} />
             <Route path="assessment/drive/take" element={<DriveTakePage />} />
             <Route path="assessment/mosaic/take" element={<MosaicTakePage />} />
+            {/* V3.5 IA — redirect legacy :code/take URLs to the V1 lens-taking flow.
+                Catches any /assessment/[code]/take not handled by a specialized
+                take route above (e.g. /assessment/forge/take already specialized;
+                /assessment/quest/take falls through to here). */}
+            <Route path="assessment/:code/take" element={<LegacyAssessmentTakeRedirect />} />
             {/* Generic canonical landing for 4 remaining instruments: FORGE, BRIDGE, MOSAIC, DRIVE */}
-            <Route path="assessment/:code" element={<Navigate to="/nexus/lenses/:code" replace />} />
+            <Route path="assessment/:code" element={<LegacyAssessmentLandingRedirect />} />
             {/* Batch 5 · W4-T10 — Assessment depth pages (deep-link only, not browsable from nav). 11 instances, data-driven from canon. */}
             <Route path="assessment/:code/deep" element={<AssessmentDepthPage />} />
             {/* V3 IA — redirect legacy :id-style results URLs to the V1 readout page.
@@ -361,7 +396,7 @@ export default function App() {
                 /assessment/impact/results/:id, and any future :id-style results URL.
                 (No-id variants like /assessment/cpi/results stay as-is — they have
                 their own specialized results components with bespoke loading logic.) */}
-            <Route path="assessment/:code/results/:id" element={<Navigate to="/nexus/lenses/:code/readout/:id" replace />} />
+            <Route path="assessment/:code/results/:id" element={<LegacyAssessmentReadoutRedirect />} />
 
             {/* Results routes — post-assessment (shareable / bookmarkable) */}
             {/* Keep all results routes — bookmarks from prior sessions must not break. */}

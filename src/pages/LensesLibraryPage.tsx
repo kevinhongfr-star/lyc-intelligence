@@ -128,7 +128,7 @@ function StatusBadge({ status }: { status: Status }) {
 }
 
 /* ── Lens row (rows, not cards) ── */
-function LensRow({ lens, completedCodes }: { lens: Lens; completedCodes: Set<string> }) {
+function LensRow({ lens, completedCodes }: { lens: Lens; completedCodes: Set<string>; key?: string }) {
   const status = lensStatus(lens, completedCodes);
   const isFeatured = lens.featured;
   return (
@@ -191,7 +191,7 @@ export function LensesLibraryPage() {
   useEffect(() => {
     try {
       const codes = new Set<string>();
-      const slugs = LENSES.map(l => l.code.toLowerCase());
+      const slugs: string[] = LENSES.map((l: Lens) => l.code.toLowerCase());
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
         if (!k) continue;
@@ -214,10 +214,10 @@ export function LensesLibraryPage() {
 
   // Group filtered lenses by pillar for display
   const grouped = useMemo(() => {
-    return PILLARS.map(p => ({
+    return PILLARS.map((p: typeof PILLARS[number]) => ({
       pillar: p,
-      lenses: filteredLenses.filter(l => l.pillar === p.id),
-    })).filter(g => g.lenses.length > 0);
+      lenses: filteredLenses.filter((l: Lens) => l.pillar === p.id),
+    })).filter((g: { pillar: typeof PILLARS[number]; lenses: Lens[] }) => g.lenses.length > 0);
   }, [filteredLenses]);
 
   return (
@@ -322,7 +322,7 @@ export function LensesLibraryPage() {
 
             {/* Lens list grouped by pillar */}
             <div>
-              {grouped.map(group => (
+              {grouped.map((group: { pillar: typeof PILLARS[number]; lenses: Lens[] }) => (
                 <section key={group.pillar.id} style={{ marginTop: 32 }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 4 }}>
                     <span className="v1-mono" style={{ color: V1.teal700, fontWeight: V1.fwSemibold }}>{group.pillar.id}</span>
@@ -331,7 +331,7 @@ export function LensesLibraryPage() {
                     </h2>
                   </div>
                   <div>
-                    {group.lenses.map(lens => (
+                    {group.lenses.map((lens: Lens) => (
                       <LensRow key={lens.code} lens={lens} completedCodes={completedCodes} />
                     ))}
                   </div>

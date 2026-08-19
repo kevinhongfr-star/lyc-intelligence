@@ -32,7 +32,7 @@ import { SEO } from '@/components/seo/SEO';
 import { V1 } from '@/styles/v1-tokens';
 import { useAuthStore } from '@/stores/authStore';
 import { getResult } from '@/services/diagnosticApi';
-import type { ScoringResult } from '@/services/diagnosticScoring';
+import type { ScoringResult, DimensionScore } from '@/services/diagnosticScoring';
 
 /* ── Canon lens metadata for header + dimension fallback ──
  * Code → human name. Descriptors from canon/index.json.
@@ -61,7 +61,7 @@ function scoreColor(score: number): string {
 }
 
 /* ── Mini bar (2px thin, editorial) ── */
-function MiniBar({ score, label }: { score: number; label?: string }) {
+function MiniBar({ score, label }: { score: number; label?: string; key?: string }) {
   return (
     <div style={{ marginBottom: 14 }}>
       {label && (
@@ -80,7 +80,7 @@ function MiniBar({ score, label }: { score: number; label?: string }) {
 /* ── In-page section nav item ── */
 function SectionNavItem({
   label, active, completed, onClick,
-}: { label: string; active: boolean; completed: boolean; onClick: () => void }) {
+}: { label: string; active: boolean; completed: boolean; onClick: () => void; key?: string }) {
   return (
     <button
       onClick={onClick}
@@ -140,10 +140,10 @@ export function LensReadoutPage() {
 
   // Build sections: Overview + one per dimension
   const sections = useMemo(() => {
-    const dims = result?.dimension_scores || [];
+    const dims: DimensionScore[] = result?.dimension_scores || [];
     return [
       { id: 'overview', label: 'Overview' },
-      ...dims.map((d, i) => ({ id: d.dimension_key, label: d.dimension_name || `Dimension ${i + 1}` })),
+      ...dims.map((d: DimensionScore, i: number) => ({ id: d.dimension_key, label: d.dimension_name || `Dimension ${i + 1}` })),
     ];
   }, [result]);
 
@@ -204,13 +204,13 @@ export function LensReadoutPage() {
             <p className="v1-mono" style={{ color: V1.textDim, marginTop: 4 }}>{lensMeta.descriptor}</p>
           </div>
           <div style={{ padding: `0 ${V1.shellPad}px` }}>
-            {sections.map((s, i) => (
+            {sections.map((s: { id: string; label: string }, i: number) => (
               <SectionNavItem
                 key={s.id}
                 label={s.label}
                 active={activeSection === i}
                 completed={i < activeSection}
-                onClick={() => setActiveSection(i)}
+                onClick={() => { setActiveSection(i); }}
               />
             ))}
           </div>
@@ -268,7 +268,7 @@ export function LensReadoutPage() {
               </section>
 
               {/* Dimension sections */}
-              {result.dimension_scores.map((dim, i) => {
+              {result.dimension_scores.map((dim: DimensionScore, i: number) => {
                 const sectionIdx = i + 1;
                 return (
                   <section
@@ -351,7 +351,7 @@ export function LensReadoutPage() {
               {/* Dimension breakdown */}
               <div style={{ marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${V1.dividerRow}` }}>
                 <div className="v1-sidebar-label" style={{ marginBottom: 12 }}>Dimensions</div>
-                {result.dimension_scores.map(d => (
+                {result.dimension_scores.map((d: DimensionScore) => (
                   <MiniBar key={d.dimension_key} score={d.score} label={d.dimension_name} />
                 ))}
               </div>
@@ -361,7 +361,7 @@ export function LensReadoutPage() {
                 <div className="v1-sidebar-label">Your focus</div>
                 <p style={{ fontFamily: V1.bodyFont, fontSize: V1.textBodySm, color: V1.textSecondary, margin: '8px 0 0', lineHeight: V1.leadingBody }}>
                   {(() => {
-                    const lowest = [...result.dimension_scores].sort((a, b) => a.score - b.score)[0];
+                    const lowest = [...result.dimension_scores].sort((a: DimensionScore, b: DimensionScore) => a.score - b.score)[0];
                     return lowest ? `Bring ${lowest.dimension_name.toLowerCase()} into your next conversation. It is where the most movement is available.` : 'Begin with the dimension closest to where you stand now.';
                   })()}
                 </p>
