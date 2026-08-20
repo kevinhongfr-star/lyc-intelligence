@@ -74,7 +74,7 @@ const DEFAULT_FRAMEWORKS: Framework[] = [
     id: 'shift',
     name: 'SHIFT',
     description:
-      'Situational leadership framework for analyzing context and recommending optimal leadership style.',
+      'Situational leadership model for analyzing context and recommending optimal leadership style.',
     useCases: ['Team leadership', 'Change management', 'Coaching scenarios'],
     icon: GitBranch,
     accentColor: '#B45309',
@@ -83,7 +83,7 @@ const DEFAULT_FRAMEWORKS: Framework[] = [
     id: 'canvas',
     name: 'Scorecard Builder',
     description:
-      'Visual thinking framework for mapping out a complete situation across multiple dimensions.',
+      'Visual thinking model for mapping out a complete situation across multiple dimensions.',
     useCases: ['Strategic planning', 'Problem solving', 'Team alignment'],
     icon: Layout,
     accentColor: '#6D28D9',
@@ -92,7 +92,7 @@ const DEFAULT_FRAMEWORKS: Framework[] = [
     id: 'grade',
     name: 'GRADE',
     description:
-      'Goal-oriented reflective framework for structured thinking and decision quality assessment.',
+      'Goal-oriented reflective model for structured thinking and decision quality assessment.',
     useCases: ['Decision making', 'Goal setting', 'Performance assessment'],
     icon: BarChart3,
     accentColor: '#047857',
@@ -101,7 +101,7 @@ const DEFAULT_FRAMEWORKS: Framework[] = [
     id: 'situational',
     name: 'Situational',
     description:
-      'Context-aware framework that adapts questions and analysis based on your specific situation.',
+      'Context-aware model that adapts questions and analysis based on your specific situation.',
     useCases: ['Role-specific advice', 'Industry guidance', 'Contextual coaching'],
     icon: Compass,
     accentColor: '#0E7490',
@@ -110,7 +110,7 @@ const DEFAULT_FRAMEWORKS: Framework[] = [
     id: 'stakeholder',
     name: 'Stakeholder Map',
     description:
-      'Framework for mapping and analyzing stakeholder relationships and influence dynamics.',
+      'Model for mapping and analyzing stakeholder relationships and influence dynamics.',
     useCases: ['Stakeholder management', 'Organizational navigation', 'Influence mapping'],
     icon: Layers,
     accentColor: '#7C3AED',
@@ -409,7 +409,7 @@ export function FrameworkSelector({
           >
             {activeFramework
               ? `Selected: ${activeFramework.name}`
-              : 'Select a framework to activate'}
+              : 'Select a model to activate'}
           </span>
           <button
             onClick={handleActivate}

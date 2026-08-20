@@ -180,10 +180,11 @@ export default function PersonasSettingsTab() {
             margin: '12px 0 0 0',
           }}
         >
-          Based on your {CURRENT_TIER} tier, you can have up to {tierLimit} personas.
+          Based on your {CURRENT_TIER} tier, you can have{' '}
+          {tierLimit === 'Unlimited' ? 'all available personas' : `up to ${tierLimit} personas`}.
           <span style={{ opacity: 0.7 }}>
             {' '}
-            (Starter = 1, Professional = 3, Executive/Council = Unlimited)
+            (Starter = 1, Professional = 3, Executive/Council = all available)
           </span>
         </p>
       </div>

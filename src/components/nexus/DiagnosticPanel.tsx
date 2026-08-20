@@ -117,7 +117,7 @@ export function DiagnosticPanel({
               letterSpacing: '1px',
             }}
           >
-            Diagnostic Coverage
+            Discovery Coverage
           </span>
         </div>
         <span
@@ -333,7 +333,7 @@ export function DiagnosticPanel({
                 fontWeight: 500,
               }}
             >
-              ✅ Diagnostic complete. I now have a clear picture of your situation.
+              ✅ Discovery complete. I now have a clear picture of your situation.
             </p>
           </div>
         )}

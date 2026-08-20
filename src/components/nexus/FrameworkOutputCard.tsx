@@ -124,7 +124,7 @@ export function FrameworkOutputCard({
               fontWeight: 500,
             }}
           >
-            Framework Output
+            Model Output
           </span>
         </div>
 
@@ -132,7 +132,7 @@ export function FrameworkOutputCard({
           {onExport && (
             <button
               onClick={onExport}
-              aria-label="Export framework output"
+              aria-label="Export model output"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -285,7 +285,7 @@ export function FrameworkOutputCard({
               }}
             >
               <RotateCcw style={{ width: 14, height: 14 }} />
-              Use this framework again
+              Use this model again
             </button>
           </div>
         )}

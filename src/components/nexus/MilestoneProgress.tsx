@@ -40,8 +40,8 @@ export interface MilestoneProgressProps {
 
 const PHASE_LABELS: Record<MilestonePhase, string> = {
   goal_defined: 'Goal Defined',
-  diagnostic_started: 'Diagnostic Started',
-  diagnostic_complete: 'Diagnostic Complete',
+  diagnostic_started: 'Discovery Started',
+  diagnostic_complete: 'Discovery Complete',
   solution_path: 'Solution Path',
   next_steps: 'Next Steps',
 };

@@ -55,7 +55,7 @@ export function DiagnosticProgressBar({ dimensions, progress, className }: Diagn
           textTransform: 'uppercase',
           letterSpacing: '1px',
         }}>
-          Diagnostic Progress
+          Discovery Progress
         </span>
         <span style={{
           fontFamily: DS.bodyFont,
@@ -131,7 +131,7 @@ export function DiagnosticProgressBar({ dimensions, progress, className }: Diagn
             color: DS.text,
             margin: 0,
           }}>
-            Diagnostic complete. I now have a clear picture of your situation.
+            Discovery complete. I now have a clear picture of your situation.
           </p>
         </div>
       )}

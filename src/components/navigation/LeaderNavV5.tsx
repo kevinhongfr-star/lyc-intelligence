@@ -280,7 +280,7 @@ export function LeaderNavV5(): React.ReactElement {
         />
 
         {/* HUMAN LAYER */}
-        <SectionHeader label="Human layer" />
+        <SectionHeader label="Human Layer" />
         <NavItem
           to="/app/nexus/coaching"
           label="Coaching hours"

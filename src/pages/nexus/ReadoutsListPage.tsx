@@ -52,7 +52,7 @@ const DATE_GROUPS: DateGroup[] = [
         date: 'Aug 12, 2026',
         scoreSnippet:
           '"You score in the 82nd percentile on Adopted Use — the gap is in Strategy and Governance, where most leaders stall after the initial deployment wave."',
-        href: '/nexus/readouts/spark/r1',
+        href: '/nexus/lenses/spark/readout/r1',
       },
       {
         id: 'r2',
@@ -61,7 +61,7 @@ const DATE_GROUPS: DateGroup[] = [
         date: 'Aug 3, 2026',
         scoreSnippet:
           '"Your decision-rights dimension is the outlier — strong at the center, weak at the front line. The dual-line ambiguity for the Singapore GM is the #1 structural drag."',
-        href: '/nexus/readouts/forge/r2',
+        href: '/nexus/lenses/forge/readout/r2',
       },
     ],
   },
@@ -75,7 +75,7 @@ const DATE_GROUPS: DateGroup[] = [
         date: 'Jul 22, 2026',
         scoreSnippet:
           '"Your narrative quality in board updates is top quartile. The drag: you pre-frame options before the board has time to digest the framing itself."',
-        href: '/nexus/readouts/impact/r3',
+        href: '/nexus/lenses/impact/readout/r3',
       },
       {
         id: 'r4',
@@ -84,7 +84,7 @@ const DATE_GROUPS: DateGroup[] = [
         date: 'Jul 9, 2026',
         scoreSnippet:
           '"Strong on Relationship, weaker on Hierarchy Distance — your default communication style lands as too direct with the Tokyo team and too consultative in Shanghai."',
-        href: '/nexus/readouts/mosaic/r4',
+        href: '/nexus/lenses/mosaic/readout/r4',
       },
       {
         id: 'r5',
@@ -92,8 +92,8 @@ const DATE_GROUPS: DateGroup[] = [
         name: 'Personal execution velocity',
         date: 'Jul 1, 2026',
         scoreSnippet:
-          '"Your energy distribution curves sharply downward by 4pm. The highest-leverage shift: protect the first 90 minutes for type-1 decisions, not scheduling."',
-        href: '/nexus/readouts/drive/r5',
+          '"Your energy distribution curves sharply downward by 4pm. The shift that matters most: protect the first 90 minutes for type-1 decisions, not scheduling."',
+        href: '/nexus/lenses/drive/readout/r5',
       },
     ],
   },
@@ -107,7 +107,7 @@ const DATE_GROUPS: DateGroup[] = [
         date: 'Jun 18, 2026',
         scoreSnippet:
           '"You are The Signal — high visibility, medium consistency. Your LinkedIn presence, in-person impression, and written output tell three different stories."',
-        href: '/nexus/readouts/prism/r6',
+        href: '/nexus/lenses/prism/readout/r6',
       },
     ],
   },
@@ -181,7 +181,7 @@ export default function ReadoutsListPage() {
                 maxWidth: 640,
               }}
             >
-              A record of every diagnostic lens you've finished. Readouts are yours to revisit, share, or discuss in coaching.
+              A record of every lens you've finished. Readouts are yours to revisit, share, or discuss in coaching.
             </p>
           </div>
 
@@ -622,7 +622,7 @@ export default function ReadoutsListPage() {
                 borderLeft: `1px solid ${V1.teal300}`,
               }}
             >
-              Completing 3 lenses unlocks a cross-diagnostic synthesis.
+              Completing 3 lenses unlocks a cross-lens synthesis.
             </p>
           </div>
         </aside>

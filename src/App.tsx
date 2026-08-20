@@ -43,7 +43,7 @@ import { TierProvider } from '@/components/tier/TierProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CookieConsent } from '@/components/CookieConsent';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
-import { Loader2 } from 'lucide-react';
+import { ThreeDots } from '@/components/nexus/V1LoadingStates';
 import { ToastContainer } from '@/components/ui/ToastContainer';
 // Phase 17 / T02 (#1288) — Vercel analytics + performance
 import { Analytics } from '@vercel/analytics/react';
@@ -294,7 +294,7 @@ function DiagnosticsRedirect() {
 function Loading() {
   return (
     <div className="flex items-center justify-center h-screen">
-      <Loader2 className="w-8 h-8 animate-spin text-fuchsia" />
+      <ThreeDots />
     </div>
   );
 }

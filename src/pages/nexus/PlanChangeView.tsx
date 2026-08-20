@@ -25,12 +25,12 @@ const TIERS: Record<Tier, {
     eyebrow: 'EXPLORER',
     name: 'Explorer',
     price: '$0',
-    billed: 'forever free',
+    billed: 'at no cost',
     features: [
       { text: '20 NEXUS messages / day', enabled: true },
-      { text: 'PRISM diagnostic baseline', enabled: true },
+      { text: 'PRISM lens baseline', enabled: true },
       { text: 'Standard result readouts', enabled: true },
-      { text: 'Diagnostic lenses beyond PRISM', enabled: false },
+      { text: 'Lenses beyond PRISM', enabled: false },
       { text: 'DEX AI assessments', enabled: false },
       { text: 'Document uploads & coaching hours', enabled: false },
     ],
@@ -41,8 +41,8 @@ const TIERS: Record<Tier, {
     price: '$99/mo',
     billed: 'billed monthly',
     features: [
-      { text: 'Unlimited NEXUS messages', enabled: true },
-      { text: '12 diagnostic lenses / year', enabled: true },
+      { text: 'All the NEXUS messages you need', enabled: true },
+      { text: '12 lenses / year', enabled: true },
       { text: '4 coaching hours / month', enabled: true },
       { text: 'DEX AI assessments', enabled: true },
       { text: 'Document uploads & storage', enabled: true },
@@ -56,7 +56,7 @@ const TIERS: Record<Tier, {
     billed: 'billed monthly',
     features: [
       { text: 'Everything in Professional', enabled: true },
-      { text: 'Unlimited diagnostic lenses', enabled: true },
+      { text: 'All available lenses', enabled: true },
       { text: '12 coaching hours / month', enabled: true },
       { text: 'Quarterly executive workshops', enabled: true },
       { text: 'Priority NEXUS response queue', enabled: true },
@@ -399,7 +399,7 @@ export default function PlanChangeView({
             You'll lose access to:
           </p>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px' }}>
-            {['Diagnostic lenses beyond PRISM', 'DEX AI assessments', 'Document uploads', 'Coaching hours'].map((item) => (
+            {['Lenses beyond PRISM', 'DEX AI assessments', 'Document uploads', 'Coaching hours'].map((item) => (
               <li
                 key={item}
                 style={{

@@ -8,10 +8,10 @@ const LENS = {
   pillarName: 'Strategic & Organizational Impact',
   tagline: 'See how the world sees your professional brand.',
   subtitle:
-    "A deep diagnostic that maps how the outside world currently sees you — and the gap between that and where you're going.",
+    "A deep lens that maps how the outside world currently sees you — and the gap between that and where you're going.",
   whatItMeasures: [
     'PRISM measures five core dimensions of your professional brand: Brand Clarity, Market Legibility, Identity Consistency, Narrative Power, and Visibility Level. Together these form a complete picture of how you present yourself to the world — and how that world receives you.',
-    'The diagnostic is grounded in a 3×3 grid model with Visibility on the vertical axis and Brand Consistency / Narrative Alignment on the horizontal. Your responses position you within this grid, surfacing one of ten distinct professional brand archetypes — from The Authority (high visibility, high consistency) to The Blank Page (early-stage, still forming).',
+    'The lens is grounded in a 3×3 grid model with Visibility on the vertical axis and Brand Consistency / Narrative Alignment on the horizontal. Your responses position you within this grid, surfacing one of ten distinct professional brand archetypes — from The Authority (high visibility, high consistency) to The Blank Page (early-stage, still forming).',
     'Unlike self-report personality instruments, PRISM focuses on external perception and market positioning. The questions ask not who you are, but how you show up — in meetings, on LinkedIn, in client conversations, and across the channels where your professional brand lives.',
   ],
   whatYouGet: [
@@ -104,7 +104,7 @@ export default function LensDetailPage() {
               marginBottom: 12,
             }}
           >
-            Diagnostic lens · {lens.pillarName}
+            Lens · {lens.pillarName}
           </div>
 
           {/* Display title */}

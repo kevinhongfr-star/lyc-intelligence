@@ -343,7 +343,7 @@ export function LensesLibraryPage() {
 
             {/* Page header */}
             <header style={{ marginBottom: 40, paddingBottom: 24, borderBottom: `1px solid ${V1.dividerStrong}` }}>
-              <div className="v1-eyebrow">Diagnostic lenses</div>
+              <div className="v1-eyebrow">Lenses</div>
               <h1 className="v1-display" style={{ fontSize: V1.textDisplay, margin: '8px 0 16px', lineHeight: V1.leadingDisplay }}>
                 Eleven lenses.
               </h1>
@@ -406,7 +406,7 @@ export function LensesLibraryPage() {
             <div style={{ marginTop: 48, paddingTop: 24, borderTop: `1px solid ${V1.dividerRow}` }}>
               <div className="v1-eyebrow" style={{ marginBottom: 8 }}>What are lenses?</div>
               <p style={{ fontFamily: V1.bodyFont, fontSize: V1.textBody, lineHeight: V1.leadingBody, color: V1.textSecondary, margin: 0, maxWidth: 600 }}>
-                A lens is a structured diagnostic on one dimension of executive practice — succession, branding, board impact, AI readiness. NEXUS brings one in when the conversation would benefit from a sharper frame. You always opt in. Each costs miles.
+                A lens is a structured deep dive on one dimension of executive practice — succession, branding, board impact, AI readiness. NEXUS brings one in when the conversation would benefit from a sharper frame. You always opt in. Each costs miles.
               </p>
               <Link to="/nexus/chat" className="v1-btn v1-btn-link" style={{ marginTop: 16 }}>
                 Ask NEXUS which lens fits <span className="v1-arrow" aria-hidden="true">→</span>

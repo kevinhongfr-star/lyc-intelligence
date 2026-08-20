@@ -1,7 +1,28 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { V1 } from '@/styles/v1-tokens';
 import ChatRightRail from '@/components/nexus/ChatRightRail';
 import { ConversationContextBar, DateSeparator } from '@/components/nexus/SingleConversationView';
+import { sendChatMessage } from '@/services/coze';
+import { useAuthStore } from '@/stores/authStore';
+import {
+  buildNexusSystemPrompt,
+  buildNexusFirstResponse,
+  NEXUS_FIRST_RESPONSE_QUICK_REPLIES,
+} from '@/nexus/nexusKnowledge';
+import {
+  buildLocalAssessmentContextForNexus,
+  getAssessmentProgress,
+  recommendNextAssessment,
+} from '@/nexus/resultContextBuilder';
+import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
+import { getAvailablePersonas } from '@/config/nexusPersonas';
+import { reportError } from '@/analytics/errorMonitor';
+import {
+  trackCTA,
+  trackNexusChatInitiation,
+  trackNexusFirstMessageSent,
+} from '@/analytics/eventTracker';
 
 interface BotMessage {
   type: 'bot';
@@ -60,109 +81,29 @@ type MessageRow =
   | OptionChips
   | TypingIndicator;
 
-const sampleMessages: MessageRow[] = [
-  { type: 'date', id: 'd1', date: 'Yesterday · Aug 18, 2026' },
-  {
-    type: 'bot',
-    id: 'b1',
-    paragraphs: [
-      'Good morning. I\'ve reviewed your notes from the offsite — there\'s a throughline in what you\'re grappling with. The transition you\'re managing isn\'t just structural; it\'s a shift in how the regional team perceives authority and direction.',
-      'Before we dig deeper, let me make sure I have the frame right. You\'re six weeks into a broader APAC remit, reporting now to the CFO instead of the regional VP. Two direct reports have resigned since the announcement. And your board readout is in three weeks.',
-    ],
-    time: 'NEXUS · 9:14 AM',
-  },
-  {
-    type: 'chips',
-    id: 'c1',
-    options: [
-      'Tell me more about my PRISM readout',
-      'Walk me through my milestones',
-      'Start a new lens',
-    ],
-  },
-  {
-    type: 'system',
-    id: 's1',
-    label: 'LENS ACTIVATED',
-    title: 'PRISM · Professional branding',
-    pills: ['POSITIONING', 'VOICE', 'STORY', 'PRESENCE'],
-    insight: 'Starting PRISM adds 12 dimensions to your profile. We\'ll ask 28 questions across 4 categories — expect 12–15 minutes.',
-  },
-  {
-    type: 'bot',
-    id: 'b2',
-    paragraphs: [
-      'PRISM is designed to surface gaps between how you see yourself and how others experience your leadership. Based on your 360 data, there\'s a specific tension worth examining first.',
-      'Your self-assessment rates "direct communication" at 4.6/5. But peer and direct-report scores cluster around 3.2 on the same dimension. The qualitative comments are consistent: they describe your communication as "thoughtful but hard to parse" and "confident when written, indirect in person."',
-    ],
-    time: 'NEXUS · 9:16 AM',
-  },
-  {
-    type: 'user',
-    id: 'u1',
-    text: 'That tracks. I\'ve always preferred writing things down — I process better that way. But in regional standups, I feel like I\'m searching for the right words while everyone\'s waiting.',
-    time: 'You · 9:21 AM',
-  },
-  {
-    type: 'bot',
-    id: 'b3',
-    paragraphs: [
-      'That\'s not a defect in how you communicate. It\'s a mismatch between your cognitive style and the format expected of you. Reflective writers don\'t perform well in rooms that reward quick, decisive verbal turns — especially when the room is watching for signals of authority.',
-      'There\'s a specific intervention worth testing. Instead of opening standups with "what happened yesterday" — which puts you on the spot for spontaneous synthesis — try circulating a one-page memo the night before. Then open the standup with "what would you challenge in what I wrote?"',
-    ],
-    time: 'NEXUS · 9:23 AM',
-  },
-  {
-    type: 'system',
-    id: 's2',
-    label: 'MILESTONE CREATED',
-    title: 'Improve stakeholder alignment',
-    pills: [],
-    insight: 'Milestone added to your Q3 plan. First checkpoint in two weeks.',
-  },
-  {
-    type: 'milestone',
-    id: 'm1',
-    title: 'Improve stakeholder alignment',
-    dueDate: 'Due · Oct 15, 2026',
-    status: 'On track',
-  },
-  {
-    type: 'bot',
-    id: 'b4',
-    paragraphs: [
-      'I\'ve extracted this as a concrete milestone with a specific first action: circulate three pre-written memos before your next three regional standups. We\'ll measure the difference in engagement quality and decision velocity.',
-      'Between now and next week, I\'ll surface three short exercises — five minutes each — drawn from PRISM\'s Voice dimension. They\'re designed to build a tighter linkage between your written and spoken presence so that the memo and the room align rather than compete.',
-    ],
-    time: 'NEXUS · 9:25 AM',
-  },
-  { type: 'date', id: 'd2', date: 'Today · Aug 19, 2026' },
-  {
-    type: 'bot',
-    id: 'b5',
-    paragraphs: [
-      'Good morning. I\'ve been thinking about what we covered yesterday. There\'s something in the offsite notes I want to raise — something that connects the resignations to the memo approach.',
-      'The two people who resigned both made the same remark in exit interviews: they "didn\'t know where you stood" on priorities. That\'s not a content problem. It\'s a signalling problem. The pre-meeting memo doesn\'t just help you think — it broadcasts your stance before the room starts negotiating.',
-    ],
-    time: 'NEXUS · 10:42 AM',
-  },
-  {
-    type: 'user',
-    id: 'u2',
-    text: 'I sent the first memo last night. It went over better than I expected. One direct report pushed back on a timeline — but in a way that felt constructive, not oppositional.',
-    time: 'You · 10:43 AM',
-  },
-  {
-    type: 'bot',
-    id: 'b6',
-    paragraphs: [
-      'That\'s the pattern we want to repeat. Constructive pushback means the memo gave them something specific to push against — rather than trying to read ambiguity in your tone or body language.',
-      'Let me ask a harder question. When you read the pushback, what did you feel? Relief? Annoyance? Something else? The answer tells us where to go next in PRISM.',
-    ],
-    time: 'NEXUS · 10:45 AM',
-  },
-  { type: 'typing', id: 't1' },
-];
+function nowTime(prefix: string): string {
+  const d = new Date();
+  const hh = d.getHours();
+  const mm = d.getMinutes().toString().padStart(2, '0');
+  const ampm = hh >= 12 ? 'PM' : 'AM';
+  const h12 = ((hh + 11) % 12) + 1;
+  return `${prefix} · ${h12}:${mm} ${ampm}`;
+}
+
+function todayLabel(): string {
+  const d = new Date();
+  const month = d.toLocaleString('en-US', { month: 'short' });
+  return `Today · ${month} ${d.getDate()}, ${d.getFullYear()}`;
+}
+
+/** Split a model response into display paragraphs (V5 plain-text blocks). */
+function toParagraphs(response: string): string[] {
+  const paras = response
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  return paras.length > 0 ? paras : [response];
+}
 
 function BotMessageBlock({ msg }: { msg: BotMessage }) {
   return (
@@ -502,59 +443,176 @@ function TypingIndicatorBlock() {
 
 export function NexusChatPageV5(): React.ReactElement {
   const [inputValue, setInputValue] = useState('');
-  const [messages, setMessages] = useState<MessageRow[]>(sampleMessages);
+  const [messages, setMessages] = useState<MessageRow[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { user, profile } = useAuthStore();
+  const [searchParams] = useSearchParams();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const firstMessageSentRef = useRef(false);
+
+  const codeParam = searchParams.get('code');
+
+  // System prompt construction (matches the existing /nexus/chat pattern).
+  const lensContext = useMemo(() => {
+    if (!codeParam) return undefined;
+    const info = ASSESSMENT_CATALOG[codeParam.toUpperCase()];
+    if (!info) return undefined;
+    const dimList = info.dimensions
+      .map((d) => `${d.name} (${d.lowLabel} → ${d.highLabel})`)
+      .join('; ');
+    return [
+      `=== CURRENT LENS CONTEXT ===`,
+      `The user is asking about their ${info.name} (${info.code}) results.`,
+      `Instrument measures ${info.dimensions.length} dimensions: ${dimList}.`,
+      `Tagline: ${info.tagline}`,
+      `Ground your answer in this instrument. Reference the specific dimensions by name when explaining findings.`,
+    ].join('\n');
+  }, [codeParam]);
+
+  const localAssessmentContext = useMemo(() => buildLocalAssessmentContextForNexus(), []);
+  const combinedContext = [lensContext, localAssessmentContext.contextString]
+    .filter(Boolean)
+    .join('\n\n');
+  const systemPrompt = useMemo(
+    () => buildNexusSystemPrompt(combinedContext).systemPrompt,
+    [combinedContext],
+  );
+
+  // Active lens for the right rail — derived from URL or local history.
+  const activeLensData = useMemo(() => {
+    const pick = (code: string | undefined) => {
+      if (!code) return undefined;
+      const info = ASSESSMENT_CATALOG[code.toUpperCase()];
+      if (!info) return undefined;
+      return { code: info.code, name: info.b2cName || info.name, progress: 100 };
+    };
+    return pick(codeParam) || pick(localAssessmentContext.completedCodes[0]);
+  }, [codeParam, localAssessmentContext]);
+
+  // Persona for the right rail — derived from the member's tier.
+  const activePersona = useMemo(() => {
+    const personas = getAvailablePersonas(profile?.tier);
+    return personas[0];
+  }, [profile?.tier]);
 
   const autoGrow = (el: HTMLTextAreaElement) => {
     el.style.height = '44px';
     el.style.height = Math.min(el.scrollHeight, 200) + 'px';
   };
 
-  const sendMessage = () => {
-    const text = inputValue.trim();
-    if (!text) return;
-    const now = new Date();
-    const hh = now.getHours();
-    const mm = now.getMinutes().toString().padStart(2, '0');
-    const ampm = hh >= 12 ? 'PM' : 'AM';
-    const h12 = ((hh + 11) % 12) + 1;
+  // Initialize the thread with NEXUS's first response (same pattern as the
+  // existing /nexus/chat page — no sample data).
+  useEffect(() => {
+    trackNexusChatInitiation('direct_link');
+    const base = buildNexusFirstResponse(profile?.name);
+    const assessmentProgress = getAssessmentProgress();
+    let greeting = base;
+    if (assessmentProgress.completed > 0) {
+      const progressLine = `\n\nYou've completed ${assessmentProgress.completed} of ${assessmentProgress.total} assessments on this device.`;
+      let recLine = '';
+      const nextRecommendation = recommendNextAssessment();
+      if (nextRecommendation) {
+        recLine = `\nBased on your history, I'd suggest **${nextRecommendation.name}** next — ${nextRecommendation.reason}`;
+      }
+      greeting = base + progressLine + recLine;
+    }
+    setMessages([
+      { type: 'date', id: 'today', date: todayLabel() },
+      { type: 'bot', id: 'welcome', paragraphs: toParagraphs(greeting), time: nowTime('NEXUS') },
+      { type: 'chips', id: 'quick-replies', options: NEXUS_FIRST_RESPONSE_QUICK_REPLIES },
+    ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.name]);
+
+  // Auto-scroll on new messages / loading.
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, loading]);
+
+  const sendMessage = async (messageText?: string) => {
+    const text = (messageText || inputValue).trim();
+    if (!text || loading) return;
+    if (messageText) {
+      trackCTA({
+        location: 'nexus_chat',
+        label: 'Quick Reply',
+        destination: undefined,
+        context_id: messageText.slice(0, 80),
+      });
+    }
     const userMsg: UserMessage = {
       type: 'user',
-      id: `u-new-${Date.now()}`,
+      id: `u-${Date.now()}`,
       text,
-      time: `You · ${h12}:${mm} ${ampm}`,
+      time: nowTime('You'),
     };
-    const beforeTyping = messages.filter((m) => m.type !== 'typing');
-    setMessages([...beforeTyping, userMsg, { type: 'typing', id: `t-new-${Date.now()}` }]);
+    const typingId = `t-${Date.now()}`;
+    // Drop any chips / stale typing before appending the user msg + fresh typing.
+    setMessages((prev) => {
+      const cleaned = prev.filter((m) => m.type !== 'typing' && m.type !== 'chips');
+      return [...cleaned, userMsg, { type: 'typing', id: typingId }];
+    });
     setInputValue('');
     if (textareaRef.current) {
       textareaRef.current.style.height = '44px';
     }
-    setTimeout(() => {
+    setLoading(true);
+    try {
+      const userId =
+        user?.id ||
+        'guest-' + (localStorage.getItem('nexus_guest_id') || Math.random().toString(36).slice(2));
+      const history = messages
+        .filter((m) => m.type === 'user' || m.type === 'bot')
+        .slice(-10)
+        .map((m) => ({
+          role: m.type === 'user' ? 'user' : 'assistant',
+          content: m.type === 'user' ? m.text : m.paragraphs.join('\n\n'),
+        }));
+      const response = await sendChatMessage(
+        text,
+        userId,
+        history,
+        systemPrompt ? { systemPrompt } : undefined,
+      );
       setMessages((prev) => {
-        const withoutTyping = prev.filter((m) => m.type !== 'typing');
+        const withoutTyping = prev.filter((m) => m.id !== typingId);
         return [
           ...withoutTyping,
           {
             type: 'bot',
-            id: `b-new-${Date.now()}`,
-            paragraphs: [
-              `That's a useful framing. Let me ground this in what you've already shared and pull the relevant threads together.`,
-            ],
-            time: `NEXUS · ${h12}:${mm} ${ampm}`,
+            id: `b-${Date.now()}`,
+            paragraphs: toParagraphs(response),
+            time: nowTime('NEXUS'),
           },
         ];
       });
-    }, 1600);
+      if (!firstMessageSentRef.current) {
+        firstMessageSentRef.current = true;
+        trackNexusFirstMessageSent('coze-gpt-4o');
+      }
+    } catch (e) {
+      reportError(e, { scope: 'nexus_v5:sendChatMessage', severity: 'warning' });
+      setMessages((prev) => {
+        const withoutTyping = prev.filter((m) => m.id !== typingId);
+        return [
+          ...withoutTyping,
+          {
+            type: 'bot',
+            id: `b-err-${Date.now()}`,
+            paragraphs: ['Something went wrong. Please try again in a moment.'],
+            time: nowTime('NEXUS'),
+          },
+        ];
+      });
+    }
+    setLoading(false);
   };
 
   const handleChipSelect = (text: string) => {
-    setInputValue(text);
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-      autoGrow(textareaRef.current);
-    }
+    sendMessage(text);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -775,16 +833,9 @@ export function NexusChatPageV5(): React.ReactElement {
 
       <ChatRightRail
         mode="regular"
-        activeLens={{
-          code: 'PRISM',
-          name: 'Professional branding',
-          progress: 32,
-        }}
-        recentMilestones={[
-          { title: 'Improve stakeholder alignment', status: 'on_track' },
-          { title: 'Board impact narrative', status: 'at_risk' },
-          { title: 'Q3 leadership transition', status: 'pending' },
-        ]}
+        persona={activePersona}
+        activeLens={activeLensData}
+        recentMilestones={[]}
       />
     </div>
   );

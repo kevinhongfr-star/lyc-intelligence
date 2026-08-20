@@ -84,8 +84,8 @@ function getGradeColor(grade: string): string {
 }
 
 const DIMENSION_LABELS: Record<QualityDimensionId, string> = {
-  diagnostic: 'Diagnostic Depth',
-  framework: 'Framework Alignment',
+  diagnostic: 'Discovery Depth',
+  framework: 'Model Alignment',
   deliverable: 'Deliverable Quality',
   coaching: 'Coaching Efficacy',
   reflection: 'Reflection Depth',

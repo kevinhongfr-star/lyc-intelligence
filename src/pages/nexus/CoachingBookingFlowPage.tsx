@@ -1064,7 +1064,7 @@ function CoachingBookingFlowPage() {
               color: V1.ink500,
             }}
           >
-            Free cancellation up to 24hrs before. Late cancellations forfeit the session.
+            Cancel up to 24hrs before at no charge. Late cancellations forfeit the session.
           </div>
         </div>
       </div>

@@ -171,8 +171,8 @@ export function MilestoneBanner({ milestones, currentGoal, className }: Mileston
 // Default milestones for a coaching session
 export const DEFAULT_MILESTONES: Milestone[] = [
   { id: 'goal_defined', label: 'Goal defined', complete: false, description: 'User articulates their objective' },
-  { id: 'diagnostic_started', label: 'Diagnostic started', complete: false, description: 'Begin 5-dimension assessment' },
-  { id: 'diagnostic_complete', label: 'Diagnostic complete', complete: false, description: 'All 5 dimensions understood' },
+  { id: 'diagnostic_started', label: 'Discovery started', complete: false, description: 'Begin 5-dimension assessment' },
+  { id: 'diagnostic_complete', label: 'Discovery complete', complete: false, description: 'All 5 dimensions understood' },
   { id: 'solution_path', label: 'Solution path mapped', complete: false, description: 'Actionable path proposed' },
   { id: 'next_steps', label: 'Next steps defined', complete: false, description: 'Concrete actions identified' },
 ];

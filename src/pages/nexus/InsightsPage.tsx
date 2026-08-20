@@ -60,7 +60,7 @@ const PATTERNS: Pattern[] = [
     id: 'p1',
     label: 'PATTERN 01',
     color: 'teal',
-    title: 'Cross-diagnostic consistency',
+    title: 'Cross-lens consistency',
     body: "Your scores on Decision Quality, Strategic Clarity, and Narrative Strength hold within a tight band (\u00b18%) across all five lenses you've completed so far. This suggests these are stable strengths rather than context-dependent.",
   },
   {
@@ -75,7 +75,7 @@ const PATTERNS: Pattern[] = [
     label: 'PATTERN 03',
     color: 'teal',
     title: 'Situation blind spots',
-    body: "Your lowest-scoring scenarios consistently involve high-ambiguity settings without structured data: board debates in open Q&A, impromptu all-hands questions, and negotiation free-play. Scripted contexts score strongly.",
+    body: "Your lowest-scoring scenarios consistently involve high-ambiguity settings without structured data: board debates in open Q&A, impromptu all-hands questions, and open-ended negotiation. Scripted contexts score strongly.",
   },
   {
     id: 'p4',
@@ -115,8 +115,8 @@ const MILESTONES: MilestoneObservation[] = [
   },
   {
     id: 'm3',
-    name: 'Q4 \u2014 Stand up AI governance framework',
-    insight: "Three of your lens readouts (SPARK, FORGE, CPI) independently flag this as the single highest-leverage structural move you can make this half. There's a ready-made framework in the governance playbook if you want a shortcut.",
+    name: 'Q4 \u2014 Stand up AI governance model',
+    insight: "Three of your lens readouts (SPARK, FORGE, CPI) independently flag this as the single most consequential structural move you can make this half. The governance playbook has a worked model you can adapt if you want a starting point.",
     status: 'On track',
   },
 ];

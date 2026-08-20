@@ -77,7 +77,7 @@ export default function PersonaSwitcherModal({
   const limitText =
     tierName && tierLimit !== undefined
       ? tierLimit === -1
-        ? `Your ${tierName} tier allows Unlimited styles.`
+        ? `Your ${tierName} tier unlocks all style options.`
         : `Your ${tierName} tier allows ${tierLimit} styles.`
       : null;
 

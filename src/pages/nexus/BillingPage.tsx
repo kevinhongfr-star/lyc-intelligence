@@ -155,7 +155,7 @@ export default function BillingPage() {
               margin: '10px 0 0',
             }}
           >
-            Unlimited AI coaching · 12 diagnostic lenses per year · 4 coaching hours · DEX AI access.
+            Continuous AI coaching · 12 lenses per year · 4 coaching hours · DEX AI access.
           </p>
         </div>
 
