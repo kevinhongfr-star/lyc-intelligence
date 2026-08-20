@@ -1,23 +1,169 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- V5.2 · Cutover sitemap — 2026-08-20 regenerated.
+     Canonical URLs follow the V3.0 consolidated IA:
+       - 11 SEO lens landings live at /nexus/lenses/[code]
+       - Old /assessment/[code] routes 301 here (see vercel.json redirects)
+       - /assessments catalog → /nexus/lenses (user-facing library)
+       - All 5 portals are noindexed via meta robots + X-Robots-Tag header
+     Lastmod = cutover date so Google recrawls every URL.
+-->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.lyc-intelligence.app/</loc><priority>1.0</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/assessments</loc><priority>0.95</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/pricing</loc><priority>0.92</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/b2b</loc><priority>0.85</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/dex</loc><priority>0.8</priority></url>
-  <!-- 11 assessments as canonical singular per-slug -->
-  <url><loc>https://www.lyc-intelligence.app/assessment/cpi</loc><priority>0.9</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/assessment/prism</loc><priority>0.82</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/assessment/spark</loc><priority>0.82</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/assessment/leap</loc><priority>0.82</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/assessment/impact</loc><priority>0.82</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/assessment/quest</loc><priority>0.78</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/assessment/bridge</loc><priority>0.78</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/assessment/drive</loc><priority>0.78</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/assessment/forge</loc><priority>0.78</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/assessment/coach</loc><priority>0.78</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/assessment/mosaic</loc><priority>0.78</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/terms</loc><priority>0.3</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/privacy</loc><priority>0.3</priority></url>
-  <url><loc>https://www.lyc-intelligence.app/cookies</loc><priority>0.3</priority></url>
+  <!-- Core marketing -->
+  <url>
+    <loc>https://www.lyc-intelligence.app/</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/pricing</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/assessments</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.92</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.92</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/b2b</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.88</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/match</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>quarterly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/dex</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>quarterly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- 11 Diagnostic SEO landings — now at /nexus/lenses/[code] (V3.0)
+       Old /assessment/[code] URLs 301 here via vercel.json redirects. -->
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses/cpi</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.92</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses/prism</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses/spark</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses/leap</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses/impact</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses/quest</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses/bridge</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses/drive</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses/forge</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses/coach</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/nexus/lenses/mosaic</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Long-tail SEO assets -->
+  <url>
+    <loc>https://www.lyc-intelligence.app/referral</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>quarterly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/about</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>quarterly</changefreq>
+    <priority>0.45</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/contact</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>quarterly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- Legal -->
+  <url>
+    <loc>https://www.lyc-intelligence.app/terms</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/privacy</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://www.lyc-intelligence.app/cookies</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
 </urlset>

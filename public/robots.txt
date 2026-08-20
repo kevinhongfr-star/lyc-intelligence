@@ -1,27 +1,64 @@
 User-agent: *
+
+# ── V5.2 · Cutover robots.txt — 2026-08-20
+# Allow-list is now the consolidated V3.0 IA:
+#   Marketing root: /, /pricing, /b2b, /match, /dex, /about, /contact, /referral
+#   NEXUS public:   /nexus (landing), /nexus/lenses (library), /nexus/lenses/[11 codes] (SEO landings)
+#   Assessment catalog: /assessments
+#   Legal: /terms, /privacy, /cookies
+# All authenticated portals + action routes (take, chat, results, readout) are blocked.
+# ─────────────────────────────────────────────────────────────────────
+
 Allow: /$
+Allow: /nexus$
+Allow: /nexus/lenses$
+Allow: /nexus/lenses/[a-z0-9]+$
 Allow: /assessments$
-Allow: /assessment/[a-z-]+$
+Allow: /assessment/[a-z0-9-]+$
 Allow: /pricing$
 Allow: /b2b$
+Allow: /match$
 Allow: /dex$
+Allow: /about$
+Allow: /contact$
+Allow: /referral$
 Allow: /terms$
 Allow: /privacy$
 Allow: /cookies$
-Disallow: /api/
+
+# Portals — all require auth; no SEO value here
 Disallow: /app/
 Disallow: /member/
 Disallow: /admin/
 Disallow: /consultant/
 Disallow: /candidate/
 Disallow: /client/
+
+# Auth entry + email flows
 Disallow: /login$
 Disallow: /signup$
 Disallow: /reset-password$
-Disallow: /share/
+Disallow: /email-verified$
+Disallow: /password-reset-done$
+Disallow: /password-expired$
+Disallow: /magic-link$
+
+# NEXUS chat (conversational; authenticated only)
 Disallow: /nexus/chat$
+
+# Lens-taking flows, readouts (action URLs, not SEO assets)
+Disallow: /nexus/lenses/*/take$
+Disallow: /nexus/lenses/*/readout/
 Disallow: /assessment/*/take
 Disallow: /assessment/*/results
+
+# All query-string variants (UTM, session ids) of allowed pages
 Disallow: /*?*
+
+# Internal APIs + share cards
+Disallow: /api/
+Disallow: /share/
+Disallow: /og-image/
+Disallow: /import/
 
 Sitemap: /sitemap.xml

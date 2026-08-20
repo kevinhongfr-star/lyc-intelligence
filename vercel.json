@@ -180,226 +180,130 @@
     }
   ],
   "redirects": [
-    {
-      "source": "/home",
-      "destination": "/",
-      "permanent": true
-    },
-    {
-      "source": "/products",
-      "destination": "/#assessment-catalog",
-      "permanent": true
-    },
-    {
-      "source": "/enterprise",
-      "destination": "/pricing",
-      "permanent": true
-    },
-    {
-      "source": "/pricing-old",
-      "destination": "/pricing",
-      "permanent": true
-    },
-    {
-      "source": "/for-business",
-      "destination": "/b2b",
-      "permanent": true
-    },
-    {
-      "source": "/about/about-us",
-      "destination": "/about",
-      "permanent": true
-    },
-    {
-      "source": "/about-us",
-      "destination": "/about",
-      "permanent": true
-    },
-    {
-      "source": "/b2b#contact",
-      "destination": "/contact",
-      "permanent": false
-    },
-    {
-      "source": "/contact-us",
-      "destination": "/contact",
-      "permanent": true
-    },
-    {
-      "source": "/app/pricing",
-      "destination": "/pricing",
-      "permanent": true
-    },
-    {
-      "source": "/app/referrals",
-      "destination": "/referral",
-      "permanent": true
-    },
-    {
-      "source": "/app/dashboard",
-      "destination": "/member/dashboard",
-      "permanent": true
-    },
-    {
-      "source": "/app/settings",
-      "destination": "/member/settings",
-      "permanent": true
-    },
-    {
-      "source": "/app/assessments",
-      "destination": "/assessment",
-      "permanent": true
-    },
-    {
-      "source": "/app/profile",
-      "destination": "/member/profile",
-      "permanent": true
-    },
-    {
-      "source": "/app/matches",
-      "destination": "/member/matches",
-      "permanent": true
-    },
-    {
-      "source": "/app/referrals",
-      "destination": "/referral",
-      "permanent": true
-    },
-    {
-      "source": "/portal/candidates",
-      "destination": "/candidate",
-      "permanent": true
-    },
-    {
-      "source": "/portal/mandates",
-      "destination": "/consultant/mandates",
-      "permanent": true
-    },
-    {
-      "source": "/portal/pipeline",
-      "destination": "/consultant/pipeline",
-      "permanent": true
-    },
-    {
-      "source": "/portal/settings",
-      "destination": "/consultant/settings",
-      "permanent": true
-    },
-    {
-      "source": "/portal/clients",
-      "destination": "/client/clients",
-      "permanent": true
-    },
-    {
-      "source": "/portal/admin",
-      "destination": "/admin",
-      "permanent": true
-    },
-    {
-      "source": "/assessments/china-pipeline-index",
-      "destination": "/assessment/cpi",
-      "permanent": true
-    },
-    {
-      "source": "/assessments/cpi-diagnostic",
-      "destination": "/assessment/cpi",
-      "permanent": true
-    },
-    {
-      "source": "/assessments/shift-mobility",
-      "destination": "/assessment/shift",
-      "permanent": true
-    },
-    {
-      "source": "/assessments/career-shift",
-      "destination": "/assessment/shift",
-      "permanent": true
-    },
-    {
-      "source": "/assessments/cross-border",
-      "destination": "/assessment/cross-border",
-      "permanent": true
-    },
-    {
-      "source": "/assessments/executive-scope",
-      "destination": "/assessment/exec-scope",
-      "permanent": true
-    },
-    {
-      "source": "/assessments/geo-fit",
-      "destination": "/assessment/geo-fit",
-      "permanent": true
-    },
-    {
-      "source": "/assessments/board-readiness",
-      "destination": "/assessment/board-readiness",
-      "permanent": true
-    },
-    {
-      "source": "/assessment",
-      "destination": "/assessments",
-      "permanent": true
-    },
-    {
-      "source": "/assessments/:slug",
-      "destination": "/assessment/:slug",
-      "permanent": true
-    },
-    {
-      "source": "/diagnostics/:path*",
-      "destination": "/assessment/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/platform/nexus",
-      "destination": "/nexus",
-      "permanent": true
-    },
-    {
-      "source": "/chat",
-      "destination": "/nexus/chat",
-      "permanent": true
-    },
-    {
-      "source": "/dashboard",
-      "destination": "/member/dashboard",
-      "permanent": true
-    },
-    {
-      "source": "/settings",
-      "destination": "/member/settings",
-      "permanent": true
-    },
-    {
-      "source": "/login-old",
-      "destination": "/login",
-      "permanent": true
-    },
-    {
-      "source": "/platform",
-      "destination": "/",
-      "permanent": true
-    },
-    {
-      "source": "/trident",
-      "destination": "/assessments",
-      "permanent": true
-    },
-    {
-      "source": "/shift-mobility",
-      "destination": "/assessment/shift",
-      "permanent": true
-    },
-    {
-      "source": "/spark-assessment",
-      "destination": "/assessment/spark",
-      "permanent": true
-    },
-    {
-      "source": "/prism-assessment",
-      "destination": "/assessment/prism",
-      "permanent": true
-    }
+    /* ═══════════════════════════════════════════════════════════════
+       V5.2 CUTOVER — 301 redirects for v1.5 → v3.0 URL changes.
+       Ordered by specificity (longest source prefixes first) so a
+       more specific rule wins before a shorter catch-all.
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* ── NEXUS LENSES (11 × 4 route families each) ──────────────────
+       Old: /assessment/[code] (SEO landings + taking + results)
+       New: /nexus/lenses/[code] (SEO landing)
+            /nexus/lenses/[code]/take (wizard)
+            /nexus/lenses/[code]/readout/:id (readout)
+       11 codes: cpi, prism, spark, leap, impact, quest, bridge,
+                 drive, forge, coach, mosaic
+       ───────────────────────────────────────────────────────────── */
+    { "source": "/assessment/cpi/results/:id*", "destination": "/nexus/lenses/cpi/readout/:id*", "permanent": true },
+    { "source": "/assessment/cpi/take",        "destination": "/nexus/lenses/cpi/take",          "permanent": true },
+    { "source": "/assessment/cpi",             "destination": "/nexus/lenses/cpi",               "permanent": true },
+    { "source": "/assessment/prism/results/:id*", "destination": "/nexus/lenses/prism/readout/:id*", "permanent": true },
+    { "source": "/assessment/prism/take",        "destination": "/nexus/lenses/prism/take",          "permanent": true },
+    { "source": "/assessment/prism",             "destination": "/nexus/lenses/prism",               "permanent": true },
+    { "source": "/assessment/spark/results/:id*", "destination": "/nexus/lenses/spark/readout/:id*", "permanent": true },
+    { "source": "/assessment/spark/take",        "destination": "/nexus/lenses/spark/take",          "permanent": true },
+    { "source": "/assessment/spark",             "destination": "/nexus/lenses/spark",               "permanent": true },
+    { "source": "/assessment/leap/results/:id*", "destination": "/nexus/lenses/leap/readout/:id*", "permanent": true },
+    { "source": "/assessment/leap/take",        "destination": "/nexus/lenses/leap/take",          "permanent": true },
+    { "source": "/assessment/leap",             "destination": "/nexus/lenses/leap",               "permanent": true },
+    { "source": "/assessment/impact/results/:id*", "destination": "/nexus/lenses/impact/readout/:id*", "permanent": true },
+    { "source": "/assessment/impact/take",        "destination": "/nexus/lenses/impact/take",          "permanent": true },
+    { "source": "/assessment/impact",             "destination": "/nexus/lenses/impact",               "permanent": true },
+    { "source": "/assessment/quest/results/:id*", "destination": "/nexus/lenses/quest/readout/:id*", "permanent": true },
+    { "source": "/assessment/quest/take",        "destination": "/nexus/lenses/quest/take",          "permanent": true },
+    { "source": "/assessment/quest",             "destination": "/nexus/lenses/quest",               "permanent": true },
+    { "source": "/assessment/bridge/results/:id*", "destination": "/nexus/lenses/bridge/readout/:id*", "permanent": true },
+    { "source": "/assessment/bridge/take",        "destination": "/nexus/lenses/bridge/take",          "permanent": true },
+    { "source": "/assessment/bridge",             "destination": "/nexus/lenses/bridge",               "permanent": true },
+    { "source": "/assessment/drive/results/:id*", "destination": "/nexus/lenses/drive/readout/:id*", "permanent": true },
+    { "source": "/assessment/drive/take",        "destination": "/nexus/lenses/drive/take",          "permanent": true },
+    { "source": "/assessment/drive",             "destination": "/nexus/lenses/drive",               "permanent": true },
+    { "source": "/assessment/forge/results/:id*", "destination": "/nexus/lenses/forge/readout/:id*", "permanent": true },
+    { "source": "/assessment/forge/take",        "destination": "/nexus/lenses/forge/take",          "permanent": true },
+    { "source": "/assessment/forge",             "destination": "/nexus/lenses/forge",               "permanent": true },
+    { "source": "/assessment/coach/results/:id*", "destination": "/nexus/lenses/coach/readout/:id*", "permanent": true },
+    { "source": "/assessment/coach/take",        "destination": "/nexus/lenses/coach/take",          "permanent": true },
+    { "source": "/assessment/coach",             "destination": "/nexus/lenses/coach",               "permanent": true },
+    { "source": "/assessment/mosaic/results/:id*", "destination": "/nexus/lenses/mosaic/readout/:id*", "permanent": true },
+    { "source": "/assessment/mosaic/take",        "destination": "/nexus/lenses/mosaic/take",          "permanent": true },
+    { "source": "/assessment/mosaic",             "destination": "/nexus/lenses/mosaic",               "permanent": true },
+
+    /* Catch-all: any remaining /assessment/[other]/results|take — route param wildcards
+       keep generic result & take routes working for unknown slugs. */
+    { "source": "/assessment/:code/results/:id*", "destination": "/nexus/lenses/:code/readout/:id*", "permanent": true },
+    { "source": "/assessment/:code/take",         "destination": "/nexus/lenses/:code/take",          "permanent": true },
+    /* SEO landing pages catch-all → /nexus/lenses/[code] */
+    { "source": "/assessment/:code",              "destination": "/nexus/lenses/:code",               "permanent": true },
+
+    /* Plural ↔ singular redirects — keep both directions as V1.5 did but
+       point to the canonical /assessments catalog */
+    { "source": "/assessment",                    "destination": "/assessments",                      "permanent": true },
+
+    /* ── /diagnostics/* → /assessment/* (then Vercel re-applies above) ── */
+    { "source": "/diagnostics/:path*",            "destination": "/assessment/:path*",                "permanent": true },
+
+    /* ── NEXUS product + chat ────────────────────────────────────── */
+    { "source": "/platform/nexus",                "destination": "/nexus",                            "permanent": true },
+    { "source": "/chat",                          "destination": "/nexus/chat",                       "permanent": true },
+
+    /* ── Leader portal URL changes (/app/* canonical; /member/* is legacy) ── */
+    { "source": "/member/dashboard",              "destination": "/app/nexus",                        "permanent": true },
+    { "source": "/member/settings",               "destination": "/app/nexus/settings",               "permanent": true },
+    { "source": "/member/profile",                "destination": "/app/nexus/settings?tab=profile",   "permanent": true },
+    { "source": "/member/matches",                "destination": "/app/nexus/milestones",             "permanent": true },
+    { "source": "/member/:path*",                 "destination": "/app/:path*",                       "permanent": true },
+
+    { "source": "/app/dashboard",                 "destination": "/app/nexus",                        "permanent": true },
+    { "source": "/app/settings",                  "destination": "/app/nexus/settings",               "permanent": true },
+    { "source": "/app/assessments",               "destination": "/app/nexus/lenses",                 "permanent": true },
+    { "source": "/app/profile",                   "destination": "/app/nexus/settings?tab=profile",   "permanent": true },
+    { "source": "/app/matches",                   "destination": "/app/nexus/milestones",             "permanent": true },
+    { "source": "/app/referrals",                 "destination": "/referral",                         "permanent": true },
+    { "source": "/app/pricing",                   "destination": "/pricing",                          "permanent": true },
+    { "source": "/app/results",                   "destination": "/app/nexus/readouts",               "permanent": true },
+    { "source": "/app/billing",                   "destination": "/app/nexus/billing",                "permanent": true },
+
+    /* ── Consultant portal consolidation — /portal/* → /consultant/* ── */
+    { "source": "/portal/mandates",               "destination": "/consultant/mandates",              "permanent": true },
+    { "source": "/portal/pipeline",               "destination": "/consultant/pipeline",              "permanent": true },
+    { "source": "/portal/settings",               "destination": "/consultant/settings",              "permanent": true },
+    { "source": "/portal/clients",                "destination": "/client/clients",                   "permanent": true },
+    { "source": "/portal/candidates",             "destination": "/candidate",                        "permanent": true },
+    { "source": "/portal/admin",                  "destination": "/admin",                            "permanent": true },
+
+    /* ── Dashboard alias /platform homepage alias ────────────────── */
+    { "source": "/dashboard",                     "destination": "/member/dashboard",                 "permanent": true },
+    { "source": "/settings",                      "destination": "/member/settings",                  "permanent": true },
+    { "source": "/platform",                      "destination": "/",                                 "permanent": true },
+
+    /* ── Trident + SHIFT + aliases ──────────────────────────────── */
+    { "source": "/trident",                       "destination": "/assessments",                      "permanent": true },
+    { "source": "/shift-mobility",                "destination": "/assessment/shift",                 "permanent": true },
+    { "source": "/spark-assessment",              "destination": "/assessment/spark",                 "permanent": true },
+    { "source": "/prism-assessment",              "destination": "/assessment/prism",                 "permanent": true },
+
+    /* ── Old specialized URLs (from v1.5 sitemap) ───────────────── */
+    { "source": "/assessments/china-pipeline-index", "destination": "/assessment/cpi",                 "permanent": true },
+    { "source": "/assessments/cpi-diagnostic",       "destination": "/assessment/cpi",                 "permanent": true },
+    { "source": "/assessments/shift-mobility",       "destination": "/assessment/shift",               "permanent": true },
+    { "source": "/assessments/career-shift",         "destination": "/assessment/shift",               "permanent": true },
+    { "source": "/assessments/cross-border",         "destination": "/assessment/bridge",              "permanent": true },
+    { "source": "/assessments/executive-scope",      "destination": "/assessment/impact",              "permanent": true },
+    { "source": "/assessments/geo-fit",              "destination": "/assessment/leap",                "permanent": true },
+    { "source": "/assessments/board-readiness",      "destination": "/assessment/quest",               "permanent": true },
+    { "source": "/assessments/:slug",                "destination": "/assessment/:slug",               "permanent": true },
+
+    /* ── Pre-cutover legacy site aliases ─────────────────────────── */
+    { "source": "/home",                            "destination": "/",                                 "permanent": true },
+    { "source": "/products",                        "destination": "/#assessment-catalog",              "permanent": true },
+    { "source": "/enterprise",                      "destination": "/pricing",                          "permanent": true },
+    { "source": "/pricing-old",                     "destination": "/pricing",                          "permanent": true },
+    { "source": "/for-business",                    "destination": "/b2b",                              "permanent": true },
+    { "source": "/about/about-us",                  "destination": "/about",                            "permanent": true },
+    { "source": "/about-us",                        "destination": "/about",                            "permanent": true },
+    { "source": "/b2b#contact",                     "destination": "/contact",                          "permanent": false },
+    { "source": "/contact-us",                      "destination": "/contact",                          "permanent": true },
+    { "source": "/login-old",                       "destination": "/login",                            "permanent": true }
   ],
   "rewrites": [
     {

@@ -202,7 +202,10 @@ export function getAssessmentMeta(
     milesCost,
     title,
     description,
-    path: `/assessments/${code.toLowerCase()}`,
+    // V5.2 Cutover: canonical SEO path is /nexus/lenses/[code] (the new marketing
+    // landing). Old /assessments/[code] and /assessment/[code] URLs both 301
+    // here via vercel.json redirects.
+    path: `/nexus/lenses/${code.toLowerCase()}`,
     type: 'product',
     ogImage: ogImageUrl(b2cName, `${code} Assessment`),
     structuredData: {
@@ -219,7 +222,7 @@ export function getAssessmentMeta(
         price: String(milesCost),
         priceCurrency: 'USD',
         availability: 'https://schema.org/InStock',
-        url: `${SITE_URL}/assessments/${code.toLowerCase()}`,
+        url: `${SITE_URL}/nexus/lenses/${code.toLowerCase()}`,
       },
     },
   };
@@ -370,14 +373,20 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
 
   // ─────────────────────────────────────────────────────────────
   // 11 ASSESSMENT LANDINGS (each is its own SEO asset)
+  // V5.2 Cutover: canonical SEO URLs are /nexus/lenses/[code].
+  // Old /assessment/[code] and /assessments/[code] URLs continue to
+  // work as 301 redirects in vercel.json and keep the legacy meta
+  // entries listed here so any crawler landing via a legacy URL
+  // still gets a canonical hint (then follows the 301).
   // ─────────────────────────────────────────────────────────────
+  // ── /nexus/lenses/* (canonical new SEO assets for V3.0)
   {
-    pattern: '/assessment/cpi',
+    pattern: '/nexus/lenses/cpi',
     meta: {
       title: 'CPI Diagnostic | China Leadership Pipeline Index',
       description:
         'The CPI Diagnostic benchmarks your leadership readiness for China market roles across 4 axes. 15 minutes, 200+ data points, actionable report.',
-      canonical: u('/assessment/cpi'),
+      canonical: u('/nexus/lenses/cpi'),
       keywords: [
         'CPI leadership assessment Singapore executive',
         'China C-suite positioning benchmark diagnostic',
@@ -389,19 +398,179 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
     },
   },
   {
-    pattern: '/assessment/shift',
+    pattern: '/nexus/lenses/prism',
     meta: {
-      title: 'Career Transition Radar for China Leaders | LYC Intelligence',
+      title: 'PRISM — Professional Branding Assessment | LYC Intelligence',
       description:
-        'The Career Transition Radar maps your adjacent career moves across industry, function, and stage — with 5 ranked paths and LYC likelihood scores. 12 minutes, data-driven.',
-      canonical: u('/assessment/shift'),
+        'PRISM maps how the world sees your professional brand across positioning, influence, and executive presence. Validated against 500+ APAC placements.',
+      canonical: u('/nexus/lenses/prism'),
       keywords: [
+        'PRISM executive branding assessment APAC',
+        'professional positioning diagnostic C-suite',
+        'executive presence scorecard China',
+      ],
+    },
+  },
+  {
+    pattern: '/nexus/lenses/spark',
+    meta: {
+      title: 'SPARK — AI Leadership Readiness | LYC Intelligence',
+      description:
+        'SPARK benchmarks your AI leadership readiness: strategy fluency, change management, and governance maturity. 15-minute diagnostic.',
+      canonical: u('/nexus/lenses/spark'),
+      keywords: [
+        'SPARK AI readiness diagnostic 2026',
+        'AI leadership benchmark executive',
+        'China AI governance readiness assessment',
+      ],
+    },
+  },
+  {
+    pattern: '/nexus/lenses/leap',
+    meta: {
+      title: 'LEAP — Competitive Positioning | LYC Intelligence',
+      description:
+        'LEAP maps your adjacent career moves across industry, function, and stage — 5 ranked paths with likelihood scores. 12 minutes, data-driven.',
+      canonical: u('/nexus/lenses/leap'),
+      keywords: [
+        'LEAP leadership transition profile China executive',
         'career mobility assessment APAC executive',
-        'China leader career transition radar 5 paths',
-        'executive industry pivot likelihood score',
-        'cross-functional move assessment C-suite',
-        'career stage transition diagnostic Shenzhen',
-        'LYC career mobility benchmark executive',
+      ],
+    },
+  },
+  {
+    pattern: '/nexus/lenses/impact',
+    meta: {
+      title: 'IMPACT — Board & Stakeholder Impact | LYC Intelligence',
+      description:
+        'IMPACT measures your influence at the highest levels: boardroom credibility, stakeholder communication, and governance fluency.',
+      canonical: u('/nexus/lenses/impact'),
+      keywords: [
+        'IMPACT board governance index assessment',
+        'executive stakeholder influence diagnostic',
+      ],
+    },
+  },
+  {
+    pattern: '/nexus/lenses/quest',
+    meta: {
+      title: 'QUEST — Strategic Market Positioning | LYC Intelligence',
+      description:
+        'QUEST benchmarks strategic market positioning: where you stand and where to play. Market segment fit, adjacency scoring, and 18-month roadmap.',
+      canonical: u('/nexus/lenses/quest'),
+      keywords: [
+        'strategic market positioning assessment executive',
+        'board readiness assessment C-suite',
+      ],
+    },
+  },
+  {
+    pattern: '/nexus/lenses/bridge',
+    meta: {
+      title: 'BRIDGE — Cross-Cultural Relational Intelligence | LYC Intelligence',
+      description:
+        'BRIDGE measures cross-cultural relational intelligence for cross-border mandates. Built on 20 years of APAC placement data.',
+      canonical: u('/nexus/lenses/bridge'),
+      keywords: [
+        'BRIDGE cross-border leadership assessment',
+        'cross-cultural executive intelligence China APAC',
+      ],
+    },
+  },
+  {
+    pattern: '/nexus/lenses/drive',
+    meta: {
+      title: 'DRIVE — Motivational Alignment | LYC Intelligence',
+      description:
+        'DRIVE maps what fuels you and what fades you. Motivational archetypes, demotivator mapping, and role-fit scoring.',
+      canonical: u('/nexus/lenses/drive'),
+      keywords: [
+        'DRIVE motivational alignment diagnostic executive',
+        'intrinsic vs extrinsic motivation assessment APAC',
+      ],
+    },
+  },
+  {
+    pattern: '/nexus/lenses/forge',
+    meta: {
+      title: 'FORGE — Sales Excellence Capability | LYC Intelligence',
+      description:
+        'FORGE builds the sales leader your market needs. Pipeline discipline, deal strategy, and team enablement scoring across 6 dimensions.',
+      canonical: u('/nexus/lenses/forge'),
+      keywords: [
+        'FORGE sales leadership strength matching',
+        'revenue leader assessment China market',
+      ],
+    },
+  },
+  {
+    pattern: '/nexus/lenses/coach',
+    meta: {
+      title: 'COACH — Executive Coaching Fit | LYC Intelligence',
+      description:
+        'COACH calibrates executive coaching fit: chemistry, focus area match, and 1–3 recommended coaches from the LYC network.',
+      canonical: u('/nexus/lenses/coach'),
+      keywords: [
+        'executive coaching fit assessment APAC',
+        'LYC coach matching diagnostic',
+      ],
+    },
+  },
+  {
+    pattern: '/nexus/lenses/mosaic',
+    meta: {
+      title: 'MOSAIC — Institutional Trust & Relationship Velocity | LYC Intelligence',
+      description:
+        'MOSAIC accelerates partnership velocity: institutional trust levers, relationship capital map, and 90-day activation plan.',
+      canonical: u('/nexus/lenses/mosaic'),
+      keywords: [
+        'MOSAIC institutional trust diagnostic executive',
+        'relationship velocity assessment China',
+      ],
+    },
+  },
+
+  // ── /nexus/lenses (library — replaces /assessments for B2C user surface)
+  {
+    pattern: '/nexus/lenses',
+    meta: {
+      title: 'Diagnostic Lenses Library | LYC Intelligence',
+      description:
+        'Eleven leadership diagnostics in one place. PRISM, CPI, SPARK, LEAP, IMPACT, BRIDGE, MOSAIC, DRIVE, QUEST, COACH, FORGE — start in under 60 seconds.',
+      canonical: u('/nexus/lenses'),
+      keywords: [
+        'PRISM SPARK FORGE executive assessment APAC',
+        'CPI flagship assessment LYC',
+        '11 leadership diagnostic lenses',
+      ],
+    },
+  },
+  // ── /nexus (product landing — "what is NEXUS?")
+  {
+    pattern: '/nexus',
+    meta: {
+      title: 'NEXUS — Your Executive Advisor | LYC Intelligence',
+      description:
+        'NEXUS is your executive advisor. It knows all 11 leadership diagnostics, interprets your results, and builds milestones. Complimentary entry tier.',
+      canonical: u('/nexus'),
+      keywords: [
+        'NEXUS executive advisory copilot',
+        'AI leadership advisor executive C-suite',
+      ],
+    },
+  },
+
+  // ── Legacy /assessment/* URLs (301 in vercel.json; meta kept as fallback)
+  {
+    pattern: '/assessment/cpi',
+    meta: {
+      title: 'CPI Diagnostic | China Leadership Pipeline Index',
+      description:
+        'The CPI Diagnostic benchmarks your leadership readiness for China market roles across 4 axes. 15 minutes, 200+ data points, actionable report.',
+      canonical: u('/nexus/lenses/cpi'),
+      keywords: [
+        'CPI leadership assessment Singapore executive',
+        'China C-suite positioning benchmark diagnostic',
       ],
     },
   },
@@ -411,14 +580,23 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
       title: '6 Leadership Assessments | LYC Intelligence',
       description:
         'Every LYC leadership assessment in one place. PRISM, SPARK, FORGE, BRIDGE, MOSAIC, DRIVE — start in under 60 seconds, get a personalised report.',
-      canonical: u('/assessment'),
+      canonical: u('/nexus/lenses'),
       keywords: [
         'PRISM SPARK FORGE executive assessment APAC',
-        'LEAP leadership transition profile China executive',
-        'SPARK AI readiness diagnostic 2026',
-        'IMPACT board governance index assessment',
-        'BRIDGE cross-border leadership assessment',
-        'FORGE sales leadership strength matching',
+        'leadership diagnostics library LYC',
+      ],
+    },
+  },
+  {
+    pattern: '/assessments',
+    meta: {
+      title: '6 Leadership Assessments | LYC Intelligence',
+      description:
+        'Every LYC leadership assessment in one place. PRISM, SPARK, FORGE, BRIDGE, MOSAIC, DRIVE — start in under 60 seconds, get a personalised report.',
+      canonical: u('/nexus/lenses'),
+      keywords: [
+        'PRISM SPARK FORGE executive assessment APAC',
+        'leadership diagnostics library LYC',
       ],
     },
   },
