@@ -104,7 +104,7 @@ const MILESTONES: MilestoneObservation[] = [
   {
     id: 'm1',
     name: 'Q3 \u2014 Launch Singapore GM transition',
-    insight: "The handover plan looks solid on paper, but MOSAIC flagged that the Singapore team expects a more consultative decision style than your default. A short calibration conversation before the announcement would reduce friction.",
+    insight: "The handover plan looks solid on paper, but MOSAIC flagged that the Singapore team expects a more consultative decision style than your default. A short pre-announcement check-in would reduce friction.",
     status: 'At risk',
   },
   {

@@ -151,7 +151,7 @@ const LENS_DATA: Record<string, LensSEOContent> = {
     sampleInsight: 'Verbal Command & Framing is your signature strength — 91st percentile. But Written Persuasion Quality lands at the 38th, and this is the gap that matters. People leave the room persuaded by what you said, then read the memo afterward and soften their position because the written case does not carry the same weight. Rebuilding your memo template around the same framing structure you use verbally will extend your influence well beyond the rooms you are actually in.',
     dimensionTeaser: [
       { name: 'Gravitas & Room Presence', description: 'How your physical bearing, silence, and timing shape a room independent of what you say.' },
-      { name: 'Verbal Command & Framing', description: 'The structure, economy, and rhetorical force of your spoken contributions.' },
+      { name: 'Verbal Command & Framing', description: 'The structure, economy, and rhetorical precision of your spoken contributions.' },
       { name: 'Listening & Attunement', description: 'How accurately you read a room and adjust your position based on what is not being said.' },
     ],
     whoItsFor: [

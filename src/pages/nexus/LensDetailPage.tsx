@@ -517,7 +517,7 @@ export default function LensDetailPage() {
                 margin: '0 0 20px',
               }}
             >
-              Other diagnostics that pair well.
+              Other lenses that pair well.
             </h2>
             <div
               style={{
