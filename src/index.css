@@ -2210,3 +2210,81 @@ body {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   V3.5 LANDING PAGE — responsive + interactions
+   Editorial minimalism. Zero radius. No shadows. Rule lines, not cards.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* CTA hover — invert (dark bg → cream text) */
+.v3-cta-primary:hover {
+  background: #e0e0e0 !important;
+}
+
+/* Nav CTA hover — invert (outline → solid) */
+.v3-nav-cta:hover {
+  background: #FAFAFA !important;
+  color: #0A0A0A !important;
+}
+
+/* Nav link hover — full opacity */
+.v3-nav-links a:hover {
+  opacity: 1 !important;
+}
+
+/* Tablet (768px) — membership 5-col → 2-col wrap, lens row scrolls */
+@media (max-width: 1024px) {
+  .v3-tier-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .v3-tier-grid > div {
+    border-left: 1px solid #E0E0E0 !important;
+  }
+  .v3-tier-grid > div:nth-child(odd) {
+    border-left: none !important;
+  }
+  .v3-footer-top {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 32px !important;
+  }
+}
+
+/* Mobile (375px) — single column, lens row horizontal scroll */
+@media (max-width: 768px) {
+  .v3-nav-links {
+    display: none !important;
+  }
+  .v3-tier-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .v3-tier-grid > div {
+    border-left: none !important;
+    border-top: 1px solid #E0E0E0 !important;
+  }
+  .v3-tier-grid > div:first-child {
+    border-top: none !important;
+  }
+  /* Lens row — horizontal scroll on mobile */
+  .v3-lens-row {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .v3-lens-row > div {
+    flex: 0 0 100px !important;
+  }
+  .v3-cap-footer {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .v3-footer-top {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+}
+
+/* V3.5 reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .v3-cta-primary, .v3-nav-cta, .v3-nav-links a {
+    transition: none !important;
+  }
+}
+
