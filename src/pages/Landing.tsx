@@ -227,7 +227,7 @@ function MarketingNav(): React.ReactElement {
 
       <Link
         to={SIGNUP}
-        onClick={() => trackCTA({ location: 'nav_marketing', label: 'Experience NEXUS', destination: SIGNUP })}
+        onClick={() => trackCTA({ location: 'nav', label: 'Experience NEXUS', destination: SIGNUP })}
         style={{
           fontFamily: V3.bodyFont,
           fontSize: '0.8rem',
@@ -556,7 +556,7 @@ function Capabilities(): React.ReactElement {
           </p>
           <Link
             to="/nexus/lenses"
-            onClick={() => trackCTA({ location: 'assessment_card', label: 'Explore all lenses', destination: '/nexus/lenses' })}
+            onClick={() => trackCTA({ location: 'capabilities', label: 'Explore all lenses', destination: '/nexus/lenses' })}
             style={{
               fontFamily: V3.bodyFont,
               fontSize: '0.85rem',
@@ -694,7 +694,7 @@ function Membership(): React.ReactElement {
                 </ul>
                 <Link
                   to={SIGNUP}
-                  onClick={() => trackCTA({ location: 'pricing_tier', label: tier.cta, destination: SIGNUP, context_id: tier.name })}
+                  onClick={() => trackCTA({ location: 'tiers', label: tier.cta, destination: SIGNUP, context_id: tier.name })}
                   style={{
                     fontFamily: V3.bodyFont,
                     fontSize: '0.82rem',
@@ -833,7 +833,7 @@ function FinalCTA(): React.ReactElement {
         </p>
         <Link
           to={SIGNUP}
-          onClick={() => trackCTA({ location: 'hero', label: 'Experience NEXUS', destination: SIGNUP })}
+          onClick={() => trackCTA({ location: 'final-cta', label: 'Experience NEXUS', destination: SIGNUP })}
           style={{
             display: 'inline-block',
             fontFamily: V3.bodyFont,
