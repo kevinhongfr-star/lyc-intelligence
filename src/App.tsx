@@ -79,6 +79,8 @@ const SignupPage = lazy(() => import('@/pages/SignupPage').then(m => ({ default:
 const WhatPage = lazy(() => import('@/pages/marketing/WhatPage').then(m => ({ default: m.WhatPage })));
 const HowPage = lazy(() => import('@/pages/marketing/HowPage').then(m => ({ default: m.HowPage })));
 const LensesPage = lazy(() => import('@/pages/marketing/LensesPage').then(m => ({ default: m.LensesPage })));
+const MembershipPage = lazy(() => import('@/pages/marketing/MembershipPage').then(m => ({ default: m.MembershipPage })));
+const JournalPage = lazy(() => import('@/pages/marketing/JournalPage').then(m => ({ default: m.JournalPage })));
 
 // ── Public product landing pages (Canonical — consolidated IA) ──
 const AssessmentPage = lazy(() => import('@/pages/AssessmentPage').then(m => ({ default: m.AssessmentPage })));
@@ -351,6 +353,8 @@ export default function App() {
             <Route path="what" element={<WhatPage />} />
             <Route path="how" element={<HowPage />} />
             <Route path="lenses" element={<LensesPage />} />
+            <Route path="membership" element={<MembershipPage />} />
+            <Route path="journal" element={<JournalPage />} />
             {/* Auth entry points (public, sit under marketing chrome) */}
             <Route path="login" element={<LoginPage />} />
             <Route path="reset-password" element={<ResetPasswordPage />} />

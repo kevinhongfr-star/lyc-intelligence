@@ -2252,6 +2252,11 @@ body {
   border-top: 1px solid #E0E0E0;
 }
 
+/* V7.0 journal row hover */
+.v3-journal-row:hover {
+  background: rgba(15, 44, 74, 0.03);
+}
+
 /* Tablet (768px) — membership 5-col → 2-col wrap, lens row scrolls */
 @media (max-width: 1024px) {
   .v3-tier-grid {
@@ -2315,6 +2320,15 @@ body {
   }
   .v3-lens-grid > article:nth-child(n+2) {
     border-top: 1px solid #E0E0E0 !important;
+  }
+  /* Journal row → stacked on mobile (date / title / tag vertical) */
+  .v3-journal-row {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .v3-journal-row > *:last-child {
+    justify-self: start !important;
+    text-align: left !important;
   }
   /* Lens row — horizontal scroll on mobile */
   .v3-lens-row {
