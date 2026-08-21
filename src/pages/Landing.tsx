@@ -180,7 +180,7 @@ function NexusWordmark({ onDark = false }: { onDark?: boolean }): React.ReactEle
 function MarketingNav(): React.ReactElement {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 80);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -196,6 +196,7 @@ function MarketingNav(): React.ReactElement {
 
   return (
     <header
+      className={scrolled ? 'v3-fixed-nav v3-nav-scrolled' : 'v3-fixed-nav'}
       style={{
         position: 'fixed',
         top: 0,
@@ -210,7 +211,7 @@ function MarketingNav(): React.ReactElement {
         background: 'rgba(10, 10, 10, 0.5)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: scrolled ? `1px solid rgba(255,255,255,0.08)` : '1px solid transparent',
+        borderBottom: '1px solid transparent',
         transition: `border-color ${V3.durNormal}ms ${V3.ease}`,
       }}
     >
@@ -328,6 +329,7 @@ function Hero(): React.ReactElement {
       >
         <div style={{ maxWidth: 720 }}>
           <p
+            className="reveal v3-eyebrow"
             style={{
               ...eyebrowStyle,
               color: V3.teal400,
@@ -338,6 +340,7 @@ function Hero(): React.ReactElement {
           </p>
 
           <h1
+            className="reveal v3-headline"
             style={{
               fontFamily: V3.displayFont,
               fontSize: V3.textHero,
@@ -355,7 +358,7 @@ function Hero(): React.ReactElement {
             </span>
           </h1>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 28, flexWrap: 'wrap' }}>
+          <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: 28, flexWrap: 'wrap' }}>
             <Link
               to={SIGNUP}
               onClick={() => trackCTA({ location: 'hero', label: 'Experience NEXUS', destination: SIGNUP })}
@@ -370,6 +373,7 @@ function Hero(): React.ReactElement {
 
         {/* Fuchsia focal dot at right edge */}
         <span
+          className="v3-focal-dot"
           aria-hidden
           style={{
             position: 'absolute',
@@ -402,13 +406,13 @@ function WhatItIs(): React.ReactElement {
       }}
     >
       <div style={{ maxWidth: V3.contentMax, margin: '0 auto' }}>
-        <p style={{ ...eyebrowStyle, color: V3.ocean600, margin: '0 0 20px 0' }}>What it is</p>
-        <h2 style={{ ...sectionTitleStyle, marginBottom: 24 }}>
+        <p className="reveal v3-eyebrow" style={{ ...eyebrowStyle, color: V3.ocean600, margin: '0 0 20px 0' }}>What it is</p>
+        <h2 className="reveal v3-headline" style={{ ...sectionTitleStyle, marginBottom: 24 }}>
           A place for the thinking
           <br />
           you can't take anywhere else.
         </h2>
-        <p style={{ ...bodySerifStyle, maxWidth: 680, marginBottom: 64 }}>
+        <p className="reveal" style={{ ...bodySerifStyle, maxWidth: 680, marginBottom: 64 }}>
           NEXUS holds the full picture of where you are and where you're heading. Always on. Fully discreet. Gets sharper the more you talk.
         </p>
 
@@ -416,7 +420,7 @@ function WhatItIs(): React.ReactElement {
           {PILLARS.map((p, i) => (
             <React.Fragment key={p.n}>
               <div
-                className="reveal"
+                className={`v3-what-item v3-stagger-${i + 1} reveal`}
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '80px 1fr',
@@ -455,7 +459,7 @@ function LensGlyph({ code }: { code: string }): React.ReactElement {
   // Minimal SVG line icon (24x24) — concentric framing, stroke 1.2, ocean-500.
   // Same visual primitive for all 11; the name differentiates.
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden style={{ display: 'block' }}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="v3-lens-icon" style={{ display: 'block' }}>
       <circle cx="12" cy="12" r="9" stroke={V3.ocean500} strokeWidth="1.2" />
       <circle cx="12" cy="12" r="4" stroke={V3.ocean500} strokeWidth="1.2" />
       <line x1="12" y1="2" x2="12" y2="5" stroke={V3.ocean500} strokeWidth="1.2" />
@@ -476,13 +480,13 @@ function Capabilities(): React.ReactElement {
       }}
     >
       <div style={{ maxWidth: V3.contentMax, margin: '0 auto' }}>
-        <p style={{ ...eyebrowStyle, color: V3.ocean600, margin: '0 0 20px 0' }}>Capabilities</p>
-        <h2 style={{ ...sectionTitleStyle, marginBottom: 24 }}>
+        <p className="reveal v3-eyebrow" style={{ ...eyebrowStyle, color: V3.ocean600, margin: '0 0 20px 0' }}>Capabilities</p>
+        <h2 className="reveal v3-headline" style={{ ...sectionTitleStyle, marginBottom: 24 }}>
           Eleven ways to look deeper.
           <br />
           One place that holds them all.
         </h2>
-        <p style={{ ...bodySerifStyle, maxWidth: 680, marginBottom: 56 }}>
+        <p className="reveal" style={{ ...bodySerifStyle, maxWidth: 680, marginBottom: 56 }}>
           Use them one at a time. Or let NEXUS suggest what you're not seeing in a conversation.
         </p>
 
@@ -498,6 +502,7 @@ function Capabilities(): React.ReactElement {
           {LENSES.map((lens, i) => (
             <div
               key={lens.code}
+              className={`v3-lens-cell v3-stagger-${i + 1} reveal`}
               style={{
                 flex: '1 1 0',
                 minWidth: 0,
@@ -585,13 +590,13 @@ function Membership(): React.ReactElement {
       }}
     >
       <div style={{ maxWidth: V3.contentMax, margin: '0 auto' }}>
-        <p style={{ ...eyebrowStyle, color: V3.ocean600, margin: '0 0 20px 0' }}>Membership</p>
-        <h2 style={{ ...sectionTitleStyle, marginBottom: 24 }}>
+        <p className="reveal v3-eyebrow" style={{ ...eyebrowStyle, color: V3.ocean600, margin: '0 0 20px 0' }}>Membership</p>
+        <h2 className="reveal v3-headline" style={{ ...sectionTitleStyle, marginBottom: 24 }}>
           Five levels.
           <br />
           One standard of discretion.
         </h2>
-        <p style={{ ...bodySerifStyle, maxWidth: 680, marginBottom: 56 }}>
+        <p className="reveal" style={{ ...bodySerifStyle, maxWidth: 680, marginBottom: 56 }}>
           Start wherever it makes sense. Move up when the work calls for it. Every tier gets the same measured, competent attention.
         </p>
 
@@ -610,7 +615,7 @@ function Membership(): React.ReactElement {
             return (
               <div
                 key={tier.name}
-                className="reveal"
+                className={`v3-tier-col v3-stagger-${i + 1} reveal`}
                 style={{
                   padding: '36px 24px',
                   borderLeft: i === 0 ? 'none' : `1px solid ${featured ? 'rgba(255,255,255,0.1)' : V3.ink200}`,
@@ -728,6 +733,7 @@ function Testimonial(): React.ReactElement {
     >
       <div style={{ maxWidth: 640, margin: '0 auto' }}>
         <span
+          className="v3-quote-mark reveal"
           aria-hidden
           style={{
             display: 'block',
@@ -797,8 +803,9 @@ function FinalCTA(): React.ReactElement {
         }}
       />
       <div style={{ position: 'relative', maxWidth: 560, margin: '0 auto' }}>
-        <p style={{ ...eyebrowStyle, color: V3.teal400, margin: '0 0 20px 0' }}>Begin</p>
+        <p className="reveal v3-eyebrow" style={{ ...eyebrowStyle, color: V3.teal400, margin: '0 0 20px 0' }}>Begin</p>
         <h2
+          className="reveal v3-headline"
           style={{
             fontFamily: V3.displayFont,
             fontSize: V3.textSectionTitle,
@@ -813,6 +820,7 @@ function FinalCTA(): React.ReactElement {
           Complimentary.
         </h2>
         <p
+          className="reveal"
           style={{
             fontFamily: V3.displayFont,
             fontSize: V3.textBodySerif,
