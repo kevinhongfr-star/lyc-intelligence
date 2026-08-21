@@ -2283,8 +2283,122 @@ body {
 
 /* V3.5 reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .v3-cta-primary, .v3-nav-cta, .v3-nav-links a {
+  .v3-cta-primary, .v3-nav-cta, .v3-nav-links a,
+  .v3-lens-icon, .v3-focal-dot, .v3-quote-mark,
+  .v3-tier-col, .v3-lens-cell, .v3-what-item,
+  .v3-eyebrow, .v3-headline, .v3-fixed-nav {
     transition: none !important;
+    animation: none !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   V6.1 — Motion Enhancements
+   Editorial-grade. CSS-only. Respects prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Scroll reveal: fade + slide-up (20px -> 0) */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  will-change: opacity, transform;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ===== Stagger within sections ===== */
+  /* Eyebrow reveals 200ms before headline */
+  .reveal.v3-eyebrow { transition-delay: 0ms !important; }
+  .reveal.v3-headline { transition-delay: 200ms !important; }
+
+  /* Tier columns: 100ms between each */
+  .v3-tier-grid .v3-tier-col.reveal.visible { transition-delay: 0ms; }
+  .v3-tier-grid .v3-tier-col.reveal.visible ~ .v3-tier-col.reveal.visible { transition-delay: 0ms; }
+
+  .v3-tier-col.v3-stagger-1.reveal.visible { transition-delay: 0ms !important; }
+  .v3-tier-col.v3-stagger-2.reveal.visible { transition-delay: 100ms !important; }
+  .v3-tier-col.v3-stagger-3.reveal.visible { transition-delay: 200ms !important; }
+  .v3-tier-col.v3-stagger-4.reveal.visible { transition-delay: 300ms !important; }
+  .v3-tier-col.v3-stagger-5.reveal.visible { transition-delay: 400ms !important; }
+
+  /* Lens cells: 50ms between each */
+  .v3-lens-cell.v3-stagger-1.reveal.visible { transition-delay: 0ms !important; }
+  .v3-lens-cell.v3-stagger-2.reveal.visible { transition-delay: 50ms !important; }
+  .v3-lens-cell.v3-stagger-3.reveal.visible { transition-delay: 100ms !important; }
+  .v3-lens-cell.v3-stagger-4.reveal.visible { transition-delay: 150ms !important; }
+  .v3-lens-cell.v3-stagger-5.reveal.visible { transition-delay: 200ms !important; }
+  .v3-lens-cell.v3-stagger-6.reveal.visible { transition-delay: 250ms !important; }
+  .v3-lens-cell.v3-stagger-7.reveal.visible { transition-delay: 300ms !important; }
+  .v3-lens-cell.v3-stagger-8.reveal.visible { transition-delay: 350ms !important; }
+  .v3-lens-cell.v3-stagger-9.reveal.visible { transition-delay: 400ms !important; }
+  .v3-lens-cell.v3-stagger-10.reveal.visible { transition-delay: 450ms !important; }
+  .v3-lens-cell.v3-stagger-11.reveal.visible { transition-delay: 500ms !important; }
+
+  /* "What It Is" numbered items: 80ms between each */
+  .v3-what-item.v3-stagger-1.reveal.visible { transition-delay: 0ms !important; }
+  .v3-what-item.v3-stagger-2.reveal.visible { transition-delay: 80ms !important; }
+  .v3-what-item.v3-stagger-3.reveal.visible { transition-delay: 160ms !important; }
+  .v3-what-item.v3-stagger-4.reveal.visible { transition-delay: 240ms !important; }
+
+  /* ===== Lens SVG icons: hover lift + color shift ===== */
+  .v3-lens-icon {
+    transition: transform 200ms ease-out;
+  }
+  .v3-lens-cell:hover .v3-lens-icon {
+    transform: translateY(-2px);
+  }
+  .v3-lens-cell:hover .v3-lens-icon circle,
+  .v3-lens-cell:hover .v3-lens-icon line {
+    stroke: #2DB0C2;
+  }
+  .v3-lens-icon circle,
+  .v3-lens-icon line {
+    transition: stroke 200ms ease-out;
+  }
+
+  /* ===== Hero focal dot: slow pulse ===== */
+  @keyframes v3-focal-pulse {
+    0%, 100% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-50%) scale(1.15); }
+  }
+  .v3-focal-dot {
+    animation: v3-focal-pulse 3s ease-in-out infinite;
+  }
+
+  /* ===== Testimonial quote mark: fade + scale on reveal ===== */
+  .v3-quote-mark {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 600ms ease-out, transform 600ms ease-out;
+  }
+  .v3-quote-mark.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* ===== Nav border after scroll (ocean-800 / 30%) ===== */
+  .v3-fixed-nav {
+    transition: border-color 200ms ease-out;
+  }
+  .v3-fixed-nav.v3-nav-scrolled {
+    border-bottom: 1px solid rgba(15, 44, 74, 0.3) !important;
+  }
+
+  /* ===== CTA hover: -2px lift alongside invert ===== */
+  .v3-cta-primary {
+    transition: transform 200ms ease-out, background 200ms ease-out;
+  }
+  .v3-cta-primary:hover {
+    transform: translateY(-2px);
+  }
+}
+
 
