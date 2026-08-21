@@ -81,6 +81,7 @@ const HowPage = lazy(() => import('@/pages/marketing/HowPage').then(m => ({ defa
 const LensesPage = lazy(() => import('@/pages/marketing/LensesPage').then(m => ({ default: m.LensesPage })));
 const MembershipPage = lazy(() => import('@/pages/marketing/MembershipPage').then(m => ({ default: m.MembershipPage })));
 const JournalPage = lazy(() => import('@/pages/marketing/JournalPage').then(m => ({ default: m.JournalPage })));
+const AuthPage = lazy(() => import('@/pages/marketing/AuthPage').then(m => ({ default: m.AuthPage })));
 
 // ── Public product landing pages (Canonical — consolidated IA) ──
 const AssessmentPage = lazy(() => import('@/pages/AssessmentPage').then(m => ({ default: m.AssessmentPage })));
@@ -489,6 +490,14 @@ export default function App() {
             <Route path="privacy" element={<PrivacyPage />} />
             <Route path="cookies" element={<CookiesPage />} />
           </Route>
+
+          {/* ═══════════════════════════════════════════════════════════
+              V7.0 · AUTH — standalone full-viewport dark auth screen.
+              Not nested under MarketingLayout (its own wordmark + centered
+              content per spec). Existing /login, /signup, /reset-password
+              keep working unchanged under MarketingLayout above.
+              ═══════════════════════════════════════════════════════════ */}
+          <Route path="/auth" element={<AuthPage />} />
 
           {/* ═══════════════════════════════════════════════════════════
               PHASE 16 · LEADER PORTAL — /app/* (B2C executives)
