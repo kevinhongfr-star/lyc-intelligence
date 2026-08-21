@@ -337,14 +337,11 @@ export default function App() {
       <SpeedInsights />
       <Suspense fallback={<Loading />}>
         <Routes>
-          {/* V6.1 — Landing page escapes MarketingLayout to avoid double nav/footer.
-              Landing renders its own Fixed Nav (V6.0-2a) + Marketing Footer (V6.0-2h). */}
-          <Route index element={<Landing />} />
-
           {/* ═══════════════════════════════════════════════════════════
-              PHASE 16 · MARKETING LAYOUT — no auth, premium marketing chrome
+              V7.0 · MARKETING LAYOUT — shared v3.5 nav + footer for all pages
               ═══════════════════════════════════════════════════════════ */}
           <Route path="/" element={<MarketingLayout />}>
+            <Route index element={<Landing />} />
             {/* Auth entry points (public, sit under marketing chrome) */}
             <Route path="login" element={<LoginPage />} />
             <Route path="reset-password" element={<ResetPasswordPage />} />

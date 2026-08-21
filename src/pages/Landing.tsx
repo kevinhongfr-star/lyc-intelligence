@@ -1,112 +1,43 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { initScrollReveal } from '@/lib/utils';
 import { V3 } from '@/styles/v3-tokens';
 import { SEO } from '@/components/seo/SEO';
 import { trackCTA } from '@/analytics/eventTracker';
+import { HOME_TIERS } from '@/config/marketing-data';
 
 /**
- * V6.0 — Landing page v3.5 full redesign.
+ * V7.0 — Landing page (home). Replaces the V6.1 landing.
+ *
+ * Rendered inside the shared MarketingLayout, which supplies the fixed nav
+ * + footer — this file contains page content only (no nav, no footer).
  *
  * Canon: Ocean primary, Teal secondary (cyan-leaning), Fuchsia punctuation
- * only. Editorial minimalism — rule lines, zero radius, no shadows.
- * NEXUS. wordmark (no space before dot). Hero video with 60% SOLID black
- * overlay. 5-tier membership with Pro featured dark. 11 lenses in one row.
+ * only. Editorial minimalism — rule lines (1px solid), zero radius, no
+ * shadows, no gradients (sole exception: a subtle radial glow in the final
+ * CTA). NEXUS. wordmark (no space before dot). Hero video with a 60% SOLID
+ * black scrim, pulled behind the fixed nav via marginTop: -navHeight.
  *
- * Copy is locked per spec. CTAs route to /auth/signup.
+ * Copy is locked per spec. All CTAs route to /auth and fire trackCTA with a
+ * location string (hero | tiers | capabilities | final-cta).
  */
 
-const SIGNUP = '/auth/signup';
+const AUTH = '/auth';
+const MEMBERSHIP = '/membership';
 
 // ── 11 lenses (compact capabilities row) ──
-const LENSES: Array<{ code: string; name: string }> = [
-  { code: 'PRISM', name: 'PRISM' },
-  { code: 'LEAP', name: 'LEAP' },
-  { code: 'MOSAIC', name: 'MOSAIC' },
-  { code: 'BRIDGE', name: 'BRIDGE' },
-  { code: 'COACH', name: 'COACH' },
-  { code: 'IMPACT', name: 'IMPACT' },
-  { code: 'DRIVE', name: 'DRIVE' },
-  { code: 'QUEST', name: 'QUEST' },
-  { code: 'SPARK', name: 'SPARK' },
-  { code: 'FORGE', name: 'FORGE' },
-  { code: 'CPI', name: 'CPI' },
-];
-
-// ── 5 membership tiers ──
-interface Tier {
-  level: string;
-  name: string;
-  price: string;
-  features: string[];
-  cta: string;
-  featured?: boolean;
-}
-
-const TIERS: Tier[] = [
-  {
-    level: 'Entry',
-    name: 'Explorer',
-    price: 'To begin',
-    features: [
-      'Conversation access',
-      'PRISM and LEAP lenses',
-      'Starter credits to begin',
-    ],
-    cta: 'Begin',
-  },
-  {
-    level: 'Foundational',
-    name: 'Starter',
-    price: '$29 / month',
-    features: [
-      'Everything in Explorer',
-      'Two structured sessions per month',
-      'Milestone tracking',
-      'Human debriefs — on request',
-    ],
-    cta: 'Begin',
-  },
-  {
-    level: 'Recommended',
-    name: 'Pro',
-    price: '$79 / month',
-    features: [
-      'All eleven lenses',
-      'Open conversation access',
-      'Milestone tracking',
-      'Document library — 50MB',
-      'Human debriefs — on request',
-    ],
-    cta: 'Begin',
-    featured: true,
-  },
-  {
-    level: 'Senior',
-    name: 'Executive',
-    price: '$199 / month',
-    features: [
-      'Everything in Pro',
-      'Percentile baselines',
-      '360° feedback integration',
-      'Two included human debriefs per month',
-      'Document library — 250MB',
-    ],
-    cta: 'Begin',
-  },
-  {
-    level: 'Private',
-    name: 'Council',
-    price: 'By introduction',
-    features: [
-      'CPI flagship assessment',
-      'DEX integration',
-      'Dedicated LYC advisor',
-      'Document library — 1GB',
-      'Invitation-only',
-    ],
-    cta: 'Enquire',
-  },
+const LENSES: string[] = [
+  'PRISM',
+  'LEAP',
+  'MOSAIC',
+  'BRIDGE',
+  'COACH',
+  'IMPACT',
+  'DRIVE',
+  'QUEST',
+  'SPARK',
+  'FORGE',
+  'CPI',
 ];
 
 // ── What It Is — 4 numbered items ──
@@ -157,96 +88,7 @@ const bodySerifStyle: React.CSSProperties = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════
-// V6.0-2a — Fixed Nav
-// ═══════════════════════════════════════════════════════════════════════
-
-function NexusWordmark({ onDark = false }: { onDark?: boolean }): React.ReactElement {
-  return (
-    <span
-      style={{
-        fontFamily: V3.displayFont,
-        fontWeight: V3.fwBold,
-        fontSize: '1.4rem',
-        letterSpacing: '-0.01em',
-        color: onDark ? V3.cream : V3.ink900,
-      }}
-    >
-      NEXUS
-      <span style={{ color: V3.fuchsia600 }}>.</span>
-    </span>
-  );
-}
-
-function MarketingNav(): React.ReactElement {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 80);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const navLinkStyle: React.CSSProperties = {
-    fontFamily: V3.bodyFont,
-    fontSize: '0.875rem',
-    color: V3.cream,
-    textDecoration: 'none',
-    opacity: 0.82,
-    transition: `opacity ${V3.durNormal}ms ${V3.ease}`,
-  };
-
-  return (
-    <header
-      className={scrolled ? 'v3-fixed-nav v3-nav-scrolled' : 'v3-fixed-nav'}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        height: V3.navHeight,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 32px',
-        background: 'rgba(10, 10, 10, 0.5)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: '1px solid transparent',
-        transition: `border-color ${V3.durNormal}ms ${V3.ease}`,
-      }}
-    >
-      <Link to="/" style={{ textDecoration: 'none' }} aria-label="NEXUS home">
-        <NexusWordmark onDark />
-      </Link>
-
-      <nav style={{ display: 'flex', gap: 40 }} className="v3-nav-links">
-        <a href="#what-it-is" style={navLinkStyle}>What it is</a>
-        <a href="#capabilities" style={navLinkStyle}>Capabilities</a>
-        <a href="#membership" style={navLinkStyle}>Membership</a>
-      </nav>
-
-      <Link
-        to={SIGNUP}
-        onClick={() => trackCTA({ location: 'nav', label: 'Experience NEXUS', destination: SIGNUP })}
-        style={{
-          fontFamily: V3.bodyFont,
-          fontSize: '0.8rem',
-          color: V3.cream,
-          textDecoration: 'none',
-          padding: '10px 20px',
-          border: `1px solid ${V3.cream}`,
-          transition: `background ${V3.durNormal}ms ${V3.ease}, color ${V3.durNormal}ms ${V3.ease}`,
-        }}
-        className="v3-nav-cta"
-      >
-        Experience NEXUS
-      </Link>
-    </header>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// V6.0-2b — Hero (full viewport, video bg, 60% SOLID black overlay)
+// V7.0-2b — Hero (full viewport, video bg, 60% SOLID black scrim)
 // ═══════════════════════════════════════════════════════════════════════
 
 function Hero(): React.ReactElement {
@@ -255,8 +97,8 @@ function Hero(): React.ReactElement {
     fontFamily: V3.bodyFont,
     fontSize: '0.9rem',
     fontWeight: V3.fwMedium,
-    color: V3.ink900,
-    background: V3.cream,
+    color: V3.cream,
+    background: V3.ink900,
     padding: '14px 28px',
     border: 'none',
     textDecoration: 'none',
@@ -266,9 +108,9 @@ function Hero(): React.ReactElement {
   const secondaryCtaStyle: React.CSSProperties = {
     fontFamily: V3.bodyFont,
     fontSize: '0.9rem',
-    color: V3.cream,
+    color: V3.teal300,
     textDecoration: 'none',
-    borderBottom: `1px solid ${V3.cream}`,
+    borderBottom: `1px solid ${V3.teal300}`,
     paddingBottom: 2,
   };
 
@@ -276,12 +118,12 @@ function Hero(): React.ReactElement {
     <section
       style={{
         position: 'relative',
-        height: '100vh',
-        minHeight: 600,
+        minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
         overflow: 'hidden',
-        background: V3.ink900, // fallback if video fails
+        background: V3.ink900, // #0A0A0A fallback if video fails
+        marginTop: -V3.navHeight, // pull behind the fixed nav
       }}
     >
       {/* Video background */}
@@ -302,7 +144,8 @@ function Hero(): React.ReactElement {
       >
         <source src="/hero-bg.mp4" type="video/mp4" />
       </video>
-      {/* 80% SOLID black overlay — V6.1 darker overlay, NOT a gradient */}
+
+      {/* 60% SOLID black scrim — NOT a gradient */}
       <div
         style={{
           position: 'absolute',
@@ -310,7 +153,7 @@ function Hero(): React.ReactElement {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'rgba(10,10,10,0.8)',
+          background: 'rgba(10,10,10,0.6)',
           zIndex: 1,
         }}
       />
@@ -360,14 +203,20 @@ function Hero(): React.ReactElement {
 
           <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: 28, flexWrap: 'wrap' }}>
             <Link
-              to={SIGNUP}
-              onClick={() => trackCTA({ location: 'hero', label: 'Experience NEXUS', destination: SIGNUP })}
+              to={AUTH}
+              onClick={() => trackCTA({ location: 'hero', label: 'Start here', destination: AUTH })}
               style={primaryCtaStyle}
               className="v3-cta-primary"
             >
-              Experience NEXUS
+              Start here
             </Link>
-            <a href="#what-it-is" style={secondaryCtaStyle}>What it is</a>
+            <Link
+              to="/what"
+              onClick={() => trackCTA({ location: 'hero', label: 'What it is', destination: '/what' })}
+              style={secondaryCtaStyle}
+            >
+              What it is
+            </Link>
           </div>
         </div>
 
@@ -392,7 +241,7 @@ function Hero(): React.ReactElement {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// V6.0-2c — What It Is
+// V7.0-2c — What It Is
 // ═══════════════════════════════════════════════════════════════════════
 
 function WhatItIs(): React.ReactElement {
@@ -413,37 +262,36 @@ function WhatItIs(): React.ReactElement {
           you can't take anywhere else.
         </h2>
         <p className="reveal" style={{ ...bodySerifStyle, maxWidth: 680, marginBottom: 64 }}>
-          NEXUS holds the full picture of where you are and where you're heading. Always on. Fully discreet. Gets sharper the more you talk.
+          The full picture of where you are and where you're heading. Always on. Fully discreet. Gets sharper the more you talk.
         </p>
 
         <div>
           {PILLARS.map((p, i) => (
-            <React.Fragment key={p.n}>
-              <div
-                className={`v3-what-item v3-stagger-${i + 1} reveal`}
+            <div
+              key={p.n}
+              className={`v3-what-item v3-stagger-${i + 1} reveal`}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '80px 1fr',
+                gap: 32,
+                padding: '32px 0',
+                borderTop: i === 0 ? `1px solid ${V3.ink200}` : 'none',
+                borderBottom: `1px solid ${V3.ink200}`,
+              }}
+            >
+              <span
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: '80px 1fr',
-                  gap: 32,
-                  padding: '32px 0',
-                  borderTop: i === 0 ? `1px solid ${V3.ink200}` : 'none',
-                  borderBottom: `1px solid ${V3.ink200}`,
+                  fontFamily: V3.monoFont,
+                  fontSize: '0.9rem',
+                  color: V3.ocean600,
+                  letterSpacing: V3.trackingMono,
+                  paddingTop: 4,
                 }}
               >
-                <span
-                  style={{
-                    fontFamily: V3.monoFont,
-                    fontSize: '0.9rem',
-                    color: V3.ocean600,
-                    letterSpacing: V3.trackingMono,
-                    paddingTop: 4,
-                  }}
-                >
-                  {p.n}
-                </span>
-                <p style={{ ...bodySerifStyle, margin: 0 }}>{p.body}</p>
-              </div>
-            </React.Fragment>
+                {p.n}
+              </span>
+              <p style={{ ...bodySerifStyle, margin: 0 }}>{p.body}</p>
+            </div>
           ))}
         </div>
       </div>
@@ -452,7 +300,7 @@ function WhatItIs(): React.ReactElement {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// V6.0-2d — Capabilities (11 lenses, single row, vertical rule lines)
+// V7.0-2d — Capabilities (11 lenses, single row, vertical rule lines)
 // ═══════════════════════════════════════════════════════════════════════
 
 function LensGlyph({ code }: { code: string }): React.ReactElement {
@@ -487,7 +335,7 @@ function Capabilities(): React.ReactElement {
           One place that holds them all.
         </h2>
         <p className="reveal" style={{ ...bodySerifStyle, maxWidth: 680, marginBottom: 56 }}>
-          Use them one at a time. Or let NEXUS suggest what you're not seeing in a conversation.
+          Use them one at a time. Or just talk through what's on your mind — the right lens finds you.
         </p>
 
         {/* Single row of 11 lens cells with vertical rule lines */}
@@ -499,9 +347,9 @@ function Capabilities(): React.ReactElement {
             borderBottom: `1px solid ${V3.ink200}`,
           }}
         >
-          {LENSES.map((lens, i) => (
+          {LENSES.map((code, i) => (
             <div
-              key={lens.code}
+              key={code}
               className={`v3-lens-cell v3-stagger-${i + 1} reveal`}
               style={{
                 flex: '1 1 0',
@@ -514,7 +362,7 @@ function Capabilities(): React.ReactElement {
                 gap: 14,
               }}
             >
-              <LensGlyph code={lens.code} />
+              <LensGlyph code={code} />
               <span
                 style={{
                   fontFamily: V3.monoFont,
@@ -526,7 +374,7 @@ function Capabilities(): React.ReactElement {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {lens.name}
+                {code}
               </span>
             </div>
           ))}
@@ -555,8 +403,8 @@ function Capabilities(): React.ReactElement {
             CPI is the flagship — a private day with your advisor, by introduction only.
           </p>
           <Link
-            to="/nexus/lenses"
-            onClick={() => trackCTA({ location: 'capabilities', label: 'Explore all lenses', destination: '/nexus/lenses' })}
+            to="/how"
+            onClick={() => trackCTA({ location: 'capabilities', label: 'See how it works', destination: '/how' })}
             style={{
               fontFamily: V3.bodyFont,
               fontSize: '0.85rem',
@@ -566,7 +414,7 @@ function Capabilities(): React.ReactElement {
               paddingBottom: 2,
             }}
           >
-            Explore all lenses →
+            See how it works →
           </Link>
         </div>
       </div>
@@ -575,7 +423,7 @@ function Capabilities(): React.ReactElement {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// V6.0-2e — Membership (5 tiers, Pro featured dark)
+// V7.0-2e — Membership (5 tiers, Pro featured dark)
 // ═══════════════════════════════════════════════════════════════════════
 
 function Membership(): React.ReactElement {
@@ -584,7 +432,7 @@ function Membership(): React.ReactElement {
       id="membership"
       className="reveal"
       style={{
-        background: V3.white,
+        background: V3.cream,
         padding: `${V3.marketingPadY}px 32px`,
         borderTop: `1px solid ${V3.ink200}`,
       }}
@@ -610,8 +458,8 @@ function Membership(): React.ReactElement {
             borderBottom: `1px solid ${V3.ink200}`,
           }}
         >
-          {TIERS.map((tier, i) => {
-            const featured = tier.featured;
+          {HOME_TIERS.map((tier, i) => {
+            const featured = tier.featured === true;
             return (
               <div
                 key={tier.name}
@@ -638,7 +486,7 @@ function Membership(): React.ReactElement {
                 <h3
                   style={{
                     fontFamily: V3.displayFont,
-                    fontSize: '1.6rem',
+                    fontSize: '1.3rem',
                     fontWeight: V3.fwRegular,
                     lineHeight: 1.2,
                     margin: '0 0 8px 0',
@@ -650,23 +498,14 @@ function Membership(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: V3.displayFont,
-                    fontStyle: 'italic',
                     fontSize: '1.1rem',
+                    fontWeight: V3.fwRegular,
                     color: featured ? V3.teal300 : V3.ink700,
                     margin: '0 0 28px 0',
                   }}
                 >
                   {tier.price}
                 </p>
-                <span
-                  style={{
-                    ...eyebrowStyle,
-                    color: featured ? 'rgba(250,250,250,0.5)' : V3.ink400,
-                    margin: '0 0 16px 0',
-                  }}
-                >
-                  Included
-                </span>
                 <ul
                   style={{
                     listStyle: 'none',
@@ -693,8 +532,8 @@ function Membership(): React.ReactElement {
                   ))}
                 </ul>
                 <Link
-                  to={SIGNUP}
-                  onClick={() => trackCTA({ location: 'tiers', label: tier.cta, destination: SIGNUP, context_id: tier.name })}
+                  to={MEMBERSHIP}
+                  onClick={() => trackCTA({ location: 'tiers', label: tier.cta, destination: MEMBERSHIP, context_id: tier.name })}
                   style={{
                     fontFamily: V3.bodyFont,
                     fontSize: '0.82rem',
@@ -717,7 +556,7 @@ function Membership(): React.ReactElement {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// V6.0-2f — Testimonial
+// V7.0-2f — Testimonial
 // ═══════════════════════════════════════════════════════════════════════
 
 function Testimonial(): React.ReactElement {
@@ -773,7 +612,7 @@ function Testimonial(): React.ReactElement {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// V6.0-2g — Final CTA (dark, subtle radial glow)
+// V7.0-2g — Final CTA (dark, subtle radial glow)
 // ═══════════════════════════════════════════════════════════════════════
 
 function FinalCTA(): React.ReactElement {
@@ -788,7 +627,7 @@ function FinalCTA(): React.ReactElement {
         overflow: 'hidden',
       }}
     >
-      {/* Subtle radial glow — ocean-600 at 15% opacity, depth only */}
+      {/* Subtle radial glow — ocean-600 at ~26% opacity (the only gradient exception) */}
       <div
         aria-hidden
         style={{
@@ -798,7 +637,7 @@ function FinalCTA(): React.ReactElement {
           width: 600,
           height: 600,
           transform: 'translate(-50%, -50%)',
-          background: `radial-gradient(circle, ${V3.ocean600}26 0%, transparent 70%)`,
+          background: `radial-gradient(circle, ${V3.ocean600}42 0%, transparent 70%)`,
           pointerEvents: 'none',
         }}
       />
@@ -832,8 +671,8 @@ function FinalCTA(): React.ReactElement {
           A conversation about what's on your mind, and whether this is the right fit. You'll know quickly.
         </p>
         <Link
-          to={SIGNUP}
-          onClick={() => trackCTA({ location: 'final-cta', label: 'Experience NEXUS', destination: SIGNUP })}
+          to={AUTH}
+          onClick={() => trackCTA({ location: 'final-cta', label: 'Start here', destination: AUTH })}
           style={{
             display: 'inline-block',
             fontFamily: V3.bodyFont,
@@ -842,119 +681,16 @@ function FinalCTA(): React.ReactElement {
             color: V3.ink900,
             background: V3.cream,
             padding: '14px 28px',
+            border: 'none',
             textDecoration: 'none',
             transition: `background ${V3.durNormal}ms ${V3.ease}`,
           }}
           className="v3-cta-primary"
         >
-          Experience NEXUS
+          Start here
         </Link>
       </div>
     </section>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// V6.0-2h — Footer (new marketing footer)
-// ═══════════════════════════════════════════════════════════════════════
-
-function MarketingFooter(): React.ReactElement {
-  const footerLink: React.CSSProperties = {
-    display: 'block',
-    fontFamily: V3.bodyFont,
-    fontSize: '0.8rem',
-    color: 'rgba(250,250,250,0.6)',
-    textDecoration: 'none',
-    padding: '5px 0',
-    transition: `color ${V3.durNormal}ms ${V3.ease}`,
-  };
-  const colLabel: React.CSSProperties = {
-    ...eyebrowStyle,
-    color: 'rgba(250,250,250,0.4)',
-    margin: '0 0 16px 0',
-  };
-
-  return (
-    <footer style={{ background: V3.ink900, padding: '72px 32px 32px 32px' }}>
-      <div style={{ maxWidth: V3.contentMax, margin: '0 auto' }}>
-        {/* Top area */}
-        <div
-          className="v3-footer-top"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1fr 1fr 1fr',
-            gap: 48,
-            paddingBottom: 48,
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
-          }}
-        >
-          <div>
-            <NexusWordmark onDark />
-            <p
-              style={{
-                fontFamily: V3.bodyFont,
-                fontSize: '0.85rem',
-                color: 'rgba(250,250,250,0.5)',
-                margin: '12px 0 0 0',
-              }}
-            >
-              Executive intelligence. Always on.
-            </p>
-          </div>
-
-          <div>
-            <p style={colLabel}>Product</p>
-            <a href="#capabilities" style={footerLink}>Capabilities</a>
-            <a href="#membership" style={footerLink}>Membership</a>
-            <Link to="/b2b" style={footerLink}>For teams</Link>
-          </div>
-
-          <div>
-            <p style={colLabel}>Company</p>
-            <Link to="/about" style={footerLink}>About</Link>
-            <Link to="/about" style={footerLink}>LYC Partners</Link>
-            <Link to="/about" style={footerLink}>Press</Link>
-          </div>
-
-          <div>
-            <p style={colLabel}>Legal</p>
-            <Link to="/privacy" style={footerLink}>Privacy</Link>
-            <Link to="/terms" style={footerLink}>Terms</Link>
-            <Link to="/security" style={footerLink}>Security</Link>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingTop: 24,
-            flexWrap: 'wrap',
-            gap: 12,
-          }}
-        >
-          <span
-            style={{
-              fontFamily: V3.bodyFont,
-              fontSize: '0.75rem',
-              color: 'rgba(250,250,250,0.4)',
-            }}
-          >
-            © 2026 NEXUS<span style={{ color: V3.fuchsia600 }}>.</span>
-          </span>
-          <span
-            style={{
-              ...eyebrowStyle,
-              color: 'rgba(250,250,250,0.4)',
-            }}
-          >
-            Shanghai · Singapore · Paris
-          </span>
-        </div>
-      </div>
-    </footer>
   );
 }
 
@@ -965,25 +701,18 @@ function MarketingFooter(): React.ReactElement {
 export function Landing(): React.ReactElement {
   useEffect(() => {
     const observer = initScrollReveal();
-    document.body.style.overflow = 'auto';
-    return () => {
-      if (observer) observer.disconnect();
-    };
+    return () => { if (observer) observer.disconnect(); };
   }, []);
 
   return (
     <>
       <SEO page="landing" />
-      <MarketingNav />
-      <main>
-        <Hero />
-        <WhatItIs />
-        <Capabilities />
-        <Membership />
-        <Testimonial />
-        <FinalCTA />
-      </main>
-      <MarketingFooter />
+      <Hero />
+      <WhatItIs />
+      <Capabilities />
+      <Membership />
+      <Testimonial />
+      <FinalCTA />
     </>
   );
 }
