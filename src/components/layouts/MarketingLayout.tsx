@@ -1,100 +1,125 @@
 /**
- * Phase 16 — MarketingLayout (public / marketing identity).
+ * V7.0 — MarketingLayout (v3.5 design system).
  *
- * No auth required. Chrome: MarketingNav at top + marketing footer.
- * Visual: lots of whitespace, serif-heavy, premium magazine feel.
- * Zero radius, font trio, accent #C108AB.
+ * Shared marketing shell: fixed dark nav + Outlet + dark footer.
+ * Replaces the old Phase 16 MarketingLayout entirely.
+ * Zero radius, no shadows, rule lines. Editorial minimalism.
  */
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import MarketingNav from '@/components/navigation/MarketingNav';
 import { SkipToContent } from '@/components/a11y/SkipToContent';
-
-const DS = {
-  headingFont: "'DejaVu Serif', 'Georgia', 'Times New Roman', Times, serif",
-  bodyFont: "'DM Sans', system-ui, sans-serif",
-  accent: '#C108AB',
-  bg: '#FFFFFF',
-  footerBg: '#F9F9F9',
-  border: '#E5E5E5',
-  text: '#000000',
-  textSecondary: '#333333',
-  muted: '#666666',
-};
+import { V3 } from '@/styles/v3-tokens';
+import { Wordmark, MonoLabel } from '@/components/marketing/v7-shell';
+import { trackCTA } from '@/analytics/eventTracker';
 
 function MarketingFooter(): React.ReactElement {
-  const year = new Date().getFullYear();
-  // Phase 9 Batch 6, ticket #1352 — B2C marketing footer only. Remove B2B Match link.
-  // Replace "For Business" with "About" only; keep /b2b as direct-access route but not in footer.
   const columns = [
     {
       title: 'Product',
       links: [
-        { label: 'NEXUS', href: '/nexus/chat' },
-        { label: 'Leadership Assessments', href: '/assessments' },
-        { label: 'Pricing', href: '/pricing' },
+        { label: 'Lenses', href: '/lenses' },
+        { label: 'Membership', href: '/membership' },
+        { label: 'Journal', href: '/journal' },
       ],
     },
     {
       title: 'Company',
       links: [
-        { label: 'About', href: '/#about' },
+        { label: 'About LYC', href: '/what' },
         { label: 'Contact', href: 'mailto:hello@lycintelligence.com' },
       ],
     },
     {
       title: 'Legal',
       links: [
-        { label: 'Terms', href: '/terms' },
         { label: 'Privacy', href: '/privacy' },
-        { label: 'Cookies', href: '/cookies' },
+        { label: 'Terms', href: '/terms' },
+        { label: 'Security', href: '/security' },
       ],
     },
   ];
+
   return (
-    <footer style={{
-      background: DS.footerBg, borderTop: `1px solid ${DS.border}`,
-      marginTop: 'auto', fontFamily: DS.bodyFont,
-    }}>
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '56px 32px 32px' }}>
-        <div style={{
-          display: 'grid', gap: 40,
-          gridTemplateColumns: 'minmax(0,1.2fr) repeat(3,minmax(0,1fr))',
-        }} className="marketing-footer-grid">
+    <footer
+      style={{
+        background: V3.ink900,
+        borderTop: `1px solid rgba(250,250,250,0.08)`,
+        paddingTop: 80,
+        paddingBottom: 32,
+      }}
+    >
+      <div style={{ maxWidth: 1160, margin: '0 auto', padding: '0 32px' }}>
+        {/* Top: wordmark + tagline + 3 cols */}
+        <div
+          className="v3-footer-top"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0,1.2fr) repeat(3,minmax(0,1fr))',
+            gap: 48,
+            paddingBottom: 64,
+          }}
+        >
           <div>
-            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', marginBottom: 16 }}>
-              <span style={{
-                width: 32, height: 32, background: DS.accent, color: '#fff',
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                fontFamily: DS.headingFont, fontWeight: 700, fontSize: 15,
-              }}>L</span>
-              <span style={{ fontFamily: DS.headingFont, fontSize: 17, fontWeight: 700, color: DS.text }}>
-                LYC Intelligence
-              </span>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <Wordmark onDark size="md" />
             </Link>
-            <p style={{ fontSize: 14, color: DS.muted, lineHeight: 1.6, maxWidth: 320, margin: 0 }}>
-              Executive intelligence for high-achieving leaders. Advisory, assessments, and talent search in one private service.
+            <p
+              style={{
+                fontFamily: V3.displayFont,
+                fontSize: '1rem',
+                lineHeight: 1.5,
+                fontWeight: V3.fwLight,
+                color: V3.onDarkMuted,
+                margin: '16px 0 0 0',
+                maxWidth: 280,
+              }}
+            >
+              Executive intelligence. Always on.
             </p>
           </div>
           {columns.map((col) => (
             <div key={col.title}>
-              <div style={{
-                fontSize: 12, fontWeight: 700, color: DS.text, letterSpacing: 1,
-                textTransform: 'uppercase', marginBottom: 16,
-              }}>{col.title}</div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <MonoLabel
+                color="rgba(250,250,250,0.4)"
+                style={{ display: 'block', marginBottom: 20 }}
+              >
+                {col.title}
+              </MonoLabel>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {col.links.map((l) => (
                   <li key={l.label}>
                     {l.href.startsWith('mailto:') ? (
-                      <a href={l.href} style={{ fontSize: 14, color: DS.textSecondary, textDecoration: 'none' }}
-                        onMouseOver={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = DS.accent; }}
-                        onMouseOut={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = DS.textSecondary; }}
-                      >{l.label}</a>
+                      <a
+                        href={l.href}
+                        style={{
+                          fontFamily: V3.bodyFont,
+                          fontSize: '0.9rem',
+                          color: 'rgba(250,250,250,0.66)',
+                          textDecoration: 'none',
+                          transition: `color ${V3.durNormal}ms ${V3.ease}`,
+                        }}
+                        onMouseOver={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = V3.cream; }}
+                        onMouseOut={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(250,250,250,0.66)'; }}
+                      >
+                        {l.label}
+                      </a>
                     ) : (
-                      <Link to={l.href} style={{ fontSize: 14, color: DS.textSecondary, textDecoration: 'none' }}
-                        onMouseOver={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = DS.accent; }}
-                        onMouseOut={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = DS.textSecondary; }}
-                      >{l.label}</Link>
+                      <Link
+                        to={l.href}
+                        onClick={() => trackCTA({ location: 'footer', label: l.label, destination: l.href })}
+                        style={{
+                          fontFamily: V3.bodyFont,
+                          fontSize: '0.9rem',
+                          color: 'rgba(250,250,250,0.66)',
+                          textDecoration: 'none',
+                          transition: `color ${V3.durNormal}ms ${V3.ease}`,
+                        }}
+                        onMouseOver={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = V3.cream; }}
+                        onMouseOut={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(250,250,250,0.66)'; }}
+                      >
+                        {l.label}
+                      </Link>
                     )}
                   </li>
                 ))}
@@ -102,17 +127,41 @@ function MarketingFooter(): React.ReactElement {
             </div>
           ))}
         </div>
-        <div style={{
-          borderTop: `1px solid ${DS.border}`, marginTop: 48, paddingTop: 20,
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16,
-          flexWrap: 'wrap',
-        }}>
-          <div style={{ fontSize: 12.5, color: DS.muted }}>
-            © {year} LYC Intelligence. All rights reserved.
-          </div>
-          <div style={{ fontSize: 12.5, color: DS.muted }}>
-            Made for leaders.
-          </div>
+
+        {/* Bottom bar */}
+        <div
+          style={{
+            borderTop: `1px solid rgba(250,250,250,0.08)`,
+            paddingTop: 24,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 16,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: V3.monoFont,
+              fontSize: '0.68rem',
+              letterSpacing: V3.trackingMono,
+              textTransform: 'uppercase',
+              color: 'rgba(250,250,250,0.4)',
+            }}
+          >
+            © 2026 NEXUS.
+          </span>
+          <span
+            style={{
+              fontFamily: V3.monoFont,
+              fontSize: '0.68rem',
+              letterSpacing: V3.trackingMono,
+              textTransform: 'uppercase',
+              color: 'rgba(250,250,250,0.4)',
+            }}
+          >
+            Shanghai · Singapore · Paris
+          </span>
         </div>
       </div>
     </footer>
@@ -121,13 +170,23 @@ function MarketingFooter(): React.ReactElement {
 
 export function MarketingLayout(): React.ReactElement {
   return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', minHeight: '100vh',
-      background: DS.bg, fontFamily: DS.bodyFont,
-    }} data-portal-kind="marketing">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        background: V3.cream,
+        fontFamily: V3.bodyFont,
+      }}
+      data-portal-kind="marketing"
+    >
       <SkipToContent targetId="main-content" />
       <MarketingNav />
-      <main id="main-content" aria-label="Main content" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <main
+        id="main-content"
+        aria-label="Main content"
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', paddingTop: V3.navHeight }}
+      >
         <Outlet />
       </main>
       <MarketingFooter />

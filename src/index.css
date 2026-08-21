@@ -2231,6 +2231,11 @@ body {
   opacity: 1 !important;
 }
 
+/* Mobile toggle — hidden on desktop, shown on mobile */
+.v3-mobile-toggle {
+  display: none;
+}
+
 /* Tablet (768px) — membership 5-col → 2-col wrap, lens row scrolls */
 @media (max-width: 1024px) {
   .v3-tier-grid {
@@ -2252,6 +2257,9 @@ body {
 @media (max-width: 768px) {
   .v3-nav-links {
     display: none !important;
+  }
+  .v3-mobile-toggle {
+    display: flex !important;
   }
   .v3-tier-grid {
     grid-template-columns: 1fr !important;

@@ -1,48 +1,43 @@
 /**
- * Phase 16 — MarketingNav (public / marketing identity).
+ * V7.0 — MarketingNav (v3.5 design system).
  *
- * Batch 1.5 / Ticket 3: Simplified nav. Primary = NEXUS, Assessments, Pricing.
- * Logo click → Home (no separate Home link). Tier-aware: authenticated users
- * see "My Portal" + tier badge; guests see "Sign in" + "Meet NEXUS".
- * URL: /assessments/ (not /assessment/).
- *
- * Visual: lots of whitespace, serif-heavy brand feel.
- * Zero radius, font trio, accent #C108AB.
+ * Fixed, dark, translucent + backdrop blur.
+ * Left: NEXUS. wordmark. Center: 6 nav links. Right: "Begin" → /auth.
+ * Mobile: hamburger menu. Auth-aware for logged-in users.
  */
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ArrowRight, Sparkles } from 'lucide-react';
+import { V3 } from '@/styles/v3-tokens';
+import { Wordmark } from '@/components/marketing/v7-shell';
 import { useAuthStore } from '@/stores/authStore';
 import { getDefaultPortalRoute } from '@/services/portalClassification';
 import { trackCTA, setTrackingUser } from '@/analytics/eventTracker';
-import { DS } from '@/tokens';
-import { Logo } from '@/components/ui/Logo';
-import { useTier } from '@/components/tier/TierProvider';
+
+const NAV_LINKS = [
+  { href: '/', label: 'Home' },
+  { href: '/what', label: 'What it is' },
+  { href: '/how', label: 'How it works' },
+  { href: '/lenses', label: 'Lenses' },
+  { href: '/membership', label: 'Membership' },
+  { href: '/journal', label: 'Journal' },
+];
 
 export function MarketingNav(): React.ReactElement {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut } = useAuthStore();
-  const { displayName: tierName, isEntryTier } = useTier();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
+    const onScroll = () => setScrolled(window.scrollY > 80);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const handlePortalEntry = () => {
-    if (user) {
-      trackCTA({ location: 'nav_marketing', label: 'My Portal', destination: getDefaultPortalRoute(profile?.role) });
-      navigate(getDefaultPortalRoute(profile?.role), { replace: true });
-      return;
-    }
-    trackCTA({ location: 'nav_marketing', label: 'Meet NEXUS (guest portal)', destination: '/nexus' });
-    navigate('/nexus');
-  };
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
 
   const handleSignOut = async () => {
     setTrackingUser(null);
@@ -50,171 +45,238 @@ export function MarketingNav(): React.ReactElement {
     navigate('/', { replace: true });
   };
 
-  // Primary nav items — NEXUS, Assessments, Pricing (per Batch 1.5 spec)
-  const navItems = [
-    { href: '/nexus/chat', label: 'Chat' },
-    { href: '/assessments', label: 'Assessments' },
-    { href: '/pricing', label: 'Pricing' },
-  ];
+  const isActive = (href: string) => {
+    if (href === '/') return location.pathname === '/';
+    return location.pathname.startsWith(href);
+  };
 
-  const isActive = (href: string) =>
-    location.pathname === href || location.pathname.startsWith(href + '/');
+  const navLinkStyle = (active: boolean): React.CSSProperties => ({
+    fontFamily: V3.bodyFont,
+    fontSize: '0.85rem',
+    fontWeight: V3.fwMedium,
+    color: active ? V3.cream : 'rgba(250,250,250,0.66)',
+    textDecoration: 'none',
+    transition: `color ${V3.durNormal}ms ${V3.ease}`,
+  });
 
   return (
-    <header
-      style={{
-        background: scrolled ? 'rgba(255,255,255,0.98)' : DS.bg,
-        borderBottom: scrolled ? `1px solid ${DS.border}` : '1px solid transparent',
-        transition: 'border-color 0.2s, background 0.2s',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        fontFamily: DS.bodyFont,
-      }}
-    >
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
-        {/* Logo — click → Home (replaces separate Home link) */}
-        <Link to="/" onClick={() => trackCTA({ location: 'nav_marketing', label: 'Logo → Home', destination: '/' })}>
-          <Logo size="md" variant="light" />
+    <>
+      <header
+        className={scrolled ? 'v3-fixed-nav v3-nav-scrolled' : 'v3-fixed-nav'}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          height: V3.navHeight,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 32px',
+          background: 'rgba(10, 10, 10, 0.5)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid transparent',
+          transition: `border-color ${V3.durNormal}ms ${V3.ease}`,
+        }}
+      >
+        {/* Wordmark */}
+        <Link to="/" style={{ textDecoration: 'none' }} aria-label="NEXUS home">
+          <Wordmark onDark />
         </Link>
 
-        {/* Desktop nav — 3 primary items */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }} className="hidden md:flex">
-          {navItems.map((item) => (
+        {/* Desktop nav — center */}
+        <nav
+          className="v3-nav-links"
+          style={{ display: 'flex', alignItems: 'center', gap: 32 }}
+        >
+          {NAV_LINKS.map((item) => (
             <Link
               key={item.href}
               to={item.href}
-              onClick={() => trackCTA({ location: 'nav_marketing', label: item.label, destination: item.href })}
-              style={{
-                fontSize: 14,
-                fontWeight: 500,
-                color: isActive(item.href) ? DS.text : DS.textSecondary,
-                textDecoration: 'none',
-                fontFamily: DS.bodyFont,
-              }}
+              onClick={() => trackCTA({ location: 'nav', label: item.label, destination: item.href })}
+              style={navLinkStyle(isActive(item.href))}
+              onMouseOver={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = V3.cream; }}
+              onMouseOut={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = isActive(item.href) ? V3.cream : 'rgba(250,250,250,0.66)'; }}
             >
               {item.label}
             </Link>
           ))}
-
-          {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              {/* Tier badge — tier-aware nav */}
-              {!isEntryTier && (
-                <span style={{
-                  fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
-                  textTransform: 'uppercase', color: DS.accent,
-                  padding: '4px 8px', border: `1px solid ${DS.accent}`,
-                }}>
-                  {tierName}
-                </span>
-              )}
-              <button onClick={handlePortalEntry} style={{
-                padding: '9px 18px', fontSize: 14, fontWeight: 600,
-                background: 'transparent', color: DS.accent,
-                border: `1px solid ${DS.accent}`, cursor: 'pointer',
-                fontFamily: DS.bodyFont,
-              }}>
-                My Portal
-              </button>
-              <button onClick={handleSignOut} style={{
-                background: 'none', border: 'none',
-                fontSize: 14, color: DS.muted, cursor: 'pointer',
-              }}>
-                Sign out
-              </button>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <Link to="/login"
-                onClick={() => trackCTA({ location: 'nav_marketing', label: 'Sign in', destination: '/login' })}
-                style={{
-                  fontSize: 14, fontWeight: 500, color: DS.textSecondary, textDecoration: 'none',
-                }}>
-                Sign in
-              </Link>
-              <button onClick={() => {
-                trackCTA({ location: 'nav_marketing', label: 'Try NEXUS', destination: '/nexus/chat' });
-                navigate('/nexus/chat');
-              }} style={{
-                padding: '9px 20px', fontSize: 14, fontWeight: 600,
-                background: DS.accent, color: '#fff', border: 'none', cursor: 'pointer',
-                fontFamily: DS.bodyFont,
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-              }}>
-                <Sparkles size={15} />
-                Try NEXUS
-                <ArrowRight size={15} />
-              </button>
-            </div>
-          )}
         </nav>
 
-        {/* Mobile toggle */}
-        <button className="md:hidden" onClick={() => setMobileOpen((v) => !v)}
-          style={{ background: 'none', border: 'none', padding: 8, cursor: 'pointer', color: DS.text }}>
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </div>
+        {/* Right CTA */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          {user ? (
+            <>
+              <button
+                onClick={() => navigate(getDefaultPortalRoute(profile?.role), { replace: true })}
+                style={{
+                  fontFamily: V3.bodyFont,
+                  fontSize: '0.85rem',
+                  fontWeight: V3.fwMedium,
+                  color: V3.cream,
+                  background: 'transparent',
+                  border: `1px solid ${V3.cream}`,
+                  padding: '10px 20px',
+                  cursor: 'pointer',
+                  transition: `background ${V3.durNormal}ms ${V3.ease}, color ${V3.durNormal}ms ${V3.ease}`,
+                }}
+                className="v3-nav-cta"
+              >
+                My Portal
+              </button>
+              <button
+                onClick={handleSignOut}
+                style={{
+                  fontFamily: V3.bodyFont,
+                  fontSize: '0.8rem',
+                  color: 'rgba(250,250,250,0.66)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/auth"
+              onClick={() => trackCTA({ location: 'nav', label: 'Begin', destination: '/auth' })}
+              style={{
+                fontFamily: V3.bodyFont,
+                fontSize: '0.8rem',
+                color: V3.cream,
+                textDecoration: 'none',
+                padding: '10px 20px',
+                border: `1px solid ${V3.cream}`,
+                transition: `background ${V3.durNormal}ms ${V3.ease}, color ${V3.durNormal}ms ${V3.ease}`,
+              }}
+              className="v3-nav-cta"
+            >
+              Begin
+            </Link>
+          )}
+        </div>
+      </header>
 
-      {/* Mobile panel — same 3 primary items */}
+      {/* Mobile hamburger toggle — visible on mobile only via CSS */}
+      <button
+        className="v3-mobile-toggle"
+        onClick={() => setMobileOpen((v) => !v)}
+        style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          height: V3.navHeight,
+          width: V3.navHeight,
+          zIndex: 101,
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          color: V3.cream,
+          fontSize: '1.4rem',
+          lineHeight: 1,
+        }}
+        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+      >
+        {mobileOpen ? '\u2715' : '\u2630'}
+      </button>
+
+      {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden" style={{
-          borderTop: `1px solid ${DS.border}`, padding: '16px 32px 24px',
-          background: DS.bg, display: 'flex', flexDirection: 'column', gap: 12,
-        }}>
-          {navItems.map((item) => (
+        <div
+          className="v3-mobile-menu"
+          style={{
+            position: 'fixed',
+            top: V3.navHeight,
+            left: 0,
+            right: 0,
+            zIndex: 99,
+            background: V3.ink900,
+            padding: '24px 32px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 20,
+          }}
+        >
+          {NAV_LINKS.map((item) => (
             <Link
               key={item.href}
               to={item.href}
               onClick={() => {
                 setMobileOpen(false);
-                trackCTA({ location: 'nav_marketing', label: `${item.label} (mobile)`, destination: item.href });
+                trackCTA({ location: 'nav', label: `${item.label} (mobile)`, destination: item.href });
               }}
               style={{
-                padding: '10px 0', fontSize: 15,
-                color: isActive(item.href) ? DS.accent : DS.text,
+                fontFamily: V3.bodyFont,
+                fontSize: '1rem',
+                color: isActive(item.href) ? V3.cream : 'rgba(250,250,250,0.66)',
                 textDecoration: 'none',
+                padding: '8px 0',
               }}
             >
               {item.label}
             </Link>
           ))}
-          <div style={{ borderTop: `1px solid ${DS.border}`, marginTop: 4, paddingTop: 12 }} />
-          {user ? (
-            <>
-              {!isEntryTier && (
-                <span style={{ fontSize: 11, fontWeight: 600, color: DS.accent, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  {tierName} tier
-                </span>
-              )}
-              <button onClick={() => { setMobileOpen(false); handlePortalEntry(); }}
-                style={{ marginTop: 8, padding: '12px', background: DS.accent, color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
-                My Portal
-              </button>
-              <button onClick={() => { setMobileOpen(false); handleSignOut(); }}
-                style={{ padding: '12px', background: 'transparent', border: `1px solid ${DS.border}`, color: DS.text, fontSize: 14, cursor: 'pointer' }}>
-                Sign out
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav_marketing', label: 'Sign in (mobile)', destination: '/login' }); }}
-                style={{ padding: '12px', textAlign: 'center', fontSize: 15, color: DS.text, textDecoration: 'none' }}>
-                Sign in
+          <div style={{ borderTop: `1px solid rgba(250,250,250,0.1)`, marginTop: 8, paddingTop: 16 }}>
+            {user ? (
+              <>
+                <Link
+                  to={getDefaultPortalRoute(profile?.role)}
+                  onClick={() => setMobileOpen(false)}
+                  style={{
+                    display: 'block',
+                    textAlign: 'center',
+                    padding: '12px',
+                    background: V3.cream,
+                    color: V3.ink900,
+                    fontSize: '0.9rem',
+                    fontWeight: V3.fwMedium,
+                    textDecoration: 'none',
+                    marginBottom: 8,
+                  }}
+                >
+                  My Portal
+                </Link>
+                <button
+                  onClick={() => { setMobileOpen(false); handleSignOut(); }}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    background: 'transparent',
+                    border: `1px solid rgba(250,250,250,0.2)`,
+                    color: V3.cream,
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/auth"
+                onClick={() => { setMobileOpen(false); trackCTA({ location: 'nav', label: 'Begin (mobile)', destination: '/auth' }); }}
+                style={{
+                  display: 'block',
+                  textAlign: 'center',
+                  padding: '12px',
+                  background: V3.cream,
+                  color: V3.ink900,
+                  fontSize: '0.9rem',
+                  fontWeight: V3.fwMedium,
+                  textDecoration: 'none',
+                }}
+              >
+                Begin
               </Link>
-              <Link to="/nexus" onClick={() => {
-                setMobileOpen(false);
-                trackCTA({ location: 'nav_marketing', label: 'Try NEXUS Chat (mobile)', destination: '/nexus/chat' });
-              }}
-                style={{ padding: '12px', textAlign: 'center', background: DS.accent, color: '#fff', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
-                Try NEXUS
-              </Link>
-            </>
-          )}
+            )}
+          </div>
         </div>
       )}
-    </header>
+    </>
   );
 }
 
