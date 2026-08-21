@@ -1,20 +1,37 @@
-Trae — V6.0: Landing Page v3.5 Full Redesign (Production)
+V6.0: LANDING PAGE v3.5 FULL REDESIGN (PRODUCTION)
+==================================================
 
-Highest priority right now. Full rewrite of src/pages/Landing.tsx based on the v3.5 design mockup. This is a complete replacement — current V5.3 landing goes away entirely.
+Goal: Replace the current V5.3 landing page with the v3.5 redesign. Full rewrite of src/pages/Landing.tsx. New design system canon (ocean/teal/fuchsia palette, NEXUS. wordmark, video hero). 5-tier membership. 11 lenses compact capabilities row. New marketing footer.
 
-Design system canon v3.5 applies to this entire page. New palette, new wordmark, new typography scale. Everything is in the spec: specs/v6_0_landing_v3_5_full_redesign_spec.md on main.
+Priority: P0 — highest priority batch right now. This is the public face of the product.
+Depends on: Nothing standalone — hero video already deployed to public/ on production.
 
-Visual reference: design_mockups/NEXUS_Landing_v3.5.html — open in a browser, that's what the final product should look like.
+**Design system:** v3.5 — Ocean primary blue, cyan-leaning teal secondary, fuchsia punctuation. NEXUS. wordmark (no space before dot). Crimson Pro display / Inter body / IBM Plex Mono meta. Editorial minimalism — rule lines, not cards, zero radius, no shadows.
+**Data source:** V4.1 tier matrix (5 tiers: Explorer / Starter / Pro / Executive / Council), 11 lenses + 4-Pillar canon
+**Copy status:** Locked. All copy final — hero, section titles, body, tier descriptions, testimonial, footer tagline.
+**Mockup reference:** design_mockups/NEXUS_Landing_v3.5.html — open in browser, this is ground truth
+**Full spec:** specs/v6_0_landing_v3_5_full_redesign_spec.md on main
+**GitHub issue:** #1391
 
-Production URL to verify: https://www.lyc-intelligence.app
+BRAND & VOICE RULES (non-negotiable):
+- Premium not SaaS. Confident, measured, no hype.
+- NEXUS is the product — always NEXUS, never "the app" / "the tool" / "the AI"
+- White space / iceberg principle — show, don't tell. Trust the reader to fill the gap.
+- No defensive sales language — no "no pitch", "no follow-up call", "no credit card"
+- "complimentary" used sparingly — only once (final CTA section)
+- "lens" not "assessment" — EXCEPTION: CPI = "flagship assessment"
+- "milestones" not "dashboard"
+- No internal taxonomy leaks — no internal framework names in client-facing copy
+- One accent strategy: Ocean primary, teal secondary, fuchsia only for punctuation/dots
+- Hero video overlay = 60% SOLID black, NOT gradient
+
+4 TICKETS TO BUILD:
 
 ---
+TICKET V6.0-1: DESIGN SYSTEM SETUP (v3.5 tokens) — P0
+Priority: P0. Everything else depends on these tokens being correct.
 
-P0 · CRITICAL
-
-=== TICKET 1: Design System Setup (v3.5 tokens) ===
-
-Set up the v3.5 design system tokens for the marketing surface. This replaces the previous token system for the landing page.
+Set up v3.5 design system tokens for the marketing surface. This replaces the previous token system for the landing page.
 
 Palette — 3 accent families:
 
@@ -47,138 +64,117 @@ Visual language:
 - Editorial minimalism — rule lines, not cards
 - Zero border-radius everywhere
 - No box shadows
-- No gradients (except hero video overlay — see Ticket 2b)
+- No gradients (except hero video overlay — see V6.0-2b)
 - SVG line icons: stroke-width 1.2, no fill, ocean-500 color
 
-=== TICKET 2: Full Landing Page Build (8 sections) ===
+Acceptance: Tokens defined and used consistently across the page. No drift toward green-teal. No bold headlines. Wordmark correct with no space before dot.
 
-Full rewrite of src/pages/Landing.tsx. 8 sections, top to bottom.
+---
+TICKET V6.0-2: FULL LANDING PAGE BUILD (8 sections) — P0
+Priority: P0. Main event. Full rewrite of src/pages/Landing.tsx.
 
---- 2a: Fixed Nav ---
+8 sections, top to bottom:
 
-Background: rgba(10, 10, 10, 0.5) + backdrop-filter blur(12px)
-Left: NEXUS. wordmark (cream)
-Center links: What it is / Capabilities / Membership (anchor links)
-Right CTA button: "Experience NEXUS" — 1px border, cream text, hover inverts (cream bg, ink-900 text)
-Fixed position, full width.
+V6.0-2a: Fixed Nav
+  Background: rgba(10, 10, 10, 0.5) + backdrop-filter blur(12px)
+  Left: NEXUS. wordmark (cream)
+  Center links: What it is / Capabilities / Membership (anchor links)
+  Right CTA button: "Experience NEXUS" — 1px border, cream text, hover inverts
+  Fixed position, full width.
 
---- 2b: Hero (full viewport) ---
+V6.0-2b: Hero (full viewport, 100vh)
+  Video background: /hero-bg.mp4 — autoplay muted loop playsinline (already in public/)
+  Overlay: SOLID black at 60% opacity — rgba(10,10,10,0.6). NOT a gradient. Solid 60% black transparency. No gradient.
+  Eyebrow: "Executive Intelligence" — teal-400, mono
+  Headline (2 lines):
+    Line 1: "Know where you stand."
+    Line 2: "Know where to go." — italic, teal-300
+  Primary CTA: "Experience NEXUS" — solid cream button
+  Secondary CTA: "What it is" — text link with bottom border
+  Fuchsia focal dot: 4px circle at right edge
+  Content vertically centered, left-aligned.
 
-100vh height. Dark background.
-Video background: /hero-bg.mp4 — autoplay muted loop playsinline (already in public/)
-Overlay: SOLID black at 60% opacity — rgba(10,10,10,0.6). NOT a gradient. Solid 60% black transparency. No gradient.
-Eyebrow: "Executive Intelligence" — teal-400, mono
-Headline (2 lines):
-  Line 1: "Know where you stand."
-  Line 2: "Know where to go." — italic, teal-300
-Primary CTA: "Experience NEXUS" — solid cream button
-Secondary CTA: "What it is" — text link with bottom border
-Fuchsia focal dot: 4px circle at right edge
-Content vertically centered, left-aligned.
+V6.0-2c: What It Is (cream background)
+  Eyebrow: "What it is" — ocean-600, mono
+  Section title: "A place for the thinking" / "you can't take anywhere else."
+  Subhead: "NEXUS holds the full picture of where you are and where you're heading. Always on. Fully discreet. Gets sharper the more you talk."
+  4 numbered items with rule lines between:
+  01 — "Talk through what's on your mind. NEXUS listens, remembers everything, and asks the questions you haven't thought to ask yourself yet."
+  02 — "Your thinking builds over time. You can see the shape of your progression across four pillars — positioning, leadership, operating, narrative — not just a list of tasks."
+  03 — "When you want structure, use a lens. Eleven different ways of looking at the same situation, each built around how senior leaders actually think."
+  04 — "Sometimes you need a human in the room. Book a debrief with an LYC advisor who already knows your context. No intake forms, no catching up."
+  Numbers: mono, ocean-600. Rule lines (1px solid ink-200) between items. Left-aligned stacked.
 
---- 2c: What It Is ---
+V6.0-2d: Capabilities (cream background)
+  Eyebrow: "Capabilities" — ocean-600, mono
+  Section title: "Eleven ways to look deeper." / "One place that holds them all."
+  Sub: "Use them one at a time. Or let NEXUS suggest what you're not seeing in a conversation."
+  Single row of 11 lens cells — compact, equal width, vertical rule lines between cells.
+  Each cell: small line icon (24x24) + lens name below.
+  Lenses in order (left to right): PRISM, LEAP, MOSAIC, BRIDGE, COACH, IMPACT, DRIVE, QUEST, SPARK, FORGE, CPI
+  Vertical rule lines (1px, ink-200) between each cell. All 11 in one horizontal row — NOT a grid.
+  Footer row below lenses:
+    Left: "CPI is the flagship — a private day with your advisor, by introduction only."
+    Right: "Explore all lenses →" link
 
-Cream background.
-Eyebrow: "What it is" — ocean-600, mono
-Section title (2 lines): "A place for the thinking" / "you can't take anywhere else."
-Subhead: "NEXUS holds the full picture of where you are and where you're heading. Always on. Fully discreet. Gets sharper the more you talk."
+V6.0-2e: Membership (white background, 5 tiers)
+  Eyebrow: "Membership" — ocean-600, mono
+  Section title: "Five levels." / "One standard of discretion."
+  Sub: "Start wherever it makes sense. Move up when the work calls for it. Every tier gets the same measured, competent attention."
+  5-column grid with rule lines (not cards):
 
-4 numbered items with rule lines between:
-01 — "Talk through what's on your mind. NEXUS listens, remembers everything, and asks the questions you haven't thought to ask yourself yet."
-02 — "Your thinking builds over time. You can see the shape of your progression across four pillars — positioning, leadership, operating, narrative — not just a list of tasks."
-03 — "When you want structure, use a lens. Eleven different ways of looking at the same situation, each built around how senior leaders actually think."
-04 — "Sometimes you need a human in the room. Book a debrief with an LYC advisor who already knows your context. No intake forms, no catching up."
+  Column 1 — Entry / Explorer / "To begin"
+  Included: Conversation access · PRISM and LEAP lenses · Starter credits to begin
 
-Numbers: 01, 02, etc. — mono, ocean-600
-Rule lines (1px solid ink-200) between each item.
-Left-aligned stacked vertical layout.
+  Column 2 — Foundational / Starter / $29 / month
+  Included: Everything in Explorer · Two structured sessions per month · Milestone tracking · Human debriefs — on request
 
---- 2d: Capabilities (11 lenses compact row) ---
+  Column 3 — RECOMMENDED / Pro / $79 / month (FEATURED — dark column)
+  Included: All eleven lenses · Open conversation access · Milestone tracking · Document library — 50MB · Human debriefs — on request
+  Featured treatment: dark background #0A0A0A, teal top border accent, cream text, "Recommended" eyebrow in teal-400 mono
 
-Cream background.
-Eyebrow: "Capabilities" — ocean-600, mono
-Section title: "Eleven ways to look deeper." / "One place that holds them all."
-Sub: "Use them one at a time. Or let NEXUS suggest what you're not seeing in a conversation."
+  Column 4 — Senior / Executive / $199 / month
+  Included: Everything in Pro · Percentile baselines · 360° feedback integration · Two included human debriefs per month · Document library — 250MB
 
-Single row of 11 lens cells — compact, equal width, vertical rule lines between cells.
-Each cell: small line icon (24x24) + lens name below.
+  Column 5 — Private / Council / "By introduction"
+  Included: CPI flagship assessment · DEX integration · Dedicated LYC advisor · Document library — 1GB · Invitation-only
 
-Lenses in order (left to right):
-PRISM, LEAP, MOSAIC, BRIDGE, COACH, IMPACT, DRIVE, QUEST, SPARK, FORGE, CPI
+  Each column (top to bottom): tier level label (mono) → tier name (serif display) → price (serif italic) → "Included" mono label → feature list (em dash bullets) → CTA link at bottom
+  Vertical rule lines between columns. No card borders. No box shadows. No border-radius.
 
-Vertical rule lines (1px, ink-200) between each cell.
-All 11 in one horizontal row — NOT a grid.
+V6.0-2f: Testimonial (cream background, centered)
+  Large quote mark — ocean-200, huge serif display
+  Quote: "I've had three coaches over the last ten years. None of them remembered the things I said three sessions ago. NEXUS does."
+  Attribution: Willy Te / VP Operations · Fortune 500
+  Narrow max-width (~640px), centered.
 
-Footer row below lenses:
-Left: "CPI is the flagship — a private day with your advisor, by introduction only."
-Right: "Explore all lenses →" link
+V6.0-2g: Final CTA (full dark section, ink-900)
+  Subtle radial gradient glow — ocean-600 at 15% opacity, centered behind text (depth only, not a color accent)
+  Eyebrow: "Begin" — teal-400, mono
+  Title: "First session." / "Complimentary."
+  Body: "A conversation about what's on your mind, and whether this is the right fit. You'll know quickly."
+  CTA button: "Experience NEXUS" — solid cream
+  Content centered.
 
---- 2e: Membership (5 tiers) ---
+V6.0-2h: Footer (dark background, ink-900)
+  This is a new marketing footer. The existing UnifiedFooter is app-style — replace or wrap for the marketing landing page.
+  Top area:
+    Left: NEXUS. wordmark + "Executive intelligence. Always on." tagline below
+    3 columns of links:
+      Product: Capabilities, Membership, For teams
+      Company: About, LYC Partners, Press
+      Legal: Privacy, Terms, Security
+  Bottom bar:
+    Left: © 2026 NEXUS .
+    Right: Shanghai · Singapore · Paris
 
-White background.
-Eyebrow: "Membership" — ocean-600, mono
-Section title: "Five levels." / "One standard of discretion."
-Sub: "Start wherever it makes sense. Move up when the work calls for it. Every tier gets the same measured, competent attention."
+Acceptance: All 8 sections built end-to-end. Visual match against the mockup. Hero video plays with 60% SOLID black overlay (NOT gradient). Pro column dark featured. 11 lenses in single compact row. Wordmark correct. Footer tagline correct.
 
-5-column grid with rule lines (not cards):
+---
+TICKET V6.0-3: CONTENT RULES ENFORCEMENT & BANNED WORDS AUDIT — P0
+Priority: P0. Non-negotiable. Must pass before deploy.
 
-Column 1 — Entry / Explorer / "To begin"
-Included: Conversation access · PRISM and LEAP lenses · Starter credits to begin
-
-Column 2 — Foundational / Starter / $29 / month
-Included: Everything in Explorer · Two structured sessions per month · Milestone tracking · Human debriefs — on request
-
-Column 3 — RECOMMENDED / Pro / $79 / month (FEATURED COLUMN)
-Included: All eleven lenses · Open conversation access · Milestone tracking · Document library — 50MB · Human debriefs — on request
-Featured treatment: dark background #0A0A0A, teal top border accent, cream text, "Recommended" eyebrow in teal-400 mono
-
-Column 4 — Senior / Executive / $199 / month
-Included: Everything in Pro · Percentile baselines · 360° feedback integration · Two included human debriefs per month · Document library — 250MB
-
-Column 5 — Private / Council / "By introduction"
-Included: CPI flagship assessment · DEX integration · Dedicated LYC advisor · Document library — 1GB · Invitation-only
-
-Each column (top to bottom): tier level label (mono) → tier name (serif display) → price (serif italic) → "Included" mono label → feature list (em dash bullets) → CTA link at bottom
-
-Vertical rule lines between columns. No card borders. No box shadows. No border-radius.
-
---- 2f: Testimonial ---
-
-Cream background, centered.
-Large quote mark — ocean-200, huge serif display
-Quote: "I've had three coaches over the last ten years. None of them remembered the things I said three sessions ago. NEXUS does."
-Attribution: Willy Te / VP Operations · Fortune 500
-Narrow max-width (~640px), centered.
-
---- 2g: Final CTA ---
-
-Full dark section (ink-900 background).
-Subtle radial gradient glow — ocean-600 at 15% opacity, centered behind text (depth only, not a color accent)
-Eyebrow: "Begin" — teal-400, mono
-Title: "First session." / "Complimentary."
-Body: "A conversation about what's on your mind, and whether this is the right fit. You'll know quickly."
-CTA button: "Experience NEXUS" — solid cream
-Content centered.
-
---- 2h: Footer ---
-
-Dark background (ink-900).
-This is a new marketing footer. The existing UnifiedFooter is app-style — replace or wrap for the marketing landing page.
-
-Top area:
-Left: NEXUS. wordmark + "Executive intelligence. Always on." tagline below
-3 columns of links:
-  Product: Capabilities, Membership, For teams
-  Company: About, LYC Partners, Press
-  Legal: Privacy, Terms, Security
-
-Bottom bar:
-Left: © 2026 NEXUS .
-Right: Shanghai · Singapore · Paris
-
-=== TICKET 3: Content Rules Enforcement ===
-
-Non-negotiable. Audit the entire page before deploying.
+Run a full audit against all rules below. Fix anything that fails.
 
 Hard banned words — do NOT let any through:
 architecture/architect, framework, platform, navigate/navigation, fire/burn/ignite/flame, leverage, landscape, disrupt/disruption, calibrated/calibration, flywheel, layer/Layer, maturity stack, stages, signals, entry point, funnel, endorsed brand, taxonomy rule, anti-positioning, quiet, war/force, hunt/hunting, free
@@ -204,22 +200,26 @@ Tier 2 identity bans:
 Tone rules:
 - No hedging, no advice-giving stance, no guru positioning
 - No motivational fluff, no corporate consultant speak, no content bro tone
-- NO defensive sales language — don't say "no pitch", "no follow-up call", "no credit card". Ritz doesn't say "no hidden fees" — they just don't have them.
+- NO defensive sales language — don't say "no pitch", "no follow-up call", "no credit card"
 
 White space / iceberg principle: show, don't tell. Trust the reader to fill the gap.
 
-=== TICKET 4: Technical Integration & Deployment ===
+Acceptance: Full grep audit passes. Zero banned words, zero banned phrases, zero banned structures. Correct terminology throughout.
 
-Files:
+---
+TICKET V6.0-4: TECHNICAL INTEGRATION & DEPLOYMENT — P0
+Priority: P0. Wire up integrations, verify, deploy.
+
+Files affected:
 - src/pages/Landing.tsx — full rewrite
 - src/components/marketing/MarketingNav.tsx — update to v3.5 nav style (dark translucent)
 - src/components/marketing/MarketingLayout.tsx — update if needed for new footer
 
 Hero video:
-- /hero-bg.mp4 already exists in public/ (verified production)
+- /hero-bg.mp4 already exists in public/ (verified on production)
 - autoplay muted loop playsinline
 - 60% black overlay — SOLID, not gradient
-- Fallback: dark #0A0A0A if video fails
+- Fallback: dark #0A0A0A if video fails to load
 
 Preserve existing integrations:
 - Keep existing SEO / metadata imports
@@ -233,26 +233,26 @@ Responsive:
 - Hero headline scales with clamp() — already responsive
 
 Motion:
-- Preserve existing scroll reveal if it fits
+- Preserve existing scroll reveal if it fits the design
 - Otherwise simple fade-in on section entry
 - Understated, editorial. No excess.
 
 Footer: this landing needs its own marketing footer, not the app UnifiedFooter.
 
-=== DEPLOYMENT CHECKLIST ===
+Acceptance: Build passes clean. No TypeScript errors. All CTAs route. Analytics fire. Responsive on mobile/tablet/desktop.
 
-[ ] Build locally — verify no TypeScript / build errors
-[ ] Visual check against mockup — section by section
-[ ] Hero video plays, 60% SOLID black overlay (NOT gradient)
-[ ] All 5 membership tiers render, Pro column is dark featured
-[ ] 11 lenses in capabilities row — correct order, compact, rule lines between
-[ ] Wordmark is "NEXUS." — no space before dot, fuchsia dot
-[ ] Footer tagline: "Executive intelligence. Always on."
-[ ] Banned words audit — grep for all terms in Ticket 3
-[ ] Lighthouse visual pass
-[ ] All CTAs route correctly
-[ ] Responsive mobile check
-[ ] Commit: "V6.0: Landing page v3.5 full redesign"
-[ ] Push to main → Vercel auto-deploys
-[ ] Verify production: https://www.lyc-intelligence.app
-[ ] Close issue #1391
+---
+
+EXECUTION ORDER:
+1. V6.0-1 (Design system tokens) — foundation first
+2. V6.0-2 (Full landing build — 8 sections) — main event, build 2a through 2h
+3. V6.0-3 (Content rules & banned words audit) — pass before deploy
+4. V6.0-4 (Technical integration + deploy) — wire up, verify, push
+
+Estimated: 1-2 Trae cycles.
+Build on main. After each ticket: commit + push to remote, no batching.
+
+Test on: mobile (375px), tablet (768px), desktop (1440px).
+Verify: hero video plays + 60% solid black overlay, Pro column dark, 11 lenses one row, wordmark correct, footer tagline correct, banned words clean, zero border-radius, no box shadows.
+
+When done: Close issue #1391.
