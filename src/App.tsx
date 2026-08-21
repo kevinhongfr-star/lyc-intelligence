@@ -75,6 +75,11 @@ const LoginPage = lazy(() => import('@/pages/LoginPage').then(m => ({ default: m
 const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
 const SignupPage = lazy(() => import('@/pages/SignupPage').then(m => ({ default: m.SignupPage })));
 
+// ── V7.0 marketing pages (v3.5 design system) ──
+const WhatPage = lazy(() => import('@/pages/marketing/WhatPage').then(m => ({ default: m.WhatPage })));
+const HowPage = lazy(() => import('@/pages/marketing/HowPage').then(m => ({ default: m.HowPage })));
+const LensesPage = lazy(() => import('@/pages/marketing/LensesPage').then(m => ({ default: m.LensesPage })));
+
 // ── Public product landing pages (Canonical — consolidated IA) ──
 const AssessmentPage = lazy(() => import('@/pages/AssessmentPage').then(m => ({ default: m.AssessmentPage })));
 const B2BLanding = lazy(() => import('@/pages/B2BLanding').then(m => ({ default: m.B2BLanding })));
@@ -342,6 +347,10 @@ export default function App() {
               ═══════════════════════════════════════════════════════════ */}
           <Route path="/" element={<MarketingLayout />}>
             <Route index element={<Landing />} />
+            {/* V7.0 marketing pages */}
+            <Route path="what" element={<WhatPage />} />
+            <Route path="how" element={<HowPage />} />
+            <Route path="lenses" element={<LensesPage />} />
             {/* Auth entry points (public, sit under marketing chrome) */}
             <Route path="login" element={<LoginPage />} />
             <Route path="reset-password" element={<ResetPasswordPage />} />
