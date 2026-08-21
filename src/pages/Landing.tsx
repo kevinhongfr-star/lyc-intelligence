@@ -301,7 +301,7 @@ function Hero(): React.ReactElement {
       >
         <source src="/hero-bg.mp4" type="video/mp4" />
       </video>
-      {/* 60% SOLID black overlay — NOT a gradient */}
+      {/* 80% SOLID black overlay — V6.1 darker overlay, NOT a gradient */}
       <div
         style={{
           position: 'absolute',
@@ -309,7 +309,7 @@ function Hero(): React.ReactElement {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'rgba(10,10,10,0.6)',
+          background: 'rgba(10,10,10,0.8)',
           zIndex: 1,
         }}
       />
