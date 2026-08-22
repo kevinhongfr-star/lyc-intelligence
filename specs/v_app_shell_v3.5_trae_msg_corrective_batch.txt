@@ -1,0 +1,196 @@
+V-APP v3.5 — Corrective Batch: NEXUS Engine Integration
+
+**Branch to fix:** v3.5-app-shell
+**Current state:** Visual shell + Supabase wiring complete. NEXUS Engine NOT wired in.
+**Priority:** 🔴 P0 — chat is still on the legacy Coze endpoint
+
+---
+
+## 🔴 WHAT'S BROKEN (AUDIT FINDINGS)
+
+The V-App visual rebuild is solid. Design system is clean, all views wire to real backend data, zero mock data. But the chat is still using the old `/api/chat` endpoint (Coze-based). The NEXUS Engine v1.5 Python code is in `nexus-engine/` but NOT actually powering anything.
+
+**P0 failures:**
+1. Chat routes to old Coze endpoint, not the NEXUS Engine
+2. No 6-layer prompt stack (persona → core → quality → pattern → scenario → turn engine)
+3. No 3-lane detection (Leadership Advisory / Career Architecture / Search Operations)
+4. No Python engine service layer or API route
+5. Voice reference v1.0 not enforced in chat output
+
+**P1 failures:**
+6. Settings page — notification toggles and consultant hide toggle are UI-only, not all persisting to DB
+7. Booking view present but need to verify it creates real bookings
+
+---
+
+## WHAT TO FIX
+
+### Fix 1: Wire chat to NEXUS Engine (P0)
+
+Create a new API route `app/api/nexus-chat/route.ts` that:
+- Accepts: message, conversation_id, user_id, history
+- Calls the Python NEXUS Engine (from `nexus-engine/`) to generate the response
+- Saves messages to Supabase (same conversations/messages schema — preserve existing data model)
+- Returns the streamed response
+
+The Python engine is in `nexus-engine/`. Read `nexus-engine/nexus_llm_engine.py` and `nexus-engine/nexus_engine.py` to understand how to call it.
+
+**Engine architecture (must NOT flatten):**
+- Layer 0: Persona Constitution (00_persona_master_v1.1.md) — 7 dimensions × 3 lanes
+- Layer 1: Core Identity (01_core_master_prompt_v2.0.md) — lane-activated
+- Layer 2: Quality System (02_quality_system_prompt_v1.0.md)
+- Layer 3: Pattern Context (03_pattern_context_spec_v1.0.md) — pattern retrieval from 164-pattern library
+- Layer 4: Scenario Control (scenario routing based on lane + conversation context)
+- Layer 5: Turn Engine (05_turn_engine_prompt_v1.0.md)
+
+**3 vertical intelligence layers:**
+- U0: User Intelligence (08_user_intelligence_model_v1.0.md) — profile, memory, milestones
+- L0: Lens Intelligence (07_lens_identification_system_v1.0.md) — pattern-to-lens mapping
+- R1: Recommendation Engine (09_recommendation_engine_v1.0.md) — trust-aligned recs
+
+**PR that flattens the 6-layer prompt stack into a single system prompt = REJECTED.**
+Each layer must remain a distinct injection point. The engine must compose them at runtime.
+
+---
+
+### Fix 2: 3-Lane Detection (P0)
+
+The engine must automatically detect which lane the user is in from their first message. **Never ask the user "which lane are you in."**
+
+3 lanes:
+- **Lane 1 — Leadership Advisory:** org strategy, team leadership, stakeholder management, board dynamics, culture
+- **Lane 2 — Career Architecture:** career moves, positioning, transitions, personal brand, compensation, leveling
+- **Lane 3 — Search Operations:** active search process, interview prep, offer negotiation, recruiter interactions
+
+Lane detection rules:
+- Infer from first message content + context
+- Can shift mid-conversation if topic changes materially
+- Lane state persists for the conversation
+- User should never see "lane" as a UI concept — it's internal to the engine
+
+Lane activates the corresponding variant in:
+- Persona Constitution (lane-specific evidence base)
+- Core Identity (lane-specific behavioral configuration)
+- Pattern retrieval priority (lane-relevant patterns surface first)
+- Voice calibration (subtle lane-specific temperature adjustments)
+
+**China is the deepest evidence base, NOT the default frame.** Activated by Lane 3 detection + user context, not baked into the base persona.
+
+---
+
+### Fix 3: Voice Reference Enforcement (P1)
+
+The NEXUS Engine chat output must conform to the Voice Reference v1.0 spec.
+
+File: `nexus-engine/voice_reference_v1.0.md`
+
+**Hard voice rules:**
+- Register: FT op-ed / Economist opinion, NOT coaching blog
+- Temperature: cool incisive (level 2 on 1-5 scale), NOT warm supportive
+- No validation preambles: no "thank you for sharing," "that takes courage," "I can understand"
+- No therapy language: no "how does that make you feel," "safe space," "holding space"
+- No coach-template phrases: no "let's explore that," "would you like to go deeper," "how does that land"
+- No hedging: no "I wonder if," "it could be that," "you might want to" — state it directly
+- No bullet points or numbered lists — paragraphs only
+- No warm sign-offs: no "you've got this," "I'm here for you"
+- No summaries: no "to summarize what we've covered" — synthesize, don't recap
+- One question per turn maximum. Never three.
+- Short paragraphs (1-3 sentences), white space between them
+- Lead with observation, then ask
+- Name patterns directly, don't soften them
+
+The voice reference should be injected as part of the Quality System layer (Layer 2) or as a quality gate on output. Either way — output that violates these rules fails.
+
+---
+
+### Fix 4: Settings Persistence (P1)
+
+Currently in SettingsPageV3:
+- `handleSave` only saves `name` and `icp`
+- Notification toggles (product updates, etc.) are local state only
+- Consultant hide toggle calls `updateProfile` but needs verification
+
+Fix:
+- All settings toggles must persist to the users table / profile
+- Find existing settings columns and wire them all
+- If columns don't exist, create migration (but prefer using what's already there)
+- Instant save on toggle change (no save button needed for toggles)
+- Show subtle saved confirmation
+
+---
+
+### Fix 5: Booking Verification (P1)
+
+Verify the booking view actually:
+- Pulls real availability from the backend
+- Creates real booking records on confirm
+- Sends confirmation email (if that's part of existing flow)
+
+If booking is currently mock or partially wired, fix it.
+
+---
+
+## NEXUS ENGINE — HOW TO INTEGRATE
+
+The Python engine is in `nexus-engine/`. Key files:
+- `nexus_llm_engine.py` — LLM client (DeepSeek API, reads DEEPSEEK_API_KEY from env)
+- `nexus_engine.py` — Pattern retriever + scenario router
+- `nexus_lens_memory_engine.py` — Lens scoring + memory
+- `nexus_demo_server.py` — Reference HTTP server (see how it calls the engine)
+- `system_prompts/` — All 9 prompt files (L0-L5 + 3 vertical)
+- `pattern_db/patterns_v1.0.json` — Pattern DB (JSON for retrieval)
+- `nexus_pattern_library_consolidated_v3.1.md` — 164 patterns (reference)
+
+**Integration approach:**
+Deploy as a Python Vercel Function or Edge Function that wraps the engine.
+The Next.js app calls `/api/nexus-chat` → Python function → DeepSeek API → streams back.
+
+Message persistence (Supabase conversations/messages) stays the same.
+Only the response generation changes — from old Coze endpoint to NEXUS Engine.
+
+If Python Vercel Functions are problematic, wrap the engine in a simple HTTP service (see `nexus_demo_server.py` as reference) and deploy it separately. But prefer keeping it in the same repo as a server function.
+
+---
+
+## ACCEPTANCE CRITERIA — CORRECTIVE BATCH
+
+**P0 (must pass):**
+- [ ] Chat response generation uses NEXUS Engine Python code, NOT old /api/chat Coze endpoint
+- [ ] 6-layer prompt stack is composed at runtime as distinct layers — NOT flattened into one prompt
+- [ ] 3-lane detection works automatically from first message
+- [ ] Lane never shown in UI — fully internal
+- [ ] Pattern retrieval from pattern DB is active during chat
+- [ ] Lens intelligence layer maps conversation patterns to lens insights
+- [ ] User intelligence layer incorporates profile/milestones/memory context
+- [ ] DeepSeek API is the LLM backend (not OpenAI, not Coze)
+- [ ] All messages still persist to Supabase conversations/messages tables
+- [ ] Chat streaming works with the new engine
+
+**P1 (must pass):**
+- [ ] Voice reference v1.0 rules enforced in chat output
+- [ ] All settings on Settings page persist to DB
+- [ ] Booking creates real records
+
+**Design / regression:**
+- [ ] Zero regression on visual design (v3.5 tokens, zero radius, no shadows)
+- [ ] All views that were working before still work
+- [ ] No hardcoded mock data anywhere
+
+---
+
+## WORKFLOW
+
+1. Read `nexus-engine/nexus_llm_engine.py` + `nexus_engine.py` + `nexus_demo_server.py` — understand the engine interface
+2. Create Python server function that wraps the engine (or API route that calls it)
+3. Create `/api/nexus-chat` route in Next.js that calls the engine
+4. Update ChatPageV3 to use the new endpoint instead of `sendChatMessage` from `services/coze.ts`
+5. Implement lane detection in the engine (read first message, classify into 1 of 3 lanes)
+6. Wire the 6-layer prompt stack + 3 vertical layers properly
+7. Inject voice reference as quality gate
+8. Fix settings persistence
+9. Verify booking
+10. Test end-to-end: send a message → engine responds → message saved to DB → lane detected
+
+Commit and push after each major fix. Update existing PR or create new one. Tag me when ready.
+
+**Ground truth = nexus-engine/ directory for brain logic + HTML mockups for visuals. Read both. Match both. Don't improvise.**
