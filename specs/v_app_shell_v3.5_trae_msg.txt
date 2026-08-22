@@ -1,55 +1,100 @@
-V-APP — NEXUS App Shell v3.5 Full Rebuild
+V-APP — NEXUS App Shell v3.5 Full Rebuild (with NEXUS Engine Integration)
 
 **Phase:** V-App (post-V7.0 marketing rebuild)
-**Type:** FUNCTIONAL app shell rebuild — visual redesign + real backend wiring
-**Priority:** High — unifies app visual language with v3.5 marketing system
-**Spec file:** v_app_shell_v3.5_spec.md (full spec, READ FIRST — especially Section 9: Backend Integration)
+**Type:** FUNCTIONAL app shell rebuild — visual redesign + nexus-engine wiring + Supabase per-user data
+**Priority:** High — unifies app visual language with v3.5 marketing system and wires in the NEXUS brain
+**Spec file:** specs/v_app_shell_v3.5_spec.md (full spec, READ FIRST — especially Section 9: Backend Integration)
 **Source mockups (VISUAL ground truth — open in browser and match pixel-close):**
-- NEXUS_AppShell_v3.5.html (sidebar + topbar + layout)
-- NEXUS_Chat_v3.5.html (chat interface)
-- NEXUS_Lenses_v3.5.html (lenses library, 11 lenses, 3-col grid)
-- NEXUS_Milestones_v3.5.html (milestones timeline + profile + settings)
-- NEXUS_DocumentsBooking_v3.5.html (documents list + booking flow)
+- specs/mockups/NEXUS_AppShell_v3.5.html (sidebar + topbar + layout)
+- specs/mockups/NEXUS_Chat_v3.5.html (chat interface)
+- specs/mockups/NEXUS_Lenses_v3.5.html (lenses library, 11 lenses, 3-col grid)
+- specs/mockups/NEXUS_Milestones_v3.5.html (milestones timeline + profile + settings)
+- specs/mockups/NEXUS_DocumentsBooking_v3.5.html (documents list + booking flow)
+**NEXUS Engine (BRAIN — read first):** nexus-engine/ directory
+- nexus_llm_engine.py — DeepSeek LLM client + 5-layer prompt stack
+- nexus_engine.py — pattern retriever + scenario router
+- nexus_lens_memory_engine.py — lens scoring + memory system
+- pattern_db/patterns_v1.0.json — full pattern knowledge base
+- system_prompts/ — 6 system prompt files (core, quality, pattern spec, scenarios, turn engine, general mode)
+- conversation_scripts/ — 6 reference demo conversation scripts
 
 ---
 
 ## 🔴 MOST IMPORTANT RULE — READ THIS FIRST
 
-**This is NOT a static mock build. This is a FUNCTIONAL rebuild.**
+**This is NOT a static mock build. This is NOT a simple UI skin on existing Supabase tables.**
 
-Every view must wire to real backend data. You are NOT building pretty HTML pages with sample text. You are rebuilding the UI of an already-working app, reusing all existing backend logic, data models, API routes, and business logic.
+This is a FUNCTIONAL rebuild with TWO backend layers you must wire together:
 
-- The app already works. Chat works. Lenses work. Milestones work. Documents work. Booking works.
-- Your job: rebuild the UI shell to match the v3.5 mockups, while keeping all existing functionality intact.
-- Mock data is allowed ONLY as a temporary scaffold during development. It must be removed before the PR.
-- PR with hardcoded mock data = rejected.
+**Layer 1 — NEXUS Engine (the brain):**
+- Python engine in nexus-engine/ directory
+- Handles all chat intelligence: 5-layer prompt stack, pattern retrieval, scenario routing, lens scoring, memory
+- Uses DeepSeek API (DEEPSEEK_API_KEY env var)
+- Pattern knowledge base (JSON) and system prompts live here — NOT in Supabase
+- Communicates via API endpoints you will build (Next.js route handlers that call the Python engine)
 
-**Before writing any component, explore the codebase.** Understand:
-- How auth works
-- Where conversations/messages are stored and fetched
-- How lenses/diagnostics work and where scores come from
-- How milestones are modeled
-- Where user profile and settings live
-- How documents are generated and listed
-- How booking/scheduling works
-- What API routes exist
+**Layer 2 — Supabase (per-user state):**
+- Auth, conversations, messages, user profile, settings, documents, bookings
+- User-scoped with RLS (users only see their own data)
+- Same Supabase instance as DEX products — strict RLS separation between products
 
-Then rebuild the UI on top of that existing foundation.
+**Your job:** Build the v3.5 UI and wire it so that:
+1. Chat messages go through the NEXUS Engine (Python), not a simple Supabase/OpenAI passthrough
+2. Lens scores come from the NEXUS Lens Memory Engine, not hardcoded values
+3. User-specific state (conversations, profile, settings, docs, bookings) still lives in Supabase
+4. Pattern knowledge and prompt logic NEVER enters Supabase tables — it stays in the Python engine
+
+**Mock data is allowed ONLY as a temporary scaffold during development. It must be removed before the PR.**
+**PR with hardcoded mock data = rejected.**
+**PR that bypasses the NEXUS Engine and wires chat directly to LLM = rejected.**
+
+**Before writing any component, explore:**
+- The existing Next.js app structure, auth flow, and Supabase schema
+- nexus-engine/ — read nexus_llm_engine.py, nexus_engine.py, nexus_lens_memory_engine.py
+- The system prompts in nexus-engine/system_prompts/ — understand the 5-layer stack
+- patterns_v1.0.json — understand the pattern data structure
+
+Then build on top of both foundations.
 
 ---
 
 ## WHAT TO BUILD
 
-Full redesign of the NEXUS app shell to v3.5 design system, with full backend integration.
+Full redesign of the NEXUS app shell to v3.5 design system, with nexus-engine integration.
 
 **5 view groups to rebuild (all functional):**
 1. V1: App Shell — sidebar nav + topbar + page layout
-2. V2: Chat — real conversation list + real message thread + real streaming composer
-3. V3: Lenses Library — 11 lenses with real scores + real tier gating from subscription
+2. V2: Chat — conversation list (Supabase) + message thread + composer (both via NEXUS Engine)
+3. V3: Lenses Library — 11 lenses with scores from NEXUS Lens Memory Engine + tier gating from Supabase
 4. V4: Milestones / Profile / Settings — real milestone data + real user profile + real persistent settings
 5. V5: Documents + Booking — real document list + real calendar availability + real booking creation
 
 **1 shared component library** used across all views (buttons, badges, toggles, selects, score bars, modals, empty states, loading skeletons, etc.)
+
+**New: NEXUS Engine API layer** — Next.js route handlers that bridge the frontend to the Python engine
+
+---
+
+## ARCHITECTURE OVERVIEW
+
+```
+Frontend (Next.js App Router, v3.5 UI)
+    │
+    ├── Chat messages ──► /api/nexus/chat (stream) ──► NEXUS Engine (Python) ──► DeepSeek API
+    │                                                ├─ 5-layer prompt stack
+    │                                                ├─ Pattern retrieval
+    │                                                ├─ Scenario routing
+    │                                                └─ Lens memory update
+    │
+    ├── Lens scores ─────► /api/nexus/lenses ───────► NEXUS Lens Memory Engine
+    │
+    ├── Conversations ───► Supabase (conversations table, user-scoped)
+    ├── Profile/Settings ─► Supabase (users table, settings table)
+    ├── Documents ───────► Supabase (documents table)
+    └── Booking ─────────► Supabase (bookings table) + calendar provider
+```
+
+The NEXUS Engine is the intelligence layer. Supabase is the user state layer. Both must work together.
 
 ---
 
@@ -72,41 +117,87 @@ Full redesign of the NEXUS app shell to v3.5 design system, with full backend in
 
 ## BACKEND INTEGRATION — PER VIEW
 
-**Chat:**
-- Wire to existing Supabase conversations + messages tables
-- Use existing streaming chat endpoint (find it — could be /api/chat, edge function, or worker)
-- Conversation list = real user conversations, sorted by recent
-- Message thread = real messages for active conversation
-- Composer = real streaming, not fake typing
-- Preserve ALL existing agent orchestration, memory, context system, tools — only change the UI
+### Chat (most complex — read carefully)
 
-**Lenses:**
-- Use existing diagnostic/assessment system
-- Scores = real computed scores from user's diagnostic data
-- Tier gating = read from user's actual subscription tier
-- Unlocked/locked computed from real tier, not hardcoded
-- Insight text comes from real lens readout generation
-- 11 lens definitions (code, name, suite, description) can be config — but everything dynamic must be real
+**Do NOT wire chat directly to an LLM API. Chat must go through the NEXUS Engine.**
 
-**Milestones:**
-- Use existing milestones/goals data model
+Build API routes that call the NEXUS Python engine:
+- `POST /api/nexus/chat` — send a message, stream back NEXUS response
+- The engine assembles the full 5-layer prompt stack (core identity → quality system → retrieved patterns → scenario controller → turn engine)
+- Pattern retrieval happens automatically based on user input + conversation context
+- Scenario routing classifies the conversation type
+- After each turn, the lens memory engine updates lens scores
+
+**Supabase side:**
+- Conversation list from Supabase conversations table (user-scoped via RLS)
+- Messages saved to Supabase messages table for persistence
+- First message in a conversation triggers scenario classification by the engine
+
+**What to preserve from the engine:**
+- The 5-layer prompt architecture — do NOT flatten or simplify
+- Pattern retrieval from pattern_db/patterns_v1.0.json
+- Scenario routing logic
+- Lens memory / scoring updates after each turn
+- Quality gate checks
+
+### Lenses
+
+- Lens scores computed by NEXUS Lens Memory Engine (nexus_lens_memory_engine.py)
+- 11 lenses across 2 suites — definitions from engine, scores from engine based on conversation history
+- Tier gating from Supabase subscription tier
+- Insight text generated by engine, not hardcoded
+- Active/locked state from real tier + real data availability
+
+### Milestones
+
+- Use existing milestones/goals data model in Supabase
 - Status, progress, target dates = real data
 - Click through to existing milestone detail if applicable
 
-**Profile & Settings:**
+### Profile & Settings
+
 - Profile from users table (name, email, company, role, tier, etc.)
 - Settings = real preferences that persist on change
 - Find existing settings schema and use it
 
-**Documents:**
-- Document list from real documents/reports table
+### Documents
+
+- Document list from real documents/reports table in Supabase
 - Status reflects real generation state
 - Click = navigate to real document readout page
 
-**Booking:**
+### Booking
+
 - Session types mapped to real session products
 - Calendar + time slots = real availability
 - Confirm bar = creates real booking record
+
+---
+
+## NEXUS ENGINE INTEGRATION NOTES
+
+The Python engine is in `nexus-engine/`. Key integration points:
+
+**nexus_llm_engine.py — NexusLLMEngine class:**
+- Takes DEEPSEEK_API_KEY env var
+- `chat(user_message, conversation_history, scenario_id, persona)` — full turn
+- 5-layer prompt assembly at runtime (not a single static system prompt)
+- Pattern retrieval is part of the pipeline
+
+**nexus_engine.py — PatternRetriever + ScenarioRouter:**
+- Keyword-based pattern retrieval from patterns_v1.0.json
+- Scenario classification
+
+**nexus_lens_memory_engine.py — LensMemoryEngine:**
+- Tracks 11 lens scores per user
+- Updates scores based on conversation content
+- Generates lens insights
+
+**How to call from Next.js:**
+- Options: (a) Python subprocess per request, (b) Vercel Function running Python, (c) separate microservice
+- Choose the approach that works best with Vercel deployment
+- Streaming is required — chat responses must stream token-by-token, not return full response at once
+- DEEPSEEK_API_KEY comes from environment variables (server-side only, never expose to client)
 
 ---
 
@@ -127,7 +218,7 @@ Full redesign of the NEXUS app shell to v3.5 design system, with full backend in
 - SPARK — AI Readiness (locked on Pro)
 - IMPACT — Stakeholder Influence (locked on Pro)
 
-Tier gating must be wired to the user's actual subscription tier.
+Tier gating wired from real subscription tier. Lens scores wired from real engine output.
 
 ---
 
@@ -137,29 +228,35 @@ Tier gating must be wired to the user's actual subscription tier.
 - Extend Tailwind config with v3.5 custom tokens (match CSS vars in mockups)
 - Shared components in src/components/app/ui/ and src/components/app/shell/
 - Pages in src/app/nexus/ (chat, lenses, milestones, profile, settings, documents, booking)
-- **Reuse existing backend endpoints, data models, auth, middleware** — this is a UI rebuild, not a backend rebuild
+- NEXUS Engine API routes in src/app/api/nexus/
 - Server Components for data fetching, Client Components for interactivity
 - Loading skeletons + error states + empty states for every data-fetching view
 - Desktop-first (1280px+). Mobile responsive is NOT in scope for this pass.
 - Semantic HTML, keyboard accessible, WCAG AA contrast
+- Environment variables: DEEPSEEK_API_KEY (server only) + existing Supabase vars
 
 ---
 
 ## ACCEPTANCE CRITERIA
 
-**Functional (must pass):**
+**Functional — NEXUS Engine (hard requirements):**
+- [ ] Chat goes through NEXUS Engine (5-layer prompt stack + pattern retrieval + scenario routing), NOT direct LLM call
+- [ ] Chat streams token-by-token from engine through API route
+- [ ] Lens scores come from NEXUS Lens Memory Engine, not hardcoded
+- [ ] Pattern knowledge base (patterns_v1.0.json) is used by the engine, not copied to Supabase
+- [ ] System prompts (6 files) are loaded by the engine at runtime, not inlined in frontend code
+- [ ] DEEPSEEK_API_KEY is server-side only (never exposed to client bundle)
+
+**Functional — Supabase / per-user state:**
 - [ ] No hardcoded mock data anywhere in production code at PR time
-- [ ] Chat streams real messages through real endpoint
-- [ ] Lenses show real scores from real diagnostic data
+- [ ] Conversations and messages persist to Supabase (user-scoped via RLS)
 - [ ] Tier gating works based on user's actual subscription tier
 - [ ] Milestones data comes from real data source
 - [ ] Profile data comes from users table
 - [ ] Settings persist on change (write to DB)
 - [ ] Documents list from real documents table
 - [ ] Booking uses real availability and creates real records
-- [ ] Loading states show during data fetch
-- [ ] Error states handle failed fetches gracefully
-- [ ] Empty states show when user has no data yet
+- [ ] Loading / error / empty states all work for every view
 
 **Visual (must pass):**
 - [ ] Sidebar: dark bg, NEXUS. wordmark with fuchsia dot, nav items with active state (ocean-50 bg + left border)
@@ -179,14 +276,15 @@ Tier gating must be wired to the user's actual subscription tier.
 
 ## WORKFLOW
 
-1. **Explore first** — map the existing codebase: auth, data models, API routes, existing components
+1. **Explore first** — map both codebases: existing Next.js app (auth, data, routes) AND nexus-engine/ (LLM engine, patterns, lens memory)
 2. Design tokens + shared UI components (buttons, badges, toggles, score bar, etc.)
 3. App shell layout (sidebar + topbar + page structure), wired to auth/user context
-4. Lenses library (most visible, most complex card pattern), wired to diagnostic data
-5. Milestones / Profile / Settings (secondary nav + 3 views), wired to user data
-6. Documents + Booking (list pattern + calendar/slot patterns), wired to docs/booking backend
-7. Chat interface (most complex interaction), wired to real streaming endpoint
+4. **NEXUS Engine API layer** — build the /api/nexus/ routes that call the Python engine
+5. Lenses library (most visible card pattern), wired to lens memory engine
+6. Chat interface (most complex interaction), wired through engine API with streaming
+7. Milestones / Profile / Settings (secondary nav + 3 views), wired to Supabase
+8. Documents + Booking (list pattern + calendar/slot patterns), wired to Supabase
 
 Commit and push after each major section is complete. Create a single PR for the full V-App rebuild. Tag me when ready for review.
 
-**Ground truth = the HTML mockups for visuals + existing codebase for data. Read both. Match both. Don't improvise.**
+**Ground truth = HTML mockups for visuals + nexus-engine/ for brain logic + existing Supabase for user state. Read all three. Match all three. Don't improvise.**
