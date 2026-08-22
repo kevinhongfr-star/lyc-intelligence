@@ -1,21 +1,22 @@
-V-APP v3.5 — Corrective Batch: NEXUS Engine Integration
+V-APP v3.5 — Corrective Batch: NEXUS Engine Integration (System Prompt v2.2)
 
 **Branch to fix:** v3.5-app-shell
 **Current state:** Visual shell + Supabase wiring complete. NEXUS Engine NOT wired in.
 **Priority:** 🔴 P0 — chat is still on the legacy Coze endpoint
+**System prompt ground truth:** `nexus-engine/nexus_llm_system_prompt_v2.2.txt`
 
 ---
 
 ## 🔴 WHAT'S BROKEN (AUDIT FINDINGS)
 
-The V-App visual rebuild is solid. Design system is clean, all views wire to real backend data, zero mock data. But the chat is still using the old `/api/chat` endpoint (Coze-based). The NEXUS Engine v1.5 Python code is in `nexus-engine/` but NOT actually powering anything.
+The V-App visual rebuild is solid. Design system is clean, all views wire to real backend data, zero mock data. But the chat is still using the old `/api/chat` endpoint (Coze-based). The NEXUS Engine v1.5 Python code + v2.2 system prompt are in `nexus-engine/` but NOT actually powering anything.
 
 **P0 failures:**
 1. Chat routes to old Coze endpoint, not the NEXUS Engine
-2. No 6-layer prompt stack (persona → core → quality → pattern → scenario → turn engine)
+2. v2.2 system prompt is not being used as the chat system prompt
 3. No 3-lane detection (Leadership Advisory / Career Architecture / Search Operations)
 4. No Python engine service layer or API route
-5. Voice reference v1.0 not enforced in chat output
+5. No onboarding / trust stages / lens suggestion logic active
 
 **P1 failures:**
 6. Settings page — notification toggles and consultant hide toggle are UI-only, not all persisting to DB
@@ -25,31 +26,39 @@ The V-App visual rebuild is solid. Design system is clean, all views wire to rea
 
 ## WHAT TO FIX
 
-### Fix 1: Wire chat to NEXUS Engine (P0)
+### Fix 1: Wire chat to NEXUS Engine with v2.2 system prompt (P0)
 
 Create a new API route `app/api/nexus-chat/route.ts` that:
 - Accepts: message, conversation_id, user_id, history
 - Calls the Python NEXUS Engine (from `nexus-engine/`) to generate the response
+- Uses `nexus-engine/nexus_llm_system_prompt_v2.2.txt` as the master system prompt
 - Saves messages to Supabase (same conversations/messages schema — preserve existing data model)
 - Returns the streamed response
 
 The Python engine is in `nexus-engine/`. Read `nexus-engine/nexus_llm_engine.py` and `nexus-engine/nexus_engine.py` to understand how to call it.
 
-**Engine architecture (must NOT flatten):**
-- Layer 0: Persona Constitution (00_persona_master_v1.1.md) — 7 dimensions × 3 lanes
-- Layer 1: Core Identity (01_core_master_prompt_v2.0.md) — lane-activated
-- Layer 2: Quality System (02_quality_system_prompt_v1.0.md)
-- Layer 3: Pattern Context (03_pattern_context_spec_v1.0.md) — pattern retrieval from 164-pattern library
-- Layer 4: Scenario Control (scenario routing based on lane + conversation context)
-- Layer 5: Turn Engine (05_turn_engine_prompt_v1.0.md)
+**v2.2 system prompt IS the ground truth.** Don't rewrite it. Don't compress it. Load it whole. It contains:
+- VOICE section (cool incisive, FT register, DOs/DON'Ts, temperature dial)
+- CORE WORLDVIEW + 3 lanes (Leadership Advisory / Career Architecture / Search Operations)
+- ONBOARDING — first session rules (3 entry vectors, no self-introduction, no warm-up)
+- PERSONA MODES (5 × 3 lanes = 15 configurations)
+- INTELLECTUAL CANON (3-tier: core / secondary / lane-specific deep)
+- BLIND SPOTS + EMOTIONAL BOUNDARIES + GRAVITAS
+- SESSION RESUME — return session rules (memory discipline, closing protocol)
+- 12-GATE QUALITY SYSTEM (G1-Specificity → G12-Brand Voice hard gate)
+- TURN ENGINE — ASSESS → ACTIVATE → SHAPE → VOICE CHECK → QUALITY CHECK
+- LENS SUGGESTION LOGIC — 11 lenses, 7/10 signal threshold, earned not announced
+- TRUST STAGES — 4 phases (Introductory / Working / Deep / Partner) with tiered recommendations
+- KNOWLEDGE BASE — 164+ pattern library
 
-**3 vertical intelligence layers:**
-- U0: User Intelligence (08_user_intelligence_model_v1.0.md) — profile, memory, milestones
-- L0: Lens Intelligence (07_lens_identification_system_v1.0.md) — pattern-to-lens mapping
-- R1: Recommendation Engine (09_recommendation_engine_v1.0.md) — trust-aligned recs
+**Additionally, the engine must load and inject at runtime:**
+- Pattern library for retrieval (`nexus-engine/pattern_db/patterns_v1.0.json` or consolidated v3.1)
+- User intelligence layer (profile, milestones, memory — read from Supabase)
+- Lens intelligence layer (pattern-to-lens mapping)
+- Recommendation engine (trust-stage-aligned recommendations)
 
-**PR that flattens the 6-layer prompt stack into a single system prompt = REJECTED.**
-Each layer must remain a distinct injection point. The engine must compose them at runtime.
+**PR that flattens the v2.2 system prompt into fewer sections or rewrites it = REJECTED.**
+The v2.2 prompt is the product. Use it as-is. Only add runtime context injection (patterns, user data, lens state, trust stage) around it.
 
 ---
 
@@ -73,33 +82,28 @@ Lane activates the corresponding variant in:
 - Core Identity (lane-specific behavioral configuration)
 - Pattern retrieval priority (lane-relevant patterns surface first)
 - Voice calibration (subtle lane-specific temperature adjustments)
+- Deep canon activation (lane-specific intellectual canon tier 3)
 
 **China is the deepest evidence base, NOT the default frame.** Activated by Lane 3 detection + user context, not baked into the base persona.
 
 ---
 
-### Fix 3: Voice Reference Enforcement (P1)
+### Fix 3: Lens Suggestion Logic (P1)
 
-The NEXUS Engine chat output must conform to the Voice Reference v1.0 spec.
+From v2.2 system prompt:
+- 11 lenses total (CPI flagship + LEAP, COACH, PRISM, IMPACT, QUEST, BRIDGE, MOSAIC, DRIVE, SPARK, FORGE)
+- Lenses are earned, not announced
+- Signal threshold: 7/10 before a lens becomes suggestible
+- Only suggest when conversation naturally opens to it
+- If user says no, drop completely — no follow-up
 
-File: `nexus-engine/voice_reference_v1.0.md`
+Trust stages gate lens access:
+- Introductory (0-1 sessions): only complimentary lenses (LEAP, PRISM)
+- Working (2-4 sessions + 1 lens): all standard lenses
+- Deep (5+ sessions + 3 lenses): signature lenses
+- Partner (ongoing + ROI): team + enterprise
 
-**Hard voice rules:**
-- Register: FT op-ed / Economist opinion, NOT coaching blog
-- Temperature: cool incisive (level 2 on 1-5 scale), NOT warm supportive
-- No validation preambles: no "thank you for sharing," "that takes courage," "I can understand"
-- No therapy language: no "how does that make you feel," "safe space," "holding space"
-- No coach-template phrases: no "let's explore that," "would you like to go deeper," "how does that land"
-- No hedging: no "I wonder if," "it could be that," "you might want to" — state it directly
-- No bullet points or numbered lists — paragraphs only
-- No warm sign-offs: no "you've got this," "I'm here for you"
-- No summaries: no "to summarize what we've covered" — synthesize, don't recap
-- One question per turn maximum. Never three.
-- Short paragraphs (1-3 sentences), white space between them
-- Lead with observation, then ask
-- Name patterns directly, don't soften them
-
-The voice reference should be injected as part of the Quality System layer (Layer 2) or as a quality gate on output. Either way — output that violates these rules fails.
+This logic must be implemented in the engine, not as UI chrome. The user never sees signal scores or trust stage numbers.
 
 ---
 
@@ -137,16 +141,17 @@ The Python engine is in `nexus-engine/`. Key files:
 - `nexus_engine.py` — Pattern retriever + scenario router
 - `nexus_lens_memory_engine.py` — Lens scoring + memory
 - `nexus_demo_server.py` — Reference HTTP server (see how it calls the engine)
-- `system_prompts/` — All 9 prompt files (L0-L5 + 3 vertical)
+- `nexus_llm_system_prompt_v2.2.txt` — MASTER SYSTEM PROMPT (use this as-is)
+- `system_prompts/` — Individual layer files (reference only, v2.2 consolidates them)
 - `pattern_db/patterns_v1.0.json` — Pattern DB (JSON for retrieval)
 - `nexus_pattern_library_consolidated_v3.1.md` — 164 patterns (reference)
 
 **Integration approach:**
-Deploy as a Python Vercel Function or Edge Function that wraps the engine.
+Deploy as a Python Vercel Function that wraps the engine.
 The Next.js app calls `/api/nexus-chat` → Python function → DeepSeek API → streams back.
 
 Message persistence (Supabase conversations/messages) stays the same.
-Only the response generation changes — from old Coze endpoint to NEXUS Engine.
+Only the response generation changes — from old Coze endpoint to NEXUS Engine with v2.2 prompt.
 
 If Python Vercel Functions are problematic, wrap the engine in a simple HTTP service (see `nexus_demo_server.py` as reference) and deploy it separately. But prefer keeping it in the same repo as a server function.
 
@@ -155,21 +160,26 @@ If Python Vercel Functions are problematic, wrap the engine in a simple HTTP ser
 ## ACCEPTANCE CRITERIA — CORRECTIVE BATCH
 
 **P0 (must pass):**
+- [ ] Chat uses v2.2 system prompt as master prompt (loaded from file, not re-written)
 - [ ] Chat response generation uses NEXUS Engine Python code, NOT old /api/chat Coze endpoint
-- [ ] 6-layer prompt stack is composed at runtime as distinct layers — NOT flattened into one prompt
 - [ ] 3-lane detection works automatically from first message
 - [ ] Lane never shown in UI — fully internal
 - [ ] Pattern retrieval from pattern DB is active during chat
-- [ ] Lens intelligence layer maps conversation patterns to lens insights
-- [ ] User intelligence layer incorporates profile/milestones/memory context
+- [ ] Lens suggestion logic: 7/10 threshold, earned, never pushed
+- [ ] Trust stages gate lens access correctly
+- [ ] Session resume works — references prior context naturally, no admin recaps
+- [ ] Onboarding: first message has zero self-introduction, zero warm-up
 - [ ] DeepSeek API is the LLM backend (not OpenAI, not Coze)
 - [ ] All messages still persist to Supabase conversations/messages tables
 - [ ] Chat streaming works with the new engine
 
 **P1 (must pass):**
-- [ ] Voice reference v1.0 rules enforced in chat output
+- [ ] 12-gate quality system enforced (especially G12 brand voice)
 - [ ] All settings on Settings page persist to DB
 - [ ] Booking creates real records
+- [ ] Voice: cool incisive, FT register, no validation preambles, one question max per turn
+- [ ] No bullet points / lists in chat output
+- [ ] No hedging language ("I think," "maybe," "you might want to")
 
 **Design / regression:**
 - [ ] Zero regression on visual design (v3.5 tokens, zero radius, no shadows)
@@ -180,17 +190,17 @@ If Python Vercel Functions are problematic, wrap the engine in a simple HTTP ser
 
 ## WORKFLOW
 
-1. Read `nexus-engine/nexus_llm_engine.py` + `nexus_engine.py` + `nexus_demo_server.py` — understand the engine interface
-2. Create Python server function that wraps the engine (or API route that calls it)
-3. Create `/api/nexus-chat` route in Next.js that calls the engine
-4. Update ChatPageV3 to use the new endpoint instead of `sendChatMessage` from `services/coze.ts`
-5. Implement lane detection in the engine (read first message, classify into 1 of 3 lanes)
-6. Wire the 6-layer prompt stack + 3 vertical layers properly
-7. Inject voice reference as quality gate
+1. Read `nexus-engine/nexus_llm_system_prompt_v2.2.txt` — this IS the product. Understand every section.
+2. Read `nexus-engine/nexus_llm_engine.py` + `nexus_engine.py` + `nexus_demo_server.py` — understand the engine interface
+3. Create Python server function that wraps the engine (or API route that calls it)
+4. Create `/api/nexus-chat` route in Next.js that calls the engine
+5. Update ChatPageV3 to use the new endpoint instead of `sendChatMessage` from `services/coze.ts`
+6. Implement lane detection in the engine (read first message, classify into 1 of 3 lanes)
+7. Wire pattern retrieval + lens suggestion logic + trust stages + session resume
 8. Fix settings persistence
 9. Verify booking
-10. Test end-to-end: send a message → engine responds → message saved to DB → lane detected
+10. Test end-to-end: send a message → engine responds with v2.2 voice → message saved to DB → lane detected → lens signal accumulates
 
 Commit and push after each major fix. Update existing PR or create new one. Tag me when ready.
 
-**Ground truth = nexus-engine/ directory for brain logic + HTML mockups for visuals. Read both. Match both. Don't improvise.**
+**Ground truth = nexus_llm_system_prompt_v2.2.txt for behavior + nexus-engine/ for runtime logic + HTML mockups for visuals. Read all three. Match all three. Don't improvise.**
